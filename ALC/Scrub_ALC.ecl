@@ -39,12 +39,23 @@ EXPORT Scrub_ALC(STRING pversion) := MODULE
 																															 ,
 																															 ,myEmail);
 
-		// All custom errors for this product have the value of 2, but only a few have the custom check.
-		critical_bad_records := #IF(datasetName IN ['ALC_ACCOUNTANTS', 'ALC_NURSES'])
-                              N.ExpandedInFile(license_no_invalid = 2)
-														#ELSE
-			                        DATASET([], RECORDOF(N.ExpandedInFile))
-														#END;
+// All custom errors for this product have the value of 2, but only a few have the custom check.
+
+
+
+
+	
+critical_bad_records := 
+#IF(datasetName IN['ALC_ACCOUNTANTS', 'ALC_NURSES'])
+	#IF(datasetName = 'ALC_ACCOUNTANTS')
+		 N.ExpandedInFile(license_no_invalid = 2)
+	#END
+	#IF(datasetName = 'ALC_NURSES')
+	   IF(Scrubs_ALC_nurses.MOD_custom_err.fn_get_tx_err_pct >= 2, N.ExpandedInFile(license_no_invalid = 2), DATASET([], RECORDOF(N.ExpandedInFile)))
+	#END	
+	#ELSE  DATASET([], RECORDOF(N.ExpandedInFile))
+#END;
+
 
     // For professionals, the custom error detection is only the first step.  The vendor says that a short
 		//   license number is not, in itself, an error, but if the license number is not unique on top of it...
@@ -54,6 +65,8 @@ EXPORT Scrub_ALC(STRING pversion) := MODULE
 														              #ELSE
 			                                      DATASET([], RECORDOF(N.ExpandedInFile))
 														              #END;
+
+
 
     #IF(datasetName = 'ALC_PROFESSIONALS')
 			custom_rec := RECORD
@@ -74,7 +87,8 @@ EXPORT Scrub_ALC(STRING pversion) := MODULE
 											OrbitReportSummary,
 											SubmitStats,
 											IF(COUNT(scrubsAlert) > 0, mailfile, OUTPUT('No ' + datasetName + ' Scrubs Alerts')),
-											IF(COUNT(critical_bad_records) > 0 OR COUNT(professional_critical_bad_records) > 0,
+
+										IF(COUNT(critical_bad_records) > 0 OR COUNT(professional_critical_bad_records) > 0,
 											   SEQUENTIAL(#IF(datasetName != 'ALC_PROFESSIONALS')
 												              OUTPUT(critical_bad_records, , '~thor_data400::error::' + pversion + '::' + datasetName, COMPRESSED, OVERWRITE);
 																		#ELSE
@@ -87,18 +101,15 @@ EXPORT Scrub_ALC(STRING pversion) := MODULE
 	ENDMACRO;
 
   EXPORT All :=
-	  SEQUENTIAL(MAC_Scrubs_Report(pversion, 'Scrubs_ALC_ACCOUNTANTS', 'In_ALC_ACCOUNTANTS',
-		                                'ALC_ACCOUNTANTS'),
-							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_DENTAL_PROFESSIONALS', 'In_ALC_DENTAL_PROFESSIONALS',
-		                                'ALC_DENTAL_PROFESSIONALS'),
-							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_INSURANCE_AGENTS', 'In_ALC_INSURANCE_AGENTS',
-							                      'ALC_INSURANCE_AGENTS'),
+	  SEQUENTIAL(
+							MAC_Scrubs_Report(pversion, 'Scrubs_ALC_ACCOUNTANTS', 'In_ALC_ACCOUNTANTS','ALC_ACCOUNTANTS'),
+							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_DENTAL_PROFESSIONALS', 'In_ALC_DENTAL_PROFESSIONALS','ALC_DENTAL_PROFESSIONALS'),
+							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_INSURANCE_AGENTS', 'In_ALC_INSURANCE_AGENTS','ALC_INSURANCE_AGENTS'),
 							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_LAWYERS', 'In_ALC_LAWYERS', 'ALC_LAWYERS'),
 							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_NURSES', 'In_ALC_NURSES', 'ALC_NURSES'),
-							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_PHARMACISTS', 'In_ALC_PHARMACISTS',
-		                                'ALC_PHARMACISTS'),
+							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_PHARMACISTS', 'In_ALC_PHARMACISTS','ALC_PHARMACISTS'),
 							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_PILOTS', 'In_ALC_PILOTS', 'ALC_PILOTS'),
-							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_PROFESSIONALS', 'In_ALC_PROFESSIONALS',
-		                                'ALC_PROFESSIONALS'));
+							 MAC_Scrubs_Report(pversion, 'Scrubs_ALC_PROFESSIONALS', 'In_ALC_PROFESSIONALS', 'ALC_PROFESSIONALS')
+							);
 
 END;
