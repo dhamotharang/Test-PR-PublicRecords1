@@ -1,4 +1,4 @@
-﻿IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, ut, std, UPI_DataBuild, 
+﻿IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, didville, ut, std, UPI_DataBuild, 
 				HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, wk_ut, workman;
 
 TrimUpper(STRING s) := FUNCTION
@@ -51,13 +51,15 @@ EXPORT Append_LexID (string pVersion, boolean pUseProd, string gcid, unsigned1 p
 #STORED('did_add_force','thor'); // remove or set to 'roxi' to put recs through roxi
 	
 		matchset := ['A','Z','P','D','S'];
-		// matchset := ['A','Z','P'];
-		did_add.MAC_Match_Flex
-			(append_these, matchset,					
-			temp_ssn,temp_dob,temp_fname, temp_mname, temp_lname,temp_suffix, 
-			prim_range, prim_name, sec_range, zip, st, home_phone, 
-			temp_lexid, {norm_base} , true, temp_lexid_score,
-			pLexidThreshold, d_did);
+
+		did_add.MAC_Match_Flex_V2			
+			(append_these, matchset,
+			temp_ssn, temp_dob, temp_fname, temp_mname, temp_lname, temp_suffix, 
+			prim_range, prim_name, sec_range, zip, st, home_phone,
+			temp_lexid, {norm_base}, true, temp_lexid_score,
+			pLexidThreshold,	d_did, false,, false,, false, 
+			predir, addr_suffix, postdir, unit_desig, city_name, zip4);			
+			
 		all_ages	:= d_did + under18;
 		
 		sort_person1	:= sort(distribute(all_ages(person_type = 1), hash(rec_number)), rec_number, local);

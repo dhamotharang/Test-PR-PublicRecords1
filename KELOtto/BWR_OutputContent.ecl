@@ -13,8 +13,8 @@ output(KELOtto.KelFiles.CustomerStats,, '~gov::otto::customerstats', overwrite);
 output(KELOtto.KelFiles.CustomerStatsPivot,, '~gov::otto::customerstats_pivot', overwrite);
 */
 
-//output(KELOtto.KelFiles.FullCluster,,'~gov::otto::fullgraph', overwrite);
-//output(KELOtto.KelFiles.EntityStats,, '~gov::otto::entitystats', overwrite);
+output(KELOtto.KelFiles.FullCluster,,'~gov::otto::fullgraph', overwrite);
+output(KELOtto.KelFiles.EntityStats,, '~gov::otto::entitystats', overwrite);
 
 
 // Association Details

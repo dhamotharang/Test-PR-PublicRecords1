@@ -1,4 +1,4 @@
-﻿import STD, lib_stringlib, Address;
+﻿import STD;
 
 export fn_isPerson(string name, $.NameStatus quality) :=
 		CASE(quality,

@@ -1,4 +1,4 @@
-﻿import tools, LocationID_xLink;
+﻿import tools, LocationID, LocationID_xLink;
 
 export key_high_risk_industries := module	
   export Key_Phone      := BIPV2_Build.HighRiskIndustries.phoneIndexDef();
@@ -25,7 +25,7 @@ export key_high_risk_industries := module
   export keygrandfather_code := keyvs_code().grandfather;
 	
 	export AddrSearchLayout := record
-		string prim_range;
+		 string prim_range;
 	  string predir;
 	  string prim_name;
 	  string postdir;
@@ -34,7 +34,7 @@ export key_high_risk_industries := module
 	  string v_city_name;
 	  string st;
 	  string zip5;
-		unsigned6 UniqueId;
+		 unsigned6 UniqueId;
 	end;
 
 	export PhoneSearchLayout := record
@@ -42,9 +42,46 @@ export key_high_risk_industries := module
 		unsigned6 UniqueId;
 	end;
 	
+	export Address_Search_Roxie(dataset(AddrSearchLayout) addrSearchDs) := function 
+
+   LocIDInput := project(addrSearchDs,
+			                      transform(LocationID.IdAppendLayouts.AppendInput, self := left, self.request_id := left.UniqueId, self := []));
+																									
+   locid_results := LocationID.IdAppendRoxie(LocIDInput);
+											 
+	  outputRec := record
+					addrSearchDs.UniqueId;
+					locid_results.locid;
+			  Key_Addr;
+			end;
+
+	  finalRec := record
+			    addrSearchDs.UniqueId;
+       locid_results.locid;
+			    Key_Code;
+			end;
+			 
+	  getSeleIds := join(locid_results, Key_Addr,
+			                   left.locid = right.locid,
+									             transform(outputRec, self.uniqueID := left.request_id, self := right, self := left)); 
+													
+	  getCodes   := join(getSeleIds, Key_Code,
+		                    left.seleid = right.seleid,
+													         transform(finalRec, self := right, self := left)); 
+       
+			return getCodes;
+	end;
+
 	export Address_Search(dataset(AddrSearchLayout) addrSearchDs) := function 
 
-   LocationID_xLink.Append(addrSearchDs
+   AddLocIDField := record
+	   addrSearchDs;
+		 unsigned6 locid := 0;
+	 end;
+	 
+	 addrSearchDs2 := project(addrSearchDs,AddLocIDField);
+	 
+   LocationID_xLink.Append(addrSearchDs2
                           ,prim_range
                           ,predir
                           ,prim_name

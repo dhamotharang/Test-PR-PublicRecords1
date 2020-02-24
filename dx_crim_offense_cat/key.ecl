@@ -5,5 +5,5 @@ payload := $.layouts.payload;
 			   
 EXPORT Key(boolean pUseProd = false) := INDEX(keyed_fields
                                                     ,payload
-                                                    ,$.names(pUseProd).key,opt);
+                                                    ,$.names(pUseProd).key);
 

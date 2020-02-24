@@ -1,4 +1,4 @@
-﻿import std, Watchdog_V2, dx_BestRecords;
+﻿import std, dx_BestRecords;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout); 
 
@@ -84,12 +84,11 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.POBoxFlag;
 
 shared relationship_key_qa           := Relationship.key_relatives_v3;
-shared dWatchdogUniversalKey         := dx_BestRecords.key_watchdog();
-shared relationship_Marketing_Filter := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0;
-shared relationship_D2C_Filter       := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered > 0;
+shared relationship_Marketing_Filter := dx_BestRecords.Constants.PERM_TYPE.marketing;
+shared relationship_D2C_Filter       := dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered;
 shared DID_ds_dist                   := distribute(DID_ds,hash(did));
 
-shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key_qa r) := TRANSFORM
+shared layout_GetRelationship.interfaceOutputNeutral xform(relationship_key_qa r) := TRANSFORM
   self.title_type  := MAP(r.title between 1 and 43 => 'R',
                           r.title = 44             => 'A',
                           r.title = 45             => 'N',
@@ -119,25 +118,36 @@ shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationshi
 END;
 
 doJoin(relKey, joinOptions) := functionmacro
-  out := join(DID_ds, relKey, keyed(left.did=right.did1), xform(left,right),#EXPAND(joinOptions));
+  out := join(DID_ds, relKey, keyed(left.did=right.did1), xform(right),#EXPAND(joinOptions));
   return out;
 endmacro;
 doJoinThor(relKey, joinOptions) := functionmacro
   relKeyJ := distribute(pull(relKey),hash(did1));
-  out := join(DID_ds_dist, relKeyJ, left.did=right.did1, xform(left,right),#EXPAND(joinOptions), local);
+  out := join(DID_ds_dist, relKeyJ, left.did=right.did1, xform(right),#EXPAND(joinOptions), local);
   return out;
 endmacro;
 
 doFilteredJoin(relFilter, joinOptions) := functionmacro
-  filteredOut := join(dWatchdogUniversalKey(relFilter), DID_ds, left.did=right.did, TRANSFORM(RIGHT));
-  out := join(filteredOut, relationship_key_qa, keyed(left.did=right.did1), xform(left,right),#EXPAND(joinOptions));
+  // Remove DID1s that need to be filtered
+  filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout); 
+  // Get DID1 & DID2 pairs
+  getDID2 := JOIN(filteredOutDID1, relationship_key_qa, keyed(left.did=right.did1), xform(right),#EXPAND(joinOptions));
+  dDID2 := PROJECT(getDID2,TRANSFORM(Layout_GetRelationship.DIDs_layout,SELF.did:=LEFT.did2));
+  // Remove DID2s that should also be filtered
+  filteredOutDID2 := dx_BestRecords.get(dDID2,did,relFilter,Layout_GetRelationship.DIDs_layout);
+  out := JOIN(filteredOutDID2, getDID2, left.did=right.did2, TRANSFORM(RIGHT));
   return out;
 endmacro;
 doFilteredJoinThor(relFilter, joinOptions) := functionmacro
-  relFilteredKeyJ := distribute(pull(dWatchdogUniversalKey)(relFilter),hash(did));
-  filteredOut := join(relFilteredKeyJ, DID_ds_dist, left.did=right.did, TRANSFORM(RIGHT), local);
+  // Remove DID1s that need to be filtered
+  filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE);
   fullFilteredKey := distribute(pull(relationship_key_qa),hash(did1));
-  out := join(filteredOut, fullFilteredKey, left.did=right.did1, xform(left,right),#EXPAND(joinOptions), local);
+  // Get DID1 & DID2 pairs
+  getDID2 := join(DISTRIBUTED(filteredOutDID1,HASH(did)), fullFilteredKey, left.did=right.did1, xform(right),#EXPAND(joinOptions), local);
+  dDID2   :=  PROJECT(getDID2,TRANSFORM(Layout_GetRelationship.DIDs_layout,SELF.did:=LEFT.did2));
+  // Remove DID2s that should also be filtered
+  filteredOutDID2 := dx_BestRecords.get(dDID2,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE);
+  out :=  JOIN(DISTRIBUTED(filteredOutDID2,HASH(did)), DISTRIBUTED(getDID2,HASH(did2)), left.did=right.did2, TRANSFORM(RIGHT),LOCAL);
   return out;
 endmacro;
 

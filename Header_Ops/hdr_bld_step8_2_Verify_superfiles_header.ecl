@@ -1,45 +1,54 @@
-﻿IMPORT header;
-#workunit('name','PersonHeader - verifysuperfiles');
+IMPORT header;
 
-output(choosen(header.verify_keys('PersonHeaderKeys')   ,1000), named('PersonHeaderKeys')   ,all);
-output(choosen(header.verify_keys('PersonHeaderKeys',true)   ,1000), named('FCRA_PersonHeaderKeys')   ,all);
-output(choosen(header.verify_keys('RelativeV3Keys')     ,1000),	named('RelativeKeys_v3')    ,all);
-output(choosen(header.verify_keys('PersonSlimsortKeys') ,1000),	named('PersonSlimsortKeys') ,all);
-output(choosen(header.verify_keys('PersonLabKeys')      ,1000),	named('PersonLabKeys')      ,all);
-output(choosen(header.Verify_XADL1_base_files           ,1000),	named('XADLfiles')          ,all);
-output(choosen(header.verify_keys('SourceKeys')         ,1000),	named('SourceKeys')         ,all);
-output(choosen(header.verify_keys('PersonAncillaryKeys'),1000),	named('PersonAncillaryKeys'),all);
-output(header.verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'));
-// fileservices.sendemail('gabriel.marcan@lexisnexis.com'
-											 // ,'PersonHeader '+Header.version_build+' keys verification'
-											 // ,'Output has been created. See:'+workunit
-											// );
-// output(header.verify_keys('PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'));
+bver := header.version_build;
+#workunit('name',bver + 'PersonHeader - verifysuperfiles');
+
+PHKeys   := header.verify_keys('PersonHeaderKeys');
+// F_PHKeys := header.verify_keys('PersonHeaderKeys',true);
+RelKeys  := header.verify_keys('RelativeV3Keys');
+PSlimKeys:= header.verify_keys('PersonSlimsortKeys');
+PLabKeys := header.verify_keys('PersonLabKeys');
+XAdlKeys := header.Verify_XADL1_base_files;
+SrcKeys  := header.verify_keys('SourceKeys');
+PAncKeys := header.verify_keys('PersonAncillaryKeys');
+BoolKeys := header.verify_keys('PowerSearchKeys',,true);
+
+output(PHKeys   ,named('PersonHeaderKeys')     ,all);
+// output(F_PHKeys ,named('FCRA_PersonHeaderKeys'),all);
+output(RelKeys  ,named('RelativeKeys_v3')      ,all);
+output(PSlimKeys,named('PersonSlimsortKeys')   ,all);
+output(PLabKeys ,named('PersonLabKeys')        ,all);
+output(XAdlKeys ,named('XADLfiles')            ,all);
+output(SrcKeys  ,named('SourceKeys')           ,all);
+output(PAncKeys ,named('PersonAncillaryKeys')  ,all);
+output(BoolKeys ,named('PowerSearchKeys')      ,all);
+
+PHWrongKeys := PHKeys(~regexfind(bver, lfn));
+if(count(PHWrongKeys) > 0, output(PHWrongKeys, named('PHWrongKeys'), all), output('ALL QA PersonHeaderKeys contains ' + bver + ' keys'));
+// F_PHWrongKeys := F_PHKeys(~regexfind(bver, lfn));
+// if(count(F_PHWrongKeys) > 0, output(F_PHWrongKeys, named('F_PHWrongKeys'), all), output('ALL QA FCRA_PersonHeaderKeys contains ' + bver + ' keys'));
+RelWrongKeys := RelKeys(~regexfind(bver, lfn));
+if(count(RelWrongKeys) > 0, output(RelWrongKeys, named('RelWrongKeys'), all), output('ALL QA RelativeKeys_v3 contains ' + bver + ' keys'));
+SlimWrongKeys := PSlimKeys(~regexfind(bver, lfn));
+if(count(SlimWrongKeys) > 0, output(SlimWrongKeys, named('SlimWrongKeys'), all), output('ALL QA PersonSlimsortKeys contains ' + bver + ' keys'));
+LabWrongKeys := PLabKeys(~regexfind(bver, lfn));
+if(count(LabWrongKeys) > 0, output(LabWrongKeys, named('LabWrongKeys'), all), output('ALL QA PersonLabKeys contains ' + bver + ' keys'));
+XadlWrongKeys := XAdlKeys(regexfind('::qa::|_qa',sfn) and ~regexfind(bver, lfn[1].name));
+if(count(XadlWrongKeys) > 0, output(XadlWrongKeys, named('XadlWrongKeys'), all), output('ALL QA XADLfiles contains ' + bver + ' keys'));
+SrcWrongKeys := SrcKeys(~regexfind(bver, lfn));
+if(count(SrcWrongKeys) > 0, output(SrcWrongKeys, named('SrcWrongKeys'), all), output('ALL QA SourceKeys contains ' + bver + ' keys'));
+AncWrongKeys := PAncKeys(~regexfind(bver, lfn));
+if(count(AncWrongKeys) > 0, output(AncWrongKeys, named('AncWrongKeys'), all), output('ALL QA PersonAncillaryKeys contains ' + bver + ' keys'));
+BoolWrongKeys := BoolKeys(~regexfind(bver, lfn));
+if(count(BoolWrongKeys) > 0, output(BoolWrongKeys, named('BoolWrongKeys'), all), output('ALL QA PowerSearchKeys contains ' + bver + ' keys'));
+
+fileservices.sendemail('debendra.kumar@lexisnexisrisk.com;gabriel.marcan@lexisnexisrisk.com'
+						,'PersonHeader '+bVer+' keys verification'
+						,'Output has been created. See:'+workunit
+						);
+
+// (run on hthor)
+
+//20191128 W20200103-133348 
 
 
-//(run on hthor)
-
-// 0626 W20180717-111732
-// 0522 W20180620-134609
-// 0320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-140712#/stub/Summary
-// 0221 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-094152#/stub/Summary 
-// 0130 W20180306-122403
-// 1121  W20180105-131659
-// 1025a W20171206-103234 
-// W20170905-235302 0725
-// W20170807-102916 0628
-// W20170724-103014 0522
-// W20170613-093624 0430
-// W20170501-153806 0321
-// W20170321-130908 0223
-// W20170222-102604 0123
-// W20170117-122405
-// W20161216-091159
-// W20161122-081541
-// W20160216-092800
-// W20160119-104633
-// W20151120-105834
-// W20151118-110349
-// W20151009-122501
-// W20150813-120406
-// W20160314-094201 - v20160223

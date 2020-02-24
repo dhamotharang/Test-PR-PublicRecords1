@@ -62,7 +62,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		superFile_processed_input_delete			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete'),
 																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete_nosave'));
 																												
-	// make sure superfiles are created - save data option	
+	// make sure superfiles are created	
 		make_frombatch					:= map(not superFile_frombatch and pHistMode = 'A'	=> FileServices.CreateSuperFile('~ushc::crk::from_batch::' + gcid),
 																	 not superFile_frombatch and pHistMode = 'N'  => FileServices.CreateSuperFile('~ushc::crk::from_batch::' + gcid + '_nosave'));
 		make_frombatch_hist			:= map(not superFile_frombatch_hist and pHistMode = 'A' => FileServices.CreateSuperFile('~ushc::crk::from_batch::' + gcid + '::history'),
@@ -120,8 +120,8 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 				make_processed_building, make_processed_built, make_processed_qa, make_processed_father, make_processed_delete);
 		return make_them;
 	end;
-	
-	export pVersion_unique	:= pVersion + '_' + trim(pBatch_jobID);
+		
+	export pVersion_unique			:= pVersion + '_' + trim(pBatch_jobID);
 	
 	export step1 := sequential(
 			check_supers
@@ -137,17 +137,24 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 			,UPI_DataBuild.Build_Base_V2.Build_temp_header(pVersion_unique,pUseProd,gcid,pHistMode,gcid_name,pBatch_jobID).temp_header_all
 			,UPI_DataBuild.Promote_V2.promote_temp_header(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
 	);
-
+	// export step2	:= output(pVersion_crk_macro(gcid, pVersion));
 	export step2	:= HealthcareNoMatchHeader_InternalLinking.MAC_AppendCRK(
 				gcid
-			 ,pVersion
+			 ,pVersion_unique
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).temp_header.built
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).asheader.built);
 			 			 
 	export step3 := sequential(
 			UPI_DataBuild.Build_Base_V2.Build_base_members(pVersion_unique,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).member_all
-			,UPI_DataBuild.Promote_V2.promote_base(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
-			
+			,if(pHistMode = 'A', UPI_DataBuild.Promote_V2.promote_base(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA,
+					sequential(
+						 fileservices.startsuperfiletransaction()
+						,fileservices.addsuperfile('~ushc::crk::base::' + gcid + '::qa_nosave',UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).member_base.new)
+						// ,fileservices.addsuperfile('~ushc::crk::base::' + gcid + '::built_nosave',UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).member_base.new)
+						,fileservices.finishsuperfiletransaction()))
+						// only promote save all base files through normal promote - nosave base files should only go to QA, and will 
+						// eventually be deleted with the nosave cleanup process
+																											
 			,UPI_DataBuild.Build_Base_V2.Build_batch_output(pVersion_unique,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).full_batch_all
 			,UPI_DataBuild.Promote_V2.promote_return_tobatch(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
 			

@@ -328,11 +328,13 @@ MODULE
 	export src_MMCP						           := '61';  // Michigan/Illinois Medicaid Custom Program
 	export src_NaturalDisaster_Readiness := 'NR';
 	export src_NeustarWireless					 := 'N2';  //Neustar Wireless Phones 
+	export src_Netwise									 := 'WQ';  //Netwise Business to Consumer file (royalty gateway) - DF-26925
 	export src_NCOA                      := 'NC';
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
-	export src_One_Click_Data            := 'OC';
+	export src_One_Click_Data            := 'OC';	
+	export src_OPM                       := '33';  // Office Of Personnel Management
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
 	export src_OutwardMedia 						 						:= 'OM';
 	export src_OKC_Student_List										:= 'O9';  //okc student list	
@@ -350,6 +352,7 @@ MODULE
 	export src_PhonesPorted_TCPA				 := 'PJ';  // Landline-to-Cellphone
 	export src_PhonesPorted_TCPA_CL			 := 'PM';	 // Cellphone-to-Landline	- DF-23525
 	export src_PhonesPorted_iConectiv		 := 'PK';
+	export src_PhonesPorted2_iConectiv	 := 'P!';
 	export src_PhonesPorted_iConectiv_Rng:= 'PU';
 	export src_POS                       := 'PO';  // Provider of Services for Organization master repositry	
 	export src_Professional_License      := 'PL';	
@@ -1113,7 +1116,7 @@ export set_Marketing_Sources           := [
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
 		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_Database_USA
-		,src_DataBridge
+		,src_DataBridge                ,src_OPM	
 		/*updated set_Marketing_Corp*/		
     ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
 		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
@@ -1139,6 +1142,7 @@ export set_Marketing_Sources           := [
     ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
     ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
     ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
+				,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -1161,8 +1165,8 @@ export set_Marketing_Restricted := [
   src_SD_Corporations,       src_TN_Corporations,        src_TN_Watercraft,          src_TX_Corporations,           src_TX_Watercraft,
   src_TXBUS,                 src_UCC,                    src_UCCV2,                  src_US_Coastguard,             src_UT_Corporations,
   src_VA_Corporations,       src_VT_Corporations,        src_WI_Corporations,        src_WI_Watercraft,             src_WV_Corporations,
-  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,           src_Bankruptcy,               src_Experian_CRDB,
-	 src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
+  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,          src_Bankruptcy,                src_Experian_CRDB,
+	src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
  ];
   
 
@@ -1339,9 +1343,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 
   // POE = Place of Employment, now known as WorkPlace Locator
 	export set_POE := [
-		 /*src_jigsaw	 ,*/							src_spoke											,src_zoom											 ,src_teletrack
-	  ,src_one_click_data						 ,src_Clarity										,src_Garnishments							 ,src_Thrive_LT
-		,src_Thrive_PD
+		 /*src_jigsaw	 ,*/							 src_Clarity									 ,src_Database_USA						 ,src_Databridge
+		,src_Garnishments								,src_Netwise									 ,src_one_click_data					 ,src_OPM
+	  ,src_spoke											,src_teletrack								 ,src_Thrive_LT								 ,src_Thrive_PD
+		,src_zoom
 	] 
 	+ set_CorpV2
 	+ set_email
@@ -1743,7 +1748,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NM_DL                     := [src_NM_DL                     ];
 	export set_NV_DL                     := [src_NV_DL                     ];
 	export set_LA_DL                     := [src_LA_DL                     ];		
-	export set_OH_DL                     := [src_OH_DL                     ];
+	export set_OH_DL                     := [src_OH_DL                     ];	
 	export set_OR_DL                     := [src_OR_DL                     ];
 	export set_TN_DL                     := [src_TN_DL                     ];
 	export set_TX_DL                     := [src_TX_DL                     ];
@@ -1892,9 +1897,11 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NCPDP                     := [src_NCPDP                     ];
 	export set_NCOA                      := [src_NCOA                      ];
 	export set_NeustarWireless					 := [src_NeustarWireless					 ];
+	export set_Netwise									 := [src_Netwise									 ];
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
+	export set_OPM                       := [src_OPM                       ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
 	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
 	export set_OKC_Probate							 :=	[src_OKC_Probate  						 ];
@@ -1909,7 +1916,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Phones_Accudata_CNAM_CNM2 := [src_Phones_Accudata_CNAM_CNM2 ];
 	export set_Phones_Lerg6							 := [src_Phones_Lerg6							 ];
 	export set_Phones_LIDB				 			 := [src_Phones_LIDB				 			 ];
-	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
+	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted2_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
 	export set_POS                       := [src_POS                       ];  			
 	export set_Professional_License      := [src_Professional_License      ];
 	export set_PSS								       := [src_PSS									     ];
@@ -2433,6 +2440,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsMMCP						            (string  sr) := sr               in set_MMCP						           ;
   export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
   export SourceIsNeustarWireless  					(string  sr) := sr               in set_NeustarWireless					   ;  //Jira DF-24336
+	export SourceIsNetwise				  					(string  sr) := sr               in set_Netwise									   ;
 	export SourceIsNCOA                       (string  sr) := sr               in set_NCOA                       ;
 	export SourceIsNCPDP                      (string  sr) := sr               in set_NCPDP                      ;
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
@@ -2441,6 +2449,7 @@ export set_NonDerog_FCRA_sources_v50 := [
   export SourceIsOKC_Probate                (string  sr) := sr               in set_OKC_Probate		             ;	
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
 	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
+	export SourceIsOPM                        (string  sr) := sr               in set_OPM                        ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
 		export SourceIsOnProbation                (string  sr) := SourceGroup(sr)  in set_Probation                ;
 	#else
@@ -2966,11 +2975,13 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NCOA                      ,'NCOA'                                                      }
 		,{src_NCPDP											,'NCPDP'																										 }
 		,{src_NeustarWireless						,'Neustar Wireless Phones'																	 }
+		,{src_Netwise										,'Netwise Business to Consumer file'												 }
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
 		,{src_OKC_Student_List          ,'OKC Student List'                                          }
+		,{src_OPM			                  ,'OPM'   		                     														 }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
 		,{src_PBSA                      ,'United States Postal Service' 			                       }	  
@@ -3487,11 +3498,13 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_NaturalDisaster_Readiness => 'NaturalDisaster Readiness'														
 		,src_NCPDP										 => 'NCPDP'							
 		,src_NeustarWireless					 => 'Neustar Wireless Phones'
+		,src_Netwise									 => 'Netwise Business to Consumer file'
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
     ,src_OKC_Probate               => 'OKC Probate' 
 		,src_OKC_Student_List					 => 'OKC Student List'
+		,src_OPM			                 => 'Office of Personnel Management'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
 		,src_PBSA	                     => 'United States Postal Service'                   		 	

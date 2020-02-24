@@ -9,22 +9,23 @@ EXPORT fn_orbit_entries(boolean isCreate, string filedate) := function
        
     return parallel(
             Orbit3.Proc_Orbit3_CreateBuild('Show Sources', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            // - Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('FCRA_AddressRawAIDKeys', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);            
             Orbit3.Proc_Orbit3_CreateBuild('Header', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             Orbit3.Proc_Orbit3_CreateBuild('RelativesV3', filedate, 'N',skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             Orbit3.Proc_Orbit3_CreateBuild('personAncillarykeys', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             Orbit3.Proc_Orbit3_CreateBuild('Slimsorts', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('PowerSearchBoolean', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('PowerSearchBoolean', filedate, 'B', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             Orbit3.Proc_Orbit3_CreateBuild('Remote Linking', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            // - Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
             if(is_hash_month, Orbit3.Proc_Orbit3_CreateBuild('Header Hashes', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
             );
 end;
 
-filedate := '20190324'; // RUN ON HTHOR
+filedate := '20191226'; // RUN ON HTHOR
 
-fn_orbit_entries(true, filedate);
+// fn_orbit_entries(true, filedate);
 fn_orbit_entries(false, filedate);
 
 
@@ -36,6 +37,9 @@ version
 create entries
 update for QA
 
+20191226 W20200128-102242 - create
+20191128 W20200103-135944 - create
+20191128 W20200103-140359 - update
 20190422 W20190424-145840 - create
 20190324 W20190424-092000 - update
 20181224 W20190109-101007(create)

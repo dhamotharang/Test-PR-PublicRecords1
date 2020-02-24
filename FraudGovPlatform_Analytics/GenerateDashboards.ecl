@@ -1,4 +1,4 @@
-EXPORT GenerateDashboards(
+﻿EXPORT GenerateDashboards(
 	BOOLEAN runProd = FALSE,			//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
 	BOOLEAN useProdData = FALSE,	//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
 	BOOLEAN newVersion = FALSE,		//set to FALSE it will create the new indexes but not automatically update the existing dashboard service to use them
@@ -8,7 +8,7 @@ EXPORT GenerateDashboards(
 	
 	IMPORT FraudGovPlatform_Analytics, STD,_control , FraudGovPlatform;
 	
-	ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_44');
+	ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_36');
 
 	//Currently we need to run this in thor in order to create the log file
 	//In the future we will be wrapping the HTTPCALL in a NOTHOR action because we don't want to 

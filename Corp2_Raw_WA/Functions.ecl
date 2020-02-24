@@ -1,4 +1,4 @@
-﻿IMPORT corp2_raw_ia, corp2;
+﻿IMPORT corp2_raw_ia, corp2,ut;
  
 EXPORT FUNCTIONs := Module
   	
@@ -22,7 +22,17 @@ EXPORT FUNCTIONs := Module
 																	'APPLICABLE','DIRECTORS ON FILE','MORE ON FILE','VACANT']
 						,'' ,corp2.t2u(LName));
 
-
+  //********************************************************************
+	//Phone_No: cleans phone numbers and Returns a hyphenated 7 or 10 digit number 
+	//********************************************************************	
+	EXPORT PhoneNo(STRING Phone) := FUNCTION
+      ph             := stringlib.stringfilterout(phone,')( - ');
+			phone_number   := (INTEGER)ut.CleanPhone(ph); // we have first 3 digits are zeros in phones EX:0003456789 ,0000000000
+			cln_phone_nmbr := if(phone_number <> 0, (string) phone_number, '');
+			RETURN cln_phone_nmbr;
+				
+	END;
+		
   EXPORT GetOrgStrucDesc(string code, string typ)
 	    := map( corp2.t2u(code) = '3LP'  =>  'LIMITED LIABILITY LIMITED PARTNERSHIP',
 							corp2.t2u(code) = 'AUT'  =>  'JOINT MUNICIPAL UTILITY SERVICE',
@@ -63,10 +73,12 @@ EXPORT FUNCTIONs := Module
 								'ACTIVE PENDING'  					 => 'ACTIVE PENDING',
 								'ADMINISTRATIVELY DISSOLVED' => 'ADMINISTRATIVELY DISSOLVED',
 								'CONVERTED'  								 => 'CONVERTED',
+								'CONSOLIDATED'               => 'CONSOLIDATED',
 								'DELINQUENT'  							 => 'DELINQUENT',
 								'DISSOLVED'  								 => 'DISSOLVED',
 								'DUPED UBI'  								 => 'DUPED UBI',
 								'INACTIVE'  								 => 'INACTIVE',
+								'JUDICIALLY DISSOLVED'       => 'JUDICIALLY DISSOLVED',
 								'MERGED'  									 => 'MERGED',
 								'TERMINATED'  						 	 => 'TERMINATED',
 								'VOLUNTARILY DISSOLVED'  	   => 'VOLUNTARILY DISSOLVED',
@@ -649,8 +661,6 @@ EXPORT FUNCTIONs := Module
 									  'SPAIN' 								                       => 'ESP',
 									  'LKA' 								                         => 'LKA',
 									  'SRI LANKA' 								                   => 'LKA',
-									  'SHN' 								                         => 'SHN',
-									  'ST. HELENA' 								                   => 'SHN',
 									  'SDN' 								                         => 'SDN',
 									  'SUDAN' 								                       => 'SDN',
 									  'SUR' 								                         => 'SUR',
@@ -1430,4 +1440,118 @@ EXPORT FUNCTIONs := Module
 										'FOREIGN' 							=> '',
 										'**|' + corp2.t2u(code));
 
+		EXPORT GetEventType(string desc)
+								:= case(corp2.t2u(desc),
+										'ADMINISTRATIVE DISSOLUTION'	                                              => 'ADMINISTRATIVE DISSOLUTION',
+										'AMENDED AND RESTATED ARTICLES OF INCORPORATION'	                          => 'AMENDED AND RESTATED ARTICLES OF INCORPORATION',
+										'AMENDED AND RESTATED CERTIFICATE OF FORMATION'	                            => 'AMENDED AND RESTATED CERTIFICATE OF FORMATION',
+										'AMENDED CERTIFICATE OF FORMATION'	                                        => 'AMENDED CERTIFICATE OF FORMATION',
+										'AMENDED CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP'	            => 'AMENDED CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP',
+										'AMENDED CERTIFICATE OF LIMITED LIABILITY PARTNERSHIP'	                    => 'AMENDED CERTIFICATE OF LIMITED LIABILITY PARTNERSHIP',
+										'AMENDED CERTIFICATE OF LIMITED PARTNERSHIP'	                              => 'AMENDED CERTIFICATE OF LIMITED PARTNERSHIP',
+										'AMENDED CERTIFICATE OF PROF LIMITED LIABILITY PARTNERSHIP'	                => 'AMENDED CERTIFICATE OF PROF LIMITED LIABILITY PARTNERSHIP',
+										'AMENDMENT OF FOREIGN REGISTRATION STATEMENT'	                              => 'AMENDMENT OF FOREIGN REGISTRATION STATEMENT',
+										'AMENDMENT'	                                                                => 'AMENDMENT',
+										'APOSTILLE'	                                                                => 'APOSTILLE',
+										'APPLICATION'	                                                              => 'APPLICATION',
+										'APPLICATION FOR STATUS AS A PUBLIC BENEFIT'	                              => 'APPLICATION FOR STATUS AS A PUBLIC BENEFIT',
+										'ARAD'	                                                                    => 'ADMINISTRATIVE DISSOLUTION',
+										'ARADFOREIGN'	                                                              => 'STATEMENT OF TERMINATION', 
+										'ARTICLES OF AMENDMENT'	                                                    => 'ARTICLES OF AMENDMENT',
+										'ARTICLES OF DISSOLUTION'	                                                  => 'ARTICLES OF DISSOLUTION',
+										'ARTICLES OF INCORPORATION'	                                                => 'ARTICLES OF INCORPORATION',
+										'ARTICLES OF INCORPORATION WITH INITIAL REPORT'	                            => 'ARTICLES OF INCORPORATION WITH INITIAL REPORT',
+										'BANKRUPTCY'	                                                              => 'BANKRUPTCY',
+										'CERTIFICATE OF AMENDMENT'	                                                => 'CERTIFICATE OF AMENDMENT',
+										'CERTIFICATE OF DISSOLUTION'	                                              => 'CERTIFICATE OF DISSOLUTION',
+										'CERTIFICATE OF FORMATION'	                                                => 'CERTIFICATE OF FORMATION',
+										'CERTIFICATE OF FORMATION WITH INITIAL REPORT'	                            => 'CERTIFICATE OF FORMATION WITH INITIAL REPORT',
+										'CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP'	                    => 'CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP',
+										'CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP WITH INITIAL REPORT'	=> 'CERTIFICATE OF LIMITED LIABILITY LIMITED PARTNERSHIP WITH INITIAL REPORT',
+										'CERTIFICATE OF LIMITED PARTNERSHIP'	                                      => 'CERTIFICATE OF LIMITED PARTNERSHIP',
+										'CERTIFICATE OF LIMITED PARTNERSHIP WITH INITIAL REPORT'	                  => 'CERTIFICATE OF LIMITED PARTNERSHIP WITH INITIAL REPORT',
+										'CERTIFICATE OF WITHDRAWAL'	                                                => 'CERTIFICATE OF WITHDRAWAL', 
+										'COMMERCIAL AGENT LISTING'	                                                => 'COMMERCIAL AGENT LISTING (2209)',
+										'COMMERCIAL LISTING STATEMENT'	                                            => 'COMMERCIAL LISTING STATEMENT',
+										'COMMERCIAL STATEMENT OF CHANGE'	                                          => 'COMMERCIAL STATEMENT OF CHANGE',
+										'COMMERCIAL TERMINATION STATEMENT'	                                        => 'COMMERCIAL TERMINATION STATEMENT',
+										'CONSOLIDATION'	                                                            => 'CONSOLIDATION',
+										'CONVERSION'	                                                              => 'CONVERSION',
+										'CORRESPONDENCE'	                                                          => 'CORRESPONDENCE',
+										'CORRESPONDENCE WITH FEE'	                                                  => 'CORRESPONDENCE WITH FEE',
+										'CORRESPONDENCE WITHOUT FEE'	                                              => 'CORRESPONDENCE WITHOUT FEE',
+										'DECLARATION OF TRUST'	                                                    => 'DECLARATION OF TRUST',
+										'DECLARATION OF TRUST WITH INITIAL REPORT'	                                => 'DECLARATION OF TRUST WITH INITIAL REPORT',
+										'DISSOLUTION ADMINISTRATIVE-REJECT'	                                        => 'DISSOLUTION ADMINISTRATIVE-REJECT',
+										'DISSOLUTION/WITHDRAWAL'	                                                  => 'DISSOLUTION/WITHDRAWAL',
+										'DISSOLUTION/WITHDRAWAL-REJECT'	                                            => 'DISSOLUTION/WITHDRAWAL-REJECT',
+										'DUPLICATE'	                                                                => 'DUPLICATE',  
+										'DUPLICATE UBI'                                                            	=> 'DUPLICATE UBI',
+										'EXAD'	                                                                    => 'EXPIRATION OF DURATION NOTICE',
+										'FEE WAIVER'	                                                              => 'FEE WAIVER',
+										'FOREIGN NAME REGISTRATION'	                                                => 'FOREIGN NAME REGISTRATION',
+										'FOREIGN REGISTRATION STATEMENT'	                                          => 'FOREIGN REGISTRATION STATEMENT',
+										'FORMATION'	                                                                => 'FORMATION',
+										'HISTORY CARD'	                                                            => 'HISTORY CARD',
+										'INITIAL REPORT'	                                                          => 'INITIAL REPORT',
+										'JOINT MUNICIPALITY AUTHORITY AGREEMENT'	                                  => 'JOINT MUNICIPALITY AUTHORITY AGREEMENT',
+										'LEGACY FILING TYPE'	                                                      => 'LEGACY FILING TYPE',
+										'MERGER'	                                                                  => 'MERGER',
+										'MERGER NON-SURVIVOR'	                                                      => 'MERGER NON-SURVIVOR',
+										'MISCELLANEOUS'	                                                            => 'MISCELLANEOUS',
+										'NAME RESERVATION'	                                                        => 'NAME RESERVATION',
+										'NREX'	                                                                    => 'NAME RESERVATION EXPIRED',
+										'NAME RESERVATION EXPIRED'	                                                => 'NAME RESERVATION EXPIRED',
+										'OFFICE CORRECTION'	                                                        => 'OFFICE CORRECTION',
+										'RAAD'	                                                                    => 'ADMINISTRATIVE DISSOLUTION', 
+										'RADQ'	                                                                    => 'REGISTERED AGENT RESIGNATION NOTICE',
+										'REFUND'	                                                                  => 'REFUND',  
+										'REFUND REQUEST'	                                                          => 'REFUND REQUEST',
+										'REGISTRATION'	                                                            => 'REGISTRATION',
+										'REINSTATEMENT'	                                                            => 'REINSTATEMENT',
+										'RENEWAL - REJECT'	                                                        => 'RENEWAL - REJECT',
+										'REQUALIFICATION'	                                                          => 'REQUALIFICATION',
+										'REQUEST FOR INFORMATION'	                                                  => 'REQUEST FOR INFORMATION',
+										'REQUEST FOR PAYMENT'	                                                      => 'REQUEST FOR PAYMENT',
+										'RESERVATION OF NAME'	                                                      => 'RESERVATION OF NAME',
+										'RESIGNATION OF AGENT'	                                                    => 'RESIGNATION OF AGENT',
+										'RESIGNATION OF OFFICER'	                                                  => 'RESIGNATION OF OFFICER',
+										'RESIGNATION OF OFFICER/DIRECTOR'	                                          => 'RESIGNATION OF OFFICER/DIRECTOR',
+										'RESTATED ARTICLES OF INCORPORATION'	                                      => 'RESTATED ARTICLES OF INCORPORATION',
+										'RESTATED CERTIFICATE OF FORMATION'	                                        => 'RESTATED CERTIFICATE OF FORMATION',
+										'RESTATED CERTIFICATE OF LIMITED PARTNERSHIP'	                              => 'RESTATED CERTIFICATE OF LIMITED PARTNERSHIP',
+										'RETURN MAIL'	                                                              => 'RETURN MAIL',
+										'REVOCATION OF VOLUNTARY DISSOLUTION'	                                      => 'REVOCATION OF VOLUNTARY DISSOLUTION',
+										'SHARE EXCHANGE'	                                                          => 'SHARE EXCHANGE',
+										'STATEMENT A OF CHANGE'	                                                    => 'STATEMENT A OF CHANGE',
+										'STATEMENT OF CHANGE'	                                                      => 'STATEMENT OF CHANGE',
+										'STATEMENT OF CORRECTION'	                                                  => 'STATEMENT OF CORRECTION',
+										'STATEMENT OF RESIGNATION'	                                                => 'STATEMENT OF RESIGNATION',
+										'STATEMENT OF TERMINATION'	                                                => 'STATEMENT OF TERMINATION',
+										'STATEMENT OF WITHDRAWAL'	                                                  => 'STATEMENT OF WITHDRAWAL',
+										'STATEMENT OF WITHDRAWAL OF FILED RECORD'	                                  => 'STATEMENT OF WITHDRAWAL OF FILED RECORD',
+										'STUDENTS FOREIGN EXCHANGE'	                                                => 'STUDENTS FOREIGN EXCHANGE',
+										'SUMMONS AND COMPLAINT'	                                                    => 'SUMMONS AND COMPLAINT', 
+										'SUMMONS AND COMPLAINTS'	                                                  => 'SUMMONS AND COMPLAINTS',
+										'TRADEMARK APPLICATION'	                                                    => 'TRADEMARK APPLICATION', 
+										'TRADEMARK NAME RESERVATION'	                                              => 'TRADEMARK NAME RESERVATION', 
+										'TRANSFER OF FOREIGN REGISTRATION'	                                        => 'TRANSFER OF FOREIGN REGISTRATION', 
+										'TRANSFER OF NAME RESERVATION'	                                            => 'TRANSFER OF NAME RESERVATION',
+										'TRANSFER OF REGISTRATION'	                                                => 'TRANSFER OF REGISTRATION',
+										'UNIDENTIFIED'	                                                            => 'UNIDENTIFIED',
+										'VOLUNTARY TERMINATION'	                                                    => 'VOLUNTARY TERMINATION',
+										'WAIVER REQUEST'	                                                          => 'WAIVER REQUEST',
+										'NREGEXP'	                                                                  => '',
+										''        									                                                => '',
+										'**|' + corp2.t2u(desc));
+
+		EXPORT GetARType(string desc)
+								:= case(corp2.t2u(desc),										
+										'AMENDED ANNUAL REPORT'         => 'AMENDED ANNUAL REPORT',	
+										'AMENDED REPORT'                => 'AMENDED REPORT',	
+										'ANNUAL REPORT'                 => 'ANNUAL REPORT',	
+										'ANNUAL REPORT-WAIVER GRANTED'  => 'ANNUAL REPORT-WAIVER GRANTED',
+										'ARDQ'                          => 'DELINQUENT ANNUAL REPORT NOTICE',	
+										'**|' + corp2.t2u(desc));
+											
 END;
