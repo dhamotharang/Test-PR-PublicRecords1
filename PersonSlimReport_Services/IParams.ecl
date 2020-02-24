@@ -49,8 +49,10 @@ EXPORT IParams := MODULE
   END;
 
   EXPORT getOptions(iesp.personslimreport.t_PersonSlimReportRequest inIesp) := FUNCTION
+    unsigned1 glb_purpose := (unsigned1)inIesp.user.glbpurpose;
+
     in_mod := MODULE(PersonSlimReportOptions)
-      EXPORT UNSIGNED1 glb                := (unsigned1)inIesp.user.glbpurpose;
+      EXPORT UNSIGNED1 glb                := glb_purpose;
       EXPORT UNSIGNED1 dppa               := (unsigned1)inIesp.user.dlpurpose;
       EXPORT STRING    DataRestrictionMask       := inIesp.user.datarestrictionmask;
       EXPORT STRING32  application_type          := inIesp.user.applicationtype;
@@ -58,6 +60,7 @@ EXPORT IParams := MODULE
       EXPORT STRING    ssn_mask                  := inIesp.user.ssnmask;
       EXPORT unsigned1 dl_mask                   := IF (inIesp.user.dlmask, 1, 0);
       EXPORT unsigned1 dob_mask                  := suppress.date_mask_math.MaskIndicator (inIesp.user.dobmask);
+      EXPORT boolean show_minors                 := inIesp.Options.IncludeMinors OR (glb_purpose = 2);
 
       EXPORT BOOLEAN IncludeAddresses            := inIesp.Options.IncludeAddresses;
       EXPORT BOOLEAN IncludePhones               := inIesp.Options.IncludePhones;
@@ -86,7 +89,6 @@ EXPORT IParams := MODULE
       EXPORT BOOLEAN EnableNationalAccidents     := inIesp.Options.EnableNationalAccidents;
       EXPORT BOOLEAN EnableExtraAccidents        := inIesp.Options.EnableExtraAccidents;
       EXPORT BOOLEAN includeBlankDOD             := inIesp.Options.IncludeBlankDOD;
-      EXPORT BOOLEAN IncludeMinors               := inIesp.Options.IncludeMinors;
       EXPORT BOOLEAN IncludeFullPhonesPlus       := inIesp.Options.IncludeFullPhonesPlus;
       EXPORT BOOLEAN include_NonRegulated_WatercraftSources := inIesp.Options.IncludeNonRegulatedWatercraftSources;
       EXPORT BOOLEAN IncludeNonRegulatedVehicleSources      := inIesp.Options.IncludeNonRegulatedVehicleSources;
