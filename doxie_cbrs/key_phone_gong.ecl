@@ -1,7 +1,2 @@
-import gong_Neustar, doxie;
-f := gong_Neustar.File_Gong_Full_Prepped_For_Keys_1(phone10 <> '' and (integer)phone10 <> 0);
-
-export key_phone_gong := INDEX(f, 
-{phone10},
-{f}, 
-'~thor_data400::key::cbrs.phone10_gong_' + doxie.Version_SuperKey);
+IMPORT dx_Gong;
+EXPORT key_phone_gong := dx_Gong.key_phone10() : DEPRECATED('Use dx_gong.key_phone10 instead');
