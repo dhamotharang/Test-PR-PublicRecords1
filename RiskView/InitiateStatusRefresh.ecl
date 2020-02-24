@@ -67,7 +67,6 @@ LEFT.Response.Result.IsRefreshRecommended = TRUE,
 TRANSFORM(iesp.okc_statusrefresh_request.t_OkcStatusRefreshRequest,
 														SELF.User.ReferenceCode := StatusRefreshGatewayCfg.TransactionId;
 														SELF.Options.Blind := Gateway.Configuration.GetBlindOption(StatusRefreshGatewayCfg);
-														SELF.Options.TestOkcStatusRefreshService := TestOKCStatusRefresh;
 														SELF.SearchBy.RMSID := RIGHT.RMSID;
 													/* Customer Due Date isn't a parameter that OKC is using, but it's still required for the gateway call. 
 														In case OKC does start using it one day, a default of two weeks in the future is good enough coverage.
