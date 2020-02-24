@@ -25,6 +25,7 @@ surnames_all := surnames_gong + surnames_pplus : PERSIST('~thor_data400::persist
 
 //get all of the permutations (lname is required; fname and state optional)
 surnames_l := TABLE(surnames_all, {name_last, cnt := COUNT(GROUP)}, name_last,local);
+// DF-26966: recent change made to Gong_Neustar/Key_History_Surname.ecl
 surnames_lf := TABLE(surnames_all(name_first<>''), {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
 surnames_ls := TABLE(surnames_all(st<>''), {name_last,st, cnt := COUNT(GROUP)}, name_last, st,local);
 surnames_lfs := TABLE(surnames_all(name_first<>'',st<>''), {name_last,name_first,st, cnt := COUNT(GROUP)}, name_last, name_first, st,local);
