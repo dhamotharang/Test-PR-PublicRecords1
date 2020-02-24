@@ -522,9 +522,10 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																												,true)
 																						,0);
 			timediff := endseconds - startseconds;
-			totaltime := if (l.datasetname = r.datasetname and l.componentname = r.componentname and l.buildversion = r.buildversion
+			/*totaltime := if (l.datasetname = r.datasetname and l.componentname = r.componentname and l.buildversion = r.buildversion
 													,l.totaltimeinsecs + timediff
-													,0 + timediff);
+													,0 + timediff);*/
+			totaltime := timediff; // because now we r.created as time when first created and r.modified = time when last touched
 			td := totaltime - (integer)r.thresholdinsecs;
 			
 			s_prefix := 'ACTION Required: ' + r.datasetname + ':' + r.buildversion +':'+ r.componentname;

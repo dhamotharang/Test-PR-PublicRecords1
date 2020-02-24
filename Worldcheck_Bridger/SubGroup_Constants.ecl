@@ -1188,6 +1188,11 @@
 		export string KEYWORD_JPCAA									:= '874';
 		export string KEYWORD_PHBOI									:= '875';
 		export string KEYWORD_PHBIR									:= '876';
+		export string KEYWORD_CGPALF								:= '877';
+		export string KEYWORD_PAISRSNF							:= '878';
+		export string KEYWORD_IQAML									:= '879';
+		export string KEYWORD_UKTR									:= '880';
+		export string KEYWORD_PBC_AP								:= '881';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
