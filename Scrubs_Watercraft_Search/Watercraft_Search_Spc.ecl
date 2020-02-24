@@ -1,5 +1,6 @@
-MODULE:Scrubs_Watercraft_Search
+﻿MODULE:Scrubs_Watercraft_Search
 FILENAME:Watercraft_Search
+OPTIONS:-gh
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
 //RIDFIELD:<NameOfRidField>
@@ -29,7 +30,7 @@ FIELDTYPE:invalid_fips:ALLOW(0123456789):LENGTHS(0..)
 FIELDTYPE:invalid_ssn_fein:ALLOW(0123456789):LENGTHS(9,0)
 FIELDTYPE:invalid_phone:ALLOW(0123456789):SPACES( ):LENGTHS(10,0)
 FIELDTYPE:invalid_blank:LENGTHS(1..)
-FIELDTYPE:invalid_source_code:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2)
+FIELDTYPE:invalid_source_code:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ[]):LENGTHS(2)
 
 
 FIELD:date_first_seen:LIKE(invalid_date):TYPE(STRING8):0,0
