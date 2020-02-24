@@ -1,4 +1,4 @@
-﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE, strata;
+﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE, strata, dops, prte2,Orbit3;
 
 EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	
@@ -141,6 +141,7 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 		'~prte::key::phone_table_v2_@version@',
 		'~prte::key::business_header::' + file_date + '::hri::phone10_v2', build_key_phone_table_v2);
 
+//FCRA Keys
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_phone_table_v2(true,true),
 		'~prte::key::business_header::filtered::fcra::@version@::hri::phone10_v2',
 		'~prte::key::business_header::filtered::fcra::' + file_date + '::hri::phone10_v2', build_key_business_headerfilteredfcra_hriphone10_v2);
@@ -477,13 +478,27 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 	
 		
 	//---------- making DOPS optional and only in PROD build -------------------------------
+	dataset_name				:= 'GongKeys';
+	dataset_name_fcra		:= 'FCRA_GongKeys';
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion('GongKeys', file_date, notifyEmail,	l_inloc:='B', l_inenvment:='N',l_includeboolean :='N');
-	updatedops_fcra  		:=  PRTE.UpdateVersion('FCRA_GongKeys',file_date,notifyEmail,	l_inloc:='B', l_inenvment:='F',l_includeboolean :='N');
+	updatedops					:=	PRTE.UpdateVersion(dataset_name, file_date, notifyEmail,	l_inloc:='B', l_inenvment:='N',l_includeboolean :='N');
+	updatedops_fcra  		:=  PRTE.UpdateVersion(dataset_name_fcra,file_date,notifyEmail,	l_inloc:='B', l_inenvment:='F',l_includeboolean :='N');
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops,updatedops_fcra),NoUpdate);
   //---------------------------------------------------------------------------------------
 
+//Key VAlidation
+	key_validation 			:=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,dataset_name, 'N'), named(dataset_name+'Validation'));
+	key_validation_fcra :=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,dataset_name_fcra, 'F'), named(dataset_name_fcra+'Validation'));	
+	
+//Orbit Build
+	//Create Orbit instances
+create_orbit_build := parallel(
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - Gong', file_date, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - FCRA_Gong', file_date, 'F', true, true, false,  _control.MyInfo.EmailAddressNormal),
+															);
+
+	
 	RETURN 		sequential(			
 	
 				build_key_cbrs_phone10_gong, 
@@ -602,7 +617,9 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 				move_qa_key_gong_historyfcra_did, 
 				move_qa_key_gong_historyfcra_phone,
 				parallel(cnt_gong_fcra_address, cnt_gong_fcra_did, cnt_gong_fcra_phone),
-				PerformUpdateOrNot
+				PerformUpdateOrNot,
+				parallel(key_validation, key_validation_fcra)
+				// create_orbit_build
 				);
 
 END;

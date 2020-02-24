@@ -2,6 +2,17 @@
 
 EXPORT Layouts := MODULE
 
+Export Email_linkids_layout:=RECORD
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned6 powid;
+  unsigned6 empid;
+  unsigned6 dotid;
+  unsigned8 email_rec_key;
+ END;
+
 EXPORT Base_Ext := record
 PRTE2_Email_Data.layouts.base;
 string9 	clean_ssn;

@@ -1,9 +1,12 @@
-
+﻿
 EXPORT Constants := module
 
-
-		EXPORT in_prefix_name           := '~prte::in::irs5500';
-    EXPORT base_prefix_name         := '~prte::base::irs5500';
+    EXPORT dops_name := 'IRSkeys';
+			
+		EXPORT in_boca :=  '~PRTE::IN::irskeys::boca';
+    Export in_alpha := '~PRTE::IN::irskeys::alpha';
+		
+		EXPORT base_prefix_name         := '~prte::base::irs5500';
 		
 		//roxie keys
 		EXPORT key_prefix 							:= '~prte::key::irs5500::';

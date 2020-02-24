@@ -28,10 +28,10 @@ Nid.Layout_Repository xform(Nid.Layout_Repository R) := TRANSFORM
 		self.cln_suffix2    := cln_name[136..140];
 		self.gender			:= if(ntype = 'P',
 								Address.NameTester.GenderEx(self.cln_fname,self.cln_mname),'');
-		self.nameind := Nid.NameIndicators.fn_setNameIndicator(ntype,0,
+		self.nameind := $.NameIndicators.fn_setNameIndicator(ntype,0,
 								self.gender,
-								false) |
-						(Address.Persons.NameQuality(Address.PrecleanName(nm)) << 3);
+								false);
+						//(Address.Persons.NameQuality(Address.PrecleanName(nm)) << 3);
 								
 		self.std_biz := CASE(ntype,
 												'B' => Nid.clnBizName(nm),

@@ -1,4 +1,4 @@
-﻿IMPORT Std;
+﻿IMPORT Std, Address;
 EXPORT mod_NameFormat := MODULE
 
 shared rgxBasic := '([A-Z]+)';
@@ -744,10 +744,8 @@ export DualNameFormat(string s) := MAP(
 // determine name format so we know location of first name
 // supports hyphenated last name and period after middle name
 export PersonalNameFormat(string s, boolean forceValid = false) := 
-	//IF(REGEXFIND('([ ]+AND[ ]+|[ ]*&[ ]*)', s, NOCASE), DualNameFormat(s), SingleNameFormat(s));
-	//IF(REGEXFIND(rgxConnector, s), DualNameFormat(s), SingleNameFormat(s));
 	MAP(
-		Not forceValid and NameTester.InvalidNameFormat(s) => NameFormat.NoName,
+		Not forceValid and $.NameTester.InvalidNameFormat(s) => NameFormat.NoName,
 		REGEXFIND(rgxConnector, s) => DualNameFormat(s),
 		REGEXFIND(rgxLScFMM, s) => NameFormat.LScFMM,	// not to clash with FMLcFML
 		REGEXFIND(rgxLcSFM, s) => NameFormat.LcSFM,	// not to clash with FMLcFML
@@ -759,10 +757,10 @@ export PersonalNameFormat(string s, boolean forceValid = false) :=
 	);
 	
 
-export boolean IsDualNameFormat(string s) := PersonalNameFormat(s) >= NameFormat.LFaF;
+//export boolean IsDualNameFormat(string s) := PersonalNameFormat(s) >= NameFormat.LFaF;
 export boolean IsNameFormatDual(integer2 n) := (n >= NameFormat.LFaF);
 export boolean validPersonNameFormat(integer2 n) := (n != NameFormat.NoName) AND (NOT IsNameFormatDual(n));
-export boolean validNameFormat(string s) := PersonalNameFormat(s) != NameFormat.NoName;
+//export boolean validNameFormat(string s) := PersonalNameFormat(s) != NameFormat.NoName;
 
 shared InvalidFormat := ENUM(integer2, NotInvalid=0,
 	L,		// Last name only  van damme	
@@ -1937,8 +1935,6 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 			'');
 END;
 
-
-
 shared titles :=
  '\\b(MR|MRS|MS|MMS|MISS|DR|REV|RABBI|REVEREND|MSGR|PROF|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|MAJ|SFC|SRTA|APCO|CAPT|CPT|SGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
 export string Title (string s, NameFormat n, string1 clue='U', string fullname='') := FUNCTION
@@ -2097,5 +2093,238 @@ export set of NameFormat NameLFM := [
 	NameFormat.LcFcS, NameFormat.LLcFM, NameFormat.LLcFS, NameFormat.LxFM, NameFormat.LcFhF,
 	NameFormat.LFMiM, NameFormat.LFMiMi, NameFormat.LFMicS
 	];
+
+
+//types := ['X','F','L','B'];
+shared string1 GetNameClass(string nm) :=
+	types[IF ($.NameTester.IsFirstNameOrInitial(nm),1,0) +
+	IF ($.NameTester.IsValidLastName(nm),2,0) + 1];
 	
+
+	
+shared NameStatus VerifyHyphenatedName(string fname, string lname) := FUNCTION
+	s := IF($.NameTester.IsFirstname(fname), 'F', 'X') +
+		IF($.NameTester.IsDoubleLastName(lname),'L','X');
+	return IF(s='XX',NameStatus.PossibleName,NameStatus.ProbableName);
+END;
+
+shared NameStatus VerifyPossibleName(string fname, string lname) := 
+	IF($.NameTester.IsFirstname(fname) and $.NameTester.IsLastNameEx(lname),NameStatus.ProbableName,NameStatus.PossibleName);
+
+shared NameStatus VerifyNameOrder(string2 s, string fname, string lname) := FUNCTION
+
+	return MAP(
+		s in ['FL','BL','FB','BB','LF','LB','BF'] => NameStatus.ProbableName,
+		s in ['FF','LL','LB','FX','XF','BX','XB'] => NameStatus.PossibleName,
+		s = 'XL' => IF(NameTester.LikelyBizWord(fname),NameStatus.ImprobableName,NameStatus.PossibleName),
+		s = 'LX' => IF(NameTester.LikelyBizWord(lname),NameStatus.ImprobableName,NameStatus.PossibleName),
+		NameStatus.ImprobableName
+		);
+END;
+
+shared NameStatus VerifyName(string fname, string lname) := FUNCTION
+	s := GetNameClass(fname) + GetNameClass(lname);
+	return VerifyNameOrder(s, fname, lname);
+END; 
+
+shared NameStatus VerifyNameFL(string rgx, string s, integer f, integer l) :=
+							VerifyName(REGEXFIND(rgxFLoLF, s, f), REGEXFIND(rgxFLoLF, s, l));
+							
+shared NameStatus VerifyNameL(string lname) := CASE(
+	GetNameType(lname),
+	'F' => IF($.NameTester.IsFirstNameBasic(lname),NameStatus.ImprobableName,NameStatus.PossibleName),
+	'X' => NameStatus.PossibleName,
+	NameStatus.ProbableName
+	);
+	
+shared NameStatus VerifyNameFML(string fname, string mname, string lname) := FUNCTION
+	segs := GetNameTypes(fname, lname, mname);
+	segsFL := segs[1] + segs[3];		// FML
+	segM := segs[2];
+
+	return MAP(
+		segs in ['FFX','FFL','FFB','FBX','FBL','FLL','FXL',
+		         'BFX','BFB','BBX','BFL','BBL','BXL',
+							'XFL','XBL','LLF','LFF','XBF'] => NameStatus.ProbableName,
+		segs in ['FXX','FBX','FLX','LFX','LXX','LLB','LBX','LBF','BFX','BLX','BXX','XLX','XFX','XFB','XXL','LLX','XLX','XXF','XFF','XBB','XLL'] => NameStatus.PossibleName,
+		segsFL = 'BB' => NameStatus.ProbableName,
+		segsFL in ['FF','LL','LB','BF'] => NameStatus.PossibleName,
+		segsFL in ['BB','FL','FB','BL','LF'] => NameStatus.ProbableName,
+		segsFL in ['BX','FX'] => IF(NameTester.LikelyBizWord(lname),NameStatus.ImprobableName,NameStatus.PossibleName),
+		segsFL in ['XB','XL'] => IF(NameTester.LikelyBizWord(fname),NameStatus.ImprobableName,NameStatus.PossibleName),
+		//segsFL in ['LX'] => NameStatus.ImprobableName,
+		segM in ['F','B'] => NameStatus.PossibleName,
+		IF(NameTester.LikelyBizWord(fname),NameStatus.ImprobableName,NameStatus.PossibleName)
+	);
+END;
+
+shared NameStatus VerifyNameFLL(string s) := FUNCTION
+	segs := ExtractNameTypesFML(rgxFLL, s, 1, 2, 5);
+
+	return MAP(
+		segs[1] IN ['F','B'] AND (segs[2] IN ['B','L'] OR segs[2] IN ['B','L']) => NameStatus.ProbableName,
+		segs[1] IN ['F','B'] OR segs[2] IN ['B','L'] OR segs[2] IN ['B','L'] => NameStatus.PossibleName,
+		IF(NameTester.LikelyBizWord(s),NameStatus.ImprobableName,NameStatus.PossibleName)
+	);
+END;
+
+shared rgxStreet := '^[0-9]+.+ (ROAD|RD|STREET|ST|AVE|AVENUE|DRIVE|DR|PLACE|PATH|LANE|LN|WAY|WY)$';		// street address only
+	
+export NameStatus ValidatePersonalName(string name, unsigned2 format) := FUNCTION
+	fullname := FormatName(name, format);
+	fname := TRIM(fullname[6..25]);
+	mname := TRIM(fullname[26..45]);
+	lname := TRIM(fullname[46..65]);
+
+	return MAP (
+		NOT validPersonNameFormat(format) => NameStatus.NotAName,
+		format = NameFormat.NoName => NameStatus.NotAName,
+		$.NameTester.InvalidLastName(lname) AND lname<>'' => NameStatus.InvalidNameFormat,
+		$.NameTester.InvalidFirstName(fname) AND fname<>'' => NameStatus.InvalidNameFormat,
+		$.NameTester.IsBusinessWord(fname) OR NameTester.IsBusinessWord(mname) OR NameTester.IsBusinessWord(lname) => NameStatus.ImprobableName,
+		format in LikelyNameFormats => NameStatus.ProbableName,		
+		REGEXFIND(rgxFLhL, name) => VerifyHyphenatedName(REGEXFIND(rgxFLhL, name, 1),REGEXFIND(rgxFLhL, name,2)),
+		REGEXFIND(rgxStreet, name) => NameStatus.InvalidNameFormat,
+		format= NameFormat.LFi => VerifyNameL(lname),
+		format IN PossibleNameFormats => VerifyPossibleName(fname,lname),
+		format = NameFormat.FMLL => VerifyNameFML(fname,mname,lname),
+					//VerifyName2(fname,mname,lname),
+		format = NameFormat.FLorLF => VerifyNameFL(rgxFLoLF, name, 1, 3),
+		format = NameFormat.LFiMi => IF($.NameTester.IsLastNameEx(lname),
+									NameStatus.ProbableName,NameStatus.PossibleName),
+		format in [NameFormat.FMLorLFM,NameFormat.LcFcM] => VerifyNameFML(fname,mname,lname),
+		format = NameFormat.FLL => VerifyNameFLL(name),
+		format = NameFormat.LFMMi => VerifyNameFML(fname,mname,lname),
+		format = NameFormat.FiML => VerifyPossibleName(mname,lname),
+		format = NameFormat.L => CASE(GetNameType(lname),
+								'F' => NameStatus.ImprobableName,
+								NameStatus.StandaloneName),
+		format = NameFormat.LS => NameStatus.StandaloneName,
+		VerifyName(fname,lname)
+	);
+
+END;
+
+export NameStatus NameQuality(string name, unsigned2 format) := 
+	MAP(
+		TRIM(name) = '' => NameStatus.NotAName,
+		REGEXFIND(rgxConnector, name) => If(IsNameFormatDual(format), NameStatus.InvalidNameFormat, NameStatus.PossibleDualName),
+		$.NameTester.IsJustLastName(name) => NameStatus.StandaloneName,
+		ValidatePersonalName(name, format)
+		);
+		
+// matches a likely name format
+export boolean IsLikelyNameFormat(string name, unsigned2 format) := IF(
+		TRIM(name) = '' OR
+		REGEXFIND(rgxConnector, name) OR
+		$.NameTester.InvalidNameFormat(name) OR
+		$.NameTester.IsJustLastName(name),
+		false,
+			format IN (LikelyNameFormats + [NameFormat.FLorLF]));	
+			
+export boolean IsLikelyName(string name, unsigned2 format) := 
+	IF(ValidatePersonalName(name, format) in [NameStatus.ProbableName,NameStatus.PossibleName], true, false);
+
+shared IsLoQualityFirstName(string s) :=
+	$.NameTester.IsLoPctFirstName(s)
+	OR $.NameTester.IsHyphenatedFirstName(s)
+	OR LENGTH(s) = 1;
+
+		
+export boolean TestDualName(string lname, string fname1, string fname2) := FUNCTION
+			segs := GetNameType(lname)+GetNameType(fname1)+GetNameType(fname2);
+
+			return MAP(
+					segs IN ['LLL','LLX',	// vary 3
+									//'LBL',	// vary 2
+									'LXL',	// vary 2
+									'XLL','XLB','XLX',	// vary 1
+									'XXL',				// 'XXX' let's assume XXX is a person
+									'BLL','BLB','BLX',	// vary 1
+									'BXL']							//'BXB','BXX'],
+								=> IF(IsLoQualityFirstName(fname1) OR IsLoQualityFirstName(fname2), true, false),
+					//segs = 'LLB' => NameTester.IsLoQualityFirstName(fname1),
+					true);
+							// removed 11/5: 'LBX','LXB',
+//				segs IN ['FFL','FBL','BFL','BBL','XXX','FBL','FXL','BXL','XBL','BFB'] => 'F',
+//				segs IN ['LFF','LFB','LFX','LBF','LBB','LBX','LXL','LXX','LXF','BFF','BBF','XBX','XFX'] => 'L',
+//				segs in ['LLF','XLF','BLF'] => 'U',
+END;
+
+shared boolean TestLastName(string lname) := FUNCTION
+			seg := GetNameType(lname);
+			return (seg in ['L','B']) or ~$.NameTester.LikelyBizWord(lname);
+END;
+	
+
+export boolean ValidDualName(string s, unsigned2 format) := FUNCTION
+	fullname := FormatName1(s, format) + FormatName2(s, format);
+	fname := TRIM(fullname[6..25]);
+	fname2 := TRIM(fullname[76..95]);
+	lname := TRIM(fullname[46..65]);
+	lname2 := TRIM(fullname[116..135]);
+	return MAP (
+			format = NameFormat.NoName OR NOT IsNameFormatDual(format) =>	false,
+		$.NameTester.InvalidLastName(lname) => false,
+		$.NameTester.InvalidLastName(lname2) => false,
+			format IN ValidatedDualNameFormats =>	true,		// this is a validated format
+			format = NameFormat.FiaFiL => TestLastName(lname),
+			format = NameFormat.FMLaFM => TestDualName(lname, fname, fname2),
+			format = NameFormat.LcFaF => TestDualName(lname, fname, fname2),
+			format = NameFormat.LFaF => TestDualName(lname, fname, fname2),
+			format = NameFormat.FaFL => true,
+			format = NameFormat.LFaFM => $.NameTester.IsLastNameExOrHyphenated(LName) OR 
+								$.NameTester.IsFirstNameOrInitial(FName) OR
+								$.NameTester.IsFirstNameOrInitial(FName2) OR
+								$.NameTester.IsFirstNameOrInitial(TRIM(fullname[96..115])), // middle name 2
+			$.NameTester.IsFirstNameOrInitial(FName) OR $.NameTester.IsFirstNameOrInitial(FName2) 
+				OR $.NameTester.IsLastNameConfirmed(LName)
+			);
+END;
+
+export boolean IsDualName(string s, unsigned2 format) := FUNCTION
+	return MAP(
+		format = NameFormat.NoName =>	false,
+		NameTester.InvalidNameFormat(s) => false,
+		/*NOT REGEXFIND(rgxConnector, s) AND NOT REGEXFIND(rgxFMLcFML,s) => false,
+		REGEXFIND(rgxLScFMM, s) => false,
+		REGEXFIND(rgxLcFMM, s) => false,
+		REGEXFIND(rgxFMLcIII, s) => false,*/
+		//REGEXFIND('\\b[B-DF-HJ-NP-TVWXZ]+Q\\b', s) => false,
+		//REGEXFIND('\\b[B-DF-HJ-NP-TVWXZ]{4,}\\b', s) => false,
+		//REGEXFIND('\\b(PT|LT|FT|DL|JT|ERROR|EST)\\b',s) => false,  // unprocessed abbreviations
+		REGEXFIND('^[A-Z] +AND +[A-Z] +[A-Z]$',s) => false,
+		REGEXFIND('\\b([B-DF-HJ-NP-TVWXZ]+Q|[B-DF-HJ-NP-TVWXZ]{5,}|PT|LT|FT|DL|JT|ERROR|EST)\\b',s) => false,
+		REGEXFIND('^[A-Z] +(AND|&) +[A-Z]+ +[A-Z]$',s) => false,
+
+		REGEXFIND('\\b[A-Z]+ *( AND | OR |&) *(JR|SR|II|III|IV)$', s) => false,
+		REGEXFIND('^[A-Z]+ +(JR|SR) *' + rgxConnector + ' *[A-Z]+$', s) => false,
+		REGEXFIND('^[A-Z]+ +[A-Z] +OR +[A-Z]+$', s) => false,	// LEE O OR DEES
+		REGEXFIND('^[A-Z] *' + rgxConnector + ' *[A-Z]$', s) => false,
+		REGEXFIND('^[A-Z] *& *[A-Z] +(RET|NLN|NMN|COL|REV|ESQ|ESQUIRE|MAJ)$', s) => false,
+		REGEXFIND('^FIRM +', s) => false,
+		//REGEXFIND('\\bAND GUEST(S)?$', s) => false,
+		REGEXFIND(rgxConnector + ' *(GUEST(S)?|PARENT(S)?|CHILD(REN?)|TREASURER|DIRECTOR)\\b', s) => false,
+		REGEXFIND(' *& *NT\\b', s) => false,
+		Address.SpecialNames.IsAbbreviation(REGEXFIND('\\b([B-DF-HJ-NP-TVWXZ]{3})\\b', s, 1)) => false,
+		ValidDualName(s, format)
+	);
+END;
+
+// matches a supported name format
+export boolean IsPossibleName(string name, unsigned2 format) := IF(
+		TRIM(name) = '' OR
+		REGEXFIND(rgxConnector, name) OR
+		$.NameTester.InvalidNameFormat(name) OR
+		$.NameTester.IsJustLastName(name) OR
+		format = NameFormat.NoName,
+		false, true);
+
+export boolean IsPossibleDualName(string name, unsigned2 format) := IF(
+		TRIM(name) = '' OR
+		~REGEXFIND(rgxConnector, name) OR
+		~IsNameFormatDual(format) OR
+		format = NameFormat.NoName,
+		false, true);		
+		
 END;

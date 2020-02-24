@@ -664,6 +664,7 @@ Export CIID := RECORD
 	unsigned8 Record_ID;
 	unsigned6 fdn_file_info_id;
 	integer1 relativeaddressmatch;
+	unsigned6 did_orig;
  END;
  
  Export Crim	:= RECORD
@@ -676,6 +677,7 @@ Export CIID := RECORD
  string20	lname_orig;
  string10	ssn_orig;
  string10	dob_orig;
+ unsigned6 did_orig;
  END;
  
  Export Death	:= RECORD
@@ -683,6 +685,7 @@ Export CIID := RECORD
  string errorcode;
  unsigned8 Record_ID;
  unsigned6 fdn_file_info_id;
+ unsigned6 did_orig;
  END;
  
  Export FraudPoint	:= RECORD
@@ -1048,6 +1051,13 @@ Export CIID := RECORD
   integer8 associated_with_incarcerated_flag_;
   integer8 associated_with_fraud_offenses_flag_;
   integer8 deceased_match_;
+  unsigned4 date_of_birth_;
+  unsigned1 __date_of_birth__flags;
+  string deceased_match_date_of_death_;
+  unsigned1 __deceased_match_date_of_death__flags;
+  integer8 age_;
+  unsigned1 __age__flags;
+  integer8 is_minor_;
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
@@ -1097,9 +1107,13 @@ Export CIID := RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
  END;
  
@@ -1220,7 +1234,8 @@ Export CIID := RECORD
   integer8 weight;
  END;
  
-EXPORT fullgraph	:= RECORD
+EXPORT fullgraph	:= 
+RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -1262,11 +1277,19 @@ EXPORT fullgraph	:= RECORD
   integer8 cl_high_risk_pattern5_flag_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 currently_incarcerated_flag_;
   integer8 fraud_offenses_flag_;
   integer8 associated_with_incarcerated_flag_;
   integer8 associated_with_fraud_offenses_flag_;
   integer8 deceased_match_;
+  unsigned4 date_of_birth_;
+  unsigned1 __date_of_birth__flags;
+  string deceased_match_date_of_death_;
+  unsigned1 __deceased_match_date_of_death__flags;
+  integer8 age_;
+  unsigned1 __age__flags;
+  integer8 is_minor_;
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
@@ -1316,13 +1339,16 @@ EXPORT fullgraph	:= RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
  END;
+
 
 
  Export	personassociationsdetails	:=	RECORD
@@ -1924,6 +1950,17 @@ EXPORT fullgraph	:= RECORD
   integer8 industry_type_;
   integer8 customer_id_;
   string entity_context_uid_;
+  string best_first_name_;
+  string best_middle_name_;
+  string best_last_name_;
+  string best_name_suffix_;
+  string best_ssn_;
+  string best_email_;
+  string best_street_address_;
+  string best_city_;
+  string best_zip_;
+  string best_state_;
+  unsigned4 date_of_birth_;
   string label_;
   unsigned8 _r_customer_;
   integer8 age_;
@@ -1960,6 +1997,18 @@ EXPORT fullgraph	:= RECORD
   integer8 max_deceased_to_event_diff_;
   integer8 no_lex_id_;
   integer8 no_lex_id_gt22_;
+  integer8 address_is_cmra30_count_;
+  integer8 address_is_cmra30_flag_;
+  integer8 address_invalid30_count_;
+  integer8 address_invalid30_flag_;
+  integer8 hri14_active30_flag_;
+  integer8 hri50_active30_flag_;
+  integer8 validation_addr_problems30_count_;
+  integer8 validation_addr_problems30_flag_;
+  integer8 address_is_out_of_state30_count_;
+  integer8 address_is_of_state30_flag_;
+  unsigned4 dt_last_seen_;
+  integer8 score_;
   integer8 id_ssn_identity_count_max_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
@@ -2067,6 +2116,7 @@ EXPORT fullgraph	:= RECORD
  Export Advo	:= Record
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
+	unsigned6 did;
   string1 advo_hitflag;
   string1 advo_vacancyindicator;
   string1 advo_throwbackindicator;
@@ -2096,7 +2146,7 @@ EXPORT fullgraph	:= RECORD
   string8 advo_vacationperiodscount;
  End;
  
- Export CustomerDashTopClusters :=Record
+ Export CustomerDashTopClusters :=RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -2138,11 +2188,19 @@ EXPORT fullgraph	:= RECORD
   integer8 cl_high_risk_pattern5_flag_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 currently_incarcerated_flag_;
   integer8 fraud_offenses_flag_;
   integer8 associated_with_incarcerated_flag_;
   integer8 associated_with_fraud_offenses_flag_;
   integer8 deceased_match_;
+  unsigned4 date_of_birth_;
+  unsigned1 __date_of_birth__flags;
+  string deceased_match_date_of_death_;
+  unsigned1 __deceased_match_date_of_death__flags;
+  integer8 age_;
+  unsigned1 __age__flags;
+  integer8 is_minor_;
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
@@ -2192,14 +2250,17 @@ EXPORT fullgraph	:= RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
   integer1 high_risk_centroid;
   integer1 known_risk_centroid;
+  integer1 high_scoring_cluster;
   integer8 cl_high_risk_routing_count_;
   integer8 cl_no_lex_id_gt22_count_;
   integer8 cl_death_prior_to_all_events_identity_count_;
@@ -2253,6 +2314,6 @@ EXPORT fullgraph	:= RECORD
   unsigned1 cl_high_risk_pattern13_flag_;
   unsigned1 cl_high_risk_pattern14_flag_;
   unsigned1 cl_high_risk_pattern15_flag_;
- End;
+ END;
  
 END;

@@ -1,6 +1,6 @@
-IMPORT ut,SALT35;
+﻿IMPORT ut,SALT35;
 EXPORT Fields := MODULE
-  
+ 
 // Processing for each FieldType
 EXPORT SALT35.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'EMAIL_FMT','SSN_FMT','WORDBAG','NAME','WORDSTR','CORPKEY_FMT','CITY','fld_contact','zip5','hasZip4','alpha_st','number','multiword','Noblanks','number09','number9','alpha02');
 EXPORT FieldTypeNum(SALT35.StrType fn) := CASE(fn,'EMAIL_FMT' => 1,'SSN_FMT' => 2,'WORDBAG' => 3,'NAME' => 4,'WORDSTR' => 5,'CORPKEY_FMT' => 6,'CITY' => 7,'fld_contact' => 8,'zip5' => 9,'hasZip4' => 10,'alpha_st' => 11,'number' => 12,'multiword' => 13,'Noblanks' => 14,'number09' => 15,'number9' => 16,'alpha02' => 17,0);
@@ -126,8 +126,8 @@ END;
 EXPORT InValidFT_alpha02(SALT35.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT35.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
 EXPORT InValidMessageFT_alpha02(UNSIGNED1 wh) := CHOOSE(wh,SALT35.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT35.HygieneErrors.NotLength('0,2'),SALT35.HygieneErrors.Good);
  
-EXPORT SALT35.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'source','source_record_id','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen_company_name','dt_last_seen_company_name','dt_first_seen_company_address','dt_last_seen_company_address','dt_first_seen_contact','dt_last_seen_contact','isContact','iscorp','cnp_hasnumber','cnp_name','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_aceaid','corp_legal_name','dba_name','active_duns_number','hist_duns_number','active_enterprise_number','hist_enterprise_number','ebr_file_number','active_domestic_corp_key','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','source_docid','title','fname','mname','lname','name_suffix','name_score','company_name','company_name_type_raw','company_name_type_derived','company_rawaid','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_state','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','company_bdid','company_address_type_raw','company_fein','best_fein_indicator','company_phone','phone_type','phone_score','company_org_structure_raw','company_incorporation_date','company_sic_code1','company_sic_code2','company_sic_code3','company_sic_code4','company_sic_code5','company_naics_code1','company_naics_code2','company_naics_code3','company_naics_code4','company_naics_code5','company_ticker','company_ticker_exchange','company_foreign_domestic','company_url','company_inc_state','company_charter_number','company_filing_date','company_status_date','company_foreign_date','event_filing_date','company_name_status_raw','company_status_raw','vl_id','current','contact_did','contact_type_raw','contact_job_title_raw','contact_ssn','contact_dob','contact_status_raw','contact_email','contact_email_username','contact_email_domain','contact_phone','from_hdr','company_department','company_address_type_derived','company_org_structure_derived','company_name_status_derived','company_status_derived','contact_type_derived','contact_job_title_derived','contact_status_derived');
-EXPORT FieldNum(SALT35.StrType fn) := CASE(fn,'source' => 0,'source_record_id' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'dt_vendor_first_reported' => 4,'dt_vendor_last_reported' => 5,'dt_first_seen_company_name' => 6,'dt_last_seen_company_name' => 7,'dt_first_seen_company_address' => 8,'dt_last_seen_company_address' => 9,'dt_first_seen_contact' => 10,'dt_last_seen_contact' => 11,'isContact' => 12,'iscorp' => 13,'cnp_hasnumber' => 14,'cnp_name' => 15,'cnp_number' => 16,'cnp_btype' => 17,'cnp_lowv' => 18,'cnp_translated' => 19,'cnp_classid' => 20,'company_aceaid' => 21,'corp_legal_name' => 22,'dba_name' => 23,'active_duns_number' => 24,'hist_duns_number' => 25,'active_enterprise_number' => 26,'hist_enterprise_number' => 27,'ebr_file_number' => 28,'active_domestic_corp_key' => 29,'hist_domestic_corp_key' => 30,'foreign_corp_key' => 31,'unk_corp_key' => 32,'source_docid' => 33,'title' => 34,'fname' => 35,'mname' => 36,'lname' => 37,'name_suffix' => 38,'name_score' => 39,'company_name' => 40,'company_name_type_raw' => 41,'company_name_type_derived' => 42,'company_rawaid' => 43,'prim_range' => 44,'predir' => 45,'prim_name' => 46,'addr_suffix' => 47,'postdir' => 48,'unit_desig' => 49,'sec_range' => 50,'p_city_name' => 51,'v_city_name' => 52,'st' => 53,'zip' => 54,'zip4' => 55,'cart' => 56,'cr_sort_sz' => 57,'lot' => 58,'lot_order' => 59,'dbpc' => 60,'chk_digit' => 61,'rec_type' => 62,'fips_state' => 63,'fips_county' => 64,'geo_lat' => 65,'geo_long' => 66,'msa' => 67,'geo_blk' => 68,'geo_match' => 69,'err_stat' => 70,'company_bdid' => 71,'company_address_type_raw' => 72,'company_fein' => 73,'best_fein_indicator' => 74,'company_phone' => 75,'phone_type' => 76,'phone_score' => 77,'company_org_structure_raw' => 78,'company_incorporation_date' => 79,'company_sic_code1' => 80,'company_sic_code2' => 81,'company_sic_code3' => 82,'company_sic_code4' => 83,'company_sic_code5' => 84,'company_naics_code1' => 85,'company_naics_code2' => 86,'company_naics_code3' => 87,'company_naics_code4' => 88,'company_naics_code5' => 89,'company_ticker' => 90,'company_ticker_exchange' => 91,'company_foreign_domestic' => 92,'company_url' => 93,'company_inc_state' => 94,'company_charter_number' => 95,'company_filing_date' => 96,'company_status_date' => 97,'company_foreign_date' => 98,'event_filing_date' => 99,'company_name_status_raw' => 100,'company_status_raw' => 101,'vl_id' => 102,'current' => 103,'contact_did' => 104,'contact_type_raw' => 105,'contact_job_title_raw' => 106,'contact_ssn' => 107,'contact_dob' => 108,'contact_status_raw' => 109,'contact_email' => 110,'contact_email_username' => 111,'contact_email_domain' => 112,'contact_phone' => 113,'from_hdr' => 114,'company_department' => 115,'company_address_type_derived' => 116,'company_org_structure_derived' => 117,'company_name_status_derived' => 118,'company_status_derived' => 119,'contact_type_derived' => 120,'contact_job_title_derived' => 121,'contact_status_derived' => 122,0);
+EXPORT SALT35.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'source','source_record_id','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen_company_name','dt_last_seen_company_name','dt_first_seen_company_address','dt_last_seen_company_address','dt_first_seen_contact','dt_last_seen_contact','isContact','iscorp','cnp_hasnumber','cnp_name','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_aceaid','corp_legal_name','dba_name','active_duns_number','hist_duns_number','active_enterprise_number','hist_enterprise_number','ebr_file_number','active_domestic_corp_key','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','global_sid','record_sid','employee_count_org_raw','employee_count_org_derived','revenue_org_raw','revenue_org_derived','employee_count_local_raw','employee_count_local_derived','revenue_local_raw','revenue_local_derived','locid','source_docid','title','fname','mname','lname','name_suffix','name_score','company_name','company_name_type_raw','company_name_type_derived','company_rawaid','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_state','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','company_bdid','company_address_type_raw','company_fein','best_fein_indicator','company_phone','phone_type','phone_score','company_org_structure_raw','company_incorporation_date','company_sic_code1','company_sic_code2','company_sic_code3','company_sic_code4','company_sic_code5','company_naics_code1','company_naics_code2','company_naics_code3','company_naics_code4','company_naics_code5','company_ticker','company_ticker_exchange','company_foreign_domestic','company_url','company_inc_state','company_charter_number','company_filing_date','company_status_date','company_foreign_date','event_filing_date','company_name_status_raw','company_status_raw','vl_id','current','contact_did','contact_type_raw','contact_job_title_raw','contact_ssn','contact_dob','contact_status_raw','contact_email','contact_email_username','contact_email_domain','contact_phone','from_hdr','company_department','company_address_type_derived','company_org_structure_derived','company_name_status_derived','company_status_derived','contact_type_derived','contact_job_title_derived','contact_status_derived');
+EXPORT FieldNum(SALT35.StrType fn) := CASE(fn,'source' => 0,'source_record_id' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'dt_vendor_first_reported' => 4,'dt_vendor_last_reported' => 5,'dt_first_seen_company_name' => 6,'dt_last_seen_company_name' => 7,'dt_first_seen_company_address' => 8,'dt_last_seen_company_address' => 9,'dt_first_seen_contact' => 10,'dt_last_seen_contact' => 11,'isContact' => 12,'iscorp' => 13,'cnp_hasnumber' => 14,'cnp_name' => 15,'cnp_number' => 16,'cnp_btype' => 17,'cnp_lowv' => 18,'cnp_translated' => 19,'cnp_classid' => 20,'company_aceaid' => 21,'corp_legal_name' => 22,'dba_name' => 23,'active_duns_number' => 24,'hist_duns_number' => 25,'active_enterprise_number' => 26,'hist_enterprise_number' => 27,'ebr_file_number' => 28,'active_domestic_corp_key' => 29,'hist_domestic_corp_key' => 30,'foreign_corp_key' => 31,'unk_corp_key' => 32,'global_sid' => 33,'record_sid' => 34,'employee_count_org_raw' => 35,'employee_count_org_derived' => 36,'revenue_org_raw' => 37,'revenue_org_derived' => 38,'employee_count_local_raw' => 39,'employee_count_local_derived' => 40,'revenue_local_raw' => 41,'revenue_local_derived' => 42,'locid' => 43,'source_docid' => 44,'title' => 45,'fname' => 46,'mname' => 47,'lname' => 48,'name_suffix' => 49,'name_score' => 50,'company_name' => 51,'company_name_type_raw' => 52,'company_name_type_derived' => 53,'company_rawaid' => 54,'prim_range' => 55,'predir' => 56,'prim_name' => 57,'addr_suffix' => 58,'postdir' => 59,'unit_desig' => 60,'sec_range' => 61,'p_city_name' => 62,'v_city_name' => 63,'st' => 64,'zip' => 65,'zip4' => 66,'cart' => 67,'cr_sort_sz' => 68,'lot' => 69,'lot_order' => 70,'dbpc' => 71,'chk_digit' => 72,'rec_type' => 73,'fips_state' => 74,'fips_county' => 75,'geo_lat' => 76,'geo_long' => 77,'msa' => 78,'geo_blk' => 79,'geo_match' => 80,'err_stat' => 81,'company_bdid' => 82,'company_address_type_raw' => 83,'company_fein' => 84,'best_fein_indicator' => 85,'company_phone' => 86,'phone_type' => 87,'phone_score' => 88,'company_org_structure_raw' => 89,'company_incorporation_date' => 90,'company_sic_code1' => 91,'company_sic_code2' => 92,'company_sic_code3' => 93,'company_sic_code4' => 94,'company_sic_code5' => 95,'company_naics_code1' => 96,'company_naics_code2' => 97,'company_naics_code3' => 98,'company_naics_code4' => 99,'company_naics_code5' => 100,'company_ticker' => 101,'company_ticker_exchange' => 102,'company_foreign_domestic' => 103,'company_url' => 104,'company_inc_state' => 105,'company_charter_number' => 106,'company_filing_date' => 107,'company_status_date' => 108,'company_foreign_date' => 109,'event_filing_date' => 110,'company_name_status_raw' => 111,'company_status_raw' => 112,'vl_id' => 113,'current' => 114,'contact_did' => 115,'contact_type_raw' => 116,'contact_job_title_raw' => 117,'contact_ssn' => 118,'contact_dob' => 119,'contact_status_raw' => 120,'contact_email' => 121,'contact_email_username' => 122,'contact_email_domain' => 123,'contact_phone' => 124,'from_hdr' => 125,'company_department' => 126,'company_address_type_derived' => 127,'company_org_structure_derived' => 128,'company_name_status_derived' => 129,'company_status_derived' => 130,'contact_type_derived' => 131,'contact_job_title_derived' => 132,'contact_status_derived' => 133,0);
  
 //Individual field level validation
  
@@ -262,6 +262,50 @@ EXPORT InValidMessage_foreign_corp_key(UNSIGNED1 wh) := InValidMessageFT_CORPKEY
 EXPORT Make_unk_corp_key(SALT35.StrType s0) := s0;
 EXPORT InValid_unk_corp_key(SALT35.StrType s) := 0;
 EXPORT InValidMessage_unk_corp_key(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_global_sid(SALT35.StrType s0) := s0;
+EXPORT InValid_global_sid(SALT35.StrType s) := 0;
+EXPORT InValidMessage_global_sid(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_record_sid(SALT35.StrType s0) := s0;
+EXPORT InValid_record_sid(SALT35.StrType s) := 0;
+EXPORT InValidMessage_record_sid(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_employee_count_org_raw(SALT35.StrType s0) := s0;
+EXPORT InValid_employee_count_org_raw(SALT35.StrType s) := 0;
+EXPORT InValidMessage_employee_count_org_raw(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_employee_count_org_derived(SALT35.StrType s0) := s0;
+EXPORT InValid_employee_count_org_derived(SALT35.StrType s) := 0;
+EXPORT InValidMessage_employee_count_org_derived(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_revenue_org_raw(SALT35.StrType s0) := s0;
+EXPORT InValid_revenue_org_raw(SALT35.StrType s) := 0;
+EXPORT InValidMessage_revenue_org_raw(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_revenue_org_derived(SALT35.StrType s0) := s0;
+EXPORT InValid_revenue_org_derived(SALT35.StrType s) := 0;
+EXPORT InValidMessage_revenue_org_derived(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_employee_count_local_raw(SALT35.StrType s0) := s0;
+EXPORT InValid_employee_count_local_raw(SALT35.StrType s) := 0;
+EXPORT InValidMessage_employee_count_local_raw(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_employee_count_local_derived(SALT35.StrType s0) := s0;
+EXPORT InValid_employee_count_local_derived(SALT35.StrType s) := 0;
+EXPORT InValidMessage_employee_count_local_derived(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_revenue_local_raw(SALT35.StrType s0) := s0;
+EXPORT InValid_revenue_local_raw(SALT35.StrType s) := 0;
+EXPORT InValidMessage_revenue_local_raw(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_revenue_local_derived(SALT35.StrType s0) := s0;
+EXPORT InValid_revenue_local_derived(SALT35.StrType s) := 0;
+EXPORT InValidMessage_revenue_local_derived(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_locid(SALT35.StrType s0) := s0;
+EXPORT InValid_locid(SALT35.StrType s) := 0;
+EXPORT InValidMessage_locid(UNSIGNED1 wh) := '';
  
 EXPORT Make_source_docid(SALT35.StrType s0) := s0;
 EXPORT InValid_source_docid(SALT35.StrType s) := 0;
@@ -677,6 +721,17 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_hist_domestic_corp_key;
     BOOLEAN Diff_foreign_corp_key;
     BOOLEAN Diff_unk_corp_key;
+    BOOLEAN Diff_global_sid;
+    BOOLEAN Diff_record_sid;
+    BOOLEAN Diff_employee_count_org_raw;
+    BOOLEAN Diff_employee_count_org_derived;
+    BOOLEAN Diff_revenue_org_raw;
+    BOOLEAN Diff_revenue_org_derived;
+    BOOLEAN Diff_employee_count_local_raw;
+    BOOLEAN Diff_employee_count_local_derived;
+    BOOLEAN Diff_revenue_local_raw;
+    BOOLEAN Diff_revenue_local_derived;
+    BOOLEAN Diff_locid;
     BOOLEAN Diff_source_docid;
     BOOLEAN Diff_title;
     BOOLEAN Diff_fname;
@@ -806,6 +861,17 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_hist_domestic_corp_key := le.hist_domestic_corp_key <> ri.hist_domestic_corp_key;
     SELF.Diff_foreign_corp_key := le.foreign_corp_key <> ri.foreign_corp_key;
     SELF.Diff_unk_corp_key := le.unk_corp_key <> ri.unk_corp_key;
+    SELF.Diff_global_sid := le.global_sid <> ri.global_sid;
+    SELF.Diff_record_sid := le.record_sid <> ri.record_sid;
+    SELF.Diff_employee_count_org_raw := le.employee_count_org_raw <> ri.employee_count_org_raw;
+    SELF.Diff_employee_count_org_derived := le.employee_count_org_derived <> ri.employee_count_org_derived;
+    SELF.Diff_revenue_org_raw := le.revenue_org_raw <> ri.revenue_org_raw;
+    SELF.Diff_revenue_org_derived := le.revenue_org_derived <> ri.revenue_org_derived;
+    SELF.Diff_employee_count_local_raw := le.employee_count_local_raw <> ri.employee_count_local_raw;
+    SELF.Diff_employee_count_local_derived := le.employee_count_local_derived <> ri.employee_count_local_derived;
+    SELF.Diff_revenue_local_raw := le.revenue_local_raw <> ri.revenue_local_raw;
+    SELF.Diff_revenue_local_derived := le.revenue_local_derived <> ri.revenue_local_derived;
+    SELF.Diff_locid := le.locid <> ri.locid;
     SELF.Diff_source_docid := le.source_docid <> ri.source_docid;
     SELF.Diff_title := le.title <> ri.title;
     SELF.Diff_fname := le.fname <> ri.fname;
@@ -898,7 +964,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_contact_status_derived := le.contact_status_derived <> ri.contact_status_derived;
     SELF.Val := (SALT35.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_source,1,0)+ IF( SELF.Diff_source_record_id,1,0)+ IF( SELF.Diff_isContact,1,0)+ IF( SELF.Diff_iscorp,1,0)+ IF( SELF.Diff_cnp_hasnumber,1,0)+ IF( SELF.Diff_cnp_name,1,0)+ IF( SELF.Diff_cnp_number,1,0)+ IF( SELF.Diff_cnp_btype,1,0)+ IF( SELF.Diff_cnp_lowv,1,0)+ IF( SELF.Diff_cnp_translated,1,0)+ IF( SELF.Diff_cnp_classid,1,0)+ IF( SELF.Diff_company_aceaid,1,0)+ IF( SELF.Diff_corp_legal_name,1,0)+ IF( SELF.Diff_dba_name,1,0)+ IF( SELF.Diff_active_duns_number,1,0)+ IF( SELF.Diff_hist_duns_number,1,0)+ IF( SELF.Diff_active_enterprise_number,1,0)+ IF( SELF.Diff_hist_enterprise_number,1,0)+ IF( SELF.Diff_ebr_file_number,1,0)+ IF( SELF.Diff_active_domestic_corp_key,1,0)+ IF( SELF.Diff_hist_domestic_corp_key,1,0)+ IF( SELF.Diff_foreign_corp_key,1,0)+ IF( SELF.Diff_unk_corp_key,1,0)+ IF( SELF.Diff_source_docid,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_fname,1,0)+ IF( SELF.Diff_mname,1,0)+ IF( SELF.Diff_lname,1,0)+ IF( SELF.Diff_name_suffix,1,0)+ IF( SELF.Diff_name_score,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_company_name_type_raw,1,0)+ IF( SELF.Diff_company_name_type_derived,1,0)+ IF( SELF.Diff_company_rawaid,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dbpc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_fips_state,1,0)+ IF( SELF.Diff_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_company_bdid,1,0)+ IF( SELF.Diff_company_address_type_raw,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_best_fein_indicator,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_phone_type,1,0)+ IF( SELF.Diff_phone_score,1,0)+ IF( SELF.Diff_company_org_structure_raw,1,0)+ IF( SELF.Diff_company_incorporation_date,1,0)+ IF( SELF.Diff_company_sic_code1,1,0)+ IF( SELF.Diff_company_sic_code2,1,0)+ IF( SELF.Diff_company_sic_code3,1,0)+ IF( SELF.Diff_company_sic_code4,1,0)+ IF( SELF.Diff_company_sic_code5,1,0)+ IF( SELF.Diff_company_naics_code1,1,0)+ IF( SELF.Diff_company_naics_code2,1,0)+ IF( SELF.Diff_company_naics_code3,1,0)+ IF( SELF.Diff_company_naics_code4,1,0)+ IF( SELF.Diff_company_naics_code5,1,0)+ IF( SELF.Diff_company_ticker,1,0)+ IF( SELF.Diff_company_ticker_exchange,1,0)+ IF( SELF.Diff_company_foreign_domestic,1,0)+ IF( SELF.Diff_company_url,1,0)+ IF( SELF.Diff_company_inc_state,1,0)+ IF( SELF.Diff_company_charter_number,1,0)+ IF( SELF.Diff_company_filing_date,1,0)+ IF( SELF.Diff_company_status_date,1,0)+ IF( SELF.Diff_company_foreign_date,1,0)+ IF( SELF.Diff_event_filing_date,1,0)+ IF( SELF.Diff_company_name_status_raw,1,0)+ IF( SELF.Diff_company_status_raw,1,0)+ IF( SELF.Diff_vl_id,1,0)+ IF( SELF.Diff_current,1,0)+ IF( SELF.Diff_contact_did,1,0)+ IF( SELF.Diff_contact_type_raw,1,0)+ IF( SELF.Diff_contact_job_title_raw,1,0)+ IF( SELF.Diff_contact_ssn,1,0)+ IF( SELF.Diff_contact_dob,1,0)+ IF( SELF.Diff_contact_status_raw,1,0)+ IF( SELF.Diff_contact_email,1,0)+ IF( SELF.Diff_contact_email_username,1,0)+ IF( SELF.Diff_contact_email_domain,1,0)+ IF( SELF.Diff_contact_phone,1,0)+ IF( SELF.Diff_from_hdr,1,0)+ IF( SELF.Diff_company_department,1,0)+ IF( SELF.Diff_company_address_type_derived,1,0)+ IF( SELF.Diff_company_org_structure_derived,1,0)+ IF( SELF.Diff_company_name_status_derived,1,0)+ IF( SELF.Diff_company_status_derived,1,0)+ IF( SELF.Diff_contact_type_derived,1,0)+ IF( SELF.Diff_contact_job_title_derived,1,0)+ IF( SELF.Diff_contact_status_derived,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_source,1,0)+ IF( SELF.Diff_source_record_id,1,0)+ IF( SELF.Diff_isContact,1,0)+ IF( SELF.Diff_iscorp,1,0)+ IF( SELF.Diff_cnp_hasnumber,1,0)+ IF( SELF.Diff_cnp_name,1,0)+ IF( SELF.Diff_cnp_number,1,0)+ IF( SELF.Diff_cnp_btype,1,0)+ IF( SELF.Diff_cnp_lowv,1,0)+ IF( SELF.Diff_cnp_translated,1,0)+ IF( SELF.Diff_cnp_classid,1,0)+ IF( SELF.Diff_company_aceaid,1,0)+ IF( SELF.Diff_corp_legal_name,1,0)+ IF( SELF.Diff_dba_name,1,0)+ IF( SELF.Diff_active_duns_number,1,0)+ IF( SELF.Diff_hist_duns_number,1,0)+ IF( SELF.Diff_active_enterprise_number,1,0)+ IF( SELF.Diff_hist_enterprise_number,1,0)+ IF( SELF.Diff_ebr_file_number,1,0)+ IF( SELF.Diff_active_domestic_corp_key,1,0)+ IF( SELF.Diff_hist_domestic_corp_key,1,0)+ IF( SELF.Diff_foreign_corp_key,1,0)+ IF( SELF.Diff_unk_corp_key,1,0)+ IF( SELF.Diff_global_sid,1,0)+ IF( SELF.Diff_record_sid,1,0)+ IF( SELF.Diff_employee_count_org_raw,1,0)+ IF( SELF.Diff_employee_count_org_derived,1,0)+ IF( SELF.Diff_revenue_org_raw,1,0)+ IF( SELF.Diff_revenue_org_derived,1,0)+ IF( SELF.Diff_employee_count_local_raw,1,0)+ IF( SELF.Diff_employee_count_local_derived,1,0)+ IF( SELF.Diff_revenue_local_raw,1,0)+ IF( SELF.Diff_revenue_local_derived,1,0)+ IF( SELF.Diff_locid,1,0)+ IF( SELF.Diff_source_docid,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_fname,1,0)+ IF( SELF.Diff_mname,1,0)+ IF( SELF.Diff_lname,1,0)+ IF( SELF.Diff_name_suffix,1,0)+ IF( SELF.Diff_name_score,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_company_name_type_raw,1,0)+ IF( SELF.Diff_company_name_type_derived,1,0)+ IF( SELF.Diff_company_rawaid,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dbpc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_fips_state,1,0)+ IF( SELF.Diff_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_company_bdid,1,0)+ IF( SELF.Diff_company_address_type_raw,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_best_fein_indicator,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_phone_type,1,0)+ IF( SELF.Diff_phone_score,1,0)+ IF( SELF.Diff_company_org_structure_raw,1,0)+ IF( SELF.Diff_company_incorporation_date,1,0)+ IF( SELF.Diff_company_sic_code1,1,0)+ IF( SELF.Diff_company_sic_code2,1,0)+ IF( SELF.Diff_company_sic_code3,1,0)+ IF( SELF.Diff_company_sic_code4,1,0)+ IF( SELF.Diff_company_sic_code5,1,0)+ IF( SELF.Diff_company_naics_code1,1,0)+ IF( SELF.Diff_company_naics_code2,1,0)+ IF( SELF.Diff_company_naics_code3,1,0)+ IF( SELF.Diff_company_naics_code4,1,0)+ IF( SELF.Diff_company_naics_code5,1,0)+ IF( SELF.Diff_company_ticker,1,0)+ IF( SELF.Diff_company_ticker_exchange,1,0)+ IF( SELF.Diff_company_foreign_domestic,1,0)+ IF( SELF.Diff_company_url,1,0)+ IF( SELF.Diff_company_inc_state,1,0)+ IF( SELF.Diff_company_charter_number,1,0)+ IF( SELF.Diff_company_filing_date,1,0)+ IF( SELF.Diff_company_status_date,1,0)+ IF( SELF.Diff_company_foreign_date,1,0)+ IF( SELF.Diff_event_filing_date,1,0)+ IF( SELF.Diff_company_name_status_raw,1,0)+ IF( SELF.Diff_company_status_raw,1,0)+ IF( SELF.Diff_vl_id,1,0)+ IF( SELF.Diff_current,1,0)+ IF( SELF.Diff_contact_did,1,0)+ IF( SELF.Diff_contact_type_raw,1,0)+ IF( SELF.Diff_contact_job_title_raw,1,0)+ IF( SELF.Diff_contact_ssn,1,0)+ IF( SELF.Diff_contact_dob,1,0)+ IF( SELF.Diff_contact_status_raw,1,0)+ IF( SELF.Diff_contact_email,1,0)+ IF( SELF.Diff_contact_email_username,1,0)+ IF( SELF.Diff_contact_email_domain,1,0)+ IF( SELF.Diff_contact_phone,1,0)+ IF( SELF.Diff_from_hdr,1,0)+ IF( SELF.Diff_company_department,1,0)+ IF( SELF.Diff_company_address_type_derived,1,0)+ IF( SELF.Diff_company_org_structure_derived,1,0)+ IF( SELF.Diff_company_name_status_derived,1,0)+ IF( SELF.Diff_company_status_derived,1,0)+ IF( SELF.Diff_contact_type_derived,1,0)+ IF( SELF.Diff_contact_job_title_derived,1,0)+ IF( SELF.Diff_contact_status_derived,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -944,6 +1010,17 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_hist_domestic_corp_key := COUNT(GROUP,%Closest%.Diff_hist_domestic_corp_key);
     Count_Diff_foreign_corp_key := COUNT(GROUP,%Closest%.Diff_foreign_corp_key);
     Count_Diff_unk_corp_key := COUNT(GROUP,%Closest%.Diff_unk_corp_key);
+    Count_Diff_global_sid := COUNT(GROUP,%Closest%.Diff_global_sid);
+    Count_Diff_record_sid := COUNT(GROUP,%Closest%.Diff_record_sid);
+    Count_Diff_employee_count_org_raw := COUNT(GROUP,%Closest%.Diff_employee_count_org_raw);
+    Count_Diff_employee_count_org_derived := COUNT(GROUP,%Closest%.Diff_employee_count_org_derived);
+    Count_Diff_revenue_org_raw := COUNT(GROUP,%Closest%.Diff_revenue_org_raw);
+    Count_Diff_revenue_org_derived := COUNT(GROUP,%Closest%.Diff_revenue_org_derived);
+    Count_Diff_employee_count_local_raw := COUNT(GROUP,%Closest%.Diff_employee_count_local_raw);
+    Count_Diff_employee_count_local_derived := COUNT(GROUP,%Closest%.Diff_employee_count_local_derived);
+    Count_Diff_revenue_local_raw := COUNT(GROUP,%Closest%.Diff_revenue_local_raw);
+    Count_Diff_revenue_local_derived := COUNT(GROUP,%Closest%.Diff_revenue_local_derived);
+    Count_Diff_locid := COUNT(GROUP,%Closest%.Diff_locid);
     Count_Diff_source_docid := COUNT(GROUP,%Closest%.Diff_source_docid);
     Count_Diff_title := COUNT(GROUP,%Closest%.Diff_title);
     Count_Diff_fname := COUNT(GROUP,%Closest%.Diff_fname);

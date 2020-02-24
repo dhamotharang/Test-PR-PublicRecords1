@@ -60,7 +60,10 @@ function
     self.p_city_name         := best_address.company_p_city_name    ;
     self.v_city_name         := best_address.address_v_city_name    ;
     self.st                  := best_address.company_st             ;
-    self.zip                 := best_address.company_zip5           ;
+    self.zip                 := map(length(trim(best_address.company_zip5)) = 5  =>       best_address.company_zip5 
+                                   ,length(trim(best_address.company_zip5)) = 4  => '0' + trim(best_address.company_zip5) 
+                                   ,                                                ''
+    );
     self.msa                 := ''                                  ;//need to get this from the base file
     self.err_stat            := ''                                  ;//need to get this from the base file
     self.fips_state          := best_address.state_fips             ;

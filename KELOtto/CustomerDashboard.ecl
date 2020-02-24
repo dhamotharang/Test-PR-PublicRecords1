@@ -9,6 +9,8 @@
    STRING Entity_Context_uid_;
 	 INTEGER1 High_Risk_Centroid;
 	 INTEGER1 Known_Risk_Centroid;
+	 INTEGER1 High_Scoring_Cluster := 0;
+	 INTEGER1 connected_element_count_ := 0;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_High_Risk_Routing_Count_;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_No_Lex_Id_Gt22_Count_;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_Death_Prior_To_All_Events_Identity_Count_;
@@ -69,39 +71,41 @@
   EXPORT ClusterPrep1 := 
     PROJECT(KELOtto.Q__show_Customer_Person.Res0(cl_event_count_ < 1000 AND event_count_ < 1000 and cl_identity_count_ < 50), 
 		  TRANSFORM(ClusterRecord, SELF := LEFT, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 => 1, 0), SELF := [])) + 
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 => 1, 0), SELF := [])) + 
     PROJECT(KELOtto.Q__show_Customer_Address.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT.Invalid_Address_ + LEFT.Address_Is_Vacant_ + LEFT.Address_Is_Cmra_ + LEFT.Address_Is_Po_Box_ > 0 AND LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := LEFT.Identity_Count_Gt2_, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Email.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT._isdisposableemail_ + LEFT.Not_Safe_Last_Domain_Gt2_ > 0 AND LEFT.Identity_Count_ > 1=> 1, 0),SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Phone.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT, SELF := [])) + 
     PROJECT(KELOtto.Q__show_Customer_Bank_Account.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP((LEFT.High_Risk_Routing_ = 1 OR LEFT.Identity_Count_Gt2_ > 0 ) AND LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT, SELF := [])) + 
     PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELf.High_Risk_Centroid := MAP((LEFT.Ip_Not_Us_ + LEFT.Ip_Vpn_ + LEFT.Ip_High_Risk_City_ + LEFT.Ip_Hosted_ + LEFT.Ip_Tor_ > 0) AND LEFT.Identity_Count_ > 1 => 1, 0),SELF := LEFT));
 		
-  EXPORT ClusterPrep := JOIN(KELOtto.KelFiles.FullCluster(entity_context_uid_ = tree_uid_ AND cl_hr_identity_count_ > 1 /* jp */), ClusterPrep1, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
-	                 TRANSFORM({RECORDOF(LEFT), RECORDOF(RIGHT)}, SELF.High_Risk_Centroid := MAP(LEFT.entity_type_ = 1 => MAP(LEFT.cl_hr_identity_count_ > 1 => 1, 0), RIGHT.High_Risk_Centroid), SELF := LEFT, SELF := RIGHT),
+  EXPORT ClusterPrep := JOIN(KELOtto.KelFiles.FullCluster(entity_context_uid_ = tree_uid_), ClusterPrep1, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
+	                 TRANSFORM({RECORDOF(LEFT), RECORDOF(RIGHT)}, SELF.High_Risk_Centroid := MAP(LEFT.entity_type_ = 1 => MAP(LEFT.cl_hr_identity_count_ > 1 => 1, 0), RIGHT.High_Risk_Centroid),
+									                                              SELF.High_Scoring_Cluster := MAP(LEFT.cl_hr_element_count_ > 1 and LEFT.cl_hr_identity_count_ > 1 => 1, 0),
+																																SELF := LEFT, SELF := RIGHT),
 	                 HASH);
 	
-  EXPORT OttoFullGraphElements := ClusterPrep(safe_flag_ = 0 AND entity_type_ != 1 AND Cl_High_Kr_Identity_Percent_ < 1 AND cl_hr_element_count_ > 1 and cl_hr_identity_count_ > 1);
+  EXPORT OttoFullGraphElements := ClusterPrep(safe_flag_ = 0 AND entity_type_ != 1 AND Cl_High_Kr_Identity_Percent_ < 1 );
 
-  EXPORT OttoFullGraphIdentities := ClusterPrep(safe_flag_ = 0 AND entity_type_ = 1 AND Cl_High_Kr_Identity_Percent_ < 1 AND cl_hr_element_count_ > 1 and cl_hr_identity_count_ > 1);
+  EXPORT OttoFullGraphIdentities := ClusterPrep(safe_flag_ = 0 AND entity_type_ = 1 AND Cl_High_Kr_Identity_Percent_ < 1 AND connected_element_count_ > 1);
 	
   EXPORT Identities_1 := JOIN(OttoFullGraphIdentities, OttoFullGraphIdentities, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_ and LEFT.entity_context_uid_ != RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.entity_context_uid_, SELF := LEFT), HASH);
   EXPORT Identities_2 := JOIN(OttoFullGraphIdentities, OttoFullGraphIdentities, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_ and LEFT.entity_context_uid_ != RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.tree_uid_, SELF := LEFT), KEEP(1), HASH);
@@ -137,12 +141,12 @@
 														 SELF.Cl_High_Risk_Pattern4_Flag_ := MAP(LEFT.Cl_Ip_High_Risk_Identity_Top10_ = 1 =>1,0),
 														 SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(LEFT.Cl_High_Kr_Identity_Percent_ < 1 AND LEFT.Cl_High_Kr_Identity_Percent_ > 0 AND LEFT.Cl_Kr_Event_After_Known_Risk_Identity_Count_ > 1 => 1, 0), //,
 														 SELF.Cl_High_Risk_Pattern6_Flag_ := LEFT.Known_Risk_Centroid, 
-														 SELF.Cl_High_Risk_Pattern7_Flag_ := MAP(LEFT.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Count_>0 => 1, 0),
+														 SELF.Cl_High_Risk_Pattern7_Flag_ := MAP(LEFT.cl_deceased_count_>0 => 1, 0),
 														 SELF.Cl_High_Risk_Pattern8_Flag_ := LEFT.Cl_Adjacent_No_Safe_Flag_,
 														 SELF.Cl_High_Risk_Pattern9_Flag_ := MAP(LEFT.Cl_Bank_Identity_Count_Gt2_Count_ > 0 OR LEFT.Cl_High_Risk_Routing_Count_ > 0 => 1, 0),
 														 SELF.Cl_High_Risk_Pattern10_Flag_ := MAP(LEFT.Cl_High_Risk_Email_Top10_=1=>1, 0),// measure of the % of high risk identities and elements in the cluster,
 														 SELF.Cl_High_Risk_Pattern11_Flag_ := LEFT.High_Risk_Centroid, 
-														 SELF.Cl_High_Risk_Pattern12_Flag_ := 0, 
+														 SELF.Cl_High_Risk_Pattern12_Flag_ := LEFT.High_Scoring_Cluster, 
 														 SELF := LEFT, SELF := []));
 	
   EXPORT MainClusters := MainClustersPrep6;	
