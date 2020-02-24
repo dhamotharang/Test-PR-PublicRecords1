@@ -36,7 +36,7 @@ EXPORT email_distribution := MODULE
 										// 'Haley.Vicchio' + at +
 										// 'lea.smith' + at +
 										'';	
-	
+	//2/24/2020 edited PR_QA
 	SHARED PR_QA := 
 										'isabel.ma' + at +
 										'Benjamin.Karnatz' + at +
@@ -48,16 +48,18 @@ EXPORT email_distribution := MODULE
 										'Karen.Acuna' + at +
 										'Lucky.Mores' + at +
 										'Vishesh.Dosaj' + at +
-                    '';
+                    'alexander.garcia' + at +
+										'';
 	
 	// SHARED INS_QA := 
 // ;
 	
-//2/1/2020	 added for boca_54
+//2/1/2020 added Scoring_QA for boca_54
+//2/24/20  edited Scoring_QA
 	  SHARED Scoring_QA	:= 
-		                 'isabel.ma' + at +
-										 'Matthew.Ludewig' + at +
- 		                'alexander.garcia' + at + 
+		                 //'isabel.ma' + at +
+										 //'Matthew.Ludewig' + at +
+ 		                //'alexander.garcia' + at + 
 	                   '';
 	SHARED Other_QA := 
 										// 'Nathan.Koubsky' + at +
