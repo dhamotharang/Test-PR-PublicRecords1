@@ -10,7 +10,8 @@ export build_base(string filedate, boolean pUseProd = false)  := function
         
         all_seq :=      sequential(
                                 crim_offense_cat.CheckSuperfiles(crim_offense_cat.Filenames(pUseProd).base), //creates missing superfiles
-                                seq_base
+                                seq_base,
+                                std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).processedBase, crim_offense_cat.filenames(pUseProd).Base+'_' + filedate)
                                 );
         return all_seq;
 end;
