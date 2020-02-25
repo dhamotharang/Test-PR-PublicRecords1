@@ -24,8 +24,8 @@ EXPORT Proc_FirstData_buildall(
 	);
 
 	shared dops_update := SEQUENTIAL(
-		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N');
-		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F');
+		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N'),
+		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F')
 	);
 	
 	// All filenames associated with this Dataset
