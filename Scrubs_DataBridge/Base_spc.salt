@@ -80,8 +80,8 @@ FIELD:clean_telephone_num:TYPE(STRING10):LIKE(invalid_phone):0,0
 // FIELD:city:TYPE(STRING20):0,0
 FIELD:state:TYPE(STRING2):LIKE(invalid_st):0,0
 // FIELD:scf:TYPE(STRING3):0,0
-FIELD:zip:TYPE(STRING5):LIKE(invalid_zip5):0,0
-// FIELD:zip4:TYPE(STRING4):0,0
+FIELD:zip_code5:TYPE(STRING5):LIKE(invalid_zip5):0,0
+// FIELD:zip_code4:TYPE(STRING4):0,0
 FIELD:mail_score:TYPE(STRING1):LIKE(invalid_mail_score):0,0
 // FIELD:area_code:TYPE(STRING3):0,0
 // FIELD:telephone_number:TYPE(STRING10):0,0
@@ -147,6 +147,8 @@ FIELD:email_status:TYPE(STRING7):LIKE(invalid_email_status):0,0
 // FIELD:p_city_name:TYPE(STRING25):0,0
 // FIELD:v_city_name:TYPE(STRING25):0,0
 // FIELD:st:TYPE(STRING2):0,0
+// FIELD:zip:TYPE(STRING5):0,0
+// FIELD:zip4:TYPE(STRING4):0,0
 // FIELD:cart:TYPE(STRING4):0,0
 // FIELD:cr_sort_sz:TYPE(STRING1):0,0
 // FIELD:lot:TYPE(STRING4):0,0

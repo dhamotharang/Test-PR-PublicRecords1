@@ -54,9 +54,13 @@ PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header
 PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building_mnt',bld_m,2,,true,pVersion:=filedate)
 
 post1 := sequential(
-		fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILT'),
-		fileservices.addsuperfile('~thor_data400::base::file_fcra_header_building_BUILT','~thor_Data400::base::file_fcra_header_building_BUILDING',0,true),
-		fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILDING'));
+	fileservices.StartSuperFileTransaction(),
+	fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILT'),
+	fileservices.addsuperfile('~thor_data400::base::file_fcra_header_building_BUILT','~thor_Data400::base::file_fcra_header_building_BUILDING',0,true),
+	fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILDING'),
+	fileservices.clearsuperfile('~thor_data400::BASE::file_fcra_header_building_Delete'),
+	fileservices.FinishSuperFileTransaction()
+	);
 
 full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_fcra_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::fcra_header'+typ,1),
 		output('FCRA Header Base = BUILT. Nothing Done.'),

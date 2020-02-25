@@ -10,8 +10,8 @@ export Layouts := module
 		string20	City;
 		string2	  State;
 		string3	  SCF;
-		string5	  Zip;
-		string4	  Zip4;
+		string5	  Zip_Code5;
+		string4	  Zip_Code4;
 		string1	  Mail_Score;
 		string3	  Area_Code;
 		string10	Telephone_Number;
