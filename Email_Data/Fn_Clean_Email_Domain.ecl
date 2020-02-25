@@ -1,9 +1,9 @@
-import emailservice;
+﻿﻿import emailservice;
 export Fn_Clean_Email_Domain (string email) := function
 	att_pos 							:= StringLib.StringFind(email, '@',StringLib.StringFindCount(email, '@'));
 	domain_           := stringlib.stringtouppercase(trim(StringLib.StringFindReplace(StringLib.StringFindReplace(email[att_pos+1.. length(email)], ',.', '.'), '.,' ,'.'), all));
-	//blank any characters not [Aa-Zz] or [0-9] or [! # $ % & ' * + - / = ? ^ _ ` { | } ~ ]
-	blank_bad_chars 			:= regexreplace('[^[:alnum:]!#$%&\'*+-/=?^_`{|}~]',domain_ ,'');
+	//blank any characters not [Aa-Zz] or [0-9] or [-.]
+	blank_bad_chars 			:= regexreplace('[^[:alnum:].-]',domain_ ,'');
 	//blank leading or ending characters , -, .
 	blank_leading_bad_chars:= regexreplace('(^[*.-]+)|([*.-]+$)',blank_bad_chars ,'');
 	//blank with all characters being multiple 0s
@@ -39,9 +39,3 @@ export Fn_Clean_Email_Domain (string email) := function
 	
 return  if(alphachar, trim(fix_bad_com_net, all), '');
 end;	
-
-
-
-
-
-

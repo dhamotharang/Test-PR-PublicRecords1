@@ -3,8 +3,7 @@
 IMPORT Email_DataV2, Data_Services, ut, dx_Email;
 // Bright input file
 	EXPORT BV_raw			  := DATASET('~thor_data400::raw::email_dataV2::bv', Email_Event.Layouts.BV_raw, CSV(HEADING(0), SEPARATOR(','),TERMINATOR('\n'), QUOTE('"')));
-	EXPORT BV_Delta_raw := DATASET('~thor_data400::raw::email_dataV2::bv_delta', Email_Event.Layouts.BV_Delta_raw, CSV(HEADING(0), SEPARATOR('|\t|'),TERMINATOR('\r\n'), QUOTE('"')));
-
+	EXPORT BV_Delta_raw := DATASET('~thor_data400::raw::email_dataV2::bv_delta', Email_Event.Layouts.BV_Delta_raw, CSV(HEADING(0), SEPARATOR('|\t|'),TERMINATOR(['\r\n','\n']), QUOTE('"')));
 // Email Event lookup table		
 	EXPORT Email_event_lkp := DATASET('~thor_data400::base::email_dataV2::email_event_lkp', dx_Email.Layouts.i_Event_lkp, THOR);
 

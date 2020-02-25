@@ -1,4 +1,4 @@
-﻿IMPORT Email_DataV2, email_data, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR, dops, Orbit3;
+﻿﻿IMPORT Email_DataV2, email_data, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR, dops, Orbit3;
 
 EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
   // input files
@@ -13,7 +13,7 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 		SELF.transaction_id			:= STD.Str.ToUpperCase(L.transaction_id);
 		SELF.email_address			:= STD.Str.ToUpperCase(L.email_address);
 		SELF.account						:= STD.Str.ToUpperCase(L.account);
-		SELF.domain							:= STD.Str.ToUpperCase(L.domain);
+		SELF.domain							:= STD.Str.ToUpperCase(email_data.Fn_Clean_Email_Domain(L.email_address));
 		SELF.status							:= STD.Str.ToUpperCase(L.status);
 		SELF.disposable					:= STD.Str.ToUpperCase(L.disposable);
 		SELF.role_address				:= STD.Str.ToUpperCase(L.role_address);
