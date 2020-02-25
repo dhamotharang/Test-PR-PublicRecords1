@@ -1,4 +1,4 @@
-EXPORT Spray_Files (string sourceip, string targetgroup, string remotelocation, string updatefiledate):= function
+﻿EXPORT Spray_Files (string sourceip, string targetgroup, string remotelocation, string updatefiledate):= function
 
 return sequential(
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, updateFiledate,'ALABAMA'),
@@ -28,8 +28,8 @@ return sequential(
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MICHIGAN'),
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MINNESOTA'),
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MISSISSIPPI'),
-						//Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MISSOURI'),
-						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MISSOURI_V2'),  // Newer Source added 20140828
+						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MISSOURI'),
+						// Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MISSOURI_V2'),  // Source no longer provided
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'MONTANA'),
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'NEBRASKA'),
 						Hygenics_Soff.Spray_Soff_Files (sourceIP, targetGroup, remoteLocation, 	updateFiledate,'NEVADA'),
