@@ -23,12 +23,12 @@ surnames_pplus := distribute(PROJECT(Phonesplus_v2.File_Surnames(TRIM(name_last)
 
 surnames_all := surnames_gong + surnames_pplus : PERSIST('~thor_data400::persist::neustar::gong_surnames_all');
 
-
 //get all of the permutations (lname is required; fname and state optional)
 surnames_l := TABLE(surnames_all, {name_last, cnt := COUNT(GROUP)}, name_last,local);
-surnames_lf := TABLE(surnames_all, {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
-surnames_ls := TABLE(surnames_all, {name_last,st, cnt := COUNT(GROUP)}, name_last, st,local);
-surnames_lfs := TABLE(surnames_all, {name_last,name_first,st, cnt := COUNT(GROUP)}, name_last, name_first, st,local);
+// DF-26966: recent change made to Gong_Neustar/Key_History_Surname.ecl
+surnames_lf := TABLE(surnames_all(name_first<>''), {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
+surnames_ls := TABLE(surnames_all(st<>''), {name_last,st, cnt := COUNT(GROUP)}, name_last, st,local);
+surnames_lfs := TABLE(surnames_all(name_first<>'',st<>''), {name_last,name_first,st, cnt := COUNT(GROUP)}, name_last, name_first, st,local);
 
 // only save the most frequent combinations (cnt > freq_thold)
 surnames_l_f := surnames_l(cnt>freq_thold);
