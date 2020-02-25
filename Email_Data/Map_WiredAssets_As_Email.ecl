@@ -1,4 +1,4 @@
-import optincellphones, emailservice, mdr, _validate, entiera;
+﻿import optincellphones, emailservice, mdr, _validate, entiera, ut;
  export Map_WiredAssets_As_Email(version) := function
 with_email := optincellphones.files.file_base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0);
 
@@ -63,16 +63,16 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	SELF.append_rawaid  							:= input.rawaidin ;
 	SELF.best_ssn  										:= '';
 	SELF.best_dob 										:= 0;
-	self.append_domain 											:= stringlib.stringtouppercase(input.domain);
-	self.append_domain_type 									:= stringlib.stringtouppercase(input.domain_type);
-	self.append_domain_root 									:= stringlib.stringtouppercase(input.domain_root);
-	self.append_domain_ext 									:= stringlib.stringtouppercase(input.domain_ext);
-	self.append_is_tld_state									:= input.is_tld_state;
+	self.append_domain 											:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(input.domain));
+	self.append_domain_type 								:= ut.CleanSpacesAndUpper(input.domain_type);
+	self.append_domain_root 								:= ut.CleanSpacesAndUpper(input.domain_root);
+	self.append_domain_ext 									:= ut.CleanSpacesAndUpper(input.domain_ext);
+	self.append_is_tld_state								:= input.is_tld_state;
 	self.append_is_tld_generic 							:= input.is_tld_generic;
 	self.append_is_tld_country 							:= input.is_tld_country;
-	self.append_is_valid_domain_ext 					:= input.is_valid_domain_ext;
+	self.append_is_valid_domain_ext 				:= input.is_valid_domain_ext;
 	self := input;
-	self.append_email_username 							:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
+	self.append_email_username 							:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Username(self.orig_email));
 	self.clean_email    							:= trim(self.append_email_username, left, right) + '@' + trim(self.append_domain, left, right);
 	
 													 

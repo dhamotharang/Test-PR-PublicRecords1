@@ -1,4 +1,4 @@
-import AlloyMediaConsumer, aid, address, ut,emailservice, mdr, _validate, entiera;
+﻿import AlloyMediaConsumer, aid, address, ut,emailservice, mdr, _validate, entiera;
 export Map_AlloyMedia_as_Email(version) := function
 with_email := AlloyMediaConsumer.Files().base.qa(length(trim(orig_email,left, right)) > 4 and StringLib.StringFindCount(orig_email,  '@') > 0);
 
@@ -22,7 +22,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.Orig_State  								:= input.orig_state_province;
 	self.orig_ZIP  									:= input.orig_zip5;
 	self.orig_zip4  								:= input.orig_zip4;
-	self.orig_email 								:= stringlib.stringtouppercase(input.orig_email);
+	self.orig_email 								:= ut.CleanSpacesAndUpper(input.orig_email);
 	self.orig_ip  									:= '';
 	self.orig_site  								:= '';
 	self.orig_e360_id  							:= '';
@@ -69,12 +69,12 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	
 	self.Date_Vendor_First_Reported := _validate.date.fCorrectedDateString((string)input.Dt_vendor_first_reported);
 	self.Date_Vendor_Last_Reported  := _validate.date.fCorrectedDateString((string)input.Dt_vendor_last_reported);
-	self.append_email_username 						:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
-	self.append_domain 										:= stringlib.stringtouppercase(input.domain);
-	self.append_domain_type 								:= stringlib.stringtouppercase(input.domain_type);
-	self.append_domain_root 								:= stringlib.stringtouppercase(input.domain_root);
-	self.append_domain_ext 								:= stringlib.stringtouppercase(input.domain_ext);
-	self.append_is_tld_state								:= input.is_tld_state;
+	self.append_email_username 						:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Username(self.orig_email));
+	self.append_domain 										:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Domain(input.domain));
+	self.append_domain_type 							:= ut.CleanSpacesAndUpper(input.domain_type);
+	self.append_domain_root 							:= ut.CleanSpacesAndUpper(input.domain_root);
+	self.append_domain_ext 								:= ut.CleanSpacesAndUpper(input.domain_ext);
+	self.append_is_tld_state							:= input.is_tld_state;
 	self.append_is_tld_generic 						:= input.is_tld_generic;
 	self.append_is_tld_country 						:= input.is_tld_country;
 	self.append_is_valid_domain_ext 				:= input.is_valid_domain_ext;
