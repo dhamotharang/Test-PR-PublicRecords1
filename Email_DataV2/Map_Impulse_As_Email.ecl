@@ -67,7 +67,7 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.date_last_seen  							:= _validate.date.fCorrectedDateString(StringLib.StringFindReplace(input.lastmodified, '-', '')[..8]);
 	SELF.Date_Vendor_First_Reported   := IF(_validate.date.fCorrectedDateString((string)input.datevendorfirstreported) = '', _validate.date.fCorrectedDateString((string)input.datevendorfirstreported), (string)version);
 	SELF.Date_Vendor_Last_Reported  	:= IF(_validate.date.fCorrectedDateString((string)input.datevendorlastreported) = '', _validate.date.fCorrectedDateString((string)input.datevendorlastreported), (string)version);
-	SELF.append_domain 								:= ut.CleanSpacesAndUpper(input.domain);
+	SELF.append_domain 								:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(input.domain));
 	SELF.append_domain_type 					:= ut.CleanSpacesAndUpper(input.domain_type);
 	SELF.append_domain_root 					:= ut.CleanSpacesAndUpper(input.domain_root);
 	SELF.append_domain_ext 						:= ut.CleanSpacesAndUpper(input.domain_ext);
