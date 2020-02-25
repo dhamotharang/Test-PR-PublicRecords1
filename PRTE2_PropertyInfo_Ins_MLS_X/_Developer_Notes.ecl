@@ -1,7 +1,23 @@
 ﻿/* ************************************************************************************************
- PRTE2_PropertyInfo_Ins._Developer_Notes
+ PRTE2_PropertyInfo_Ins_MLS_X._Developer_Notes
 ***************************************************************************************************
-??  Next change we must make will be the Data3 changes - at that time we can fix the poor address stuff
+Feb 2020 - fix the poor address stuff in both FN_Spray_Alpharetta<Add/Spreadsheet> attributes
+			- Add empty PII xFields to do what Maria wanted
+			- Add Cust_name and Bug_Num
+			- Alter to handle incoming 6 source records potentially instead of generating 2 from 2 on the fly.
+* Removed Transform_Alpha_Data
+* Big alterations to Transforms.clean_spreadsheet
+* Alterations to both FN_Spray_Alpharetta<Add/Spreadsheet> attributes
+* Big simplifications to Get_Payload
+
+APN calculated each spray since addresses can be altered or cloned/altered. *** ASSUMES cust_name is same on all records with the same address.
+
+***************************************************************************************************
+***************************************************************************************************
+***************************************************************************************************
+OLD NOTES KEPT FOR HISTORICAL DETAILS
+***************************************************************************************************
+***************************************************************************************************
 ***************************************************************************************************
 Nov 2017 - need to remove all the Boca stuff.  If they start wanting data and a build they can do it.
 							Also renamed the old PRTE2_PropertyInfo folder to PRTE2_PropertyInfo_Obsolete and requested
@@ -21,12 +37,12 @@ April 2017 - Bruce altered in PRTE2_PropertyInfo:
 		key_PropertyInfo_address, key_PropertyInfo_rid - complete re-write to use the same logic as the 
 											PropertyCharacteristics versions
 		Layouts, - new Boca_Official_Layout and separate AlphaPropertyCSVRec - we will have two base files
-		NEW_process_build_propertyinfo, - CURRENTLY DOES NOT SAVE THE OFFICIAL ALPHA-Base in the Boca_Official_Layout (TODO)
+		proc_build_propertyinfo, - CURRENTLY DOES NOT SAVE THE OFFICIAL ALPHA-Base in the Boca_Official_Layout (TODO)
 		Transform_Alpha_Data, - tweaks to property transform
 		Transforms - probably overkill but after spraying just to be safe we transform to the CSV layout and clean up fields
 
 April 2017 after testing that code to confirm it works with new layout, Bruce copied all active code into new
-code module (folder) - PRTE2_PropertyInfo_Ins
+code module (folder) - PRTE2_PropertyInfo_Ins_MLS_X
 April 2017 - also MOVED all U* attributes into a new  PRTE2_PropertyInfo_Ins_Dev
 1. Fn_Spray - creates base file with base file layout same as before but with 3 new fields.
 2. Get_Payload - creates base file with new Boca Base layout but these are in MEMORY only during key build.
