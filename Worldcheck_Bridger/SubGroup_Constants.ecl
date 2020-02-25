@@ -1192,6 +1192,7 @@
 		export string KEYWORD_PAISRSNF							:= '878';
 		export string KEYWORD_IQAML									:= '879';
 		export string KEYWORD_UKTR									:= '880';
+		export string KEYWORD_PBC_AP								:= '881';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
