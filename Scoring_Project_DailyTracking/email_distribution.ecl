@@ -126,7 +126,7 @@ export prod_reports := ' Apaar.Sinha@lexisnexisrisk.com; Isabel.Ma@lexisnexisris
 	//				'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 
 EXPORT fail_list :=
-					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com;Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 
 
 // EXPORT DDT_general_list := 
@@ -140,7 +140,7 @@ EXPORT Bocashell_collections_success_list :=
 					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 					
 EXPORT Bocashell_collections_fail_list :=
-					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com;alexander.garcia@lexisnexisrisk.com';
 
 EXPORT test_list :=
 					'isabel.ma@lexisnexisrisk.com';
