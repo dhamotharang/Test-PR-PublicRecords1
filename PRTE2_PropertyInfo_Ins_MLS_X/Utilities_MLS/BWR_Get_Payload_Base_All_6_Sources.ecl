@@ -49,7 +49,8 @@ END;
 PropInfo_ABCDEF 	:= PROJECT(PropInfo_ABCDEF_1, Resequence_Rids (Left, Counter));
 //---------------------------------------------------------------------
 
-EXPORT_DS := SORT(PropInfo_ABCDEF,property_street_address,property_city_state_zip,vendor_source);
+EXPORT_DS := SORT(PropInfo_ABCDEF,fares_unformatted_apn,vendor_source);		// We could also do this by fares_unformatted_apn
+
 ViewLayout := RECORD
   unsigned6 property_rid;
   unsigned4 dt_vendor_last_reported;
@@ -67,12 +68,4 @@ OUTPUT(PROJECT(EXPORT_DS,viewLayout));
 lzFilePathFile	:= PII.Constants.SourcePathForPIICSV + desprayName;
 
 PRTE2_Common.DesprayCSV(EXPORT_DS, TempCSV, LandingZoneIP, lzFilePathFile);
-
-
-//---------------------------------------------------------------------
-// OBSOLETE - we previously had the "gateway" layout and the editable (left off code groups 21-85)
-// Now that we transformed all those code groups into actual field values, we just use the main "expanded" file layout (above)
-// PII_Base_SF_DS				:= PII.Files.PII_ALPHA_BASE_SF_DS_Prod;
-// EXPORT_DS 						:= PROJECT(PII_Base_SF_DS,PII.Transforms.Gateway_Reduce(LEFT));
-//---------------------------------------------------------------------
 
