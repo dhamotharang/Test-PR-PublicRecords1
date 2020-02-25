@@ -60,7 +60,7 @@ IMPORT $, Watchdog;
 
 // ============================================ File Spray =============================================
 
-$.Spray_inputs;
 
-
-[/data]/data_build_4/tris_lnssi/dops_release_history
+$.Spray_input_file.build_1;
+$.Spray_input_file.build_2;
+$.Spray_input_file.build_3;

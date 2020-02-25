@@ -16,7 +16,7 @@ IPAddress          := IF(_control.ThisEnvironment.Name='Prod_Thor',
 																	_Control.IPAddress.bctlpedata10,  // Use if in prod
 																	_Control.IPAddress.bctlpedata12); // Use if in dataland
 
-Export fSpray(string version, boolean pUseProd = false)   :=   DATASET([
+Export fSpray(string new_input, boolean pUseProd = false)   :=   DATASET([
 
     {IPAddress																			                       //SourceIP          Remote Server's IP address
     ,'/data/data_build_4/tris_lnssi/data'                    //SourceDirectory    Absolute path of directory on Remote Server where files are located
@@ -32,3 +32,4 @@ Export fSpray(string version, boolean pUseProd = false)   :=   DATASET([
 ], VersionControl.Layout_Sprays.Info);
 
 
+// [/data]/data_build_4/tris_lnssi/dops_release_history
