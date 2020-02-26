@@ -153,7 +153,7 @@ MODULE
       EXPORT STRING6   PrimarySearch        := PrimarySearchCriteria;
       EXPORT BOOLEAN   IsPrimarySearchPII   := PrimarySearch = $.Constants.PrimarySearchCriteria;
       EXPORT BOOLEAN   StrictMatch          := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
-      EXPORT BOOLEAN   PhoneticMatch        := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
+      
       EXPORT UNSIGNED  ScoreThreshold       := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
       EXPORT UNSIGNED  PenaltyThreshold     := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
       EXPORT BOOLEAN   useWaterfallv6	      := FALSE : STORED('useWaterfallv6');	// internal
@@ -167,6 +167,7 @@ MODULE
       EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress;
       EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive;
       EXPORT BOOLEAN   VerifyPhoneLastName    := pfOptions.VerificationOptions.VerifyPhoneLastName;
+      EXPORT BOOLEAN   PhoneticMatch          := VerifyPhoneName OR VerifyPhoneNameAddress OR VerifyPhoneLastName OR AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
       EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold;
       EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold;
       EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold;
@@ -352,7 +353,7 @@ MODULE
 
       EXPORT BOOLEAN   VerifyPhoneName        :=  FALSE : STORED('VerifyPhoneName');
       EXPORT BOOLEAN   VerifyPhoneNameAddress :=  FALSE : STORED('VerifyPhoneNameAddress');
-
+      
       //*****************************		RE-DESIGN data source options **************************
 
       SHARED displayAll := TransactionType in [ $.Constants.TransType.PREMIUM,

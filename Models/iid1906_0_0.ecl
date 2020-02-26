@@ -1,8 +1,7 @@
 ﻿//EXPORT IID1906_0_0 := 'todo';
 import Std, risk_indicators, ut, Models;
 
-export IID1906_0_0(grouped dataset(risk_indicators.layout_output) iid_recs)
-									 := FUNCTION
+export IID1906_0_0(dataset(risk_indicators.layout_output) iid_recs) := FUNCTION
 									
 		IID_DEBUG := FALSE;
 		// IID_DEBUG := TRUE;
@@ -365,7 +364,7 @@ END;
 
 layout_debug doModel(iid_recs le):=TRANSFORM
 #else
-Models.Layout_IID doModel (iid_recs le) :=TRANSFORM
+risk_indicators.Layout_Output doModel (iid_recs le) := TRANSFORM
 #end
 
 /* Input Variable Assignments */
@@ -2060,13 +2059,15 @@ iid1906_0_0_phonehighriskind := if(iid1906_0_0_phoneriskindex = 4, 'PR', '');
                    self:=[];
                     
      #else
-      
-      self.seq:= le.seq;
-      self.emailriskindex:= iid1906_0_0_emailriskindex;
-      self.phoneriskindex:= iid1906_0_0_phoneriskindex;
-      self.phonehighriskind:=(String)iid1906_0_0_phonehighriskind;
-      self.emailhighriskind:=(String)iid1906_0_0_emailhighriskind;
-      self:=[];
+      			
+			// set just these 4 fields in layout_output
+      self.iid_tmx.emailriskindex:= iid1906_0_0_emailriskindex;
+      self.iid_tmx.phoneriskindex:= iid1906_0_0_phoneriskindex;
+      self.iid_tmx.phonehighriskind:=(String)iid1906_0_0_phonehighriskind;
+      self.iid_tmx.emailhighriskind:=(String)iid1906_0_0_emailhighriskind;
+			
+			self := le;
+  
 #end      
       END;
 

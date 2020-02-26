@@ -398,6 +398,8 @@
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
       // Source details will be populated in Identities  only in a Phone Search.
       SELF.SourceDetails                     := IF(~inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                  := IF(~inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly           := IF(~inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF                                   := pInput;
     END;
 
@@ -506,6 +508,8 @@
       SELF                                  := pInput.RealTimePhone_Ext;
       // Source details will be populated in Primary Phone Details  in a PII Search.
       SELF.SourceDetails                    := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -551,7 +555,7 @@
                                           inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
       // Source details will be populated in OtherPhones in a PII Search.
-      SELF.SourceDetails           := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -699,7 +703,7 @@
                                     ri.RecentAddress.County, ri.RecentAddress.PostalCode, ri.RecentAddress.StateCityZip},
                                   {ri.FirstSeenWithPrimaryPhone.Year, ri.FirstSeenWithPrimaryPhone.Month, ri.FirstSeenWithPrimaryPhone.Day},
                                   {ri.LastSeenWithPrimaryPhone.Year, ri.LastSeenWithPrimaryPhone.Month, ri.LastSeenWithPrimaryPhone.Day},
-                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails},
+                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails, ri.selfreportedsourcesonly, ri.totalsourcecount},
                                 iesp.phonefinder.t_PhoneIdentityInfo);
       SELF               := le;
       SELF               := [];

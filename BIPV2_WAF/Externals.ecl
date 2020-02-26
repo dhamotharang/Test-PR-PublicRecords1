@@ -1,4 +1,4 @@
-EXPORT Externals := MODULE
+﻿EXPORT Externals := MODULE
   IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - provides 'we also found' capability
 SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2().EFR+Mod_BizContacts().EFR;
 // Need to compute the 'rolled up' counts for parents in hierarchy

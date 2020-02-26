@@ -789,7 +789,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	shellDids := PROJECT(shellres_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(shellDids,TopNCount:=100,
+	rellyids := Relationship.proc_GetRelationshipNeutral(shellDids,TopNCount:=100,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;   //All Relationships in new Format; limit set to 100 on key join
 	
 	RelativesLayout getSubjectRelatives(ShellResults le, rellyids ri) := TRANSFORM

@@ -294,8 +294,6 @@ EXPORT LayoutsInternalReport := MODULE
     STRING10 currentPreviousIndicator;
     STRING residencyType;
     STRING25 areaRisk;
-    UNSIGNED3 numberOfCurrentAddresses;
-    UNSIGNED6 numberOfPriorAddresses;
     UNSIGNED6 numberCurrentResidentTenants;
     UNSIGNED6 numberOfRelatives;
     UNSIGNED6 numberOfBusAssocs;

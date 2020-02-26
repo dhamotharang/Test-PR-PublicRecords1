@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView, Risk_Reporting;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -39,7 +39,8 @@ EXPORT Search_Function(
 	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
 	unsigned6 MinimumAmount = 0,
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
-	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
+	boolean IncludeStatusRefreshChecks = FALSE
   ) := function
 
 
@@ -282,6 +283,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
 	
+	Status_Refresh_GW_Call := if(IncludeStatusRefreshChecks, RiskView.InitiateStatusRefresh(clam[1].LnJ_datasets, gateways, 5, 0, true), DATASET([], iesp.okc_statusrefresh_request.t_OkcStatusRefreshResponseEx));
+	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
 
 	returnedReportLayout := RECORD
@@ -349,7 +352,7 @@ attrv5 := if(valid_attributes_requested,
 							self := left, self := []))
 						);
 						
-clam_noScore :=	join(	attributes_clam, attrv5,
+clam_noScore :=	join(	attributes_clam, attrv5, // uses attrv5
 					left.seq = right.seq,
 					transform(RiskView.Layouts.shell_NoScore, 
 						self.no_score := if(valid_attributes_requested, right.no_score, false);
@@ -357,12 +360,44 @@ clam_noScore :=	join(	attributes_clam, attrv5,
 						left outer);
 
 					
-attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/,
+attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/, // uses clam_noScore
 							riskview.get_attributes_LnJ(group(clam_noScore, seq), isPreScreenPurpose),
 							project(clam_noScore, transform(riskview.layouts.attributes_internal_layout, 
 							self := left, self := []))
 						);
 
+emptyGateways := dataset([],Gateway.Layouts.Config); 
+
+ CI_Layout := RECORD
+ unsigned4 seq;
+ string10 CheckProfileIndex;
+ string10 CheckTimeOldest;
+ string10 CheckTimeNewest;
+ string10 CheckNegTimeOldest;
+ string10 CheckNegRiskDecTimeNewest;
+ string10 CheckNegPaidTimeNewest;
+ string10 CheckCountTotal;
+ string10 CheckAmountTotal;
+ string10 CheckAmountTotalSinceNegPaid;
+ string10 CheckAmountTotal03Month;
+ boolean  FDGatewayCalled;
+ END;
+
+FirstData_results :=  if(AttributesVersionRequest = 'RVCheckingAttrV5', RiskView.getFirstData(bsprep,gateways),
+PROJECT(bsprep, TRANSFORM(CI_Layout,
+SELF.SEQ := LEFT.Seq;
+SELF.CheckProfileIndex := '-1';
+SELF.CheckTimeOldest := '-1';
+SELF.CheckTimeNewest := '-1'; 
+SELF.CheckNegTimeOldest := '-1';
+SELF.CheckNegRiskDecTimeNewest := '-1';
+SELF.CheckNegPaidTimeNewest := '-1';
+SELF.CheckCountTotal := '-1';
+SELF.CheckAmountTotal := '-1';
+SELF.CheckAmountTotalSinceNegPaid := '-1';
+SELF.CheckAmountTotal03Month := '-1';
+SELF.FDGatewayCalled := FALSE;
+SELF := left;)));
 
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
@@ -373,7 +408,13 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
 
-riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
+riskview5_attr_search_results_attrv5_FirstData := join(riskview5_attr_search_results_attrv5, FirstData_results, left.seq=right.seq,
+transform(riskview.layouts.layout_riskview5_search_results, 
+	self := right,
+	self := left), LEFT OUTER, KEEP(1), ATMOST(100));
+   
+
+riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5_FirstData, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did); //don't show a lexid if the truedid is not TRUE
 	self.ConsumerStatements := left.ConsumerStatements;
@@ -711,7 +752,6 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
 	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
 	ReportSuppressAlerts := (UT.Exists2(ds_alerts (alert_code = '222A')) or UT.Exists2(ds_alerts (alert_code = '200A')));
-
 	
 	self.alert1 := ds_alerts[1].alert_code;
 	self.alert2 := ds_alerts[2].alert_code;
@@ -1171,6 +1211,39 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	self.PhoneInputProblems	 := if(suppress_condition, '', le.PhoneInputProblems	);
 	self.PhoneInputSubjectCount	 := if(suppress_condition, '', le.PhoneInputSubjectCount	);
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
+  
+  //Checking Indicators
+  self.CheckProfileIndex := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckProfileIndex);
+  self.CheckTimeOldest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckTimeOldest);
+  self.CheckTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckTimeNewest);
+  self.CheckNegTimeOldest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckNegTimeOldest);
+  self.CheckNegRiskDecTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckNegRiskDecTimeNewest);
+  self.CheckNegPaidTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckNegPaidTimeNewest);
+  self.CheckCountTotal := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckCountTotal);
+  self.CheckAmountTotal := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckAmountTotal);
+  self.CheckAmountTotalSinceNegPaid := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckAmountTotalSinceNegPaid);
+  self.CheckAmountTotal03Month := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
+                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
+                                le.CheckAmountTotal03Month);
+
 //don't display data if suppressed or no report option selected	
 		self.report := if((~IncludeLnJ AND ~RiskviewReportRequest) or suppress_condition 
 		or AlertRegulatoryCondition = '3' or ReportSuppressAlerts, row([], iesp.riskview2.t_RiskView2Report), le.report);	
@@ -1246,8 +1319,6 @@ riskview5_pre_MLA := join(riskview5_search_results(Alert1 not in ['100D','100E',
 														self.results	:= left),
 													inner);
 
-emptyGateways := dataset([],Gateway.Layouts.Config); 
-
 //determine if MLA model was requested and if so, which slot in the output layout the results need to go into
 MLA_request_pos := map(custom_model  = 'MLA1608_0' 	=> 1,
 											 custom2_model = 'MLA1608_0' 	=> 2,
@@ -1263,6 +1334,21 @@ riskview5_wMLA_results := riskview5_search_results(Alert1 in ['100D','100E','100
 															 
 riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
 
+
+ /* ****************************************************************
+  *  Deferred Task ESP (DTE) Logging Functionality  *
+  ******************************************************************/
+		IF(IncludeStatusRefreshChecks, 
+			OUTPUT(Risk_Reporting.To_LOG_DTE.GetDTEOutput(
+						Status_Refresh_GW_Call[1].Response.Result.TaskID, 
+						'Status Refresh Task', 
+						/* Debugging specifically for JuLi Release 2, will change in JuLi Release 3 */
+						'<LiensRMSID>' + clam[1].LnJ_datasets.lnjliens[1].rmsid + '</LiensRMSID>' +
+						'<JudgmentsRMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].rmsid + '</JudgmentsRMSID>' +
+						'<LiensTMSID>' + clam[1].LnJ_datasets.lnjliens[1].tmsid + '</LiensTMSID>' +
+						'<JudgmentsTMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].tmsid + '</JudgmentsTMSID>'), 
+			NAMED('LOG_Deferred_Task_ESP')));
+	
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
@@ -1290,6 +1376,9 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // OUTPUT(telecommunications_model_result, NAMED('telecommunications_model_result'));
 // OUTPUT(Crossindustry_model_result, NAMED('Crossindustry_model_result'));
 // OUTPUT(custom_model_result, NAMED('custom_model_result'));
+// output(FirstData_results, named('FirstData_results'));
+// output(riskview5_attr_search_results_attrv5_FirstData, named('riskview5_attr_search_results_attrv5_FirstData'));
+// output(riskview5_attr_search_results, named('riskview5_attr_search_results'));
 // OUTPUT(riskview5_score_auto_results, NAMED('riskview5_score_auto_results'));
 // OUTPUT(riskview5_score_bankcard_results, NAMED('riskview5_score_bankcard_results'));
 // OUTPUT(riskview5_score_short_term_lending_results, NAMED('riskview5_score_short_term_lending_results'));
@@ -1320,7 +1409,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 	// output(isLnJRunningAlone, named('isLnJRunningAlone'));		
 // output(riskview5_search_results, named('riskview5_search_results'));
 // output(riskview5_search_results_tmp, named('riskview5_search_results_tmp'));
-
+	
 return riskview5_final_results;
 #else // Else, output the model results directly
 

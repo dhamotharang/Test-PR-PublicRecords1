@@ -17,7 +17,7 @@ rels(dataset(doxie.layout_references) dids) := function
 		).result;
 
 		relResult := project(relationships_neutral,
-												transform (doxie.layout_relative_dids_v3,
+												transform (doxie.layout_relative_dids,
 																	self.person1 := left.did1,
 																	self.person2 := left.did2,
 																	self.recent_cohabit := (left.rel_dt_last_seen/100), // Remove day from date since v2 version only had year/month

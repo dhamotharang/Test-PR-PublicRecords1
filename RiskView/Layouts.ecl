@@ -559,6 +559,19 @@ export layout_riskview_input := record
 	Layout_Riskview_Batch_In;
 end;
 
+export layout_checkingindicators := record
+  string2 CheckProfileIndex;
+  string3 CheckTimeOldest;
+  string3 CheckTimeNewest;
+  string2 CheckNegTimeOldest;
+  string2 CheckNegRiskDecTimeNewest;
+  string2 CheckNegPaidTimeNewest;
+  string4 CheckCountTotal;
+  string7 CheckAmountTotal;
+  string7 CheckAmountTotalSinceNegPaid;
+  string7 CheckAmountTotal03Month;
+end;
+
 export layout_riskview_attributes_5 := record
 	string3 Attribute_Index  := '0'; // for now, only 0 is valid attribute index, in the future we can default this.
 	string1	InputProvidedFirstName	;
@@ -750,8 +763,10 @@ export layout_riskview_attributes_5 := record
 	string3	PhoneInputSubjectCount	;
 	string2	PhoneInputMobile 	;
 	string1	AlertRegulatoryCondition	;
+  layout_checkingindicators;
 	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 end;
+
 
 //FCRA List Gen - Will use a slim version
 export layout_riskview5 := record
@@ -862,7 +877,7 @@ export layout_riskview5 := record
 	
 	string2000 ConsumerStatementText;
 end;
-
+  
 //FCRA List Gen - Will use a slim version
 export layout_riskview5_search_results := record
 	unsigned4 seq;
@@ -882,6 +897,7 @@ export layout_riskview5_search_results := record
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	string3	 Billing_Index2 := '';
 	Risk_Indicators.Layouts_Derog_Info.LJ_Records;
+  boolean FDGatewayCalled;
 end;
 
 
@@ -911,7 +927,7 @@ end;
                 'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
                 'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
                 'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;' +
-                'string10 Liens' + %'cntLiens'% + '_orig_rmsid;');
+                'string10 Liens' + %'cntLiens'% + '_orig_rmsid;');							
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -948,7 +964,7 @@ end;
                 'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
                 'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;' +
                 'string10 Jgmts' + %'cntJgmts'% + '_orig_rmsid;');
-
+									
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END
@@ -1116,7 +1132,7 @@ export layout_RV5capOneBatch_searchResults := record
 	string30  AcctNo;
 	string12  LexID;
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
-	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes; //CapOne is not running Juli so remove from output
+	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes - layout_checkingindicators; //CapOne is not running Juli so remove from output
   layout_riskview5_alerts-ConsumerStatementText;
   STRING12 inquiry_lexid := '';
 end;

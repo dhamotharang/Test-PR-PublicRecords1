@@ -83,9 +83,12 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     
     //get identity risk
     indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+    
+    //get civil events(liens/judgements/evictions)
+    indCivilEvents := DueDiligence.getIndCivilEvent(indIDRisk, mod_access);
 
     //populate the attributes and flags
-    indKRI := DueDiligence.getIndKRI(indIDRisk);
+    indKRI := DueDiligence.getIndKRI(indCivilEvents);
 
     //if a person report is being requested, populate the report
     indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
@@ -118,6 +121,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
     IF(debugMode, OUTPUT(indPerAssoc, NAMED('indPerAssoc')));
     IF(debugMode, OUTPUT(indIDRisk, NAMED('indIDRisk')));
+    IF(debugMode, OUTPUT(indCivilEvents, NAMED('indCivilEvents')));
     IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
     IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
     IF(debugMode, OUTPUT(indNoDIDKRI, NAMED('indNoDIDKRI')));

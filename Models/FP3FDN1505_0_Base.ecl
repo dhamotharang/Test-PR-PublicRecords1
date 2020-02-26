@@ -1,4 +1,4 @@
-import easi, Models, risk_indicators, riskwise, ut, std;
+﻿import easi, Models, risk_indicators, riskwise, ut, std;
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -570,278 +570,278 @@ sysdate := common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today()
 
 ssnpop := ssnlength = 9;
 
-fnamepop_char := if(fnamepop, 'F', ' ');
+fnamepop_char := __common__(  if(fnamepop, 'F', ' ') );
 
-lnamepop_char := if(lnamepop, 'L', ' ');
+lnamepop_char := __common__(  if(lnamepop, 'L', ' ') );
 
-addrpop_char := if(addrpop, 'A', ' ');
+addrpop_char := __common__(  if(addrpop, 'A', ' ') );
 
-hphnpop_char := if(hphnpop, 'P', ' ');
+hphnpop_char := __common__(  if(hphnpop, 'P', ' ') );
 
-ssnpop_char := if(ssnpop, 'S', ' ');
+ssnpop_char := __common__(  if(ssnpop, 'S', ' ') );
 
-dobpop_char := if(dobpop, 'D', ' ');
+dobpop_char := __common__(  if(dobpop, 'D', ' ') );
 
-// pii_profile_n := '|' || (string)fnamepop_char || (string)lnamepop_char || (string)addrpop_char || (string)hphnpop_char || (string)ssnpop_char || (string)dobpop_char || '|';
-pii_profile_n := '|' + (string)fnamepop_char + (string)lnamepop_char + (string)addrpop_char + (string)hphnpop_char + (string)ssnpop_char + (string)dobpop_char + '|';
+// pii_profile_n := __common__(  '|' || (string)fnamepop_char || (string)lnamepop_char || (string)addrpop_char || (string)hphnpop_char || (string)ssnpop_char || (string)dobpop_char || '|' );
+pii_profile_n := __common__(  '|' + (string)fnamepop_char + (string)lnamepop_char + (string)addrpop_char + (string)hphnpop_char + (string)ssnpop_char + (string)dobpop_char + '|' );
 
-r_nas_ssn_verd_d := (integer)(nas_summary in [4, 6, 7, 9, 10, 11, 12]);
+r_nas_ssn_verd_d := __common__(  (integer)(nas_summary in [4, 6, 7, 9, 10, 11, 12]) );
 
-r_nas_addr_verd_d := (integer)(nas_summary in [3, 5, 6, 8, 10, 11, 12]);
+r_nas_addr_verd_d := __common__(  (integer)(nas_summary in [3, 5, 6, 8, 10, 11, 12]) );
 
-r_nas_lname_verd_d := (integer)(nas_summary in [2, 5, 7, 8, 9, 11, 12]);
+r_nas_lname_verd_d := __common__(  (integer)(nas_summary in [2, 5, 7, 8, 9, 11, 12]) );
 
-r_nas_fname_verd_d := (integer)(nas_summary in [2, 3, 4, 8, 9, 10, 12]);
+r_nas_fname_verd_d := __common__(  (integer)(nas_summary in [2, 3, 4, 8, 9, 10, 12]) );
 
-r_nas_nothing_found_i := (integer)(nas_summary in [0]);
+r_nas_nothing_found_i := __common__(  (integer)(nas_summary in [0]) );
 
-r_nas_contradictory_i := (integer)(nas_summary in [1]);
+r_nas_contradictory_i := __common__(  (integer)(nas_summary in [1]) );
 
-r_f00_nas_ssn_no_addr_verd_i := (integer)(nas_summary in [4, 7, 9]);
+r_f00_nas_ssn_no_addr_verd_i := __common__(  (integer)(nas_summary in [4, 7, 9]) );
 
-k_nap_phn_verd_d := (integer)(nap_summary in [4, 6, 7, 9, 10, 11, 12]);
+k_nap_phn_verd_d := __common__(  (integer)(nap_summary in [4, 6, 7, 9, 10, 11, 12]) );
 
-k_nap_addr_verd_d := (integer)(nap_summary in [3, 5, 6, 8, 10, 11, 12]);
+k_nap_addr_verd_d := __common__(  (integer)(nap_summary in [3, 5, 6, 8, 10, 11, 12]) );
 
-k_nap_lname_verd_d := (integer)(nap_summary in [2, 5, 7, 8, 9, 11, 12]);
+k_nap_lname_verd_d := __common__(  (integer)(nap_summary in [2, 5, 7, 8, 9, 11, 12]) );
 
-k_nap_fname_verd_d := (integer)(nap_summary in [2, 3, 4, 8, 9, 10, 12]);
+k_nap_fname_verd_d := __common__(  (integer)(nap_summary in [2, 3, 4, 8, 9, 10, 12]) );
 
-k_nap_nothing_found_i := (integer)(nap_summary in [0]);
+k_nap_nothing_found_i := __common__(  (integer)(nap_summary in [0]) );
 
-k_nap_contradictory_i := (integer)(nap_summary in [1]);
+k_nap_contradictory_i := __common__(  (integer)(nap_summary in [1]) );
 
-k_inf_phn_verd_d := (integer)(infutor_nap in [4, 6, 7, 9, 10, 11, 12]);
+k_inf_phn_verd_d := __common__(  (integer)(infutor_nap in [4, 6, 7, 9, 10, 11, 12]) );
 
-k_inf_addr_verd_d := (integer)(infutor_nap in [3, 5, 6, 8, 10, 11, 12]);
+k_inf_addr_verd_d := __common__(  (integer)(infutor_nap in [3, 5, 6, 8, 10, 11, 12]) );
 
-k_inf_lname_verd_d := (integer)(infutor_nap in [2, 5, 7, 8, 9, 11, 12]);
+k_inf_lname_verd_d := __common__(  (integer)(infutor_nap in [2, 5, 7, 8, 9, 11, 12]) );
 
-k_inf_fname_verd_d := (integer)(infutor_nap in [2, 3, 4, 8, 9, 10, 12]);
+k_inf_fname_verd_d := __common__(  (integer)(infutor_nap in [2, 3, 4, 8, 9, 10, 12]) );
 
-k_inf_nothing_found_i := (integer)(infutor_nap in [0]);
+k_inf_nothing_found_i := __common__(  (integer)(infutor_nap in [0]) );
 
-k_inf_contradictory_i := (integer)(infutor_nap in [1]);
+k_inf_contradictory_i := __common__(  (integer)(infutor_nap in [1]) );
 
-r_s65_ssn_prior_dob_i := map(
+r_s65_ssn_prior_dob_i := __common__(  map(
     not(ssnlength > 0 and dobpop)            => NULL,
     rc_ssndobflag = 1 or rc_pwssndobflag = 1 => 1,
     rc_ssndobflag = 0 or rc_pwssndobflag = 0 => 0,
-                                                NULL);
+                                                NULL) );
 
-r_s65_ssn_invalid_i := map(
+r_s65_ssn_invalid_i := __common__(  map(
     not(ssnlength > 0)                                                                                 => NULL,
     rc_ssnvalflag = 1 or (rc_pwssnvalflag in ['1', '2', '3']) or (inputssncharflag in ['1', '2', '3']) => 1,
     rc_ssnvalflag = 0 or (rc_pwssnvalflag in ['0', '4', '5']) or (inputssncharflag in ['0', '4', '5']) => 0,
-                                                                                                          NULL);
+                                                                                                          NULL) );
 
-r_c16_inv_ssn_per_adl_i := if(not(truedid), NULL, min(if(invalid_ssns_per_adl = NULL, -NULL, invalid_ssns_per_adl), 999));
+r_c16_inv_ssn_per_adl_i := __common__(  if(not(truedid), NULL, min(if(invalid_ssns_per_adl = NULL, -NULL, invalid_ssns_per_adl), 999)) );
 
-r_c16_inv_ssn_per_adl_c6_i := if(not(truedid), NULL, min(if(invalid_ssns_per_adl_c6 = NULL, -NULL, invalid_ssns_per_adl_c6), 999));
+r_c16_inv_ssn_per_adl_c6_i := __common__(  if(not(truedid), NULL, min(if(invalid_ssns_per_adl_c6 = NULL, -NULL, invalid_ssns_per_adl_c6), 999)) );
 
-r_f00_addr_not_ver_w_ssn_i := if(not(truedid and ssnlength > 0), NULL, (integer)(nas_summary in [4, 7, 9]));
+r_f00_addr_not_ver_w_ssn_i := __common__(  if(not(truedid and ssnlength > 0), NULL, (integer)(nas_summary in [4, 7, 9])) );
 
-r_s65_ssn_problem_i := map(
+r_s65_ssn_problem_i := __common__(  map(
     not(ssnlength > 0)                                                                                                                                                                                                                                                => NULL,
     dobpop and (rc_ssndobflag = 1 or rc_pwssndobflag = 1) or truedid and invalid_ssns_per_adl >= 2 or truedid and invalid_ssns_per_adl_c6 >= 1                                                                                                                        => 2,
     rc_decsflag = 1 or contains_i(ver_sources, 'DE') > 0 or contains_i(ver_sources, 'DS') > 0 or rc_ssnvalflag = 1 or (rc_pwssnvalflag in ['1', '2', '3']) or (inputssncharflag in ['1', '2', '3']) or truedid and invalid_ssns_per_adl >= 1                          => 1,
     rc_decsflag = 0 or dobpop and (rc_ssndobflag = 0 or rc_pwssndobflag = 0) or rc_ssnvalflag = 0 or (rc_pwssnvalflag in ['0', '4', '5']) or (inputssncharflag in ['0', '4', '5']) or truedid and invalid_ssns_per_adl = 0 or truedid and invalid_ssns_per_adl_c6 = 0 => 0,
-                                                                                                                                                                                                                                                                         NULL);
+                                                                                                                                                                                                                                                                         NULL) );
 
-r_p88_phn_dst_to_inp_add_i := if(rc_disthphoneaddr = 9999, NULL, rc_disthphoneaddr);
+r_p88_phn_dst_to_inp_add_i := __common__(  if(rc_disthphoneaddr = 9999, NULL, rc_disthphoneaddr) );
 
-r_l70_zip_not_issued_i := map(
+r_l70_zip_not_issued_i := __common__(  map(
     out_z5 = ''		               => NULL,
     (rc_pwphonezipflag in ['2']) => 1,
-                                    0);
+                                    0) );
 
-r_p85_phn_not_issued_i := map(
+r_p85_phn_not_issued_i := __common__(  map(
     not(hphnpop)                 => NULL,
     (rc_pwphonezipflag in ['4']) => 1,
-                                    0);
+                                    0) );
 
-r_p85_phn_disconnected_i := map(
+r_p85_phn_disconnected_i := __common__(  map(
     not(hphnpop)                                                             => NULL,
     rc_hriskphoneflag = 5 or trim(trim(nap_status, LEFT), LEFT, RIGHT) = 'D' => 1,
-                                                                                0);
+                                                                                0) );
 
-r_p85_phn_invalid_i := map(
+r_p85_phn_invalid_i := __common__(  map(
     not(hphnpop)                                                    => NULL,
     rc_phonevalflag = 0 or rc_hphonevalflag = 0 or rc_phonetype = 5 => 1,
-                                                                       0);
+                                                                       0) );
 
-r_p85_phn_hirisk_i := map(
+r_p85_phn_hirisk_i := __common__(  map(
     not(hphnpop)                                                                                    => NULL,
     rc_hriskphoneflag = 6 or rc_hphonetypeflag = '5' or rc_hphonevalflag = 3 or rc_addrcommflag = 1 => 1,
-                                                                                                       0);
+                                                                                                       0) );
 
-r_phn_cell_n_1 := if(not(hphnpop), NULL, NULL);
+r_phn_cell_n_1 := __common__(  if(not(hphnpop), NULL, NULL) );
 
-r_phn_cell_n := if(rc_hriskphoneflag = 1 or trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = '1' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '04' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '55' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '60', 1, 0);
+r_phn_cell_n := __common__(  if(rc_hriskphoneflag = 1 or trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = '1' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '04' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '55' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '60', 1, 0) );
 
-r_p86_phn_pager_i := map(
+r_p86_phn_pager_i := __common__(  map(
     not(hphnpop)                                                                                                                                                                                                                                            => NULL,
     rc_hriskphoneflag = 2 or trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = '2' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '02' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '56' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '61' => 1,
-                                                                                                                                                                                                                                                               0);
+                                                                                                                                                                                                                                                               0) );
 
-r_phn_pcs_n := map(
+r_phn_pcs_n := __common__(  map(
     not(hphnpop)                                                                                                                                                                                                                                                                                                                                                            => NULL,
     rc_hriskphoneflag = 3 or trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = '3' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '64' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '65' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '66' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '67' or trim(trim(telcordia_type, LEFT), LEFT, RIGHT) = '68' => 1,
-                                                                                                                                                                                                                                                                                                                                                                               0);
+                                                                                                                                                                                                                                                                                                                                                                               0) );
 
-r_p86_phn_pay_phone_i := map(
+r_p86_phn_pay_phone_i := __common__(  map(
     not(hphnpop)                                           => NULL,
     trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = 'A' => 1,
-                                                              0);
+                                                              0) );
 
-r_p86_phn_fax_i := map(
+r_p86_phn_fax_i := __common__(  map(
     not(hphnpop)                                           => NULL,
     trim(trim(rc_hphonetypeflag, LEFT), LEFT, RIGHT) = 'B' => 1,
-                                                              0);
+                                                              0) );
 
-r_p87_phn_corrections_i := map(
+r_p87_phn_corrections_i := __common__(  map(
     not(hphnpop)            				=> NULL,
     trim(rc_hrisksicphone) = '2225' => 1,
-																			 0);
+																			 0) );
 
-r_c17_inv_phn_per_adl_i := map(
+r_c17_inv_phn_per_adl_i := __common__(  map(
     not(truedid)                                                => NULL,
     invalid_phones_per_adl > 0 or invalid_phones_per_adl_c6 > 0 => 1,
-                                                                   0);
+                                                                   0) );
 
-r_l77_add_po_box_i := map(
+r_l77_add_po_box_i := __common__(  map(
     not(addrpop or not(out_z5 = ''))                                                                                                                                                                                                                           => NULL,
     rc_hriskaddrflag = 1 or rc_ziptypeflag = 1 or StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'E' or StringLib.StringToUpperCase(trim(rc_zipclass, LEFT, RIGHT)) = 'P' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'P' => 1,
-                                                                                                                                                                                                                                                                    0);
+                                                                                                                                                                                                                                                                    0) );
 
-r_l70_add_invalid_i := map(
+r_l70_add_invalid_i := __common__(  map(
     not(addrpop)                                        => NULL,
     trim(trim(rc_addrvalflag, LEFT), LEFT, RIGHT) = 'N' => 1,
-                                                           0);
+                                                           0) );
 
-r_l71_add_hirisk_comm_i := map(
+r_l71_add_hirisk_comm_i := __common__(  map(
     not(addrpop)                                => NULL,
     rc_hriskaddrflag = 4 or rc_addrcommflag = 2 => 1,
-                                                   0);
+                                                   0) );
 
-r_l71_add_corp_zip_i := map(
+r_l71_add_corp_zip_i := __common__(  map(
     not(addrpop or not(out_z5 = ''))         	 => NULL,
     rc_hriskaddrflag = 2 or rc_ziptypeflag = 2 => 1,
-                                                  0);
+                                                  0) );
 
-r_l72_add_vacant_i := map(
+r_l72_add_vacant_i := __common__(  map(
     not(add_input_pop)                                          => NULL,
     trim(trim(add_input_advo_vacancy, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                                   0);
+                                                                   0) );
 
-r_l74_add_throwback_i := map(
+r_l74_add_throwback_i := __common__(  map(
     not(add_input_pop)                                             => NULL,
     trim(trim(add_input_advo_throw_back, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                                      0);
+                                                                      0) );
 
-r_l75_add_drop_delivery_i := map(
+r_l75_add_drop_delivery_i := __common__(  map(
     not(add_input_pop)                                       => NULL,
     trim(trim(add_input_advo_drop, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                                0);
+                                                                0) );
 
-r_l76_add_seasonal_i := if(not(add_input_pop), NULL, (integer)(add_input_advo_seasonal in ['Y', 'E']));
+r_l76_add_seasonal_i := __common__(  if(not(add_input_pop), NULL, (integer)(add_input_advo_seasonal in ['Y', 'E'])) );
 
-r_l71_add_business_i := map(
+r_l71_add_business_i := __common__(  map(
     not(add_input_pop)                                                       => NULL,
     (trim(trim(add_input_advo_res_or_bus, LEFT), LEFT, RIGHT) in ['B', 'D']) => 1,
-                                                                                0);
+                                                                                0) );
 
-add_ec1 := (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[1..1];
+add_ec1 := __common__(  (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[1..1] );
 
-add_ec3 := (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[3..3];
+add_ec3 := __common__(  (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[3..3] );
 
-add_ec4 := (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[4..4];
+add_ec4 := __common__(  (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[4..4] );
 
-r_l70_add_standardized_i := map(
+r_l70_add_standardized_i := __common__(  map(
     not(addrpop)                                         => NULL,
     trim(trim(add_ec1, LEFT), LEFT, RIGHT) = 'E'         => 2,
     add_ec1 = 'S' and (add_ec3 != '0' or add_ec4 != '0') => 1,
-                                                            0);
+                                                            0) );
 
-r_l70_inp_addr_dnd_i := map(
+r_l70_inp_addr_dnd_i := __common__(  map(
     not(add_input_pop)        => NULL,
     add_input_advo_dnd = '' 	=> NULL,
-                                 (integer)(add_input_advo_dnd = 'Y'));
+                                 (integer)(add_input_advo_dnd = 'Y')) );
 
-r_l71_add_curr_hirisk_comm_i := if(not(add_curr_pop), NULL, add_curr_hr_address);
+r_l71_add_curr_hirisk_comm_i := __common__(  if(not(add_curr_pop), NULL, add_curr_hr_address) );
 
-r_l72_add_curr_vacant_i := map(
+r_l72_add_curr_vacant_i := __common__(  map(
     not(add_curr_pop)                                          => NULL,
     trim(trim(add_curr_advo_vacancy, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                                  0);
+                                                                  0) );
 
-r_l74_add_curr_throwback_i := map(
+r_l74_add_curr_throwback_i := __common__(  map(
     not(add_curr_pop)                                             => NULL,
     trim(trim(add_curr_advo_throw_back, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                                     0);
+                                                                     0) );
 
-r_l75_add_curr_drop_delivery_i := map(
+r_l75_add_curr_drop_delivery_i := __common__(  map(
     not(add_curr_pop)                                       => NULL,
     trim(trim(add_curr_advo_drop, LEFT), LEFT, RIGHT) = 'Y' => 1,
-                                                               0);
+                                                               0) );
 
-r_l76_add_curr_seasonal_i := if(not(add_curr_pop), NULL, (integer)(add_curr_advo_seasonal in ['Y', 'E']));
+r_l76_add_curr_seasonal_i := __common__(  if(not(add_curr_pop), NULL, (integer)(add_curr_advo_seasonal in ['Y', 'E'])) );
 
-r_l71_add_curr_business_i := map(
+r_l71_add_curr_business_i := __common__(  map(
     not(add_curr_pop)                                                       => NULL,
     (trim(trim(add_curr_advo_res_or_bus, LEFT), LEFT, RIGHT) in ['B', 'D']) => 1,
-                                                                               0);
+                                                                               0) );
 
-r_f03_input_add_not_most_rec_i := if(not(truedid and add_input_pop), NULL, rc_input_addr_not_most_recent);
+r_f03_input_add_not_most_rec_i := __common__(  if(not(truedid and add_input_pop), NULL, rc_input_addr_not_most_recent) );
 
-r_c18_inv_add_per_adl_c6_i := if(not(truedid), NULL, min(if(invalid_addrs_per_adl_c6 = NULL, -NULL, invalid_addrs_per_adl_c6), 999));
+r_c18_inv_add_per_adl_c6_i := __common__(  if(not(truedid), NULL, min(if(invalid_addrs_per_adl_c6 = NULL, -NULL, invalid_addrs_per_adl_c6), 999)) );
 
-r_c19_add_prison_hist_i := if(not(truedid), NULL, addrs_prison_history);
+r_c19_add_prison_hist_i := __common__(  if(not(truedid), NULL, addrs_prison_history) );
 
-r_l77_apartment_i := map(
+r_l77_apartment_i := __common__(  map(
     not(addrpop)                                                                                                                                                                                         => NULL,
     StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = '') => 1,
-                                                                                                                                                                                                            0);
+                                                                                                                                                                                                            0) );
 
-r_f00_ssn_score_d := if(not(truedid and ssnlength > 0) or combo_ssnscore = 255, NULL, min(if(combo_ssnscore = NULL, -NULL, combo_ssnscore), 999));
+r_f00_ssn_score_d := __common__(  if(not(truedid and ssnlength > 0) or combo_ssnscore = 255, NULL, min(if(combo_ssnscore = NULL, -NULL, combo_ssnscore), 999)) );
 
-r_f00_dob_score_d := if(not(truedid and dobpop) or combo_dobscore = 255, NULL, min(if(combo_dobscore = NULL, -NULL, combo_dobscore), 999));
+r_f00_dob_score_d := __common__(  if(not(truedid and dobpop) or combo_dobscore = 255, NULL, min(if(combo_dobscore = NULL, -NULL, combo_dobscore), 999)) );
 
-r_f01_inp_addr_address_score_d := if(not(truedid and add_input_pop) or add_input_address_score = 255, NULL, min(if(add_input_address_score = NULL, -NULL, add_input_address_score), 999));
+r_f01_inp_addr_address_score_d := __common__(  if(not(truedid and add_input_pop) or add_input_address_score = 255, NULL, min(if(add_input_address_score = NULL, -NULL, add_input_address_score), 999)) );
 
-r_l70_inp_addr_dirty_i := if(not(add_input_pop and truedid), NULL, add_input_dirty_address);
+r_l70_inp_addr_dirty_i := __common__(  if(not(add_input_pop and truedid), NULL, add_input_dirty_address) );
 
-r_f00_input_dob_match_level_d := if(not(truedid and dobpop), NULL, (integer)input_dob_match_level);
+r_f00_input_dob_match_level_d := __common__(  if(not(truedid and dobpop), NULL, (integer)input_dob_match_level) );
 
-r_d30_derog_count_i := if(not(truedid), NULL, min(if(attr_total_number_derogs = NULL, -NULL, attr_total_number_derogs), 999));
+r_d30_derog_count_i := __common__(  if(not(truedid), NULL, min(if(attr_total_number_derogs = NULL, -NULL, attr_total_number_derogs), 999)) );
 
-r_d32_criminal_count_i := if(not(truedid), NULL, min(if(criminal_count = NULL, -NULL, criminal_count), 999));
+r_d32_criminal_count_i := __common__(  if(not(truedid), NULL, min(if(criminal_count = NULL, -NULL, criminal_count), 999)) );
 
-r_d32_felony_count_i := if(not(truedid), NULL, min(if(felony_count = NULL, -NULL, felony_count), 999));
+r_d32_felony_count_i := __common__(  if(not(truedid), NULL, min(if(felony_count = NULL, -NULL, felony_count), 999)) );
 
-_criminal_last_date := common.sas_date((string)(criminal_last_date));
+_criminal_last_date := __common__(  common.sas_date((string)(criminal_last_date)) );
 
-r_d32_mos_since_crim_ls_d := map(
+r_d32_mos_since_crim_ls_d := __common__(  map(
     not(truedid)               => NULL,
     _criminal_last_date = NULL => 241,
-                                  max(3, min(if(if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12)))), 240)));
+                                  max(3, min(if(if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12)))), 240))) );
 
-_felony_last_date := common.sas_date((string)(felony_last_date));
+_felony_last_date := __common__(  common.sas_date((string)(felony_last_date)) );
 
-r_d32_mos_since_fel_ls_d := map(
+r_d32_mos_since_fel_ls_d := __common__(  map(
     not(truedid)             => NULL,
     _felony_last_date = NULL => 241,
-                                max(3, min(if(if ((sysdate - _felony_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _felony_last_date) / (365.25 / 12)), roundup((sysdate - _felony_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _felony_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _felony_last_date) / (365.25 / 12)), roundup((sysdate - _felony_last_date) / (365.25 / 12)))), 240)));
+                                max(3, min(if(if ((sysdate - _felony_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _felony_last_date) / (365.25 / 12)), roundup((sysdate - _felony_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _felony_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _felony_last_date) / (365.25 / 12)), roundup((sysdate - _felony_last_date) / (365.25 / 12)))), 240))) );
 
-r_d31_mostrec_bk_i := map(
+r_d31_mostrec_bk_i := __common__(  map(
     not(truedid)                     => NULL,
 		//kh-changed to check for truncated string
     StringLib.StringToUpperCase(disposition[1..7]) = 'DISMISS'  => 1,
     StringLib.StringToUpperCase(disposition[1..8]) = 'DISCHARG' => 2,
     bankrupt = 1 or filing_count > 0 => 3,
-                                        0);
+                                        0) );
 
-r_d31_attr_bankruptcy_recency_d := map(
+r_d31_attr_bankruptcy_recency_d := __common__(  map(
     not(truedid)             		=> NULL,
     attr_bankruptcy_count30 >0  => 1,  //kh-added >0 for all these
     attr_bankruptcy_count90 >0  => 3,
@@ -852,15 +852,15 @@ r_d31_attr_bankruptcy_recency_d := map(
     attr_bankruptcy_count60 >0  => 60,
     bankrupt = 1             		=> 99,
     filing_count > 0         		=> 99,
-																	 0);
+																	 0) );
 
-r_d31_bk_filing_count_i := if(not(truedid), NULL, min(if(filing_count = NULL, -NULL, filing_count), 999));
+r_d31_bk_filing_count_i := __common__(  if(not(truedid), NULL, min(if(filing_count = NULL, -NULL, filing_count), 999)) );
 
-r_d31_bk_disposed_recent_count_i := if(not(truedid), NULL, min(if(bk_disposed_recent_count = NULL, -NULL, bk_disposed_recent_count), 999));
+r_d31_bk_disposed_recent_count_i := __common__(  if(not(truedid), NULL, min(if(bk_disposed_recent_count = NULL, -NULL, bk_disposed_recent_count), 999)) );
 
-r_d31_bk_disposed_hist_count_i := if(not(truedid), NULL, min(if(bk_disposed_historical_count = NULL, -NULL, bk_disposed_historical_count), 999));
+r_d31_bk_disposed_hist_count_i := __common__(  if(not(truedid), NULL, min(if(bk_disposed_historical_count = NULL, -NULL, bk_disposed_historical_count), 999)) );
 
-r_d33_eviction_recency_d := map(
+r_d33_eviction_recency_d := __common__(  map(
     not(truedid)             		=> NULL,
     attr_eviction_count90 >0    => 3,	//kh-added >0 for all these
     attr_eviction_count180 >0   => 6,
@@ -869,109 +869,109 @@ r_d33_eviction_recency_d := map(
     attr_eviction_count36 >0    => 36,
     attr_eviction_count60 >0    => 60,
     attr_eviction_count >= 1 		=> 99,
-																	 999);
+																	 999) );
 
-r_d33_eviction_count_i := if(not(truedid), NULL, min(if(attr_eviction_count = NULL, -NULL, attr_eviction_count), 999));
+r_d33_eviction_count_i := __common__(  if(not(truedid), NULL, min(if(attr_eviction_count = NULL, -NULL, attr_eviction_count), 999)) );
 
-r_d34_unrel_liens_ct_i := if(not(truedid), NULL, min(if(if(max(liens_recent_unreleased_count, liens_historical_unreleased_ct) = NULL, NULL, sum(if(liens_recent_unreleased_count = NULL, 0, liens_recent_unreleased_count), if(liens_historical_unreleased_ct = NULL, 0, liens_historical_unreleased_ct))) = NULL, -NULL, if(max(liens_recent_unreleased_count, liens_historical_unreleased_ct) = NULL, NULL, sum(if(liens_recent_unreleased_count = NULL, 0, liens_recent_unreleased_count), if(liens_historical_unreleased_ct = NULL, 0, liens_historical_unreleased_ct)))), 999));
+r_d34_unrel_liens_ct_i := __common__(  if(not(truedid), NULL, min(if(if(max(liens_recent_unreleased_count, liens_historical_unreleased_ct) = NULL, NULL, sum(if(liens_recent_unreleased_count = NULL, 0, liens_recent_unreleased_count), if(liens_historical_unreleased_ct = NULL, 0, liens_historical_unreleased_ct))) = NULL, -NULL, if(max(liens_recent_unreleased_count, liens_historical_unreleased_ct) = NULL, NULL, sum(if(liens_recent_unreleased_count = NULL, 0, liens_recent_unreleased_count), if(liens_historical_unreleased_ct = NULL, 0, liens_historical_unreleased_ct)))), 999)) );
 
-r_d34_unrel_lien60_count_i := if(not(truedid), NULL, min(if(attr_num_unrel_liens60 = NULL, -NULL, attr_num_unrel_liens60), 999));
+r_d34_unrel_lien60_count_i := __common__(  if(not(truedid), NULL, min(if(attr_num_unrel_liens60 = NULL, -NULL, attr_num_unrel_liens60), 999)) );
 
-bureau_adl_eq_fseen_pos_2 := Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E');
+bureau_adl_eq_fseen_pos_2 := __common__(  Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E') );
 
-bureau_adl_fseen_eq_2 := if(bureau_adl_eq_fseen_pos_2 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos_2, ','));
+bureau_adl_fseen_eq_2 := __common__(  if(bureau_adl_eq_fseen_pos_2 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos_2, ',')) );
 
-_bureau_adl_fseen_eq_2 := common.sas_date((string)(bureau_adl_fseen_eq_2));
+_bureau_adl_fseen_eq_2 := __common__(  common.sas_date((string)(bureau_adl_fseen_eq_2)) );
 
-_src_bureau_adl_fseen := min(if(_bureau_adl_fseen_eq_2 = NULL, -NULL, _bureau_adl_fseen_eq_2), 999999);
+_src_bureau_adl_fseen := __common__(  min(if(_bureau_adl_fseen_eq_2 = NULL, -NULL, _bureau_adl_fseen_eq_2), 999999) );
 
-r_c21_m_bureau_adl_fs_d := map(
+r_c21_m_bureau_adl_fs_d := __common__(  map(
     not(truedid)                   => NULL,
     _src_bureau_adl_fseen = 999999 => 1000,
-                                      min(if(if ((sysdate - _src_bureau_adl_fseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)))), 999));
+                                      min(if(if ((sysdate - _src_bureau_adl_fseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen) / (365.25 / 12)))), 999)) );
 
-bureau_adl_eq_fseen_pos_1 := Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E');
+bureau_adl_eq_fseen_pos_1 := __common__(  Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E') );
 
-bureau_adl_fseen_eq_1 := if(bureau_adl_eq_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos_1, ','));
+bureau_adl_fseen_eq_1 := __common__(  if(bureau_adl_eq_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos_1, ',')) );
 
-_bureau_adl_fseen_eq_1 := common.sas_date((string)(bureau_adl_fseen_eq_1));
+_bureau_adl_fseen_eq_1 := __common__(  common.sas_date((string)(bureau_adl_fseen_eq_1)) );
 
-bureau_adl_en_fseen_pos_1 := Models.Common.findw_cpp(ver_sources, 'EN' , ',', 'E');
+bureau_adl_en_fseen_pos_1 := __common__(  Models.Common.findw_cpp(ver_sources, 'EN' , ',', 'E') );
 
-bureau_adl_fseen_en_1 := if(bureau_adl_en_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_en_fseen_pos_1, ','));
+bureau_adl_fseen_en_1 := __common__(  if(bureau_adl_en_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_en_fseen_pos_1, ',')) );
 
-_bureau_adl_fseen_en_1 := common.sas_date((string)(bureau_adl_fseen_en_1));
+_bureau_adl_fseen_en_1 := __common__(  common.sas_date((string)(bureau_adl_fseen_en_1)) );
 
-bureau_adl_ts_fseen_pos_1 := Models.Common.findw_cpp(ver_sources, 'TS' , ',', 'E');
+bureau_adl_ts_fseen_pos_1 := __common__(  Models.Common.findw_cpp(ver_sources, 'TS' , ',', 'E') );
 
-bureau_adl_fseen_ts_1 := if(bureau_adl_ts_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_ts_fseen_pos_1, ','));
+bureau_adl_fseen_ts_1 := __common__(  if(bureau_adl_ts_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_ts_fseen_pos_1, ',')) );
 
-_bureau_adl_fseen_ts_1 := common.sas_date((string)(bureau_adl_fseen_ts_1));
+_bureau_adl_fseen_ts_1 := __common__(  common.sas_date((string)(bureau_adl_fseen_ts_1)) );
 
-bureau_adl_tu_fseen_pos_1 := Models.Common.findw_cpp(ver_sources, 'TU' , ',', 'E');
+bureau_adl_tu_fseen_pos_1 := __common__(  Models.Common.findw_cpp(ver_sources, 'TU' , ',', 'E') );
 
-bureau_adl_fseen_tu_1 := if(bureau_adl_tu_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tu_fseen_pos_1, ','));
+bureau_adl_fseen_tu_1 := __common__(  if(bureau_adl_tu_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tu_fseen_pos_1, ',')) );
 
-_bureau_adl_fseen_tu_1 := common.sas_date((string)(bureau_adl_fseen_tu_1));
+_bureau_adl_fseen_tu_1 := __common__(  common.sas_date((string)(bureau_adl_fseen_tu_1)) );
 
-bureau_adl_tn_fseen_pos_1 := Models.Common.findw_cpp(ver_sources, 'TN' , ',', 'E');
+bureau_adl_tn_fseen_pos_1 := __common__(  Models.Common.findw_cpp(ver_sources, 'TN' , ',', 'E') );
 
-bureau_adl_fseen_tn_1 := if(bureau_adl_tn_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tn_fseen_pos_1, ','));
+bureau_adl_fseen_tn_1 := __common__(  if(bureau_adl_tn_fseen_pos_1 = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tn_fseen_pos_1, ',')) );
 
-_bureau_adl_fseen_tn_1 := common.sas_date((string)(bureau_adl_fseen_tn_1));
+_bureau_adl_fseen_tn_1 := __common__(  common.sas_date((string)(bureau_adl_fseen_tn_1)) );
 
-_src_bureau_adl_fseen_all := min(if(_bureau_adl_fseen_tn_1 = NULL, -NULL, _bureau_adl_fseen_tn_1), if(_bureau_adl_fseen_ts_1 = NULL, -NULL, _bureau_adl_fseen_ts_1), if(_bureau_adl_fseen_tu_1 = NULL, -NULL, _bureau_adl_fseen_tu_1), if(_bureau_adl_fseen_en_1 = NULL, -NULL, _bureau_adl_fseen_en_1), if(_bureau_adl_fseen_eq_1 = NULL, -NULL, _bureau_adl_fseen_eq_1), 999999);
+_src_bureau_adl_fseen_all := __common__(  min(if(_bureau_adl_fseen_tn_1 = NULL, -NULL, _bureau_adl_fseen_tn_1), if(_bureau_adl_fseen_ts_1 = NULL, -NULL, _bureau_adl_fseen_ts_1), if(_bureau_adl_fseen_tu_1 = NULL, -NULL, _bureau_adl_fseen_tu_1), if(_bureau_adl_fseen_en_1 = NULL, -NULL, _bureau_adl_fseen_en_1), if(_bureau_adl_fseen_eq_1 = NULL, -NULL, _bureau_adl_fseen_eq_1), 999999) );
 
-f_m_bureau_adl_fs_all_d := map(
+f_m_bureau_adl_fs_all_d := __common__(  map(
     not(truedid)                       => NULL,
     _src_bureau_adl_fseen_all = 999999 => 1000,
-                                          min(if(if ((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)))), 999));
+                                          min(if(if ((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_all) / (365.25 / 12)))), 999)) );
 
-bureau_adl_eq_fseen_pos := Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E');
+bureau_adl_eq_fseen_pos := __common__(  Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E') );
 
-bureau_adl_fseen_eq := if(bureau_adl_eq_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos, ','));
+bureau_adl_fseen_eq := __common__(  if(bureau_adl_eq_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_eq_fseen_pos, ',')) );
 
-_bureau_adl_fseen_eq := common.sas_date((string)(bureau_adl_fseen_eq));
+_bureau_adl_fseen_eq := __common__(  common.sas_date((string)(bureau_adl_fseen_eq)) );
 
-bureau_adl_en_fseen_pos := Models.Common.findw_cpp(ver_sources, 'EN' , ',', 'E');
+bureau_adl_en_fseen_pos := __common__(  Models.Common.findw_cpp(ver_sources, 'EN' , ',', 'E') );
 
-bureau_adl_fseen_en := if(bureau_adl_en_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_en_fseen_pos, ','));
+bureau_adl_fseen_en := __common__(  if(bureau_adl_en_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_en_fseen_pos, ',')) );
 
-_bureau_adl_fseen_en := common.sas_date((string)(bureau_adl_fseen_en));
+_bureau_adl_fseen_en := __common__(  common.sas_date((string)(bureau_adl_fseen_en)) );
 
-bureau_adl_ts_fseen_pos := Models.Common.findw_cpp(ver_sources, 'TS' , ',', 'E');
+bureau_adl_ts_fseen_pos := __common__(  Models.Common.findw_cpp(ver_sources, 'TS' , ',', 'E') );
 
-bureau_adl_fseen_ts := if(bureau_adl_ts_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_ts_fseen_pos, ','));
+bureau_adl_fseen_ts := __common__(  if(bureau_adl_ts_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_ts_fseen_pos, ',')) );
 
-_bureau_adl_fseen_ts := common.sas_date((string)(bureau_adl_fseen_ts));
+_bureau_adl_fseen_ts := __common__(  common.sas_date((string)(bureau_adl_fseen_ts)) );
 
-bureau_adl_tu_fseen_pos := Models.Common.findw_cpp(ver_sources, 'TU' , ',', 'E');
+bureau_adl_tu_fseen_pos := __common__(  Models.Common.findw_cpp(ver_sources, 'TU' , ',', 'E') );
 
-bureau_adl_fseen_tu := if(bureau_adl_tu_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tu_fseen_pos, ','));
+bureau_adl_fseen_tu := __common__(  if(bureau_adl_tu_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tu_fseen_pos, ',')) );
 
-_bureau_adl_fseen_tu := common.sas_date((string)(bureau_adl_fseen_tu));
+_bureau_adl_fseen_tu := __common__(  common.sas_date((string)(bureau_adl_fseen_tu)) );
 
-bureau_adl_tn_fseen_pos := Models.Common.findw_cpp(ver_sources, 'TN' , ',', 'E');
+bureau_adl_tn_fseen_pos := __common__(  Models.Common.findw_cpp(ver_sources, 'TN' , ',', 'E') );
 
-bureau_adl_fseen_tn := if(bureau_adl_tn_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tn_fseen_pos, ','));
+bureau_adl_fseen_tn := __common__(  if(bureau_adl_tn_fseen_pos = 0, '       0', Models.Common.getw(ver_sources_first_seen, bureau_adl_tn_fseen_pos, ',')) );
 
-_bureau_adl_fseen_tn := common.sas_date((string)(bureau_adl_fseen_tn));
+_bureau_adl_fseen_tn := __common__(  common.sas_date((string)(bureau_adl_fseen_tn)) );
 
-_src_bureau_adl_fseen_notu := min(if(_bureau_adl_fseen_en = NULL, -NULL, _bureau_adl_fseen_en), if(_bureau_adl_fseen_eq = NULL, -NULL, _bureau_adl_fseen_eq), 999999);
+_src_bureau_adl_fseen_notu := __common__(  min(if(_bureau_adl_fseen_en = NULL, -NULL, _bureau_adl_fseen_en), if(_bureau_adl_fseen_eq = NULL, -NULL, _bureau_adl_fseen_eq), 999999) );
 
-f_m_bureau_adl_fs_notu_d := map(
+f_m_bureau_adl_fs_notu_d := __common__(  map(
     not(truedid)                        => NULL,
     _src_bureau_adl_fseen_notu = 999999 => 1000,
-                                           min(if(if ((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)))), 999));
+                                           min(if(if ((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_notu) / (365.25 / 12)))), 999)) );
 
-_header_first_seen := common.sas_date((string)(header_first_seen));
+_header_first_seen := __common__(  common.sas_date((string)(header_first_seen)) );
 
-r_c10_m_hdr_fs_d := map(
+r_c10_m_hdr_fs_d := __common__(  map(
     not(truedid)              => NULL,
     _header_first_seen = NULL => 1000,
-                                 min(if(if ((sysdate - _header_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _header_first_seen) / (365.25 / 12)), roundup((sysdate - _header_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _header_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _header_first_seen) / (365.25 / 12)), roundup((sysdate - _header_first_seen) / (365.25 / 12)))), 999));
+                                 min(if(if ((sysdate - _header_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _header_first_seen) / (365.25 / 12)), roundup((sysdate - _header_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _header_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _header_first_seen) / (365.25 / 12)), roundup((sysdate - _header_first_seen) / (365.25 / 12)))), 999)) );
 
-r_c12_nonderog_recency_i := map(
+r_c12_nonderog_recency_i := __common__(  map(
     not(truedid)            	 => NULL,
     attr_num_nonderogs90 > 0   => 3, //kh-added >0 to all these
     attr_num_nonderogs180 > 0  => 6,
@@ -980,180 +980,180 @@ r_c12_nonderog_recency_i := map(
     attr_num_nonderogs36 > 0   => 36,
     attr_num_nonderogs60 > 0   => 60,
     attr_num_nonderogs >= 1 	 => 99,
-																  999);
+																  999) );
 
-r_c12_num_nonderogs_d := if(not(truedid), NULL, min(if(attr_num_nonderogs = NULL, -NULL, attr_num_nonderogs), 999));
+r_c12_num_nonderogs_d := __common__(  if(not(truedid), NULL, min(if(attr_num_nonderogs = NULL, -NULL, attr_num_nonderogs), 999)) );
 
-r_c15_ssns_per_adl_i := map(
+r_c15_ssns_per_adl_i := __common__(  map(
     not(truedid)             => NULL,
     ssns_per_adl = 0         => 2,
     (ssns_per_adl in [1, 2]) => 1,
-                                min(if(ssns_per_adl = NULL, -NULL, ssns_per_adl), 999));
+                                min(if(ssns_per_adl = NULL, -NULL, ssns_per_adl), 999)) );
 
-r_c15_ssns_per_adl_c6_i_1 := map(
+r_c15_ssns_per_adl_c6_i_1 := __common__(  map(
     not(truedid)        => NULL,
     ssns_per_adl_c6 = 0 => 1,
-                           min(if(ssns_per_adl_c6 = NULL, -NULL, ssns_per_adl_c6), 999));
+                           min(if(ssns_per_adl_c6 = NULL, -NULL, ssns_per_adl_c6), 999)) );
 
-r_s66_adlperssn_count_i := map(
+r_s66_adlperssn_count_i := __common__(  map(
     not(ssnlength > 0) => NULL,
     adls_per_ssn = 0   => 1,
-                          min(if(adls_per_ssn = NULL, -NULL, adls_per_ssn), 999));
+                          min(if(adls_per_ssn = NULL, -NULL, adls_per_ssn), 999)) );
 
-_in_dob := common.sas_date((string)(in_dob));
+_in_dob := __common__(  common.sas_date((string)(in_dob)) );
 
-yr_in_dob := if(_in_dob = NULL, NULL, (sysdate - _in_dob) / 365.25);
+yr_in_dob := __common__(  if(_in_dob = NULL, NULL, (sysdate - _in_dob) / 365.25) );
 
-yr_in_dob_int := if (yr_in_dob >= 0, roundup(yr_in_dob), truncate(yr_in_dob));
+yr_in_dob_int := __common__(  if (yr_in_dob >= 0, roundup(yr_in_dob), truncate(yr_in_dob)) );
 
-k_comb_age_d := map(
+k_comb_age_d := __common__(  map(
     yr_in_dob_int > 0            => yr_in_dob_int,
     inferred_age > 0 and truedid => inferred_age,
-                                    NULL);
+                                    NULL) );
 
-r_f03_address_match_d := map(
+r_f03_address_match_d := __common__(  map(
     not(truedid)                                => NULL,
     add_input_isbestmatch                       => 4,
     not(add_input_pop) and add_curr_isbestmatch => 3,
     add_input_pop and add_curr_isbestmatch      => 2,
     add_curr_pop                                => 1,
     add_input_pop                               => 0,
-                                                   NULL);
+                                                   NULL) );
 
-r_a48_inp_addr_conv_mortgage_d := map(
+r_a48_inp_addr_conv_mortgage_d := __common__(  map(
     not(truedid and add_input_pop)                                                                                                                                                                                                                                                                                                      => 2,
     add_input_financing_type = 'CNV' or (add_input_mortgage_type in ['CNV', 'N'])                                                                                                                                                                                                                                                       => 2,
     add_input_mortgage_type = '' and not((add_input_mortgage_date in [0, NULL])) or not(add_input_mortgage_type = '') and not((add_input_mortgage_type in ['CNV', 'N', 'FHA', 'G', 'VA', '1', 'D', '2', 'E', 'R', 'C', 'I', 'K', 'O', 'LHM', 'T', 'SBA', 'H', 'J', 'PMM', 'PP', 'S', 'L', 'U'])) or add_input_financing_type = '' => 2,
-                                                                                                                                                                                                                                                                                                                                           1);
+                                                                                                                                                                                                                                                                                                                                           1) );
 
-r_a44_curr_add_naprop_d := if(not(truedid and add_curr_pop), NULL, (integer)add_curr_naprop);
+r_a44_curr_add_naprop_d := __common__(  if(not(truedid and add_curr_pop), NULL, (integer)add_curr_naprop) );
 
-r_a48_curr_addr_conv_mortg_d := map(
+r_a48_curr_addr_conv_mortg_d := __common__(  map(
     not(truedid and add_curr_pop)                                                                                                                                                                                                                                                                                                  => 2,
     add_curr_financing_type = 'CNV' or (add_curr_mortgage_type in ['CNV', 'N'])                                                                                                                                                                                                                                                    => 2,
     add_curr_mortgage_type = '' and not((add_curr_mortgage_date in [0, NULL])) or not(add_curr_mortgage_type = '') and not((add_curr_mortgage_type in ['CNV', 'N', 'FHA', 'G', 'VA', '1', 'D', '2', 'E', 'R', 'C', 'I', 'K', 'O', 'LHM', 'T', 'SBA', 'H', 'J', 'PMM', 'PP', 'S', 'L', 'U'])) or add_curr_financing_type = '' => 2,
-                                                                                                                                                                                                                                                                                                                                      1);
+                                                                                                                                                                                                                                                                                                                                      1) );
 
-r_l80_inp_avm_autoval_d := map(
+r_l80_inp_avm_autoval_d := __common__(  map(
     not(add_input_pop)         => NULL,
     add_input_avm_auto_val = 0 => NULL,
-                                  min(if(add_input_avm_auto_val = NULL, -NULL, add_input_avm_auto_val), 300000));
+                                  min(if(add_input_avm_auto_val = NULL, -NULL, add_input_avm_auto_val), 300000)) );
 
-r_a46_curr_avm_autoval_d := map(
+r_a46_curr_avm_autoval_d := __common__(  map(
     // not(truedid)              => NULL,	//kh-delta
     not(add_curr_pop)            => NULL,
     add_curr_avm_auto_val = 0 => NULL,
-                                 min(if(add_curr_avm_auto_val = NULL, -NULL, add_curr_avm_auto_val), 300000));
+                                 min(if(add_curr_avm_auto_val = NULL, -NULL, add_curr_avm_auto_val), 300000)) );
 
-r_a49_curr_avm_chg_1yr_i := map(
+r_a49_curr_avm_chg_1yr_i := __common__(  map(
     // not(truedid)                                              => NULL,	//kh-delta
     not(add_curr_pop)                                         => NULL,
     add_curr_lres < 12                                        => NULL,
     add_curr_avm_auto_val > 0 and add_curr_avm_auto_val_2 > 0 => add_curr_avm_auto_val - add_curr_avm_auto_val_2,
-                                                                 NULL);
+                                                                 NULL) );
 
-r_a49_curr_avm_chg_1yr_pct_i := map(	//kh-added decimal definition
+r_a49_curr_avm_chg_1yr_pct_i := __common__(  map(	//kh-added decimal definition
     // not(truedid)                                              => NULL,
     not(add_curr_pop)                                         => NULL,
     add_curr_lres < 12                                        => NULL,
     // add_curr_avm_auto_val > 0 and add_curr_avm_auto_val_2 > 0 => round(100 * add_curr_avm_auto_val / add_curr_avm_auto_val_2/0.1)*0.1,
     add_curr_avm_auto_val > 0 and add_curr_avm_auto_val_2 > 0 => round(100 * add_curr_avm_auto_val / add_curr_avm_auto_val_2/0.1) / 10,	//kh-changed to divide
-                                                                 NULL);
+                                                                 NULL) );
 
-r_c13_curr_addr_lres_d := if(not(truedid and add_curr_pop), NULL, min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
+r_c13_curr_addr_lres_d := __common__(  if(not(truedid and add_curr_pop), NULL, min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999)) );
 
-r_c14_addr_stability_v2_d := map(
+r_c14_addr_stability_v2_d := __common__(  map(
     not(truedid)          => NULL,
     addr_stability_v2 = 0 => NULL,
-                             addr_stability_v2);
+                             addr_stability_v2) );
 
-r_c13_max_lres_d := if(not(truedid), NULL, min(if(max_lres = NULL, -NULL, max_lres), 999));
+r_c13_max_lres_d := __common__(  if(not(truedid), NULL, min(if(max_lres = NULL, -NULL, max_lres), 999)) );
 
-r_add_curr_pop_i := if(not(add_curr_pop), 0, 1);
+r_add_curr_pop_i := __common__(  if(not(add_curr_pop), 0, 1) );
 
-r_c14_addrs_5yr_i := if(not(truedid), NULL, min(if(addrs_5yr = NULL, -NULL, addrs_5yr), 999));
+r_c14_addrs_5yr_i := __common__(  if(not(truedid), NULL, min(if(addrs_5yr = NULL, -NULL, addrs_5yr), 999)) );
 
-r_c14_addrs_10yr_i := if(not(truedid), NULL, min(if(addrs_10yr = NULL, -NULL, addrs_10yr), 999));
+r_c14_addrs_10yr_i := __common__(  if(not(truedid), NULL, min(if(addrs_10yr = NULL, -NULL, addrs_10yr), 999)) );
 
-r_c14_addrs_per_adl_c6_i := if(not(truedid), NULL, min(if(addrs_per_adl_c6 = NULL, -NULL, addrs_per_adl_c6), 999));
+r_c14_addrs_per_adl_c6_i := __common__(  if(not(truedid), NULL, min(if(addrs_per_adl_c6 = NULL, -NULL, addrs_per_adl_c6), 999)) );
 
-r_c14_addrs_15yr_i := if(not(truedid), NULL, min(if(addrs_15yr = NULL, -NULL, addrs_15yr), 999));
+r_c14_addrs_15yr_i := __common__(  if(not(truedid), NULL, min(if(addrs_15yr = NULL, -NULL, addrs_15yr), 999)) );
 
-r_a41_prop_owner_d := map(
+r_a41_prop_owner_d := __common__(  map(
     not(truedid)                                                                                   => NULL,
     add_input_naprop = 4 or add_curr_naprop = 4 or add_prev_naprop = 4 or property_owned_total > 0 => 1,
-                                                                                                      0);
+                                                                                                      0) );
 
-r_a41_prop_owner_inp_only_d := map(
+r_a41_prop_owner_inp_only_d := __common__(  map(
     not(truedid)                                => NULL,
     add_input_naprop = 4 or add_curr_naprop = 4 => 1,
-                                                   0);
+                                                   0) );
 
-r_prop_owner_history_d := map(
+r_prop_owner_history_d := __common__(  map(
     not(truedid)                                                                     => NULL,
     add_input_naprop = 4 or add_curr_naprop = 4 or property_owned_total > 0          => 2,
     add_prev_naprop = 4 or Models.Common.findw_cpp(ver_sources, 'P' , ', ', 'E') > 0 => 1,
-                                                                                        0);
+                                                                                        0) );
 
-r_a43_aircraft_cnt_d := if(not(truedid), NULL, attr_num_aircraft);
+r_a43_aircraft_cnt_d := __common__(  if(not(truedid), NULL, attr_num_aircraft) );
 
-r_a43_watercraft_cnt_d := if(not(truedid), NULL, watercraft_count);
+r_a43_watercraft_cnt_d := __common__(  if(not(truedid), NULL, watercraft_count) );
 
-r_ever_asset_owner_d := map(
+r_ever_asset_owner_d := __common__(  map(
     not(truedid)                                                                                                                                                                                                 => NULL,
     add_input_naprop = 4 or add_curr_naprop = 4 or add_prev_naprop = 4 or property_owned_total > 0 or Models.Common.findw_cpp(ver_sources, 'P' , ', ', 'E') > 0 or watercraft_count > 0 or attr_num_aircraft > 0 => 1,
-                                                                                                                                                                                                                    0);
+                                                                                                                                                                                                                    0) );
 
-r_c20_email_count_i := if(not(truedid), NULL, min(if(email_count = NULL, -NULL, email_count), 999));
+r_c20_email_count_i := __common__(  if(not(truedid), NULL, min(if(email_count = NULL, -NULL, email_count), 999)) );
 
-r_c20_email_domain_free_count_i := if(not(truedid), NULL, min(if(email_domain_free_count = NULL, -NULL, email_domain_free_count), 999));
+r_c20_email_domain_free_count_i := __common__(  if(not(truedid), NULL, min(if(email_domain_free_count = NULL, -NULL, email_domain_free_count), 999)) );
 
-r_c20_email_domain_isp_count_i := if(not(truedid), NULL, min(if(email_domain_ISP_count = NULL, -NULL, email_domain_ISP_count), 999));
+r_c20_email_domain_isp_count_i := __common__(  if(not(truedid), NULL, min(if(email_domain_ISP_count = NULL, -NULL, email_domain_ISP_count), 999)) );
 
-r_e57_prof_license_flag_d := if(not(truedid), NULL, prof_license_flag);
+r_e57_prof_license_flag_d := __common__(  if(not(truedid), NULL, prof_license_flag) );
 
-// r_l79_adls_per_addr_curr_i := if(not(addrpop), NULL, min(if(adls_per_addr_curr = NULL, -NULL, adls_per_addr_curr), 999));	//kh-delta
-r_l79_adls_per_addr_curr_i := if(not(add_curr_pop), NULL, min(if(adls_per_addr_curr = NULL, -NULL, adls_per_addr_curr), 999));
+// r_l79_adls_per_addr_curr_i := __common__(  if(not(addrpop), NULL, min(if(adls_per_addr_curr = NULL, -NULL, adls_per_addr_curr), 999)) );	//kh-delta
+r_l79_adls_per_addr_curr_i := __common__(  if(not(add_curr_pop), NULL, min(if(adls_per_addr_curr = NULL, -NULL, adls_per_addr_curr), 999)) );
 
-r_c15_ssns_per_adl_c6_i := if(not(truedid), NULL, min(if(ssns_per_adl_c6 = NULL, -NULL, ssns_per_adl_c6), 999));
+r_c15_ssns_per_adl_c6_i := __common__(  if(not(truedid), NULL, min(if(ssns_per_adl_c6 = NULL, -NULL, ssns_per_adl_c6), 999)) );
 
-r_l79_adls_per_addr_c6_i := if(not(addrpop), NULL, min(if(adls_per_addr_c6 = NULL, -NULL, adls_per_addr_c6), 999));
+r_l79_adls_per_addr_c6_i := __common__(  if(not(addrpop), NULL, min(if(adls_per_addr_c6 = NULL, -NULL, adls_per_addr_c6), 999)) );
 
-r_c18_invalid_addrs_per_adl_i := if(not(truedid), NULL, min(if(invalid_addrs_per_adl = NULL, -NULL, invalid_addrs_per_adl), 999));
+r_c18_invalid_addrs_per_adl_i := __common__(  if(not(truedid), NULL, min(if(invalid_addrs_per_adl = NULL, -NULL, invalid_addrs_per_adl), 999)) );
 
-r_has_pb_record_d := if((integer)pb_number_of_sources > 0, 1, 0);
+r_has_pb_record_d := __common__(  if((integer)pb_number_of_sources > 0, 1, 0) );
 
-r_a50_pb_average_dollars_d := map(
+r_a50_pb_average_dollars_d := __common__(  map(
     not(truedid)              => NULL,
     pb_average_dollars = '0' 		=> 5000,
-                                 min(if(pb_average_dollars = '', -NULL, (integer)pb_average_dollars), 5000));
+                                 min(if(pb_average_dollars = '', -NULL, (integer)pb_average_dollars), 5000)) );
 
-r_a50_pb_total_dollars_d := map(
+r_a50_pb_total_dollars_d := __common__(  map(
     not(truedid)            => NULL,
     pb_total_dollars = '' 		=> 10001,
-                               min(if(pb_total_dollars = '', -NULL, (integer)pb_total_dollars), 10000));
+                               min(if(pb_total_dollars = '', -NULL, (integer)pb_total_dollars), 10000)) );
 
-r_a50_pb_total_orders_d := map(
+r_a50_pb_total_orders_d := __common__(  map(
     not(truedid)           => NULL,
     pb_total_orders = ''		 => -1,
-                              (integer)pb_total_orders);
+                              (integer)pb_total_orders) );
 
-r_pb_order_freq_d := map(
+r_pb_order_freq_d := __common__(  map(
     not(truedid)                     => NULL,
     pb_number_of_sources = ''	       => NULL,
     pb_average_days_bt_orders = ''		 => -1,
-                                        min(if(pb_average_days_bt_orders = '0', 0, (integer)pb_average_days_bt_orders), 999));
+                                        min(if(pb_average_days_bt_orders = '0', 0, (integer)pb_average_days_bt_orders), 999)) );
 
-r_l78_no_phone_at_addr_vel_i := map(
+r_l78_no_phone_at_addr_vel_i := __common__(  map(
     not(addrpop)             => NULL,
     phones_per_addr_curr = 0 => 1,
-                                0);
+                                0) );
 
-r_i60_inq_count12_i := if(not(truedid), NULL, min(if(inq_count12 = NULL, -NULL, inq_count12), 999));
+r_i60_inq_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_count12 = NULL, -NULL, inq_count12), 999)) );
 
-r_i60_credit_seeking_i := if(not(truedid), NULL, if(max(min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03)), min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03)), min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03)), min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03)), min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03))) = NULL, NULL, sum(if(min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03)) = NULL, 0, min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03))), if(min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03)) = NULL, 0, min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03))), if(min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03)) = NULL, 0, min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03))), if(min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03)) = NULL, 0, min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03))), if(min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03)) = NULL, 0, min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03))))));
+r_i60_credit_seeking_i := __common__(  if(not(truedid), NULL, if(max(min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03)), min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03)), min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03)), min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03)), min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03))) = NULL, NULL, sum(if(min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03)) = NULL, 0, min(2, if(inq_auto_count03 = NULL, -NULL, inq_auto_count03))), if(min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03)) = NULL, 0, min(2, if(inq_banking_count03 = NULL, -NULL, inq_banking_count03))), if(min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03)) = NULL, 0, min(2, if(inq_mortgage_count03 = NULL, -NULL, inq_mortgage_count03))), if(min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03)) = NULL, 0, min(2, if(inq_retail_count03 = NULL, -NULL, inq_retail_count03))), if(min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03)) = NULL, 0, min(2, if(inq_communications_count03 = NULL, -NULL, inq_communications_count03)))))) );
 
-r_i60_inq_recency_d := map(
+r_i60_inq_recency_d := __common__(  map(
     not(truedid) 		=> NULL,
     inq_count01 > 0 => 1,
     inq_count03 > 0 => 3,
@@ -1161,11 +1161,11 @@ r_i60_inq_recency_d := map(
     inq_count12 > 0 => 12,
     inq_count24 > 0 => 24,
     inq_count   > 0 => 99,
-											 999);
+											 999) );
 
-r_i61_inq_collection_count12_i := if(not(truedid), NULL, min(if(inq_collection_count12 = NULL, -NULL, inq_collection_count12), 999));
+r_i61_inq_collection_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_collection_count12 = NULL, -NULL, inq_collection_count12), 999)) );
 
-r_i61_inq_collection_recency_d := map(
+r_i61_inq_collection_recency_d := __common__(  map(
     not(truedid)           		 => NULL,
     inq_collection_count01 > 0 => 1,
     inq_collection_count03 > 0 => 3,
@@ -1173,11 +1173,11 @@ r_i61_inq_collection_recency_d := map(
     inq_collection_count12 > 0 => 12,
     inq_collection_count24 > 0 => 24,
     inq_collection_count   > 0 => 99,
-																	999);
+																	999) );
 
-r_i60_inq_auto_count12_i := if(not(truedid), NULL, min(if(inq_auto_count12 = NULL, -NULL, inq_auto_count12), 999));
+r_i60_inq_auto_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_auto_count12 = NULL, -NULL, inq_auto_count12), 999)) );
 
-r_i60_inq_auto_recency_d := map(
+r_i60_inq_auto_recency_d := __common__(  map(
     not(truedid)     		 => NULL,
     inq_auto_count01 > 0 => 1,
     inq_auto_count03 > 0 => 3,
@@ -1185,11 +1185,11 @@ r_i60_inq_auto_recency_d := map(
     inq_auto_count12 > 0 => 12,
     inq_auto_count24 > 0 => 24,
     inq_auto_count   > 0 => 99,
-														999);
+														999) );
 
-r_i60_inq_banking_count12_i := if(not(truedid), NULL, min(if(inq_banking_count12 = NULL, -NULL, inq_banking_count12), 999));
+r_i60_inq_banking_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_banking_count12 = NULL, -NULL, inq_banking_count12), 999)) );
 
-r_i60_inq_banking_recency_d := map(
+r_i60_inq_banking_recency_d := __common__(  map(
     not(truedid)        		=> NULL,
     inq_banking_count01 > 0 => 1,
     inq_banking_count03 > 0 => 3,
@@ -1197,11 +1197,11 @@ r_i60_inq_banking_recency_d := map(
     inq_banking_count12 > 0 => 12,
     inq_banking_count24 > 0 => 24,
     inq_banking_count   > 0 => 99,
-															 999);
+															 999) );
 
-r_i60_inq_mortgage_count12_i := if(not(truedid), NULL, min(if(inq_mortgage_count12 = NULL, -NULL, inq_mortgage_count12), 999));
+r_i60_inq_mortgage_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_mortgage_count12 = NULL, -NULL, inq_mortgage_count12), 999)) );
 
-r_i60_inq_mortgage_recency_d := map(
+r_i60_inq_mortgage_recency_d := __common__(  map(
     not(truedid)         		 => NULL,
     inq_mortgage_count01 > 0 => 1,
     inq_mortgage_count03 > 0 => 3,
@@ -1209,11 +1209,11 @@ r_i60_inq_mortgage_recency_d := map(
     inq_mortgage_count12 > 0 => 12,
     inq_mortgage_count24 > 0 => 24,
     inq_mortgage_count   > 0 => 99,
-																999);
+																999) );
 
-r_i60_inq_hiriskcred_count12_i := if(not(truedid), NULL, min(if(inq_highRiskCredit_count12 = NULL, -NULL, inq_highRiskCredit_count12), 999));
+r_i60_inq_hiriskcred_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_highRiskCredit_count12 = NULL, -NULL, inq_highRiskCredit_count12), 999)) );
 
-r_i60_inq_hiriskcred_recency_d := map(
+r_i60_inq_hiriskcred_recency_d := __common__(  map(
     not(truedid)               		 => NULL,
     inq_highRiskCredit_count01 > 0 => 1,
     inq_highRiskCredit_count03 > 0 => 3,
@@ -1221,11 +1221,11 @@ r_i60_inq_hiriskcred_recency_d := map(
     inq_highRiskCredit_count12 > 0 => 12,
     inq_highRiskCredit_count24 > 0 => 24,
     inq_highRiskCredit_count   > 0 => 99,
-																			999);
+																			999) );
 
-r_i60_inq_retail_count12_i := if(not(truedid), NULL, min(if(inq_retail_count12 = NULL, -NULL, inq_retail_count12), 999));
+r_i60_inq_retail_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_retail_count12 = NULL, -NULL, inq_retail_count12), 999)) );
 
-r_i60_inq_retail_recency_d := map(
+r_i60_inq_retail_recency_d := __common__(  map(
     not(truedid)       		 => NULL,
     inq_retail_count01 > 0 => 1,
     inq_retail_count03 > 0 => 3,
@@ -1233,11 +1233,11 @@ r_i60_inq_retail_recency_d := map(
     inq_retail_count12 > 0 => 12,
     inq_retail_count24 > 0 => 24,
     inq_retail_count   > 0 => 99,
-															999);
+															999) );
 
-r_i60_inq_comm_count12_i := if(not(truedid), NULL, min(if(inq_communications_count12 = NULL, -NULL, inq_communications_count12), 999));
+r_i60_inq_comm_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_communications_count12 = NULL, -NULL, inq_communications_count12), 999)) );
 
-r_i60_inq_comm_recency_d := map(
+r_i60_inq_comm_recency_d := __common__(  map(
     not(truedid)               		 => NULL,
     inq_communications_count01 > 0 => 1,
     inq_communications_count03 > 0 => 3,
@@ -1245,245 +1245,245 @@ r_i60_inq_comm_recency_d := map(
     inq_communications_count12 > 0 => 12,
     inq_communications_count24 > 0 => 24,
     inq_communications_count   > 0 => 99,
-																			999);
+																			999) );
 
-f_bus_addr_match_count_d := if(not(addrpop), NULL, bus_addr_match_count);
+f_bus_addr_match_count_d := __common__(  if(not(addrpop), NULL, bus_addr_match_count) );
 
-f_bus_fname_verd_d := if(not(addrpop), NULL, (integer)(bus_name_match in [2, 4]));
+f_bus_fname_verd_d := __common__(  if(not(addrpop), NULL, (integer)(bus_name_match in [2, 4])) );
 
-f_bus_lname_verd_d := if(not(addrpop), NULL, (integer)(bus_name_match in [3, 4]));
+f_bus_lname_verd_d := __common__(  if(not(addrpop), NULL, (integer)(bus_name_match in [3, 4])) );
 
-f_bus_name_nover_i := if(not(addrpop), NULL, (integer)(bus_name_match = 1));
+f_bus_name_nover_i := __common__(  if(not(addrpop), NULL, (integer)(bus_name_match = 1)) );
 
-f_bus_ssn_match_d := if(not(addrpop), NULL, (integer)(bus_ssn_match = 3));
+f_bus_ssn_match_d := __common__(  if(not(addrpop), NULL, (integer)(bus_ssn_match = 3)) );
 
-f_bus_phone_match_d := if(not(addrpop), NULL, (integer)(bus_phone_match = 3));
+f_bus_phone_match_d := __common__(  if(not(addrpop), NULL, (integer)(bus_phone_match = 3)) );
 
-// f_adl_util_inf_n := indexc(util_adl_type_list, '1') > 0; //kh-replaced indexc with StringFind
-f_adl_util_inf_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), '1', 1) > 0);
+// f_adl_util_inf_n := __common__(  indexc(util_adl_type_list, '1') > 0 ); //kh-replaced indexc with StringFind
+f_adl_util_inf_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), '1', 1) > 0) );
 
-// f_adl_util_conv_n := indexc(util_adl_type_list, '2') > 0; //kh-replaced indexc with StringFind
-f_adl_util_conv_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), '2', 1) > 0);
+// f_adl_util_conv_n := __common__(  indexc(util_adl_type_list, '2') > 0 ); //kh-replaced indexc with StringFind
+f_adl_util_conv_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), '2', 1) > 0) );
 
-// f_adl_util_misc_n := indexc(util_adl_type_list, 'Z') > 0; //kh-replaced indexc with StringFind
-f_adl_util_misc_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), 'Z', 1) > 0);
+// f_adl_util_misc_n := __common__(  indexc(util_adl_type_list, 'Z') > 0 ); //kh-replaced indexc with StringFind
+f_adl_util_misc_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_adl_type_list), 'Z', 1) > 0) );
 
-f_util_adl_count_n := if(not(truedid), NULL, util_adl_count);
+f_util_adl_count_n := __common__(  if(not(truedid), NULL, util_adl_count) );
 
-// f_util_add_input_inf_n := indexc(util_add_input_type_list, '1') > 0; //kh-replaced indexc with StringFind
-f_util_add_input_inf_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), '1', 1) > 0);
+// f_util_add_input_inf_n := __common__(  indexc(util_add_input_type_list, '1') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_input_inf_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), '1', 1) > 0) );
 
-// f_util_add_input_conv_n := indexc(util_add_input_type_list, '2') > 0; //kh-replaced indexc with StringFind
-f_util_add_input_conv_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), '2', 1) > 0);
+// f_util_add_input_conv_n := __common__(  indexc(util_add_input_type_list, '2') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_input_conv_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), '2', 1) > 0) );
 
-// f_util_add_input_misc_n := indexc(util_add_input_type_list, 'Z') > 0; //kh-replaced indexc with StringFind
-f_util_add_input_misc_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), 'Z', 1) > 0);
+// f_util_add_input_misc_n := __common__(  indexc(util_add_input_type_list, 'Z') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_input_misc_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_input_type_list), 'Z', 1) > 0) );
 
-// f_util_add_curr_inf_n := indexc(util_add_curr_type_list, '1') > 0; //kh-replaced indexc with StringFind
-f_util_add_curr_inf_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), '1', 1) > 0);
+// f_util_add_curr_inf_n := __common__(  indexc(util_add_curr_type_list, '1') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_curr_inf_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), '1', 1) > 0) );
 
-// f_util_add_curr_conv_n := indexc(util_add_curr_type_list, '2') > 0; //kh-replaced indexc with StringFind
-f_util_add_curr_conv_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), '2', 1) > 0);
+// f_util_add_curr_conv_n := __common__(  indexc(util_add_curr_type_list, '2') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_curr_conv_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), '2', 1) > 0) );
 
-// f_util_add_curr_misc_n := indexc(util_add_curr_type_list, 'Z') > 0; //kh-replaced indexc with StringFind
-f_util_add_curr_misc_n := (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), 'Z', 1) > 0);
+// f_util_add_curr_misc_n := __common__(  indexc(util_add_curr_type_list, 'Z') > 0 ); //kh-replaced indexc with StringFind
+f_util_add_curr_misc_n := __common__(  (integer)(Stringlib.StringFind(StringLib.StringToUpperCase(util_add_curr_type_list), 'Z', 1) > 0) );
 
-f_add_input_has_occ_1yr_d := if(add_input_occupants_1yr <= 0, 0, 1);
+f_add_input_has_occ_1yr_d := __common__(  if(add_input_occupants_1yr <= 0, 0, 1) );
 
-f_add_input_mobility_index_i := map(
+f_add_input_mobility_index_i := __common__(  map(
     not(addrpop)                 => NULL,
     add_input_occupants_1yr <= 0 => NULL,
-                                    if(max(add_input_turnover_1yr_in, add_input_turnover_1yr_out) = NULL, NULL, sum(if(add_input_turnover_1yr_in = NULL, 0, add_input_turnover_1yr_in), if(add_input_turnover_1yr_out = NULL, 0, add_input_turnover_1yr_out))) / add_input_occupants_1yr);
+                                    if(max(add_input_turnover_1yr_in, add_input_turnover_1yr_out) = NULL, NULL, sum(if(add_input_turnover_1yr_in = NULL, 0, add_input_turnover_1yr_in), if(add_input_turnover_1yr_out = NULL, 0, add_input_turnover_1yr_out))) / add_input_occupants_1yr) );
 
-f_add_input_has_bus_ct_i := if(add_input_nhood_BUS_ct = 0, 0, 1);
+f_add_input_has_bus_ct_i := __common__(  if(add_input_nhood_BUS_ct = 0, 0, 1) );
 
-add_input_nhood_prop_sum_3 := if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct)));
+add_input_nhood_prop_sum_3 := __common__(  if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct))) );
 
-f_add_input_nhood_bus_pct_i := map(
+f_add_input_nhood_bus_pct_i := __common__(  map(
     not(addrpop)               => NULL,
     add_input_nhood_BUS_ct = 0 => NULL,
-                                  add_input_nhood_BUS_ct / add_input_nhood_prop_sum_3);
+                                  add_input_nhood_BUS_ct / add_input_nhood_prop_sum_3) );
 
-f_add_input_has_mfd_ct_i := if(add_input_nhood_MFD_ct = 0, 0, 1);
+f_add_input_has_mfd_ct_i := __common__(  if(add_input_nhood_MFD_ct = 0, 0, 1) );
 
-add_input_nhood_prop_sum_2 := if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct)));
+add_input_nhood_prop_sum_2 := __common__(  if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct))) );
 
-f_add_input_nhood_mfd_pct_i := map(
+f_add_input_nhood_mfd_pct_i := __common__(  map(
     not(addrpop)               => NULL,
     add_input_nhood_MFD_ct = 0 => NULL,
-                                  add_input_nhood_MFD_ct / add_input_nhood_prop_sum_2);
+                                  add_input_nhood_MFD_ct / add_input_nhood_prop_sum_2) );
 
-f_add_input_has_sfd_ct_d := if(add_input_nhood_SFD_ct = 0, 0, 1);
+f_add_input_has_sfd_ct_d := __common__(  if(add_input_nhood_SFD_ct = 0, 0, 1) );
 
-add_input_nhood_prop_sum_1 := if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct)));
+add_input_nhood_prop_sum_1 := __common__(  if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct))) );
 
-f_add_input_nhood_sfd_pct_d := map(
+f_add_input_nhood_sfd_pct_d := __common__(  map(
     not(addrpop)               => NULL,
     add_input_nhood_SFD_ct = 0 => -1,
-                                  add_input_nhood_SFD_ct / add_input_nhood_prop_sum_1);
+                                  add_input_nhood_SFD_ct / add_input_nhood_prop_sum_1) );
 
-f_add_input_has_vac_ct_i := if(add_input_nhood_prop_sum_1 = 0, 0, 1);
+f_add_input_has_vac_ct_i := __common__(  if(add_input_nhood_prop_sum_1 = 0, 0, 1) );
 
-add_input_nhood_prop_sum := if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct)));
+add_input_nhood_prop_sum := __common__(  if(max(add_input_nhood_BUS_ct, add_input_nhood_SFD_ct, add_input_nhood_MFD_ct) = NULL, NULL, sum(if(add_input_nhood_BUS_ct = NULL, 0, add_input_nhood_BUS_ct), if(add_input_nhood_SFD_ct = NULL, 0, add_input_nhood_SFD_ct), if(add_input_nhood_MFD_ct = NULL, 0, add_input_nhood_MFD_ct))) );
 
-f_add_input_nhood_vac_pct_i := map(
+f_add_input_nhood_vac_pct_i := __common__(  map(
     not(addrpop)                 => NULL,
     add_input_nhood_prop_sum = 0 => -1,
-                                    add_input_nhood_VAC_prop / add_input_nhood_prop_sum);
+                                    add_input_nhood_VAC_prop / add_input_nhood_prop_sum) );
 
-f_add_curr_has_occ_1yr_d := if(add_curr_occupants_1yr <= 0, 0, 1);
+f_add_curr_has_occ_1yr_d := __common__(  if(add_curr_occupants_1yr <= 0, 0, 1) );
 
-f_add_curr_mobility_index_i := map(
+f_add_curr_mobility_index_i := __common__(  map(
     // not(addrpop)                => NULL,	//kh-delta
     not(add_curr_pop)           => NULL,
     add_curr_occupants_1yr <= 0 => NULL,
-                                   if(max(add_curr_turnover_1yr_in, add_curr_turnover_1yr_out) = NULL, NULL, sum(if(add_curr_turnover_1yr_in = NULL, 0, add_curr_turnover_1yr_in), if(add_curr_turnover_1yr_out = NULL, 0, add_curr_turnover_1yr_out))) / add_curr_occupants_1yr);
+                                   if(max(add_curr_turnover_1yr_in, add_curr_turnover_1yr_out) = NULL, NULL, sum(if(add_curr_turnover_1yr_in = NULL, 0, add_curr_turnover_1yr_in), if(add_curr_turnover_1yr_out = NULL, 0, add_curr_turnover_1yr_out))) / add_curr_occupants_1yr) );
 
-f_add_curr_has_bus_ct_i := if(add_curr_nhood_BUS_ct = 0, 0, 1);
+f_add_curr_has_bus_ct_i := __common__(  if(add_curr_nhood_BUS_ct = 0, 0, 1) );
 
-add_curr_nhood_prop_sum_3 := if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct)));
+add_curr_nhood_prop_sum_3 := __common__(  if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct))) );
 
-f_add_curr_nhood_bus_pct_i := map(
+f_add_curr_nhood_bus_pct_i := __common__(  map(
     // not(addrpop)              => NULL,	//kh-delta
     not(add_curr_pop)         => NULL,
     add_curr_nhood_BUS_ct = 0 => NULL,
-                                 add_curr_nhood_BUS_ct / add_curr_nhood_prop_sum_3);
+                                 add_curr_nhood_BUS_ct / add_curr_nhood_prop_sum_3) );
 
-f_add_curr_has_mfd_ct_i := if(add_curr_nhood_MFD_ct = 0, 0, 1);
+f_add_curr_has_mfd_ct_i := __common__(  if(add_curr_nhood_MFD_ct = 0, 0, 1) );
 
-add_curr_nhood_prop_sum_2 := if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct)));
+add_curr_nhood_prop_sum_2 := __common__(  if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct))) );
 
-f_add_curr_nhood_mfd_pct_i := map(
+f_add_curr_nhood_mfd_pct_i := __common__(  map(
     // not(addrpop)              => NULL,	//kh-delta
     not(add_curr_pop)         => NULL,
     add_curr_nhood_MFD_ct = 0 => NULL,
-                                 add_curr_nhood_MFD_ct / add_curr_nhood_prop_sum_2);
+                                 add_curr_nhood_MFD_ct / add_curr_nhood_prop_sum_2) );
 
-f_add_curr_has_sfd_ct_d := if(add_curr_nhood_SFD_ct = 0, 0, 1);
+f_add_curr_has_sfd_ct_d := __common__(  if(add_curr_nhood_SFD_ct = 0, 0, 1) );
 
-add_curr_nhood_prop_sum_1 := if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct)));
+add_curr_nhood_prop_sum_1 := __common__(  if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct))) );
 
-f_add_curr_nhood_sfd_pct_d := map(
+f_add_curr_nhood_sfd_pct_d := __common__(  map(
     // not(addrpop)              => NULL,	//kh-delta
     not(add_curr_pop)         => NULL,
     add_curr_nhood_SFD_ct = 0 => -1,
-                                 add_curr_nhood_SFD_ct / add_curr_nhood_prop_sum_1);
+                                 add_curr_nhood_SFD_ct / add_curr_nhood_prop_sum_1) );
 
-f_add_curr_has_vac_ct_i := if(add_curr_nhood_prop_sum_1 = 0, 0, 1);
+f_add_curr_has_vac_ct_i := __common__(  if(add_curr_nhood_prop_sum_1 = 0, 0, 1) );
 
-add_curr_nhood_prop_sum := if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct)));
+add_curr_nhood_prop_sum := __common__(  if(max(add_curr_nhood_BUS_ct, add_curr_nhood_SFD_ct, add_curr_nhood_MFD_ct) = NULL, NULL, sum(if(add_curr_nhood_BUS_ct = NULL, 0, add_curr_nhood_BUS_ct), if(add_curr_nhood_SFD_ct = NULL, 0, add_curr_nhood_SFD_ct), if(add_curr_nhood_MFD_ct = NULL, 0, add_curr_nhood_MFD_ct))) );
 
-f_add_curr_nhood_vac_pct_i := map(
+f_add_curr_nhood_vac_pct_i := __common__(  map(
     // not(addrpop)                => NULL,	//kh-delta
     not(add_curr_pop)           => NULL,
     add_curr_nhood_prop_sum = 0 => -1,
-                                   add_curr_nhood_VAC_prop / add_curr_nhood_prop_sum);
+                                   add_curr_nhood_VAC_prop / add_curr_nhood_prop_sum) );
 
-f_recent_disconnects_i := if(not(hphnpop), NULL, min(if(recent_disconnects = NULL, -NULL, recent_disconnects), 999));
+f_recent_disconnects_i := __common__(  if(not(hphnpop), NULL, min(if(recent_disconnects = NULL, -NULL, recent_disconnects), 999)) );
 
-f_inq_count_i := if(not(truedid), NULL, min(if(inq_count = NULL, -NULL, inq_count), 999));
+f_inq_count_i := __common__(  if(not(truedid), NULL, min(if(inq_count = NULL, -NULL, inq_count), 999)) );
 
-f_inq_count24_i := if(not(truedid), NULL, min(if(inq_count24 = NULL, -NULL, inq_count24), 999));
+f_inq_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_count24 = NULL, -NULL, inq_count24), 999)) );
 
-f_inq_auto_count_i := if(not(truedid), NULL, min(if(inq_Auto_count = NULL, -NULL, inq_Auto_count), 999));
+f_inq_auto_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Auto_count = NULL, -NULL, inq_Auto_count), 999)) );
 
-f_inq_auto_count24_i := if(not(truedid), NULL, min(if(inq_Auto_count24 = NULL, -NULL, inq_Auto_count24), 999));
+f_inq_auto_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Auto_count24 = NULL, -NULL, inq_Auto_count24), 999)) );
 
-f_inq_banking_count_i := if(not(truedid), NULL, min(if(inq_Banking_count = NULL, -NULL, inq_Banking_count), 999));
+f_inq_banking_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Banking_count = NULL, -NULL, inq_Banking_count), 999)) );
 
-f_inq_banking_count24_i := if(not(truedid), NULL, min(if(inq_Banking_count24 = NULL, -NULL, inq_Banking_count24), 999));
+f_inq_banking_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Banking_count24 = NULL, -NULL, inq_Banking_count24), 999)) );
 
-f_inq_collection_count_i := if(not(truedid), NULL, min(if(inq_Collection_count = NULL, -NULL, inq_Collection_count), 999));
+f_inq_collection_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Collection_count = NULL, -NULL, inq_Collection_count), 999)) );
 
-f_inq_collection_count24_i := if(not(truedid), NULL, min(if(inq_Collection_count24 = NULL, -NULL, inq_Collection_count24), 999));
+f_inq_collection_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Collection_count24 = NULL, -NULL, inq_Collection_count24), 999)) );
 
-f_inq_communications_count_i := if(not(truedid), NULL, min(if(inq_Communications_count = NULL, -NULL, inq_Communications_count), 999));
+f_inq_communications_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Communications_count = NULL, -NULL, inq_Communications_count), 999)) );
 
-f_inq_communications_count24_i := if(not(truedid), NULL, min(if(inq_Communications_count24 = NULL, -NULL, inq_Communications_count24), 999));
+f_inq_communications_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Communications_count24 = NULL, -NULL, inq_Communications_count24), 999)) );
 
-f_inq_highriskcredit_count_i := if(not(truedid), NULL, min(if(inq_HighRiskCredit_count = NULL, -NULL, inq_HighRiskCredit_count), 999));
+f_inq_highriskcredit_count_i := __common__(  if(not(truedid), NULL, min(if(inq_HighRiskCredit_count = NULL, -NULL, inq_HighRiskCredit_count), 999)) );
 
-f_inq_highriskcredit_count24_i := if(not(truedid), NULL, min(if(inq_HighRiskCredit_count24 = NULL, -NULL, inq_HighRiskCredit_count24), 999));
+f_inq_highriskcredit_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_HighRiskCredit_count24 = NULL, -NULL, inq_HighRiskCredit_count24), 999)) );
 
-f_inq_mortgage_count_i := if(not(truedid), NULL, min(if(inq_Mortgage_count = NULL, -NULL, inq_Mortgage_count), 999));
+f_inq_mortgage_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Mortgage_count = NULL, -NULL, inq_Mortgage_count), 999)) );
 
-f_inq_mortgage_count24_i := if(not(truedid), NULL, min(if(inq_Mortgage_count24 = NULL, -NULL, inq_Mortgage_count24), 999));
+f_inq_mortgage_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Mortgage_count24 = NULL, -NULL, inq_Mortgage_count24), 999)) );
 
-f_inq_other_count_i := if(not(truedid), NULL, min(if(inq_Other_count = NULL, -NULL, inq_Other_count), 999));
+f_inq_other_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Other_count = NULL, -NULL, inq_Other_count), 999)) );
 
-f_inq_other_count24_i := if(not(truedid), NULL, min(if(inq_Other_count24 = NULL, -NULL, inq_Other_count24), 999));
+f_inq_other_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Other_count24 = NULL, -NULL, inq_Other_count24), 999)) );
 
-f_inq_retail_count_i := if(not(truedid), NULL, min(if(inq_Retail_count = NULL, -NULL, inq_Retail_count), 999));
+f_inq_retail_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Retail_count = NULL, -NULL, inq_Retail_count), 999)) );
 
-f_inq_retail_count24_i := if(not(truedid), NULL, min(if(inq_Retail_count24 = NULL, -NULL, inq_Retail_count24), 999));
+f_inq_retail_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Retail_count24 = NULL, -NULL, inq_Retail_count24), 999)) );
 
-k_inq_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(inq_perssn = NULL, -NULL, inq_perssn), 999));
+k_inq_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(inq_perssn = NULL, -NULL, inq_perssn), 999)) );
 
-k_inq_adls_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(inq_adlsperssn = NULL, -NULL, inq_adlsperssn), 999));
+k_inq_adls_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(inq_adlsperssn = NULL, -NULL, inq_adlsperssn), 999)) );
 
-k_inq_lnames_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(inq_lnamesperssn = NULL, -NULL, inq_lnamesperssn), 999));
+k_inq_lnames_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(inq_lnamesperssn = NULL, -NULL, inq_lnamesperssn), 999)) );
 
-k_inq_addrs_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(inq_addrsperssn = NULL, -NULL, inq_addrsperssn), 999));
+k_inq_addrs_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(inq_addrsperssn = NULL, -NULL, inq_addrsperssn), 999)) );
 
-k_inq_dobs_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(inq_dobsperssn = NULL, -NULL, inq_dobsperssn), 999));
+k_inq_dobs_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(inq_dobsperssn = NULL, -NULL, inq_dobsperssn), 999)) );
 
-k_inq_per_addr_i := if(not(addrpop), NULL, min(if(inq_peraddr = NULL, -NULL, inq_peraddr), 999));
+k_inq_per_addr_i := __common__(  if(not(addrpop), NULL, min(if(inq_peraddr = NULL, -NULL, inq_peraddr), 999)) );
 
-k_inq_adls_per_addr_i := if(not(addrpop), NULL, min(if(inq_adlsperaddr = NULL, -NULL, inq_adlsperaddr), 999));
+k_inq_adls_per_addr_i := __common__(  if(not(addrpop), NULL, min(if(inq_adlsperaddr = NULL, -NULL, inq_adlsperaddr), 999)) );
 
-k_inq_lnames_per_addr_i := if(not(addrpop), NULL, min(if(inq_lnamesperaddr = NULL, -NULL, inq_lnamesperaddr), 999));
+k_inq_lnames_per_addr_i := __common__(  if(not(addrpop), NULL, min(if(inq_lnamesperaddr = NULL, -NULL, inq_lnamesperaddr), 999)) );
 
-k_inq_ssns_per_addr_i := if(not(addrpop), NULL, min(if(inq_ssnsperaddr = NULL, -NULL, inq_ssnsperaddr), 999));
+k_inq_ssns_per_addr_i := __common__(  if(not(addrpop), NULL, min(if(inq_ssnsperaddr = NULL, -NULL, inq_ssnsperaddr), 999)) );
 
-k_inq_per_phone_i := if(not(hphnpop), NULL, min(if(inq_perphone = NULL, -NULL, inq_perphone), 999));
+k_inq_per_phone_i := __common__(  if(not(hphnpop), NULL, min(if(inq_perphone = NULL, -NULL, inq_perphone), 999)) );
 
-k_inq_adls_per_phone_i := if(not(hphnpop), NULL, min(if(inq_adlsperphone = NULL, -NULL, inq_adlsperphone), 999));
+k_inq_adls_per_phone_i := __common__(  if(not(hphnpop), NULL, min(if(inq_adlsperphone = NULL, -NULL, inq_adlsperphone), 999)) );
 
-_inq_banko_am_first_seen := common.sas_date((string)(Inq_banko_am_first_seen));
+_inq_banko_am_first_seen := __common__(  common.sas_date((string)(Inq_banko_am_first_seen)) );
 
-f_mos_inq_banko_am_fseen_d := map(
+f_mos_inq_banko_am_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _inq_banko_am_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _inq_banko_am_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_am_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _inq_banko_am_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_am_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_first_seen) / (365.25 / 12)))), 999)) );
 
-_inq_banko_am_last_seen := common.sas_date((string)(Inq_banko_am_last_seen));
+_inq_banko_am_last_seen := __common__(  common.sas_date((string)(Inq_banko_am_last_seen)) );
 
-f_mos_inq_banko_am_lseen_d := map(
+f_mos_inq_banko_am_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _inq_banko_am_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _inq_banko_am_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_am_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _inq_banko_am_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_am_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_am_last_seen) / (365.25 / 12)))), 999))) );
 
-_inq_banko_cm_first_seen := common.sas_date((string)(Inq_banko_cm_first_seen));
+_inq_banko_cm_first_seen := __common__(  common.sas_date((string)(Inq_banko_cm_first_seen)) );
 
-f_mos_inq_banko_cm_fseen_d := map(
+f_mos_inq_banko_cm_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _inq_banko_cm_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_first_seen) / (365.25 / 12)))), 999)) );
 
-_inq_banko_cm_last_seen := common.sas_date((string)(Inq_banko_cm_last_seen));
+_inq_banko_cm_last_seen := __common__(  common.sas_date((string)(Inq_banko_cm_last_seen)) );
 
-f_mos_inq_banko_cm_lseen_d := map(
+f_mos_inq_banko_cm_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _inq_banko_cm_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)))), 999))) );
 
-_inq_banko_om_first_seen := common.sas_date((string)(Inq_banko_om_first_seen));
+_inq_banko_om_first_seen := __common__(  common.sas_date((string)(Inq_banko_om_first_seen)) );
 
-f_mos_inq_banko_om_fseen_d := map(
+f_mos_inq_banko_om_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _inq_banko_om_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _inq_banko_om_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_om_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _inq_banko_om_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_om_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_first_seen) / (365.25 / 12)))), 999)) );
 
-_inq_banko_om_last_seen := common.sas_date((string)(Inq_banko_om_last_seen));
+_inq_banko_om_last_seen := __common__(  common.sas_date((string)(Inq_banko_om_last_seen)) );
 
-f_mos_inq_banko_om_lseen_d := map(
+f_mos_inq_banko_om_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _inq_banko_om_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _inq_banko_om_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_om_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _inq_banko_om_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_om_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_om_last_seen) / (365.25 / 12)))), 999))) );
 
-f_attr_arrests_i := if(not(truedid), NULL, min(if(attr_arrests = NULL, -NULL, attr_arrests), 999));
+f_attr_arrests_i := __common__(  if(not(truedid), NULL, min(if(attr_arrests = NULL, -NULL, attr_arrests), 999)) );
 
-f_attr_arrest_recency_d := map(
+f_attr_arrest_recency_d := __common__(  map(
     not(truedid)        => NULL,
     attr_arrests30 > 0  => 1,
     attr_arrests90 > 0  => 3,
@@ -1493,226 +1493,226 @@ f_attr_arrest_recency_d := map(
     attr_arrests36 > 0  => 36,
     attr_arrests60 > 0  => 60,
     attr_arrests > 0    => 99,
-                           100);
+                           100) );
 
-_liens_unrel_cj_first_seen := common.sas_date((string)(liens_unrel_CJ_first_seen));
+_liens_unrel_cj_first_seen := __common__(  common.sas_date((string)(liens_unrel_CJ_first_seen)) );
 
-f_mos_liens_unrel_cj_fseen_d := map(
+f_mos_liens_unrel_cj_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_cj_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_cj_last_seen := common.sas_date((string)(liens_unrel_CJ_last_seen));
+_liens_unrel_cj_last_seen := __common__(  common.sas_date((string)(liens_unrel_CJ_last_seen)) );
 
-f_mos_liens_unrel_cj_lseen_d := map(
+f_mos_liens_unrel_cj_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_cj_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_cj_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_cj_total_amt_i := if(not(truedid), NULL, liens_unrel_CJ_total_amount);
+f_liens_unrel_cj_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_CJ_total_amount) );
 
-_liens_rel_cj_first_seen := common.sas_date((string)(liens_rel_CJ_first_seen));
+_liens_rel_cj_first_seen := __common__(  common.sas_date((string)(liens_rel_CJ_first_seen)) );
 
-f_mos_liens_rel_cj_fseen_d := map(
+f_mos_liens_rel_cj_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_cj_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_cj_last_seen := common.sas_date((string)(liens_rel_CJ_last_seen));
+_liens_rel_cj_last_seen := __common__(  common.sas_date((string)(liens_rel_CJ_last_seen)) );
 
-f_mos_liens_rel_cj_lseen_d := map(
+f_mos_liens_rel_cj_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_cj_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_cj_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_cj_total_amt_i := if(not(truedid), NULL, liens_rel_CJ_total_amount);
+f_liens_rel_cj_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_CJ_total_amount) );
 
-_liens_unrel_ft_first_seen := common.sas_date((string)(liens_unrel_FT_first_seen));
+_liens_unrel_ft_first_seen := __common__(  common.sas_date((string)(liens_unrel_FT_first_seen)) );
 
-f_mos_liens_unrel_ft_fseen_d := map(
+f_mos_liens_unrel_ft_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_ft_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_ft_last_seen := common.sas_date((string)(liens_unrel_FT_last_seen));
+_liens_unrel_ft_last_seen := __common__(  common.sas_date((string)(liens_unrel_FT_last_seen)) );
 
-f_mos_liens_unrel_ft_lseen_d := map(
+f_mos_liens_unrel_ft_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_ft_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ft_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_ft_total_amt_i := if(not(truedid), NULL, liens_unrel_FT_total_amount);
+f_liens_unrel_ft_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_FT_total_amount) );
 
-_liens_rel_ft_first_seen := common.sas_date((string)(liens_rel_FT_first_seen));
+_liens_rel_ft_first_seen := __common__(  common.sas_date((string)(liens_rel_FT_first_seen)) );
 
-f_mos_liens_rel_ft_fseen_d := map(
+f_mos_liens_rel_ft_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_ft_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_ft_last_seen := common.sas_date((string)(liens_rel_FT_last_seen));
+_liens_rel_ft_last_seen := __common__(  common.sas_date((string)(liens_rel_FT_last_seen)) );
 
-f_mos_liens_rel_ft_lseen_d := map(
+f_mos_liens_rel_ft_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_ft_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ft_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_ft_total_amt_i := if(not(truedid), NULL, liens_rel_FT_total_amount);
+f_liens_rel_ft_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_FT_total_amount) );
 
-_liens_unrel_fc_first_seen := common.sas_date((string)(liens_unrel_FC_first_seen));
+_liens_unrel_fc_first_seen := __common__(  common.sas_date((string)(liens_unrel_FC_first_seen)) );
 
-f_mos_liens_unrel_fc_fseen_d := map(
+f_mos_liens_unrel_fc_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_fc_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_fc_last_seen := common.sas_date((string)(liens_unrel_FC_last_seen));
+_liens_unrel_fc_last_seen := __common__(  common.sas_date((string)(liens_unrel_FC_last_seen)) );
 
-f_mos_liens_unrel_fc_lseen_d := map(
+f_mos_liens_unrel_fc_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_fc_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_fc_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_fc_total_amt_i := if(not(truedid), NULL, liens_unrel_FC_total_amount);
+f_liens_unrel_fc_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_FC_total_amount) );
 
-_liens_rel_fc_first_seen := common.sas_date((string)(liens_rel_FC_first_seen));
+_liens_rel_fc_first_seen := __common__(  common.sas_date((string)(liens_rel_FC_first_seen)) );
 
-f_mos_liens_rel_fc_fseen_d := map(
+f_mos_liens_rel_fc_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_fc_first_seen = NULL => -1,
-                                       min(if(if ((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_fc_last_seen := common.sas_date((string)(liens_rel_FC_last_seen));
+_liens_rel_fc_last_seen := __common__(  common.sas_date((string)(liens_rel_FC_last_seen)) );
 
-f_mos_liens_rel_fc_lseen_d := map(
+f_mos_liens_rel_fc_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_fc_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_fc_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_fc_total_amt_i := if(not(truedid), NULL, liens_rel_FC_total_amount);
+f_liens_rel_fc_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_FC_total_amount) );
 
-_liens_unrel_lt_first_seen := common.sas_date((string)(liens_unrel_LT_first_seen));
+_liens_unrel_lt_first_seen := __common__(  common.sas_date((string)(liens_unrel_LT_first_seen)) );
 
-f_mos_liens_unrel_lt_fseen_d := map(
+f_mos_liens_unrel_lt_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_lt_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_lt_last_seen := common.sas_date((string)(liens_unrel_LT_last_seen));
+_liens_unrel_lt_last_seen := __common__(  common.sas_date((string)(liens_unrel_LT_last_seen)) );
 
-f_mos_liens_unrel_lt_lseen_d := map(
+f_mos_liens_unrel_lt_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_lt_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_lt_last_seen) / (365.25 / 12)))), 999))) );
 
-_liens_rel_lt_first_seen := common.sas_date((string)(liens_rel_LT_first_seen));
+_liens_rel_lt_first_seen := __common__(  common.sas_date((string)(liens_rel_LT_first_seen)) );
 
-f_mos_liens_rel_lt_fseen_d := map(
+f_mos_liens_rel_lt_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_lt_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_lt_last_seen := common.sas_date((string)(liens_rel_LT_last_seen));
+_liens_rel_lt_last_seen := __common__(  common.sas_date((string)(liens_rel_LT_last_seen)) );
 
-f_mos_liens_rel_lt_lseen_d := map(
+f_mos_liens_rel_lt_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_lt_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_lt_last_seen) / (365.25 / 12)))), 999))) );
 
-_liens_unrel_o_first_seen := common.sas_date((string)(liens_unrel_O_first_seen));
+_liens_unrel_o_first_seen := __common__(  common.sas_date((string)(liens_unrel_O_first_seen)) );
 
-f_mos_liens_unrel_o_fseen_d := map(
+f_mos_liens_unrel_o_fseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_o_first_seen = NULL => 1000,
-                                        min(if(if ((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)))), 999));
+                                        min(if(if ((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_o_last_seen := common.sas_date((string)(liens_unrel_O_last_seen));
+_liens_unrel_o_last_seen := __common__(  common.sas_date((string)(liens_unrel_O_last_seen)) );
 
-f_mos_liens_unrel_o_lseen_d := map(
+f_mos_liens_unrel_o_lseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_unrel_o_last_seen = NULL => 1000,
-                                       max(3, min(if(if ((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)))), 999)));
+                                       max(3, min(if(if ((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_o_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_o_total_amt_i := if(not(truedid), NULL, liens_unrel_O_total_amount);
+f_liens_unrel_o_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_O_total_amount) );
 
-_liens_rel_o_first_seen := common.sas_date((string)(liens_rel_O_first_seen));
+_liens_rel_o_first_seen := __common__(  common.sas_date((string)(liens_rel_O_first_seen)) );
 
-f_mos_liens_rel_o_fseen_d := map(
+f_mos_liens_rel_o_fseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_o_first_seen = NULL => 1000,
-                                      min(if(if ((sysdate - _liens_rel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)))), 999));
+                                      min(if(if ((sysdate - _liens_rel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_o_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_o_last_seen := common.sas_date((string)(liens_rel_O_last_seen));
+_liens_rel_o_last_seen := __common__(  common.sas_date((string)(liens_rel_O_last_seen)) );
 
-f_mos_liens_rel_o_lseen_d := map(
+f_mos_liens_rel_o_lseen_d := __common__(  map(
     not(truedid)                  => NULL,
     _liens_rel_o_last_seen = NULL => 1000,
-                                     max(3, min(if(if ((sysdate - _liens_rel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)))), 999)));
+                                     max(3, min(if(if ((sysdate - _liens_rel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_o_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_o_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_o_total_amt_i := if(not(truedid), NULL, liens_rel_O_total_amount);
+f_liens_rel_o_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_O_total_amount) );
 
-_liens_unrel_ot_first_seen := common.sas_date((string)(liens_unrel_OT_first_seen));
+_liens_unrel_ot_first_seen := __common__(  common.sas_date((string)(liens_unrel_OT_first_seen)) );
 
-f_mos_liens_unrel_ot_fseen_d := map(
+f_mos_liens_unrel_ot_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_ot_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_ot_last_seen := common.sas_date((string)(liens_unrel_OT_last_seen));
+_liens_unrel_ot_last_seen := __common__(  common.sas_date((string)(liens_unrel_OT_last_seen)) );
 
-f_mos_liens_unrel_ot_lseen_d := map(
+f_mos_liens_unrel_ot_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_ot_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_ot_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_ot_total_amt_i := if(not(truedid), NULL, liens_unrel_OT_total_amount);
+f_liens_unrel_ot_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_OT_total_amount) );
 
-_liens_rel_ot_first_seen := common.sas_date((string)(liens_rel_OT_first_seen));
+_liens_rel_ot_first_seen := __common__(  common.sas_date((string)(liens_rel_OT_first_seen)) );
 
-f_mos_liens_rel_ot_fseen_d := map(
+f_mos_liens_rel_ot_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_ot_first_seen = NULL => -1,
-                                       min(if(if ((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_ot_last_seen := common.sas_date((string)(liens_rel_OT_last_seen));
+_liens_rel_ot_last_seen := __common__(  common.sas_date((string)(liens_rel_OT_last_seen)) );
 
-f_mos_liens_rel_ot_lseen_d := map(
+f_mos_liens_rel_ot_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_ot_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_ot_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_ot_total_amt_i := if(not(truedid), NULL, liens_rel_OT_total_amount);
+f_liens_rel_ot_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_OT_total_amount) );
 
-_liens_unrel_sc_first_seen := common.sas_date((string)(liens_unrel_SC_first_seen));
+_liens_unrel_sc_first_seen := __common__(  common.sas_date((string)(liens_unrel_SC_first_seen)) );
 
-f_mos_liens_unrel_sc_fseen_d := map(
+f_mos_liens_unrel_sc_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_sc_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_sc_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_sc_last_seen := common.sas_date((string)(liens_unrel_SC_last_seen));
+_liens_unrel_sc_last_seen := __common__(  common.sas_date((string)(liens_unrel_SC_last_seen)) );
 
-f_mos_liens_unrel_sc_lseen_d := map(
+f_mos_liens_unrel_sc_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_sc_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)), roundup((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)), roundup((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)), roundup((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)), roundup((sysdate - liens_unrel_SC_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_sc_total_amt_i := if(not(truedid), NULL, liens_unrel_SC_total_amount);
+f_liens_unrel_sc_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_SC_total_amount) );
 
-f_foreclosure_flag_i := if(not(truedid), NULL, foreclosure_flag);
+f_foreclosure_flag_i := __common__(  if(not(truedid), NULL, foreclosure_flag) );
 
-_foreclosure_last_date := common.sas_date((string)(foreclosure_last_date));
+_foreclosure_last_date := __common__(  common.sas_date((string)(foreclosure_last_date)) );
 
-f_mos_foreclosure_lseen_d := map(
+f_mos_foreclosure_lseen_d := __common__(  map(
     not(truedid)                  => NULL,
     _foreclosure_last_date = NULL => 1000,
-                                     max(3, min(if(if ((sysdate - _foreclosure_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _foreclosure_last_date) / (365.25 / 12)), roundup((sysdate - _foreclosure_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _foreclosure_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _foreclosure_last_date) / (365.25 / 12)), roundup((sysdate - _foreclosure_last_date) / (365.25 / 12)))), 999)));
+                                     max(3, min(if(if ((sysdate - _foreclosure_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _foreclosure_last_date) / (365.25 / 12)), roundup((sysdate - _foreclosure_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _foreclosure_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _foreclosure_last_date) / (365.25 / 12)), roundup((sysdate - _foreclosure_last_date) / (365.25 / 12)))), 999))) );
 
-k_estimated_income_d := if(not(truedid), NULL, estimated_income);
+k_estimated_income_d := __common__(  if(not(truedid), NULL, estimated_income) );
 
-r_wealth_index_d := if(not(truedid), NULL, wealth_index);
+r_wealth_index_d := __common__(  if(not(truedid), NULL, wealth_index) );
 
-f_college_income_d := map(
+f_college_income_d := __common__(  map(
     not(truedid)                     => NULL,
     college_income_level_code = ''	 => NULL,
     college_income_level_code = 'A'  => 1,
@@ -1726,180 +1726,180 @@ f_college_income_d := map(
     college_income_level_code = 'I'  => 9,
     college_income_level_code = 'J'  => 10,
     college_income_level_code = 'K'  => 11,
-                                        NULL);
+                                        NULL) );
 
-f_has_relatives_n := if(rel_count > 0, 1, 0);
+f_has_relatives_n := __common__(  if(rel_count > 0, 1, 0) );
 
-f_rel_count_i := if(not(truedid), NULL, min(if(rel_count = NULL, -NULL, rel_count), 999));
+f_rel_count_i := __common__(  if(not(truedid), NULL, min(if(rel_count = NULL, -NULL, rel_count), 999)) );
 
-f_rel_incomeover25_count_d := map(
+f_rel_incomeover25_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_incomeover100_count, rel_incomeunder100_count, rel_incomeunder75_count, rel_incomeunder50_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count), if(rel_incomeunder75_count = NULL, 0, rel_incomeunder75_count), if(rel_incomeunder50_count = NULL, 0, rel_incomeunder50_count))));
+                     if(max(rel_incomeover100_count, rel_incomeunder100_count, rel_incomeunder75_count, rel_incomeunder50_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count), if(rel_incomeunder75_count = NULL, 0, rel_incomeunder75_count), if(rel_incomeunder50_count = NULL, 0, rel_incomeunder50_count)))) );
 
-f_rel_incomeover50_count_d := map(
+f_rel_incomeover50_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_incomeover100_count, rel_incomeunder100_count, rel_incomeunder75_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count), if(rel_incomeunder75_count = NULL, 0, rel_incomeunder75_count))));
+                     if(max(rel_incomeover100_count, rel_incomeunder100_count, rel_incomeunder75_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count), if(rel_incomeunder75_count = NULL, 0, rel_incomeunder75_count)))) );
 
-f_rel_incomeover75_count_d := map(
+f_rel_incomeover75_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_incomeover100_count, rel_incomeunder100_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count))));
+                     if(max(rel_incomeover100_count, rel_incomeunder100_count) = NULL, NULL, sum(if(rel_incomeover100_count = NULL, 0, rel_incomeover100_count), if(rel_incomeunder100_count = NULL, 0, rel_incomeunder100_count)))) );
 
-f_rel_incomeover100_count_d := map(
+f_rel_incomeover100_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     rel_incomeover100_count);
+                     rel_incomeover100_count) );
 
-f_rel_homeover50_count_d := map(
+f_rel_homeover50_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_homeunder100_count, rel_homeunder150_count, rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder100_count = NULL, 0, rel_homeunder100_count), if(rel_homeunder150_count = NULL, 0, rel_homeunder150_count), if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count))));
+                     if(max(rel_homeunder100_count, rel_homeunder150_count, rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder100_count = NULL, 0, rel_homeunder100_count), if(rel_homeunder150_count = NULL, 0, rel_homeunder150_count), if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count)))) );
 
-f_rel_homeover100_count_d := map(
+f_rel_homeover100_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_homeunder150_count, rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder150_count = NULL, 0, rel_homeunder150_count), if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count))));
+                     if(max(rel_homeunder150_count, rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder150_count = NULL, 0, rel_homeunder150_count), if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count)))) );
 
-f_rel_homeover150_count_d := map(
+f_rel_homeover150_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count))));
+                     if(max(rel_homeunder200_count, rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder200_count = NULL, 0, rel_homeunder200_count), if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count)))) );
 
-f_rel_homeover200_count_d := map(
+f_rel_homeover200_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count))));
+                     if(max(rel_homeunder300_count, rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder300_count = NULL, 0, rel_homeunder300_count), if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count)))) );
 
-f_rel_homeover300_count_d := map(
+f_rel_homeover300_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count))));
+                     if(max(rel_homeunder500_count, rel_homeover500_count) = NULL, NULL, sum(if(rel_homeunder500_count = NULL, 0, rel_homeunder500_count), if(rel_homeover500_count = NULL, 0, rel_homeover500_count)))) );
 
-f_rel_homeover500_count_d := map(
+f_rel_homeover500_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     rel_homeover500_count);
+                     rel_homeover500_count) );
 
-f_rel_ageover20_count_d := map(
+f_rel_ageover20_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_ageunder30_count, rel_ageunder40_count, rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder30_count = NULL, 0, rel_ageunder30_count), if(rel_ageunder40_count = NULL, 0, rel_ageunder40_count), if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count))));
+                     if(max(rel_ageunder30_count, rel_ageunder40_count, rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder30_count = NULL, 0, rel_ageunder30_count), if(rel_ageunder40_count = NULL, 0, rel_ageunder40_count), if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count)))) );
 
-f_rel_ageover30_count_d := map(
+f_rel_ageover30_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_ageunder40_count, rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder40_count = NULL, 0, rel_ageunder40_count), if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count))));
+                     if(max(rel_ageunder40_count, rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder40_count = NULL, 0, rel_ageunder40_count), if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count)))) );
 
-f_rel_ageover40_count_d := map(
+f_rel_ageover40_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count))));
+                     if(max(rel_ageunder50_count, rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder50_count = NULL, 0, rel_ageunder50_count), if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count)))) );
 
-f_rel_ageover50_count_d := map(
+f_rel_ageover50_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count))));
+                     if(max(rel_ageunder60_count, rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder60_count = NULL, 0, rel_ageunder60_count), if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count)))) );
 
-f_rel_ageover60_count_d_1 := map(
+f_rel_ageover60_count_d_1 := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count))));
+                     if(max(rel_ageunder70_count, rel_ageover70_count) = NULL, NULL, sum(if(rel_ageunder70_count = NULL, 0, rel_ageunder70_count), if(rel_ageover70_count = NULL, 0, rel_ageover70_count)))) );
 
-f_rel_ageover60_count_d := map(
+f_rel_ageover60_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     rel_ageover70_count);
+                     rel_ageover70_count) );
 
-f_rel_educationover8_count_d := map(
+f_rel_educationover8_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_educationunder12_count, rel_educationover12_count) = NULL, NULL, sum(if(rel_educationunder12_count = NULL, 0, rel_educationunder12_count), if(rel_educationover12_count = NULL, 0, rel_educationover12_count))));
+                     if(max(rel_educationunder12_count, rel_educationover12_count) = NULL, NULL, sum(if(rel_educationunder12_count = NULL, 0, rel_educationunder12_count), if(rel_educationover12_count = NULL, 0, rel_educationover12_count)))) );
 
-f_rel_educationover12_count_d := map(
+f_rel_educationover12_count_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     rel_educationover12_count);
+                     rel_educationover12_count) );
 
-f_crim_rel_under25miles_cnt_i := map(
+f_crim_rel_under25miles_cnt_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     crim_rel_within25miles);
+                     crim_rel_within25miles) );
 
-f_crim_rel_under100miles_cnt_i := map(
+f_crim_rel_under100miles_cnt_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(crim_rel_within25miles, crim_rel_within100miles) = NULL, NULL, sum(if(crim_rel_within25miles = NULL, 0, crim_rel_within25miles), if(crim_rel_within100miles = NULL, 0, crim_rel_within100miles))));
+                     if(max(crim_rel_within25miles, crim_rel_within100miles) = NULL, NULL, sum(if(crim_rel_within25miles = NULL, 0, crim_rel_within25miles), if(crim_rel_within100miles = NULL, 0, crim_rel_within100miles)))) );
 
-f_crim_rel_under500miles_cnt_i := map(
+f_crim_rel_under500miles_cnt_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(crim_rel_within25miles, crim_rel_within100miles, crim_rel_within500miles) = NULL, NULL, sum(if(crim_rel_within25miles = NULL, 0, crim_rel_within25miles), if(crim_rel_within100miles = NULL, 0, crim_rel_within100miles), if(crim_rel_within500miles = NULL, 0, crim_rel_within500miles))));
+                     if(max(crim_rel_within25miles, crim_rel_within100miles, crim_rel_within500miles) = NULL, NULL, sum(if(crim_rel_within25miles = NULL, 0, crim_rel_within25miles), if(crim_rel_within100miles = NULL, 0, crim_rel_within100miles), if(crim_rel_within500miles = NULL, 0, crim_rel_within500miles)))) );
 
-f_rel_under25miles_cnt_d := map(
+f_rel_under25miles_cnt_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     rel_within25miles_count);
+                     rel_within25miles_count) );
 
-f_rel_under100miles_cnt_d := map(
+f_rel_under100miles_cnt_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_within25miles_count, rel_within100miles_count) = NULL, NULL, sum(if(rel_within25miles_count = NULL, 0, rel_within25miles_count), if(rel_within100miles_count = NULL, 0, rel_within100miles_count))));
+                     if(max(rel_within25miles_count, rel_within100miles_count) = NULL, NULL, sum(if(rel_within25miles_count = NULL, 0, rel_within25miles_count), if(rel_within100miles_count = NULL, 0, rel_within100miles_count)))) );
 
-f_rel_under500miles_cnt_d := map(
+f_rel_under500miles_cnt_d := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => NULL,
-                     if(max(rel_within25miles_count, rel_within100miles_count, rel_within500miles_count) = NULL, NULL, sum(if(rel_within25miles_count = NULL, 0, rel_within25miles_count), if(rel_within100miles_count = NULL, 0, rel_within100miles_count), if(rel_within500miles_count = NULL, 0, rel_within500miles_count))));
+                     if(max(rel_within25miles_count, rel_within100miles_count, rel_within500miles_count) = NULL, NULL, sum(if(rel_within25miles_count = NULL, 0, rel_within25miles_count), if(rel_within100miles_count = NULL, 0, rel_within100miles_count), if(rel_within500miles_count = NULL, 0, rel_within500miles_count)))) );
 
-f_rel_bankrupt_count_i := map(
+f_rel_bankrupt_count_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => -1,
-                     min(if(rel_bankrupt_count = NULL, -NULL, rel_bankrupt_count), 999));
+                     min(if(rel_bankrupt_count = NULL, -NULL, rel_bankrupt_count), 999)) );
 
-f_rel_criminal_count_i := map(
+f_rel_criminal_count_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => -1,
-                     min(if(rel_criminal_count = NULL, -NULL, rel_criminal_count), 999));
+                     min(if(rel_criminal_count = NULL, -NULL, rel_criminal_count), 999)) );
 
-f_rel_felony_count_i := map(
+f_rel_felony_count_i := __common__(  map(
     not(truedid)  => NULL,
     rel_count = 0 => -1,
-                     min(if(rel_felony_count = NULL, -NULL, rel_felony_count), 999));
+                     min(if(rel_felony_count = NULL, -NULL, rel_felony_count), 999)) );
 
-f_current_count_d := if(not(truedid), NULL, min(if(current_count = NULL, -NULL, current_count), 999));
+f_current_count_d := __common__(  if(not(truedid), NULL, min(if(current_count = NULL, -NULL, current_count), 999)) );
 
-f_historical_count_d := if(not(truedid), NULL, min(if(historical_count = NULL, -NULL, historical_count), 999));
+f_historical_count_d := __common__(  if(not(truedid), NULL, min(if(historical_count = NULL, -NULL, historical_count), 999)) );
 
-f_accident_count_i := if(not(truedid), NULL, min(if(acc_count = NULL, -NULL, acc_count), 999));
+f_accident_count_i := __common__(  if(not(truedid), NULL, min(if(acc_count = NULL, -NULL, acc_count), 999)) );
 
-f_acc_damage_amt_total_i := if(not(truedid), NULL, acc_damage_amt_total);
+f_acc_damage_amt_total_i := __common__(  if(not(truedid), NULL, acc_damage_amt_total) );
 
-_acc_last_seen := common.sas_date((string)(acc_last_seen));
+_acc_last_seen := __common__(  common.sas_date((string)(acc_last_seen)) );
 
-f_mos_acc_lseen_d := map(
+f_mos_acc_lseen_d := __common__(  map(
     not(truedid)          => NULL,
     _acc_last_seen = NULL => 1000,
-                             max(3, min(if(if ((sysdate - _acc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _acc_last_seen) / (365.25 / 12)), roundup((sysdate - _acc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _acc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _acc_last_seen) / (365.25 / 12)), roundup((sysdate - _acc_last_seen) / (365.25 / 12)))), 999)));
+                             max(3, min(if(if ((sysdate - _acc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _acc_last_seen) / (365.25 / 12)), roundup((sysdate - _acc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _acc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _acc_last_seen) / (365.25 / 12)), roundup((sysdate - _acc_last_seen) / (365.25 / 12)))), 999))) );
 
-f_acc_damage_amt_last_i := if(not(truedid), NULL, acc_damage_amt_last);
+f_acc_damage_amt_last_i := __common__(  if(not(truedid), NULL, acc_damage_amt_last) );
 
-f_acc_damage_amt_last_1mo_i := map(
+f_acc_damage_amt_last_1mo_i := __common__(  map(
     not(truedid)     => NULL,
     acc_count_30 = 0 => -1,
-                        acc_damage_amt_last);
+                        acc_damage_amt_last) );
 
-f_acc_damage_amt_last_3mos_i := map(
+f_acc_damage_amt_last_3mos_i := __common__(  map(
     not(truedid)     => NULL,
     acc_count_90 = 0 => -1,
-                        acc_damage_amt_last);
+                        acc_damage_amt_last) );
 
-f_acc_damage_amt_last_6mos_i := map(
+f_acc_damage_amt_last_6mos_i := __common__(  map(
     not(truedid)      => NULL,
     acc_count_180 = 0 => -1,
-                         acc_damage_amt_last);
+                         acc_damage_amt_last) );
 
-f_accident_recency_d := map(
+f_accident_recency_d := __common__(  map(
     not(truedid)  		=> NULL,
     acc_count_30 > 0 	=> 1,
     acc_count_90 > 0  => 3,
@@ -1909,285 +1909,285 @@ f_accident_recency_d := map(
     acc_count_36 > 0  => 36,
     acc_count_60 > 0  => 60,
     acc_count > 0     => 61,
-												 62);
+												 62) );
 
-f_idrisktype_i := if(not(truedid) or fp_idrisktype = '', NULL, (integer)fp_idrisktype);
+f_idrisktype_i := __common__(  if(not(truedid) or fp_idrisktype = '', NULL, (integer)fp_idrisktype) );
 
-f_idverrisktype_i := if(not(truedid) or fp_idverrisktype = '', NULL, (integer)fp_idverrisktype);
+f_idverrisktype_i := __common__(  if(not(truedid) or fp_idverrisktype = '', NULL, (integer)fp_idverrisktype) );
 
-f_sourcerisktype_i := map(
+f_sourcerisktype_i := __common__(  map(
     not(truedid)             => NULL,
     fp_sourcerisktype = ''	 => NULL,
-                                (integer)fp_sourcerisktype);
+                                (integer)fp_sourcerisktype) );
 
-f_varrisktype_i := map(
+f_varrisktype_i := __common__(  map(
     not(truedid)          => NULL,
     fp_varrisktype = ''	  => NULL,
-                             (integer)fp_varrisktype);
+                             (integer)fp_varrisktype) );
 
-f_varmsrcssncount_i := if(not(truedid), NULL, min(if(fp_varmsrcssncount = '', -NULL, (integer)fp_varmsrcssncount), 999));
+f_varmsrcssncount_i := __common__(  if(not(truedid), NULL, min(if(fp_varmsrcssncount = '', -NULL, (integer)fp_varmsrcssncount), 999)) );
 
-f_varmsrcssnunrelcount_i := if(not(truedid), NULL, min(if(fp_varmsrcssnunrelcount = '', -NULL, (integer)fp_varmsrcssnunrelcount), 999));
+f_varmsrcssnunrelcount_i := __common__(  if(not(truedid), NULL, min(if(fp_varmsrcssnunrelcount = '', -NULL, (integer)fp_varmsrcssnunrelcount), 999)) );
 
-f_vardobcount_i := if(not(truedid), NULL, min(if(fp_vardobcount = '', -NULL, (integer)fp_vardobcount), 999));
+f_vardobcount_i := __common__(  if(not(truedid), NULL, min(if(fp_vardobcount = '', -NULL, (integer)fp_vardobcount), 999)) );
 
-f_vardobcountnew_i := if(not(truedid), NULL, min(if(fp_vardobcountnew = '', -NULL, (integer)fp_vardobcountnew), 999));
+f_vardobcountnew_i := __common__(  if(not(truedid), NULL, min(if(fp_vardobcountnew = '', -NULL, (integer)fp_vardobcountnew), 999)) );
 
-f_srchvelocityrisktype_i := map(
+f_srchvelocityrisktype_i := __common__(  map(
     not(truedid)                   => NULL,
     fp_srchvelocityrisktype = ''	 => NULL,
-                                      (integer)fp_srchvelocityrisktype);
+                                      (integer)fp_srchvelocityrisktype) );
 
-f_srchcountwk_i := if(not(truedid), NULL, min(if(fp_srchcountwk = '', -NULL, (integer)fp_srchcountwk), 999));
+f_srchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchcountwk = '', -NULL, (integer)fp_srchcountwk), 999)) );
 
-f_srchcountday_i := if(not(truedid), NULL, min(if(fp_srchcountday = '', -NULL, (integer)fp_srchcountday), 999));
+f_srchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchcountday = '', -NULL, (integer)fp_srchcountday), 999)) );
 
-f_srchunvrfdssncount_i := if(not(truedid), NULL, min(if(fp_srchunvrfdssncount = '', -NULL, (integer)fp_srchunvrfdssncount), 999));
+f_srchunvrfdssncount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchunvrfdssncount = '', -NULL, (integer)fp_srchunvrfdssncount), 999)) );
 
-f_srchunvrfdaddrcount_i := if(not(truedid), NULL, min(if(fp_srchunvrfdaddrcount = '', -NULL, (integer)fp_srchunvrfdaddrcount), 999));
+f_srchunvrfdaddrcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchunvrfdaddrcount = '', -NULL, (integer)fp_srchunvrfdaddrcount), 999)) );
 
-f_srchunvrfddobcount_i := if(not(truedid), NULL, min(if(fp_srchunvrfddobcount = '', -NULL, (integer)fp_srchunvrfddobcount), 999));
+f_srchunvrfddobcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchunvrfddobcount = '', -NULL, (integer)fp_srchunvrfddobcount), 999)) );
 
-f_srchunvrfdphonecount_i := if(not(truedid), NULL, min(if(fp_srchunvrfdphonecount = '', -NULL, (integer)fp_srchunvrfdphonecount), 999));
+f_srchunvrfdphonecount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchunvrfdphonecount = '', -NULL, (integer)fp_srchunvrfdphonecount), 999)) );
 
-f_srchfraudsrchcount_i := if(not(truedid), NULL, min(if(fp_srchfraudsrchcount = '', -NULL, (integer)fp_srchfraudsrchcount), 999));
+f_srchfraudsrchcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchfraudsrchcount = '', -NULL, (integer)fp_srchfraudsrchcount), 999)) );
 
-f_srchfraudsrchcountyr_i := if(not(truedid), NULL, min(if(fp_srchfraudsrchcountyr = '', -NULL, (integer)fp_srchfraudsrchcountyr), 999));
+f_srchfraudsrchcountyr_i := __common__(  if(not(truedid), NULL, min(if(fp_srchfraudsrchcountyr = '', -NULL, (integer)fp_srchfraudsrchcountyr), 999)) );
 
-f_srchfraudsrchcountmo_i := if(not(truedid), NULL, min(if(fp_srchfraudsrchcountmo = '', -NULL, (integer)fp_srchfraudsrchcountmo), 999));
+f_srchfraudsrchcountmo_i := __common__(  if(not(truedid), NULL, min(if(fp_srchfraudsrchcountmo = '', -NULL, (integer)fp_srchfraudsrchcountmo), 999)) );
 
-f_srchfraudsrchcountwk_i := if(not(truedid), NULL, min(if(fp_srchfraudsrchcountwk = '', -NULL, (integer)fp_srchfraudsrchcountwk), 999));
+f_srchfraudsrchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchfraudsrchcountwk = '', -NULL, (integer)fp_srchfraudsrchcountwk), 999)) );
 
-f_srchfraudsrchcountday_i := if(not(truedid), NULL, min(if(fp_srchfraudsrchcountday = '', -NULL, (integer)fp_srchfraudsrchcountday), 999));
+f_srchfraudsrchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchfraudsrchcountday = '', -NULL, (integer)fp_srchfraudsrchcountday), 999)) );
 
-f_srchlocatesrchcountwk_i := if(not(truedid), NULL, min(if(fp_srchlocatesrchcountwk = '', -NULL, (integer)fp_srchlocatesrchcountwk), 999));
+f_srchlocatesrchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchlocatesrchcountwk = '', -NULL, (integer)fp_srchlocatesrchcountwk), 999)) );
 
-f_srchlocatesrchcountday_i := if(not(truedid), NULL, min(if(fp_srchlocatesrchcountday = '', -NULL, (integer)fp_srchlocatesrchcountday), 999));
+f_srchlocatesrchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchlocatesrchcountday = '', -NULL, (integer)fp_srchlocatesrchcountday), 999)) );
 
-f_assocrisktype_i := map(
+f_assocrisktype_i := __common__(  map(
     not(truedid)            => NULL,
     fp_assocrisktype = ''	  => NULL,
-                               (integer)fp_assocrisktype);
+                               (integer)fp_assocrisktype) );
 
-f_assocsuspicousidcount_i := if(not(truedid), NULL, min(if(fp_assocsuspicousidcount = '', -NULL, (integer)fp_assocsuspicousidcount), 999));
+f_assocsuspicousidcount_i := __common__(  if(not(truedid), NULL, min(if(fp_assocsuspicousidcount = '', -NULL, (integer)fp_assocsuspicousidcount), 999)) );
 
-f_assoccredbureaucount_i := if(not(truedid), NULL, min(if(fp_assoccredbureaucount = '', -NULL, (integer)fp_assoccredbureaucount), 999));
+f_assoccredbureaucount_i := __common__(  if(not(truedid), NULL, min(if(fp_assoccredbureaucount = '', -NULL, (integer)fp_assoccredbureaucount), 999)) );
 
-f_assoccredbureaucountnew_i := if(not(truedid), NULL, (integer)fp_assoccredbureaucountnew);
+f_assoccredbureaucountnew_i := __common__(  if(not(truedid), NULL, (integer)fp_assoccredbureaucountnew) );
 
-f_assoccredbureaucountmo_i := if(not(truedid), NULL, (integer)fp_assoccredbureaucountmo);
+f_assoccredbureaucountmo_i := __common__(  if(not(truedid), NULL, (integer)fp_assoccredbureaucountmo) );
 
-f_validationrisktype_i := map(
+f_validationrisktype_i := __common__(  map(
     not(truedid)                 => NULL,
     fp_validationrisktype = ''	 => NULL,
-                                    (integer)fp_validationrisktype);
+                                    (integer)fp_validationrisktype) );
 
-f_corrrisktype_i := map(
+f_corrrisktype_i := __common__(  map(
     not(truedid)           => NULL,
     fp_corrrisktype = ''	 => NULL,
-                              (integer)fp_corrrisktype);
+                              (integer)fp_corrrisktype) );
 
-f_corrssnnamecount_d := if(not(truedid), NULL, min(if(fp_corrssnnamecount = '', -NULL, (integer)fp_corrssnnamecount), 999));
+f_corrssnnamecount_d := __common__(  if(not(truedid), NULL, min(if(fp_corrssnnamecount = '', -NULL, (integer)fp_corrssnnamecount), 999)) );
 
-f_corrssnaddrcount_d := if(not(truedid), NULL, min(if(fp_corrssnaddrcount = '', -NULL, (integer)fp_corrssnaddrcount), 999));
+f_corrssnaddrcount_d := __common__(  if(not(truedid), NULL, min(if(fp_corrssnaddrcount = '', -NULL, (integer)fp_corrssnaddrcount), 999)) );
 
-f_corraddrnamecount_d := if(not(truedid), NULL, min(if(fp_corraddrnamecount = '', -NULL, (integer)fp_corraddrnamecount), 999));
+f_corraddrnamecount_d := __common__(  if(not(truedid), NULL, min(if(fp_corraddrnamecount = '', -NULL, (integer)fp_corraddrnamecount), 999)) );
 
-f_corraddrphonecount_d := if(not(truedid), NULL, min(if(fp_corraddrphonecount = '', -NULL, (integer)fp_corraddrphonecount), 999));
+f_corraddrphonecount_d := __common__(  if(not(truedid), NULL, min(if(fp_corraddrphonecount = '', -NULL, (integer)fp_corraddrphonecount), 999)) );
 
-f_corrphonelastnamecount_d := if(not(truedid), NULL, min(if(fp_corrphonelastnamecount = '', -NULL, (integer)fp_corrphonelastnamecount), 999));
+f_corrphonelastnamecount_d := __common__(  if(not(truedid), NULL, min(if(fp_corrphonelastnamecount = '', -NULL, (integer)fp_corrphonelastnamecount), 999)) );
 
-f_divrisktype_i := map(
+f_divrisktype_i := __common__(  map(
     not(truedid)          => NULL,
     fp_divrisktype = ''	  => NULL,
-                             (integer)fp_divrisktype);
+                             (integer)fp_divrisktype) );
 
-f_divssnidmsrcurelcount_i := if(not(truedid), NULL, min(if(fp_divssnidmsrcurelcount = '', -NULL, (integer)fp_divssnidmsrcurelcount), 999));
+f_divssnidmsrcurelcount_i := __common__(  if(not(truedid), NULL, min(if(fp_divssnidmsrcurelcount = '', -NULL, (integer)fp_divssnidmsrcurelcount), 999)) );
 
-f_divaddrsuspidcountnew_i := if(not(truedid), NULL, min(if(fp_divaddrsuspidcountnew = '', -NULL, (integer)fp_divaddrsuspidcountnew), 999));
+f_divaddrsuspidcountnew_i := __common__(  if(not(truedid), NULL, min(if(fp_divaddrsuspidcountnew = '', -NULL, (integer)fp_divaddrsuspidcountnew), 999)) );
 
-f_divsrchaddrsuspidcount_i := if(not(truedid), NULL, min(if(fp_divsrchaddrsuspidcount = '', -NULL, (integer)fp_divsrchaddrsuspidcount), 999));
+f_divsrchaddrsuspidcount_i := __common__(  if(not(truedid), NULL, min(if(fp_divsrchaddrsuspidcount = '', -NULL, (integer)fp_divsrchaddrsuspidcount), 999)) );
 
-f_srchcomponentrisktype_i := map(
+f_srchcomponentrisktype_i := __common__(  map(
     not(truedid)                    => NULL,
     fp_srchcomponentrisktype = ''	  => NULL,
-                                       (integer)fp_srchcomponentrisktype);
+                                       (integer)fp_srchcomponentrisktype) );
 
-f_srchssnsrchcount_i := if(not(truedid), NULL, min(if(fp_srchssnsrchcount = '', -NULL, (integer)fp_srchssnsrchcount), 999));
+f_srchssnsrchcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchssnsrchcount = '', -NULL, (integer)fp_srchssnsrchcount), 999)) );
 
-f_srchssnsrchcountmo_i := if(not(truedid), NULL, min(if(fp_srchssnsrchcountmo = '', -NULL, (integer)fp_srchssnsrchcountmo), 999));
+f_srchssnsrchcountmo_i := __common__(  if(not(truedid), NULL, min(if(fp_srchssnsrchcountmo = '', -NULL, (integer)fp_srchssnsrchcountmo), 999)) );
 
-f_srchssnsrchcountwk_i := if(not(truedid), NULL, min(if(fp_srchssnsrchcountwk = '', -NULL, (integer)fp_srchssnsrchcountwk), 999));
+f_srchssnsrchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchssnsrchcountwk = '', -NULL, (integer)fp_srchssnsrchcountwk), 999)) );
 
-f_srchssnsrchcountday_i := if(not(truedid), NULL, min(if(fp_srchssnsrchcountday = '', -NULL, (integer)fp_srchssnsrchcountday), 999));
+f_srchssnsrchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchssnsrchcountday = '', -NULL, (integer)fp_srchssnsrchcountday), 999)) );
 
-f_srchaddrsrchcount_i := if(not(truedid), NULL, min(if(fp_srchaddrsrchcount = '', -NULL, (integer)fp_srchaddrsrchcount), 999));
+f_srchaddrsrchcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchaddrsrchcount = '', -NULL, (integer)fp_srchaddrsrchcount), 999)) );
 
-f_srchaddrsrchcountmo_i := if(not(truedid), NULL, min(if(fp_srchaddrsrchcountmo = '', -NULL, (integer)fp_srchaddrsrchcountmo), 999));
+f_srchaddrsrchcountmo_i := __common__(  if(not(truedid), NULL, min(if(fp_srchaddrsrchcountmo = '', -NULL, (integer)fp_srchaddrsrchcountmo), 999)) );
 
-f_srchaddrsrchcountwk_i := if(not(truedid), NULL, min(if(fp_srchaddrsrchcountwk = '', -NULL, (integer)fp_srchaddrsrchcountwk), 999));
+f_srchaddrsrchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchaddrsrchcountwk = '', -NULL, (integer)fp_srchaddrsrchcountwk), 999)) );
 
-f_srchaddrsrchcountday_i := if(not(truedid), NULL, min(if(fp_srchaddrsrchcountday = '', -NULL, (integer)fp_srchaddrsrchcountday), 999));
+f_srchaddrsrchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchaddrsrchcountday = '', -NULL, (integer)fp_srchaddrsrchcountday), 999)) );
 
-f_srchphonesrchcount_i := if(not(truedid), NULL, min(if(fp_srchphonesrchcount = '', -NULL, (integer)fp_srchphonesrchcount), 999));
+f_srchphonesrchcount_i := __common__(  if(not(truedid), NULL, min(if(fp_srchphonesrchcount = '', -NULL, (integer)fp_srchphonesrchcount), 999)) );
 
-f_srchphonesrchcountmo_i := if(not(truedid), NULL, min(if(fp_srchphonesrchcountmo = '', -NULL, (integer)fp_srchphonesrchcountmo), 999));
+f_srchphonesrchcountmo_i := __common__(  if(not(truedid), NULL, min(if(fp_srchphonesrchcountmo = '', -NULL, (integer)fp_srchphonesrchcountmo), 999)) );
 
-f_srchphonesrchcountwk_i := if(not(truedid), NULL, min(if(fp_srchphonesrchcountwk = '', -NULL, (integer)fp_srchphonesrchcountwk), 999));
+f_srchphonesrchcountwk_i := __common__(  if(not(truedid), NULL, min(if(fp_srchphonesrchcountwk = '', -NULL, (integer)fp_srchphonesrchcountwk), 999)) );
 
-f_srchphonesrchcountday_i := if(not(truedid), NULL, min(if(fp_srchphonesrchcountday = '', -NULL, (integer)fp_srchphonesrchcountday), 999));
+f_srchphonesrchcountday_i := __common__(  if(not(truedid), NULL, min(if(fp_srchphonesrchcountday = '', -NULL, (integer)fp_srchphonesrchcountday), 999)) );
 
-f_componentcharrisktype_i := map(
+f_componentcharrisktype_i := __common__(  map(
     not(truedid)                    => NULL,
     fp_componentcharrisktype = ''	  => NULL,
-                                       (integer)fp_componentcharrisktype);
+                                       (integer)fp_componentcharrisktype) );
 
-f_inputaddractivephonelist_d := map(
+f_inputaddractivephonelist_d := __common__(  map(
     not(truedid)                     => NULL,
     fp_inputaddractivephonelist = '-1' => 0,
-                                        (integer)fp_inputaddractivephonelist);
+                                        (integer)fp_inputaddractivephonelist) );
 
-f_addrchangeincomediff_d_1 := if(not(truedid), NULL, NULL);
+f_addrchangeincomediff_d_1 := __common__(  if(not(truedid), NULL, NULL) );
 
-f_addrchangeincomediff_d := if(fp_addrchangeincomediff = '-1', NULL, (integer)fp_addrchangeincomediff);
+f_addrchangeincomediff_d := __common__(  if(fp_addrchangeincomediff = '-1', NULL, (integer)fp_addrchangeincomediff) );
 
-f_addrchangevaluediff_d := map(
+f_addrchangevaluediff_d := __common__(  map(
     not(truedid)                => NULL,
     fp_addrchangevaluediff = '-1' => NULL,
-                                   (integer)fp_addrchangevaluediff);
+                                   (integer)fp_addrchangevaluediff) );
 
-f_addrchangecrimediff_i := map(
+f_addrchangecrimediff_i := __common__(  map(
     not(truedid)                => NULL,
     fp_addrchangecrimediff = '-1' => NULL,
-                                   (integer)fp_addrchangecrimediff);
+                                   (integer)fp_addrchangecrimediff) );
 
-f_addrchangeecontrajindex_d := if(not(truedid) or fp_addrchangeecontrajindex = '-1' or fp_addrchangeecontrajindex = '', NULL, (integer)fp_addrchangeecontrajindex);
+f_addrchangeecontrajindex_d := __common__(  if(not(truedid) or fp_addrchangeecontrajindex = '-1' or fp_addrchangeecontrajindex = '', NULL, (integer)fp_addrchangeecontrajindex) );
 
-f_curraddractivephonelist_d := map(
+f_curraddractivephonelist_d := __common__(  map(
     // not(truedid)                    => NULL,	//kh-delta
     not(add_curr_pop)                 => NULL,
     fp_curraddractivephonelist = '-1' => NULL,
-                                       (integer)fp_curraddractivephonelist);
+                                       (integer)fp_curraddractivephonelist) );
 
-// f_curraddrmedianincome_d := if(not(truedid), NULL, (integer)fp_curraddrmedianincome);	//kh-delta
-f_curraddrmedianincome_d := if(not(add_curr_pop), NULL, (integer)fp_curraddrmedianincome);
+// f_curraddrmedianincome_d := __common__(  if(not(truedid), NULL, (integer)fp_curraddrmedianincome) );	//kh-delta
+f_curraddrmedianincome_d := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrmedianincome) );
 
-// f_curraddrmedianvalue_d := if(not(truedid), NULL, (integer)fp_curraddrmedianvalue);	//kh-delta
-f_curraddrmedianvalue_d := if(not(add_curr_pop), NULL, (integer)fp_curraddrmedianvalue);
+// f_curraddrmedianvalue_d := __common__(  if(not(truedid), NULL, (integer)fp_curraddrmedianvalue) );	//kh-delta
+f_curraddrmedianvalue_d := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrmedianvalue) );
 
-// f_curraddrmurderindex_i := if(not(truedid), NULL, (integer)fp_curraddrmurderindex);	//kh-delta
-f_curraddrmurderindex_i := if(not(add_curr_pop), NULL, (integer)fp_curraddrmurderindex);
+// f_curraddrmurderindex_i := __common__(  if(not(truedid), NULL, (integer)fp_curraddrmurderindex) );	//kh-delta
+f_curraddrmurderindex_i := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrmurderindex) );
 
-// f_curraddrcartheftindex_i := if(not(truedid), NULL, (integer)fp_curraddrcartheftindex);	//kh-delta
-f_curraddrcartheftindex_i := if(not(add_curr_pop), NULL, (integer)fp_curraddrcartheftindex);
+// f_curraddrcartheftindex_i := __common__(  if(not(truedid), NULL, (integer)fp_curraddrcartheftindex) );	//kh-delta
+f_curraddrcartheftindex_i := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrcartheftindex) );
 
-// f_curraddrburglaryindex_i := if(not(truedid), NULL, (integer)fp_curraddrburglaryindex);	//kh-delta
-f_curraddrburglaryindex_i := if(not(add_curr_pop), NULL, (integer)fp_curraddrburglaryindex);
+// f_curraddrburglaryindex_i := __common__(  if(not(truedid), NULL, (integer)fp_curraddrburglaryindex) );	//kh-delta
+f_curraddrburglaryindex_i := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrburglaryindex) );
 
-// f_curraddrcrimeindex_i := if(not(truedid), NULL, (integer)fp_curraddrcrimeindex);	//kh-delta
-f_curraddrcrimeindex_i := if(not(add_curr_pop), NULL, (integer)fp_curraddrcrimeindex);
+// f_curraddrcrimeindex_i := __common__(  if(not(truedid), NULL, (integer)fp_curraddrcrimeindex) );	//kh-delta
+f_curraddrcrimeindex_i := __common__(  if(not(add_curr_pop), NULL, (integer)fp_curraddrcrimeindex) );
 
-f_prevaddrageoldest_d := if(not(truedid), NULL, min(if(fp_prevaddrageoldest = '', -NULL, (integer)fp_prevaddrageoldest), 999));
+f_prevaddrageoldest_d := __common__(  if(not(truedid), NULL, min(if(fp_prevaddrageoldest = '', -NULL, (integer)fp_prevaddrageoldest), 999)) );
 
-f_prevaddrlenofres_d := if(not(truedid), NULL, min(if(fp_prevaddrlenofres = '', -NULL, (integer)fp_prevaddrlenofres), 999));
+f_prevaddrlenofres_d := __common__(  if(not(truedid), NULL, min(if(fp_prevaddrlenofres = '', -NULL, (integer)fp_prevaddrlenofres), 999)) );
 
-f_prevaddrdwelltype_apt_n := if(not(truedid), NULL, (integer)(fp_prevaddrdwelltype = 'H'));
+f_prevaddrdwelltype_apt_n := __common__(  if(not(truedid), NULL, (integer)(fp_prevaddrdwelltype = 'H')) );
 
-f_prevaddrdwelltype_sfd_n := if(not(truedid), NULL, (integer)(fp_prevaddrdwelltype = 'S'));
+f_prevaddrdwelltype_sfd_n := __common__(  if(not(truedid), NULL, (integer)(fp_prevaddrdwelltype = 'S')) );
 
-f_prevaddrstatus_i := map(
+f_prevaddrstatus_i := __common__(  map(
     not(truedid)            => NULL,
     fp_prevaddrstatus = '0' => 1,
     fp_prevaddrstatus = 'U' => 2,
     fp_prevaddrstatus = 'R' => 3,
-                               NULL);
+                               NULL) );
 
-f_prevaddroccupantowned_i := map(
+f_prevaddroccupantowned_i := __common__(  map(
     not(truedid)                    => NULL,
     fp_prevaddroccupantowned = ''	  => NULL,
-                                       (integer)fp_prevaddroccupantowned);
+                                       (integer)fp_prevaddroccupantowned) );
 
-f_prevaddrmedianincome_d := if(not(truedid), NULL, (integer)fp_prevaddrmedianincome);
+f_prevaddrmedianincome_d := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrmedianincome) );
 
-f_prevaddrmedianvalue_d := if(not(truedid), NULL, (integer)fp_prevaddrmedianvalue);
+f_prevaddrmedianvalue_d := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrmedianvalue) );
 
-f_prevaddrmurderindex_i := if(not(truedid), NULL, (integer)fp_prevaddrmurderindex);
+f_prevaddrmurderindex_i := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrmurderindex) );
 
-f_prevaddrcartheftindex_i := if(not(truedid), NULL, (integer)fp_prevaddrcartheftindex);
+f_prevaddrcartheftindex_i := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrcartheftindex) );
 
-f_fp_prevaddrburglaryindex_i := if(not(truedid), NULL, (integer)fp_prevaddrburglaryindex);
+f_fp_prevaddrburglaryindex_i := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrburglaryindex) );
 
-f_fp_prevaddrcrimeindex_i := if(not(truedid), NULL, (integer)fp_prevaddrcrimeindex);
+f_fp_prevaddrcrimeindex_i := __common__(  if(not(truedid), NULL, (integer)fp_prevaddrcrimeindex) );
 
-r_s65_ssn_deceased_i := map(
+r_s65_ssn_deceased_i := __common__(  map(
     not(truedid or ssnlength > 0)                                          => NULL,
     rc_decsflag = 1                                                        => 1,
     rc_ssndod != 0                                                         => 1,
     contains_i(ver_sources, 'DE') > 0 or contains_i(ver_sources, 'DS') > 0 => 1,
     rc_decsflag = 0                                                        => 0,
-                                                                              NULL);
+                                                                              NULL) );
 
-r_d31_all_bk_i := map(
+r_d31_all_bk_i := __common__(  map(
     not(truedid)                                                                                                                                                                                                                                                                                    => NULL,
 		//kh-changed to check for truncated string
     StringLib.StringToUpperCase(disposition[1..7]) = 'DISMISS' or if(max(bk_dismissed_recent_count, bk_dismissed_historical_count) = NULL, NULL, sum(if(bk_dismissed_recent_count = NULL, 0, bk_dismissed_recent_count), if(bk_dismissed_historical_count = NULL, 0, bk_dismissed_historical_count))) > 0 => 1,
     StringLib.StringToUpperCase(disposition[1..8]) = 'DISCHARG' or if(max(bk_disposed_recent_count, bk_disposed_historical_count) = NULL, NULL, sum(if(bk_disposed_recent_count = NULL, 0, bk_disposed_recent_count), if(bk_disposed_historical_count = NULL, 0, bk_disposed_historical_count))) > 0      => 2,
     bankrupt = 1 or filing_count > 0                                                                                                                                                                                                                                                                => 3,
-                                                                                                                                                                                                                                                                                                       0);
+                                                                                                                                                                                                                                                                                                       0) );
 //kh-changed this variable to populate as an integer as this is what the FLAPS sub model expects
-// r_d31_bk_chapter_n := map(
+// r_d31_bk_chapter_n := __common__(  map(
     // not(truedid)                                 => '',
     // not((bk_chapter in ['7', '11', '12', '13'])) => '',
-                                                    // trim(bk_chapter, LEFT));
+                                                    // trim(bk_chapter, LEFT)) );
 																										
-r_d31_bk_chapter_n := map(
+r_d31_bk_chapter_n := __common__(  map(
     not(truedid)                                 => NULL,
     not((bk_chapter in ['7', '11', '12', '13'])) => NULL,
-                                                    (integer)bk_chapter);
+                                                    (integer)bk_chapter) );
 
-r_d31_bk_dism_recent_count_i := if(not(truedid), NULL, min(if(bk_dismissed_recent_count = NULL, -NULL, bk_dismissed_recent_count), 999));
+r_d31_bk_dism_recent_count_i := __common__(  if(not(truedid), NULL, min(if(bk_dismissed_recent_count = NULL, -NULL, bk_dismissed_recent_count), 999)) );
 
-r_d31_bk_dism_hist_count_i := if(not(truedid), NULL, min(if(bk_dismissed_historical_count = NULL, -NULL, bk_dismissed_historical_count), 999));
+r_d31_bk_dism_hist_count_i := __common__(  if(not(truedid), NULL, min(if(bk_dismissed_historical_count = NULL, -NULL, bk_dismissed_historical_count), 999)) );
 
-r_c22_stl_inq_count90_i := if(not(truedid), NULL, min(if(STL_Inq_count90 = NULL, -NULL, STL_Inq_count90), 999));
+r_c22_stl_inq_count90_i := __common__(  if(not(truedid), NULL, min(if(STL_Inq_count90 = NULL, -NULL, STL_Inq_count90), 999)) );
 
-r_c22_stl_inq_count180_i := if(not(truedid), NULL, min(if(STL_Inq_count180 = NULL, -NULL, STL_Inq_count180), 999));
+r_c22_stl_inq_count180_i := __common__(  if(not(truedid), NULL, min(if(STL_Inq_count180 = NULL, -NULL, STL_Inq_count180), 999)) );
 
-r_c22_stl_inq_count12_i := if(not(truedid), NULL, min(if(STL_Inq_count12 = NULL, -NULL, STL_Inq_count12), 999));
+r_c22_stl_inq_count12_i := __common__(  if(not(truedid), NULL, min(if(STL_Inq_count12 = NULL, -NULL, STL_Inq_count12), 999)) );
 
-r_c22_stl_inq_count24_i := if(not(truedid), NULL, min(if(STL_Inq_count24 = NULL, -NULL, STL_Inq_count24), 999));
+r_c22_stl_inq_count24_i := __common__(  if(not(truedid), NULL, min(if(STL_Inq_count24 = NULL, -NULL, STL_Inq_count24), 999)) );
 
-r_c22_stl_recency_d := map(
+r_c22_stl_recency_d := __common__(  map(
     not(truedid)         => NULL,
     stl_inq_count90 > 0  => 3,
     stl_inq_count180 > 0 => 6,
     stl_inq_count12 > 0  => 12,
     stl_inq_count24 > 0  => 24,
-                            0);
+                            0) );
 
-r_c12_source_profile_d := if(not(truedid), NULL, hdr_source_profile);
+r_c12_source_profile_d := __common__(  if(not(truedid), NULL, hdr_source_profile) );
 
-r_c12_source_profile_index_d := if(not(truedid), NULL, hdr_source_profile_index);
+r_c12_source_profile_index_d := __common__(  if(not(truedid), NULL, hdr_source_profile_index) );
 
-r_f01_inp_addr_not_verified_i := if(not(add_input_pop and truedid), NULL, add_input_addr_not_verified);
+r_f01_inp_addr_not_verified_i := __common__(  if(not(add_input_pop and truedid), NULL, add_input_addr_not_verified) );
 
-r_c23_inp_addr_occ_index_d := if(not(add_input_pop and truedid), NULL, add_input_occ_index);
+r_c23_inp_addr_occ_index_d := __common__(  if(not(add_input_pop and truedid), NULL, add_input_occ_index) );
 
-r_c23_inp_addr_owned_not_occ_d := if(not(add_input_pop and truedid), NULL, add_input_owned_not_occ);
+r_c23_inp_addr_owned_not_occ_d := __common__(  if(not(add_input_pop and truedid), NULL, add_input_owned_not_occ) );
 
-r_f04_curr_add_occ_index_d := if(not(truedid and add_curr_pop), NULL, add_curr_occ_index);
+r_f04_curr_add_occ_index_d := __common__(  if(not(truedid and add_curr_pop), NULL, add_curr_occ_index) );
 
-r_e55_college_ind_d := map(
+r_e55_college_ind_d := __common__(  map(
     not(truedid)                           => NULL,
     (college_file_type in ['H', 'C', 'A']) => 1,
     college_attendance                     => 1,
-                                              0);
+                                              0) );
 
-r_e57_br_source_count_d := if(not(truedid), NULL, br_source_count);
+r_e57_br_source_count_d := __common__(  if(not(truedid), NULL, br_source_count) );
 
-r_i60_inq_prepaidcards_count12_i := if(not(truedid), NULL, min(if(inq_PrepaidCards_count12 = NULL, -NULL, inq_PrepaidCards_count12), 999));
+r_i60_inq_prepaidcards_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_PrepaidCards_count12 = NULL, -NULL, inq_PrepaidCards_count12), 999)) );
 
-r_i60_inq_prepaidcards_recency_d := map(
+r_i60_inq_prepaidcards_recency_d := __common__(  map(
     not(truedid)             		 => NULL,
     inq_PrepaidCards_count01 > 0 => 1,
     inq_PrepaidCards_count03 > 0 => 3,
@@ -2195,11 +2195,11 @@ r_i60_inq_prepaidcards_recency_d := map(
     inq_PrepaidCards_count12 > 0 => 12,
     inq_PrepaidCards_count24 > 0 => 24,
     inq_PrepaidCards_count   > 0 => 99,
-																		999);
+																		999) );
 
-r_i60_inq_retpymt_count12_i := if(not(truedid), NULL, min(if(inq_retailpayments_count12 = NULL, -NULL, inq_retailpayments_count12), 999));
+r_i60_inq_retpymt_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_retailpayments_count12 = NULL, -NULL, inq_retailpayments_count12), 999)) );
 
-r_i60_inq_retpymt_recency_d := map(
+r_i60_inq_retpymt_recency_d := __common__(  map(
     not(truedid)               		 => NULL,
     inq_retailpayments_count01 > 0 => 1,
     inq_retailpayments_count03 > 0 => 3,
@@ -2207,11 +2207,11 @@ r_i60_inq_retpymt_recency_d := map(
     inq_retailpayments_count12 > 0 => 12,
     inq_retailpayments_count24 > 0 => 24,
     inq_retailpayments_count   > 0 => 99,
-																			999);
+																			999) );
 
-r_i60_inq_stdloan_count12_i := if(not(truedid), NULL, min(if(inq_studentloan_count12 = NULL, -NULL, inq_studentloan_count12), 999));
+r_i60_inq_stdloan_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_studentloan_count12 = NULL, -NULL, inq_studentloan_count12), 999)) );
 
-r_i60_inq_stdloan_recency_d := map(
+r_i60_inq_stdloan_recency_d := __common__(  map(
     not(truedid)            		=> NULL,
     inq_studentloan_count01 > 0 => 1,
     inq_studentloan_count03 > 0 => 3,
@@ -2219,11 +2219,11 @@ r_i60_inq_stdloan_recency_d := map(
     inq_studentloan_count12 > 0 => 12,
     inq_studentloan_count24 > 0 => 24,
     inq_studentloan_count   > 0 => 99,
-																	 999);
+																	 999) );
 
-r_i60_inq_util_count12_i := if(not(truedid), NULL, min(if(inq_utilities_count12 = NULL, -NULL, inq_utilities_count12), 999));
+r_i60_inq_util_count12_i := __common__(  if(not(truedid), NULL, min(if(inq_utilities_count12 = NULL, -NULL, inq_utilities_count12), 999)) );
 
-r_i60_inq_util_recency_d := map(
+r_i60_inq_util_recency_d := __common__(  map(
     not(truedid)          		=> NULL,
     inq_utilities_count01 > 0 => 1,
     inq_utilities_count03 > 0 => 3,
@@ -2231,503 +2231,507 @@ r_i60_inq_util_recency_d := map(
     inq_utilities_count12 > 0 => 12,
     inq_utilities_count24 > 0 => 24,
     inq_utilities_count   > 0 => 99,
-																 999);
+																 999) );
 
-f_phone_ver_insurance_d := if(not(truedid) or phone_ver_insurance = '-1', NULL, (integer)phone_ver_insurance);
+f_phone_ver_insurance_d := __common__(  if(not(truedid) or phone_ver_insurance = '-1', NULL, (integer)phone_ver_insurance) );
 
-f_phone_ver_experian_d := if(not(truedid) or phone_ver_experian = '-1', NULL, (integer)phone_ver_experian);
+f_phone_ver_experian_d := __common__(  if(not(truedid) or phone_ver_experian = '-1', NULL, (integer)phone_ver_experian) );
 
-f_addrs_per_ssn_i := if(not(ssnlength > 0), NULL, min(if(addrs_per_ssn = NULL, -NULL, addrs_per_ssn), 999));
+f_addrs_per_ssn_i := __common__(  if(not(ssnlength > 0), NULL, min(if(addrs_per_ssn = NULL, -NULL, addrs_per_ssn), 999)) );
 
-// f_phones_per_addr_curr_i := if(not(addrpop), NULL, min(if(phones_per_addr_curr = NULL, -NULL, phones_per_addr_curr), 999));	//kh-delta
-f_phones_per_addr_curr_i := if(not(add_curr_pop), NULL, min(if(phones_per_addr_curr = NULL, -NULL, phones_per_addr_curr), 999));
+// f_phones_per_addr_curr_i := __common__(  if(not(addrpop), NULL, min(if(phones_per_addr_curr = NULL, -NULL, phones_per_addr_curr), 999)) );	//kh-delta
+f_phones_per_addr_curr_i := __common__(  if(not(add_curr_pop), NULL, min(if(phones_per_addr_curr = NULL, -NULL, phones_per_addr_curr), 999)) );
 
-f_addrs_per_ssn_c6_i := if(not(ssnlength > 0), NULL, min(if(addrs_per_ssn_c6 = NULL, -NULL, addrs_per_ssn_c6), 999));
+f_addrs_per_ssn_c6_i := __common__(  if(not(ssnlength > 0), NULL, min(if(addrs_per_ssn_c6 = NULL, -NULL, addrs_per_ssn_c6), 999)) );
 
-f_phones_per_addr_c6_i := if(not(addrpop), NULL, min(if(phones_per_addr_c6 = NULL, -NULL, phones_per_addr_c6), 999));
+f_phones_per_addr_c6_i := __common__(  if(not(addrpop), NULL, min(if(phones_per_addr_c6 = NULL, -NULL, phones_per_addr_c6), 999)) );
 
-f_adls_per_phone_c6_i := if(not(hphnpop), NULL, min(if(adls_per_phone_c6 = NULL, -NULL, adls_per_phone_c6), 999));
+f_adls_per_phone_c6_i := __common__(  if(not(hphnpop), NULL, min(if(adls_per_phone_c6 = NULL, -NULL, adls_per_phone_c6), 999)) );
 
-f_dl_addrs_per_adl_i := if(not(truedid), NULL, min(if(dl_addrs_per_adl = NULL, -NULL, dl_addrs_per_adl), 999));
+f_dl_addrs_per_adl_i := __common__(  if(not(truedid), NULL, min(if(dl_addrs_per_adl = NULL, -NULL, dl_addrs_per_adl), 999)) );
 
-f_inq_email_ver_count_i := if(not(truedid), NULL, min(if(inq_email_ver_count = NULL, -NULL, inq_email_ver_count), 999));
+f_inq_email_ver_count_i := __common__(  if(not(truedid), NULL, min(if(inq_email_ver_count = NULL, -NULL, inq_email_ver_count), 999)) );
 
-f_inq_count_day_i := if(not(truedid), NULL, min(if(inq_count_day = NULL, -NULL, inq_count_day), 999));
+f_inq_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_count_day = NULL, -NULL, inq_count_day), 999)) );
 
-f_inq_count_week_i := if(not(truedid), NULL, min(if(inq_count_week = NULL, -NULL, inq_count_week), 999));
+f_inq_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_count_week = NULL, -NULL, inq_count_week), 999)) );
 
-f_inq_auto_count_day_i := if(not(truedid), NULL, min(if(inq_Auto_count_day = NULL, -NULL, inq_Auto_count_day), 999));
+f_inq_auto_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Auto_count_day = NULL, -NULL, inq_Auto_count_day), 999)) );
 
-f_inq_auto_count_week_i := if(not(truedid), NULL, min(if(inq_Auto_count_week = NULL, -NULL, inq_Auto_count_week), 999));
+f_inq_auto_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Auto_count_week = NULL, -NULL, inq_Auto_count_week), 999)) );
 
-f_inq_banking_count_day_i := if(not(truedid), NULL, min(if(inq_Banking_count_day = NULL, -NULL, inq_Banking_count_day), 999));
+f_inq_banking_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Banking_count_day = NULL, -NULL, inq_Banking_count_day), 999)) );
 
-f_inq_banking_count_week_i := if(not(truedid), NULL, min(if(inq_Banking_count_week = NULL, -NULL, inq_Banking_count_week), 999));
+f_inq_banking_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Banking_count_week = NULL, -NULL, inq_Banking_count_week), 999)) );
 
-f_inq_collection_count_day_i := if(not(truedid), NULL, min(if(inq_Collection_count_day = NULL, -NULL, inq_Collection_count_day), 999));
+f_inq_collection_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Collection_count_day = NULL, -NULL, inq_Collection_count_day), 999)) );
 
-f_inq_collection_count_week_i := if(not(truedid), NULL, min(if(inq_Collection_count_week = NULL, -NULL, inq_Collection_count_week), 999));
+f_inq_collection_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Collection_count_week = NULL, -NULL, inq_Collection_count_week), 999)) );
 
-f_inq_communications_cnt_day_i := if(not(truedid), NULL, min(if(inq_Communications_count_day = NULL, -NULL, inq_Communications_count_day), 999));
+f_inq_communications_cnt_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Communications_count_day = NULL, -NULL, inq_Communications_count_day), 999)) );
 
-f_inq_communications_cnt_week_i := if(not(truedid), NULL, min(if(inq_Communications_count_week = NULL, -NULL, inq_Communications_count_week), 999));
+f_inq_communications_cnt_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Communications_count_week = NULL, -NULL, inq_Communications_count_week), 999)) );
 
-f_inq_highriskcredit_cnt_day_i := if(not(truedid), NULL, min(if(inq_HighRiskCredit_count_day = NULL, -NULL, inq_HighRiskCredit_count_day), 999));
+f_inq_highriskcredit_cnt_day_i := __common__(  if(not(truedid), NULL, min(if(inq_HighRiskCredit_count_day = NULL, -NULL, inq_HighRiskCredit_count_day), 999)) );
 
-f_inq_highriskcredit_cnt_week_i := if(not(truedid), NULL, min(if(inq_HighRiskCredit_count_week = NULL, -NULL, inq_HighRiskCredit_count_week), 999));
+f_inq_highriskcredit_cnt_week_i := __common__(  if(not(truedid), NULL, min(if(inq_HighRiskCredit_count_week = NULL, -NULL, inq_HighRiskCredit_count_week), 999)) );
 
-f_inq_mortgage_count_day_i := if(not(truedid), NULL, min(if(inq_Mortgage_count_day = NULL, -NULL, inq_Mortgage_count_day), 999));
+f_inq_mortgage_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Mortgage_count_day = NULL, -NULL, inq_Mortgage_count_day), 999)) );
 
-f_inq_mortgage_count_week_i := if(not(truedid), NULL, min(if(inq_Mortgage_count_week = NULL, -NULL, inq_Mortgage_count_week), 999));
+f_inq_mortgage_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Mortgage_count_week = NULL, -NULL, inq_Mortgage_count_week), 999)) );
 
-f_inq_other_count_day_i := if(not(truedid), NULL, min(if(inq_Other_count_day = NULL, -NULL, inq_Other_count_day), 999));
+f_inq_other_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Other_count_day = NULL, -NULL, inq_Other_count_day), 999)) );
 
-f_inq_other_count_week_i := if(not(truedid), NULL, min(if(inq_Other_count_week = NULL, -NULL, inq_Other_count_week), 999));
+f_inq_other_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Other_count_week = NULL, -NULL, inq_Other_count_week), 999)) );
 
-f_inq_prepaidcards_count_i := if(not(truedid), NULL, min(if(inq_PrepaidCards_count = NULL, -NULL, inq_PrepaidCards_count), 999));
+f_inq_prepaidcards_count_i := __common__(  if(not(truedid), NULL, min(if(inq_PrepaidCards_count = NULL, -NULL, inq_PrepaidCards_count), 999)) );
 
-f_inq_prepaidcards_count_day_i := if(not(truedid), NULL, min(if(inq_PrepaidCards_count_day = NULL, -NULL, inq_PrepaidCards_count_day), 999));
+f_inq_prepaidcards_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_PrepaidCards_count_day = NULL, -NULL, inq_PrepaidCards_count_day), 999)) );
 
-f_inq_prepaidcards_count_week_i := if(not(truedid), NULL, min(if(inq_PrepaidCards_count_week = NULL, -NULL, inq_PrepaidCards_count_week), 999));
+f_inq_prepaidcards_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_PrepaidCards_count_week = NULL, -NULL, inq_PrepaidCards_count_week), 999)) );
 
-f_inq_prepaidcards_count24_i := if(not(truedid), NULL, min(if(inq_PrepaidCards_count24 = NULL, -NULL, inq_PrepaidCards_count24), 999));
+f_inq_prepaidcards_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_PrepaidCards_count24 = NULL, -NULL, inq_PrepaidCards_count24), 999)) );
 
-f_inq_quizprovider_count_i := if(not(truedid), NULL, min(if(inq_QuizProvider_count = NULL, -NULL, inq_QuizProvider_count), 999));
+f_inq_quizprovider_count_i := __common__(  if(not(truedid), NULL, min(if(inq_QuizProvider_count = NULL, -NULL, inq_QuizProvider_count), 999)) );
 
-f_inq_quizprovider_count_day_i := if(not(truedid), NULL, min(if(inq_QuizProvider_count_day = NULL, -NULL, inq_QuizProvider_count_day), 999));
+f_inq_quizprovider_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_QuizProvider_count_day = NULL, -NULL, inq_QuizProvider_count_day), 999)) );
 
-f_inq_quizprovider_count_week_i := if(not(truedid), NULL, min(if(inq_QuizProvider_count_week = NULL, -NULL, inq_QuizProvider_count_week), 999));
+f_inq_quizprovider_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_QuizProvider_count_week = NULL, -NULL, inq_QuizProvider_count_week), 999)) );
 
-f_inq_quizprovider_count24_i := if(not(truedid), NULL, min(if(inq_QuizProvider_count24 = NULL, -NULL, inq_QuizProvider_count24), 999));
+f_inq_quizprovider_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_QuizProvider_count24 = NULL, -NULL, inq_QuizProvider_count24), 999)) );
 
-f_inq_retail_count_day_i := if(not(truedid), NULL, min(if(inq_Retail_count_day = NULL, -NULL, inq_Retail_count_day), 999));
+f_inq_retail_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Retail_count_day = NULL, -NULL, inq_Retail_count_day), 999)) );
 
-f_inq_retail_count_week_i := if(not(truedid), NULL, min(if(inq_Retail_count_week = NULL, -NULL, inq_Retail_count_week), 999));
+f_inq_retail_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Retail_count_week = NULL, -NULL, inq_Retail_count_week), 999)) );
 
-f_inq_retailpayments_cnt_i := if(not(truedid), NULL, min(if(inq_RetailPayments_count = NULL, -NULL, inq_RetailPayments_count), 999));
+f_inq_retailpayments_cnt_i := __common__(  if(not(truedid), NULL, min(if(inq_RetailPayments_count = NULL, -NULL, inq_RetailPayments_count), 999)) );
 
-f_inq_retailpayments_cnt_day_i := if(not(truedid), NULL, min(if(inq_RetailPayments_count_day = NULL, -NULL, inq_RetailPayments_count_day), 999));
+f_inq_retailpayments_cnt_day_i := __common__(  if(not(truedid), NULL, min(if(inq_RetailPayments_count_day = NULL, -NULL, inq_RetailPayments_count_day), 999)) );
 
-f_inq_retailpayments_cnt_week_i := if(not(truedid), NULL, min(if(inq_RetailPayments_count_week = NULL, -NULL, inq_RetailPayments_count_week), 999));
+f_inq_retailpayments_cnt_week_i := __common__(  if(not(truedid), NULL, min(if(inq_RetailPayments_count_week = NULL, -NULL, inq_RetailPayments_count_week), 999)) );
 
-f_inq_retailpayments_count24_i := if(not(truedid), NULL, min(if(inq_RetailPayments_count24 = NULL, -NULL, inq_RetailPayments_count24), 999));
+f_inq_retailpayments_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_RetailPayments_count24 = NULL, -NULL, inq_RetailPayments_count24), 999)) );
 
-f_inq_studentloan_count_i := if(not(truedid), NULL, min(if(inq_StudentLoan_count = NULL, -NULL, inq_StudentLoan_count), 999));
+f_inq_studentloan_count_i := __common__(  if(not(truedid), NULL, min(if(inq_StudentLoan_count = NULL, -NULL, inq_StudentLoan_count), 999)) );
 
-f_inq_studentloan_count_day_i := if(not(truedid), NULL, min(if(inq_StudentLoan_count_day = NULL, -NULL, inq_StudentLoan_count_day), 999));
+f_inq_studentloan_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_StudentLoan_count_day = NULL, -NULL, inq_StudentLoan_count_day), 999)) );
 
-f_inq_studentloan_count_week_i := if(not(truedid), NULL, min(if(inq_StudentLoan_count_week = NULL, -NULL, inq_StudentLoan_count_week), 999));
+f_inq_studentloan_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_StudentLoan_count_week = NULL, -NULL, inq_StudentLoan_count_week), 999)) );
 
-f_inq_studentloan_count24_i := if(not(truedid), NULL, min(if(inq_StudentLoan_count24 = NULL, -NULL, inq_StudentLoan_count24), 999));
+f_inq_studentloan_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_StudentLoan_count24 = NULL, -NULL, inq_StudentLoan_count24), 999)) );
 
-f_inq_utilities_count_i := if(not(truedid), NULL, min(if(inq_Utilities_count = NULL, -NULL, inq_Utilities_count), 999));
+f_inq_utilities_count_i := __common__(  if(not(truedid), NULL, min(if(inq_Utilities_count = NULL, -NULL, inq_Utilities_count), 999)) );
 
-f_inq_utilities_count_day_i := if(not(truedid), NULL, min(if(inq_Utilities_count_day = NULL, -NULL, inq_Utilities_count_day), 999));
+f_inq_utilities_count_day_i := __common__(  if(not(truedid), NULL, min(if(inq_Utilities_count_day = NULL, -NULL, inq_Utilities_count_day), 999)) );
 
-f_inq_utilities_count_week_i := if(not(truedid), NULL, min(if(inq_Utilities_count_week = NULL, -NULL, inq_Utilities_count_week), 999));
+f_inq_utilities_count_week_i := __common__(  if(not(truedid), NULL, min(if(inq_Utilities_count_week = NULL, -NULL, inq_Utilities_count_week), 999)) );
 
-f_inq_utilities_count24_i := if(not(truedid), NULL, min(if(inq_Utilities_count24 = NULL, -NULL, inq_Utilities_count24), 999));
+f_inq_utilities_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_Utilities_count24 = NULL, -NULL, inq_Utilities_count24), 999)) );
 
-f_inq_billgrp_count_i := if(not(truedid), NULL, min(if(inq_billgroup_count = NULL, -NULL, inq_billgroup_count), 999));
+f_inq_billgrp_count_i := __common__(  if(not(truedid), NULL, min(if(inq_billgroup_count = NULL, -NULL, inq_billgroup_count), 999)) );
 
-f_inq_billgrp_count24_i := if(not(truedid), NULL, min(if(inq_billgroup_count24 = NULL, -NULL, inq_billgroup_count24), 999));
+f_inq_billgrp_count24_i := __common__(  if(not(truedid), NULL, min(if(inq_billgroup_count24 = NULL, -NULL, inq_billgroup_count24), 999)) );
 
-f_inq_email_per_adl_i := if(not(truedid), NULL, min(if(inq_email_per_adl = NULL, -NULL, inq_email_per_adl), 999));
+f_inq_email_per_adl_i := __common__(  if(not(truedid), NULL, min(if(inq_email_per_adl = NULL, -NULL, inq_email_per_adl), 999)) );
 
-f_inq_adls_per_email_i := if(not(emailpop), NULL, min(if(inq_adls_per_email = NULL, -NULL, inq_adls_per_email), 999));
+f_inq_adls_per_email_i := __common__(  if(not(emailpop), NULL, min(if(inq_adls_per_email = NULL, -NULL, inq_adls_per_email), 999)) );
 
-f_nae_email_verd_d := (integer)((integer)email_name_addr_verification in [2, 3, 4, 5, 6, 7, 8]);
+f_nae_email_verd_d := __common__(  (integer)((integer)email_name_addr_verification in [2, 3, 4, 5, 6, 7, 8]) );
 
-f_nae_addr_verd_d := (integer)((integer)email_name_addr_verification in [3, 6, 7, 8]);
+f_nae_addr_verd_d := __common__(  (integer)((integer)email_name_addr_verification in [3, 6, 7, 8]) );
 
-f_nae_lname_verd_d := (integer)((integer)email_name_addr_verification in [4, 5, 7, 8]);
+f_nae_lname_verd_d := __common__(  (integer)((integer)email_name_addr_verification in [4, 5, 7, 8]) );
 
-f_nae_fname_verd_d := (integer)((integer)email_name_addr_verification in [2, 5, 6, 8]);
+f_nae_fname_verd_d := __common__(  (integer)((integer)email_name_addr_verification in [2, 5, 6, 8]) );
 
-f_nae_nothing_found_i := (integer)((integer)email_name_addr_verification = 0);
+f_nae_nothing_found_i := __common__(  (integer)((integer)email_name_addr_verification = 0) );
 
-f_nae_contradictory_i := (integer)((integer)email_name_addr_verification = 1);
+f_nae_contradictory_i := __common__(  (integer)((integer)email_name_addr_verification = 1) );
 
-f_adl_per_email_i := if(not(emailpop), NULL, min(if(adl_per_email = NULL, -NULL, adl_per_email), 999));
+f_adl_per_email_i := __common__(  if(not(emailpop), NULL, min(if(adl_per_email = NULL, -NULL, adl_per_email), 999)) );
 
-r_c20_email_verification_d := if(not(emailpop), NULL, email_verification);
+r_c20_email_verification_d := __common__(  if(not(emailpop), NULL, email_verification) );
 
-f_vf_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_hi_risk_ct = NULL, -NULL, vf_hi_risk_ct), 999));
+f_vf_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_hi_risk_ct = NULL, -NULL, vf_hi_risk_ct), 999)) );
 
-f_vf_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_lo_risk_ct = NULL, -NULL, vf_lo_risk_ct), 999));
+f_vf_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_lo_risk_ct = NULL, -NULL, vf_lo_risk_ct), 999)) );
 
-// f_vf_lexid_phn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_phone_hi_risk_ct = 0, -NULL, (integer)vf_LexID_phone_hi_risk_ct), 999));
-f_vf_lexid_phn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_phone_hi_risk_ct = 0, 0, (integer)vf_LexID_phone_hi_risk_ct), 999));
+// f_vf_lexid_phn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_phone_hi_risk_ct = 0, -NULL, (integer)vf_LexID_phone_hi_risk_ct), 999)) );
+f_vf_lexid_phn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_phone_hi_risk_ct = 0, 0, (integer)vf_LexID_phone_hi_risk_ct), 999)) );
 
-// f_vf_lexid_phn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_phone_lo_risk_ct = 0, -NULL, (integer)vf_LexID_phone_lo_risk_ct), 999));
-f_vf_lexid_phn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_phone_lo_risk_ct = 0, 0, (integer)vf_LexID_phone_lo_risk_ct), 999));
+// f_vf_lexid_phn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_phone_lo_risk_ct = 0, -NULL, (integer)vf_LexID_phone_lo_risk_ct), 999)) );
+f_vf_lexid_phn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_phone_lo_risk_ct = 0, 0, (integer)vf_LexID_phone_lo_risk_ct), 999)) );
 
-// f_vf_altlexid_phn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_phone_hi_risk_ct = 0, -NULL, (integer)vf_AltLexID_phone_hi_risk_ct), 999));
-f_vf_altlexid_phn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_phone_hi_risk_ct = 0, 0, (integer)vf_AltLexID_phone_hi_risk_ct), 999));
+// f_vf_altlexid_phn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_phone_hi_risk_ct = 0, -NULL, (integer)vf_AltLexID_phone_hi_risk_ct), 999)) );
+f_vf_altlexid_phn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_phone_hi_risk_ct = 0, 0, (integer)vf_AltLexID_phone_hi_risk_ct), 999)) );
 
-// f_vf_altlexid_phn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_phone_lo_risk_ct = 0, -NULL, (integer)vf_AltLexID_phone_lo_risk_ct), 999));
-f_vf_altlexid_phn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_phone_lo_risk_ct = 0, 0, (integer)vf_AltLexID_phone_lo_risk_ct), 999));
+// f_vf_altlexid_phn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_phone_lo_risk_ct = 0, -NULL, (integer)vf_AltLexID_phone_lo_risk_ct), 999)) );
+f_vf_altlexid_phn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_phone_lo_risk_ct = 0, 0, (integer)vf_AltLexID_phone_lo_risk_ct), 999)) );
 
-// f_vf_lexid_addr_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_addr_hi_risk_ct = 0, -NULL, vf_LexID_addr_hi_risk_ct), 999));
-f_vf_lexid_addr_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_addr_hi_risk_ct = 0, 0, vf_LexID_addr_hi_risk_ct), 999));
+// f_vf_lexid_addr_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_addr_hi_risk_ct = 0, -NULL, vf_LexID_addr_hi_risk_ct), 999)) );
+f_vf_lexid_addr_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_addr_hi_risk_ct = 0, 0, vf_LexID_addr_hi_risk_ct), 999)) );
 
-// f_vf_lexid_addr_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_addr_lo_risk_ct = 0, -NULL, vf_LexID_addr_lo_risk_ct), 999));
-f_vf_lexid_addr_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_addr_lo_risk_ct = 0, 0, vf_LexID_addr_lo_risk_ct), 999));
+// f_vf_lexid_addr_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_addr_lo_risk_ct = 0, -NULL, vf_LexID_addr_lo_risk_ct), 999)) );
+f_vf_lexid_addr_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_addr_lo_risk_ct = 0, 0, vf_LexID_addr_lo_risk_ct), 999)) );
 
-// f_vf_altlexid_addr_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_addr_hi_risk_ct = 0, -NULL, vf_AltLexID_addr_hi_risk_ct), 999));
-f_vf_altlexid_addr_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_addr_hi_risk_ct = 0, 0, vf_AltLexID_addr_hi_risk_ct), 999));
+// f_vf_altlexid_addr_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_addr_hi_risk_ct = 0, -NULL, vf_AltLexID_addr_hi_risk_ct), 999)) );
+f_vf_altlexid_addr_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_addr_hi_risk_ct = 0, 0, vf_AltLexID_addr_hi_risk_ct), 999)) );
 
-// f_vf_altlexid_addr_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_addr_lo_risk_ct = 0, -NULL, vf_AltLexID_addr_lo_risk_ct), 999));
-f_vf_altlexid_addr_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_addr_lo_risk_ct = 0, 0, vf_AltLexID_addr_lo_risk_ct), 999));
+// f_vf_altlexid_addr_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_addr_lo_risk_ct = 0, -NULL, vf_AltLexID_addr_lo_risk_ct), 999)) );
+f_vf_altlexid_addr_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_addr_lo_risk_ct = 0, 0, vf_AltLexID_addr_lo_risk_ct), 999)) );
 
-// f_vf_lexid_ssn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_ssn_hi_risk_ct = 0, -NULL, vf_LexID_ssn_hi_risk_ct), 999));
-f_vf_lexid_ssn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_LexID_ssn_hi_risk_ct = 0, 0, vf_LexID_ssn_hi_risk_ct), 999));
+// f_vf_lexid_ssn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_ssn_hi_risk_ct = 0, -NULL, vf_LexID_ssn_hi_risk_ct), 999)) );
+f_vf_lexid_ssn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_LexID_ssn_hi_risk_ct = 0, 0, vf_LexID_ssn_hi_risk_ct), 999)) );
 
-// f_vf_lexid_ssn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_ssn_lo_risk_ct = 0, -NULL, vf_LexID_ssn_lo_risk_ct), 999));
-f_vf_lexid_ssn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_LexID_ssn_lo_risk_ct = 0, 0, vf_LexID_ssn_lo_risk_ct), 999));
+// f_vf_lexid_ssn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_ssn_lo_risk_ct = 0, -NULL, vf_LexID_ssn_lo_risk_ct), 999)) );
+f_vf_lexid_ssn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_LexID_ssn_lo_risk_ct = 0, 0, vf_LexID_ssn_lo_risk_ct), 999)) );
 
-// f_vf_altlexid_ssn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_ssn_hi_risk_ct = 0, -NULL, vf_AltLexID_ssn_hi_risk_ct), 999));
-f_vf_altlexid_ssn_hi_risk_ct_i := if(not(truedid), NULL, min(if(vf_AltLexID_ssn_hi_risk_ct = 0, 0, vf_AltLexID_ssn_hi_risk_ct), 999));
+// f_vf_altlexid_ssn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_ssn_hi_risk_ct = 0, -NULL, vf_AltLexID_ssn_hi_risk_ct), 999)) );
+f_vf_altlexid_ssn_hi_risk_ct_i := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_ssn_hi_risk_ct = 0, 0, vf_AltLexID_ssn_hi_risk_ct), 999)) );
 
-// f_vf_altlexid_ssn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_ssn_lo_risk_ct = 0, -NULL, vf_AltLexID_ssn_lo_risk_ct), 999));
-f_vf_altlexid_ssn_lo_risk_ct_d := if(not(truedid), NULL, min(if(vf_AltLexID_ssn_lo_risk_ct = 0, 0, vf_AltLexID_ssn_lo_risk_ct), 999));
+// f_vf_altlexid_ssn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_ssn_lo_risk_ct = 0, -NULL, vf_AltLexID_ssn_lo_risk_ct), 999)) );
+f_vf_altlexid_ssn_lo_risk_ct_d := __common__(  if(not(truedid), NULL, min(if(vf_AltLexID_ssn_lo_risk_ct = 0, 0, vf_AltLexID_ssn_lo_risk_ct), 999)) );
 
-_liens_rel_sc_first_seen := common.sas_date((string)(liens_rel_SC_first_seen));
+_liens_rel_sc_first_seen := __common__(  common.sas_date((string)(liens_rel_SC_first_seen)) );
 
-f_mos_liens_rel_sc_fseen_d := map(
+f_mos_liens_rel_sc_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_sc_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_sc_last_seen := common.sas_date((string)(liens_rel_SC_last_seen));
+_liens_rel_sc_last_seen := __common__(  common.sas_date((string)(liens_rel_SC_last_seen)) );
 
-f_mos_liens_rel_sc_lseen_d := map(
+f_mos_liens_rel_sc_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_sc_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_sc_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_sc_total_amt_i := if(not(truedid), NULL, liens_rel_SC_total_amount);
+f_liens_rel_sc_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_SC_total_amount) );
 
-f_liens_unrel_st_ct_i := if(not(truedid), NULL, min(if(liens_unrel_ST_ct = NULL, -NULL, liens_unrel_ST_ct), 999));
+f_liens_unrel_st_ct_i := __common__(  if(not(truedid), NULL, min(if(liens_unrel_ST_ct = NULL, -NULL, liens_unrel_ST_ct), 999)) );
 
-_liens_unrel_st_first_seen := common.sas_date((string)(liens_unrel_ST_first_seen));
+_liens_unrel_st_first_seen := __common__(  common.sas_date((string)(liens_unrel_ST_first_seen)) );
 
-f_mos_liens_unrel_st_fseen_d := map(
+f_mos_liens_unrel_st_fseen_d := __common__(  map(
     not(truedid)                      => NULL,
     _liens_unrel_st_first_seen = NULL => 1000,
-                                         min(if(if ((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)))), 999));
+                                         min(if(if ((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_unrel_st_last_seen := common.sas_date((string)(liens_unrel_ST_last_seen));
+_liens_unrel_st_last_seen := __common__(  common.sas_date((string)(liens_unrel_ST_last_seen)) );
 
-f_mos_liens_unrel_st_lseen_d := map(
+f_mos_liens_unrel_st_lseen_d := __common__(  map(
     not(truedid)                     => NULL,
     _liens_unrel_st_last_seen = NULL => 1000,
-                                        max(3, min(if(if ((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_unrel_st_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_unrel_st_total_amt_i := if(not(truedid), NULL, liens_unrel_ST_total_amount);
+f_liens_unrel_st_total_amt_i := __common__(  if(not(truedid), NULL, liens_unrel_ST_total_amount) );
 
-f_liens_rel_st_ct_i := if(not(truedid), NULL, min(if(liens_rel_ST_ct = NULL, -NULL, liens_rel_ST_ct), 999));
+f_liens_rel_st_ct_i := __common__(  if(not(truedid), NULL, min(if(liens_rel_ST_ct = NULL, -NULL, liens_rel_ST_ct), 999)) );
 
-_liens_rel_st_first_seen := common.sas_date((string)(liens_rel_ST_first_seen));
+_liens_rel_st_first_seen := __common__(  common.sas_date((string)(liens_rel_ST_first_seen)) );
 
-f_mos_liens_rel_st_fseen_d := map(
+f_mos_liens_rel_st_fseen_d := __common__(  map(
     not(truedid)                    => NULL,
     _liens_rel_st_first_seen = NULL => 1000,
-                                       min(if(if ((sysdate - _liens_rel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)))), 999));
+                                       min(if(if ((sysdate - _liens_rel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_st_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_first_seen) / (365.25 / 12)))), 999)) );
 
-_liens_rel_st_last_seen := common.sas_date((string)(liens_rel_ST_last_seen));
+_liens_rel_st_last_seen := __common__(  common.sas_date((string)(liens_rel_ST_last_seen)) );
 
-f_mos_liens_rel_st_lseen_d := map(
+f_mos_liens_rel_st_lseen_d := __common__(  map(
     not(truedid)                   => NULL,
     _liens_rel_st_last_seen = NULL => 1000,
-                                      max(3, min(if(if ((sysdate - _liens_rel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)))), 999)));
+                                      max(3, min(if(if ((sysdate - _liens_rel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _liens_rel_st_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)), roundup((sysdate - _liens_rel_st_last_seen) / (365.25 / 12)))), 999))) );
 
-f_liens_rel_st_total_amt_i := if(not(truedid), NULL, liens_rel_ST_total_amount);
+f_liens_rel_st_total_amt_i := __common__(  if(not(truedid), NULL, liens_rel_ST_total_amount) );
 
-f_has_professional_license_d := map(
+f_has_professional_license_d := __common__(  map(
     not(truedid)                      => NULL,
     not(prof_license_category = '') 	=> 1,
-                                         0);
+                                         0) );
 
-f_prof_license_category_ix_d := map(
+f_prof_license_category_ix_d := __common__(  map(
     not(truedid) or prof_license_source != 'IX' => NULL,
     prof_license_category = ''                	=> NULL,
-                                                   (integer)prof_license_category);
+                                                   (integer)prof_license_category) );
 
-f_has_hh_members_n := map(
+f_has_hh_members_n := __common__(  map(
     not(truedid)      => NULL,
     hh_members_ct > 0 => 1,
-                         0);
+                         0) );
 
-f_hh_members_ct_d := if(not(truedid), NULL, min(if(hh_members_ct = NULL, -NULL, hh_members_ct), 999));
+f_hh_members_ct_d := __common__(  if(not(truedid), NULL, min(if(hh_members_ct = NULL, -NULL, hh_members_ct), 999)) );
 
-f_property_owners_ct_d := if(not(truedid), NULL, min(if(hh_property_owners_ct = NULL, -NULL, hh_property_owners_ct), 999));
+f_property_owners_ct_d := __common__(  if(not(truedid), NULL, min(if(hh_property_owners_ct = NULL, -NULL, hh_property_owners_ct), 999)) );
 
-f_hh_age_65_plus_d := if(not(truedid), NULL, min(if(hh_age_65_plus = NULL, -NULL, hh_age_65_plus), 999));
+f_hh_age_65_plus_d := __common__(  if(not(truedid), NULL, min(if(hh_age_65_plus = NULL, -NULL, hh_age_65_plus), 999)) );
 
-f_hh_age_30_plus_d := if(not(truedid), NULL, min(if(if(max(hh_age_65_plus, hh_age_30_to_65) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65))) = NULL, -NULL, if(max(hh_age_65_plus, hh_age_30_to_65) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65)))), 999));
+f_hh_age_30_plus_d := __common__(  if(not(truedid), NULL, min(if(if(max(hh_age_65_plus, hh_age_30_to_65) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65))) = NULL, -NULL, if(max(hh_age_65_plus, hh_age_30_to_65) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65)))), 999)) );
 
-f_hh_age_18_plus_d := if(not(truedid), NULL, min(if(if(max(hh_age_65_plus, hh_age_30_to_65, hh_age_18_to_30) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65), if(hh_age_18_to_30 = NULL, 0, hh_age_18_to_30))) = NULL, -NULL, if(max(hh_age_65_plus, hh_age_30_to_65, hh_age_18_to_30) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65), if(hh_age_18_to_30 = NULL, 0, hh_age_18_to_30)))), 999));
+f_hh_age_18_plus_d := __common__(  if(not(truedid), NULL, min(if(if(max(hh_age_65_plus, hh_age_30_to_65, hh_age_18_to_30) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65), if(hh_age_18_to_30 = NULL, 0, hh_age_18_to_30))) = NULL, -NULL, if(max(hh_age_65_plus, hh_age_30_to_65, hh_age_18_to_30) = NULL, NULL, sum(if(hh_age_65_plus = NULL, 0, hh_age_65_plus), if(hh_age_30_to_65 = NULL, 0, hh_age_30_to_65), if(hh_age_18_to_30 = NULL, 0, hh_age_18_to_30)))), 999)) );
 
-f_hh_age_lt18_i := if(not(truedid), NULL, min(if(hh_age_lt18 = NULL, -NULL, hh_age_lt18), 999));
+f_hh_age_lt18_i := __common__(  if(not(truedid), NULL, min(if(hh_age_lt18 = NULL, -NULL, hh_age_lt18), 999)) );
 
-f_hh_collections_ct_i := if(not(truedid), NULL, min(if(hh_collections_ct = NULL, -NULL, hh_collections_ct), 999));
+f_hh_collections_ct_i := __common__(  if(not(truedid), NULL, min(if(hh_collections_ct = NULL, -NULL, hh_collections_ct), 999)) );
 
-f_hh_workers_paw_d := if(not(truedid), NULL, min(if(hh_workers_paw = NULL, -NULL, hh_workers_paw), 999));
+f_hh_workers_paw_d := __common__(  if(not(truedid), NULL, min(if(hh_workers_paw = NULL, -NULL, hh_workers_paw), 999)) );
 
-f_hh_payday_loan_users_i := if(not(truedid), NULL, min(if(hh_payday_loan_users = NULL, -NULL, hh_payday_loan_users), 999));
+f_hh_payday_loan_users_i := __common__(  if(not(truedid), NULL, min(if(hh_payday_loan_users = NULL, -NULL, hh_payday_loan_users), 999)) );
 
-f_hh_members_w_derog_i := if(not(truedid), NULL, min(if(hh_members_w_derog = NULL, -NULL, hh_members_w_derog), 999));
+f_hh_members_w_derog_i := __common__(  if(not(truedid), NULL, min(if(hh_members_w_derog = NULL, -NULL, hh_members_w_derog), 999)) );
 
-f_hh_tot_derog_i := if(not(truedid), NULL, min(if(hh_tot_derog = NULL, -NULL, hh_tot_derog), 999));
+f_hh_tot_derog_i := __common__(  if(not(truedid), NULL, min(if(hh_tot_derog = NULL, -NULL, hh_tot_derog), 999)) );
 
-f_hh_bankruptcies_i := if(not(truedid), NULL, min(if(hh_bankruptcies = NULL, -NULL, hh_bankruptcies), 999));
+f_hh_bankruptcies_i := __common__(  if(not(truedid), NULL, min(if(hh_bankruptcies = NULL, -NULL, hh_bankruptcies), 999)) );
 
-f_hh_lienholders_i := if(not(truedid), NULL, min(if(hh_lienholders = NULL, -NULL, hh_lienholders), 999));
+f_hh_lienholders_i := __common__(  if(not(truedid), NULL, min(if(hh_lienholders = NULL, -NULL, hh_lienholders), 999)) );
 
-f_hh_prof_license_holders_d := if(not(truedid), NULL, min(if(hh_prof_license_holders = NULL, -NULL, hh_prof_license_holders), 999));
+f_hh_prof_license_holders_d := __common__(  if(not(truedid), NULL, min(if(hh_prof_license_holders = NULL, -NULL, hh_prof_license_holders), 999)) );
 
-f_hh_criminals_i := if(not(truedid), NULL, min(if(hh_criminals = NULL, -NULL, hh_criminals), 999));
+f_hh_criminals_i := __common__(  if(not(truedid), NULL, min(if(hh_criminals = NULL, -NULL, hh_criminals), 999)) );
 
-f_hh_college_attendees_d := if(not(truedid), NULL, min(if(hh_college_attendees = NULL, -NULL, hh_college_attendees), 999));
+f_hh_college_attendees_d := __common__(  if(not(truedid), NULL, min(if(hh_college_attendees = NULL, -NULL, hh_college_attendees), 999)) );
 
-f_prof_lic_ix_sanct_ct_n := if(not(truedid), NULL, min(if(prof_license_IX_sanct_ct = NULL, -NULL, prof_license_IX_sanct_ct), 999));
+f_prof_lic_ix_sanct_ct_n := __common__(  if(not(truedid), NULL, min(if(prof_license_IX_sanct_ct = NULL, -NULL, prof_license_IX_sanct_ct), 999)) );
 
-_prof_license_ix_sanct_fs := common.sas_date((string)(Prof_license_IX_sanct_fs));
+_prof_license_ix_sanct_fs := __common__(  common.sas_date((string)(Prof_license_IX_sanct_fs)) );
 
-f_mos_prof_lic_ix_sanct_fs_n := map(
+f_mos_prof_lic_ix_sanct_fs_n := __common__(  map(
     not(truedid)                     => NULL,
     _prof_license_ix_sanct_fs = NULL => -1,
-                                        min(if(if ((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)))), 999));
+                                        min(if(if ((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_fs) / (365.25 / 12)))), 999)) );
 
-_prof_license_ix_sanct_ls := common.sas_date((string)(Prof_license_IX_sanct_ls));
+_prof_license_ix_sanct_ls := __common__(  common.sas_date((string)(Prof_license_IX_sanct_ls)) );
 
-f_mos_prof_lic_ix_sanct_ls_n := map(
+f_mos_prof_lic_ix_sanct_ls_n := __common__(  map(
     not(truedid)                     => NULL,
     _prof_license_ix_sanct_ls = NULL => -1,
-                                        max(3, min(if(if ((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)))), 999)));
+                                        max(3, min(if(if ((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12) >= 0, truncate((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)), roundup((sysdate - _prof_license_ix_sanct_ls) / (365.25 / 12)))), 999))) );
 
-f_prof_lic_ix_sanct_type_n := map(
+f_prof_lic_ix_sanct_type_n := __common__(  map(
     not(truedid)                 => '           ',
     Prof_license_IX_sanct_ct = 0 => 'NO SANCTION',
-                                    trim((string)StringLib.StringToUpperCase(Prof_license_IX_sanct_type[1..11]), LEFT));
+                                    trim((string)StringLib.StringToUpperCase(Prof_license_IX_sanct_type[1..11]), LEFT)) );
 
-nf_vf_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_hi_risk_ct > 0));
+nf_vf_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_hi_risk_ct > 0)) );
 
-nf_vf_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_lo_risk_ct > 0));
+nf_vf_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lo_risk_ct > 0)) );
 
-nf_vf_lexid_addr_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_addr_hi_risk_ct > 0));
+nf_vf_lexid_addr_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_addr_hi_risk_ct > 0)) );
 
-nf_vf_lexid_phone_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_phone_hi_risk_ct > 0));
+nf_vf_lexid_phone_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_phone_hi_risk_ct > 0)) );
 
-nf_vf_lexid_ssn_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_ssn_hi_risk_ct > 0));
+nf_vf_lexid_ssn_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_ssn_hi_risk_ct > 0)) );
 
-nf_vf_altlexid_addr_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_addr_hi_risk_ct > 0));
+nf_vf_altlexid_addr_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_addr_hi_risk_ct > 0)) );
 
-nf_vf_altlexid_phone_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_phone_hi_risk_ct > 0));
+nf_vf_altlexid_phone_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_phone_hi_risk_ct > 0)) );
 
-nf_vf_altlexid_ssn_hi_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_ssn_hi_risk_ct > 0));
+nf_vf_altlexid_ssn_hi_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_ssn_hi_risk_ct > 0)) );
 
-nf_vf_lexid_addr_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_addr_lo_risk_ct > 0));
+nf_vf_lexid_addr_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_addr_lo_risk_ct > 0)) );
 
-nf_vf_lexid_phone_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_phone_lo_risk_ct > 0));
+nf_vf_lexid_phone_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_phone_lo_risk_ct > 0)) );
 
-nf_vf_lexid_ssn_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_lexid_ssn_lo_risk_ct > 0));
+nf_vf_lexid_ssn_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_ssn_lo_risk_ct > 0)) );
 
-nf_vf_altlexid_addr_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_addr_lo_risk_ct > 0));
+nf_vf_altlexid_addr_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_addr_lo_risk_ct > 0)) );
 
-nf_vf_altlexid_phone_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_phone_lo_risk_ct > 0));
+nf_vf_altlexid_phone_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_phone_lo_risk_ct > 0)) );
 
-nf_vf_altlexid_ssn_lo_risk_ind := if(not(truedid), NULL, (integer)(vf_altlexid_ssn_lo_risk_ct > 0));
+nf_vf_altlexid_ssn_lo_risk_ind := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_ssn_lo_risk_ct > 0)) );
 
-nf_vf_type := map(
+nf_vf_type := __common__(  map(
     not(truedid)                                                                => NULL,
     (boolean)(integer)nf_vf_hi_risk_ind and (boolean)(integer)nf_vf_lo_risk_ind => 2,
     (boolean)(integer)nf_vf_hi_risk_ind                                         => 3,
     (boolean)(integer)nf_vf_lo_risk_ind                                         => 1,
-                                                                                   0);
+                                                                                   0) );
 
-nf_vf_lexid_hi_summary := if(not(truedid), NULL, (integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
+nf_vf_lexid_hi_summary := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_hi_risk_ct > 0) * 2 +
-    (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4);
+    (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4) );
 
-nf_vf_altlexid_hi_summary_1 := if(not(truedid), NULL, (integer)(vf_altlexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
+nf_vf_altlexid_hi_summary_1 := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_hi_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4);
+    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4) );
 
-nf_vf_lexid_lo_summary := if(not(truedid), NULL, (integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
+nf_vf_lexid_lo_summary := __common__(  if(not(truedid), NULL, (integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_lo_risk_ct > 0) * 2 +
-    (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4);
+    (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4) );
 
-nf_vf_altlexid_hi_summary := if(not(truedid), NULL, (integer)(vf_altlexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
+nf_vf_altlexid_hi_summary := __common__(  if(not(truedid), NULL, (integer)(vf_altlexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_lo_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4);
+    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4) );
 
-nf_vf_hi_summary := if(not(truedid), NULL, max((integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
+nf_vf_hi_summary := __common__(  if(not(truedid), NULL, max((integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_hi_risk_ct > 0) * 2 +
     (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4, (integer)(vf_altlexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_hi_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4));
+    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4)) );
 
-nf_vf_lo_summary := if(not(truedid), NULL, max((integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
+nf_vf_lo_summary := __common__(  if(not(truedid), NULL, max((integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_lo_risk_ct > 0) * 2 +
     (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4, (integer)(vf_altlexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_lo_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4));
+    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4)) );
 
-_vf_hi_summary := max((integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
+_vf_hi_summary := __common__(  max((integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_hi_risk_ct > 0) * 2 +
     (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4, (integer)(vf_altlexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_hi_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4);
+    (integer)(vf_altlexid_ssn_hi_risk_ct > 0) * 4) );
 
-_vf_lo_summary := max((integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
+_vf_lo_summary := __common__(  max((integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_lo_risk_ct > 0) * 2 +
     (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4, (integer)(vf_altlexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_altlexid_phone_lo_risk_ct > 0) * 2 +
-    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4);
+    (integer)(vf_altlexid_ssn_lo_risk_ct > 0) * 4) );
 
-_vf_lexid_lo_summary := (integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
+_vf_lexid_lo_summary := __common__(  (integer)(vf_lexid_addr_lo_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_lo_risk_ct > 0) * 2 +
-    (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4;
+    (integer)(vf_lexid_ssn_lo_risk_ct > 0) * 4 );
 
-_vf_lexid_hi_summary := (integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
+_vf_lexid_hi_summary := __common__(  (integer)(vf_lexid_addr_hi_risk_ct > 0) * POWER(2, 0) +
     (integer)(vf_lexid_phone_hi_risk_ct > 0) * 2 +
-    (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4;
+    (integer)(vf_lexid_ssn_hi_risk_ct > 0) * 4 );
 
-nf_vf_level_c514 := map(
+nf_vf_level_c514 := __common__(  map(
     (_vf_lexid_lo_summary in [3, 7]) => 0,
     _vf_lexid_lo_summary = 4         => 2,
-                                        1);
+                                        1) );
 
-nf_vf_level_c515 := map(
+nf_vf_level_c515 := __common__(  map(
     (_vf_lexid_hi_summary in [3, 7])    => 5,
     (_vf_lexid_hi_summary in [4, 5, 6]) => 6,
-                                           4);
+                                           4) );
 
-nf_vf_level := map(
+nf_vf_level := __common__(  map(
     not(truedid)                               => NULL,
     _vf_hi_summary = 0 and _vf_lo_summary = 0  => -1,
     _vf_hi_summary = 0 and _vf_lo_summary != 0 => nf_vf_level_c514,
     _vf_hi_summary != 0 and _vf_lo_summary = 0 => nf_vf_level_c515,
-                                                  3);
+                                                  3) );
 
-nf_vf_hi_additional_entries := if(not(truedid), NULL, min(if(max(0, vf_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_hi_risk_ct - 1)), 3));
+nf_vf_hi_additional_entries := __common__(  if(not(truedid), NULL, min(if(max(0, vf_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_hi_risk_ct - 1)), 3)) );
 
-nf_vf_lo_additional_entries := if(not(truedid), NULL, min(if(max(0, vf_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lo_risk_ct - 1)), 3));
+nf_vf_lo_additional_entries := __common__(  if(not(truedid), NULL, min(if(max(0, vf_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lo_risk_ct - 1)), 3)) );
 
-nf_vf_hi_addr_add_entries := map(
+nf_vf_hi_addr_add_entries := __common__(  map(
     not(truedid)                 => NULL,
     vf_lexid_addr_hi_risk_ct = 0 => min(if(max(0, vf_altlexid_addr_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_altlexid_addr_hi_risk_ct - 1)), 3),
-                                    min(if(max(0, vf_lexid_addr_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_addr_hi_risk_ct - 1)), 3));
+                                    min(if(max(0, vf_lexid_addr_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_addr_hi_risk_ct - 1)), 3)) );
 
-nf_vf_hi_phone_add_entries := map(
+nf_vf_hi_phone_add_entries := __common__(  map(
     not(truedid)                  => NULL,
     (integer)vf_lexid_phone_hi_risk_ct = 0 => min(if(max(0, (integer)vf_altlexid_phone_hi_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_altlexid_phone_hi_risk_ct - 1)), 3),
-                                     min(if(max(0, (integer)vf_lexid_phone_hi_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_lexid_phone_hi_risk_ct - 1)), 3));
+                                     min(if(max(0, (integer)vf_lexid_phone_hi_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_lexid_phone_hi_risk_ct - 1)), 3)) );
 
-nf_vf_hi_ssn_add_entries := map(
+nf_vf_hi_ssn_add_entries := __common__(  map(
     not(truedid)                => NULL,
     vf_lexid_ssn_hi_risk_ct = 0 => min(if(max(0, vf_altlexid_ssn_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_altlexid_ssn_hi_risk_ct - 1)), 3),
-                                   min(if(max(0, vf_lexid_ssn_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_ssn_hi_risk_ct - 1)), 3));
+                                   min(if(max(0, vf_lexid_ssn_hi_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_ssn_hi_risk_ct - 1)), 3)) );
 
-nf_vf_lo_addr_add_entries := map(
+nf_vf_lo_addr_add_entries := __common__(  map(
     not(truedid)                 => NULL,
     vf_lexid_addr_lo_risk_ct = 0 => min(if(max(0, vf_altlexid_addr_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_altlexid_addr_lo_risk_ct - 1)), 3),
-                                    min(if(max(0, vf_lexid_addr_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_addr_lo_risk_ct - 1)), 3));
+                                    min(if(max(0, vf_lexid_addr_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_addr_lo_risk_ct - 1)), 3)) );
 
-nf_vf_lo_phone_add_entries := map(
+nf_vf_lo_phone_add_entries := __common__(  map(
     not(truedid)                  => NULL,
     (integer)vf_lexid_phone_lo_risk_ct = 0 => min(if(max(0, (integer)vf_altlexid_phone_lo_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_altlexid_phone_lo_risk_ct - 1)), 3),
-                                     min(if(max(0, (integer)vf_lexid_phone_lo_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_lexid_phone_lo_risk_ct - 1)), 3));
+                                     min(if(max(0, (integer)vf_lexid_phone_lo_risk_ct - 1) = NULL, -NULL, max(0, (integer)vf_lexid_phone_lo_risk_ct - 1)), 3)) );
 
-nf_vf_lo_ssn_add_entries := map(
+nf_vf_lo_ssn_add_entries := __common__(  map(
     not(truedid)                => NULL,
     vf_lexid_ssn_lo_risk_ct = 0 => min(if(max(0, vf_altlexid_ssn_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_altlexid_ssn_lo_risk_ct - 1)), 3),
-                                   min(if(max(0, vf_lexid_ssn_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_ssn_lo_risk_ct - 1)), 3));
+                                   min(if(max(0, vf_lexid_ssn_lo_risk_ct - 1) = NULL, -NULL, max(0, vf_lexid_ssn_lo_risk_ct - 1)), 3)) );
 
-nf_altlexid_addr_hi_no_hi_lexid := map(
+nf_altlexid_addr_hi_no_hi_lexid := __common__(  map(
     not(truedid)      => NULL,
     vf_hi_risk_ct > 0 => 0,
-                         vf_altlexid_addr_hi_risk_ct);
+                         vf_altlexid_addr_hi_risk_ct) );
 
-nf_altlexid_phone_hi_no_hi_lexid := map(
+nf_altlexid_phone_hi_no_hi_lexid := __common__(  map(
     not(truedid)      => NULL,
     vf_hi_risk_ct > 0 => 0,
-                         (integer)vf_altlexid_phone_hi_risk_ct);
+                         (integer)vf_altlexid_phone_hi_risk_ct) );
 
-nf_altlexid_ssn_hi_no_hi_lexid := map(
+nf_altlexid_ssn_hi_no_hi_lexid := __common__(  map(
     not(truedid)      => NULL,
     vf_hi_risk_ct > 0 => 0,
-                         vf_altlexid_ssn_hi_risk_ct);
+                         vf_altlexid_ssn_hi_risk_ct) );
 
-nf_max_altlexid_hi_no_hi_lexid := max(nf_altlexid_addr_hi_no_hi_lexid, nf_altlexid_phone_hi_no_hi_lexid, nf_altlexid_ssn_hi_no_hi_lexid);
+nf_max_altlexid_hi_no_hi_lexid := __common__(  max(nf_altlexid_addr_hi_no_hi_lexid, nf_altlexid_phone_hi_no_hi_lexid, nf_altlexid_ssn_hi_no_hi_lexid) );
 
-nf_vf_hi_risk_hit_type := map(
+nf_vf_hi_risk_hit_type := __common__(  map(
     not(truedid)                                                                                                         => NULL,
     vf_hi_risk_ct > 0 and max(vf_altlexid_addr_hi_risk_ct, (integer)vf_altlexid_phone_hi_risk_ct, vf_altlexid_ssn_hi_risk_ct) > 0 => 1,
     vf_hi_risk_ct > 0                                                                                                    => 2,
     max(vf_altlexid_addr_hi_risk_ct, (integer)vf_altlexid_phone_hi_risk_ct, vf_altlexid_ssn_hi_risk_ct) > 0                       => 3,
-                                                                                                                            4);
+                                                                                                                            4) );
 
-_alt_nohi_score := 10 * min(if(nf_altlexid_addr_hi_no_hi_lexid = NULL, -NULL, nf_altlexid_addr_hi_no_hi_lexid), 4) +
+_alt_nohi_score := __common__(  10 * min(if(nf_altlexid_addr_hi_no_hi_lexid = NULL, -NULL, nf_altlexid_addr_hi_no_hi_lexid), 4) +
     (integer)(nf_altlexid_phone_hi_no_hi_lexid > 0) +
-    2 * (integer)(nf_altlexid_ssn_hi_no_hi_lexid > 0);
+    2 * (integer)(nf_altlexid_ssn_hi_no_hi_lexid > 0) );
 
-_alt_nohi_grp := map(
+_alt_nohi_grp := __common__(  map(
     _alt_nohi_score = 0                                                   => '0: NONE            ',
     (_alt_nohi_score in [1, 2, 3])                                        => '1: NO ADDR         ',
     (_alt_nohi_score in [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43]) => '3: MIXED MULTIPLES ',
     _alt_nohi_score < 20                                                  => '2: 1 ADDR ONLY     ',
     _alt_nohi_score < 30                                                  => '3: MIXED MULTIPLES ',
-                                                                             '4: 3+ ADDR ONLY    ');
+                                                                             '4: 3+ ADDR ONLY    ') );
 
-nf_vf_hi_risk_index_c530 := map(
+nf_vf_hi_risk_index_c530 := __common__(  map(
     _alt_nohi_grp = '1: NO ADDR'         => 6,
     _alt_nohi_grp = '2: 1 ADDR ONLY'     => 5,
     _alt_nohi_grp = '3: MIXED MULTIPLES' => 4,
-                                            3);
+                                            3) );
 
-nf_vf_hi_risk_index := map(
+nf_vf_hi_risk_index := __common__(  map(
     not(truedid)                                                                                                         => NULL,
     vf_hi_risk_ct > 0 and max(vf_altlexid_addr_hi_risk_ct, (integer)vf_altlexid_phone_hi_risk_ct, vf_altlexid_ssn_hi_risk_ct) > 0 => 1,
     vf_hi_risk_ct = 1                                                                                                    => 5,
     vf_hi_risk_ct >= 2                                                                                                   => 2,
     max(vf_altlexid_addr_hi_risk_ct, (integer)vf_altlexid_phone_hi_risk_ct, vf_altlexid_ssn_hi_risk_ct) > 0                       => nf_vf_hi_risk_index_c530,
-                                                                                                                            7);
+                                                                                                                            7) );
 
-_ver_src_ds := Models.Common.findw_cpp(ver_sources, 'DS' , ',', '') > 0;
+_ver_src_ds := __common__(  Models.Common.findw_cpp(ver_sources, 'DS' , ',', '') > 0 );
 
-_ver_src_de := Models.Common.findw_cpp(ver_sources, 'DE' , ',', '') > 0;
+_ver_src_de := __common__(  Models.Common.findw_cpp(ver_sources, 'DE' , ',', '') > 0 );
 
-_ver_src_eq := Models.Common.findw_cpp(ver_sources, 'EQ' , ',', '') > 0;
+_ver_src_eq := __common__(  Models.Common.findw_cpp(ver_sources, 'EQ' , ',', '') > 0 );
 
-_ver_src_en := Models.Common.findw_cpp(ver_sources, 'EN' , ',', '') > 0;
+_ver_src_en := __common__(  Models.Common.findw_cpp(ver_sources, 'EN' , ',', '') > 0 );
 
-_ver_src_tn := Models.Common.findw_cpp(ver_sources, 'TN' , ',', '') > 0;
+_ver_src_tn := __common__(  Models.Common.findw_cpp(ver_sources, 'TN' , ',', '') > 0 );
 
-_ver_src_tu := Models.Common.findw_cpp(ver_sources, 'TU' , ',', '') > 0;
+_ver_src_tu := __common__(  Models.Common.findw_cpp(ver_sources, 'TU' , ',', '') > 0 );
 
-_credit_source_cnt := if(max((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu) = NULL, NULL, sum((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu));
+_credit_source_cnt := __common__(  if(max((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu) = NULL, NULL, sum((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu)) );
 
-// _ver_src_cnt := Models.Common.countw((string)(ver_sources), ARRAY(0x2ef84c0));
-_ver_src_cnt := Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources, ALL))), ',');	//kh-changed to this
+// _ver_src_cnt := __common__(  Models.Common.countw((string)(ver_sources), ARRAY(0x2ef84c0)) );
+_ver_src_cnt := __common__(  Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources, ALL))), ',') );	//kh-changed to this
 
-_bureauonly := _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (StringLib.StringToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6]));
+_bureauonly := __common__(  _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (StringLib.StringToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6])) );
 
-_derog := felony_count > 0 OR addrs_prison_history > 0 OR attr_num_unrel_liens60 > 0 OR attr_eviction_count > 0 OR stl_inq_count > 0 OR inq_highriskcredit_count12 > 0 OR inq_collection_count12 >= 2;
+_derog := __common__(  felony_count > 0 OR addrs_prison_history > 0 OR attr_num_unrel_liens60 > 0 OR attr_eviction_count > 0 OR stl_inq_count > 0 OR inq_highriskcredit_count12 > 0 OR inq_collection_count12 >= 2 );
 
-_deceased := rc_decsflag = 1 OR rc_ssndod != 0 OR _ver_src_ds OR _ver_src_de;
+_deceased := __common__(  rc_decsflag = 1 OR rc_ssndod != 0 OR _ver_src_ds OR _ver_src_de );
 
-_ssnpriortodob := rc_ssndobflag = 1 OR rc_pwssndobflag = 1;
+_ssnpriortodob := __common__(  rc_ssndobflag = 1 OR rc_pwssndobflag = 1 );
 
-_inputmiskeys := rc_ssnmiskeyflag or rc_addrmiskeyflag or add_input_house_number_match = 0;
+_inputmiskeys := __common__(  rc_ssnmiskeyflag or rc_addrmiskeyflag or add_input_house_number_match = 0 );
 
-_multiplessns := ssns_per_adl >= 2 OR ssns_per_adl_c6 >= 1 OR invalid_ssns_per_adl >= 1;
+_multiplessns := __common__(  ssns_per_adl >= 2 OR ssns_per_adl_c6 >= 1 OR invalid_ssns_per_adl >= 1 );
 
-_hh_strikes := if(max((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)) = 0, NULL, sum((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)));
+_hh_strikes := __common__(  if(max((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)) = 0, NULL, sum((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0))) );
 
-nf_seg_fraudpoint_3_0 := map(
+
+
+
+
+nf_seg_fraudpoint_3_0 := __common__( map(
     // (nas_summary in [4, 7, 9]) or 1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9 or _deceased or _ssnpriortodob                         => '1: Stolen/Manip ID  ',	//kh-delta
     (addrpop and nas_summary in [4, 7, 9]) or (fnamepop and lnamepop and addrpop and 1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9) or _deceased or _ssnpriortodob  				=> '1: Stolen/Manip ID  ',
     _inputmiskeys and (_multiplessns or lnames_per_adl_c6 > 1)                                                                                                       																			=> '1: Stolen/Manip ID  ',
@@ -2737,7 +2741,7 @@ nf_seg_fraudpoint_3_0 := map(
     Inq_count03 > 0 or Inq_count12 >= 4 or (integer)fp_srchfraudsrchcountyr >= 1 or (integer)fp_srchssnsrchcountmo >= 1 or (integer)fp_srchaddrsrchcountmo >= 1 or (integer)fp_srchphonesrchcountmo >= 1 	=> '4: Recent Activity  ',
     0 < inferred_age AND inferred_age <= 17 or inferred_age >= 70                                                                                                    																			=> '5: Vuln Vic/Friendly',
     hh_members_ct > 1 and (hh_payday_loan_users > 0 or _hh_strikes >= 2 or rel_felony_count >= 2)                                                                    																			=> '5: Vuln Vic/Friendly',
-																																																																																																						 '6: Other            ');
+																																																																																																						 '6: Other            ') );
 			self.seqa := le.bs.seq;
 			self.sysdate                          := sysdate;
 			self.pii_profile_n                    := pii_profile_n;
@@ -4462,128 +4466,129 @@ nf_seg_fraudpoint_3_0 := map(
 NULL := -999999999;
 
 // base := 700;
-base := 850;	//kh-delta
 
-pts := -50;
+base := __common__( 850 );	//kh-delta
 
-lgt := ln(1 / 200);
+pts := __common__( -50 );
 
-// offset := ln((1 - 0.01) * 0.10 / 0.01 * (1 - 0.10));
-offset := ln(((1 - 0.01) * 0.10) / (0.01 * (1 - 0.10)));	//kh-added another set of parenthesis
+lgt := __common__( ln(1 / 200) );
 
-fp3_wfdn_scaled := min(if(max(round(base + pts * (FP3_wFDN_LGT - offset - lgt) / ln(2)), 300) = NULL, -NULL, max(round(base + pts * (FP3_wFDN_LGT - offset - lgt) / ln(2)), 300)), 999);
+// offset := __common__( ln((1 - 0.01) * 0.10 / 0.01 * (1 - 0.10)) );
+offset := __common__( ln(((1 - 0.01) * 0.10) / (0.01 * (1 - 0.10))) );	//kh-added another set of parenthesis
 
-tf_lexid_ct := le.tf_lexid_ct;
+fp3_wfdn_scaled := __common__( min(if(max(round(base + pts * (FP3_wFDN_LGT - offset - lgt) / ln(2)), 300) = NULL, -NULL, max(round(base + pts * (FP3_wFDN_LGT - offset - lgt) / ln(2)), 300)), 999) );
 
-tf_ssn_ct := le.tf_ssn_ct;
+tf_lexid_ct := __common__( le.tf_lexid_ct );
 
-tf_phone_ct := le.tf_phone_ct;
+tf_ssn_ct := __common__( le.tf_ssn_ct );
 
-tf_addr_ct := le.tf_addr_ct;
+tf_phone_ct := __common__( le.tf_phone_ct );
 
-cf_lexid_ct := le.cf_lexid_ct;
+tf_addr_ct := __common__( le.tf_addr_ct );
 
-cf_ssn_ct := le.cf_ssn_ct;
+cf_lexid_ct := __common__( le.cf_lexid_ct );
 
-cf_phone_ct := le.cf_phone_ct;
+cf_ssn_ct := __common__( le.cf_ssn_ct );
 
-cf_addr_ct := le.cf_addr_ct;
+cf_phone_ct := __common__( le.cf_phone_ct );
 
-or_decsssn := ssnlength > 0 and rc_decsflag = 1;
+cf_addr_ct := __common__( le.cf_addr_ct );
 
-or_ssnpriordob := ssnlength > 0 and dobpop and rc_ssndobflag = 1;
+or_decsssn := __common__( ssnlength > 0 and rc_decsflag = 1 );
 
-// or_prisonaddr := rc_hrisksic = 2225;	//kh-delta
-or_prisonaddr := addrpop and rc_hrisksic = '2225';
+or_ssnpriordob := __common__( ssnlength > 0 and dobpop and rc_ssndobflag = 1 );
 
-or_prisonphone := hphnpop and rc_hrisksicphone = '2225';
+// or_prisonaddr := __common__( rc_hrisksic = 2225 );	//kh-delta
+or_prisonaddr := __common__( addrpop and rc_hrisksic = '2225' );
 
-// or_hraddr := rc_hriskaddrflag = 4 or rc_addrcommflag = 2;	//kh-delta
-or_hraddr := addrpop and (rc_hriskaddrflag=4 or rc_addrcommflag=2);
+or_prisonphone := __common__( hphnpop and rc_hrisksicphone = '2225' );
 
-or_hrphone := hphnpop and (rc_hriskphoneflag = 6 or rc_hphonetypeflag = '5' or rc_hphonevalflag = 3 or rc_addrcommflag = 1);
+// or_hraddr := __common__( rc_hriskaddrflag = 4 or rc_addrcommflag = 2 );	//kh-delta
+or_hraddr := __common__( addrpop and (rc_hriskaddrflag=4 or rc_addrcommflag=2) );
 
-or_invalidssn := ssnlength > 0 and (rc_ssnvalflag = 1 or (rc_pwssnvalflag in ['1', '2', '3']));
+or_hrphone := __common__( hphnpop and (rc_hriskphoneflag = 6 or rc_hphonetypeflag = '5' or rc_hphonevalflag = 3 or rc_addrcommflag = 1) );
 
-// or_invalidaddr := rc_addrvalflag != 'V';	//kh-delta
-	or_invalidaddr := addrpop and rc_addrvalflag != 'V';
+or_invalidssn := __common__( ssnlength > 0 and (rc_ssnvalflag = 1 or (rc_pwssnvalflag in ['1', '2', '3'])) );
 
-or_invalidphone := hphnpop and (rc_phonevalflag = 0 or rc_hphonevalflag = 0);
+// or_invalidaddr := __common__( rc_addrvalflag != 'V' );	//kh-delta
+	or_invalidaddr := __common__( addrpop and rc_addrvalflag != 'V' );
 
-or_testfraud := tf_lexid_ct > 0 or tf_ssn_ct > 0 or tf_phone_ct > 0 or tf_addr_ct > 0;
+or_invalidphone := __common__( hphnpop and (rc_phonevalflag = 0 or rc_hphonevalflag = 0) );
 
-or_contrfraud := cf_lexid_ct > 0 or cf_ssn_ct > 0 or cf_phone_ct > 0 or cf_addr_ct > 0;
+or_testfraud := __common__( tf_lexid_ct > 0 or tf_ssn_ct > 0 or tf_phone_ct > 0 or tf_addr_ct > 0 );
 
-fp3_wfdn_score := map(
+or_contrfraud := __common__( cf_lexid_ct > 0 or cf_ssn_ct > 0 or cf_phone_ct > 0 or cf_addr_ct > 0 );
+
+fp3_wfdn_score := __common__( map(
     // or_testfraud or or_contrfraud or or_decsssn or or_ssnpriordob or or_prisonaddr                  => min(if(fp3_wfdn_scaled = NULL, -NULL, fp3_wfdn_scaled), 540),
     or_decsssn or or_ssnpriordob or or_prisonaddr                  																	=> min(if(fp3_wfdn_scaled = NULL, -NULL, fp3_wfdn_scaled), 690),
     or_testfraud or or_contrfraud                  																									=> min(if(fp3_wfdn_scaled = NULL, -NULL, fp3_wfdn_scaled), 750),
     or_prisonphone or or_hraddr or or_hrphone or or_invalidssn or or_invalidaddr or or_invalidphone => min(if(fp3_wfdn_scaled = NULL, -NULL, fp3_wfdn_scaled), 890),
-                                                                                                       fp3_wfdn_scaled);
+                                                                                                       fp3_wfdn_scaled) );
 
-fp3fdn1505_0_0 := if(FP3_wFDN_LGT = -999, 0, fp3_wfdn_score);
+fp3fdn1505_0_0 := __common__( if(FP3_wFDN_LGT = -999, 0, fp3_wfdn_score) );
 
-_ver_src_ds := Models.Common.findw_cpp(ver_sources, 'DS' , ',', '') > 0;
+_ver_src_ds := __common__( Models.Common.findw_cpp(ver_sources, 'DS' , ',', '') > 0 );
 
-_ver_src_de := Models.Common.findw_cpp(ver_sources, 'DE' , ',', '') > 0;
+_ver_src_de := __common__( Models.Common.findw_cpp(ver_sources, 'DE' , ',', '') > 0 );
 
-_ver_src_eq := Models.Common.findw_cpp(ver_sources, 'EQ' , ',', '') > 0;
+_ver_src_eq := __common__( Models.Common.findw_cpp(ver_sources, 'EQ' , ',', '') > 0 );
 
-_ver_src_en := Models.Common.findw_cpp(ver_sources, 'EN' , ',', '') > 0;
+_ver_src_en := __common__( Models.Common.findw_cpp(ver_sources, 'EN' , ',', '') > 0 );
 
-_ver_src_tn := Models.Common.findw_cpp(ver_sources, 'TN' , ',', '') > 0;
+_ver_src_tn := __common__( Models.Common.findw_cpp(ver_sources, 'TN' , ',', '') > 0 );
 
-_ver_src_tu := Models.Common.findw_cpp(ver_sources, 'TU' , ',', '') > 0;
+_ver_src_tu := __common__( Models.Common.findw_cpp(ver_sources, 'TU' , ',', '') > 0 );
 
-_credit_source_cnt := if(max((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu) = NULL, NULL, sum((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu));
+_credit_source_cnt := __common__( if(max((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu) = NULL, NULL, sum((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu)) );
 
-// _ver_src_cnt := Models.Common.countw((string)(ver_sources), ARRAY(0x29cae78));
-_ver_src_cnt := Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources, ALL))), ',');	//kh-changed to this
+// _ver_src_cnt := __common__( Models.Common.countw((string)(ver_sources), ARRAY(0x29cae78)) );
+_ver_src_cnt := __common__( Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources, ALL))), ',') );	//kh-changed to this
 
-_bureauonly := _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (StringLib.StringToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6]));
+_bureauonly := __common__( _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (StringLib.StringToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6])) );
 
-_derog := felony_count > 0 OR addrs_prison_history > 0 OR attr_num_unrel_liens60 > 0 OR attr_eviction_count > 0 OR stl_inq_count > 0 OR inq_highriskcredit_count12 > 0 OR inq_collection_count12 >= 2;
+_derog := __common__( felony_count > 0 OR addrs_prison_history > 0 OR attr_num_unrel_liens60 > 0 OR attr_eviction_count > 0 OR stl_inq_count > 0 OR inq_highriskcredit_count12 > 0 OR inq_collection_count12 >= 2 );
 
-_deceased := rc_decsflag = 1 OR rc_ssndod != 0 OR _ver_src_ds OR _ver_src_de;
+_deceased := __common__( rc_decsflag = 1 OR rc_ssndod != 0 OR _ver_src_ds OR _ver_src_de );
 
-_ssnpriortodob := rc_ssndobflag = 1 OR rc_pwssndobflag = 1;
+_ssnpriortodob := __common__( rc_ssndobflag = 1 OR rc_pwssndobflag = 1 );
 
-_inputmiskeys := rc_ssnmiskeyflag or rc_addrmiskeyflag or add_input_house_number_match = 0;
+_inputmiskeys := __common__( rc_ssnmiskeyflag or rc_addrmiskeyflag or add_input_house_number_match = 0 );
 
-_multiplessns := ssns_per_adl >= 2 OR ssns_per_adl_c6 >= 1 OR invalid_ssns_per_adl >= 1;
+_multiplessns := __common__( ssns_per_adl >= 2 OR ssns_per_adl_c6 >= 1 OR invalid_ssns_per_adl >= 1 );
 
-// _hh_strikes := if(max((integer)hh_members_w_derog > 0, (integer)hh_criminals > 0, (integer)hh_payday_loan_users > 0) = NULL, NULL, sum((integer)hh_members_w_derog > 0, (integer)hh_criminals > 0, (integer)hh_payday_loan_users > 0));	//kh-changed to below
-_hh_strikes := if(max((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)) = 0, NULL, sum((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)));
+// _hh_strikes := __common__( if(max((integer)hh_members_w_derog > 0, (integer)hh_criminals > 0, (integer)hh_payday_loan_users > 0) = NULL, NULL, sum((integer)hh_members_w_derog > 0, (integer)hh_criminals > 0, (integer)hh_payday_loan_users > 0)) );	//kh-changed to below
+_hh_strikes := __common__( if(max((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0)) = 0, NULL, sum((integer)(hh_members_w_derog > 0), (integer)(hh_criminals > 0), (integer)(hh_payday_loan_users > 0))) );
 
-// stolenid := if((nas_summary in [4, 7, 9]) or 1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9 or _deceased or _ssnpriortodob, 1, 0);	//kh-delta
-	stolenid := if((addrpop and nas_summary in [4, 7, 9]) or (fnamepop and lnamepop and addrpop and 1 <= nas_summary AND nas_summary <= 9) and inq_count03 > 0 and ssnlength = 9 or _deceased or _ssnpriortodob, 1, 0);
+// stolenid := __common__( if((nas_summary in [4, 7, 9]) or 1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9 or _deceased or _ssnpriortodob, 1, 0) );	//kh-delta
+	stolenid := __common__( if((addrpop and nas_summary in [4, 7, 9]) or (fnamepop and lnamepop and addrpop and 1 <= nas_summary AND nas_summary <= 9) and inq_count03 > 0 and ssnlength = 9 or _deceased or _ssnpriortodob, 1, 0) );
 
-manipulatedid := if(_inputmiskeys and (_multiplessns or lnames_per_adl_c6 > 1), 1, 0);
+manipulatedid := __common__( if(_inputmiskeys and (_multiplessns or lnames_per_adl_c6 > 1), 1, 0) );
 
-manipulatedidpt2 := if(1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9, 1, 0);
+manipulatedidpt2 := __common__( if(1 <= nas_summary AND nas_summary <= 9 and inq_count03 > 0 and ssnlength = 9, 1, 0) );
 
-// syntheticid := if(nap_summary <= 4 and nas_summary <= 4 or _ver_src_cnt = 0 or _bureauonly or add_curr_pop = 0, 1, 0);	//kh-delta
-syntheticid := if(fnamepop and lnamepop and addrpop and ssnlength=9 and hphnpop and nap_summary <= 4 and nas_summary <= 4 or _ver_src_cnt = 0 or _bureauonly or ~add_curr_pop, 1, 0);
+// syntheticid := __common__( if(nap_summary <= 4 and nas_summary <= 4 or _ver_src_cnt = 0 or _bureauonly or add_curr_pop = 0, 1, 0) );	//kh-delta
+syntheticid := __common__( if(fnamepop and lnamepop and addrpop and ssnlength=9 and hphnpop and nap_summary <= 4 and nas_summary <= 4 or _ver_src_cnt = 0 or _bureauonly or ~add_curr_pop, 1, 0) );
 
-suspiciousactivity := if(_derog, 1, 0);
+suspiciousactivity := __common__( if(_derog, 1, 0) );
 
-vulnerablevictim := if(0 < inferred_age AND inferred_age <= 17 or inferred_age >= 70, 1, 0);
+vulnerablevictim := __common__( if(0 < inferred_age AND inferred_age <= 17 or inferred_age >= 70, 1, 0) );
 
-friendlyfraud := if(hh_members_ct > 1 and (hh_payday_loan_users > 0 or _hh_strikes >= 2 or rel_felony_count >= 2), 1, 0);
+friendlyfraud := __common__( if(hh_members_ct > 1 and (hh_payday_loan_users > 0 or _hh_strikes >= 2 or rel_felony_count >= 2), 1, 0) );
 
-stolenc_fp3fdn1505_0_0 := if(stolenid = 1, fp3fdn1505_0_0, 299);
+stolenc_fp3fdn1505_0_0 := __common__( if(stolenid = 1, fp3fdn1505_0_0, 299) );
 
-manip2c_fp3fdn1505_0_0 := if((boolean)(integer)manipulatedid or (boolean)(integer)manipulatedidpt2, fp3fdn1505_0_0, 299);
+manip2c_fp3fdn1505_0_0 := __common__( if((boolean)(integer)manipulatedid or (boolean)(integer)manipulatedidpt2, fp3fdn1505_0_0, 299) );
 
-synthc_fp3fdn1505_0_0 := if(syntheticid = 1, fp3fdn1505_0_0, 299);
+synthc_fp3fdn1505_0_0 := __common__( if(syntheticid = 1, fp3fdn1505_0_0, 299) );
 
-suspactc_fp3fdn1505_0_0 := if(suspiciousactivity = 1, fp3fdn1505_0_0, 299);
+suspactc_fp3fdn1505_0_0 := __common__( if(suspiciousactivity = 1, fp3fdn1505_0_0, 299) );
 
-vulnvicc_fp3fdn1505_0_0 := if(vulnerablevictim = 1, fp3fdn1505_0_0, 299);
+vulnvicc_fp3fdn1505_0_0 := __common__( if(vulnerablevictim = 1, fp3fdn1505_0_0, 299) );
 
-friendlyc_fp3fdn1505_0_0 := if(friendlyfraud = 1, fp3fdn1505_0_0, 299);
+friendlyc_fp3fdn1505_0_0 := __common__( if(friendlyfraud = 1, fp3fdn1505_0_0, 299) );
 
-stolidindexfdn := map(
+stolidindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																							=> 0, //kh-delta
     stolenc_fp3fdn1505_0_0 = 299                                    => 1,
     300 <= stolenc_fp3fdn1505_0_0 AND stolenc_fp3fdn1505_0_0 < 600  => 9,
@@ -4594,9 +4599,9 @@ stolidindexfdn := map(
     795 <= stolenc_fp3fdn1505_0_0 AND stolenc_fp3fdn1505_0_0 < 820  => 4,
     820 <= stolenc_fp3fdn1505_0_0 AND stolenc_fp3fdn1505_0_0 < 850  => 3,
     850 <= stolenc_fp3fdn1505_0_0 AND stolenc_fp3fdn1505_0_0 <= 999 => 2,
-                                                                       99);
+                                                                       99) );
 
-manipidindexfdn := map(
+manipidindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																							=> 0, //kh-delta
     manip2c_fp3fdn1505_0_0 = 299                                    => 1,
     300 <= manip2c_fp3fdn1505_0_0 AND manip2c_fp3fdn1505_0_0 < 550  => 9,
@@ -4607,9 +4612,9 @@ manipidindexfdn := map(
     800 <= manip2c_fp3fdn1505_0_0 AND manip2c_fp3fdn1505_0_0 < 825  => 4,
     825 <= manip2c_fp3fdn1505_0_0 AND manip2c_fp3fdn1505_0_0 < 850  => 3,
     850 <= manip2c_fp3fdn1505_0_0 AND manip2c_fp3fdn1505_0_0 <= 999 => 2,
-                                                                       99);
+                                                                       99) );
 
-synthidindexfdn := map(
+synthidindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																						=> 0, //kh-delta
     synthc_fp3fdn1505_0_0 = 299                                   => 1,
     300 <= synthc_fp3fdn1505_0_0 AND synthc_fp3fdn1505_0_0 < 590  => 9,
@@ -4620,9 +4625,9 @@ synthidindexfdn := map(
     790 <= synthc_fp3fdn1505_0_0 AND synthc_fp3fdn1505_0_0 < 825  => 4,
     825 <= synthc_fp3fdn1505_0_0 AND synthc_fp3fdn1505_0_0 < 855  => 3,
     855 <= synthc_fp3fdn1505_0_0 AND synthc_fp3fdn1505_0_0 <= 999 => 2,
-                                                                     99);
+                                                                     99) );
 
-suspactindexfdn := map(
+suspactindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																								=> 0, //kh-delta
     suspactc_fp3fdn1505_0_0 = 299                                     => 1,
     300 <= suspactc_fp3fdn1505_0_0 AND suspactc_fp3fdn1505_0_0 < 570  => 9,
@@ -4633,9 +4638,9 @@ suspactindexfdn := map(
     790 <= suspactc_fp3fdn1505_0_0 AND suspactc_fp3fdn1505_0_0 < 840  => 4,
     840 <= suspactc_fp3fdn1505_0_0 AND suspactc_fp3fdn1505_0_0 < 870  => 3,
     870 <= suspactc_fp3fdn1505_0_0 AND suspactc_fp3fdn1505_0_0 <= 999 => 2,
-                                                                         99);
+                                                                         99) );
 
-vulnvicindexfdn := map(
+vulnvicindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																								=> 0, //kh-delta
     vulnvicc_fp3fdn1505_0_0 = 299                                     => 1,
     300 <= vulnvicc_fp3fdn1505_0_0 AND vulnvicc_fp3fdn1505_0_0 < 550  => 9,
@@ -4646,9 +4651,9 @@ vulnvicindexfdn := map(
     830 <= vulnvicc_fp3fdn1505_0_0 AND vulnvicc_fp3fdn1505_0_0 < 850  => 4,
     850 <= vulnvicc_fp3fdn1505_0_0 AND vulnvicc_fp3fdn1505_0_0 < 875  => 3,
     875 <= vulnvicc_fp3fdn1505_0_0 AND vulnvicc_fp3fdn1505_0_0 <= 999 => 2,
-                                                                         99);
+                                                                         99) );
 
-friendfrdindexfdn := map(
+friendfrdindexfdn := __common__( map(
 		FP3_wFDN_LGT = -999																									=> 0, //kh-delta
     friendlyc_fp3fdn1505_0_0 = 299                                      => 1,
     300 <= friendlyc_fp3fdn1505_0_0 AND friendlyc_fp3fdn1505_0_0 < 600  => 9,
@@ -4659,8 +4664,7 @@ friendfrdindexfdn := map(
     810 <= friendlyc_fp3fdn1505_0_0 AND friendlyc_fp3fdn1505_0_0 < 840  => 4,
     840 <= friendlyc_fp3fdn1505_0_0 AND friendlyc_fp3fdn1505_0_0 < 870  => 3,
     870 <= friendlyc_fp3fdn1505_0_0 AND friendlyc_fp3fdn1505_0_0 <= 999 => 2,
-                                                                           99);
-
+                                                                           99) );
 
 	#if(FP_DEBUG)	
 	self.base                             := base;

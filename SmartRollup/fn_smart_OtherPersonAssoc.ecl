@@ -17,7 +17,7 @@ export fn_smart_OtherPersonAssoc( dataset(iesp.bpsreport.t_BpsReportAssociateSli
 	   integer uniqueID;
 	   dataset(iesp.share.t_StringArrayItem) Roles {xpath('Roles/Role'), MAXCOUNT(iesp.Constants.SMART.MaxRoles)};
 	end;
-	foundlayout addMisc(inAssociates l, Relationship.layout_GetRelationship.InterfaceOuput r) := transform
+	foundlayout addMisc(inAssociates l, Relationship.layout_GetRelationship.interfaceOutputNeutral r) := transform
 	  self.uniqueID := (integer)l.uniqueId;
     self.Roles := map(r.source_type = -3 => 
 											dataset([PersonReports.Constants.rolesSet[PersonReports.Constants.PossibleRoommate]], iesp.share.t_StringArrayItem)	 ,
@@ -38,7 +38,7 @@ export fn_smart_OtherPersonAssoc( dataset(iesp.bpsreport.t_BpsReportAssociateSli
 		self := [];
 	end;
 	did_rec := DATASET ([prep_did()]);
-	relRecs := Relationship.proc_GetRelationship(did_rec,
+	relRecs := Relationship.proc_GetRelationshipNeutral(did_rec,
 		RelativeFlag:=TRUE,
 		AssociateFlag:=TRUE,
 		MaxCount:=RiskWise.max_atmost,
