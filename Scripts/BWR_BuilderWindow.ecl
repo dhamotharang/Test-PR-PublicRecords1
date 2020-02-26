@@ -60,7 +60,18 @@ IMPORT $, Watchdog;
 
 // ============================================ File Spray =============================================
 
+// $.Spray_input_file.build_1;
+// $.Spray_input_file.build_2;
+// $.Spray_input_file.build_3;
 
-$.Spray_input_file.build_1;
-$.Spray_input_file.build_2;
-$.Spray_input_file.build_3;
+
+kyedsizedhistory := $.History_Analysis.Keysizedhistory_report;
+master_build := $.History_Analysis.Master_Build_Frequence_Report;
+orbit_build := $.History_Analysis.Orbit_buildinstance;
+
+Output(kyedsizedhistory, Named('Keyedsized_History_Report'));
+Output(master_build, Named('Master_Build_Frequency_Report'));
+Output(orbit_build, Named('Orbit_Build_Instance_Report'));
+
+
+//$.History_Analysis.Master_Build_Frequence_Report(regexfind('EYS', package));

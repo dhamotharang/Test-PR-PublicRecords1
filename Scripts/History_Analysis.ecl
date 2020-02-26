@@ -2,7 +2,7 @@
 
 Export History_Analysis := Module
 
-    Export Layout_Master_Build := Record
+    Shared Layout_Master_Build := Record
     String25 build_name;
     String25 frequency;
     String25 status;
@@ -11,19 +11,19 @@ Export History_Analysis := Module
     String8  Scorecard;
     End;
     
-    Export Layout_keysizehistory := Record
-    STRING field1;
-    STRING field2;
-    STRING field3;
-    STRING field4;
-    STRING field5;
-    STRING field6;
-    STRING field7;
-    STRING field8;
-    STRING field9;
+    Shared Layout_keysizehistory := Record
+    String25   datasetname;  
+    Unsigned8  build_version;
+    Qstring25  whenlive;
+    String1    clusterflag;
+    String1    updateflag;
+    Qstring60  superkey;
+    String10   templatelogicalkey;
+    Unsigned8  size;
+    Integer8   recordcount;
     End;
 
-    Export Layout_Orbit_Buildinstance := Record
+    Shared Layout_Orbit_Buildinstance := Record
     String10  select;
     Integer8  build_id;
     String25  build_name;
@@ -33,19 +33,17 @@ Export History_Analysis := Module
     Qstring10 platform_build_status;
     String15  family;
     Qstring15 issue_tracking;
-    STRING    field9;
-    STRING    field10;
-    STRING    field11;
-    STRING    field12;
-    STRING    field13;
+    Qstring20 date_created;
+    String15  created_by;
+    Qstring20 date_updated;
+    String15  master_build;
     End;
 
 
+    Export Master_Build_Frequence_Report := Dataset('~thor_data400::in::master_build_frequency::20200221::dops_extract01', Layout_Master_Build, CSV(Heading(1)));
 
-    Export Master_Build_Frequence_Report := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', Layout_Master_Build, CSV);
+    Export Keysizedhistory_report := Dataset('~thor_data400::in::dops_keysizedhistory::20200220::dops_extract02', Layout_keysizehistory, CSV(Heading(1)));
 
-    Export Keysizedhistory_report := Dataset('~thor_data400::in::dops_keysizedhistory::20200220::dops_extract02', Layout_keysizehistory, Thor);
-
-    Export Orbit_buildinstance  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', Layout_Orbit_Buildinstance, CSV);
+    Export Orbit_buildinstance  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', Layout_Orbit_Buildinstance, CSV(Heading(1)));
 
 End;
