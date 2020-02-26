@@ -139,12 +139,12 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 		issue_dte 						:= MAP(REGEXFIND('(N/A)',pInput.LIC_ISSUE_DATE) => '00000000',
 																 REGEXFIND('(11111111|88888888)',pInput.LIC_ISSUE_DATE) => '00000000',
 																 pInput.LIC_ISSUE_DATE = '' => '00000000',
-																 Prof_License_Mari.DateCleaner.norm_date3(pInput.LIC_ISSUE_DATE));
+																 Prof_License_Mari.DateCleaner.FromISOToUS(pInput.LIC_ISSUE_DATE));
 
 		expire_dte 						:=  MAP(REGEXFIND('(N/A)',pInput.LIC_EXP_DATE) => '00000000',
 																	REGEXFIND('(11111111|88888888)',pInput.LIC_EXP_DATE) => '00000000',
 																	pInput.LIC_EXP_DATE = '' => '00000000',
-																	Prof_License_Mari.DateCleaner.norm_date3(pInput.LIC_EXP_DATE));
+																	Prof_License_Mari.DateCleaner.FromISOToUS(pInput.LIC_EXP_DATE));
 		
 		self.CURR_ISSUE_DTE		:= '17530101';
 		self.ORIG_ISSUE_DTE		:= IF(issue_dte != '00000000',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(issue_dte),'17530101');
