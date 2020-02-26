@@ -1285,6 +1285,16 @@
 				trim(kword, left, right) = 'SAMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SAMA,
 				trim(kword, left, right) = 'CMLAGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_CMLAGA,					
 				trim(kword, left, right) = 'EGMLCU' =>SubGroup_Constants.numKeywordsID.KEYWORD_EGMLCU,
+				trim(kword, left, right) = 'FRAFA' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRAFA,
+				trim(kword, left, right) = 'PTIMPIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTIMPIC,
+				trim(kword, left, right) = 'JPCAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPCAA,
+				trim(kword, left, right) = 'PHBOI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBOI,
+				trim(kword, left, right) = 'PHBIR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBIR,
+				trim(kword, left, right) = 'CGPALF' =>SubGroup_Constants.numKeywordsID.KEYWORD_CGPALF,
+				trim(kword, left, right) = 'PAISRSNF' =>SubGroup_Constants.numKeywordsID.KEYWORD_PAISRSNF,
+				trim(kword, left, right) = 'IQAML' =>SubGroup_Constants.numKeywordsID.KEYWORD_IQAML,
+				trim(kword, left, right) = 'UKTR' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKTR,
+				trim(kword, left, right) = 'PBC-AP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PBC_AP,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

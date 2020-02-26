@@ -137,7 +137,7 @@ export proc_postHeaderBuilds(string pBldVer = '') := module
                          if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
                         ,if(exists(wl),fail('QUICK HEADER is running'))
                         ,header.Proc_AcceptSK_toQA(BldVer)
-                        ,Header.move_header_raw_to_prod()
+                        // ,Header.move_header_raw_to_prod()
                         ,Header.Proc_Copy_From_Alpha(BldVer).MoveToQA
                         ,header.Proc_Accept_SRC_toQA()
                         ,notify('build_property_full','*')
