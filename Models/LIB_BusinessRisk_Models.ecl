@@ -68,7 +68,7 @@ EXPORT LIB_BusinessRisk_Models(
                   {'BOFM1812_1_0', 'BOFM1812_1_0', 11, '0-999'}, //not blended, business only
                   {'BBFM1811_1_0', 'BBFM1811_1_0', 12, '0-999'}, //blended  
                   {'BBFM1903_1_0', 'BBFM1903_1_0', 13, '0-999'}, //blended  
-                  {'BBFM1906_1_0', 'BBFM1906_1_0', 14, '0-999'}, //blended  
+                  {'BBFM1906_1_0', 'BBFM1906_1_0', 16, '0-999'}, //blended  
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -85,17 +85,15 @@ EXPORT LIB_BusinessRisk_Models(
 											'SBOM1601_0_0' => UNGROUP(Models.SBOM1601_0_0(busShell)),
 											'SLBB1702_0_2' => UNGROUP(Models.SLBB1702_0_2(busShell, bocaShell)),
 											'SLBB1809_0_0' => UNGROUP(Models.SLBB1809_0_0(busShell, bocaShell)),
-											'BBFM1808_1_0' => UNGROUP(Models.BBFM1808_1_0(bocaShell,busShell)),
-											'BBFM1903_1_0' => UNGROUP(Models.BBFM1903_1_0(bocaShell,busShell)),
 											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
 											'SLBO1809_0_0' => UNGROUP(Models.SLBO1809_0_0(busShell)),
-                      'BOFM1812_1_0' => UNGROUP(Models.BOFM1812_1_0(busShell)),
-                      'BBFM1811_1_0' => UNGROUP(Models.BBFM1811_1_0(bocaShell,iid,'',ips,false,DPPA,GLB,DataRestriction,DataPermission,'',busShell,54)),
 											// ----------------------------------------------------------------------------------
 											// --------------------------------- CUSTOM MODELS ----------------------------------
-
-											// - - - - - - - - - - - - - - - - - - NONE YET - - - - - - - - - - - - - - - - - - -
-											
+                      'BBFM1808_1_0' => UNGROUP(Models.BBFM1808_1_0(bocaShell,busShell)),
+                      'BOFM1812_1_0' => UNGROUP(Models.BOFM1812_1_0(busShell)),
+                      'BBFM1811_1_0' => UNGROUP(Models.BBFM1811_1_0(bocaShell,iid,'',ips,false,DPPA,GLB,DataRestriction,DataPermission,'',busShell,54)),
+                      'BBFM1903_1_0' => UNGROUP(Models.BBFM1903_1_0(bocaShell,busShell)),
+                      'BBFM1906_1_0' => UNGROUP(Models.BBFM1906_1_0(bocaShell,busShell)),											
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'SBBM9999_9' => UNGROUP(Models.FAKE_1_0(busShell, 'BR')),
