@@ -20,7 +20,6 @@ export build_Base_Data(boolean pUseProd = false) := function
                 );
             self.category := L.category;
     END;
-    #option('multiplePersistInstances',FALSE);
-    final_data := project(rawdata, remove_quotes(left)):persist(crim_offense_cat.filenames(pUseProd).Base + 'persist');
+    final_data := project(rawdata, remove_quotes(left));
     RETURN final_data;
 END;
