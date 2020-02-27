@@ -125,93 +125,84 @@ EXPORT Functions := MODULE
 
 	    RETURN Cnt;
 	END; // UnknownFHE
-	
-  EXPORT fSlashedMDYtoCYMD(STRING pDateIn) := FUNCTION
-         outdate :=   INTFORMAT((INTEGER2)REGEXREPLACE('.*[-/].*[-/]([0-9]+)',pDateIn,'$1'),4,1) 
-									  + INTFORMAT((INTEGER1)REGEXREPLACE('([0-9]+)[-/].*[-/].*',pDateIn,'$1'),2,1)
-									  + INTFORMAT((INTEGER1)REGEXREPLACE('.*[-/]([0-9]+)[-/].*',pDateIn,'$1'),2,1);
-   RETURN outdate;
-  END;
-	
-	EXPORT fSlashedDMYtoCYMD(STRING pDateIn) := FUNCTION
-         outdate :=   INTFORMAT((INTEGER2)REGEXREPLACE('.*[-/].*[-/]([0-9]+)',pDateIn,'$1'),4,1) 
-									  + INTFORMAT((INTEGER1)REGEXREPLACE('.*[-/]([0-9]+)[-/].*',pDateIn,'$1'),2,1)
-									  + INTFORMAT((INTEGER1)REGEXREPLACE('([0-9]+)[-/].*[-/].*',pDateIn,'$1'),2,1);
-   RETURN outdate;
-  END;
 
-	EXPORT CleanPLDate(STRING pDate) := FUNCTION
-    STRING yy := pDate[LENGTH(pDate)-1..];
-	  STRING mm := pDate[4..6];
-    INTEGER current_yy := (INTEGER)(stringlib.GetDateYYYYMMDD()[3..4]);
-    STRING4 AdjustYear(STRING year) := MAP(LENGTH(year) <> 2 => year,
-																				   (INTEGER)year <= (current_yy + 30) => (STRING4)(2000 + (INTEGER)year),
-											                     (STRING4)(1900 + (INTEGER)year));
-    STRING Stdyear := AdjustYear(yy);
-		STRING2 ConvertMonth(STRING3 mname) := MAP(mname = 'JAN' => '01',
-																							 mname = 'FEB' => '02',
-																							 mname = 'MAR' => '03',
-																							 mname = 'APR' => '04',
-																							 mname = 'MAY' => '05',
-																							 mname = 'JUN' => '06',
-																							 mname = 'JUL' => '07',
-																							 mname = 'AUG' => '08',
-																							 mname = 'SEP' => '09',
-																							 mname = 'OCT' => '10',
-																							 mname = 'NOV' => '11',
-																							 mname = 'DEC' => '12',
-																							 '00');
-	 STRING Stdmmonth := ConvertMonth(stringlib.stringtouppercase( mm ));
-	 STRING day := pDate[1..2];
+
+	EXPORT CleanDate(string pDate) := function
+   STRING yy := pDate[LENGTH(pDate)-1..];
+	 STRING mm := pDate[4..6];
+   INTEGER current_yy := (INTEGER)(stringlib.GetDateYYYYMMDD()[3..4]);
+   STRING4 AdjustYear(STRING year) := MAP(LENGTH(year) <> 2 => year,
+																				 (INTEGER)year <= (current_yy + 30) => (string4)(2000 + (integer)year),
+											                   (STRING4)(1900 + (INTEGER)year));
+   STRING Stdyear := AdjustYear(yy);
+   STRING2 ConvertMonth(STRING3 mname) := MAP(mname = 'JAN' => '01',
+																							mname = 'FEB' => '02',
+																							mname = 'MAR' => '03',
+																							mname = 'APR' => '04',
+																							mname = 'MAY' => '05',
+																							mname = 'JUN' => '06',
+																							mname = 'JUL' => '07',
+																							mname = 'AUG' => '08',
+																							mname = 'SEP' => '09',
+																							mname = 'OCT' => '10',
+																							mname = 'NOV' => '11',
+																							mname = 'DEC' => '12',
+																							'00');
+	STRING Stdmmonth := ConvertMonth(stringlib.stringtouppercase( mm ));
+	STRING day := pDate[1..2];
 
 	RETURN Stdyear+Stdmmonth+day;
  END;
-	
- EXPORT dateconv( STRING10 date) := function
-  RETURN  IF (TRIM(date) <> ''  , CASE ( LENGTH(TRIM(date)) , 10 =>  MAP( TRIM(date[1..2]) <= '12'  and TRIM(date) [4..5] > '12' =>  fSlashedMDYtoCYMD ( TRIM(date)),
-                                                                          TRIM(date[1..2]) in [ '19','20' ] and TRIM(date)[5] in ['-', '/'] and TRIM(date)[6..7] <= '12' =>  TRIM(date[1..4]) + TRIM(date)[6..7] + TRIM(date)[9..10],
-																																          TRIM(date[1..2]) in [ '19','20' ] and TRIM(date)[5] in ['-', '/'] and TRIM(date)[6..7] > '12' =>  TRIM(date[1..4]) + TRIM(date)[9..10] + TRIM(date)[6..7] ,
-																																           fSlashedDMYtoCYMD ( TRIM(date))),
-                                                               9 =>  MAP( REGEXFIND('[aA-zZ]', TRIM(date)) = true => CleanPLDate ( TRIM(date)) ,
-																										                      REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and  TRIM( date) [7] not in ['-', '/'] and TRIM(date)[6..7] > '12' => TRIM(date) [1..4] + '0' + TRIM(date)[9] + TRIM(date)[6..7],
-																															            REGEXFIND( '[-,/]',TRIM(date)) and  TRIM(date)[2] in ['-', '/'] =>  TRIM(date) [6..9] + '0' + TRIM(date)[1] + TRIM(date)[3..4],
-																															            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and TRIM( date) [7] in ['-', '/'] and TRIM(date)[8..9] > '12' => TRIM(date) [1..4] + '0' + TRIM(date)[6] + TRIM(date)[8..9],
-																															            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and TRIM( date) [7] in ['-', '/']  => TRIM(date) [1..4] + '0' + TRIM(date)[6] + TRIM(date)[8..9],
-																															            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] > '12' and TRIM(date)[3] in ['-', '/'] and TRIM( date) [5] in ['-', '/'] => TRIM(date) [6..9] + '0' + TRIM( date) [4] + TRIM(date) [1..2],
-																															            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-', '/'] and TRIM( date) [5] in ['-', '/'] => TRIM(date) [6..9] + '0' + TRIM( date) [4] + TRIM(date) [1..2],
-																															            ''),
-																															  
-																		                           8 =>   MAP( REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7] in ['1','0']  and TRIM(date[1..2]) <= '12' => '20' + TRIM(date)[7..8] +  TRIM(date)[1..2] + TRIM(date)[4..5],
-																										                       REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/']  and TRIM(date)[7] in ['1','0'] and  TRIM(date[1..2]) > '12' => '20' + TRIM(date)[7..8] + TRIM(date)[4..5]  +  TRIM(date)[1..2],
-																		                                       REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7..8] > '30' and TRIM(date[1..2]) <= '12' => '19' + TRIM(date)[7..8] +  TRIM(date)[1..2] + TRIM(date)[4..5],
-																																           REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7..8] > '30' and TRIM(date[1..2]) > '12' => '19' + TRIM(date)[7..8] + TRIM(date)[4..5] +  TRIM(date)[1..2],
-																															             REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2] 	in [ '19','20' ]  and TRIM(date[5..6]) <= '12' => TRIM(date),
-																																           REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2] 	in [ '19','20' ]  and TRIM(date[5..6]) > '12' and TRIM( date)[5..6] not in [ '19','20' ] => TRIM(date[1..4]) + TRIM(date[7..8]) + TRIM(date[5..6]),
-																																           REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2] 	in [ '19','20' ]  and TRIM(date[3..4]) <= '12' and TRIM( date)[5..6]  in [ '19','20' ] => TRIM(date[5..8]) + TRIM(date[3..4]) + TRIM(date[1..2]),
-                                                                           REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[5..6] in [ '19','20' ] and TRIM(date[1..2]) <= '12'  => TRIM(date[5..8]) + TRIM(date[1..2]) + TRIM(date[3..4]),
-																																           REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[5..6] in [ '19','20' ] and TRIM(date[1..2]) >  '12' => TRIM(date[5..8]) + TRIM(date[3..4]) + TRIM(date[1..2]), 
-                                                                           ''),
-																		                             7  => MAP( REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[4..5] in [ '19','20' ] => TRIM(date[4..7]) + '0' + TRIM(date[1..3]),
-																										                        REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] > '12' => '19' +TRIM(date)[6..7] + '0'+ TRIM(date)[4] + TRIM(date) [1..2] ,
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[3] in ['-','/']  and TRIM(date)[1..2] <= '12' => '19' +TRIM(date)[6..7] + TRIM(date) [1..2] + '0'+ TRIM(date)[4] ,
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] > '12' => '20' +TRIM(date)[6..7] + '0'+ TRIM(date)[4] + TRIM(date) [1..2], 
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] <= '12' => '20' +TRIM(date)[6..7] + TRIM(date) [1..2] + '0'+ TRIM(date)[4] , 
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] > '12'  => '19' +TRIM(date)[6..7] + '0'+ TRIM(date)[1] + TRIM(date) [3..4],
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[2] in ['-','/']and TRIM(date)[3..4] <= '12'  => '19' +TRIM(date)[6..7] + TRIM(date) [3..4] + '0'+ TRIM(date)[1],
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] > '12'  => '20' +TRIM(date)[6..7] + '0'+ TRIM(date)[1] + TRIM(date) [3..4],
-																																            REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] <= '12'  => '20' +TRIM(date)[6..7] + TRIM(date) [3..4] + '0'+ TRIM(date)[1],
-																																						''),
-																		                             6 => MAP( TRIM(date)[3..4] in [ '19','20' ]  and ( TRIM(date)[1..2]  not in [ '19','20' ] )  => TRIM(date)[3..6] + '0'+ TRIM(date)[1]+ '0' + TRIM(date)[2] ,
-																																           TRIM(date)[1..2] in [ '19','20' ]  and ( TRIM(date)[3..4]  not in [ '19','20' ] ) => TRIM(date)[1..4] + '0'+ TRIM(date)[5]+ '0' + TRIM(date)[6] ,	
-																																           TRIM(date)[1..2] > '50' and TRIM(date)[3] = '0' and TRIM(date)[5] = '0' => '19' + TRIM(date)[1..6],
-																																           TRIM(date)[5] in ['1','0','2'] and TRIM(date)[1..2] <= '12'  => '20' + TRIM(date)[5..6] + TRIM(date)[1..4],
-																										                       TRIM(date)[5] in ['1','0','2'] and TRIM(date)[1..2] > '12'  => '20' + TRIM(date)[5..6] + TRIM(date)[3..4] + TRIM(date)[1..2],
-																													                 TRIM(date)[5] not in ['1','0','2'] and TRIM(date)[1..2] <= '12'   =>  '19' + TRIM(date)[5..6] + TRIM(date)[1..4],
-																																 	         TRIM(date)[5] not in ['1','0','2'] and TRIM(date)[1..2] > '12'   =>  '19' + TRIM(date)[5..6] + TRIM(date)[3..4] + TRIM(date)[1..2],
-																																	         '') ,
-																																 
-																			                          ''),
-						                                                '');
+
+ EXPORT dateconv( STRING10 date) := FUNCTION
+	RETURN  IF (TRIM(date) <> ''  , CASE ( LENGTH(TRIM(date, ALL)) , 10 =>  MAP( TRIM(date)[1..2] <= '12' and TRIM(date)[3] in ['/'] and TRIM(date) [4..5] <= '01'  and  TRIM(date)[6] in ['/'] and TRIM(date)[7..8] in ['19','20'] => (STRING)STD.Date.FromStringToDate(TRIM(date), '%m/%d/%Y'), 
+																																							 TRIM(date)[1..2] <= '12' and TRIM(date)[3] in ['-'] and TRIM(date) [4..5] <= '01' and  TRIM(date)[6] in ['-'] and TRIM(date)[7..8] in ['19','20'] =>  (STRING)STD.Date.FromStringToDate(TRIM(date), '%m-%d-%Y'),
+																																							 TRIM(date)[1..2] in ['19','20' ] and TRIM(date)[5] in ['-', '/'] and TRIM(date)[6..7] <= '12' =>  TRIM(date[1..4]) + TRIM(date)[6..7] + TRIM(date)[9..10],
+																																							 TRIM(date)[1..2] in ['19','20' ] and TRIM(date)[5] in ['-', '/'] and TRIM(date)[6..7] > '12' =>  TRIM(date[1..4]) + TRIM(date)[9..10] + TRIM(date)[6..7] ,
+																																							 TRIM(date)[1..2] <= '01' and TRIM(date)[3] in ['/'] and TRIM(date) [4..5] <= '12' and  TRIM(date)[6] in ['/'] => (STRING)STD.Date.FromStringToDate(TRIM(date), '%d/%m/%Y') ,
+																																							 TRIM(date)[1..2] <= '01' and TRIM(date)[3] in ['-'] and TRIM(date) [4..5] <= '12' and  TRIM(date)[6] in ['-']  => (STRING)STD.Date.FromStringToDate(TRIM(date), '%d-%m-%Y') ,
+																																							 ''),
+																																		9 =>  MAP( REGEXFIND('[aA-zZ]', TRIM(date)) = true => CleanDate( TRIM(date)) ,
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and  TRIM( date) [7] not in ['-', '/'] and TRIM(date)[6..7] > '12' => TRIM(date) [1..4] + '0' + TRIM(date)[9] + TRIM(date)[6..7],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and  TRIM(date)[2] in ['-', '/'] =>  TRIM(date) [6..9] + '0' + TRIM(date)[1] + TRIM(date)[3..4],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and TRIM( date) [7] in ['-', '/'] and TRIM(date)[8..9] > '12' => TRIM(date) [1..4] + '0' + TRIM(date)[6] + TRIM(date)[8..9],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] in [ '19','20' ] and TRIM(date) [3..4] not in ['-', '/'] and TRIM(date)[5] in ['-', '/'] and TRIM( date) [7] in ['-', '/']  => TRIM(date) [1..4] + '0' + TRIM(date)[6] + TRIM(date)[8..9],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date) [1..2] > '12' and TRIM(date)[3] in ['-', '/'] and TRIM( date) [5] in ['-', '/'] => TRIM(date) [6..9] + '0' + TRIM( date) [4] + TRIM(date) [1..2],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-', '/'] and TRIM( date) [5] in ['-', '/'] => TRIM(date) [6..9] + '0' + TRIM( date) [4] + TRIM(date) [1..2],
+																																							 ''),
+
+																																		8 =>   MAP( REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7] in ['1','0']  and TRIM(date[1..2]) <= '12' => '20' + TRIM(date)[7..8] +  TRIM(date)[1..2] + TRIM(date)[4..5],
+																																								REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/']  and TRIM(date)[7] in ['1','0'] and  TRIM(date[1..2]) > '12' => '20' + TRIM(date)[7..8] + TRIM(date)[4..5]  +  TRIM(date)[1..2],
+																																								REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7..8] > '30' and TRIM(date[1..2]) <= '12' => '19' + TRIM(date)[7..8] +  TRIM(date)[1..2] + TRIM(date)[4..5],
+																																								REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[3] in ['-','/'] and TRIM(date)[7..8] > '30' and TRIM(date[1..2]) > '12' => '19' + TRIM(date)[7..8] + TRIM(date)[4..5] +  TRIM(date)[1..2],
+																																								REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2]            in [ '19','20' ]  and TRIM(date[5..6]) <= '12' => TRIM(date),
+																																								REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2]              in [ '19','20' ]  and TRIM(date[5..6]) > '12' and TRIM( date)[5..6] not in [ '19','20' ] => TRIM(date[1..4]) + TRIM(date[7..8]) + TRIM(date[5..6]),
+																																								REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[1..2]              in [ '19','20' ]  and TRIM(date[3..4]) <= '12' and TRIM( date)[5..6]  in [ '19','20' ] => TRIM(date[5..8]) + TRIM(date[3..4]) + TRIM(date[1..2]),
+																																								REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[5..6] in [ '19','20' ] and TRIM(date[1..2]) <= '12'  => TRIM(date[5..8]) + TRIM(date[1..2]) + TRIM(date[3..4]),
+																																								REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[5..6] in [ '19','20' ] and TRIM(date[1..2]) >  '12' => TRIM(date[5..8]) + TRIM(date[3..4]) + TRIM(date[1..2]), 
+																																								''),
+																																		7  => MAP( REGEXFIND( '[-,/]',TRIM(date)) = false and TRIM(date)[4..5] in [ '19','20' ] => TRIM(date[4..7]) + '0' + TRIM(date[1..3]),
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] > '12' => '19' +TRIM(date)[6..7] + '0'+ TRIM(date)[4] + TRIM(date) [1..2] ,
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[3] in ['-','/']  and TRIM(date)[1..2] <= '12' => '19' +TRIM(date)[6..7] + TRIM(date) [1..2] + '0'+ TRIM(date)[4] ,
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] > '12' => '20' +TRIM(date)[6..7] + '0'+ TRIM(date)[4] + TRIM(date) [1..2], 
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[3] in ['-','/'] and TRIM(date)[1..2] <= '12' => '20' +TRIM(date)[6..7] + TRIM(date) [1..2] + '0'+ TRIM(date)[4] , 
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] > '12'  => '19' +TRIM(date)[6..7] + '0'+ TRIM(date)[1] + TRIM(date) [3..4],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] > '30' and TRIM(date)[2] in ['-','/']and TRIM(date)[3..4] <= '12'  => '19' +TRIM(date)[6..7] + TRIM(date) [3..4] + '0'+ TRIM(date)[1],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] > '12'  => '20' +TRIM(date)[6..7] + '0'+ TRIM(date)[1] + TRIM(date) [3..4],
+																																							 REGEXFIND( '[-,/]',TRIM(date)) and TRIM(date)[6..7] < '30' and TRIM(date)[2] in ['-','/'] and TRIM(date)[3..4] <= '12'  => '20' +TRIM(date)[6..7] + TRIM(date) [3..4] + '0'+ TRIM(date)[1],
+																																							 ''),
+																																		6 => MAP( TRIM(date)[3..4] in [ '19','20' ]  and ( TRIM(date)[1..2]  not in [ '19','20' ] )  => TRIM(date)[3..6] + '0'+ TRIM(date)[1]+ '0' + TRIM(date)[2] ,
+																																							TRIM(date)[1..2] in [ '19','20' ]  and ( TRIM(date)[3..4]  not in [ '19','20' ] ) => TRIM(date)[1..4] + '0'+ TRIM(date)[5]+ '0' + TRIM(date)[6] ,           
+																																							TRIM(date)[1..2] > '50' and TRIM(date)[3] = '0' and TRIM(date)[5] = '0' => '19' + TRIM(date)[1..6],
+																																							TRIM(date)[5] in ['1','0','2'] and TRIM(date)[1..2] <= '12'  => '20' + TRIM(date)[5..6] + TRIM(date)[1..4],
+																																							TRIM(date)[5] in ['1','0','2'] and TRIM(date)[1..2] > '12'  => '20' + TRIM(date)[5..6] + TRIM(date)[3..4] + TRIM(date)[1..2],
+																																							TRIM(date)[5] not in ['1','0','2'] and TRIM(date)[1..2] <= '12'   =>  '19' + TRIM(date)[5..6] + TRIM(date)[1..4],
+																																							TRIM(date)[5] not in ['1','0','2'] and TRIM(date)[1..2] > '12'   =>  '19' + TRIM(date)[5..6] + TRIM(date)[3..4] + TRIM(date)[1..2],
+																																							'') ,
+
+		                                                    ''),
+		                                           '');
  END;
+
 
 END;
