@@ -4,7 +4,7 @@ export build_base(string filedate, boolean pUseProd = false)  := function
         //Different process if running for the first time
         base_rec := crim_offense_cat.build_base_update(pUseProd);
         processed_data := dataset(crim_offense_cat.Filenames(pUseProd).processedbase, crim_offense_cat.layouts.base_layout, thor, opt);
-        store_first_input := if(exists(processed_data), 
+        store_first_input := if(~exists(processed_data), 
                                         std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).ProcessedIn,
                                                 std.file.getsuperfilesubname(crim_offense_cat.filenames(pUseProd).basein,1)),
                                         output('not first time, adding '+ filedate));
