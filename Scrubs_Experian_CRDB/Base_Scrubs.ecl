@@ -228,24 +228,24 @@ EXPORT Base_Scrubs := MODULE
           ,'empid:invalid_zero_blank:ENUM'
           ,'empscore:invalid_zero_blank:ENUM'
           ,'empweight:invalid_zero_blank:ENUM'
-          ,'powid:invalid_numeric:CUSTOM'
+          ,'powid:invalid_numeric:ALLOW'
           ,'powscore:invalid_percentage:CUSTOM'
-          ,'powweight:invalid_numeric:CUSTOM'
-          ,'proxid:invalid_numeric:CUSTOM'
+          ,'powweight:invalid_numeric:ALLOW'
+          ,'proxid:invalid_numeric:ALLOW'
           ,'proxscore:invalid_percentage:CUSTOM'
-          ,'proxweight:invalid_numeric:CUSTOM'
-          ,'seleid:invalid_numeric:CUSTOM'
+          ,'proxweight:invalid_numeric:ALLOW'
+          ,'seleid:invalid_numeric:ALLOW'
           ,'selescore:invalid_percentage:CUSTOM'
-          ,'seleweight:invalid_numeric:CUSTOM'
-          ,'orgid:invalid_numeric:CUSTOM'
+          ,'seleweight:invalid_numeric:ALLOW'
+          ,'orgid:invalid_numeric:ALLOW'
           ,'orgscore:invalid_percentage:CUSTOM'
-          ,'orgweight:invalid_numeric:CUSTOM'
-          ,'ultid:invalid_numeric:CUSTOM'
+          ,'orgweight:invalid_numeric:ALLOW'
+          ,'ultid:invalid_numeric:ALLOW'
           ,'ultscore:invalid_percentage:CUSTOM'
-          ,'ultweight:invalid_numeric:CUSTOM'
-          ,'bdid:invalid_numeric:CUSTOM'
+          ,'ultweight:invalid_numeric:ALLOW'
+          ,'bdid:invalid_numeric:ALLOW'
           ,'bdid_score:invalid_percentage:CUSTOM'
-          ,'did:invalid_numeric:CUSTOM'
+          ,'did:invalid_numeric:ALLOW'
           ,'dt_first_seen:invalid_pastdate:CUSTOM'
           ,'dt_last_seen:invalid_pastdate:CUSTOM'
           ,'dt_vendor_first_reported:invalid_pastdate:CUSTOM'
@@ -258,13 +258,13 @@ EXPORT Base_Scrubs := MODULE
           ,'zip_code:invalid_zip:CUSTOM'
           ,'zip_plus_4:invalid_zip4:CUSTOM'
           ,'carrier_route:invalid_carrier_route:ALLOW'
-          ,'county_code:invalid_numeric:CUSTOM'
+          ,'county_code:invalid_numeric:ALLOW'
           ,'county_name:invalid_alphaHyphen:ALLOW'
           ,'phone_number:invalid_phone:CUSTOM'
-          ,'msa_code:invalid_numeric:CUSTOM'
+          ,'msa_code:invalid_numeric:ALLOW'
           ,'establish_date:invalid_pastdate:CUSTOM'
           ,'latest_reported_date:invalid_pastdate:CUSTOM'
-          ,'years_in_file:invalid_numeric:CUSTOM'
+          ,'years_in_file:invalid_numeric:ALLOW'
           ,'geo_code_latitude:invalid_numericPeriod:ALLOW'
           ,'geo_code_latitude_direction:invalid_geo_code_latitude_direction:ALLOW'
           ,'geo_code_longitude:invalid_numericPeriod:ALLOW'
@@ -272,12 +272,12 @@ EXPORT Base_Scrubs := MODULE
           ,'recent_update_code:invalid_recent_update_code:ENUM'
           ,'years_in_business_code:invalid_years_in_business_code:ALLOW'
           ,'year_business_started:invalid_year:CUSTOM'
-          ,'months_in_file:invalid_numeric:CUSTOM'
+          ,'months_in_file:invalid_numeric:ALLOW'
           ,'address_type_code:invalid_address_type_code:ALLOW'
-          ,'estimated_number_of_employees:invalid_numeric:CUSTOM'
+          ,'estimated_number_of_employees:invalid_numeric:ALLOW'
           ,'employee_size_code:invalid_employee_size_code:ALLOW'
           ,'estimated_annual_sales_amount_sign:invalid_sign:ENUM'
-          ,'estimated_annual_sales_amount:invalid_numeric:CUSTOM'
+          ,'estimated_annual_sales_amount:invalid_numeric:ALLOW'
           ,'annual_sales_size_code:invalid_annual_Sales_Size_Code:ENUM'
           ,'location_code:invalid_location_code:ENUM'
           ,'primary_sic_code_industry_classification:invalid_primary_sic_code_industry_classification:ENUM'
@@ -292,107 +292,107 @@ EXPORT Base_Scrubs := MODULE
           ,'second_naics_code:invalid_naics_codes:CUSTOM'
           ,'third_naics_code:invalid_naics_codes:CUSTOM'
           ,'fourth_naics_code:invalid_naics_codes:CUSTOM'
-          ,'executive_count:invalid_numeric:CUSTOM'
+          ,'executive_count:invalid_numeric:ALLOW'
           ,'business_type:invalid_business_type:ALLOW'
           ,'ownership_code:invalid_ownership_code:ALLOW'
           ,'derogatory_indicator:invalid_derogatory_indicator:ALLOW'
           ,'recent_derogatory_filed_date:invalid_pastdate:CUSTOM'
           ,'derogatory_liability_amount_sign:invalid_sign:ENUM'
-          ,'derogatory_liability_amount:invalid_numeric:CUSTOM'
+          ,'derogatory_liability_amount:invalid_numeric:ALLOW'
           ,'ucc_data_indicator:invalid_ucc_data_indicator:ALLOW'
-          ,'ucc_count:invalid_numeric:CUSTOM'
-          ,'number_of_legal_items:invalid_numeric:CUSTOM'
+          ,'ucc_count:invalid_numeric:ALLOW'
+          ,'number_of_legal_items:invalid_numeric:ALLOW'
           ,'legal_balance_sign:invalid_sign:ENUM'
-          ,'legal_balance_amount:invalid_numeric:CUSTOM'
+          ,'legal_balance_amount:invalid_numeric:ALLOW'
           ,'pmtkbankruptcy:invalid_boolean:ENUM'
           ,'pmtkjudgment:invalid_boolean:ENUM'
           ,'pmtktaxlien:invalid_boolean:ENUM'
           ,'pmtkpayment:invalid_boolean:ENUM'
           ,'bankruptcy_filed:invalid_boolean:ENUM'
-          ,'number_of_derogatory_legal_items:invalid_numeric:CUSTOM'
-          ,'lien_count:invalid_numeric:CUSTOM'
-          ,'judgment_count:invalid_numeric:CUSTOM'
-          ,'bkc006:invalid_numeric:CUSTOM'
-          ,'bkc007:invalid_numeric:CUSTOM'
-          ,'bkc008:invalid_numeric:CUSTOM'
-          ,'bko009:invalid_numeric:CUSTOM'
+          ,'number_of_derogatory_legal_items:invalid_numeric:ALLOW'
+          ,'lien_count:invalid_numeric:ALLOW'
+          ,'judgment_count:invalid_numeric:ALLOW'
+          ,'bkc006:invalid_numeric:ALLOW'
+          ,'bkc007:invalid_numeric:ALLOW'
+          ,'bkc008:invalid_numeric:ALLOW'
+          ,'bko009:invalid_numeric:ALLOW'
           ,'bkb001_sign:invalid_sign:ENUM'
-          ,'bkb001:invalid_numeric:CUSTOM'
+          ,'bkb001:invalid_numeric:ALLOW'
           ,'bkb003_sign:invalid_sign:ENUM'
-          ,'bkb003:invalid_numeric:CUSTOM'
-          ,'bko010:invalid_numeric:CUSTOM'
-          ,'bko011:invalid_numeric:CUSTOM'
-          ,'jdc010:invalid_numeric:CUSTOM'
-          ,'jdc011:invalid_numeric:CUSTOM'
-          ,'jdc012:invalid_numeric:CUSTOM'
-          ,'jdb004:invalid_numeric:CUSTOM'
-          ,'jdb005:invalid_numeric:CUSTOM'
-          ,'jdb006:invalid_numeric:CUSTOM'
-          ,'jDO013:invalid_numeric:CUSTOM'
-          ,'jDO014:invalid_numeric:CUSTOM'
-          ,'jdb002:invalid_numeric:CUSTOM'
-          ,'jdp016:invalid_numeric:CUSTOM'
-          ,'lgc004:invalid_numeric:CUSTOM'
-          ,'pro001:invalid_numeric:CUSTOM'
-          ,'pro003:invalid_numeric:CUSTOM'
-          ,'txc010:invalid_numeric:CUSTOM'
-          ,'txc011:invalid_numeric:CUSTOM'
+          ,'bkb003:invalid_numeric:ALLOW'
+          ,'bko010:invalid_numeric:ALLOW'
+          ,'bko011:invalid_numeric:ALLOW'
+          ,'jdc010:invalid_numeric:ALLOW'
+          ,'jdc011:invalid_numeric:ALLOW'
+          ,'jdc012:invalid_numeric:ALLOW'
+          ,'jdb004:invalid_numeric:ALLOW'
+          ,'jdb005:invalid_numeric:ALLOW'
+          ,'jdb006:invalid_numeric:ALLOW'
+          ,'jDO013:invalid_numeric:ALLOW'
+          ,'jDO014:invalid_numeric:ALLOW'
+          ,'jdb002:invalid_numeric:ALLOW'
+          ,'jdp016:invalid_numeric:ALLOW'
+          ,'lgc004:invalid_numeric:ALLOW'
+          ,'pro001:invalid_numeric:ALLOW'
+          ,'pro003:invalid_numeric:ALLOW'
+          ,'txc010:invalid_numeric:ALLOW'
+          ,'txc011:invalid_numeric:ALLOW'
           ,'txb004_sign:invalid_sign:ENUM'
-          ,'txb004:invalid_numeric:CUSTOM'
-          ,'txo013:invalid_numeric:CUSTOM'
+          ,'txb004:invalid_numeric:ALLOW'
+          ,'txo013:invalid_numeric:ALLOW'
           ,'txb002_sign:invalid_sign:ENUM'
-          ,'txb002:invalid_numeric:CUSTOM'
-          ,'txp016:invalid_numeric:CUSTOM'
-          ,'ucc001:invalid_numeric:CUSTOM'
-          ,'ucc002:invalid_numeric:CUSTOM'
-          ,'ucc003:invalid_numeric:CUSTOM'
-          ,'intelliscore_plus:invalid_numeric:CUSTOM'
-          ,'percentile_model:invalid_numeric:CUSTOM'
+          ,'txb002:invalid_numeric:ALLOW'
+          ,'txp016:invalid_numeric:ALLOW'
+          ,'ucc001:invalid_numeric:ALLOW'
+          ,'ucc002:invalid_numeric:ALLOW'
+          ,'ucc003:invalid_numeric:ALLOW'
+          ,'intelliscore_plus:invalid_numeric:ALLOW'
+          ,'percentile_model:invalid_numeric:ALLOW'
           ,'model_action:invalid_model_action:ENUM'
-          ,'score_factor_1:invalid_numeric:CUSTOM'
-          ,'score_factor_2:invalid_numeric:CUSTOM'
-          ,'score_factor_3:invalid_numeric:CUSTOM'
-          ,'score_factor_4:invalid_numeric:CUSTOM'
+          ,'score_factor_1:invalid_numeric:ALLOW'
+          ,'score_factor_2:invalid_numeric:ALLOW'
+          ,'score_factor_3:invalid_numeric:ALLOW'
+          ,'score_factor_4:invalid_numeric:ALLOW'
           ,'model_type:invalid_model_type:ALLOW'
           ,'last_experian_inquiry_date:invalid_pastdate:CUSTOM'
           ,'recent_high_credit_sign:invalid_sign:ENUM'
-          ,'recent_high_credit:invalid_numeric:CUSTOM'
+          ,'recent_high_credit:invalid_numeric:ALLOW'
           ,'median_credit_amount_sign:invalid_sign:ENUM'
-          ,'median_credit_amount:invalid_numeric:CUSTOM'
-          ,'total_combined_trade_lines_count:invalid_numeric:CUSTOM'
-          ,'dbt_of_combined_trade_totals:invalid_numeric:CUSTOM'
-          ,'combined_trade_balance:invalid_numeric:CUSTOM'
+          ,'median_credit_amount:invalid_numeric:ALLOW'
+          ,'total_combined_trade_lines_count:invalid_numeric:ALLOW'
+          ,'dbt_of_combined_trade_totals:invalid_numeric:ALLOW'
+          ,'combined_trade_balance:invalid_numeric:ALLOW'
           ,'aged_trade_lines:invalid_aged_trade_lines:ALLOW'
           ,'experian_credit_rating:invalid_Experian_Credit_Rating:ALLOW'
-          ,'quarter_1_average_dbt:invalid_numeric:CUSTOM'
-          ,'quarter_2_average_dbt:invalid_numeric:CUSTOM'
-          ,'quarter_3_average_dbt:invalid_numeric:CUSTOM'
-          ,'quarter_4_average_dbt:invalid_numeric:CUSTOM'
-          ,'quarter_5_average_dbt:invalid_numeric:CUSTOM'
-          ,'combined_dbt:invalid_numeric:CUSTOM'
+          ,'quarter_1_average_dbt:invalid_numeric:ALLOW'
+          ,'quarter_2_average_dbt:invalid_numeric:ALLOW'
+          ,'quarter_3_average_dbt:invalid_numeric:ALLOW'
+          ,'quarter_4_average_dbt:invalid_numeric:ALLOW'
+          ,'quarter_5_average_dbt:invalid_numeric:ALLOW'
+          ,'combined_dbt:invalid_numeric:ALLOW'
           ,'total_account_balance_sign:invalid_sign:ENUM'
-          ,'total_account_balance:invalid_numeric:CUSTOM'
+          ,'total_account_balance:invalid_numeric:ALLOW'
           ,'combined_account_balance_sign:invalid_sign:ENUM'
-          ,'combined_account_balance:invalid_numeric:CUSTOM'
-          ,'collection_count:invalid_numeric:CUSTOM'
-          ,'atc021:invalid_numeric:CUSTOM'
-          ,'atc022:invalid_numeric:CUSTOM'
-          ,'atc023:invalid_numeric:CUSTOM'
-          ,'atc024:invalid_numeric:CUSTOM'
-          ,'atc025:invalid_numeric:CUSTOM'
+          ,'combined_account_balance:invalid_numeric:ALLOW'
+          ,'collection_count:invalid_numeric:ALLOW'
+          ,'atc021:invalid_numeric:ALLOW'
+          ,'atc022:invalid_numeric:ALLOW'
+          ,'atc023:invalid_numeric:ALLOW'
+          ,'atc024:invalid_numeric:ALLOW'
+          ,'atc025:invalid_numeric:ALLOW'
           ,'last_activity_age_code:invalid_last_activity_age_code:ALLOW'
           ,'cottage_indicator:invalid_boolean:ENUM'
           ,'nonprofit_indicator:invalid_nonprofit_indicator:ALLOW'
-          ,'financial_stability_risk_score:invalid_numeric:CUSTOM'
+          ,'financial_stability_risk_score:invalid_numeric:ALLOW'
           ,'fsr_risk_class:invalid_fsr_risk_class:ALLOW'
-          ,'fsr_score_factor_1:invalid_numeric:CUSTOM'
-          ,'fsr_score_factor_2:invalid_numeric:CUSTOM'
-          ,'fsr_score_factor_3:invalid_numeric:CUSTOM'
-          ,'fsr_score_factor_4:invalid_numeric:CUSTOM'
+          ,'fsr_score_factor_1:invalid_numeric:ALLOW'
+          ,'fsr_score_factor_2:invalid_numeric:ALLOW'
+          ,'fsr_score_factor_3:invalid_numeric:ALLOW'
+          ,'fsr_score_factor_4:invalid_numeric:ALLOW'
           ,'ip_score_change_sign:invalid_sign:ENUM'
-          ,'ip_score_change:invalid_numeric:CUSTOM'
+          ,'ip_score_change:invalid_numeric:ALLOW'
           ,'fsr_score_change_sign:invalid_sign:ENUM'
-          ,'fsr_score_change:invalid_numeric:CUSTOM'
+          ,'fsr_score_change:invalid_numeric:ALLOW'
           ,'predir:invalid_direction:ALLOW'
           ,'prim_name:invalid_mandatory:CUSTOM'
           ,'postdir:invalid_direction:ALLOW'
@@ -422,7 +422,7 @@ EXPORT Base_Scrubs := MODULE
           ,'ace_aid:invalid_ace_aid:CUSTOM'
           ,'prep_addr_line1:invalid_mandatory:CUSTOM'
           ,'prep_addr_line_last:invalid_mandatory:CUSTOM'
-          ,'source_rec_id:invalid_numeric:CUSTOM'
+          ,'source_rec_id:invalid_numeric:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -1087,24 +1087,24 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     empid_ENUM_ErrorCount := COUNT(GROUP,h.empid_Invalid=1);
     empscore_ENUM_ErrorCount := COUNT(GROUP,h.empscore_Invalid=1);
     empweight_ENUM_ErrorCount := COUNT(GROUP,h.empweight_Invalid=1);
-    powid_CUSTOM_ErrorCount := COUNT(GROUP,h.powid_Invalid=1);
+    powid_ALLOW_ErrorCount := COUNT(GROUP,h.powid_Invalid=1);
     powscore_CUSTOM_ErrorCount := COUNT(GROUP,h.powscore_Invalid=1);
-    powweight_CUSTOM_ErrorCount := COUNT(GROUP,h.powweight_Invalid=1);
-    proxid_CUSTOM_ErrorCount := COUNT(GROUP,h.proxid_Invalid=1);
+    powweight_ALLOW_ErrorCount := COUNT(GROUP,h.powweight_Invalid=1);
+    proxid_ALLOW_ErrorCount := COUNT(GROUP,h.proxid_Invalid=1);
     proxscore_CUSTOM_ErrorCount := COUNT(GROUP,h.proxscore_Invalid=1);
-    proxweight_CUSTOM_ErrorCount := COUNT(GROUP,h.proxweight_Invalid=1);
-    seleid_CUSTOM_ErrorCount := COUNT(GROUP,h.seleid_Invalid=1);
+    proxweight_ALLOW_ErrorCount := COUNT(GROUP,h.proxweight_Invalid=1);
+    seleid_ALLOW_ErrorCount := COUNT(GROUP,h.seleid_Invalid=1);
     selescore_CUSTOM_ErrorCount := COUNT(GROUP,h.selescore_Invalid=1);
-    seleweight_CUSTOM_ErrorCount := COUNT(GROUP,h.seleweight_Invalid=1);
-    orgid_CUSTOM_ErrorCount := COUNT(GROUP,h.orgid_Invalid=1);
+    seleweight_ALLOW_ErrorCount := COUNT(GROUP,h.seleweight_Invalid=1);
+    orgid_ALLOW_ErrorCount := COUNT(GROUP,h.orgid_Invalid=1);
     orgscore_CUSTOM_ErrorCount := COUNT(GROUP,h.orgscore_Invalid=1);
-    orgweight_CUSTOM_ErrorCount := COUNT(GROUP,h.orgweight_Invalid=1);
-    ultid_CUSTOM_ErrorCount := COUNT(GROUP,h.ultid_Invalid=1);
+    orgweight_ALLOW_ErrorCount := COUNT(GROUP,h.orgweight_Invalid=1);
+    ultid_ALLOW_ErrorCount := COUNT(GROUP,h.ultid_Invalid=1);
     ultscore_CUSTOM_ErrorCount := COUNT(GROUP,h.ultscore_Invalid=1);
-    ultweight_CUSTOM_ErrorCount := COUNT(GROUP,h.ultweight_Invalid=1);
-    bdid_CUSTOM_ErrorCount := COUNT(GROUP,h.bdid_Invalid=1);
+    ultweight_ALLOW_ErrorCount := COUNT(GROUP,h.ultweight_Invalid=1);
+    bdid_ALLOW_ErrorCount := COUNT(GROUP,h.bdid_Invalid=1);
     bdid_score_CUSTOM_ErrorCount := COUNT(GROUP,h.bdid_score_Invalid=1);
-    did_CUSTOM_ErrorCount := COUNT(GROUP,h.did_Invalid=1);
+    did_ALLOW_ErrorCount := COUNT(GROUP,h.did_Invalid=1);
     dt_first_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid=1);
     dt_last_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid=1);
     dt_vendor_first_reported_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid=1);
@@ -1117,13 +1117,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     zip_code_CUSTOM_ErrorCount := COUNT(GROUP,h.zip_code_Invalid=1);
     zip_plus_4_CUSTOM_ErrorCount := COUNT(GROUP,h.zip_plus_4_Invalid=1);
     carrier_route_ALLOW_ErrorCount := COUNT(GROUP,h.carrier_route_Invalid=1);
-    county_code_CUSTOM_ErrorCount := COUNT(GROUP,h.county_code_Invalid=1);
+    county_code_ALLOW_ErrorCount := COUNT(GROUP,h.county_code_Invalid=1);
     county_name_ALLOW_ErrorCount := COUNT(GROUP,h.county_name_Invalid=1);
     phone_number_CUSTOM_ErrorCount := COUNT(GROUP,h.phone_number_Invalid=1);
-    msa_code_CUSTOM_ErrorCount := COUNT(GROUP,h.msa_code_Invalid=1);
+    msa_code_ALLOW_ErrorCount := COUNT(GROUP,h.msa_code_Invalid=1);
     establish_date_CUSTOM_ErrorCount := COUNT(GROUP,h.establish_date_Invalid=1);
     latest_reported_date_CUSTOM_ErrorCount := COUNT(GROUP,h.latest_reported_date_Invalid=1);
-    years_in_file_CUSTOM_ErrorCount := COUNT(GROUP,h.years_in_file_Invalid=1);
+    years_in_file_ALLOW_ErrorCount := COUNT(GROUP,h.years_in_file_Invalid=1);
     geo_code_latitude_ALLOW_ErrorCount := COUNT(GROUP,h.geo_code_latitude_Invalid=1);
     geo_code_latitude_direction_ALLOW_ErrorCount := COUNT(GROUP,h.geo_code_latitude_direction_Invalid=1);
     geo_code_longitude_ALLOW_ErrorCount := COUNT(GROUP,h.geo_code_longitude_Invalid=1);
@@ -1131,12 +1131,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     recent_update_code_ENUM_ErrorCount := COUNT(GROUP,h.recent_update_code_Invalid=1);
     years_in_business_code_ALLOW_ErrorCount := COUNT(GROUP,h.years_in_business_code_Invalid=1);
     year_business_started_CUSTOM_ErrorCount := COUNT(GROUP,h.year_business_started_Invalid=1);
-    months_in_file_CUSTOM_ErrorCount := COUNT(GROUP,h.months_in_file_Invalid=1);
+    months_in_file_ALLOW_ErrorCount := COUNT(GROUP,h.months_in_file_Invalid=1);
     address_type_code_ALLOW_ErrorCount := COUNT(GROUP,h.address_type_code_Invalid=1);
-    estimated_number_of_employees_CUSTOM_ErrorCount := COUNT(GROUP,h.estimated_number_of_employees_Invalid=1);
+    estimated_number_of_employees_ALLOW_ErrorCount := COUNT(GROUP,h.estimated_number_of_employees_Invalid=1);
     employee_size_code_ALLOW_ErrorCount := COUNT(GROUP,h.employee_size_code_Invalid=1);
     estimated_annual_sales_amount_sign_ENUM_ErrorCount := COUNT(GROUP,h.estimated_annual_sales_amount_sign_Invalid=1);
-    estimated_annual_sales_amount_CUSTOM_ErrorCount := COUNT(GROUP,h.estimated_annual_sales_amount_Invalid=1);
+    estimated_annual_sales_amount_ALLOW_ErrorCount := COUNT(GROUP,h.estimated_annual_sales_amount_Invalid=1);
     annual_sales_size_code_ENUM_ErrorCount := COUNT(GROUP,h.annual_sales_size_code_Invalid=1);
     location_code_ENUM_ErrorCount := COUNT(GROUP,h.location_code_Invalid=1);
     primary_sic_code_industry_classification_ENUM_ErrorCount := COUNT(GROUP,h.primary_sic_code_industry_classification_Invalid=1);
@@ -1151,107 +1151,107 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     second_naics_code_CUSTOM_ErrorCount := COUNT(GROUP,h.second_naics_code_Invalid=1);
     third_naics_code_CUSTOM_ErrorCount := COUNT(GROUP,h.third_naics_code_Invalid=1);
     fourth_naics_code_CUSTOM_ErrorCount := COUNT(GROUP,h.fourth_naics_code_Invalid=1);
-    executive_count_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_count_Invalid=1);
+    executive_count_ALLOW_ErrorCount := COUNT(GROUP,h.executive_count_Invalid=1);
     business_type_ALLOW_ErrorCount := COUNT(GROUP,h.business_type_Invalid=1);
     ownership_code_ALLOW_ErrorCount := COUNT(GROUP,h.ownership_code_Invalid=1);
     derogatory_indicator_ALLOW_ErrorCount := COUNT(GROUP,h.derogatory_indicator_Invalid=1);
     recent_derogatory_filed_date_CUSTOM_ErrorCount := COUNT(GROUP,h.recent_derogatory_filed_date_Invalid=1);
     derogatory_liability_amount_sign_ENUM_ErrorCount := COUNT(GROUP,h.derogatory_liability_amount_sign_Invalid=1);
-    derogatory_liability_amount_CUSTOM_ErrorCount := COUNT(GROUP,h.derogatory_liability_amount_Invalid=1);
+    derogatory_liability_amount_ALLOW_ErrorCount := COUNT(GROUP,h.derogatory_liability_amount_Invalid=1);
     ucc_data_indicator_ALLOW_ErrorCount := COUNT(GROUP,h.ucc_data_indicator_Invalid=1);
-    ucc_count_CUSTOM_ErrorCount := COUNT(GROUP,h.ucc_count_Invalid=1);
-    number_of_legal_items_CUSTOM_ErrorCount := COUNT(GROUP,h.number_of_legal_items_Invalid=1);
+    ucc_count_ALLOW_ErrorCount := COUNT(GROUP,h.ucc_count_Invalid=1);
+    number_of_legal_items_ALLOW_ErrorCount := COUNT(GROUP,h.number_of_legal_items_Invalid=1);
     legal_balance_sign_ENUM_ErrorCount := COUNT(GROUP,h.legal_balance_sign_Invalid=1);
-    legal_balance_amount_CUSTOM_ErrorCount := COUNT(GROUP,h.legal_balance_amount_Invalid=1);
+    legal_balance_amount_ALLOW_ErrorCount := COUNT(GROUP,h.legal_balance_amount_Invalid=1);
     pmtkbankruptcy_ENUM_ErrorCount := COUNT(GROUP,h.pmtkbankruptcy_Invalid=1);
     pmtkjudgment_ENUM_ErrorCount := COUNT(GROUP,h.pmtkjudgment_Invalid=1);
     pmtktaxlien_ENUM_ErrorCount := COUNT(GROUP,h.pmtktaxlien_Invalid=1);
     pmtkpayment_ENUM_ErrorCount := COUNT(GROUP,h.pmtkpayment_Invalid=1);
     bankruptcy_filed_ENUM_ErrorCount := COUNT(GROUP,h.bankruptcy_filed_Invalid=1);
-    number_of_derogatory_legal_items_CUSTOM_ErrorCount := COUNT(GROUP,h.number_of_derogatory_legal_items_Invalid=1);
-    lien_count_CUSTOM_ErrorCount := COUNT(GROUP,h.lien_count_Invalid=1);
-    judgment_count_CUSTOM_ErrorCount := COUNT(GROUP,h.judgment_count_Invalid=1);
-    bkc006_CUSTOM_ErrorCount := COUNT(GROUP,h.bkc006_Invalid=1);
-    bkc007_CUSTOM_ErrorCount := COUNT(GROUP,h.bkc007_Invalid=1);
-    bkc008_CUSTOM_ErrorCount := COUNT(GROUP,h.bkc008_Invalid=1);
-    bko009_CUSTOM_ErrorCount := COUNT(GROUP,h.bko009_Invalid=1);
+    number_of_derogatory_legal_items_ALLOW_ErrorCount := COUNT(GROUP,h.number_of_derogatory_legal_items_Invalid=1);
+    lien_count_ALLOW_ErrorCount := COUNT(GROUP,h.lien_count_Invalid=1);
+    judgment_count_ALLOW_ErrorCount := COUNT(GROUP,h.judgment_count_Invalid=1);
+    bkc006_ALLOW_ErrorCount := COUNT(GROUP,h.bkc006_Invalid=1);
+    bkc007_ALLOW_ErrorCount := COUNT(GROUP,h.bkc007_Invalid=1);
+    bkc008_ALLOW_ErrorCount := COUNT(GROUP,h.bkc008_Invalid=1);
+    bko009_ALLOW_ErrorCount := COUNT(GROUP,h.bko009_Invalid=1);
     bkb001_sign_ENUM_ErrorCount := COUNT(GROUP,h.bkb001_sign_Invalid=1);
-    bkb001_CUSTOM_ErrorCount := COUNT(GROUP,h.bkb001_Invalid=1);
+    bkb001_ALLOW_ErrorCount := COUNT(GROUP,h.bkb001_Invalid=1);
     bkb003_sign_ENUM_ErrorCount := COUNT(GROUP,h.bkb003_sign_Invalid=1);
-    bkb003_CUSTOM_ErrorCount := COUNT(GROUP,h.bkb003_Invalid=1);
-    bko010_CUSTOM_ErrorCount := COUNT(GROUP,h.bko010_Invalid=1);
-    bko011_CUSTOM_ErrorCount := COUNT(GROUP,h.bko011_Invalid=1);
-    jdc010_CUSTOM_ErrorCount := COUNT(GROUP,h.jdc010_Invalid=1);
-    jdc011_CUSTOM_ErrorCount := COUNT(GROUP,h.jdc011_Invalid=1);
-    jdc012_CUSTOM_ErrorCount := COUNT(GROUP,h.jdc012_Invalid=1);
-    jdb004_CUSTOM_ErrorCount := COUNT(GROUP,h.jdb004_Invalid=1);
-    jdb005_CUSTOM_ErrorCount := COUNT(GROUP,h.jdb005_Invalid=1);
-    jdb006_CUSTOM_ErrorCount := COUNT(GROUP,h.jdb006_Invalid=1);
-    jDO013_CUSTOM_ErrorCount := COUNT(GROUP,h.jDO013_Invalid=1);
-    jDO014_CUSTOM_ErrorCount := COUNT(GROUP,h.jDO014_Invalid=1);
-    jdb002_CUSTOM_ErrorCount := COUNT(GROUP,h.jdb002_Invalid=1);
-    jdp016_CUSTOM_ErrorCount := COUNT(GROUP,h.jdp016_Invalid=1);
-    lgc004_CUSTOM_ErrorCount := COUNT(GROUP,h.lgc004_Invalid=1);
-    pro001_CUSTOM_ErrorCount := COUNT(GROUP,h.pro001_Invalid=1);
-    pro003_CUSTOM_ErrorCount := COUNT(GROUP,h.pro003_Invalid=1);
-    txc010_CUSTOM_ErrorCount := COUNT(GROUP,h.txc010_Invalid=1);
-    txc011_CUSTOM_ErrorCount := COUNT(GROUP,h.txc011_Invalid=1);
+    bkb003_ALLOW_ErrorCount := COUNT(GROUP,h.bkb003_Invalid=1);
+    bko010_ALLOW_ErrorCount := COUNT(GROUP,h.bko010_Invalid=1);
+    bko011_ALLOW_ErrorCount := COUNT(GROUP,h.bko011_Invalid=1);
+    jdc010_ALLOW_ErrorCount := COUNT(GROUP,h.jdc010_Invalid=1);
+    jdc011_ALLOW_ErrorCount := COUNT(GROUP,h.jdc011_Invalid=1);
+    jdc012_ALLOW_ErrorCount := COUNT(GROUP,h.jdc012_Invalid=1);
+    jdb004_ALLOW_ErrorCount := COUNT(GROUP,h.jdb004_Invalid=1);
+    jdb005_ALLOW_ErrorCount := COUNT(GROUP,h.jdb005_Invalid=1);
+    jdb006_ALLOW_ErrorCount := COUNT(GROUP,h.jdb006_Invalid=1);
+    jDO013_ALLOW_ErrorCount := COUNT(GROUP,h.jDO013_Invalid=1);
+    jDO014_ALLOW_ErrorCount := COUNT(GROUP,h.jDO014_Invalid=1);
+    jdb002_ALLOW_ErrorCount := COUNT(GROUP,h.jdb002_Invalid=1);
+    jdp016_ALLOW_ErrorCount := COUNT(GROUP,h.jdp016_Invalid=1);
+    lgc004_ALLOW_ErrorCount := COUNT(GROUP,h.lgc004_Invalid=1);
+    pro001_ALLOW_ErrorCount := COUNT(GROUP,h.pro001_Invalid=1);
+    pro003_ALLOW_ErrorCount := COUNT(GROUP,h.pro003_Invalid=1);
+    txc010_ALLOW_ErrorCount := COUNT(GROUP,h.txc010_Invalid=1);
+    txc011_ALLOW_ErrorCount := COUNT(GROUP,h.txc011_Invalid=1);
     txb004_sign_ENUM_ErrorCount := COUNT(GROUP,h.txb004_sign_Invalid=1);
-    txb004_CUSTOM_ErrorCount := COUNT(GROUP,h.txb004_Invalid=1);
-    txo013_CUSTOM_ErrorCount := COUNT(GROUP,h.txo013_Invalid=1);
+    txb004_ALLOW_ErrorCount := COUNT(GROUP,h.txb004_Invalid=1);
+    txo013_ALLOW_ErrorCount := COUNT(GROUP,h.txo013_Invalid=1);
     txb002_sign_ENUM_ErrorCount := COUNT(GROUP,h.txb002_sign_Invalid=1);
-    txb002_CUSTOM_ErrorCount := COUNT(GROUP,h.txb002_Invalid=1);
-    txp016_CUSTOM_ErrorCount := COUNT(GROUP,h.txp016_Invalid=1);
-    ucc001_CUSTOM_ErrorCount := COUNT(GROUP,h.ucc001_Invalid=1);
-    ucc002_CUSTOM_ErrorCount := COUNT(GROUP,h.ucc002_Invalid=1);
-    ucc003_CUSTOM_ErrorCount := COUNT(GROUP,h.ucc003_Invalid=1);
-    intelliscore_plus_CUSTOM_ErrorCount := COUNT(GROUP,h.intelliscore_plus_Invalid=1);
-    percentile_model_CUSTOM_ErrorCount := COUNT(GROUP,h.percentile_model_Invalid=1);
+    txb002_ALLOW_ErrorCount := COUNT(GROUP,h.txb002_Invalid=1);
+    txp016_ALLOW_ErrorCount := COUNT(GROUP,h.txp016_Invalid=1);
+    ucc001_ALLOW_ErrorCount := COUNT(GROUP,h.ucc001_Invalid=1);
+    ucc002_ALLOW_ErrorCount := COUNT(GROUP,h.ucc002_Invalid=1);
+    ucc003_ALLOW_ErrorCount := COUNT(GROUP,h.ucc003_Invalid=1);
+    intelliscore_plus_ALLOW_ErrorCount := COUNT(GROUP,h.intelliscore_plus_Invalid=1);
+    percentile_model_ALLOW_ErrorCount := COUNT(GROUP,h.percentile_model_Invalid=1);
     model_action_ENUM_ErrorCount := COUNT(GROUP,h.model_action_Invalid=1);
-    score_factor_1_CUSTOM_ErrorCount := COUNT(GROUP,h.score_factor_1_Invalid=1);
-    score_factor_2_CUSTOM_ErrorCount := COUNT(GROUP,h.score_factor_2_Invalid=1);
-    score_factor_3_CUSTOM_ErrorCount := COUNT(GROUP,h.score_factor_3_Invalid=1);
-    score_factor_4_CUSTOM_ErrorCount := COUNT(GROUP,h.score_factor_4_Invalid=1);
+    score_factor_1_ALLOW_ErrorCount := COUNT(GROUP,h.score_factor_1_Invalid=1);
+    score_factor_2_ALLOW_ErrorCount := COUNT(GROUP,h.score_factor_2_Invalid=1);
+    score_factor_3_ALLOW_ErrorCount := COUNT(GROUP,h.score_factor_3_Invalid=1);
+    score_factor_4_ALLOW_ErrorCount := COUNT(GROUP,h.score_factor_4_Invalid=1);
     model_type_ALLOW_ErrorCount := COUNT(GROUP,h.model_type_Invalid=1);
     last_experian_inquiry_date_CUSTOM_ErrorCount := COUNT(GROUP,h.last_experian_inquiry_date_Invalid=1);
     recent_high_credit_sign_ENUM_ErrorCount := COUNT(GROUP,h.recent_high_credit_sign_Invalid=1);
-    recent_high_credit_CUSTOM_ErrorCount := COUNT(GROUP,h.recent_high_credit_Invalid=1);
+    recent_high_credit_ALLOW_ErrorCount := COUNT(GROUP,h.recent_high_credit_Invalid=1);
     median_credit_amount_sign_ENUM_ErrorCount := COUNT(GROUP,h.median_credit_amount_sign_Invalid=1);
-    median_credit_amount_CUSTOM_ErrorCount := COUNT(GROUP,h.median_credit_amount_Invalid=1);
-    total_combined_trade_lines_count_CUSTOM_ErrorCount := COUNT(GROUP,h.total_combined_trade_lines_count_Invalid=1);
-    dbt_of_combined_trade_totals_CUSTOM_ErrorCount := COUNT(GROUP,h.dbt_of_combined_trade_totals_Invalid=1);
-    combined_trade_balance_CUSTOM_ErrorCount := COUNT(GROUP,h.combined_trade_balance_Invalid=1);
+    median_credit_amount_ALLOW_ErrorCount := COUNT(GROUP,h.median_credit_amount_Invalid=1);
+    total_combined_trade_lines_count_ALLOW_ErrorCount := COUNT(GROUP,h.total_combined_trade_lines_count_Invalid=1);
+    dbt_of_combined_trade_totals_ALLOW_ErrorCount := COUNT(GROUP,h.dbt_of_combined_trade_totals_Invalid=1);
+    combined_trade_balance_ALLOW_ErrorCount := COUNT(GROUP,h.combined_trade_balance_Invalid=1);
     aged_trade_lines_ALLOW_ErrorCount := COUNT(GROUP,h.aged_trade_lines_Invalid=1);
     experian_credit_rating_ALLOW_ErrorCount := COUNT(GROUP,h.experian_credit_rating_Invalid=1);
-    quarter_1_average_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.quarter_1_average_dbt_Invalid=1);
-    quarter_2_average_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.quarter_2_average_dbt_Invalid=1);
-    quarter_3_average_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.quarter_3_average_dbt_Invalid=1);
-    quarter_4_average_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.quarter_4_average_dbt_Invalid=1);
-    quarter_5_average_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.quarter_5_average_dbt_Invalid=1);
-    combined_dbt_CUSTOM_ErrorCount := COUNT(GROUP,h.combined_dbt_Invalid=1);
+    quarter_1_average_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.quarter_1_average_dbt_Invalid=1);
+    quarter_2_average_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.quarter_2_average_dbt_Invalid=1);
+    quarter_3_average_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.quarter_3_average_dbt_Invalid=1);
+    quarter_4_average_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.quarter_4_average_dbt_Invalid=1);
+    quarter_5_average_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.quarter_5_average_dbt_Invalid=1);
+    combined_dbt_ALLOW_ErrorCount := COUNT(GROUP,h.combined_dbt_Invalid=1);
     total_account_balance_sign_ENUM_ErrorCount := COUNT(GROUP,h.total_account_balance_sign_Invalid=1);
-    total_account_balance_CUSTOM_ErrorCount := COUNT(GROUP,h.total_account_balance_Invalid=1);
+    total_account_balance_ALLOW_ErrorCount := COUNT(GROUP,h.total_account_balance_Invalid=1);
     combined_account_balance_sign_ENUM_ErrorCount := COUNT(GROUP,h.combined_account_balance_sign_Invalid=1);
-    combined_account_balance_CUSTOM_ErrorCount := COUNT(GROUP,h.combined_account_balance_Invalid=1);
-    collection_count_CUSTOM_ErrorCount := COUNT(GROUP,h.collection_count_Invalid=1);
-    atc021_CUSTOM_ErrorCount := COUNT(GROUP,h.atc021_Invalid=1);
-    atc022_CUSTOM_ErrorCount := COUNT(GROUP,h.atc022_Invalid=1);
-    atc023_CUSTOM_ErrorCount := COUNT(GROUP,h.atc023_Invalid=1);
-    atc024_CUSTOM_ErrorCount := COUNT(GROUP,h.atc024_Invalid=1);
-    atc025_CUSTOM_ErrorCount := COUNT(GROUP,h.atc025_Invalid=1);
+    combined_account_balance_ALLOW_ErrorCount := COUNT(GROUP,h.combined_account_balance_Invalid=1);
+    collection_count_ALLOW_ErrorCount := COUNT(GROUP,h.collection_count_Invalid=1);
+    atc021_ALLOW_ErrorCount := COUNT(GROUP,h.atc021_Invalid=1);
+    atc022_ALLOW_ErrorCount := COUNT(GROUP,h.atc022_Invalid=1);
+    atc023_ALLOW_ErrorCount := COUNT(GROUP,h.atc023_Invalid=1);
+    atc024_ALLOW_ErrorCount := COUNT(GROUP,h.atc024_Invalid=1);
+    atc025_ALLOW_ErrorCount := COUNT(GROUP,h.atc025_Invalid=1);
     last_activity_age_code_ALLOW_ErrorCount := COUNT(GROUP,h.last_activity_age_code_Invalid=1);
     cottage_indicator_ENUM_ErrorCount := COUNT(GROUP,h.cottage_indicator_Invalid=1);
     nonprofit_indicator_ALLOW_ErrorCount := COUNT(GROUP,h.nonprofit_indicator_Invalid=1);
-    financial_stability_risk_score_CUSTOM_ErrorCount := COUNT(GROUP,h.financial_stability_risk_score_Invalid=1);
+    financial_stability_risk_score_ALLOW_ErrorCount := COUNT(GROUP,h.financial_stability_risk_score_Invalid=1);
     fsr_risk_class_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_risk_class_Invalid=1);
-    fsr_score_factor_1_CUSTOM_ErrorCount := COUNT(GROUP,h.fsr_score_factor_1_Invalid=1);
-    fsr_score_factor_2_CUSTOM_ErrorCount := COUNT(GROUP,h.fsr_score_factor_2_Invalid=1);
-    fsr_score_factor_3_CUSTOM_ErrorCount := COUNT(GROUP,h.fsr_score_factor_3_Invalid=1);
-    fsr_score_factor_4_CUSTOM_ErrorCount := COUNT(GROUP,h.fsr_score_factor_4_Invalid=1);
+    fsr_score_factor_1_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_score_factor_1_Invalid=1);
+    fsr_score_factor_2_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_score_factor_2_Invalid=1);
+    fsr_score_factor_3_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_score_factor_3_Invalid=1);
+    fsr_score_factor_4_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_score_factor_4_Invalid=1);
     ip_score_change_sign_ENUM_ErrorCount := COUNT(GROUP,h.ip_score_change_sign_Invalid=1);
-    ip_score_change_CUSTOM_ErrorCount := COUNT(GROUP,h.ip_score_change_Invalid=1);
+    ip_score_change_ALLOW_ErrorCount := COUNT(GROUP,h.ip_score_change_Invalid=1);
     fsr_score_change_sign_ENUM_ErrorCount := COUNT(GROUP,h.fsr_score_change_sign_Invalid=1);
-    fsr_score_change_CUSTOM_ErrorCount := COUNT(GROUP,h.fsr_score_change_Invalid=1);
+    fsr_score_change_ALLOW_ErrorCount := COUNT(GROUP,h.fsr_score_change_Invalid=1);
     predir_ALLOW_ErrorCount := COUNT(GROUP,h.predir_Invalid=1);
     prim_name_CUSTOM_ErrorCount := COUNT(GROUP,h.prim_name_Invalid=1);
     postdir_ALLOW_ErrorCount := COUNT(GROUP,h.postdir_Invalid=1);
@@ -1281,7 +1281,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     ace_aid_CUSTOM_ErrorCount := COUNT(GROUP,h.ace_aid_Invalid=1);
     prep_addr_line1_CUSTOM_ErrorCount := COUNT(GROUP,h.prep_addr_line1_Invalid=1);
     prep_addr_line_last_CUSTOM_ErrorCount := COUNT(GROUP,h.prep_addr_line_last_Invalid=1);
-    source_rec_id_CUSTOM_ErrorCount := COUNT(GROUP,h.source_rec_id_Invalid=1);
+    source_rec_id_ALLOW_ErrorCount := COUNT(GROUP,h.source_rec_id_Invalid=1);
     AnyRule_WithErrorsCount := COUNT(GROUP, h.dotid_Invalid > 0 OR h.dotscore_Invalid > 0 OR h.dotweight_Invalid > 0 OR h.empid_Invalid > 0 OR h.empscore_Invalid > 0 OR h.empweight_Invalid > 0 OR h.powid_Invalid > 0 OR h.powscore_Invalid > 0 OR h.powweight_Invalid > 0 OR h.proxid_Invalid > 0 OR h.proxscore_Invalid > 0 OR h.proxweight_Invalid > 0 OR h.seleid_Invalid > 0 OR h.selescore_Invalid > 0 OR h.seleweight_Invalid > 0 OR h.orgid_Invalid > 0 OR h.orgscore_Invalid > 0 OR h.orgweight_Invalid > 0 OR h.ultid_Invalid > 0 OR h.ultscore_Invalid > 0 OR h.ultweight_Invalid > 0 OR h.bdid_Invalid > 0 OR h.bdid_score_Invalid > 0 OR h.did_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.dt_vendor_first_reported_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.experian_bus_id_Invalid > 0 OR h.business_name_Invalid > 0 OR h.address_Invalid > 0 OR h.city_Invalid > 0 OR h.state_Invalid > 0 OR h.zip_code_Invalid > 0 OR h.zip_plus_4_Invalid > 0 OR h.carrier_route_Invalid > 0 OR h.county_code_Invalid > 0 OR h.county_name_Invalid > 0 OR h.phone_number_Invalid > 0 OR h.msa_code_Invalid > 0 OR h.establish_date_Invalid > 0 OR h.latest_reported_date_Invalid > 0 OR h.years_in_file_Invalid > 0 OR h.geo_code_latitude_Invalid > 0 OR h.geo_code_latitude_direction_Invalid > 0 OR h.geo_code_longitude_Invalid > 0 OR h.geo_code_longitude_direction_Invalid > 0 OR h.recent_update_code_Invalid > 0 OR h.years_in_business_code_Invalid > 0 OR h.year_business_started_Invalid > 0 OR h.months_in_file_Invalid > 0 OR h.address_type_code_Invalid > 0 OR h.estimated_number_of_employees_Invalid > 0 OR h.employee_size_code_Invalid > 0 OR h.estimated_annual_sales_amount_sign_Invalid > 0 OR h.estimated_annual_sales_amount_Invalid > 0 OR h.annual_sales_size_code_Invalid > 0 OR h.location_code_Invalid > 0 OR h.primary_sic_code_industry_classification_Invalid > 0 OR h.primary_sic_code_4_digit_Invalid > 0 OR h.primary_sic_code_Invalid > 0 OR h.second_sic_code_Invalid > 0 OR h.third_sic_code_Invalid > 0 OR h.fourth_sic_code_Invalid > 0 OR h.fifth_sic_code_Invalid > 0 OR h.sixth_sic_code_Invalid > 0 OR h.primary_naics_code_Invalid > 0 OR h.second_naics_code_Invalid > 0 OR h.third_naics_code_Invalid > 0 OR h.fourth_naics_code_Invalid > 0 OR h.executive_count_Invalid > 0 OR h.business_type_Invalid > 0 OR h.ownership_code_Invalid > 0 OR h.derogatory_indicator_Invalid > 0 OR h.recent_derogatory_filed_date_Invalid > 0 OR h.derogatory_liability_amount_sign_Invalid > 0 OR h.derogatory_liability_amount_Invalid > 0 OR h.ucc_data_indicator_Invalid > 0 OR h.ucc_count_Invalid > 0 OR h.number_of_legal_items_Invalid > 0 OR h.legal_balance_sign_Invalid > 0 OR h.legal_balance_amount_Invalid > 0 OR h.pmtkbankruptcy_Invalid > 0 OR h.pmtkjudgment_Invalid > 0 OR h.pmtktaxlien_Invalid > 0 OR h.pmtkpayment_Invalid > 0 OR h.bankruptcy_filed_Invalid > 0 OR h.number_of_derogatory_legal_items_Invalid > 0 OR h.lien_count_Invalid > 0 OR h.judgment_count_Invalid > 0 OR h.bkc006_Invalid > 0 OR h.bkc007_Invalid > 0 OR h.bkc008_Invalid > 0 OR h.bko009_Invalid > 0 OR h.bkb001_sign_Invalid > 0 OR h.bkb001_Invalid > 0 OR h.bkb003_sign_Invalid > 0 OR h.bkb003_Invalid > 0 OR h.bko010_Invalid > 0 OR h.bko011_Invalid > 0 OR h.jdc010_Invalid > 0 OR h.jdc011_Invalid > 0 OR h.jdc012_Invalid > 0 OR h.jdb004_Invalid > 0 OR h.jdb005_Invalid > 0 OR h.jdb006_Invalid > 0 OR h.jDO013_Invalid > 0 OR h.jDO014_Invalid > 0 OR h.jdb002_Invalid > 0 OR h.jdp016_Invalid > 0 OR h.lgc004_Invalid > 0 OR h.pro001_Invalid > 0 OR h.pro003_Invalid > 0 OR h.txc010_Invalid > 0 OR h.txc011_Invalid > 0 OR h.txb004_sign_Invalid > 0 OR h.txb004_Invalid > 0 OR h.txo013_Invalid > 0 OR h.txb002_sign_Invalid > 0 OR h.txb002_Invalid > 0 OR h.txp016_Invalid > 0 OR h.ucc001_Invalid > 0 OR h.ucc002_Invalid > 0 OR h.ucc003_Invalid > 0 OR h.intelliscore_plus_Invalid > 0 OR h.percentile_model_Invalid > 0 OR h.model_action_Invalid > 0 OR h.score_factor_1_Invalid > 0 OR h.score_factor_2_Invalid > 0 OR h.score_factor_3_Invalid > 0 OR h.score_factor_4_Invalid > 0 OR h.model_type_Invalid > 0 OR h.last_experian_inquiry_date_Invalid > 0 OR h.recent_high_credit_sign_Invalid > 0 OR h.recent_high_credit_Invalid > 0 OR h.median_credit_amount_sign_Invalid > 0 OR h.median_credit_amount_Invalid > 0 OR h.total_combined_trade_lines_count_Invalid > 0 OR h.dbt_of_combined_trade_totals_Invalid > 0 OR h.combined_trade_balance_Invalid > 0 OR h.aged_trade_lines_Invalid > 0 OR h.experian_credit_rating_Invalid > 0 OR h.quarter_1_average_dbt_Invalid > 0 OR h.quarter_2_average_dbt_Invalid > 0 OR h.quarter_3_average_dbt_Invalid > 0 OR h.quarter_4_average_dbt_Invalid > 0 OR h.quarter_5_average_dbt_Invalid > 0 OR h.combined_dbt_Invalid > 0 OR h.total_account_balance_sign_Invalid > 0 OR h.total_account_balance_Invalid > 0 OR h.combined_account_balance_sign_Invalid > 0 OR h.combined_account_balance_Invalid > 0 OR h.collection_count_Invalid > 0 OR h.atc021_Invalid > 0 OR h.atc022_Invalid > 0 OR h.atc023_Invalid > 0 OR h.atc024_Invalid > 0 OR h.atc025_Invalid > 0 OR h.last_activity_age_code_Invalid > 0 OR h.cottage_indicator_Invalid > 0 OR h.nonprofit_indicator_Invalid > 0 OR h.financial_stability_risk_score_Invalid > 0 OR h.fsr_risk_class_Invalid > 0 OR h.fsr_score_factor_1_Invalid > 0 OR h.fsr_score_factor_2_Invalid > 0 OR h.fsr_score_factor_3_Invalid > 0 OR h.fsr_score_factor_4_Invalid > 0 OR h.ip_score_change_sign_Invalid > 0 OR h.ip_score_change_Invalid > 0 OR h.fsr_score_change_sign_Invalid > 0 OR h.fsr_score_change_Invalid > 0 OR h.predir_Invalid > 0 OR h.prim_name_Invalid > 0 OR h.postdir_Invalid > 0 OR h.p_city_name_Invalid > 0 OR h.v_city_name_Invalid > 0 OR h.st_Invalid > 0 OR h.zip_Invalid > 0 OR h.zip4_Invalid > 0 OR h.cart_Invalid > 0 OR h.cr_sort_sz_Invalid > 0 OR h.lot_Invalid > 0 OR h.lot_order_Invalid > 0 OR h.dbpc_Invalid > 0 OR h.chk_digit_Invalid > 0 OR h.fips_state_Invalid > 0 OR h.fips_county_Invalid > 0 OR h.geo_lat_Invalid > 0 OR h.geo_long_Invalid > 0 OR h.msa_Invalid > 0 OR h.geo_match_Invalid > 0 OR h.err_stat_Invalid > 0 OR h.company_name_Invalid > 0 OR h.p_fname_Invalid > 0 OR h.p_mname_Invalid > 0 OR h.p_lname_Invalid > 0 OR h.raw_aid_Invalid > 0 OR h.ace_aid_Invalid > 0 OR h.prep_addr_line1_Invalid > 0 OR h.prep_addr_line_last_Invalid > 0 OR h.source_rec_id_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
@@ -1290,9 +1290,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.selescore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bdid_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.did_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.experian_bus_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_plus_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.carrier_route_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.establish_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latest_reported_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.years_in_file_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_update_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.years_in_business_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_business_started_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.months_in_file_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_type_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_number_of_employees_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employee_size_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.annual_sales_size_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.location_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_industry_classification_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_4_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fifth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sixth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ownership_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.derogatory_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_derogatory_filed_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc_data_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.number_of_legal_items_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pmtkbankruptcy_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkjudgment_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtktaxlien_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkpayment_ENUM_ErrorCount > 0, 1, 0) + IF(le.bankruptcy_filed_ENUM_ErrorCount > 0, 1, 0) + IF(le.number_of_derogatory_legal_items_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lien_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.judgment_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc006_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc007_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc008_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko009_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkb001_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkb003_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc012_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb005_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb006_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jDO013_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jDO014_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdp016_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lgc004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pro001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pro003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txc010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txc011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txb004_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txo013_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txb002_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txp016_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.intelliscore_plus_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.percentile_model_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.model_action_ENUM_ErrorCount > 0, 1, 0) + IF(le.score_factor_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.model_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_experian_inquiry_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_combined_trade_lines_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dbt_of_combined_trade_totals_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_trade_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.aged_trade_lines_ALLOW_ErrorCount > 0, 1, 0) + IF(le.experian_credit_rating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_1_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_2_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_3_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_4_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_5_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.collection_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc021_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc022_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc023_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc024_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc025_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_activity_age_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cottage_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.nonprofit_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.financial_stability_risk_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_risk_class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.raw_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ace_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line_last_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.experian_bus_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_plus_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.carrier_route_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.establish_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latest_reported_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.years_in_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_update_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.years_in_business_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_business_started_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.months_in_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address_type_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_number_of_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.employee_size_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.annual_sales_size_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.location_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_industry_classification_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_4_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fifth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sixth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.business_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ownership_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.derogatory_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_derogatory_filed_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_data_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.number_of_legal_items_ALLOW_ErrorCount > 0, 1, 0) + IF(le.legal_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pmtkbankruptcy_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkjudgment_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtktaxlien_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkpayment_ENUM_ErrorCount > 0, 1, 0) + IF(le.bankruptcy_filed_ENUM_ErrorCount > 0, 1, 0) + IF(le.number_of_derogatory_legal_items_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lien_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.judgment_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc006_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc007_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc008_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko009_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkb001_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkb003_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc012_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb005_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb006_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jDO013_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jDO014_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdp016_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lgc004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pro001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pro003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txc010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txc011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txb004_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txo013_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txb002_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txp016_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.intelliscore_plus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.percentile_model_ALLOW_ErrorCount > 0, 1, 0) + IF(le.model_action_ENUM_ErrorCount > 0, 1, 0) + IF(le.score_factor_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.model_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_experian_inquiry_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_combined_trade_lines_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_of_combined_trade_totals_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_trade_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aged_trade_lines_ALLOW_ErrorCount > 0, 1, 0) + IF(le.experian_credit_rating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_1_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_2_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_3_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_4_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_5_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.collection_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc021_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc022_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc023_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc024_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc025_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_activity_age_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cottage_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.nonprofit_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.financial_stability_risk_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_risk_class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.raw_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ace_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line_last_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.selescore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultweight_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bdid_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.did_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.experian_bus_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_plus_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.carrier_route_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.establish_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latest_reported_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.years_in_file_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_update_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.years_in_business_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_business_started_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.months_in_file_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_type_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_number_of_employees_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employee_size_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.annual_sales_size_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.location_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_industry_classification_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_4_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fifth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sixth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ownership_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.derogatory_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_derogatory_filed_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc_data_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.number_of_legal_items_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pmtkbankruptcy_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkjudgment_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtktaxlien_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkpayment_ENUM_ErrorCount > 0, 1, 0) + IF(le.bankruptcy_filed_ENUM_ErrorCount > 0, 1, 0) + IF(le.number_of_derogatory_legal_items_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lien_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.judgment_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc006_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc007_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkc008_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko009_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkb001_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkb003_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bko011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdc012_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb005_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb006_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jDO013_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jDO014_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdb002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.jdp016_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lgc004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pro001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pro003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txc010_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txc011_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txb004_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb004_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txo013_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txb002_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.txp016_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc001_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc002_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ucc003_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.intelliscore_plus_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.percentile_model_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.model_action_ENUM_ErrorCount > 0, 1, 0) + IF(le.score_factor_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_factor_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.model_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_experian_inquiry_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_combined_trade_lines_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dbt_of_combined_trade_totals_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_trade_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.aged_trade_lines_ALLOW_ErrorCount > 0, 1, 0) + IF(le.experian_credit_rating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_1_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_2_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_3_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_4_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.quarter_5_average_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_dbt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.collection_count_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc021_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc022_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc023_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc024_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.atc025_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_activity_age_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cottage_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.nonprofit_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.financial_stability_risk_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_risk_class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.raw_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ace_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line_last_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.experian_bus_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.business_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_plus_4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.carrier_route_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.establish_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latest_reported_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.years_in_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_latitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_code_longitude_direction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_update_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.years_in_business_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_business_started_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.months_in_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address_type_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_number_of_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.employee_size_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.estimated_annual_sales_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.annual_sales_size_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.location_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_industry_classification_ENUM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_4_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fifth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sixth_sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.third_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fourth_naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.business_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ownership_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.derogatory_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recent_derogatory_filed_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.derogatory_liability_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_data_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.number_of_legal_items_ALLOW_ErrorCount > 0, 1, 0) + IF(le.legal_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.legal_balance_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pmtkbankruptcy_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkjudgment_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtktaxlien_ENUM_ErrorCount > 0, 1, 0) + IF(le.pmtkpayment_ENUM_ErrorCount > 0, 1, 0) + IF(le.bankruptcy_filed_ENUM_ErrorCount > 0, 1, 0) + IF(le.number_of_derogatory_legal_items_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lien_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.judgment_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc006_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc007_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkc008_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko009_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkb001_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkb003_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.bkb003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bko011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdc012_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb005_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb006_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jDO013_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jDO014_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdb002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.jdp016_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lgc004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pro001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pro003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txc010_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txc011_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txb004_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb004_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txo013_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txb002_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.txb002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.txp016_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc001_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc002_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ucc003_ALLOW_ErrorCount > 0, 1, 0) + IF(le.intelliscore_plus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.percentile_model_ALLOW_ErrorCount > 0, 1, 0) + IF(le.model_action_ENUM_ErrorCount > 0, 1, 0) + IF(le.score_factor_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.score_factor_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.model_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_experian_inquiry_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.recent_high_credit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.median_credit_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_combined_trade_lines_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_of_combined_trade_totals_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_trade_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aged_trade_lines_ALLOW_ErrorCount > 0, 1, 0) + IF(le.experian_credit_rating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_1_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_2_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_3_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_4_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.quarter_5_average_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.total_account_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.combined_account_balance_ALLOW_ErrorCount > 0, 1, 0) + IF(le.collection_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc021_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc022_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc023_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc024_ALLOW_ErrorCount > 0, 1, 0) + IF(le.atc025_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_activity_age_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cottage_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.nonprofit_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.financial_stability_risk_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_risk_class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_factor_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.ip_score_change_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_sign_ENUM_ErrorCount > 0, 1, 0) + IF(le.fsr_score_change_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.p_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.raw_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ace_aid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line_last_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -1316,24 +1316,24 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.empid_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.empscore_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.empweight_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.powid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.powid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.powscore_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.powweight_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.proxid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.powweight_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.proxid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.proxscore_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.proxweight_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.seleid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.proxweight_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.seleid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.selescore_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.seleweight_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orgid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.seleweight_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.orgid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.orgscore_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orgweight_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ultid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.orgweight_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ultid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ultscore_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ultweight_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bdid_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.ultweight_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bdid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.bdid_score_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.did_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.did_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.dt_first_seen_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_last_seen_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_vendor_first_reported_Invalid,'CUSTOM','UNKNOWN')
@@ -1346,13 +1346,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.zip_code_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.zip_plus_4_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.carrier_route_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.county_code_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.county_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.county_name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone_number_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.msa_code_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.msa_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.establish_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.latest_reported_date_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.years_in_file_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.years_in_file_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.geo_code_latitude_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.geo_code_latitude_direction_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.geo_code_longitude_Invalid,'ALLOW','UNKNOWN')
@@ -1360,12 +1360,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.recent_update_code_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.years_in_business_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.year_business_started_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.months_in_file_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.months_in_file_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.address_type_code_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.estimated_number_of_employees_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.estimated_number_of_employees_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.employee_size_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.estimated_annual_sales_amount_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.estimated_annual_sales_amount_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.estimated_annual_sales_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.annual_sales_size_code_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.location_code_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.primary_sic_code_industry_classification_Invalid,'ENUM','UNKNOWN')
@@ -1380,107 +1380,107 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.second_naics_code_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.third_naics_code_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.fourth_naics_code_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.executive_count_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_count_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.business_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ownership_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.derogatory_indicator_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.recent_derogatory_filed_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.derogatory_liability_amount_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.derogatory_liability_amount_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.derogatory_liability_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ucc_data_indicator_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.ucc_count_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.number_of_legal_items_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.ucc_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.number_of_legal_items_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.legal_balance_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.legal_balance_amount_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.legal_balance_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.pmtkbankruptcy_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.pmtkjudgment_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.pmtktaxlien_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.pmtkpayment_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.bankruptcy_filed_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.number_of_derogatory_legal_items_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.lien_count_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.judgment_count_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bkc006_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bkc007_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bkc008_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bko009_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.number_of_derogatory_legal_items_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.lien_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.judgment_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bkc006_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bkc007_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bkc008_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bko009_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.bkb001_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.bkb001_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.bkb001_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.bkb003_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.bkb003_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bko010_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.bko011_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdc010_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdc011_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdc012_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdb004_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdb005_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdb006_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jDO013_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jDO014_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdb002_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.jdp016_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.lgc004_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.pro001_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.pro003_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.txc010_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.txc011_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.bkb003_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bko010_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bko011_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdc010_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdc011_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdc012_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdb004_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdb005_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdb006_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jDO013_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jDO014_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdb002_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.jdp016_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.lgc004_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.pro001_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.pro003_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.txc010_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.txc011_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.txb004_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.txb004_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.txo013_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.txb004_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.txo013_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.txb002_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.txb002_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.txp016_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ucc001_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ucc002_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ucc003_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.intelliscore_plus_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.percentile_model_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.txb002_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.txp016_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ucc001_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ucc002_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ucc003_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.intelliscore_plus_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.percentile_model_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.model_action_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.score_factor_1_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.score_factor_2_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.score_factor_3_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.score_factor_4_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.score_factor_1_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.score_factor_2_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.score_factor_3_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.score_factor_4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.model_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.last_experian_inquiry_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.recent_high_credit_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.recent_high_credit_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.recent_high_credit_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.median_credit_amount_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.median_credit_amount_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.total_combined_trade_lines_count_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.dbt_of_combined_trade_totals_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.combined_trade_balance_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.median_credit_amount_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.total_combined_trade_lines_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.dbt_of_combined_trade_totals_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.combined_trade_balance_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.aged_trade_lines_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.experian_credit_rating_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.quarter_1_average_dbt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.quarter_2_average_dbt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.quarter_3_average_dbt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.quarter_4_average_dbt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.quarter_5_average_dbt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.combined_dbt_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.quarter_1_average_dbt_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.quarter_2_average_dbt_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.quarter_3_average_dbt_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.quarter_4_average_dbt_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.quarter_5_average_dbt_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.combined_dbt_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.total_account_balance_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.total_account_balance_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.total_account_balance_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.combined_account_balance_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.combined_account_balance_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.collection_count_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.atc021_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.atc022_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.atc023_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.atc024_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.atc025_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.combined_account_balance_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.collection_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.atc021_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.atc022_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.atc023_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.atc024_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.atc025_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.last_activity_age_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.cottage_indicator_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.nonprofit_indicator_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.financial_stability_risk_score_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.financial_stability_risk_score_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fsr_risk_class_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.fsr_score_factor_1_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.fsr_score_factor_2_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.fsr_score_factor_3_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.fsr_score_factor_4_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.fsr_score_factor_1_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fsr_score_factor_2_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fsr_score_factor_3_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fsr_score_factor_4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ip_score_change_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.ip_score_change_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.ip_score_change_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fsr_score_change_sign_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.fsr_score_change_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.fsr_score_change_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.predir_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.prim_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.postdir_Invalid,'ALLOW','UNKNOWN')
@@ -1510,7 +1510,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.ace_aid_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.prep_addr_line1_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.prep_addr_line_last_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.source_rec_id_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+          ,CHOOSE(le.source_rec_id_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','seleid','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','bdid','bdid_score','did','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','experian_bus_id','business_name','address','city','state','zip_code','zip_plus_4','carrier_route','county_code','county_name','phone_number','msa_code','establish_date','latest_reported_date','years_in_file','geo_code_latitude','geo_code_latitude_direction','geo_code_longitude','geo_code_longitude_direction','recent_update_code','years_in_business_code','year_business_started','months_in_file','address_type_code','estimated_number_of_employees','employee_size_code','estimated_annual_sales_amount_sign','estimated_annual_sales_amount','annual_sales_size_code','location_code','primary_sic_code_industry_classification','primary_sic_code_4_digit','primary_sic_code','second_sic_code','third_sic_code','fourth_sic_code','fifth_sic_code','sixth_sic_code','primary_naics_code','second_naics_code','third_naics_code','fourth_naics_code','executive_count','business_type','ownership_code','derogatory_indicator','recent_derogatory_filed_date','derogatory_liability_amount_sign','derogatory_liability_amount','ucc_data_indicator','ucc_count','number_of_legal_items','legal_balance_sign','legal_balance_amount','pmtkbankruptcy','pmtkjudgment','pmtktaxlien','pmtkpayment','bankruptcy_filed','number_of_derogatory_legal_items','lien_count','judgment_count','bkc006','bkc007','bkc008','bko009','bkb001_sign','bkb001','bkb003_sign','bkb003','bko010','bko011','jdc010','jdc011','jdc012','jdb004','jdb005','jdb006','jDO013','jDO014','jdb002','jdp016','lgc004','pro001','pro003','txc010','txc011','txb004_sign','txb004','txo013','txb002_sign','txb002','txp016','ucc001','ucc002','ucc003','intelliscore_plus','percentile_model','model_action','score_factor_1','score_factor_2','score_factor_3','score_factor_4','model_type','last_experian_inquiry_date','recent_high_credit_sign','recent_high_credit','median_credit_amount_sign','median_credit_amount','total_combined_trade_lines_count','dbt_of_combined_trade_totals','combined_trade_balance','aged_trade_lines','experian_credit_rating','quarter_1_average_dbt','quarter_2_average_dbt','quarter_3_average_dbt','quarter_4_average_dbt','quarter_5_average_dbt','combined_dbt','total_account_balance_sign','total_account_balance','combined_account_balance_sign','combined_account_balance','collection_count','atc021','atc022','atc023','atc024','atc025','last_activity_age_code','cottage_indicator','nonprofit_indicator','financial_stability_risk_score','fsr_risk_class','fsr_score_factor_1','fsr_score_factor_2','fsr_score_factor_3','fsr_score_factor_4','ip_score_change_sign','ip_score_change','fsr_score_change_sign','fsr_score_change','predir','prim_name','postdir','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','fips_state','fips_county','geo_lat','geo_long','msa','geo_match','err_stat','company_name','p_fname','p_mname','p_lname','raw_aid','ace_aid','prep_addr_line1','prep_addr_line_last','source_rec_id','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_zero_blank','invalid_zero_blank','invalid_zero_blank','invalid_zero_blank','invalid_zero_blank','invalid_zero_blank','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_pastdate','invalid_pastdate','invalid_pastdate','invalid_pastdate','invalid_experian_bus_id','invalid_business_name','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip','invalid_zip4','invalid_carrier_route','invalid_numeric','invalid_alphaHyphen','invalid_phone','invalid_numeric','invalid_pastdate','invalid_pastdate','invalid_numeric','invalid_numericPeriod','invalid_geo_code_latitude_direction','invalid_numericPeriod','invalid_geo_code_longitude_direction','invalid_recent_update_code','invalid_years_in_business_code','invalid_year','invalid_numeric','invalid_address_type_code','invalid_numeric','invalid_employee_size_code','invalid_sign','invalid_numeric','invalid_annual_Sales_Size_Code','invalid_location_code','invalid_primary_sic_code_industry_classification','invalid_sic_codes','invalid_sic_codes','invalid_sic_codes','invalid_sic_codes','invalid_sic_codes','invalid_sic_codes','invalid_sic_codes','invalid_naics_codes','invalid_naics_codes','invalid_naics_codes','invalid_naics_codes','invalid_numeric','invalid_business_type','invalid_ownership_code','invalid_derogatory_indicator','invalid_pastdate','invalid_sign','invalid_numeric','invalid_ucc_data_indicator','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_boolean','invalid_boolean','invalid_boolean','invalid_boolean','invalid_boolean','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_sign','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_model_action','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_model_type','invalid_pastdate','invalid_sign','invalid_numeric','invalid_sign','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_aged_trade_lines','invalid_Experian_Credit_Rating','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_sign','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_last_activity_age_code','invalid_boolean','invalid_nonprofit_indicator','invalid_numeric','invalid_fsr_risk_class','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_sign','invalid_numeric','invalid_sign','invalid_numeric','invalid_direction','invalid_mandatory','invalid_direction','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip','invalid_zip4','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dpbc','invalid_chk_digit','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_geo','invalid_msa','invalid_geo_match','invalid_err_stat','invalid_bName_pName','invalid_bName_fName','invalid_bName_mName','invalid_bName_lName','invalid_raw_aid','invalid_ace_aid','invalid_mandatory','invalid_mandatory','invalid_numeric','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dotid,(SALT311.StrType)le.dotscore,(SALT311.StrType)le.dotweight,(SALT311.StrType)le.empid,(SALT311.StrType)le.empscore,(SALT311.StrType)le.empweight,(SALT311.StrType)le.powid,(SALT311.StrType)le.powscore,(SALT311.StrType)le.powweight,(SALT311.StrType)le.proxid,(SALT311.StrType)le.proxscore,(SALT311.StrType)le.proxweight,(SALT311.StrType)le.seleid,(SALT311.StrType)le.selescore,(SALT311.StrType)le.seleweight,(SALT311.StrType)le.orgid,(SALT311.StrType)le.orgscore,(SALT311.StrType)le.orgweight,(SALT311.StrType)le.ultid,(SALT311.StrType)le.ultscore,(SALT311.StrType)le.ultweight,(SALT311.StrType)le.bdid,(SALT311.StrType)le.bdid_score,(SALT311.StrType)le.did,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.experian_bus_id,(SALT311.StrType)le.business_name,(SALT311.StrType)le.address,(SALT311.StrType)le.city,(SALT311.StrType)le.state,(SALT311.StrType)le.zip_code,(SALT311.StrType)le.zip_plus_4,(SALT311.StrType)le.carrier_route,(SALT311.StrType)le.county_code,(SALT311.StrType)le.county_name,(SALT311.StrType)le.phone_number,(SALT311.StrType)le.msa_code,(SALT311.StrType)le.establish_date,(SALT311.StrType)le.latest_reported_date,(SALT311.StrType)le.years_in_file,(SALT311.StrType)le.geo_code_latitude,(SALT311.StrType)le.geo_code_latitude_direction,(SALT311.StrType)le.geo_code_longitude,(SALT311.StrType)le.geo_code_longitude_direction,(SALT311.StrType)le.recent_update_code,(SALT311.StrType)le.years_in_business_code,(SALT311.StrType)le.year_business_started,(SALT311.StrType)le.months_in_file,(SALT311.StrType)le.address_type_code,(SALT311.StrType)le.estimated_number_of_employees,(SALT311.StrType)le.employee_size_code,(SALT311.StrType)le.estimated_annual_sales_amount_sign,(SALT311.StrType)le.estimated_annual_sales_amount,(SALT311.StrType)le.annual_sales_size_code,(SALT311.StrType)le.location_code,(SALT311.StrType)le.primary_sic_code_industry_classification,(SALT311.StrType)le.primary_sic_code_4_digit,(SALT311.StrType)le.primary_sic_code,(SALT311.StrType)le.second_sic_code,(SALT311.StrType)le.third_sic_code,(SALT311.StrType)le.fourth_sic_code,(SALT311.StrType)le.fifth_sic_code,(SALT311.StrType)le.sixth_sic_code,(SALT311.StrType)le.primary_naics_code,(SALT311.StrType)le.second_naics_code,(SALT311.StrType)le.third_naics_code,(SALT311.StrType)le.fourth_naics_code,(SALT311.StrType)le.executive_count,(SALT311.StrType)le.business_type,(SALT311.StrType)le.ownership_code,(SALT311.StrType)le.derogatory_indicator,(SALT311.StrType)le.recent_derogatory_filed_date,(SALT311.StrType)le.derogatory_liability_amount_sign,(SALT311.StrType)le.derogatory_liability_amount,(SALT311.StrType)le.ucc_data_indicator,(SALT311.StrType)le.ucc_count,(SALT311.StrType)le.number_of_legal_items,(SALT311.StrType)le.legal_balance_sign,(SALT311.StrType)le.legal_balance_amount,(SALT311.StrType)le.pmtkbankruptcy,(SALT311.StrType)le.pmtkjudgment,(SALT311.StrType)le.pmtktaxlien,(SALT311.StrType)le.pmtkpayment,(SALT311.StrType)le.bankruptcy_filed,(SALT311.StrType)le.number_of_derogatory_legal_items,(SALT311.StrType)le.lien_count,(SALT311.StrType)le.judgment_count,(SALT311.StrType)le.bkc006,(SALT311.StrType)le.bkc007,(SALT311.StrType)le.bkc008,(SALT311.StrType)le.bko009,(SALT311.StrType)le.bkb001_sign,(SALT311.StrType)le.bkb001,(SALT311.StrType)le.bkb003_sign,(SALT311.StrType)le.bkb003,(SALT311.StrType)le.bko010,(SALT311.StrType)le.bko011,(SALT311.StrType)le.jdc010,(SALT311.StrType)le.jdc011,(SALT311.StrType)le.jdc012,(SALT311.StrType)le.jdb004,(SALT311.StrType)le.jdb005,(SALT311.StrType)le.jdb006,(SALT311.StrType)le.jDO013,(SALT311.StrType)le.jDO014,(SALT311.StrType)le.jdb002,(SALT311.StrType)le.jdp016,(SALT311.StrType)le.lgc004,(SALT311.StrType)le.pro001,(SALT311.StrType)le.pro003,(SALT311.StrType)le.txc010,(SALT311.StrType)le.txc011,(SALT311.StrType)le.txb004_sign,(SALT311.StrType)le.txb004,(SALT311.StrType)le.txo013,(SALT311.StrType)le.txb002_sign,(SALT311.StrType)le.txb002,(SALT311.StrType)le.txp016,(SALT311.StrType)le.ucc001,(SALT311.StrType)le.ucc002,(SALT311.StrType)le.ucc003,(SALT311.StrType)le.intelliscore_plus,(SALT311.StrType)le.percentile_model,(SALT311.StrType)le.model_action,(SALT311.StrType)le.score_factor_1,(SALT311.StrType)le.score_factor_2,(SALT311.StrType)le.score_factor_3,(SALT311.StrType)le.score_factor_4,(SALT311.StrType)le.model_type,(SALT311.StrType)le.last_experian_inquiry_date,(SALT311.StrType)le.recent_high_credit_sign,(SALT311.StrType)le.recent_high_credit,(SALT311.StrType)le.median_credit_amount_sign,(SALT311.StrType)le.median_credit_amount,(SALT311.StrType)le.total_combined_trade_lines_count,(SALT311.StrType)le.dbt_of_combined_trade_totals,(SALT311.StrType)le.combined_trade_balance,(SALT311.StrType)le.aged_trade_lines,(SALT311.StrType)le.experian_credit_rating,(SALT311.StrType)le.quarter_1_average_dbt,(SALT311.StrType)le.quarter_2_average_dbt,(SALT311.StrType)le.quarter_3_average_dbt,(SALT311.StrType)le.quarter_4_average_dbt,(SALT311.StrType)le.quarter_5_average_dbt,(SALT311.StrType)le.combined_dbt,(SALT311.StrType)le.total_account_balance_sign,(SALT311.StrType)le.total_account_balance,(SALT311.StrType)le.combined_account_balance_sign,(SALT311.StrType)le.combined_account_balance,(SALT311.StrType)le.collection_count,(SALT311.StrType)le.atc021,(SALT311.StrType)le.atc022,(SALT311.StrType)le.atc023,(SALT311.StrType)le.atc024,(SALT311.StrType)le.atc025,(SALT311.StrType)le.last_activity_age_code,(SALT311.StrType)le.cottage_indicator,(SALT311.StrType)le.nonprofit_indicator,(SALT311.StrType)le.financial_stability_risk_score,(SALT311.StrType)le.fsr_risk_class,(SALT311.StrType)le.fsr_score_factor_1,(SALT311.StrType)le.fsr_score_factor_2,(SALT311.StrType)le.fsr_score_factor_3,(SALT311.StrType)le.fsr_score_factor_4,(SALT311.StrType)le.ip_score_change_sign,(SALT311.StrType)le.ip_score_change,(SALT311.StrType)le.fsr_score_change_sign,(SALT311.StrType)le.fsr_score_change,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.postdir,(SALT311.StrType)le.p_city_name,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.cart,(SALT311.StrType)le.cr_sort_sz,(SALT311.StrType)le.lot,(SALT311.StrType)le.lot_order,(SALT311.StrType)le.dbpc,(SALT311.StrType)le.chk_digit,(SALT311.StrType)le.fips_state,(SALT311.StrType)le.fips_county,(SALT311.StrType)le.geo_lat,(SALT311.StrType)le.geo_long,(SALT311.StrType)le.msa,(SALT311.StrType)le.geo_match,(SALT311.StrType)le.err_stat,(SALT311.StrType)le.company_name,(SALT311.StrType)le.p_fname,(SALT311.StrType)le.p_mname,(SALT311.StrType)le.p_lname,(SALT311.StrType)le.raw_aid,(SALT311.StrType)le.ace_aid,(SALT311.StrType)le.prep_addr_line1,(SALT311.StrType)le.prep_addr_line_last,(SALT311.StrType)le.source_rec_id,'***SALTBUG***');
@@ -1534,24 +1534,24 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.empid_ENUM_ErrorCount
           ,le.empscore_ENUM_ErrorCount
           ,le.empweight_ENUM_ErrorCount
-          ,le.powid_CUSTOM_ErrorCount
+          ,le.powid_ALLOW_ErrorCount
           ,le.powscore_CUSTOM_ErrorCount
-          ,le.powweight_CUSTOM_ErrorCount
-          ,le.proxid_CUSTOM_ErrorCount
+          ,le.powweight_ALLOW_ErrorCount
+          ,le.proxid_ALLOW_ErrorCount
           ,le.proxscore_CUSTOM_ErrorCount
-          ,le.proxweight_CUSTOM_ErrorCount
-          ,le.seleid_CUSTOM_ErrorCount
+          ,le.proxweight_ALLOW_ErrorCount
+          ,le.seleid_ALLOW_ErrorCount
           ,le.selescore_CUSTOM_ErrorCount
-          ,le.seleweight_CUSTOM_ErrorCount
-          ,le.orgid_CUSTOM_ErrorCount
+          ,le.seleweight_ALLOW_ErrorCount
+          ,le.orgid_ALLOW_ErrorCount
           ,le.orgscore_CUSTOM_ErrorCount
-          ,le.orgweight_CUSTOM_ErrorCount
-          ,le.ultid_CUSTOM_ErrorCount
+          ,le.orgweight_ALLOW_ErrorCount
+          ,le.ultid_ALLOW_ErrorCount
           ,le.ultscore_CUSTOM_ErrorCount
-          ,le.ultweight_CUSTOM_ErrorCount
-          ,le.bdid_CUSTOM_ErrorCount
+          ,le.ultweight_ALLOW_ErrorCount
+          ,le.bdid_ALLOW_ErrorCount
           ,le.bdid_score_CUSTOM_ErrorCount
-          ,le.did_CUSTOM_ErrorCount
+          ,le.did_ALLOW_ErrorCount
           ,le.dt_first_seen_CUSTOM_ErrorCount
           ,le.dt_last_seen_CUSTOM_ErrorCount
           ,le.dt_vendor_first_reported_CUSTOM_ErrorCount
@@ -1564,13 +1564,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.zip_code_CUSTOM_ErrorCount
           ,le.zip_plus_4_CUSTOM_ErrorCount
           ,le.carrier_route_ALLOW_ErrorCount
-          ,le.county_code_CUSTOM_ErrorCount
+          ,le.county_code_ALLOW_ErrorCount
           ,le.county_name_ALLOW_ErrorCount
           ,le.phone_number_CUSTOM_ErrorCount
-          ,le.msa_code_CUSTOM_ErrorCount
+          ,le.msa_code_ALLOW_ErrorCount
           ,le.establish_date_CUSTOM_ErrorCount
           ,le.latest_reported_date_CUSTOM_ErrorCount
-          ,le.years_in_file_CUSTOM_ErrorCount
+          ,le.years_in_file_ALLOW_ErrorCount
           ,le.geo_code_latitude_ALLOW_ErrorCount
           ,le.geo_code_latitude_direction_ALLOW_ErrorCount
           ,le.geo_code_longitude_ALLOW_ErrorCount
@@ -1578,12 +1578,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.recent_update_code_ENUM_ErrorCount
           ,le.years_in_business_code_ALLOW_ErrorCount
           ,le.year_business_started_CUSTOM_ErrorCount
-          ,le.months_in_file_CUSTOM_ErrorCount
+          ,le.months_in_file_ALLOW_ErrorCount
           ,le.address_type_code_ALLOW_ErrorCount
-          ,le.estimated_number_of_employees_CUSTOM_ErrorCount
+          ,le.estimated_number_of_employees_ALLOW_ErrorCount
           ,le.employee_size_code_ALLOW_ErrorCount
           ,le.estimated_annual_sales_amount_sign_ENUM_ErrorCount
-          ,le.estimated_annual_sales_amount_CUSTOM_ErrorCount
+          ,le.estimated_annual_sales_amount_ALLOW_ErrorCount
           ,le.annual_sales_size_code_ENUM_ErrorCount
           ,le.location_code_ENUM_ErrorCount
           ,le.primary_sic_code_industry_classification_ENUM_ErrorCount
@@ -1598,107 +1598,107 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.second_naics_code_CUSTOM_ErrorCount
           ,le.third_naics_code_CUSTOM_ErrorCount
           ,le.fourth_naics_code_CUSTOM_ErrorCount
-          ,le.executive_count_CUSTOM_ErrorCount
+          ,le.executive_count_ALLOW_ErrorCount
           ,le.business_type_ALLOW_ErrorCount
           ,le.ownership_code_ALLOW_ErrorCount
           ,le.derogatory_indicator_ALLOW_ErrorCount
           ,le.recent_derogatory_filed_date_CUSTOM_ErrorCount
           ,le.derogatory_liability_amount_sign_ENUM_ErrorCount
-          ,le.derogatory_liability_amount_CUSTOM_ErrorCount
+          ,le.derogatory_liability_amount_ALLOW_ErrorCount
           ,le.ucc_data_indicator_ALLOW_ErrorCount
-          ,le.ucc_count_CUSTOM_ErrorCount
-          ,le.number_of_legal_items_CUSTOM_ErrorCount
+          ,le.ucc_count_ALLOW_ErrorCount
+          ,le.number_of_legal_items_ALLOW_ErrorCount
           ,le.legal_balance_sign_ENUM_ErrorCount
-          ,le.legal_balance_amount_CUSTOM_ErrorCount
+          ,le.legal_balance_amount_ALLOW_ErrorCount
           ,le.pmtkbankruptcy_ENUM_ErrorCount
           ,le.pmtkjudgment_ENUM_ErrorCount
           ,le.pmtktaxlien_ENUM_ErrorCount
           ,le.pmtkpayment_ENUM_ErrorCount
           ,le.bankruptcy_filed_ENUM_ErrorCount
-          ,le.number_of_derogatory_legal_items_CUSTOM_ErrorCount
-          ,le.lien_count_CUSTOM_ErrorCount
-          ,le.judgment_count_CUSTOM_ErrorCount
-          ,le.bkc006_CUSTOM_ErrorCount
-          ,le.bkc007_CUSTOM_ErrorCount
-          ,le.bkc008_CUSTOM_ErrorCount
-          ,le.bko009_CUSTOM_ErrorCount
+          ,le.number_of_derogatory_legal_items_ALLOW_ErrorCount
+          ,le.lien_count_ALLOW_ErrorCount
+          ,le.judgment_count_ALLOW_ErrorCount
+          ,le.bkc006_ALLOW_ErrorCount
+          ,le.bkc007_ALLOW_ErrorCount
+          ,le.bkc008_ALLOW_ErrorCount
+          ,le.bko009_ALLOW_ErrorCount
           ,le.bkb001_sign_ENUM_ErrorCount
-          ,le.bkb001_CUSTOM_ErrorCount
+          ,le.bkb001_ALLOW_ErrorCount
           ,le.bkb003_sign_ENUM_ErrorCount
-          ,le.bkb003_CUSTOM_ErrorCount
-          ,le.bko010_CUSTOM_ErrorCount
-          ,le.bko011_CUSTOM_ErrorCount
-          ,le.jdc010_CUSTOM_ErrorCount
-          ,le.jdc011_CUSTOM_ErrorCount
-          ,le.jdc012_CUSTOM_ErrorCount
-          ,le.jdb004_CUSTOM_ErrorCount
-          ,le.jdb005_CUSTOM_ErrorCount
-          ,le.jdb006_CUSTOM_ErrorCount
-          ,le.jDO013_CUSTOM_ErrorCount
-          ,le.jDO014_CUSTOM_ErrorCount
-          ,le.jdb002_CUSTOM_ErrorCount
-          ,le.jdp016_CUSTOM_ErrorCount
-          ,le.lgc004_CUSTOM_ErrorCount
-          ,le.pro001_CUSTOM_ErrorCount
-          ,le.pro003_CUSTOM_ErrorCount
-          ,le.txc010_CUSTOM_ErrorCount
-          ,le.txc011_CUSTOM_ErrorCount
+          ,le.bkb003_ALLOW_ErrorCount
+          ,le.bko010_ALLOW_ErrorCount
+          ,le.bko011_ALLOW_ErrorCount
+          ,le.jdc010_ALLOW_ErrorCount
+          ,le.jdc011_ALLOW_ErrorCount
+          ,le.jdc012_ALLOW_ErrorCount
+          ,le.jdb004_ALLOW_ErrorCount
+          ,le.jdb005_ALLOW_ErrorCount
+          ,le.jdb006_ALLOW_ErrorCount
+          ,le.jDO013_ALLOW_ErrorCount
+          ,le.jDO014_ALLOW_ErrorCount
+          ,le.jdb002_ALLOW_ErrorCount
+          ,le.jdp016_ALLOW_ErrorCount
+          ,le.lgc004_ALLOW_ErrorCount
+          ,le.pro001_ALLOW_ErrorCount
+          ,le.pro003_ALLOW_ErrorCount
+          ,le.txc010_ALLOW_ErrorCount
+          ,le.txc011_ALLOW_ErrorCount
           ,le.txb004_sign_ENUM_ErrorCount
-          ,le.txb004_CUSTOM_ErrorCount
-          ,le.txo013_CUSTOM_ErrorCount
+          ,le.txb004_ALLOW_ErrorCount
+          ,le.txo013_ALLOW_ErrorCount
           ,le.txb002_sign_ENUM_ErrorCount
-          ,le.txb002_CUSTOM_ErrorCount
-          ,le.txp016_CUSTOM_ErrorCount
-          ,le.ucc001_CUSTOM_ErrorCount
-          ,le.ucc002_CUSTOM_ErrorCount
-          ,le.ucc003_CUSTOM_ErrorCount
-          ,le.intelliscore_plus_CUSTOM_ErrorCount
-          ,le.percentile_model_CUSTOM_ErrorCount
+          ,le.txb002_ALLOW_ErrorCount
+          ,le.txp016_ALLOW_ErrorCount
+          ,le.ucc001_ALLOW_ErrorCount
+          ,le.ucc002_ALLOW_ErrorCount
+          ,le.ucc003_ALLOW_ErrorCount
+          ,le.intelliscore_plus_ALLOW_ErrorCount
+          ,le.percentile_model_ALLOW_ErrorCount
           ,le.model_action_ENUM_ErrorCount
-          ,le.score_factor_1_CUSTOM_ErrorCount
-          ,le.score_factor_2_CUSTOM_ErrorCount
-          ,le.score_factor_3_CUSTOM_ErrorCount
-          ,le.score_factor_4_CUSTOM_ErrorCount
+          ,le.score_factor_1_ALLOW_ErrorCount
+          ,le.score_factor_2_ALLOW_ErrorCount
+          ,le.score_factor_3_ALLOW_ErrorCount
+          ,le.score_factor_4_ALLOW_ErrorCount
           ,le.model_type_ALLOW_ErrorCount
           ,le.last_experian_inquiry_date_CUSTOM_ErrorCount
           ,le.recent_high_credit_sign_ENUM_ErrorCount
-          ,le.recent_high_credit_CUSTOM_ErrorCount
+          ,le.recent_high_credit_ALLOW_ErrorCount
           ,le.median_credit_amount_sign_ENUM_ErrorCount
-          ,le.median_credit_amount_CUSTOM_ErrorCount
-          ,le.total_combined_trade_lines_count_CUSTOM_ErrorCount
-          ,le.dbt_of_combined_trade_totals_CUSTOM_ErrorCount
-          ,le.combined_trade_balance_CUSTOM_ErrorCount
+          ,le.median_credit_amount_ALLOW_ErrorCount
+          ,le.total_combined_trade_lines_count_ALLOW_ErrorCount
+          ,le.dbt_of_combined_trade_totals_ALLOW_ErrorCount
+          ,le.combined_trade_balance_ALLOW_ErrorCount
           ,le.aged_trade_lines_ALLOW_ErrorCount
           ,le.experian_credit_rating_ALLOW_ErrorCount
-          ,le.quarter_1_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_2_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_3_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_4_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_5_average_dbt_CUSTOM_ErrorCount
-          ,le.combined_dbt_CUSTOM_ErrorCount
+          ,le.quarter_1_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_2_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_3_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_4_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_5_average_dbt_ALLOW_ErrorCount
+          ,le.combined_dbt_ALLOW_ErrorCount
           ,le.total_account_balance_sign_ENUM_ErrorCount
-          ,le.total_account_balance_CUSTOM_ErrorCount
+          ,le.total_account_balance_ALLOW_ErrorCount
           ,le.combined_account_balance_sign_ENUM_ErrorCount
-          ,le.combined_account_balance_CUSTOM_ErrorCount
-          ,le.collection_count_CUSTOM_ErrorCount
-          ,le.atc021_CUSTOM_ErrorCount
-          ,le.atc022_CUSTOM_ErrorCount
-          ,le.atc023_CUSTOM_ErrorCount
-          ,le.atc024_CUSTOM_ErrorCount
-          ,le.atc025_CUSTOM_ErrorCount
+          ,le.combined_account_balance_ALLOW_ErrorCount
+          ,le.collection_count_ALLOW_ErrorCount
+          ,le.atc021_ALLOW_ErrorCount
+          ,le.atc022_ALLOW_ErrorCount
+          ,le.atc023_ALLOW_ErrorCount
+          ,le.atc024_ALLOW_ErrorCount
+          ,le.atc025_ALLOW_ErrorCount
           ,le.last_activity_age_code_ALLOW_ErrorCount
           ,le.cottage_indicator_ENUM_ErrorCount
           ,le.nonprofit_indicator_ALLOW_ErrorCount
-          ,le.financial_stability_risk_score_CUSTOM_ErrorCount
+          ,le.financial_stability_risk_score_ALLOW_ErrorCount
           ,le.fsr_risk_class_ALLOW_ErrorCount
-          ,le.fsr_score_factor_1_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_2_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_3_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_4_CUSTOM_ErrorCount
+          ,le.fsr_score_factor_1_ALLOW_ErrorCount
+          ,le.fsr_score_factor_2_ALLOW_ErrorCount
+          ,le.fsr_score_factor_3_ALLOW_ErrorCount
+          ,le.fsr_score_factor_4_ALLOW_ErrorCount
           ,le.ip_score_change_sign_ENUM_ErrorCount
-          ,le.ip_score_change_CUSTOM_ErrorCount
+          ,le.ip_score_change_ALLOW_ErrorCount
           ,le.fsr_score_change_sign_ENUM_ErrorCount
-          ,le.fsr_score_change_CUSTOM_ErrorCount
+          ,le.fsr_score_change_ALLOW_ErrorCount
           ,le.predir_ALLOW_ErrorCount
           ,le.prim_name_CUSTOM_ErrorCount
           ,le.postdir_ALLOW_ErrorCount
@@ -1728,7 +1728,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.ace_aid_CUSTOM_ErrorCount
           ,le.prep_addr_line1_CUSTOM_ErrorCount
           ,le.prep_addr_line_last_CUSTOM_ErrorCount
-          ,le.source_rec_id_CUSTOM_ErrorCount
+          ,le.source_rec_id_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -1743,24 +1743,24 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.empid_ENUM_ErrorCount
           ,le.empscore_ENUM_ErrorCount
           ,le.empweight_ENUM_ErrorCount
-          ,le.powid_CUSTOM_ErrorCount
+          ,le.powid_ALLOW_ErrorCount
           ,le.powscore_CUSTOM_ErrorCount
-          ,le.powweight_CUSTOM_ErrorCount
-          ,le.proxid_CUSTOM_ErrorCount
+          ,le.powweight_ALLOW_ErrorCount
+          ,le.proxid_ALLOW_ErrorCount
           ,le.proxscore_CUSTOM_ErrorCount
-          ,le.proxweight_CUSTOM_ErrorCount
-          ,le.seleid_CUSTOM_ErrorCount
+          ,le.proxweight_ALLOW_ErrorCount
+          ,le.seleid_ALLOW_ErrorCount
           ,le.selescore_CUSTOM_ErrorCount
-          ,le.seleweight_CUSTOM_ErrorCount
-          ,le.orgid_CUSTOM_ErrorCount
+          ,le.seleweight_ALLOW_ErrorCount
+          ,le.orgid_ALLOW_ErrorCount
           ,le.orgscore_CUSTOM_ErrorCount
-          ,le.orgweight_CUSTOM_ErrorCount
-          ,le.ultid_CUSTOM_ErrorCount
+          ,le.orgweight_ALLOW_ErrorCount
+          ,le.ultid_ALLOW_ErrorCount
           ,le.ultscore_CUSTOM_ErrorCount
-          ,le.ultweight_CUSTOM_ErrorCount
-          ,le.bdid_CUSTOM_ErrorCount
+          ,le.ultweight_ALLOW_ErrorCount
+          ,le.bdid_ALLOW_ErrorCount
           ,le.bdid_score_CUSTOM_ErrorCount
-          ,le.did_CUSTOM_ErrorCount
+          ,le.did_ALLOW_ErrorCount
           ,le.dt_first_seen_CUSTOM_ErrorCount
           ,le.dt_last_seen_CUSTOM_ErrorCount
           ,le.dt_vendor_first_reported_CUSTOM_ErrorCount
@@ -1773,13 +1773,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.zip_code_CUSTOM_ErrorCount
           ,le.zip_plus_4_CUSTOM_ErrorCount
           ,le.carrier_route_ALLOW_ErrorCount
-          ,le.county_code_CUSTOM_ErrorCount
+          ,le.county_code_ALLOW_ErrorCount
           ,le.county_name_ALLOW_ErrorCount
           ,le.phone_number_CUSTOM_ErrorCount
-          ,le.msa_code_CUSTOM_ErrorCount
+          ,le.msa_code_ALLOW_ErrorCount
           ,le.establish_date_CUSTOM_ErrorCount
           ,le.latest_reported_date_CUSTOM_ErrorCount
-          ,le.years_in_file_CUSTOM_ErrorCount
+          ,le.years_in_file_ALLOW_ErrorCount
           ,le.geo_code_latitude_ALLOW_ErrorCount
           ,le.geo_code_latitude_direction_ALLOW_ErrorCount
           ,le.geo_code_longitude_ALLOW_ErrorCount
@@ -1787,12 +1787,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.recent_update_code_ENUM_ErrorCount
           ,le.years_in_business_code_ALLOW_ErrorCount
           ,le.year_business_started_CUSTOM_ErrorCount
-          ,le.months_in_file_CUSTOM_ErrorCount
+          ,le.months_in_file_ALLOW_ErrorCount
           ,le.address_type_code_ALLOW_ErrorCount
-          ,le.estimated_number_of_employees_CUSTOM_ErrorCount
+          ,le.estimated_number_of_employees_ALLOW_ErrorCount
           ,le.employee_size_code_ALLOW_ErrorCount
           ,le.estimated_annual_sales_amount_sign_ENUM_ErrorCount
-          ,le.estimated_annual_sales_amount_CUSTOM_ErrorCount
+          ,le.estimated_annual_sales_amount_ALLOW_ErrorCount
           ,le.annual_sales_size_code_ENUM_ErrorCount
           ,le.location_code_ENUM_ErrorCount
           ,le.primary_sic_code_industry_classification_ENUM_ErrorCount
@@ -1807,107 +1807,107 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.second_naics_code_CUSTOM_ErrorCount
           ,le.third_naics_code_CUSTOM_ErrorCount
           ,le.fourth_naics_code_CUSTOM_ErrorCount
-          ,le.executive_count_CUSTOM_ErrorCount
+          ,le.executive_count_ALLOW_ErrorCount
           ,le.business_type_ALLOW_ErrorCount
           ,le.ownership_code_ALLOW_ErrorCount
           ,le.derogatory_indicator_ALLOW_ErrorCount
           ,le.recent_derogatory_filed_date_CUSTOM_ErrorCount
           ,le.derogatory_liability_amount_sign_ENUM_ErrorCount
-          ,le.derogatory_liability_amount_CUSTOM_ErrorCount
+          ,le.derogatory_liability_amount_ALLOW_ErrorCount
           ,le.ucc_data_indicator_ALLOW_ErrorCount
-          ,le.ucc_count_CUSTOM_ErrorCount
-          ,le.number_of_legal_items_CUSTOM_ErrorCount
+          ,le.ucc_count_ALLOW_ErrorCount
+          ,le.number_of_legal_items_ALLOW_ErrorCount
           ,le.legal_balance_sign_ENUM_ErrorCount
-          ,le.legal_balance_amount_CUSTOM_ErrorCount
+          ,le.legal_balance_amount_ALLOW_ErrorCount
           ,le.pmtkbankruptcy_ENUM_ErrorCount
           ,le.pmtkjudgment_ENUM_ErrorCount
           ,le.pmtktaxlien_ENUM_ErrorCount
           ,le.pmtkpayment_ENUM_ErrorCount
           ,le.bankruptcy_filed_ENUM_ErrorCount
-          ,le.number_of_derogatory_legal_items_CUSTOM_ErrorCount
-          ,le.lien_count_CUSTOM_ErrorCount
-          ,le.judgment_count_CUSTOM_ErrorCount
-          ,le.bkc006_CUSTOM_ErrorCount
-          ,le.bkc007_CUSTOM_ErrorCount
-          ,le.bkc008_CUSTOM_ErrorCount
-          ,le.bko009_CUSTOM_ErrorCount
+          ,le.number_of_derogatory_legal_items_ALLOW_ErrorCount
+          ,le.lien_count_ALLOW_ErrorCount
+          ,le.judgment_count_ALLOW_ErrorCount
+          ,le.bkc006_ALLOW_ErrorCount
+          ,le.bkc007_ALLOW_ErrorCount
+          ,le.bkc008_ALLOW_ErrorCount
+          ,le.bko009_ALLOW_ErrorCount
           ,le.bkb001_sign_ENUM_ErrorCount
-          ,le.bkb001_CUSTOM_ErrorCount
+          ,le.bkb001_ALLOW_ErrorCount
           ,le.bkb003_sign_ENUM_ErrorCount
-          ,le.bkb003_CUSTOM_ErrorCount
-          ,le.bko010_CUSTOM_ErrorCount
-          ,le.bko011_CUSTOM_ErrorCount
-          ,le.jdc010_CUSTOM_ErrorCount
-          ,le.jdc011_CUSTOM_ErrorCount
-          ,le.jdc012_CUSTOM_ErrorCount
-          ,le.jdb004_CUSTOM_ErrorCount
-          ,le.jdb005_CUSTOM_ErrorCount
-          ,le.jdb006_CUSTOM_ErrorCount
-          ,le.jDO013_CUSTOM_ErrorCount
-          ,le.jDO014_CUSTOM_ErrorCount
-          ,le.jdb002_CUSTOM_ErrorCount
-          ,le.jdp016_CUSTOM_ErrorCount
-          ,le.lgc004_CUSTOM_ErrorCount
-          ,le.pro001_CUSTOM_ErrorCount
-          ,le.pro003_CUSTOM_ErrorCount
-          ,le.txc010_CUSTOM_ErrorCount
-          ,le.txc011_CUSTOM_ErrorCount
+          ,le.bkb003_ALLOW_ErrorCount
+          ,le.bko010_ALLOW_ErrorCount
+          ,le.bko011_ALLOW_ErrorCount
+          ,le.jdc010_ALLOW_ErrorCount
+          ,le.jdc011_ALLOW_ErrorCount
+          ,le.jdc012_ALLOW_ErrorCount
+          ,le.jdb004_ALLOW_ErrorCount
+          ,le.jdb005_ALLOW_ErrorCount
+          ,le.jdb006_ALLOW_ErrorCount
+          ,le.jDO013_ALLOW_ErrorCount
+          ,le.jDO014_ALLOW_ErrorCount
+          ,le.jdb002_ALLOW_ErrorCount
+          ,le.jdp016_ALLOW_ErrorCount
+          ,le.lgc004_ALLOW_ErrorCount
+          ,le.pro001_ALLOW_ErrorCount
+          ,le.pro003_ALLOW_ErrorCount
+          ,le.txc010_ALLOW_ErrorCount
+          ,le.txc011_ALLOW_ErrorCount
           ,le.txb004_sign_ENUM_ErrorCount
-          ,le.txb004_CUSTOM_ErrorCount
-          ,le.txo013_CUSTOM_ErrorCount
+          ,le.txb004_ALLOW_ErrorCount
+          ,le.txo013_ALLOW_ErrorCount
           ,le.txb002_sign_ENUM_ErrorCount
-          ,le.txb002_CUSTOM_ErrorCount
-          ,le.txp016_CUSTOM_ErrorCount
-          ,le.ucc001_CUSTOM_ErrorCount
-          ,le.ucc002_CUSTOM_ErrorCount
-          ,le.ucc003_CUSTOM_ErrorCount
-          ,le.intelliscore_plus_CUSTOM_ErrorCount
-          ,le.percentile_model_CUSTOM_ErrorCount
+          ,le.txb002_ALLOW_ErrorCount
+          ,le.txp016_ALLOW_ErrorCount
+          ,le.ucc001_ALLOW_ErrorCount
+          ,le.ucc002_ALLOW_ErrorCount
+          ,le.ucc003_ALLOW_ErrorCount
+          ,le.intelliscore_plus_ALLOW_ErrorCount
+          ,le.percentile_model_ALLOW_ErrorCount
           ,le.model_action_ENUM_ErrorCount
-          ,le.score_factor_1_CUSTOM_ErrorCount
-          ,le.score_factor_2_CUSTOM_ErrorCount
-          ,le.score_factor_3_CUSTOM_ErrorCount
-          ,le.score_factor_4_CUSTOM_ErrorCount
+          ,le.score_factor_1_ALLOW_ErrorCount
+          ,le.score_factor_2_ALLOW_ErrorCount
+          ,le.score_factor_3_ALLOW_ErrorCount
+          ,le.score_factor_4_ALLOW_ErrorCount
           ,le.model_type_ALLOW_ErrorCount
           ,le.last_experian_inquiry_date_CUSTOM_ErrorCount
           ,le.recent_high_credit_sign_ENUM_ErrorCount
-          ,le.recent_high_credit_CUSTOM_ErrorCount
+          ,le.recent_high_credit_ALLOW_ErrorCount
           ,le.median_credit_amount_sign_ENUM_ErrorCount
-          ,le.median_credit_amount_CUSTOM_ErrorCount
-          ,le.total_combined_trade_lines_count_CUSTOM_ErrorCount
-          ,le.dbt_of_combined_trade_totals_CUSTOM_ErrorCount
-          ,le.combined_trade_balance_CUSTOM_ErrorCount
+          ,le.median_credit_amount_ALLOW_ErrorCount
+          ,le.total_combined_trade_lines_count_ALLOW_ErrorCount
+          ,le.dbt_of_combined_trade_totals_ALLOW_ErrorCount
+          ,le.combined_trade_balance_ALLOW_ErrorCount
           ,le.aged_trade_lines_ALLOW_ErrorCount
           ,le.experian_credit_rating_ALLOW_ErrorCount
-          ,le.quarter_1_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_2_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_3_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_4_average_dbt_CUSTOM_ErrorCount
-          ,le.quarter_5_average_dbt_CUSTOM_ErrorCount
-          ,le.combined_dbt_CUSTOM_ErrorCount
+          ,le.quarter_1_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_2_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_3_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_4_average_dbt_ALLOW_ErrorCount
+          ,le.quarter_5_average_dbt_ALLOW_ErrorCount
+          ,le.combined_dbt_ALLOW_ErrorCount
           ,le.total_account_balance_sign_ENUM_ErrorCount
-          ,le.total_account_balance_CUSTOM_ErrorCount
+          ,le.total_account_balance_ALLOW_ErrorCount
           ,le.combined_account_balance_sign_ENUM_ErrorCount
-          ,le.combined_account_balance_CUSTOM_ErrorCount
-          ,le.collection_count_CUSTOM_ErrorCount
-          ,le.atc021_CUSTOM_ErrorCount
-          ,le.atc022_CUSTOM_ErrorCount
-          ,le.atc023_CUSTOM_ErrorCount
-          ,le.atc024_CUSTOM_ErrorCount
-          ,le.atc025_CUSTOM_ErrorCount
+          ,le.combined_account_balance_ALLOW_ErrorCount
+          ,le.collection_count_ALLOW_ErrorCount
+          ,le.atc021_ALLOW_ErrorCount
+          ,le.atc022_ALLOW_ErrorCount
+          ,le.atc023_ALLOW_ErrorCount
+          ,le.atc024_ALLOW_ErrorCount
+          ,le.atc025_ALLOW_ErrorCount
           ,le.last_activity_age_code_ALLOW_ErrorCount
           ,le.cottage_indicator_ENUM_ErrorCount
           ,le.nonprofit_indicator_ALLOW_ErrorCount
-          ,le.financial_stability_risk_score_CUSTOM_ErrorCount
+          ,le.financial_stability_risk_score_ALLOW_ErrorCount
           ,le.fsr_risk_class_ALLOW_ErrorCount
-          ,le.fsr_score_factor_1_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_2_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_3_CUSTOM_ErrorCount
-          ,le.fsr_score_factor_4_CUSTOM_ErrorCount
+          ,le.fsr_score_factor_1_ALLOW_ErrorCount
+          ,le.fsr_score_factor_2_ALLOW_ErrorCount
+          ,le.fsr_score_factor_3_ALLOW_ErrorCount
+          ,le.fsr_score_factor_4_ALLOW_ErrorCount
           ,le.ip_score_change_sign_ENUM_ErrorCount
-          ,le.ip_score_change_CUSTOM_ErrorCount
+          ,le.ip_score_change_ALLOW_ErrorCount
           ,le.fsr_score_change_sign_ENUM_ErrorCount
-          ,le.fsr_score_change_CUSTOM_ErrorCount
+          ,le.fsr_score_change_ALLOW_ErrorCount
           ,le.predir_ALLOW_ErrorCount
           ,le.prim_name_CUSTOM_ErrorCount
           ,le.postdir_ALLOW_ErrorCount
@@ -1937,7 +1937,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.ace_aid_CUSTOM_ErrorCount
           ,le.prep_addr_line1_CUSTOM_ErrorCount
           ,le.prep_addr_line_last_CUSTOM_ErrorCount
-          ,le.source_rec_id_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.source_rec_id_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
