@@ -104,7 +104,7 @@ EXPORT Functions := MODULE
 	//****************************************************************************
 	//fn_numeric: returns true if only populated with numbers !
 	//****************************************************************************
-	EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
+	EXPORT fn_numeric(STRING nmbr) := FUNCTION
 
 		RETURN IF(
 				/*
