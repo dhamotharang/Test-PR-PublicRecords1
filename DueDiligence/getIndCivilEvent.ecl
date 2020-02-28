@@ -3,7 +3,6 @@
 /*
 	Following Keys being used:
 			liensv2.key_liens_DID
-      liensv2.key_liens_party_id
 */
 
 EXPORT getIndCivilEvent(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
@@ -22,21 +21,9 @@ EXPORT getIndCivilEvent(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                           KEEP(DueDiligence.Constants.MAX_ATMOST_500),
                           ATMOST(KEYED(LEFT.inquiredDID = RIGHT.did), DueDiligence.Constants.MAX_ATMOST_1000));
                           
-                          
-    indivLienInfo := JOIN(indivLienKeys, liensv2.key_liens_party_id, 
-                          LEFT.rmsid <> DueDiligence.Constants.EMPTY AND
-                          KEYED(LEFT.tmsid = RIGHT.tmsid) AND 
-                          KEYED(LEFT.rmsid = RIGHT.rmsid),
-                          TRANSFORM(DueDiligence.LayoutsInternal.SharedSlimLiens, 
-                                     SELF.dateFirstSeen := (UNSIGNED4)RIGHT.date_first_seen,
-                                     SELF.dateLastSeen := (UNSIGNED4)RIGHT.date_last_seen,
-                                     SELF := LEFT;),
-                          KEEP(DueDiligence.Constants.MAX_ATMOST_1000),
-                          ATMOST(KEYED(LEFT.tmsid = RIGHT.tmsid) AND KEYED(LEFT.rmsid = RIGHT.rmsid), DueDiligence.Constants.MAX_ATMOST_1000));
-                          
 
 
-    eventDetails := DueDiligence.getSharedLiensJudgementsEvictions(indivLienInfo, mod_access);
+    eventDetails := DueDiligence.getSharedLiensJudgementsEvictions(indivLienKeys, mod_access);
 
     
     //add civil information back to the input
@@ -48,6 +35,7 @@ EXPORT getIndCivilEvent(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                 SELF.liensUnreleasedCntOVNYR := RIGHT.totalUnreleasedLiensOver3Yrs;
                                 SELF.evictionsCntInThePastNYR := RIGHT.totalEvictionsPast3Yrs;
                                 SELF.evictionsCntOVNYR := RIGHT.totalEvictionsOver3Yrs;
+                                SELF.ljeDetails := RIGHT.lje;
                                 SELF := LEFT;),
                       LEFT OUTER,
                       ATMOST(1));
@@ -55,9 +43,7 @@ EXPORT getIndCivilEvent(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
 
 
-    // OUTPUT(indivLienKeys, NAMED('indivLienKeys'));
-    // OUTPUT(indivLienInfo, NAMED('indivLienInfo'));
-    
+    // OUTPUT(indivLienKeys, NAMED('indivLienKeys'));    
     // OUTPUT(eventDetails, NAMED('eventDetails'));
     // OUTPUT(addCivil, NAMED('addCivil'));
     
