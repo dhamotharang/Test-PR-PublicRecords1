@@ -91,11 +91,9 @@ EXPORT phone_noreconn_search := MACRO
   doxie.MAC_Header_Field_Declare();
   globalmod := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalmod);
-  IsCNSMR := ut.IndustryClass.is_Knowx;
+  IsCNSMR := mod_access.isConsumer();
   srchMod := MODULE(PROJECT(globalmod,doxie.phone_noreconn_param.searchParams,OPT))
-    EXPORT UNSIGNED1 DPPAPurpose := DPPA_Purpose;
-    EXPORT UNSIGNED1 GLBPurpose := GLB_Purpose;
-    EXPORT STRING32 ApplicationType := application_type_value;
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
     EXPORT STRING5 IndustryClass := industry_class_value;
     EXPORT UNSIGNED1 ScoreThreshold := score_threshold_value;
     EXPORT STRING30 Acctno := '' : STORED('Acctno');
@@ -138,7 +136,7 @@ EXPORT phone_noreconn_search := MACRO
   // eliminate minors as necessary
   ut.PermissionTools.GLB.mac_FilterOutMinors(dids_deduped, filteredDids)
 
-  resultOut_w_tzone := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
+  resultOut_w_tzone := doxie.phone_noreconn_records(srchMod, filteredDids, gateways_in);
 
   boolean  batch_friendly := false : stored('BatchFriendly');
   boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
@@ -161,7 +159,7 @@ EXPORT phone_noreconn_search := MACRO
   unsigned1 SSNSearchLength :=  if (lname_value <> '', length(trim(SSN_value)), 0);
 
   // boolean use_PVS := TRUE;
-  boolean use_PVS := 
+  boolean use_PVS :=
     (NOT EXISTS(resultOut_w_tzone)
     OR
     EXISTS(resultOut_w_tzone(COCType ='EOC' and ssc in ['C','R']))
@@ -224,10 +222,10 @@ EXPORT phone_noreconn_search := MACRO
     transform(Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse,
       self.dt_first_seen := iesp.ECL2ESP.t_DateToString8(left.RealTimePhone_Ext.listingCreationDate),
       self.dt_last_seen := iesp.ECL2ESP.t_DateToString8(left.RealTimePhone_Ext.listingTransactionDate),
-      self := left)), 
+      self := left)),
     -dt_last_seen,-dt_first_seen,record);
 
-  cmp_res := if(use_PVS and Call_PVS, PVS_sort) & 
+  cmp_res := if(use_PVS and Call_PVS, PVS_sort) &
     project(resultOut_w_tzone,transform(
       Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse,
       self := left, self := []));
@@ -246,7 +244,7 @@ EXPORT phone_noreconn_search := MACRO
                   (zip <> '' or (city_name <> '' and st <> '')))));
 
   without_did := cmp_res_seq(hasEnoughInfoAndNoDid(did, lname, fname, ssn, prim_range, prim_name, zip, city_name, st));
-  appendDid_ready := project(without_did, 
+  appendDid_ready := project(without_did,
     transform(DidVille.Layout_Did_OutBatch,
       self.did := 0,
       self.phone10 := left.phone,
@@ -293,7 +291,7 @@ EXPORT phone_noreconn_search := MACRO
 
   //Rollup records to keep best TNT value
   cmp_res_wtnt keepBestTNT(cmp_res_wtnt le, cmp_res_wtnt ri) := transform
-    self.tnt := 
+    self.tnt :=
       MAP(le.tnt = 'B' or ri.tnt = 'B' => 'B',
         le.tnt = 'V' or ri.tnt = 'V' => 'V',
         le.tnt = 'C' or ri.tnt = 'C' => 'C',
@@ -354,7 +352,7 @@ EXPORT phone_noreconn_search := MACRO
   Death_source_info :=
     iterate(Death_source_grp,
       transform(out_layout_info,
-        self.IsLimitedAccessDMF := 
+        self.IsLimitedAccessDMF :=
           if(counter = 1, right.dod != 0 and right.is_src_restricted, left.IsLimitedAccessDMF),
         self :=right));
 
@@ -550,18 +548,18 @@ EXPORT phone_noreconn_search := MACRO
     ds_results_ported_checkedFilteredSlimBoth,
     If (srchMod.DateFirstSeen <> 0 and srchMod.DateLastSeen = 0 and dt_filterOK,
         ds_results_ported_checkedFilteredSlimJustFirstSeen,
-        if (srchMod.DateFirstSeen = 0 and srchMod.DateLastSeen <> 0 and dt_filterOK, 
+        if (srchMod.DateFirstSeen = 0 and srchMod.DateLastSeen <> 0 and dt_filterOK,
           ds_results_ported_checkedFilteredSlimJustLastSeen,
     ds_results_ported_checked)));
 
-  ds_results_ported_checkedFilteredDate := 
+  ds_results_ported_checkedFilteredDate :=
     if (dt_filterOk, ds_results_ported_checkedFilteredDateTmp & ds_results_ported_checked_gatewayOnly,
       ds_results_ported_checkedFilteredDateTmp);
 
   // ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
 
-  resultsWithDateSort := if(UseDateSort,sort(ds_results_ported_checkedFilteredDate,-dt_last_seen,penalt, lname, fname, record),ds_results_ported_checkedFilteredDate); 
-  
+  resultsWithDateSort := if(UseDateSort,sort(ds_results_ported_checkedFilteredDate,-dt_last_seen,penalt, lname, fname, record),ds_results_ported_checkedFilteredDate);
+
     // the string 'FB'  in attr names stands for phones FeedBack (FB)
   PhonesFeedback_Services.Mac_Append_Feedback(resultsWithDateSort, did, Phone, resultsPhnFB, mod_access);
 
@@ -573,12 +571,12 @@ EXPORT phone_noreconn_search := MACRO
 
   //resort incase either phone feedback or address feedback changed the UseDateSort sort logic
   results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
-  
+
   // Suppress records without full name and address and carrier name, Royalties are calculated off of Non-suppressed results
-	// Note: Even though option name is SuppressBlankNameAddress we look for carrier_name as well 
+  // Note: Even though option name is SuppressBlankNameAddress we look for carrier_name as well
   results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))  OR carrier_name != ''))), results);
 
-	doxie.MAC_Marshall_Results_NoCount(results_suppress,marshalled_results,,disp_cnt);	
+  doxie.MAC_Marshall_Results_NoCount(results_suppress,marshalled_results,,disp_cnt);
 
   results_friendly := project(marshalled_results, transform(recordof(marshalled_results),
     self.COCDescription := [],

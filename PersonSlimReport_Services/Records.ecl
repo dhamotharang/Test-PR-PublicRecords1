@@ -1,4 +1,4 @@
-﻿IMPORT PersonSlimReport_Services, doxie, iesp, PersonReports, SmartRollup,
+IMPORT PersonSlimReport_Services, doxie, iesp, PersonReports, SmartRollup,
        ATF_Services, AutoStandardI, American_Student_Services, Suppress;
 
 EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
@@ -6,6 +6,8 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
 
   //had to use this for phones, accidents, atf sections to avoid ABSTRACT Module error...
   globalMod := AutoStandardI.GlobalModule();
+  //a workaround for HPCC-23091 (or similar);
+  m_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
 
   mod_access := PROJECT(in_mod, doxie.IDataAccess);
  //filter out minors and suppress DID(s) before attempting to fetch any data....
@@ -21,6 +23,9 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
 
  //***PHONE RECS***\\ //DATASET([],iesp.personslimreport.t_PersonSlimReportPhone);
  phone_mod := MODULE(PROJECT(globalMod,doxie.phone_noreconn_param.searchParams,OPT))
+  //if input in_mod or mod_access is used instead, this code fails when compiling the query
+  // doxie.compliance.MAC_CopyModAccessValues(in_mod);
+   doxie.compliance.MAC_CopyModAccessValues(m_access);
    EXPORT BOOLEAN IncludeFullPhonesPlus := in_mod.IncludeFullPhonesPlus;
   END;
  phones := if(in_mod.IncludePhones,
