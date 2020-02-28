@@ -46,8 +46,8 @@
 		string20	city;
 		string2	  state;
 		string3	  scf;
-		string5	  zip;
-		string4	  zip4;
+		string5	  zip_code5;
+		string4	  zip_code4;
 		string1	  mail_score;
 		string3	  area_code;
 		string10	telephone_number;
