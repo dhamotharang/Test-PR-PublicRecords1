@@ -1336,7 +1336,7 @@ export set of string invalid_segments := [
 'INCOMMING PERSON',
 'ISSUEDINERR',
 'ISTCSD',
-'ITF',		// in trust for
+//'ITF',		// in trust for
 'J CARDHOLDER',
 'JNT TNCY',
 'JOINT TENANT',

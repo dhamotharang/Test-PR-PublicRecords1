@@ -1294,6 +1294,8 @@
 				trim(kword, left, right) = 'PAISRSNF' =>SubGroup_Constants.numKeywordsID.KEYWORD_PAISRSNF,
 				trim(kword, left, right) = 'IQAML' =>SubGroup_Constants.numKeywordsID.KEYWORD_IQAML,
 				trim(kword, left, right) = 'UKTR' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKTR,
+				trim(kword, left, right) = 'PBC-AP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PBC_AP,
+				trim(kword, left, right) = 'MMACCM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MMACCM,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
