@@ -1,18 +1,13 @@
-﻿// ****************** New module description *********************
-// Create a new dx_gateway.parser_netwise attribute: 
-// to parse the netwise gateway email search <Response><Results> 
-// in the iesp.net_wise.t_NetWiseQueryResponseEx.Results child dataset format
-// and assign dids to (primary) name (First Last format) + PersonalContactInfo all addresses and all phones.
-// Then look for the did on the new (CCPA) suppression opt-out key (see existing macro for that) and when any did for 
-// a <Results> record is found, blank out that associated record from the <Results> child dataset.
-// NOTE: For netwise email search, do not have to parse/check the input request to the gateway, 
-// since it only has an email and we cannot assign a did just from an email.
-
-IMPORT $, Address, doxie, iesp;
+﻿IMPORT $, Address, doxie, iesp;
 
 EXPORT parser_netwise_email := MODULE
   
-  // Common temp record layouts used by both functions below
+  // Common temp record layouts used by the functions below
+  SHARED rec_request_wseq := RECORD
+    UNSIGNED1 request_seq; // needed for joining later
+    iesp.net_wise.t_NetWiseQueryRequest;
+  END;
+
   SHARED rec_results_wseq := RECORD
     UNSIGNED1 results_seq; // needed for joining later
     iesp.net_wise_share.t_NetWiseResult;
@@ -30,6 +25,29 @@ EXPORT parser_netwise_email := MODULE
   END;
 
 
+  // ********************************************************************************************************
+  // ********************************************************************************************************
+  EXPORT fn_parseRequest(DATASET(rec_request_wseq) ds_in_request) := FUNCTION
+
+    ds_out_request := PROJECT(ds_in_request,
+      TRANSFORM($.Layouts.common_optout,
+        SELF.seq            := LEFT.request_seq; 
+        SELF.did            := (UNSIGNED6) LEFT.SearchBy.UniqueId; // use ESP passed in LexID, even though the gateway does not accept LexID
+        SELF.global_sid     := $.Constants.Netwise.GLOBAL_SID_EMAIL;
+        SELF.transaction_id := LEFT.GatewayParams.TxnTransactionId;
+        // other fields on common_optout layout don't matter so they can be nulled out
+        SELF := []
+        ));
+ 
+    //OUTPUT(ds_in_request,  named('ds_in_request'));
+    //OUTPUT(ds_out_request, named('ds_out_request')); 
+
+    RETURN ds_out_request;
+  END;
+
+
+  // ********************************************************************************************************
+  // ********************************************************************************************************
   EXPORT fn_parseResponse(DATASET(rec_response_wseq) ds_in_response) := FUNCTION
 
     // First normalize all <Results> child dataset records on every <response> record using 
@@ -146,6 +164,40 @@ EXPORT parser_netwise_email := MODULE
     //OUTPUT(ds_parse_results_out,      named('ds_parse_results_out')); 
 
     RETURN ds_parse_results_out;
+  END;
+
+
+  // ********************************************************************************************************
+  // ********************************************************************************************************
+  EXPORT fn_CleanRequest(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_request_in, 
+                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+    // Add a sequence# to each request dataset record to be used for joining on later.
+    rec_request_wseq tf_add_req_seq(iesp.net_wise.t_NetWiseQueryRequest L, INTEGER C) := TRANSFORM
+      SELF.request_seq := C;
+      SELF             := L;
+    END;
+
+    ds_req_in_wseq := PROJECT(ds_request_in, tf_add_req_seq(LEFT,COUNTER));
+
+    ds_req_parsed := fn_parseRequest(ds_req_in_wseq);
+
+    dx_gateway.mac_flag_optout(ds_req_parsed, ds_req_did_optout, mod_access);
+
+    ds_req_clean := JOIN(ds_req_in_wseq, ds_req_did_optout(~is_suppressed), 
+                           LEFT.request_seq = RIGHT.seq,
+                         TRANSFORM(iesp.net_wise.t_NetWiseQueryRequest,
+                           SELF := LEFT),
+                         KEEP(1), LIMIT(0));
+
+    //OUTPUT(ds_request_in,           named('ds_request_in'));
+    //OUTPUT(ds_req_in_wseq,          named('ds_req_in_wseq'));
+    //OUTPUT(ds_req_parsed,           named('ds_req_parsed'));
+    //OUTPUT(ds_req_did_optout,       named('ds_req_did_optout'));
+    //OUTPUT(ds_req_clean,            named('ds_req_clean'));
+
+    RETURN ds_req_clean;
+
   END;
 
 
