@@ -802,14 +802,15 @@ Export CIID := RECORD
  END;
 
  EXPORT CoverageDates := RECORD
-    unsigned6   gc_id;
+    unsigned6 customer_id;
     string2		customer_state;
-    unsigned6   ind_type;
-    string100   fdn_file_code;
-    string100	clean_source := '';
-    unsigned4	reported_date := 0;
-    unsigned4	process_date := 0;
-    unsigned4	row_count := 1;				
+    string1   customer_program;
+    string100 contribution_code;
+    string100	source := '';
+    string100	source_group := '';
+    unsigned4	max_reported_date := 0;
+    unsigned4	max_process_date := 0;
+    unsigned4	record_count := 1;				
   END;
  
  
