@@ -1296,6 +1296,9 @@
 				trim(kword, left, right) = 'UKTR' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKTR,
 				trim(kword, left, right) = 'PBC-AP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PBC_AP,
 				trim(kword, left, right) = 'MMACCM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MMACCM,
+				trim(kword, left, right) = 'EU-TUR' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_TUR,
+				trim(kword, left, right) = 'AOCMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_AOCMC,
+				trim(kword, left, right) = 'AOBNA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AOBNA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
