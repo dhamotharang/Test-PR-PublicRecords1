@@ -14,7 +14,6 @@ export BWR(string new_input_folder = '20200220', boolean pUseProd = true) := fun
                                 output('debug no orbit')
                                 );
         return sequential(
-                        UpdateDops,
                         crim_offense_cat.checksuperfiles(basein),
                         if( isSameAsLast,
                                 output(newName + ' already in superfile, skipping input version control'),
@@ -29,6 +28,7 @@ export BWR(string new_input_folder = '20200220', boolean pUseProd = true) := fun
                                 ),
                         crim_offense_cat.Mac_build_all(new_input_folder, pUseProd), //runs key process once input is sprayed and version controlled,
                         std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).processedIn, newName),
+                        UpdateDops,
                         UpdateOrbit
                         );
 end;
