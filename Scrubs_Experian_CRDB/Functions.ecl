@@ -70,18 +70,6 @@ EXPORT Functions := MODULE
     RETURN IF(LENGTH(TRIM(Busname, ALL)) > 0, 1, 0);
   END;
   
-  //****************************************************************************
-  //fn_clean_dba_name: returns true if dba_name is populated then clean value should be
-  //****************************************************************************
-   EXPORT fn_clean_dba_name(STRING clean_dba_name,STRING dba_name) := FUNCTION
-       RETURN IF
-	   	(	
-			TRIM(clean_dba_name,whitespace) = TRIM(STD.STR.ToUpperCase(dba_name),whitespace),
-			1,
-			0
-		);
-   END;
-  
    //****************************************************************************
    //fn_bName_pName: returns true either valid company_name or valid people names available in the data 
   //****************************************************************************
