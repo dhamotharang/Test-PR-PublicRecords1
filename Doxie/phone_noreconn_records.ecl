@@ -1,8 +1,7 @@
-﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, targus, ut, Gateway, Census_data, std, doxie;
+import doxie_raw, gong_services, phonesPlus_Services, Suppress, targus, ut, Gateway, Census_data, std, doxie;
 
-EXPORT phone_noreconn_records($.phone_noreconn_param.searchParams inMod) := module
-
-EXPORT val (dataset(doxie.layout_references) dids,
+EXPORT phone_noreconn_records($.phone_noreconn_param.searchParams inMod,
+            dataset(doxie.layout_references) dids,
             dataset(gateway.Layouts.Config)gateways = dataset([],gateway.Layouts.Config)):= FUNCTION
 
 #stored('ZipRadius', 15);
@@ -12,12 +11,7 @@ targus_cfg := gateways(Gateway.Configuration.isTargus(servicename))[1];
 //Address HRIs option
 unsigned1 maxHriPer_value := 10;
 
-mod_access  := module(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-  export unsigned1 dppa := inMod.DPPAPurpose;
-  export unsigned1 glb := inMod.GLBPurpose;
-  export string5 industry_class := inMod.IndustryClass;
-  export string32 application_type := inMod.ApplicationType;          
-end;
+mod_access  := project(inmod, Doxie.IDataAccess);
 
 //adding targus and qsent options
 boolean use_tg  := doxie.compliance.use_targus(mod_access.DataPermissionMask);
@@ -64,7 +58,7 @@ h0 := h0_tf(((phoneOnlySearch or phoneStSearch) AND PhoneSize=7 AND inMod.Phone=
 h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
   inMod.Phone, inMod.FirstName, inMod.MiddleName, inMod.LastName,
   inMod.PrimRange, inMod.PreDir, inMod.PrimName, inMod.Suffix,
-  inMod.PostDir, '', inMod.SecRange, inMod.City, inMod.State, inMod.Zip, '', 
+  inMod.PostDir, '', inMod.SecRange, inMod.City, inMod.State, inMod.Zip, '',
   mod_access, score_threshold_value, targus_cfg, inMod.CompanyName)
   (phone<>'',penalt<score_threshold_value));
 
@@ -260,5 +254,4 @@ doxie.compliance.logSoldToSources(h_qsent, mod_access);
 
 RETURN resultOut_w_tzone;
 
-END;
 END;
