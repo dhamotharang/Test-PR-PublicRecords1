@@ -1,4 +1,4 @@
-﻿IMPORT ut, Scrubs, Codes, _validate, STD;
+﻿IMPORT ut, Scrubs, Codes, _validate;
 
 EXPORT Functions := MODULE
 
