@@ -223,9 +223,6 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	export records := if(isCanada,can_records,us_records);
 
 	export rolled_records := mod_Rollup(search_inputs).roll(records, inputmod.MaxResults);
-  
- BOOLEAN doHighlight := search_options.highlight;
-	export highlighted_records := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records), rolled_records);
 
 	MaxNumPhoneSubjectPre := (integer)search_options.MaxNumPhoneSubject;
 	TrueMaxNumPhoneSubject := map(MaxNumPhoneSubjectPre > 3 => 3, // max is 3
@@ -239,12 +236,12 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	end;
 
 	// Choose top 5 DIDs
-	temp_rec := recordof(highlighted_records);
+	temp_rec := recordof(rolled_records);
 
 	temp_rec xrollup(temp_rec l , temp_rec r) := transform
    self := if(l.score > r.score, l, r );
 	end;
-	QualifyingRecords := highlighted_records(score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and
+	QualifyingRecords := rolled_records(score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and
                                       EntityType = UPS_Services.Constants.TAG_ENTITY_IND);
 	RollupAndTopScoreUp := sort(rollup(QualifyingRecords,left.UniqueID = right.UniqueID,
                               xrollup(left,right) ),-score);
@@ -257,23 +254,33 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 
 	wfpRecords := if( doWaterfallPhones, UPS_Services.fn_WaterfallPhonesLookup(topDids,PSearchMod));
 
-	highlighted_records_with_phones := if(doWaterfallPhones,
-                                    join(highlighted_records,wfpRecords,
+	rolled_records_with_phones := if(doWaterfallPhones,
+                                    join(rolled_records,wfpRecords,
                                          ~isCanada and left.EntityType = UPS_Services.Constants.TAG_ENTITY_IND and
                                          left.score  >  UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and
                                          left.UniqueID = (string)right.DID,
-                                           transform(recordof(highlighted_records),
+                                           transform(recordof(rolled_records),
                                              firstAddress           := left.Addresses[1];
-                                             phones_pre := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo, 
+                                             phones := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo,
                                                                            self.phone10 := left.phone10, self := [])) +
                                                                            firstAddress.phones;
-                                             phones                 := dedup(sort(phones_pre,phone10),phone10);
-					                                        firstAddressWithPhones := project(firstAddress,transform(iesp.rightaddress.t_RAAddressWithPhones, 
+					                                        firstAddressWithPhones := project(firstAddress,transform(iesp.rightaddress.t_RAAddressWithPhones,
                                                                            self.phones := phones, self := left ));
 
                                              self.addresses         := firstAddressWithPhones + choosen(Left.Addresses,all,2),
                                              self := left), left outer,limit(0),keep(1)),
-                                 highlighted_records);
+                                 rolled_records);
+
+ rolled_records_with_phones_dedup := PROJECT(rolled_records_with_phones,
+                                       TRANSFORM(recordof(rolled_records_with_phones),
+                                         SELF.Addresses := PROJECT(LEFT.Addresses, TRANSFORM(iesp.rightaddress.t_RAAddressWithPhones,
+                                                             SELF.Phones := DEDUP(SORT(LEFT.Phones, phone10), phone10),
+                                                             SELF := LEFT));,
+                                         self := LEFT
+                                       ));
+
+  BOOLEAN doHighlight := search_options.highlight;
+  export highlighted_records_with_phones := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records_with_phones_dedup), rolled_records_with_phones_dedup);
 
 	//**** START TEMP DEMO CODE FOR CUSTOMER REVIEW
 	//**** This is temp because, if they want this behavior, we need to do the filtering much earlier.
