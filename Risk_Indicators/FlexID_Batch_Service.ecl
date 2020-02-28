@@ -131,7 +131,7 @@
 </pre>
 */
 
-import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
+import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5, Royalty;
 
 export FlexID_Batch_Service := MACRO
 
@@ -721,10 +721,8 @@ clam :=  risk_indicators.Boca_Shell_Function(	ret,
                                                             BatchUID := BatchUID, 
                                                             GlobalCompanyID := GlobalCompanyID);
 															
-															
-
-ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
-ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose);
+ip_prep := JOIN(ret, fs, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := right.ip_addr, self.seq := right.seq, self.did := left.did ) );
+ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose, applyOptOut := TRUE);
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
