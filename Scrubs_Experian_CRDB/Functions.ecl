@@ -104,10 +104,16 @@ EXPORT Functions := MODULE
 	//****************************************************************************
 	//fn_numeric: returns true if only populated with numbers !
 	//****************************************************************************
-		EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
+	EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
 
-		RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
-		Stringlib.StringFilterOut(nmbr, '0123456789') = '' and (integer)nmbr<>0, 1, 0);
+		RETURN IF(
+			//IF(size = 0, 
+				//LENGTH(TRIM(nmbr, ALL)) > 0, 
+			(LENGTH(TRIM(nmbr, ALL)) = size OR LENGTH(TRIM(nmbr, ALL)) = 0)
+			AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',
+			//and (integer)nmbr<>0, 
+			1, 
+			0);
 
 	END;
 
