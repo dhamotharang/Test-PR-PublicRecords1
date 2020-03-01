@@ -1860,7 +1860,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/212 Syria List','1847'},
 {'EC 2020/189 Democratic Republic of the Congo List','1848'},
 {'EC 2020/211 Syria List','1849'},
-{'EC 2020/218 ISIL (Da\'esh) and Al-Qaida List,','1850'},
+{'EC 2020/218 ISIL (Da\'esh) and Al-Qaida List','1850'},
 {'EC 2020/219 Zimbabwe List','1851'}
 ],r);
 
