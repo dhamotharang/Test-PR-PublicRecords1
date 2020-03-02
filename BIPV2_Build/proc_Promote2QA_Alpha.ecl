@@ -5,7 +5,7 @@ EXPORT proc_Promote2QA_Alpha(
   ,pcluster         = '\'hthor_prod_eclcc\''
   ,pEmailList       = 'BIPV2_Build.mod_email.emailList'     // -- for testing, make sure to put in your email address to receive the emails
   ,pCompileTest     = 'false'
-  ,pdoParallel      = 'false'
+  ,pdoParallel      = 'true'
   ,pLESP            = '\'alpha_prod_thor_esp.risk.regn.net\''
 ) :=
 functionmacro
