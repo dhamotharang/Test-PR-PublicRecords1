@@ -51,7 +51,7 @@ export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bn
 // export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20160520';
 // export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20161206';
 // export PRIO_Scores_Chase_PIO2_infile := '~	scoring_project::in::prio_xml_chase_pi02_20180507';
-export PRIO_Scores_Chase_PIO2_infile := '~	scoring_project::in::prio_xml_chase_pi02_20191029';
+export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20191029';
 
 // export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20141216';
 // export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20160525';//
