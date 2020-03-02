@@ -159,7 +159,7 @@ output(jPEP,named('PoliticallyExposedPersons_InRaw_notbase'));
 	
 	
 		jWBIF:= join(WBIFRaw,WBIFBase,
-						      trim(ClnRawName(left.orig_firm_name))[1..20] = trim(right.orig_pty_name)[1..20],
+						      regexreplace('[^ -~]', ClnRawName(left.orig_firm_name),'')[1..20] = trim(right.orig_pty_name)[1..20],
 									left only);
 						 
 // output(count(WBIFRaw()),named('Cnt_World_Bank_Ineligible_Firmsraw')); 
