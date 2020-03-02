@@ -16,35 +16,50 @@ Shared g_keysizedhistory_rec := Group(s_keysizedhistory_rec, datasetname, superk
 Shared f_keysizedhistory_rec := g_keysizedhistory_rec( Not whenlive = '');
 
 
+previousRec := Record
+    f_keysizedhistory_rec.recordcount;
+    f_keysizedhistory_rec.datasetname;
+    f_keysizedhistory_rec.build_version;
+    f_keysizedhistory_rec.whenlive;
+    f_keysizedhistory_rec.superkey;
+    Integer8 deltas := [];
+End;
+
+Export t_previousRec := Project( f_keysizedhistory_rec, previousRec );
+
+newRec := Record
+    f_keysizedhistory_rec.recordcount;
+    f_keysizedhistory_rec.datasetname;
+    f_keysizedhistory_rec.build_version;
+    f_keysizedhistory_rec.whenlive;
+    f_keysizedhistory_rec.superkey;
+    Integer8 deltas := []; 
+End;
+Export t_newRec := Project( f_keysizedhistory_rec, newRec );
+
 // Out record set layout
 OutRec := Record
+Integer8   recordcount;
 String25   datasetname;  
 Unsigned8  build_version;
 Qstring25  whenlive;
-String1    clusterflag;
-String1    updateflag;
 Qstring60  superkey;
-String10   templatelogicalkey;
-Unsigned8  size;
-Integer8   recordcount;
 Integer8   deltas;
 End;
 
 // Transform
-OutRec CountDeltas( f_keysizedhistory_rec Le, f_keysizedhistory_rec Ri ) := Transform
+OutRec CountDeltas( t_previousRec Le, t_newRec Ri ) := Transform
+    Self.recordcount   := Le.recordcount;
     Self.datasetname   := Le.datasetname;
     Self.build_version := Le.build_version;
     Self.whenlive      := Le.whenlive;
-    Self.clusterflag   := Le.clusterflag;
-    Self.updateflag    := Le.updateflag;
     Self.superkey      := Le.superkey;
-    Self.templatelogicalkey := Le.templatelogicalkey;
-    Self.size          := Le.size;
-    Self.recordcount   := Le.recordcount;
-    Self.deltas        := Le.recordcount + Ri.recordcount;
+    Self.deltas        := if( Le.datasetname = Ri.datasetname AND 
+                              Le.build_version != Ri.build_version, // Break
+                              Ri.recordcount - Le.recordcount, Le.recordcount );
 End;
 
-// project
-Export deltas_calculated := Project(f_keysizedhistory_rec, CountDeltas(Left, Right));
+// Iterate
+Export Main := Iterate(t_previousRec, CountDeltas(Left, Right));
 
 End;

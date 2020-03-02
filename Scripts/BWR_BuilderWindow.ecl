@@ -69,9 +69,23 @@ kyedsizedhistory := $.History_Analysis.Keysizedhistory_report;
 master_build := $.History_Analysis.Master_Build_Frequence_Report;
 orbit_build := $.History_Analysis.Orbit_buildinstance;
 
-Output(kyedsizedhistory, Named('Keyedsized_History_Report'));
-Output(master_build, Named('Master_Build_Frequency_Report'));
-Output(orbit_build, Named('Orbit_Build_Instance_Report'));
+//Output(kyedsizedhistory, Named('Keyedsized_History_Report'));
+// Output(master_build, Named('Master_Build_Frequency_Report'));
+// Output(orbit_build, Named('Orbit_Build_Instance_Report'));
 
 
 //$.History_Analysis.Master_Build_Frequence_Report(regexfind('EYS', package));
+
+
+
+// ========================================== Counted Deltas ======================================
+
+//Output($.Counted_Deltas.deltas_calculated, Named('Calculated_Deltas'));
+
+//Output($.Counted_Deltas.deltas_calculated);
+
+// Output($.Counted_Deltas.g_keysizedhistory_rec, Named('Grouped_Sorted_Record'));
+// Output($.Counted_Deltas.st_previousRec, Named('Sliced_Sorted_Record'));
+Output($.Counted_Deltas.deltas_calculated, Named('Calculated_Deltas'));
+//Output($.Counted_Deltas.st_previousRec, Named('Previous'));
+//Output($.Counted_Deltas.t_newRec, Named('New_Record'));
