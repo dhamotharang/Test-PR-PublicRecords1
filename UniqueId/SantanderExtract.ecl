@@ -77,9 +77,9 @@ records := SORT(
 							WatchListName, few),							
 							WatchListName);
 
-ip := _Control.IPAddress.bctlpedata12;
+ip := _Control.IPAddress.bctlpedata10;
 
-path := '/data/projects/uniqueid/santander/report/';
+path := '/data/hds_3/uniqueid/santander/';
 
 UnsprayReport(string lfn) := 		STD.file.Despray(
 					'~thor::uniqueid::santander::' + lfn,
