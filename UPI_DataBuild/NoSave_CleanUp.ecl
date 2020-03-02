@@ -20,7 +20,7 @@ EXPORT NoSave_CleanUp := MODULE
 	export write_log 						:= FALSE; 						//SHOULD BE TRUE WHEN WE GO LIVE!!
 	export execute_deletes 			:= FALSE;	//SHOULD BE TRUE WHEN WE GO LIVE!!
 	export URL_details 					:= 'http://' + wk_ut._constants.LocalEsp + ':8010/?Wuid=' + Workunit + '&Sequence=0&Widget=ResultsWidget';
-	export string asOfDate			:= (string)std.date.today();
+	
 	
 	export get_part(string lfn, integer2 starting_delim, integer2 known_length = 0) := FUNCTION
 
@@ -81,7 +81,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  std.Date.ConvertDateFormat(left.modified[1..10]), 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -119,7 +119,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -157,7 +157,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -195,7 +195,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -211,7 +211,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.version 	:= map(left.superfile => '', 
 																			 get_type(left.name) = 'FROM_BATCH' => get_version_from_batch(left.name),
 																			 get_version(left.name))
-								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name 						 := '~'+left.name
 								,self									 := left));
@@ -247,7 +247,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.version 	:= map(left.superfile => '', 
 																			 get_type(left.name) = 'FROM_BATCH' => get_version_from_batch(left.name),
 																			 get_version(left.name))
-								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name 						 := '~'+left.name
 								,self									 := left));
@@ -282,7 +282,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.type := get_type(left.name)			
 								,self.gcid := get_gcid(left.name)
 								,self.version 	:= if(left.superfile, '', get_version(left.name))
-								,self.days_old 	:= if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate,-1, 1)); 
+								,self.days_old 	:= if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -299,7 +299,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.gcid := get_gcid(left.name)
 								,self.version 	:= if(left.superfile, '', get_version(left.name))
 								// ,self.days_old := if(left.superfile, 0, ut.DaysApart(self.version, asOfDate) * if(self.version > asOfDate, -1, 1)); 
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, -1, 1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate,  1, -1)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
