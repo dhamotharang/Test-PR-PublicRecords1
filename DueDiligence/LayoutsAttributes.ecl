@@ -105,6 +105,11 @@
     //BusSales
     INTEGER sales;                                                  //populated in DueDiligence.getBusSales
     STRING4 salesYearReported;                                      //populated in DueDiligence.getBusSales
+    //BusCivilLegalEvent
+    UNSIGNED3 liensUnreleasedCntInThePastNYR;
+    UNSIGNED3 evictionsCntInThePastNYR;
+    UNSIGNED3 liensUnreleasedCntOVNYR;
+    UNSIGNED3 evictionsCntOVNYR;
   END;
   
   

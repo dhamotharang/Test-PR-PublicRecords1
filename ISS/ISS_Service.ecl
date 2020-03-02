@@ -114,7 +114,7 @@ ISSServiceRequest XML:
 
 export ISS_Service := MACRO
 
-	import risk_indicators, ut, iesp,std, address, seed_files, models, dma, doxie, riskwise, gateway, OFAC_XG5;
+	import risk_indicators, ut, iesp,std, address, models, dma, doxie, riskwise, gateway, OFAC_XG5;
 
 	// Get XML input 
 	ds_in    	:= dataset([], iesp.issservice.t_InsuranceScoringServiceRequest)  	: stored('InsuranceScoringServiceRequest', few);
@@ -224,7 +224,7 @@ export ISS_Service := MACRO
 		    + intformat((integer1)l.searchby.dob.day,   2, 1);
 		self.dob := if((unsigned)dob=0, '', dob);
 		self.age := if (l.searchby.age = 0 and (integer)dob != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														if(l.searchby.age=0, '', (STRING3)l.searchby.age));	
 		fullname := trim(l.searchby.name.full);
 		cleanname := address.CleanPerson73( fullname );
@@ -477,8 +477,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 
 
 	// get the IP data from netacuity outside the getFDattributes()
-	ip_prepped := project( iid_prep, transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := left.ip_address ) );
-	ip_gateway_response := risk_indicators.getNetAcuity( ip_prepped, gateways, DPPA, GLBA );
+	ip_prepped := JOIN( iid_prep, iid, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := left.ip_address, self.did := right.did) );
+	ip_gateway_response := risk_indicators.getNetAcuity( ip_prepped, gateways, DPPA, GLBA, applyOptOut := true);
 	
 	// Get Fraud Attributes
 	fraudAttr := Models.getFDAttributes(finalClam, iid, '', ip_gateway_response);

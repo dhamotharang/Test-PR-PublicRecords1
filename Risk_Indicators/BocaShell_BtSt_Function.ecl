@@ -71,11 +71,12 @@ wScores := join(outf3, sc, left.bill_to_out.seq=right.seq, add_scores(left, righ
 riskwise.Layout_IPAI prep_ips(iid_btst le) := transform
 	self.seq := le.bill_to_output.seq;
 	self.ipaddr := le.Bill_to_output.ip_address;
+	self.did := le.Bill_to_output.did;
 end;
 
 preNetAcuity := ungroup(project(iid_btst, prep_ips(left)));
 
-ips := if(ipid_only, dataset([], riskwise.Layout_IP2O),risk_indicators.getNetAcuity(preNetAcuity, gateways, dppa, glb, NetAcuity_v4));
+ips := if(ipid_only, dataset([], riskwise.Layout_IP2O),risk_indicators.getNetAcuity(preNetAcuity, gateways, dppa, glb, NetAcuity_v4, applyOptOut := TRUE));
 
 risk_indicators.layout_bocashell_btst_out add_ips(wScores le, ips rt) := transform
 	self.ip2o := rt;

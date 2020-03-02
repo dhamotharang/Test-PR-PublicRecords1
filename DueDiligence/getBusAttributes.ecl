@@ -78,7 +78,8 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     //get attribute data for individuals related to the inquired business
     busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport, mod_access);
 
-    busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport, mod_access); 
+    busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, mod_access); 
+    
 
 
     //get attribute data for the inquired business
@@ -95,9 +96,13 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     busGeoRisk := DueDiligence.getBusGeographicRisk(busReg);   
 
     busSales := DueDiligence.getBusSales(busGeoRisk, options, linkingOptions, mod_access);
+    
+    busCivilEvents := DueDiligence.getBusCivilEvent(busSales, options, mod_access);
+    
+    
 
     //attributes taking in inquired and linked businesses
-    busHeader := DueDiligence.getBusHeader(busSales, options, linkingOptions, includeAllBusinessData, includeReport, mod_access);
+    busHeader := DueDiligence.getBusHeader(busCivilEvents, options, linkingOptions, includeAllBusinessData, includeReport, mod_access);
 
     busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReport);
 
@@ -144,6 +149,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
     IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
     IF(debugMode, OUTPUT(busSales, NAMED('busSales')));
+    IF(debugMode, OUTPUT(busCivilEvents, NAMED('busCivilEvents')));
 
     IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
     IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));

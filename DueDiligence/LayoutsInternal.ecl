@@ -295,88 +295,26 @@ EXPORT LayoutsInternal := MODULE
   EXPORT SharedSlimLiens := RECORD
     InternalSeqAndIdentifiersLayout; 
     UNSIGNED4 historyDate;
-    STRING50 rmsid;
-    STRING50 tmsid;
+    DueDiligence.Layouts.LiensJudgementsEvictionDetails;
     UNSIGNED4 global_sid;
     UNSIGNED4 dateFirstSeen;
     UNSIGNED4 dateLastSeen;
-    STRING20 filingNumber;
-    STRING20 filingJurisdiction;
-    STRING50 filingTypeDesc;
-    STRING30 filingStatus;
-    STRING75 agency;
-    STRING2 agencyState;
-    STRING25 agencyCounty;
-    STRING11 amount;
-    UNSIGNED4 releaseDate;
-    STRING1 eviction;
-    UNSIGNED4 origFilingDate;
+    STRING30 filingStatus;    
     UNSIGNED4 lapseDate;
-    STRING lienTypeCategory;
-    STRING judgmentCategory;
-    STRING filingStatusCategory;
-    UNSIGNED totalEvictions;
     UNSIGNED totalEvictionsOver3Yrs;
     UNSIGNED totalEvictionsPast3Yrs;
-    UNSIGNED totalUnreleasedLiens;
     UNSIGNED totalUnreleasedLiensOver3Yrs;
     UNSIGNED totalUnreleasedLiensPast3Yrs; 
-    UNSIGNED totalReleasedLiens;
+    
+    //additional for report
+    STRING1 nameType;
+    DueDiligence.Layouts.Name;
+    UNSIGNED6 partyLexID;    
+    STRING9 taxID;
+    STRING120 streetAddress1;
+    DueDiligence.Layouts.AddressSlimDetail;
+    STRING countyName;
   END;
-
-
-  //------                                      ------
-  //------      COMMON SECTION                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT common_layout_liens_judgments := RECORD
-    STRING50 tmsid;
-    UNSIGNED4	HistoryDate;
-    UNSIGNED4 DateToUse; 
-    UNSIGNED3 NumOfDaysAgo; 
-    STRING20 filing_number;                      //***all these fields are from:  liensV2.key_liens_main_ID
-    STRING20 filing_jurisdiction;             
-    STRING8  date_first_seen;
-    STRING8  date_last_seen;
-    STRING1  eviction;
-    STRING8  orig_filing_date;
-    STRING50 filing_type_desc;
-    STRING11 amount;
-    STRING8  release_date;
-    STRING8  lapse_date;
-    STRING30 filing_status;
-    STRING75 agency;
-    STRING2  agency_state;
-    STRING25 agency_county; 
-  END;
-
-
-  EXPORT plus_category_liens_judgments := RECORD
-    STRING  lien_type_category;
-    STRING  judgment_type_category;
-    STRING  filing_status_category;
-  END;
-
-  //------                                      ------
-  //------      For Businesses                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT layout_liens_judgments := RECORD
-    InternalSeqAndIdentifiersLayout;
-    common_layout_liens_judgments;   
-  END;
-
-  //------                                      ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-  EXPORT 	layout_liens_judgments_categorized := RECORD
-    layout_liens_judgments;
-    plus_category_liens_judgments;
-  END;
-
-
 
 
   EXPORT CriminalOffenses := RECORD
