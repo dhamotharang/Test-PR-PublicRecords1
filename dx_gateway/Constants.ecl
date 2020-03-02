@@ -21,9 +21,13 @@
   EXPORT QSent := MODULE
     EXPORT GLOBAL_SID := 28421;
   END;
-	
+
   EXPORT NetAcuity := MODULE
     EXPORT GLOBAL_SID := 28481;
   END;
-	
+
+  EXPORT CaAvmReport := MODULE
+    EXPORT GLOBAL_SID := 28471; // hard-coded here, but coming from Orbit.
+  END;
+
 END;
