@@ -112,7 +112,8 @@ EXPORT BocaShell_54_nonFCRA_cert_MACRO( bs_version, nonfcraroxie_IP,neutralroxie
 			//final file out to thor
 			// final_output := OUTPUT (ds_soap_output_pjt, , out_name_head , thor,cluster('thor50_dev'),compressed, overwrite,expire(60));
 			 OUTPUT (ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite);
-OUTPUT(ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
+//03/02/2020 -commented OUTPUT below			 
+      // OUTPUT(ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
 
 			return 0;
 

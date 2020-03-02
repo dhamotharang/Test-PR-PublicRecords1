@@ -96,7 +96,8 @@
 
       //final file out to thor
 			OUTPUT (ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite,expire(30));
-			OUTPUT (ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
+//03/02/2020 -commented OUTPUT below		
+		// OUTPUT (ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
 
 			return 0;
 
