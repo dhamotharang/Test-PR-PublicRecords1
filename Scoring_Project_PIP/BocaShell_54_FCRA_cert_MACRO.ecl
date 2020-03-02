@@ -109,7 +109,7 @@
 			
 output(ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite);
 
-//03/02/2020
+//03/02/2020 -commented OUTPUT below
 //OUTPUT(ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
 	
 return 0;	
