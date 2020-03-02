@@ -679,6 +679,7 @@ END;
 	rel_withinother_count            := le.clam.relatives.relative_withinother_count;
 	historical_count                 := le.clam.vehicles.historical_count;
 
+business_only_check := if(le.clam.did = 0 and le.clam.Shell_Input.fname = '' and le.clam.Shell_Input.mname = '' and le.clam.Shell_Input.lname = '', true, false);
 
 //***Begining of the SAS code that was converted to ECL ****//
 
@@ -7120,7 +7121,7 @@ bbfm1906_1_0 :=   __common__( map(
                      // SELF.clam                            := ri;  
                      // self.Busshell                        = le ;
                      
-                    reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons)[1].hris;
+                    reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
                     self.bbfm_wc1                         := reasonCodes[1].hri;//bbfm_wc
                     self.bbfm_wc2                         := reasonCodes[2].hri;
                     self.bbfm_wc3                         := reasonCodes[3].hri;
@@ -7128,7 +7129,7 @@ bbfm1906_1_0 :=   __common__( map(
   
   #else
      
-     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons)[1].hris;
+     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
   
   
   	 SELF.ri := PROJECT(reasonCodes, TRANSFORM(Risk_Indicators.Layout_Desc,
