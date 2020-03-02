@@ -2,6 +2,10 @@
 /*
 IMPORTANT: unwanted calls to both gateways were made without the double condition before the SOAPCALL.
 DO NOT REMOVE!!!
+
+ALSO IMPORTANT: QSent GW data is subject to CCPA suppression, which is not done here.
+ If you are adding a call to this attribute, search for RealTimePhones_Raw() for reference on how to 
+ apply suppressions.
 */
 import AutoStandardI, BatchServices, PhonesPlus, ut, Phones, Gateway;
 
