@@ -318,6 +318,7 @@
 																		self.SancCategory := right.Cat;
 																		self.SancLegacyType := map(left.LicenseStatus='T' and left.sanc1_code = '112DS' => right.LegacyType,
 																															 left.sanc1_code = '112DS' => 'HISTORICAL CONDITIONS',
+																															 left.SancLegacyType<>''=>left.SancLegacyType,
 																															 right.LegacyType);
 																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);
 																		self.SancLevel := if(RIGHT.level='STATE','',RIGHT.level);
@@ -333,7 +334,6 @@
 																		self:=left;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0), left outer);
-
 			return rawdatalookup4;
 	end;
 
@@ -482,7 +482,9 @@
 			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
 			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-       return facilities_rolled;
+  		return facilities_rolled;
+			      
+			
 			
 	end;
 

@@ -1,4 +1,4 @@
-IMPORT $, Data_Services, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, EmailService;
+IMPORT $, Address_Rank, Codes, Data_Services, DidVille, doxie, dx_BestRecords, EmailService, Royalty, Suppress;
 
 EXPORT Functions := MODULE
 
@@ -168,11 +168,50 @@ EXPORT Functions := MODULE
     perm_type := dx_BestRecords.Functions.get_perm_type_idata(PROJECT(in_mod,doxie.IDataAccess),
                        useMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase));
 
-    email_with_best_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
+    email_with_watchdog_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
                                     TRANSFORM($.Layouts.email_final_rec,
                                               SELF.bestinfo := LEFT._best,
                                               SELF:=LEFT,
                                               SELF:=[]));
+
+    // for best address we will use address ranking - req. EMAIL-205
+    addr_rank_in := PROJECT(email_with_watchdog_recs,
+                           TRANSFORM(Address_Rank.Layouts.Batch_in,
+                                     SELF.acctno := (STRING) COUNTER,
+                                     SELF.did    := LEFT.did,
+                                     SELF := []));
+    mod_addr_rank := MODULE(PROJECT(in_mod, Address_Rank.IParams.BatchParams, OPT))
+                            EXPORT BOOLEAN   IncludeShortTermRental := FALSE;
+                            EXPORT BOOLEAN   IncludeSTRSplitFlag    := FALSE;
+                            EXPORT UNSIGNED1 MaxRecordsToReturn		  := 1;
+                            EXPORT BOOLEAN   getDids                := FALSE;
+                     END;
+
+    //get all addresses from header
+    all_hdr_recs 	:= Address_Rank.Functions.fn_getHdrAddrRecs(addr_rank_in, mod_addr_rank);
+
+    //get address history from Address Rank Key and determine best address
+    addr_ranked_recs	:= Address_Rank.fn_getAddressHistory(all_hdr_recs, mod_addr_rank.MaxRecordsToReturn);
+
+    // adding best address to the results
+    email_with_best_recs :=
+      JOIN(email_with_watchdog_recs, addr_ranked_recs,
+           LEFT.did = RIGHT.did,
+           TRANSFORM($.Layouts.email_final_rec,
+                    SELF.bestinfo.prim_range := RIGHT.prim_range,
+                    SELF.bestinfo.predir := RIGHT.predir,
+                    SELF.bestinfo.prim_name := RIGHT.prim_name,
+                    SELF.bestinfo.postdir := RIGHT.postdir,
+                    SELF.bestinfo.suffix := RIGHT.suffix,
+                    SELF.bestinfo.unit_desig := RIGHT.unit_desig,
+                    SELF.bestinfo.sec_range := RIGHT.sec_range,
+                    SELF.bestinfo.zip := RIGHT.z5,
+                    SELF.bestinfo.zip4 := RIGHT.zip4,
+                    SELF.bestinfo.st := RIGHT.st,
+                    SELF.bestinfo.city_name := RIGHT.p_city_name,
+                    SELF := LEFT
+                  ),
+           LEFT OUTER, KEEP(1), LIMIT(0));
 
     Suppress.MAC_Suppress(email_with_best_recs,email_with_best_ready,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,bestinfo.ssn);
 

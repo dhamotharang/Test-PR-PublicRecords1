@@ -1,6 +1,5 @@
 ﻿import LocationID;
 import LocationId_xLink;
-import SALT37;
 
 /**
 	inputDs  - Address Fields - with a uniqueID for each record
@@ -13,7 +12,7 @@ export IdAppendRoxie(dataset(LocationID.IdAppendLayouts.AppendInput) inputDs
 				,integer minWeight   = 19
 				,boolean debug       = false) := function	
 				 
-     SALTInput := project(inputDs,
+     SALTInput := project(inputDs(prim_name<>''),  // don't bother sending transactions into linking which don't have the address empty
                           transform(LocationId_xLink.Process_LocationID_Layouts.InputLayout,                               
                                    POBoxIndex               := left.prim_name[1..6]='PO BOX';
                                    RRIndex                  := left.prim_name[1..2] in ['RR','HC'];

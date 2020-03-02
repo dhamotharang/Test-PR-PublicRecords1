@@ -979,8 +979,8 @@ InsuranceRoyalties 	:= if(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetB
 					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission,
                     LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
-	ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
-	ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
+	ip_prep := join(fs, ret, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq, self.did := right.did) );
+	ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose, applyOptOut := TRUE);
 
 	bs_with_ip := record
 		risk_indicators.Layout_Boca_Shell bs;

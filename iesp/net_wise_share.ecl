@@ -11,6 +11,7 @@ end;
 		
 export t_NetWiseRequestParams := record
 	string AppId {xpath('AppId')};
+	string UniqueId {xpath('UniqueId')};
 	string Email1 {xpath('Email1')};
 	string Email2 {xpath('Email2')};
 	string Email3 {xpath('Email3')};
