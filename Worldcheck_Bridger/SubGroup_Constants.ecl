@@ -1194,6 +1194,9 @@
 		export string KEYWORD_UKTR									:= '880';
 		export string KEYWORD_PBC_AP								:= '881';
 		export string KEYWORD_MMACCM								:= '882';
+		export string KEYWORD_EU_TUR								:= '883';
+		export string KEYWORD_AOCMC									:= '884';
+		export string KEYWORD_AOBNA									:= '885';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
