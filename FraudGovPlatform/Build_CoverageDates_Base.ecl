@@ -59,7 +59,7 @@ module
                             , STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source = '' AND L.Confidence_that_activity_was_deceitful_id = 3 => 'SAFELIST'
                             , L.source 
                         );
-        SELF.source_group := if(STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source_group = '', 'DELTABASE', L.source_group );
+        SELF.source_group := if(STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source_group = '', 'AGENCYACTIVITY', L.source_group );
         SELF := L;
     end;
                                                                         
