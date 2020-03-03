@@ -127,7 +127,8 @@ functionmacro
     #APPEND(OUTPUT_RESULTS ,'    ,output(\'------------------------------------------------------------------------------\',named(\'_____________________\'),overwrite)\n'        )
     #SET   (DS_RESULTS ,'  export ds_results := dataset([\n'         )
   #ELSE
-    #SET(OUTPUT_RESULTS ,'  export output_results := parallel(STD.System.Debug.Sleep(1));\n'         )
+    #SET   (OUTPUT_RESULTS ,'  export output_results := parallel(\n'  )
+    #APPEND(OUTPUT_RESULTS ,'     STD.System.Debug.Sleep(1)\n'        )
     #SET   (DS_RESULTS ,'  export ds_results := dataset([],WorkMan.Layouts.lay_results);\n'         )
 
   #END
@@ -146,7 +147,7 @@ functionmacro
     #SET(GET_BOOLEANS ,',' + %'GET_BOOLEANS'%)
   #ELSE
     #SET    (CODE_APPEND    ,'\n  export stopcondition := false;\n\n')
-    #SET    (CODE_GET_LOCAL ,'\n  export stopcondition_ := false;\n\n')
+    #SET    (CODE_GET_LOCAL ,'\n  export stopcondition_ := false;\n\n')  
   #END
 
   #LOOP
@@ -292,10 +293,11 @@ functionmacro
   #END
 
 
+  #APPEND(OUTPUT_RESULTS ,'    ,output( ds_results      ,named(\'Results_Output\'),overwrite)\n')
+  #APPEND(OUTPUT_RESULTS ,'    ,output( email_outputs   ,named(\'Email_Outputs\'),overwrite)\n')
+  #APPEND(OUTPUT_RESULTS    ,');\n')
+
   #IF(count(pSetResults) != 0)
-    #APPEND(OUTPUT_RESULTS ,'    ,output( ds_results      ,named(\'Results_Output\'),overwrite)\n')
-    #APPEND(OUTPUT_RESULTS ,'    ,output( email_outputs   ,named(\'Email_Outputs\'),overwrite)\n')
-    #APPEND(OUTPUT_RESULTS    ,');\n')
     #APPEND(DS_RESULTS  ,  '  ],WorkMan.Layouts.lay_results);\n')
   #END
   
