@@ -19,8 +19,8 @@ Shared f_keysizedhistory_rec := g_keysizedhistory_rec( Not whenlive = '');
 // then compare accross files
 previousRec := Record
     f_keysizedhistory_rec.datasetname;
-    f_keysizedhistory_rec.build_version;
     String10   prevbuild_version := '';
+    f_keysizedhistory_rec.build_version;
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
     f_keysizedhistory_rec.size;
@@ -33,8 +33,8 @@ Export t_previousRec := Project( f_keysizedhistory_rec, previousRec );
 
 newRec := Record
     f_keysizedhistory_rec.datasetname;
-    f_keysizedhistory_rec.build_version;
     String10   prevbuild_version := '';
+    f_keysizedhistory_rec.build_version;
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
     f_keysizedhistory_rec.size;
@@ -48,8 +48,8 @@ Export t_newRec := Project( f_keysizedhistory_rec, newRec );
 // Out record set layout
 OutRec := Record
 String25   datasetname;
-String10   build_version;
 String10   prevbuild_version;
+String10   build_version;
 String25   whenlive;
 String60   superkey;
 Unsigned8  size;
@@ -61,8 +61,8 @@ End;
 // Transform
 OutRec CountDeltas( t_previousRec Le, t_newRec Ri ) := Transform
     Self.datasetname   := Ri.datasetname;
-    Self.build_version := Ri.build_version;
     Self.prevbuild_version := Le.build_version;
+    Self.build_version := Ri.build_version;
     Self.whenlive      := Ri.whenlive;
     Self.superkey      := Ri.superkey;
     Self.size          := Ri.size;
