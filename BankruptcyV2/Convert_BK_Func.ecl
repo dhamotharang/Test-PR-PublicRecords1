@@ -4,12 +4,12 @@ export Convert_BK_Func := function
 	
 	// dmain := bankruptcyv2.file_bankruptcy_main;
 	// dparty := bankruptcyv2.file_bankruptcy_search;
-	
+	//VC DF-23528
 	dmain1    := bankruptcyv2.file_bankruptcy_main;	
   dist_id 	:= distribute(dmain1, hash(TMSID));
 	sort_id 	:= sort(dist_id, TMSID, -process_Date, local);
 	dmain    	:= dedup(sort_id, TMSID,local);
-	
+	//VC DF-23528
 	dparty1       := bankruptcyv2.file_bankruptcy_search;	
 	Partydist_id 	:= distribute(dparty1, hash(TMSID));
 	Partysort_id 	:= sort(Partydist_id, TMSID, -process_Date, local);
