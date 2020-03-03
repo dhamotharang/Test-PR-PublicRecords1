@@ -842,6 +842,22 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		return project(ds_in, toNull(left));
 	end;
 	
+	export dataset(l_dot) SetSICNAICS(dataset(l_dot) ds_in) := function
+		l_dot tCleanSIC(l_dot L) := transform
+			self.company_sic_code1							:= if (trim(l.company_sic_code1  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code1  ) = 1, trim(l.company_sic_code1   )   ,'');
+			self.company_sic_code2							:= if (trim(l.company_sic_code2  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code2  ) = 1, trim(l.company_sic_code2   )   ,'');
+			self.company_sic_code3							:= if (trim(l.company_sic_code3  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code3  ) = 1, trim(l.company_sic_code3   )   ,'');
+			self.company_sic_code4							:= if (trim(l.company_sic_code4  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code4  ) = 1, trim(l.company_sic_code4   )   ,'');
+			self.company_sic_code5							:= if (trim(l.company_sic_code5  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code5  ) = 1, trim(l.company_sic_code5   )   ,'');
+			self.company_naics_code1						:= if (trim(l.company_naics_code1) != '' and ut.fn_valid_NAICSCode(l.company_naics_code1) = 1, trim(l.company_naics_code1 )   ,'');
+			self.company_naics_code2						:= if (trim(l.company_naics_code2) != '' and ut.fn_valid_NAICSCode(l.company_naics_code2) = 1, trim(l.company_naics_code2 )   ,'');
+			self.company_naics_code3						:= if (trim(l.company_naics_code3) != '' and ut.fn_valid_NAICSCode(l.company_naics_code3) = 1, trim(l.company_naics_code3 )   ,'');
+			self.company_naics_code4						:= if (trim(l.company_naics_code4) != '' and ut.fn_valid_NAICSCode(l.company_naics_code4) = 1, trim(l.company_naics_code4 )   ,'');
+			self.company_naics_code5						:= if (trim(l.company_naics_code5) != '' and ut.fn_valid_NAICSCode(l.company_naics_code5) = 1, trim(l.company_naics_code5 )   ,'');
+			self := L;
+		end;
+		return project(ds_in, tCleanSIC(left));
+	end;
 	// rerun selected routines on an existing DOT file
 	export dataset(l_dot) reclean(dataset(l_dot) ds_in) := function
 		ds_cnp	:= SetCompanyFields     (ds_in    );
@@ -852,7 +868,8 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ds_pr		:= SetPrimRangeDerived  (ds_pn    );
     ds_at   := SetAddrType          (ds_pr    );
     ds_owner:= Set_Vanity_Owner_Did (ds_at    );
-		return ds_owner;
+    ds_sic  := SetSICNAICS          (ds_owner    );
+		return ds_sic;
 	end;
 	
 	export city_samp(ds_in, st_field, city_field) := functionmacro
