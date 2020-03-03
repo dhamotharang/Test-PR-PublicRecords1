@@ -15,51 +15,63 @@ Shared g_keysizedhistory_rec := Group(s_keysizedhistory_rec, datasetname, superk
 // Ensures no blank whenlive fields are counted
 Shared f_keysizedhistory_rec := g_keysizedhistory_rec( Not whenlive = '');
 
-
+// slice into two files made up from one file
+// then compare accross files
 previousRec := Record
-    f_keysizedhistory_rec.recordcount;
     f_keysizedhistory_rec.datasetname;
     f_keysizedhistory_rec.build_version;
+    String10   prevbuild_version := '';
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
-    Integer8 deltas := [];
+    f_keysizedhistory_rec.size;
+    f_keysizedhistory_rec.recordcount;
+    Integer8 deltas := (integer8)0;
 End;
 
 Export t_previousRec := Project( f_keysizedhistory_rec, previousRec );
 
 newRec := Record
-    f_keysizedhistory_rec.recordcount;
     f_keysizedhistory_rec.datasetname;
     f_keysizedhistory_rec.build_version;
+    String10   prevbuild_version := '';
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
-    Integer8 deltas := []; 
+    f_keysizedhistory_rec.size;
+    f_keysizedhistory_rec.recordcount;
+    Integer8 deltas := (Integer8)0; 
 End;
+
 Export t_newRec := Project( f_keysizedhistory_rec, newRec );
 
 // Out record set layout
 OutRec := Record
+String25   datasetname;
+String10   build_version;
+String10   prevbuild_version;
+String25   whenlive;
+String60   superkey;
+Unsigned8  size;
 Integer8   recordcount;
-String25   datasetname;  
-Unsigned8  build_version;
-Qstring25  whenlive;
-Qstring60  superkey;
 Integer8   deltas;
 End;
 
 // Transform
 OutRec CountDeltas( t_previousRec Le, t_newRec Ri ) := Transform
-    Self.recordcount   := Le.recordcount;
-    Self.datasetname   := Le.datasetname;
-    Self.build_version := Le.build_version;
-    Self.whenlive      := Le.whenlive;
-    Self.superkey      := Le.superkey;
-    Self.deltas        := if( Le.datasetname = Ri.datasetname AND 
+    Self.datasetname   := Ri.datasetname;
+    Self.build_version := Ri.build_version;
+    Self.prevbuild_version := Le.build_version;
+    Self.whenlive      := Ri.whenlive;
+    Self.superkey      := Ri.superkey;
+    Self.size          := Ri.size;
+    Self.recordcount   := Ri.recordcount;
+    Self.deltas        := (Integer8)if( Le.datasetname = Ri.datasetname AND 
                               Le.build_version != Ri.build_version, // Break
                               Ri.recordcount - Le.recordcount, Le.recordcount );
 End;
 
 // Iterate
 Export Main := Iterate(t_previousRec, CountDeltas(Left, Right));
+
+
 
 End;
