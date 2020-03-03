@@ -64,6 +64,40 @@
 		STRING Change_Date;
 	END;
 
+  EXPORT INACTV_LayoutIn := record
+		STRING Entity_Number;
+		STRING Entity_Name;
+		STRING Formation_Date;
+		STRING Approval_Date;
+		STRING Business_Type;
+		STRING Status;
+		STRING Character_of_Business;
+		STRING Domicile;
+		STRING Known_Place_of_Business_Street_Address_1;
+		STRING Known_Place_of_Business_Street_Address_2;
+		STRING Known_Place_of_Business_City;
+		STRING Known_Place_of_Business_State;
+		STRING Known_Place_of_Business_Zip_Code;
+		STRING Known_Place_of_Business_County;
+		STRING Principal_Street_Address_1;
+		STRING Principal_Street_Address_2;
+		STRING Principal_Address_City;
+		STRING Principal_Address_State;
+		STRING Principal_Address_Zip_Code;
+		STRING Statutory_Agent_Name;
+		STRING Statutory_Agent_Physical_Street_Address_1;
+		STRING Statutory_Agent_Physical_Street_Address_2;
+		STRING Statutory_Agent_Physical_Address_City;
+		STRING Statutory_Agent_Physical_Address_State;
+		STRING Statutory_Agent_Physical_Address_Zip_Code;
+		STRING Statutory_Agent_Mailing_Street_Address_1;
+		STRING Statutory_Agent_Mailing_Street_Address_2;
+		STRING Statutory_Agent_Mailing_Address_City;
+		STRING Statutory_Agent_Mailing_Address_State;
+		STRING Statutory_Agent_Mailing_Address_Zip_Code;
+		STRING Statutory_Agent_Status_Date;
+		STRING Statutory_Agent_Status;
+	END;
 	
 	//Intermediate Files
 	
