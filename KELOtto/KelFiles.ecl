@@ -32,7 +32,7 @@
             TRANSFORM({RECORDOF(LEFT), STRING ToPersonLabel}, 
             SELF.customer_id_ := RIGHT.customer_id_, // Correct the customer id and industry type for the relationship to be based off the associated customer_id and not the source.
             SELF.industry_type_ := RIGHT.industry_type_,
-            SELF.ToPersonLabel := RIGHT.Label_, SELF := LEFT, SELF := RIGHT), KEEP(1), ALL, HASH);
+            SELF.ToPersonLabel := RIGHT.Label_, SELF := LEFT, SELF := RIGHT), KEEP(1), HASH);
   EXPORT PersonAssociationsDetails := KELOtto.AddressPersonAssociations.PersonAddressMatches;
 
   // Customer ScoreBreakdown
