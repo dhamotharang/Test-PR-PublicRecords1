@@ -156,7 +156,7 @@ suppressAgencies := agency(drivers_exchange_flag ='0');
 
 updtdAllrecs:= join(allrecs,distribute(suppressAgencies(agency_id!=''),hash(agency_id)),
 							trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and trim(left.report_type_id,left,right) ='DE',
-							many lookup , left only, local);	
+							many lookup , left only );	
 
 //end
 					
