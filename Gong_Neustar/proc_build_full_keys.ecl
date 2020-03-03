@@ -23,12 +23,12 @@ name_scoring_attributes   := '~thor_data400::key::gong_scoring::' + rundate + ':
 RoxieKeybuild.MAC_build_logical(dx_Gong.key_phone(), DayBatchEda.data_key_gong_phone, '', name_phone, bk_phone);
 RoxieKeybuild.MAC_build_logical(dx_Gong.key_czsslf(), DayBatchEda.data_key_gong_batch_czsslf, '', name_czsslf, bk_czsslf);
 RoxieKeyBuild.MAC_build_logical(dx_Gong.key_lczf(), DayBatchEda.data_key_gong_batch_lczf, '', name_lczf, bk_lczf);
-RoxieKeyBuild.MAC_build_logical(dx_Gong.key_address_current(), Gong_Neustar.data_key_address_current, '', name_address_current, bk_addr_curr, 3);
-RoxieKeyBuild.MAC_build_logical(dx_Gong.key_surname_count(), Gong_Neustar.data_key_SurnameCount, '', name_surnamecnt, bk_srnmct, 3);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_address_current(), Gong_Neustar.data_key_address_current, '', name_address_current, bk_addr_curr);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_surname_count(), Gong_Neustar.data_key_SurnameCount, '', name_surnamecnt, bk_srnmct);
 RoxieKeyBuild.MAC_build_logical(dx_Gong.key_phone10(), Gong_Neustar.data_key_phone10, '', name_phone10, bk_phone10);
 RoxieKeyBuild.MAC_build_logical(dx_Gong.key_zip(), Gong_Neustar.data_key_zip, '', name_zip, bk_zip);
 RoxieKeyBuild.MAC_build_logical(dx_Gong.key_npa(), Gong_Neustar.data_key_npa, '', name_npa, bk_npa);
-RoxieKeyBuild.MAC_build_logical(dx_Gong.key_scoring_attributes(), Gong_Neustar.data_Key_GongScoringAttributes, '', name_scoring_attributes, bk_scoring, 3);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_scoring_attributes(), Gong_Neustar.data_Key_GongScoringAttributes, '', name_scoring_attributes, bk_scoring);
 
 //Add to "build" superfile
 RoxieKeyBuild.Mac_SK_Move_To_Built(name_phone, dx_Gong.names('').i_phone, mv_phone, 3);

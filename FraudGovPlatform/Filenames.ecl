@@ -129,6 +129,7 @@ module
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
+		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
 		
 		
 		//Kel Files
@@ -201,6 +202,7 @@ module
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
 			FraudPoint.dAll_filenames +
+			BestInfo.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
