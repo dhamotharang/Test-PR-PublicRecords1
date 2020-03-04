@@ -24,6 +24,8 @@ previousRec := Record
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
     f_keysizedhistory_rec.size;
+    Integer8 delta_size := (Integer8)0;
+    Decimal5_2 size_perc := (Decimal5_2)0;
     Integer8 prevrecordcount := (Integer8)0;
     f_keysizedhistory_rec.recordcount;
     Integer8 deltas_count := (Integer8)0;
@@ -39,6 +41,8 @@ newRec := Record
     f_keysizedhistory_rec.whenlive;
     f_keysizedhistory_rec.superkey;
     f_keysizedhistory_rec.size;
+    Integer8 delta_size := (Integer8)0;
+    Decimal5_2 size_perc := (Decimal5_2)0;
     Integer8 prevrecordcount := (Integer8)0;
     f_keysizedhistory_rec.recordcount;
     Integer8 deltas_count := (Integer8)0;
@@ -49,34 +53,41 @@ Export t_newRec := Project( f_keysizedhistory_rec, newRec );
 
 // Out record set layout
 OutRec := Record
-String25   datasetname;
-String10   prevbuild_version;
-String10   build_version;
-String25   whenlive;
-String60   superkey;
-Unsigned8  size;
-Integer8   prevrecordcount;
-Integer8   recordcount;
-Integer8   deltas_count;
-Decimal5_2 delta_perc;
+    String25   datasetname;
+    String10   prevbuild_version;
+    String10   build_version;
+    String25   whenlive;
+    String60   superkey;
+    Integer8   size;    
+    Integer8   delta_size;
+    Decimal5_2 size_perc;
+    Integer8   prevrecordcount;
+    Integer8   recordcount;
+    Integer8   deltas_count;
+    Decimal5_2 delta_perc;
 End;
 
 // Transform
 OutRec CountDeltas( t_previousRec Le, t_newRec Ri ) := Transform
-    NotSameVersion     := if( Le.build_version[1..8] != Ri.build_version[1..8], true, false );
+    NotSameVersion     := if( Le.build_version[1..8] != Ri.build_version[1..8], true, false ); // Checks that it is not same version 
     Self.datasetname   := Ri.datasetname;
-    Self.prevbuild_version := if( NotSameVersion, Le.build_version, Le.prevbuild_version );
+    Self.prevbuild_version := if( NotSameVersion, Le.build_version, Le.prevbuild_version ); 
     Self.build_version := Ri.build_version;
     Self.whenlive      := Ri.whenlive;
     Self.superkey      := Ri.superkey;
-    Self.prevrecordcount := if( NotSameVersion, Le.recordcount, Le.prevrecordcount );
     Self.size          := Ri.size;
+    Self.delta_size    := if( Le.datasetname = Ri.datasetname AND NotSameVersion, 
+                              Ri.size - Le.size, Ri.size - Le.size );
+    Self.size_perc     := (Decimal5_2)if( Le.datasetname = Ri.datasetname AND NotSameVersion,  // Percetaages of changes in deltas 
+                                         ( (Real)Self.delta_size / (Real)Le.size ) * 100,
+                                         ( (Real)Self.delta_size / (Real)Le.size ) * 100); 
+    Self.prevrecordcount := if( NotSameVersion, Le.recordcount, Le.prevrecordcount );           
     Self.recordcount   := Ri.recordcount;
     Self.deltas_count  := if( Le.datasetname = Ri.datasetname AND NotSameVersion,
-                              Ri.recordcount - Le.recordcount, Ri.recordcount - Le.prevrecordcount );
-    Self.delta_perc := (Decimal5_2)if( Le.datasetname = Ri.datasetname AND NotSameVersion,
-                                    ( (REAL)Self.deltas_count / (REAL)Le.recordcount) * 100, 
-                                    ( (REAL)Self.deltas_count / (REAL)Le.prevrecordcount) * 100 );
+                              Ri.recordcount - Le.recordcount, Ri.recordcount - Le.prevrecordcount ); // Calculate deltas from previous version to new 
+    Self.delta_perc := (Decimal5_2)if( Le.datasetname = Ri.datasetname AND NotSameVersion,  // 
+                                    ( (Real)Self.deltas_count / (Real)Le.recordcount) * 100, 
+                                    ( (Real)Self.deltas_count / (Real)Le.prevrecordcount) * 100 );
 End;
 
 // Iterate

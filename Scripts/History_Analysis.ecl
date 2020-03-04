@@ -19,7 +19,7 @@ Export History_Analysis := Module
     String1   updateflag;
     String60  superkey;
     String10  templatelogicalkey;
-    Unsigned8 size;
+    Integer8  size;
     Integer8  recordcount;
     End;
 
