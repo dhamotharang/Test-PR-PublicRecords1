@@ -56,7 +56,7 @@ EXPORT Attributes_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
-    + 'FIELDTYPE:Number:ALLOW(0123456789):LENGTHS(0,1..)\n'
+    + 'FIELDTYPE:Number:ALLOW(0123456789)\n'
     + 'FIELDTYPE:Ratio:ALLOW(0123456789.-E):LENGTHS(0,1..)\n'
     + '\n'
     + 'FIELD:ultimate_linkid:LIKE(Number):0,0\n'

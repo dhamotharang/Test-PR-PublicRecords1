@@ -14,6 +14,9 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 									self.persistent_record_id := (left.link_id << 32) + self.dt_vendor_first_reported;
 									self.clean_phone := ut.CleanPhone(left.PHONE);
 									self.clean_fax := ut.CleanPhone(left.FAX);
+									//Commented out until Vern Bentley has completed using function
+									// self.primary_sic := If(ut.fn_SicCode_functions.fn_validate_SicCode(left.primary_sic) = 1,ut.CleanSpacesAndUpper(left.primary_sic),'');
+			            // self.primary_naics := If(ut.fn_NAICSCode_functions.fn_validate_NAICSCode(left.primary_naics) = 1,ut.CleanSpacesAndUpper(left.primary_naics),'');
 									self := left;
 									self := [];
 									)

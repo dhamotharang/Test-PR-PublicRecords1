@@ -2,8 +2,8 @@
 EXPORT Attributes_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 544;
-  EXPORT NumRulesFromFieldType := 544;
+  EXPORT NumRules := 482;
+  EXPORT NumRulesFromFieldType := 482;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 272;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -291,7 +291,6 @@ EXPORT Attributes_Scrubs := MODULE
     UNSIGNED8 ScrubsBits6;
     UNSIGNED8 ScrubsBits7;
     UNSIGNED8 ScrubsBits8;
-    UNSIGNED8 ScrubsBits9;
   END;
 EXPORT FromNone(DATASET(Attributes_Layout_Cortera) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
@@ -572,15 +571,14 @@ EXPORT FromNone(DATASET(Attributes_Layout_Cortera) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Attributes_Layout_Cortera);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.ultimate_linkid_Invalid << 0 ) + ( le.cortera_score_Invalid << 2 ) + ( le.cpr_score_Invalid << 4 ) + ( le.cpr_segment_Invalid << 6 ) + ( le.dbt_Invalid << 8 ) + ( le.avg_bal_Invalid << 10 ) + ( le.air_spend_Invalid << 12 ) + ( le.fuel_spend_Invalid << 14 ) + ( le.leasing_spend_Invalid << 16 ) + ( le.ltl_spend_Invalid << 18 ) + ( le.rail_spend_Invalid << 20 ) + ( le.tl_spend_Invalid << 22 ) + ( le.transvc_spend_Invalid << 24 ) + ( le.transup_spend_Invalid << 26 ) + ( le.bst_spend_Invalid << 28 ) + ( le.dg_spend_Invalid << 30 ) + ( le.electrical_spend_Invalid << 32 ) + ( le.hvac_spend_Invalid << 34 ) + ( le.other_b_spend_Invalid << 36 ) + ( le.plumbing_spend_Invalid << 38 ) + ( le.rs_spend_Invalid << 40 ) + ( le.wp_spend_Invalid << 42 ) + ( le.chemical_spend_Invalid << 44 ) + ( le.electronic_spend_Invalid << 46 ) + ( le.metal_spend_Invalid << 48 ) + ( le.other_m_spend_Invalid << 50 ) + ( le.packaging_spend_Invalid << 52 ) + ( le.pvf_spend_Invalid << 54 ) + ( le.plastic_spend_Invalid << 56 ) + ( le.textile_spend_Invalid << 58 ) + ( le.bs_spend_Invalid << 60 ) + ( le.ce_spend_Invalid << 62 );
-    SELF.ScrubsBits2 := ( le.hardware_spend_Invalid << 0 ) + ( le.ie_spend_Invalid << 2 ) + ( le.is_spend_Invalid << 4 ) + ( le.it_spend_Invalid << 6 ) + ( le.mls_spend_Invalid << 8 ) + ( le.os_spend_Invalid << 10 ) + ( le.pp_spend_Invalid << 12 ) + ( le.sis_spend_Invalid << 14 ) + ( le.apparel_spend_Invalid << 16 ) + ( le.beverages_spend_Invalid << 18 ) + ( le.constr_spend_Invalid << 20 ) + ( le.consulting_spend_Invalid << 22 ) + ( le.fs_spend_Invalid << 24 ) + ( le.fp_spend_Invalid << 26 ) + ( le.insurance_spend_Invalid << 28 ) + ( le.ls_spend_Invalid << 30 ) + ( le.oil_gas_spend_Invalid << 32 ) + ( le.utilities_spend_Invalid << 34 ) + ( le.other_spend_Invalid << 36 ) + ( le.advt_spend_Invalid << 38 ) + ( le.air_growth_Invalid << 40 ) + ( le.fuel_growth_Invalid << 42 ) + ( le.leasing_growth_Invalid << 44 ) + ( le.ltl_growth_Invalid << 46 ) + ( le.rail_growth_Invalid << 48 ) + ( le.tl_growth_Invalid << 50 ) + ( le.transvc_growth_Invalid << 52 ) + ( le.transup_growth_Invalid << 54 ) + ( le.bst_growth_Invalid << 56 ) + ( le.dg_growth_Invalid << 58 ) + ( le.electrical_growth_Invalid << 60 ) + ( le.hvac_growth_Invalid << 62 );
-    SELF.ScrubsBits3 := ( le.other_b_growth_Invalid << 0 ) + ( le.plumbing_growth_Invalid << 2 ) + ( le.rs_growth_Invalid << 4 ) + ( le.wp_growth_Invalid << 6 ) + ( le.chemical_growth_Invalid << 8 ) + ( le.electronic_growth_Invalid << 10 ) + ( le.metal_growth_Invalid << 12 ) + ( le.other_m_growth_Invalid << 14 ) + ( le.packaging_growth_Invalid << 16 ) + ( le.pvf_growth_Invalid << 18 ) + ( le.plastic_growth_Invalid << 20 ) + ( le.textile_growth_Invalid << 22 ) + ( le.bs_growth_Invalid << 24 ) + ( le.ce_growth_Invalid << 26 ) + ( le.hardware_growth_Invalid << 28 ) + ( le.ie_growth_Invalid << 30 ) + ( le.is_growth_Invalid << 32 ) + ( le.it_growth_Invalid << 34 ) + ( le.mls_growth_Invalid << 36 ) + ( le.os_growth_Invalid << 38 ) + ( le.pp_growth_Invalid << 40 ) + ( le.sis_growth_Invalid << 42 ) + ( le.apparel_growth_Invalid << 44 ) + ( le.beverages_growth_Invalid << 46 ) + ( le.constr_growth_Invalid << 48 ) + ( le.consulting_growth_Invalid << 50 ) + ( le.fs_growth_Invalid << 52 ) + ( le.fp_growth_Invalid << 54 ) + ( le.insurance_growth_Invalid << 56 ) + ( le.ls_growth_Invalid << 58 ) + ( le.oil_gas_growth_Invalid << 60 ) + ( le.utilities_growth_Invalid << 62 );
-    SELF.ScrubsBits4 := ( le.other_growth_Invalid << 0 ) + ( le.advt_growth_Invalid << 2 ) + ( le.top5_growth_Invalid << 4 ) + ( le.shipping_y1_Invalid << 6 ) + ( le.shipping_growth_Invalid << 8 ) + ( le.materials_y1_Invalid << 10 ) + ( le.materials_growth_Invalid << 12 ) + ( le.operations_y1_Invalid << 14 ) + ( le.operations_growth_Invalid << 16 ) + ( le.total_paid_average_0t12_Invalid << 18 ) + ( le.total_paid_monthspastworst_24_Invalid << 20 ) + ( le.total_paid_slope_0t12_Invalid << 22 ) + ( le.total_paid_slope_0t6_Invalid << 24 ) + ( le.total_paid_slope_6t12_Invalid << 26 ) + ( le.total_paid_slope_6t18_Invalid << 28 ) + ( le.total_paid_volatility_0t12_Invalid << 30 ) + ( le.total_paid_volatility_0t6_Invalid << 32 ) + ( le.total_paid_volatility_12t18_Invalid << 34 ) + ( le.total_paid_volatility_6t12_Invalid << 36 ) + ( le.total_spend_monthspastleast_24_Invalid << 38 ) + ( le.total_spend_monthspastmost_24_Invalid << 40 ) + ( le.total_spend_slope_0t12_Invalid << 42 ) + ( le.total_spend_slope_0t24_Invalid << 44 ) + ( le.total_spend_slope_0t6_Invalid << 46 ) + ( le.total_spend_slope_6t12_Invalid << 48 ) + ( le.total_spend_sum_12_Invalid << 50 ) + ( le.total_spend_volatility_0t12_Invalid << 52 ) + ( le.total_spend_volatility_0t6_Invalid << 54 ) + ( le.total_spend_volatility_12t18_Invalid << 56 ) + ( le.total_spend_volatility_6t12_Invalid << 58 ) + ( le.mfgmat_paid_average_12_Invalid << 60 ) + ( le.mfgmat_paid_monthspastworst_24_Invalid << 62 );
-    SELF.ScrubsBits5 := ( le.mfgmat_paid_slope_0t12_Invalid << 0 ) + ( le.mfgmat_paid_slope_0t24_Invalid << 2 ) + ( le.mfgmat_paid_slope_0t6_Invalid << 4 ) + ( le.mfgmat_paid_volatility_0t12_Invalid << 6 ) + ( le.mfgmat_paid_volatility_0t6_Invalid << 8 ) + ( le.mfgmat_spend_monthspastleast_24_Invalid << 10 ) + ( le.mfgmat_spend_monthspastmost_24_Invalid << 12 ) + ( le.mfgmat_spend_slope_0t12_Invalid << 14 ) + ( le.mfgmat_spend_slope_0t24_Invalid << 16 ) + ( le.mfgmat_spend_slope_0t6_Invalid << 18 ) + ( le.mfgmat_spend_sum_12_Invalid << 20 ) + ( le.mfgmat_spend_volatility_0t6_Invalid << 22 ) + ( le.mfgmat_spend_volatility_6t12_Invalid << 24 ) + ( le.ops_paid_average_12_Invalid << 26 ) + ( le.ops_paid_monthspastworst_24_Invalid << 28 ) + ( le.ops_paid_slope_0t12_Invalid << 30 ) + ( le.ops_paid_slope_0t24_Invalid << 32 ) + ( le.ops_paid_slope_0t6_Invalid << 34 ) + ( le.ops_paid_volatility_0t12_Invalid << 36 ) + ( le.ops_paid_volatility_0t6_Invalid << 38 ) + ( le.ops_spend_monthspastleast_24_Invalid << 40 ) + ( le.ops_spend_monthspastmost_24_Invalid << 42 ) + ( le.ops_spend_slope_0t12_Invalid << 44 ) + ( le.ops_spend_slope_0t24_Invalid << 46 ) + ( le.ops_spend_slope_0t6_Invalid << 48 ) + ( le.fleet_paid_monthspastworst_24_Invalid << 50 ) + ( le.fleet_paid_slope_0t12_Invalid << 52 ) + ( le.fleet_paid_slope_0t24_Invalid << 54 ) + ( le.fleet_paid_slope_0t6_Invalid << 56 ) + ( le.fleet_paid_volatility_0t12_Invalid << 58 ) + ( le.fleet_paid_volatility_0t6_Invalid << 60 ) + ( le.fleet_spend_slope_0t12_Invalid << 62 );
-    SELF.ScrubsBits6 := ( le.fleet_spend_slope_0t24_Invalid << 0 ) + ( le.fleet_spend_slope_0t6_Invalid << 2 ) + ( le.carrier_paid_slope_0t12_Invalid << 4 ) + ( le.carrier_paid_slope_0t24_Invalid << 6 ) + ( le.carrier_paid_slope_0t6_Invalid << 8 ) + ( le.carrier_paid_volatility_0t12_Invalid << 10 ) + ( le.carrier_paid_volatility_0t6_Invalid << 12 ) + ( le.carrier_spend_slope_0t12_Invalid << 14 ) + ( le.carrier_spend_slope_0t24_Invalid << 16 ) + ( le.carrier_spend_slope_0t6_Invalid << 18 ) + ( le.carrier_spend_volatility_0t6_Invalid << 20 ) + ( le.carrier_spend_volatility_6t12_Invalid << 22 ) + ( le.bldgmats_paid_slope_0t12_Invalid << 24 ) + ( le.bldgmats_paid_slope_0t24_Invalid << 26 ) + ( le.bldgmats_paid_slope_0t6_Invalid << 28 ) + ( le.bldgmats_paid_volatility_0t12_Invalid << 30 ) + ( le.bldgmats_paid_volatility_0t6_Invalid << 32 ) + ( le.bldgmats_spend_slope_0t12_Invalid << 34 ) + ( le.bldgmats_spend_slope_0t24_Invalid << 36 ) + ( le.bldgmats_spend_slope_0t6_Invalid << 38 ) + ( le.bldgmats_spend_volatility_0t6_Invalid << 40 ) + ( le.bldgmats_spend_volatility_6t12_Invalid << 42 ) + ( le.top5_paid_slope_0t12_Invalid << 44 ) + ( le.top5_paid_slope_0t24_Invalid << 46 ) + ( le.top5_paid_slope_0t6_Invalid << 48 ) + ( le.top5_paid_volatility_0t12_Invalid << 50 ) + ( le.top5_paid_volatility_0t6_Invalid << 52 ) + ( le.top5_spend_slope_0t12_Invalid << 54 ) + ( le.top5_spend_slope_0t24_Invalid << 56 ) + ( le.top5_spend_slope_0t6_Invalid << 58 ) + ( le.top5_spend_volatility_0t6_Invalid << 60 ) + ( le.top5_spend_volatility_6t12_Invalid << 62 );
-    SELF.ScrubsBits7 := ( le.total_numrel_slope_0t12_Invalid << 0 ) + ( le.total_numrel_slope_0t24_Invalid << 2 ) + ( le.total_numrel_slope_0t6_Invalid << 4 ) + ( le.total_numrel_slope_6t12_Invalid << 6 ) + ( le.mfgmat_numrel_slope_0t12_Invalid << 8 ) + ( le.mfgmat_numrel_slope_0t24_Invalid << 10 ) + ( le.mfgmat_numrel_slope_0t6_Invalid << 12 ) + ( le.mfgmat_numrel_slope_6t12_Invalid << 14 ) + ( le.ops_numrel_slope_0t12_Invalid << 16 ) + ( le.ops_numrel_slope_0t24_Invalid << 18 ) + ( le.ops_numrel_slope_0t6_Invalid << 20 ) + ( le.ops_numrel_slope_6t12_Invalid << 22 ) + ( le.fleet_numrel_slope_0t12_Invalid << 24 ) + ( le.fleet_numrel_slope_0t24_Invalid << 26 ) + ( le.fleet_numrel_slope_0t6_Invalid << 28 ) + ( le.fleet_numrel_slope_6t12_Invalid << 30 ) + ( le.carrier_numrel_slope_0t12_Invalid << 32 ) + ( le.carrier_numrel_slope_0t24_Invalid << 34 ) + ( le.carrier_numrel_slope_0t6_Invalid << 36 ) + ( le.carrier_numrel_slope_6t12_Invalid << 38 ) + ( le.bldgmats_numrel_slope_0t12_Invalid << 40 ) + ( le.bldgmats_numrel_slope_0t24_Invalid << 42 ) + ( le.bldgmats_numrel_slope_0t6_Invalid << 44 ) + ( le.bldgmats_numrel_slope_6t12_Invalid << 46 ) + ( le.bldgmats_numrel_var_0t12_Invalid << 48 ) + ( le.bldgmats_numrel_var_12t24_Invalid << 50 ) + ( le.total_percprov30_slope_0t12_Invalid << 52 ) + ( le.total_percprov30_slope_0t24_Invalid << 54 ) + ( le.total_percprov30_slope_0t6_Invalid << 56 ) + ( le.total_percprov30_slope_6t12_Invalid << 58 ) + ( le.total_percprov60_slope_0t12_Invalid << 60 ) + ( le.total_percprov60_slope_0t24_Invalid << 62 );
-    SELF.ScrubsBits8 := ( le.total_percprov60_slope_0t6_Invalid << 0 ) + ( le.total_percprov60_slope_6t12_Invalid << 2 ) + ( le.total_percprov90_slope_0t24_Invalid << 4 ) + ( le.total_percprov90_slope_0t6_Invalid << 6 ) + ( le.total_percprov90_slope_6t12_Invalid << 8 ) + ( le.mfgmat_percprov30_slope_0t12_Invalid << 10 ) + ( le.mfgmat_percprov30_slope_6t12_Invalid << 12 ) + ( le.mfgmat_percprov60_slope_0t12_Invalid << 14 ) + ( le.mfgmat_percprov60_slope_6t12_Invalid << 16 ) + ( le.mfgmat_percprov90_slope_0t24_Invalid << 18 ) + ( le.mfgmat_percprov90_slope_0t6_Invalid << 20 ) + ( le.mfgmat_percprov90_slope_6t12_Invalid << 22 ) + ( le.ops_percprov30_slope_0t12_Invalid << 24 ) + ( le.ops_percprov30_slope_6t12_Invalid << 26 ) + ( le.ops_percprov60_slope_0t12_Invalid << 28 ) + ( le.ops_percprov60_slope_6t12_Invalid << 30 ) + ( le.ops_percprov90_slope_0t24_Invalid << 32 ) + ( le.ops_percprov90_slope_0t6_Invalid << 34 ) + ( le.ops_percprov90_slope_6t12_Invalid << 36 ) + ( le.fleet_percprov30_slope_0t12_Invalid << 38 ) + ( le.fleet_percprov30_slope_6t12_Invalid << 40 ) + ( le.fleet_percprov60_slope_0t12_Invalid << 42 ) + ( le.fleet_percprov60_slope_6t12_Invalid << 44 ) + ( le.fleet_percprov90_slope_0t24_Invalid << 46 ) + ( le.fleet_percprov90_slope_0t6_Invalid << 48 ) + ( le.fleet_percprov90_slope_6t12_Invalid << 50 ) + ( le.carrier_percprov30_slope_0t12_Invalid << 52 ) + ( le.carrier_percprov30_slope_6t12_Invalid << 54 ) + ( le.carrier_percprov60_slope_0t12_Invalid << 56 ) + ( le.carrier_percprov60_slope_6t12_Invalid << 58 ) + ( le.carrier_percprov90_slope_0t24_Invalid << 60 ) + ( le.carrier_percprov90_slope_0t6_Invalid << 62 );
-    SELF.ScrubsBits9 := ( le.carrier_percprov90_slope_6t12_Invalid << 0 ) + ( le.bldgmats_percprov30_slope_0t12_Invalid << 2 ) + ( le.bldgmats_percprov30_slope_6t12_Invalid << 4 ) + ( le.bldgmats_percprov60_slope_0t12_Invalid << 6 ) + ( le.bldgmats_percprov60_slope_6t12_Invalid << 8 ) + ( le.bldgmats_percprov90_slope_0t24_Invalid << 10 ) + ( le.bldgmats_percprov90_slope_0t6_Invalid << 12 ) + ( le.bldgmats_percprov90_slope_6t12_Invalid << 14 ) + ( le.top5_percprov30_slope_0t12_Invalid << 16 ) + ( le.top5_percprov30_slope_6t12_Invalid << 18 ) + ( le.top5_percprov60_slope_0t12_Invalid << 20 ) + ( le.top5_percprov60_slope_6t12_Invalid << 22 ) + ( le.top5_percprov90_slope_0t24_Invalid << 24 ) + ( le.top5_percprov90_slope_0t6_Invalid << 26 ) + ( le.top5_percprov90_slope_6t12_Invalid << 28 ) + ( le.top5_percprovoutstanding_adjustedslope_0t12_Invalid << 30 );
+    SELF.ScrubsBits1 := ( le.ultimate_linkid_Invalid << 0 ) + ( le.cortera_score_Invalid << 1 ) + ( le.cpr_score_Invalid << 2 ) + ( le.cpr_segment_Invalid << 3 ) + ( le.dbt_Invalid << 4 ) + ( le.avg_bal_Invalid << 6 ) + ( le.air_spend_Invalid << 7 ) + ( le.fuel_spend_Invalid << 8 ) + ( le.leasing_spend_Invalid << 9 ) + ( le.ltl_spend_Invalid << 10 ) + ( le.rail_spend_Invalid << 11 ) + ( le.tl_spend_Invalid << 12 ) + ( le.transvc_spend_Invalid << 13 ) + ( le.transup_spend_Invalid << 14 ) + ( le.bst_spend_Invalid << 15 ) + ( le.dg_spend_Invalid << 16 ) + ( le.electrical_spend_Invalid << 17 ) + ( le.hvac_spend_Invalid << 18 ) + ( le.other_b_spend_Invalid << 19 ) + ( le.plumbing_spend_Invalid << 20 ) + ( le.rs_spend_Invalid << 21 ) + ( le.wp_spend_Invalid << 22 ) + ( le.chemical_spend_Invalid << 23 ) + ( le.electronic_spend_Invalid << 24 ) + ( le.metal_spend_Invalid << 25 ) + ( le.other_m_spend_Invalid << 26 ) + ( le.packaging_spend_Invalid << 27 ) + ( le.pvf_spend_Invalid << 28 ) + ( le.plastic_spend_Invalid << 29 ) + ( le.textile_spend_Invalid << 30 ) + ( le.bs_spend_Invalid << 31 ) + ( le.ce_spend_Invalid << 32 ) + ( le.hardware_spend_Invalid << 33 ) + ( le.ie_spend_Invalid << 34 ) + ( le.is_spend_Invalid << 35 ) + ( le.it_spend_Invalid << 36 ) + ( le.mls_spend_Invalid << 37 ) + ( le.os_spend_Invalid << 38 ) + ( le.pp_spend_Invalid << 39 ) + ( le.sis_spend_Invalid << 40 ) + ( le.apparel_spend_Invalid << 41 ) + ( le.beverages_spend_Invalid << 42 ) + ( le.constr_spend_Invalid << 43 ) + ( le.consulting_spend_Invalid << 44 ) + ( le.fs_spend_Invalid << 45 ) + ( le.fp_spend_Invalid << 46 ) + ( le.insurance_spend_Invalid << 47 ) + ( le.ls_spend_Invalid << 48 ) + ( le.oil_gas_spend_Invalid << 49 ) + ( le.utilities_spend_Invalid << 50 ) + ( le.other_spend_Invalid << 51 ) + ( le.advt_spend_Invalid << 52 ) + ( le.air_growth_Invalid << 53 ) + ( le.fuel_growth_Invalid << 55 ) + ( le.leasing_growth_Invalid << 57 ) + ( le.ltl_growth_Invalid << 59 ) + ( le.rail_growth_Invalid << 61 );
+    SELF.ScrubsBits2 := ( le.tl_growth_Invalid << 0 ) + ( le.transvc_growth_Invalid << 2 ) + ( le.transup_growth_Invalid << 4 ) + ( le.bst_growth_Invalid << 6 ) + ( le.dg_growth_Invalid << 8 ) + ( le.electrical_growth_Invalid << 10 ) + ( le.hvac_growth_Invalid << 12 ) + ( le.other_b_growth_Invalid << 14 ) + ( le.plumbing_growth_Invalid << 16 ) + ( le.rs_growth_Invalid << 18 ) + ( le.wp_growth_Invalid << 20 ) + ( le.chemical_growth_Invalid << 22 ) + ( le.electronic_growth_Invalid << 24 ) + ( le.metal_growth_Invalid << 26 ) + ( le.other_m_growth_Invalid << 28 ) + ( le.packaging_growth_Invalid << 30 ) + ( le.pvf_growth_Invalid << 32 ) + ( le.plastic_growth_Invalid << 34 ) + ( le.textile_growth_Invalid << 36 ) + ( le.bs_growth_Invalid << 38 ) + ( le.ce_growth_Invalid << 40 ) + ( le.hardware_growth_Invalid << 42 ) + ( le.ie_growth_Invalid << 44 ) + ( le.is_growth_Invalid << 46 ) + ( le.it_growth_Invalid << 48 ) + ( le.mls_growth_Invalid << 50 ) + ( le.os_growth_Invalid << 52 ) + ( le.pp_growth_Invalid << 54 ) + ( le.sis_growth_Invalid << 56 ) + ( le.apparel_growth_Invalid << 58 ) + ( le.beverages_growth_Invalid << 60 ) + ( le.constr_growth_Invalid << 62 );
+    SELF.ScrubsBits3 := ( le.consulting_growth_Invalid << 0 ) + ( le.fs_growth_Invalid << 2 ) + ( le.fp_growth_Invalid << 4 ) + ( le.insurance_growth_Invalid << 6 ) + ( le.ls_growth_Invalid << 8 ) + ( le.oil_gas_growth_Invalid << 10 ) + ( le.utilities_growth_Invalid << 12 ) + ( le.other_growth_Invalid << 14 ) + ( le.advt_growth_Invalid << 16 ) + ( le.top5_growth_Invalid << 18 ) + ( le.shipping_y1_Invalid << 20 ) + ( le.shipping_growth_Invalid << 21 ) + ( le.materials_y1_Invalid << 23 ) + ( le.materials_growth_Invalid << 24 ) + ( le.operations_y1_Invalid << 26 ) + ( le.operations_growth_Invalid << 27 ) + ( le.total_paid_average_0t12_Invalid << 29 ) + ( le.total_paid_monthspastworst_24_Invalid << 31 ) + ( le.total_paid_slope_0t12_Invalid << 33 ) + ( le.total_paid_slope_0t6_Invalid << 35 ) + ( le.total_paid_slope_6t12_Invalid << 37 ) + ( le.total_paid_slope_6t18_Invalid << 39 ) + ( le.total_paid_volatility_0t12_Invalid << 41 ) + ( le.total_paid_volatility_0t6_Invalid << 43 ) + ( le.total_paid_volatility_12t18_Invalid << 45 ) + ( le.total_paid_volatility_6t12_Invalid << 47 ) + ( le.total_spend_monthspastleast_24_Invalid << 49 ) + ( le.total_spend_monthspastmost_24_Invalid << 50 ) + ( le.total_spend_slope_0t12_Invalid << 51 ) + ( le.total_spend_slope_0t24_Invalid << 53 ) + ( le.total_spend_slope_0t6_Invalid << 55 ) + ( le.total_spend_slope_6t12_Invalid << 57 ) + ( le.total_spend_sum_12_Invalid << 59 ) + ( le.total_spend_volatility_0t12_Invalid << 61 );
+    SELF.ScrubsBits4 := ( le.total_spend_volatility_0t6_Invalid << 0 ) + ( le.total_spend_volatility_12t18_Invalid << 2 ) + ( le.total_spend_volatility_6t12_Invalid << 4 ) + ( le.mfgmat_paid_average_12_Invalid << 6 ) + ( le.mfgmat_paid_monthspastworst_24_Invalid << 8 ) + ( le.mfgmat_paid_slope_0t12_Invalid << 9 ) + ( le.mfgmat_paid_slope_0t24_Invalid << 11 ) + ( le.mfgmat_paid_slope_0t6_Invalid << 13 ) + ( le.mfgmat_paid_volatility_0t12_Invalid << 15 ) + ( le.mfgmat_paid_volatility_0t6_Invalid << 17 ) + ( le.mfgmat_spend_monthspastleast_24_Invalid << 19 ) + ( le.mfgmat_spend_monthspastmost_24_Invalid << 20 ) + ( le.mfgmat_spend_slope_0t12_Invalid << 21 ) + ( le.mfgmat_spend_slope_0t24_Invalid << 23 ) + ( le.mfgmat_spend_slope_0t6_Invalid << 25 ) + ( le.mfgmat_spend_sum_12_Invalid << 27 ) + ( le.mfgmat_spend_volatility_0t6_Invalid << 29 ) + ( le.mfgmat_spend_volatility_6t12_Invalid << 31 ) + ( le.ops_paid_average_12_Invalid << 33 ) + ( le.ops_paid_monthspastworst_24_Invalid << 35 ) + ( le.ops_paid_slope_0t12_Invalid << 37 ) + ( le.ops_paid_slope_0t24_Invalid << 39 ) + ( le.ops_paid_slope_0t6_Invalid << 41 ) + ( le.ops_paid_volatility_0t12_Invalid << 43 ) + ( le.ops_paid_volatility_0t6_Invalid << 45 ) + ( le.ops_spend_monthspastleast_24_Invalid << 47 ) + ( le.ops_spend_monthspastmost_24_Invalid << 48 ) + ( le.ops_spend_slope_0t12_Invalid << 49 ) + ( le.ops_spend_slope_0t24_Invalid << 51 ) + ( le.ops_spend_slope_0t6_Invalid << 53 ) + ( le.fleet_paid_monthspastworst_24_Invalid << 55 ) + ( le.fleet_paid_slope_0t12_Invalid << 56 ) + ( le.fleet_paid_slope_0t24_Invalid << 58 ) + ( le.fleet_paid_slope_0t6_Invalid << 60 ) + ( le.fleet_paid_volatility_0t12_Invalid << 62 );
+    SELF.ScrubsBits5 := ( le.fleet_paid_volatility_0t6_Invalid << 0 ) + ( le.fleet_spend_slope_0t12_Invalid << 2 ) + ( le.fleet_spend_slope_0t24_Invalid << 4 ) + ( le.fleet_spend_slope_0t6_Invalid << 6 ) + ( le.carrier_paid_slope_0t12_Invalid << 8 ) + ( le.carrier_paid_slope_0t24_Invalid << 10 ) + ( le.carrier_paid_slope_0t6_Invalid << 12 ) + ( le.carrier_paid_volatility_0t12_Invalid << 14 ) + ( le.carrier_paid_volatility_0t6_Invalid << 16 ) + ( le.carrier_spend_slope_0t12_Invalid << 18 ) + ( le.carrier_spend_slope_0t24_Invalid << 20 ) + ( le.carrier_spend_slope_0t6_Invalid << 22 ) + ( le.carrier_spend_volatility_0t6_Invalid << 24 ) + ( le.carrier_spend_volatility_6t12_Invalid << 26 ) + ( le.bldgmats_paid_slope_0t12_Invalid << 28 ) + ( le.bldgmats_paid_slope_0t24_Invalid << 30 ) + ( le.bldgmats_paid_slope_0t6_Invalid << 32 ) + ( le.bldgmats_paid_volatility_0t12_Invalid << 34 ) + ( le.bldgmats_paid_volatility_0t6_Invalid << 36 ) + ( le.bldgmats_spend_slope_0t12_Invalid << 38 ) + ( le.bldgmats_spend_slope_0t24_Invalid << 40 ) + ( le.bldgmats_spend_slope_0t6_Invalid << 42 ) + ( le.bldgmats_spend_volatility_0t6_Invalid << 44 ) + ( le.bldgmats_spend_volatility_6t12_Invalid << 46 ) + ( le.top5_paid_slope_0t12_Invalid << 48 ) + ( le.top5_paid_slope_0t24_Invalid << 50 ) + ( le.top5_paid_slope_0t6_Invalid << 52 ) + ( le.top5_paid_volatility_0t12_Invalid << 54 ) + ( le.top5_paid_volatility_0t6_Invalid << 56 ) + ( le.top5_spend_slope_0t12_Invalid << 58 ) + ( le.top5_spend_slope_0t24_Invalid << 60 ) + ( le.top5_spend_slope_0t6_Invalid << 62 );
+    SELF.ScrubsBits6 := ( le.top5_spend_volatility_0t6_Invalid << 0 ) + ( le.top5_spend_volatility_6t12_Invalid << 2 ) + ( le.total_numrel_slope_0t12_Invalid << 4 ) + ( le.total_numrel_slope_0t24_Invalid << 6 ) + ( le.total_numrel_slope_0t6_Invalid << 8 ) + ( le.total_numrel_slope_6t12_Invalid << 10 ) + ( le.mfgmat_numrel_slope_0t12_Invalid << 12 ) + ( le.mfgmat_numrel_slope_0t24_Invalid << 14 ) + ( le.mfgmat_numrel_slope_0t6_Invalid << 16 ) + ( le.mfgmat_numrel_slope_6t12_Invalid << 18 ) + ( le.ops_numrel_slope_0t12_Invalid << 20 ) + ( le.ops_numrel_slope_0t24_Invalid << 22 ) + ( le.ops_numrel_slope_0t6_Invalid << 24 ) + ( le.ops_numrel_slope_6t12_Invalid << 26 ) + ( le.fleet_numrel_slope_0t12_Invalid << 28 ) + ( le.fleet_numrel_slope_0t24_Invalid << 30 ) + ( le.fleet_numrel_slope_0t6_Invalid << 32 ) + ( le.fleet_numrel_slope_6t12_Invalid << 34 ) + ( le.carrier_numrel_slope_0t12_Invalid << 36 ) + ( le.carrier_numrel_slope_0t24_Invalid << 38 ) + ( le.carrier_numrel_slope_0t6_Invalid << 40 ) + ( le.carrier_numrel_slope_6t12_Invalid << 42 ) + ( le.bldgmats_numrel_slope_0t12_Invalid << 44 ) + ( le.bldgmats_numrel_slope_0t24_Invalid << 46 ) + ( le.bldgmats_numrel_slope_0t6_Invalid << 48 ) + ( le.bldgmats_numrel_slope_6t12_Invalid << 50 ) + ( le.bldgmats_numrel_var_0t12_Invalid << 52 ) + ( le.bldgmats_numrel_var_12t24_Invalid << 54 ) + ( le.total_percprov30_slope_0t12_Invalid << 56 ) + ( le.total_percprov30_slope_0t24_Invalid << 58 ) + ( le.total_percprov30_slope_0t6_Invalid << 60 ) + ( le.total_percprov30_slope_6t12_Invalid << 62 );
+    SELF.ScrubsBits7 := ( le.total_percprov60_slope_0t12_Invalid << 0 ) + ( le.total_percprov60_slope_0t24_Invalid << 2 ) + ( le.total_percprov60_slope_0t6_Invalid << 4 ) + ( le.total_percprov60_slope_6t12_Invalid << 6 ) + ( le.total_percprov90_slope_0t24_Invalid << 8 ) + ( le.total_percprov90_slope_0t6_Invalid << 10 ) + ( le.total_percprov90_slope_6t12_Invalid << 12 ) + ( le.mfgmat_percprov30_slope_0t12_Invalid << 14 ) + ( le.mfgmat_percprov30_slope_6t12_Invalid << 16 ) + ( le.mfgmat_percprov60_slope_0t12_Invalid << 18 ) + ( le.mfgmat_percprov60_slope_6t12_Invalid << 20 ) + ( le.mfgmat_percprov90_slope_0t24_Invalid << 22 ) + ( le.mfgmat_percprov90_slope_0t6_Invalid << 24 ) + ( le.mfgmat_percprov90_slope_6t12_Invalid << 26 ) + ( le.ops_percprov30_slope_0t12_Invalid << 28 ) + ( le.ops_percprov30_slope_6t12_Invalid << 30 ) + ( le.ops_percprov60_slope_0t12_Invalid << 32 ) + ( le.ops_percprov60_slope_6t12_Invalid << 34 ) + ( le.ops_percprov90_slope_0t24_Invalid << 36 ) + ( le.ops_percprov90_slope_0t6_Invalid << 38 ) + ( le.ops_percprov90_slope_6t12_Invalid << 40 ) + ( le.fleet_percprov30_slope_0t12_Invalid << 42 ) + ( le.fleet_percprov30_slope_6t12_Invalid << 44 ) + ( le.fleet_percprov60_slope_0t12_Invalid << 46 ) + ( le.fleet_percprov60_slope_6t12_Invalid << 48 ) + ( le.fleet_percprov90_slope_0t24_Invalid << 50 ) + ( le.fleet_percprov90_slope_0t6_Invalid << 52 ) + ( le.fleet_percprov90_slope_6t12_Invalid << 54 ) + ( le.carrier_percprov30_slope_0t12_Invalid << 56 ) + ( le.carrier_percprov30_slope_6t12_Invalid << 58 ) + ( le.carrier_percprov60_slope_0t12_Invalid << 60 ) + ( le.carrier_percprov60_slope_6t12_Invalid << 62 );
+    SELF.ScrubsBits8 := ( le.carrier_percprov90_slope_0t24_Invalid << 0 ) + ( le.carrier_percprov90_slope_0t6_Invalid << 2 ) + ( le.carrier_percprov90_slope_6t12_Invalid << 4 ) + ( le.bldgmats_percprov30_slope_0t12_Invalid << 6 ) + ( le.bldgmats_percprov30_slope_6t12_Invalid << 8 ) + ( le.bldgmats_percprov60_slope_0t12_Invalid << 10 ) + ( le.bldgmats_percprov60_slope_6t12_Invalid << 12 ) + ( le.bldgmats_percprov90_slope_0t24_Invalid << 14 ) + ( le.bldgmats_percprov90_slope_0t6_Invalid << 16 ) + ( le.bldgmats_percprov90_slope_6t12_Invalid << 18 ) + ( le.top5_percprov30_slope_0t12_Invalid << 20 ) + ( le.top5_percprov30_slope_6t12_Invalid << 22 ) + ( le.top5_percprov60_slope_0t12_Invalid << 24 ) + ( le.top5_percprov60_slope_6t12_Invalid << 26 ) + ( le.top5_percprov90_slope_0t24_Invalid << 28 ) + ( le.top5_percprov90_slope_0t6_Invalid << 30 ) + ( le.top5_percprov90_slope_6t12_Invalid << 32 ) + ( le.top5_percprovoutstanding_adjustedslope_0t12_Invalid << 34 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -589,278 +587,278 @@ END;
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Attributes_Layout_Cortera);
   Expanded_Layout into(h le) := TRANSFORM
-    SELF.ultimate_linkid_Invalid := (le.ScrubsBits1 >> 0) & 3;
-    SELF.cortera_score_Invalid := (le.ScrubsBits1 >> 2) & 3;
-    SELF.cpr_score_Invalid := (le.ScrubsBits1 >> 4) & 3;
-    SELF.cpr_segment_Invalid := (le.ScrubsBits1 >> 6) & 3;
-    SELF.dbt_Invalid := (le.ScrubsBits1 >> 8) & 3;
-    SELF.avg_bal_Invalid := (le.ScrubsBits1 >> 10) & 3;
-    SELF.air_spend_Invalid := (le.ScrubsBits1 >> 12) & 3;
-    SELF.fuel_spend_Invalid := (le.ScrubsBits1 >> 14) & 3;
-    SELF.leasing_spend_Invalid := (le.ScrubsBits1 >> 16) & 3;
-    SELF.ltl_spend_Invalid := (le.ScrubsBits1 >> 18) & 3;
-    SELF.rail_spend_Invalid := (le.ScrubsBits1 >> 20) & 3;
-    SELF.tl_spend_Invalid := (le.ScrubsBits1 >> 22) & 3;
-    SELF.transvc_spend_Invalid := (le.ScrubsBits1 >> 24) & 3;
-    SELF.transup_spend_Invalid := (le.ScrubsBits1 >> 26) & 3;
-    SELF.bst_spend_Invalid := (le.ScrubsBits1 >> 28) & 3;
-    SELF.dg_spend_Invalid := (le.ScrubsBits1 >> 30) & 3;
-    SELF.electrical_spend_Invalid := (le.ScrubsBits1 >> 32) & 3;
-    SELF.hvac_spend_Invalid := (le.ScrubsBits1 >> 34) & 3;
-    SELF.other_b_spend_Invalid := (le.ScrubsBits1 >> 36) & 3;
-    SELF.plumbing_spend_Invalid := (le.ScrubsBits1 >> 38) & 3;
-    SELF.rs_spend_Invalid := (le.ScrubsBits1 >> 40) & 3;
-    SELF.wp_spend_Invalid := (le.ScrubsBits1 >> 42) & 3;
-    SELF.chemical_spend_Invalid := (le.ScrubsBits1 >> 44) & 3;
-    SELF.electronic_spend_Invalid := (le.ScrubsBits1 >> 46) & 3;
-    SELF.metal_spend_Invalid := (le.ScrubsBits1 >> 48) & 3;
-    SELF.other_m_spend_Invalid := (le.ScrubsBits1 >> 50) & 3;
-    SELF.packaging_spend_Invalid := (le.ScrubsBits1 >> 52) & 3;
-    SELF.pvf_spend_Invalid := (le.ScrubsBits1 >> 54) & 3;
-    SELF.plastic_spend_Invalid := (le.ScrubsBits1 >> 56) & 3;
-    SELF.textile_spend_Invalid := (le.ScrubsBits1 >> 58) & 3;
-    SELF.bs_spend_Invalid := (le.ScrubsBits1 >> 60) & 3;
-    SELF.ce_spend_Invalid := (le.ScrubsBits1 >> 62) & 3;
-    SELF.hardware_spend_Invalid := (le.ScrubsBits2 >> 0) & 3;
-    SELF.ie_spend_Invalid := (le.ScrubsBits2 >> 2) & 3;
-    SELF.is_spend_Invalid := (le.ScrubsBits2 >> 4) & 3;
-    SELF.it_spend_Invalid := (le.ScrubsBits2 >> 6) & 3;
-    SELF.mls_spend_Invalid := (le.ScrubsBits2 >> 8) & 3;
-    SELF.os_spend_Invalid := (le.ScrubsBits2 >> 10) & 3;
-    SELF.pp_spend_Invalid := (le.ScrubsBits2 >> 12) & 3;
-    SELF.sis_spend_Invalid := (le.ScrubsBits2 >> 14) & 3;
-    SELF.apparel_spend_Invalid := (le.ScrubsBits2 >> 16) & 3;
-    SELF.beverages_spend_Invalid := (le.ScrubsBits2 >> 18) & 3;
-    SELF.constr_spend_Invalid := (le.ScrubsBits2 >> 20) & 3;
-    SELF.consulting_spend_Invalid := (le.ScrubsBits2 >> 22) & 3;
-    SELF.fs_spend_Invalid := (le.ScrubsBits2 >> 24) & 3;
-    SELF.fp_spend_Invalid := (le.ScrubsBits2 >> 26) & 3;
-    SELF.insurance_spend_Invalid := (le.ScrubsBits2 >> 28) & 3;
-    SELF.ls_spend_Invalid := (le.ScrubsBits2 >> 30) & 3;
-    SELF.oil_gas_spend_Invalid := (le.ScrubsBits2 >> 32) & 3;
-    SELF.utilities_spend_Invalid := (le.ScrubsBits2 >> 34) & 3;
-    SELF.other_spend_Invalid := (le.ScrubsBits2 >> 36) & 3;
-    SELF.advt_spend_Invalid := (le.ScrubsBits2 >> 38) & 3;
-    SELF.air_growth_Invalid := (le.ScrubsBits2 >> 40) & 3;
-    SELF.fuel_growth_Invalid := (le.ScrubsBits2 >> 42) & 3;
-    SELF.leasing_growth_Invalid := (le.ScrubsBits2 >> 44) & 3;
-    SELF.ltl_growth_Invalid := (le.ScrubsBits2 >> 46) & 3;
-    SELF.rail_growth_Invalid := (le.ScrubsBits2 >> 48) & 3;
-    SELF.tl_growth_Invalid := (le.ScrubsBits2 >> 50) & 3;
-    SELF.transvc_growth_Invalid := (le.ScrubsBits2 >> 52) & 3;
-    SELF.transup_growth_Invalid := (le.ScrubsBits2 >> 54) & 3;
-    SELF.bst_growth_Invalid := (le.ScrubsBits2 >> 56) & 3;
-    SELF.dg_growth_Invalid := (le.ScrubsBits2 >> 58) & 3;
-    SELF.electrical_growth_Invalid := (le.ScrubsBits2 >> 60) & 3;
-    SELF.hvac_growth_Invalid := (le.ScrubsBits2 >> 62) & 3;
-    SELF.other_b_growth_Invalid := (le.ScrubsBits3 >> 0) & 3;
-    SELF.plumbing_growth_Invalid := (le.ScrubsBits3 >> 2) & 3;
-    SELF.rs_growth_Invalid := (le.ScrubsBits3 >> 4) & 3;
-    SELF.wp_growth_Invalid := (le.ScrubsBits3 >> 6) & 3;
-    SELF.chemical_growth_Invalid := (le.ScrubsBits3 >> 8) & 3;
-    SELF.electronic_growth_Invalid := (le.ScrubsBits3 >> 10) & 3;
-    SELF.metal_growth_Invalid := (le.ScrubsBits3 >> 12) & 3;
-    SELF.other_m_growth_Invalid := (le.ScrubsBits3 >> 14) & 3;
-    SELF.packaging_growth_Invalid := (le.ScrubsBits3 >> 16) & 3;
-    SELF.pvf_growth_Invalid := (le.ScrubsBits3 >> 18) & 3;
-    SELF.plastic_growth_Invalid := (le.ScrubsBits3 >> 20) & 3;
-    SELF.textile_growth_Invalid := (le.ScrubsBits3 >> 22) & 3;
-    SELF.bs_growth_Invalid := (le.ScrubsBits3 >> 24) & 3;
-    SELF.ce_growth_Invalid := (le.ScrubsBits3 >> 26) & 3;
-    SELF.hardware_growth_Invalid := (le.ScrubsBits3 >> 28) & 3;
-    SELF.ie_growth_Invalid := (le.ScrubsBits3 >> 30) & 3;
-    SELF.is_growth_Invalid := (le.ScrubsBits3 >> 32) & 3;
-    SELF.it_growth_Invalid := (le.ScrubsBits3 >> 34) & 3;
-    SELF.mls_growth_Invalid := (le.ScrubsBits3 >> 36) & 3;
-    SELF.os_growth_Invalid := (le.ScrubsBits3 >> 38) & 3;
-    SELF.pp_growth_Invalid := (le.ScrubsBits3 >> 40) & 3;
-    SELF.sis_growth_Invalid := (le.ScrubsBits3 >> 42) & 3;
-    SELF.apparel_growth_Invalid := (le.ScrubsBits3 >> 44) & 3;
-    SELF.beverages_growth_Invalid := (le.ScrubsBits3 >> 46) & 3;
-    SELF.constr_growth_Invalid := (le.ScrubsBits3 >> 48) & 3;
-    SELF.consulting_growth_Invalid := (le.ScrubsBits3 >> 50) & 3;
-    SELF.fs_growth_Invalid := (le.ScrubsBits3 >> 52) & 3;
-    SELF.fp_growth_Invalid := (le.ScrubsBits3 >> 54) & 3;
-    SELF.insurance_growth_Invalid := (le.ScrubsBits3 >> 56) & 3;
-    SELF.ls_growth_Invalid := (le.ScrubsBits3 >> 58) & 3;
-    SELF.oil_gas_growth_Invalid := (le.ScrubsBits3 >> 60) & 3;
-    SELF.utilities_growth_Invalid := (le.ScrubsBits3 >> 62) & 3;
-    SELF.other_growth_Invalid := (le.ScrubsBits4 >> 0) & 3;
-    SELF.advt_growth_Invalid := (le.ScrubsBits4 >> 2) & 3;
-    SELF.top5_growth_Invalid := (le.ScrubsBits4 >> 4) & 3;
-    SELF.shipping_y1_Invalid := (le.ScrubsBits4 >> 6) & 3;
-    SELF.shipping_growth_Invalid := (le.ScrubsBits4 >> 8) & 3;
-    SELF.materials_y1_Invalid := (le.ScrubsBits4 >> 10) & 3;
-    SELF.materials_growth_Invalid := (le.ScrubsBits4 >> 12) & 3;
-    SELF.operations_y1_Invalid := (le.ScrubsBits4 >> 14) & 3;
-    SELF.operations_growth_Invalid := (le.ScrubsBits4 >> 16) & 3;
-    SELF.total_paid_average_0t12_Invalid := (le.ScrubsBits4 >> 18) & 3;
-    SELF.total_paid_monthspastworst_24_Invalid := (le.ScrubsBits4 >> 20) & 3;
-    SELF.total_paid_slope_0t12_Invalid := (le.ScrubsBits4 >> 22) & 3;
-    SELF.total_paid_slope_0t6_Invalid := (le.ScrubsBits4 >> 24) & 3;
-    SELF.total_paid_slope_6t12_Invalid := (le.ScrubsBits4 >> 26) & 3;
-    SELF.total_paid_slope_6t18_Invalid := (le.ScrubsBits4 >> 28) & 3;
-    SELF.total_paid_volatility_0t12_Invalid := (le.ScrubsBits4 >> 30) & 3;
-    SELF.total_paid_volatility_0t6_Invalid := (le.ScrubsBits4 >> 32) & 3;
-    SELF.total_paid_volatility_12t18_Invalid := (le.ScrubsBits4 >> 34) & 3;
-    SELF.total_paid_volatility_6t12_Invalid := (le.ScrubsBits4 >> 36) & 3;
-    SELF.total_spend_monthspastleast_24_Invalid := (le.ScrubsBits4 >> 38) & 3;
-    SELF.total_spend_monthspastmost_24_Invalid := (le.ScrubsBits4 >> 40) & 3;
-    SELF.total_spend_slope_0t12_Invalid := (le.ScrubsBits4 >> 42) & 3;
-    SELF.total_spend_slope_0t24_Invalid := (le.ScrubsBits4 >> 44) & 3;
-    SELF.total_spend_slope_0t6_Invalid := (le.ScrubsBits4 >> 46) & 3;
-    SELF.total_spend_slope_6t12_Invalid := (le.ScrubsBits4 >> 48) & 3;
-    SELF.total_spend_sum_12_Invalid := (le.ScrubsBits4 >> 50) & 3;
-    SELF.total_spend_volatility_0t12_Invalid := (le.ScrubsBits4 >> 52) & 3;
-    SELF.total_spend_volatility_0t6_Invalid := (le.ScrubsBits4 >> 54) & 3;
-    SELF.total_spend_volatility_12t18_Invalid := (le.ScrubsBits4 >> 56) & 3;
-    SELF.total_spend_volatility_6t12_Invalid := (le.ScrubsBits4 >> 58) & 3;
-    SELF.mfgmat_paid_average_12_Invalid := (le.ScrubsBits4 >> 60) & 3;
-    SELF.mfgmat_paid_monthspastworst_24_Invalid := (le.ScrubsBits4 >> 62) & 3;
-    SELF.mfgmat_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 0) & 3;
-    SELF.mfgmat_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 2) & 3;
-    SELF.mfgmat_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 4) & 3;
-    SELF.mfgmat_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 6) & 3;
-    SELF.mfgmat_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 8) & 3;
-    SELF.mfgmat_spend_monthspastleast_24_Invalid := (le.ScrubsBits5 >> 10) & 3;
-    SELF.mfgmat_spend_monthspastmost_24_Invalid := (le.ScrubsBits5 >> 12) & 3;
-    SELF.mfgmat_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 14) & 3;
-    SELF.mfgmat_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 16) & 3;
-    SELF.mfgmat_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 18) & 3;
-    SELF.mfgmat_spend_sum_12_Invalid := (le.ScrubsBits5 >> 20) & 3;
-    SELF.mfgmat_spend_volatility_0t6_Invalid := (le.ScrubsBits5 >> 22) & 3;
-    SELF.mfgmat_spend_volatility_6t12_Invalid := (le.ScrubsBits5 >> 24) & 3;
-    SELF.ops_paid_average_12_Invalid := (le.ScrubsBits5 >> 26) & 3;
-    SELF.ops_paid_monthspastworst_24_Invalid := (le.ScrubsBits5 >> 28) & 3;
-    SELF.ops_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 30) & 3;
-    SELF.ops_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 32) & 3;
-    SELF.ops_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 34) & 3;
-    SELF.ops_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 36) & 3;
-    SELF.ops_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 38) & 3;
-    SELF.ops_spend_monthspastleast_24_Invalid := (le.ScrubsBits5 >> 40) & 3;
-    SELF.ops_spend_monthspastmost_24_Invalid := (le.ScrubsBits5 >> 42) & 3;
-    SELF.ops_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 44) & 3;
-    SELF.ops_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 46) & 3;
-    SELF.ops_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 48) & 3;
-    SELF.fleet_paid_monthspastworst_24_Invalid := (le.ScrubsBits5 >> 50) & 3;
-    SELF.fleet_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 52) & 3;
-    SELF.fleet_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 54) & 3;
-    SELF.fleet_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 56) & 3;
-    SELF.fleet_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 58) & 3;
-    SELF.fleet_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 60) & 3;
-    SELF.fleet_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 62) & 3;
-    SELF.fleet_spend_slope_0t24_Invalid := (le.ScrubsBits6 >> 0) & 3;
-    SELF.fleet_spend_slope_0t6_Invalid := (le.ScrubsBits6 >> 2) & 3;
-    SELF.carrier_paid_slope_0t12_Invalid := (le.ScrubsBits6 >> 4) & 3;
-    SELF.carrier_paid_slope_0t24_Invalid := (le.ScrubsBits6 >> 6) & 3;
-    SELF.carrier_paid_slope_0t6_Invalid := (le.ScrubsBits6 >> 8) & 3;
-    SELF.carrier_paid_volatility_0t12_Invalid := (le.ScrubsBits6 >> 10) & 3;
-    SELF.carrier_paid_volatility_0t6_Invalid := (le.ScrubsBits6 >> 12) & 3;
-    SELF.carrier_spend_slope_0t12_Invalid := (le.ScrubsBits6 >> 14) & 3;
-    SELF.carrier_spend_slope_0t24_Invalid := (le.ScrubsBits6 >> 16) & 3;
-    SELF.carrier_spend_slope_0t6_Invalid := (le.ScrubsBits6 >> 18) & 3;
-    SELF.carrier_spend_volatility_0t6_Invalid := (le.ScrubsBits6 >> 20) & 3;
-    SELF.carrier_spend_volatility_6t12_Invalid := (le.ScrubsBits6 >> 22) & 3;
-    SELF.bldgmats_paid_slope_0t12_Invalid := (le.ScrubsBits6 >> 24) & 3;
-    SELF.bldgmats_paid_slope_0t24_Invalid := (le.ScrubsBits6 >> 26) & 3;
-    SELF.bldgmats_paid_slope_0t6_Invalid := (le.ScrubsBits6 >> 28) & 3;
-    SELF.bldgmats_paid_volatility_0t12_Invalid := (le.ScrubsBits6 >> 30) & 3;
-    SELF.bldgmats_paid_volatility_0t6_Invalid := (le.ScrubsBits6 >> 32) & 3;
-    SELF.bldgmats_spend_slope_0t12_Invalid := (le.ScrubsBits6 >> 34) & 3;
-    SELF.bldgmats_spend_slope_0t24_Invalid := (le.ScrubsBits6 >> 36) & 3;
-    SELF.bldgmats_spend_slope_0t6_Invalid := (le.ScrubsBits6 >> 38) & 3;
-    SELF.bldgmats_spend_volatility_0t6_Invalid := (le.ScrubsBits6 >> 40) & 3;
-    SELF.bldgmats_spend_volatility_6t12_Invalid := (le.ScrubsBits6 >> 42) & 3;
-    SELF.top5_paid_slope_0t12_Invalid := (le.ScrubsBits6 >> 44) & 3;
-    SELF.top5_paid_slope_0t24_Invalid := (le.ScrubsBits6 >> 46) & 3;
-    SELF.top5_paid_slope_0t6_Invalid := (le.ScrubsBits6 >> 48) & 3;
-    SELF.top5_paid_volatility_0t12_Invalid := (le.ScrubsBits6 >> 50) & 3;
-    SELF.top5_paid_volatility_0t6_Invalid := (le.ScrubsBits6 >> 52) & 3;
-    SELF.top5_spend_slope_0t12_Invalid := (le.ScrubsBits6 >> 54) & 3;
-    SELF.top5_spend_slope_0t24_Invalid := (le.ScrubsBits6 >> 56) & 3;
-    SELF.top5_spend_slope_0t6_Invalid := (le.ScrubsBits6 >> 58) & 3;
-    SELF.top5_spend_volatility_0t6_Invalid := (le.ScrubsBits6 >> 60) & 3;
-    SELF.top5_spend_volatility_6t12_Invalid := (le.ScrubsBits6 >> 62) & 3;
-    SELF.total_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 0) & 3;
-    SELF.total_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 2) & 3;
-    SELF.total_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 4) & 3;
-    SELF.total_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 6) & 3;
-    SELF.mfgmat_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 8) & 3;
-    SELF.mfgmat_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 10) & 3;
-    SELF.mfgmat_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 12) & 3;
-    SELF.mfgmat_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 14) & 3;
-    SELF.ops_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 16) & 3;
-    SELF.ops_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 18) & 3;
-    SELF.ops_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 20) & 3;
-    SELF.ops_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 22) & 3;
-    SELF.fleet_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 24) & 3;
-    SELF.fleet_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 26) & 3;
-    SELF.fleet_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 28) & 3;
-    SELF.fleet_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 30) & 3;
-    SELF.carrier_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 32) & 3;
-    SELF.carrier_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 34) & 3;
-    SELF.carrier_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 36) & 3;
-    SELF.carrier_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 38) & 3;
-    SELF.bldgmats_numrel_slope_0t12_Invalid := (le.ScrubsBits7 >> 40) & 3;
-    SELF.bldgmats_numrel_slope_0t24_Invalid := (le.ScrubsBits7 >> 42) & 3;
-    SELF.bldgmats_numrel_slope_0t6_Invalid := (le.ScrubsBits7 >> 44) & 3;
-    SELF.bldgmats_numrel_slope_6t12_Invalid := (le.ScrubsBits7 >> 46) & 3;
-    SELF.bldgmats_numrel_var_0t12_Invalid := (le.ScrubsBits7 >> 48) & 3;
-    SELF.bldgmats_numrel_var_12t24_Invalid := (le.ScrubsBits7 >> 50) & 3;
-    SELF.total_percprov30_slope_0t12_Invalid := (le.ScrubsBits7 >> 52) & 3;
-    SELF.total_percprov30_slope_0t24_Invalid := (le.ScrubsBits7 >> 54) & 3;
-    SELF.total_percprov30_slope_0t6_Invalid := (le.ScrubsBits7 >> 56) & 3;
-    SELF.total_percprov30_slope_6t12_Invalid := (le.ScrubsBits7 >> 58) & 3;
-    SELF.total_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 60) & 3;
-    SELF.total_percprov60_slope_0t24_Invalid := (le.ScrubsBits7 >> 62) & 3;
-    SELF.total_percprov60_slope_0t6_Invalid := (le.ScrubsBits8 >> 0) & 3;
-    SELF.total_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 2) & 3;
-    SELF.total_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 4) & 3;
-    SELF.total_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 6) & 3;
-    SELF.total_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 8) & 3;
-    SELF.mfgmat_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 10) & 3;
-    SELF.mfgmat_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 12) & 3;
-    SELF.mfgmat_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 14) & 3;
-    SELF.mfgmat_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 16) & 3;
-    SELF.mfgmat_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 18) & 3;
-    SELF.mfgmat_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 20) & 3;
-    SELF.mfgmat_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 22) & 3;
-    SELF.ops_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 24) & 3;
-    SELF.ops_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 26) & 3;
-    SELF.ops_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 28) & 3;
-    SELF.ops_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 30) & 3;
-    SELF.ops_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 32) & 3;
-    SELF.ops_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 34) & 3;
-    SELF.ops_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 36) & 3;
-    SELF.fleet_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 38) & 3;
-    SELF.fleet_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 40) & 3;
-    SELF.fleet_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 42) & 3;
-    SELF.fleet_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 44) & 3;
-    SELF.fleet_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 46) & 3;
-    SELF.fleet_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 48) & 3;
-    SELF.fleet_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 50) & 3;
-    SELF.carrier_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 52) & 3;
-    SELF.carrier_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 54) & 3;
-    SELF.carrier_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 56) & 3;
-    SELF.carrier_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 58) & 3;
-    SELF.carrier_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 60) & 3;
-    SELF.carrier_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 62) & 3;
-    SELF.carrier_percprov90_slope_6t12_Invalid := (le.ScrubsBits9 >> 0) & 3;
-    SELF.bldgmats_percprov30_slope_0t12_Invalid := (le.ScrubsBits9 >> 2) & 3;
-    SELF.bldgmats_percprov30_slope_6t12_Invalid := (le.ScrubsBits9 >> 4) & 3;
-    SELF.bldgmats_percprov60_slope_0t12_Invalid := (le.ScrubsBits9 >> 6) & 3;
-    SELF.bldgmats_percprov60_slope_6t12_Invalid := (le.ScrubsBits9 >> 8) & 3;
-    SELF.bldgmats_percprov90_slope_0t24_Invalid := (le.ScrubsBits9 >> 10) & 3;
-    SELF.bldgmats_percprov90_slope_0t6_Invalid := (le.ScrubsBits9 >> 12) & 3;
-    SELF.bldgmats_percprov90_slope_6t12_Invalid := (le.ScrubsBits9 >> 14) & 3;
-    SELF.top5_percprov30_slope_0t12_Invalid := (le.ScrubsBits9 >> 16) & 3;
-    SELF.top5_percprov30_slope_6t12_Invalid := (le.ScrubsBits9 >> 18) & 3;
-    SELF.top5_percprov60_slope_0t12_Invalid := (le.ScrubsBits9 >> 20) & 3;
-    SELF.top5_percprov60_slope_6t12_Invalid := (le.ScrubsBits9 >> 22) & 3;
-    SELF.top5_percprov90_slope_0t24_Invalid := (le.ScrubsBits9 >> 24) & 3;
-    SELF.top5_percprov90_slope_0t6_Invalid := (le.ScrubsBits9 >> 26) & 3;
-    SELF.top5_percprov90_slope_6t12_Invalid := (le.ScrubsBits9 >> 28) & 3;
-    SELF.top5_percprovoutstanding_adjustedslope_0t12_Invalid := (le.ScrubsBits9 >> 30) & 3;
+    SELF.ultimate_linkid_Invalid := (le.ScrubsBits1 >> 0) & 1;
+    SELF.cortera_score_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.cpr_score_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.cpr_segment_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.dbt_Invalid := (le.ScrubsBits1 >> 4) & 3;
+    SELF.avg_bal_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.air_spend_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.fuel_spend_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.leasing_spend_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.ltl_spend_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.rail_spend_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.tl_spend_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.transvc_spend_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.transup_spend_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.bst_spend_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.dg_spend_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.electrical_spend_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.hvac_spend_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.other_b_spend_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.plumbing_spend_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.rs_spend_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.wp_spend_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.chemical_spend_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.electronic_spend_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.metal_spend_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.other_m_spend_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.packaging_spend_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.pvf_spend_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.plastic_spend_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.textile_spend_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.bs_spend_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.ce_spend_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.hardware_spend_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.ie_spend_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.is_spend_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.it_spend_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.mls_spend_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.os_spend_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.pp_spend_Invalid := (le.ScrubsBits1 >> 39) & 1;
+    SELF.sis_spend_Invalid := (le.ScrubsBits1 >> 40) & 1;
+    SELF.apparel_spend_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.beverages_spend_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.constr_spend_Invalid := (le.ScrubsBits1 >> 43) & 1;
+    SELF.consulting_spend_Invalid := (le.ScrubsBits1 >> 44) & 1;
+    SELF.fs_spend_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.fp_spend_Invalid := (le.ScrubsBits1 >> 46) & 1;
+    SELF.insurance_spend_Invalid := (le.ScrubsBits1 >> 47) & 1;
+    SELF.ls_spend_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.oil_gas_spend_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.utilities_spend_Invalid := (le.ScrubsBits1 >> 50) & 1;
+    SELF.other_spend_Invalid := (le.ScrubsBits1 >> 51) & 1;
+    SELF.advt_spend_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.air_growth_Invalid := (le.ScrubsBits1 >> 53) & 3;
+    SELF.fuel_growth_Invalid := (le.ScrubsBits1 >> 55) & 3;
+    SELF.leasing_growth_Invalid := (le.ScrubsBits1 >> 57) & 3;
+    SELF.ltl_growth_Invalid := (le.ScrubsBits1 >> 59) & 3;
+    SELF.rail_growth_Invalid := (le.ScrubsBits1 >> 61) & 3;
+    SELF.tl_growth_Invalid := (le.ScrubsBits2 >> 0) & 3;
+    SELF.transvc_growth_Invalid := (le.ScrubsBits2 >> 2) & 3;
+    SELF.transup_growth_Invalid := (le.ScrubsBits2 >> 4) & 3;
+    SELF.bst_growth_Invalid := (le.ScrubsBits2 >> 6) & 3;
+    SELF.dg_growth_Invalid := (le.ScrubsBits2 >> 8) & 3;
+    SELF.electrical_growth_Invalid := (le.ScrubsBits2 >> 10) & 3;
+    SELF.hvac_growth_Invalid := (le.ScrubsBits2 >> 12) & 3;
+    SELF.other_b_growth_Invalid := (le.ScrubsBits2 >> 14) & 3;
+    SELF.plumbing_growth_Invalid := (le.ScrubsBits2 >> 16) & 3;
+    SELF.rs_growth_Invalid := (le.ScrubsBits2 >> 18) & 3;
+    SELF.wp_growth_Invalid := (le.ScrubsBits2 >> 20) & 3;
+    SELF.chemical_growth_Invalid := (le.ScrubsBits2 >> 22) & 3;
+    SELF.electronic_growth_Invalid := (le.ScrubsBits2 >> 24) & 3;
+    SELF.metal_growth_Invalid := (le.ScrubsBits2 >> 26) & 3;
+    SELF.other_m_growth_Invalid := (le.ScrubsBits2 >> 28) & 3;
+    SELF.packaging_growth_Invalid := (le.ScrubsBits2 >> 30) & 3;
+    SELF.pvf_growth_Invalid := (le.ScrubsBits2 >> 32) & 3;
+    SELF.plastic_growth_Invalid := (le.ScrubsBits2 >> 34) & 3;
+    SELF.textile_growth_Invalid := (le.ScrubsBits2 >> 36) & 3;
+    SELF.bs_growth_Invalid := (le.ScrubsBits2 >> 38) & 3;
+    SELF.ce_growth_Invalid := (le.ScrubsBits2 >> 40) & 3;
+    SELF.hardware_growth_Invalid := (le.ScrubsBits2 >> 42) & 3;
+    SELF.ie_growth_Invalid := (le.ScrubsBits2 >> 44) & 3;
+    SELF.is_growth_Invalid := (le.ScrubsBits2 >> 46) & 3;
+    SELF.it_growth_Invalid := (le.ScrubsBits2 >> 48) & 3;
+    SELF.mls_growth_Invalid := (le.ScrubsBits2 >> 50) & 3;
+    SELF.os_growth_Invalid := (le.ScrubsBits2 >> 52) & 3;
+    SELF.pp_growth_Invalid := (le.ScrubsBits2 >> 54) & 3;
+    SELF.sis_growth_Invalid := (le.ScrubsBits2 >> 56) & 3;
+    SELF.apparel_growth_Invalid := (le.ScrubsBits2 >> 58) & 3;
+    SELF.beverages_growth_Invalid := (le.ScrubsBits2 >> 60) & 3;
+    SELF.constr_growth_Invalid := (le.ScrubsBits2 >> 62) & 3;
+    SELF.consulting_growth_Invalid := (le.ScrubsBits3 >> 0) & 3;
+    SELF.fs_growth_Invalid := (le.ScrubsBits3 >> 2) & 3;
+    SELF.fp_growth_Invalid := (le.ScrubsBits3 >> 4) & 3;
+    SELF.insurance_growth_Invalid := (le.ScrubsBits3 >> 6) & 3;
+    SELF.ls_growth_Invalid := (le.ScrubsBits3 >> 8) & 3;
+    SELF.oil_gas_growth_Invalid := (le.ScrubsBits3 >> 10) & 3;
+    SELF.utilities_growth_Invalid := (le.ScrubsBits3 >> 12) & 3;
+    SELF.other_growth_Invalid := (le.ScrubsBits3 >> 14) & 3;
+    SELF.advt_growth_Invalid := (le.ScrubsBits3 >> 16) & 3;
+    SELF.top5_growth_Invalid := (le.ScrubsBits3 >> 18) & 3;
+    SELF.shipping_y1_Invalid := (le.ScrubsBits3 >> 20) & 1;
+    SELF.shipping_growth_Invalid := (le.ScrubsBits3 >> 21) & 3;
+    SELF.materials_y1_Invalid := (le.ScrubsBits3 >> 23) & 1;
+    SELF.materials_growth_Invalid := (le.ScrubsBits3 >> 24) & 3;
+    SELF.operations_y1_Invalid := (le.ScrubsBits3 >> 26) & 1;
+    SELF.operations_growth_Invalid := (le.ScrubsBits3 >> 27) & 3;
+    SELF.total_paid_average_0t12_Invalid := (le.ScrubsBits3 >> 29) & 3;
+    SELF.total_paid_monthspastworst_24_Invalid := (le.ScrubsBits3 >> 31) & 3;
+    SELF.total_paid_slope_0t12_Invalid := (le.ScrubsBits3 >> 33) & 3;
+    SELF.total_paid_slope_0t6_Invalid := (le.ScrubsBits3 >> 35) & 3;
+    SELF.total_paid_slope_6t12_Invalid := (le.ScrubsBits3 >> 37) & 3;
+    SELF.total_paid_slope_6t18_Invalid := (le.ScrubsBits3 >> 39) & 3;
+    SELF.total_paid_volatility_0t12_Invalid := (le.ScrubsBits3 >> 41) & 3;
+    SELF.total_paid_volatility_0t6_Invalid := (le.ScrubsBits3 >> 43) & 3;
+    SELF.total_paid_volatility_12t18_Invalid := (le.ScrubsBits3 >> 45) & 3;
+    SELF.total_paid_volatility_6t12_Invalid := (le.ScrubsBits3 >> 47) & 3;
+    SELF.total_spend_monthspastleast_24_Invalid := (le.ScrubsBits3 >> 49) & 1;
+    SELF.total_spend_monthspastmost_24_Invalid := (le.ScrubsBits3 >> 50) & 1;
+    SELF.total_spend_slope_0t12_Invalid := (le.ScrubsBits3 >> 51) & 3;
+    SELF.total_spend_slope_0t24_Invalid := (le.ScrubsBits3 >> 53) & 3;
+    SELF.total_spend_slope_0t6_Invalid := (le.ScrubsBits3 >> 55) & 3;
+    SELF.total_spend_slope_6t12_Invalid := (le.ScrubsBits3 >> 57) & 3;
+    SELF.total_spend_sum_12_Invalid := (le.ScrubsBits3 >> 59) & 3;
+    SELF.total_spend_volatility_0t12_Invalid := (le.ScrubsBits3 >> 61) & 3;
+    SELF.total_spend_volatility_0t6_Invalid := (le.ScrubsBits4 >> 0) & 3;
+    SELF.total_spend_volatility_12t18_Invalid := (le.ScrubsBits4 >> 2) & 3;
+    SELF.total_spend_volatility_6t12_Invalid := (le.ScrubsBits4 >> 4) & 3;
+    SELF.mfgmat_paid_average_12_Invalid := (le.ScrubsBits4 >> 6) & 3;
+    SELF.mfgmat_paid_monthspastworst_24_Invalid := (le.ScrubsBits4 >> 8) & 1;
+    SELF.mfgmat_paid_slope_0t12_Invalid := (le.ScrubsBits4 >> 9) & 3;
+    SELF.mfgmat_paid_slope_0t24_Invalid := (le.ScrubsBits4 >> 11) & 3;
+    SELF.mfgmat_paid_slope_0t6_Invalid := (le.ScrubsBits4 >> 13) & 3;
+    SELF.mfgmat_paid_volatility_0t12_Invalid := (le.ScrubsBits4 >> 15) & 3;
+    SELF.mfgmat_paid_volatility_0t6_Invalid := (le.ScrubsBits4 >> 17) & 3;
+    SELF.mfgmat_spend_monthspastleast_24_Invalid := (le.ScrubsBits4 >> 19) & 1;
+    SELF.mfgmat_spend_monthspastmost_24_Invalid := (le.ScrubsBits4 >> 20) & 1;
+    SELF.mfgmat_spend_slope_0t12_Invalid := (le.ScrubsBits4 >> 21) & 3;
+    SELF.mfgmat_spend_slope_0t24_Invalid := (le.ScrubsBits4 >> 23) & 3;
+    SELF.mfgmat_spend_slope_0t6_Invalid := (le.ScrubsBits4 >> 25) & 3;
+    SELF.mfgmat_spend_sum_12_Invalid := (le.ScrubsBits4 >> 27) & 3;
+    SELF.mfgmat_spend_volatility_0t6_Invalid := (le.ScrubsBits4 >> 29) & 3;
+    SELF.mfgmat_spend_volatility_6t12_Invalid := (le.ScrubsBits4 >> 31) & 3;
+    SELF.ops_paid_average_12_Invalid := (le.ScrubsBits4 >> 33) & 3;
+    SELF.ops_paid_monthspastworst_24_Invalid := (le.ScrubsBits4 >> 35) & 3;
+    SELF.ops_paid_slope_0t12_Invalid := (le.ScrubsBits4 >> 37) & 3;
+    SELF.ops_paid_slope_0t24_Invalid := (le.ScrubsBits4 >> 39) & 3;
+    SELF.ops_paid_slope_0t6_Invalid := (le.ScrubsBits4 >> 41) & 3;
+    SELF.ops_paid_volatility_0t12_Invalid := (le.ScrubsBits4 >> 43) & 3;
+    SELF.ops_paid_volatility_0t6_Invalid := (le.ScrubsBits4 >> 45) & 3;
+    SELF.ops_spend_monthspastleast_24_Invalid := (le.ScrubsBits4 >> 47) & 1;
+    SELF.ops_spend_monthspastmost_24_Invalid := (le.ScrubsBits4 >> 48) & 1;
+    SELF.ops_spend_slope_0t12_Invalid := (le.ScrubsBits4 >> 49) & 3;
+    SELF.ops_spend_slope_0t24_Invalid := (le.ScrubsBits4 >> 51) & 3;
+    SELF.ops_spend_slope_0t6_Invalid := (le.ScrubsBits4 >> 53) & 3;
+    SELF.fleet_paid_monthspastworst_24_Invalid := (le.ScrubsBits4 >> 55) & 1;
+    SELF.fleet_paid_slope_0t12_Invalid := (le.ScrubsBits4 >> 56) & 3;
+    SELF.fleet_paid_slope_0t24_Invalid := (le.ScrubsBits4 >> 58) & 3;
+    SELF.fleet_paid_slope_0t6_Invalid := (le.ScrubsBits4 >> 60) & 3;
+    SELF.fleet_paid_volatility_0t12_Invalid := (le.ScrubsBits4 >> 62) & 3;
+    SELF.fleet_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 0) & 3;
+    SELF.fleet_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 2) & 3;
+    SELF.fleet_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 4) & 3;
+    SELF.fleet_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 6) & 3;
+    SELF.carrier_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 8) & 3;
+    SELF.carrier_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 10) & 3;
+    SELF.carrier_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 12) & 3;
+    SELF.carrier_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 14) & 3;
+    SELF.carrier_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 16) & 3;
+    SELF.carrier_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 18) & 3;
+    SELF.carrier_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 20) & 3;
+    SELF.carrier_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 22) & 3;
+    SELF.carrier_spend_volatility_0t6_Invalid := (le.ScrubsBits5 >> 24) & 3;
+    SELF.carrier_spend_volatility_6t12_Invalid := (le.ScrubsBits5 >> 26) & 3;
+    SELF.bldgmats_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 28) & 3;
+    SELF.bldgmats_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 30) & 3;
+    SELF.bldgmats_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 32) & 3;
+    SELF.bldgmats_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 34) & 3;
+    SELF.bldgmats_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 36) & 3;
+    SELF.bldgmats_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 38) & 3;
+    SELF.bldgmats_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 40) & 3;
+    SELF.bldgmats_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 42) & 3;
+    SELF.bldgmats_spend_volatility_0t6_Invalid := (le.ScrubsBits5 >> 44) & 3;
+    SELF.bldgmats_spend_volatility_6t12_Invalid := (le.ScrubsBits5 >> 46) & 3;
+    SELF.top5_paid_slope_0t12_Invalid := (le.ScrubsBits5 >> 48) & 3;
+    SELF.top5_paid_slope_0t24_Invalid := (le.ScrubsBits5 >> 50) & 3;
+    SELF.top5_paid_slope_0t6_Invalid := (le.ScrubsBits5 >> 52) & 3;
+    SELF.top5_paid_volatility_0t12_Invalid := (le.ScrubsBits5 >> 54) & 3;
+    SELF.top5_paid_volatility_0t6_Invalid := (le.ScrubsBits5 >> 56) & 3;
+    SELF.top5_spend_slope_0t12_Invalid := (le.ScrubsBits5 >> 58) & 3;
+    SELF.top5_spend_slope_0t24_Invalid := (le.ScrubsBits5 >> 60) & 3;
+    SELF.top5_spend_slope_0t6_Invalid := (le.ScrubsBits5 >> 62) & 3;
+    SELF.top5_spend_volatility_0t6_Invalid := (le.ScrubsBits6 >> 0) & 3;
+    SELF.top5_spend_volatility_6t12_Invalid := (le.ScrubsBits6 >> 2) & 3;
+    SELF.total_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 4) & 3;
+    SELF.total_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 6) & 3;
+    SELF.total_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 8) & 3;
+    SELF.total_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 10) & 3;
+    SELF.mfgmat_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 12) & 3;
+    SELF.mfgmat_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 14) & 3;
+    SELF.mfgmat_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 16) & 3;
+    SELF.mfgmat_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 18) & 3;
+    SELF.ops_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 20) & 3;
+    SELF.ops_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 22) & 3;
+    SELF.ops_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 24) & 3;
+    SELF.ops_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 26) & 3;
+    SELF.fleet_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 28) & 3;
+    SELF.fleet_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 30) & 3;
+    SELF.fleet_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 32) & 3;
+    SELF.fleet_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 34) & 3;
+    SELF.carrier_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 36) & 3;
+    SELF.carrier_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 38) & 3;
+    SELF.carrier_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 40) & 3;
+    SELF.carrier_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 42) & 3;
+    SELF.bldgmats_numrel_slope_0t12_Invalid := (le.ScrubsBits6 >> 44) & 3;
+    SELF.bldgmats_numrel_slope_0t24_Invalid := (le.ScrubsBits6 >> 46) & 3;
+    SELF.bldgmats_numrel_slope_0t6_Invalid := (le.ScrubsBits6 >> 48) & 3;
+    SELF.bldgmats_numrel_slope_6t12_Invalid := (le.ScrubsBits6 >> 50) & 3;
+    SELF.bldgmats_numrel_var_0t12_Invalid := (le.ScrubsBits6 >> 52) & 3;
+    SELF.bldgmats_numrel_var_12t24_Invalid := (le.ScrubsBits6 >> 54) & 3;
+    SELF.total_percprov30_slope_0t12_Invalid := (le.ScrubsBits6 >> 56) & 3;
+    SELF.total_percprov30_slope_0t24_Invalid := (le.ScrubsBits6 >> 58) & 3;
+    SELF.total_percprov30_slope_0t6_Invalid := (le.ScrubsBits6 >> 60) & 3;
+    SELF.total_percprov30_slope_6t12_Invalid := (le.ScrubsBits6 >> 62) & 3;
+    SELF.total_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 0) & 3;
+    SELF.total_percprov60_slope_0t24_Invalid := (le.ScrubsBits7 >> 2) & 3;
+    SELF.total_percprov60_slope_0t6_Invalid := (le.ScrubsBits7 >> 4) & 3;
+    SELF.total_percprov60_slope_6t12_Invalid := (le.ScrubsBits7 >> 6) & 3;
+    SELF.total_percprov90_slope_0t24_Invalid := (le.ScrubsBits7 >> 8) & 3;
+    SELF.total_percprov90_slope_0t6_Invalid := (le.ScrubsBits7 >> 10) & 3;
+    SELF.total_percprov90_slope_6t12_Invalid := (le.ScrubsBits7 >> 12) & 3;
+    SELF.mfgmat_percprov30_slope_0t12_Invalid := (le.ScrubsBits7 >> 14) & 3;
+    SELF.mfgmat_percprov30_slope_6t12_Invalid := (le.ScrubsBits7 >> 16) & 3;
+    SELF.mfgmat_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 18) & 3;
+    SELF.mfgmat_percprov60_slope_6t12_Invalid := (le.ScrubsBits7 >> 20) & 3;
+    SELF.mfgmat_percprov90_slope_0t24_Invalid := (le.ScrubsBits7 >> 22) & 3;
+    SELF.mfgmat_percprov90_slope_0t6_Invalid := (le.ScrubsBits7 >> 24) & 3;
+    SELF.mfgmat_percprov90_slope_6t12_Invalid := (le.ScrubsBits7 >> 26) & 3;
+    SELF.ops_percprov30_slope_0t12_Invalid := (le.ScrubsBits7 >> 28) & 3;
+    SELF.ops_percprov30_slope_6t12_Invalid := (le.ScrubsBits7 >> 30) & 3;
+    SELF.ops_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 32) & 3;
+    SELF.ops_percprov60_slope_6t12_Invalid := (le.ScrubsBits7 >> 34) & 3;
+    SELF.ops_percprov90_slope_0t24_Invalid := (le.ScrubsBits7 >> 36) & 3;
+    SELF.ops_percprov90_slope_0t6_Invalid := (le.ScrubsBits7 >> 38) & 3;
+    SELF.ops_percprov90_slope_6t12_Invalid := (le.ScrubsBits7 >> 40) & 3;
+    SELF.fleet_percprov30_slope_0t12_Invalid := (le.ScrubsBits7 >> 42) & 3;
+    SELF.fleet_percprov30_slope_6t12_Invalid := (le.ScrubsBits7 >> 44) & 3;
+    SELF.fleet_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 46) & 3;
+    SELF.fleet_percprov60_slope_6t12_Invalid := (le.ScrubsBits7 >> 48) & 3;
+    SELF.fleet_percprov90_slope_0t24_Invalid := (le.ScrubsBits7 >> 50) & 3;
+    SELF.fleet_percprov90_slope_0t6_Invalid := (le.ScrubsBits7 >> 52) & 3;
+    SELF.fleet_percprov90_slope_6t12_Invalid := (le.ScrubsBits7 >> 54) & 3;
+    SELF.carrier_percprov30_slope_0t12_Invalid := (le.ScrubsBits7 >> 56) & 3;
+    SELF.carrier_percprov30_slope_6t12_Invalid := (le.ScrubsBits7 >> 58) & 3;
+    SELF.carrier_percprov60_slope_0t12_Invalid := (le.ScrubsBits7 >> 60) & 3;
+    SELF.carrier_percprov60_slope_6t12_Invalid := (le.ScrubsBits7 >> 62) & 3;
+    SELF.carrier_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 0) & 3;
+    SELF.carrier_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 2) & 3;
+    SELF.carrier_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 4) & 3;
+    SELF.bldgmats_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 6) & 3;
+    SELF.bldgmats_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 8) & 3;
+    SELF.bldgmats_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 10) & 3;
+    SELF.bldgmats_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 12) & 3;
+    SELF.bldgmats_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 14) & 3;
+    SELF.bldgmats_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 16) & 3;
+    SELF.bldgmats_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 18) & 3;
+    SELF.top5_percprov30_slope_0t12_Invalid := (le.ScrubsBits8 >> 20) & 3;
+    SELF.top5_percprov30_slope_6t12_Invalid := (le.ScrubsBits8 >> 22) & 3;
+    SELF.top5_percprov60_slope_0t12_Invalid := (le.ScrubsBits8 >> 24) & 3;
+    SELF.top5_percprov60_slope_6t12_Invalid := (le.ScrubsBits8 >> 26) & 3;
+    SELF.top5_percprov90_slope_0t24_Invalid := (le.ScrubsBits8 >> 28) & 3;
+    SELF.top5_percprov90_slope_0t6_Invalid := (le.ScrubsBits8 >> 30) & 3;
+    SELF.top5_percprov90_slope_6t12_Invalid := (le.ScrubsBits8 >> 32) & 3;
+    SELF.top5_percprovoutstanding_adjustedslope_0t12_Invalid := (le.ScrubsBits8 >> 34) & 3;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -870,161 +868,59 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
     ultimate_linkid_ALLOW_ErrorCount := COUNT(GROUP,h.ultimate_linkid_Invalid=1);
-    ultimate_linkid_LENGTHS_ErrorCount := COUNT(GROUP,h.ultimate_linkid_Invalid=2);
-    ultimate_linkid_Total_ErrorCount := COUNT(GROUP,h.ultimate_linkid_Invalid>0);
     cortera_score_ALLOW_ErrorCount := COUNT(GROUP,h.cortera_score_Invalid=1);
-    cortera_score_LENGTHS_ErrorCount := COUNT(GROUP,h.cortera_score_Invalid=2);
-    cortera_score_Total_ErrorCount := COUNT(GROUP,h.cortera_score_Invalid>0);
     cpr_score_ALLOW_ErrorCount := COUNT(GROUP,h.cpr_score_Invalid=1);
-    cpr_score_LENGTHS_ErrorCount := COUNT(GROUP,h.cpr_score_Invalid=2);
-    cpr_score_Total_ErrorCount := COUNT(GROUP,h.cpr_score_Invalid>0);
     cpr_segment_ALLOW_ErrorCount := COUNT(GROUP,h.cpr_segment_Invalid=1);
-    cpr_segment_LENGTHS_ErrorCount := COUNT(GROUP,h.cpr_segment_Invalid=2);
-    cpr_segment_Total_ErrorCount := COUNT(GROUP,h.cpr_segment_Invalid>0);
     dbt_ALLOW_ErrorCount := COUNT(GROUP,h.dbt_Invalid=1);
     dbt_LENGTHS_ErrorCount := COUNT(GROUP,h.dbt_Invalid=2);
     dbt_Total_ErrorCount := COUNT(GROUP,h.dbt_Invalid>0);
     avg_bal_ALLOW_ErrorCount := COUNT(GROUP,h.avg_bal_Invalid=1);
-    avg_bal_LENGTHS_ErrorCount := COUNT(GROUP,h.avg_bal_Invalid=2);
-    avg_bal_Total_ErrorCount := COUNT(GROUP,h.avg_bal_Invalid>0);
     air_spend_ALLOW_ErrorCount := COUNT(GROUP,h.air_spend_Invalid=1);
-    air_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.air_spend_Invalid=2);
-    air_spend_Total_ErrorCount := COUNT(GROUP,h.air_spend_Invalid>0);
     fuel_spend_ALLOW_ErrorCount := COUNT(GROUP,h.fuel_spend_Invalid=1);
-    fuel_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.fuel_spend_Invalid=2);
-    fuel_spend_Total_ErrorCount := COUNT(GROUP,h.fuel_spend_Invalid>0);
     leasing_spend_ALLOW_ErrorCount := COUNT(GROUP,h.leasing_spend_Invalid=1);
-    leasing_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.leasing_spend_Invalid=2);
-    leasing_spend_Total_ErrorCount := COUNT(GROUP,h.leasing_spend_Invalid>0);
     ltl_spend_ALLOW_ErrorCount := COUNT(GROUP,h.ltl_spend_Invalid=1);
-    ltl_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.ltl_spend_Invalid=2);
-    ltl_spend_Total_ErrorCount := COUNT(GROUP,h.ltl_spend_Invalid>0);
     rail_spend_ALLOW_ErrorCount := COUNT(GROUP,h.rail_spend_Invalid=1);
-    rail_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.rail_spend_Invalid=2);
-    rail_spend_Total_ErrorCount := COUNT(GROUP,h.rail_spend_Invalid>0);
     tl_spend_ALLOW_ErrorCount := COUNT(GROUP,h.tl_spend_Invalid=1);
-    tl_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.tl_spend_Invalid=2);
-    tl_spend_Total_ErrorCount := COUNT(GROUP,h.tl_spend_Invalid>0);
     transvc_spend_ALLOW_ErrorCount := COUNT(GROUP,h.transvc_spend_Invalid=1);
-    transvc_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.transvc_spend_Invalid=2);
-    transvc_spend_Total_ErrorCount := COUNT(GROUP,h.transvc_spend_Invalid>0);
     transup_spend_ALLOW_ErrorCount := COUNT(GROUP,h.transup_spend_Invalid=1);
-    transup_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.transup_spend_Invalid=2);
-    transup_spend_Total_ErrorCount := COUNT(GROUP,h.transup_spend_Invalid>0);
     bst_spend_ALLOW_ErrorCount := COUNT(GROUP,h.bst_spend_Invalid=1);
-    bst_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.bst_spend_Invalid=2);
-    bst_spend_Total_ErrorCount := COUNT(GROUP,h.bst_spend_Invalid>0);
     dg_spend_ALLOW_ErrorCount := COUNT(GROUP,h.dg_spend_Invalid=1);
-    dg_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.dg_spend_Invalid=2);
-    dg_spend_Total_ErrorCount := COUNT(GROUP,h.dg_spend_Invalid>0);
     electrical_spend_ALLOW_ErrorCount := COUNT(GROUP,h.electrical_spend_Invalid=1);
-    electrical_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.electrical_spend_Invalid=2);
-    electrical_spend_Total_ErrorCount := COUNT(GROUP,h.electrical_spend_Invalid>0);
     hvac_spend_ALLOW_ErrorCount := COUNT(GROUP,h.hvac_spend_Invalid=1);
-    hvac_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.hvac_spend_Invalid=2);
-    hvac_spend_Total_ErrorCount := COUNT(GROUP,h.hvac_spend_Invalid>0);
     other_b_spend_ALLOW_ErrorCount := COUNT(GROUP,h.other_b_spend_Invalid=1);
-    other_b_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.other_b_spend_Invalid=2);
-    other_b_spend_Total_ErrorCount := COUNT(GROUP,h.other_b_spend_Invalid>0);
     plumbing_spend_ALLOW_ErrorCount := COUNT(GROUP,h.plumbing_spend_Invalid=1);
-    plumbing_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.plumbing_spend_Invalid=2);
-    plumbing_spend_Total_ErrorCount := COUNT(GROUP,h.plumbing_spend_Invalid>0);
     rs_spend_ALLOW_ErrorCount := COUNT(GROUP,h.rs_spend_Invalid=1);
-    rs_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.rs_spend_Invalid=2);
-    rs_spend_Total_ErrorCount := COUNT(GROUP,h.rs_spend_Invalid>0);
     wp_spend_ALLOW_ErrorCount := COUNT(GROUP,h.wp_spend_Invalid=1);
-    wp_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.wp_spend_Invalid=2);
-    wp_spend_Total_ErrorCount := COUNT(GROUP,h.wp_spend_Invalid>0);
     chemical_spend_ALLOW_ErrorCount := COUNT(GROUP,h.chemical_spend_Invalid=1);
-    chemical_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.chemical_spend_Invalid=2);
-    chemical_spend_Total_ErrorCount := COUNT(GROUP,h.chemical_spend_Invalid>0);
     electronic_spend_ALLOW_ErrorCount := COUNT(GROUP,h.electronic_spend_Invalid=1);
-    electronic_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.electronic_spend_Invalid=2);
-    electronic_spend_Total_ErrorCount := COUNT(GROUP,h.electronic_spend_Invalid>0);
     metal_spend_ALLOW_ErrorCount := COUNT(GROUP,h.metal_spend_Invalid=1);
-    metal_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.metal_spend_Invalid=2);
-    metal_spend_Total_ErrorCount := COUNT(GROUP,h.metal_spend_Invalid>0);
     other_m_spend_ALLOW_ErrorCount := COUNT(GROUP,h.other_m_spend_Invalid=1);
-    other_m_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.other_m_spend_Invalid=2);
-    other_m_spend_Total_ErrorCount := COUNT(GROUP,h.other_m_spend_Invalid>0);
     packaging_spend_ALLOW_ErrorCount := COUNT(GROUP,h.packaging_spend_Invalid=1);
-    packaging_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.packaging_spend_Invalid=2);
-    packaging_spend_Total_ErrorCount := COUNT(GROUP,h.packaging_spend_Invalid>0);
     pvf_spend_ALLOW_ErrorCount := COUNT(GROUP,h.pvf_spend_Invalid=1);
-    pvf_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.pvf_spend_Invalid=2);
-    pvf_spend_Total_ErrorCount := COUNT(GROUP,h.pvf_spend_Invalid>0);
     plastic_spend_ALLOW_ErrorCount := COUNT(GROUP,h.plastic_spend_Invalid=1);
-    plastic_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.plastic_spend_Invalid=2);
-    plastic_spend_Total_ErrorCount := COUNT(GROUP,h.plastic_spend_Invalid>0);
     textile_spend_ALLOW_ErrorCount := COUNT(GROUP,h.textile_spend_Invalid=1);
-    textile_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.textile_spend_Invalid=2);
-    textile_spend_Total_ErrorCount := COUNT(GROUP,h.textile_spend_Invalid>0);
     bs_spend_ALLOW_ErrorCount := COUNT(GROUP,h.bs_spend_Invalid=1);
-    bs_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.bs_spend_Invalid=2);
-    bs_spend_Total_ErrorCount := COUNT(GROUP,h.bs_spend_Invalid>0);
     ce_spend_ALLOW_ErrorCount := COUNT(GROUP,h.ce_spend_Invalid=1);
-    ce_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.ce_spend_Invalid=2);
-    ce_spend_Total_ErrorCount := COUNT(GROUP,h.ce_spend_Invalid>0);
     hardware_spend_ALLOW_ErrorCount := COUNT(GROUP,h.hardware_spend_Invalid=1);
-    hardware_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.hardware_spend_Invalid=2);
-    hardware_spend_Total_ErrorCount := COUNT(GROUP,h.hardware_spend_Invalid>0);
     ie_spend_ALLOW_ErrorCount := COUNT(GROUP,h.ie_spend_Invalid=1);
-    ie_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.ie_spend_Invalid=2);
-    ie_spend_Total_ErrorCount := COUNT(GROUP,h.ie_spend_Invalid>0);
     is_spend_ALLOW_ErrorCount := COUNT(GROUP,h.is_spend_Invalid=1);
-    is_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.is_spend_Invalid=2);
-    is_spend_Total_ErrorCount := COUNT(GROUP,h.is_spend_Invalid>0);
     it_spend_ALLOW_ErrorCount := COUNT(GROUP,h.it_spend_Invalid=1);
-    it_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.it_spend_Invalid=2);
-    it_spend_Total_ErrorCount := COUNT(GROUP,h.it_spend_Invalid>0);
     mls_spend_ALLOW_ErrorCount := COUNT(GROUP,h.mls_spend_Invalid=1);
-    mls_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.mls_spend_Invalid=2);
-    mls_spend_Total_ErrorCount := COUNT(GROUP,h.mls_spend_Invalid>0);
     os_spend_ALLOW_ErrorCount := COUNT(GROUP,h.os_spend_Invalid=1);
-    os_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.os_spend_Invalid=2);
-    os_spend_Total_ErrorCount := COUNT(GROUP,h.os_spend_Invalid>0);
     pp_spend_ALLOW_ErrorCount := COUNT(GROUP,h.pp_spend_Invalid=1);
-    pp_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.pp_spend_Invalid=2);
-    pp_spend_Total_ErrorCount := COUNT(GROUP,h.pp_spend_Invalid>0);
     sis_spend_ALLOW_ErrorCount := COUNT(GROUP,h.sis_spend_Invalid=1);
-    sis_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.sis_spend_Invalid=2);
-    sis_spend_Total_ErrorCount := COUNT(GROUP,h.sis_spend_Invalid>0);
     apparel_spend_ALLOW_ErrorCount := COUNT(GROUP,h.apparel_spend_Invalid=1);
-    apparel_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.apparel_spend_Invalid=2);
-    apparel_spend_Total_ErrorCount := COUNT(GROUP,h.apparel_spend_Invalid>0);
     beverages_spend_ALLOW_ErrorCount := COUNT(GROUP,h.beverages_spend_Invalid=1);
-    beverages_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.beverages_spend_Invalid=2);
-    beverages_spend_Total_ErrorCount := COUNT(GROUP,h.beverages_spend_Invalid>0);
     constr_spend_ALLOW_ErrorCount := COUNT(GROUP,h.constr_spend_Invalid=1);
-    constr_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.constr_spend_Invalid=2);
-    constr_spend_Total_ErrorCount := COUNT(GROUP,h.constr_spend_Invalid>0);
     consulting_spend_ALLOW_ErrorCount := COUNT(GROUP,h.consulting_spend_Invalid=1);
-    consulting_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.consulting_spend_Invalid=2);
-    consulting_spend_Total_ErrorCount := COUNT(GROUP,h.consulting_spend_Invalid>0);
     fs_spend_ALLOW_ErrorCount := COUNT(GROUP,h.fs_spend_Invalid=1);
-    fs_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.fs_spend_Invalid=2);
-    fs_spend_Total_ErrorCount := COUNT(GROUP,h.fs_spend_Invalid>0);
     fp_spend_ALLOW_ErrorCount := COUNT(GROUP,h.fp_spend_Invalid=1);
-    fp_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.fp_spend_Invalid=2);
-    fp_spend_Total_ErrorCount := COUNT(GROUP,h.fp_spend_Invalid>0);
     insurance_spend_ALLOW_ErrorCount := COUNT(GROUP,h.insurance_spend_Invalid=1);
-    insurance_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.insurance_spend_Invalid=2);
-    insurance_spend_Total_ErrorCount := COUNT(GROUP,h.insurance_spend_Invalid>0);
     ls_spend_ALLOW_ErrorCount := COUNT(GROUP,h.ls_spend_Invalid=1);
-    ls_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.ls_spend_Invalid=2);
-    ls_spend_Total_ErrorCount := COUNT(GROUP,h.ls_spend_Invalid>0);
     oil_gas_spend_ALLOW_ErrorCount := COUNT(GROUP,h.oil_gas_spend_Invalid=1);
-    oil_gas_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.oil_gas_spend_Invalid=2);
-    oil_gas_spend_Total_ErrorCount := COUNT(GROUP,h.oil_gas_spend_Invalid>0);
     utilities_spend_ALLOW_ErrorCount := COUNT(GROUP,h.utilities_spend_Invalid=1);
-    utilities_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.utilities_spend_Invalid=2);
-    utilities_spend_Total_ErrorCount := COUNT(GROUP,h.utilities_spend_Invalid>0);
     other_spend_ALLOW_ErrorCount := COUNT(GROUP,h.other_spend_Invalid=1);
-    other_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.other_spend_Invalid=2);
-    other_spend_Total_ErrorCount := COUNT(GROUP,h.other_spend_Invalid>0);
     advt_spend_ALLOW_ErrorCount := COUNT(GROUP,h.advt_spend_Invalid=1);
-    advt_spend_LENGTHS_ErrorCount := COUNT(GROUP,h.advt_spend_Invalid=2);
-    advt_spend_Total_ErrorCount := COUNT(GROUP,h.advt_spend_Invalid>0);
     air_growth_ALLOW_ErrorCount := COUNT(GROUP,h.air_growth_Invalid=1);
     air_growth_LENGTHS_ErrorCount := COUNT(GROUP,h.air_growth_Invalid=2);
     air_growth_Total_ErrorCount := COUNT(GROUP,h.air_growth_Invalid>0);
@@ -1167,20 +1063,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     top5_growth_LENGTHS_ErrorCount := COUNT(GROUP,h.top5_growth_Invalid=2);
     top5_growth_Total_ErrorCount := COUNT(GROUP,h.top5_growth_Invalid>0);
     shipping_y1_ALLOW_ErrorCount := COUNT(GROUP,h.shipping_y1_Invalid=1);
-    shipping_y1_LENGTHS_ErrorCount := COUNT(GROUP,h.shipping_y1_Invalid=2);
-    shipping_y1_Total_ErrorCount := COUNT(GROUP,h.shipping_y1_Invalid>0);
     shipping_growth_ALLOW_ErrorCount := COUNT(GROUP,h.shipping_growth_Invalid=1);
     shipping_growth_LENGTHS_ErrorCount := COUNT(GROUP,h.shipping_growth_Invalid=2);
     shipping_growth_Total_ErrorCount := COUNT(GROUP,h.shipping_growth_Invalid>0);
     materials_y1_ALLOW_ErrorCount := COUNT(GROUP,h.materials_y1_Invalid=1);
-    materials_y1_LENGTHS_ErrorCount := COUNT(GROUP,h.materials_y1_Invalid=2);
-    materials_y1_Total_ErrorCount := COUNT(GROUP,h.materials_y1_Invalid>0);
     materials_growth_ALLOW_ErrorCount := COUNT(GROUP,h.materials_growth_Invalid=1);
     materials_growth_LENGTHS_ErrorCount := COUNT(GROUP,h.materials_growth_Invalid=2);
     materials_growth_Total_ErrorCount := COUNT(GROUP,h.materials_growth_Invalid>0);
     operations_y1_ALLOW_ErrorCount := COUNT(GROUP,h.operations_y1_Invalid=1);
-    operations_y1_LENGTHS_ErrorCount := COUNT(GROUP,h.operations_y1_Invalid=2);
-    operations_y1_Total_ErrorCount := COUNT(GROUP,h.operations_y1_Invalid>0);
     operations_growth_ALLOW_ErrorCount := COUNT(GROUP,h.operations_growth_Invalid=1);
     operations_growth_LENGTHS_ErrorCount := COUNT(GROUP,h.operations_growth_Invalid=2);
     operations_growth_Total_ErrorCount := COUNT(GROUP,h.operations_growth_Invalid>0);
@@ -1215,11 +1105,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     total_paid_volatility_6t12_LENGTHS_ErrorCount := COUNT(GROUP,h.total_paid_volatility_6t12_Invalid=2);
     total_paid_volatility_6t12_Total_ErrorCount := COUNT(GROUP,h.total_paid_volatility_6t12_Invalid>0);
     total_spend_monthspastleast_24_ALLOW_ErrorCount := COUNT(GROUP,h.total_spend_monthspastleast_24_Invalid=1);
-    total_spend_monthspastleast_24_LENGTHS_ErrorCount := COUNT(GROUP,h.total_spend_monthspastleast_24_Invalid=2);
-    total_spend_monthspastleast_24_Total_ErrorCount := COUNT(GROUP,h.total_spend_monthspastleast_24_Invalid>0);
     total_spend_monthspastmost_24_ALLOW_ErrorCount := COUNT(GROUP,h.total_spend_monthspastmost_24_Invalid=1);
-    total_spend_monthspastmost_24_LENGTHS_ErrorCount := COUNT(GROUP,h.total_spend_monthspastmost_24_Invalid=2);
-    total_spend_monthspastmost_24_Total_ErrorCount := COUNT(GROUP,h.total_spend_monthspastmost_24_Invalid>0);
     total_spend_slope_0t12_ALLOW_ErrorCount := COUNT(GROUP,h.total_spend_slope_0t12_Invalid=1);
     total_spend_slope_0t12_LENGTHS_ErrorCount := COUNT(GROUP,h.total_spend_slope_0t12_Invalid=2);
     total_spend_slope_0t12_Total_ErrorCount := COUNT(GROUP,h.total_spend_slope_0t12_Invalid>0);
@@ -1251,8 +1137,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     mfgmat_paid_average_12_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_paid_average_12_Invalid=2);
     mfgmat_paid_average_12_Total_ErrorCount := COUNT(GROUP,h.mfgmat_paid_average_12_Invalid>0);
     mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount := COUNT(GROUP,h.mfgmat_paid_monthspastworst_24_Invalid=1);
-    mfgmat_paid_monthspastworst_24_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_paid_monthspastworst_24_Invalid=2);
-    mfgmat_paid_monthspastworst_24_Total_ErrorCount := COUNT(GROUP,h.mfgmat_paid_monthspastworst_24_Invalid>0);
     mfgmat_paid_slope_0t12_ALLOW_ErrorCount := COUNT(GROUP,h.mfgmat_paid_slope_0t12_Invalid=1);
     mfgmat_paid_slope_0t12_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_paid_slope_0t12_Invalid=2);
     mfgmat_paid_slope_0t12_Total_ErrorCount := COUNT(GROUP,h.mfgmat_paid_slope_0t12_Invalid>0);
@@ -1269,11 +1153,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     mfgmat_paid_volatility_0t6_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_paid_volatility_0t6_Invalid=2);
     mfgmat_paid_volatility_0t6_Total_ErrorCount := COUNT(GROUP,h.mfgmat_paid_volatility_0t6_Invalid>0);
     mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastleast_24_Invalid=1);
-    mfgmat_spend_monthspastleast_24_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastleast_24_Invalid=2);
-    mfgmat_spend_monthspastleast_24_Total_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastleast_24_Invalid>0);
     mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastmost_24_Invalid=1);
-    mfgmat_spend_monthspastmost_24_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastmost_24_Invalid=2);
-    mfgmat_spend_monthspastmost_24_Total_ErrorCount := COUNT(GROUP,h.mfgmat_spend_monthspastmost_24_Invalid>0);
     mfgmat_spend_slope_0t12_ALLOW_ErrorCount := COUNT(GROUP,h.mfgmat_spend_slope_0t12_Invalid=1);
     mfgmat_spend_slope_0t12_LENGTHS_ErrorCount := COUNT(GROUP,h.mfgmat_spend_slope_0t12_Invalid=2);
     mfgmat_spend_slope_0t12_Total_ErrorCount := COUNT(GROUP,h.mfgmat_spend_slope_0t12_Invalid>0);
@@ -1314,11 +1194,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     ops_paid_volatility_0t6_LENGTHS_ErrorCount := COUNT(GROUP,h.ops_paid_volatility_0t6_Invalid=2);
     ops_paid_volatility_0t6_Total_ErrorCount := COUNT(GROUP,h.ops_paid_volatility_0t6_Invalid>0);
     ops_spend_monthspastleast_24_ALLOW_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastleast_24_Invalid=1);
-    ops_spend_monthspastleast_24_LENGTHS_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastleast_24_Invalid=2);
-    ops_spend_monthspastleast_24_Total_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastleast_24_Invalid>0);
     ops_spend_monthspastmost_24_ALLOW_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastmost_24_Invalid=1);
-    ops_spend_monthspastmost_24_LENGTHS_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastmost_24_Invalid=2);
-    ops_spend_monthspastmost_24_Total_ErrorCount := COUNT(GROUP,h.ops_spend_monthspastmost_24_Invalid>0);
     ops_spend_slope_0t12_ALLOW_ErrorCount := COUNT(GROUP,h.ops_spend_slope_0t12_Invalid=1);
     ops_spend_slope_0t12_LENGTHS_ErrorCount := COUNT(GROUP,h.ops_spend_slope_0t12_Invalid=2);
     ops_spend_slope_0t12_Total_ErrorCount := COUNT(GROUP,h.ops_spend_slope_0t12_Invalid>0);
@@ -1329,8 +1205,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     ops_spend_slope_0t6_LENGTHS_ErrorCount := COUNT(GROUP,h.ops_spend_slope_0t6_Invalid=2);
     ops_spend_slope_0t6_Total_ErrorCount := COUNT(GROUP,h.ops_spend_slope_0t6_Invalid>0);
     fleet_paid_monthspastworst_24_ALLOW_ErrorCount := COUNT(GROUP,h.fleet_paid_monthspastworst_24_Invalid=1);
-    fleet_paid_monthspastworst_24_LENGTHS_ErrorCount := COUNT(GROUP,h.fleet_paid_monthspastworst_24_Invalid=2);
-    fleet_paid_monthspastworst_24_Total_ErrorCount := COUNT(GROUP,h.fleet_paid_monthspastworst_24_Invalid>0);
     fleet_paid_slope_0t12_ALLOW_ErrorCount := COUNT(GROUP,h.fleet_paid_slope_0t12_Invalid=1);
     fleet_paid_slope_0t12_LENGTHS_ErrorCount := COUNT(GROUP,h.fleet_paid_slope_0t12_Invalid=2);
     fleet_paid_slope_0t12_Total_ErrorCount := COUNT(GROUP,h.fleet_paid_slope_0t12_Invalid>0);
@@ -1693,9 +1567,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.ultimate_linkid_Total_ErrorCount > 0, 1, 0) + IF(le.cortera_score_Total_ErrorCount > 0, 1, 0) + IF(le.cpr_score_Total_ErrorCount > 0, 1, 0) + IF(le.cpr_segment_Total_ErrorCount > 0, 1, 0) + IF(le.dbt_Total_ErrorCount > 0, 1, 0) + IF(le.avg_bal_Total_ErrorCount > 0, 1, 0) + IF(le.air_spend_Total_ErrorCount > 0, 1, 0) + IF(le.fuel_spend_Total_ErrorCount > 0, 1, 0) + IF(le.leasing_spend_Total_ErrorCount > 0, 1, 0) + IF(le.ltl_spend_Total_ErrorCount > 0, 1, 0) + IF(le.rail_spend_Total_ErrorCount > 0, 1, 0) + IF(le.tl_spend_Total_ErrorCount > 0, 1, 0) + IF(le.transvc_spend_Total_ErrorCount > 0, 1, 0) + IF(le.transup_spend_Total_ErrorCount > 0, 1, 0) + IF(le.bst_spend_Total_ErrorCount > 0, 1, 0) + IF(le.dg_spend_Total_ErrorCount > 0, 1, 0) + IF(le.electrical_spend_Total_ErrorCount > 0, 1, 0) + IF(le.hvac_spend_Total_ErrorCount > 0, 1, 0) + IF(le.other_b_spend_Total_ErrorCount > 0, 1, 0) + IF(le.plumbing_spend_Total_ErrorCount > 0, 1, 0) + IF(le.rs_spend_Total_ErrorCount > 0, 1, 0) + IF(le.wp_spend_Total_ErrorCount > 0, 1, 0) + IF(le.chemical_spend_Total_ErrorCount > 0, 1, 0) + IF(le.electronic_spend_Total_ErrorCount > 0, 1, 0) + IF(le.metal_spend_Total_ErrorCount > 0, 1, 0) + IF(le.other_m_spend_Total_ErrorCount > 0, 1, 0) + IF(le.packaging_spend_Total_ErrorCount > 0, 1, 0) + IF(le.pvf_spend_Total_ErrorCount > 0, 1, 0) + IF(le.plastic_spend_Total_ErrorCount > 0, 1, 0) + IF(le.textile_spend_Total_ErrorCount > 0, 1, 0) + IF(le.bs_spend_Total_ErrorCount > 0, 1, 0) + IF(le.ce_spend_Total_ErrorCount > 0, 1, 0) + IF(le.hardware_spend_Total_ErrorCount > 0, 1, 0) + IF(le.ie_spend_Total_ErrorCount > 0, 1, 0) + IF(le.is_spend_Total_ErrorCount > 0, 1, 0) + IF(le.it_spend_Total_ErrorCount > 0, 1, 0) + IF(le.mls_spend_Total_ErrorCount > 0, 1, 0) + IF(le.os_spend_Total_ErrorCount > 0, 1, 0) + IF(le.pp_spend_Total_ErrorCount > 0, 1, 0) + IF(le.sis_spend_Total_ErrorCount > 0, 1, 0) + IF(le.apparel_spend_Total_ErrorCount > 0, 1, 0) + IF(le.beverages_spend_Total_ErrorCount > 0, 1, 0) + IF(le.constr_spend_Total_ErrorCount > 0, 1, 0) + IF(le.consulting_spend_Total_ErrorCount > 0, 1, 0) + IF(le.fs_spend_Total_ErrorCount > 0, 1, 0) + IF(le.fp_spend_Total_ErrorCount > 0, 1, 0) + IF(le.insurance_spend_Total_ErrorCount > 0, 1, 0) + IF(le.ls_spend_Total_ErrorCount > 0, 1, 0) + IF(le.oil_gas_spend_Total_ErrorCount > 0, 1, 0) + IF(le.utilities_spend_Total_ErrorCount > 0, 1, 0) + IF(le.other_spend_Total_ErrorCount > 0, 1, 0) + IF(le.advt_spend_Total_ErrorCount > 0, 1, 0) + IF(le.air_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_Total_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_Total_ErrorCount > 0, 1, 0) + IF(le.rail_growth_Total_ErrorCount > 0, 1, 0) + IF(le.tl_growth_Total_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_Total_ErrorCount > 0, 1, 0) + IF(le.transup_growth_Total_ErrorCount > 0, 1, 0) + IF(le.bst_growth_Total_ErrorCount > 0, 1, 0) + IF(le.dg_growth_Total_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_Total_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_Total_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_Total_ErrorCount > 0, 1, 0) + IF(le.rs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.wp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_Total_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_Total_ErrorCount > 0, 1, 0) + IF(le.metal_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_Total_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_Total_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_Total_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_Total_ErrorCount > 0, 1, 0) + IF(le.textile_growth_Total_ErrorCount > 0, 1, 0) + IF(le.bs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ce_growth_Total_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ie_growth_Total_ErrorCount > 0, 1, 0) + IF(le.is_growth_Total_ErrorCount > 0, 1, 0) + IF(le.it_growth_Total_ErrorCount > 0, 1, 0) + IF(le.mls_growth_Total_ErrorCount > 0, 1, 0) + IF(le.os_growth_Total_ErrorCount > 0, 1, 0) + IF(le.pp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.sis_growth_Total_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_Total_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_Total_ErrorCount > 0, 1, 0) + IF(le.constr_growth_Total_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ls_growth_Total_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_Total_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_growth_Total_ErrorCount > 0, 1, 0) + IF(le.advt_growth_Total_ErrorCount > 0, 1, 0) + IF(le.top5_growth_Total_ErrorCount > 0, 1, 0) + IF(le.shipping_y1_Total_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_Total_ErrorCount > 0, 1, 0) + IF(le.materials_y1_Total_ErrorCount > 0, 1, 0) + IF(le.materials_growth_Total_ErrorCount > 0, 1, 0) + IF(le.operations_y1_Total_ErrorCount > 0, 1, 0) + IF(le.operations_growth_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastleast_24_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastmost_24_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastleast_24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastmost_24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastleast_24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastmost_24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_Total_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.ultimate_linkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cortera_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_segment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_Total_ErrorCount > 0, 1, 0) + IF(le.avg_bal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fuel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.leasing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ltl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rail_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transvc_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transup_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bst_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dg_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electrical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hvac_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_b_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plumbing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chemical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electronic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.metal_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_m_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.packaging_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pvf_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plastic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.textile_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ce_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hardware_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ie_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.is_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.it_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.os_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sis_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apparel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.beverages_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.constr_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.consulting_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.insurance_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.oil_gas_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.utilities_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.advt_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_Total_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_Total_ErrorCount > 0, 1, 0) + IF(le.rail_growth_Total_ErrorCount > 0, 1, 0) + IF(le.tl_growth_Total_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_Total_ErrorCount > 0, 1, 0) + IF(le.transup_growth_Total_ErrorCount > 0, 1, 0) + IF(le.bst_growth_Total_ErrorCount > 0, 1, 0) + IF(le.dg_growth_Total_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_Total_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_Total_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_Total_ErrorCount > 0, 1, 0) + IF(le.rs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.wp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_Total_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_Total_ErrorCount > 0, 1, 0) + IF(le.metal_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_Total_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_Total_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_Total_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_Total_ErrorCount > 0, 1, 0) + IF(le.textile_growth_Total_ErrorCount > 0, 1, 0) + IF(le.bs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ce_growth_Total_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ie_growth_Total_ErrorCount > 0, 1, 0) + IF(le.is_growth_Total_ErrorCount > 0, 1, 0) + IF(le.it_growth_Total_ErrorCount > 0, 1, 0) + IF(le.mls_growth_Total_ErrorCount > 0, 1, 0) + IF(le.os_growth_Total_ErrorCount > 0, 1, 0) + IF(le.pp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.sis_growth_Total_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_Total_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_Total_ErrorCount > 0, 1, 0) + IF(le.constr_growth_Total_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fs_growth_Total_ErrorCount > 0, 1, 0) + IF(le.fp_growth_Total_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_Total_ErrorCount > 0, 1, 0) + IF(le.ls_growth_Total_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_Total_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_Total_ErrorCount > 0, 1, 0) + IF(le.other_growth_Total_ErrorCount > 0, 1, 0) + IF(le.advt_growth_Total_ErrorCount > 0, 1, 0) + IF(le.top5_growth_Total_ErrorCount > 0, 1, 0) + IF(le.shipping_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_Total_ErrorCount > 0, 1, 0) + IF(le.materials_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.materials_growth_Total_ErrorCount > 0, 1, 0) + IF(le.operations_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operations_growth_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_Total_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_Total_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_Total_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.ultimate_linkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultimate_linkid_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cortera_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cortera_score_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cpr_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_score_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cpr_segment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_segment_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.avg_bal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.avg_bal_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.air_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fuel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fuel_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.leasing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.leasing_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ltl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ltl_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rail_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rail_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tl_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transvc_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transvc_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transup_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transup_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bst_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bst_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dg_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dg_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electrical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electrical_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hvac_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hvac_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_b_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_b_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plumbing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plumbing_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rs_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.wp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wp_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.chemical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chemical_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electronic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electronic_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.metal_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.metal_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_m_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_m_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.packaging_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.packaging_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pvf_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pvf_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plastic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plastic_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.textile_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.textile_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bs_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ce_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ce_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hardware_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hardware_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ie_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ie_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.is_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.is_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.it_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.it_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mls_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.os_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.os_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pp_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.sis_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sis_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.apparel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apparel_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.beverages_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.beverages_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.constr_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.constr_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.consulting_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.consulting_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fs_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fp_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.insurance_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.insurance_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ls_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.oil_gas_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.oil_gas_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.utilities_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.utilities_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.advt_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.advt_spend_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.air_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rail_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rail_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tl_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tl_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transup_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transup_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bst_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bst_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dg_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dg_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.wp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.metal_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.metal_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.textile_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.textile_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ce_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ce_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ie_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ie_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.is_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.is_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.it_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.it_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mls_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mls_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.os_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.os_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.sis_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sis_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.constr_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.constr_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ls_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ls_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.advt_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.advt_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.shipping_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.shipping_y1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.materials_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.materials_y1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.materials_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.materials_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.operations_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operations_y1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.operations_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operations_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastleast_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastmost_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastleast_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastmost_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastleast_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastmost_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_LENGTHS_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.ultimate_linkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cortera_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cpr_segment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbt_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.avg_bal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fuel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.leasing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ltl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rail_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tl_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transvc_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transup_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bst_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dg_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electrical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hvac_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_b_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plumbing_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chemical_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electronic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.metal_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_m_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.packaging_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pvf_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plastic_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.textile_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ce_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hardware_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ie_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.is_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.it_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.os_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sis_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apparel_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.beverages_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.constr_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.consulting_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fs_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fp_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.insurance_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ls_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.oil_gas_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.utilities_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.advt_spend_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.air_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fuel_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.leasing_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ltl_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rail_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rail_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tl_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tl_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transvc_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.transup_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transup_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bst_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bst_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dg_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dg_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electrical_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hvac_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_b_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plumbing_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.wp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chemical_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.electronic_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.metal_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.metal_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_m_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.packaging_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pvf_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plastic_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.textile_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.textile_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ce_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ce_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hardware_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ie_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ie_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.is_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.is_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.it_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.it_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mls_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mls_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.os_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.os_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.pp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.sis_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sis_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apparel_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.beverages_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.constr_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.constr_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.consulting_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fs_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fs_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fp_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fp_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.insurance_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ls_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ls_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.oil_gas_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.utilities_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.other_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.other_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.advt_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.advt_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.shipping_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.shipping_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.materials_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.materials_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.materials_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.operations_y1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operations_growth_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operations_growth_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_average_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_slope_6t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_12t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_paid_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_sum_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_12t18_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_average_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_sum_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_average_12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_monthspastworst_24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastleast_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_monthspastmost_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_paid_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_spend_volatility_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_numrel_var_12t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mfgmat_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ops_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fleet_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bldgmats_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov30_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_0t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov60_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t24_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_0t6_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprov90_slope_6t12_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_ALLOW_ErrorCount > 0, 1, 0) + IF(le.top5_percprovoutstanding_adjustedslope_0t12_LENGTHS_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -1713,58 +1587,58 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     UNSIGNED1 ErrNum := CHOOSE(c,le.ultimate_linkid_Invalid,le.cortera_score_Invalid,le.cpr_score_Invalid,le.cpr_segment_Invalid,le.dbt_Invalid,le.avg_bal_Invalid,le.air_spend_Invalid,le.fuel_spend_Invalid,le.leasing_spend_Invalid,le.ltl_spend_Invalid,le.rail_spend_Invalid,le.tl_spend_Invalid,le.transvc_spend_Invalid,le.transup_spend_Invalid,le.bst_spend_Invalid,le.dg_spend_Invalid,le.electrical_spend_Invalid,le.hvac_spend_Invalid,le.other_b_spend_Invalid,le.plumbing_spend_Invalid,le.rs_spend_Invalid,le.wp_spend_Invalid,le.chemical_spend_Invalid,le.electronic_spend_Invalid,le.metal_spend_Invalid,le.other_m_spend_Invalid,le.packaging_spend_Invalid,le.pvf_spend_Invalid,le.plastic_spend_Invalid,le.textile_spend_Invalid,le.bs_spend_Invalid,le.ce_spend_Invalid,le.hardware_spend_Invalid,le.ie_spend_Invalid,le.is_spend_Invalid,le.it_spend_Invalid,le.mls_spend_Invalid,le.os_spend_Invalid,le.pp_spend_Invalid,le.sis_spend_Invalid,le.apparel_spend_Invalid,le.beverages_spend_Invalid,le.constr_spend_Invalid,le.consulting_spend_Invalid,le.fs_spend_Invalid,le.fp_spend_Invalid,le.insurance_spend_Invalid,le.ls_spend_Invalid,le.oil_gas_spend_Invalid,le.utilities_spend_Invalid,le.other_spend_Invalid,le.advt_spend_Invalid,le.air_growth_Invalid,le.fuel_growth_Invalid,le.leasing_growth_Invalid,le.ltl_growth_Invalid,le.rail_growth_Invalid,le.tl_growth_Invalid,le.transvc_growth_Invalid,le.transup_growth_Invalid,le.bst_growth_Invalid,le.dg_growth_Invalid,le.electrical_growth_Invalid,le.hvac_growth_Invalid,le.other_b_growth_Invalid,le.plumbing_growth_Invalid,le.rs_growth_Invalid,le.wp_growth_Invalid,le.chemical_growth_Invalid,le.electronic_growth_Invalid,le.metal_growth_Invalid,le.other_m_growth_Invalid,le.packaging_growth_Invalid,le.pvf_growth_Invalid,le.plastic_growth_Invalid,le.textile_growth_Invalid,le.bs_growth_Invalid,le.ce_growth_Invalid,le.hardware_growth_Invalid,le.ie_growth_Invalid,le.is_growth_Invalid,le.it_growth_Invalid,le.mls_growth_Invalid,le.os_growth_Invalid,le.pp_growth_Invalid,le.sis_growth_Invalid,le.apparel_growth_Invalid,le.beverages_growth_Invalid,le.constr_growth_Invalid,le.consulting_growth_Invalid,le.fs_growth_Invalid,le.fp_growth_Invalid,le.insurance_growth_Invalid,le.ls_growth_Invalid,le.oil_gas_growth_Invalid,le.utilities_growth_Invalid,le.other_growth_Invalid,le.advt_growth_Invalid,le.top5_growth_Invalid,le.shipping_y1_Invalid,le.shipping_growth_Invalid,le.materials_y1_Invalid,le.materials_growth_Invalid,le.operations_y1_Invalid,le.operations_growth_Invalid,le.total_paid_average_0t12_Invalid,le.total_paid_monthspastworst_24_Invalid,le.total_paid_slope_0t12_Invalid,le.total_paid_slope_0t6_Invalid,le.total_paid_slope_6t12_Invalid,le.total_paid_slope_6t18_Invalid,le.total_paid_volatility_0t12_Invalid,le.total_paid_volatility_0t6_Invalid,le.total_paid_volatility_12t18_Invalid,le.total_paid_volatility_6t12_Invalid,le.total_spend_monthspastleast_24_Invalid,le.total_spend_monthspastmost_24_Invalid,le.total_spend_slope_0t12_Invalid,le.total_spend_slope_0t24_Invalid,le.total_spend_slope_0t6_Invalid,le.total_spend_slope_6t12_Invalid,le.total_spend_sum_12_Invalid,le.total_spend_volatility_0t12_Invalid,le.total_spend_volatility_0t6_Invalid,le.total_spend_volatility_12t18_Invalid,le.total_spend_volatility_6t12_Invalid,le.mfgmat_paid_average_12_Invalid,le.mfgmat_paid_monthspastworst_24_Invalid,le.mfgmat_paid_slope_0t12_Invalid,le.mfgmat_paid_slope_0t24_Invalid,le.mfgmat_paid_slope_0t6_Invalid,le.mfgmat_paid_volatility_0t12_Invalid,le.mfgmat_paid_volatility_0t6_Invalid,le.mfgmat_spend_monthspastleast_24_Invalid,le.mfgmat_spend_monthspastmost_24_Invalid,le.mfgmat_spend_slope_0t12_Invalid,le.mfgmat_spend_slope_0t24_Invalid,le.mfgmat_spend_slope_0t6_Invalid,le.mfgmat_spend_sum_12_Invalid,le.mfgmat_spend_volatility_0t6_Invalid,le.mfgmat_spend_volatility_6t12_Invalid,le.ops_paid_average_12_Invalid,le.ops_paid_monthspastworst_24_Invalid,le.ops_paid_slope_0t12_Invalid,le.ops_paid_slope_0t24_Invalid,le.ops_paid_slope_0t6_Invalid,le.ops_paid_volatility_0t12_Invalid,le.ops_paid_volatility_0t6_Invalid,le.ops_spend_monthspastleast_24_Invalid,le.ops_spend_monthspastmost_24_Invalid,le.ops_spend_slope_0t12_Invalid,le.ops_spend_slope_0t24_Invalid,le.ops_spend_slope_0t6_Invalid,le.fleet_paid_monthspastworst_24_Invalid,le.fleet_paid_slope_0t12_Invalid,le.fleet_paid_slope_0t24_Invalid,le.fleet_paid_slope_0t6_Invalid,le.fleet_paid_volatility_0t12_Invalid,le.fleet_paid_volatility_0t6_Invalid,le.fleet_spend_slope_0t12_Invalid,le.fleet_spend_slope_0t24_Invalid,le.fleet_spend_slope_0t6_Invalid,le.carrier_paid_slope_0t12_Invalid,le.carrier_paid_slope_0t24_Invalid,le.carrier_paid_slope_0t6_Invalid,le.carrier_paid_volatility_0t12_Invalid,le.carrier_paid_volatility_0t6_Invalid,le.carrier_spend_slope_0t12_Invalid,le.carrier_spend_slope_0t24_Invalid,le.carrier_spend_slope_0t6_Invalid,le.carrier_spend_volatility_0t6_Invalid,le.carrier_spend_volatility_6t12_Invalid,le.bldgmats_paid_slope_0t12_Invalid,le.bldgmats_paid_slope_0t24_Invalid,le.bldgmats_paid_slope_0t6_Invalid,le.bldgmats_paid_volatility_0t12_Invalid,le.bldgmats_paid_volatility_0t6_Invalid,le.bldgmats_spend_slope_0t12_Invalid,le.bldgmats_spend_slope_0t24_Invalid,le.bldgmats_spend_slope_0t6_Invalid,le.bldgmats_spend_volatility_0t6_Invalid,le.bldgmats_spend_volatility_6t12_Invalid,le.top5_paid_slope_0t12_Invalid,le.top5_paid_slope_0t24_Invalid,le.top5_paid_slope_0t6_Invalid,le.top5_paid_volatility_0t12_Invalid,le.top5_paid_volatility_0t6_Invalid,le.top5_spend_slope_0t12_Invalid,le.top5_spend_slope_0t24_Invalid,le.top5_spend_slope_0t6_Invalid,le.top5_spend_volatility_0t6_Invalid,le.top5_spend_volatility_6t12_Invalid,le.total_numrel_slope_0t12_Invalid,le.total_numrel_slope_0t24_Invalid,le.total_numrel_slope_0t6_Invalid,le.total_numrel_slope_6t12_Invalid,le.mfgmat_numrel_slope_0t12_Invalid,le.mfgmat_numrel_slope_0t24_Invalid,le.mfgmat_numrel_slope_0t6_Invalid,le.mfgmat_numrel_slope_6t12_Invalid,le.ops_numrel_slope_0t12_Invalid,le.ops_numrel_slope_0t24_Invalid,le.ops_numrel_slope_0t6_Invalid,le.ops_numrel_slope_6t12_Invalid,le.fleet_numrel_slope_0t12_Invalid,le.fleet_numrel_slope_0t24_Invalid,le.fleet_numrel_slope_0t6_Invalid,le.fleet_numrel_slope_6t12_Invalid,le.carrier_numrel_slope_0t12_Invalid,le.carrier_numrel_slope_0t24_Invalid,le.carrier_numrel_slope_0t6_Invalid,le.carrier_numrel_slope_6t12_Invalid,le.bldgmats_numrel_slope_0t12_Invalid,le.bldgmats_numrel_slope_0t24_Invalid,le.bldgmats_numrel_slope_0t6_Invalid,le.bldgmats_numrel_slope_6t12_Invalid,le.bldgmats_numrel_var_0t12_Invalid,le.bldgmats_numrel_var_12t24_Invalid,le.total_percprov30_slope_0t12_Invalid,le.total_percprov30_slope_0t24_Invalid,le.total_percprov30_slope_0t6_Invalid,le.total_percprov30_slope_6t12_Invalid,le.total_percprov60_slope_0t12_Invalid,le.total_percprov60_slope_0t24_Invalid,le.total_percprov60_slope_0t6_Invalid,le.total_percprov60_slope_6t12_Invalid,le.total_percprov90_slope_0t24_Invalid,le.total_percprov90_slope_0t6_Invalid,le.total_percprov90_slope_6t12_Invalid,le.mfgmat_percprov30_slope_0t12_Invalid,le.mfgmat_percprov30_slope_6t12_Invalid,le.mfgmat_percprov60_slope_0t12_Invalid,le.mfgmat_percprov60_slope_6t12_Invalid,le.mfgmat_percprov90_slope_0t24_Invalid,le.mfgmat_percprov90_slope_0t6_Invalid,le.mfgmat_percprov90_slope_6t12_Invalid,le.ops_percprov30_slope_0t12_Invalid,le.ops_percprov30_slope_6t12_Invalid,le.ops_percprov60_slope_0t12_Invalid,le.ops_percprov60_slope_6t12_Invalid,le.ops_percprov90_slope_0t24_Invalid,le.ops_percprov90_slope_0t6_Invalid,le.ops_percprov90_slope_6t12_Invalid,le.fleet_percprov30_slope_0t12_Invalid,le.fleet_percprov30_slope_6t12_Invalid,le.fleet_percprov60_slope_0t12_Invalid,le.fleet_percprov60_slope_6t12_Invalid,le.fleet_percprov90_slope_0t24_Invalid,le.fleet_percprov90_slope_0t6_Invalid,le.fleet_percprov90_slope_6t12_Invalid,le.carrier_percprov30_slope_0t12_Invalid,le.carrier_percprov30_slope_6t12_Invalid,le.carrier_percprov60_slope_0t12_Invalid,le.carrier_percprov60_slope_6t12_Invalid,le.carrier_percprov90_slope_0t24_Invalid,le.carrier_percprov90_slope_0t6_Invalid,le.carrier_percprov90_slope_6t12_Invalid,le.bldgmats_percprov30_slope_0t12_Invalid,le.bldgmats_percprov30_slope_6t12_Invalid,le.bldgmats_percprov60_slope_0t12_Invalid,le.bldgmats_percprov60_slope_6t12_Invalid,le.bldgmats_percprov90_slope_0t24_Invalid,le.bldgmats_percprov90_slope_0t6_Invalid,le.bldgmats_percprov90_slope_6t12_Invalid,le.top5_percprov30_slope_0t12_Invalid,le.top5_percprov30_slope_6t12_Invalid,le.top5_percprov60_slope_0t12_Invalid,le.top5_percprov60_slope_6t12_Invalid,le.top5_percprov90_slope_0t24_Invalid,le.top5_percprov90_slope_0t6_Invalid,le.top5_percprov90_slope_6t12_Invalid,le.top5_percprovoutstanding_adjustedslope_0t12_Invalid,100);
     SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Attributes_Fields.InvalidMessage_ultimate_linkid(le.ultimate_linkid_Invalid),Attributes_Fields.InvalidMessage_cortera_score(le.cortera_score_Invalid),Attributes_Fields.InvalidMessage_cpr_score(le.cpr_score_Invalid),Attributes_Fields.InvalidMessage_cpr_segment(le.cpr_segment_Invalid),Attributes_Fields.InvalidMessage_dbt(le.dbt_Invalid),Attributes_Fields.InvalidMessage_avg_bal(le.avg_bal_Invalid),Attributes_Fields.InvalidMessage_air_spend(le.air_spend_Invalid),Attributes_Fields.InvalidMessage_fuel_spend(le.fuel_spend_Invalid),Attributes_Fields.InvalidMessage_leasing_spend(le.leasing_spend_Invalid),Attributes_Fields.InvalidMessage_ltl_spend(le.ltl_spend_Invalid),Attributes_Fields.InvalidMessage_rail_spend(le.rail_spend_Invalid),Attributes_Fields.InvalidMessage_tl_spend(le.tl_spend_Invalid),Attributes_Fields.InvalidMessage_transvc_spend(le.transvc_spend_Invalid),Attributes_Fields.InvalidMessage_transup_spend(le.transup_spend_Invalid),Attributes_Fields.InvalidMessage_bst_spend(le.bst_spend_Invalid),Attributes_Fields.InvalidMessage_dg_spend(le.dg_spend_Invalid),Attributes_Fields.InvalidMessage_electrical_spend(le.electrical_spend_Invalid),Attributes_Fields.InvalidMessage_hvac_spend(le.hvac_spend_Invalid),Attributes_Fields.InvalidMessage_other_b_spend(le.other_b_spend_Invalid),Attributes_Fields.InvalidMessage_plumbing_spend(le.plumbing_spend_Invalid),Attributes_Fields.InvalidMessage_rs_spend(le.rs_spend_Invalid),Attributes_Fields.InvalidMessage_wp_spend(le.wp_spend_Invalid),Attributes_Fields.InvalidMessage_chemical_spend(le.chemical_spend_Invalid),Attributes_Fields.InvalidMessage_electronic_spend(le.electronic_spend_Invalid),Attributes_Fields.InvalidMessage_metal_spend(le.metal_spend_Invalid),Attributes_Fields.InvalidMessage_other_m_spend(le.other_m_spend_Invalid),Attributes_Fields.InvalidMessage_packaging_spend(le.packaging_spend_Invalid),Attributes_Fields.InvalidMessage_pvf_spend(le.pvf_spend_Invalid),Attributes_Fields.InvalidMessage_plastic_spend(le.plastic_spend_Invalid),Attributes_Fields.InvalidMessage_textile_spend(le.textile_spend_Invalid),Attributes_Fields.InvalidMessage_bs_spend(le.bs_spend_Invalid),Attributes_Fields.InvalidMessage_ce_spend(le.ce_spend_Invalid),Attributes_Fields.InvalidMessage_hardware_spend(le.hardware_spend_Invalid),Attributes_Fields.InvalidMessage_ie_spend(le.ie_spend_Invalid),Attributes_Fields.InvalidMessage_is_spend(le.is_spend_Invalid),Attributes_Fields.InvalidMessage_it_spend(le.it_spend_Invalid),Attributes_Fields.InvalidMessage_mls_spend(le.mls_spend_Invalid),Attributes_Fields.InvalidMessage_os_spend(le.os_spend_Invalid),Attributes_Fields.InvalidMessage_pp_spend(le.pp_spend_Invalid),Attributes_Fields.InvalidMessage_sis_spend(le.sis_spend_Invalid),Attributes_Fields.InvalidMessage_apparel_spend(le.apparel_spend_Invalid),Attributes_Fields.InvalidMessage_beverages_spend(le.beverages_spend_Invalid),Attributes_Fields.InvalidMessage_constr_spend(le.constr_spend_Invalid),Attributes_Fields.InvalidMessage_consulting_spend(le.consulting_spend_Invalid),Attributes_Fields.InvalidMessage_fs_spend(le.fs_spend_Invalid),Attributes_Fields.InvalidMessage_fp_spend(le.fp_spend_Invalid),Attributes_Fields.InvalidMessage_insurance_spend(le.insurance_spend_Invalid),Attributes_Fields.InvalidMessage_ls_spend(le.ls_spend_Invalid),Attributes_Fields.InvalidMessage_oil_gas_spend(le.oil_gas_spend_Invalid),Attributes_Fields.InvalidMessage_utilities_spend(le.utilities_spend_Invalid),Attributes_Fields.InvalidMessage_other_spend(le.other_spend_Invalid),Attributes_Fields.InvalidMessage_advt_spend(le.advt_spend_Invalid),Attributes_Fields.InvalidMessage_air_growth(le.air_growth_Invalid),Attributes_Fields.InvalidMessage_fuel_growth(le.fuel_growth_Invalid),Attributes_Fields.InvalidMessage_leasing_growth(le.leasing_growth_Invalid),Attributes_Fields.InvalidMessage_ltl_growth(le.ltl_growth_Invalid),Attributes_Fields.InvalidMessage_rail_growth(le.rail_growth_Invalid),Attributes_Fields.InvalidMessage_tl_growth(le.tl_growth_Invalid),Attributes_Fields.InvalidMessage_transvc_growth(le.transvc_growth_Invalid),Attributes_Fields.InvalidMessage_transup_growth(le.transup_growth_Invalid),Attributes_Fields.InvalidMessage_bst_growth(le.bst_growth_Invalid),Attributes_Fields.InvalidMessage_dg_growth(le.dg_growth_Invalid),Attributes_Fields.InvalidMessage_electrical_growth(le.electrical_growth_Invalid),Attributes_Fields.InvalidMessage_hvac_growth(le.hvac_growth_Invalid),Attributes_Fields.InvalidMessage_other_b_growth(le.other_b_growth_Invalid),Attributes_Fields.InvalidMessage_plumbing_growth(le.plumbing_growth_Invalid),Attributes_Fields.InvalidMessage_rs_growth(le.rs_growth_Invalid),Attributes_Fields.InvalidMessage_wp_growth(le.wp_growth_Invalid),Attributes_Fields.InvalidMessage_chemical_growth(le.chemical_growth_Invalid),Attributes_Fields.InvalidMessage_electronic_growth(le.electronic_growth_Invalid),Attributes_Fields.InvalidMessage_metal_growth(le.metal_growth_Invalid),Attributes_Fields.InvalidMessage_other_m_growth(le.other_m_growth_Invalid),Attributes_Fields.InvalidMessage_packaging_growth(le.packaging_growth_Invalid),Attributes_Fields.InvalidMessage_pvf_growth(le.pvf_growth_Invalid),Attributes_Fields.InvalidMessage_plastic_growth(le.plastic_growth_Invalid),Attributes_Fields.InvalidMessage_textile_growth(le.textile_growth_Invalid),Attributes_Fields.InvalidMessage_bs_growth(le.bs_growth_Invalid),Attributes_Fields.InvalidMessage_ce_growth(le.ce_growth_Invalid),Attributes_Fields.InvalidMessage_hardware_growth(le.hardware_growth_Invalid),Attributes_Fields.InvalidMessage_ie_growth(le.ie_growth_Invalid),Attributes_Fields.InvalidMessage_is_growth(le.is_growth_Invalid),Attributes_Fields.InvalidMessage_it_growth(le.it_growth_Invalid),Attributes_Fields.InvalidMessage_mls_growth(le.mls_growth_Invalid),Attributes_Fields.InvalidMessage_os_growth(le.os_growth_Invalid),Attributes_Fields.InvalidMessage_pp_growth(le.pp_growth_Invalid),Attributes_Fields.InvalidMessage_sis_growth(le.sis_growth_Invalid),Attributes_Fields.InvalidMessage_apparel_growth(le.apparel_growth_Invalid),Attributes_Fields.InvalidMessage_beverages_growth(le.beverages_growth_Invalid),Attributes_Fields.InvalidMessage_constr_growth(le.constr_growth_Invalid),Attributes_Fields.InvalidMessage_consulting_growth(le.consulting_growth_Invalid),Attributes_Fields.InvalidMessage_fs_growth(le.fs_growth_Invalid),Attributes_Fields.InvalidMessage_fp_growth(le.fp_growth_Invalid),Attributes_Fields.InvalidMessage_insurance_growth(le.insurance_growth_Invalid),Attributes_Fields.InvalidMessage_ls_growth(le.ls_growth_Invalid),Attributes_Fields.InvalidMessage_oil_gas_growth(le.oil_gas_growth_Invalid),Attributes_Fields.InvalidMessage_utilities_growth(le.utilities_growth_Invalid),Attributes_Fields.InvalidMessage_other_growth(le.other_growth_Invalid),Attributes_Fields.InvalidMessage_advt_growth(le.advt_growth_Invalid),Attributes_Fields.InvalidMessage_top5_growth(le.top5_growth_Invalid),Attributes_Fields.InvalidMessage_shipping_y1(le.shipping_y1_Invalid),Attributes_Fields.InvalidMessage_shipping_growth(le.shipping_growth_Invalid),Attributes_Fields.InvalidMessage_materials_y1(le.materials_y1_Invalid),Attributes_Fields.InvalidMessage_materials_growth(le.materials_growth_Invalid),Attributes_Fields.InvalidMessage_operations_y1(le.operations_y1_Invalid),Attributes_Fields.InvalidMessage_operations_growth(le.operations_growth_Invalid),Attributes_Fields.InvalidMessage_total_paid_average_0t12(le.total_paid_average_0t12_Invalid),Attributes_Fields.InvalidMessage_total_paid_monthspastworst_24(le.total_paid_monthspastworst_24_Invalid),Attributes_Fields.InvalidMessage_total_paid_slope_0t12(le.total_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_total_paid_slope_0t6(le.total_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_paid_slope_6t12(le.total_paid_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_total_paid_slope_6t18(le.total_paid_slope_6t18_Invalid),Attributes_Fields.InvalidMessage_total_paid_volatility_0t12(le.total_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_total_paid_volatility_0t6(le.total_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_total_paid_volatility_12t18(le.total_paid_volatility_12t18_Invalid),Attributes_Fields.InvalidMessage_total_paid_volatility_6t12(le.total_paid_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_total_spend_monthspastleast_24(le.total_spend_monthspastleast_24_Invalid),Attributes_Fields.InvalidMessage_total_spend_monthspastmost_24(le.total_spend_monthspastmost_24_Invalid),Attributes_Fields.InvalidMessage_total_spend_slope_0t12(le.total_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_total_spend_slope_0t24(le.total_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_total_spend_slope_0t6(le.total_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_spend_slope_6t12(le.total_spend_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_total_spend_sum_12(le.total_spend_sum_12_Invalid),Attributes_Fields.InvalidMessage_total_spend_volatility_0t12(le.total_spend_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_total_spend_volatility_0t6(le.total_spend_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_total_spend_volatility_12t18(le.total_spend_volatility_12t18_Invalid),Attributes_Fields.InvalidMessage_total_spend_volatility_6t12(le.total_spend_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_average_12(le.mfgmat_paid_average_12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_monthspastworst_24(le.mfgmat_paid_monthspastworst_24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t12(le.mfgmat_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t24(le.mfgmat_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t6(le.mfgmat_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t12(le.mfgmat_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t6(le.mfgmat_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastleast_24(le.mfgmat_spend_monthspastleast_24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastmost_24(le.mfgmat_spend_monthspastmost_24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t12(le.mfgmat_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t24(le.mfgmat_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t6(le.mfgmat_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_sum_12(le.mfgmat_spend_sum_12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_volatility_0t6(le.mfgmat_spend_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_spend_volatility_6t12(le.mfgmat_spend_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_ops_paid_average_12(le.ops_paid_average_12_Invalid),Attributes_Fields.InvalidMessage_ops_paid_monthspastworst_24(le.ops_paid_monthspastworst_24_Invalid),Attributes_Fields.InvalidMessage_ops_paid_slope_0t12(le.ops_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_paid_slope_0t24(le.ops_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_ops_paid_slope_0t6(le.ops_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_ops_paid_volatility_0t12(le.ops_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_paid_volatility_0t6(le.ops_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_ops_spend_monthspastleast_24(le.ops_spend_monthspastleast_24_Invalid),Attributes_Fields.InvalidMessage_ops_spend_monthspastmost_24(le.ops_spend_monthspastmost_24_Invalid),Attributes_Fields.InvalidMessage_ops_spend_slope_0t12(le.ops_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_spend_slope_0t24(le.ops_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_ops_spend_slope_0t6(le.ops_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_monthspastworst_24(le.fleet_paid_monthspastworst_24_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t12(le.fleet_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t24(le.fleet_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t6(le.fleet_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_volatility_0t12(le.fleet_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_paid_volatility_0t6(le.fleet_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_fleet_spend_slope_0t12(le.fleet_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_spend_slope_0t24(le.fleet_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_fleet_spend_slope_0t6(le.fleet_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_paid_slope_0t12(le.carrier_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_paid_slope_0t24(le.carrier_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_carrier_paid_slope_0t6(le.carrier_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_paid_volatility_0t12(le.carrier_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_paid_volatility_0t6(le.carrier_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_spend_slope_0t12(le.carrier_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_spend_slope_0t24(le.carrier_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_carrier_spend_slope_0t6(le.carrier_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_spend_volatility_0t6(le.carrier_spend_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_spend_volatility_6t12(le.carrier_spend_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_paid_slope_0t12(le.bldgmats_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_paid_slope_0t24(le.bldgmats_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_bldgmats_paid_slope_0t6(le.bldgmats_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_paid_volatility_0t12(le.bldgmats_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_paid_volatility_0t6(le.bldgmats_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_spend_slope_0t12(le.bldgmats_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_spend_slope_0t24(le.bldgmats_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_bldgmats_spend_slope_0t6(le.bldgmats_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_spend_volatility_0t6(le.bldgmats_spend_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_spend_volatility_6t12(le.bldgmats_spend_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_top5_paid_slope_0t12(le.top5_paid_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_top5_paid_slope_0t24(le.top5_paid_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_top5_paid_slope_0t6(le.top5_paid_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_top5_paid_volatility_0t12(le.top5_paid_volatility_0t12_Invalid),Attributes_Fields.InvalidMessage_top5_paid_volatility_0t6(le.top5_paid_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_top5_spend_slope_0t12(le.top5_spend_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_top5_spend_slope_0t24(le.top5_spend_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_top5_spend_slope_0t6(le.top5_spend_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_top5_spend_volatility_0t6(le.top5_spend_volatility_0t6_Invalid),Attributes_Fields.InvalidMessage_top5_spend_volatility_6t12(le.top5_spend_volatility_6t12_Invalid),Attributes_Fields.InvalidMessage_total_numrel_slope_0t12(le.total_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_total_numrel_slope_0t24(le.total_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_total_numrel_slope_0t6(le.total_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_numrel_slope_6t12(le.total_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_numrel_slope_0t12(le.mfgmat_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_numrel_slope_0t24(le.mfgmat_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_numrel_slope_0t6(le.mfgmat_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_numrel_slope_6t12(le.mfgmat_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_ops_numrel_slope_0t12(le.ops_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_numrel_slope_0t24(le.ops_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_ops_numrel_slope_0t6(le.ops_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_ops_numrel_slope_6t12(le.ops_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_fleet_numrel_slope_0t12(le.fleet_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_numrel_slope_0t24(le.fleet_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_fleet_numrel_slope_0t6(le.fleet_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_fleet_numrel_slope_6t12(le.fleet_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_carrier_numrel_slope_0t12(le.carrier_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_numrel_slope_0t24(le.carrier_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_carrier_numrel_slope_0t6(le.carrier_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_numrel_slope_6t12(le.carrier_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_slope_0t12(le.bldgmats_numrel_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_slope_0t24(le.bldgmats_numrel_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_slope_0t6(le.bldgmats_numrel_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_slope_6t12(le.bldgmats_numrel_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_var_0t12(le.bldgmats_numrel_var_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_numrel_var_12t24(le.bldgmats_numrel_var_12t24_Invalid),Attributes_Fields.InvalidMessage_total_percprov30_slope_0t12(le.total_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_total_percprov30_slope_0t24(le.total_percprov30_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_total_percprov30_slope_0t6(le.total_percprov30_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_percprov30_slope_6t12(le.total_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_total_percprov60_slope_0t12(le.total_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_total_percprov60_slope_0t24(le.total_percprov60_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_total_percprov60_slope_0t6(le.total_percprov60_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_percprov60_slope_6t12(le.total_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_total_percprov90_slope_0t24(le.total_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_total_percprov90_slope_0t6(le.total_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_total_percprov90_slope_6t12(le.total_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov30_slope_0t12(le.mfgmat_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov30_slope_6t12(le.mfgmat_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov60_slope_0t12(le.mfgmat_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov60_slope_6t12(le.mfgmat_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov90_slope_0t24(le.mfgmat_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov90_slope_0t6(le.mfgmat_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_mfgmat_percprov90_slope_6t12(le.mfgmat_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_ops_percprov30_slope_0t12(le.ops_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_percprov30_slope_6t12(le.ops_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_ops_percprov60_slope_0t12(le.ops_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_ops_percprov60_slope_6t12(le.ops_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_ops_percprov90_slope_0t24(le.ops_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_ops_percprov90_slope_0t6(le.ops_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_ops_percprov90_slope_6t12(le.ops_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov30_slope_0t12(le.fleet_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov30_slope_6t12(le.fleet_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov60_slope_0t12(le.fleet_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov60_slope_6t12(le.fleet_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov90_slope_0t24(le.fleet_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov90_slope_0t6(le.fleet_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_fleet_percprov90_slope_6t12(le.fleet_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov30_slope_0t12(le.carrier_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov30_slope_6t12(le.carrier_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov60_slope_0t12(le.carrier_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov60_slope_6t12(le.carrier_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov90_slope_0t24(le.carrier_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov90_slope_0t6(le.carrier_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_carrier_percprov90_slope_6t12(le.carrier_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov30_slope_0t12(le.bldgmats_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov30_slope_6t12(le.bldgmats_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov60_slope_0t12(le.bldgmats_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov60_slope_6t12(le.bldgmats_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov90_slope_0t24(le.bldgmats_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov90_slope_0t6(le.bldgmats_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_bldgmats_percprov90_slope_6t12(le.bldgmats_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprov30_slope_0t12(le.top5_percprov30_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprov30_slope_6t12(le.top5_percprov30_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprov60_slope_0t12(le.top5_percprov60_slope_0t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprov60_slope_6t12(le.top5_percprov60_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprov90_slope_0t24(le.top5_percprov90_slope_0t24_Invalid),Attributes_Fields.InvalidMessage_top5_percprov90_slope_0t6(le.top5_percprov90_slope_0t6_Invalid),Attributes_Fields.InvalidMessage_top5_percprov90_slope_6t12(le.top5_percprov90_slope_6t12_Invalid),Attributes_Fields.InvalidMessage_top5_percprovoutstanding_adjustedslope_0t12(le.top5_percprovoutstanding_adjustedslope_0t12_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.ultimate_linkid_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.cortera_score_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.cpr_score_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.cpr_segment_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.ultimate_linkid_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.cortera_score_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.cpr_score_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.cpr_segment_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.dbt_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.avg_bal_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.air_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.fuel_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.leasing_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ltl_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.rail_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.tl_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.transvc_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.transup_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.bst_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.dg_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.electrical_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.hvac_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.other_b_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.plumbing_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.rs_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.wp_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.chemical_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.electronic_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.metal_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.other_m_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.packaging_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.pvf_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.plastic_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.textile_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.bs_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ce_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.hardware_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ie_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.is_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.it_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.mls_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.os_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.pp_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.sis_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.apparel_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.beverages_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.constr_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.consulting_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.fs_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.fp_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.insurance_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ls_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.oil_gas_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.utilities_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.other_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.advt_spend_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.avg_bal_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.air_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fuel_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.leasing_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ltl_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rail_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.tl_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.transvc_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.transup_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bst_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.dg_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.electrical_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.hvac_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.other_b_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.plumbing_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rs_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.wp_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.chemical_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.electronic_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.metal_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.other_m_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.packaging_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.pvf_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.plastic_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.textile_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bs_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ce_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.hardware_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ie_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.is_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.it_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.mls_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.os_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.pp_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.sis_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.apparel_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.beverages_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.constr_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.consulting_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fs_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.fp_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.insurance_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ls_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.oil_gas_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.utilities_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.other_spend_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.advt_spend_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.air_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.fuel_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.leasing_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
@@ -1812,11 +1686,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.other_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.advt_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.top5_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.shipping_y1_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.shipping_y1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.shipping_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.materials_y1_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.materials_y1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.materials_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.operations_y1_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.operations_y1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.operations_growth_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_paid_average_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_paid_monthspastworst_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
@@ -1828,8 +1702,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.total_paid_volatility_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_paid_volatility_12t18_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_paid_volatility_6t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.total_spend_monthspastleast_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.total_spend_monthspastmost_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.total_spend_monthspastleast_24_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.total_spend_monthspastmost_24_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.total_spend_slope_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_spend_slope_0t24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_spend_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
@@ -1840,14 +1714,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.total_spend_volatility_12t18_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.total_spend_volatility_6t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_average_12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.mfgmat_paid_monthspastworst_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.mfgmat_paid_monthspastworst_24_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_slope_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_slope_0t24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_volatility_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_paid_volatility_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.mfgmat_spend_monthspastleast_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.mfgmat_spend_monthspastmost_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.mfgmat_spend_monthspastleast_24_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.mfgmat_spend_monthspastmost_24_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.mfgmat_spend_slope_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_spend_slope_0t24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mfgmat_spend_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
@@ -1861,12 +1735,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.ops_paid_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ops_paid_volatility_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ops_paid_volatility_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ops_spend_monthspastleast_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ops_spend_monthspastmost_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.ops_spend_monthspastleast_24_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ops_spend_monthspastmost_24_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ops_spend_slope_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ops_spend_slope_0t24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ops_spend_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.fleet_paid_monthspastworst_24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.fleet_paid_monthspastworst_24_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fleet_paid_slope_0t12_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.fleet_paid_slope_0t24_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.fleet_paid_slope_0t6_Invalid,'ALLOW','LENGTHS','UNKNOWN')
@@ -2000,58 +1874,58 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'ultimate_linkid:Number:ALLOW','ultimate_linkid:Number:LENGTHS'
-          ,'cortera_score:Number:ALLOW','cortera_score:Number:LENGTHS'
-          ,'cpr_score:Number:ALLOW','cpr_score:Number:LENGTHS'
-          ,'cpr_segment:Number:ALLOW','cpr_segment:Number:LENGTHS'
+          ,'ultimate_linkid:Number:ALLOW'
+          ,'cortera_score:Number:ALLOW'
+          ,'cpr_score:Number:ALLOW'
+          ,'cpr_segment:Number:ALLOW'
           ,'dbt:Ratio:ALLOW','dbt:Ratio:LENGTHS'
-          ,'avg_bal:Number:ALLOW','avg_bal:Number:LENGTHS'
-          ,'air_spend:Number:ALLOW','air_spend:Number:LENGTHS'
-          ,'fuel_spend:Number:ALLOW','fuel_spend:Number:LENGTHS'
-          ,'leasing_spend:Number:ALLOW','leasing_spend:Number:LENGTHS'
-          ,'ltl_spend:Number:ALLOW','ltl_spend:Number:LENGTHS'
-          ,'rail_spend:Number:ALLOW','rail_spend:Number:LENGTHS'
-          ,'tl_spend:Number:ALLOW','tl_spend:Number:LENGTHS'
-          ,'transvc_spend:Number:ALLOW','transvc_spend:Number:LENGTHS'
-          ,'transup_spend:Number:ALLOW','transup_spend:Number:LENGTHS'
-          ,'bst_spend:Number:ALLOW','bst_spend:Number:LENGTHS'
-          ,'dg_spend:Number:ALLOW','dg_spend:Number:LENGTHS'
-          ,'electrical_spend:Number:ALLOW','electrical_spend:Number:LENGTHS'
-          ,'hvac_spend:Number:ALLOW','hvac_spend:Number:LENGTHS'
-          ,'other_b_spend:Number:ALLOW','other_b_spend:Number:LENGTHS'
-          ,'plumbing_spend:Number:ALLOW','plumbing_spend:Number:LENGTHS'
-          ,'rs_spend:Number:ALLOW','rs_spend:Number:LENGTHS'
-          ,'wp_spend:Number:ALLOW','wp_spend:Number:LENGTHS'
-          ,'chemical_spend:Number:ALLOW','chemical_spend:Number:LENGTHS'
-          ,'electronic_spend:Number:ALLOW','electronic_spend:Number:LENGTHS'
-          ,'metal_spend:Number:ALLOW','metal_spend:Number:LENGTHS'
-          ,'other_m_spend:Number:ALLOW','other_m_spend:Number:LENGTHS'
-          ,'packaging_spend:Number:ALLOW','packaging_spend:Number:LENGTHS'
-          ,'pvf_spend:Number:ALLOW','pvf_spend:Number:LENGTHS'
-          ,'plastic_spend:Number:ALLOW','plastic_spend:Number:LENGTHS'
-          ,'textile_spend:Number:ALLOW','textile_spend:Number:LENGTHS'
-          ,'bs_spend:Number:ALLOW','bs_spend:Number:LENGTHS'
-          ,'ce_spend:Number:ALLOW','ce_spend:Number:LENGTHS'
-          ,'hardware_spend:Number:ALLOW','hardware_spend:Number:LENGTHS'
-          ,'ie_spend:Number:ALLOW','ie_spend:Number:LENGTHS'
-          ,'is_spend:Number:ALLOW','is_spend:Number:LENGTHS'
-          ,'it_spend:Number:ALLOW','it_spend:Number:LENGTHS'
-          ,'mls_spend:Number:ALLOW','mls_spend:Number:LENGTHS'
-          ,'os_spend:Number:ALLOW','os_spend:Number:LENGTHS'
-          ,'pp_spend:Number:ALLOW','pp_spend:Number:LENGTHS'
-          ,'sis_spend:Number:ALLOW','sis_spend:Number:LENGTHS'
-          ,'apparel_spend:Number:ALLOW','apparel_spend:Number:LENGTHS'
-          ,'beverages_spend:Number:ALLOW','beverages_spend:Number:LENGTHS'
-          ,'constr_spend:Number:ALLOW','constr_spend:Number:LENGTHS'
-          ,'consulting_spend:Number:ALLOW','consulting_spend:Number:LENGTHS'
-          ,'fs_spend:Number:ALLOW','fs_spend:Number:LENGTHS'
-          ,'fp_spend:Number:ALLOW','fp_spend:Number:LENGTHS'
-          ,'insurance_spend:Number:ALLOW','insurance_spend:Number:LENGTHS'
-          ,'ls_spend:Number:ALLOW','ls_spend:Number:LENGTHS'
-          ,'oil_gas_spend:Number:ALLOW','oil_gas_spend:Number:LENGTHS'
-          ,'utilities_spend:Number:ALLOW','utilities_spend:Number:LENGTHS'
-          ,'other_spend:Number:ALLOW','other_spend:Number:LENGTHS'
-          ,'advt_spend:Number:ALLOW','advt_spend:Number:LENGTHS'
+          ,'avg_bal:Number:ALLOW'
+          ,'air_spend:Number:ALLOW'
+          ,'fuel_spend:Number:ALLOW'
+          ,'leasing_spend:Number:ALLOW'
+          ,'ltl_spend:Number:ALLOW'
+          ,'rail_spend:Number:ALLOW'
+          ,'tl_spend:Number:ALLOW'
+          ,'transvc_spend:Number:ALLOW'
+          ,'transup_spend:Number:ALLOW'
+          ,'bst_spend:Number:ALLOW'
+          ,'dg_spend:Number:ALLOW'
+          ,'electrical_spend:Number:ALLOW'
+          ,'hvac_spend:Number:ALLOW'
+          ,'other_b_spend:Number:ALLOW'
+          ,'plumbing_spend:Number:ALLOW'
+          ,'rs_spend:Number:ALLOW'
+          ,'wp_spend:Number:ALLOW'
+          ,'chemical_spend:Number:ALLOW'
+          ,'electronic_spend:Number:ALLOW'
+          ,'metal_spend:Number:ALLOW'
+          ,'other_m_spend:Number:ALLOW'
+          ,'packaging_spend:Number:ALLOW'
+          ,'pvf_spend:Number:ALLOW'
+          ,'plastic_spend:Number:ALLOW'
+          ,'textile_spend:Number:ALLOW'
+          ,'bs_spend:Number:ALLOW'
+          ,'ce_spend:Number:ALLOW'
+          ,'hardware_spend:Number:ALLOW'
+          ,'ie_spend:Number:ALLOW'
+          ,'is_spend:Number:ALLOW'
+          ,'it_spend:Number:ALLOW'
+          ,'mls_spend:Number:ALLOW'
+          ,'os_spend:Number:ALLOW'
+          ,'pp_spend:Number:ALLOW'
+          ,'sis_spend:Number:ALLOW'
+          ,'apparel_spend:Number:ALLOW'
+          ,'beverages_spend:Number:ALLOW'
+          ,'constr_spend:Number:ALLOW'
+          ,'consulting_spend:Number:ALLOW'
+          ,'fs_spend:Number:ALLOW'
+          ,'fp_spend:Number:ALLOW'
+          ,'insurance_spend:Number:ALLOW'
+          ,'ls_spend:Number:ALLOW'
+          ,'oil_gas_spend:Number:ALLOW'
+          ,'utilities_spend:Number:ALLOW'
+          ,'other_spend:Number:ALLOW'
+          ,'advt_spend:Number:ALLOW'
           ,'air_growth:Ratio:ALLOW','air_growth:Ratio:LENGTHS'
           ,'fuel_growth:Ratio:ALLOW','fuel_growth:Ratio:LENGTHS'
           ,'leasing_growth:Ratio:ALLOW','leasing_growth:Ratio:LENGTHS'
@@ -2099,11 +1973,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'other_growth:Ratio:ALLOW','other_growth:Ratio:LENGTHS'
           ,'advt_growth:Ratio:ALLOW','advt_growth:Ratio:LENGTHS'
           ,'top5_growth:Ratio:ALLOW','top5_growth:Ratio:LENGTHS'
-          ,'shipping_y1:Number:ALLOW','shipping_y1:Number:LENGTHS'
+          ,'shipping_y1:Number:ALLOW'
           ,'shipping_growth:Ratio:ALLOW','shipping_growth:Ratio:LENGTHS'
-          ,'materials_y1:Number:ALLOW','materials_y1:Number:LENGTHS'
+          ,'materials_y1:Number:ALLOW'
           ,'materials_growth:Ratio:ALLOW','materials_growth:Ratio:LENGTHS'
-          ,'operations_y1:Number:ALLOW','operations_y1:Number:LENGTHS'
+          ,'operations_y1:Number:ALLOW'
           ,'operations_growth:Ratio:ALLOW','operations_growth:Ratio:LENGTHS'
           ,'total_paid_average_0t12:Ratio:ALLOW','total_paid_average_0t12:Ratio:LENGTHS'
           ,'total_paid_monthspastworst_24:Ratio:ALLOW','total_paid_monthspastworst_24:Ratio:LENGTHS'
@@ -2115,8 +1989,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'total_paid_volatility_0t6:Ratio:ALLOW','total_paid_volatility_0t6:Ratio:LENGTHS'
           ,'total_paid_volatility_12t18:Ratio:ALLOW','total_paid_volatility_12t18:Ratio:LENGTHS'
           ,'total_paid_volatility_6t12:Ratio:ALLOW','total_paid_volatility_6t12:Ratio:LENGTHS'
-          ,'total_spend_monthspastleast_24:Number:ALLOW','total_spend_monthspastleast_24:Number:LENGTHS'
-          ,'total_spend_monthspastmost_24:Number:ALLOW','total_spend_monthspastmost_24:Number:LENGTHS'
+          ,'total_spend_monthspastleast_24:Number:ALLOW'
+          ,'total_spend_monthspastmost_24:Number:ALLOW'
           ,'total_spend_slope_0t12:Ratio:ALLOW','total_spend_slope_0t12:Ratio:LENGTHS'
           ,'total_spend_slope_0t24:Ratio:ALLOW','total_spend_slope_0t24:Ratio:LENGTHS'
           ,'total_spend_slope_0t6:Ratio:ALLOW','total_spend_slope_0t6:Ratio:LENGTHS'
@@ -2127,14 +2001,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'total_spend_volatility_12t18:Ratio:ALLOW','total_spend_volatility_12t18:Ratio:LENGTHS'
           ,'total_spend_volatility_6t12:Ratio:ALLOW','total_spend_volatility_6t12:Ratio:LENGTHS'
           ,'mfgmat_paid_average_12:Ratio:ALLOW','mfgmat_paid_average_12:Ratio:LENGTHS'
-          ,'mfgmat_paid_monthspastworst_24:Number:ALLOW','mfgmat_paid_monthspastworst_24:Number:LENGTHS'
+          ,'mfgmat_paid_monthspastworst_24:Number:ALLOW'
           ,'mfgmat_paid_slope_0t12:Ratio:ALLOW','mfgmat_paid_slope_0t12:Ratio:LENGTHS'
           ,'mfgmat_paid_slope_0t24:Ratio:ALLOW','mfgmat_paid_slope_0t24:Ratio:LENGTHS'
           ,'mfgmat_paid_slope_0t6:Ratio:ALLOW','mfgmat_paid_slope_0t6:Ratio:LENGTHS'
           ,'mfgmat_paid_volatility_0t12:Ratio:ALLOW','mfgmat_paid_volatility_0t12:Ratio:LENGTHS'
           ,'mfgmat_paid_volatility_0t6:Ratio:ALLOW','mfgmat_paid_volatility_0t6:Ratio:LENGTHS'
-          ,'mfgmat_spend_monthspastleast_24:Number:ALLOW','mfgmat_spend_monthspastleast_24:Number:LENGTHS'
-          ,'mfgmat_spend_monthspastmost_24:Number:ALLOW','mfgmat_spend_monthspastmost_24:Number:LENGTHS'
+          ,'mfgmat_spend_monthspastleast_24:Number:ALLOW'
+          ,'mfgmat_spend_monthspastmost_24:Number:ALLOW'
           ,'mfgmat_spend_slope_0t12:Ratio:ALLOW','mfgmat_spend_slope_0t12:Ratio:LENGTHS'
           ,'mfgmat_spend_slope_0t24:Ratio:ALLOW','mfgmat_spend_slope_0t24:Ratio:LENGTHS'
           ,'mfgmat_spend_slope_0t6:Ratio:ALLOW','mfgmat_spend_slope_0t6:Ratio:LENGTHS'
@@ -2148,12 +2022,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'ops_paid_slope_0t6:Ratio:ALLOW','ops_paid_slope_0t6:Ratio:LENGTHS'
           ,'ops_paid_volatility_0t12:Ratio:ALLOW','ops_paid_volatility_0t12:Ratio:LENGTHS'
           ,'ops_paid_volatility_0t6:Ratio:ALLOW','ops_paid_volatility_0t6:Ratio:LENGTHS'
-          ,'ops_spend_monthspastleast_24:Number:ALLOW','ops_spend_monthspastleast_24:Number:LENGTHS'
-          ,'ops_spend_monthspastmost_24:Number:ALLOW','ops_spend_monthspastmost_24:Number:LENGTHS'
+          ,'ops_spend_monthspastleast_24:Number:ALLOW'
+          ,'ops_spend_monthspastmost_24:Number:ALLOW'
           ,'ops_spend_slope_0t12:Ratio:ALLOW','ops_spend_slope_0t12:Ratio:LENGTHS'
           ,'ops_spend_slope_0t24:Ratio:ALLOW','ops_spend_slope_0t24:Ratio:LENGTHS'
           ,'ops_spend_slope_0t6:Ratio:ALLOW','ops_spend_slope_0t6:Ratio:LENGTHS'
-          ,'fleet_paid_monthspastworst_24:Number:ALLOW','fleet_paid_monthspastworst_24:Number:LENGTHS'
+          ,'fleet_paid_monthspastworst_24:Number:ALLOW'
           ,'fleet_paid_slope_0t12:Ratio:ALLOW','fleet_paid_slope_0t12:Ratio:LENGTHS'
           ,'fleet_paid_slope_0t24:Ratio:ALLOW','fleet_paid_slope_0t24:Ratio:LENGTHS'
           ,'fleet_paid_slope_0t6:Ratio:ALLOW','fleet_paid_slope_0t6:Ratio:LENGTHS'
@@ -2280,58 +2154,58 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'record:Number_Errored_Records:SUMMARY'
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
-          ,Attributes_Fields.InvalidMessage_ultimate_linkid(1),Attributes_Fields.InvalidMessage_ultimate_linkid(2)
-          ,Attributes_Fields.InvalidMessage_cortera_score(1),Attributes_Fields.InvalidMessage_cortera_score(2)
-          ,Attributes_Fields.InvalidMessage_cpr_score(1),Attributes_Fields.InvalidMessage_cpr_score(2)
-          ,Attributes_Fields.InvalidMessage_cpr_segment(1),Attributes_Fields.InvalidMessage_cpr_segment(2)
+          ,Attributes_Fields.InvalidMessage_ultimate_linkid(1)
+          ,Attributes_Fields.InvalidMessage_cortera_score(1)
+          ,Attributes_Fields.InvalidMessage_cpr_score(1)
+          ,Attributes_Fields.InvalidMessage_cpr_segment(1)
           ,Attributes_Fields.InvalidMessage_dbt(1),Attributes_Fields.InvalidMessage_dbt(2)
-          ,Attributes_Fields.InvalidMessage_avg_bal(1),Attributes_Fields.InvalidMessage_avg_bal(2)
-          ,Attributes_Fields.InvalidMessage_air_spend(1),Attributes_Fields.InvalidMessage_air_spend(2)
-          ,Attributes_Fields.InvalidMessage_fuel_spend(1),Attributes_Fields.InvalidMessage_fuel_spend(2)
-          ,Attributes_Fields.InvalidMessage_leasing_spend(1),Attributes_Fields.InvalidMessage_leasing_spend(2)
-          ,Attributes_Fields.InvalidMessage_ltl_spend(1),Attributes_Fields.InvalidMessage_ltl_spend(2)
-          ,Attributes_Fields.InvalidMessage_rail_spend(1),Attributes_Fields.InvalidMessage_rail_spend(2)
-          ,Attributes_Fields.InvalidMessage_tl_spend(1),Attributes_Fields.InvalidMessage_tl_spend(2)
-          ,Attributes_Fields.InvalidMessage_transvc_spend(1),Attributes_Fields.InvalidMessage_transvc_spend(2)
-          ,Attributes_Fields.InvalidMessage_transup_spend(1),Attributes_Fields.InvalidMessage_transup_spend(2)
-          ,Attributes_Fields.InvalidMessage_bst_spend(1),Attributes_Fields.InvalidMessage_bst_spend(2)
-          ,Attributes_Fields.InvalidMessage_dg_spend(1),Attributes_Fields.InvalidMessage_dg_spend(2)
-          ,Attributes_Fields.InvalidMessage_electrical_spend(1),Attributes_Fields.InvalidMessage_electrical_spend(2)
-          ,Attributes_Fields.InvalidMessage_hvac_spend(1),Attributes_Fields.InvalidMessage_hvac_spend(2)
-          ,Attributes_Fields.InvalidMessage_other_b_spend(1),Attributes_Fields.InvalidMessage_other_b_spend(2)
-          ,Attributes_Fields.InvalidMessage_plumbing_spend(1),Attributes_Fields.InvalidMessage_plumbing_spend(2)
-          ,Attributes_Fields.InvalidMessage_rs_spend(1),Attributes_Fields.InvalidMessage_rs_spend(2)
-          ,Attributes_Fields.InvalidMessage_wp_spend(1),Attributes_Fields.InvalidMessage_wp_spend(2)
-          ,Attributes_Fields.InvalidMessage_chemical_spend(1),Attributes_Fields.InvalidMessage_chemical_spend(2)
-          ,Attributes_Fields.InvalidMessage_electronic_spend(1),Attributes_Fields.InvalidMessage_electronic_spend(2)
-          ,Attributes_Fields.InvalidMessage_metal_spend(1),Attributes_Fields.InvalidMessage_metal_spend(2)
-          ,Attributes_Fields.InvalidMessage_other_m_spend(1),Attributes_Fields.InvalidMessage_other_m_spend(2)
-          ,Attributes_Fields.InvalidMessage_packaging_spend(1),Attributes_Fields.InvalidMessage_packaging_spend(2)
-          ,Attributes_Fields.InvalidMessage_pvf_spend(1),Attributes_Fields.InvalidMessage_pvf_spend(2)
-          ,Attributes_Fields.InvalidMessage_plastic_spend(1),Attributes_Fields.InvalidMessage_plastic_spend(2)
-          ,Attributes_Fields.InvalidMessage_textile_spend(1),Attributes_Fields.InvalidMessage_textile_spend(2)
-          ,Attributes_Fields.InvalidMessage_bs_spend(1),Attributes_Fields.InvalidMessage_bs_spend(2)
-          ,Attributes_Fields.InvalidMessage_ce_spend(1),Attributes_Fields.InvalidMessage_ce_spend(2)
-          ,Attributes_Fields.InvalidMessage_hardware_spend(1),Attributes_Fields.InvalidMessage_hardware_spend(2)
-          ,Attributes_Fields.InvalidMessage_ie_spend(1),Attributes_Fields.InvalidMessage_ie_spend(2)
-          ,Attributes_Fields.InvalidMessage_is_spend(1),Attributes_Fields.InvalidMessage_is_spend(2)
-          ,Attributes_Fields.InvalidMessage_it_spend(1),Attributes_Fields.InvalidMessage_it_spend(2)
-          ,Attributes_Fields.InvalidMessage_mls_spend(1),Attributes_Fields.InvalidMessage_mls_spend(2)
-          ,Attributes_Fields.InvalidMessage_os_spend(1),Attributes_Fields.InvalidMessage_os_spend(2)
-          ,Attributes_Fields.InvalidMessage_pp_spend(1),Attributes_Fields.InvalidMessage_pp_spend(2)
-          ,Attributes_Fields.InvalidMessage_sis_spend(1),Attributes_Fields.InvalidMessage_sis_spend(2)
-          ,Attributes_Fields.InvalidMessage_apparel_spend(1),Attributes_Fields.InvalidMessage_apparel_spend(2)
-          ,Attributes_Fields.InvalidMessage_beverages_spend(1),Attributes_Fields.InvalidMessage_beverages_spend(2)
-          ,Attributes_Fields.InvalidMessage_constr_spend(1),Attributes_Fields.InvalidMessage_constr_spend(2)
-          ,Attributes_Fields.InvalidMessage_consulting_spend(1),Attributes_Fields.InvalidMessage_consulting_spend(2)
-          ,Attributes_Fields.InvalidMessage_fs_spend(1),Attributes_Fields.InvalidMessage_fs_spend(2)
-          ,Attributes_Fields.InvalidMessage_fp_spend(1),Attributes_Fields.InvalidMessage_fp_spend(2)
-          ,Attributes_Fields.InvalidMessage_insurance_spend(1),Attributes_Fields.InvalidMessage_insurance_spend(2)
-          ,Attributes_Fields.InvalidMessage_ls_spend(1),Attributes_Fields.InvalidMessage_ls_spend(2)
-          ,Attributes_Fields.InvalidMessage_oil_gas_spend(1),Attributes_Fields.InvalidMessage_oil_gas_spend(2)
-          ,Attributes_Fields.InvalidMessage_utilities_spend(1),Attributes_Fields.InvalidMessage_utilities_spend(2)
-          ,Attributes_Fields.InvalidMessage_other_spend(1),Attributes_Fields.InvalidMessage_other_spend(2)
-          ,Attributes_Fields.InvalidMessage_advt_spend(1),Attributes_Fields.InvalidMessage_advt_spend(2)
+          ,Attributes_Fields.InvalidMessage_avg_bal(1)
+          ,Attributes_Fields.InvalidMessage_air_spend(1)
+          ,Attributes_Fields.InvalidMessage_fuel_spend(1)
+          ,Attributes_Fields.InvalidMessage_leasing_spend(1)
+          ,Attributes_Fields.InvalidMessage_ltl_spend(1)
+          ,Attributes_Fields.InvalidMessage_rail_spend(1)
+          ,Attributes_Fields.InvalidMessage_tl_spend(1)
+          ,Attributes_Fields.InvalidMessage_transvc_spend(1)
+          ,Attributes_Fields.InvalidMessage_transup_spend(1)
+          ,Attributes_Fields.InvalidMessage_bst_spend(1)
+          ,Attributes_Fields.InvalidMessage_dg_spend(1)
+          ,Attributes_Fields.InvalidMessage_electrical_spend(1)
+          ,Attributes_Fields.InvalidMessage_hvac_spend(1)
+          ,Attributes_Fields.InvalidMessage_other_b_spend(1)
+          ,Attributes_Fields.InvalidMessage_plumbing_spend(1)
+          ,Attributes_Fields.InvalidMessage_rs_spend(1)
+          ,Attributes_Fields.InvalidMessage_wp_spend(1)
+          ,Attributes_Fields.InvalidMessage_chemical_spend(1)
+          ,Attributes_Fields.InvalidMessage_electronic_spend(1)
+          ,Attributes_Fields.InvalidMessage_metal_spend(1)
+          ,Attributes_Fields.InvalidMessage_other_m_spend(1)
+          ,Attributes_Fields.InvalidMessage_packaging_spend(1)
+          ,Attributes_Fields.InvalidMessage_pvf_spend(1)
+          ,Attributes_Fields.InvalidMessage_plastic_spend(1)
+          ,Attributes_Fields.InvalidMessage_textile_spend(1)
+          ,Attributes_Fields.InvalidMessage_bs_spend(1)
+          ,Attributes_Fields.InvalidMessage_ce_spend(1)
+          ,Attributes_Fields.InvalidMessage_hardware_spend(1)
+          ,Attributes_Fields.InvalidMessage_ie_spend(1)
+          ,Attributes_Fields.InvalidMessage_is_spend(1)
+          ,Attributes_Fields.InvalidMessage_it_spend(1)
+          ,Attributes_Fields.InvalidMessage_mls_spend(1)
+          ,Attributes_Fields.InvalidMessage_os_spend(1)
+          ,Attributes_Fields.InvalidMessage_pp_spend(1)
+          ,Attributes_Fields.InvalidMessage_sis_spend(1)
+          ,Attributes_Fields.InvalidMessage_apparel_spend(1)
+          ,Attributes_Fields.InvalidMessage_beverages_spend(1)
+          ,Attributes_Fields.InvalidMessage_constr_spend(1)
+          ,Attributes_Fields.InvalidMessage_consulting_spend(1)
+          ,Attributes_Fields.InvalidMessage_fs_spend(1)
+          ,Attributes_Fields.InvalidMessage_fp_spend(1)
+          ,Attributes_Fields.InvalidMessage_insurance_spend(1)
+          ,Attributes_Fields.InvalidMessage_ls_spend(1)
+          ,Attributes_Fields.InvalidMessage_oil_gas_spend(1)
+          ,Attributes_Fields.InvalidMessage_utilities_spend(1)
+          ,Attributes_Fields.InvalidMessage_other_spend(1)
+          ,Attributes_Fields.InvalidMessage_advt_spend(1)
           ,Attributes_Fields.InvalidMessage_air_growth(1),Attributes_Fields.InvalidMessage_air_growth(2)
           ,Attributes_Fields.InvalidMessage_fuel_growth(1),Attributes_Fields.InvalidMessage_fuel_growth(2)
           ,Attributes_Fields.InvalidMessage_leasing_growth(1),Attributes_Fields.InvalidMessage_leasing_growth(2)
@@ -2379,11 +2253,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Attributes_Fields.InvalidMessage_other_growth(1),Attributes_Fields.InvalidMessage_other_growth(2)
           ,Attributes_Fields.InvalidMessage_advt_growth(1),Attributes_Fields.InvalidMessage_advt_growth(2)
           ,Attributes_Fields.InvalidMessage_top5_growth(1),Attributes_Fields.InvalidMessage_top5_growth(2)
-          ,Attributes_Fields.InvalidMessage_shipping_y1(1),Attributes_Fields.InvalidMessage_shipping_y1(2)
+          ,Attributes_Fields.InvalidMessage_shipping_y1(1)
           ,Attributes_Fields.InvalidMessage_shipping_growth(1),Attributes_Fields.InvalidMessage_shipping_growth(2)
-          ,Attributes_Fields.InvalidMessage_materials_y1(1),Attributes_Fields.InvalidMessage_materials_y1(2)
+          ,Attributes_Fields.InvalidMessage_materials_y1(1)
           ,Attributes_Fields.InvalidMessage_materials_growth(1),Attributes_Fields.InvalidMessage_materials_growth(2)
-          ,Attributes_Fields.InvalidMessage_operations_y1(1),Attributes_Fields.InvalidMessage_operations_y1(2)
+          ,Attributes_Fields.InvalidMessage_operations_y1(1)
           ,Attributes_Fields.InvalidMessage_operations_growth(1),Attributes_Fields.InvalidMessage_operations_growth(2)
           ,Attributes_Fields.InvalidMessage_total_paid_average_0t12(1),Attributes_Fields.InvalidMessage_total_paid_average_0t12(2)
           ,Attributes_Fields.InvalidMessage_total_paid_monthspastworst_24(1),Attributes_Fields.InvalidMessage_total_paid_monthspastworst_24(2)
@@ -2395,8 +2269,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Attributes_Fields.InvalidMessage_total_paid_volatility_0t6(1),Attributes_Fields.InvalidMessage_total_paid_volatility_0t6(2)
           ,Attributes_Fields.InvalidMessage_total_paid_volatility_12t18(1),Attributes_Fields.InvalidMessage_total_paid_volatility_12t18(2)
           ,Attributes_Fields.InvalidMessage_total_paid_volatility_6t12(1),Attributes_Fields.InvalidMessage_total_paid_volatility_6t12(2)
-          ,Attributes_Fields.InvalidMessage_total_spend_monthspastleast_24(1),Attributes_Fields.InvalidMessage_total_spend_monthspastleast_24(2)
-          ,Attributes_Fields.InvalidMessage_total_spend_monthspastmost_24(1),Attributes_Fields.InvalidMessage_total_spend_monthspastmost_24(2)
+          ,Attributes_Fields.InvalidMessage_total_spend_monthspastleast_24(1)
+          ,Attributes_Fields.InvalidMessage_total_spend_monthspastmost_24(1)
           ,Attributes_Fields.InvalidMessage_total_spend_slope_0t12(1),Attributes_Fields.InvalidMessage_total_spend_slope_0t12(2)
           ,Attributes_Fields.InvalidMessage_total_spend_slope_0t24(1),Attributes_Fields.InvalidMessage_total_spend_slope_0t24(2)
           ,Attributes_Fields.InvalidMessage_total_spend_slope_0t6(1),Attributes_Fields.InvalidMessage_total_spend_slope_0t6(2)
@@ -2407,14 +2281,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Attributes_Fields.InvalidMessage_total_spend_volatility_12t18(1),Attributes_Fields.InvalidMessage_total_spend_volatility_12t18(2)
           ,Attributes_Fields.InvalidMessage_total_spend_volatility_6t12(1),Attributes_Fields.InvalidMessage_total_spend_volatility_6t12(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_average_12(1),Attributes_Fields.InvalidMessage_mfgmat_paid_average_12(2)
-          ,Attributes_Fields.InvalidMessage_mfgmat_paid_monthspastworst_24(1),Attributes_Fields.InvalidMessage_mfgmat_paid_monthspastworst_24(2)
+          ,Attributes_Fields.InvalidMessage_mfgmat_paid_monthspastworst_24(1)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t12(1),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t12(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t24(1),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t24(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t6(1),Attributes_Fields.InvalidMessage_mfgmat_paid_slope_0t6(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t12(1),Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t12(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t6(1),Attributes_Fields.InvalidMessage_mfgmat_paid_volatility_0t6(2)
-          ,Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastleast_24(1),Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastleast_24(2)
-          ,Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastmost_24(1),Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastmost_24(2)
+          ,Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastleast_24(1)
+          ,Attributes_Fields.InvalidMessage_mfgmat_spend_monthspastmost_24(1)
           ,Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t12(1),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t12(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t24(1),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t24(2)
           ,Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t6(1),Attributes_Fields.InvalidMessage_mfgmat_spend_slope_0t6(2)
@@ -2428,12 +2302,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Attributes_Fields.InvalidMessage_ops_paid_slope_0t6(1),Attributes_Fields.InvalidMessage_ops_paid_slope_0t6(2)
           ,Attributes_Fields.InvalidMessage_ops_paid_volatility_0t12(1),Attributes_Fields.InvalidMessage_ops_paid_volatility_0t12(2)
           ,Attributes_Fields.InvalidMessage_ops_paid_volatility_0t6(1),Attributes_Fields.InvalidMessage_ops_paid_volatility_0t6(2)
-          ,Attributes_Fields.InvalidMessage_ops_spend_monthspastleast_24(1),Attributes_Fields.InvalidMessage_ops_spend_monthspastleast_24(2)
-          ,Attributes_Fields.InvalidMessage_ops_spend_monthspastmost_24(1),Attributes_Fields.InvalidMessage_ops_spend_monthspastmost_24(2)
+          ,Attributes_Fields.InvalidMessage_ops_spend_monthspastleast_24(1)
+          ,Attributes_Fields.InvalidMessage_ops_spend_monthspastmost_24(1)
           ,Attributes_Fields.InvalidMessage_ops_spend_slope_0t12(1),Attributes_Fields.InvalidMessage_ops_spend_slope_0t12(2)
           ,Attributes_Fields.InvalidMessage_ops_spend_slope_0t24(1),Attributes_Fields.InvalidMessage_ops_spend_slope_0t24(2)
           ,Attributes_Fields.InvalidMessage_ops_spend_slope_0t6(1),Attributes_Fields.InvalidMessage_ops_spend_slope_0t6(2)
-          ,Attributes_Fields.InvalidMessage_fleet_paid_monthspastworst_24(1),Attributes_Fields.InvalidMessage_fleet_paid_monthspastworst_24(2)
+          ,Attributes_Fields.InvalidMessage_fleet_paid_monthspastworst_24(1)
           ,Attributes_Fields.InvalidMessage_fleet_paid_slope_0t12(1),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t12(2)
           ,Attributes_Fields.InvalidMessage_fleet_paid_slope_0t24(1),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t24(2)
           ,Attributes_Fields.InvalidMessage_fleet_paid_slope_0t6(1),Attributes_Fields.InvalidMessage_fleet_paid_slope_0t6(2)
@@ -2560,58 +2434,58 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Records with at least one error'
           ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.ultimate_linkid_ALLOW_ErrorCount,le.ultimate_linkid_LENGTHS_ErrorCount
-          ,le.cortera_score_ALLOW_ErrorCount,le.cortera_score_LENGTHS_ErrorCount
-          ,le.cpr_score_ALLOW_ErrorCount,le.cpr_score_LENGTHS_ErrorCount
-          ,le.cpr_segment_ALLOW_ErrorCount,le.cpr_segment_LENGTHS_ErrorCount
+          ,le.ultimate_linkid_ALLOW_ErrorCount
+          ,le.cortera_score_ALLOW_ErrorCount
+          ,le.cpr_score_ALLOW_ErrorCount
+          ,le.cpr_segment_ALLOW_ErrorCount
           ,le.dbt_ALLOW_ErrorCount,le.dbt_LENGTHS_ErrorCount
-          ,le.avg_bal_ALLOW_ErrorCount,le.avg_bal_LENGTHS_ErrorCount
-          ,le.air_spend_ALLOW_ErrorCount,le.air_spend_LENGTHS_ErrorCount
-          ,le.fuel_spend_ALLOW_ErrorCount,le.fuel_spend_LENGTHS_ErrorCount
-          ,le.leasing_spend_ALLOW_ErrorCount,le.leasing_spend_LENGTHS_ErrorCount
-          ,le.ltl_spend_ALLOW_ErrorCount,le.ltl_spend_LENGTHS_ErrorCount
-          ,le.rail_spend_ALLOW_ErrorCount,le.rail_spend_LENGTHS_ErrorCount
-          ,le.tl_spend_ALLOW_ErrorCount,le.tl_spend_LENGTHS_ErrorCount
-          ,le.transvc_spend_ALLOW_ErrorCount,le.transvc_spend_LENGTHS_ErrorCount
-          ,le.transup_spend_ALLOW_ErrorCount,le.transup_spend_LENGTHS_ErrorCount
-          ,le.bst_spend_ALLOW_ErrorCount,le.bst_spend_LENGTHS_ErrorCount
-          ,le.dg_spend_ALLOW_ErrorCount,le.dg_spend_LENGTHS_ErrorCount
-          ,le.electrical_spend_ALLOW_ErrorCount,le.electrical_spend_LENGTHS_ErrorCount
-          ,le.hvac_spend_ALLOW_ErrorCount,le.hvac_spend_LENGTHS_ErrorCount
-          ,le.other_b_spend_ALLOW_ErrorCount,le.other_b_spend_LENGTHS_ErrorCount
-          ,le.plumbing_spend_ALLOW_ErrorCount,le.plumbing_spend_LENGTHS_ErrorCount
-          ,le.rs_spend_ALLOW_ErrorCount,le.rs_spend_LENGTHS_ErrorCount
-          ,le.wp_spend_ALLOW_ErrorCount,le.wp_spend_LENGTHS_ErrorCount
-          ,le.chemical_spend_ALLOW_ErrorCount,le.chemical_spend_LENGTHS_ErrorCount
-          ,le.electronic_spend_ALLOW_ErrorCount,le.electronic_spend_LENGTHS_ErrorCount
-          ,le.metal_spend_ALLOW_ErrorCount,le.metal_spend_LENGTHS_ErrorCount
-          ,le.other_m_spend_ALLOW_ErrorCount,le.other_m_spend_LENGTHS_ErrorCount
-          ,le.packaging_spend_ALLOW_ErrorCount,le.packaging_spend_LENGTHS_ErrorCount
-          ,le.pvf_spend_ALLOW_ErrorCount,le.pvf_spend_LENGTHS_ErrorCount
-          ,le.plastic_spend_ALLOW_ErrorCount,le.plastic_spend_LENGTHS_ErrorCount
-          ,le.textile_spend_ALLOW_ErrorCount,le.textile_spend_LENGTHS_ErrorCount
-          ,le.bs_spend_ALLOW_ErrorCount,le.bs_spend_LENGTHS_ErrorCount
-          ,le.ce_spend_ALLOW_ErrorCount,le.ce_spend_LENGTHS_ErrorCount
-          ,le.hardware_spend_ALLOW_ErrorCount,le.hardware_spend_LENGTHS_ErrorCount
-          ,le.ie_spend_ALLOW_ErrorCount,le.ie_spend_LENGTHS_ErrorCount
-          ,le.is_spend_ALLOW_ErrorCount,le.is_spend_LENGTHS_ErrorCount
-          ,le.it_spend_ALLOW_ErrorCount,le.it_spend_LENGTHS_ErrorCount
-          ,le.mls_spend_ALLOW_ErrorCount,le.mls_spend_LENGTHS_ErrorCount
-          ,le.os_spend_ALLOW_ErrorCount,le.os_spend_LENGTHS_ErrorCount
-          ,le.pp_spend_ALLOW_ErrorCount,le.pp_spend_LENGTHS_ErrorCount
-          ,le.sis_spend_ALLOW_ErrorCount,le.sis_spend_LENGTHS_ErrorCount
-          ,le.apparel_spend_ALLOW_ErrorCount,le.apparel_spend_LENGTHS_ErrorCount
-          ,le.beverages_spend_ALLOW_ErrorCount,le.beverages_spend_LENGTHS_ErrorCount
-          ,le.constr_spend_ALLOW_ErrorCount,le.constr_spend_LENGTHS_ErrorCount
-          ,le.consulting_spend_ALLOW_ErrorCount,le.consulting_spend_LENGTHS_ErrorCount
-          ,le.fs_spend_ALLOW_ErrorCount,le.fs_spend_LENGTHS_ErrorCount
-          ,le.fp_spend_ALLOW_ErrorCount,le.fp_spend_LENGTHS_ErrorCount
-          ,le.insurance_spend_ALLOW_ErrorCount,le.insurance_spend_LENGTHS_ErrorCount
-          ,le.ls_spend_ALLOW_ErrorCount,le.ls_spend_LENGTHS_ErrorCount
-          ,le.oil_gas_spend_ALLOW_ErrorCount,le.oil_gas_spend_LENGTHS_ErrorCount
-          ,le.utilities_spend_ALLOW_ErrorCount,le.utilities_spend_LENGTHS_ErrorCount
-          ,le.other_spend_ALLOW_ErrorCount,le.other_spend_LENGTHS_ErrorCount
-          ,le.advt_spend_ALLOW_ErrorCount,le.advt_spend_LENGTHS_ErrorCount
+          ,le.avg_bal_ALLOW_ErrorCount
+          ,le.air_spend_ALLOW_ErrorCount
+          ,le.fuel_spend_ALLOW_ErrorCount
+          ,le.leasing_spend_ALLOW_ErrorCount
+          ,le.ltl_spend_ALLOW_ErrorCount
+          ,le.rail_spend_ALLOW_ErrorCount
+          ,le.tl_spend_ALLOW_ErrorCount
+          ,le.transvc_spend_ALLOW_ErrorCount
+          ,le.transup_spend_ALLOW_ErrorCount
+          ,le.bst_spend_ALLOW_ErrorCount
+          ,le.dg_spend_ALLOW_ErrorCount
+          ,le.electrical_spend_ALLOW_ErrorCount
+          ,le.hvac_spend_ALLOW_ErrorCount
+          ,le.other_b_spend_ALLOW_ErrorCount
+          ,le.plumbing_spend_ALLOW_ErrorCount
+          ,le.rs_spend_ALLOW_ErrorCount
+          ,le.wp_spend_ALLOW_ErrorCount
+          ,le.chemical_spend_ALLOW_ErrorCount
+          ,le.electronic_spend_ALLOW_ErrorCount
+          ,le.metal_spend_ALLOW_ErrorCount
+          ,le.other_m_spend_ALLOW_ErrorCount
+          ,le.packaging_spend_ALLOW_ErrorCount
+          ,le.pvf_spend_ALLOW_ErrorCount
+          ,le.plastic_spend_ALLOW_ErrorCount
+          ,le.textile_spend_ALLOW_ErrorCount
+          ,le.bs_spend_ALLOW_ErrorCount
+          ,le.ce_spend_ALLOW_ErrorCount
+          ,le.hardware_spend_ALLOW_ErrorCount
+          ,le.ie_spend_ALLOW_ErrorCount
+          ,le.is_spend_ALLOW_ErrorCount
+          ,le.it_spend_ALLOW_ErrorCount
+          ,le.mls_spend_ALLOW_ErrorCount
+          ,le.os_spend_ALLOW_ErrorCount
+          ,le.pp_spend_ALLOW_ErrorCount
+          ,le.sis_spend_ALLOW_ErrorCount
+          ,le.apparel_spend_ALLOW_ErrorCount
+          ,le.beverages_spend_ALLOW_ErrorCount
+          ,le.constr_spend_ALLOW_ErrorCount
+          ,le.consulting_spend_ALLOW_ErrorCount
+          ,le.fs_spend_ALLOW_ErrorCount
+          ,le.fp_spend_ALLOW_ErrorCount
+          ,le.insurance_spend_ALLOW_ErrorCount
+          ,le.ls_spend_ALLOW_ErrorCount
+          ,le.oil_gas_spend_ALLOW_ErrorCount
+          ,le.utilities_spend_ALLOW_ErrorCount
+          ,le.other_spend_ALLOW_ErrorCount
+          ,le.advt_spend_ALLOW_ErrorCount
           ,le.air_growth_ALLOW_ErrorCount,le.air_growth_LENGTHS_ErrorCount
           ,le.fuel_growth_ALLOW_ErrorCount,le.fuel_growth_LENGTHS_ErrorCount
           ,le.leasing_growth_ALLOW_ErrorCount,le.leasing_growth_LENGTHS_ErrorCount
@@ -2659,11 +2533,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.other_growth_ALLOW_ErrorCount,le.other_growth_LENGTHS_ErrorCount
           ,le.advt_growth_ALLOW_ErrorCount,le.advt_growth_LENGTHS_ErrorCount
           ,le.top5_growth_ALLOW_ErrorCount,le.top5_growth_LENGTHS_ErrorCount
-          ,le.shipping_y1_ALLOW_ErrorCount,le.shipping_y1_LENGTHS_ErrorCount
+          ,le.shipping_y1_ALLOW_ErrorCount
           ,le.shipping_growth_ALLOW_ErrorCount,le.shipping_growth_LENGTHS_ErrorCount
-          ,le.materials_y1_ALLOW_ErrorCount,le.materials_y1_LENGTHS_ErrorCount
+          ,le.materials_y1_ALLOW_ErrorCount
           ,le.materials_growth_ALLOW_ErrorCount,le.materials_growth_LENGTHS_ErrorCount
-          ,le.operations_y1_ALLOW_ErrorCount,le.operations_y1_LENGTHS_ErrorCount
+          ,le.operations_y1_ALLOW_ErrorCount
           ,le.operations_growth_ALLOW_ErrorCount,le.operations_growth_LENGTHS_ErrorCount
           ,le.total_paid_average_0t12_ALLOW_ErrorCount,le.total_paid_average_0t12_LENGTHS_ErrorCount
           ,le.total_paid_monthspastworst_24_ALLOW_ErrorCount,le.total_paid_monthspastworst_24_LENGTHS_ErrorCount
@@ -2675,8 +2549,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.total_paid_volatility_0t6_ALLOW_ErrorCount,le.total_paid_volatility_0t6_LENGTHS_ErrorCount
           ,le.total_paid_volatility_12t18_ALLOW_ErrorCount,le.total_paid_volatility_12t18_LENGTHS_ErrorCount
           ,le.total_paid_volatility_6t12_ALLOW_ErrorCount,le.total_paid_volatility_6t12_LENGTHS_ErrorCount
-          ,le.total_spend_monthspastleast_24_ALLOW_ErrorCount,le.total_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.total_spend_monthspastmost_24_ALLOW_ErrorCount,le.total_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.total_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.total_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.total_spend_slope_0t12_ALLOW_ErrorCount,le.total_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.total_spend_slope_0t24_ALLOW_ErrorCount,le.total_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.total_spend_slope_0t6_ALLOW_ErrorCount,le.total_spend_slope_0t6_LENGTHS_ErrorCount
@@ -2687,14 +2561,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.total_spend_volatility_12t18_ALLOW_ErrorCount,le.total_spend_volatility_12t18_LENGTHS_ErrorCount
           ,le.total_spend_volatility_6t12_ALLOW_ErrorCount,le.total_spend_volatility_6t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_average_12_ALLOW_ErrorCount,le.mfgmat_paid_average_12_LENGTHS_ErrorCount
-          ,le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount,le.mfgmat_paid_monthspastworst_24_LENGTHS_ErrorCount
+          ,le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount
           ,le.mfgmat_paid_slope_0t12_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_slope_0t24_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t24_LENGTHS_ErrorCount
           ,le.mfgmat_paid_slope_0t6_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t6_LENGTHS_ErrorCount
           ,le.mfgmat_paid_volatility_0t12_ALLOW_ErrorCount,le.mfgmat_paid_volatility_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_volatility_0t6_ALLOW_ErrorCount,le.mfgmat_paid_volatility_0t6_LENGTHS_ErrorCount
-          ,le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount,le.mfgmat_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount,le.mfgmat_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.mfgmat_spend_slope_0t12_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_spend_slope_0t24_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.mfgmat_spend_slope_0t6_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t6_LENGTHS_ErrorCount
@@ -2708,12 +2582,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.ops_paid_slope_0t6_ALLOW_ErrorCount,le.ops_paid_slope_0t6_LENGTHS_ErrorCount
           ,le.ops_paid_volatility_0t12_ALLOW_ErrorCount,le.ops_paid_volatility_0t12_LENGTHS_ErrorCount
           ,le.ops_paid_volatility_0t6_ALLOW_ErrorCount,le.ops_paid_volatility_0t6_LENGTHS_ErrorCount
-          ,le.ops_spend_monthspastleast_24_ALLOW_ErrorCount,le.ops_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.ops_spend_monthspastmost_24_ALLOW_ErrorCount,le.ops_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.ops_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.ops_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.ops_spend_slope_0t12_ALLOW_ErrorCount,le.ops_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.ops_spend_slope_0t24_ALLOW_ErrorCount,le.ops_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.ops_spend_slope_0t6_ALLOW_ErrorCount,le.ops_spend_slope_0t6_LENGTHS_ErrorCount
-          ,le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount,le.fleet_paid_monthspastworst_24_LENGTHS_ErrorCount
+          ,le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount
           ,le.fleet_paid_slope_0t12_ALLOW_ErrorCount,le.fleet_paid_slope_0t12_LENGTHS_ErrorCount
           ,le.fleet_paid_slope_0t24_ALLOW_ErrorCount,le.fleet_paid_slope_0t24_LENGTHS_ErrorCount
           ,le.fleet_paid_slope_0t6_ALLOW_ErrorCount,le.fleet_paid_slope_0t6_LENGTHS_ErrorCount
@@ -2840,58 +2714,58 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.AnyRule_WithErrorsCount
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
-          ,le.ultimate_linkid_ALLOW_ErrorCount,le.ultimate_linkid_LENGTHS_ErrorCount
-          ,le.cortera_score_ALLOW_ErrorCount,le.cortera_score_LENGTHS_ErrorCount
-          ,le.cpr_score_ALLOW_ErrorCount,le.cpr_score_LENGTHS_ErrorCount
-          ,le.cpr_segment_ALLOW_ErrorCount,le.cpr_segment_LENGTHS_ErrorCount
+          ,le.ultimate_linkid_ALLOW_ErrorCount
+          ,le.cortera_score_ALLOW_ErrorCount
+          ,le.cpr_score_ALLOW_ErrorCount
+          ,le.cpr_segment_ALLOW_ErrorCount
           ,le.dbt_ALLOW_ErrorCount,le.dbt_LENGTHS_ErrorCount
-          ,le.avg_bal_ALLOW_ErrorCount,le.avg_bal_LENGTHS_ErrorCount
-          ,le.air_spend_ALLOW_ErrorCount,le.air_spend_LENGTHS_ErrorCount
-          ,le.fuel_spend_ALLOW_ErrorCount,le.fuel_spend_LENGTHS_ErrorCount
-          ,le.leasing_spend_ALLOW_ErrorCount,le.leasing_spend_LENGTHS_ErrorCount
-          ,le.ltl_spend_ALLOW_ErrorCount,le.ltl_spend_LENGTHS_ErrorCount
-          ,le.rail_spend_ALLOW_ErrorCount,le.rail_spend_LENGTHS_ErrorCount
-          ,le.tl_spend_ALLOW_ErrorCount,le.tl_spend_LENGTHS_ErrorCount
-          ,le.transvc_spend_ALLOW_ErrorCount,le.transvc_spend_LENGTHS_ErrorCount
-          ,le.transup_spend_ALLOW_ErrorCount,le.transup_spend_LENGTHS_ErrorCount
-          ,le.bst_spend_ALLOW_ErrorCount,le.bst_spend_LENGTHS_ErrorCount
-          ,le.dg_spend_ALLOW_ErrorCount,le.dg_spend_LENGTHS_ErrorCount
-          ,le.electrical_spend_ALLOW_ErrorCount,le.electrical_spend_LENGTHS_ErrorCount
-          ,le.hvac_spend_ALLOW_ErrorCount,le.hvac_spend_LENGTHS_ErrorCount
-          ,le.other_b_spend_ALLOW_ErrorCount,le.other_b_spend_LENGTHS_ErrorCount
-          ,le.plumbing_spend_ALLOW_ErrorCount,le.plumbing_spend_LENGTHS_ErrorCount
-          ,le.rs_spend_ALLOW_ErrorCount,le.rs_spend_LENGTHS_ErrorCount
-          ,le.wp_spend_ALLOW_ErrorCount,le.wp_spend_LENGTHS_ErrorCount
-          ,le.chemical_spend_ALLOW_ErrorCount,le.chemical_spend_LENGTHS_ErrorCount
-          ,le.electronic_spend_ALLOW_ErrorCount,le.electronic_spend_LENGTHS_ErrorCount
-          ,le.metal_spend_ALLOW_ErrorCount,le.metal_spend_LENGTHS_ErrorCount
-          ,le.other_m_spend_ALLOW_ErrorCount,le.other_m_spend_LENGTHS_ErrorCount
-          ,le.packaging_spend_ALLOW_ErrorCount,le.packaging_spend_LENGTHS_ErrorCount
-          ,le.pvf_spend_ALLOW_ErrorCount,le.pvf_spend_LENGTHS_ErrorCount
-          ,le.plastic_spend_ALLOW_ErrorCount,le.plastic_spend_LENGTHS_ErrorCount
-          ,le.textile_spend_ALLOW_ErrorCount,le.textile_spend_LENGTHS_ErrorCount
-          ,le.bs_spend_ALLOW_ErrorCount,le.bs_spend_LENGTHS_ErrorCount
-          ,le.ce_spend_ALLOW_ErrorCount,le.ce_spend_LENGTHS_ErrorCount
-          ,le.hardware_spend_ALLOW_ErrorCount,le.hardware_spend_LENGTHS_ErrorCount
-          ,le.ie_spend_ALLOW_ErrorCount,le.ie_spend_LENGTHS_ErrorCount
-          ,le.is_spend_ALLOW_ErrorCount,le.is_spend_LENGTHS_ErrorCount
-          ,le.it_spend_ALLOW_ErrorCount,le.it_spend_LENGTHS_ErrorCount
-          ,le.mls_spend_ALLOW_ErrorCount,le.mls_spend_LENGTHS_ErrorCount
-          ,le.os_spend_ALLOW_ErrorCount,le.os_spend_LENGTHS_ErrorCount
-          ,le.pp_spend_ALLOW_ErrorCount,le.pp_spend_LENGTHS_ErrorCount
-          ,le.sis_spend_ALLOW_ErrorCount,le.sis_spend_LENGTHS_ErrorCount
-          ,le.apparel_spend_ALLOW_ErrorCount,le.apparel_spend_LENGTHS_ErrorCount
-          ,le.beverages_spend_ALLOW_ErrorCount,le.beverages_spend_LENGTHS_ErrorCount
-          ,le.constr_spend_ALLOW_ErrorCount,le.constr_spend_LENGTHS_ErrorCount
-          ,le.consulting_spend_ALLOW_ErrorCount,le.consulting_spend_LENGTHS_ErrorCount
-          ,le.fs_spend_ALLOW_ErrorCount,le.fs_spend_LENGTHS_ErrorCount
-          ,le.fp_spend_ALLOW_ErrorCount,le.fp_spend_LENGTHS_ErrorCount
-          ,le.insurance_spend_ALLOW_ErrorCount,le.insurance_spend_LENGTHS_ErrorCount
-          ,le.ls_spend_ALLOW_ErrorCount,le.ls_spend_LENGTHS_ErrorCount
-          ,le.oil_gas_spend_ALLOW_ErrorCount,le.oil_gas_spend_LENGTHS_ErrorCount
-          ,le.utilities_spend_ALLOW_ErrorCount,le.utilities_spend_LENGTHS_ErrorCount
-          ,le.other_spend_ALLOW_ErrorCount,le.other_spend_LENGTHS_ErrorCount
-          ,le.advt_spend_ALLOW_ErrorCount,le.advt_spend_LENGTHS_ErrorCount
+          ,le.avg_bal_ALLOW_ErrorCount
+          ,le.air_spend_ALLOW_ErrorCount
+          ,le.fuel_spend_ALLOW_ErrorCount
+          ,le.leasing_spend_ALLOW_ErrorCount
+          ,le.ltl_spend_ALLOW_ErrorCount
+          ,le.rail_spend_ALLOW_ErrorCount
+          ,le.tl_spend_ALLOW_ErrorCount
+          ,le.transvc_spend_ALLOW_ErrorCount
+          ,le.transup_spend_ALLOW_ErrorCount
+          ,le.bst_spend_ALLOW_ErrorCount
+          ,le.dg_spend_ALLOW_ErrorCount
+          ,le.electrical_spend_ALLOW_ErrorCount
+          ,le.hvac_spend_ALLOW_ErrorCount
+          ,le.other_b_spend_ALLOW_ErrorCount
+          ,le.plumbing_spend_ALLOW_ErrorCount
+          ,le.rs_spend_ALLOW_ErrorCount
+          ,le.wp_spend_ALLOW_ErrorCount
+          ,le.chemical_spend_ALLOW_ErrorCount
+          ,le.electronic_spend_ALLOW_ErrorCount
+          ,le.metal_spend_ALLOW_ErrorCount
+          ,le.other_m_spend_ALLOW_ErrorCount
+          ,le.packaging_spend_ALLOW_ErrorCount
+          ,le.pvf_spend_ALLOW_ErrorCount
+          ,le.plastic_spend_ALLOW_ErrorCount
+          ,le.textile_spend_ALLOW_ErrorCount
+          ,le.bs_spend_ALLOW_ErrorCount
+          ,le.ce_spend_ALLOW_ErrorCount
+          ,le.hardware_spend_ALLOW_ErrorCount
+          ,le.ie_spend_ALLOW_ErrorCount
+          ,le.is_spend_ALLOW_ErrorCount
+          ,le.it_spend_ALLOW_ErrorCount
+          ,le.mls_spend_ALLOW_ErrorCount
+          ,le.os_spend_ALLOW_ErrorCount
+          ,le.pp_spend_ALLOW_ErrorCount
+          ,le.sis_spend_ALLOW_ErrorCount
+          ,le.apparel_spend_ALLOW_ErrorCount
+          ,le.beverages_spend_ALLOW_ErrorCount
+          ,le.constr_spend_ALLOW_ErrorCount
+          ,le.consulting_spend_ALLOW_ErrorCount
+          ,le.fs_spend_ALLOW_ErrorCount
+          ,le.fp_spend_ALLOW_ErrorCount
+          ,le.insurance_spend_ALLOW_ErrorCount
+          ,le.ls_spend_ALLOW_ErrorCount
+          ,le.oil_gas_spend_ALLOW_ErrorCount
+          ,le.utilities_spend_ALLOW_ErrorCount
+          ,le.other_spend_ALLOW_ErrorCount
+          ,le.advt_spend_ALLOW_ErrorCount
           ,le.air_growth_ALLOW_ErrorCount,le.air_growth_LENGTHS_ErrorCount
           ,le.fuel_growth_ALLOW_ErrorCount,le.fuel_growth_LENGTHS_ErrorCount
           ,le.leasing_growth_ALLOW_ErrorCount,le.leasing_growth_LENGTHS_ErrorCount
@@ -2939,11 +2813,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.other_growth_ALLOW_ErrorCount,le.other_growth_LENGTHS_ErrorCount
           ,le.advt_growth_ALLOW_ErrorCount,le.advt_growth_LENGTHS_ErrorCount
           ,le.top5_growth_ALLOW_ErrorCount,le.top5_growth_LENGTHS_ErrorCount
-          ,le.shipping_y1_ALLOW_ErrorCount,le.shipping_y1_LENGTHS_ErrorCount
+          ,le.shipping_y1_ALLOW_ErrorCount
           ,le.shipping_growth_ALLOW_ErrorCount,le.shipping_growth_LENGTHS_ErrorCount
-          ,le.materials_y1_ALLOW_ErrorCount,le.materials_y1_LENGTHS_ErrorCount
+          ,le.materials_y1_ALLOW_ErrorCount
           ,le.materials_growth_ALLOW_ErrorCount,le.materials_growth_LENGTHS_ErrorCount
-          ,le.operations_y1_ALLOW_ErrorCount,le.operations_y1_LENGTHS_ErrorCount
+          ,le.operations_y1_ALLOW_ErrorCount
           ,le.operations_growth_ALLOW_ErrorCount,le.operations_growth_LENGTHS_ErrorCount
           ,le.total_paid_average_0t12_ALLOW_ErrorCount,le.total_paid_average_0t12_LENGTHS_ErrorCount
           ,le.total_paid_monthspastworst_24_ALLOW_ErrorCount,le.total_paid_monthspastworst_24_LENGTHS_ErrorCount
@@ -2955,8 +2829,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.total_paid_volatility_0t6_ALLOW_ErrorCount,le.total_paid_volatility_0t6_LENGTHS_ErrorCount
           ,le.total_paid_volatility_12t18_ALLOW_ErrorCount,le.total_paid_volatility_12t18_LENGTHS_ErrorCount
           ,le.total_paid_volatility_6t12_ALLOW_ErrorCount,le.total_paid_volatility_6t12_LENGTHS_ErrorCount
-          ,le.total_spend_monthspastleast_24_ALLOW_ErrorCount,le.total_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.total_spend_monthspastmost_24_ALLOW_ErrorCount,le.total_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.total_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.total_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.total_spend_slope_0t12_ALLOW_ErrorCount,le.total_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.total_spend_slope_0t24_ALLOW_ErrorCount,le.total_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.total_spend_slope_0t6_ALLOW_ErrorCount,le.total_spend_slope_0t6_LENGTHS_ErrorCount
@@ -2967,14 +2841,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.total_spend_volatility_12t18_ALLOW_ErrorCount,le.total_spend_volatility_12t18_LENGTHS_ErrorCount
           ,le.total_spend_volatility_6t12_ALLOW_ErrorCount,le.total_spend_volatility_6t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_average_12_ALLOW_ErrorCount,le.mfgmat_paid_average_12_LENGTHS_ErrorCount
-          ,le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount,le.mfgmat_paid_monthspastworst_24_LENGTHS_ErrorCount
+          ,le.mfgmat_paid_monthspastworst_24_ALLOW_ErrorCount
           ,le.mfgmat_paid_slope_0t12_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_slope_0t24_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t24_LENGTHS_ErrorCount
           ,le.mfgmat_paid_slope_0t6_ALLOW_ErrorCount,le.mfgmat_paid_slope_0t6_LENGTHS_ErrorCount
           ,le.mfgmat_paid_volatility_0t12_ALLOW_ErrorCount,le.mfgmat_paid_volatility_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_paid_volatility_0t6_ALLOW_ErrorCount,le.mfgmat_paid_volatility_0t6_LENGTHS_ErrorCount
-          ,le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount,le.mfgmat_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount,le.mfgmat_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.mfgmat_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.mfgmat_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.mfgmat_spend_slope_0t12_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.mfgmat_spend_slope_0t24_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.mfgmat_spend_slope_0t6_ALLOW_ErrorCount,le.mfgmat_spend_slope_0t6_LENGTHS_ErrorCount
@@ -2988,12 +2862,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.ops_paid_slope_0t6_ALLOW_ErrorCount,le.ops_paid_slope_0t6_LENGTHS_ErrorCount
           ,le.ops_paid_volatility_0t12_ALLOW_ErrorCount,le.ops_paid_volatility_0t12_LENGTHS_ErrorCount
           ,le.ops_paid_volatility_0t6_ALLOW_ErrorCount,le.ops_paid_volatility_0t6_LENGTHS_ErrorCount
-          ,le.ops_spend_monthspastleast_24_ALLOW_ErrorCount,le.ops_spend_monthspastleast_24_LENGTHS_ErrorCount
-          ,le.ops_spend_monthspastmost_24_ALLOW_ErrorCount,le.ops_spend_monthspastmost_24_LENGTHS_ErrorCount
+          ,le.ops_spend_monthspastleast_24_ALLOW_ErrorCount
+          ,le.ops_spend_monthspastmost_24_ALLOW_ErrorCount
           ,le.ops_spend_slope_0t12_ALLOW_ErrorCount,le.ops_spend_slope_0t12_LENGTHS_ErrorCount
           ,le.ops_spend_slope_0t24_ALLOW_ErrorCount,le.ops_spend_slope_0t24_LENGTHS_ErrorCount
           ,le.ops_spend_slope_0t6_ALLOW_ErrorCount,le.ops_spend_slope_0t6_LENGTHS_ErrorCount
-          ,le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount,le.fleet_paid_monthspastworst_24_LENGTHS_ErrorCount
+          ,le.fleet_paid_monthspastworst_24_ALLOW_ErrorCount
           ,le.fleet_paid_slope_0t12_ALLOW_ErrorCount,le.fleet_paid_slope_0t12_LENGTHS_ErrorCount
           ,le.fleet_paid_slope_0t24_ALLOW_ErrorCount,le.fleet_paid_slope_0t24_LENGTHS_ErrorCount
           ,le.fleet_paid_slope_0t6_ALLOW_ErrorCount,le.fleet_paid_slope_0t6_LENGTHS_ErrorCount

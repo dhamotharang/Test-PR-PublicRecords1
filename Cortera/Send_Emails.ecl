@@ -10,7 +10,7 @@ EXPORT Send_Emails(
 	,STRING								pEmailList							= Cortera.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
 	,STRING								pRoxieEmailList					= Cortera.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= Cortera._Constants().Name
-	,STRING								pPackageName						= 'Cortera'
+	,STRING								pPackageName						= Cortera._Constants().Name
 	,STRING								pBuildMessage						= 'Base Files Finished'
 ) := tools.mod_SendEmails(pversion
 		                     ,pBuildFilenames					

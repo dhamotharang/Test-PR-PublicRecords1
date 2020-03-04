@@ -3,15 +3,14 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Executives_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 36;
-  EXPORT NumRulesFromFieldType := 36;
+  EXPORT NumRules := 34;
+  EXPORT NumRulesFromFieldType := 34;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 34;
+  EXPORT NumFieldsWithRules := 33;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Executives_Layout_Cortera)
     UNSIGNED1 link_id_Invalid;
-    UNSIGNED1 name_Invalid;
     UNSIGNED1 country_Invalid;
     UNSIGNED1 latitude_Invalid;
     UNSIGNED1 longitude_Invalid;
@@ -51,7 +50,6 @@ EXPORT Executives_Scrubs := MODULE
 EXPORT FromNone(DATASET(Executives_Layout_Cortera) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.link_id_Invalid := Executives_Fields.InValid_link_id((SALT311.StrType)le.link_id);
-    SELF.name_Invalid := Executives_Fields.InValid_name((SALT311.StrType)le.name);
     SELF.country_Invalid := Executives_Fields.InValid_country((SALT311.StrType)le.country);
     SELF.latitude_Invalid := Executives_Fields.InValid_latitude((SALT311.StrType)le.latitude);
     SELF.longitude_Invalid := Executives_Fields.InValid_longitude((SALT311.StrType)le.longitude);
@@ -89,7 +87,7 @@ EXPORT FromNone(DATASET(Executives_Layout_Cortera) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Executives_Layout_Cortera);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.link_id_Invalid << 0 ) + ( le.name_Invalid << 1 ) + ( le.country_Invalid << 2 ) + ( le.latitude_Invalid << 4 ) + ( le.longitude_Invalid << 5 ) + ( le.fein_Invalid << 6 ) + ( le.position_type_Invalid << 8 ) + ( le.ultimate_linkid_Invalid << 9 ) + ( le.loc_date_last_seen_Invalid << 10 ) + ( le.primary_sic_Invalid << 11 ) + ( le.primary_naics_Invalid << 12 ) + ( le.ownership_Invalid << 13 ) + ( le.executive_name1_Invalid << 14 ) + ( le.title1_Invalid << 15 ) + ( le.executive_name2_Invalid << 16 ) + ( le.title2_Invalid << 17 ) + ( le.executive_name3_Invalid << 18 ) + ( le.title3_Invalid << 19 ) + ( le.executive_name4_Invalid << 20 ) + ( le.title4_Invalid << 21 ) + ( le.executive_name5_Invalid << 22 ) + ( le.title5_Invalid << 23 ) + ( le.executive_name6_Invalid << 24 ) + ( le.title6_Invalid << 25 ) + ( le.executive_name7_Invalid << 26 ) + ( le.title7_Invalid << 27 ) + ( le.executive_name8_Invalid << 28 ) + ( le.title8_Invalid << 29 ) + ( le.executive_name9_Invalid << 30 ) + ( le.title9_Invalid << 31 ) + ( le.executive_name10_Invalid << 32 ) + ( le.title10_Invalid << 33 ) + ( le.status_Invalid << 34 ) + ( le.is_closed_Invalid << 35 );
+    SELF.ScrubsBits1 := ( le.link_id_Invalid << 0 ) + ( le.country_Invalid << 1 ) + ( le.latitude_Invalid << 2 ) + ( le.longitude_Invalid << 3 ) + ( le.fein_Invalid << 4 ) + ( le.position_type_Invalid << 6 ) + ( le.ultimate_linkid_Invalid << 7 ) + ( le.loc_date_last_seen_Invalid << 8 ) + ( le.primary_sic_Invalid << 9 ) + ( le.primary_naics_Invalid << 10 ) + ( le.ownership_Invalid << 11 ) + ( le.executive_name1_Invalid << 12 ) + ( le.title1_Invalid << 13 ) + ( le.executive_name2_Invalid << 14 ) + ( le.title2_Invalid << 15 ) + ( le.executive_name3_Invalid << 16 ) + ( le.title3_Invalid << 17 ) + ( le.executive_name4_Invalid << 18 ) + ( le.title4_Invalid << 19 ) + ( le.executive_name5_Invalid << 20 ) + ( le.title5_Invalid << 21 ) + ( le.executive_name6_Invalid << 22 ) + ( le.title6_Invalid << 23 ) + ( le.executive_name7_Invalid << 24 ) + ( le.title7_Invalid << 25 ) + ( le.executive_name8_Invalid << 26 ) + ( le.title8_Invalid << 27 ) + ( le.executive_name9_Invalid << 28 ) + ( le.title9_Invalid << 29 ) + ( le.executive_name10_Invalid << 30 ) + ( le.title10_Invalid << 31 ) + ( le.status_Invalid << 32 ) + ( le.is_closed_Invalid << 33 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -99,39 +97,38 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Executives_Layout_Cortera);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.link_id_Invalid := (le.ScrubsBits1 >> 0) & 1;
-    SELF.name_Invalid := (le.ScrubsBits1 >> 1) & 1;
-    SELF.country_Invalid := (le.ScrubsBits1 >> 2) & 3;
-    SELF.latitude_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.longitude_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.fein_Invalid := (le.ScrubsBits1 >> 6) & 3;
-    SELF.position_type_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.ultimate_linkid_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.loc_date_last_seen_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.primary_sic_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.primary_naics_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.ownership_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.executive_name1_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.title1_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.executive_name2_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.title2_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.executive_name3_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.title3_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.executive_name4_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.title4_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.executive_name5_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.title5_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.executive_name6_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.title6_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.executive_name7_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.title7_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.executive_name8_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.title8_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.executive_name9_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.title9_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.executive_name10_Invalid := (le.ScrubsBits1 >> 32) & 1;
-    SELF.title10_Invalid := (le.ScrubsBits1 >> 33) & 1;
-    SELF.status_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.is_closed_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.country_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.latitude_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.longitude_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.fein_Invalid := (le.ScrubsBits1 >> 4) & 3;
+    SELF.position_type_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.ultimate_linkid_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.loc_date_last_seen_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.primary_sic_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.primary_naics_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.ownership_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.executive_name1_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.title1_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.executive_name2_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.title2_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.executive_name3_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.title3_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.executive_name4_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.title4_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.executive_name5_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.title5_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.executive_name6_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.title6_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.executive_name7_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.title7_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.executive_name8_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.title8_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.executive_name9_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.title9_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.executive_name10_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.title10_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.status_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.is_closed_Invalid := (le.ScrubsBits1 >> 33) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -140,45 +137,42 @@ END;
 EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
-    link_id_ALLOW_ErrorCount := COUNT(GROUP,h.link_id_Invalid=1);
-    name_ALLOW_ErrorCount := COUNT(GROUP,h.name_Invalid=1);
-    country_ALLOW_ErrorCount := COUNT(GROUP,h.country_Invalid=1);
-    country_LENGTHS_ErrorCount := COUNT(GROUP,h.country_Invalid=2);
-    country_Total_ErrorCount := COUNT(GROUP,h.country_Invalid>0);
-    latitude_ALLOW_ErrorCount := COUNT(GROUP,h.latitude_Invalid=1);
-    longitude_ALLOW_ErrorCount := COUNT(GROUP,h.longitude_Invalid=1);
+    link_id_CUSTOM_ErrorCount := COUNT(GROUP,h.link_id_Invalid=1);
+    country_CUSTOM_ErrorCount := COUNT(GROUP,h.country_Invalid=1);
+    latitude_CUSTOM_ErrorCount := COUNT(GROUP,h.latitude_Invalid=1);
+    longitude_CUSTOM_ErrorCount := COUNT(GROUP,h.longitude_Invalid=1);
     fein_ALLOW_ErrorCount := COUNT(GROUP,h.fein_Invalid=1);
     fein_LENGTHS_ErrorCount := COUNT(GROUP,h.fein_Invalid=2);
     fein_Total_ErrorCount := COUNT(GROUP,h.fein_Invalid>0);
     position_type_ENUM_ErrorCount := COUNT(GROUP,h.position_type_Invalid=1);
-    ultimate_linkid_ALLOW_ErrorCount := COUNT(GROUP,h.ultimate_linkid_Invalid=1);
+    ultimate_linkid_CUSTOM_ErrorCount := COUNT(GROUP,h.ultimate_linkid_Invalid=1);
     loc_date_last_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.loc_date_last_seen_Invalid=1);
     primary_sic_CUSTOM_ErrorCount := COUNT(GROUP,h.primary_sic_Invalid=1);
     primary_naics_CUSTOM_ErrorCount := COUNT(GROUP,h.primary_naics_Invalid=1);
     ownership_ENUM_ErrorCount := COUNT(GROUP,h.ownership_Invalid=1);
-    executive_name1_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name1_Invalid=1);
-    title1_ALLOW_ErrorCount := COUNT(GROUP,h.title1_Invalid=1);
-    executive_name2_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name2_Invalid=1);
-    title2_ALLOW_ErrorCount := COUNT(GROUP,h.title2_Invalid=1);
-    executive_name3_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name3_Invalid=1);
-    title3_ALLOW_ErrorCount := COUNT(GROUP,h.title3_Invalid=1);
-    executive_name4_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name4_Invalid=1);
-    title4_ALLOW_ErrorCount := COUNT(GROUP,h.title4_Invalid=1);
-    executive_name5_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name5_Invalid=1);
-    title5_ALLOW_ErrorCount := COUNT(GROUP,h.title5_Invalid=1);
-    executive_name6_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name6_Invalid=1);
-    title6_ALLOW_ErrorCount := COUNT(GROUP,h.title6_Invalid=1);
-    executive_name7_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name7_Invalid=1);
-    title7_ALLOW_ErrorCount := COUNT(GROUP,h.title7_Invalid=1);
-    executive_name8_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name8_Invalid=1);
-    title8_ALLOW_ErrorCount := COUNT(GROUP,h.title8_Invalid=1);
-    executive_name9_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name9_Invalid=1);
-    title9_ALLOW_ErrorCount := COUNT(GROUP,h.title9_Invalid=1);
-    executive_name10_ALLOW_ErrorCount := COUNT(GROUP,h.executive_name10_Invalid=1);
-    title10_ALLOW_ErrorCount := COUNT(GROUP,h.title10_Invalid=1);
+    executive_name1_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name1_Invalid=1);
+    title1_CUSTOM_ErrorCount := COUNT(GROUP,h.title1_Invalid=1);
+    executive_name2_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name2_Invalid=1);
+    title2_CUSTOM_ErrorCount := COUNT(GROUP,h.title2_Invalid=1);
+    executive_name3_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name3_Invalid=1);
+    title3_CUSTOM_ErrorCount := COUNT(GROUP,h.title3_Invalid=1);
+    executive_name4_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name4_Invalid=1);
+    title4_CUSTOM_ErrorCount := COUNT(GROUP,h.title4_Invalid=1);
+    executive_name5_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name5_Invalid=1);
+    title5_CUSTOM_ErrorCount := COUNT(GROUP,h.title5_Invalid=1);
+    executive_name6_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name6_Invalid=1);
+    title6_CUSTOM_ErrorCount := COUNT(GROUP,h.title6_Invalid=1);
+    executive_name7_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name7_Invalid=1);
+    title7_CUSTOM_ErrorCount := COUNT(GROUP,h.title7_Invalid=1);
+    executive_name8_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name8_Invalid=1);
+    title8_CUSTOM_ErrorCount := COUNT(GROUP,h.title8_Invalid=1);
+    executive_name9_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name9_Invalid=1);
+    title9_CUSTOM_ErrorCount := COUNT(GROUP,h.title9_Invalid=1);
+    executive_name10_CUSTOM_ErrorCount := COUNT(GROUP,h.executive_name10_Invalid=1);
+    title10_CUSTOM_ErrorCount := COUNT(GROUP,h.title10_Invalid=1);
     status_ENUM_ErrorCount := COUNT(GROUP,h.status_Invalid=1);
     is_closed_ENUM_ErrorCount := COUNT(GROUP,h.is_closed_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.link_id_Invalid > 0 OR h.name_Invalid > 0 OR h.country_Invalid > 0 OR h.latitude_Invalid > 0 OR h.longitude_Invalid > 0 OR h.fein_Invalid > 0 OR h.position_type_Invalid > 0 OR h.ultimate_linkid_Invalid > 0 OR h.loc_date_last_seen_Invalid > 0 OR h.primary_sic_Invalid > 0 OR h.primary_naics_Invalid > 0 OR h.ownership_Invalid > 0 OR h.executive_name1_Invalid > 0 OR h.title1_Invalid > 0 OR h.executive_name2_Invalid > 0 OR h.title2_Invalid > 0 OR h.executive_name3_Invalid > 0 OR h.title3_Invalid > 0 OR h.executive_name4_Invalid > 0 OR h.title4_Invalid > 0 OR h.executive_name5_Invalid > 0 OR h.title5_Invalid > 0 OR h.executive_name6_Invalid > 0 OR h.title6_Invalid > 0 OR h.executive_name7_Invalid > 0 OR h.title7_Invalid > 0 OR h.executive_name8_Invalid > 0 OR h.title8_Invalid > 0 OR h.executive_name9_Invalid > 0 OR h.title9_Invalid > 0 OR h.executive_name10_Invalid > 0 OR h.title10_Invalid > 0 OR h.status_Invalid > 0 OR h.is_closed_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.link_id_Invalid > 0 OR h.country_Invalid > 0 OR h.latitude_Invalid > 0 OR h.longitude_Invalid > 0 OR h.fein_Invalid > 0 OR h.position_type_Invalid > 0 OR h.ultimate_linkid_Invalid > 0 OR h.loc_date_last_seen_Invalid > 0 OR h.primary_sic_Invalid > 0 OR h.primary_naics_Invalid > 0 OR h.ownership_Invalid > 0 OR h.executive_name1_Invalid > 0 OR h.title1_Invalid > 0 OR h.executive_name2_Invalid > 0 OR h.title2_Invalid > 0 OR h.executive_name3_Invalid > 0 OR h.title3_Invalid > 0 OR h.executive_name4_Invalid > 0 OR h.title4_Invalid > 0 OR h.executive_name5_Invalid > 0 OR h.title5_Invalid > 0 OR h.executive_name6_Invalid > 0 OR h.title6_Invalid > 0 OR h.executive_name7_Invalid > 0 OR h.title7_Invalid > 0 OR h.executive_name8_Invalid > 0 OR h.title8_Invalid > 0 OR h.executive_name9_Invalid > 0 OR h.title9_Invalid > 0 OR h.executive_name10_Invalid > 0 OR h.title10_Invalid > 0 OR h.status_Invalid > 0 OR h.is_closed_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -186,9 +180,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.link_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.country_Total_ErrorCount > 0, 1, 0) + IF(le.latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fein_Total_ErrorCount > 0, 1, 0) + IF(le.position_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultimate_linkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.loc_date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ownership_ENUM_ErrorCount > 0, 1, 0) + IF(le.executive_name1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.status_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_closed_ENUM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.link_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.country_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fein_Total_ErrorCount > 0, 1, 0) + IF(le.position_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultimate_linkid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loc_date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ownership_ENUM_ErrorCount > 0, 1, 0) + IF(le.executive_name1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name9_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title9_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name10_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title10_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.status_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_closed_ENUM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.link_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.country_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.latitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.longitude_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fein_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fein_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.position_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultimate_linkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.loc_date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ownership_ENUM_ErrorCount > 0, 1, 0) + IF(le.executive_name1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.executive_name10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.status_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_closed_ENUM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.link_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.country_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fein_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fein_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.position_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultimate_linkid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loc_date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_sic_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_naics_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ownership_ENUM_ErrorCount > 0, 1, 0) + IF(le.executive_name1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name9_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title9_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.executive_name10_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title10_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.status_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_closed_ENUM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -203,48 +197,47 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.link_id_Invalid,le.name_Invalid,le.country_Invalid,le.latitude_Invalid,le.longitude_Invalid,le.fein_Invalid,le.position_type_Invalid,le.ultimate_linkid_Invalid,le.loc_date_last_seen_Invalid,le.primary_sic_Invalid,le.primary_naics_Invalid,le.ownership_Invalid,le.executive_name1_Invalid,le.title1_Invalid,le.executive_name2_Invalid,le.title2_Invalid,le.executive_name3_Invalid,le.title3_Invalid,le.executive_name4_Invalid,le.title4_Invalid,le.executive_name5_Invalid,le.title5_Invalid,le.executive_name6_Invalid,le.title6_Invalid,le.executive_name7_Invalid,le.title7_Invalid,le.executive_name8_Invalid,le.title8_Invalid,le.executive_name9_Invalid,le.title9_Invalid,le.executive_name10_Invalid,le.title10_Invalid,le.status_Invalid,le.is_closed_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Executives_Fields.InvalidMessage_link_id(le.link_id_Invalid),Executives_Fields.InvalidMessage_name(le.name_Invalid),Executives_Fields.InvalidMessage_country(le.country_Invalid),Executives_Fields.InvalidMessage_latitude(le.latitude_Invalid),Executives_Fields.InvalidMessage_longitude(le.longitude_Invalid),Executives_Fields.InvalidMessage_fein(le.fein_Invalid),Executives_Fields.InvalidMessage_position_type(le.position_type_Invalid),Executives_Fields.InvalidMessage_ultimate_linkid(le.ultimate_linkid_Invalid),Executives_Fields.InvalidMessage_loc_date_last_seen(le.loc_date_last_seen_Invalid),Executives_Fields.InvalidMessage_primary_sic(le.primary_sic_Invalid),Executives_Fields.InvalidMessage_primary_naics(le.primary_naics_Invalid),Executives_Fields.InvalidMessage_ownership(le.ownership_Invalid),Executives_Fields.InvalidMessage_executive_name1(le.executive_name1_Invalid),Executives_Fields.InvalidMessage_title1(le.title1_Invalid),Executives_Fields.InvalidMessage_executive_name2(le.executive_name2_Invalid),Executives_Fields.InvalidMessage_title2(le.title2_Invalid),Executives_Fields.InvalidMessage_executive_name3(le.executive_name3_Invalid),Executives_Fields.InvalidMessage_title3(le.title3_Invalid),Executives_Fields.InvalidMessage_executive_name4(le.executive_name4_Invalid),Executives_Fields.InvalidMessage_title4(le.title4_Invalid),Executives_Fields.InvalidMessage_executive_name5(le.executive_name5_Invalid),Executives_Fields.InvalidMessage_title5(le.title5_Invalid),Executives_Fields.InvalidMessage_executive_name6(le.executive_name6_Invalid),Executives_Fields.InvalidMessage_title6(le.title6_Invalid),Executives_Fields.InvalidMessage_executive_name7(le.executive_name7_Invalid),Executives_Fields.InvalidMessage_title7(le.title7_Invalid),Executives_Fields.InvalidMessage_executive_name8(le.executive_name8_Invalid),Executives_Fields.InvalidMessage_title8(le.title8_Invalid),Executives_Fields.InvalidMessage_executive_name9(le.executive_name9_Invalid),Executives_Fields.InvalidMessage_title9(le.title9_Invalid),Executives_Fields.InvalidMessage_executive_name10(le.executive_name10_Invalid),Executives_Fields.InvalidMessage_title10(le.title10_Invalid),Executives_Fields.InvalidMessage_status(le.status_Invalid),Executives_Fields.InvalidMessage_is_closed(le.is_closed_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.link_id_Invalid,le.country_Invalid,le.latitude_Invalid,le.longitude_Invalid,le.fein_Invalid,le.position_type_Invalid,le.ultimate_linkid_Invalid,le.loc_date_last_seen_Invalid,le.primary_sic_Invalid,le.primary_naics_Invalid,le.ownership_Invalid,le.executive_name1_Invalid,le.title1_Invalid,le.executive_name2_Invalid,le.title2_Invalid,le.executive_name3_Invalid,le.title3_Invalid,le.executive_name4_Invalid,le.title4_Invalid,le.executive_name5_Invalid,le.title5_Invalid,le.executive_name6_Invalid,le.title6_Invalid,le.executive_name7_Invalid,le.title7_Invalid,le.executive_name8_Invalid,le.title8_Invalid,le.executive_name9_Invalid,le.title9_Invalid,le.executive_name10_Invalid,le.title10_Invalid,le.status_Invalid,le.is_closed_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Executives_Fields.InvalidMessage_link_id(le.link_id_Invalid),Executives_Fields.InvalidMessage_country(le.country_Invalid),Executives_Fields.InvalidMessage_latitude(le.latitude_Invalid),Executives_Fields.InvalidMessage_longitude(le.longitude_Invalid),Executives_Fields.InvalidMessage_fein(le.fein_Invalid),Executives_Fields.InvalidMessage_position_type(le.position_type_Invalid),Executives_Fields.InvalidMessage_ultimate_linkid(le.ultimate_linkid_Invalid),Executives_Fields.InvalidMessage_loc_date_last_seen(le.loc_date_last_seen_Invalid),Executives_Fields.InvalidMessage_primary_sic(le.primary_sic_Invalid),Executives_Fields.InvalidMessage_primary_naics(le.primary_naics_Invalid),Executives_Fields.InvalidMessage_ownership(le.ownership_Invalid),Executives_Fields.InvalidMessage_executive_name1(le.executive_name1_Invalid),Executives_Fields.InvalidMessage_title1(le.title1_Invalid),Executives_Fields.InvalidMessage_executive_name2(le.executive_name2_Invalid),Executives_Fields.InvalidMessage_title2(le.title2_Invalid),Executives_Fields.InvalidMessage_executive_name3(le.executive_name3_Invalid),Executives_Fields.InvalidMessage_title3(le.title3_Invalid),Executives_Fields.InvalidMessage_executive_name4(le.executive_name4_Invalid),Executives_Fields.InvalidMessage_title4(le.title4_Invalid),Executives_Fields.InvalidMessage_executive_name5(le.executive_name5_Invalid),Executives_Fields.InvalidMessage_title5(le.title5_Invalid),Executives_Fields.InvalidMessage_executive_name6(le.executive_name6_Invalid),Executives_Fields.InvalidMessage_title6(le.title6_Invalid),Executives_Fields.InvalidMessage_executive_name7(le.executive_name7_Invalid),Executives_Fields.InvalidMessage_title7(le.title7_Invalid),Executives_Fields.InvalidMessage_executive_name8(le.executive_name8_Invalid),Executives_Fields.InvalidMessage_title8(le.title8_Invalid),Executives_Fields.InvalidMessage_executive_name9(le.executive_name9_Invalid),Executives_Fields.InvalidMessage_title9(le.title9_Invalid),Executives_Fields.InvalidMessage_executive_name10(le.executive_name10_Invalid),Executives_Fields.InvalidMessage_title10(le.title10_Invalid),Executives_Fields.InvalidMessage_status(le.status_Invalid),Executives_Fields.InvalidMessage_is_closed(le.is_closed_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.link_id_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.country_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.latitude_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.longitude_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.link_id_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.country_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.latitude_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.longitude_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.fein_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.position_type_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.ultimate_linkid_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ultimate_linkid_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.loc_date_last_seen_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.primary_sic_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.primary_naics_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.ownership_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.executive_name1_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title1_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name2_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title2_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name3_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title3_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name4_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title4_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name5_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title5_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name6_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title6_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name7_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title7_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name8_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title8_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name9_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title9_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.executive_name10_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.title10_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.executive_name1_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title1_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name2_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title2_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name3_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title3_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name4_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title4_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name5_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title5_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name6_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title6_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name7_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title7_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name8_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title8_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name9_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title9_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.executive_name10_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.title10_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.status_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.is_closed_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'link_id','name','country','latitude','longitude','fein','position_type','ultimate_linkid','loc_date_last_seen','primary_sic','primary_naics','ownership','executive_name1','title1','executive_name2','title2','executive_name3','title3','executive_name4','title4','executive_name5','title5','executive_name6','title6','executive_name7','title7','executive_name8','title8','executive_name9','title9','executive_name10','title10','status','is_closed','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Numeric','name','StateAbrv','Invalid_LatLong','Invalid_LatLong','feintype','CorpHierarchy','Numeric','Invalid_Date','invalid_sic','invalid_naics','OwnershipTypes','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','name','alpha','StatusTypes','YesNo','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.link_id,(SALT311.StrType)le.name,(SALT311.StrType)le.country,(SALT311.StrType)le.latitude,(SALT311.StrType)le.longitude,(SALT311.StrType)le.fein,(SALT311.StrType)le.position_type,(SALT311.StrType)le.ultimate_linkid,(SALT311.StrType)le.loc_date_last_seen,(SALT311.StrType)le.primary_sic,(SALT311.StrType)le.primary_naics,(SALT311.StrType)le.ownership,(SALT311.StrType)le.executive_name1,(SALT311.StrType)le.title1,(SALT311.StrType)le.executive_name2,(SALT311.StrType)le.title2,(SALT311.StrType)le.executive_name3,(SALT311.StrType)le.title3,(SALT311.StrType)le.executive_name4,(SALT311.StrType)le.title4,(SALT311.StrType)le.executive_name5,(SALT311.StrType)le.title5,(SALT311.StrType)le.executive_name6,(SALT311.StrType)le.title6,(SALT311.StrType)le.executive_name7,(SALT311.StrType)le.title7,(SALT311.StrType)le.executive_name8,(SALT311.StrType)le.title8,(SALT311.StrType)le.executive_name9,(SALT311.StrType)le.title9,(SALT311.StrType)le.executive_name10,(SALT311.StrType)le.title10,(SALT311.StrType)le.status,(SALT311.StrType)le.is_closed,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'link_id','country','latitude','longitude','fein','position_type','ultimate_linkid','loc_date_last_seen','primary_sic','primary_naics','ownership','executive_name1','title1','executive_name2','title2','executive_name3','title3','executive_name4','title4','executive_name5','title5','executive_name6','title6','executive_name7','title7','executive_name8','title8','executive_name9','title9','executive_name10','title10','status','is_closed','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Numeric','StateAbrv','Invalid_LatLong','Invalid_LatLong','feintype','CorpHierarchy','Numeric','Invalid_Date','invalid_sic','invalid_naics','OwnershipTypes','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','alpha','StatusTypes','YesNo','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.link_id,(SALT311.StrType)le.country,(SALT311.StrType)le.latitude,(SALT311.StrType)le.longitude,(SALT311.StrType)le.fein,(SALT311.StrType)le.position_type,(SALT311.StrType)le.ultimate_linkid,(SALT311.StrType)le.loc_date_last_seen,(SALT311.StrType)le.primary_sic,(SALT311.StrType)le.primary_naics,(SALT311.StrType)le.ownership,(SALT311.StrType)le.executive_name1,(SALT311.StrType)le.title1,(SALT311.StrType)le.executive_name2,(SALT311.StrType)le.title2,(SALT311.StrType)le.executive_name3,(SALT311.StrType)le.title3,(SALT311.StrType)le.executive_name4,(SALT311.StrType)le.title4,(SALT311.StrType)le.executive_name5,(SALT311.StrType)le.title5,(SALT311.StrType)le.executive_name6,(SALT311.StrType)le.title6,(SALT311.StrType)le.executive_name7,(SALT311.StrType)le.title7,(SALT311.StrType)le.executive_name8,(SALT311.StrType)le.title8,(SALT311.StrType)le.executive_name9,(SALT311.StrType)le.title9,(SALT311.StrType)le.executive_name10,(SALT311.StrType)le.title10,(SALT311.StrType)le.status,(SALT311.StrType)le.is_closed,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,34,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,33,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -255,38 +248,37 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'link_id:Numeric:ALLOW'
-          ,'name:name:ALLOW'
-          ,'country:StateAbrv:ALLOW','country:StateAbrv:LENGTHS'
-          ,'latitude:Invalid_LatLong:ALLOW'
-          ,'longitude:Invalid_LatLong:ALLOW'
+          ,'link_id:Numeric:CUSTOM'
+          ,'country:StateAbrv:CUSTOM'
+          ,'latitude:Invalid_LatLong:CUSTOM'
+          ,'longitude:Invalid_LatLong:CUSTOM'
           ,'fein:feintype:ALLOW','fein:feintype:LENGTHS'
           ,'position_type:CorpHierarchy:ENUM'
-          ,'ultimate_linkid:Numeric:ALLOW'
+          ,'ultimate_linkid:Numeric:CUSTOM'
           ,'loc_date_last_seen:Invalid_Date:CUSTOM'
           ,'primary_sic:invalid_sic:CUSTOM'
           ,'primary_naics:invalid_naics:CUSTOM'
           ,'ownership:OwnershipTypes:ENUM'
-          ,'executive_name1:name:ALLOW'
-          ,'title1:alpha:ALLOW'
-          ,'executive_name2:name:ALLOW'
-          ,'title2:alpha:ALLOW'
-          ,'executive_name3:name:ALLOW'
-          ,'title3:alpha:ALLOW'
-          ,'executive_name4:name:ALLOW'
-          ,'title4:alpha:ALLOW'
-          ,'executive_name5:name:ALLOW'
-          ,'title5:alpha:ALLOW'
-          ,'executive_name6:name:ALLOW'
-          ,'title6:alpha:ALLOW'
-          ,'executive_name7:name:ALLOW'
-          ,'title7:alpha:ALLOW'
-          ,'executive_name8:name:ALLOW'
-          ,'title8:alpha:ALLOW'
-          ,'executive_name9:name:ALLOW'
-          ,'title9:alpha:ALLOW'
-          ,'executive_name10:name:ALLOW'
-          ,'title10:alpha:ALLOW'
+          ,'executive_name1:alpha:CUSTOM'
+          ,'title1:alpha:CUSTOM'
+          ,'executive_name2:alpha:CUSTOM'
+          ,'title2:alpha:CUSTOM'
+          ,'executive_name3:alpha:CUSTOM'
+          ,'title3:alpha:CUSTOM'
+          ,'executive_name4:alpha:CUSTOM'
+          ,'title4:alpha:CUSTOM'
+          ,'executive_name5:alpha:CUSTOM'
+          ,'title5:alpha:CUSTOM'
+          ,'executive_name6:alpha:CUSTOM'
+          ,'title6:alpha:CUSTOM'
+          ,'executive_name7:alpha:CUSTOM'
+          ,'title7:alpha:CUSTOM'
+          ,'executive_name8:alpha:CUSTOM'
+          ,'title8:alpha:CUSTOM'
+          ,'executive_name9:alpha:CUSTOM'
+          ,'title9:alpha:CUSTOM'
+          ,'executive_name10:alpha:CUSTOM'
+          ,'title10:alpha:CUSTOM'
           ,'status:StatusTypes:ENUM'
           ,'is_closed:YesNo:ENUM'
           ,'field:Number_Errored_Fields:SUMMARY'
@@ -298,8 +290,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,Executives_Fields.InvalidMessage_link_id(1)
-          ,Executives_Fields.InvalidMessage_name(1)
-          ,Executives_Fields.InvalidMessage_country(1),Executives_Fields.InvalidMessage_country(2)
+          ,Executives_Fields.InvalidMessage_country(1)
           ,Executives_Fields.InvalidMessage_latitude(1)
           ,Executives_Fields.InvalidMessage_longitude(1)
           ,Executives_Fields.InvalidMessage_fein(1),Executives_Fields.InvalidMessage_fein(2)
@@ -339,38 +330,37 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Records with at least one error'
           ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.link_id_ALLOW_ErrorCount
-          ,le.name_ALLOW_ErrorCount
-          ,le.country_ALLOW_ErrorCount,le.country_LENGTHS_ErrorCount
-          ,le.latitude_ALLOW_ErrorCount
-          ,le.longitude_ALLOW_ErrorCount
+          ,le.link_id_CUSTOM_ErrorCount
+          ,le.country_CUSTOM_ErrorCount
+          ,le.latitude_CUSTOM_ErrorCount
+          ,le.longitude_CUSTOM_ErrorCount
           ,le.fein_ALLOW_ErrorCount,le.fein_LENGTHS_ErrorCount
           ,le.position_type_ENUM_ErrorCount
-          ,le.ultimate_linkid_ALLOW_ErrorCount
+          ,le.ultimate_linkid_CUSTOM_ErrorCount
           ,le.loc_date_last_seen_CUSTOM_ErrorCount
           ,le.primary_sic_CUSTOM_ErrorCount
           ,le.primary_naics_CUSTOM_ErrorCount
           ,le.ownership_ENUM_ErrorCount
-          ,le.executive_name1_ALLOW_ErrorCount
-          ,le.title1_ALLOW_ErrorCount
-          ,le.executive_name2_ALLOW_ErrorCount
-          ,le.title2_ALLOW_ErrorCount
-          ,le.executive_name3_ALLOW_ErrorCount
-          ,le.title3_ALLOW_ErrorCount
-          ,le.executive_name4_ALLOW_ErrorCount
-          ,le.title4_ALLOW_ErrorCount
-          ,le.executive_name5_ALLOW_ErrorCount
-          ,le.title5_ALLOW_ErrorCount
-          ,le.executive_name6_ALLOW_ErrorCount
-          ,le.title6_ALLOW_ErrorCount
-          ,le.executive_name7_ALLOW_ErrorCount
-          ,le.title7_ALLOW_ErrorCount
-          ,le.executive_name8_ALLOW_ErrorCount
-          ,le.title8_ALLOW_ErrorCount
-          ,le.executive_name9_ALLOW_ErrorCount
-          ,le.title9_ALLOW_ErrorCount
-          ,le.executive_name10_ALLOW_ErrorCount
-          ,le.title10_ALLOW_ErrorCount
+          ,le.executive_name1_CUSTOM_ErrorCount
+          ,le.title1_CUSTOM_ErrorCount
+          ,le.executive_name2_CUSTOM_ErrorCount
+          ,le.title2_CUSTOM_ErrorCount
+          ,le.executive_name3_CUSTOM_ErrorCount
+          ,le.title3_CUSTOM_ErrorCount
+          ,le.executive_name4_CUSTOM_ErrorCount
+          ,le.title4_CUSTOM_ErrorCount
+          ,le.executive_name5_CUSTOM_ErrorCount
+          ,le.title5_CUSTOM_ErrorCount
+          ,le.executive_name6_CUSTOM_ErrorCount
+          ,le.title6_CUSTOM_ErrorCount
+          ,le.executive_name7_CUSTOM_ErrorCount
+          ,le.title7_CUSTOM_ErrorCount
+          ,le.executive_name8_CUSTOM_ErrorCount
+          ,le.title8_CUSTOM_ErrorCount
+          ,le.executive_name9_CUSTOM_ErrorCount
+          ,le.title9_CUSTOM_ErrorCount
+          ,le.executive_name10_CUSTOM_ErrorCount
+          ,le.title10_CUSTOM_ErrorCount
           ,le.status_ENUM_ErrorCount
           ,le.is_closed_ENUM_ErrorCount
           ,le.FieldsChecked_WithErrors
@@ -381,38 +371,37 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.AnyRule_WithErrorsCount
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
-          ,le.link_id_ALLOW_ErrorCount
-          ,le.name_ALLOW_ErrorCount
-          ,le.country_ALLOW_ErrorCount,le.country_LENGTHS_ErrorCount
-          ,le.latitude_ALLOW_ErrorCount
-          ,le.longitude_ALLOW_ErrorCount
+          ,le.link_id_CUSTOM_ErrorCount
+          ,le.country_CUSTOM_ErrorCount
+          ,le.latitude_CUSTOM_ErrorCount
+          ,le.longitude_CUSTOM_ErrorCount
           ,le.fein_ALLOW_ErrorCount,le.fein_LENGTHS_ErrorCount
           ,le.position_type_ENUM_ErrorCount
-          ,le.ultimate_linkid_ALLOW_ErrorCount
+          ,le.ultimate_linkid_CUSTOM_ErrorCount
           ,le.loc_date_last_seen_CUSTOM_ErrorCount
           ,le.primary_sic_CUSTOM_ErrorCount
           ,le.primary_naics_CUSTOM_ErrorCount
           ,le.ownership_ENUM_ErrorCount
-          ,le.executive_name1_ALLOW_ErrorCount
-          ,le.title1_ALLOW_ErrorCount
-          ,le.executive_name2_ALLOW_ErrorCount
-          ,le.title2_ALLOW_ErrorCount
-          ,le.executive_name3_ALLOW_ErrorCount
-          ,le.title3_ALLOW_ErrorCount
-          ,le.executive_name4_ALLOW_ErrorCount
-          ,le.title4_ALLOW_ErrorCount
-          ,le.executive_name5_ALLOW_ErrorCount
-          ,le.title5_ALLOW_ErrorCount
-          ,le.executive_name6_ALLOW_ErrorCount
-          ,le.title6_ALLOW_ErrorCount
-          ,le.executive_name7_ALLOW_ErrorCount
-          ,le.title7_ALLOW_ErrorCount
-          ,le.executive_name8_ALLOW_ErrorCount
-          ,le.title8_ALLOW_ErrorCount
-          ,le.executive_name9_ALLOW_ErrorCount
-          ,le.title9_ALLOW_ErrorCount
-          ,le.executive_name10_ALLOW_ErrorCount
-          ,le.title10_ALLOW_ErrorCount
+          ,le.executive_name1_CUSTOM_ErrorCount
+          ,le.title1_CUSTOM_ErrorCount
+          ,le.executive_name2_CUSTOM_ErrorCount
+          ,le.title2_CUSTOM_ErrorCount
+          ,le.executive_name3_CUSTOM_ErrorCount
+          ,le.title3_CUSTOM_ErrorCount
+          ,le.executive_name4_CUSTOM_ErrorCount
+          ,le.title4_CUSTOM_ErrorCount
+          ,le.executive_name5_CUSTOM_ErrorCount
+          ,le.title5_CUSTOM_ErrorCount
+          ,le.executive_name6_CUSTOM_ErrorCount
+          ,le.title6_CUSTOM_ErrorCount
+          ,le.executive_name7_CUSTOM_ErrorCount
+          ,le.title7_CUSTOM_ErrorCount
+          ,le.executive_name8_CUSTOM_ErrorCount
+          ,le.title8_CUSTOM_ErrorCount
+          ,le.executive_name9_CUSTOM_ErrorCount
+          ,le.title9_CUSTOM_ErrorCount
+          ,le.executive_name10_CUSTOM_ErrorCount
+          ,le.title10_CUSTOM_ErrorCount
           ,le.status_ENUM_ErrorCount
           ,le.is_closed_ENUM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
