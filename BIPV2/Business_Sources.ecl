@@ -82,7 +82,7 @@ Business_Sources1 :=
   + Workers_Compensation.As_Business_Linking
   + YellowPages.As_Business_Linking()
   // + Zoom.Zoom_As_Business_Linking          //on blacklist of ingest sources, filtered out completely
-	+ Cortera.Files.Bus_linking
+	+ Cortera.As_Business_Linking()
 	+ Infutor_NARB.As_Business_Linking()
 	+ Equifax_Business_Data.As_Business_Linking()
 	+ DataBridge.As_Business_Linking()
