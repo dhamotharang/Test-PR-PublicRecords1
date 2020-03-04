@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta2
 #OPTION('expandSelectCreateRow',true);
 OUTPUT('no non-parameterized queries',NAMED('empty'));
 

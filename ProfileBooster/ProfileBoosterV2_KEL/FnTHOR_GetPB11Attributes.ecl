@@ -1,4 +1,4 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL12 AS KEL;
 IMPORT ProfileBooster, Business_Risk_BIP, ProfileBooster.ProfileBoosterV2_KEL, Risk_Indicators, STD;
 
 EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
@@ -8,17 +8,11 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 	// Append the KEL Permissions Required for Viewing the Data
 	Options := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Fn_Set_Interface_Options(OptionsRaw, KEL_Settings);
 
-	Common_Functions := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Common_Functions;
+	// Common_Functions := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Common_Functions;
 	
 	RecordsWithLexID := InputData(P_LexID > 0);
 	RecordsWithoutLexID := InputData(P_LexID <= 0);
 	
-	lexidonly := RECORD
-		INTEGER7 P_LexID;
-	END;
-	PLexIDs_DS := PROJECT(RecordsWithLexID, lexidonly);
-	PLexIDs := SET(PLexIDs_DS,P_LexID);
-	PInputArchiveDateClean:=(INTEGER)OptionsRaw.ArchiveDate;
 	UNSIGNED8 PDPM := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(Options.Data_Restriction_Mask, 
 																																																Options.Data_Permission_Mask, 
 																																																Options.GLBAPurpose, 
@@ -29,27 +23,26 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 																																																FALSE, //OverrideExperianRestriction
 																																																'', //PermissiblePurpose, 
 																																																'',// IndustryClass ??DRMKT
-																																																ProfileBoosterV2_KEL.CFG_Compile, 
+																																																KEL_Settings,//ProfileBoosterV2_KEL.CFG_Compile, 
 																																																FALSE);
-	STRING8 today := (STRING8)Std.Date.Today();																													
+																																																
+	mod_transforms := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Transforms;
 	
-	// VehicleAttributesRaw := 	CHOOSEN(KEL.Clean(ProfileBooster.ProfileBoosterV2_KEL.Q_Debugging_Vehicle_Query(PLexIDs,PInputArchiveDateClean,PDPM).res0, TRUE, TRUE, TRUE),100000);	
-	// outputFile2 := TRIM('~jfrancis::out::' + today + '_' + thorlib.wuid() + '_PB1_1_VEHICLEHELPER_ATTRS_' + thorlib.wuid());
-  // VehicleHelperFinal := VehicleAttributesRaw(vinavin<>'');//PROJECT(VehicleAttributesRaw, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutVehiclePB11,SELF := LEFT;));
-	// OUTPUT(CHOOSEN(VehicleHelperFinal,100000),,outputFile2, CSV(HEADING(single), QUOTE('"')));
-
-	NonFCRAPB2AttributesRaw := KEL.Clean(ProfileBooster.ProfileBoosterV2_KEL.Q_Non_F_C_R_A_Profile_Booster_V2(PLexIDs,PInputArchiveDateClean,PDPM).res0, TRUE, TRUE, TRUE);	
-	// OUTPUT(COUNT(NonFCRAPB2AttributesRaw),named('NonFCRAPB2AttributesRaw_cnt'));
-	// OUTPUT(CHOOSEN(NonFCRAPB2AttributesRaw(pl_astvehautocntev<>0),1000),named('NonFCRAPB2AttributesRaw_populated'));		
-	PB2AttributesRaw := NonFCRAPB2AttributesRaw;
-
+	LexIDAttributesInput := PROJECT(RecordsWithLexID, mod_transforms.xfm_LexIDAttributesInput(LEFT, Options.KEL_Permissions_Mask) );
+	
+	PB2AttributesRaw := ProfileBooster.ProfileBoosterV2_KEL.RQ_Non_F_C_R_A_Profile_Booster_V2(LexIDAttributesInput, KEL_Settings).Res0;
+   																													 
+	PB2AttributesRawCleaned := KEL.Clean(PB2AttributesRaw, TRUE, TRUE, TRUE);		
+	
 	// Cast Attributes back to their string values
-	PB2AttributesWithLexID := JOIN(RecordsWithLexID, PB2AttributesRaw, LEFT.P_LexID = RIGHT.LexID, 
+	PB2AttributesWithLexID := JOIN(RecordsWithLexID, PB2AttributesRawCleaned, LEFT.P_LexID = RIGHT.LexID, 
 		TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutPersonPB11,
 			ResultsFound := RIGHT.LexID > 0;
 			P_LexIDSeenFlag := IF(ResultsFound,'1','0');
 			LexIDNotOnFile := P_LexIDSeenFlag = '0';
 			SELF.LexID := LEFT.P_LexID;
+			SELF.G_ProcUID := RIGHT.__queryid;
+			SELF.P_InpAcct := LEFT.P_InpAcct;
 			SELF.PurchNewAmt := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER3)RIGHT.PL_PurchNewAmt, 0);
@@ -199,64 +192,19 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 								ResultsFound => (INTEGER3)RIGHT.PL_AstVehAutoEmrgPriceMin, 0);
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
+      	
+   	PB2AttributesWithoutLexID := PROJECT(RecordsWithoutLexID, mod_transforms.xfm_MissingInputData(LEFT) );
+   			
+   	PB2Attributes := SORT( PB2AttributesWithLexID + PB2AttributesWithoutLexID, G_ProcUID ); 
 
-	
-	PB2AttributesWithoutLexID := PROJECT(RecordsWithoutLexID,
-		TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutPersonPB11,
-			SELF.LexID := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchNewAmt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchTotEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchNewMsnc := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchOldMsnc := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchItemCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.PurchAmtAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoCarCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEliteCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoExpCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoLuxuryCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoMakeCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoOrigOwnCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoSUVCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoTruckCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoVanCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAuto2ndFreqMake := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.AstVehAuto2ndFreqMakeCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoFreqMake := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.AstVehAutoFreqMakeCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoNewTypeIndx := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgPriceAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgPriceDiff := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgPriceMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoNewPrice := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgAgeAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgAgeMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgAgeMin := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgSpanAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoLastAgeAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoLastAgeMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoLastAgeMin := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoNewMsnc := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoTimeOwnSpanAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherATVCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherCamperCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherCommCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherMtrCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherOrigOwnCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherScooterCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherNewMsnc := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherNewTypeIndx := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherNewPrice := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherPriceAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherPriceMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehOtherPriceMin := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.AstVehAutoEmrgPriceMin := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF := LEFT)); 	
-			
-	PB2Attributes := SORT( PB2AttributesWithLexID + PB2AttributesWithoutLexID, G_ProcUID ); 
-	// PB2Attributes := PB2AttributesWithLexID; 
-	// OUTPUT(CHOOSEN(PB2Attributes,1000),named('PB2Attributes'));
-	RETURN PB2Attributes;
+		//DEBUGGING
+		// OUTPUT(CHOOSEN(LexIDAttributesInput,100), NAMED('LexIDAttributesInput_100'));
+		// OUTPUT(COUNT(LexIDAttributesInput), NAMED('LexIDAttributesInput_cnt'));
+   	// OUTPUT(CHOOSEN(PB2AttributesRaw,100), NAMED('PB2AttributesRaw_100'));
+   	// OUTPUT(CHONT(PB2AttributesRaw), NAMED('PB2AttributesRaw_cnt'));
+   	// OUTPUT(COUNT(PB2Attributes), NAMED('PB2Attributes_cnt'));
+   	// OUTPUT(CHOOSEN(PB2AttributesRawCleaned,100), NAMED('PB2AttributesRawCleaned_100'));
+   
+   	RETURN PB2Attributes;
+
 END;	

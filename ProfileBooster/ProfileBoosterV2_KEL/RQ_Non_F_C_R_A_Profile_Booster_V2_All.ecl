@@ -1,18 +1,17 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_1,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_Vehicle,B_Person_Vehicle_1,B_Person_Vehicle_10,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Person_Vehicle_4,B_Person_Vehicle_5,B_Person_Vehicle_6,B_Person_Vehicle_7,B_Person_Vehicle_8,B_Person_Vehicle_9,B_Vehicle,B_Vehicle_1,B_Vehicle_2,B_Vehicle_3,B_Vehicle_4,B_Vehicle_5,B_Vehicle_6,B_Vehicle_7,B_Vehicle_8,B_Vehicle_9,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2_All(DATASET(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout) __Non_F_C_R_A_Profile_Booster_V2_All_Params, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __ExtParams := TABLE(__Non_F_C_R_A_Profile_Booster_V2_All_Params,{__Non_F_C_R_A_Profile_Booster_V2_All_Params,KEL.typ.kdate __Asof := Input_Archive_Date_Clean_,UNSIGNED8 __Using := D_P_M_});
   SHARED __FilterValues := DEDUP(SORT(__ExtParams,__Asof,__Using),__Asof,__Using);
-  SHARED __Partitions := PROJECT(__FilterValues,TRANSFORM(RECORDOF(__ExtParams),SELF.__Part:=COUNTER,SELF:=LEFT));
+  SHARED __Partitions := PROJECT(__FilterValues,TRANSFORM({UNSIGNED4 __Part,KEL.typ.kdate __Asof,UNSIGNED8 __Using},SELF.__Part:=COUNTER,SELF:=LEFT));
   SHARED __Params := JOIN(__ExtParams,__Partitions,LEFT.__Asof = RIGHT.__Asof AND LEFT.__Using = RIGHT.__Using,TRANSFORM(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout,SELF.__Part:=RIGHT.__Part,SELF:=LEFT));
   SHARED __PartDict := DICTIONARY(__Partitions,{__Part=>__Partitions});
   SHARED __cfg_Local := MODULE(CFG_Compile)
     SHARED DATASET(CurrentDateLayout) CurrentDateData := PROJECT(__Partitions,CurrentDateLayout);
     EXPORT KEL.typ.str LogicalFileFragment := __cfg.LogicalFileFragment;
     EXPORT KEL.typ.str SuperFileFragment := __cfg.SuperFileFragment;
-    EXPORT KEL.typ.str PersistId := __cfg.PersistId;
   END;
   SHARED E_Person_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__cfg))
     EXPORT __PreEntities := JOIN(B_Person(__cfg).IDX_Person_UID_Wrapped,__Partitions,TRUE,TRANSFORM(E_Person(__cfg).PreEntityLayout,SELF.__Part:=RIGHT.__Part,SELF:=LEFT),ALL);
@@ -146,9 +145,9 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2_All(DATASET(CFG_Compile.Non_F_C_R_A_Pro
     SHARED TYPEOF(B_Vehicle_1(__cfg).__ENH_Vehicle_1) __ENH_Vehicle_1 := B_Vehicle_1_Local(__cfg).__ENH_Vehicle_1;
   END;
   SHARED TYPEOF(B_Person(__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__cfg_Local).__ENH_Person;
-  SHARED __EE414622 := __ENH_Person;
-  SHARED __EE414835 := __Params;
-  SHARED __ST415224_Layout := RECORD
+  SHARED __EE404643 := __ENH_Person;
+  SHARED __EE404856 := __Params;
+  SHARED __ST405245_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -216,13 +215,13 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2_All(DATASET(CFG_Compile.Non_F_C_R_A_Pro
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC415583(B_Person(__cfg_Local).__ST7277_Layout __EE414622, CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout __EE414835) := TRUE AND __EE414622.__Part = __EE414835.__Part;
-  __ST415224_Layout __JT415583(B_Person(__cfg_Local).__ST7277_Layout __l, CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout __r) := TRANSFORM
+  __JC405604(B_Person(__cfg_Local).__ST7281_Layout __EE404643, CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout __EE404856) := TRUE AND __EE404643.__Part = __EE404856.__Part;
+  __ST405245_Layout __JT405604(B_Person(__cfg_Local).__ST7281_Layout __l, CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_All_Params_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE415584 := JOIN(__EE414622,__EE414835,__JC415583(LEFT,RIGHT),__JT415583(LEFT,RIGHT),INNER,ALL);
-  SHARED __ST414201_Layout := RECORD
+  SHARED __EE405605 := JOIN(__EE404643,__EE404856,__JC405604(LEFT,RIGHT),__JT405604(LEFT,RIGHT),INNER,ALL);
+  SHARED __ST404222_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.nint P_L___Purch_New_Amt_;
     KEL.typ.nint P_L___Purch_Tot_Ev_;
@@ -279,7 +278,7 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2_All(DATASET(CFG_Compile.Non_F_C_R_A_Pro
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE415584,TRANSFORM(__ST414201_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE405605,TRANSFORM(__ST404222_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
   EXPORT DBG_Params := __UNWRAP(__Params);
   EXPORT DBG_E_Person_PreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PreEntities);
   EXPORT DBG_E_Person_FilteredPreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PostFilter);

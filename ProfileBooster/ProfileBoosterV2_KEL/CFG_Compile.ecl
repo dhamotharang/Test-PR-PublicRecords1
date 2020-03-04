@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT * FROM KEL11.Null;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT CFG_Compile := MODULE, VIRTUAL
   // **** The __Part field in parameter datasets is for internal use.  Any value assigned to this  ****;
   // **** field will be ignored.                                                                   ****;
   EXPORT Non_F_C_R_A_Profile_Booster_V2_Params_Layout := RECORD
     KEL.typ.uid __QueryId := 0;
-    SET OF KEL.typ.int Lex_I_Ds__in_ := [];
-    KEL.typ.kdate Input_Archive_Date_Clean_ := 0;
+    KEL.typ.uid Lex_I_D__in_ := 0;
+    KEL.typ.kdate P___Inp_Cln_Arch_Dt_ := 0;
     UNSIGNED8 D_P_M_ := 0;
     UNSIGNED4 __Part := 0;
   END;
@@ -87,9 +87,7 @@ EXPORT CFG_Compile := MODULE, VIRTUAL
   EXPORT CurrentDate := DICTIONARY(CurrentDateData,{__Part=>__Asof});
   // **** These definitions may be overridden as needed ****;
   // Override to set the logicalfile fragment for key file names;
-  EXPORT KEL.typ.str LogicalFileFragment := 'Vault';
+  EXPORT KEL.typ.str LogicalFileFragment := 'PB20';
   // Override to set the superfile fragment for key file names;
-  EXPORT KEL.typ.str SuperFileFragment := 'Vault';
-  // Override to change the query specific persist name fragment;
-  EXPORT KEL.typ.str PersistId := '';
+  EXPORT KEL.typ.str SuperFileFragment := 'PB20';
 END;

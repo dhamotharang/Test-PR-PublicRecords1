@@ -1,17 +1,16 @@
 ﻿IMPORT ProfileBooster.ProfileBoosterV2_KEL, MDR, STD;
 
-/*
--99: No LexID or input needed is not populated
--98: No data returned from search
--97: Records available but unable to calculate due to missing values or missing associated/child data
-*/
 EXPORT Constants := MODULE
+	EXPORT STRING KEL_KEY := '~key::kel::publicrecords_kel::pb20::person::uid';
+	EXPORT STRING PB_WATCHDOG_KEY := '~thor_data400::key::watchdog_pb';
+
   EXPORT STRING MISSING_INPUT_DATA := '-99999';
   EXPORT STRING NO_DATA_FOUND := '-99998';
   EXPORT STRING RECS_AVAIL_BUT_CANNOT_CALCULATE := '-99997';
 	
   EXPORT INTEGER MISSING_INPUT_DATA_INT := -99999;
   EXPORT INTEGER NO_DATA_FOUND_INT := -99998;
+  EXPORT INTEGER RECS_AVAIL_BUT_CANNOT_CALCULATE_INT := -99997;
 
   EXPORT INTEGER DEFAULT_JOIN_LIMIT := 10000;
 

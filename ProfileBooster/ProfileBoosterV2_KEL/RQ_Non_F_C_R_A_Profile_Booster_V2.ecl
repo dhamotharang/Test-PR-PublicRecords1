@@ -1,25 +1,23 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_1,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_Vehicle,B_Person_Vehicle_1,B_Person_Vehicle_10,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Person_Vehicle_4,B_Person_Vehicle_5,B_Person_Vehicle_6,B_Person_Vehicle_7,B_Person_Vehicle_8,B_Person_Vehicle_9,B_Vehicle,B_Vehicle_1,B_Vehicle_2,B_Vehicle_3,B_Vehicle_4,B_Vehicle_5,B_Vehicle_6,B_Vehicle_7,B_Vehicle_8,B_Vehicle_9,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout) __Non_F_C_R_A_Profile_Booster_V2_Params, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED __ExtParams := TABLE(__Non_F_C_R_A_Profile_Booster_V2_Params,{__Non_F_C_R_A_Profile_Booster_V2_Params,KEL.typ.kdate __Asof := Input_Archive_Date_Clean_,UNSIGNED8 __Using := D_P_M_});
+  SHARED __ExtParams := TABLE(__Non_F_C_R_A_Profile_Booster_V2_Params,{__Non_F_C_R_A_Profile_Booster_V2_Params,KEL.typ.kdate __Asof := P___Inp_Cln_Arch_Dt_,UNSIGNED8 __Using := D_P_M_});
   SHARED __FilterValues := DEDUP(SORT(__ExtParams,__Asof,__Using),__Asof,__Using);
-  SHARED __Partitions := PROJECT(__FilterValues,TRANSFORM(RECORDOF(__ExtParams),SELF.__Part:=COUNTER,SELF:=LEFT));
+  SHARED __Partitions := PROJECT(__FilterValues,TRANSFORM({UNSIGNED4 __Part,KEL.typ.kdate __Asof,UNSIGNED8 __Using},SELF.__Part:=COUNTER,SELF:=LEFT));
   SHARED __Params := JOIN(__ExtParams,__Partitions,LEFT.__Asof = RIGHT.__Asof AND LEFT.__Using = RIGHT.__Using,TRANSFORM(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout,SELF.__Part:=RIGHT.__Part,SELF:=LEFT));
   SHARED __PartDict := DICTIONARY(__Partitions,{__Part=>__Partitions});
   SHARED __cfg_Local := MODULE(CFG_Compile)
     SHARED DATASET(CurrentDateLayout) CurrentDateData := PROJECT(__Partitions,CurrentDateLayout);
     EXPORT KEL.typ.str LogicalFileFragment := __cfg.LogicalFileFragment;
     EXPORT KEL.typ.str SuperFileFragment := __cfg.SuperFileFragment;
-    EXPORT KEL.typ.str PersistId := __cfg.PersistId;
   END;
   SHARED __UIDLayout := RECORD
     KEL.typ.nuid UID;
     UNSIGNED4 __Part;
   END;
-  SHARED __FC362099(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __l, B_Person(__cfg_Local).__ST468344_Layout __r) := (KEL.typ.int)KEL.Indexing.Key(__r.UID) IN __l.Lex_I_Ds__in_;
-  SHARED __Person_KeyList_1 := JOIN(__Params,B_Person(__cfg_Local).IDX_Person_UID,__FC362099(LEFT,RIGHT),TRANSFORM(__UIDLayout,SELF.__Part:=LEFT.__Part,SELF.UID:=__CN(RIGHT.UID),SELF:=RIGHT));
+  SHARED __Person_KeyList_1 := PROJECT(__Params,TRANSFORM(__UIDLayout,SELF.UID:=__CN(LEFT.Lex_I_D__in_),SELF.__Part:=LEFT.__Part));
   SHARED __Person_KeyList := __Person_KeyList_1;
   SHARED E_Person_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__cfg))
     EXPORT __PreEntities := JOIN(DEDUP(__Person_KeyList,RECORD,ALL),B_Person(__cfg).IDX_Person_UID,KEL.Indexing.Key(RIGHT.UID) = __T(LEFT.UID),TRANSFORM(PreEntityLayout,SELF.__Part:=LEFT.__Part,SELF.UID:=__CN(RIGHT.UID),SELF:=RIGHT));
@@ -153,12 +151,12 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     SHARED TYPEOF(B_Vehicle_1(__cfg).__ENH_Vehicle_1) __ENH_Vehicle_1 := B_Vehicle_1_Local(__cfg).__ENH_Vehicle_1;
   END;
   SHARED TYPEOF(B_Person(__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__cfg_Local).__ENH_Person;
-  SHARED __EE342844 := __Params;
-  SHARED __EE342849 := __ENH_Person;
-  SHARED __ST343920_Layout := RECORD
+  SHARED __EE332893 := __Params;
+  SHARED __EE332898 := __ENH_Person;
+  SHARED __ST333969_Layout := RECORD
     KEL.typ.uid __QueryId := 0;
-    SET OF KEL.typ.int Lex_I_Ds__in_ := [];
-    KEL.typ.kdate Input_Archive_Date_Clean_ := 0;
+    KEL.typ.uid Lex_I_D__in_ := 0;
+    KEL.typ.kdate P___Inp_Cln_Arch_Dt_ := 0;
     UNSIGNED8 D_P_M_ := 0;
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
@@ -224,13 +222,13 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC467466(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __EE342844, B_Person(__cfg_Local).__ST7277_Layout __EE342849) := __T(__OP2(__CAST(KEL.typ.int,__EE342849.UID),IN,__CN(__EE342844.Lex_I_Ds__in_))) AND __EE342844.__Part = __EE342849.__Part;
-  __ST343920_Layout __JT467466(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __l, B_Person(__cfg_Local).__ST7277_Layout __r) := TRANSFORM
+  __JC457431(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __EE332893, B_Person(__cfg_Local).__ST7281_Layout __EE332898) := __NNEQ(__EE332898.UID,__CN(__EE332893.Lex_I_D__in_)) AND __T(__OP2(__EE332898.UID,=,__CN(__EE332893.Lex_I_D__in_))) AND __EE332893.__Part = __EE332898.__Part;
+  __ST333969_Layout __JT457431(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __l, B_Person(__cfg_Local).__ST7281_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE467556 := JOIN(__EE342849,__EE342844,__JC467466(RIGHT,LEFT),__JT467466(RIGHT,LEFT),INNER,SMART);
-  SHARED __ST342669_Layout := RECORD
+  SHARED __EE457521 := JOIN(__EE332898,__EE332893,__JC457431(RIGHT,LEFT),__JT457431(RIGHT,LEFT),INNER,SMART);
+  SHARED __ST332718_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.nint P_L___Purch_New_Amt_;
     KEL.typ.nint P_L___Purch_Tot_Ev_;
@@ -287,7 +285,7 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE467556,TRANSFORM(__ST342669_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE457521,TRANSFORM(__ST332718_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
   EXPORT DBG_Params := __UNWRAP(__Params);
   EXPORT DBG_E_Person_PreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PreEntities);
   EXPORT DBG_E_Person_FilteredPreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PostFilter);

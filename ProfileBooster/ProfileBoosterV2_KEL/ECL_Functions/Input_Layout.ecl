@@ -24,4 +24,5 @@ EXPORT Input_Layout := record
 	STRING employername;
 	STRING historydate; //(adding historydate timestamp) 
 	STRING LexID;
+	INTEGER G_ProcUID;
 END;

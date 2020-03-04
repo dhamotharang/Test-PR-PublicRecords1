@@ -9,10 +9,10 @@ IMPORT ProfileBooster.ProfileBoosterV2_KEL.Uses;
 // --- Attributes Section ---
 IMPORT ProfileBooster.ProfileBoosterV2_KEL.Attributes;
 
-QUERY: NonFCRAProfileBoosterV2(SET OF INTEGER LexIDs_in, 
-																			InputArchiveDateClean,
-																			PERMITS DPM
-																			) <= Person(UID IN LexIDs_in){
+QUERY: NonFCRAProfileBoosterV2(Person LexID_in, 
+					// DATASET OF ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII InputPIIDataset, 
+					P_InpClnArchDt,
+					PERMITS DPM) <= Person(UID = LexID_in){
 			LexID := UID,
 			PL_PurchNewAmt,
 			PL_PurchTotEv,
@@ -64,7 +64,7 @@ QUERY: NonFCRAProfileBoosterV2(SET OF INTEGER LexIDs_in,
 			PL_AstVehOtherPriceMin,
 			PL_AstVehAutoEmrgPriceMin
    		}
-   	ASOF reportedby(InputArchiveDateClean)
+   	ASOF reportedby(P_InpClnArchDt) 
    	USING DPM;
 		
 		QUERY: NonFCRAProfileBoosterV2All(InputArchiveDateClean,

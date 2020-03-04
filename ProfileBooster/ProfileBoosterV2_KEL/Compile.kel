@@ -9,6 +9,6 @@
 // #OPTION(persistexpire, 5) // Number of days before PERSIST files are automatically deleted
 #OPTION(persistexpire, 28) // Number of days before PERSIST files are automatically deleted
 
-#OPTION(keytemplate, '~key::kel::publicrecords_kel::{logicalfile=Vault}{superfile=Vault}::{keyname}') // Generates Roxie Index logical files such as 'key::kel::publicrecords_kel::Vault::Person::UID'
+#OPTION(keytemplate, '~key::kel::publicrecords_kel::{logicalfile=PB20}{superfile=PB20}::{keyname}') // Generates Roxie Index logical files such as 'key::kel::publicrecords_kel::Vault::Person::UID'
 
 IMPORT ProfileBooster.ProfileBoosterV2_KEL.Graph;

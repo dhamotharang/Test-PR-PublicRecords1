@@ -1,6 +1,6 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT * FROM KEL11.Null;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta2
+IMPORT KEL12 AS KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT CFG_Attributes := MODULE, VIRTUAL
   EXPORT UNSIGNED8 Permit__NONE := 0x0;
   EXPORT UNSIGNED8 Permit_Restricted := 0x1;
