@@ -87,6 +87,7 @@ EXPORT phone_noreconn_search := MACRO
   boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
   boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
   boolean GetSSNBest := false : stored('GetSSNBest');
+  string32 ApplicationType := '' : stored('ApplicationType');
 
   doxie.MAC_Header_Field_Declare();
   globalmod := AutoStandardI.GlobalModule();
@@ -572,10 +573,13 @@ EXPORT phone_noreconn_search := MACRO
   //resort incase either phone feedback or address feedback changed the UseDateSort sort logic
   results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
 
-  // Suppress records without full name and address and carrier name, Royalties are calculated off of Non-suppressed results
-  // Note: Even though option name is SuppressBlankNameAddress we look for carrier_name as well
-  results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))  OR carrier_name != ''))), results);
+  IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
 
+  // Suppress records without full name and address and carrier name (only for gov application types), Royalties are calculated off of Non-suppressed results
+  // Note: Even though option name is SuppressBlankNameAddress, for gov application types we look for carrier_name  as well
+  results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))  OR (IsGovsearch AND carrier_name != '')))), results);
+
+  
   doxie.MAC_Marshall_Results_NoCount(results_suppress,marshalled_results,,disp_cnt);
 
   results_friendly := project(marshalled_results, transform(recordof(marshalled_results),
