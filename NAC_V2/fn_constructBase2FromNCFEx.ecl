@@ -139,7 +139,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								self.ProcessDate := (unsigned4)Version;
 								self.filename := left.filename;
 								self.NCF_FileDate := (unsigned4)left.filename[11..18];
-								self.NCF_FileTime := left.filename[20..26];
+								self.NCF_FileTime := left.filename[20..25];
 								self.created := left.created;
 								self.updated := left.updated;
 								self.replaced := left.replaced;
