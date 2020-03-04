@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT ProfileBooster;
 IMPORT CFG_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT E_Person(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -174,7 +174,7 @@ EXPORT E_Person(CFG_Compile __cfg = CFG_Compile) := MODULE
     SELF := __r;
   END;
   SHARED __PreResult := PROJECT(Person_Group(COUNT(__Payload) = 1),Person__Single_Rollup(LEFT.__Payload[1],LEFT)) + PROJECT(Person_Group(COUNT(__Payload) > 1),Person__Rollup(LEFT.__Payload[1],LEFT.__Payload,LEFT));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::ProfileBooster.ProfileBoosterV2_KEL::Person::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(28));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);

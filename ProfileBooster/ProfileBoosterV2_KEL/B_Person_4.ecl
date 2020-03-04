@@ -1,24 +1,21 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person_5,B_Person_Vehicle_5,B_Vehicle_5,B_Vehicle_7,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_5(__cfg).__ENH_Person_5) __ENH_Person_5 := B_Person_5(__cfg).__ENH_Person_5;
   SHARED VIRTUAL TYPEOF(B_Person_Vehicle_5(__cfg).__ENH_Person_Vehicle_5) __ENH_Person_Vehicle_5 := B_Person_Vehicle_5(__cfg).__ENH_Person_Vehicle_5;
   SHARED VIRTUAL TYPEOF(B_Vehicle_5(__cfg).__ENH_Vehicle_5) __ENH_Vehicle_5 := B_Vehicle_5(__cfg).__ENH_Vehicle_5;
-  SHARED __EE36582 := __ENH_Person_5;
-  SHARED __EE36596 := __ENH_Person_Vehicle_5;
-  SHARED __EE36632 := __EE36596(__T(__AND(__EE36596.Flag_Depreciated_Price_,__CN(__NN(__EE36596.Subject_) AND __NN(__EE36596.Vehicle_Min_Date_) AND __NN(__EE36596.Automobile_)))));
-  SHARED __EE36600 := __EE36582;
-  SHARED __EE36613 := __EE36600(__NN(__EE36600.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_));
-  __JC36647(B_Person_Vehicle_5(__cfg).__ST10159_Layout __EE36632, B_Person_5(__cfg).__ST12143_Layout __EE36613) := __EEQP(__EE36613.UID,__EE36632.Subject_) AND __NNEQ(__EE36632.Vehicle_Min_Date_,__EE36613.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_) AND __T(__AND(__EEQ(__EE36613.UID,__EE36632.Subject_),__OP2(__EE36632.Vehicle_Min_Date_,=,__EE36613.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_))) AND __EE36632.__Part = __EE36613.__Part;
-  SHARED __EE36697 := JOIN(__EE36632,__EE36613,__JC36647(LEFT,RIGHT),TRANSFORM(B_Person_Vehicle_5(__cfg).__ST10159_Layout,SELF:=LEFT),HASH,KEEP(1));
-  SHARED __EE36594 := __ENH_Vehicle_5;
-  SHARED __EE36598 := __EE36594;
-  SHARED __EE36606 := __EE36598(__T(__EE36598.Flag_Auto_));
-  __JC36706(B_Person_Vehicle_5(__cfg).__ST10159_Layout __EE36697, B_Vehicle_7(__cfg).__ST11244_Layout __EE36606) := __EEQP(__EE36697.Automobile_,__EE36606.UID) AND __EE36697.__Part = __EE36606.__Part;
-  SHARED __EE36756 := JOIN(__EE36697,__EE36606,__JC36706(LEFT,RIGHT),TRANSFORM(B_Person_Vehicle_5(__cfg).__ST10159_Layout,SELF:=LEFT),HASH,KEEP(1));
-  SHARED __ST31307_Layout := RECORD
+  SHARED __EE35575 := __ENH_Person_5;
+  SHARED __EE35587 := __ENH_Person_Vehicle_5;
+  SHARED __EE35623 := __EE35587(__T(__AND(__EE35587.Flag_Depreciated_Price_,__CN(__NN(__EE35587.Subject_) AND __NN(__EE35587.Vehicle_Min_Date_) AND __NN(__EE35587.Automobile_)))));
+  SHARED __EE35591 := __EE35575;
+  SHARED __EE35604 := __EE35591(__NN(__EE35591.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_));
+  __JC35638(B_Person_Vehicle_5(__cfg).__ST10163_Layout __EE35623, B_Person_5(__cfg).__ST12147_Layout __EE35604) := __EEQP(__EE35604.UID,__EE35623.Subject_) AND __NNEQ(__EE35623.Vehicle_Min_Date_,__EE35604.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_) AND __T(__AND(__EEQ(__EE35604.UID,__EE35623.Subject_),__OP2(__EE35623.Vehicle_Min_Date_,=,__EE35604.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_))) AND __EE35623.__Part = __EE35604.__Part;
+  SHARED __EE35688 := JOIN(__EE35623,__EE35604,__JC35638(LEFT,RIGHT),TRANSFORM(B_Person_Vehicle_5(__cfg).__ST10163_Layout,SELF:=LEFT),HASH,KEEP(1));
+  SHARED __EE35589 := __ENH_Vehicle_5;
+  SHARED __EE35597 := __EE35589(__T(__EE35589.Flag_Auto_));
+  SHARED __ST31358_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -150,14 +147,14 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC36765(B_Person_Vehicle_5(__cfg).__ST10159_Layout __EE36756, B_Vehicle_7(__cfg).__ST11244_Layout __EE36594) := __EEQP(__EE36756.Automobile_,__EE36594.UID) AND __EE36756.__Part = __EE36594.__Part;
-  __ST31307_Layout __JT36765(B_Person_Vehicle_5(__cfg).__ST10159_Layout __l, B_Vehicle_7(__cfg).__ST11244_Layout __r) := TRANSFORM
+  __JC35697(B_Person_Vehicle_5(__cfg).__ST10163_Layout __EE35688, B_Vehicle_7(__cfg).__ST11248_Layout __EE35597) := __EEQP(__EE35688.Automobile_,__EE35597.UID) AND __EE35688.__Part = __EE35597.__Part;
+  __ST31358_Layout __JT35697(B_Person_Vehicle_5(__cfg).__ST10163_Layout __l, B_Vehicle_7(__cfg).__ST11248_Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE36932 := JOIN(__EE36756,__EE36594,__JC36765(LEFT,RIGHT),__JT36765(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST30861_Layout := RECORD
+  SHARED __EE35864 := JOIN(__EE35688,__EE35597,__JC35697(LEFT,RIGHT),__JT35697(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST30978_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) ____grp___U_I_D_;
     KEL.typ.nstr Vina_Vin_;
     KEL.typ.nint Depreciated_Price_;
@@ -166,10 +163,10 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __EE36954 := PROJECT(TABLE(PROJECT(__EE36932,TRANSFORM(__ST30861_Layout,SELF.____grp___U_I_D_ := LEFT.Subject_,SELF := LEFT)),{KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),____grp___U_I_D_,Vina_Vin_,Depreciated_Price_,Date_First_Seen_Capped_,__Part},____grp___U_I_D_,Vina_Vin_,Depreciated_Price_,Date_First_Seen_Capped_,__Part,MERGE),__ST30861_Layout);
-  SHARED __EE36965 := GROUP(__EE36954,____grp___U_I_D_,__Part,ALL);
-  SHARED __EE36969 := TOPN(__EE36965(__NN(__EE36965.Date_First_Seen_Capped_)),1, -__T(__EE36965.Date_First_Seen_Capped_),__T(____grp___U_I_D_),__T(Vina_Vin_),__T(Depreciated_Price_));
-  SHARED __ST31865_Layout := RECORD
+  SHARED __EE35886 := PROJECT(TABLE(PROJECT(__EE35864,TRANSFORM(__ST30978_Layout,SELF.____grp___U_I_D_ := LEFT.Subject_,SELF := LEFT)),{KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),____grp___U_I_D_,Vina_Vin_,Depreciated_Price_,Date_First_Seen_Capped_,__Part},____grp___U_I_D_,Vina_Vin_,Depreciated_Price_,Date_First_Seen_Capped_,__Part,MERGE),__ST30978_Layout);
+  SHARED __EE35897 := GROUP(__EE35886,____grp___U_I_D_,__Part,ALL);
+  SHARED __EE35901 := TOPN(__EE35897(__NN(__EE35897.Date_First_Seen_Capped_)),1, -__T(__EE35897.Date_First_Seen_Capped_),__T(____grp___U_I_D_),__T(Vina_Vin_),__T(Depreciated_Price_));
+  SHARED __ST31923_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -184,19 +181,19 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.ndataset(__ST30861_Layout) Exp1_;
+    KEL.typ.ndataset(__ST30978_Layout) Exp1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC36978(B_Person_5(__cfg).__ST12143_Layout __EE36582, __ST30861_Layout __EE36969) := __EEQP(__EE36582.UID,__EE36969.____grp___U_I_D_) AND __EE36582.__Part = __EE36969.__Part;
-  __ST31865_Layout __Join__ST31865_Layout(B_Person_5(__cfg).__ST12143_Layout __r, DATASET(__ST30861_Layout) __recs) := TRANSFORM
+  __JC35910(B_Person_5(__cfg).__ST12147_Layout __EE35575, __ST30978_Layout __EE35901) := __EEQP(__EE35575.UID,__EE35901.____grp___U_I_D_) AND __EE35575.__Part = __EE35901.__Part;
+  __ST31923_Layout __Join__ST31923_Layout(B_Person_5(__cfg).__ST12147_Layout __r, DATASET(__ST30978_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Exp1_ := __CN(__recs);
   END;
-  SHARED __EE37025 := DENORMALIZE(DISTRIBUTE(__EE36582,HASH(UID)),DISTRIBUTE(__EE36969,HASH(____grp___U_I_D_)),__JC36978(LEFT,RIGHT),GROUP,__Join__ST31865_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __ST12280_Layout := RECORD
+  SHARED __EE35957 := DENORMALIZE(DISTRIBUTE(__EE35575,HASH(UID)),DISTRIBUTE(__EE35901,HASH(____grp___U_I_D_)),__JC35910(LEFT,RIGHT),GROUP,__Join__ST31923_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __ST12429_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -207,7 +204,7 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.nstr Race_Description_;
     KEL.typ.ndataset(E_Person(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Person(__cfg).Dunn_Data_Layout) Dunn_Data_;
-    KEL.typ.ndataset(__ST30861_Layout) Ast_Veh_Auto_Emrg_Price_Set_;
+    KEL.typ.ndataset(__ST30978_Layout) Ast_Veh_Auto_Emrg_Price_Set_;
     KEL.typ.bool Invalid_Vehicle_Auto_Min_Date_ := FALSE;
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_;
@@ -217,13 +214,13 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST12280_Layout __ND37033__Project(__ST31865_Layout __PP37029) := TRANSFORM
-    __EE37028 := __PP37029.Exp1_;
-    SELF.Ast_Veh_Auto_Emrg_Price_Set_ := __EE37028;
-    SELF := __PP37029;
+  SHARED __ST12429_Layout __ND35965__Project(__ST31923_Layout __PP35961) := TRANSFORM
+    __EE35960 := __PP35961.Exp1_;
+    SELF.Ast_Veh_Auto_Emrg_Price_Set_ := __EE35960;
+    SELF := __PP35961;
   END;
-  SHARED __EE37153 := PROJECT(__EE37025,__ND37033__Project(LEFT));
-  EXPORT __ST4431_Layout := RECORD
+  SHARED __EE36085 := PROJECT(__EE35957,__ND35965__Project(LEFT));
+  EXPORT __ST4433_Layout := RECORD
     KEL.typ.nstr Vina_Vin_;
     KEL.typ.nint Depreciated_Price_;
     KEL.typ.nkdate Date_First_Seen_Capped_;
@@ -232,7 +229,7 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT __ST30783_Layout := RECORD
+  EXPORT __ST30901_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -243,7 +240,7 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.nstr Race_Description_;
     KEL.typ.ndataset(E_Person(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Person(__cfg).Dunn_Data_Layout) Dunn_Data_;
-    KEL.typ.ndataset(__ST4431_Layout) Ast_Veh_Auto_Emrg_Price_Set_;
+    KEL.typ.ndataset(__ST4433_Layout) Ast_Veh_Auto_Emrg_Price_Set_;
     KEL.typ.bool Invalid_Vehicle_Auto_Min_Date_ := FALSE;
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_;
@@ -253,10 +250,10 @@ EXPORT B_Person_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST30783_Layout __ND36452__Project(__ST12280_Layout __PP36448) := TRANSFORM
-    __EE37156 := __PP36448.Ast_Veh_Auto_Emrg_Price_Set_;
-    SELF.Ast_Veh_Auto_Emrg_Price_Set_ := __PROJECT(__EE37156,__ST4431_Layout);
-    SELF := __PP36448;
+  SHARED __ST30901_Layout __ND35445__Project(__ST12429_Layout __PP35441) := TRANSFORM
+    __EE36088 := __PP35441.Ast_Veh_Auto_Emrg_Price_Set_;
+    SELF.Ast_Veh_Auto_Emrg_Price_Set_ := __PROJECT(__EE36088,__ST4433_Layout);
+    SELF := __PP35441;
   END;
-  EXPORT __ENH_Person_4 := PROJECT(__EE37153,__ND36452__Project(LEFT));
+  EXPORT __ENH_Person_4 := PROJECT(__EE36085,__ND35445__Project(LEFT));
 END;

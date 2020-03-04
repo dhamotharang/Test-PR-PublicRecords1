@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person_Vehicle_7,B_Vehicle_7,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Person_Vehicle_6(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Vehicle_7(__cfg).__ENH_Person_Vehicle_7) __ENH_Person_Vehicle_7 := B_Person_Vehicle_7(__cfg).__ENH_Person_Vehicle_7;
   SHARED VIRTUAL TYPEOF(B_Vehicle_7(__cfg).__ENH_Vehicle_7) __ENH_Vehicle_7 := B_Vehicle_7(__cfg).__ENH_Vehicle_7;
-  SHARED __EE24508 := __ENH_Person_Vehicle_7;
-  SHARED __EE24423 := __ENH_Vehicle_7;
-  SHARED __ST24613_Layout := RECORD
+  SHARED __EE24513 := __ENH_Person_Vehicle_7;
+  SHARED __EE24428 := __ENH_Vehicle_7;
+  SHARED __ST24618_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -137,14 +137,14 @@ EXPORT B_Person_Vehicle_6(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC24610(B_Person_Vehicle_7(__cfg).__ST11058_Layout __EE24508, B_Vehicle_7(__cfg).__ST11244_Layout __EE24423) := __EEQP(__EE24508.Automobile_,__EE24423.UID) AND __EE24508.__Part = __EE24423.__Part;
-  __ST24613_Layout __JT24610(B_Person_Vehicle_7(__cfg).__ST11058_Layout __l, B_Vehicle_7(__cfg).__ST11244_Layout __r) := TRANSFORM
+  __JC24615(B_Person_Vehicle_7(__cfg).__ST11062_Layout __EE24513, B_Vehicle_7(__cfg).__ST11248_Layout __EE24428) := __EEQP(__EE24513.Automobile_,__EE24428.UID) AND __EE24513.__Part = __EE24428.__Part;
+  __ST24618_Layout __JT24615(B_Person_Vehicle_7(__cfg).__ST11062_Layout __l, B_Vehicle_7(__cfg).__ST11248_Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE24611 := JOIN(__EE24508,__EE24423,__JC24610(LEFT,RIGHT),__JT24610(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST10641_Layout := RECORD
+  SHARED __EE24616 := JOIN(__EE24513,__EE24428,__JC24615(LEFT,RIGHT),__JT24615(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST10645_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -162,10 +162,10 @@ EXPORT B_Person_Vehicle_6(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST10641_Layout __ND25250__Project(__ST24613_Layout __PP24974) := TRANSFORM
-    __CC1077 := -99997;
-    SELF.Depreciated_Price_ := __FN3(KEL.Routines.BoundsFold,__FN1(ROUND,MAP(__T(__AND(__OP2(__PP24974.Age_Year_At_First_Seen_,<,__CN(2)),__FN1(KEL.Routines.IsValidDate,__PP24974.Date_First_Seen_Capped_)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__PP24974.Vina_Price_)),__T(__OR(__OP2(__PP24974.Age_Year_At_First_Seen_,>=,__CN(2)),__OP2(__PP24974.Age_Year_At_First_Seen_,<,__CN(3))))=>__ECAST(KEL.typ.nfloat,__OP2(__PP24974.Vina_Price_,*,__CN(0.75))),__T(__OP2(__PP24974.Age_Year_At_First_Seen_,>=,__CN(3)))=>__ECAST(KEL.typ.nfloat,__OP2(__OP2(__PP24974.Vina_Price_,*,__CN(0.75)),*,__FN2(POWER,__CN(0.85),__OP2(__PP24974.Age_Year_At_First_Seen_,-,__CN(2))))),__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC1077))))),__CN(__CC1077),__CN(999999));
-    SELF := __PP24974;
+  SHARED __ST10645_Layout __ND25255__Project(__ST24618_Layout __PP24979) := TRANSFORM
+    __CC1079 := -99997;
+    SELF.Depreciated_Price_ := __FN3(KEL.Routines.BoundsFold,__FN1(ROUND,MAP(__T(__AND(__OP2(__PP24979.Age_Year_At_First_Seen_,<,__CN(2)),__FN1(KEL.Routines.IsValidDate,__PP24979.Date_First_Seen_Capped_)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__PP24979.Vina_Price_)),__T(__OR(__OP2(__PP24979.Age_Year_At_First_Seen_,>=,__CN(2)),__OP2(__PP24979.Age_Year_At_First_Seen_,<,__CN(3))))=>__ECAST(KEL.typ.nfloat,__OP2(__PP24979.Vina_Price_,*,__CN(0.75))),__T(__OP2(__PP24979.Age_Year_At_First_Seen_,>=,__CN(3)))=>__ECAST(KEL.typ.nfloat,__OP2(__OP2(__PP24979.Vina_Price_,*,__CN(0.75)),*,__FN2(POWER,__CN(0.85),__OP2(__PP24979.Age_Year_At_First_Seen_,-,__CN(2))))),__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC1079))))),__CN(__CC1079),__CN(999999));
+    SELF := __PP24979;
   END;
-  EXPORT __ENH_Person_Vehicle_6 := PROJECT(__EE24611,__ND25250__Project(LEFT));
+  EXPORT __ENH_Person_Vehicle_6 := PROJECT(__EE24616,__ND25255__Project(LEFT));
 END;

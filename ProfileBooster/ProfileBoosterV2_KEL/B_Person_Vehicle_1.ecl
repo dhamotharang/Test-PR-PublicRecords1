@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person_Vehicle_2,B_Vehicle_2,B_Vehicle_4,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Person_Vehicle_1(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Vehicle_2(__cfg).__ENH_Person_Vehicle_2) __ENH_Person_Vehicle_2 := B_Person_Vehicle_2(__cfg).__ENH_Person_Vehicle_2;
   SHARED VIRTUAL TYPEOF(B_Vehicle_2(__cfg).__ENH_Vehicle_2) __ENH_Vehicle_2 := B_Vehicle_2(__cfg).__ENH_Vehicle_2;
-  SHARED __EE106599 := __ENH_Person_Vehicle_2;
-  SHARED __EE106526 := __ENH_Vehicle_2;
-  SHARED __ST106706_Layout := RECORD
+  SHARED __EE98894 := __ENH_Person_Vehicle_2;
+  SHARED __EE98821 := __ENH_Vehicle_2;
+  SHARED __ST99001_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -142,14 +142,14 @@ EXPORT B_Person_Vehicle_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC106703(B_Person_Vehicle_2(__cfg).__ST12764_Layout __EE106599, B_Vehicle_4(__cfg).__ST9857_Layout __EE106526) := __EEQP(__EE106599.Automobile_,__EE106526.UID) AND __EE106599.__Part = __EE106526.__Part;
-  __ST106706_Layout __JT106703(B_Person_Vehicle_2(__cfg).__ST12764_Layout __l, B_Vehicle_4(__cfg).__ST9857_Layout __r) := TRANSFORM
+  __JC98998(B_Person_Vehicle_2(__cfg).__ST12768_Layout __EE98894, B_Vehicle_4(__cfg).__ST9861_Layout __EE98821) := __EEQP(__EE98894.Automobile_,__EE98821.UID) AND __EE98894.__Part = __EE98821.__Part;
+  __ST99001_Layout __JT98998(B_Person_Vehicle_2(__cfg).__ST12768_Layout __l, B_Vehicle_4(__cfg).__ST9861_Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE106704 := JOIN(__EE106599,__EE106526,__JC106703(LEFT,RIGHT),__JT106703(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST7855_Layout := RECORD
+  SHARED __EE98999 := JOIN(__EE98894,__EE98821,__JC98998(LEFT,RIGHT),__JT98998(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST7859_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -168,11 +168,11 @@ EXPORT B_Person_Vehicle_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST7855_Layout __ND107328__Project(__ST106706_Layout __PP107063) := TRANSFORM
-    __CC1079 := '-99997';
-    SELF.Flag_New_V_I_N_ := __AND(__AND(__AND(__OP2(__PP107063.Age_At_First_Seen_,<,__CN(365.25 * 3)),__OP2(__PP107063.Age_At_First_Seen_,>=,__CN(0))),__OP2(__PP107063.Vina_Model_Date_,<>,__CN(__CC1079))),__FN1(KEL.Routines.IsValidDate,__PP107063.Date_First_Seen_Capped_));
-    SELF.Vehicle_Max_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP107063.Date_Last_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP107063.Date_Last_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC1079)));
-    SELF := __PP107063;
+  SHARED __ST7859_Layout __ND99623__Project(__ST99001_Layout __PP99358) := TRANSFORM
+    __CC1081 := '-99997';
+    SELF.Flag_New_V_I_N_ := __AND(__AND(__AND(__OP2(__PP99358.Age_At_First_Seen_,<,__CN(365.25 * 3)),__OP2(__PP99358.Age_At_First_Seen_,>=,__CN(0))),__OP2(__PP99358.Vina_Model_Date_,<>,__CN(__CC1081))),__FN1(KEL.Routines.IsValidDate,__PP99358.Date_First_Seen_Capped_));
+    SELF.Vehicle_Max_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP99358.Date_Last_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP99358.Date_Last_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC1081)));
+    SELF := __PP99358;
   END;
-  EXPORT __ENH_Person_Vehicle_1 := PROJECT(__EE106704,__ND107328__Project(LEFT));
+  EXPORT __ENH_Person_Vehicle_1 := PROJECT(__EE98999,__ND99623__Project(LEFT));
 END;

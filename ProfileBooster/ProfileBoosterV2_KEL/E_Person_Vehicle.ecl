@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT ProfileBooster;
 IMPORT CFG_Compile,E_Person,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT E_Person_Vehicle(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -176,7 +176,7 @@ EXPORT E_Person_Vehicle(CFG_Compile __cfg = CFG_Compile) := MODULE
     SELF := __r;
   END;
   SHARED __PreResult := PROJECT(PersonVehicle_Group(COUNT(__Payload) = 1),Person_Vehicle__Single_Rollup(LEFT.__Payload[1],LEFT)) + PROJECT(PersonVehicle_Group(COUNT(__Payload) > 1),Person_Vehicle__Rollup(LEFT.__Payload[1],LEFT.__Payload,LEFT));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::ProfileBooster.ProfileBoosterV2_KEL::Person_Vehicle::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(28));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Automobile__Orphan := JOIN(InData(__NN(Automobile_)),E_Vehicle(__cfg).__Result,__EEQP(LEFT.Automobile_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

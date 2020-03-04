@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_Vehicle,B_Vehicle,CFG_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_BuildAll_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Indexes := DATASET([
     {'Person_UID',B_Person(__cfg).IDX_Person_UID_LogicalName,B_Person(__cfg).IDX_Person_UID_SuperName},

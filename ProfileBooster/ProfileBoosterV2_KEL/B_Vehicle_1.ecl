@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+IMPORT KEL12 AS KEL;
 IMPORT B_Vehicle_2,B_Vehicle_4,CFG_Compile,E_Vehicle,FN_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle_1(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Vehicle_2(__cfg).__ENH_Vehicle_2) __ENH_Vehicle_2 := B_Vehicle_2(__cfg).__ENH_Vehicle_2;
-  SHARED __EE108567 := __ENH_Vehicle_2;
-  EXPORT __ST8062_Layout := RECORD
+  SHARED __EE100862 := __ENH_Vehicle_2;
+  EXPORT __ST8066_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -128,13 +128,13 @@ EXPORT B_Vehicle_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST8062_Layout __ND108815__Project(B_Vehicle_4(__cfg).__ST9857_Layout __PP107950) := TRANSFORM
-    __CC1334 := ['Aston Martin','Bentley','Bugatti','Ferrari','Koenigsegg','Lamborghini','Lotus','Maserati','McLaren','Noble','Pagani','Pininfarina','Rolls-Royce'];
-    SELF.Flag_Elite_Brand_ := __AND(__CN(__PP107950.Flag_Vina_Make_Desc_ = (KEL.typ.str)1),__OP2(__PP107950.Vina_Make_Description_,IN,__CN(__CC1334)));
-    __CC1319 := ['Acura','Alfa Romeo','Audi','BMW','Cadillac','Genesis','Infiniti','Jaguar','Lexus','Lincoln','Mercedes-Benz','Porsche','Saab','Volvo'];
-    SELF.Flag_Luxury_Brand_ := __AND(__CN(__PP107950.Flag_Vina_Make_Desc_ = (KEL.typ.str)1),__OP2(__PP107950.Vina_Make_Description_,IN,__CN(__CC1319)));
-    SELF.Flag_Vina_Price_ := FN_Compile(__cfg).FN_Is_Echo_Populated_Integer(__ECAST(KEL.typ.nint,__PP107950.Vina_Price_));
-    SELF := __PP107950;
+  SHARED __ST8066_Layout __ND101110__Project(B_Vehicle_4(__cfg).__ST9861_Layout __PP100245) := TRANSFORM
+    __CC1336 := ['Aston Martin','Bentley','Bugatti','Ferrari','Koenigsegg','Lamborghini','Lotus','Maserati','McLaren','Noble','Pagani','Pininfarina','Rolls-Royce'];
+    SELF.Flag_Elite_Brand_ := __AND(__CN(__PP100245.Flag_Vina_Make_Desc_ = (KEL.typ.str)1),__OP2(__PP100245.Vina_Make_Description_,IN,__CN(__CC1336)));
+    __CC1321 := ['Acura','Alfa Romeo','Audi','BMW','Cadillac','Genesis','Infiniti','Jaguar','Lexus','Lincoln','Mercedes-Benz','Porsche','Saab','Volvo'];
+    SELF.Flag_Luxury_Brand_ := __AND(__CN(__PP100245.Flag_Vina_Make_Desc_ = (KEL.typ.str)1),__OP2(__PP100245.Vina_Make_Description_,IN,__CN(__CC1321)));
+    SELF.Flag_Vina_Price_ := FN_Compile(__cfg).FN_Is_Echo_Populated_Integer(__ECAST(KEL.typ.nint,__PP100245.Vina_Price_));
+    SELF := __PP100245;
   END;
-  EXPORT __ENH_Vehicle_1 := PROJECT(__EE108567,__ND108815__Project(LEFT));
+  EXPORT __ENH_Vehicle_1 := PROJECT(__EE100862,__ND101110__Project(LEFT));
 END;

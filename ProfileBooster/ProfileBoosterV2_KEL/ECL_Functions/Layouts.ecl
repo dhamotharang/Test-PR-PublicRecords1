@@ -1,6 +1,15 @@
 ﻿IMPORT ProfileBooster, ProfileBooster.ProfileBoosterV2_KEL;
+IMPORT KEL12 AS KEL;
 
 EXPORT Layouts := MODULE
+
+	EXPORT Layout_PB_BatchOut := RECORD
+		string30 	AcctNo;
+		unsigned6	Seq;
+		unsigned6 LexID;
+		unsigned3	HistoryDate;
+		ProfileBooster.Layouts.Layout_ProfileBooster 		attributes;
+	END;
 
 	SHARED LayoutInputPIIEchoInternal := RECORD
 		STRING65 P_InpAcct;
@@ -72,7 +81,7 @@ EXPORT Layouts := MODULE
 	END;
 			
 	EXPORT LayoutInputPII := RECORD
-		INTEGER G_ProcUID;
+		INTEGER G_ProcUID := 0;
 		INTEGER G_ProcBusUID;
 		INTEGER RepNumber;
 		LayoutInputPIIEchoInternal;
@@ -1248,6 +1257,10 @@ EXPORT LayoutVehiclePB11 := RECORD
 		LayoutPersonPB11 -LexID -G_ProcUID -P_InpAcct;
 	END;
 	
+	EXPORT PB11_Layout := RECORD
+		ProfileBooster.Layouts.Layout_PB_In;
+		LayoutPersonPB11 -LexID -G_ProcUID; // -P_InpAcct;
+	END;
 	
 	EXPORT PB11_MergedLayout := RECORD
 		ProfileBooster.Layouts.Layout_PB_BatchOutFlat;
@@ -2420,5 +2433,62 @@ EXPORT LayoutVehiclePB11 := RECORD
 		unsigned4 global_sid;
 		unsigned8 record_sid;
 	 END;
+	 
+	 EXPORT Q_Non_F_C_R_A_Profile_Booster_V2_Layout := RECORD
+    KEL.typ.nuid Lex_I_D_;
+    KEL.typ.nint P_L___Purch_New_Amt_;
+    KEL.typ.nint P_L___Purch_Tot_Ev_;
+    KEL.typ.nint P_L___Purch_Cnt_Ev_;
+    KEL.typ.nint P_L___Purch_New_Age_Months_;
+    KEL.typ.nint P_L___Purch_Old_Age_Months_;
+    KEL.typ.nint P_L___Purch_Item_Cnt_Ev_;
+    KEL.typ.nint P_L___Purch_Amt_Avg_;
+    KEL.typ.int P_L___Ast_Veh_Auto_Car_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Elite_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Exp_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Luxury_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Make_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Orig_Own_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_S_U_V_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Truck_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_Van_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Veh_Auto2nd_Freq_Make_;
+    KEL.typ.int P_L___Ast_Veh_Auto2nd_Freq_Make_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Veh_Auto_Freq_Make_;
+    KEL.typ.int P_L___Ast_Veh_Auto_Freq_Make_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Auto_New_Type_Indx_ := 0;
+    KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_Price_Avg_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Price_Diff_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Price_Max_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_New_Price_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Age_Avg_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Age_Max_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Age_Min_;
+    KEL.typ.nfloat P_L___Ast_Veh_Auto_Emrg_Span_Avg_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Last_Age_Avg_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Last_Age_Max_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Last_Age_Min_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_New_Msnc_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Time_Own_Span_Avg_;
+    KEL.typ.int P_L___Ast_Veh_Other_A_T_V_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Camper_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Comm_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Mtr_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Orig_Own_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Ast_Veh_Other_Scooter_Cnt_Ev_ := 0;
+    KEL.typ.nint P_L___Ast_Veh_Other_New_Msnc_;
+    KEL.typ.int P_L___Ast_Veh_Other_New_Type_Indx_ := 0;
+    KEL.typ.nint P_L___Ast_Veh_Other_New_Price_;
+    KEL.typ.nfloat P_L___Ast_Veh_Other_Price_Avg_;
+    KEL.typ.nint P_L___Ast_Veh_Other_Price_Max_;
+    KEL.typ.nint P_L___Ast_Veh_Other_Price_Min_;
+    KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Price_Min_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+    // UNSIGNED4 __Part := 0;
+  END;
 
 END;

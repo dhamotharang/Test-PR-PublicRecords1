@@ -3,42 +3,70 @@
 #OPTION('outputLimit', 2000);
 #OPTION('outputLimitMb', 1000);
 #OPTION('splitterSpill', 1);
-#OPTION('multiplePersistInstances',FALSE);
+#OPTION('multiplePersistInstances',TRUE);
 #OPTION('defaultSkewError', 1);
 
 //Ensure to check the RecordsToRun below to see if that is how many you want to run. 
 
 IMPORT ProfileBooster.ProfileBoosterV2_KEL, ProfileBooster, STD, Risk_Indicators;
-IMPORT KEL11 AS KEL;
+IMPORT KEL12 AS KEL;
 
-InputFile := '~temp::kel::consumer_nonfcra_100k_with_LexIDs.csv';
-prii_layout := RECORD
-    STRING Account             ;
-    STRING FirstName           ;
-    STRING MiddleName          ;
-    STRING LastName            ;
-    STRING StreetAddress       ;
-    STRING City                ;
-    STRING State               ;
-    STRING Zip                 ;
-    STRING HomePhone           ;
-    STRING SSN                 ;
-    STRING DateOfBirth         ;
-    STRING WorkPhone           ;
-    STRING Income              ;
-    STRING DLNumber            ;
-    STRING DLState             ;
-    STRING Balance             ;
-    STRING ChargeOffD          ;
-    STRING FormerName          ;
-    STRING Email               ;
-    STRING EmployerName        ;
-    STRING historydate;
-    STRING LexID;
-    STRING IPAddress;
-    STRING Perf;
-    STRING Proj;
-END;
+	InputFile := '~pb11::in::carvana_customer_sample_200127_in.csv';
+	// file := '~pb11::in::carvana_customer_sample_200113_in.csv';
+	// file_name := file[(STD.Str.Find(file,'::',STD.Str.FindCount(file,'::'))+2)..LENGTH(file)];
+
+	prii_layout := RECORD
+		STRING Account;
+		STRING FirstName;
+		STRING MiddleName;
+		STRING LastName;
+		STRING StreetAddress;
+		STRING City;
+		STRING State;
+		STRING Zip;
+		STRING HomePhone;
+		STRING SSN;
+		STRING DateOfBirth;
+		// STRING WorkPhone;
+		// STRING income;  
+		// string DLNumber;
+		// string DLState;													
+		// string BALANCE; 
+		// string CHARGEOFFD;  
+		// string FormerName;
+		// string EMAIL;  
+		// string employername;
+		string historydate;
+		unsigned did;
+	END;
+// InputFile := '~temp::kel::consumer_nonfcra_100k_with_LexIDs.csv';
+// prii_layout := RECORD
+    // STRING Account             ;
+    // STRING FirstName           ;
+    // STRING MiddleName          ;
+    // STRING LastName            ;
+    // STRING StreetAddress       ;
+    // STRING City                ;
+    // STRING State               ;
+    // STRING Zip                 ;
+    // STRING HomePhone           ;
+    // STRING SSN                 ;
+    // STRING DateOfBirth         ;
+    // STRING WorkPhone           ;
+    // STRING Income              ;
+    // STRING DLNumber            ;
+    // STRING DLState             ;
+    // STRING Balance             ;
+    // STRING ChargeOffD          ;
+    // STRING FormerName          ;
+    // STRING Email               ;
+    // STRING EmployerName        ;
+    // STRING historydate;
+    // STRING LexID;
+    // STRING IPAddress;
+    // STRING Perf;
+    // STRING Proj;
+// END;
 // InputFile := '~thor400::profilebooster::ln_output_springleaf_layout_profboostertest.csv';
 // InputFile := '~thor400::profilebooster::ln_output_springleaf_layout_profboostertest_100k.csv';
 // prii_layout := RECORD
@@ -206,12 +234,12 @@ END;
  // END;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '20191027';
+histDate := '0';
 // histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // RecordsToRun := 0;
-RecordsToRun := 100000;
+RecordsToRun := 100;
 eyeball := 100;
 
 // runUsingInfo := 1; //pii only
@@ -234,12 +262,15 @@ STRING8 today := (STRING8)Std.Date.Today();
 
 outputFile := TRIM('~jfrancis::out::' + today + '_' + thorlib.wuid() + '_PB1_1_' + TRIM(mapInputData) + '_' + TRIM(mapModeText));
 
-p_in := DATASET(InputFile, prii_layout, thor)((integer)lexid>0);
+p_in := DATASET([{'1','JACK','RICHARD','FRANCIS','12384 FREMONT LN','ZIMMERMAN','MN','55398','5128318833','465759977','19800319','20190101',847892904}], prii_layout);//, thor);
+// p_in := DATASET(InputFile, prii_layout, thor);
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 
 PP1 := PROJECT(P, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Input_Layout, 
-	SELF.historydate := histDate;
-	SELF.lexid := (STRING)LEFT.lexid;
+	SELF.historydate := LEFT.historydate;
+	SELF.lexid := (STRING)LEFT.did;
+	SELF.G_ProcUID := COUNTER;
+	SELF.Account := LEFT.Account;
 	SELF := LEFT;
 	SELF := [];
 	));	
@@ -249,7 +280,7 @@ myCFG := MODULE(ProfileBooster.ProfileBoosterV2_KEL.CFG_Compile)
 END;
 
 GLBA := 1; 
-DPPA := 3; 
+DPPA := 0; 
 DataRestrictionMask						:= '00000000000000000000000000000000000000000000000000';
 DataPermissionMask 						:= '11111111111111111111111111111111111111111111111111';  
 
