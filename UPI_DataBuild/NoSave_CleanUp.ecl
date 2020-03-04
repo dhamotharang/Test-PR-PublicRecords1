@@ -81,7 +81,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  std.Date.ConvertDateFormat(left.modified[1..10]), 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -119,7 +119,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -157,7 +157,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -195,7 +195,7 @@ EXPORT NoSave_CleanUp := MODULE
 														left.superfile						=>  '', 
 														get_type(left.name)	= 'FROM_BATCH'	=> get_version_from_batch(left.name),
 														get_version(left.name))
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -211,7 +211,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.version 	:= map(left.superfile => '', 
 																			 get_type(left.name) = 'FROM_BATCH' => get_version_from_batch(left.name),
 																			 get_version(left.name))
-								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name 						 := '~'+left.name
 								,self									 := left));
@@ -247,7 +247,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.version 	:= map(left.superfile => '', 
 																			 get_type(left.name) = 'FROM_BATCH' => get_version_from_batch(left.name),
 																			 get_version(left.name))
-								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old 				 := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name 						 := '~'+left.name
 								,self									 := left));
@@ -282,7 +282,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.type := get_type(left.name)			
 								,self.gcid := get_gcid(left.name)
 								,self.version 	:= if(left.superfile, '', get_version(left.name))
-								,self.days_old 	:= if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate) * if(self.version > asOfDate, 1, -1)); 
+								,self.days_old 	:= if(left.superfile, 0, std.Date.DaysBetween((unsigned4)self.version, (unsigned4)asOfDate)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -298,8 +298,7 @@ EXPORT NoSave_CleanUp := MODULE
 								,self.type := get_type(left.name)			
 								,self.gcid := get_gcid(left.name)
 								,self.version 	:= if(left.superfile, '', get_version(left.name))
-								// ,self.days_old := if(left.superfile, 0, ut.DaysApart(self.version, asOfDate) * if(self.version > asOfDate, -1, 1)); 
-								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version) * if(self.version > asOfDate,  1, -1)); 
+								,self.days_old := if(left.superfile, 0, std.Date.DaysBetween((unsigned4)asOfDate, (unsigned4)self.version)); 
 								,self.name_says_nosave := std.str.find(std.str.touppercase(left.name), std.str.touppercase(str_nosave), 1) > 0			
 								,self.name := '~'+left.name
 								,self := left));
@@ -324,10 +323,6 @@ EXPORT NoSave_CleanUp := MODULE
 			delete_today 			:= ds(days_till_delete = 0);
 			deleting					:= delete_overdue + delete_today;
 			delete_soon				:= ds(days_till_delete <= grace_period_days);
-
-			// remove_supers 		:= nothor(apply(global(deleting(sf_owner <> '')	,few), std.file.RemoveSuperFile			(sf_owner,name)));
-			// remove_supers 		:= nothor(apply(global(deleting,few), std.file.RemoveSuperFile		(sf_owner,name)));
-			// delete_logical 		:= nothor(apply(global(deleting,few), std.file.deletelogicalfile	(name)));
 
 			remove_supers1 		:= nothor(apply(global(deleting(sf_owner1 <> ''),few), tools.mod_Utilities.removesuper	(sf_owner1,execute_deletes)));
 			remove_supers2		:= nothor(apply(global(deleting(sf_owner2 <> ''),few), tools.mod_Utilities.removesuper	(sf_owner2,execute_deletes)));
@@ -382,10 +377,6 @@ EXPORT NoSave_CleanUp := MODULE
 			delete_today 			:= ds(days_till_delete = 0);
 			deleting					:= delete_overdue + delete_today;
 			delete_soon				:= ds(days_till_delete <= grace_period_days);
-
-			// remove_supers 		:= nothor(apply(global(deleting(sf_owner <> '')	,few), std.file.RemoveSuperFile			(sf_owner,name)));
-			// remove_supers 		:= nothor(apply(global(deleting,few), std.file.RemoveSuperFile		(sf_owner,name)));
-			// delete_logical 		:= nothor(apply(global(deleting,few), std.file.deletelogicalfile	(name)));
 
 			remove_supers1 		:= nothor(apply(global(deleting(sf_owner1 <> ''),few), tools.mod_Utilities.removesuper	(sf_owner1,execute_deletes)));
 			remove_supers2 		:= nothor(apply(global(deleting(sf_owner2 <> ''),few), tools.mod_Utilities.removesuper	(sf_owner2,execute_deletes)));
@@ -502,7 +493,7 @@ EXPORT NoSave_CleanUp := MODULE
 				,output(execute_deletes, named('executing_deletes'))
 				,output(dedup(table(ds_logical(gcid in set(gcids_versions_conflicted, gcid) and version in set(gcids_versions_conflicted, version)), {gcid, version, gcid_version_has_nosave, name_says_nosave}), all), named('gcid_versions_conflicted'))
 				// ,output(dedup(table(ds(gcid in set(gcids_conflicted, gcid)), {gcid, version, gcid_version_has_nosave, gcid_has_nosave}), all), named('gcids_conflicted_from_batch'))
-				,if(write_log, output(ds_logical,,'~log::CRK::NoSaveReport' + workunit))		 
+				,if(write_log, output(deleting + deleting_supers,,'~log::CRK::NoSaveReport' + workunit))		 
 				,if(execute_deletes, delete_action)
 		 // ,if(send_Email, fileservices.sendemail(email_to, email_Subject, email_body, std.system.smtpserver,std.system.smtpport,std.system.emailAddress))
 			); 
