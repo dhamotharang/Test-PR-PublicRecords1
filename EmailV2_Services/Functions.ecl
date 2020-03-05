@@ -175,23 +175,58 @@ EXPORT Functions := MODULE
                                               SELF:=[]));
 
     // for best address we will use address ranking - req. EMAIL-205
-    addr_rank_in := PROJECT(email_with_watchdog_recs,
+    addr_rank_in := PROJECT(DEDUP(SORT(ds_batch_in(did!=0),did),did),
                            TRANSFORM(Address_Rank.Layouts.Batch_in,
                                      SELF.acctno := (STRING) COUNTER,
                                      SELF.did    := LEFT.did,
                                      SELF := []));
-    mod_addr_rank := MODULE(PROJECT(in_mod, Address_Rank.IParams.BatchParams, OPT))
-                            EXPORT BOOLEAN   IncludeShortTermRental := FALSE;
-                            EXPORT BOOLEAN   IncludeSTRSplitFlag    := FALSE;
-                            EXPORT UNSIGNED1 MaxRecordsToReturn		  := 1;
-                            EXPORT BOOLEAN   getDids                := FALSE;
-                     END;
 
-    //get all addresses from header
-    all_hdr_recs 	:= Address_Rank.Functions.fn_getHdrAddrRecs(addr_rank_in, mod_addr_rank);
+    //get all addresses from header based on LexIds
+    dids_for_header   := PROJECT(addr_rank_in, doxie.layout_references_hh);
+    // implementation similar to Address_Rank\fn_getHdrRecByDid_wBestdates.ecl  except we need to set IncludeAllRecords=true to by-pass penalties based on PII (pulled from stored)
+    hdr_recs := doxie.header_records_byDID(dids:=dids_for_header, include_dailies:=TRUE, IncludeAllRecords:=TRUE);
+
+    doxie.Layout_presentation roll_dates(doxie.Layout_presentation l, doxie.Layout_presentation r) := TRANSFORM
+      SELF.dt_first_seen := ut.min2(l.dt_first_seen, r.dt_first_seen);
+      SELF := l;
+      SELF := r;
+      SELF := [];
+    END;
+
+    hdr_roll_recs	:= ROLLUP(SORT(hdr_recs, did, zip, prim_range, predir, prim_name, postdir, suffix, sec_range, -dt_last_seen),
+                        LEFT.did 				= RIGHT.did 				AND
+                        LEFT.zip 		 		= RIGHT.zip					AND
+                        LEFT.prim_range = RIGHT.prim_range	AND
+                        LEFT.predir			= RIGHT.predir			AND
+                        LEFT.prim_name 	= RIGHT.prim_name		AND
+                        LEFT.postdir	 	= RIGHT.postdir			AND
+                        LEFT.suffix 		= RIGHT.suffix			AND
+                        LEFT.sec_range 	= RIGHT.sec_range,
+                        roll_dates(LEFT,RIGHT));
+
+    Address_Rank.Layouts.Bestrec xform_addrbest(Address_Rank.Layouts.Batch_in l, doxie.Layout_presentation r):= TRANSFORM
+                    SELF.acctno      := (STRING)l.acctno;
+                    SELF.dob         := (STRING)r.dob;
+                    SELF.name_first  := r.fname;
+                    SELF.name_middle := r.mname;
+                    SELF.name_last   := r.lname;
+                    SELF.suffix      := r.suffix;
+                    SELF.p_city_name := r.city_name;
+                    SELF.z5          := r.zip;
+                    SELF.addr_dt_first_seen := (STRING)r.dt_first_seen;
+                    SELF.addr_dt_last_seen  := (STRING)r.dt_last_seen;
+                    SELF.srcs := r.src;
+                    SELF := r;
+                    SELF := [];
+    END;
+    all_hdr_recs := JOIN(addr_rank_in, hdr_roll_recs,
+              LEFT.did = RIGHT.did,
+              xform_addrbest(LEFT, RIGHT),
+              LIMIT(0), LEFT OUTER);
+
 
     //get address history from Address Rank Key and determine best address
-    addr_ranked_recs	:= Address_Rank.fn_getAddressHistory(all_hdr_recs, mod_addr_rank.MaxRecordsToReturn);
+    addr_ranked_recs	:= Address_Rank.fn_getAddressHistory(all_hdr_recs, MaxRecordsToReturn:=1);
 
     // adding best address to the results
     email_with_best_recs :=
