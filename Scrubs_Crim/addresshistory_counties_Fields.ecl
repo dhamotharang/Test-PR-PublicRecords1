@@ -29,11 +29,11 @@ EXPORT InValidFT_Invalid_Source_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>
 EXPORT InValidMessageFT_Invalid_Source_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_ '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_ZIP(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789- '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_ZIP(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_ZIP(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_ZIP(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789- '))));
+EXPORT InValidMessageFT_Invalid_ZIP(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789- '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_City(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.- '); // Only allow valid symbols
