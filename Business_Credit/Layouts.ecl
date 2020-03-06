@@ -1,4 +1,4 @@
-IMPORT	Address, BIPV2;
+﻿IMPORT	Address, BIPV2;
 EXPORT	Layouts	:=	MODULE
 	EXPORT	FileHeaderSegment	:=	RECORD	// (FA)
 		STRING2		Segment_Identifier;
@@ -426,7 +426,7 @@ EXPORT	Layouts	:=	MODULE
 		AccountBaseSegment;																																					//	AB
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
-		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(25)};													//	AH
+		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(1000)};													//	AH
 		DATASET(PhoneNumberSegment)									phone{MAXCOUNT(100)};														//	PN
 		DATASET(TaxID_SSNSegment)										taxID{MAXCOUNT(100)};														//	TI
 		DATASET(IndividualOwnerLayout)							individualOwner{MAXCOUNT(200)};									//	IS
@@ -450,7 +450,7 @@ EXPORT	Layouts	:=	MODULE
 		AB_Virtual;																																									//	AB
 		DATASET(MA_Virtual)													masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AD_Virtual)													address{MAXCOUNT(100)};													//	AD
-		DATASET(AH_Virtual)													history{MAXCOUNT(25)};													//	AH
+		DATASET(AH_Virtual)													history{MAXCOUNT(1000)};													//	AH
 		DATASET(PN_Virtual)													phone{MAXCOUNT(100)};														//	PN
 		DATASET(TI_Virtual)													taxID{MAXCOUNT(100)};														//	TI
 		DATASET(IndividualOwnerLayout_Virtual)			individualOwner{MAXCOUNT(200)};									//	IS
@@ -603,6 +603,9 @@ EXPORT	Layouts	:=	MODULE
 		STRING1		correction_type;
 		STRING8		correction_date;
 		STRING		original_process_date;
+		//DF-26180 Add CCPA fields to . thor_data400::key::sbfe::qa::businessownerinformation
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rAccountBase	:=	RECORD
@@ -646,6 +649,10 @@ EXPORT	Layouts	:=	MODULE
 		BS;
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
+		//DF-26180 Add CCPA fields to thor_data400::key::sbfe::qa::businessowner
+		UNSIGNED6	did					:= 0;
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rCollateral	:=	RECORD
@@ -688,6 +695,10 @@ EXPORT	Layouts	:=	MODULE
 		IS;
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
+		//DF-26180 Add CCPA fields to  thor_data400::key::sbfe::qa::individualowner
+		UNSIGNED6	did					:= 0;
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rMasterAccount	:=	RECORD

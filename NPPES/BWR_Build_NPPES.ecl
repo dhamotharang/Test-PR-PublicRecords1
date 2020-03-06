@@ -1,8 +1,8 @@
 ﻿import Lib_FileServices, STRATA, ut, Roxiekeybuild, PromoteSupers, Orbit3;
-export BWR_Build_NPPES(string version) := function
+export BWR_Build_NPPES(string version, string FileType = 'A') := function
 #workunit('name','Yogurt:NPPES Build - ' + version);
 
-mailTarget := 'Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com;michael.gould@lexisnexis.com;abednego.escobal@lexisnexisrisk.com';
+mailTarget := 'Manuel.Tarectecan@lexisnexisrisk.com;abednego.escobal@lexisnexisrisk.com';
 
 send_mail (string pSubject, string pBody) := lib_fileservices.FileServices.sendemail(mailTarget, pSubject, pBody);
 
@@ -151,6 +151,9 @@ rolledup_dAppendIds := rollup(npi_dist_sort, rollupBase(left, right), except dt_
 										Clean_location_address.geo_match,	
 										Clean_location_address.err_stat,		
 										source_rec_id,
+										record_sid,
+										global_sid,
+										
 																   local);
 
 PromoteSupers.MAC_SF_BuildProcess(project(rolledup_dAppendIds,nppes.layouts.base),NPPES.Cluster + 'base::NPPES',NPPES_Base,3,false,true);
@@ -175,9 +178,14 @@ build_Keys      := NPPES.proc_Build_Keys(version) :
 							
 build_stats := NPPES.out_STRATA_population_stats(version);
 
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('NPPES',(string)version,'N');
+orbit_update := Case ( FileType,
+						'A' => Orbit3.proc_Orbit3_CreateBuild('NPPES',(string)version,'N'),
+						'B' => Output('Orbit will be skipped'),
+						'C' => Orbit3.proc_Orbit3_CreateBuild('NPPES Monthly',(string)version,'N'));
 
-dops_update := Roxiekeybuild.updateversion('NppesKeys',version,'Randy.Reyes@lexisnexis.com;Manuel.Tarectecan@lexisnexis.com',,'N'); 
+dops_update := If ( FileType <> 'B',
+						Roxiekeybuild.updateversion('NppesKeys',version,'abednego.escobal@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexis.com',,'N'),
+						Output('DOPS will be skipped'));
 
 build_all := sequential(finish_base, create_keyfile,parallel(build_autoKeys,build_Keys,build_stats),dops_update,orbit_update,
                          send_mail('NPPES Build Completed',

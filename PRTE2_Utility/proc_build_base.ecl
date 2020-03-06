@@ -43,9 +43,16 @@ Transform(layouts.base,
 	 SELF.geo_match						:= left.clean_address.geo_match;
 	 SELF.err_stat						:= left.clean_address.err_stat;
 	 self.company_name        := left.company_name;
-
-
-															
+	 
+	 self.address_street := left.clean_address.prim_range;	
+	 self.address_street_name  := left.clean_address.prim_name;
+	 self.address_street_type:= left.clean_address.addr_suffix;
+	 self.address_street_direction:= left.clean_address.postdir;
+	 self.address_city:=left.orig_city;
+	 self.address_state:=left.orig_st;
+	 self.address_zip:=left.orig_zip;
+	 Self.address_apartment := (varstring)Trim(left.clean_address.unit_desig) + ' ' +  (varstring)Trim(left.clean_address.sec_range);
+													
   full_clean_name		:= Left.orig_fname + ' ' + left.orig_mname + ' ' + Left.orig_lname + ' ' + Left.orig_name_suffix;
 
   CleanName        := Address.CleanPersonFML73_fields(full_clean_name);

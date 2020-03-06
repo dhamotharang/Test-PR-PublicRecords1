@@ -1,17 +1,25 @@
-import Property, ut, roxiekeybuild,Orbit_report, PromoteSupers;
+﻿import Property, ut, roxiekeybuild,Orbit_report, PromoteSupers;
 
 export Foreclosure_Keys(string filedate) :=
 function
 	#option ('newWorkflow', true);
 	#workunit('name','Foreclosure Build - ' + filedate);
 	
-	emails	:=	'dknowles@seisint.com;gwitz@seisint.com;kgummadi@seisint.com;david.lenz@lexisnexis.com';
+	emails	:=	'dknowles@seisint.com;gwitz@seisint.com;kgummadi@seisint.com;melanie.jackson@lexisnexisrisk.com';
 	PromoteSupers.MAC_SF_BuildProcess(property.Foreclosure_Clean_AID,'~thor_data400::in::foreclosure',build_clean,,,true);
 	PromoteSupers.MAC_SF_BuildProcess(property.Foreclosure_DID,'~thor_data400::base::foreclosure',build_base,,,true );
   PromoteSupers.MAC_SF_BuildProcess(property.Foreclosure_normalized,'~thor_data400::base::foreclosure_normalized',build_normalized,,,true );	
 	Orbit_report.Foreclosures_Stats(getretval);
-	doSamples := sequential (output(CHOOSEN(property.file_foreclosure(deed_category = 'N' and process_date >= filedate),100),,'~thor_data400::out::foreclosure::samples_NOD',overwrite,named('NOD_Key_Samples'))
-                        ,output(CHOOSEN(property.file_foreclosure(deed_category = 'U' and process_date >= filedate),100),,'~thor_data400::out::foreclosure::samples_FDATA',overwrite,named('Foreclosure_Data_Key_Samples')));
+	
+	//Get current samples of both CL and BK data that include DID
+	SampleForeclosure	:= CHOOSEN(property.file_foreclosure(deed_category = 'U' and process_date >= filedate AND (UNSIGNED)name1_did <> 0 AND source = 'FR'),50);
+	SampleBKForeclosure	:= CHOOSEN(property.file_foreclosure(deed_category = 'U' and process_date >= filedate AND (UNSIGNED)name1_did <> 0 AND source = 'I5'),50);
+
+	SampleNOD	:= CHOOSEN(property.file_foreclosure(deed_category = 'N' and process_date >= filedate AND (UNSIGNED)name1_did <> 0 AND source = 'FR'),50);
+	SampleBKNOD	:= 	CHOOSEN(property.file_foreclosure(deed_category = 'N' and process_date >= filedate AND (UNSIGNED)name1_did <> 0 AND source = 'B7'),50);
+	
+	doSamples := sequential (output(SampleNOD + SampleBKNOD,,'~thor_data400::out::foreclosure::samples_NOD',overwrite,named('NOD_Key_Samples'))
+													,output(SampleForeclosure + SampleBKForeclosure,,'~thor_data400::out::foreclosure::samples_FDATA',overwrite,named('Foreclosure_Data_Key_Samples')));
 												
 	return sequential(build_clean,
 										build_base,

@@ -1,6 +1,8 @@
-﻿import ut, business_header, mdr, std;
+﻿import ut, business_header, mdr, std, cortera;
 
-EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
+asBusinessLinkingBase := dataset('~thor::cortera::executives', cortera.Layout_Executives, thor);
+
+EXPORT As_Business_Linking() := FUNCTION
 
 		/**
 			counter values
@@ -9,7 +11,7 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 				3		alternate name, phone
 				4		alternate name, fax
 		**/
-		business_header.layout_business_linking.linking_interface xBiz(Cortera.Layout_Executives hdr, integer n) := TRANSFORM,
+		business_header.layout_business_linking.linking_interface xBiz(asBusinessLinkingBase hdr, integer n) := TRANSFORM,
 				SKIP((n in [2,4] and hdr.clean_fax='') OR (n in [3,4] and hdr.alternate_business_name=''))
 
 		self.rcid := 0;
@@ -93,13 +95,17 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 		
 		self.company_foreign_domestic := IF(hdr.country='US','D','F');
 
-		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);
-
+		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);   
+		string temp_employees            := if(trim(hdr.total_employees) = '' OR trim(hdr.total_employees) = '0', trim(hdr.employee_range), trim(hdr.total_employees));
+		string temp_sales                := if(trim(hdr.total_sales) = '' OR trim(hdr.total_sales) = '0', trim(hdr.sales_range), trim(hdr.total_sales));
+    self.employee_count_local_raw    := if(temp_employees != '0', 
+		                                    temp_employees, '');
+		self.revenue_local_raw           := if(temp_sales != '0', 
+		                                    temp_sales, '');
 		self := [];
-		
 	END;
 
-	 link := NORMALIZE(hdr, 4, xBiz(Left, counter));
+	 link := NORMALIZE(asBusinessLinkingBase, 4, xBiz(Left, counter));
 	
 		link_dist 		  := distribute(link(trim(company_name) <> ''),(integer)vl_id);
 		link_sort    	:= sort(link_dist ,vl_id,company_name,-company_address.zip,-company_address.prim_name,-company_address.prim_range,-company_address.v_city_name,-company_address.st
@@ -138,7 +144,7 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 																					     and left.contact_job_title_raw 			= right.contact_job_title_raw
 														              ),x4(left,right),local);
 
-	biz := link_rollup;
+	biz := link_rollup: persist('~thor_data400::persist::Cortera::As_Business_Linking', REFRESH(TRUE), SINGLE);
 	
 	return biz;
 

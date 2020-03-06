@@ -28,27 +28,28 @@ EXPORT ChildRunner(
    pECL
   ,pversion
   ,pcluster
-  ,pNotifyEvent                                               //master event name, used to notify the master when you are done
-  // ,pWaitEvent                                                 //used in when clause for this child runner.  the watcher wuid uses this to notify this childrunner that the iteration has completed/failed/aborted
-  ,pStartIteration      = ''                                  // default is it will start where it left off + 1.  Or you can specify the start #.
-  ,pNumMaxIterations    = ''                                  // default is no maximum.  although it is recommended to have a maximum.  in the absence of a stop condition, this is the number of iterations it will run.
-  ,pNumMinIterations    = ''                                  // default is no minimum.  when populated, only works in conjunction with a stop condition
-  ,pOutputFilename      = '\'\''                              // filename to output the workunits dataset to.  
-  ,pOutputSuperfile     = '\'\''                              // superfile to add the above file to. 
-  ,pSetResults          = '[]'                                // output these results after each iteration.  These are named results from the workunit kicked off.
-  ,pStopCondition       = '\'\''                              // if condition is true, don't kick off next iteration.  In effect, making pNumMaxIterations a max # of iterations instead of total iterations
-  ,pSetNameCalculations = '[]'                                //name the calculations in the above pStopCondition.  each calculation in the pStopCondition that is surrounded by parentheses will be output in the emails and to the childrunner results.
-                                                              //this parameter allows you to name them.
-  ,pBuildName         = '\'\''
-  ,pESP               = 'WorkMan._Config.LocalEsp'            //this esp is the esp of the workunit that kicked this off.  all wuids created by this wuid are local.  the notification done at the end will be to this esp.
+  ,pNotifyEvent                                                       //master event name, used to notify the master when you are done
+  // ,pWaitEvent                                                      //used in when clause for this child runner.  the watcher wuid uses this to notify this childrunner that the iteration has completed/failed/aborted
+  ,pStartIteration      = ''                                          // default is it will start where it left off + 1.  Or you can specify the start #.
+  ,pNumMaxIterations    = ''                                          // default is no maximum.  although it is recommended to have a maximum.  in the absence of a stop condition, this is the number of iterations it will run.
+  ,pNumMinIterations    = ''                                          // default is no minimum.  when populated, only works in conjunction with a stop condition
+  ,pOutputFilename      = '\'\''                                      // filename to output the workunits dataset to.  
+  ,pOutputSuperfile     = '\'\''                                      // superfile to add the above file to. 
+  ,pSetResults          = '[]'                                        // output these results after each iteration.  These are named results from the workunit kicked off.
+  ,pStopCondition       = '\'\''                                      // if condition is true, don't kick off next iteration.  In effect, making pNumMaxIterations a max # of iterations instead of total iterations
+  ,pSetNameCalculations = '[]'                                        //name the calculations in the above pStopCondition.  each calculation in the pStopCondition that is surrounded by parentheses will be output in the emails and to the childrunner results.
+                                                                      //this parameter allows you to name them.
+  ,pBuildName         = '\'\''        
+  ,pESP               = 'WorkMan._Config.LocalEsp'                    //this esp is the esp of the workunit that kicked this off.  all wuids created by this wuid are local.  the notification done at the end will be to this esp.
   ,pNotifyEmails      = 'WorkMan._Config.EmailAddressNotify'
   ,pFailureEmails     = 'WorkMan._Config.EmailAddressNotify'          // extra email addresses to which to send any failures 
   ,pShouldEmail       = 'true'
   ,pPollingFrequency  = '\'5\''
-  ,pForceRun          = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
-  ,pForceSkip         = 'false'                               // if true, then it will skip all failures and continue with the next iteration.  FALSE will ask if you want to rerun, skip or fail.
+  ,pForceRun          = 'false'                                       // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
+  ,pForceSkip         = 'false'                                       // if true, then it will skip all failures and continue with the next iteration.  FALSE will ask if you want to rerun, skip or fail.
   ,pDebugValues       = 'dataset([],WsWorkunits.Layouts.DebugValues)' // for the spawning of the wuids.  can use other repositories using this.
-  ,pOnlyCompile       = 'false'                               // if true, then it will only compile the iteration, not run it.  Useful for testing a build.
+  ,pOnlyCompile       = 'false'                                       // if true, then it will only compile the iteration, not run it.  Useful for testing a build.
+  ,pAutoResubmit      = 'false'                                       // if true, then it will automatically resubmit the wuid upon failure.  FALSE it will not(the default)
 
 ) := 
 functionmacro
@@ -108,7 +109,7 @@ functionmacro
   Get_Results(string pwuid) := WorkMan.mac_Parse_Results(pSetResults ,pStopCondition,pSetNameCalculations);
   
   
-// myevent := '<a href="http://' + 'prod_esp.br.seisint.com' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
+// myevent := '<a href="http://' + 'uspr-prod-thor-esp.risk.regn.net' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
 
 //  http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 //  output('<a href="http://10.241.3.242:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150330-165839">W20150330-165839</a>' ,named('RelativeWU_WithUrl__html'));  //works
@@ -117,7 +118,7 @@ functionmacro
   // -- Add this code to the Child/Iteration so you know what wuid kicked it off.
   // outputRunnerwuidcode  := 'output(\'<a href="http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n';
 
-// http://prod_esp.br.seisint.com:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
+// http://uspr-prod-thor-esp.risk.regn.net:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
 // http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
   
   // -- Number of times this wuid called
@@ -157,11 +158,12 @@ functionmacro
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
+  latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := if(pOutputSuperfile != ''  
     // default_start_iteration            := if((#TEXT(pStartIteration) = '' or trim((string)pStartIteration) = '') and pOutputSuperfile != '' //and trim(ds_previous_build_final_iterations[1].iteration) != '' 
-                                            ,(string)((unsigned)ds_previous_build_final_iterations[1].iteration + 1)
+                                            ,(string)((unsigned)latest_previous_iteration + 1)
                                             ,''
                                          );
     StartIteration := default_start_iteration;
@@ -219,7 +221,7 @@ functionmacro
     
   createwatcherworkunit := WorkMan.CreateWuid_Raw(
        '#workunit(\'name\',\'---WorkMan.mac_Watcher--- for wuid: ' + Iteration_Wuid_result + ', ' + if(pBuildName != '' , pBuildName ,'') +  ', version: ' + pversion + ' iteration: ' + Iteration + '\');\n'       
-     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\');'
+     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\',' + if(pOnlyCompile = true,'true','false') + ');'
     ,watchercluster
     ,localesp
     ,
@@ -227,7 +229,7 @@ functionmacro
   );
 
   child_wuid2    := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid');
-  stop_condition := Get_Results(child_wuid2).stopcondition;
+  stop_condition := Get_Results(child_wuid2).stopcondition_;
 
                        
 
@@ -271,7 +273,7 @@ functionmacro
       #IF(pOnlyCompile = false)
       ,if(OutputFilename != '' and not DoesFileExist ,WorkMan.Update_File(StartFilename,ds_wuids + StartExistingDataset + StartDataset,false,true,'wuid'))
       #END
-      ,STD.System.Debug.Sleep(30000)  //sleep for 30 seconds before kicking this off because of problems with it returning in a compile state
+      // ,STD.System.Debug.Sleep(10000)  //sleep for 30 seconds before kicking this off because of problems with it returning in a compile state
       ,output(createwatcherworkunit                             ,named('Watcher_Wuid'                                        ),overwrite)
       ,output(clickableWatcher_wuid                             ,named('Watcher_Wuid__html'                                  ),overwrite)
       // ,output(dataset([{WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid__html'),WorkMan.get_Jobname(Child_watcher_Wuid,localesp)}  ],lay_iterations)  ,named('Watcher_Wuids__html'                               ),extend)
@@ -280,13 +282,13 @@ functionmacro
   // ----------------------------------------------------------------------------------
   // -- Gather Child Info
   // ----------------------------------------------------------------------------------
-  getstate       := WorkMan.get_State(child_wuid2,localesp);    
+  getstate       := WorkMan.get_State       (child_wuid2,localesp);    
   realstate      := if(getstate[1..6] = 'failed' ,'failed' ,getstate);
-  thor_time      := WorkMan.get_TotalTime(child_wuid2,localesp); 
-  thor_time_secs := WorkMan.Convert2Seconds(thor_time);
-  jobname        := WorkMan.get_Jobname(child_wuid2,localesp);   
-  Errors         := WorkMan.get_Errors(child_wuid2,localesp);
-  Owner          := WorkMan.get_Owner(child_wuid2,localesp);
+  thor_time      := WorkMan.get_TotalTime   (child_wuid2,localesp); 
+  thor_time_secs := WorkMan.Convert2Seconds (thor_time);
+  jobname        := WorkMan.get_Jobname     (child_wuid2,localesp);   
+  Errors         := WorkMan.get_Errors      (child_wuid2,localesp);
+  Owner          := WorkMan.get_Owner       (child_wuid2,localesp);
   
   thiswuid       := if(pOutputSuperfile = '' ,if(WorkMan.get_Scalar_Result(workunit       ,'Workunits') != '',WorkMan.get_DS_Result(workunit        ,'Workunits',WorkMan.layouts.wks_slim),dataset([],WorkMan.layouts.wks_slim))
                                              ,ds_output_superfile(version = pversion)
@@ -306,16 +308,23 @@ functionmacro
 
 
   dWUDetails  := project(dataset([{jobname ,pBuildName,child_wuid2 ,Owner,localesp,WorkMan._Config.LocalENV,getstate ,Iteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,WorkMan.getTimeDate()
-    ,StartIteration ,#TEXT(pNumMaxIterations),#TEXT(pNumMinIterations),pStopCondition,Get_Results(child_wuid2).stopcondition   
+    ,StartIteration ,#TEXT(pNumMaxIterations),#TEXT(pNumMinIterations),pStopCondition,Get_Results(child_wuid2).stopcondition_   
     // ,#TEXT(pStartIteration) ,%'NumMaxIterations'%,%'NumMinIterations'%,pStopCondition,Get_Results(child_wuid2).stopcondition   
-    ,Get_Results(child_wuid2).ds_results
+    ,dataset([],WorkMan.Layouts.lay_results)
     ,Advice
-    ,Errors}] ,WorkMan.layouts.wks_slim),transform(WorkMan.layouts.wks_slim ,self.results := Get_Results(child_wuid2).ds_results,self := left));
+    ,Errors}] ,WorkMan.layouts.wks_slim),transform(WorkMan.layouts.wks_slim ,self.results := Get_Results(child_wuid2).ds_results_out,self := left));
+
+// --
+  get_state_stuff := if(trim(getstate) in ['completed','failed','aborted','compiled']  ,'has ' + trim(getstate)
+                                                                                       ,'is '  + trim(getstate)
+                     );
+// --
+
     
   jobname2    := if(jobname != '' ,jobname ,child_wuid2);
   sendemail   := WorkMan.Send_Email(
                              iff(getstate in ['failed','aborted']  ,%'FAILUREEMAILS'% ,pNotifyEmails)
-                            ,jobname2 + ' has ' + getstate + ' in ' + thor_time + ' on ' + _Control.ThisEnvironment.Name + ' on this date: ' + WorkMan.getTimeDate()
+                            ,jobname2 + ' ' + get_state_stuff + ' in ' + thor_time + ' on ' + _Control.ThisEnvironment.Name + ' on this date: ' + WorkMan.getTimeDate()
                             , if(jobname != ''
                             , 'Jobname'         + '\t\t\t: '    + jobname                                                                             + '\n','')
                             + 'workunit'        + '\t\t\t: '    + child_wuid2                                                                         + '\n' 
@@ -326,25 +335,29 @@ functionmacro
                             + 'Iteration'       + '\t\t\t: '    + Iteration                                                                           + '\n'
                             + 'Version'         + '\t\t\t\t: '  + pversion                                                                            + '\n'
 
-#IF(trim(#TEXT(pStartIteration))  != '') 
-                            + 'Start Iteration\t\t\t: ' + #TEXT(pStartIteration) + '\n'
-#END 
+// #IF(trim(#TEXT(pStartIteration))  != '') 
+                            + 'Start Iteration\t\t\t: ' + StartIteration + '\n'
+// #END 
 #IF(trim(#TEXT(pNumMinIterations))  != '') 
                             + 'Min Iterations\t\t\t: ' + %'NumMinIterations'%+ '\n'
 #END 
 #IF(trim(#TEXT(pNumMaxIterations))  != '') 
                             + 'Max Iterations\t\t\t: ' + %'NumMaxIterations'%+ '\n'
 #END 
-                            + Get_Results(child_wuid2).email_outputs
+                            + Get_Results(child_wuid2).email_outputs_out
                             + 'Runner Wuid link\t\t: ' + 'http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit   + '#/stub/Summary\n' 
                             + if(trim(Errors) != '' ,'FailMessage(s)\t\t\t: \n' + Errors + '\n','')
-                            + iff(getstate in ['failed','aborted']
-                                , '\nThis workunit ' + getstate + '.  I am awaiting your advice on what to do next.\n'
+                            + map(getstate in ['failed','aborted'] and (pAutoResubmit = false or pAutoResubmit = true and Errors[1..5] = 'eclcc') and pOnlyCompile = false
+                               => '\nThis workunit ' + getstate + '.  I am awaiting your advice on what to do next.\n'
                                 + 'Here are your options(Simply click the link beside your choice to advise the process.DO NOT CLICK SUBMIT ON THE WEBPAGE THAT COMES UP!):\n\n'
                                 + 'Rerun iteration'               + '\t\t\t: '  + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Rerun',localesp) + '\n'
                                 + 'Move on to the next iteration' + '\t: '      + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Skip' ,localesp) + '\n'
                                 + 'Fail workunit'                 + '\t\t\t: '  + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Fail' ,localesp) + '\n'                                
+                              ,getstate in ['failed','aborted'] and pAutoResubmit = true  and pOnlyCompile = false and Errors[1..5] != 'eclcc' => '\nThis workunit ' + getstate + '. Auto Resubmit is on, so it will be automatically resubmitted, no need to resubmit manually.'
                               ,'')
+                            + iff(trim(getstate) not in ['completed','failed','aborted'] and pOnlyCompile = false  ,'\n'
+                            + 'This Workman Childrunner was notified before your child wuid finished.  It will kick off another watcher and go back into the scheduler to wait until your child wuid finishes.  Do not panic!'
+                            ,'')
                   );
 
   //if you are using a superfile, then the children should be in there, no need to get the workunits dataset from the children.
@@ -369,25 +382,25 @@ functionmacro
                   );
 
   reruns := parallel(
-                     output('------------------------------------------------------------------------------'                                          ,named('_______'   ),overwrite)
-                    ,output('-- The workunit ' + getstate + '.  Please click one of the 3 links below to rerun it, skip it, or fail the whole thing.' ,named('________'  ),overwrite)
-                    ,output('------------------------------------------------------------------------------'                                          ,named('_________' ),overwrite)
-                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Rerun',localesp) + '">Rerun Workunit</a>'                        ,named('Rerun__html'),overwrite)
-                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Skip' ,localesp) + '">Skip Workunit</a>'                         ,named('Skip__html' ),overwrite)
-                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Fail' ,localesp) + '">Fail Workunit</a>'                         ,named('Fail__html' ),overwrite)                              
+                     output('------------------------------------------------------------------------------'                                          ,named('_______'    ),overwrite)
+                    ,output('-- The workunit ' + get_state_stuff + '.  Please click one of the 3 links below to rerun it, skip it, or fail the whole thing.' ,named('________'   ),overwrite)
+                    ,output('------------------------------------------------------------------------------'                                          ,named('_________'  ),overwrite)
+                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Rerun',localesp) + '">Rerun Workunit</a>'     ,named('Rerun__html'),overwrite)
+                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Skip' ,localesp) + '">Skip Workunit</a>'      ,named('Skip__html' ),overwrite)
+                    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'Fail' ,localesp) + '">Fail Workunit</a>'      ,named('Fail__html' ),overwrite)                              
 
                      // output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + %'WORKMAN_CHILDRUNNER_EVENT'% + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>' ,named('Rerun__html'),overwrite)
                     // ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + %'WORKMAN_CHILDRUNNER_EVENT'% + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Skip'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Skip Workunit</a>'  ,named('Skip__html' ),overwrite)
                     // ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + %'WORKMAN_CHILDRUNNER_EVENT'% + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Fail'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Fail Workunit</a>'  ,named('Fail__html' ),overwrite)                              
                   );
-  result_Iteration_Number      := WorkMan.get_Scalar_Result(workunit ,'Current_Iteration'           );
-  result_Iteration_Number2     := WorkMan.get_Scalar_Result(workunit ,'Current_Iteration'           );
-  result_Iteration_Wuid        := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid'      );
-  result_Iteration_Wuid__html  := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid__html');
+  result_Iteration_Number      := WorkMan.get_Scalar_Result(workunit ,'Current_Iteration'                   );
+  result_Iteration_Number2     := WorkMan.get_Scalar_Result(workunit ,'Current_Iteration'                   );
+  result_Iteration_Wuid        := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid'                      );
+  result_Iteration_Wuid__html  := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid__html'                );
   result_Iteration_Wuids__html := WorkMan.get_DS_Result    (workunit ,'Iteration_Wuids__html',lay_iterations);
-  result_Watcher_Wuid          := WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid'        );
-  result_Watcher_Wuid__html    := WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid__html'  );
-  result_NotifyEvent           := WorkMan.get_Scalar_Result(workunit ,'NotifyEvent'         );
+  result_Watcher_Wuid          := WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid'                        );
+  result_Watcher_Wuid__html    := WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid__html'                  );
+  result_NotifyEvent           := WorkMan.get_Scalar_Result(workunit ,'NotifyEvent'                         );
 
   // ----------------------------------------------------------------------------------
   // -- Get EventExtra text
@@ -490,8 +503,21 @@ functionmacro
                   )
                 )
                 ,sequential(
-                  reruns
-                 ,sendemail
+                                                                                                                        // -- don't autoresubmit for compile errors, only runtime.  compile errors require manual intervention.
+                  map(  trim(getstate) in ['failed','aborted']  and pOnlyCompile = false and pAutoResubmit = true and Errors[1..5] != 'eclcc' => sequential(sendemail,kickWuid )   
+                       ,trim(getstate) in ['failed','aborted']  and pOnlyCompile = false                                                      => sequential(reruns   ,sendemail) // all others will be normal restarting(manual in email link)
+                       ,pOnlyCompile = true                                                                                                   => sendemail
+                       ,iff(trim(getstate) not in ['completed','failed','aborted'] and pOnlyCompile = false 
+                          ,sequential(  
+                             output(createwatcherworkunit                             ,named('Watcher_Wuid'                                        ),overwrite)
+                            ,output(clickableWatcher_wuid                             ,named('Watcher_Wuid__html'                                  ),overwrite)
+                          )
+                        )                  
+                  )
+
+
+
+
                )
              )
              
@@ -585,12 +611,15 @@ functionmacro
   );
   // failOrSkip := sequential(output(dataset([{'Received advice after failure.  It is: ' + Advice,WorkMan.getTimeDate()}],{string Action_Performed,string time}),named('Actions_Performed'),extend),sendFeedbackEmail,tidy_Up_For_Skip,WorkMan.mac_Notify(pNotifyEvent,,,pESP),blank_reruns,output('Deschedule workunit because wuid ' + Child_Wuid + ' has ' + getstate + ', and your advice was to ' + Advice + ' it on ' + WorkMan.getTimeDate()),WorkMan.Deschedule_Wuid(workunit));
 
+  //kick off watcher again to hopefully get the correct status.  completed/failed/aborted
   default    := sequential(
          output(dataset([{'Sending email--default',WorkMan.getTimeDate()}],{string Action_Performed,string time}),named('Actions_Performed'),extend)
         ,output('Sending email--default' ,named('Last_Action_Performed'),overwrite)
         // ,output('Do dummy output to see if it doesn\'t matter what is in here, it will kick off new wuids anyway',named('DefaultOutput'),overwrite)
         ,sendemail
         ,blank_reruns
+        ,output(createwatcherworkunit                             ,named('Watcher_Wuid'                                        ),overwrite)
+        ,output(clickableWatcher_wuid                             ,named('Watcher_Wuid__html'                                  ),overwrite)
       );//default  send an email 
 
   // -- in case we finished the iterations but come back in here to run more
@@ -616,6 +645,7 @@ functionmacro
   doit := sequential(
      fixstart_filename
     ,output(WorkMan.getTimeDate()                            ,named('DateTime'              ),overwrite)
+    ,output('<a href="' + WorkMan.Push_Event_Result_Link(%'WORKMAN_CHILDRUNNER_EVENT'%,'*',localesp) +  '">Notify_Childrunner</a>' ,named('Notify_Childrunner__html'),overwrite)
     ,output(Last_Action_Performed                            ,named('ChildRunner_Status'    ),overwrite)
     ,output(ds_wuids2                                        ,named('Workunits'             ),overwrite,ALL)
     ,output(pBuildName                                       ,named('Build'                 ),overwrite)

@@ -12,6 +12,12 @@ export IdAppendThor(
 		,string svcAppendUrl = ''
 		,boolean useFuzzy = false
 		,boolean doZipExpansion = false
+		,boolean segmentation = true
+		,unsigned soapTimeout = 300
+		,unsigned soapTimeLimit = 0
+		,unsigned soapRetries = 0
+		,unsigned remoteBatchSize = 100
+		,boolean allowHighErrorRate = false
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -44,6 +50,7 @@ export IdAppendThor(
 		,useFuzzy := useFuzzy
 		,weightThreshold := weightThreshold
 		,disableSaltForce := not primForce
+		,segmentation := segmentation
 	);
 	#END
 
@@ -56,7 +63,14 @@ export IdAppendThor(
 			,doZipExpansion := doZipExpansion
 			,reAppend := reAppend
 			,mimicRoxie := mimicRoxie
-			,svcAppendUrl := svcAppendUrl);
+			,svcAppendUrl := svcAppendUrl
+			,segmentation := segmentation
+			,soapTimeout := soapTimeout
+			,soapTimeLimit := soapTimeLimit
+			,soapRetries := soapRetries
+			,remoteBatchSize := remoteBatchSize
+			,allowHighErrorRate := allowHighErrorRate
+			);
 
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);

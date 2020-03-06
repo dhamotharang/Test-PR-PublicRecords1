@@ -10,11 +10,11 @@ export proc_build_all(
   ,pPowStartIteration     = '\'\''
   ,pEmpDownStartIteration = '1'
   ,pEmpStartIteration     = '\'\''
-  ,pDotNumIterations      = '3'
+  ,pDotNumIterations      = '2'
   ,pProxNumIterations     = '2'
   ,pProxMj6NumIterations  = '3'
-  ,pProxPostNumIterations = '3'
-  ,pLgid3NumIterations    = '15'
+  ,pProxPostNumIterations = '1'
+  ,pLgid3NumIterations    = '7'
   ,pPowDownNumIterations  = '2'
   ,pPowNumIterations      = '2'
   ,pEmpDownNumIterations  = '6'
@@ -64,6 +64,7 @@ export proc_build_all(
   ,pSkipEmpDown           = 'false'
   ,pSkipEmp               = 'false'
   ,pSkipCommonBase        = 'false'
+  ,pSkipCleanCommonBase   = 'false'
   ,pSkipXlink             = 'false'
   ,pSkipCopyXlinkKeys     = 'false'
   ,pSkipXlinkValidation   = 'false'
@@ -75,12 +76,14 @@ export proc_build_all(
   ,pSkipQASamples         = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
+  ,pSkipDataCard          = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+  ,pSkipMktgListBuild     = 'false'
+  ,pSkipHighRiskKeys      = 'false'
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
-  ,pSkipDataCard          = 'false'
   ,pSkipEntityReport      = 'false'
   ,pSkipDashboard         = 'false'
   ,pSkipCopyOtherKeys     = 'false'
@@ -101,7 +104,7 @@ export proc_build_all(
 ) := 
 functionmacro
     
-    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools;    
+    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List;    
 
     // -- Cleanup the previous build -- this needs to expand to more files
     // notdeleteversion  := regexfind('[[:digit:]]+',pversion,0,nocase);  //do this so we don't delete any files from a rebuild--may want to keep those until the next build for research purposes.
@@ -114,14 +117,14 @@ functionmacro
     UpdateBIPV2WeeklyKeysDops := email.BIPV2WeeklyKeys.Roxie;
     
     // -- Split the build after CommonBase into 4 threads(wuids), then wait for them to finish
-    xlinkCondition  := pSkipXlink = false or pSkipCopyXlinkKeys = false or pSkipXlinkValidation = false or pSkipXlinkSample = false or pSkipWeeklyKeys = false;
-    bestCondition   := pSkipBest  = false or pSkipIndustry      = false or pSkipMisckeys    = false;
+    xlinkCondition  := pSkipXlink     = false or pSkipCopyXlinkKeys = false or pSkipXlinkValidation = false or pSkipXlinkSample = false or pSkipWeeklyKeys  = false ;
+    bestCondition   := pSkipBest      = false or pSkipIndustry      = false or pSkipMisckeys        = false                                                         ;
+    statsCondition  := pSkipMisckeys  = false or pSkipSegStats      = false or pSkipStrata          = false or pSkipDataCard    = false or pSkipOverlinking = false ;
     
-    XlinkStuffWuid  := if(xlinkCondition                                                                  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true           ,'XlinkStuff'                      ,,pCompileTest),'');
-    BestWuid        := if(bestCondition                                                                   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,true          ,pSkipQASamples ,true           ,true         ,true             ,true                 ,pSkipCrosswalk ,'BestAndMiscKeys'                 ,,pCompileTest),'');
-    StatsWuid       := if(pSkipSegStats       = false or pSkipStrata = false or pSkipOverlinking = false  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,pSkipMisckeys ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipOverlinking ,true                 ,true           ,'Stats'                           ,,pCompileTest),'');
-    RelativesWuid   := if(pSkipSeleidRelative = false                                                     ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,pSkipSeleidRelative  ,true           ,'SeleidRelative'                  ,,pCompileTest),'');
-
+    XlinkStuffWuid  := if(xlinkCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true                 ,true           ,true              ,'XlinkStuff'                      ,,pCompileTest),'');
+    BestWuid        := if(bestCondition                 ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,true          ,pSkipQASamples ,true           ,true         ,true             ,true                 ,true                 ,pSkipCrosswalk ,pSkipHighRiskKeys ,'BestAndMiscKeys'                 ,,pCompileTest),'');
+    StatsWuid       := if(statsCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,pSkipMisckeys ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipDataCard    ,pSkipOverlinking     ,true                 ,true           ,true              ,'Stats'                           ,,pCompileTest),'');
+    RelativesWuid   := if(pSkipSeleidRelative = false   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,pSkipSeleidRelative  ,true           ,true              ,'SeleidRelative'                  ,,pCompileTest),'');
     Wait4Threads    := if(XlinkStuffWuid != '' or BestWuid != '' or StatsWuid != '' or RelativesWuid != ''   ,wk_ut.Wait4Workunits([XlinkStuffWuid,BestWuid,StatsWuid,RelativesWuid],'1',pversion,'Wait4Wuids',,BIPV2_Build.mod_email.emailList));
     
     // -- Total up the workunit timings
@@ -167,19 +170,21 @@ functionmacro
       ,if(pSkipEmpDown          = false ,BIPV2_Build.proc_empid_down           ().MultIter_run (pEmpDownStartIteration ,pEmpDownNumIterations,pdoEmpDownInit                                                       ,,,,,,,,pCompileTest  ))
       ,if(pSkipEmp              = false ,BIPV2_Build.proc_empid                ().MultIter_run (pEmpStartIteration     ,pEmpNumIterations    ,pdoEmpInit    ,pdoEmpSpecs     ,pdoEmpIters    ,pdoEmpPost              ,,,,,pCompileTest  ))
       ,if(pSkipCommonBase       = false ,BIPV2_Build.proc_CommonBase           ()                                                                                                                           )
+      ,if(pSkipCleanCommonBase  = false ,BIPV2_Build.proc_Clean_Commonbase     (pversion)                                                                                                                           )
       
       ,Wait4Threads
       
       // -- Now do Post process stuff.  All keys have been built so do some housekeeping, copying, renaming, promoting(if requested), verifying, and updating DOPS(if requested)
 
-
+      
+      ,if(pSkipMktgListBuild = false ,Marketing_List.proc_build_all           (pversion                                                                                                     )) // do Build Marketing List in background
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
-      ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard
+      // ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard --moved to earlier in build
       ,if(pSkipEntityReport  = false ,BIPV2_Build.proc_EntityReport           (pversion                                                                                                     )) // do entity report
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
       ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
-      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',true                                                                   )) // Copy the rest of the BIPV2FullKeys package to dataland
+      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',false,true                                                              )) // Copy the rest of the BIPV2FullKeys package to dataland, turn off alpha copy
       ,if(pPromote2QA        = true  ,BIPV2_Build.proc_Promote2QA             (pversion)                                                                                                     )
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2FullKeys_Package       (keyversion).outputpackage                                                                                     ) //double check that keys match layout
       ,UpdateBIPV2FullKeysDops  

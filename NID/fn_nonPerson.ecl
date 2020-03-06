@@ -1,32 +1,8 @@
 ﻿IMPORT STD, Address;
 
-
- MatchType := ENUM(integer2, NoMatch=0, Trust, Business, Person, Dual, Unclass, Inv, Blank);
-
- NameTypeToCode(string1 type) := CASE(type,
-							'B' => MatchType.Business,
-							'P' => MatchType.Person,
-							'D' => MatchType.Dual,
-							'I' => MatchType.Inv,
-							'T' => MatchType.Trust,
-							'U' => MatchType.Unclass,
-							MatchType.NoMatch);
-
-
  rgxRemoveSuf := '([A-Z ]+) (I|II|L|SB)';
 // remove extraneous suffix from special names
  RemoveSuffix(string s) := TRIM(IF(REGEXFIND(rgxRemoveSuf,s),REGEXFIND(rgxRemoveSuf,s,1),s));
-/*
-shared MatchType CheckInvalid(string s) := FUNCTION
-	ds := WordSplit(s);
-	return MAP(
-		EXISTS(ds(word in SpecialNames.unclassifiable_segments)) => MatchType.Inv,
-		s IN SpecialNames.unclassifiable_names => MatchType.Inv,
-		EXISTS(ds(word in SpecialNames.single_name_segment_obscenities)) => MatchType.Inv,
-		s IN SpecialNames.full_name_obscenities => MatchType.Inv,
-		MatchType.NoMatch);
-END;
-*/
 
  boolean CountyCheck(string s) := FUNCTION
 	phrase4 := '^([A-Z]+) +([A-Z]+)$';
@@ -63,11 +39,11 @@ END;
 
 // Initial & Initial NAME
  MatchType ValidIIName(string name, string word) := MAP(
-	Address.NameTester.IsAmbiguousWord(word) => MatchType.Business,
+	$.NameTester.IsAmbiguousWord(word) => MatchType.Business,
 	REGEXFIND('^[A-Z] *(&| AND ) *[A-Z]$', name) => MatchType.Inv,
 	word = 'ASS' => MatchType.Business,		// J & J Associates
-	Address.Persons.IsLastNameEx(word) /*OR NameTester.IsFirstName(word)*/ => MatchType.Dual, 
-	Address.NameTester.PossibleBizWord(word) => MatchType.Business,
+	$.NameTester.IsLastNameEx(word) /*OR NameTester.IsFirstName(word)*/ => MatchType.Dual, 
+	$.NameTester.PossibleBizWord(word) => MatchType.Business,
 	MatchType.Dual);
 
 
@@ -85,20 +61,6 @@ END;
 	
  CheckRepeated(string s) := IF(s in RNames,MatchType.Inv, MatchType.NoMatch);
 
- MatchName(MatchType n) := CASE(n,
-	MatchType.NoMatch=>'N', MatchType.Trust=>'T', MatchType.Business=>'B', 
-	MatchType.Person=>'P', MatchType.Dual=>'D', MatchType.Inv=> 'I', MatchType.Unclass=> 'U',
-	MatchType.blank=>'', '?');
-
-/*
-shared Layout_Results Token_xform(Layout_Results l, Layout_Weighted_Tokens r, integer rule) := TRANSFORM
-	self.org := l.org;
-	self.match := IF(r.phrase='',false,true);
-	self.source := IF(self.match, rule, 0);
-	self.phrase := r.phrase;
-END;
-*/
-
 rgxHoa := 
 '\\b(ACRES|BAY|CANYON|COURT(S)?|COVE|CREEK(S)?|CROSS(ING)?|DOWNS|FALLS|FARM(S)?|FOUNTAIN|GARDEN(S)?|HILL(S)?|HOLLOW|KNOLL(S)?|LAKE(S)?( [A-Z]+)?|LANE|MANOR|MEADOW(S)?|OAK(S)?|PARK|POINTE|PRAIRIE|RIDGE|SHORE(S)?|TERRACE|TIMBERS|TREE|UNIT [A-Z0-9]+|VIEW|VILLA(S)?|VISTA(S)?|WOODS|[0-9]+)\\b.* (HOA|POA)$';
 
@@ -108,7 +70,6 @@ rgxBizEndings := '(&| AND ) *(FAB|SPA|SOUND|STORAGE|GR|FEED|TRUCKING|TACKLE|TILE
  boolean MatchPattern(string s) := MAP(
 		REGEXFIND('[ ,]("?L[.,]? ?L[.,]? ?[CP][.,"]*)((?=\\s)\\s|$)', s) => true,	// L L C OR LLP
 		REGEXFIND('\\b[A-Z]+\'S\\b',s) => true,					// possessive TONY'S
-//		REGEXFIND('\\b[0-9]{2,}\\b',s) AND ~REGEXFIND('\\bTRUST\\b',s) => true,
 		REGEXFIND('^[A-Z]+[0-9+&]+[A-Z]*$',s) => true,	// was '^[A-Z]+[0-9.+&]*[A-Z]*$'
 		REGEXFIND('^(THE|NO|SECOND|THIRD|UNIV|U OF|NEW|LOS|LAS) ', s) => true,
 		REGEXFIND('\\bL\\.? ?T\\.? ?D\\.?$', s) => true,	// LTD
@@ -237,6 +198,7 @@ rgxBizEndings := '(&| AND ) *(FAB|SPA|SOUND|STORAGE|GR|FEED|TRUCKING|TACKLE|TILE
 		REGEXFIND('^[A-Z]+ [A-Z] [A-Z] [A-Z] [A-Z]$',s) => true, 	// SUNTRUST B A N K
 		REGEXFIND('^[A-Z]+ +[A-Z]+ *( AND |&) *[A-Z]+ +(MD(S)?|DDS|DPM|ATTY|CPA|VETERINARIANS)?$',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
 		REGEXFIND('\\bA (GUY|LOCK|WING) *( AND |&) *A (GIRL|SAFE|PRAYER)\\b',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
+		REGEXFIND('\\b(CARPET|RUG|GOLF|SNOW|NEWS|TAX|SPA|DIESEL|SALES|MOBILE|TRAILER|HOME|LIMO|TRUCKING) +SERVICE\\b', s) => true,
 		REGEXFIND(rgxHoa,s) => true,
 		false
 	);
@@ -244,7 +206,7 @@ rgxBizEndings := '(&| AND ) *(FAB|SPA|SOUND|STORAGE|GR|FEED|TRUCKING|TACKLE|TILE
 boolean Check0ForO(string s) := 
 	//IF(REGEXFIND('\\b([A-Z]*0[A-Z]+)\\b', s),
 	IF(StringLib.StringFind(s, '0', 1) > 0,
-		Address.NameTester.IsFirstName(StringLib.StringFindReplace(REGEXFIND('\\b([A-Z]+0[A-Z]+)\\b', s, 1),'0','O')),
+		$.NameTester.IsFirstName(StringLib.StringFindReplace(REGEXFIND('\\b([A-Z]+0[A-Z]+)\\b', s, 1),'0','O')),
 		false);
 
 boolean MatchRepeatedWord(string s) :=
@@ -253,14 +215,13 @@ boolean MatchRepeatedWord(string s) :=
 		REGEXFIND('^([A-Z]+) ', s, 1) IN RNames, false);
 
 boolean CheckParentsOf(string s) := 
-		Address.NameTester.IsBusinessWord(s) OR Address.NameTester.IsAmbiguousWord(s);
-
+		$.NameTester.IsBusinessWord(s) OR $.NameTester.IsAmbiguousWord(s);
 
 boolean IsConjunctive(string phrase, string s) := FUNCTION
 	conjunctive := REGEXFIND(phrase, s, 1) + ' & ' + REGEXFIND(phrase, s, 3);
 	alternate := REGEXFIND(phrase, s, 3) + ' & ' + REGEXFIND(phrase, s, 1);
 	return IF(REGEXFIND(phrase, s),
-				Address.NameTester.IsInConjuctives(conjunctive) OR Address.NameTester.IsInConjuctives(alternate),
+				$.NameTester.IsInConjuctives(conjunctive) OR $.NameTester.IsInConjuctives(alternate),
 			false);
 END;
 
@@ -294,7 +255,7 @@ boolean IsGeo(string s1) := FUNCTION
 		REGEXFIND(phrase5, s) => true,
 		REGEXFIND(phrase6, s) => CheckGeo(REGEXFIND(phrase6, s, 1),'COUNTY'),
 		REGEXFIND(phrase7, s) => CheckGeo(REGEXFIND(phrase7, s, 1),'COUNTY'),
-		REGEXFIND(phrase8,s) and NOT Address.Persons.IsFirstNameEx(REGEXFIND(phrase8,s, 1)) => true,
+		REGEXFIND(phrase8,s) and NOT $.NameTester.IsFirstNameEx(REGEXFIND(phrase8,s, 1)) => true,
 		REGEXFIND(phrase2,s) => CheckGeo(REGEXFIND(phrase2, s, 1),REGEXFIND(phrase2, s, 2)),
 		false);
 //					CheckGeo(REGEXFIND(phrase, s, 1),REGEXFIND(phrase, s, 3)),
@@ -317,23 +278,23 @@ set of string placewords :=
 		];
 rgxGeo := '^([A-Z]+) +(CREEK|GROVE|HIGHLANDS|LAKE|LAKES|POINT|SPRING|SPRINGS|STREET|MEADOW)\\b';
 rgxGeo1 := '^([A-Z]+) +(CREEK|GROVE|LAKE|LAKES|POINT|SPRING|SPRINGS|STREET|CITY|STATE|MEADOW) +([A-Z]+)\\b';
-boolean IsGeoCity(string s) := 
+boolean IsGeoCity(string s, unsigned2 format) := 
 	IF(~REGEXFIND(rgxGeo, s), false,
 		MAP(
 			Address.SpecialNames.IsCityName(REGEXFIND(rgxGeo, s, 1) + ' ' +
 										REGEXFIND(rgxGeo, s, 2)) => true,
 			REGEXFIND(rgxGeo1, s, 3) IN placewords => true,
-			Address.NameTester.IsFirstname(REGEXFIND('^([A-Z]+) +([A-Z]+)$', s, 1)) => false,
-			REGEXFIND(rgxGeo1, s) AND ~Address.NameTester.IsFirstname(REGEXFIND(rgxGeo1, s, 1)) => true,
-			~Address.Persons.IsPossibleName(s) AND
-				~Address.Persons.IsPossibleDualName(s) => true,
+			$.NameTester.IsFirstname(REGEXFIND('^([A-Z]+) +([A-Z]+)$', s, 1)) => false,
+			REGEXFIND(rgxGeo1, s) AND ~$.NameTester.IsFirstname(REGEXFIND(rgxGeo1, s, 1)) => true,
+			~$.mod_NameFormat.IsPossibleName(s, format) AND
+				~$.mod_NameFormat.IsPossibleDualName(s, format) => true,
 			false));
 
 // e.g. names ending as BUILDERS TRUCKING HOLDINGS
 rgxDualNames := '^([A-Z]{2,}) +(&|AND) +([A-Z]{2,})$';
 boolean TwoFirstNames(string s) := 
-			Address.NameTester.IsFirstName(REGEXFIND(rgxDualNames,s, 1)) AND
-			Address.NameTester.IsFirstName(REGEXFIND(rgxDualNames,s, 3));
+			$.NameTester.IsFirstName(REGEXFIND(rgxDualNames,s, 1)) AND
+			$.NameTester.IsFirstName(REGEXFIND(rgxDualNames,s, 3));
 			
 set of string colors := ['RED','ORANGE','GREEN','BLUE','YELLOW','PURPLE','WHITE','BLACK','BROWN',
 			'GREY','GRAY','AZURE','TEAL','PINK'];
@@ -354,7 +315,7 @@ boolean IsGeoDesignation(string s) := MAP(
 		s = '' => false,
 		s in geowords => true,
 		Address.SpecialNames.IsStateName(s) AND s != 'MD' => true,
-		Address.NameTester.IsFirstName(s) => false,
+		$.NameTester.IsFirstName(s) => false,
 		Address.SpecialNames.IsCityName(s) => true,
 		Address.SpecialNames.IsCountyName(s) => true,
 		false);
@@ -367,9 +328,9 @@ boolean IsGeoDesignation2(string s) :=
 		s in geowords => true,
 		REGEXFIND('[0-9]',s) => true,
 		Address.SpecialNames.IsStateName(s) AND s NOT IN ['MD','PA'] => true,
-		Address.NameTester.IsFirstName(s) => false,
-		Address.NameTester.IsLastName(s) => false,
-		Address.NameTester.IsAmbiguousWord(s) => true,
+		$.NameTester.IsFirstName(s) => false,
+		$.NameTester.IsLastName(s) => false,
+		$.NameTester.IsAmbiguousWord(s) => true,
 		Address.SpecialNames.IsCityName(s) => true,
 		Address.SpecialNames.IsCountyName(s) => true,
 		false);
@@ -378,7 +339,7 @@ rgxTwoWords := '^([A-Z]{2,}) +([A-Z]{2,})$';
 rgxThreeWords := '^([A-Z]{2,}) +([A-Z]{2,}) +([A-Z]{2,})$';
 rgxFourWords := '^[A-Z]+ +[A-Z]+ +[A-Z]+ [A-Z]+$';
 rgxPersonalBusiness := '^([A-Z0-9 ,&\'.-]+) +(BUILDERS|HOLDINGS|HOMES|TRUCKING|CATTLE|RANCH|FARM|FARMS|HARDWARE|DEV)[.,]?$';
-boolean CheckPersonalBusiness(string s, boolean isBiz) := 
+boolean CheckPersonalBusiness(string s, boolean isBiz, unsigned2 format) := 
 	MAP(
 		s = '' => false,
 		REGEXFIND('^[A-Z][. ]*(&| AND ) *[A-Z]\\.?$',s) => true,	// A & C TRUCKING
@@ -392,14 +353,12 @@ boolean CheckPersonalBusiness(string s, boolean isBiz) :=
 		REGEXFIND('^([A-Z]+) +([A-Z])$',s) => isBiz,
 		REGEXFIND('^[A-Z]+ *(&| AND ) *[A-Z]+ +[A-Z]+$',s) => true,	// Adam Baker & Charley TRUCKING
 		REGEXFIND('^(TRI|ROCKING) ',s) => true,	
-		Address.NameTester.IsLastName(REGEXFIND('^[A-Z]\\.? +([A-Z]+)$',s, 1)) => true, 	// S JONES TRUCKING
+		$.NameTester.IsLastName(REGEXFIND('^[A-Z]\\.? +([A-Z]+)$',s, 1)) => true, 	// S JONES TRUCKING
 		REGEXFIND(rgxDualNames,s) => if(isBiz, true, NOT TwoFirstNames(s)),  // SAM & BRENDA TRUCKING
 		//NameTester.InvalidNameFormat(s) => true,
-		Address.Persons.IsLastNameConfirmed(REGEXFIND('^([A-Z \'-]+)$', s, 1)) => true,
-		Address.Persons.ValidNameFormat(s) => true,
-//		NameTester.IsFirstName(REGEXFIND('^([A-Z]+) +([A-Z]+)$',s, 1)) AND
-//			NameTester.IsLastName(REGEXFIND('^([A-Z]+) +([A-Z]+)$',s, 2))
-//					=> true,	// SAM JONES TRUCKING,
+		$.NameTester.IsLastNameConfirmed(REGEXFIND('^([A-Z \'-]+)$', s, 1)) => true,
+		$.mod_NameFormat.validPersonNameFormat(format) => true,
+
 		IsGeoDesignation(s) => true,
 		IsGeoDesignation(RegexFind(rgxTwoWords, s, 2)) => true,
 		RegexFind(rgxTwoWords, s, 1) in colors => true,
@@ -414,7 +373,7 @@ set of string saintwords := [
 boolean IsSaintWord(string s) := MAP(		
 		s = '' => false,
 		s in saintwords => true,
-		Address.NameTester.IsAmbiguousWord(s) => true,
+		$.NameTester.IsAmbiguousWord(s) => true,
 		false);
 string TrimWell(string s) := Std.Str.CleanSpaces(REGEXREPLACE('^([ ,&-]+)',REGEXREPLACE('([ ,&-]+)$',s,' '),' '));
 
@@ -422,18 +381,15 @@ TrustWords := Nid.Trusts.TrustWords;
 CoTrustees := '\\bCO[ -]+(TRUSTEE|TRUSTE|TRUSTEES|TRSTEE|TTEE|TRS|TRSTE|TRU|TTE|TR|EXECUT(OR|RIX))\\b';
 
 rgxTrustDated := '\\(?(DATED|DTD|UTD) +\\d{1,2}[/-] *\\d{1,2} *[/-] *\\d{2,4}\\)?';
-TrustAbbreviations := '(TRUST|TRU|TR|TRS)';
 boolean LikelyTrust(string s) := Nid.Trusts.LikelyTrust(s);
-//	REGEXFIND('([A-Z]+) +(TRUST(S)?|TRUS|TRU|TRST|TR|T, RUST|TR, UST|TRU, ST|TRUS, T|TRU ST|(IR)?REVOCABLE LIVING)$', s, 1) in TrustWords
-//	OR REGEXFIND('\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$',s)
-//	OR Nid.Trusts.IsTrust2BeginOrEnd(s);
 
-MatchType CheckTrust(string s, DATASET(Address.NameTester.rWord) words, DATASET(Address.NameTester.rWord) digraphs,string name) := 
+MatchType CheckTrust(string s, DATASET(Address.NameTester.rWord) words, DATASET(Address.NameTester.rWord) digraphs,
+													  string name, unsigned2 format) := 
 	MAP(
 		REGEXFIND('^([A-Z]+) +TRUST$', s, 1) in TrustWords => MatchType.Inv,
 		REGEXFIND('^TRUST +([A-Z]+)$', s, 1) in TrustWords => MatchType.Inv,
 		REGEXFIND('^TRUST +' + rgxTrustDated + '$', s) => MatchType.Inv,
-		Address.NameTester.IsFirstname(REGEXFIND('^([A-Z]+) +[A-Z] +TRUST$', s, 1)) => MatchType.Person,
+		$.NameTester.IsFirstname(REGEXFIND('^([A-Z]+) +[A-Z] +TRUST$', s, 1)) => MatchType.Person,
 
 		REGEXFIND('^TRUST +DATED', s) => MatchType.Trust,
 		REGEXFIND('^TRUST +(AGREEMENT|AGREEME NT|AGREEMEN)$', s) => MatchType.Inv,
@@ -458,7 +414,7 @@ MatchType CheckTrust(string s, DATASET(Address.NameTester.rWord) words, DATASET(
 		REGEXFIND('^[A-Z]+ +[A-Z]+ +[A-Z]+ +TRUST$',s) => MatchType.Trust,
 		REGEXFIND('^[A-Z]+ +TRUST, *[A-Z]+ +[A-Z]+$',s) => MatchType.Trust,
 		REGEXFIND('^[A-Z]+ +TRUST, *[A-Z]+$',s) => MatchType.Trust,
-		Address.Persons.IsPossibleDualName(REGEXFIND('^([A-Z &\'-]+) +TRUST(S)?$', name, 1))	=> MatchType.Trust,
+//*		$.mod_NameFormat.IsPossibleDualName(REGEXFIND('^([A-Z &\'-]+) +TRUST(S)?$', name, 1))	=> MatchType.Trust,
 		REGEXFIND('^[A-Z]+ [A-Z]+ & [A-Z]+ [A-Z]+ TRUST$',s) => MatchType.Business,
 		REGEXFIND('^[0-9]+ +[A-Z0-9 ]+ +(AVENUE|AVE|ST|STREET|RD|DR|DRIVE|ROAD|LANE|PLACE|PL).+TRUST',s) => MatchType.Business,
 		REGEXFIND('^(1ST|2ND|3RD|4TH|5TH|6TH|1|2|3|4|5|6|7|8|0) +[A-Z ]*.+TRUST',s) => MatchType.Business,
@@ -472,24 +428,20 @@ MatchType CheckTrust(string s, DATASET(Address.NameTester.rWord) words, DATASET(
 		REGEXFIND('\\b(FAMILY|LIVING)TRUST\\b', s) => MatchType.Trust,		// run on words TRUST
 		REGEXFIND('\\bTRUST +(& PT|COC|ETAL|ET AL|DTD|/TR|TRUSTEES)$', s) => MatchType.Trust,
 		LikelyTrust(s) => MatchType.Trust,
-		Address.NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,	
+		$.NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,	
 
 		REGEXFIND('\\b\\d+ +[A-Z]+ +TRUST\\b', s) => MatchType.Trust,	// 5 Windsor Trust
-		//COUNT(words(NameTester.IsAmbiguousWord(word))) > 1 => MatchType.Business,
 		REGEXFIND('^[A-Z]+ +[A-Z]+ +TRUST$',s) => MatchType.Trust,
 		REGEXFIND('^TRUST +[A-Z] +[A-Z]+$',s) => MatchType.Trust,
-		//Persons.IsLikelyNameFormat(REGEXFIND('^([A-Z \',-]+) +TRUST$', name, 1))	=> MatchType.Trust,
 		REGEXFIND('^[A-Z]+-[A-Z]+$', TrimWell(REGEXREPLACE('\\b(TRUST)\\b', name, ' ')))	=> MatchType.Trust,
-		Address.Persons.IsLikelyNameFormat(TrimWell(REGEXREPLACE('\\b(TRUST)\\b', name, ' ')))	=> MatchType.Trust,
-		REGEXFIND('^([A-Z]+) +TRUST$', s) => IF(Address.NameTester.IsFirstNameBasic(REGEXFIND('^([A-Z]+) +TRUST$', s, 1)),MatchType.Person,MatchType.Trust),
-		Address.Persons.IsLikelyNameFormat(name) => MatchType.Person,
+		$.mod_NameFormat.IsLikelyNameFormat(name, format) => MatchType.Person,
 		MatchType.Trust
 		);
 
 
 // check for trailer
 boolean IsTrailer(string s) := 
-			Address.NameTester.IsBusinessWord(REGEXFIND('\\b([A-Z]+)(INC)\\b',s, 1));
+			$.NameTester.IsBusinessWord(REGEXFIND('\\b([A-Z]+)(INC)\\b',s, 1));
 
 
 boolean IsLastAmbi(string name, DATASET({string32 word}) tokens) := FUNCTION
@@ -499,8 +451,8 @@ boolean IsLastAmbi(string name, DATASET({string32 word}) tokens) := FUNCTION
 	RETURN MAP (
 		x = 0 => false,
 		x < 4 => false,
-		Address.Persons.IsSuffix(s) => false,
-		Address.NameTester.IsAmbiguousWord(s)
+		$.NameTester.IsSuffix(s) => false,
+		$.NameTester.IsAmbiguousWord(s)
 		);
 END;		
 
@@ -514,36 +466,15 @@ boolean IsInvalidTaxpayer(string s) :=
 			REGEXFIND('TAXPAYER [0-9][0-9A-Z]+ *[0-9A-Z]* *OF\\b', s) => true,
 			REGEXFIND('TAXPAYER [A-Z] +[0-9A-Z]* *OF\\b', s) => true,
 			REGEXFIND('^[A-Z]+ +[A-Z]* *TAXPAYER$', s) 
-				AND Address.NameTester.IsFirstName(REGEXFIND('^([A-Z]+) ',s,1)) => true,		
+				AND $.NameTester.IsFirstName(REGEXFIND('^([A-Z]+) ',s,1)) => true,		
 			false
 		);
 
-	// of the format name ( term )
-/*	set of string	parenTerms := [
-		'DECEASED','EST','ETAL','HEIRS','L/U','LEASOR','LESSEE','LIFETIME','REF',
-		'SURV','SURVIVOR','TRS','TRUST','TRUSTE'
-		];*/
-		// excluded 7/2/2-13 'TR','COTRUSTEE','COTRUSTEES','TE','LE','TRUSTEE','TRUSTEES','TRSTE'
 		
 	runonwords := '\\b([A-Z]+)(LLC|CORP|COMPANY|INCORPO|FOUNDATION|LTD|UNITED|SERVICES|MORTGAGE)\\b';
-// INC excludes too many person names, so it was removed
-/*
-boolean TestBreakUp(string s) := FUNCTION
-	tokens := TokenManagement.TokenSet(s, TokenManagement.TokenCount(s));
 
-	RETURN 
-		NameTester.MatchBusinessTokens(tokens);
-		//OR		MatchPattern(s);
-END;
-	
-boolean BreakUpName(string s) := 
-	IF (REGEXFIND(runonwords, s),
-		TestBreakUp(REGEXREPLACE(runonwords, s, '$1')),
-		false);
-*/		
 boolean BreakUpName(string s) := REGEXFIND(runonwords, s);
 
-	
 boolean IsGreekFrat(DATASET({string32 word}) words) := COUNT(words) = 3 AND
 			Address.SpecialNames.IsGreekLetter(words[1].word) AND
 			Address.SpecialNames.IsGreekLetter(words[2].word) AND
@@ -569,8 +500,8 @@ KnownFirmName(string s) := Address.SpecialNames.IsKnownFirm(
 
 types := ['X','F','L','B'];
 string1 GetNameClass(string nm) :=
-	types[IF (Address.NameTester.IsFirstName(nm),1,0) +
-	IF (Address.Persons.IsLastNameEx(nm),2,0) + 1];
+	types[IF ($.NameTester.IsFirstName(nm),1,0) +
+	IF ($.NameTester.IsLastNameEx(nm),2,0) + 1];
 	
 string3 GetNameTypes(string s) :=
 		GetNameClass(REGEXFIND(rgxFirm, s, 1)) +
@@ -579,8 +510,6 @@ string3 GetNameTypes(string s) :=
 NonFirmNames := ['JR','SR','II','III','MC'];
 
 boolean LikelyFirmName(string s) := FUNCTION
-	//t := GetNameTypes(s);
-
 	RETURN MAP(
 		StringLib.StringFind(s, 'AND OR', 1) > 0 => false,
 		REGEXFIND('\\b(AND FRIENDS|MORE|ASS|ASSC|ASSO|SON(S)?|DAUGHTER(S))\\b', s) => true,
@@ -593,7 +522,7 @@ boolean LikelyFirmName(string s) := FUNCTION
 		KnownFirmName(s) => true,
 		REGEXFIND(rgxFirm, s, 1) IN NonFirmNames OR REGEXFIND(rgxFirm, s, 2) IN NonFirmNames OR
 							REGEXFIND(rgxFirm, s, 4) IN NonFirmNames => false,
-		NOT Address.Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
+//*		NOT Address.Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
 		//t[2] = 'F' OR t[3] = 'F' => false,
 		//t IN ['LFF','LBF','LFB','LBB','BLF','FLF','FLB'] => false,
 		//t in ['LBL','BBL','BLL','BLB','LLL','LXL','LLX'] => true,
@@ -611,9 +540,7 @@ boolean LikelyFirmName(string s) := FUNCTION
 					'BFF','BBF','BFB','BBB',
 					'BFX','BBX','BXF','BXB','BXB','BXX'] => false,*/
 		TooManyConsonants3(s) => true,
-		Address.NameTester.LikelyBizWord(s) => true,
-//		EmbeddedWords(s) => true,
-//		EndPhrase(s) => true,
+		$.NameTester.LikelyBizWord(s) => true,
 		false);					// unknown or either
 END;
 			
@@ -624,9 +551,9 @@ boolean IsFirmName(string s, string preCleaned) :=
 		REGEXFIND(' *(&|AND ) *(WIFE|JLRS|GUEST(S)?|PARENT(S)?|CHILD(REN?))$', s) => false,
 		NOT REGEXFIND('(&| AND )', preCleaned) => false,
 		REGEXFIND(rgxFirm, s) => LikelyFirmName(s),
-		Address.Persons.IsDualName(preCleaned) => false,
+//*		Address.Persons.IsDualName(preCleaned) => false,
 		REGEXFIND(rgxFirm4, preCleaned) => true,
-		REGEXFIND('^[A-Z] *(&|AND ) *[A-Z] +[A-Z]+$',s) => Address.NameTester.LikelyBizWord(s), // A & A biztype
+		REGEXFIND('^[A-Z] *(&|AND ) *[A-Z] +[A-Z]+$',s) => $.NameTester.LikelyBizWord(s), // A & A biztype
 		REGEXFIND('^([A-Z-]{2,} +){3,} *(&|AND ) *[A-Z]+$',s) => true, // MOE LARRY SHEMP & CURLEY
 		//REGEXFIND('^[A-Z-]+ *, *[A-Z]+ *(&| AND ) *[A-Z]+$',s) => true, // BAKER,GREENSPAN & BERNSTEIN
 		REGEXFIND('^.+ *(&| AND ) *.+ +P[ .]?(A|C)\\.?$',s) => true, // any & any P C or PA
@@ -669,8 +596,8 @@ MatchType DoubleCheckName(string s) := FUNCTION
 		name1 := REGEXFIND('^([A-Z]{2,}) +([A-Z]{2,})$',s,1);
 		name2 := REGEXFIND('^([A-Z]{2,}) +([A-Z]{2,})$',s,2);
 		return MAP(
-			GetNameClass(name1) = 'X' => IF(Address.NameTester.LikelyBizWord(name1),MatchType.Business,MatchType.Person),
-			GetNameClass(name2) = 'X' => IF(Address.NameTester.LikelyBizWord(name2),MatchType.Business,MatchType.Person),
+			GetNameClass(name1) = 'X' => IF($.NameTester.LikelyBizWord(name1),MatchType.Business,MatchType.Person),
+			GetNameClass(name2) = 'X' => IF($.NameTester.LikelyBizWord(name2),MatchType.Business,MatchType.Person),
 			MatchType.Person
 		);
 END;
@@ -679,14 +606,12 @@ rgxFaFL := '^[A-Z]+ *(&| AND ) *[A-Z]+ +[A-Z]{2,}$';
 rgxFaFML := '^[A-Z]+ *(&| AND ) *[A-Z]+ +[A-Z] +[A-Z]+$';
 
 
-MatchType TwoWordName(string s) := FUNCTION
-	
-	quality := Address.Persons.NameQuality(s);
+MatchType TwoWordName(string s, unsigned2 quality) := FUNCTION
 
 	return MAP(
 	//MatchingName(s) => MatchType.Person,
-	quality = Address.Persons.NameStatus.ProbableName => MatchType.Person,
-	quality = Address.Persons.NameStatus.PossibleName => MatchType.Person,
+	quality = $.NameStatus.ProbableName => MatchType.Person,
+	quality = $.NameStatus.PossibleName => MatchType.Person,
 	REGEXFIND('^[A-Z]+ +(JR|SR|NMN|NMI|II|III|IV)$', s)	=> MatchType.Inv,	// NAME JR
 	REGEXFIND(doubleDouble, s) => TestOriental(s),
 //	REGEXFIND(doubleDouble, s) => MatchType.Inv,
@@ -705,9 +630,9 @@ MatchType TwoWordName(string s) := FUNCTION
 	Address.SpecialNames.IsCityName(REGEXFIND(rgxFL,s,2)) => MatchType.Business,
 	Address.SpecialNames.IsStateName(REGEXFIND(rgxFL,s,2)) => MatchType.Business,
 	Address.SpecialNames.IsCountyName(REGEXFIND(rgxFL,s,2)) => MatchType.Business,
-	quality = Address.Persons.NameStatus.ImprobableName => DoubleCheckName(s),
-	quality IN [Address.Persons.NameStatus.NotAName, Address.Persons.NameStatus.InvalidNameFormat,
-					Address.Persons.NameStatus.StandaloneName] => MatchType.Inv,
+	quality = $.NameStatus.ImprobableName => DoubleCheckName(s),
+	quality IN [$.NameStatus.NotAName, $.NameStatus.InvalidNameFormat,
+					$.NameStatus.StandaloneName] => MatchType.Inv,
 	MatchType.Person	// otherwise we miss too many names
 	);
 END;
@@ -715,14 +640,14 @@ END;
 boolean IsGoodName(string name) := FUNCTION
 	n1 := REGEXFIND(rgxTwoWords,name, 1);
 	n2 := REGEXFIND(rgxTwoWords,name, 2);
-	segs := Address.Persons.GetNameTypes(n1, n2);
+	segs := $.mod_NameFormat.GetNameTypes(n1, n2);
 	RETURN MAP(
 			segs in ['LL','LX','XL','XX'] => false,
-			Address.NameTester.IsAmbiguousWord(n2) AND GetNameClass(n1) in ['L','X'] => false,
-			Address.NameTester.IsFirstName(n1) AND Address.Persons.IsLastNameEx(n2) => true,
-			Address.NameTester.IsFirstName(n2) AND Address.Persons.IsLastNameEx(n1) => true,
-			Address.NameTester.IsFirstName(n1) AND Address.NameTester.IsAmbiguousWord(n2) => true,
-			Address.NameTester.InvalidNameFormat(name) => false,
+			$.NameTester.IsAmbiguousWord(n2) AND GetNameClass(n1) in ['L','X'] => false,
+			$.NameTester.IsFirstName(n1) AND $.NameTester.IsLastNameEx(n2) => true,
+			$.NameTester.IsFirstName(n2) AND $.NameTester.IsLastNameEx(n1) => true,
+			$.NameTester.IsFirstName(n1) AND $.NameTester.IsAmbiguousWord(n2) => true,
+			$.NameTester.InvalidNameFormat(name) => false,
 			//MatchingName(name) => true,
 			TooShort(name) => false,
 			TooManyConsonants(name) => false,
@@ -730,39 +655,36 @@ boolean IsGoodName(string name) := FUNCTION
 			EndPhrase(name) => false,
 			//NameTester.IsFirstName(n1) AND NameTester.IsAmbiguousWord(n1) => true,
 			n1='MARINA' => true,		// temporary fix
-			Address.NameTester.IsAmbiguousWord(n1) AND Address.NameTester.IsFirstName(n2) => true,
-			Address.Persons.IsLastNameConfirmed(n1) AND Address.Persons.IsLastNameConfirmed(n2) => false,
-			Address.NameTester.IsAmbiguousWord(n1) AND Address.Persons.IsLastNameConfirmed(n2) => true,
+			$.NameTester.IsAmbiguousWord(n1) AND $.NameTester.IsFirstName(n2) => true,
+			$.NameTester.IsLastNameConfirmed(n1) AND $.NameTester.IsLastNameConfirmed(n2) => false,
+			$.NameTester.IsAmbiguousWord(n1) AND $.NameTester.IsLastNameConfirmed(n2) => true,
 			false);
 END;
 
 boolean IsGoodTriName(string name) := FUNCTION
-	segs := Address.Persons.GetNameTypes(REGEXFIND(rgxThreeWords,name, 1), REGEXFIND(rgxThreeWords,name, 3), REGEXFIND(rgxThreeWords,name, 2));
+	segs := $.mod_NameFormat.GetNameTypes(REGEXFIND(rgxThreeWords,name, 1), REGEXFIND(rgxThreeWords,name, 3), REGEXFIND(rgxThreeWords,name, 2));
   return IF(LENGTH(Std.Str.FilterOut(segs, 'FB'))=3, false, true);
 END;
 
 
-//boolean IsAmbiguousBusiness(DATASET({string32 word}) words, string busname, string name) := false;
-boolean IsAmbiguousBusiness(DATASET({string32 word}) words, string busname, string name) := 
+boolean IsAmbiguousBusiness(DATASET({string32 word}) words, string busname, string name, unsigned2 format) := 
 	MAP(
-				COUNT(words(Address.NameTester.IsAmbiguousWord(word))) = 0 => false,
-				COUNT(words(Address.NameTester.IsAmbiguousWord(word))) > 1 => true,
+				COUNT(words($.NameTester.IsAmbiguousWord(word))) = 0 => false,
+				COUNT(words($.NameTester.IsAmbiguousWord(word))) > 1 => true,
 				//REGEXFIND('^BABY (BOY|GIRL) ',busname) => false,
-				Address.NameTester.InvalidNameFormat(name) =>true,
+				$.NameTester.InvalidNameFormat(name) =>true,
 				REGEXFIND('^([A-Z]{2,}) +(&|AND) +\\1+ +[A-Z]+$',trim(name)) => true,
 				//REGEXFIND('\\bCENTER\\b', busname) => true,
 				//REGEXFIND(rgxFourWords,busname) => true,
 				REGEXFIND(rgxTwoWords,busname) => NOT IsGoodName(busname),
 				REGEXFIND(rgxThreeWords,busname) => NOT IsGoodTriName(busname),
 				//Persons.IsPossibleDualName(name) => false,
-				Address.Persons.IsDualName(name) => false,
-				Address.Persons.IsLikelyName(name) => false,
+				$.mod_NameFormat.IsDualName(name, format) => false,
+				$.mod_NameFormat.IsLikelyName(name, format) => false,
 				IsLastAmbi(busname, words) => true,
 				true)
 			;
 
-				//SpecialNames.IsCityName(REGEXFIND(rgxCityWord, name, 1)) AND
-				//	IsAmbiguousWord(REGEXFIND(rgxCityWord, name, 3)) => true,
 BusEndings := ['L C','L P','P C','P A','P S','S C','N A','S A','P L','L L','A C'];
 boolean CheckBusEndings(string s) :=
 		REGEXFIND('^.+ ([A-Z] [A-Z])[,]?$',s,1) IN BusEndings;
@@ -777,8 +699,6 @@ boolean CrazyBizName(string s) :=
 string TrimRightPunct(string s) := REGEXREPLACE('[ ,&+*/\\x00-\\x1f\\x80-\\xff-]+$',s,'');
 string Unquote(string s) := REGEXREPLACE('^\'(.+)\'$', s, '$1');
 
- rgxMispelledTrust := ' (TRU ST|TRUS, T|TR, UST)$';
- CheckMispelledTrust(string s) := IF(REGEXFIND(rgxMispelledTrust, s), REGEXREPLACE(rgxMispelledTrust, s, ' TRUST'), s);
  
 // remove apostropohe at beginning or end of a word
 rgxApos1 := '[^A-Z0-9_]\'([A-Z0-9_]+)';
@@ -795,7 +715,32 @@ positions := '\\b' + positionNames+'$';
 rgxStreet := '\\b([0-9]+|[A-Z] [A-Z]|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|CENTER|NORTH|SOUTH|EAST|WEST).* (ROAD|RD|STREET|ST|AVE|AVENUE|DRIVE|CT|PLACE|PATH|LN|WAY|WY)$';		// street address only
 rgxCaseNum := '^(CASE|CIVIL ACTION|PROBATE COURT CASE|PROBATE CASE|BANKRUPTCY|COURT CASE|CIRCUIT COURT CASE) *#[A-Z0-9 ,#&/-]+$';
 
-EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
+MatchType NotAName(string name, string s, DATASET({string32 word}) words, unsigned2 format) := 
+			MAP(	
+				REGEXFIND(rgxTwoWords, name) => MatchType.Person,
+				REGEXFIND('^[A-Z]+$',name) => if(NameTester.PossibleBizWord(name),	MatchType.Business,	// single word name
+																													MatchType.Inv),
+				REGEXFIND('^[A-Z]+ [A-Z]$',name) => MatchType.Inv,	// First Mi
+				REGEXFIND('\\b((MR|DR) (&|AND)? MRS)\\b',s) => MatchType.Inv,		//MatchType.Unclass,
+				REGEXFIND(CoTrustees, s) => MatchType.Trust,		//MatchType.Unclass,
+				$.mod_NameFormat.IsNameFormatDual(format) => MatchType.Dual,
+				REGEXFIND('( AND |&| OR |&/OR )', s) => MatchType.Business,
+				REGEXFIND(' A-[A-Z]+',s) => MatchType.Business,
+				$.NameTester.LikelyBizWord(s) => MatchType.Business,
+				Address.SpecialNames.IsCityName(s) => MatchType.Business,
+				CheckBusEndings(s) => MatchType.Business,
+				REGEXFIND('^(1ST|2ND|3RD|4TH|5TH|6TH|7TH|8TH|9TH)',s) => MatchType.Business,
+				REGEXFIND(rgxFML, name) => if($.NameTester.PossibleBizWord(name),	// single word name
+																				MatchType.Business,MatchType.Inv),
+				REGEXFIND('[*%#@!?\\[]+',name) => MatchType.Inv,	// special characters
+				//preferBiz => MatchType.Business,
+				REGEXFIND('^[A-Z]{3,4}$',s) => MatchType.Business,
+				COUNT(words($.NameTester.IsAmbiguousWord(word))) > 0 => MatchType.Business,
+				MatchType.Inv		//MatchType.Hnh	//		Business
+			);
+
+
+EXPORT MatchType fn_nonPerson(string str, string s, string name, unsigned2 quality, unsigned2 format) := FUNCTION
 
 	words := Address.WordSplit(RemoveApostrophe(s));
 	digraphs := Address.WordPairs(RemoveApostrophe(s));
@@ -823,10 +768,11 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 		LENGTH(Std.Str.Filter(name, '"^~!:')) > 4 => MatchType.Inv,
 		// Rule 14: check for invalid or obscene patterns
 		Address.SpecialNames.IsInvalidToken(words, digraphs) => MatchType.Inv,
-		Address.SpecialNames.IsOverride(s) => NameTypeToCode(Address.SpecialNames.overrideType(s)),
+		Address.SpecialNames.IsOverride(s) => $.Conversions.NameTypeToCode(Address.SpecialNames.overrideType(s)),
 		REGEXFIND(rgxCaseNum, s) => MatchType.Inv,
 		REGEXFIND('^CREDIT[A-Z ]+APPLICANT$', s) => MatchType.Inv,
 		REGEXFIND(rgxStreet,s) => MatchType.Inv,
+		REGEXFIND('^CEO +[A-Z]+$', TRIM(s)) => MatchType.Inv,
 		IsInvalidTaxpayer(s) => MatchType.Inv,
 		REGEXFIND('^[0-9]+ +(PERCENT|PER CENT)$', s) => MatchType.Inv,
 		//***** UNKNOWN
@@ -835,7 +781,7 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 							MatchType.Business, MatchType.Inv),
 			
 		// CARDHOLDER
-		REGEXFIND('^[A-Z]+ +[A-Z]* *CARDHOLDER$', s) AND ((Address.NameTester.IsFirstName(TRIM(words[1].word))) OR
+		REGEXFIND('^[A-Z]+ +[A-Z]* *CARDHOLDER$', s) AND (($.NameTester.IsFirstName(TRIM(words[1].word))) OR
 					(TRIM(words[1].word) IN ['TEST', 'BANKBOSTON','SECURED','PURPOSE','SHELL','TWO']))
 					=> MatchType.Inv,
 		// Rule x: Trusts
@@ -849,27 +795,25 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 
 		REGEXFIND('\\b(T/E|TRUST PT|A LIFE E|LIVING TST|A LIVING T|LIV TRT|REV TRUS|REV TRT|REV LT|(ROTH|SEP|TRU[, ]ST|ROLLOVER) IRA)\\b|\\bRT$', s) => MatchType.Trust,
 		// business words
-		//REGEXFIND('\\bTRUST(S)?\\b',s) => CheckTrust(s, words, digraphs, name),
-		NOT REGEXFIND(CoTrustees, s) AND REGEXFIND('\\b(TRUST|TRUS|TRU|TRST|TST|TRUSTS)\\b',s) => CheckTrust(s, words, digraphs, name),
-//		LikelyTrust(s) => MatchType.Trust,
+		NOT REGEXFIND(CoTrustees, s) AND REGEXFIND('\\b(TRUST|TRUS|TRU|TRST|TST|TRUSTS)\\b',s) => CheckTrust(s, words, digraphs, name, format),
 		REGEXFIND('\\bEXECUT(OR|RIX) +(OF|FOR)\\b', s) => MatchType.Inv,				//MatchType.Unclass,
 		NOT REGEXFIND(CoTrustees, s) AND	NOT REGEXFIND(Positions, s) AND	// avoiding interpreting CO as company
-				Address.NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,
+				$.NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,
 		(REGEXFIND(CoTrustees, s) OR	REGEXFIND(Positions, s)) AND	// avoiding interpreting CO as company
-				Address.NameTester.MatchBusinessTokens(words(word<>'CO'), digraphs) => MatchType.Business,
+				$.NameTester.MatchBusinessTokens(words(word<>'CO'), digraphs) => MatchType.Business,
 				
 //		COUNT(words) > 10 => MatchType.Business,
 		Address.SpecialNames.IsKnownBusiness(RemoveSuffix(s)) => MatchType.Business,
 		Address.SpecialNames.IsKnownBusiness(s) => MatchType.Business,
 		
-		IsGeoCity(s) => MatchType.Business,
+		IsGeoCity(name, format) => MatchType.Business,
 		REGEXFIND('\\b' + rgxChurchTypes + ' +' + rgxChurchWords + '\\b',s) => MatchType.Business,
 		REGEXFIND('\\b' + rgxChurchWords + ' +' + rgxChurchTypes + '\\b',s) => MatchType.Business,
 		IsSaintWord(REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS|FIRST|LIFE) +[A-Z ]+ +([A-Z]+)\\b', s, 2))
 										=> MatchType.Business,
 		REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS) +[A-Z]+ *( AND |&) *[A-Z]+', s) => MatchType.Business,
-		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) 
-				OR CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, name, 1), preferBiz) => MatchType.Business, 
+		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz, format) 
+				OR CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, name, 1), preferBiz, format) => MatchType.Business, 
 		
 		StringLib.StringFind(s, 'CORPORATION', 1) > 0 OR
 		StringLib.StringFind(s, 'MORTGAGE', 1) > 0 OR
@@ -891,7 +835,7 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 		
 		//Std.str.Contains(options,'W',true) and REGEXFIND('^[A-Z]+$',s) => MatchType.Person,
 		// abbreviation NT
-		REGEXFIND('^[0-9]+ +.+ +([A-Z]+) +NT,?$',s, 1) in geowords => MatchType.Inv,
+		//REGEXFIND('^[0-9]+ +.+ +([A-Z]+) +NT,?$',s, 1) in geowords => MatchType.Inv,
 		MatchPattern(s) => MatchType.Business,
 		
 		// junk matches 
@@ -916,8 +860,8 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 		// other unclassified names
 		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
-//$		SpecialNames.IsCityState(s) => MatchType.Unclass,
-		// final checks before person
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+	// final checks before person
 		
 		REGEXFIND('^BABY (BOY|GIRL) ',s) => MatchType.Inv,		//MatchType.Unclass,
 
@@ -929,16 +873,13 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
-
 		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
-		//REGEXFIND('^(EST|TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Trust,		//MatchType.Unclass,
-		//REGEXFIND('\\b(LT|FT)$',s) => MatchType.Inv,		//MatchType.Unclass,
-//		SpecialNames.IsAbbreviation(tokens[NumTokens]) => MatchType.Inv,		//MatchType.Unclass,
+
 
 		REGEXFIND('^[A-Z]+ +[0-9] +[A-Z]+$',s) => MatchType.Inv,	// name numeral name
 		IsGreekFrat(words) => MatchType.Business,
 		REGEXFIND('\\b(A LOT|U SAVE)\\b', s) AND
-			NOT Address.NameTester.IsFirstName(REGEXFIND('^([A-Z]+) +(A LOT|U SAVE)\\b', s, 1))
+			NOT $.NameTester.IsFirstName(REGEXFIND('^([A-Z]+) +(A LOT|U SAVE)\\b', s, 1))
 							=> MatchType.Business,
 
 		REGEXFIND('^[A-Z]+$',name) AND ~REGEXFIND('^[A-Z]+$',s)
@@ -951,21 +892,24 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
-		Address.Persons.IsDualName(name) => MatchType.Dual,
+		NameTester.IsAmbiguousWord(REGEXFIND('\\b([A-Z]+) +SERVICE\\b', TRIM(name), 1)) => MatchType.Business,
+		$.mod_NameFormat.IsDualName(name, format) => MatchType.Dual,
 		IsFirmName(s, name) => MatchType.Business,
-		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
+		IsAmbiguousBusiness(words, s, name, format) => MatchType.Business,
 		//Address.Persons.IsDualName(name) => MatchType.Dual,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,
-		Address.NameTester.IsAmbiguousWord(REGEXFIND('^[A-Z]+ *& *[A-Z]+ +([A-Z]+)$',s,1)) => MatchType.Business,
+		$.NameTester.IsAmbiguousWord(REGEXFIND('^[A-Z]+ *& *[A-Z]+ +([A-Z]+)$',s,1)) => MatchType.Business,
 		// from Gong
 		REGEXFIND('\\b(UNPUBLISHED|UNLISTED|BLOCKED|FOR)\\b',s) => MatchType.Inv,
-		REGEXFIND('^[A-Z]{2,} +[A-Z]{2,}$',name) => TwoWordName(name),
+		REGEXFIND('^[A-Z]{2,} +[A-Z]{2,}$',name) => TwoWordName(name, quality),
 		name = '' => MatchType.Inv,
 		STD.Str.FindCount(s, '&') >= 3 => MatchType.Inv,
 		REGEXFIND('^[0-9]+[A-Z]+[0-9]+$', name) => MatchType.Inv,
 		REGEXFIND('^[0-9]+', s) AND CheckBusEndings(s) => MatchType.Business,
 		REGEXFIND('^[A-Z]+ +[A-Z]+ +[A-Z] [A-Z]$', s) AND CheckBusEndings(s) => MatchType.Business,
-		0);
+		
+		quality = 0 => NotAName(name, s, words, format),			// Persons.NameStatus.NotAName
+		quality <> 0 => $.fn_isPerson(name, quality),
+		MatchType.NoMatch);
 
 	END;
-

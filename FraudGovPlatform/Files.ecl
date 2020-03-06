@@ -67,6 +67,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim,Layouts.Crim,Crim);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death,Layouts.Death,Death);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint,Layouts.FraudPoint,FraudPoint);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BestInfo,Layouts.BestInfo,BestInfo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii_Demo,Layouts.Pii,Pii_Demo);
@@ -94,6 +95,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entity_scorebreakdown_demo,Layouts.entityScoreBreakdown, kel_entity_scorebreakdown_demo,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopEntityStats_demo,Layouts.CustomerDashTopEntityStats, kel_CustomerDashTopEntityStats_demo,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_demo,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClusters_demo,Layouts.CustomerDashTopClusters, kel_CustomerDashTopClusters_demo,,,,,,true);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customeraddress_delta,Layouts.CustomerAddress,kel_customeraddress_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personstats_delta,Layouts.PersonStats, kel_personstats_delta);
@@ -107,12 +109,14 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entity_scorebreakdown_delta,Layouts.entityScoreBreakdown, kel_entity_scorebreakdown_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopEntityStats_delta,Layouts.CustomerDashTopEntityStats, kel_CustomerDashTopEntityStats_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_delta,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClusters_delta,Layouts.CustomerDashTopClusters, kel_CustomerDashTopClusters_delta);
 		
 	end;
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
 	export CustomerMappings := dataset(Filenames().CustomerMappings,Layouts.CustomerMappings,thor,opt);
 	export CustomerDashboard := dataset(Filenames().CustomerDashboard,Layouts.DashboardResponse,thor,opt);
+	export CustomerDashboard1_1 := dataset(Filenames().CustomerDashboard1_1,Layouts.DashboardResponse,thor,opt);
 	export ClusterDetails := dataset(Filenames().ClusterDetails,Layouts.DashboardResponse,thor,opt);
 	export ProdDashboardVersion := dataset(Filenames().ProdDashboardVersion,Layouts.ProdDashboardVersion,thor,opt);
 

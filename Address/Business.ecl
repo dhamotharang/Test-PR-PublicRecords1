@@ -238,6 +238,7 @@ export boolean MatchPattern(string s) := MAP(
 		REGEXFIND('^[A-Z]+ [A-Z] [A-Z] [A-Z] [A-Z]$',s) => true, 	// SUNTRUST B A N K
 		REGEXFIND('^[A-Z]+ +[A-Z]+ *( AND |&) *[A-Z]+ +(MD(S)?|DDS|DPM|ATTY|CPA|VETERINARIANS)?$',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
 		REGEXFIND('\\bA (GUY|LOCK|WING) *( AND |&) *A (GIRL|SAFE|PRAYER)\\b',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
+		REGEXFIND('\\b(CARPET|RUG|GOLF|SNOW|NEWS|TAX|SPA|DIESEL|SALES|MOBILE|TRAILER|HOME|LIMO|TRUCKING) +SERVICE\\b', s) => true,
 		REGEXFIND(rgxHoa,s) => true,
 		false
 	);
@@ -838,6 +839,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		REGEXFIND(rgxCaseNum, s) => MatchType.Inv,
 		REGEXFIND('^CREDIT[A-Z ]+APPLICANT$', s) => MatchType.Inv,
 		REGEXFIND(rgxStreet,s) => MatchType.Inv,
+		REGEXFIND('^CEO +[A-Z]+$', TRIM(s)) => MatchType.Inv,
 		IsInvalidTaxpayer(s) => MatchType.Inv,
 		REGEXFIND('^[0-9]+ +(PERCENT|PER CENT)$', s) => MatchType.Inv,
 		//***** UNKNOWN
@@ -924,8 +926,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsGeo(s) => MatchType.Business,
 		IsGeo(name) => MatchType.Business,
 		
-		// other unclassified names
-		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
+		// other invalid names
+		REGEXFIND('^DIVORCED +[A-Z]+$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
 //$		SpecialNames.IsCityState(s) => MatchType.Unclass,
 		// final checks before person
@@ -941,7 +944,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
 
-		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|MDN) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
 		//REGEXFIND('^(EST|TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Trust,		//MatchType.Unclass,
 		//REGEXFIND('\\b(LT|FT)$',s) => MatchType.Inv,		//MatchType.Unclass,
 //		SpecialNames.IsAbbreviation(tokens[NumTokens]) => MatchType.Inv,		//MatchType.Unclass,
@@ -962,7 +966,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
+		NameTester.IsAmbiguousWord(REGEXFIND('\\b([A-Z]+) +SERVICE\\b', TRIM(name), 1)) => MatchType.Business,
 		Persons.IsDualName(name) => MatchType.Dual,
+		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		IsFirmName(s, name) => MatchType.Business,
 		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,

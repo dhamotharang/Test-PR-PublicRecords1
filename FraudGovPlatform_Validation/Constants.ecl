@@ -20,11 +20,11 @@ module
 	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	
-	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/prod';
-	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';
+	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in';
+	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in';
 
 	export string		ThorName_Dev					:= 'thor400_dev_eclcc';
-	export string		ThorName_Prod				:= 'thor400_44_eclcc';
+	export string		ThorName_Prod				:= 'thor400_36_eclcc';
 
 	export string		hthor_Dev						:= 'hthor_dev_eclcc';
 	export string		hthor_Prod					:= 'hthor_eclcc';

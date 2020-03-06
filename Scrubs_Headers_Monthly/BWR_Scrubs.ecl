@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Headers_Monthly.BWR_Scrubs - Checking field validity in a file - SALT V3.9.0');
-IMPORT Scrubs_Headers_Monthly,SALT39;
+#workunit('name','Scrubs_Headers_Monthly.BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
+IMPORT Scrubs_Headers_Monthly,SALT311;
 infile := Scrubs_Headers_Monthly.In_File;
 mod_scrubs := Scrubs_Headers_Monthly.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;

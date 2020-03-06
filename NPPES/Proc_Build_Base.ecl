@@ -1,4 +1,12 @@
-﻿#stored('did_add_force','thor');
+/*2019-08-17T22:07:47Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-256
+*/
+
+/*2019-12-05T13:20:00Z (Vladislavas, Petrokas (RIS-BCT))
+ROOLLUP EXCEPT FIX (ADDED global_sid,record_sid,source_rec_id to the ROOLLUP EXCEPT)
+*/
+
+#stored('did_add_force','thor');
 import address, 
 	   business_header_ss, 
 	   business_header, 
@@ -147,7 +155,7 @@ nppes.Layouts.base   buildBase(outfile15 L) := transform, skip (length(trim(rege
 															'5' => 'OTHER NAME',									
 															'');
 		self.mailing_country_desc					:= ut.Country_ISO2_To_Name(l.provider_business_mailing_address_country_code);
-		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.provider_business_practice_location_address_city_name);
+		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.Provider_Business_Practice_Location_Address_Country_Code);
 		self.other_pid_issuer_desc_1                := getIssuerDesc(l.other_provider_identifier_type_code_1);
 		self.other_pid_issuer_desc_2                := getIssuerDesc(l.other_provider_identifier_type_code_2);
 		self.other_pid_issuer_desc_3                := getIssuerDesc(l.other_provider_identifier_type_code_3);
@@ -297,7 +305,8 @@ end;
 		SELF.dt_vendor_last_reported	:= MAX(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 		SELF.dt_vendor_first_reported	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 		SELF.process_date				      := IF(L.process_date > r.process_date, L.process_date, R.process_date);
-		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);	
+		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+		
 		SELF := L;		
 	END;
 
@@ -306,13 +315,12 @@ end;
 	// have a 0 and the base record would not (if an lnpid was found).  In the future, if there's a
 	// field added that's sorted above, but not calculated/determined until later... you'll need to
 	// probably add it to the EXCEPT below to keep the records collapsing correctly.
-	
   prebase_rolledup := ROLLUP(npi_dist_sort, rollupBase(LEFT, RIGHT),
 																 EXCEPT did, did_score, bdid, bdid_score, dt_first_seen, dt_last_seen,
 																		dt_vendor_first_reported, dt_vendor_last_reported, process_date,
 																		clean_name_provider.name_score, clean_name_provider_other.name_score,
 																		clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
-																		RawAID_Location, AceAID_Location, source_rec_id, lnpid,
+																		RawAID_Location, AceAID_Location,global_sid,record_sid,source_rec_id, lnpid, //added global_sid,record_sid,source_rec_id
 																		xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
 																		xadl2_matches, xadl2_matches_desc,																		
 																 LOCAL);
@@ -327,7 +335,16 @@ end;
             										 ,local);
 
 	ut.MAC_Append_Rcid (sync_dates, source_rec_id, addSourceRid);
-   
-	return addSourceRid;
+	
+	// move source_rec_id to record_sid field for CCPA project
+	nppes.layouts.base addRecSid(nppes.layouts.base L) := transform
+			self.global_sid	:= 22931;
+			self.record_sid := L.source_rec_id;
+			self						:= L;
+	end;
+	
+	with_record_sid := project(addSourceRid, addRecSid (left));
+
+	return with_record_sid;
 
 end;

@@ -1,11 +1,11 @@
-﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild;
+﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild, dops, Scrubs_FirstData;
 
 EXPORT Proc_FirstData_buildall(
 	STRING  pVersion   = (STRING)STD.Date.Today(),
 	STRING  pServerIP  = FirstData.Constants(pVersion).serverIP,
 	STRING  pDirectory = FirstData.Constants(pVersion).Directory + pVersion + '/',
 	STRING  pFilename  = '*csv',
-	STRING  pContacts  = Email_Notification_Lists().BuildSuccess, 
+	STRING  pContacts  = Email_Notification_Lists().BuildSuccess,
 	STRING  pGroupName = _Dataset().pGroupname,
 	BOOLEAN pIsTesting = FALSE,
 	BOOLEAN pOverwrite = FALSE
@@ -23,6 +23,11 @@ EXPORT Proc_FirstData_buildall(
 		)
 	);
 
+	shared dops_update := SEQUENTIAL(
+		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N'),
+		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F')
+	);
+	
 	// All filenames associated with this Dataset
 	SHARED dAll_filenames := Filenames().dAll_filenames;
 
@@ -41,7 +46,9 @@ EXPORT Proc_FirstData_buildall(
 		BuildLogger.KeyEnd(false),
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
-		// FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
+		dops_update,
+		FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
+		Scrubs_FirstData.fn_RunScrubs(pversion,''),
 		BuildLogger.PostEnd(False),
 		BuildLogger.BuildEnd(false)
 	): 

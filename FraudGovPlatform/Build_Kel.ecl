@@ -35,6 +35,7 @@ BuildStatusReport :=
 +'wuname := \'FraudGov Build Status Report\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'protect\', true);\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov Build Status Report\'\n'
@@ -55,7 +56,7 @@ BuildStatusReport :=
 										,Promote(pversion).buildfiles.New2Built
 										,Promote(pversion).buildfiles.Built2QA
 										,FraudGovPlatform.Promote(pversion).promote_keys
-										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
+										,FraudGovPlatform.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
 										,FraudGovPlatform.Send_Emails(pversion).Roxie										

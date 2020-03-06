@@ -1,7 +1,10 @@
-import ut,doxie,header, mdr;
+﻿import ut,doxie,header, mdr, suppress ;
 
-export fn_ADLSegmentation(dataset(header.Layout_Header) f_, boolean isFCRA = FALSE )  := module
+export fn_ADLSegmentation(dataset(header.Layout_Header) hdr_in, boolean isFCRA = FALSE )  := module
 
+	hdr_adl_in := header.regulatory.apply_ADL_Segment(hdr_in); 
+		
+	f_ := distribute(hdr_adl_in, hash(did));
 
 	slimr :=
 	RECORD

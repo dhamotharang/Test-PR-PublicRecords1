@@ -1,4 +1,4 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Medians_Scrubs := MODULE
  
@@ -19,13 +19,42 @@ EXPORT Medians_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Medians_Layout_AVM)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Medians_Layout_AVM)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'history_date:Invalid_Date:CUSTOM'
+          ,'fips_geo_12:Invalid_Num:ALLOW'
+          ,'median_valuation:Invalid_Num:ALLOW'
+          ,'history_history_date:Invalid_Date:CUSTOM'
+          ,'history_median_valuation:Invalid_Num:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Medians_Fields.InvalidMessage_history_date(1)
+          ,Medians_Fields.InvalidMessage_fips_geo_12(1)
+          ,Medians_Fields.InvalidMessage_median_valuation(1)
+          ,Medians_Fields.InvalidMessage_history_history_date(1)
+          ,Medians_Fields.InvalidMessage_history_median_valuation(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(Medians_Layout_AVM) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.history_date_Invalid := Medians_Fields.InValid_history_date((SALT38.StrType)le.history_date);
-    SELF.fips_geo_12_Invalid := Medians_Fields.InValid_fips_geo_12((SALT38.StrType)le.fips_geo_12);
-    SELF.median_valuation_Invalid := Medians_Fields.InValid_median_valuation((SALT38.StrType)le.median_valuation);
-    SELF.history_history_date_Invalid := Medians_Fields.InValid_history_history_date((SALT38.StrType)le.history_history_date);
-    SELF.history_median_valuation_Invalid := Medians_Fields.InValid_history_median_valuation((SALT38.StrType)le.history_median_valuation);
+    SELF.history_date_Invalid := Medians_Fields.InValid_history_date((SALT311.StrType)le.history_date);
+    SELF.fips_geo_12_Invalid := Medians_Fields.InValid_fips_geo_12((SALT311.StrType)le.fips_geo_12);
+    SELF.median_valuation_Invalid := Medians_Fields.InValid_median_valuation((SALT311.StrType)le.median_valuation);
+    SELF.history_history_date_Invalid := Medians_Fields.InValid_history_history_date((SALT311.StrType)le.history_history_date);
+    SELF.history_median_valuation_Invalid := Medians_Fields.InValid_history_median_valuation((SALT311.StrType)le.history_median_valuation);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -35,6 +64,19 @@ EXPORT FromNone(DATASET(Medians_Layout_AVM) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -78,8 +120,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -93,7 +135,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.history_median_valuation_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'history_date','fips_geo_12','median_valuation','history_history_date','history_median_valuation','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Num','Invalid_Num','Invalid_Date','Invalid_Num','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.history_date,(SALT38.StrType)le.fips_geo_12,(SALT38.StrType)le.median_valuation,(SALT38.StrType)le.history_history_date,(SALT38.StrType)le.history_median_valuation,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.history_date,(SALT311.StrType)le.fips_geo_12,(SALT311.StrType)le.median_valuation,(SALT311.StrType)le.history_history_date,(SALT311.StrType)le.history_median_valuation,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,5,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -101,36 +143,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Medians_Layout_AVM) prevDS = DATASET([], Medians_Layout_AVM), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'history_date:Invalid_Date:CUSTOM'
-          ,'fips_geo_12:Invalid_Num:ALLOW'
-          ,'median_valuation:Invalid_Num:ALLOW'
-          ,'history_history_date:Invalid_Date:CUSTOM'
-          ,'history_median_valuation:Invalid_Num:ALLOW'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Medians_Fields.InvalidMessage_history_date(1)
-          ,Medians_Fields.InvalidMessage_fips_geo_12(1)
-          ,Medians_Fields.InvalidMessage_median_valuation(1)
-          ,Medians_Fields.InvalidMessage_history_history_date(1)
-          ,Medians_Fields.InvalidMessage_history_median_valuation(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.history_date_CUSTOM_ErrorCount
           ,le.fips_geo_12_ALLOW_ErrorCount
@@ -149,7 +167,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.fips_geo_12_ALLOW_ErrorCount
           ,le.median_valuation_ALLOW_ErrorCount
           ,le.history_history_date_CUSTOM_ErrorCount
-          ,le.history_median_valuation_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.history_median_valuation_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -163,12 +181,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -183,7 +201,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -210,7 +228,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,5,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -235,12 +253,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(Medians_Layout_AVM) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_AVM, Medians_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_AVM, Medians_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -251,10 +269,10 @@ EXPORT StandardStats(DATASET(Medians_Layout_AVM) inFile, BOOLEAN doErrorOverall 
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

@@ -10,10 +10,10 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	//Pull Gong History Records///////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
-	ds 								:= Gong.Key_History_Phone;
-	
+  ds := File_OptedOut_Inputs.Gong;//CCPA-799
+  
 	//Pull Date From Filename
-	fd 								:= nothor(Fileservices.Getsuperfilesubname('~thor_data400::key::gong_history_phone_qa',1));
+	fd 								:= nothor(Fileservices.Getsuperfilesubname(Data_Services.foreign_prod+'thor_data400::key::gong_history_phone_qa',1));
 	trFDate						:= trim(fd, left, right);
 	fDate							:= stringlib.stringfilter(trFDate[std.str.Find(trFDate, 'history', 1)..], '0123456789');
 	
@@ -36,15 +36,15 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	addAddr_did 			:= addAddr(hhid=0 and did<>0 and bdid=0) + addAddr(hhid=0 and did<>0 and bdid<>0);
 	addAddr_bdid			:= addAddr(hhid=0 and did=0 and bdid<>0) + addAddr(hhid<>0 and did=0 and bdid<>0);
 	
-	//Pull Current Records First
-	dhhid							:= dedup(sort(distribute(addAddr_hhid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), p3+phone7, hhid, local);
-	ddid							:= dedup(sort(distribute(addAddr_did(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, did, local);
-	dbdid							:= dedup(sort(distribute(addAddr_bdid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, bdid, local);	
+	//Pull Current Records First//CCPA-799 - performance tuning
+	dhhid							:= dedup(sort(addAddr_hhid(dt_first_seen not in ['','0']), p3+phone7, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), p3+phone7, hhid, local);
+	ddid							:= dedup(sort(addAddr_did(dt_first_seen not in ['','0']) , p3+phone7, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, did, local);
+	dbdid							:= dedup(sort(addAddr_bdid(dt_first_seen not in ['','0']), p3+phone7, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, bdid, local);	
 
 	allRec						:= dhhid + ddid + dbdid;
 
 	//Dedup By Address1; Sort Current Records First
-	ddRec 						:= dedup(sort(distribute(allRec, hash(p3+phone7)), p3+phone7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, address1, local);
+	ddRec 						:= dedup(sort(allRec, p3+phone7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, address1, local);
 
 	tempLayout := record
 		dx_PhonesInfo.Layouts.Phones_Transaction_Main;

@@ -1,4 +1,13 @@
-﻿//
+﻿
+
+
+IMPORT _Control, STD;
+
+
+
+
+
+//
 //	Dataland PPA/RIN Scheduler
 //
 envVars :=
@@ -17,10 +26,14 @@ envVars :=
 
 ip := _Control.IPAddress.bctlpedata12;
 datadir := '/data/rin_ppa/';
-opsdir := '/data/rin_ppa/data_ops/ncf2/';
+opsdir := '/data/rin_ppa/data_ops/ncf2/';  //  what about  MRR2 & MRX2?
+
 
 //Nac_V2.ProcessContributoryFile(ip, rootdir, lfn, ip2, root2, version);
 files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true)(size>0);
+//  rin_ppa file types:  MRR2, MRX2, NCF2
+
+
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput)	:=
 transform
@@ -28,17 +41,22 @@ transform
 	self.ProductCode	:=	Std.Str.ToLowerCase(pInput.ProductCode);
 	self.IsProd				:=	Std.Str.ToLowerCase(pInput.IsProd);
 	self.IsEncrypted	:=	Std.Str.ToLowerCase(pInput.IsEncrypted);
-	self					:=	pInput;
+	self							:=	pInput;
 end;
 dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
-sGroupId	:=	set(dNAC2ConfigForceLower, GroupID);
-dOKFiles	:=	files(Name[1..4] in sGroupId);
+
+
+sGroupId	 :=	set(dNAC2ConfigForceLower, GroupID);
+dOKFiles	 :=	files(Name[6..9] in sGroupId);
+
+
 
 r2 := RECORD
 	string		datadir;
 	string		lfn;
 END;
+
 
 x := project(dOKFiles, TRANSFORM(r2,
 					parts := Std.Str.FindReplace(left.Name, '/', ' ');
@@ -49,6 +67,8 @@ x := project(dOKFiles, TRANSFORM(r2,
 					self.lfn := pieces[cnt];
 					));
 
+
+
 version := (string8)Std.Date.Today() : INDEPENDENT;
 #WORKUNIT('protect',true);
 
@@ -56,10 +76,17 @@ version := (string8)Std.Date.Today() : INDEPENDENT;
 #WORKUNIT('name', 'NAC2 PPA Contributory File Scheduler');
 ThorName := 'thor400_sta_eclcc';		// for dataland
 
+
 lECL1 :=
 envVars
-+'nac_v2.ProcessContributoryFile(\'' + ip+'\',\''+ x[1].dataDir+'\',\''+ x[1].lfn+'\',\''+ opsdir+'\',\''+ version+'\');\n';
++'nac_v2.ProcessContributoryFile(\'' + ip + '\',\''+ x[1].dataDir+'\',\''+ x[1].lfn+'\',\''+ opsdir + '\',\''+ version+'\');\n';
 every_10_min := '*/10 0-23 * * *';
 IF(exists(x), EVALUATE(
-		_Control.fSubmitNewWorkunit(lECL1, ThorName )
+		_Control.fSubmitNewWorkunit(lECL1, ThorName)
 		)) : WHEN(CRON(every_10_min));
+
+
+
+
+
+

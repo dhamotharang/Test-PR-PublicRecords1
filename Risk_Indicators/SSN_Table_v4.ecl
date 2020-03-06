@@ -1,4 +1,4 @@
-import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr;
+﻿import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr;
 
 export SSN_Table_v4(boolean isFCRA) := function;
 
@@ -53,6 +53,9 @@ export SSN_Table_v4(boolean isFCRA) := function;
 		common_rec eq;
 		common_rec en;
 		common_rec tn;
+		//CCPA-768
+		UNSIGNED4	global_sid;
+		UNSIGNED8 record_sid;
 	END;
 
 	ssntable_version4_2 := risk_indicators.ssn_table_v4_2(isFCRA);

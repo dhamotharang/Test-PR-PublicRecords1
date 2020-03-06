@@ -5,16 +5,61 @@ EXPORT Append_CleanAdditionalAddress (
 
 	AddressCache := Files().Base.AddressCache.QA;
 	
-	dFileBase 		:= DISTRIBUTE(PULL(FileBase), HASH(clean_address.prim_range,clean_address.prim_name,clean_address.sec_range,clean_address.zip,clean_address.st));
-	dAddressCache	:= DISTRIBUTE(PULL(AddressCache), HASH(prim_range,prim_name,sec_range,zip,st));
+	pAddressCache	:= Project(AddressCache,Transform(recordof(left)
+													,self.prim_range	:= stringlib.stringfilterout(left.prim_range,'.?<&>*@!\\$=+%~\'')
+													,self.prim_name	:= stringlib.stringfilterout(left.prim_name,'.?<&>*@!\\$=+%~\'')
+													,self.sec_range	:= stringlib.stringfilterout(left.sec_range,'.?<&>*@!\\$=+%~\'')
+													,self:=left));	
+												
+	pFileBase			:= PROJECT(FileBase,Transform(recordof(left)
+													,self.additional_address.clean_address.prim_range	:= stringlib.stringfilterout(left.additional_address.clean_address.prim_range,'.?<&>*@!\\$=+%~\'')
+													,self.additional_address.clean_address.prim_name	:= stringlib.stringfilterout(left.additional_address.clean_address.prim_name,'.?<&>*@!\\$=+%~\'')
+													,self.additional_address.clean_address.sec_range	:= stringlib.stringfilterout(left.additional_address.clean_address.sec_range,'.?<&>*@!\\$=+%~\'')
+													,self:=left));
+													
+	dFileBase 		:= DISTRIBUTE(PULL(pFileBase), HASH(
+		additional_address.clean_address.prim_range,
+		additional_address.clean_address.predir,
+		additional_address.clean_address.prim_name,
+		additional_address.clean_address.addr_suffix,
+		additional_address.clean_address.postdir,
+		additional_address.clean_address.unit_desig,
+		additional_address.clean_address.sec_range,
+		additional_address.clean_address.p_city_name,
+		additional_address.clean_address.v_city_name,
+		additional_address.clean_address.zip,
+		additional_address.clean_address.st
+		));
+
+	dAddressCache	:= DISTRIBUTE(PULL(pAddressCache), HASH(
+		prim_range,
+		predir,
+		prim_name,
+		addr_suffix,
+		postdir,
+		unit_desig,
+		sec_range,
+		p_city_name,
+		v_city_name,
+		zip,
+		st
+		));
 	
 	FraudShared.Layouts.Base.Main T_Append_Additional_Address_From_Cache(FraudShared.Layouts.Base.Main L, FraudGovPlatform.Layouts.Base.AddressCache R) := TRANSFORM
 
-			FOUND := IF(	L.additional_address.clean_address.prim_range 	= R.prim_range AND
-										L.additional_address.clean_address.prim_name  	= R.prim_name AND
-										L.additional_address.clean_address.sec_range 		= R.sec_range AND
-										L.additional_address.clean_address.zip 					= R.zip AND
-										L.additional_address.clean_address.st 					= R.st, TRUE, FALSE);
+			FOUND := IF(	
+						L.additional_address.clean_address.prim_range = R.prim_range AND
+						L.additional_address.clean_address.predir = R.predir AND
+						L.additional_address.clean_address.prim_name = R.prim_name AND
+						L.additional_address.clean_address.addr_suffix = R.addr_suffix AND
+						L.additional_address.clean_address.postdir = R.postdir AND
+						L.additional_address.clean_address.unit_desig = R.unit_desig AND
+						L.additional_address.clean_address.sec_range = R.sec_range AND
+						L.additional_address.clean_address.p_city_name = R.p_city_name AND
+						L.additional_address.clean_address.v_city_name = R.v_city_name AND
+						L.additional_address.clean_address.zip = R.zip AND
+						L.additional_address.clean_address.st = R.st										
+						, TRUE, FALSE);
 
 			SELF.additional_address.clean_address.prim_range			:= if(FOUND, R.prim_range,		L.additional_address.clean_address.prim_range);
 			SELF.additional_address.clean_address.predir					:= if(FOUND, R.predir,				L.additional_address.clean_address.predir);
@@ -56,11 +101,17 @@ EXPORT Append_CleanAdditionalAddress (
 	J_Additional_Addresses_Cleared_From_Cache := JOIN(
 		dFileBase,
 		dAddressCache,
-		LEFT.additional_address.clean_address.prim_range 	= RIGHT.prim_range AND
-		LEFT.additional_address.clean_address.prim_name  	= RIGHT.prim_name AND
-		LEFT.additional_address.clean_address.sec_range 	= RIGHT.sec_range AND
-		LEFT.additional_address.clean_address.zip 				= RIGHT.zip AND
-		LEFT.additional_address.clean_address.st 					= RIGHT.st,
+			LEFT.additional_address.clean_address.prim_range = RIGHT.prim_range AND
+			LEFT.additional_address.clean_address.predir = RIGHT.predir AND
+			LEFT.additional_address.clean_address.prim_name = RIGHT.prim_name AND
+			LEFT.additional_address.clean_address.addr_suffix = RIGHT.addr_suffix AND
+			LEFT.additional_address.clean_address.postdir = RIGHT.postdir AND
+			LEFT.additional_address.clean_address.unit_desig = RIGHT.unit_desig AND
+			LEFT.additional_address.clean_address.sec_range = RIGHT.sec_range AND
+			LEFT.additional_address.clean_address.p_city_name = RIGHT.p_city_name AND
+			LEFT.additional_address.clean_address.v_city_name = RIGHT.v_city_name AND
+			LEFT.additional_address.clean_address.zip = RIGHT.zip AND
+			LEFT.additional_address.clean_address.st = RIGHT.st,
 		T_Append_Additional_Address_From_Cache(LEFT,RIGHT),
 		LEFT OUTER,
 		LOCAL
@@ -71,7 +122,7 @@ EXPORT Append_CleanAdditionalAddress (
 	FraudShared.Layouts.Base.Main T_Clean_Additional_Address( FraudShared.Layouts.Base.Main L ) := TRANSFORM 
 	
 	//*********************************************  CleanAddress182  **************************************************//
-				mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.additional_address.Street_1) + ' ' + trim(l.additional_address.Street_2));
+				mailing_address_1 := stringlib.stringfilterout(tools.AID_Helpers.fRawFixLine1( trim(l.additional_address.Street_1) + ' ' + trim(l.additional_address.Street_2)),'.?<&>*@!\\$=+%~\'');
 				mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.additional_address.City) + if(l.additional_address.State != '', ', ', '') + trim(l.additional_address.State)  + ' ' + trim(l.additional_address.Zip)[1..5]));
 				Clean_Address_182 :=  if (trim(l.additional_address.Street_1)!='' or trim(l.additional_address.Street_2)!='' or trim(l.additional_address.City)!='' or trim(l.additional_address.State)!='' or trim(l.additional_address.Zip) != '', address.CleanAddress182(mailing_address_1, mailing_address_2), '');
 	//****

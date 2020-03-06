@@ -1,4 +1,5 @@
 ﻿EXPORT Constants := MODULE
+EXPORT dops_name := 'EmailDataV2Keys';
 EXPORT key_prefix 				:= '~prte::key::email_dataV2::';
 EXPORT key_FCRA_prefix 		:= '~prte::key::email_dataV2::fcra::';
 

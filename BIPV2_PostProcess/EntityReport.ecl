@@ -121,6 +121,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     unsigned4 recent_defunct_2to3y_cnt;
     unsigned4 recent_defunct_3to5y_cnt;
     unsigned4 recent_defunct_5y_plus_cnt;
+    unsigned4 recent_unknown_cnt;
     unsigned4 sbfe_cnt;
     unsigned4 contact_did_cnt;
     unsigned4 sic_cnt;
@@ -179,6 +180,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     unsigned4 recent_defunct_2to3y;
     unsigned4 recent_defunct_3to5y;
     unsigned4 recent_defunct_5y_plus;
+    unsigned4 recent_unknown;
   end;
  
   shared  percent_rec := {				
@@ -230,6 +232,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     real recent_defunct_2to3y;
     real recent_defunct_3to5y;
     real recent_defunct_5y_plus;
+    real recent_unknown;
   };
 
   // ********************** State start **************************
@@ -410,109 +413,162 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   shared YEARS_3   := MONTHS_12 * 3;
   shared YEARS_5 		:= MONTHS_12 * 5;
 
-  shared calculateStatsByState(dataset(slim_rec) records, string name) := module
+  export calculateStatsByState(dataset(slim_rec) records, string name) := module
     // Calculate stats per Sele
-    shared tally_rec tallyTransform(slim_rec l, dataset(slim_rec) allrows) := transform
-            proxid_tot                 := count(table(allrows(proxid<>0), {proxid}, proxid)) ;
-            fein_tot                   := count(table(allrows(trim(company_fein)<>''), {company_fein}, company_fein)) ;
-            self.seleid_tot            := count(allrows) ;
-            self.seleid_cnt            := if(exists(allrows(seleid<>0)), 1, 0);
-            self.proxid_tot            := proxid_tot;
-            self.proxid_cnt            := if(exists(allrows(proxid<>0)), 1, 0);
-            self.lexid_tot             := count(table(allrows(contact_did<>0), {contact_did}, contact_did)) ;
-            self.lexid_cnt             := if(exists(allrows(contact_did<>0)), 1, 0);
-            self.private_active_cnt    := if(l.seleid_status_private='',  1, 0);		// this value is consistent for all records of a given sele
+
+    shared pre_tally_rec := {
+            tally_rec -fein_range_rec -prox_range_rec -source_type_rec,
+            header_layout.proxid;
+            boolean has_dt_last_seen;
+            integer4 daysOld;
+            unsigned4 fein_tot;
+            boolean src_p, 
+            boolean src_b, 
+            boolean src_d, 
+            boolean src_t, 
+            };
+												
+    shared pre_tally_rec toPreTallyTransform(slim_rec rec) := transform
+            self.seleid_tot            := 1; 
+            self.seleid_cnt            := 1; 
+            self.proxid_tot            := 1; 
+            self.proxid_cnt            := if(rec.proxid<>0, 1, 0); 
+            self.lexid_tot             := 0; 
+            self.lexid_cnt             := if(rec.contact_did<>0, 1, 0); 
+            self.private_active_cnt    := if(rec.seleid_status_private='', 1, 0); 
  
-            isPrivateInactive          := l.seleid_status_private='I';
+            isPrivateInactive          := rec.seleid_status_private='I';
             self.private_inactive_cnt  := if(isPrivateInactive, 1, 0);
-            isPrivateDefunt            := l.seleid_status_private='D';
+            isPrivateDefunt            := rec.seleid_status_private='D';
             self.private_defunct_cnt   := if(isPrivateDefunt, 1, 0);
-            self.public_active_cnt     := if(l.seleid_status_public='', 1, 0);	
+            self.public_active_cnt     := if(rec.seleid_status_public='', 1, 0);	
  
-            isPublicInactive           := l.seleid_status_public='I';										
+            isPublicInactive           := rec.seleid_status_public='I';										
             self.public_inactive_cnt   := if(isPublicInactive, 1, 0);
  
-            isPublicDefunct            := l.seleid_status_public='D';
+            isPublicDefunct            := rec.seleid_status_public='D';
             self.public_defunct_cnt    := if(isPublicDefunct, 1, 0);
-            self.gold_cnt              := if(exists(allrows(sele_gold='G')), 1, 0);
-            self.fein_cnt              := if(exists(allrows(trim(company_fein)<>'')), 1, 0);	
+            self.gold_cnt              := if(rec.sele_gold='G', 1, 0);
+            self.fein_cnt              := if(trim(rec.company_fein)<>'', 1, 0);
 												
-            self.charter_number_cnt    := if(exists(allrows(trim(company_charter_number)<>'')), 1, 0);		
-            self.duns_number_cnt       := if(exists(allrows(trim(duns_number)<>'')), 1, 0);			
-            self.enterprise_number_cnt := if(exists(allrows(trim(active_enterprise_number)<>'')), 1, 0);			
-            self.phone_cnt             := if(exists(allrows(trim(company_phone)<>'')), 1, 0);
-            self.nonprofit_cnt         := if( exists(allrows(MDR.sourceTools.SourceIsIRS_Non_Profit(source))), 1, 0);
-            self.cortera_cnt           := if( exists(allrows(MDR.sourceTools.SourceIsCortera(source))), 1, 0);
-            self.sec_of_state_cnt      := if(exists(allrows(MDR.sourcetools.SourceIsCorpV2(source))), 1, 0);								
+            self.charter_number_cnt    := if(trim(rec.company_charter_number)<>'', 1, 0);
+            self.duns_number_cnt       := if(trim(rec.duns_number)<>'', 1, 0);
+            self.enterprise_number_cnt := if(trim(rec.active_enterprise_number)<>'', 1, 0);
+            self.phone_cnt             := if(trim(rec.company_phone)<>'', 1, 0);
+            self.nonprofit_cnt         := if(MDR.sourceTools.SourceIsIRS_Non_Profit(rec.source), 1, 0);
+            self.cortera_cnt           := if(MDR.sourceTools.SourceIsCortera(rec.source), 1, 0);
+            self.sec_of_state_cnt      := if(MDR.sourcetools.SourceIsCorpV2(rec.source), 1, 0);
  					
-            daysOld := min(allrows(dt_last_seen>0), STD.Date.DaysBetween(dt_last_seen, reportDate));
- 						
-            self.recent_0to6m_cnt      := if(daysOld <= MONTHS_6,                        1, 0);
-            self.recent_6to12_cnt      := if(daysOld between MONTHS_6  +1 and MONTHS_12, 1, 0);
-            self.recent_12to18m_cnt    := if(daysOld between MONTHS_12 +1 and MONTHS_18, 1, 0);
-            self.recent_18to24m_cnt    := if(daysOld between MONTHS_18 +1 and YEARS_2,   1, 0);
-            recent_2to3y               := daysOld between YEARS_2   +1 and YEARS_3;
-            recent_3to5y               := daysOld between YEARS_3   +1 and YEARS_5;
-            recent_5y_plus             := daysOld > YEARS_5;
-            self.recent_defunct_2to3y_cnt   := if(recent_2to3y   and isPrivateDefunt,       1, 0);
-            self.recent_defunct_3to5y_cnt   := if(recent_3to5y   and isPrivateDefunt,       1, 0);
-            self.recent_defunct_5y_plus_cnt := if(recent_5y_plus and isPrivateDefunt,       1, 0);
-            self.recent_inactive_2to3y_cnt  := if(recent_2to3y   and not isPrivateDefunt,   1, 0);
-            self.recent_inactive_3to5y_cnt  := if(recent_3to5y   and not isPrivateDefunt,   1, 0);
-            self.recent_inactive_5y_plus_cnt:= if(recent_5y_plus and not isPrivateDefunt,   1, 0);
+            self.has_dt_last_seen      := rec.dt_last_seen<>0;
+						      self.daysOld               := if(self.has_dt_last_seen, STD.Date.DaysBetween(rec.dt_last_seen, reportDate), 1000000);
  
-            self.sbfe_cnt              := if( exists(allrows(MDR.sourceTools.SourceIsBusiness_Credit(source))), 1, 0);
-            self.contact_did_cnt       := if(exists(allrows(contact_did<>0)), 1, 0);
-            self.sic_cnt               := if(exists(allrows(trim(company_sic_code1)<>'')) or
-                                             exists(allrows(trim(company_sic_code2)<>'')) or
-                                             exists(allrows(trim(company_sic_code3)<>'')) or
-                                             exists(allrows(trim(company_sic_code4)<>'')) or
-                                             exists(allrows(trim(company_sic_code5)<>'')), 1, 0);
-            self.naics_cnt             := if(exists(allrows(trim(company_naics_code1)<>'')) or
-                                             exists(allrows(trim(company_naics_code2)<>'')) or
-                                             exists(allrows(trim(company_naics_code3)<>'')) or
-                                             exists(allrows(trim(company_naics_code4)<>'')) or
-                                             exists(allrows(trim(company_naics_code5)<>'')), 1, 0);												
-            self.proxid_1              := if(proxid_tot=1, 1, 0);
-            self.proxid_2              := if(proxid_tot=2, 1, 0);
-            self.proxid_3to4           := if(proxid_tot>=3 and proxid_tot<=4, 1, 0);
-            self.proxid_5to10          := if(proxid_tot>=5 and proxid_tot<=10, 1, 0);
-            self.proxid_11to25         := if(proxid_tot>=11 and proxid_tot<=25, 1, 0);
-            self.proxid_26to100        := if(proxid_tot>=26 and proxid_tot<=100, 1, 0);
-            self.proxid_101to500       := if(proxid_tot>=101 and proxid_tot<=500, 1, 0);
-            isProxid_501to2000         := proxid_tot>=501 and proxid_tot<=2000;
-            isProxid_2001_Plus         := proxid_tot>=2001;
-            self.proxid_501to2000      := if(isProxid_501to2000, 1, 0);
-            self.proxid_2001_Plus      := if(isProxid_2001_Plus, 1, 0);
-            self.fein_1                := if(fein_tot=1, 1, 0);
-            self.fein_2                := if(fein_tot=2, 1, 0);
-            self.fein_3to4             := if(fein_tot>=3 and fein_tot<=4, 1, 0);
-            self.fein_5to10            := if(fein_tot>=5 and fein_tot<=10, 1, 0);
-            self.fein_11to25           := if(fein_tot>=11 and fein_tot<=25, 1, 0);
-            self.fein_26to100          := if(fein_tot>=26 and fein_tot<=100, 1, 0);
-            self.fein_101to500         := if(fein_tot>=101 and fein_tot<=500, 1, 0);
-            isFein_501to2000           := fein_tot>=501 and fein_tot<=2000;
-            isFein_2001_Plus           := fein_tot>=2001;
-            self.fein_501to2000        := if(isFein_501to2000, 1, 0);
-            self.fein_2001_Plus        := if(fein_tot>=2001, 1, 0);
+            self.sbfe_cnt              := if(MDR.sourcetools.SourceIsBusiness_Credit(rec.source), 1, 0); 
+            self.contact_did_cnt       := if(rec.contact_did<>0, 1, 0); 
+            self.sic_cnt               := if(trim(rec.company_sic_code1)<>'' or
+                                             trim(rec.company_sic_code2)<>'' or
+                                             trim(rec.company_sic_code3)<>'' or
+                                             trim(rec.company_sic_code4)<>'' or
+                                             trim(rec.company_sic_code5)<>'', 1, 0);
+            self.naics_cnt             := if(trim(rec.company_naics_code1)<>'' or
+                                             trim(rec.company_naics_code2)<>'' or
+                                             trim(rec.company_naics_code3)<>'' or
+                                             trim(rec.company_naics_code4)<>'' or
+                                             trim(rec.company_naics_code5)<>'', 1, 0);												
  						
-            src_p                      := exists(allrows(isPublicRecordFn(source))); 
-            src_b                      := exists(allrows(isBureauFn(source))); 
-            src_d                      := exists(allrows(isDirectoryFn(source))); 
-            src_t                      := exists(allrows(isTelephoneFn(source))); 
- 
-            self.src_pub               := if(    src_p and not src_b and not src_d, 1, 0);
-            self.src_bur               := if(not src_p and     src_b and not src_d, 1, 0);
-            self.src_dir               := if(not src_p and not src_b and     src_d, 1, 0);
-            self.src_pub_bur           := if(    src_p and     src_b and not src_d, 1, 0);
-            self.src_pub_dir           := if(    src_p and not src_b and     src_d, 1, 0);
-            self.src_bur_dir           := if(not src_p and     src_b and     src_d, 1, 0);
-            self.src_pub_bur_dir       := if(    src_p and     src_b and     src_d, 1, 0);
-            self.src_tel_only          := if(not src_p and not src_b and not src_d and     src_t, 1, 0);
-            self.src_none              := if(not src_p and not src_b and not src_d and not src_t, 1, 0);
+            self.src_p                      := isPublicRecordFn(rec.source); 
+            self.src_b                      := isBureauFn(rec.source); 
+            self.src_d                      := isDirectoryFn(rec.source); 
+            self.src_t                      := isTelephoneFn(rec.source); 
+
+            self:=rec;
+            self:=[];
+    end;
+	
+
+					
+	   shared pre_tally_rec tallyRoll(pre_tally_rec l, pre_tally_rec r) := transform
+            self.seleid_tot            := l.seleid_tot + r.seleid_tot;               // seleid record counts
+            self.seleid_cnt            := 1;                                         // 1 per sele
+						
+            self.gold_cnt              := if(l.gold_cnt=1 or r.gold_cnt=1,1,0);
+            self.charter_number_cnt    := if(l.charter_number_cnt=1 or r.charter_number_cnt=1,1,0);
+            self.duns_number_cnt       := if(l.duns_number_cnt=1 or r.duns_number_cnt=1,1,0);
+            self.enterprise_number_cnt := if(l.enterprise_number_cnt=1 or r.enterprise_number_cnt=1,1,0);
+            self.phone_cnt             := if(l.phone_cnt=1 or r.phone_cnt=1,1,0);
+            self.nonprofit_cnt         := if(l.nonprofit_cnt=1 or r.nonprofit_cnt=1,1,0);
+            self.cortera_cnt           := if(l.cortera_cnt=1 or r.cortera_cnt=1,1,0);
+            self.sec_of_state_cnt      := if(l.sec_of_state_cnt=1 or r.sec_of_state_cnt=1,1,0);
  					
+            self.has_dt_last_seen      := l.has_dt_last_seen or r.has_dt_last_seen;
+            self.daysOld               := if(r.has_dt_last_seen, if(l.has_dt_last_seen, min(l.daysOld, r.daysold), r.daysOld), l.daysOld); 
+ 
+            self.sbfe_cnt              := if(l.sbfe_cnt=1 or r.sbfe_cnt=1,1,0); 
+            self.contact_did_cnt       := if(l.contact_did_cnt=1 or r.contact_did_cnt=1,1,0);
+            self.sic_cnt               := if(l.sic_cnt=1 or r.sic_cnt=1,1,0); 
+            self.naics_cnt             := if(l.naics_cnt=1 or r.naics_cnt=1,1,0); 
+						
+            self.src_p                 := l.src_p or r.src_p; 
+            self.src_b                 := l.src_b or r.src_b; 
+            self.src_d                 := l.src_d or r.src_d; 
+            self.src_t                 := l.src_t or r.src_t; 
+						
             self:=l;
     end;
+
+   shared tally_rec toTallyTransform(pre_tally_rec rec) := transform
+
+            self.recent_0to6m_cnt      := if(rec.daysOld <= MONTHS_6,                        1, 0);
+            self.recent_6to12_cnt      := if(rec.daysOld between MONTHS_6  +1 and MONTHS_12, 1, 0);
+            self.recent_12to18m_cnt    := if(rec.daysOld between MONTHS_12 +1 and MONTHS_18, 1, 0);
+            self.recent_18to24m_cnt    := if(rec.daysOld between MONTHS_18 +1 and YEARS_2,   1, 0);
+            recent_2to3y               := rec.daysOld between YEARS_2   +1 and YEARS_3;
+            recent_3to5y               := rec.daysOld between YEARS_3   +1 and YEARS_5;
+            recent_5y_plus             := rec.has_dt_last_seen and rec.daysOld > YEARS_5;
+            self.recent_defunct_2to3y_cnt   := if(recent_2to3y   and rec.private_defunct_cnt>0, 1, 0);
+            self.recent_defunct_3to5y_cnt   := if(recent_3to5y   and rec.private_defunct_cnt>0, 1, 0);
+            self.recent_defunct_5y_plus_cnt := if(recent_5y_plus and rec.private_defunct_cnt>0, 1, 0);
+            self.recent_inactive_2to3y_cnt  := if(recent_2to3y   and not rec.private_defunct_cnt>0, 1, 0);
+            self.recent_inactive_3to5y_cnt  := if(recent_3to5y   and not rec.private_defunct_cnt>0, 1, 0);
+            self.recent_inactive_5y_plus_cnt:= if(recent_5y_plus and not rec.private_defunct_cnt>0, 1, 0);
+            self.recent_unknown_cnt    := if(rec.has_dt_last_seen, 0, 1);
+ 						
+            self.proxid_1              := if(rec.proxid_tot=1, 1, 0);
+            self.proxid_2              := if(rec.proxid_tot=2, 1, 0);
+            self.proxid_3to4           := if(rec.proxid_tot>=3 and rec.proxid_tot<=4, 1, 0);
+            self.proxid_5to10          := if(rec.proxid_tot>=5 and rec.proxid_tot<=10, 1, 0);
+            self.proxid_11to25         := if(rec.proxid_tot>=11 and rec.proxid_tot<=25, 1, 0);
+            self.proxid_26to100        := if(rec.proxid_tot>=26 and rec.proxid_tot<=100, 1, 0);
+            self.proxid_101to500       := if(rec.proxid_tot>=101 and rec.proxid_tot<=500, 1, 0);
+            isProxid_501to2000         := rec.proxid_tot>=501 and rec.proxid_tot<=2000;
+            isProxid_2001_Plus         := rec.proxid_tot>=2001;
+            self.proxid_501to2000      := if(isProxid_501to2000, 1, 0);
+            self.proxid_2001_Plus      := if(isProxid_2001_Plus, 1, 0);
+						
+            self.fein_1                := if(rec.fein_tot=1, 1, 0);
+            self.fein_2                := if(rec.fein_tot=2, 1, 0);
+            self.fein_3to4             := if(rec.fein_tot>=3 and rec.fein_tot<=4, 1, 0);
+            self.fein_5to10            := if(rec.fein_tot>=5 and rec.fein_tot<=10, 1, 0);
+            self.fein_11to25           := if(rec.fein_tot>=11 and rec.fein_tot<=25, 1, 0);
+            self.fein_26to100          := if(rec.fein_tot>=26 and rec.fein_tot<=100, 1, 0);
+            self.fein_101to500         := if(rec.fein_tot>=101 and rec.fein_tot<=500, 1, 0);
+            isFein_501to2000           := rec.fein_tot>=501 and rec.fein_tot<=2000;
+            isFein_2001_Plus           := rec.fein_tot>=2001;
+            self.fein_501to2000        := if(isFein_501to2000, 1, 0);
+            self.fein_2001_Plus        := if(isFein_2001_Plus, 1, 0);
+ 
+            self.src_pub               := if(    rec.src_p and not rec.src_b and not rec.src_d, 1, 0);
+            self.src_bur               := if(not rec.src_p and     rec.src_b and not rec.src_d, 1, 0);
+            self.src_dir               := if(not rec.src_p and not rec.src_b and     rec.src_d, 1, 0);
+            self.src_pub_bur           := if(    rec.src_p and     rec.src_b and not rec.src_d, 1, 0);
+            self.src_pub_dir           := if(    rec.src_p and not rec.src_b and     rec.src_d, 1, 0);
+            self.src_bur_dir           := if(not rec.src_p and     rec.src_b and     rec.src_d, 1, 0);
+            self.src_pub_bur_dir       := if(    rec.src_p and     rec.src_b and     rec.src_d, 1, 0);
+            self.src_tel_only          := if(not rec.src_p and not rec.src_b and not rec.src_d and     rec.src_t, 1, 0);
+            self.src_none              := if(not rec.src_p and not rec.src_b and not rec.src_d and not rec.src_t, 1, 0);
+ 					
+            self:=rec;
+    end;	
+		
 								
     shared tally_rec tallyRollup(tally_rec l, tally_rec r) := transform
             self.seleid_tot            := l.seleid_tot            + r.seleid_tot;
@@ -546,6 +602,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
             self.recent_defunct_2to3y_cnt    := l.recent_defunct_2to3y_cnt    + r.recent_defunct_2to3y_cnt; 
             self.recent_defunct_3to5y_cnt    := l.recent_defunct_3to5y_cnt    + r.recent_defunct_3to5y_cnt;
             self.recent_defunct_5y_plus_cnt  := l.recent_defunct_5y_plus_cnt  + r.recent_defunct_5y_plus_cnt;
+            self.recent_unknown_cnt    := l.recent_unknown_cnt    + r.recent_unknown_cnt;
 
             self.sbfe_cnt              := l.sbfe_cnt              + r.sbfe_cnt;
             self.contact_did_cnt       := l.contact_did_cnt       + r.contact_did_cnt;
@@ -610,6 +667,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
             self.recent_defunct_2to3y    := ( (real) l.recent_defunct_2to3y_cnt)    / l.seleid_cnt; 
             self.recent_defunct_3to5y    := ( (real) l.recent_defunct_3to5y_cnt)    / l.seleid_cnt;
             self.recent_defunct_5y_plus  := ( (real) l.recent_defunct_5y_plus_cnt)  / l.seleid_cnt;									
+            self.recent_unknown    := ( (real) l.recent_unknown_cnt)    / l.seleid_cnt;
  
             self.SBFE              := ( (real) l.sbfe_cnt)              / l.seleid_cnt;
             self.LexId             := ( (real) l.contact_did_cnt)       / l.seleid_cnt;
@@ -668,6 +726,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
             self.recent_inactive_2to3y   := l.recent_inactive_2to3y_cnt;
             self.recent_inactive_3to5y   := l.recent_inactive_3to5y_cnt;
             self.recent_inactive_5y_plus := l.recent_inactive_5y_plus_cnt;	
+            self.recent_unknown     := l.recent_unknown_cnt;
  	
             self.SBFE               := l.sbfe_cnt;
             self.LexId              := l.contact_did_cnt;
@@ -677,7 +736,22 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
             self := l;
     end;
 			
-    shared statsBySele := ungroup(rollup(group(sort(records, seleid, local), seleid), group, tallyTransform(left, rows(left))));
+    export preTally := project(records, toPreTallyTransform(left));
+    export preTallyRoll := rollup(sort(preTally, seleid, proxid, local), left.seleid=right.seleid, tallyRoll(left,right), local);
+
+    export uniqueProxids := table(records(proxid<>0), {seleid, proxid}, seleid, proxid, local);
+    export proxid_count := table(uniqueProxids, {seleid, cnt:=count(group)}, seleid, local);
+    export preTallyWithProxid := join(preTallyRoll,    proxid_count, left.seleid=right.seleid, transform(pre_tally_rec, self.proxid_tot:=right.cnt; self.proxid_cnt:=if(right.cnt>0, 1, 0); self:=left), keep(1), left outer, local);
+
+    export uniqueLexids := table(records(contact_did<>0), {seleid, contact_did}, seleid, contact_did, local);
+    export lexid_count := table(uniqueLexids, {seleid, cnt:=count(group)}, seleid, local);
+    export preTallyWithLexid := join(preTallyWithProxid,    lexid_count, left.seleid=right.seleid, transform(pre_tally_rec, self.lexid_tot:=right.cnt; self.lexid_cnt:=if(right.cnt>0, 1, 0); self.contact_did_cnt:=if(right.cnt>0, 1, 0); self:=left), keep(1), left outer, local);
+
+    export uniqueFein := table(records(trim(company_fein)<>''), {seleid, company_fein}, seleid, company_fein, local);
+    export fein_count := table(uniqueFein, {seleid, cnt:=count(group)}, seleid, local);	
+    export preTallyWithFein  := join(preTallyWithLexid, fein_count,  left.seleid=right.seleid, transform(pre_tally_rec, self.fein_tot:=right.cnt; self.fein_cnt:=if(right.cnt>0, 1, 0); self:=left), keep(1), left outer, local);
+
+    export statsBySele := project(preTallyWithFein, toTallyTransform(left));
 
     seleByStateDist := distribute(statsBySele, hash32(state));
     shared seleByStateDist_s := sort(seleByStateDist, state, skew(1.0), local);
@@ -716,8 +790,11 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export allStats  := calculateStatsByState(all_clean_recs_with_state,  'All');
   export goldStats := calculateStatsByState(gold_clean_recs_with_state, 'Gold');
  
-  segCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
- 	 
+  segDsCleanCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
+  noSegRecords := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
+  segCatagories := segDsCleanCatagories + noSegOnlyCatagories;
+	
   shared generateSegStats(dataset(slim_rec) slim) := function
 					 SC := BIPV2_PostProcess.segmentation_category;
       allRecsWithSeg := join(slim, segCatagories, left.seleid=right.seleid, 
@@ -739,7 +816,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
 	 
   export rawSegStats   := generateSegStats(raw_slim_recs);
   export cleanSegStats := generateSegStats(clean_slim_recs);
-	 
+	
   export segSortOrder(x) := functionmacro
              return sort(x, state='NO SEG', state='Defunct', state='Inactive Noise', state='Inactive H-Merge', state='Inactive Valid', state='Active Noise',state='Active C-Merge', state='Active Valid', state='Gold', state='ALL');
     endmacro;
@@ -760,7 +837,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   end ;
 	
   export formatCntActiveOnly(dataset(report_rec) report) := function 
-      return project(report, {report_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -source_type_rec });
+      return project(report, {report_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown -source_type_rec });
 		end ;
 		
 		export formatCntAll(dataset(report_rec) report) := function 
@@ -768,7 +845,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   end ;
  
   export formatPercentActiveOnly(dataset(percent_rec) report) := function
-      return project(report, {percent_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus});
+      return project(report, {percent_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown});
   end ;
 	
   export formatPercentAll(dataset(percent_rec) report) := function

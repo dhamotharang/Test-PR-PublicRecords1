@@ -1,4 +1,4 @@
-import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr, STD;
+﻿import doxie_build, dx_header, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr, STD, Suppress;
 
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 export SSN_Table_v4_2(boolean isFCRA) := function
@@ -16,7 +16,9 @@ valid_header_uncorrected := if(isFCRA, headerprod_building(~fcra.Restricted_Head
  ****************************************************** */
 valid_header_corrected := Risk_Indicators.Header_Corrections_Function(valid_header_uncorrected);
 
-valid_header := IF(isFCRA, valid_header_corrected, valid_header_uncorrected);
+valid_header_before_suppress := IF(isFCRA, valid_header_corrected, valid_header_uncorrected);
+
+valid_header := fn_suppress_ccpa(valid_header_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
 
 /* ****************************************************
  * Corrections have been applied - Continue as normal *
@@ -85,6 +87,9 @@ final_rec := RECORD
 	common_rec eq;
 	common_rec en;
 	common_rec tn;
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 
@@ -231,7 +236,8 @@ pull_j4 := join(pull_j3, pull_file,
 // put it back into original layout without the bans and death dids
   persist_name := IF (IsFCRA, 'persist::ssn_table_v4_2_filtered', 'persist::ssn_table_v4_2'); 
   final := project(pull_j4, final_rec) : persist (persist_name);	
+	addGlobalSID := mdr.macGetGlobalSID(final,'RiskTable_Virtual','','global_sid'); //DF-26530: Populate Global_SID Field
 	
-return final;
+return addGlobalSID;
 
 end;
