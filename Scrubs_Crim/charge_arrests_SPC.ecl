@@ -1,3 +1,4 @@
+﻿﻿OPTIONS:-gh
 MODULE:Scrubs_Crim
 FILENAME:crim
 NAMESCOPE:charge_arrests
@@ -8,7 +9,7 @@ FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:Invalid_Case_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-)
 FIELDTYPE:Invalid_Current_Date:CUSTOM(Scrubs.fn_valid_date>0)
 FIELDTYPE:Invalid_Future_Date:CUSTOM(Scrubs.fn_valid_date>0,'future')
-FIELDTYPE:Invalid_Source_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
+FIELDTYPE:Invalid_Source_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ )
 
 
 FIELD:recordid:LIKE(Invalid_Record_ID):TYPE(STRING40):0,0
@@ -42,7 +43,3 @@ FIELD:bondtype:TYPE(STRING50):0,0
 FIELD:sourcename:TYPE(STRING100):0,0
 FIELD:sourceid:LIKE(Invalid_Source_ID):TYPE(STRING):0,0
 FIELD:vendor:TYPE(STRING10):0,0
-//CONCEPT statements should be used to group together interellated fields; such as address
-//RELATIONSHIP is used to find non-obvious relationships between the clusters
-//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
-//LINKPATH is used to define access paths for external linking
