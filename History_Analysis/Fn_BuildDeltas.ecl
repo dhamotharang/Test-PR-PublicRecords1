@@ -19,10 +19,11 @@ t_previousRec := Project( f_keysizedhistory_rec, history_analysis.layouts.BaseRe
 // Transform
 history_analysis.layouts.BaseRec CountDeltas( history_analysis.layouts.BaseRec Le, history_analysis.layouts.BaseRec Ri ) := Transform
     NotSameVersion     := if( Le.build_version[1..8] != Ri.build_version[1..8], true, false ); // Checks that it is not same version 
-    Self.datasetname  := Ri.datasetname;
+    Self.datasetname   := Ri.datasetname;
     Self.prevbuild_version := if( NotSameVersion, Le.build_version, Le.prevbuild_version ); 
     Self.build_version := Ri.build_version;
     Self.whenlive      := Ri.whenlive;
+    Self.updateflag    := Ri.updateflag;
     Self.superkey      := Ri.superkey;
     Self.previous_size := if( NotSameVersion, Le.size, Le.previous_size );
     Self.size          := Ri.size;
