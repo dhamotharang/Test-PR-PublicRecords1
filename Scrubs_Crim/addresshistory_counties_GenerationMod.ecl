@@ -48,7 +48,7 @@ EXPORT addresshistory_counties_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:Invalid_Source_ID:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_ )\n'
     + 'FIELDTYPE:Invalid_ZIP:ALLOW(0123456789- )\n'
-    + 'FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.- )\n'
+    + 'FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-\' )\n'
     + '\n'
     + 'FIELD:recordid:LIKE(Invalid_Record_ID):TYPE(STRING40):0,0\n'
     + 'FIELD:statecode:LIKE(Invalid_State):TYPE(STRING2):0,0\n'

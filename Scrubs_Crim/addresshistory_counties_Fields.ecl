@@ -36,11 +36,11 @@ EXPORT InValidFT_Invalid_ZIP(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH
 EXPORT InValidMessageFT_Invalid_ZIP(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789- '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_City(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.- '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-\' '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_City(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.- '))));
-EXPORT InValidMessageFT_Invalid_City(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.- '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_City(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-\' '))));
+EXPORT InValidMessageFT_Invalid_City(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-\' '),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'recordid','statecode','street','unit','city','orig_state','orig_zip','addresstype','sourcename','sourceid','vendor');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'recordid','statecode','street','unit','city','orig_state','orig_zip','addresstype','sourcename','sourceid','vendor');

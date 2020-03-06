@@ -14,7 +14,7 @@ FIELDTYPE:Invalid_Gender:ENUM(MALE|FEMALE|Female|Male|female|male|f|m|F|M|Unknow
 FIELDTYPE:Invalid_Zip:ALLOW(0123456789)
 FIELDTYPE:Invalid_Race:CUSTOM(Scrubs_Crim.fn_StandardizeRace>0)
 FIELDTYPE:Invalid_Height:ALLOW(0123456789,"')
-FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,? )
+FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,?' )
 
 FIELD:recordid:LIKE(Invalid_Record_ID):TYPE(STRING40):0,0
 FIELD:sourcename:TYPE(STRING100):0,0

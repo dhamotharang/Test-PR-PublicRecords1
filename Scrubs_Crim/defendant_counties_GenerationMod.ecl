@@ -54,7 +54,7 @@ EXPORT defendant_counties_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Zip:ALLOW(0123456789)\n'
     + 'FIELDTYPE:Invalid_Race:CUSTOM(Scrubs_Crim.fn_StandardizeRace>0)\n'
     + 'FIELDTYPE:Invalid_Height:ALLOW(0123456789,"\')\n'
-    + 'FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,? )\n'
+    + 'FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,?\' )\n'
     + '\n'
     + 'FIELD:recordid:LIKE(Invalid_Record_ID):TYPE(STRING40):0,0\n'
     + 'FIELD:sourcename:TYPE(STRING100):0,0\n'
