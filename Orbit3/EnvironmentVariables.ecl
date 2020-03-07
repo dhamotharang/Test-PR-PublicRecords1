@@ -6,7 +6,7 @@ export EnvironmentVariables := module
 	export serviceurl := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
 			'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc',
-			'https://qa.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc'
+			'https://stg.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc'
 		);
 	export serviceurlprod := 'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitService.svc';
 	export soapactionprefix := 'http://lexisnexis.com/Orbit/IOrbitService';
