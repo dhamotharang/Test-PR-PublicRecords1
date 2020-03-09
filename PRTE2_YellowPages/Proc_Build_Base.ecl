@@ -1,4 +1,4 @@
-﻿IMPORT PromoteSupers, PRTE2, STD, ut, Address, AID;
+﻿IMPORT PromoteSupers, PRTE2, STD, ut, Address, AID, mdr, YellowPages, Cellphone;
 
 EXPORT Proc_Build_Base(string pversion) := FUNCTION
 
@@ -42,15 +42,16 @@ EXPORT Proc_Build_Base(string pversion) := FUNCTION
 																//SELF.dbpc := LEFT.clean_address.dbpc;
 																SELF.chk_digit := LEFT.clean_address.chk_digit;
 																SELF.rec_type := LEFT.clean_address.rec_type;
-																//SELF.fips_state := LEFT.clean_address.fips_state;
-																//SELF.fips_county := LEFT.clean_address.fips_county;
+																SELF.fips := LEFT.clean_address.fips_state;
+																SELF.countycode := LEFT.clean_address.fips_county;
 																SELF.geo_lat := LEFT.clean_address.geo_lat;
 																SELF.geo_long := LEFT.clean_address.geo_long;
 																SELF.msa := LEFT.clean_address.msa;
 																SELF.geo_blk := LEFT.clean_address.geo_blk;
 																SELF.geo_match := LEFT.clean_address.geo_match;
 																SELF.err_stat := LEFT.clean_address.err_stat;
-																SELF.append_rawaid := LEFT.clean_raw_aid;
+																SELF.rawaid := LEFT.clean_raw_aid;
+																SELF.source := mdr.sourceTools.src_Yellow_Pages;
 																//generating bid
 																SELF.bdid := prte2.fn_AppendFakeID.bdid(LEFT.business_name,	LEFT.clean_address.prim_range, LEFT.clean_address.prim_name, LEFT.clean_address.v_city_name, LEFT.clean_address.st, LEFT.clean_address.zip, LEFT.cust_name);
 																//generating linkids
@@ -60,14 +61,14 @@ EXPORT Proc_Build_Base(string pversion) := FUNCTION
 																SELF.seleid	:= vLinkingIds.seleid;
 																SELF.orgid	:= vLinkingIds.orgid;
 																SELF.ultid	:= vLinkingIds.ultid;	 
-																//source_rec_id
-																SELF.source_rec_id :=	0;
 																SELF := LEFT;
 																SELF := [];
 																	)                                  
 																);
+	//Append PhoneType
+	YellowPages.NPA_PhoneType(yellowpages_cleaned_and_id,phone10,phoneType,PhoneType_Append);
 										
-	PromoteSupers.MAC_SF_BuildProcess(yellowpages_cleaned_and_id, constants.BASE_NAME, yellowpages_final,,,,pversion);
+	PromoteSupers.MAC_SF_BuildProcess(PhoneType_Append, constants.BASE_NAME, yellowpages_final,,,,pversion);
   RETURN SEQUENTIAL(yellowpages_final);
 
 END;
