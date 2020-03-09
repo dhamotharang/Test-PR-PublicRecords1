@@ -74,5 +74,6 @@
 // activate package file
 // choosen(dops.PackageFile(l_esp,l_port).ActivatePackage(l_roxietarget,'addresscleaner.pkg'),all);
 
-
+// dops.PackageFile has more functionalities related to package file deploy
+// dops.GetRoxiePackage has more functionalities related to reading content from a package file on roxie
 	
