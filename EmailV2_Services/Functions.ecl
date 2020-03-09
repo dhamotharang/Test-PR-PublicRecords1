@@ -183,8 +183,8 @@ EXPORT Functions := MODULE
 
     //get all addresses from header based on LexIds
     dids_for_header   := PROJECT(addr_rank_in, doxie.layout_references_hh);
-    // implementation similar to Address_Rank\fn_getHdrRecByDid_wBestdates.ecl  except we need to set IncludeAllRecords=true to by-pass penalties based on PII (pulled from stored)
-    hdr_recs := doxie.header_records_byDID(dids:=dids_for_header, include_dailies:=TRUE, IncludeAllRecords:=TRUE);
+    // implementation similar to Address_Rank\fn_getHdrRecByDid_wBestdates.ecl  except we need to set IncludeAllRecords=true to by-pass penalties based on PII (pulled from stored) and skip search for dailies
+    hdr_recs := doxie.header_records_byDID(dids:=dids_for_header, include_dailies:=TRUE, IncludeAllRecords:=TRUE, DoSearch:=FALSE);
 
     doxie.Layout_presentation roll_dates(doxie.Layout_presentation l, doxie.Layout_presentation r) := TRANSFORM
       SELF.dt_first_seen := ut.min2(l.dt_first_seen, r.dt_first_seen);
