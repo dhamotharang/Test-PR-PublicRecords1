@@ -30,7 +30,12 @@ CreateSuperFile(STRING File) := IF (~FileServices.FileExists(File), FileServices
                        CreateSuperFile('~thor_data400::key::ecrashv2_vinnbr_built'),
                        CreateSuperFile('~thor_data400::key::ecrashv2_vinnbr_father'),
                        CreateSuperFile('~thor_data400::key::ecrashv2_vinnbr_grandfather'),
-                       CreateSuperFile('~thor_data400::key::ecrashv2_vinnbr_delete')
+                       CreateSuperFile('~thor_data400::key::ecrashv2_vinnbr_delete'),
+											 CreateSuperFile('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1_qa'),
+                       CreateSuperFile('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1_built'),
+                       CreateSuperFile('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1_father'),
+                       CreateSuperFile('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1_grandfather'),
+                       CreateSuperFile('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1_delete')
                        );
 
   CreateSF := SEQUENTIAL (CreateSFBase, CreateSFKeys);
