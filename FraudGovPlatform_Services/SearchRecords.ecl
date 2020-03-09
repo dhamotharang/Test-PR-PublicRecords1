@@ -156,7 +156,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 											SELF.ElementValue := MAP(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
 																									=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.entity_value),
 																							LEFT.entity_name = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
-																									=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.entity_value),
+																									=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.entity_value, 2),
+																							LEFT.entity_name = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
+																									=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.entity_value, 1),
 																							LEFT.entity_value);
 											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,
@@ -220,7 +222,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ElementValue := MAP(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
 																=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(L.fragment_value),
 														L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
-																=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value),
+																=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 2),
+                            L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
+                                => FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 1),
 														L.fragment_value);
 
 		SELF.ElementInformation := ds_elementsInformation(fragment_value = L.fragment_value)[1];
@@ -244,7 +248,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 															ds_recentTransactions_w_timeline(
 					  												STD.Str.ToUpperCase(
-																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
+																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) + _Constant.FRAGMENT_SEPARATOR + 
 															  					Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
 																											STD.Str.CleanSPaces(PhysicalAddress.State), 
 																											STD.Str.CleanSPaces(PhysicalAddress.Zip5))
@@ -255,12 +259,13 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_recentTransactions_w_timeline(IpAddress = L.fragment_value),
 				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => 
 															ds_recentTransactions_w_timeline(BankInformation1.BankAccountNumber = 
-																			FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value)),
+																			FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 2)),
 				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_recentTransactions_w_timeline(
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
 				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
-															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = L.fragment_value),
+															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = 
+                              FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 1)),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);

@@ -106,7 +106,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF.ScoreDetails.ElementValue := MAP(LEFT.fragment = FraudGovFragConst_.PHYSICAL_ADDRESS_FRAGMENT 
 																																								=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.fragment_value),
 																																							LEFT.fragment = FraudGovFragConst_.BANK_ACCOUNT_NUMBER_FRAGMENT
-																																								=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.fragment_value),
+																																								=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.fragment_value, 2),
+																																							LEFT.fragment = FraudGovFragConst_.DRIVERS_LICENSE_NUMBER_FRAGMENT
+																																								=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.fragment_value, 1),
 																																							LEFT.fragment_value);
 																				SELF.ScoreDetails.Score := RIGHT.Score_,
 																				SELF.NoOfIdentities := (integer) RIGHT.flags(indicator = 'identity_count_')[1].value,
