@@ -82,27 +82,6 @@ EXPORT Functions := MODULE
 		return ds_indicator_attributes_dedup;
 	END;
 		
-	EXPORT getKnownFraudRecs(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
-														FraudGovPlatform_Services.IParam.BatchParams batch_params,
-														DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payloads_in) := FUNCTION
-
-		FraudGovPlatform_Services.Layouts.KnownFrauds_rec xfm_KNFDCompilation(FraudShared_Services.Layouts.BatchIn_rec L,
-																																					DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) R ) := TRANSFORM
-		
-			ds_sorted := SORT(R, -event_date);
-			SELF.payload := ds_sorted;
-			SELF := L;
-		END;
-
-		knownFraudResults := DENORMALIZE(	ds_batch_in, ds_payloads_in, 
-																			LEFT.acctno = RIGHT.acctno,
-																			GROUP,
-																			xfm_KNFDCompilation(LEFT, ROWS(RIGHT)),
-																			LEFT OUTER);
-		RETURN knownFraudResults;
-		
-	END;
-		
 	EXPORT getVelocityRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 													FraudGovPlatform_Services.IParam.BatchParams batch_params,
 													DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payload) := FUNCTION
@@ -493,11 +472,12 @@ EXPORT Functions := MODULE
 													FraudGovPlatform_Services.IParam.BatchParams batch_params,
 													Boolean skip_autokey_ds_matching = FALSE) := FUNCTION
 
-		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
-		File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;													
+		_Constant := FraudGovPlatform_Services.Constants;
+		Fragment_Types_const := _Constant.Fragment_Types;
+		File_Type_Const := _Constant.PayloadFileTypeEnum;													
 	
 		ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload, skip_autokey_ds_matching, 
-												FraudgovPlatform_Services.Constants.FRAUD_PLATFORM);
+												_Constant.FRAUD_PLATFORM);
 
 		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
 																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
@@ -508,21 +488,21 @@ EXPORT Functions := MODULE
 			bankRountingNumber1 := IF(isBankAccountNumber1 AND R.bank_routing_number_1 <> '', TRIM(R.bank_routing_number_1, LEFT, RIGHT), ' '); 
 			bankRountingNumber2 := IF(isBankAccountNumber2 AND R.bank_routing_number_2 <> '', TRIM(R.bank_routing_number_2, LEFT, RIGHT), ' ');
 			
-			bank_info_to_use := MAP(isBankAccountNumber1 => bankRountingNumber1 + '@@@' + R.bank_account_number_1,
-															isBankAccountNumber2 => bankRountingNumber2 + '@@@' + R.bank_account_number_2,
+			bank_info_to_use := MAP(isBankAccountNumber1 => bankRountingNumber1 + _Constant.FRAGMENT_SEPARATOR + R.bank_account_number_1,
+															isBankAccountNumber2 => bankRountingNumber2 + _Constant.FRAGMENT_SEPARATOR + R.bank_account_number_2,
 															'');
 			
 			SELF.fragment_value := CASE(L.fragment, 
 																	Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_info_to_use,
 																	Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
-																	Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => R.drivers_license,
+																	Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => STD.Str.CleanSpaces(R.drivers_license) + _Constant.FRAGMENT_SEPARATOR + STD.Str.CleanSpaces(R.Drivers_License_State),
 																	// Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
 																	Fragment_Types_const.IP_ADDRESS_FRAGMENT => R.ip_address	,
 																	Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1) + ' ' + STD.Str.CleanSpaces(R.additional_address.address_2)),
 																	Fragment_Types_const.NAME_FRAGMENT => (R.cleaned_name.fname + ' ' + R.cleaned_name.lname),
 																	Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
 																	Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
-																	Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
+																	Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + _Constant.FRAGMENT_SEPARATOR + STD.Str.CleanSpaces(R.address_2),
 																	Fragment_Types_const.SSN_FRAGMENT => R.ssn,
 																	Fragment_Types_const.EMAIL_FRAGMENT => R.email_address,
 																	'');
@@ -673,11 +653,11 @@ EXPORT Functions := MODULE
 	END;
 	
 	EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
-		return REGEXREPLACE('@@@',address,', ');
+		return REGEXREPLACE(FraudGovPlatform_Services.Constants.FRAGMENT_SEPARATOR ,address,', ');
 	END;	
 	
-	EXPORT GetCleanBankAccountFragmentValue(string bank_information) := FUNCTION
-		return REGEXFIND('(.*)@@@(.*)$',bank_information,2);
+	EXPORT GetCleanFragmentValue(string FragmentValue, integer pos) := FUNCTION
+		return REGEXFIND('(.*)' + FraudGovPlatform_Services.Constants.FRAGMENT_SEPARATOR + '(.*)$',FragmentValue, pos);
 	END;
 	
 	EXPORT GetLastRecentActivityDate() := FUNCTION
