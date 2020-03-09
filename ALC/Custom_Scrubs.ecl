@@ -6,7 +6,7 @@ EXPORT Custom_Scrubs := MODULE
 	//   license numbers will start with AP and are supposed to have 6 numbers afterwards.  A 1
 	//   signifies an error.
   EXPORT fn_valid_tx_nurse_license_no(STRING license_no, STRING reg_state) := FUNCTION
-	  is_in_tx         := IF( (reg_state = 'TX#'), TRUE , FALSE);
+	  is_in_tx         := IF( (TRIM(reg_state) = 'TX#'), TRUE , FALSE);
 		starts_with_ap   := license_no[1..2] = 'AP';
 		is_proper_length := LENGTH(TRIM(license_no)) = 8;
 
