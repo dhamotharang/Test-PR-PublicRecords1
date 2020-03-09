@@ -19,8 +19,10 @@ Roxiekeybuild.Mac_SK_BuildProcess_v2_local(
 
 retval := sequential(
 									Text_Search.Build_From_DocSeg_Records(ret,info),
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+									// DF-21341 - do not build this key. It is not used any any query.
+									// thor_data400::key::vehiclev2::qa::docref.vehkey
+									// build_key,
+									// Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 									fileservices.deletelogicalfile('~thor_data400::persist::vehiclev2::boolean')
 									
 									);
