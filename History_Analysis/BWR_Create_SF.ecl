@@ -1,10 +1,5 @@
 Import $, STD;  
 
-//Output(History_Analysis.Fn_BuildDeltas,, '~history_analysis_prod::base::counted_deltas', Thor, Compressed, Overwrite);
-
-
-//STD.File.CreateSuperFile('~thor_data400::history_analysis::base::counted_deltas');
-
 
 Sequential(
  STD.File.StartSuperFileTransaction(),
