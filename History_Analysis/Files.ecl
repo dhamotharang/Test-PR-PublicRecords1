@@ -5,7 +5,7 @@ Export Files := module
 
     Export Keysizedhistory_report := Dataset('~thor_data400::in::dops_keysizedhistory::20200220::dops_extract02', history_analysis.layouts.Layout_keysizehistory, CSV(Heading(1)));
 
-    Export Orbit_buildinstance  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', history_analysis.layouts.Layout_Orbit_Buildinstance, CSV(Heading(1)));
+    Export Orbit_buildinstance_report  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', history_analysis.layouts.Layout_Orbit_Buildinstance, CSV(Heading(1)));
     
     Export History_Analysis_SF := Dataset('~thor_data400::history_analysis::base::counted_deltas', History_Analysis.Layouts.BaseRec, Thor, __Compressed__);
 
