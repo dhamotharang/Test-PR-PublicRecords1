@@ -7,6 +7,6 @@ Export Files := module
 
     Export Orbit_buildinstance  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', history_analysis.layouts.Layout_Orbit_Buildinstance, CSV(Heading(1)));
     
-    Export BaseRec := Dataset('~history_analysis_prod::base::counted_deltas', History_Analysis.Layouts.BaseRec, Thor, __Compressed__);
+    Export Base_SF := $.BWR_Create_SF;
 
 End;
