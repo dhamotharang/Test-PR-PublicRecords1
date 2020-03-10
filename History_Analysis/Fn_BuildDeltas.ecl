@@ -44,7 +44,7 @@ End;
 // Iterate and count deltas
 iterateCount := Iterate(t_previousRec, CountDeltas(Left, Right));
 
-Return iterateCount( NOT prevrecord_count = 0 ); // Fitered to remove versions with prevrecord_count of zero
+Return iterateCount( NOT prevrecord_count = 0 ); // Fitered to remove versions with prevrecord_count of zero   
 
 
 End;
