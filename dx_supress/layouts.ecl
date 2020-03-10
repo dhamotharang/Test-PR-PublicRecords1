@@ -10,6 +10,5 @@ export layouts := module
         STRING8 Date_Added;
         STRING25 User;
         STRING25 Compliance_ID;
-        STRING255 Comment;
     END;
 end;
