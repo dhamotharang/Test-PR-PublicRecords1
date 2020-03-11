@@ -755,7 +755,7 @@ EXPORT Transforms := MODULE
 	end;
 
 	//Enclarity Business Base transforms
-	Export Layouts.CombinedHeaderResults build_selectfile_Facility_base (Layouts.selectfile_facilities_base_with_input l) := transform
+	Export Layouts.CombinedHeaderResults  build_selectfile_Facility_base(Layouts.selectfile_facilities_base_with_input l) := transform
 		self.acctno := l.acctno;
 		self.sources := dataset([{l.group_key,Constants.SRC_SELECTFILE}],Layouts.layout_SrcID);
 		self.LNPID := l.lnpid;
@@ -1087,6 +1087,8 @@ EXPORT Transforms := MODULE
 															self.SpecialNotes := trim(left.sanc1_case_num_ef,right)+' '+trim(left.sanc1_terms_ef,right)+' '+trim(left.sanc1_fine_ef,right)+' '+trim(left.sanc1_condition_ef,right);
 															self.LicenseStatus :=left.provider_status_ef;
 															self.isReinstatement := left.LN_derived_rein_flag or (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.sanc1_rein_date) > 0;
+                              self.sanc1_desc:=left.sanc1_description_ef;
+                              self:=left;
 															self:=[];));
 		self:=r;
 		self:=l;

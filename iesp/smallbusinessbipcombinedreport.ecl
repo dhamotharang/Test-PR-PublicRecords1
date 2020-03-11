@@ -55,12 +55,23 @@ export t_SegmentPaymentSummary := record
 	string3 PastDueAgingAmount91PlusPercent {xpath('PastDueAgingAmount91PlusPercent')};
 end;
 		
+export t_AccountPaymentHistory := record
+	iesp.share.t_Date DateReported {xpath('DateReported')};
+	string12 TotalCurrentExposure {xpath('TotalCurrentExposure')};
+	string12 WithinTermsTotal {xpath('WithinTermsTotal')};
+	string12 PastDueAgingAmount01to30Total {xpath('PastDueAgingAmount01to30Total')};
+	string12 PastDueAgingAmount31to60Total {xpath('PastDueAgingAmount31to60Total')};
+	string12 PastDueAgingAmount61to90Total {xpath('PastDueAgingAmount61to90Total')};
+	string12 PastDueAgingAmount91PlusTotal {xpath('PastDueAgingAmount91PlusTotal')};
+end;
+		
 export t_B2BTradeAcctDetail := record
 	string AccountNo {xpath('AccountNo')};
 	string Status {xpath('Status')};
 	string IndustrySegment {xpath('IndustrySegment')};
 	iesp.share.t_Date DateReported {xpath('DateReported')};
 	string12 AmountOutstanding {xpath('AmountOutstanding')};
+	dataset(t_AccountPaymentHistory) PaymentHistory {xpath('PaymentHistory/Payment'), MAXCOUNT(iesp.Constants.BusinessCredit.MaxPaymentHistory)};
 end;
 		
 export t_B2BTradeData := record

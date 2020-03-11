@@ -1109,7 +1109,7 @@ export Layouts := MODULE
 		// string10 	Src:='';
 		string		GroupSancDate:='';
 		integer		GroupSortOrder:=0;
-		Enclarity.Layouts.sanction_base;
+		Enclarity.Layouts.sanction_base - [sanc1_desc];
 		Enclarity.Layouts.Sanc_Codes_input.sanc_desc;
 		Enclarity.Layouts.Sanc_Prov_Type_input.prov_type_desc;
 		string 		FullDesc :=''; 
@@ -1122,6 +1122,7 @@ export Layouts := MODULE
 		string 		SancLossOfLic :='';
 		string 		LicenseStatus :='';
 		boolean		isReinstatement := false;
+		string sanc1_desc;
 	END;	
 	EXPORT layout_child_sanctions := RECORD	
 		string20	acctno := '';

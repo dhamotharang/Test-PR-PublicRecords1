@@ -1,4 +1,4 @@
-﻿IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, Gateway, iesp,
+IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, iesp,
        PersonReports, PersonSlimReport_Services, SmartRollup, STD, ut;
 
 EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
@@ -115,8 +115,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
     EXPORT phoneRecsByDid(doxie.phone_noreconn_param.searchParams phone_mod):= FUNCTION
        //get all free phone (no GW hits) recs (phone plus and gong) and apply restrictions
-       emptyGateway := dataset([], Gateway.Layouts.Config);
-       phones_raw   := doxie.phone_noreconn_records(phone_mod).val(in_did, emptyGateway);
+       phones_raw   := doxie.phone_noreconn_records(phone_mod, in_did);
        phones_raw_sorted:= sort(phones_raw, phone,-(unsigned4)dt_last_seen,-(unsigned4)dt_first_seen);
        phones_duped := dedup(phones_raw_sorted,phone);
        phones_duped_sorted := sort(phones_duped, -(unsigned4)dt_last_seen,-(unsigned4)dt_first_seen);

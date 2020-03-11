@@ -98,7 +98,62 @@ FUNCTION
   END;
   ds_corteraIndustrySegments := NORMALIZE(ds_corteraResults, 2, getCorteraIndustrySegments(LEFT, COUNTER));
 
-  iesp.smallbusinessbipcombinedreport.t_B2BTradeAcctDetail getCorteraTradeAcctDetail(Seed_Files.BusinessCreditReport_keys.CorteraB2B L, INTEGER C) := 
+
+  iesp.smallbusinessbipcombinedreport.t_AccountPaymentHistory xfm_acctPmtHist(STRING12 inTotalCurrentExposure,
+                                                                              STRING3  inWithinTermsTotal,
+                                                                              STRING3  inPastDueAgingAmount01to30Percent,
+                                                                              STRING3  inPastDueAgingAmount31to60Percent,
+                                                                              STRING3  inPastDueAgingAmount61to90Percent,
+                                                                              STRING3  inPastDueAgingAmount91PlusPercent,
+                                                                              STRING8  inDateReported) := 
+  TRANSFORM
+                                                                              
+    SELF.DateReported := iesp.ECL2ESP.toDatestring8(inDateReported);
+    SELF.TotalCurrentExposure := inTotalCurrentExposure;
+    SELF.WithinTermsTotal := inWithinTermsTotal;
+    SELF.PastDueAgingAmount01to30Total := inPastDueAgingAmount01to30Percent;
+    SELF.PastDueAgingAmount31to60Total := inPastDueAgingAmount31to60Percent;
+    SELF.PastDueAgingAmount61to90Total := inPastDueAgingAmount61to90Percent;
+    SELF.PastDueAgingAmount91PlusTotal := inPastDueAgingAmount91PlusPercent;
+  END;
+
+  fn_getAcctDetailPmtHist(Seed_Files.BusinessCreditReport_keys.CorteraB2B L, INTEGER C) := 
+  FUNCTION
+    ds_acctDetPmtHist := CHOOSE(C,(DATASET([xfm_AcctPmtHist(L.AcctDet1_1_TotalCurrentExposure,
+                                                            L.AcctDet1_1_WithinTermsTotal,
+                                                            L.AcctDet1_1_PastDueAgingAmount01to30Percent,
+                                                            L.AcctDet1_1_PastDueAgingAmount31to60Percent,
+                                                            L.AcctDet1_1_PastDueAgingAmount61to90Percent,
+                                                            L.AcctDet1_1_PastDueAgingAmount91PlusPercent,
+                                                            L.AcctDet1_1_DateReported)]) 
+                                   + 
+                                   DATASET([xfm_acctPmtHist(L.AcctDet1_2_TotalCurrentExposure,
+                                                            L.AcctDet1_2_WithinTermsTotal,
+                                                            L.AcctDet1_2_PastDueAgingAmount01to30Percent,
+                                                            L.AcctDet1_2_PastDueAgingAmount31to60Percent,
+                                                            L.AcctDet1_2_PastDueAgingAmount61to90Percent,
+                                                            L.AcctDet1_2_PastDueAgingAmount91PlusPercent,
+                                                            L.AcctDet1_2_DateReported)]))
+                                  ,
+                                  (DATASET([xfm_AcctPmtHist(L.AcctDet2_1_TotalCurrentExposure,
+                                                            L.AcctDet2_1_WithinTermsTotal,
+                                                            L.AcctDet2_1_PastDueAgingAmount01to30Percent,
+                                                            L.AcctDet2_1_PastDueAgingAmount31to60Percent,
+                                                            L.AcctDet2_1_PastDueAgingAmount61to90Percent,
+                                                            L.AcctDet2_1_PastDueAgingAmount91PlusPercent,
+                                                            L.AcctDet2_1_DateReported)]) 
+                                   + 
+                                   DATASET([xfm_acctPmtHist(L.AcctDet2_2_TotalCurrentExposure,
+                                                            L.AcctDet2_2_WithinTermsTotal,
+                                                            L.AcctDet2_2_PastDueAgingAmount01to30Percent,
+                                                            L.AcctDet2_2_PastDueAgingAmount31to60Percent,
+                                                            L.AcctDet2_2_PastDueAgingAmount61to90Percent,
+                                                            L.AcctDet2_2_PastDueAgingAmount91PlusPercent,
+                                                            L.AcctDet2_2_DateReported)])));    
+    RETURN ds_acctDetPmtHist;                                         
+  END;
+
+  iesp.smallbusinessbipcombinedreport.t_B2BTradeAcctDetail xfm_getCorteraTradeAcctDetail(Seed_Files.BusinessCreditReport_keys.CorteraB2B L, INTEGER C) := 
   TRANSFORM
     SELF.AccountNo  := CHOOSE(C,L.acctdet1_accountno,L.acctdet2_accountno);
     SELF.Status  := CHOOSE(C,L.acctdet1_status,L.acctdet2_status);
@@ -106,8 +161,9 @@ FUNCTION
     SELF.DateReported := iesp.ECL2ESP.toDatestring8(CHOOSE(C,L.acctdet1_accountdatereported,
                                                              L.acctdet2_accountdatereported));
     SELF.AmountOutstanding := CHOOSE(C,L.acctdet1_amountoutstanding,L.acctdet2_amountoutstanding); 
+    SELF.paymentHistory := fn_getAcctDetailPmtHist(L, C);
   END;
-  ds_corteraTradeAcctDetail := NORMALIZE(ds_corteraResults, 2, getCorteraTradeAcctDetail(LEFT, COUNTER));
+  ds_corteraTradeAcctDetail := NORMALIZE(ds_corteraResults, 2, xfm_getCorteraTradeAcctDetail(LEFT, COUNTER));
 
   iesp.smallbusinessbipcombinedreport.t_B2BTradeData getB2BTradeData:= 
   TRANSFORM

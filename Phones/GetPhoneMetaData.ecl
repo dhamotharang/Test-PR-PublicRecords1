@@ -122,6 +122,8 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
     SELF.line := R.line;
     SELF.serv := R.serv;
     SELF.operator_fullname := R.operator_fullname;
+    SELF.high_risk_indicator := R.high_risk_indicator;
+    SELF.prepaid := R.prepaid;
     SELF := L;
   END;
 
