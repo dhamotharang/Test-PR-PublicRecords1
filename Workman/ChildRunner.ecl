@@ -158,7 +158,7 @@ functionmacro
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
-  latest_previous_iteration          := (string)max(ds_previous_builds  ,(unsigned)iteration);
+  latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := if(pOutputSuperfile != ''  
@@ -221,7 +221,7 @@ functionmacro
     
   createwatcherworkunit := WorkMan.CreateWuid_Raw(
        '#workunit(\'name\',\'---WorkMan.mac_Watcher--- for wuid: ' + Iteration_Wuid_result + ', ' + if(pBuildName != '' , pBuildName ,'') +  ', version: ' + pversion + ' iteration: ' + Iteration + '\');\n'       
-     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\');'
+     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\',' + if(pOnlyCompile = true,'true','false') + ');'
     ,watchercluster
     ,localesp
     ,
@@ -229,7 +229,7 @@ functionmacro
   );
 
   child_wuid2    := WorkMan.get_Scalar_Result(workunit ,'Iteration_Wuid');
-  stop_condition := Get_Results(child_wuid2).stopcondition;
+  stop_condition := Get_Results(child_wuid2).stopcondition_;
 
                        
 
@@ -273,7 +273,7 @@ functionmacro
       #IF(pOnlyCompile = false)
       ,if(OutputFilename != '' and not DoesFileExist ,WorkMan.Update_File(StartFilename,ds_wuids + StartExistingDataset + StartDataset,false,true,'wuid'))
       #END
-      ,STD.System.Debug.Sleep(30000)  //sleep for 30 seconds before kicking this off because of problems with it returning in a compile state
+      // ,STD.System.Debug.Sleep(10000)  //sleep for 30 seconds before kicking this off because of problems with it returning in a compile state
       ,output(createwatcherworkunit                             ,named('Watcher_Wuid'                                        ),overwrite)
       ,output(clickableWatcher_wuid                             ,named('Watcher_Wuid__html'                                  ),overwrite)
       // ,output(dataset([{WorkMan.get_Scalar_Result(workunit ,'Watcher_Wuid__html'),WorkMan.get_Jobname(Child_watcher_Wuid,localesp)}  ],lay_iterations)  ,named('Watcher_Wuids__html'                               ),extend)
@@ -308,11 +308,11 @@ functionmacro
 
 
   dWUDetails  := project(dataset([{jobname ,pBuildName,child_wuid2 ,Owner,localesp,WorkMan._Config.LocalENV,getstate ,Iteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,WorkMan.getTimeDate()
-    ,StartIteration ,#TEXT(pNumMaxIterations),#TEXT(pNumMinIterations),pStopCondition,Get_Results(child_wuid2).stopcondition   
+    ,StartIteration ,#TEXT(pNumMaxIterations),#TEXT(pNumMinIterations),pStopCondition,Get_Results(child_wuid2).stopcondition_   
     // ,#TEXT(pStartIteration) ,%'NumMaxIterations'%,%'NumMinIterations'%,pStopCondition,Get_Results(child_wuid2).stopcondition   
-    ,Get_Results(child_wuid2).ds_results
+    ,dataset([],WorkMan.Layouts.lay_results)
     ,Advice
-    ,Errors}] ,WorkMan.layouts.wks_slim),transform(WorkMan.layouts.wks_slim ,self.results := Get_Results(child_wuid2).ds_results,self := left));
+    ,Errors}] ,WorkMan.layouts.wks_slim),transform(WorkMan.layouts.wks_slim ,self.results := Get_Results(child_wuid2).ds_results_out,self := left));
 
 // --
   get_state_stuff := if(trim(getstate) in ['completed','failed','aborted','compiled']  ,'has ' + trim(getstate)
@@ -335,16 +335,16 @@ functionmacro
                             + 'Iteration'       + '\t\t\t: '    + Iteration                                                                           + '\n'
                             + 'Version'         + '\t\t\t\t: '  + pversion                                                                            + '\n'
 
-#IF(trim(#TEXT(pStartIteration))  != '') 
-                            + 'Start Iteration\t\t\t: ' + #TEXT(pStartIteration) + '\n'
-#END 
+// #IF(trim(#TEXT(pStartIteration))  != '') 
+                            + 'Start Iteration\t\t\t: ' + StartIteration + '\n'
+// #END 
 #IF(trim(#TEXT(pNumMinIterations))  != '') 
                             + 'Min Iterations\t\t\t: ' + %'NumMinIterations'%+ '\n'
 #END 
 #IF(trim(#TEXT(pNumMaxIterations))  != '') 
                             + 'Max Iterations\t\t\t: ' + %'NumMaxIterations'%+ '\n'
 #END 
-                            + Get_Results(child_wuid2).email_outputs
+                            + Get_Results(child_wuid2).email_outputs_out
                             + 'Runner Wuid link\t\t: ' + 'http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit   + '#/stub/Summary\n' 
                             + if(trim(Errors) != '' ,'FailMessage(s)\t\t\t: \n' + Errors + '\n','')
                             + map(getstate in ['failed','aborted'] and (pAutoResubmit = false or pAutoResubmit = true and Errors[1..5] = 'eclcc') and pOnlyCompile = false

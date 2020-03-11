@@ -3,7 +3,7 @@
 export Build_All(
 	 string															pversion
 	,string													    pDirectory			= '/data/Builds/builds/OPM/' + pversion[1..8]	 
-	,string															pServerIP				= _control.IPAddress.bctlpedata12
+	,string															pServerIP				= _control.IPAddress.bctlpedata11
 	,string															pFilename				= '*NonDOD*.txt'
 	,string															pGroupName			= STD.System.Thorlib.Group( )
 	,boolean														pIsTesting			= false

@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT Comps_MAC_PopulationStatistics(infile,Ref='',Input_seq = '',Input_ln_fares_id = '',Input_unformatted_apn = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_lat = '',Input_long = '',Input_geo_blk = '',Input_fips_code = '',Input_land_use_code = '',Input_sales_price = '',Input_sales_price_code = '',Input_recording_date = '',Input_assessed_value_year = '',Input_assessed_total_value = '',Input_market_total_value = '',Input_lot_size = '',Input_building_area = '',Input_year_built = '',Input_no_of_stories = '',Input_no_of_rooms = '',Input_no_of_bedrooms = '',Input_no_of_baths = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_AVM;
+  IMPORT SALT311,Scrubs_AVM;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

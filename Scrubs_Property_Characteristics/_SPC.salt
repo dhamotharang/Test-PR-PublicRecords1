@@ -1,7 +1,7 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Property_Characteristics
 FILENAME:Property_Characteristics
-//NAMESCOPE:Property_Characteristics
+
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
 //RIDFIELD:<NameOfRidField>
@@ -24,7 +24,7 @@ FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
 FIELDTYPE:invalid_county_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ'):SPACES( -):WORDS(1,2,3,4,5)
 FIELDTYPE:invalid_apn:SPACES( ):ALLOW( _-.,/:&()*0123456789:;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(1..)
 FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(5,9)
-FIELDTYPE:invalid_year:ALLOW(0123456789):LENGTHS(0,4):INRANGE(0,2016)
+FIELDTYPE:invalid_year:ALLOW(0123456789):LENGTHS(0,4)
 FIELDTYPE:invalid_date:CUSTOM(Scrubs.fn_valid_date>0)
 FIELDTYPE:invalid_fips:SPACES( ):ALLOW(0123456789):LENGTHS(0,5):WITHIN(Scrubs_LN_PropertyV2_Assessor.file_fips,fips_code)
 FIELDTYPE:invalid_prop_amount:ALLOW(0123456789.):INRANGE(0,10000000)

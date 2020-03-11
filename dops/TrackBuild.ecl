@@ -58,6 +58,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		string thresholdinsecs := '';
 		string reason := '';
 		string wuerrors := '';
+
 	end;
 	
 	export rAppInfo := record
@@ -168,12 +169,15 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	export fSetInfo(string p_dopsdatasetname
 									,string p_buildversion
 									,string p_componentname
+									// DUS-346: add email
+									,string p_email = ''
 									) := function
 		// get WU state							
 		
 		dBuildInfo := dataset([{p_dopsdatasetname,p_buildversion,p_componentname
 												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime()
-												,p_vertical,p_location,'','',''}],rTrackBuild);
+												,p_vertical,p_location
+												,'','','',p_email}],rTrackBuild);
 		
 		return 	sequential
 								(
@@ -192,16 +196,17 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	export fSetInfoinWorktunit(string p_dopsdatasetname
 									,string p_buildversion
 									,string p_componentname
-									
+									// DUS-346: add email
+									,string p_email = ''
 									) := function
 	
 		// isWorkunitExists := WORKUNIT in set(STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'),wuid);
 		
 		seq_number := max(fGetAppDataFromWUDetails(WORKUNIT,localesp),app_seq)+1;
-		
+		app_value := p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location+'|'+p_email;
 		return sequential(
-										output('setting app value for '+p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname)
-										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location)
+										output('setting app value for '+app_value)
+										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',app_value)
 										);
 		
 	end;
@@ -235,6 +240,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 			self.datetime := STD.Str.SplitWords(r.value,'|')[4]; // time when the info was first captured
 			self.vertical := STD.Str.SplitWords(r.value,'|')[5]; 
 			self.location := STD.Str.SplitWords(r.value,'|')[6];
+			self.emailid := STD.Str.SplitWords(r.value,'|')[7];
 			self := l;
 		end;
 		
@@ -516,9 +522,10 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																												,true)
 																						,0);
 			timediff := endseconds - startseconds;
-			totaltime := if (l.datasetname = r.datasetname and l.componentname = r.componentname and l.buildversion = r.buildversion
+			/*totaltime := if (l.datasetname = r.datasetname and l.componentname = r.componentname and l.buildversion = r.buildversion
 													,l.totaltimeinsecs + timediff
-													,0 + timediff);
+													,0 + timediff);*/
+			totaltime := timediff; // because now we r.created as time when first created and r.modified = time when last touched
 			td := totaltime - (integer)r.thresholdinsecs;
 			
 			s_prefix := 'ACTION Required: ' + r.datasetname + ':' + r.buildversion +':'+ r.componentname;

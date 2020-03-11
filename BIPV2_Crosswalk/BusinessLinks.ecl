@@ -107,7 +107,7 @@ export BipAppend() := function
 	                                      reAppend := not useInputBipId);
 	bipAppend := bipAppendRoxie.withBest(fetchLevel := BIPV2.IdConstants.fetch_level_proxid,
 	                                     allBest := false,
-	                                     isMarketing := false);
+	                                     isMarketing := mod_access.isDirectMarketing());
 	// Add the orig_request_id back in so we can dedup
 	bipAppendOrigId := 
 		join(bipAppend, fakeRequestId,
@@ -141,6 +141,7 @@ export businessFetch := function
 		lookupInput
 		,level := businessFetchLevel
 		,sourcesToInclude := sourcesToInclude
+		,applyMarketingRestrictions := mod_access.isDirectMarketing()
 		,mod_access := mod_access
 	);
 
@@ -192,8 +193,12 @@ export businessBest := function
 
 	// Gets best for all proxids and seleids which will be filtered later based on what level
 	// of ids we're interested in.
-	bipBestAll := bipAppendMod.withBest(fetchLevel :=  BIPV2.IdConstants.fetch_level_seleid,
-	                                    allBest := true);
+	bipBestAll := 
+		bipAppendMod.withBest(
+			fetchLevel :=  BIPV2.IdConstants.fetch_level_seleid,
+			allBest := true,
+			isMarketing := mod_access.isDirectMarketing());
+
 	return bipBestAll;
 end;
 
@@ -252,7 +257,10 @@ export businesses() := function
 			self := left,
 			self := []));
 	bipAppendMod := BIPV2.IdAppendRoxie(parents, reappend := false);
-	bipParentBest := bipAppendMod.withBest(fetchLevel := BIPV2.IdConstants.fetch_level_proxid);
+	bipParentBest := 
+		bipAppendMod.withBest(
+			fetchLevel := BIPV2.IdConstants.fetch_level_proxid,
+			isMarketing := mod_access.isDirectMarketing());
 
 	withParentBest :=
 		join(withBest, bipParentBest,
@@ -288,6 +296,7 @@ export contactFetch := function
 		lookupInput
 		,Level := fetchLevel
 		,sourcesToInclude := sourcesToInclude
+        ,applyMarketingRestrictions := mod_access.isDirectMarketing()
 		,mod_access := mod_access
 	);
 
@@ -336,7 +345,7 @@ end;
 // Look up best for contacts that have lexids.
 export contactBest := function
 	gm := AutoStandardI.GlobalModule();												 
-	doxie.mac_best_records(dedup(contactLookup, contact_did, all), contact_did, getBest, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
+	doxie.mac_best_records(dedup(contactLookup, contact_did, all), contact_did, getBest, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM, mod_access.isDirectMarketing());
 	return getBest;
 end;
 

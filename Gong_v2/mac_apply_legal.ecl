@@ -1,49 +1,11 @@
-export Mac_Apply_Legal(in_f, out_f) := macro
+﻿export Mac_Apply_Legal(in_f, out_f) := macro
+import Gong_Neustar ;
 
-#uniquename(fsuppression)
 #uniquename(infile)
-#uniquename(rHashDIDAddress)
-#uniquename(rFullOut_HashDIDAddress)
-#uniquename(tHashDIDAddress)
-#uniquename(dHeader_withMD5)
-#uniquename(dSuppressedIn)
 #uniquename(out_suppress)
 #uniquename(tsuppress)
 
-
-	%rHashDIDAddress% := header_services.Supplemental_Data.layout_out;
-
-#uniquename(Suppression_Layout)
-	%Suppression_Layout% := header_services.Supplemental_Data.layout_in;
-
-#uniquename(supp_ds_func)
-	header_services.Supplemental_Data.mac_verify('gong_sup.txt',%Suppression_Layout%,%supp_ds_func%);
-
-#uniquename(Suppression_In)
-	%Suppression_In% := %supp_ds_func%();
-
-	%dSuppressedIn% := project(%Suppression_In%, header_services.Supplemental_Data.in_to_out(left));
-	 
-	%rFullOut_HashDIDAddress% := record
-	 in_f;
-	 %rHashDIDAddress%;
-	end;
-	
-	%rFullOut_HashDIDAddress% %tHashDIDAddress%(in_f l) := transform                            
-	 self.hval := hashmd5(l.phone10[4..10] + l.phone10[1..3]);
-	 self := l;
-	end;
-	
-	%dHeader_withMD5% := project(in_f, %tHashDIDAddress%(left));
-	
-	in_f %tSuppress%(%dHeader_withMD5% l, %dSuppressedIn% r) := transform
-	 self := l;
-	end;
-	
-	%out_suppress% := join(%dHeader_withMD5%,%dSuppressedIn%,
-	                          left.hval = right.hval,
-							  %tSuppress%(left,right),
-							  left only,lookup);
+%out_suppress% := Gong_Neustar.Prep_Build.applyGongNeustarSup(in_f) ;
 
 #uniquename(inf_flt)
 %inf_flt% := %out_suppress%(publish_code<>'N' or bell_id in ['BAN','LSI','LSP','QST','SWB','LSS']);

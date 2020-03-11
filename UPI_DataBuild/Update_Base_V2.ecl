@@ -380,9 +380,10 @@ EXPORT Update_Base_V2 (
 				pre_processed_input		:=  Append_LexID(pVersion, pUseProd, gcid, use_threshold, pHistMode, pBatch_jobID, pre_process_input).LexID_Append;
 
 								
-				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
-												 ,dataset([],upi_databuild.Layouts_V2.input_processing)
-												 ,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+				previous_base		:= IF((NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0)
+														OR pHistMode = 'N'
+														,dataset([],upi_databuild.Layouts_V2.input_processing)
+														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
 												 						
 				stdInput			:= dist_and_sort_them(pre_processed_input);
@@ -448,8 +449,9 @@ EXPORT Update_Base_V2 (
 				linked_input_file	:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
 				
 				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
-												 ,dataset([],upi_databuild.Layouts_V2.input_processing)
-												 ,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+														OR pHistMode = 'N'
+														,dataset([],upi_databuild.Layouts_V2.input_processing)
+														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
 				
 				update_current_batch	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
@@ -627,9 +629,18 @@ EXPORT Update_Base_V2 (
    	
    				this_batch_only	:= prepReturn;
    				
-   				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only).get_all;
+   				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only, pHistMode).get_all;
    				
    			RETURN prepMetrics;
+   	END;
+		
+ 	EXPORT Slim_Report	:= FUNCTION
+   	
+   				this_batch_only	:= prepReturn;
+   				
+   				slim_down				:= project(this_batch_only, UPI_DataBuild.Layouts_V2.slim_report);
+   				
+   			RETURN slim_down;
    	END;
 	
   	EXPORT All_Data_Base := FUNCTION

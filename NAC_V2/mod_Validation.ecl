@@ -124,7 +124,8 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcFirstName, left.FirstName, left.ProgramState, left.RecordCode}], rErr))
 							+	IF(left.MiddleName<> '' and HasInvalidChar(left.MiddleName),
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcMiddleName, left.MiddleName, left.ProgramState, left.RecordCode}], rErr))
-							+	IF(left.NameSuffix<> '' and Trim(left.NameSuffix) NOT IN suffix_set,
+							+	IF(left.NameSuffix<> '' and 
+										Trim(STD.Str.RemoveSuffix(Std.Str.ToUpperCase(left.NameSuffix),'.')) NOT IN suffix_set,
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcSuffixName, left.NameSuffix, left.ProgramState, left.RecordCode}], rErr))
 
 							+ IF(left.Race = '' OR left.Race not in Mod_sets.Race, 
@@ -262,7 +263,7 @@ EXPORT mod_Validation := MODULE
 					self := []));
 				
 	EXPORT VerifyRelatedClients(Dataset(Layouts2.rCaseEx) cases, Dataset(Layouts2.rClientEx) clients) := FUNCTION
-					ca := DISTRIBUTE(cases, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
+					ca := DISTRIBUTE(cases(errors=0), Hash32(GroupId, ProgramCode, ProgramState, CaseId));
 					cl := DISTRIBUTE(clients, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
 					j1 := JOIN(cl, ca, left.GroupId=right.GroupId
 															AND left.ProgramCode=right.ProgramCode
@@ -284,8 +285,8 @@ EXPORT mod_Validation := MODULE
 	END;
 
 	EXPORT VerifyRelatedAddresses(Dataset(Layouts2.rCaseEx) cases, Dataset(Layouts2.rClientEx) clients, Dataset(Layouts2.rAddressEx) addresses) := FUNCTION
-					ca := DISTRIBUTE(cases, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
-					cl := DISTRIBUTE(clients, Hash32(GroupId, ProgramCode, ProgramState, CaseId, ClientId));
+					ca := DISTRIBUTE(cases(errors=0), Hash32(GroupId, ProgramCode, ProgramState, CaseId));
+					cl := DISTRIBUTE(clients(errors=0), Hash32(GroupId, ProgramCode, ProgramState, CaseId, ClientId));
 					ad1 := DISTRIBUTE(addresses, Hash32(GroupId, ProgramCode, ProgramState, CaseId));	// no 
 
 					// find address records with no matching case id								

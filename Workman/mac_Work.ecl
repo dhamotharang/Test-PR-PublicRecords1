@@ -96,7 +96,7 @@ EXPORT mac_Work(
   ,pForceRun          = 'false'                                       // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                                       // if true, then it will skip all failures and continue with the next iteration.  FALSE will ask if you want to rerun, skip or fail.
   ,pCleanupSuper      = 'false'                                       // if true, then it will cleanup the superfile for all subfiles except ones that contain this version(pversion above)
-  ,pDebugValues       = 'dataset([],WsWorkunits.Layouts.DebugValues)' // for the spawning of the wuids.  can use other repositories using this.
+  ,pDebugValues       = '\'dataset([],WsWorkunits.Layouts.DebugValues)\'' // for the spawning of the wuids.  can use other repositories using this.
   ,pDont_Wait         = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will just submit the childrunner
   ,pParallel          = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will submit the childrunner and also compile set results with the previous call
   ,pCompileOnly       = 'false'                                       // if false, will run the build as normal.  true = it will compile the wuid.  this also means it will only compile one iteration of it.  it will not save the workman files either.  this is mainly for testing.
@@ -107,6 +107,9 @@ functionmacro
   // -- Set max and min iterations
   #UNIQUENAME(MAX_ITERATIONS)
   #UNIQUENAME(MIN_ITERATIONS)
+  #UNIQUENAME(WUID_DEBUG_VALUES)
+
+  #SET(WUID_DEBUG_VALUES  ,STD.Str.FilterOut(pDebugValues,' '))
 
   #IF(trim(#TEXT(pNumMaxIterations))  != '')
     #SET(MAX_ITERATIONS ,pNumMaxIterations)
@@ -270,7 +273,7 @@ childrunner_ecl_code :=
   + '  ,\'' + pPollingFrequency           + '\'\n' 
   + '  ,'   + fbool(pForceRun     )       + '\n'                                         
   + '  ,'   + fbool(pForceSkip    )       + '\n'  
-  + '  ,'   + #TEXT(pDebugValues  )       + '\n'  
+  + '  ,'   + pDebugValues                + '\n'  
   + '  ,'   + fbool(pCompileOnly  )       + '\n'  
   + '  ,'   + fbool(pAutoResubmit )       + '\n'  
   + ');\n'
@@ -278,7 +281,17 @@ childrunner_ecl_code :=
 
   // -- kickoff the childrunner
   childrunner_hthor   := WorkMan._Config.Esp2Hthor(pESP);
-  kickoff_childrunner := WorkMan.CreateWuid(childrunner_ecl_code  ,childrunner_hthor   ,pESP,,pDebugValues);
+  kickoff_childrunner := WorkMan.CreateWuid(childrunner_ecl_code  ,childrunner_hthor   ,pESP,,%WUID_DEBUG_VALUES%);
+ 
+// parallel(
+      // output(dataset([
+      // {'childrunner_ecl_code'     ,childrunner_ecl_code}
+     // ,{'childrunner_hthor' ,childrunner_hthor}
+     // ,{'pESP    ' ,pESP    }
+    // ],{string stat,string statvalue}) ,named('Workman_mac_Work'))
+    // ,output(%WUID_DEBUG_VALUES%  ,named('Workman_mac_Work_Debugvalues'))
+    // );
+ 
  
   // -- get info after child is finished
   current_childrunner       := STD.Str.FilterOut(workman.get_set_Result(workunit,'Current_Running_Wuid',localesp)[1],'\'');

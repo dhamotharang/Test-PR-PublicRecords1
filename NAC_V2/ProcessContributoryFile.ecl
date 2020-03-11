@@ -2,6 +2,8 @@
 
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
+Archive(varstring ilfn) := NOTHOR(IF(STD.File.FindSuperFileSubName($.Superfile_List.sfNCF2,ilfn)=0,
+													STD.File.AddSuperFile($.Superfile_List.sfNCF2,ilfn)));
 /**
   dataDir			has incoming and ougoing subdirectories
 	maintenance	has spraying, done, error subdirectories
@@ -45,8 +47,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		processed := $.PreprocessNCF2(ilfn);
 		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
 		reports := $.GetReports(processed, lfn);		//ModifyFileName(ilfn, 'nac2'));
-		err_rate := reports.RejectedCount/reports.TotalRecords;
-		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
+		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
 												,MoveSprayingToError
@@ -68,7 +69,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		doit := sequential(
 				MoveReadyToSpraying
-				,SprayIt										
+				,SprayIt
+				,Archive(ilfn)
 				,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
 				,OUTPUT(reports.TotalRecords, named('total_records'))
 				,OUTPUT(reports.ErrorCount, named('Error_Count'))
@@ -78,9 +80,9 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 				,out_NCF_reports
 				,IF(EXISTS(reports.dsContacts(errors=0)), fn_ProcessContactRecord(reports.dsContacts(errors=0)))
 				,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
-				,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
+				,IF(NOT ExcessiveInvalidRecordsFound,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE))
 				//,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
-				,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2')))
+				,IF(NOT ExcessiveInvalidRecordsFound,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2'))))
 				,despray_NCF_reports('ncx2')
 				,despray_NCF_reports('ncd2')
 				,despray_NCF_reports('ncr2')

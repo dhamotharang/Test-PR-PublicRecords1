@@ -14,6 +14,7 @@ EXPORT In_Base(
 // 46..46 = earliest nonzero company_filing_date
 // 47..47 = is_sele_level indicator
 // 48..48 = legal name indicator
+// 49..49 = business address
 
 
 //add address flag to source fields so it can be use in valid address funtion
@@ -59,7 +60,8 @@ shared scored_non_gong := project(score_non_gong,calc_phone_score(LEFT));
 
 shared all_phone_scored := project(scored_non_gong + no_score_gong,
 													             transform(BIPV2_Best.Layouts.In_Base_with_flags,
-																			 self.source_for_votes := (string45) left.source_for_votes+ '00' + if(left.company_name_type_raw = 'LEGAL' or left.company_name_type_derived = 'LEGAl', '1', '0'),
+																			 self.source_for_votes := (string45) left.source_for_votes+ '00' + if(left.company_name_type_raw = 'LEGAL' or left.company_name_type_derived = 'LEGAl', '1', '0')
+                                                                                    + if(left.address_type_derived = 'B', '1', '0'),
 																			 self := left));
 
 
@@ -67,24 +69,24 @@ EXPORT For_Proxid := all_phone_scored;
 
 
 //Add indicators for is_sele_level = true and earliest nonzero company_filing_date to source_for_votes
-shared earliest_company_filing_date := dedup(sort(distribute(project(pHrchyBase(company_filing_date > 0), {pHrchyBase.seleid, pHrchyBase.company_filing_date, pHrchyBase.company_name}), 
+shared company_filing_date := dedup(sort(distribute(project(pHrchyBase(company_filing_date > 0), {pHrchyBase.seleid, pHrchyBase.company_filing_date, pHrchyBase.company_name}), 
 																									hash(seleid)),
-																							seleid, company_filing_date, local),
+																							seleid, -company_filing_date, local),
 																				seleid, local);
 
 												
-shared flags_earliest_company_filing_date := join(distribute(all_phone_scored, hash(seleid)),
-										      earliest_company_filing_date,
+shared flags_company_filing_date := join(distribute(all_phone_scored, hash(seleid)),
+										      company_filing_date,
 													left.seleid = right.seleid and
 													left.company_filing_date = right.company_filing_date and left.company_filing_date<>0,
 													transform(BIPV2_Best.Layouts.In_Base_with_flags,
-																		SELF.source_for_votes := if(left.seleid = right.seleid and left.company_filing_date = right.company_filing_date and left.company_filing_date<>0, (string45) left.source_for_votes + '1' + left.source_for_votes[47..48],(string45) left.source_for_votes +'0' + left.source_for_votes[47..48]),self := left),
+																		SELF.source_for_votes := if(left.seleid = right.seleid and left.company_filing_date = right.company_filing_date and left.company_filing_date<>0, (string45) left.source_for_votes + '1' + left.source_for_votes[47..49],(string45) left.source_for_votes +'0' + left.source_for_votes[47..49]),self := left),
 													left outer,
 													local);
 											
-shared is_sele_l := project(flags_earliest_company_filing_date,
+shared is_sele_l := project(flags_company_filing_date,
 														transform(BIPV2_Best.Layouts.In_Base_with_flags,
-																		SELF.source_for_votes := if(left.is_sele_level, (string46) left.source_for_votes + '1'  + left.source_for_votes[48], (string46) left.source_for_votes + '0' + left.source_for_votes[48]),
+																		SELF.source_for_votes := if(left.is_sele_level, (string46) left.source_for_votes + '1'  + left.source_for_votes[48..49], (string46) left.source_for_votes + '0' + left.source_for_votes[48..49]),
 																		self := left));	  
 													
 															
