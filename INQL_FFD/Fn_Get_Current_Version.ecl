@@ -36,4 +36,6 @@ EXPORT fcra_full_keys										  := regexfind(version_regexp, fcra_did_full_key_
 shared fcra_input_file 										:= sort(nothor(fileservices.superfilecontents(Inql_FFD.Filenames().InputBuilding)),-name)[1].name;
 EXPORT fcra_input													:= regexfind(version_regexp, fcra_input_file,1);	
 
+EXPORT fcra_last_key_dops_prod            := if(fcra_keys_dops_prod > fcra_full_keys_dops_prod, fcra_keys_dops_prod, fcra_full_keys_dops_prod);
+
 end;
