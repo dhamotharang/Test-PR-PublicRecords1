@@ -44,7 +44,7 @@ EXPORT charge_counties_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'NAMESCOPE:charge_counties\n'
     + 'SOURCEFIELD:vendor\n'
     + '\n'
-    + 'FIELDTYPE:Invalid_Record_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)\n'
+    + 'FIELDTYPE:Invalid_Record_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ )\n'
     + 'FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:Invalid_Case_ID:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_ )\n'
     + 'FIELDTYPE:Invalid_Current_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
