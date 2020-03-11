@@ -7,7 +7,7 @@ build_full_key := sequential  (
 																Build_Base(false, isFCRA, pVersion).all; // update weekly base
 																Build_Keys(false, isFCRA, pVersion).all; // build full keys - new
 																dops.updateversion('FCRA_InquiryHistoryKeys',pVersion,INQL_FFD.Email_Notification_Lists.DopsUpdate,,'F');
-																Orbit3.Proc_Orbit3_CreateBuild_npf('FCRA Inquiry History',pVersion,'BUILD_AVAILABLE_FOR_USE', false, false, true, true, false) ;
+																INQL_FFD.FN_Update_Orbit(pVersion).run;
 																INQL_FFD.proc_KeyDiff;
 															);
 
@@ -15,7 +15,7 @@ build_delta_key := Sequential (
 																Build_Keys(true, isFCRA, pVersion).all, // build delta keys
 																Build_Strata(true, isFCRA, pVersion).all,
 																dops.updateversion('FCRA_InquiryHistoryKeys',pVersion,INQL_FFD.Email_Notification_Lists.DopsUpdate,,'F',l_updateflag:='DR');
-															  Orbit3.Proc_Orbit3_CreateBuild_npf('FCRA Inquiry History',pVersion,'BUILD_AVAILABLE_FOR_USE', false, false, true, true, false);
+															  INQL_FFD.FN_Update_Orbit(pVersion).run;
 															);
 
 doBuildFull := _Flags().LastFullKeyVersionApproved and _Flags().timetobuildfull and _Flags().LastKeyVersionApproved;
