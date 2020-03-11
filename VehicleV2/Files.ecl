@@ -63,7 +63,7 @@ module
 		export	MA									:=	dataset('~thor_data400::base::vehicleV2::direct::ma',VehicleV2.Layout_MA.MA_as_VehicleV2,thor);
 		export	Main					      :=	dataset('~thor_data400::base::vehicleV2::main',VehicleV2.Layout_Base.Main,thor);
 		// export	Party_bip       		:=	dataset('~thor_data400::base::vehicleV2::party',VehicleV2.Layout_Base.Party_bip,thor);	
-		export  party_bip						:=  project(VehicleV2.Prep_Build.Party_Base_bip('~thor_data400::base::vehicleV2::party'), transform(VehicleV2.Layout_Base.Party_CCPA,self:=left));
+		export  party_bip						:=  project(VehicleV2.Prep_Build.Party_Base_bip(data_services.data_location.prefix() + 'thor_data400::base::vehicleV2::party'), transform(VehicleV2.Layout_Base.Party_CCPA,self:=left));
 		export	Party			          :=	project(Party_bip,transform(VehicleV2.Layout_Base.Party,self:=left));
 		export  Picker              :=  dataset('~thor_data400::out::vehicle_valid_make_model', {string MakeID,string MakeCode,string MakeDescription,	string ModelDescription}, csv(separator('|')));
 		export  MakeConst           :=  dataset('~thor_data400::out::vehicle_valid_make_constant',{string MakeCode}, flat) + MakeConst_extra; 
