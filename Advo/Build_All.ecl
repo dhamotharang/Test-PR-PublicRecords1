@@ -23,7 +23,7 @@ function
 	submit_stats := Scrubs.ScrubsPlus_PassFile(file_to_scrub_t,'ADVO','ADVO','Scrubs_ADVO','',pversion,emailList,false);
 
   //append bitmap to base
-  dbuildbase := dataset('~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Layout_Scrubs,thor);
+  dbuildbase := dataset('~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Layouts.Layout_Common_Out,thor);
 	VersionControl.macBuildNewLogicalFile(filenames(pversion).base.new,dbuildbase,BuildAdvoBase	,pShouldExport := false);
 	// BuildAdvoBase:=output(dbuildbase,,'~thor_data400::base::ADVO::ScrubsTest::20170215',thor,overwrite);
 //*****************************************************************************************************	

@@ -244,6 +244,20 @@ EXPORT Layouts_V2 := MODULE
 		unsigned1		guardian_min_lexid_score;
 		unsigned1		guardian_max_lexid_score;
 		unsigned1		guardian_ave_lexid_score;
+		unsigned4		cnt_new_crk;
+	END;
+	
+	EXPORT slim_report := RECORD
+		base.batch_jobid;
+		base.dt_vendor_last_reported;
+		base.source_rid;
+		base.input_crk;
+		base.crk;
+		base.crk_changed;
+		base.input_lexid;
+		base.lexid;
+		base.lexid_score;
+		base.lexid_changed;
 	END;
 
 END;
