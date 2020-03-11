@@ -184,28 +184,6 @@ EXPORT Functions := MODULE
 		RETURN BuzCreditIndicator;
 	END;	// END of function fn_BuzCreditIndicator
 
-	EXPORT fn_BuzCreditIndicator2 (UNSIGNED6 UltID, UNSIGNED6 OrgID, UNSIGNED6 SeleID , doxie.IDataAccess mod_access, BOOLEAN buzCreditAccess = FALSE) := FUNCTION
-
-		BIPV2.IDlayouts.l_xlink_ids2 initialize() := TRANSFORM
-			SELF.SeleID := SeleID;
-			SELF.OrgID  := OrgID;
-			SELF.UltID  := UltID;
-			SELF				:= [];
-		END;
-
-		BusinessIds := DATASET([initialize()]);
-
-		BOOLEAN exists_BipHeader 			:= true; // always going to be in bip v2 header since results are from this key:  BIPV2.Key_BH_Relationship_SELEID.kFetch
-		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,mod_access,,,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
-
-		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
-													//~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY, // will never exist at this point
-														exists_BipHeader and exists_BuzCreditHeader	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
-																			0);
-
-		RETURN BuzCreditIndicator;
-	END;	// END of function fn_BuzCreditIndicator
-
 	EXPORT fn_BuzStructureDescription (STRING BuzStructureCode) := FUNCTION
 		buzStructureDesc := CASE(BuzStructureCode,
 															'001' => 'Individual Sole Proprietorship',
@@ -686,5 +664,61 @@ EXPORT Functions := MODULE
 
 				RETURN ds_MatchingRolled;
 		END;
+    
+    EXPORT AddSBFEIndicatorFunction( DATASET (TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_Final) InConnectedBusinesses,
+                                            doxie.IDataAccess mod_access, 
+                                            BOOLEAN buzCreditAccess = FALSE)   := FUNCTION
+             // function purpose is to set the BusinessCreditIndicator into values of 1 or 3 or 0 to signify if particular row in connectedBusinessSection
+             // has ult/org/seleid combo that is also in businessCredit (SBFE) header as well as BIP header.
+               InRecs := PROJECT( InConnectedBusinesses[1].ConnectedBusinessRecords,
+                    TRANSFORM({iesp.businesscreditreport.t_BusinessCreditConnectedBusiness; UNSIGNED4 UniqueId;},
+                       SELF.UniqueID := COUNTER;
+                       SELF.BusinessCreditIndicator := 0;
+                       SELF := LEFT; // all the other data copied over.
+               ));
+               InRecsWithoutcounter :=  PROJECT(InConnectedBusinesses[1].ConnectedBusinessRecords,
+                    TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,                                         
+                       SELF.BusinessCreditIndicator := 0;
+                       SELF := LEFT; // all the other data copied over.
+               ));                                         
+                // sequence the recs before they are passed into the kfetch2 function so that we can join this set back to Inrecs afterwards
+                // using UniqueID value.
+                tmpLinkids := PROJECT( InConnectedBusinesses[1].ConnectedBusinessRecords, TRANSFORM(bipv2.idlayouts.l_xlink_ids2,                                                          
+                     SELF.UniqueID := COUNTER;
+                     SELF.ultid := LEFT.BusinessIds.UltId;
+                     SELF.orgid := LEFT.BusinessIds.orgid;
+                     SELF.seleid := LEFT.BusinessIds.seleid;                                                    
+                     SELF := []));
+                tmpBusCreditRecs := Business_Credit.Key_LinkIds().Kfetch2(tmplinkids
+                                                                                                    ,mod_access
+                                                                                                    ,BIPV2.IDconstants.Fetch_Level_SeleID
+                                                                                                    ,
+                                                                                                    ,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase);
+                temp  := DEDUP(SORT(tmpBusCreditRecs, uniqueID), uniqueID);
+                                                                                                           
+                tempfinal := JOIN( InRecs, temp, 
+                                             LEFT.uniqueId = RIGHT.uniqueId,
+                                             TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,                                               
+                                                SELF.BusinessCreditIndicator := IF (RIGHT.ultid > 0  AND BuzCreditAccess, BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
+                                                                                                            BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY);                    
+                                                                                                            // if there is info on right side then we know this particular
+                                                                                                            // ult/org/seleid exists in bus credit header (SBFE) and by default we know the ult/org/seleid are in bip header
+                                                                                                            // so thus mark it as being both BIP header and SBFE bus Credit header aka (Constants.BUSINESS_CREDIT_INDICATOR.BOTH)
+                                                                                                            // otherwise just mark as being bip header only
+                                                SELF := LEFT;                                              
+                                                ), LEFT OUTER);
+                                 
+                iesp.businesscreditreport.t_BusinessCreditConnectedBusinessSection xfm_createConnBiz() := TRANSFORM                             
+                                  SELF.CountConnectedBusinesses :=  InConnectedBusinesses[1].CountConnectedBusinesses;
+                                  SELF.TotalCountConnectedBusinesses :=  InConnectedBusinesses[1].TotalCountConnectedBusinesses;
+                                  SELF. ConnectedBusinessRecords :=   IF ( buzCreditAccess, CHOOSEN(tempFinal,iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES),
+                                                                                                         CHOOSEN(InRecsWithoutcounter,iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES));
+                                  END;
+                                  
+                FinalResults := DATASET([xfm_createConnBiz()]);
+                // output(tmpBusCreditRecs, named('tmpBusCreditRecs'));
+            // output(tempfinal, named('tempfinal'));
+       RETURN (FinalResults);
+    END;
 
 END; // end of Functions module
