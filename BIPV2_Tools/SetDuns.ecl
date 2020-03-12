@@ -30,16 +30,16 @@ function
   
   // -- Refresh Duns number fields first
   ds_sample         := ds_in;
-  ds_refreshed_duns := BIPV2_Tools.refresh_duns(ds_sample,pDuns_file)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns');
+  ds_refreshed_duns := BIPV2_Tools.refresh_duns(ds_sample,pDuns_file,pPersistUnique)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns' + '_' + pPersistUnique);
   
   // -- keep only non-zero proxid and lgid3 clusters for possible explosion.  zero proxid and lgid3s don't go through this logic
-  ds_refreshed_duns_good_proxid := ds_refreshed_duns (proxid != 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_good_proxid');
-  ds_refreshed_duns_zero_proxid := ds_refreshed_duns (proxid  = 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_zero_proxid');
+  ds_refreshed_duns_good_proxid := ds_refreshed_duns (proxid != 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_good_proxid' + '_' + pPersistUnique);
+  ds_refreshed_duns_zero_proxid := ds_refreshed_duns (proxid  = 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_zero_proxid' + '_' + pPersistUnique);
   ds_refreshed_duns_zero_lgid3  := ds_refreshed_duns (lgid3   = 0);
   
   // -- append cnp_name BOW field.  this filters down the number of correction candidates for proxid and lgid3 to ones that will not come back together in a BOW match
-  ds_append_bow_proxid := BIPV2_Tools.mac_Append_BOW_Info(proxid,ds_refreshed_duns_good_proxid) : persist('~persist::BIPV2_Tools::SetDuns::ds_append_bow_proxid');
-  ds_append_bow_lgid3  := BIPV2_Tools.mac_Append_BOW_Info(lgid3 ,ds_refreshed_duns_good_proxid) : persist('~persist::BIPV2_Tools::SetDuns::ds_append_bow_lgid3' );
+  ds_append_bow_proxid := BIPV2_Tools.mac_Append_BOW_Info(proxid,ds_refreshed_duns_good_proxid  ,pPersistUnique) : persist('~persist::BIPV2_Tools::SetDuns::ds_append_bow_proxid' + '_' + pPersistUnique);
+  ds_append_bow_lgid3  := BIPV2_Tools.mac_Append_BOW_Info(lgid3 ,ds_refreshed_duns_good_proxid  ,pPersistUnique) : persist('~persist::BIPV2_Tools::SetDuns::ds_append_bow_lgid3'  + '_' + pPersistUnique);
   
   output_bow_samples := parallel(
      output(choosen(ds_append_bow_proxid                                                         ,100)  ,named('ds_append_bow_proxid'                             ))
@@ -75,7 +75,7 @@ function
   ds_other_cnp_name_sources_rollup_proxid := rollup(sort(distribute(ds_other_cnp_name_sources_dedup_proxid ,hash(proxid,cnp_name)),proxid,cnp_name,god_keys[1].god_key,local)  ,left.proxid = right.proxid and left.cnp_name = right.cnp_name,transform(recordof(left)
     ,self.god_keys := left.god_keys + right.god_keys
     ,self          := left
-  )  ,local) : persist('~persist::BIPV2_Tools::SetDuns::ds_other_cnp_name_sources_rollup_proxid');
+  )  ,local) : persist('~persist::BIPV2_Tools::SetDuns::ds_other_cnp_name_sources_rollup_proxid' + '_' + pPersistUnique);
 
   ds_other_cnp_name_sources_rollup_lgid3 := rollup(sort(distribute(ds_other_cnp_name_sources_dedup_lgid3 ,hash(lgid3,cnp_name)),lgid3,cnp_name,god_keys[1].god_key,local)  ,left.lgid3 = right.lgid3 and left.cnp_name = right.cnp_name,transform(recordof(left)
     ,self.god_keys := left.god_keys + right.god_keys
@@ -85,7 +85,7 @@ function
   // -- join god keys onto BOW file proxid, then filter for clusters that do not have another god key that will bring them back together.  
   ds_get_god_keys_left_proxid  := join(ds_append_bow_proxid_filt   ,ds_other_cnp_name_sources_rollup_proxid  ,left.proxid = right.proxid and left.cnp_name_left  = right.cnp_name ,transform({recordof(left),dataset({string god_key}) god_keys_left },self := left,self.god_keys_left  := right.god_keys) ,left outer,hash);
   ds_get_god_keys_right_proxid := join(ds_get_god_keys_left_proxid ,ds_other_cnp_name_sources_rollup_proxid  ,left.proxid = right.proxid and left.cnp_name_right = right.cnp_name ,transform({recordof(left),dataset({string god_key}) god_keys_right},self := left,self.god_keys_right := right.god_keys) ,left outer,hash)
-   : persist('~persist::BIPV2_Tools::SetDuns::ds_get_god_keys_right');
+   : persist('~persist::BIPV2_Tools::SetDuns::ds_get_god_keys_right' + '_' + pPersistUnique);
   
   ds_eval_god_keys_proxid := project(distribute(ds_get_god_keys_right_proxid),transform(
     {recordof(left),unsigned cnt_left_god_keys,unsigned cnt_right_god_keys,unsigned cnt_total_god_keys,unsigned cnt_total_deduped_god_keys,boolean did_god_keys_validate}
@@ -96,7 +96,7 @@ function
     ,self.did_god_keys_validate       := if(self.cnt_total_deduped_god_keys = self.cnt_total_god_keys  ,false  ,true)
     ,self                             := left
   ))
-   : persist('~persist::BIPV2_Tools::SetDuns::ds_eval_god_keys');
+   : persist('~persist::BIPV2_Tools::SetDuns::ds_eval_god_keys' + '_' + pPersistUnique);
   
   
   ds_eval_god_keys_not_validated_proxid := ds_eval_god_keys_proxid(did_god_keys_validate = false);
@@ -104,7 +104,7 @@ function
   // -- join god keys onto BOW file lgid3, then filter for clusters that do not have another god key that will bring them back together.  
   ds_get_god_keys_left_lgid3  := join(ds_append_bow_lgid3_filt   ,ds_other_cnp_name_sources_rollup_lgid3  ,left.lgid3 = right.lgid3 and left.cnp_name_left  = right.cnp_name ,transform({recordof(left),dataset({string god_key}) god_keys_left },self := left,self.god_keys_left  := right.god_keys) ,left outer,hash);
   ds_get_god_keys_right_lgid3 := join(ds_get_god_keys_left_lgid3 ,ds_other_cnp_name_sources_rollup_lgid3  ,left.lgid3 = right.lgid3 and left.cnp_name_right = right.cnp_name ,transform({recordof(left),dataset({string god_key}) god_keys_right},self := left,self.god_keys_right := right.god_keys) ,left outer,hash)
-   : persist('~persist::BIPV2_Tools::SetDuns::ds_get_god_keys_right_lgid3');
+   : persist('~persist::BIPV2_Tools::SetDuns::ds_get_god_keys_right_lgid3' + '_' + pPersistUnique);
   
   ds_eval_god_keys_lgid3 := project(distribute(ds_get_god_keys_right_lgid3),transform(
     {recordof(left),unsigned cnt_left_god_keys,unsigned cnt_right_god_keys,unsigned cnt_total_god_keys,unsigned cnt_total_deduped_god_keys,boolean did_god_keys_validate}
@@ -115,7 +115,7 @@ function
     ,self.did_god_keys_validate      := if(self.cnt_total_deduped_god_keys = self.cnt_total_god_keys  ,false  ,true)
     ,self                             := left
   ))
-   : persist('~persist::BIPV2_Tools::SetDuns::ds_eval_god_keys_lgid3');
+   : persist('~persist::BIPV2_Tools::SetDuns::ds_eval_god_keys_lgid3' + '_' + pPersistUnique);
   
   ds_eval_god_keys_not_validated_lgid3 := ds_eval_god_keys_lgid3(did_god_keys_validate = false);
   
@@ -125,12 +125,12 @@ function
   
   // -- reset the clusters if necessary
   ds_refreshed_duns_out := project(ds_refreshed_duns  ,bipv2.commonbase.layout);  
-  reset_clusters        := bipv2_tools.mac_reset_clusters(ds_get_all_proxid_records,ds_get_all_seleid_records ,pReturnFullPatchedDataset := true,pTurnOffAgg := true,pDs_Full_File := ds_refreshed_duns_out);
+  reset_clusters        := bipv2_tools.mac_reset_clusters(ds_get_all_proxid_records,ds_get_all_seleid_records ,pReturnFullPatchedDataset := true,pTurnOffAgg := true,pDs_Full_File := ds_refreshed_duns_out ,pPersistUnique2 := pPersistUnique);
 
   ds_return := if(exists(ds_get_all_proxid_records) or exists(ds_get_all_seleid_records)
                   ,project(reset_clusters,bipv2.commonbase.layout) + project(ds_refreshed_duns_zero_proxid,bipv2.commonbase.layout)
                   ,ds_refreshed_duns_out
-               )  : persist('~persist::BIPV2_Tools::SetDuns::ds_return');
+               )  : persist('~persist::BIPV2_Tools::SetDuns::ds_return' + '_' + pPersistUnique);
 
 
   lay_cands_stats   := {string stat, unsigned value};
@@ -249,6 +249,6 @@ function
     ,Strata_explode_stats
   );
   
-  return when(ds_return,output_all);
+  return when(ds_return,if(pDebug_Outputs = true  ,output_all));
     
 end;
