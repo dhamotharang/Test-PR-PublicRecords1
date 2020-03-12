@@ -800,6 +800,19 @@ Export CIID := RECORD
 		STRING3		score_any_fzzy;
 		STRING		errorcode;
  END;
+
+ EXPORT CoverageDates := RECORD
+    unsigned6 customer_id;
+    string2		customer_state;
+    string1   customer_program;
+    string100 contribution_code;
+    string100	source := '';
+    string100	source_group := '';
+    unsigned4	max_reported_date := 0;
+    unsigned4	max_process_date := 0;
+    unsigned4	record_count := 1;				
+  END;
+ 
  
  //KEL Layouts
  shared flagsrec := RECORD
