@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Specificities - Specificities - SALT V3.11.3');
+#workunit('name','BIPV2_ProxID.BWR_Specificities - Specificities - SALT V3.11.4');
 IMPORT BIPV2_ProxID,SALT311;
 SpecMod := BIPV2_ProxID.Specificities(BIPV2_ProxID.In_DOT_Base);
 // Use the build command to actually build the specificity indexes

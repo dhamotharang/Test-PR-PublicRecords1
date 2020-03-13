@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Best - BEST - SALT V3.11.3');
+#workunit('name','BIPV2_ProxID.BWR_Best - BEST - SALT V3.11.4');
 IMPORT BIPV2_ProxID,SALT311;
 //Best is generated automatically by proc_iterate - this file can perform best production independently
 //If you just want to test best - it is easier to build the keys and then use the best service

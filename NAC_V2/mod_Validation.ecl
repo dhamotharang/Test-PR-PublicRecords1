@@ -124,7 +124,8 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcFirstName, left.FirstName, left.ProgramState, left.RecordCode}], rErr))
 							+	IF(left.MiddleName<> '' and HasInvalidChar(left.MiddleName),
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcMiddleName, left.MiddleName, left.ProgramState, left.RecordCode}], rErr))
-							+	IF(left.NameSuffix<> '' and Trim(left.NameSuffix) NOT IN suffix_set,
+							+	IF(left.NameSuffix<> '' and 
+										Trim(STD.Str.RemoveSuffix(Std.Str.ToUpperCase(left.NameSuffix),'.')) NOT IN suffix_set,
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcSuffixName, left.NameSuffix, left.ProgramState, left.RecordCode}], rErr))
 
 							+ IF(left.Race = '' OR left.Race not in Mod_sets.Race, 

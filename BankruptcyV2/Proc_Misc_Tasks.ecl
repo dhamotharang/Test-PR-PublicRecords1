@@ -60,7 +60,7 @@ Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~tho
 
 // DF-22748 Bankruptcy: Send email when WithdrawnStatus records are added that contain valid LexID
 send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))>0,
-                               fileservices.sendemail('Kevin.Garrity@LexisNexisRisk.com,Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
+                               fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
                                'Bankruptcy Build Version ' + filedate,
                                'BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus() contains '
                                +COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))
