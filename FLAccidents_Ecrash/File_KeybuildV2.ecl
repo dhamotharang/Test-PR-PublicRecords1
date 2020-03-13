@@ -473,11 +473,13 @@ export Alpha  :=  project(AlphaOtherVendors + AlphaCoplogic, transform(Layout_ke
 shared foutrecs0 := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
 export out    := project(foutrecs0, transform(Layout_keybuild_SSv2, self := left;));
 												 
-shared EcrashAgencyExclusion := foutrecs0((trim(agency_ori, all) not in Agency_exclusion.Agency_ori_list or
-                                           trim(agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list)
-																					 or 
-																				  (trim(orig_agency_ori, all) not in Agency_exclusion.Agency_ori_list or
-                                           trim(orig_agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list));
+// shared EcrashAgencyExclusion := foutrecs0((trim(agency_ori, all) not in Agency_exclusion.Agency_ori_list or
+                                           // trim(agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list)
+																					 // or 
+																				  // (trim(orig_agency_ori, all) not in Agency_exclusion.Agency_ori_list or
+                                           // trim(orig_agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list));
+																					 
+shared EcrashAgencyExclusion := foutrecs0;
 export prout := project(EcrashAgencyExclusion, transform(Layout_keybuild_SSv2, self := left;));
 
 shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
