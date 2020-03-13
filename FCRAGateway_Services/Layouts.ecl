@@ -28,9 +28,10 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT equifax_ems := MODULE
-    
+
     EXPORT lexID_appended_report := RECORD(iesp.equifax_ems.t_CreditReportRecord)
       unsigned6 resolved_lexID;
+      iesp.share.t_Address parsed_Address; // add parsed address fields from equifax report to output
     END;
 
     EXPORT gateway_out := RECORD
