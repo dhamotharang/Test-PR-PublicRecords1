@@ -1,10 +1,10 @@
-##---------------------------------------------------------------------------
+﻿##---------------------------------------------------------------------------
 ##dCompanyNameScore
 ##Debug and matches
 ##---------------------------------------------------------------------------
 def dCompanyNameScore(): 
 	return [
-		('Debug','(SELF\.cnp_name_score := )([^;]*?)(; [/][/] Enforce FORCE parameter)','HACKCompanyNameScore'
+		('debug','(SELF\.cnp_name_score := )([^;]*?)(; [/][/] Enforce FORCE parameter)','HACKCompanyNameScore'
 			,'  import tools;\n'
 			+'  cnp_name_bow_most_38    := SALT311.MatchBagOfWords(le.cnp_name,ri.cnp_name,38   ,1);  //threshold of 800\n'
 			+'  string_similarity_ratio := tools.string_similarity_ratio(trim(le.cnp_name_phonetic),trim(ri.cnp_name_phonetic));\n'
@@ -67,7 +67,7 @@ def dCompanyNameScore():
 #---------------------------------------------------------------------------
 def dPrimNameExactMatch():
 	return [
-		('Debug', '(SELF\.prim_name_derived_score := IF \( )([^;]*?)(;)', 'HACKPrimName','\g<1>le.prim_name_derived = ri.prim_name_derived/*HACKPrimName*/ or \g<2>\g<3>', 'Hack prim_name_derived exact match'),
+		('debug', '(SELF\.prim_name_derived_score := IF \( )([^;]*?)(;)', 'HACKPrimName','\g<1>le.prim_name_derived = ri.prim_name_derived/*HACKPrimName*/ or \g<2>\g<3>', 'Hack prim_name_derived exact match'),
 		('matches', '(INTEGER2 prim_name_derived_score := IF \( )([^;]*?)(;)', 'HACKPrimName','\g<1>le.prim_name_derived = ri.prim_name_derived/*HACKPrimName*/ or \g<2>\g<3>', 'Hack prim_name_derived exact match')
 	]
 
@@ -87,19 +87,15 @@ def dCompanyNumberEquality():
 ##---------------------------------------------------------------------------
 def dScoreAssignment():
 	return [
- 		('Debug',   '(SELF\.Conf := \()'
-              + '(SELF\.cnp_number_score \+([^;]*?))([+] SELF[.]cnp_name_phonetic_score)'
-              + '([^;]*?)(\/ 100 \+ outside;)'
-    , 'HACKScoreAssignment','import ut;\n'
-			+'iComp1 := (self.salt_partition_score + \g<2>/*\g<4> HACK HACKScoreAssignment*/\g<5>\g<6>' + '\n'
+		('debug', '(SELF\.Conf := \(SELF\.cnp_number_score \+)([^;]*?)(\/ 100 \+ outside;)', 'HACKScoreAssignment','import ut;\n'
+			+'iComp1 := (self.salt_partition_score + SELF.cnp_number_score + SELF.hist_enterprise_number_score + SELF.ebr_file_number_score + SELF.active_enterprise_number_score + SELF.hist_corp_key_score + SELF.company_charter_number_score + SELF.hist_duns_number_score + SELF.active_duns_number_score + SELF.company_phone_score + SELF.company_fein_score + SELF.cnp_name_score + SELF.cnp_btype_score + SELF.company_name_type_derived_score + IF(SELF.company_address_score>0,MAX(SELF.company_address_score,IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score)),IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score))) / 100 + outside;\n'
 			+'iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 \n'
 			+'              ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1\n'
 			+'              ,le.cnp_name = ri.cnp_name and  le.prim_range_derived = ri.prim_range_derived and le.prim_name_derived = ri.prim_name_derived and ut.nneq(le.v_city_name,ri.v_city_name) and le.st = ri.st and le.zip = ri.zip and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1\n'
 			+'              ,                                                                         iComp1\n'
 			+'          );\n'
 			+'SELF.Conf := iComp;/*HACKScoreAssignment*/', 'score assignment'),
-           
- 		('matches', '(iComp := \(cnp_number_score \+)([^;]*?)(\/ 100 \+ outside;)', 'HACKScoreAssignment','import ut;\n'
+		('matches', '(iComp := \(cnp_number_score \+)([^;]*?)(\/ 100 \+ outside;)', 'HACKScoreAssignment','import ut;\n'
 			+'iComp1 := (cnp_number_score +\g<2>\g<3>\n'
 			+'iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 \n'
 			+'              ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> MatchThreshold\n'
@@ -107,7 +103,8 @@ def dScoreAssignment():
 			+'              ,                                                                         iComp1\n'
 			+'          );/*HACKScoreAssignment*/', 'score assignment'),
 
-		('matches', '[+] cnp_name_phonetic_score'     , 'Matches HACKcnp_name_phonetic_score','/*+ cnp_name_phonetic_score*/ /*HACKcnp_name_phonetic_score*/','matches HACKcnp_name_phonetic_score'),
+		('matches', '[+] cnp_name_phonetic_score'     , 'HACKcnp_name_phonetic_score','/*+ cnp_name_phonetic_score*/ /*HACKcnp_name_phonetic_score*/','matches HACKcnp_name_phonetic_score'),
+		('Debug'  , '[+] SELF\.cnp_name_phonetic_score', 'HACKcnp_name_phonetic_score','/*+ SELF.cnp_name_phonetic_score*/ /*HACKcnp_name_phonetic_score*/', 'debug HACKcnp_name_phonetic_score')
 	]
 
 ##---------------------------------------------------------------------------
@@ -116,16 +113,16 @@ def dScoreAssignment():
 ##---------------------------------------------------------------------------
 def dDebug():
 	return [
-		('Debug','(SALT311\.StrType   Matching_Attributes := \'\'; \/\/ Keys from attribute files which match)','HACKDebug01','\g<1>\n'
+		('debug','(SALT311\.StrType   Matching_Attributes := \'\'; \/\/ Keys from attribute files which match)','HACKDebug01','\g<1>\n'
 		 	+'	string cnp_name_match_info := \'\';\n'
 			+'	string2 left_salt_partition;\n'
 			+'  string2 right_salt_partition;\n'
 			+'  INTEGER2 salt_partition_score;/*HACKDebug01*/','add partition fields for compareservice'),
-		('Debug','SELF\.left_cnp_number := le\.cnp_number;','HACKDebug02','SELF.left_salt_partition  := le.salt_partition;\n'
+		('debug','SELF\.left_cnp_number := le\.cnp_number;','HACKDebug02','SELF.left_salt_partition  := le.salt_partition;\n'
 			+'  SELF.right_salt_partition := ri.salt_partition;\n'
 			+'  SELF.salt_partition_score := if(le.SALT_Partition = ri.SALT_Partition OR le.SALT_Partition=\'\' OR ri.SALT_Partition = \'\'  ,0,-9999);/*HACKDebug02*/\n'
 			+'  SELF.left_cnp_number := le.cnp_number;','set partition fields in match sample join'),
-		('Debug', 'END;[ \n\t]*SHARED AppendAttribs.*END;[ \n\t]*EXPORT Layout_RolledEntity', 'HACKDebug03','END;\n'
+		('debug', 'END;[ \n\t]*SHARED AppendAttribs.*END;[ \n\t]*EXPORT Layout_RolledEntity', 'HACKDebug03','END;\n'
       + 'SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION\n'
       + '  Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM\n'
       + '    SELF.Attribute_Conf := ri.Conf;\n'
@@ -201,20 +198,19 @@ def dDebug():
        + '\n'
       + 'EXPORT Layout_RolledEntity'
       ,'hack attribute file scores'),
-		('Debug', '(ds_roll := ROLLUP\( )(.*?;)', 'HACKDebug04',
+		('debug', '(ds_roll := ROLLUP\( )(.*?;)', 'HACKDebug04',
 			'//\g<1>\g<2>\n'
 			+'rollup1 :=  ROLLUP( SORT( distribute(infile  ,random()) , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/\n'
 			+'rollup2 :=  ROLLUP( SORT( distribute(rollup1 ,random()) , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/\n'
 			+'rollup3 :=  ROLLUP( SORT( distribute(rollup2 ,proxid)   , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/\n'
 			+'ds_roll := rollup3; ', 'hack return rollup to eliminate skew errors')
-		,('Debug'
+		,('debug'
       ,'EXPORT Layout_RolledEntity.*?END;'
       ,'HACKDebug_Layout_RolledEntity'
 			,'EXPORT Layout_RolledEntity /*HACKDebug_Layout_RolledEntity*/:= RECORD,MAXLENGTH(63000)\n'
 			+'  SALT311.UIDType Proxid;\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
-			+'  DATASET(SALT311.Layout_FieldValueList) active_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_inc_state_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_charter_number_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
@@ -245,11 +241,11 @@ def dDebug():
       
       , 'hack Layout_RolledEntity for easier match sample reviews'),
 
-		('Debug','(SELF\.cnp_name_phonetic_values :=.*?;)'  ,'HACKDebug remove cnp_name_phonetic_values'  ,'//\g<1>/*HACKDebug remove cnp_name_phonetic_values*/' ,'HACKDebug remove cnp_name_phonetic_values'),
-		('Debug','SELF\.cnp_name_phonetic_size := SALT311\.Fn_SwitchSpec[(]s\.cnp_name_phonetic_switch,count[(]le[.]cnp_name_phonetic_values[)][)];'  ,'HACKDebug remove cnp_name_phonetic_size'  ,'//SELF.cnp_name_phonetic_size := SALT311.Fn_SwitchSpec(s.cnp_name_phonetic_switch,count(le.cnp_name_phonetic_values));/*HACKDebug remove cnp_name_phonetic_size*/\n'  ,'HACKDebug remove cnp_name_phonetic_size'),
+		('debug','(SELF\.cnp_name_phonetic_values :=.*?;)'  ,'HACKDebug remove cnp_name_phonetic_values'  ,'//\g<1>/*HACKDebug remove cnp_name_phonetic_values*/' ,'HACKDebug remove cnp_name_phonetic_values'),
+		('debug','SELF\.cnp_name_phonetic_size := SALT311\.Fn_SwitchSpec[(]s\.cnp_name_phonetic_switch,count[(]le[.]cnp_name_phonetic_values[)][)];'  ,'HACKDebug remove cnp_name_phonetic_size'  ,'//SELF.cnp_name_phonetic_size := SALT311.Fn_SwitchSpec(s.cnp_name_phonetic_switch,count(le.cnp_name_phonetic_values));/*HACKDebug remove cnp_name_phonetic_size*/\n'  ,'HACKDebug remove cnp_name_phonetic_size'),
 
-		('Debug','UNSIGNED1 cnp_name_phonetic_size := 0;'  ,'HACKDebug remove cnp_name_phonetic_size in layout'  ,'//UNSIGNED1 cnp_name_phonetic_size := 0;/*HACKDebug remove cnp_name_phonetic_size in layout*/\n' ,'HACKDebug remove cnp_name_phonetic_size in layout'),
-		('Debug','\+t\.cnp_name_phonetic_size'  ,'HACKDebug remove cnp_name_phonetic_size from score add'  ,'/*+t.cnp_name_phonetic_size*//*HACKDebug remove cnp_name_phonetic_size from score add*/' ,'HACKDebug remove cnp_name_phonetic_size from score add')
+		('debug','UNSIGNED1 cnp_name_phonetic_size := 0;'  ,'HACKDebug remove cnp_name_phonetic_size in layout'  ,'//UNSIGNED1 cnp_name_phonetic_size := 0;/*HACKDebug remove cnp_name_phonetic_size in layout*/\n' ,'HACKDebug remove cnp_name_phonetic_size in layout'),
+		('debug','\+t\.cnp_name_phonetic_size'  ,'HACKDebug remove cnp_name_phonetic_size from score add'  ,'/*+t.cnp_name_phonetic_size*//*HACKDebug remove cnp_name_phonetic_size from score add*/' ,'HACKDebug remove cnp_name_phonetic_size from score add')
 	]
 
 ##---------------------------------------------------------------------------
@@ -277,39 +273,21 @@ def dMatches():
 		('matches','SALT311\.MAC_Reassign_UID\(ihbp,Cleave\(ih\)\.patch_file,Proxid,rcid,ih1\);'  ,'HACKMatches07a','SALT311.MAC_Reassign_UID(ihbp,Cleave(ih).patch_file,Proxid,rcid,ihbp01/*HACKMatches07a*/);','github 3140 issue'),
 
 		('matches','attr_match := JOIN\(DISTRIBUTE\(j1,HASH\(Proxid1\)\),hd,LEFT\.Proxid1 = RIGHT\.Proxid AND \( LEFT\.SALT_Partition = RIGHT\.SALT_Partition OR LEFT\.SALT_Partition=\'\' OR RIGHT\.SALT_Partition = \'\' \).*?,LOCAL\);'  ,'HACKMatches08'  		
-            , 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition=\'\' OR RIGHT.SALT_Partition = \'\' )\n'                    
-            + 'AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/\n'
-            + 'AND LEFT.st = RIGHT.st\n'
-            + 'AND LEFT.prim_range_derived = RIGHT.prim_range_derived\n'
-            + 'AND ( ~left.st_isnull AND ~right.st_isnull )\n'
-            + 'AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )\n'
-            + 'AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))\n'
-            + 'AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )\n'		     
-                              + ',match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name)\n'
-                              + ',ATMOST(LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived\n'
-                              + '      AND LEFT.st = RIGHT.st\n'
-                              + '      AND LEFT.prim_range_derived = RIGHT.prim_range_derived,1000)\n'
-                              + '      ,LOCAL); \n'
+    , 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition=\'\' OR RIGHT.SALT_Partition = \'\' )\n'                    
+	+ 'AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/\n'
+    + 'AND LEFT.st = RIGHT.st\n'
+    + 'AND LEFT.prim_range_derived = RIGHT.prim_range_derived\n'
+    + 'AND ( ~left.st_isnull AND ~right.st_isnull )\n'
+    + 'AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )\n'
+    + 'AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))\n'
+    + 'AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )\n'		     
+                      + ',match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name)\n'
+                      + ',ATMOST(LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived\n'
+                      + '      AND LEFT.st = RIGHT.st\n'
+                      + '      AND LEFT.prim_range_derived = RIGHT.prim_range_derived,1000)\n'
+                      + '      ,LOCAL); \n'
 
-             ,'BH-578 -- add hack to proxid to speed up attribute matches'),
-		('matches','SHARED match_candidates[(]ih[)][.]layout_matches match_join'  ,'HACK add perfect name address field','SHARED {boolean perfect_name_address_match/*HACK add perfect name address field*/,match_candidates(ih).layout_matches} match_join','add perfect name address match field'),
-		
-    ('matches','(SELF[.]Conf := IF[(] iComp[>][=]LowerMatchThreshold OR iComp[-]SELF[.]Conf_Prop [>][=] LowerMatchThreshold,iComp,SKIP [)]; // Remove failing records asap)'  
-        ,'HACK set perfect_name_address_match'
-        ,'\g<1>\n  self.perfect_name_address_match := if(le.company_address = ri.company_address and le.cnp_name = ri.cnp_name ,true ,false);/*HACK set perfect_name_address_match*/'
-        ,'set perfect name address match field in match join'),
-
-    ('matches','with_attr := attr_match [+] all_mjs;'  
-        ,'HACK split matches'
-        , 'all_mjs_not_perfect_match := project(all_mjs(perfect_name_address_match = false),match_candidates(ih).layout_matches);/*HACK split matches*/\n'
-        + 'all_mjs_perfect_match     := project(all_mjs(perfect_name_address_match = true ),match_candidates(ih).layout_matches);/*HACK split matches*/\n'
-        + 'with_attr := project(attr_match,match_candidates(ih).layout_matches) + all_mjs_not_perfect_match ;/*HACK split matches*/\n'
-        ,'split matches between perfect name, address matches and non-perfect maches'),
-
-    ('matches','(all_matches2 := MOD_Attr_RAAddresses[(]ih[)][.]ForceFilter[(]ih,all_matches1)'  
-        ,'HACK add back perfect matches'
-        , 'all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1 + all_mjs_perfect_match/*HACK add back perfect matches*/'
-        ,'add back perfect matches'),
+     ,'BH-578 -- add hack to proxid to speed up attribute matches')
 	 ]
 
 	
