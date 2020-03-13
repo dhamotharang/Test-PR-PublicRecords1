@@ -38,7 +38,7 @@ cleaned_gw_input := gw_input(highriskcheck = true);
 /* ****************************************************************
 *      OKC Status Refresh Recommended Gateway Call  		*
 ******************************************************************/
-StatusRefreshRecommendedGatewayCfg := gateways(ServiceName='OkcStatusRefreshRecommended')[1];
+StatusRefreshRecommendedGatewayCfg := gateways(STD.Str.ToLowerCase(ServiceName)='okcstatusrefreshrecommended')[1];
 
 makeStatusRefreshRecommendedGatewayCall := StatusRefreshRecommendedGatewayCfg.url!='';
 
@@ -56,7 +56,7 @@ StatusRefreshRecommended := Gateway.SoapCall_OKCStatusRefreshRecommended(high_ri
 /* ****************************************************************
 *                    OKC Status Refresh Gateway Call  		              *
 ******************************************************************/
-StatusRefreshGatewayCfg := gateways(ServiceName='OkcStatusRefresh')[1];
+StatusRefreshGatewayCfg := gateways(STD.Str.ToLowerCase(ServiceName)='okcstatusrefresh')[1];
 	
 makeStatusRefreshGatewayCall := StatusRefreshGatewayCfg.url!='';
 					
