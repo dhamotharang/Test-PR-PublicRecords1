@@ -1,4 +1,4 @@
-﻿IMPORT Models, Risk_Indicators,RiskWise, STD, Business_Risk_BIP, easi;
+﻿IMPORT Models, Risk_Indicators, STD, Business_Risk_BIP;
 
 
 
@@ -31,7 +31,7 @@ transform (businessplus_layout, self.busShell := left, self.clam :=right));
 
 	#if(MODEL_DEBUG)
 		Layout_Debug := RECORD
-                  //  unsigned seq ;
+                   // unsigned seq ;
                     integer  sysdate                          ;   // := sysdate;
                     integer  sysdate8                         ;   // := sysdate8;
                     integer  ver_src_ak_pos                   ;   // := ver_src_ak_pos;
@@ -1867,7 +1867,7 @@ transform (businessplus_layout, self.busShell := left, self.clam :=right));
                     boolean  corraddrname_src_w               ;   // := corraddrname_src_w;
                     INTEGER  corraddrname_src_wp_pos          ;   // := corraddrname_src_wp_pos;
                     boolean  corraddrname_src_wp              ;   // := corraddrname_src_wp;
-                    boolean  corraddrname_ct                  ;   // := corraddrname_ct;
+                    INTEGER  corraddrname_ct                  ;   // := corraddrname_ct;
                     integer  nf_corraddrname                  ;   // := nf_corraddrname;
                     INTEGER  rv_c14_unverified_addr_count     ;   // := rv_c14_unverified_addr_count;
                     integer  nf_inq_lnamesperaddr_recency     ;   // := nf_inq_lnamesperaddr_recency;
@@ -2390,8 +2390,12 @@ transform (businessplus_layout, self.busShell := left, self.clam :=right));
                     real  offset                           ;   // := offset;
                     integer  base                             ;   // := base;
                     integer  pts                              ;   // := pts;
-                    real  lgt                              ;   // := lgt;
-                    integer  bbfm1903_1_0                     ;   // := bbfm1903_1_0;
+                    real  lgt                              ;      // := lgt;
+										integer bln_score;
+										boolean bus_addrpop;
+										integer insuf_bus;
+										integer insuf_con;
+                    integer  bbfm1903_1_1                     ;   // := bbfm1903_1_0;
                     string5 bbfm_wc1                       ;
                     string5 bbfm_wc2                         ;
                     string5 bbfm_wc3                         ;
@@ -2493,6 +2497,7 @@ Business_Risk_BIP.Layouts.OutputLayout busShell;
 	inq_consumer_addr                := le.busShell.Inquiry.inquiryconsumeraddress;
 	inq_consumer_phone               := le.busShell.Inquiry.inquiryconsumerphone;
 	id_seleid                        := le.busShell.Verification.inputidmatchseleid;
+	id_weight						:= le.busShell.Verification.InputIDMatchConfidence;
 	e2b_rep1_match_bus_file_addr     := le.busShell.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddr;
 	phn_input_problems               := le.busShell.Input_Characteristics.InputPhoneProblems;
 	e2b_rep1_name_on_file            := le.busShell.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
@@ -2788,14 +2793,18 @@ Business_Risk_BIP.Layouts.OutputLayout busShell;
 	input_dob_match_level            := le.clam.dobmatchlevel;
 	inferred_age                     := le.clam.inferred_age;
 	estimated_income                 := le.clam.estimated_income;
+	in_zipcode								:= le.clam.shell_input.in_zipcode;
+	in_city							:= le.clam.shell_input.in_city;
+	in_state								:= le.clam.shell_input.in_state;
 
 
+business_only_check := if(le.clam.did = 0 and le.clam.Shell_Input.fname = '' and le.clam.Shell_Input.mname = '' and le.clam.Shell_Input.lname = '', true, false);
 
 
 //***Begining of the SAS code that was converted to ECL ****//
 
 NULL :=    -999999999;
-INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 
 
 
@@ -5700,13 +5709,13 @@ _ver_src_id_fdate_q32 :=   __common__( common.sas_date((string)(_ver_src_id_fdat
 
 mth__ver_src_id_fdate_q3 :=   __common__( if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 30.5)));
 
-iv_add_apt :=   __common__( if(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), 1, 0));
+iv_add_apt :=   __common__( if(STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), 1, 0));
 
 _criminal_last_date :=   __common__( common.sas_date((string)(criminal_last_date)));
 
 _in_dob :=   __common__( common.sas_date((string)(in_dob)));
 
-add_ec1 :=   __common__( (StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[1..1]);
+add_ec1 :=   __common__( (STD.Str.ToUpperCase(trim(out_addr_status, LEFT)))[1..1]);
 
 calc_dob :=   __common__( if(_in_dob = NULL, NULL, if ((sysdate - _in_dob) / 365.25 >= 0, roundup((sysdate - _in_dob) / 365.25), truncate((sysdate - _in_dob) / 365.25))));
 
@@ -6844,7 +6853,21 @@ corraddrname_src_wp_pos :=   __common__( Models.Common.findw_cpp(corraddrname_so
 
 corraddrname_src_wp :=   __common__( corraddrname_src_wp_pos > 0);
 
-corraddrname_ct :=   __common__( if(max((integer)corraddrname_src_ak, (integer)corraddrname_src_am, (integer)corraddrname_src_ar, (integer)corraddrname_src_ba, (integer)corraddrname_src_cg, (integer)corraddrname_src_co, (integer)corraddrname_src_cy, (integer)corraddrname_src_d, (integer)corraddrname_src_da, (integer)corraddrname_src_de, (integer)corraddrname_src_dl, (integer)corraddrname_src_ds, (integer)corraddrname_src_e1, (integer)corraddrname_src_e2, (integer)corraddrname_src_e3, (integer)corraddrname_src_e4, (integer)corraddrname_src_eb, (integer)corraddrname_src_em, (integer)corraddrname_src_en, (integer)corraddrname_src_eq, (integer)corraddrname_src_fe, (integer)corraddrname_src_ff, (integer)corraddrname_src_fr, (integer)corraddrname_src_l2, (integer)corraddrname_src_li, (integer)corraddrname_src_mw, (integer)corraddrname_src_nt, (integer)corraddrname_src_p, (integer)corraddrname_src_pl, (integer)corraddrname_src_sl, (integer)corraddrname_src_tn, (integer)corraddrname_src_ts, (integer)corraddrname_src_tu, (integer)corraddrname_src_v, (integer)corraddrname_src_vo, (integer)corraddrname_src_w, (integer)corraddrname_src_wp) = NULL, NULL, sum((integer)corraddrname_src_ak, (integer)corraddrname_src_am, (integer)corraddrname_src_ar, (integer)corraddrname_src_ba, (integer)corraddrname_src_cg, (integer)corraddrname_src_co, (integer)corraddrname_src_cy, (integer)corraddrname_src_d, (integer)corraddrname_src_da, (integer)corraddrname_src_de, (integer)corraddrname_src_dl, (integer)corraddrname_src_ds, (integer)corraddrname_src_e1, (integer)corraddrname_src_e2, (integer)corraddrname_src_e3, (integer)corraddrname_src_e4, (integer)corraddrname_src_eb, (integer)corraddrname_src_em, (integer)corraddrname_src_en, (integer)corraddrname_src_eq, (integer)corraddrname_src_fe, (integer)corraddrname_src_ff, (integer)corraddrname_src_fr, (integer)corraddrname_src_l2, (integer)corraddrname_src_li, (integer)corraddrname_src_mw, (integer)corraddrname_src_nt, (integer)corraddrname_src_p, (integer)corraddrname_src_pl, (integer)corraddrname_src_sl, (integer)corraddrname_src_tn, (integer)corraddrname_src_ts, (integer)corraddrname_src_tu, (integer)corraddrname_src_v, (integer)corraddrname_src_vo, (integer)corraddrname_src_w, (integer)corraddrname_src_wp)));
+corraddrname_ct :=   __common__( if(max((integer)corraddrname_src_ak, (integer)corraddrname_src_am, (integer)corraddrname_src_ar, (integer)corraddrname_src_ba, (integer)corraddrname_src_cg, 
+																				(integer)corraddrname_src_co, (integer)corraddrname_src_cy, (integer)corraddrname_src_d, (integer)corraddrname_src_da, (integer)corraddrname_src_de, 
+																				(integer)corraddrname_src_dl, (integer)corraddrname_src_ds, (integer)corraddrname_src_e1, (integer)corraddrname_src_e2, (integer)corraddrname_src_e3, 
+																				(integer)corraddrname_src_e4, (integer)corraddrname_src_eb, (integer)corraddrname_src_em, (integer)corraddrname_src_en, (integer)corraddrname_src_eq, 
+																				(integer)corraddrname_src_fe, (integer)corraddrname_src_ff, (integer)corraddrname_src_fr, (integer)corraddrname_src_l2, (integer)corraddrname_src_li, 
+																				(integer)corraddrname_src_mw, (integer)corraddrname_src_nt, (integer)corraddrname_src_p, (integer)corraddrname_src_pl, (integer)corraddrname_src_sl, 
+																				(integer)corraddrname_src_tn, (integer)corraddrname_src_ts, (integer)corraddrname_src_tu, (integer)corraddrname_src_v, (integer)corraddrname_src_vo, 
+																				(integer)corraddrname_src_w, (integer)corraddrname_src_wp) = NULL, NULL, sum((integer)corraddrname_src_ak, (integer)corraddrname_src_am, 
+																				(integer)corraddrname_src_ar, (integer)corraddrname_src_ba, (integer)corraddrname_src_cg, (integer)corraddrname_src_co, (integer)corraddrname_src_cy, 
+																				(integer)corraddrname_src_d, (integer)corraddrname_src_da, (integer)corraddrname_src_de, (integer)corraddrname_src_dl, (integer)corraddrname_src_ds, 
+																				(integer)corraddrname_src_e1, (integer)corraddrname_src_e2, (integer)corraddrname_src_e3, (integer)corraddrname_src_e4, (integer)corraddrname_src_eb, 
+																				(integer)corraddrname_src_em, (integer)corraddrname_src_en, (integer)corraddrname_src_eq, (integer)corraddrname_src_fe, (integer)corraddrname_src_ff, 
+																				(integer)corraddrname_src_fr, (integer)corraddrname_src_l2, (integer)corraddrname_src_li, (integer)corraddrname_src_mw, (integer)corraddrname_src_nt, 
+																				(integer)corraddrname_src_p, (integer)corraddrname_src_pl, (integer)corraddrname_src_sl, (integer)corraddrname_src_tn, (integer)corraddrname_src_ts, 
+																				(integer)corraddrname_src_tu, (integer)corraddrname_src_v, (integer)corraddrname_src_vo, (integer)corraddrname_src_w, (integer)corraddrname_src_wp)));
 
 nf_corraddrname :=   __common__( map(
     not(truedid)                => NULL,
@@ -7040,7 +7063,7 @@ rv_l79_adls_per_addr_c6 :=   __common__( if(not(addrpop), NULL, min(if(adls_per_
 
 rv_i62_inq_phones_per_adl :=   __common__( if(not(truedid), NULL, min(if(inq_phonesperadl = NULL, -NULL, inq_phonesperadl), 999)));
 
-truebiz_ln :=   __common__( id_seleID != '0' and NOT(((integer)ver_src_id_count in [-1, 0])));
+truebiz_ln :=   __common__( id_seleID != '0' and NOT(((integer)ver_src_id_count in [-1, 0])) and (INTEGER)id_weight > 43);
 
 bv_ver_src_id_mth_since_fs :=   __common__( if(not(truebiz_ln), NULL, (integer)ver_src_id_mth_since_fs));
 
@@ -16418,13 +16441,14 @@ pts :=   __common__( -50);
 
 lgt :=   __common__( ln(pbr / (1 - pbr)));
 
-bbfm1903_1_0 :=   __common__( min(if(max(round(base + pts * (hunt_bank_gbm_v16_gbm_logit - offset - lgt) / ln(2)), 300) = NULL, -NULL, max(round(base + pts * (hunt_bank_gbm_v16_gbm_logit - offset - lgt) / ln(2)), 300)), 999));
+bln_score :=   __common__( min(if(max(round(base + pts * (hunt_bank_gbm_v16_gbm_logit - offset - lgt) / ln(2)), 300) = NULL, -NULL, max(round(base + pts * (hunt_bank_gbm_v16_gbm_logit - offset - lgt) / ln(2)), 300)), 999));
+							
+bus_addrpop := ((pop_bus_addr = '1' and pop_bus_city = '1' and pop_bus_state = '1') or (pop_bus_addr = '1' and pop_bus_zip = '1'));
+insuf_bus := if(pop_bus_name = '1' OR bus_addrpop, 0, 1);
 
-
-
-
-//fp1407_1_1_1 :=__common__(  min(if(max(round(pts * (ln(prob1 / (1 - prob1)) - ln(odds)) / ln(2) + base) - 50, 300) = NULL, -NULL, max(round(pts * (ln(prob1 / (1 - prob1)) - ln(odds)) / ln(2) + base) - 50, 300)), 999));
-
+insuf_con := if(fnamepop and lnamepop and ((INTEGER)ssnlength > 0 or (addrpop and (in_zipcode <> '' or (in_city <> '' and in_state <> '')))), 0, 1);
+			
+BBFM1903_1_1 := IF(insuf_bus = 0 AND insuf_con = 0, bln_score, 0);	
 
  //*************************************************************************************//
 //     End Generated ECL Code
@@ -18792,14 +18816,18 @@ bbfm1903_1_0 :=   __common__( min(if(max(round(base + pts * (hunt_bank_gbm_v16_g
                     self.base                             := base;
                     self.pts                              := pts;
                     self.lgt                              := lgt;
-                    self.bbfm1903_1_0                     := bbfm1903_1_0;
+                    self.bln_score                        := bln_score;
+                    self.bus_addrpop                      := bus_addrpop;
+                    self.insuf_bus                        := insuf_bus;
+                    self.insuf_con                        := insuf_con;
+                    self.bbfm1903_1_1                     := bbfm1903_1_1;
 
                      SELF.clam                            := le.clam ;  
                      self.Busshell                        := le.Busshell ;
                      // SELF.clam                            := ri;  
                      // self.Busshell                        = le ;
                      
-                    reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons)[1].hris;
+                    reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
                     self.bbfm_wc1                         := reasonCodes[1].hri;//bbfm_wc
                     self.bbfm_wc2                         := reasonCodes[2].hri;
                     self.bbfm_wc3                         := reasonCodes[3].hri;
@@ -18807,7 +18835,7 @@ bbfm1903_1_0 :=   __common__( min(if(max(round(base + pts * (hunt_bank_gbm_v16_g
   
   #else
      
-     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons)[1].hris;
+     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
   
   
   	 SELF.ri := PROJECT(reasonCodes, TRANSFORM(Risk_Indicators.Layout_Desc,
@@ -18817,7 +18845,7 @@ bbfm1903_1_0 :=   __common__( min(if(max(round(base + pts * (hunt_bank_gbm_v16_g
                                           
                                           
 
-		 SELF.score := (STRING3)BBFM1903_1_0;
+		 SELF.score := (STRING3)BBFM1903_1_1;
 		SELF.seq := le.busshell.input_echo.seq;
 		// SELF.seq := le.input.seq;
   
