@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT CFG_Compile,E_Professional_License,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
+IMPORT CFG_Compile,E_Professional_License FROM PublicRecords_KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Professional_License_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Professional_License(__in,__cfg).__Result) __E_Professional_License := E_Professional_License(__in,__cfg).__Result;
-  SHARED __EE168679 := __E_Professional_License;
-  EXPORT __ST107695_Layout := RECORD
+  SHARED __EE257188 := __E_Professional_License;
+  EXPORT __ST143371_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -17,22 +17,21 @@ EXPORT B_Professional_License_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).Status_Layout) Status_;
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).License_Description_Layout) License_Description_;
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nkdate Current_Date_;
     KEL.typ.nkdate Max_Expire_Date_;
     KEL.typ.nkdate Max_Issue_Date_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST107695_Layout __ND168607__Project(E_Professional_License(__in,__cfg).Layout __PP167924) := TRANSFORM
-    SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
-    __EE168602 := __PP167924.License_Dates_;
-    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE168602,__T(__EE168602).Date_Of_Expiration_);
-    __EE168627 := __PP167924.License_Dates_;
-    SELF.Max_Issue_Date_ := KEL.Aggregates.MaxNN(__EE168627,IF(__T(__OP2(__T(__EE168627).Original_Date_Of_Issuance_,<,KEL.Routines.CastStringToDate(__CN('19000101')))),__ECAST(KEL.typ.nkdate,KEL.Routines.CastStringToDate(__CN(''))),__ECAST(KEL.typ.nkdate,__T(__EE168627).Original_Date_Of_Issuance_)));
-    SELF := __PP167924;
+  SHARED __ST143371_Layout __ND257117__Project(E_Professional_License(__in,__cfg).Layout __PP256449) := TRANSFORM
+    __EE257112 := __PP256449.License_Dates_;
+    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE257112,__T(__EE257112).Date_Of_Expiration_);
+    __EE257137 := __PP256449.License_Dates_;
+    SELF.Max_Issue_Date_ := KEL.Aggregates.MaxNN(__EE257137,IF(__T(__OP2(__T(__EE257137).Original_Date_Of_Issuance_,<,KEL.Routines.CastStringToDate(__CN('19000101')))),__ECAST(KEL.typ.nkdate,KEL.Routines.CastStringToDate(__CN(''))),__ECAST(KEL.typ.nkdate,__T(__EE257137).Original_Date_Of_Issuance_)));
+    SELF := __PP256449;
   END;
-  EXPORT __ENH_Professional_License_5 := PROJECT(__EE168679,__ND168607__Project(LEFT));
+  EXPORT __ENH_Professional_License_5 := PROJECT(__EE257188,__ND257117__Project(LEFT));
 END;

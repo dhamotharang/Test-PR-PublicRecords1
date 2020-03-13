@@ -175,6 +175,8 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludeSSNAddress);		
 
 	EXPORT DoFDCJoin_Header__Key_Addr_Hist := 
+		Options.IncludeMini OR
+		Options.IncludePerson OR
 		Options.IncludePersonAddress OR
 		Options.IncludeZipCodePerson;
 
@@ -272,7 +274,17 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 
 	EXPORT DoFDCJoin_AlloyMedia_student_list__key_DID := 
 			(Options.IncludeEducation OR
-			Options.IncludePersonEducation);	
+			Options.IncludePersonEducation);
+			
+/*-----------------------Surname-----------------------*/
+
+EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames := 
+ (Options.IncludeSurname OR
+  Options.IncludeBusinessSele OR
+  Options.IncludeBusinessProx OR
+  Options.IncludeSelePerson OR
+	 Options.IncludeProxPerson);
+	 
 /*-----------------------LienJudgement-----------------------*/
 		 
 	EXPORT DoFDCJoin_LiensV2_key_liens_main_ID_Records := 

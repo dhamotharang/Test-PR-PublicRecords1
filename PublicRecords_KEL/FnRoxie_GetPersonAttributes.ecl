@@ -36,6 +36,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.G_BuildAstVehAutoDt := Risk_Indicators.get_Build_date('vehicle_build_version');	
 			SELF.G_BuildAstVehAirDt := Risk_Indicators.get_Build_date('faa_build_version');
 			SELF.G_BuildAstVehWtrDt := Risk_Indicators.get_Build_date('watercraft_build_version');
+			SELF.G_BuildAstPropDt := Risk_Indicators.get_Build_date('Property_Build_Version');
 			ResultsFound := RIGHT.LexID > 0;
 			P_LexIDSeenFlag := IF(ResultsFound,RIGHT.P_LexIDSeenFlag,'0');
 			LexIDNotOnFile := P_LexIDSeenFlag = '0';
@@ -561,8 +562,25 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
 								ResultsFound => (STRING)RIGHT.PL_ProfLicActvNewSrcType,
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF := LEFT;
-		),LEFT OUTER, KEEP(1)); 
+						//Best PII
+			SELF.PL_CurrAddrFull := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								ResultsFound => (STRING)RIGHT.PL_CurrAddrFull,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			// SELF.PL_CurrAddrLocID := MAP(
+								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								// ResultsFound => (STRING)RIGHT.PL_CurrAddrLocID,
+								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.PL_PrevAddrFull := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								ResultsFound => (STRING)RIGHT.PL_PrevAddrFull,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			// SELF.PL_PrevAddrLocID := MAP(
+								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								// ResultsFound => (STRING)RIGHT.PL_PrevAddrLocID,
+								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);					
+			SELF := LEFT;		
+			),LEFT OUTER, KEEP(1)); 
 	
 	PersonAttributesWithoutLexID := PROJECT(RecordsWithoutLexID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
@@ -570,6 +588,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.G_BuildAstVehAutoDt := Risk_Indicators.get_Build_date('vehicle_build_version');
 			SELF.G_BuildAstVehAirDt := Risk_Indicators.get_Build_date('faa_build_version');
 			SELF.G_BuildAstVehWtrDt := Risk_Indicators.get_Build_date('watercraft_build_version');
+			SELF.G_BuildAstPropDt := Risk_Indicators.get_Build_date('Property_Build_Version');
 			SELF.P_LexIDSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
 			SELF.PL_AstVehAutoCntEv := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_AstVehAutoEmrgDtListEv := IF(Options.IsFCRA, '',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -714,6 +733,11 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_ProfLicActvNewTitleType := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_ProfLicActvNewIndx := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_ProfLicActvNewSrcType := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+						//Best PII
+			SELF.PL_CurrAddrFull := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.PL_CurrAddrLocID := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.PL_PrevAddrFull := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.PL_PrevAddrLocID := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF := LEFT)); 
 			
 	PersonAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, G_ProcUID ); 

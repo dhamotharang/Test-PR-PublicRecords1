@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT CFG_Compile,E_Vehicle,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+//HPCC Systems KEL Compiler Version 1.2.0beta2
+IMPORT KEL12 AS KEL;
+IMPORT CFG_Compile,E_Vehicle,FN_Compile FROM $;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Vehicle(__in,__cfg).__Result) __E_Vehicle := E_Vehicle(__in,__cfg).__Result;
-  SHARED __EE1929665 := __E_Vehicle;
-  EXPORT __ST76190_Layout := RECORD
+  SHARED __EE1992306 := __E_Vehicle;
+  EXPORT __ST81112_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -114,15 +114,16 @@ EXPORT B_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.nkdate Source_Last_Date_;
     KEL.typ.ndataset(E_Vehicle(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST76190_Layout __ND1929895__Project(E_Vehicle(__in,__cfg).Layout __PP1929106) := TRANSFORM
+  SHARED __ST81112_Layout __ND1992536__Project(E_Vehicle(__in,__cfg).Layout __PP1991747) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1929106;
+    SELF := __PP1991747;
   END;
-  EXPORT __ENH_Vehicle := PROJECT(__EE1929665,__ND1929895__Project(LEFT));
+  EXPORT __ENH_Vehicle := PROJECT(__EE1992306,__ND1992536__Project(LEFT));
 END;
