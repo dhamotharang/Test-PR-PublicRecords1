@@ -20,8 +20,7 @@ fname (integer data_category) := IF (data_category = data_services.data_env.iFCR
 
 EXPORT key_history_address (integer data_category = 0) :=
 #IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-    vault.Gong.Key_FCRA_History_Address;
-    //can and, probably, should be replaced with vault.dx_Gong.key_history_address(data_category)
+    vault.dx_Gong.key_history_address(data_category);
 #ELSE
     INDEX (keyed_fields, {rec - keyed_fields}, fname(data_category));
 #END;
