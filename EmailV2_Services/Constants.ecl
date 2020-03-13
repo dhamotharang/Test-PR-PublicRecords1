@@ -74,7 +74,7 @@ EXPORT Constants := MODULE
   EXPORT Relationship := MODULE
    EXPORT STRING NotFound        := 'No Relationship or Association Found';
    EXPORT STRING PossibleSubject := 'Possible Subject';
-
+   EXPORT IsSubject(STRING _rel) := _rel = PossibleSubject;
   END;
 
   EXPORT GatewayValues := MODULE

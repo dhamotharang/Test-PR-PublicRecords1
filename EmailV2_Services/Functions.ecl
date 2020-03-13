@@ -152,11 +152,16 @@ EXPORT Functions := MODULE
     ds_srtd_identity := SORT(ds_batch_in, acctno, -did_score, isRoyaltySource,-date_last_seen, date_first_seen, -num_sources,
                                           -latest_orig_login_date, -process_date, num_email_per_did, email_quality_mask, RECORD);
 
+    ds_srtd_identity_relations := SORT(ds_batch_in, acctno, -$.Constants.Relationship.IsSubject(relationship), -did_score, isRoyaltySource,-date_last_seen, date_first_seen, -num_sources,
+                                          -latest_orig_login_date, -process_date, num_email_per_did, email_quality_mask, RECORD);
+
     ds_srtd_email := SORT(ds_batch_in, acctno, -$.Constants.isTMXVerifiedEmail(TMX_insights.review_status), OrderByEmailStatus(email_status), // pushing TMX pass and BV verified emails to the top
                                        -num_sources, -date_last_seen, date_first_seen, -latest_orig_login_date, -did_score, isRoyaltySource, -date_last_verified,
                                         num_did_per_email, penalt,-process_date, email_quality_mask, RECORD);
 
-    ds_srtd := IF($.Constants.SearchType.isEAA(in_mod.SearchType), ds_srtd_email, ds_srtd_identity);
+    ds_srtd := MAP($.Constants.SearchType.isEAA(in_mod.SearchType) => ds_srtd_email,
+                   $.Constants.SearchType.isEIC(in_mod.SearchType) => ds_srtd_identity_relations,
+                   ds_srtd_identity); // -EIA search type
 
     RETURN ds_srtd;
   END;
@@ -364,7 +369,10 @@ EXPORT Functions := MODULE
 
 
 
-    rels_by_lexid := IF(EXISTS(inrecs_for_lexid_rels), EmailService.Functions.GetRelationshipBySubjectLexId(rel_pairs_by_lexid, include_2ndDegree_relatives:=TRUE));
+    rels_by_lexid := IF(EXISTS(inrecs_for_lexid_rels),
+                        EmailService.Functions.GetRelationshipBySubjectLexId(rel_pairs_by_lexid,
+                                     PROJECT(in_mod, Doxie.IDataAccess),
+                                     include_2ndDegree_relatives:=TRUE));
 
     recs_with_rels_by_lexid := JOIN(inrecs_for_lexid_rels, rels_by_lexid,
                                  LEFT.did = RIGHT.identity_LexID AND
