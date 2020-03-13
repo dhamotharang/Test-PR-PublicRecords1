@@ -14,8 +14,7 @@ fname (integer data_category) := IF (data_category = data_services.data_env.iNon
 
 EXPORT key_phone_table(integer data_category = 0) :=
 #IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-    vault.Gong.Key_FCRA_Business_Header_Phone_Table_Filtered_V2;
-    //can and, probably, should be replaced with vault.dx_Gong.key_phone_table(data_category)
+    vault.dx_Gong.key_phone_table(data_category);
 #ELSE
     INDEX ({rec.phone10}, rec, fname(data_category));
 #END;
