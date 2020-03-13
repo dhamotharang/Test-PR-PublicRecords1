@@ -1,4 +1,5 @@
-﻿MODULE:Scrubs_Crim
+﻿OPTIONS:-gh
+MODULE:Scrubs_Crim
 FILENAME:crim
 NAMESCOPE:Moxie_DOC_Offenses_Dev
 SOURCEFIELD:vendor
