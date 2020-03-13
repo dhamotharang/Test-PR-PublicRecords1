@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD,header;
+//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
+IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nint FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(KEL.typ.nkdate __Pfrom, KEL.typ.nkdate __Pto) := FUNCTION
     RETURN __FN1(ABS,__FN2(KEL.Routines.DaysBetween,__Pfrom,__Pto));
@@ -121,9 +121,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC8928 := -99999;
+  SHARED __CC9260 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC8928,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC9260,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -153,5 +153,47 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__Pfield1) OR __NL(__Preplacement);
     __Value := PublicRecords_KEL.ECL_Functions.Fn_RemoveSpecialChars(field1, replacement);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN__fn_Naic_Code_Interpreter(KEL.typ.nstr __PNaicCodeInput) := FUNCTION
+    NaicCodeInput := __T(__PNaicCodeInput);
+    __IsNull := __NL(__PNaicCodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.fn_NaicCodeInterpreter((INTEGER)NaicCodeInput);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.str FN__fn_Naic_Group_Code_Interpreter(KEL.typ.nstr __PNaicCodeGroup) := FUNCTION
+    RETURN MAP(__T(__OP2(__PNaicCodeGroup,=,__CN('11')))=>'Agriculture, Forestry, Fishing and Hunting',__T(__OP2(__PNaicCodeGroup,=,__CN('21')))=>'Mining',__T(__OP2(__PNaicCodeGroup,=,__CN('22')))=>'Utilities',__T(__OP2(__PNaicCodeGroup,=,__CN('23')))=>'Construction',__T(__OR(__OR(__OP2(__PNaicCodeGroup,=,__CN('31')),__OP2(__PNaicCodeGroup,=,__CN('32'))),__OP2(__PNaicCodeGroup,=,__CN('33'))))=>'Manufactuing',__T(__OP2(__PNaicCodeGroup,=,__CN('42')))=>'Wholesale Trade',__T(__OR(__OP2(__PNaicCodeGroup,=,__CN('44')),__OP2(__PNaicCodeGroup,=,__CN('45'))))=>'Retail Trade',__T(__OR(__OP2(__PNaicCodeGroup,=,__CN('48')),__OP2(__PNaicCodeGroup,=,__CN('49'))))=>'Transportation and Warehousing',__T(__OP2(__PNaicCodeGroup,=,__CN('51')))=>'Information',__T(__OP2(__PNaicCodeGroup,=,__CN('52')))=>'Finance and Insurance',__T(__OP2(__PNaicCodeGroup,=,__CN('53')))=>'Real Estate and Rental and Leasing',__T(__OP2(__PNaicCodeGroup,=,__CN('54')))=>'Professional, Scientific, and Technical Services',__T(__OP2(__PNaicCodeGroup,=,__CN('55')))=>'Management of Companies and Enterprises',__T(__OP2(__PNaicCodeGroup,=,__CN('56')))=>'Administrative and Waste Management Services',__T(__OP2(__PNaicCodeGroup,=,__CN('61')))=>'Educational Services',__T(__OP2(__PNaicCodeGroup,=,__CN('62')))=>'Health Care and Social Assistance',__T(__OP2(__PNaicCodeGroup,=,__CN('71')))=>'Arts, Entertainment, and Recreation',__T(__OP2(__PNaicCodeGroup,=,__CN('72')))=>'Accommodation and Food Services',__T(__OP2(__PNaicCodeGroup,=,__CN('81')))=>'Other Services',__T(__OP2(__PNaicCodeGroup,=,__CN('92')))=>'Public Administration','Other');
+  END;
+  EXPORT KEL.typ.nstr FN_Fn_S_I_C_Code_Interpreter(KEL.typ.nstr __PSic4CodeInput) := FUNCTION
+    Sic4CodeInput := __T(__PSic4CodeInput);
+    __IsNull := __NL(__PSic4CodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_SICCodeInterpreter((INTEGER)Sic4CodeInput);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.str FN_Fn_S_I_C_Group_Code_Interpreter(KEL.typ.nstr __PSicCodeGroup) := FUNCTION
+    RETURN MAP(__T(__OP2(__PSicCodeGroup,IN,__CN(['01','02','07','08','09'])))=>'Agriculture, Forestry, Fishing and Hunting',__T(__OP2(__PSicCodeGroup,IN,__CN(['10','12','13','14'])))=>'Mining',__T(__OP2(__PSicCodeGroup,=,__CN('49')))=>'Utilities',__T(__OP2(__PSicCodeGroup,IN,__CN(['15','16','17'])))=>'Construction',__T(__OP2(__PSicCodeGroup,IN,__CN(['20','21','22','23','24','25','26','28','29','30','31','32','33','34','35','36','37','38','39'])))=>'Manufactuing',__T(__OP2(__PSicCodeGroup,IN,__CN(['50','51'])))=>'Wholesale Trade',__T(__OP2(__PSicCodeGroup,IN,__CN(['52','53','54','55','56','57','59'])))=>'Retail Trade',__T(__OP2(__PSicCodeGroup,IN,__CN(['40','41','42','43','44','45','46','47'])))=>'Transportation and Warehousing',__T(__OP2(__PSicCodeGroup,IN,__CN(['27','48','78'])))=>'Information',__T(__OP2(__PSicCodeGroup,IN,__CN(['60','61','62','63','64','67'])))=>'Finance and Insurance',__T(__OP2(__PSicCodeGroup,=,__CN('65')))=>'Real Estate',__T(__OP2(__PSicCodeGroup,IN,__CN(['81','87'])))=>'Professional, Scientific, and Technical Services',__T(__OP2(__PSicCodeGroup,=,__CN('73')))=>'Administrative Services',__T(__OP2(__PSicCodeGroup,=,__CN('82')))=>'Educational Services',__T(__OP2(__PSicCodeGroup,IN,__CN(['80','83'])))=>'Health Care and Social Assistance',__T(__OP2(__PSicCodeGroup,IN,__CN(['79','84'])))=>'Arts, Entertainment, and Recreation',__T(__OP2(__PSicCodeGroup,IN,__CN(['58','70'])))=>'Accommodation and Food Services',__T(__OP2(__PSicCodeGroup,IN,__CN(['72','75','76','86','88','89'])))=>'Other Services',__T(__OP2(__PSicCodeGroup,IN,__CN(['91','92','93','94','95','96','97'])))=>'Public Administration','Other');
+  END;
+  EXPORT KEL.typ.nstr FN__fn_Addr1_From_Components(KEL.typ.nstr __PPrimaryRange, KEL.typ.nstr __PPredirectional, KEL.typ.nstr __PPrimaryName, KEL.typ.nstr __PSuffix, KEL.typ.nstr __PPostdirectional, KEL.typ.nstr __PUnitDesignation, KEL.typ.nstr __PSecondaryRange) := FUNCTION
+    PrimaryRange := __T(__PPrimaryRange);
+    Predirectional := __T(__PPredirectional);
+    PrimaryName := __T(__PPrimaryName);
+    Suffix := __T(__PSuffix);
+    Postdirectional := __T(__PPostdirectional);
+    UnitDesignation := __T(__PUnitDesignation);
+    SecondaryRange := __T(__PSecondaryRange);
+    __IsNull := __NL(__PPrimaryRange) OR __NL(__PPredirectional) OR __NL(__PPrimaryName) OR __NL(__PSuffix) OR __NL(__PPostdirectional) OR __NL(__PUnitDesignation) OR __NL(__PSecondaryRange);
+    __Value := address.Addr1FromComponents(PrimaryRange,Predirectional,PrimaryName,Suffix,Postdirectional,UnitDesignation,SecondaryRange);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION
+    RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),IN,__CN(['UCC-3 TERMINATION','TERMINATION','UCC3 TERMINATION'])))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CORRECTION')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('AMENDMENT')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('ASSIGNMENT')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CONTINUATION')))=>'5',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('FILING OFFICER STATEMENT')))=>'6',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('INITIAL FILING')))=>'7','7');
+  END;
+  EXPORT KEL.typ.str FN__map_Status_Type(KEL.typ.nstr __PStatusType) := FUNCTION
+    RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PStatusType)),=,__CN('ACTIVE')))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PStatusType)),=,__CN('LAPSED')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PStatusType)),=,__CN('TERMINATED')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PStatusType)),=,__CN('DELETED')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PStatusType)),=,__CN('EXPUNGED')))=>'5','1');
+  END;
+  EXPORT KEL.typ.str FN__map_Inferred_Status(KEL.typ.nstr __PfilingType) := FUNCTION
+    RETURN IF(__T(__OP2(__PfilingType,=,__CN('1'))),'3','1');
+  END;
+  EXPORT KEL.typ.nstr FN_Map_Sic_Code_Padding(KEL.typ.nstr __PSicCode) := FUNCTION
+    RETURN MAP(__T(__OP2(__FN1(LENGTH,__PSicCode),=,__CN(1)))=>__ECAST(KEL.typ.nstr,__OP2(__OP2(__CN('0'),+,__PSicCode),+,__CN('00'))),__T(__OP2(__FN1(LENGTH,__PSicCode),=,__CN(3)))=>__ECAST(KEL.typ.nstr,__OP2(__CN('0'),+,__PSicCode)),__T(__OP2(__FN1(LENGTH,__PSicCode),=,__CN(2)))=>__ECAST(KEL.typ.nstr,__OP2(__PSicCode,+,__CN('00'))),__ECAST(KEL.typ.nstr,__PSicCode));
   END;
 END;
