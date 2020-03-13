@@ -108,31 +108,31 @@ EXPORT CommonIndividual := MODULE
                                   LEFT.did = RIGHT.did,
                                   TRANSFORM({RECORDOF(LEFT), DATASET(DueDiligence.Layouts.SlimRelation) spouses, DATASET(DueDiligence.Layouts.SlimRelation) parents, DATASET(DueDiligence.Layouts.SlimRelation) associates},
                                             //roll data to inquired level - will limit if we use the data on the join to the inquired
-                                            SELF.currentlyIncarcerated := RIGHT.currIncar AND LEFT.amlrelationshipdegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION;
-                                            SELF.everIncarcerated := (RIGHT.currIncar OR RIGHT.prevIncar) AND LEFT.amlrelationshipdegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION;
-                                            SELF.potentialSexOffender := RIGHT.potentialSO AND LEFT.amlrelationshipdegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION;
-                                            SELF.currentlyParoleOrProbation := (RIGHT.currProbation OR RIGHT.currParole) AND LEFT.amlrelationshipdegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION;
-                                            SELF.felonyPast3Yrs := RIGHT.felonyPast3Years AND LEFT.amlrelationshipdegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION;
+                                            SELF.currentlyIncarcerated := RIGHT.currIncar OR LEFT.currentlyIncarcerated;
+                                            SELF.everIncarcerated := RIGHT.currIncar OR RIGHT.prevIncar OR LEFT.everIncarcerated;
+                                            SELF.potentialSexOffender := RIGHT.potentialSO OR LEFT.potentialSexOffender;
+                                            SELF.currentlyParoleOrProbation := RIGHT.currProbation OR RIGHT.currParole OR LEFT.currentlyParoleOrProbation;
+                                            SELF.felonyPast3Yrs := RIGHT.felonyPast3Years OR LEFT.felonyPast3Yrs;
                                             
                                             relly := DATASET([TRANSFORM(DueDiligence.Layouts.SlimRelation,
-                                                                                  SELF.currentlyIncarcerated := IF(dataOptions.includeLegalData, RIGHT.currIncar, LEFT.currentlyIncarcerated);
-                                                                                  SELF.everIncarcerated := IF(dataOptions.includeLegalData, RIGHT.currIncar OR RIGHT.prevIncar, LEFT.everIncarcerated);
-                                                                                  SELF.potentialSexOffender := IF(dataOptions.includeLegalData, RIGHT.potentialSO, LEFT.potentialSexOffender);
-                                                                                  SELF.currentlyParoleOrProbation := IF(dataOptions.includeLegalData, RIGHT.currProbation OR RIGHT.currParole, LEFT.currentlyParoleOrProbation);
-                                                                                  SELF.felonyPast3Yrs := IF(dataOptions.includeLegalData, RIGHT.felonyPast3Years, LEFT.felonyPast3Yrs);
+                                                                                  SELF.currentlyIncarcerated := RIGHT.currIncar OR LEFT.currentlyIncarcerated;
+                                                                                  SELF.everIncarcerated := RIGHT.currIncar OR RIGHT.prevIncar OR LEFT.everIncarcerated;
+                                                                                  SELF.potentialSexOffender := RIGHT.potentialSO OR LEFT.potentialSexOffender;
+                                                                                  SELF.currentlyParoleOrProbation := RIGHT.currProbation OR RIGHT.currParole OR LEFT.currentlyParoleOrProbation;
+                                                                                  SELF.felonyPast3Yrs := RIGHT.felonyPast3Years OR LEFT.felonyPast3Yrs;
                                                                                   
-                                                                                  SELF.offenseTrafficRelated := IF(dataOptions.includeLegalData, RIGHT.party.trafficOffenseFound, LEFT.offenseTrafficRelated);
-                                                                                  SELF.otherCriminalOffense := IF(dataOptions.includeLegalData, RIGHT.party.otherCriminalOffenseFound OR RIGHT.potentialSO, LEFT.otherCriminalOffense);
+                                                                                  SELF.offenseTrafficRelated := RIGHT.trafficOffenseFound OR LEFT.offenseTrafficRelated;
+                                                                                  SELF.otherCriminalOffense := RIGHT.otherOffenseFound OR RIGHT.potentialSO OR LEFT.otherCriminalOffense;
 
                                                                                   
                                                                                   SELF.headerFirstSeenDate := IF(dataOptions.includeHeaderData, RIGHT.headerFirstSeen, LEFT.headerFirstSeenDate);
                                                                                   
-                                                                                  SELF.validSSN := IF(dataOptions.includeSSNData, RIGHT.validSSN, LEFT.validSSN);
+                                                                                  SELF.validSSN := RIGHT.validSSN OR LEFT.validSSN;
                                                                                   SELF.ssnLowIssueDate := IF(dataOptions.includeSSNData, RIGHT.ssnLowIssue, LEFT.ssnLowIssueDate);
                                                                                   SELF.ssnMultiIdentities := IF(dataOptions.includeSSNData, RIGHT.ssnMultiIdentities, LEFT.ssnMultiIdentities);
                                                                                   SELF.ssnPerADL := IF(dataOptions.includeSSNData, RIGHT.ssnPerADL, LEFT.ssnPerADL);
-                                                                                  SELF.hasSSN := IF(dataOptions.includeSSNData, RIGHT.hasSSN, LEFT.hasSSN);
-                                                                                  SELF.ssnRisk := IF(dataOptions.includeSSNData, RIGHT.ssnRisk, LEFT.ssnRisk);
+                                                                                  SELF.hasSSN := RIGHT.hasSSN OR LEFT.hasSSN;
+                                                                                  SELF.ssnRisk := RIGHT.ssnRisk OR LEFT.ssnRisk;
                                                                                   
                                                                                   SELF := LEFT;)]);
                                             
@@ -176,15 +176,16 @@ EXPORT CommonIndividual := MODULE
                                         SELF.numberOfParents := COUNT(RIGHT.parents);
                                         SELF.numberOfAssociates := COUNT(RIGHT.associates);
                                         
-                                        SELF.relationCurrentlyIncarcerated := IF(dataOptions.includeLegalData, RIGHT.currentlyIncarcerated, LEFT.relationCurrentlyIncarcerated);
-                                        SELF.relationEverIncarcerated := IF(dataOptions.includeLegalData, RIGHT.everIncarcerated, LEFT.relationEverIncarcerated);
-                                        SELF.relationPotentialSexOffender := IF(dataOptions.includeLegalData, RIGHT.potentialSexOffender, LEFT.relationPotentialSexOffender);
-                                        SELF.relationCurrentlyParoleOrProbation := IF(dataOptions.includeLegalData, RIGHT.currentlyParoleOrProbation, LEFT.relationCurrentlyParoleOrProbation);
-                                        SELF.relationFelonyPast3Years := IF(dataOptions.includeLegalData, RIGHT.felonyPast3Yrs, LEFT.relationFelonyPast3Years);
+                                        SELF.relationCurrentlyIncarcerated := RIGHT.currentlyIncarcerated OR LEFT.relationCurrentlyIncarcerated;
+                                        SELF.relationEverIncarcerated := RIGHT.everIncarcerated OR LEFT.relationEverIncarcerated;
+                                        SELF.relationPotentialSexOffender := RIGHT.potentialSexOffender OR LEFT.relationPotentialSexOffender;
+                                        SELF.relationCurrentlyParoleOrProbation := RIGHT.currentlyParoleOrProbation OR LEFT.relationCurrentlyParoleOrProbation;
+                                        SELF.relationFelonyPast3Years := RIGHT.felonyPast3Yrs OR LEFT.relationFelonyPast3Years;
                                         
                                         SELF := LEFT;),
                               LEFT OUTER,
                               ATMOST(1));
+                              
       
       RETURN updateInquired;
   END;

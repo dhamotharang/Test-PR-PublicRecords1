@@ -107,7 +107,6 @@ EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                         
                         
     perAssocOptions := MODULE(DueDiligence.DataInterface.iAttributePerAssoc)
-                                EXPORT BOOLEAN includeLegalData := FALSE;
                                 EXPORT BOOLEAN includeSSNData := TRUE;
                                 EXPORT BOOLEAN includeHeaderData := FALSE;
                        END;    

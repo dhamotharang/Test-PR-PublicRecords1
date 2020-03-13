@@ -325,17 +325,17 @@ EXPORT Layouts := MODULE
     STRING3	    EasiTotCrime;
     STRING28    CityState;
     STRING5     FipsCode; 
-    BOOLEAN     validFIPSCode;                          //populated in DueDiligence.Common.getGeographicRisk
-    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk 
-    BOOLEAN     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
-    BOOLEAN     censusRecordExists;                     //populated in DueDiligence.Common.getGeographicRisk
+    BOOLEAN     validFIPSCode;                          //populated in DueDiligence.CommonAddress.getAddressRisk
+    STRING50    CountyName;                             //populated in DueDiligence.CommonAddress.getAddressRisk 
+    BOOLEAN     CountyHasHighCrimeIndex;                //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     CountyBordersForgeinJur;                //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     CountyBorderOceanForgJur;               //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     CityBorderStation;                      //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     CityFerryCrossing;                      //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     CityRailStation;                        //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     HIDTA;                                  //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     HIFCA;                                  //populated in DueDiligence.CommonAddress.getAddressRisk
+    BOOLEAN     censusRecordExists;                     //populated in DueDiligence.CommonAddress.getAddressRisk
   END;  	
 
 
@@ -525,8 +525,6 @@ EXPORT Layouts := MODULE
     STRING10 legalEventTypeFlags;
     STRING2 stateCriminalLegalEventsScore;
     STRING10 stateCriminalLegalEventsFlags;
-    BOOLEAN trafficOffenseFound;
-    BOOLEAN otherCriminalOffenseFound;
     STRING2 civilLegalEventsScore;
     STRING10 civilLegalEventsFlags;
     UNSIGNED3 numOfPositions;
@@ -644,7 +642,6 @@ EXPORT Layouts := MODULE
   
   EXPORT SlimRelation := RECORD
     SlimIndividual;
-    UNSIGNED1 amlRelationshipDegree;
     STRING2 rawRelationshipType;
     STRING2 relationToInquired;
     BOOLEAN offenseTrafficRelated;
