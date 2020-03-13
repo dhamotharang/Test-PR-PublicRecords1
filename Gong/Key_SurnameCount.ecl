@@ -1,4 +1,3 @@
-import Data_Services, doxie;
+import dx_Gong;
 
-export Key_SurnameCount := INDEX(ds_surname_cnts,{name_last},{st,cnt},
-								Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_surnamecnt_' + doxie.Version_SuperKey);
+export Key_SurnameCount := dx_Gong.key_surname_count();
