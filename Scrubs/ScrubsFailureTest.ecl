@@ -10,6 +10,8 @@ RelevantOrbitProfile:=ScrubsFiles(version=pVersion and STD.Str.ToLowerCase(Profi
 
 TestProfile:=if(Exists(RelevantOrbitProfile(RejectWarning='Y')),false,true);
 
+//output(RelevantOrbitProfile(RejectWarning='Y'),all);
+
 return TestProfile;
 
 end;
