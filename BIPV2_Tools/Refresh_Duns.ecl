@@ -64,32 +64,32 @@ function
    dmi_filename := dmi_input_file[1].name;
 
     ds_stats := dataset([
-       {'D&B DMI' ,''                   ,'filename'         ,dmi_filename                                           }
-      ,{'Input'   ,''                   ,'Count Records'    ,(string)count(pds_in                                 ) }
-      ,{'Output'  ,''                   ,'Count Records'    ,(string)count(ds_result                              ) ,realformat((count(ds_result                           ) / count(pds_in                          ) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'cnp_name'           ,'Count NonBlank'   ,(string)count(pds_in   (cnp_name             != '')  ) }
-      ,{'Output'  ,'cnp_name'           ,'Count NonBlank'   ,(string)count(ds_result(cnp_name             != '')  ) ,realformat((count(ds_result(cnp_name            != '')) / count(pds_in(cnp_name           != '')) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'duns_number'        ,'Count NonBlank'   ,(string)count(pds_in   (duns_number          != '')  ) }
-      ,{'Output'  ,'duns_number'        ,'Count NonBlank'   ,(string)count(ds_result(duns_number          != '')  ) ,realformat((count(ds_result(duns_number         != '')) / count(pds_in(duns_number        != '')) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'active_duns_number' ,'Count NonBlank'   ,(string)count(pds_in   (active_duns_number   != '')  ) }
-      ,{'Output'  ,'active_duns_number' ,'Count NonBlank'   ,(string)count(ds_result(active_duns_number   != '')  ) ,realformat((count(ds_result(active_duns_number  != '')) / count(pds_in(active_duns_number != '')) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'hist_duns_number'   ,'Count NonBlank'   ,(string)count(pds_in   (hist_duns_number     != '')  ) }
-      ,{'Output'  ,'hist_duns_number'   ,'Count NonBlank'   ,(string)count(ds_result(hist_duns_number     != '')  ) ,realformat((count(ds_result(hist_duns_number    != '')) / count(pds_in(hist_duns_number   != '')) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'deleted_key'        ,'Count NonBlank'   ,(string)count(pds_in   (deleted_key          != '')  ) }
-      ,{'Output'  ,'deleted_key'        ,'Count NonBlank'   ,(string)count(ds_result(deleted_key          != '')  ) ,realformat((count(ds_result(deleted_key         != '')) / count(pds_in(deleted_key        != '')) * 100.0) - 100,10,4)}
+       {'D&B DMI' + ' ' + pPersistUnique,''                   ,'filename'         ,dmi_filename                                           }
+      ,{'Input'   + ' ' + pPersistUnique ,''                   ,'Count Records'    ,(string)count(pds_in                                 ) }
+      ,{'Output'  + ' ' + pPersistUnique ,''                   ,'Count Records'    ,(string)count(ds_result                              ) ,realformat((count(ds_result                           ) / count(pds_in                          ) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'cnp_name'           ,'Count NonBlank'   ,(string)count(pds_in   (cnp_name             != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'cnp_name'           ,'Count NonBlank'   ,(string)count(ds_result(cnp_name             != '')  ) ,realformat((count(ds_result(cnp_name            != '')) / count(pds_in(cnp_name           != '')) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'duns_number'        ,'Count NonBlank'   ,(string)count(pds_in   (duns_number          != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'duns_number'        ,'Count NonBlank'   ,(string)count(ds_result(duns_number          != '')  ) ,realformat((count(ds_result(duns_number         != '')) / count(pds_in(duns_number        != '')) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'active_duns_number' ,'Count NonBlank'   ,(string)count(pds_in   (active_duns_number   != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'active_duns_number' ,'Count NonBlank'   ,(string)count(ds_result(active_duns_number   != '')  ) ,realformat((count(ds_result(active_duns_number  != '')) / count(pds_in(active_duns_number != '')) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'hist_duns_number'   ,'Count NonBlank'   ,(string)count(pds_in   (hist_duns_number     != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'hist_duns_number'   ,'Count NonBlank'   ,(string)count(ds_result(hist_duns_number     != '')  ) ,realformat((count(ds_result(hist_duns_number    != '')) / count(pds_in(hist_duns_number   != '')) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'deleted_key'        ,'Count NonBlank'   ,(string)count(pds_in   (deleted_key          != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'deleted_key'        ,'Count NonBlank'   ,(string)count(ds_result(deleted_key          != '')  ) ,realformat((count(ds_result(deleted_key         != '')) / count(pds_in(deleted_key        != '')) * 100.0) - 100,10,4)}
 
-//      ,{'Input'   ,'new deleted_key'    ,'Count NonBlank'   ,(string)count(pds_in   (deleted_key          != '',prev_deleted_duns = '')  ) }
-      ,{'Output'  ,'new deleted_key'    ,'Count NonBlank'   ,(string)count(ds_result(deleted_key          != '',prev_deleted_duns = '')  ) ,realformat((count(ds_result(deleted_key         != '',prev_deleted_duns = '')) / count(pds_in(deleted_key        != '')) * 100.0),10,4)}
-
-      ,{'Input'   ,'company_fein'       ,'Count NonBlank'   ,(string)count(pds_in   (company_fein         != '')  ) }
-      ,{'Output'  ,'company_fein'       ,'Count NonBlank'   ,(string)count(ds_result(company_fein         != '')  ) ,realformat((count(ds_result(company_fein        != '')) / count(pds_in(company_fein       != '')) * 100.0) - 100,10,4)}
-      ,{'Input'   ,'deleted_fein'       ,'Count NonBlank'   ,(string)count(pds_in   (deleted_fein         != '')  ) }
-      ,{'Output'  ,'deleted_fein'       ,'Count NonBlank'   ,(string)count(ds_result(deleted_fein         != '')  ) ,realformat((count(ds_result(deleted_fein        != '')) / count(pds_in(deleted_fein       != '')) * 100.0) - 100,10,4)}
+//      ,{'Input'   ,'new deleted_key'   ,'Count NonBlank'   ,(string)count(pds_in   (deleted_key          != '',prev_deleted_duns = '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'new deleted_key'    ,'Count NonBlank'   ,(string)count(ds_result(deleted_key          != '',prev_deleted_duns = '')  ) ,realformat((count(ds_result(deleted_key         != '',prev_deleted_duns = '')) / count(pds_in(deleted_key        != '')) * 100.0),10,4)}
+                  
+      ,{'Input'   + ' ' + pPersistUnique ,'company_fein'       ,'Count NonBlank'   ,(string)count(pds_in   (company_fein         != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'company_fein'       ,'Count NonBlank'   ,(string)count(ds_result(company_fein         != '')  ) ,realformat((count(ds_result(company_fein        != '')) / count(pds_in(company_fein       != '')) * 100.0) - 100,10,4)}
+      ,{'Input'   + ' ' + pPersistUnique ,'deleted_fein'       ,'Count NonBlank'   ,(string)count(pds_in   (deleted_fein         != '')  ) }
+      ,{'Output'  + ' ' + pPersistUnique ,'deleted_fein'       ,'Count NonBlank'   ,(string)count(ds_result(deleted_fein         != '')  ) ,realformat((count(ds_result(deleted_fein        != '')) / count(pds_in(deleted_fein       != '')) * 100.0) - 100,10,4)}
     
     
     ],{string file,string field,string stat,string value ,string pct_change := ''});
 
 
-    return when(ds_result,output(ds_stats  ,named('Stats_BIPV2_Tools_Refresh_Duns')));
+    return when(ds_result,output(ds_stats  ,named('Stats_BIPV2_Tools_Refresh_Duns'),extend));
     
 end;
