@@ -470,16 +470,15 @@ shared AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGI
 shared AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
 export Alpha  :=  project(AlphaOtherVendors + AlphaCoplogic, transform(Layout_keybuild_SSv2, self := left;));
 
-export out    := project(outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC'),
-                         transform(Layout_keybuild_SSv2, self := left;));
+shared foutrecs0 := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+export out    := project(foutrecs0, transform(Layout_keybuild_SSv2, self := left;));
 												 
-shared EcrashAgencyExclusion := outrecs0((STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list OR
-                                          STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list)
-																					OR 
-																				 (STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list OR
-                                          STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list)
-																				 );
-export prout := EcrashAgencyExclusion(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+shared EcrashAgencyExclusion := foutrecs0((trim(agency_ori, all) not in Agency_exclusion.Agency_ori_list or
+                                           trim(agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list)
+																					 or 
+																				  (trim(orig_agency_ori, all) not in Agency_exclusion.Agency_ori_list or
+                                           trim(orig_agency_ori, all)[1..2] not in Agency_exclusion.Agency_ori_jurisdiction_list));
+export prout := project(EcrashAgencyExclusion, transform(Layout_keybuild_SSv2, self := left;));
 
 shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
 export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
