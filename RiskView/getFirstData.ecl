@@ -1,6 +1,11 @@
-﻿import Risk_Indicators, Gateway, models, STD, iesp, dx_FirstData;
+﻿import Risk_Indicators, Gateway, models, STD, iesp, dx_FirstData, Riskview;
 
-export getFirstData(dataset(Risk_Indicators.Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways) := function
+layout_preCI := record
+	Risk_Indicators.Layout_Input input;
+	riskview.layouts.layout_riskview5_search_results results;
+  string9 bestssn;
+end;
+export getFirstData(dataset(layout_preCI) indata, dataset(Gateway.Layouts.Config) gateways) := function
 
 gateway_cfg	:= gateways(Gateway.Configuration.IsFirstData(servicename))[1];
 
@@ -12,31 +17,31 @@ gateway_params := project(gateways(STD.Str.ToLowerCase(ServiceName)in ['first_da
 FDKey :=  dx_FirstData.key_DID();
 
 iesp.first_data.t_FDCheckingIndicatorsRequest prep(indata le, FDKey ri) := transform  
-DL_Number := if(ri.DL_ID <> '', ri.DL_ID, le.DL_Number);
-DL_State := if(ri.dl_state <> '', ri.dl_state, le.dl_state);
+DL_Number := if(ri.DL_ID <> '', ri.DL_ID, le.input.DL_Number);
+DL_State := if(ri.dl_state <> '', ri.dl_state, le.input.dl_state);
 
 	self.searchby.MerchantId := trim(gateway_params(STD.Str.ToLowerCase(Name)in ['subscriberid'])[1].val);
 	// self.searchby.TeleCheckProductName   := 'MICRO_INDICATORS'; // Not needing to be passed but left for reference in case it is decided to in the future. Assumed will be passed from the ESP.
 	// self.searchby.VersionControl   := 'CLIENTVENDORPROD 20060215 WIN SNNK 022'; // Not needing to be passed but left for reference in case it is decided to in the future. Assumed will be passed from the ESP.
 	self.searchby.ManualId := if(trim(DL_State) = '' or trim(DL_Number) = '', '', trim(DL_State) + trim(DL_Number));
-  self.searchby.SSN := trim(le.ssn);
-	self.searchby.DOB.Year := trim(le.dob[1..4]); 
-	self.searchby.DOB.Month := trim(le.dob[5..6]);
-	self.searchby.DOB.Day := trim(le.dob[7..8]);
-	self.searchby.FullName := trim( trim(le.fname) + if(le.mname<>'', ' ' + trim(le.mname) + ' ', ' ') + trim(le.lname) );
-	self.searchby.PhoneNumber := trim(le.phone10);
-	self.searchby.Address.AddressLine1  := trim(le.in_streetAddress);
-	self.searchby.Address.City := trim(le.p_city_name);
-	self.searchby.Address.State := trim(le.st);
-	self.searchby.Address.ZipCode := trim(le.z5);
+  self.searchby.SSN := if( trim(le.bestssn) = '', trim(le.input.ssn), trim(le.bestssn));
+	self.searchby.DOB.Year := trim(le.input.dob[1..4]); 
+	self.searchby.DOB.Month := trim(le.input.dob[5..6]);
+	self.searchby.DOB.Day := trim(le.input.dob[7..8]);
+	self.searchby.FullName := trim( trim(le.input.fname) + if(le.input.mname<>'', ' ' + trim(le.input.mname) + ' ', ' ') + trim(le.input.lname) );
+	self.searchby.PhoneNumber := trim(le.input.phone10);
+	self.searchby.Address.AddressLine1  := trim(le.input.in_streetAddress);
+	self.searchby.Address.City := trim(le.input.p_city_name);
+	self.searchby.Address.State := trim(le.input.st);
+	self.searchby.Address.ZipCode := trim(le.input.z5);
  
 	self := [];
 end;
 
-firstdata_in := join(indata, FDKey, KEYED(left.DID = right.Lex_ID), prep(left, right), left outer, atmost(1000));
+firstdata_in := join(indata, FDKey, KEYED(left.input.DID = right.Lex_ID), prep(left, right), left outer, atmost(1000));
 
-firstdata_pass := firstdata_in( searchby.ManualId != '' or searchby.ssn != '');
-firstdata_fail := firstdata_in( searchby.ManualId = '' and searchby.ssn = '');
+firstdata_pass := firstdata_in(( searchby.ManualId != '' or searchby.ssn != '') and searchby.MerchantID <> '0');
+firstdata_fail := firstdata_in(( searchby.ManualId = '' and searchby.ssn = '') or searchby.MerchantID = '0');
 
 makeGatewayCall := gateway_cfg.url!= '' and count(firstdata_pass)>0;
 fd_results := if(makeGatewayCall, Gateway.SoapCall_FirstData(firstdata_in, gateway_cfg, makeGatewayCall), dataset([],iesp.first_data.t_FDCheckingIndicatorsResponseEx));
@@ -58,6 +63,7 @@ string	  NO_NEG_DECL_DAYS; //Indicator 24
 string	  PREV_HOURS; //Indicator 26
 string	  RISK_PNC; //Indicator 30
 boolean	  FD_Gateway_Pass;
+string5   Exception_Code;
 END;
 
 fd_results_slim := project(fd_results, transform(fd_ln_names,
@@ -66,8 +72,8 @@ FIRST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Ind
 FIRST_SEEN_DATE_TRUE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator14, 'FIRST_SEEN_DATE_TRUE=');
 LAST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator15, 'LAST_SEEN_DATE=');
 
-self.seq := indata[1].seq;
-self.ARCHIVE_DATE := indata[1].historyDateTimeStamp[1..6];
+self.seq := indata[1].input.seq;
+self.ARCHIVE_DATE := indata[1].input.historyDateTimeStamp[1..6];
 self.APPRS_AMT_90D := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator2, 'APPRS_AMT_90D=');
 self.DAYS_OLD_NEG := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator8, 'DAYS_OLD_NEG=');
 self.FIRST_SEEN_DATE := STD.Str.FilterOut(FIRST_SEEN_DATE_temp, '-');
@@ -81,12 +87,13 @@ self.NO_NEG_DECL_DAYS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.In
 self.PREV_HOURS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator26, 'PREV_HOURS=');
 self.RISK_PNC := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator30, 'RISK_PNC=');
 self.FD_Gateway_Pass := left.response._header.message = '';
+self.Exception_Code := '';
 
 self := left;));
 
 fd_results_slim_fail := project(firstdata_fail, transform(fd_ln_names,
 
-self.seq := indata[1].seq;
+self.seq := indata[1].input.seq;
 self.ARCHIVE_DATE := '';
 self.APPRS_AMT_90D := '';
 self.DAYS_OLD_NEG := '';
@@ -101,29 +108,13 @@ self.NO_NEG_DECL_DAYS := '';
 self.PREV_HOURS := '';
 self.RISK_PNC := '';
 self.FD_Gateway_Pass := false;
+self.Exception_Code := if(left.searchby.MerchantID = '0', '25', '');
 
 self := left;));
-
- CI_Layout := RECORD
- unsigned4 seq;
- string10 CheckProfileIndex;
- string10 CheckTimeOldest;
- string10 CheckTimeNewest;
- string10 CheckNegTimeOldest;
- string10 CheckNegRiskDecTimeNewest;
- string10 CheckNegPaidTimeNewest;
- string10 CheckCountTotal;
- string10 CheckAmountTotal;
- string10 CheckAmountTotalSinceNegPaid;
- string10 CheckAmountTotal03Month;
- boolean  FDGatewayCalled;
- END;
- 
- 
  
  /* ----------[ Start Checking Indicators Attribute Logic ]---------- */
 
-CI_Attributes := project(fd_results_slim + fd_results_slim_fail, transform(CI_Layout,
+CI_Attributes := project(fd_results_slim + fd_results_slim_fail, transform(Riskview.Layouts.Checking_Indicators_Layout,
 
 NULL := Models.Common.Null;
 
