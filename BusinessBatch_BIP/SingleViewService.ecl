@@ -3,6 +3,8 @@
   <part name="DPPAPurpose"          type="xsd:byte"/>
   <part name="GLBPurpose"           type="xsd:byte"/>
   <part name="Max_Results_Per_Acct" type="xsd:unsignedInt" default=5/>
+  <part name="Max_Businesses_Per_Acct" type="xsd:unsignedInt" default=25/>
+  <part name="Max_Contacts_Per_Acct" type="xsd:unsignedInt" default=25/>
   <part name="Score_Threshold"       type="xsd:unsignedInt" default=75/>
   <part name="Biz_Score_Threshold"   type="xsd:unsignedInt" default=75/>
   <part name="History_Limit_Years"   type="xsd:unsignedInt" default=2/>
@@ -26,16 +28,9 @@ MACRO
   
   sv_records := BusinessBatch_BIP.SingleView_Records(ds_batchInProcessed, batchParams);
 
-  // the service returns three results files
-  //  Results: The summary results containing append and linking info
-  //  Contact_Results: The contacts associated with the input business
-  //  Business_Results: The businesses associated with the input consumer
-  Results := sv_records.results();
-  Contact_Results := sv_records.contact_results();
-  Business_Results := sv_records.business_results();
+  // will return results combined into single dataset
+  Results := sv_records.combined_results();
 
   output(Results, named('Results'));
-  output(Contact_Results, named('Contact_Results'));
-  output(Business_Results, named('Business_Results'));
 
 ENDMACRO;
