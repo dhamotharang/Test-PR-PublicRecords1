@@ -42,6 +42,8 @@ MODULE
 
     EXPORT BatchParams :=
     INTERFACE(BatchShare.IParam.BatchParams)
+      EXPORT UNSIGNED8 MaxBusinessesPerAcct;
+      EXPORT UNSIGNED8 MaxContactsPerAcct;
       EXPORT UNSIGNED1 Score_Threshold;
       EXPORT UNSIGNED1 Biz_Score_Threshold;
       EXPORT UNSIGNED1 History_Limit_Years;
@@ -54,6 +56,8 @@ MODULE
       
       inMod := MODULE(PROJECT(BaseBatchParams, BatchParams, OPT))
         EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessBatch_BIP.Constants.SingleView.MaxResultsPerAcctno : STORED('Max_Results_Per_Acct');
+        EXPORT UNSIGNED8 MaxBusinessesPerAcct := BusinessBatch_BIP.Constants.SingleView.MaxLinkedPerAcctno : STORED('Max_Businesses_Per_Acct');
+        EXPORT UNSIGNED8 MaxContactsPerAcct := BusinessBatch_BIP.Constants.SingleView.MaxLinkedPerAcctno : STORED('Max_Contacts_Per_Acct');
         EXPORT UNSIGNED1 Score_Threshold := 75 : STORED('Score_Threshold');
         EXPORT UNSIGNED1 Biz_Score_Threshold := 75 : STORED('Biz_Score_Threshold');
         EXPORT UNSIGNED1 History_Limit_Years := 2 : STORED('History_Limit_Years');
