@@ -3,8 +3,8 @@ IMPORT Scrubs,Scrubs_LN_PropertyV2_Assessor,Scrubs_Property_Characteristics; // 
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 350;
-  EXPORT NumRulesFromFieldType := 350;
+  EXPORT NumRules := 337;
+  EXPORT NumRulesFromFieldType := 337;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 247;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -274,7 +274,7 @@ EXPORT Scrubs := MODULE
           ,'dt_vendor_last_reported:invalid_date:CUSTOM'
           ,'tax_sortby_date:invalid_date:CUSTOM'
           ,'deed_sortby_date:invalid_date:CUSTOM'
-          ,'fares_unformatted_apn:invalid_apn:ALLOW','fares_unformatted_apn:invalid_apn:LENGTHS'
+          ,'fares_unformatted_apn:invalid_apn:ALLOW'
           ,'property_street_address:invalid_address:ALLOW'
           ,'property_city_state_zip:invalid_csz:ALLOW'
           ,'prim_range:invalid_address:ALLOW'
@@ -370,7 +370,7 @@ EXPORT Scrubs := MODULE
           ,'stories_type:invalid_stories_type:CUSTOM'
           ,'src_stories_type:invalid_vendor_source:ENUM','src_stories_type:invalid_vendor_source:LENGTHS'
           ,'tax_dt_stories_type:invalid_date:CUSTOM'
-          ,'apn_number:invalid_apn:ALLOW','apn_number:invalid_apn:LENGTHS'
+          ,'apn_number:invalid_apn:ALLOW'
           ,'src_apn_number:invalid_vendor_source:ENUM','src_apn_number:invalid_vendor_source:LENGTHS'
           ,'tax_dt_apn_number:invalid_date:CUSTOM'
           ,'src_census_tract:invalid_vendor_source:ENUM','src_census_tract:invalid_vendor_source:LENGTHS'
@@ -427,35 +427,35 @@ EXPORT Scrubs := MODULE
           ,'sewer:invalid_sewer_type:CUSTOM'
           ,'src_sewer:invalid_vendor_source:ENUM','src_sewer:invalid_vendor_source:LENGTHS'
           ,'tax_dt_sewer:invalid_date:CUSTOM'
-          ,'assessed_land_value:invalid_tax_amount:ALLOW','assessed_land_value:invalid_tax_amount:INRANGE'
+          ,'assessed_land_value:invalid_tax_amount:ALLOW'
           ,'src_assessed_land_value:invalid_vendor_source:ENUM','src_assessed_land_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_assessed_land_value:invalid_date:CUSTOM'
           ,'assessed_year:invalid_year:ALLOW','assessed_year:invalid_year:LENGTHS'
           ,'src_assessed_year:invalid_vendor_source:ENUM','src_assessed_year:invalid_vendor_source:LENGTHS'
           ,'tax_dt_assessed_year:invalid_date:CUSTOM'
-          ,'tax_amount:invalid_tax_amount:ALLOW','tax_amount:invalid_tax_amount:INRANGE'
+          ,'tax_amount:invalid_tax_amount:ALLOW'
           ,'src_tax_amount:invalid_vendor_source:ENUM','src_tax_amount:invalid_vendor_source:LENGTHS'
           ,'tax_dt_tax_amount:invalid_date:CUSTOM'
           ,'tax_year:invalid_year:ALLOW','tax_year:invalid_year:LENGTHS'
           ,'src_tax_year:invalid_vendor_source:ENUM','src_tax_year:invalid_vendor_source:LENGTHS'
-          ,'market_land_value:invalid_tax_amount:ALLOW','market_land_value:invalid_tax_amount:INRANGE'
+          ,'market_land_value:invalid_tax_amount:ALLOW'
           ,'src_market_land_value:invalid_vendor_source:ENUM','src_market_land_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_market_land_value:invalid_date:CUSTOM'
-          ,'improvement_value:invalid_tax_amount:ALLOW','improvement_value:invalid_tax_amount:INRANGE'
+          ,'improvement_value:invalid_tax_amount:ALLOW'
           ,'src_improvement_value:invalid_vendor_source:ENUM','src_improvement_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_improvement_value:invalid_date:CUSTOM'
           ,'src_percent_improved:invalid_vendor_source:ENUM','src_percent_improved:invalid_vendor_source:LENGTHS'
           ,'tax_dt_percent_improved:invalid_date:CUSTOM'
-          ,'total_assessed_value:invalid_tax_amount:ALLOW','total_assessed_value:invalid_tax_amount:INRANGE'
+          ,'total_assessed_value:invalid_tax_amount:ALLOW'
           ,'src_total_assessed_value:invalid_vendor_source:ENUM','src_total_assessed_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_total_assessed_value:invalid_date:CUSTOM'
-          ,'total_calculated_value:invalid_tax_amount:ALLOW','total_calculated_value:invalid_tax_amount:INRANGE'
+          ,'total_calculated_value:invalid_tax_amount:ALLOW'
           ,'src_total_calculated_value:invalid_vendor_source:ENUM','src_total_calculated_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_total_calculated_value:invalid_date:CUSTOM'
-          ,'total_land_value:invalid_tax_amount:ALLOW','total_land_value:invalid_tax_amount:INRANGE'
+          ,'total_land_value:invalid_tax_amount:ALLOW'
           ,'src_total_land_value:invalid_vendor_source:ENUM','src_total_land_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_total_land_value:invalid_date:CUSTOM'
-          ,'total_market_value:invalid_tax_amount:ALLOW','total_market_value:invalid_tax_amount:INRANGE'
+          ,'total_market_value:invalid_tax_amount:ALLOW'
           ,'src_total_market_value:invalid_vendor_source:ENUM','src_total_market_value:invalid_vendor_source:LENGTHS'
           ,'tax_dt_total_market_value:invalid_date:CUSTOM'
           ,'floor_type:invalid_floor_cover_code:CUSTOM'
@@ -493,7 +493,7 @@ EXPORT Scrubs := MODULE
           ,'full_part_sale:invalid_sale_code:CUSTOM'
           ,'src_full_part_sale:invalid_vendor_source:ENUM','src_full_part_sale:invalid_vendor_source:LENGTHS'
           ,'rec_dt_full_part_sale:invalid_date:CUSTOM'
-          ,'sale_amount:invalid_tax_amount:ALLOW','sale_amount:invalid_tax_amount:INRANGE'
+          ,'sale_amount:invalid_tax_amount:ALLOW'
           ,'src_sale_amount:invalid_vendor_source:ENUM','src_sale_amount:invalid_vendor_source:LENGTHS'
           ,'rec_dt_sale_amount:invalid_date:CUSTOM'
           ,'sale_date:invalid_date:CUSTOM'
@@ -505,10 +505,10 @@ EXPORT Scrubs := MODULE
           ,'mortgage_company_name:invalid_alpha:ALLOW'
           ,'src_mortgage_company_name:invalid_vendor_source:ENUM','src_mortgage_company_name:invalid_vendor_source:LENGTHS'
           ,'rec_dt_mortgage_company_name:invalid_date:CUSTOM'
-          ,'loan_amount:invalid_tax_amount:ALLOW','loan_amount:invalid_tax_amount:INRANGE'
+          ,'loan_amount:invalid_tax_amount:ALLOW'
           ,'src_loan_amount:invalid_vendor_source:ENUM','src_loan_amount:invalid_vendor_source:LENGTHS'
           ,'rec_dt_loan_amount:invalid_date:CUSTOM'
-          ,'second_loan_amount:invalid_tax_amount:ALLOW','second_loan_amount:invalid_tax_amount:INRANGE'
+          ,'second_loan_amount:invalid_tax_amount:ALLOW'
           ,'src_second_loan_amount:invalid_vendor_source:ENUM','src_second_loan_amount:invalid_vendor_source:LENGTHS'
           ,'rec_dt_second_loan_amount:invalid_date:CUSTOM'
           ,'loan_type_code:invalid_mortgage_loan_type_code:CUSTOM'
@@ -529,7 +529,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_dt_vendor_last_reported(1)
           ,Fields.InvalidMessage_tax_sortby_date(1)
           ,Fields.InvalidMessage_deed_sortby_date(1)
-          ,Fields.InvalidMessage_fares_unformatted_apn(1),Fields.InvalidMessage_fares_unformatted_apn(2)
+          ,Fields.InvalidMessage_fares_unformatted_apn(1)
           ,Fields.InvalidMessage_property_street_address(1)
           ,Fields.InvalidMessage_property_city_state_zip(1)
           ,Fields.InvalidMessage_prim_range(1)
@@ -625,7 +625,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_stories_type(1)
           ,Fields.InvalidMessage_src_stories_type(1),Fields.InvalidMessage_src_stories_type(2)
           ,Fields.InvalidMessage_tax_dt_stories_type(1)
-          ,Fields.InvalidMessage_apn_number(1),Fields.InvalidMessage_apn_number(2)
+          ,Fields.InvalidMessage_apn_number(1)
           ,Fields.InvalidMessage_src_apn_number(1),Fields.InvalidMessage_src_apn_number(2)
           ,Fields.InvalidMessage_tax_dt_apn_number(1)
           ,Fields.InvalidMessage_src_census_tract(1),Fields.InvalidMessage_src_census_tract(2)
@@ -682,35 +682,35 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_sewer(1)
           ,Fields.InvalidMessage_src_sewer(1),Fields.InvalidMessage_src_sewer(2)
           ,Fields.InvalidMessage_tax_dt_sewer(1)
-          ,Fields.InvalidMessage_assessed_land_value(1),Fields.InvalidMessage_assessed_land_value(2)
+          ,Fields.InvalidMessage_assessed_land_value(1)
           ,Fields.InvalidMessage_src_assessed_land_value(1),Fields.InvalidMessage_src_assessed_land_value(2)
           ,Fields.InvalidMessage_tax_dt_assessed_land_value(1)
           ,Fields.InvalidMessage_assessed_year(1),Fields.InvalidMessage_assessed_year(2)
           ,Fields.InvalidMessage_src_assessed_year(1),Fields.InvalidMessage_src_assessed_year(2)
           ,Fields.InvalidMessage_tax_dt_assessed_year(1)
-          ,Fields.InvalidMessage_tax_amount(1),Fields.InvalidMessage_tax_amount(2)
+          ,Fields.InvalidMessage_tax_amount(1)
           ,Fields.InvalidMessage_src_tax_amount(1),Fields.InvalidMessage_src_tax_amount(2)
           ,Fields.InvalidMessage_tax_dt_tax_amount(1)
           ,Fields.InvalidMessage_tax_year(1),Fields.InvalidMessage_tax_year(2)
           ,Fields.InvalidMessage_src_tax_year(1),Fields.InvalidMessage_src_tax_year(2)
-          ,Fields.InvalidMessage_market_land_value(1),Fields.InvalidMessage_market_land_value(2)
+          ,Fields.InvalidMessage_market_land_value(1)
           ,Fields.InvalidMessage_src_market_land_value(1),Fields.InvalidMessage_src_market_land_value(2)
           ,Fields.InvalidMessage_tax_dt_market_land_value(1)
-          ,Fields.InvalidMessage_improvement_value(1),Fields.InvalidMessage_improvement_value(2)
+          ,Fields.InvalidMessage_improvement_value(1)
           ,Fields.InvalidMessage_src_improvement_value(1),Fields.InvalidMessage_src_improvement_value(2)
           ,Fields.InvalidMessage_tax_dt_improvement_value(1)
           ,Fields.InvalidMessage_src_percent_improved(1),Fields.InvalidMessage_src_percent_improved(2)
           ,Fields.InvalidMessage_tax_dt_percent_improved(1)
-          ,Fields.InvalidMessage_total_assessed_value(1),Fields.InvalidMessage_total_assessed_value(2)
+          ,Fields.InvalidMessage_total_assessed_value(1)
           ,Fields.InvalidMessage_src_total_assessed_value(1),Fields.InvalidMessage_src_total_assessed_value(2)
           ,Fields.InvalidMessage_tax_dt_total_assessed_value(1)
-          ,Fields.InvalidMessage_total_calculated_value(1),Fields.InvalidMessage_total_calculated_value(2)
+          ,Fields.InvalidMessage_total_calculated_value(1)
           ,Fields.InvalidMessage_src_total_calculated_value(1),Fields.InvalidMessage_src_total_calculated_value(2)
           ,Fields.InvalidMessage_tax_dt_total_calculated_value(1)
-          ,Fields.InvalidMessage_total_land_value(1),Fields.InvalidMessage_total_land_value(2)
+          ,Fields.InvalidMessage_total_land_value(1)
           ,Fields.InvalidMessage_src_total_land_value(1),Fields.InvalidMessage_src_total_land_value(2)
           ,Fields.InvalidMessage_tax_dt_total_land_value(1)
-          ,Fields.InvalidMessage_total_market_value(1),Fields.InvalidMessage_total_market_value(2)
+          ,Fields.InvalidMessage_total_market_value(1)
           ,Fields.InvalidMessage_src_total_market_value(1),Fields.InvalidMessage_src_total_market_value(2)
           ,Fields.InvalidMessage_tax_dt_total_market_value(1)
           ,Fields.InvalidMessage_floor_type(1)
@@ -748,7 +748,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_full_part_sale(1)
           ,Fields.InvalidMessage_src_full_part_sale(1),Fields.InvalidMessage_src_full_part_sale(2)
           ,Fields.InvalidMessage_rec_dt_full_part_sale(1)
-          ,Fields.InvalidMessage_sale_amount(1),Fields.InvalidMessage_sale_amount(2)
+          ,Fields.InvalidMessage_sale_amount(1)
           ,Fields.InvalidMessage_src_sale_amount(1),Fields.InvalidMessage_src_sale_amount(2)
           ,Fields.InvalidMessage_rec_dt_sale_amount(1)
           ,Fields.InvalidMessage_sale_date(1)
@@ -760,10 +760,10 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_mortgage_company_name(1)
           ,Fields.InvalidMessage_src_mortgage_company_name(1),Fields.InvalidMessage_src_mortgage_company_name(2)
           ,Fields.InvalidMessage_rec_dt_mortgage_company_name(1)
-          ,Fields.InvalidMessage_loan_amount(1),Fields.InvalidMessage_loan_amount(2)
+          ,Fields.InvalidMessage_loan_amount(1)
           ,Fields.InvalidMessage_src_loan_amount(1),Fields.InvalidMessage_src_loan_amount(2)
           ,Fields.InvalidMessage_rec_dt_loan_amount(1)
-          ,Fields.InvalidMessage_second_loan_amount(1),Fields.InvalidMessage_second_loan_amount(2)
+          ,Fields.InvalidMessage_second_loan_amount(1)
           ,Fields.InvalidMessage_src_second_loan_amount(1),Fields.InvalidMessage_src_second_loan_amount(2)
           ,Fields.InvalidMessage_rec_dt_second_loan_amount(1)
           ,Fields.InvalidMessage_loan_type_code(1)
@@ -1036,12 +1036,12 @@ EXPORT FromNone(DATASET(Layout_Property_Characteristics) h) := MODULE
   EXPORT ExpandedInfile := ExpandedInfile1;
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_Property_Characteristics);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 1 ) + ( le.tax_sortby_date_Invalid << 2 ) + ( le.deed_sortby_date_Invalid << 3 ) + ( le.fares_unformatted_apn_Invalid << 4 ) + ( le.property_street_address_Invalid << 6 ) + ( le.property_city_state_zip_Invalid << 7 ) + ( le.prim_range_Invalid << 8 ) + ( le.predir_Invalid << 9 ) + ( le.prim_name_Invalid << 10 ) + ( le.addr_suffix_Invalid << 11 ) + ( le.postdir_Invalid << 12 ) + ( le.unit_desig_Invalid << 13 ) + ( le.sec_range_Invalid << 14 ) + ( le.p_city_name_Invalid << 15 ) + ( le.v_city_name_Invalid << 16 ) + ( le.zip_Invalid << 17 ) + ( le.zip4_Invalid << 18 ) + ( le.building_square_footage_Invalid << 19 ) + ( le.src_building_square_footage_Invalid << 20 ) + ( le.tax_dt_building_square_footage_Invalid << 22 ) + ( le.air_conditioning_type_Invalid << 23 ) + ( le.src_air_conditioning_type_Invalid << 24 ) + ( le.tax_dt_air_conditioning_type_Invalid << 26 ) + ( le.basement_finish_Invalid << 27 ) + ( le.src_basement_finish_Invalid << 28 ) + ( le.tax_dt_basement_finish_Invalid << 30 ) + ( le.construction_type_Invalid << 31 ) + ( le.src_construction_type_Invalid << 32 ) + ( le.tax_dt_construction_type_Invalid << 34 ) + ( le.exterior_wall_Invalid << 35 ) + ( le.src_exterior_wall_Invalid << 36 ) + ( le.tax_dt_exterior_wall_Invalid << 38 ) + ( le.fireplace_ind_Invalid << 39 ) + ( le.src_fireplace_ind_Invalid << 40 ) + ( le.tax_dt_fireplace_ind_Invalid << 42 ) + ( le.fireplace_type_Invalid << 43 ) + ( le.src_fireplace_type_Invalid << 44 ) + ( le.tax_dt_fireplace_type_Invalid << 46 ) + ( le.src_flood_zone_panel_Invalid << 47 ) + ( le.tax_dt_flood_zone_panel_Invalid << 49 ) + ( le.garage_Invalid << 50 ) + ( le.src_garage_Invalid << 51 ) + ( le.tax_dt_garage_Invalid << 53 ) + ( le.first_floor_square_footage_Invalid << 54 ) + ( le.src_first_floor_square_footage_Invalid << 55 ) + ( le.tax_dt_first_floor_square_footage_Invalid << 57 ) + ( le.heating_Invalid << 58 ) + ( le.src_heating_Invalid << 59 ) + ( le.tax_dt_heating_Invalid << 61 ) + ( le.living_area_square_footage_Invalid << 62 );
-    SELF.ScrubsBits2 := ( le.src_living_area_square_footage_Invalid << 0 ) + ( le.tax_dt_living_area_square_footage_Invalid << 2 ) + ( le.no_of_baths_Invalid << 3 ) + ( le.src_no_of_baths_Invalid << 4 ) + ( le.tax_dt_no_of_baths_Invalid << 6 ) + ( le.no_of_bedrooms_Invalid << 7 ) + ( le.src_no_of_bedrooms_Invalid << 8 ) + ( le.tax_dt_no_of_bedrooms_Invalid << 10 ) + ( le.no_of_fireplaces_Invalid << 11 ) + ( le.src_no_of_fireplaces_Invalid << 12 ) + ( le.tax_dt_no_of_fireplaces_Invalid << 14 ) + ( le.no_of_full_baths_Invalid << 15 ) + ( le.src_no_of_full_baths_Invalid << 16 ) + ( le.tax_dt_no_of_full_baths_Invalid << 18 ) + ( le.no_of_half_baths_Invalid << 19 ) + ( le.src_no_of_half_baths_Invalid << 20 ) + ( le.tax_dt_no_of_half_baths_Invalid << 22 ) + ( le.no_of_stories_Invalid << 23 ) + ( le.src_no_of_stories_Invalid << 24 ) + ( le.tax_dt_no_of_stories_Invalid << 26 ) + ( le.parking_type_Invalid << 27 ) + ( le.src_parking_type_Invalid << 28 ) + ( le.tax_dt_parking_type_Invalid << 30 ) + ( le.src_pool_indicator_Invalid << 31 ) + ( le.tax_dt_pool_indicator_Invalid << 33 ) + ( le.pool_type_Invalid << 34 ) + ( le.src_pool_type_Invalid << 35 ) + ( le.tax_dt_pool_type_Invalid << 37 ) + ( le.roof_cover_Invalid << 38 ) + ( le.src_roof_cover_Invalid << 39 ) + ( le.tax_dt_roof_cover_Invalid << 41 ) + ( le.year_built_Invalid << 42 ) + ( le.src_year_built_Invalid << 44 ) + ( le.tax_dt_year_built_Invalid << 46 ) + ( le.foundation_Invalid << 47 ) + ( le.src_foundation_Invalid << 48 ) + ( le.tax_dt_foundation_Invalid << 50 ) + ( le.basement_square_footage_Invalid << 51 ) + ( le.src_basement_square_footage_Invalid << 52 ) + ( le.tax_dt_basement_square_footage_Invalid << 54 ) + ( le.effective_year_built_Invalid << 55 ) + ( le.src_effective_year_built_Invalid << 57 ) + ( le.tax_dt_effective_year_built_Invalid << 59 ) + ( le.garage_square_footage_Invalid << 60 ) + ( le.src_garage_square_footage_Invalid << 61 ) + ( le.tax_dt_garage_square_footage_Invalid << 63 );
-    SELF.ScrubsBits3 := ( le.stories_type_Invalid << 0 ) + ( le.src_stories_type_Invalid << 1 ) + ( le.tax_dt_stories_type_Invalid << 3 ) + ( le.apn_number_Invalid << 4 ) + ( le.src_apn_number_Invalid << 6 ) + ( le.tax_dt_apn_number_Invalid << 8 ) + ( le.src_census_tract_Invalid << 9 ) + ( le.tax_dt_census_tract_Invalid << 11 ) + ( le.src_range_Invalid << 12 ) + ( le.tax_dt_range_Invalid << 14 ) + ( le.src_zoning_Invalid << 15 ) + ( le.tax_dt_zoning_Invalid << 17 ) + ( le.src_block_number_Invalid << 18 ) + ( le.tax_dt_block_number_Invalid << 20 ) + ( le.county_name_Invalid << 21 ) + ( le.src_county_name_Invalid << 23 ) + ( le.tax_dt_county_name_Invalid << 25 ) + ( le.fips_code_Invalid << 26 ) + ( le.src_fips_code_Invalid << 28 ) + ( le.tax_dt_fips_code_Invalid << 30 ) + ( le.src_subdivision_Invalid << 31 ) + ( le.tax_dt_subdivision_Invalid << 33 ) + ( le.src_municipality_Invalid << 34 ) + ( le.tax_dt_municipality_Invalid << 36 ) + ( le.src_township_Invalid << 37 ) + ( le.tax_dt_township_Invalid << 39 ) + ( le.src_homestead_exemption_ind_Invalid << 40 ) + ( le.tax_dt_homestead_exemption_ind_Invalid << 42 ) + ( le.land_use_code_Invalid << 43 ) + ( le.src_land_use_code_Invalid << 44 ) + ( le.tax_dt_land_use_code_Invalid << 46 ) + ( le.src_latitude_Invalid << 47 ) + ( le.tax_dt_latitude_Invalid << 49 ) + ( le.src_longitude_Invalid << 50 ) + ( le.tax_dt_longitude_Invalid << 52 ) + ( le.location_influence_code_Invalid << 53 ) + ( le.src_location_influence_code_Invalid << 54 ) + ( le.tax_dt_location_influence_code_Invalid << 56 ) + ( le.src_acres_Invalid << 57 ) + ( le.tax_dt_acres_Invalid << 59 ) + ( le.src_lot_depth_footage_Invalid << 60 ) + ( le.tax_dt_lot_depth_footage_Invalid << 62 );
-    SELF.ScrubsBits4 := ( le.src_lot_front_footage_Invalid << 0 ) + ( le.tax_dt_lot_front_footage_Invalid << 2 ) + ( le.src_lot_number_Invalid << 3 ) + ( le.tax_dt_lot_number_Invalid << 5 ) + ( le.src_lot_size_Invalid << 6 ) + ( le.tax_dt_lot_size_Invalid << 8 ) + ( le.property_type_code_Invalid << 9 ) + ( le.src_property_type_code_Invalid << 10 ) + ( le.tax_dt_property_type_code_Invalid << 12 ) + ( le.structure_quality_Invalid << 13 ) + ( le.src_structure_quality_Invalid << 14 ) + ( le.tax_dt_structure_quality_Invalid << 16 ) + ( le.water_Invalid << 17 ) + ( le.src_water_Invalid << 18 ) + ( le.tax_dt_water_Invalid << 20 ) + ( le.sewer_Invalid << 21 ) + ( le.src_sewer_Invalid << 22 ) + ( le.tax_dt_sewer_Invalid << 24 ) + ( le.assessed_land_value_Invalid << 25 ) + ( le.src_assessed_land_value_Invalid << 27 ) + ( le.tax_dt_assessed_land_value_Invalid << 29 ) + ( le.assessed_year_Invalid << 30 ) + ( le.src_assessed_year_Invalid << 32 ) + ( le.tax_dt_assessed_year_Invalid << 34 ) + ( le.tax_amount_Invalid << 35 ) + ( le.src_tax_amount_Invalid << 37 ) + ( le.tax_dt_tax_amount_Invalid << 39 ) + ( le.tax_year_Invalid << 40 ) + ( le.src_tax_year_Invalid << 42 ) + ( le.market_land_value_Invalid << 44 ) + ( le.src_market_land_value_Invalid << 46 ) + ( le.tax_dt_market_land_value_Invalid << 48 ) + ( le.improvement_value_Invalid << 49 ) + ( le.src_improvement_value_Invalid << 51 ) + ( le.tax_dt_improvement_value_Invalid << 53 ) + ( le.src_percent_improved_Invalid << 54 ) + ( le.tax_dt_percent_improved_Invalid << 56 ) + ( le.total_assessed_value_Invalid << 57 ) + ( le.src_total_assessed_value_Invalid << 59 ) + ( le.tax_dt_total_assessed_value_Invalid << 61 ) + ( le.total_calculated_value_Invalid << 62 );
-    SELF.ScrubsBits5 := ( le.src_total_calculated_value_Invalid << 0 ) + ( le.tax_dt_total_calculated_value_Invalid << 2 ) + ( le.total_land_value_Invalid << 3 ) + ( le.src_total_land_value_Invalid << 5 ) + ( le.tax_dt_total_land_value_Invalid << 7 ) + ( le.total_market_value_Invalid << 8 ) + ( le.src_total_market_value_Invalid << 10 ) + ( le.tax_dt_total_market_value_Invalid << 12 ) + ( le.floor_type_Invalid << 13 ) + ( le.src_floor_type_Invalid << 14 ) + ( le.tax_dt_floor_type_Invalid << 16 ) + ( le.frame_type_Invalid << 17 ) + ( le.src_frame_type_Invalid << 18 ) + ( le.tax_dt_frame_type_Invalid << 20 ) + ( le.fuel_type_Invalid << 21 ) + ( le.src_fuel_type_Invalid << 22 ) + ( le.tax_dt_fuel_type_Invalid << 24 ) + ( le.no_of_bath_fixtures_Invalid << 25 ) + ( le.src_no_of_bath_fixtures_Invalid << 26 ) + ( le.tax_dt_no_of_bath_fixtures_Invalid << 28 ) + ( le.no_of_rooms_Invalid << 29 ) + ( le.src_no_of_rooms_Invalid << 30 ) + ( le.tax_dt_no_of_rooms_Invalid << 32 ) + ( le.no_of_units_Invalid << 33 ) + ( le.src_no_of_units_Invalid << 34 ) + ( le.tax_dt_no_of_units_Invalid << 36 ) + ( le.style_type_Invalid << 37 ) + ( le.src_style_type_Invalid << 38 ) + ( le.tax_dt_style_type_Invalid << 40 ) + ( le.assessment_document_number_Invalid << 41 ) + ( le.src_assessment_document_number_Invalid << 42 ) + ( le.tax_dt_assessment_document_number_Invalid << 44 ) + ( le.assessment_recording_date_Invalid << 45 ) + ( le.src_assessment_recording_date_Invalid << 46 ) + ( le.tax_dt_assessment_recording_date_Invalid << 48 ) + ( le.deed_document_number_Invalid << 49 ) + ( le.src_deed_document_number_Invalid << 50 ) + ( le.rec_dt_deed_document_number_Invalid << 52 ) + ( le.deed_recording_date_Invalid << 53 ) + ( le.src_deed_recording_date_Invalid << 54 ) + ( le.full_part_sale_Invalid << 56 ) + ( le.src_full_part_sale_Invalid << 57 ) + ( le.rec_dt_full_part_sale_Invalid << 59 ) + ( le.sale_amount_Invalid << 60 ) + ( le.src_sale_amount_Invalid << 62 );
-    SELF.ScrubsBits6 := ( le.rec_dt_sale_amount_Invalid << 0 ) + ( le.sale_date_Invalid << 1 ) + ( le.src_sale_date_Invalid << 2 ) + ( le.rec_dt_sale_date_Invalid << 4 ) + ( le.sale_type_code_Invalid << 5 ) + ( le.src_sale_type_code_Invalid << 6 ) + ( le.rec_dt_sale_type_code_Invalid << 8 ) + ( le.mortgage_company_name_Invalid << 9 ) + ( le.src_mortgage_company_name_Invalid << 10 ) + ( le.rec_dt_mortgage_company_name_Invalid << 12 ) + ( le.loan_amount_Invalid << 13 ) + ( le.src_loan_amount_Invalid << 15 ) + ( le.rec_dt_loan_amount_Invalid << 17 ) + ( le.second_loan_amount_Invalid << 18 ) + ( le.src_second_loan_amount_Invalid << 20 ) + ( le.rec_dt_second_loan_amount_Invalid << 22 ) + ( le.loan_type_code_Invalid << 23 ) + ( le.src_loan_type_code_Invalid << 24 ) + ( le.rec_dt_loan_type_code_Invalid << 26 ) + ( le.interest_rate_type_code_Invalid << 27 ) + ( le.src_interest_rate_type_code_Invalid << 28 ) + ( le.rec_dt_interest_rate_type_code_Invalid << 30 );
+    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 1 ) + ( le.tax_sortby_date_Invalid << 2 ) + ( le.deed_sortby_date_Invalid << 3 ) + ( le.fares_unformatted_apn_Invalid << 4 ) + ( le.property_street_address_Invalid << 5 ) + ( le.property_city_state_zip_Invalid << 6 ) + ( le.prim_range_Invalid << 7 ) + ( le.predir_Invalid << 8 ) + ( le.prim_name_Invalid << 9 ) + ( le.addr_suffix_Invalid << 10 ) + ( le.postdir_Invalid << 11 ) + ( le.unit_desig_Invalid << 12 ) + ( le.sec_range_Invalid << 13 ) + ( le.p_city_name_Invalid << 14 ) + ( le.v_city_name_Invalid << 15 ) + ( le.zip_Invalid << 16 ) + ( le.zip4_Invalid << 17 ) + ( le.building_square_footage_Invalid << 18 ) + ( le.src_building_square_footage_Invalid << 19 ) + ( le.tax_dt_building_square_footage_Invalid << 21 ) + ( le.air_conditioning_type_Invalid << 22 ) + ( le.src_air_conditioning_type_Invalid << 23 ) + ( le.tax_dt_air_conditioning_type_Invalid << 25 ) + ( le.basement_finish_Invalid << 26 ) + ( le.src_basement_finish_Invalid << 27 ) + ( le.tax_dt_basement_finish_Invalid << 29 ) + ( le.construction_type_Invalid << 30 ) + ( le.src_construction_type_Invalid << 31 ) + ( le.tax_dt_construction_type_Invalid << 33 ) + ( le.exterior_wall_Invalid << 34 ) + ( le.src_exterior_wall_Invalid << 35 ) + ( le.tax_dt_exterior_wall_Invalid << 37 ) + ( le.fireplace_ind_Invalid << 38 ) + ( le.src_fireplace_ind_Invalid << 39 ) + ( le.tax_dt_fireplace_ind_Invalid << 41 ) + ( le.fireplace_type_Invalid << 42 ) + ( le.src_fireplace_type_Invalid << 43 ) + ( le.tax_dt_fireplace_type_Invalid << 45 ) + ( le.src_flood_zone_panel_Invalid << 46 ) + ( le.tax_dt_flood_zone_panel_Invalid << 48 ) + ( le.garage_Invalid << 49 ) + ( le.src_garage_Invalid << 50 ) + ( le.tax_dt_garage_Invalid << 52 ) + ( le.first_floor_square_footage_Invalid << 53 ) + ( le.src_first_floor_square_footage_Invalid << 54 ) + ( le.tax_dt_first_floor_square_footage_Invalid << 56 ) + ( le.heating_Invalid << 57 ) + ( le.src_heating_Invalid << 58 ) + ( le.tax_dt_heating_Invalid << 60 ) + ( le.living_area_square_footage_Invalid << 61 ) + ( le.src_living_area_square_footage_Invalid << 62 );
+    SELF.ScrubsBits2 := ( le.tax_dt_living_area_square_footage_Invalid << 0 ) + ( le.no_of_baths_Invalid << 1 ) + ( le.src_no_of_baths_Invalid << 2 ) + ( le.tax_dt_no_of_baths_Invalid << 4 ) + ( le.no_of_bedrooms_Invalid << 5 ) + ( le.src_no_of_bedrooms_Invalid << 6 ) + ( le.tax_dt_no_of_bedrooms_Invalid << 8 ) + ( le.no_of_fireplaces_Invalid << 9 ) + ( le.src_no_of_fireplaces_Invalid << 10 ) + ( le.tax_dt_no_of_fireplaces_Invalid << 12 ) + ( le.no_of_full_baths_Invalid << 13 ) + ( le.src_no_of_full_baths_Invalid << 14 ) + ( le.tax_dt_no_of_full_baths_Invalid << 16 ) + ( le.no_of_half_baths_Invalid << 17 ) + ( le.src_no_of_half_baths_Invalid << 18 ) + ( le.tax_dt_no_of_half_baths_Invalid << 20 ) + ( le.no_of_stories_Invalid << 21 ) + ( le.src_no_of_stories_Invalid << 22 ) + ( le.tax_dt_no_of_stories_Invalid << 24 ) + ( le.parking_type_Invalid << 25 ) + ( le.src_parking_type_Invalid << 26 ) + ( le.tax_dt_parking_type_Invalid << 28 ) + ( le.src_pool_indicator_Invalid << 29 ) + ( le.tax_dt_pool_indicator_Invalid << 31 ) + ( le.pool_type_Invalid << 32 ) + ( le.src_pool_type_Invalid << 33 ) + ( le.tax_dt_pool_type_Invalid << 35 ) + ( le.roof_cover_Invalid << 36 ) + ( le.src_roof_cover_Invalid << 37 ) + ( le.tax_dt_roof_cover_Invalid << 39 ) + ( le.year_built_Invalid << 40 ) + ( le.src_year_built_Invalid << 42 ) + ( le.tax_dt_year_built_Invalid << 44 ) + ( le.foundation_Invalid << 45 ) + ( le.src_foundation_Invalid << 46 ) + ( le.tax_dt_foundation_Invalid << 48 ) + ( le.basement_square_footage_Invalid << 49 ) + ( le.src_basement_square_footage_Invalid << 50 ) + ( le.tax_dt_basement_square_footage_Invalid << 52 ) + ( le.effective_year_built_Invalid << 53 ) + ( le.src_effective_year_built_Invalid << 55 ) + ( le.tax_dt_effective_year_built_Invalid << 57 ) + ( le.garage_square_footage_Invalid << 58 ) + ( le.src_garage_square_footage_Invalid << 59 ) + ( le.tax_dt_garage_square_footage_Invalid << 61 ) + ( le.stories_type_Invalid << 62 );
+    SELF.ScrubsBits3 := ( le.src_stories_type_Invalid << 0 ) + ( le.tax_dt_stories_type_Invalid << 2 ) + ( le.apn_number_Invalid << 3 ) + ( le.src_apn_number_Invalid << 4 ) + ( le.tax_dt_apn_number_Invalid << 6 ) + ( le.src_census_tract_Invalid << 7 ) + ( le.tax_dt_census_tract_Invalid << 9 ) + ( le.src_range_Invalid << 10 ) + ( le.tax_dt_range_Invalid << 12 ) + ( le.src_zoning_Invalid << 13 ) + ( le.tax_dt_zoning_Invalid << 15 ) + ( le.src_block_number_Invalid << 16 ) + ( le.tax_dt_block_number_Invalid << 18 ) + ( le.county_name_Invalid << 19 ) + ( le.src_county_name_Invalid << 21 ) + ( le.tax_dt_county_name_Invalid << 23 ) + ( le.fips_code_Invalid << 24 ) + ( le.src_fips_code_Invalid << 26 ) + ( le.tax_dt_fips_code_Invalid << 28 ) + ( le.src_subdivision_Invalid << 29 ) + ( le.tax_dt_subdivision_Invalid << 31 ) + ( le.src_municipality_Invalid << 32 ) + ( le.tax_dt_municipality_Invalid << 34 ) + ( le.src_township_Invalid << 35 ) + ( le.tax_dt_township_Invalid << 37 ) + ( le.src_homestead_exemption_ind_Invalid << 38 ) + ( le.tax_dt_homestead_exemption_ind_Invalid << 40 ) + ( le.land_use_code_Invalid << 41 ) + ( le.src_land_use_code_Invalid << 42 ) + ( le.tax_dt_land_use_code_Invalid << 44 ) + ( le.src_latitude_Invalid << 45 ) + ( le.tax_dt_latitude_Invalid << 47 ) + ( le.src_longitude_Invalid << 48 ) + ( le.tax_dt_longitude_Invalid << 50 ) + ( le.location_influence_code_Invalid << 51 ) + ( le.src_location_influence_code_Invalid << 52 ) + ( le.tax_dt_location_influence_code_Invalid << 54 ) + ( le.src_acres_Invalid << 55 ) + ( le.tax_dt_acres_Invalid << 57 ) + ( le.src_lot_depth_footage_Invalid << 58 ) + ( le.tax_dt_lot_depth_footage_Invalid << 60 ) + ( le.src_lot_front_footage_Invalid << 61 ) + ( le.tax_dt_lot_front_footage_Invalid << 63 );
+    SELF.ScrubsBits4 := ( le.src_lot_number_Invalid << 0 ) + ( le.tax_dt_lot_number_Invalid << 2 ) + ( le.src_lot_size_Invalid << 3 ) + ( le.tax_dt_lot_size_Invalid << 5 ) + ( le.property_type_code_Invalid << 6 ) + ( le.src_property_type_code_Invalid << 7 ) + ( le.tax_dt_property_type_code_Invalid << 9 ) + ( le.structure_quality_Invalid << 10 ) + ( le.src_structure_quality_Invalid << 11 ) + ( le.tax_dt_structure_quality_Invalid << 13 ) + ( le.water_Invalid << 14 ) + ( le.src_water_Invalid << 15 ) + ( le.tax_dt_water_Invalid << 17 ) + ( le.sewer_Invalid << 18 ) + ( le.src_sewer_Invalid << 19 ) + ( le.tax_dt_sewer_Invalid << 21 ) + ( le.assessed_land_value_Invalid << 22 ) + ( le.src_assessed_land_value_Invalid << 23 ) + ( le.tax_dt_assessed_land_value_Invalid << 25 ) + ( le.assessed_year_Invalid << 26 ) + ( le.src_assessed_year_Invalid << 28 ) + ( le.tax_dt_assessed_year_Invalid << 30 ) + ( le.tax_amount_Invalid << 31 ) + ( le.src_tax_amount_Invalid << 32 ) + ( le.tax_dt_tax_amount_Invalid << 34 ) + ( le.tax_year_Invalid << 35 ) + ( le.src_tax_year_Invalid << 37 ) + ( le.market_land_value_Invalid << 39 ) + ( le.src_market_land_value_Invalid << 40 ) + ( le.tax_dt_market_land_value_Invalid << 42 ) + ( le.improvement_value_Invalid << 43 ) + ( le.src_improvement_value_Invalid << 44 ) + ( le.tax_dt_improvement_value_Invalid << 46 ) + ( le.src_percent_improved_Invalid << 47 ) + ( le.tax_dt_percent_improved_Invalid << 49 ) + ( le.total_assessed_value_Invalid << 50 ) + ( le.src_total_assessed_value_Invalid << 51 ) + ( le.tax_dt_total_assessed_value_Invalid << 53 ) + ( le.total_calculated_value_Invalid << 54 ) + ( le.src_total_calculated_value_Invalid << 55 ) + ( le.tax_dt_total_calculated_value_Invalid << 57 ) + ( le.total_land_value_Invalid << 58 ) + ( le.src_total_land_value_Invalid << 59 ) + ( le.tax_dt_total_land_value_Invalid << 61 ) + ( le.total_market_value_Invalid << 62 );
+    SELF.ScrubsBits5 := ( le.src_total_market_value_Invalid << 0 ) + ( le.tax_dt_total_market_value_Invalid << 2 ) + ( le.floor_type_Invalid << 3 ) + ( le.src_floor_type_Invalid << 4 ) + ( le.tax_dt_floor_type_Invalid << 6 ) + ( le.frame_type_Invalid << 7 ) + ( le.src_frame_type_Invalid << 8 ) + ( le.tax_dt_frame_type_Invalid << 10 ) + ( le.fuel_type_Invalid << 11 ) + ( le.src_fuel_type_Invalid << 12 ) + ( le.tax_dt_fuel_type_Invalid << 14 ) + ( le.no_of_bath_fixtures_Invalid << 15 ) + ( le.src_no_of_bath_fixtures_Invalid << 16 ) + ( le.tax_dt_no_of_bath_fixtures_Invalid << 18 ) + ( le.no_of_rooms_Invalid << 19 ) + ( le.src_no_of_rooms_Invalid << 20 ) + ( le.tax_dt_no_of_rooms_Invalid << 22 ) + ( le.no_of_units_Invalid << 23 ) + ( le.src_no_of_units_Invalid << 24 ) + ( le.tax_dt_no_of_units_Invalid << 26 ) + ( le.style_type_Invalid << 27 ) + ( le.src_style_type_Invalid << 28 ) + ( le.tax_dt_style_type_Invalid << 30 ) + ( le.assessment_document_number_Invalid << 31 ) + ( le.src_assessment_document_number_Invalid << 32 ) + ( le.tax_dt_assessment_document_number_Invalid << 34 ) + ( le.assessment_recording_date_Invalid << 35 ) + ( le.src_assessment_recording_date_Invalid << 36 ) + ( le.tax_dt_assessment_recording_date_Invalid << 38 ) + ( le.deed_document_number_Invalid << 39 ) + ( le.src_deed_document_number_Invalid << 40 ) + ( le.rec_dt_deed_document_number_Invalid << 42 ) + ( le.deed_recording_date_Invalid << 43 ) + ( le.src_deed_recording_date_Invalid << 44 ) + ( le.full_part_sale_Invalid << 46 ) + ( le.src_full_part_sale_Invalid << 47 ) + ( le.rec_dt_full_part_sale_Invalid << 49 ) + ( le.sale_amount_Invalid << 50 ) + ( le.src_sale_amount_Invalid << 51 ) + ( le.rec_dt_sale_amount_Invalid << 53 ) + ( le.sale_date_Invalid << 54 ) + ( le.src_sale_date_Invalid << 55 ) + ( le.rec_dt_sale_date_Invalid << 57 ) + ( le.sale_type_code_Invalid << 58 ) + ( le.src_sale_type_code_Invalid << 59 ) + ( le.rec_dt_sale_type_code_Invalid << 61 ) + ( le.mortgage_company_name_Invalid << 62 );
+    SELF.ScrubsBits6 := ( le.src_mortgage_company_name_Invalid << 0 ) + ( le.rec_dt_mortgage_company_name_Invalid << 2 ) + ( le.loan_amount_Invalid << 3 ) + ( le.src_loan_amount_Invalid << 4 ) + ( le.rec_dt_loan_amount_Invalid << 6 ) + ( le.second_loan_amount_Invalid << 7 ) + ( le.src_second_loan_amount_Invalid << 8 ) + ( le.rec_dt_second_loan_amount_Invalid << 10 ) + ( le.loan_type_code_Invalid << 11 ) + ( le.src_loan_type_code_Invalid << 12 ) + ( le.rec_dt_loan_type_code_Invalid << 14 ) + ( le.interest_rate_type_code_Invalid << 15 ) + ( le.src_interest_rate_type_code_Invalid << 16 ) + ( le.rec_dt_interest_rate_type_code_Invalid << 18 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -1067,249 +1067,249 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.dt_vendor_last_reported_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.tax_sortby_date_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.deed_sortby_date_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.fares_unformatted_apn_Invalid := (le.ScrubsBits1 >> 4) & 3;
-    SELF.property_street_address_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.property_city_state_zip_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.prim_range_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.predir_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.prim_name_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.addr_suffix_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.postdir_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.unit_desig_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.sec_range_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.p_city_name_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.v_city_name_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.zip_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.zip4_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.building_square_footage_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.src_building_square_footage_Invalid := (le.ScrubsBits1 >> 20) & 3;
-    SELF.tax_dt_building_square_footage_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.air_conditioning_type_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.src_air_conditioning_type_Invalid := (le.ScrubsBits1 >> 24) & 3;
-    SELF.tax_dt_air_conditioning_type_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.basement_finish_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.src_basement_finish_Invalid := (le.ScrubsBits1 >> 28) & 3;
-    SELF.tax_dt_basement_finish_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.construction_type_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.src_construction_type_Invalid := (le.ScrubsBits1 >> 32) & 3;
-    SELF.tax_dt_construction_type_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.exterior_wall_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.src_exterior_wall_Invalid := (le.ScrubsBits1 >> 36) & 3;
-    SELF.tax_dt_exterior_wall_Invalid := (le.ScrubsBits1 >> 38) & 1;
-    SELF.fireplace_ind_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.src_fireplace_ind_Invalid := (le.ScrubsBits1 >> 40) & 3;
-    SELF.tax_dt_fireplace_ind_Invalid := (le.ScrubsBits1 >> 42) & 1;
-    SELF.fireplace_type_Invalid := (le.ScrubsBits1 >> 43) & 1;
-    SELF.src_fireplace_type_Invalid := (le.ScrubsBits1 >> 44) & 3;
-    SELF.tax_dt_fireplace_type_Invalid := (le.ScrubsBits1 >> 46) & 1;
-    SELF.src_flood_zone_panel_Invalid := (le.ScrubsBits1 >> 47) & 3;
-    SELF.tax_dt_flood_zone_panel_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.garage_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.src_garage_Invalid := (le.ScrubsBits1 >> 51) & 3;
-    SELF.tax_dt_garage_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.src_first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 55) & 3;
-    SELF.tax_dt_first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 57) & 1;
-    SELF.heating_Invalid := (le.ScrubsBits1 >> 58) & 1;
-    SELF.src_heating_Invalid := (le.ScrubsBits1 >> 59) & 3;
-    SELF.tax_dt_heating_Invalid := (le.ScrubsBits1 >> 61) & 1;
-    SELF.living_area_square_footage_Invalid := (le.ScrubsBits1 >> 62) & 1;
-    SELF.src_living_area_square_footage_Invalid := (le.ScrubsBits2 >> 0) & 3;
-    SELF.tax_dt_living_area_square_footage_Invalid := (le.ScrubsBits2 >> 2) & 1;
-    SELF.no_of_baths_Invalid := (le.ScrubsBits2 >> 3) & 1;
-    SELF.src_no_of_baths_Invalid := (le.ScrubsBits2 >> 4) & 3;
-    SELF.tax_dt_no_of_baths_Invalid := (le.ScrubsBits2 >> 6) & 1;
-    SELF.no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 7) & 1;
-    SELF.src_no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 8) & 3;
-    SELF.tax_dt_no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 10) & 1;
-    SELF.no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 11) & 1;
-    SELF.src_no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 12) & 3;
-    SELF.tax_dt_no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 14) & 1;
-    SELF.no_of_full_baths_Invalid := (le.ScrubsBits2 >> 15) & 1;
-    SELF.src_no_of_full_baths_Invalid := (le.ScrubsBits2 >> 16) & 3;
-    SELF.tax_dt_no_of_full_baths_Invalid := (le.ScrubsBits2 >> 18) & 1;
-    SELF.no_of_half_baths_Invalid := (le.ScrubsBits2 >> 19) & 1;
-    SELF.src_no_of_half_baths_Invalid := (le.ScrubsBits2 >> 20) & 3;
-    SELF.tax_dt_no_of_half_baths_Invalid := (le.ScrubsBits2 >> 22) & 1;
-    SELF.no_of_stories_Invalid := (le.ScrubsBits2 >> 23) & 1;
-    SELF.src_no_of_stories_Invalid := (le.ScrubsBits2 >> 24) & 3;
-    SELF.tax_dt_no_of_stories_Invalid := (le.ScrubsBits2 >> 26) & 1;
-    SELF.parking_type_Invalid := (le.ScrubsBits2 >> 27) & 1;
-    SELF.src_parking_type_Invalid := (le.ScrubsBits2 >> 28) & 3;
-    SELF.tax_dt_parking_type_Invalid := (le.ScrubsBits2 >> 30) & 1;
-    SELF.src_pool_indicator_Invalid := (le.ScrubsBits2 >> 31) & 3;
-    SELF.tax_dt_pool_indicator_Invalid := (le.ScrubsBits2 >> 33) & 1;
-    SELF.pool_type_Invalid := (le.ScrubsBits2 >> 34) & 1;
-    SELF.src_pool_type_Invalid := (le.ScrubsBits2 >> 35) & 3;
-    SELF.tax_dt_pool_type_Invalid := (le.ScrubsBits2 >> 37) & 1;
-    SELF.roof_cover_Invalid := (le.ScrubsBits2 >> 38) & 1;
-    SELF.src_roof_cover_Invalid := (le.ScrubsBits2 >> 39) & 3;
-    SELF.tax_dt_roof_cover_Invalid := (le.ScrubsBits2 >> 41) & 1;
-    SELF.year_built_Invalid := (le.ScrubsBits2 >> 42) & 3;
-    SELF.src_year_built_Invalid := (le.ScrubsBits2 >> 44) & 3;
-    SELF.tax_dt_year_built_Invalid := (le.ScrubsBits2 >> 46) & 1;
-    SELF.foundation_Invalid := (le.ScrubsBits2 >> 47) & 1;
-    SELF.src_foundation_Invalid := (le.ScrubsBits2 >> 48) & 3;
-    SELF.tax_dt_foundation_Invalid := (le.ScrubsBits2 >> 50) & 1;
-    SELF.basement_square_footage_Invalid := (le.ScrubsBits2 >> 51) & 1;
-    SELF.src_basement_square_footage_Invalid := (le.ScrubsBits2 >> 52) & 3;
-    SELF.tax_dt_basement_square_footage_Invalid := (le.ScrubsBits2 >> 54) & 1;
-    SELF.effective_year_built_Invalid := (le.ScrubsBits2 >> 55) & 3;
-    SELF.src_effective_year_built_Invalid := (le.ScrubsBits2 >> 57) & 3;
-    SELF.tax_dt_effective_year_built_Invalid := (le.ScrubsBits2 >> 59) & 1;
-    SELF.garage_square_footage_Invalid := (le.ScrubsBits2 >> 60) & 1;
-    SELF.src_garage_square_footage_Invalid := (le.ScrubsBits2 >> 61) & 3;
-    SELF.tax_dt_garage_square_footage_Invalid := (le.ScrubsBits2 >> 63) & 1;
-    SELF.stories_type_Invalid := (le.ScrubsBits3 >> 0) & 1;
-    SELF.src_stories_type_Invalid := (le.ScrubsBits3 >> 1) & 3;
-    SELF.tax_dt_stories_type_Invalid := (le.ScrubsBits3 >> 3) & 1;
-    SELF.apn_number_Invalid := (le.ScrubsBits3 >> 4) & 3;
-    SELF.src_apn_number_Invalid := (le.ScrubsBits3 >> 6) & 3;
-    SELF.tax_dt_apn_number_Invalid := (le.ScrubsBits3 >> 8) & 1;
-    SELF.src_census_tract_Invalid := (le.ScrubsBits3 >> 9) & 3;
-    SELF.tax_dt_census_tract_Invalid := (le.ScrubsBits3 >> 11) & 1;
-    SELF.src_range_Invalid := (le.ScrubsBits3 >> 12) & 3;
-    SELF.tax_dt_range_Invalid := (le.ScrubsBits3 >> 14) & 1;
-    SELF.src_zoning_Invalid := (le.ScrubsBits3 >> 15) & 3;
-    SELF.tax_dt_zoning_Invalid := (le.ScrubsBits3 >> 17) & 1;
-    SELF.src_block_number_Invalid := (le.ScrubsBits3 >> 18) & 3;
-    SELF.tax_dt_block_number_Invalid := (le.ScrubsBits3 >> 20) & 1;
-    SELF.county_name_Invalid := (le.ScrubsBits3 >> 21) & 3;
-    SELF.src_county_name_Invalid := (le.ScrubsBits3 >> 23) & 3;
-    SELF.tax_dt_county_name_Invalid := (le.ScrubsBits3 >> 25) & 1;
-    SELF.fips_code_Invalid := (le.ScrubsBits3 >> 26) & 3;
-    SELF.src_fips_code_Invalid := (le.ScrubsBits3 >> 28) & 3;
-    SELF.tax_dt_fips_code_Invalid := (le.ScrubsBits3 >> 30) & 1;
-    SELF.src_subdivision_Invalid := (le.ScrubsBits3 >> 31) & 3;
-    SELF.tax_dt_subdivision_Invalid := (le.ScrubsBits3 >> 33) & 1;
-    SELF.src_municipality_Invalid := (le.ScrubsBits3 >> 34) & 3;
-    SELF.tax_dt_municipality_Invalid := (le.ScrubsBits3 >> 36) & 1;
-    SELF.src_township_Invalid := (le.ScrubsBits3 >> 37) & 3;
-    SELF.tax_dt_township_Invalid := (le.ScrubsBits3 >> 39) & 1;
-    SELF.src_homestead_exemption_ind_Invalid := (le.ScrubsBits3 >> 40) & 3;
-    SELF.tax_dt_homestead_exemption_ind_Invalid := (le.ScrubsBits3 >> 42) & 1;
-    SELF.land_use_code_Invalid := (le.ScrubsBits3 >> 43) & 1;
-    SELF.src_land_use_code_Invalid := (le.ScrubsBits3 >> 44) & 3;
-    SELF.tax_dt_land_use_code_Invalid := (le.ScrubsBits3 >> 46) & 1;
-    SELF.src_latitude_Invalid := (le.ScrubsBits3 >> 47) & 3;
-    SELF.tax_dt_latitude_Invalid := (le.ScrubsBits3 >> 49) & 1;
-    SELF.src_longitude_Invalid := (le.ScrubsBits3 >> 50) & 3;
-    SELF.tax_dt_longitude_Invalid := (le.ScrubsBits3 >> 52) & 1;
-    SELF.location_influence_code_Invalid := (le.ScrubsBits3 >> 53) & 1;
-    SELF.src_location_influence_code_Invalid := (le.ScrubsBits3 >> 54) & 3;
-    SELF.tax_dt_location_influence_code_Invalid := (le.ScrubsBits3 >> 56) & 1;
-    SELF.src_acres_Invalid := (le.ScrubsBits3 >> 57) & 3;
-    SELF.tax_dt_acres_Invalid := (le.ScrubsBits3 >> 59) & 1;
-    SELF.src_lot_depth_footage_Invalid := (le.ScrubsBits3 >> 60) & 3;
-    SELF.tax_dt_lot_depth_footage_Invalid := (le.ScrubsBits3 >> 62) & 1;
-    SELF.src_lot_front_footage_Invalid := (le.ScrubsBits4 >> 0) & 3;
-    SELF.tax_dt_lot_front_footage_Invalid := (le.ScrubsBits4 >> 2) & 1;
-    SELF.src_lot_number_Invalid := (le.ScrubsBits4 >> 3) & 3;
-    SELF.tax_dt_lot_number_Invalid := (le.ScrubsBits4 >> 5) & 1;
-    SELF.src_lot_size_Invalid := (le.ScrubsBits4 >> 6) & 3;
-    SELF.tax_dt_lot_size_Invalid := (le.ScrubsBits4 >> 8) & 1;
-    SELF.property_type_code_Invalid := (le.ScrubsBits4 >> 9) & 1;
-    SELF.src_property_type_code_Invalid := (le.ScrubsBits4 >> 10) & 3;
-    SELF.tax_dt_property_type_code_Invalid := (le.ScrubsBits4 >> 12) & 1;
-    SELF.structure_quality_Invalid := (le.ScrubsBits4 >> 13) & 1;
-    SELF.src_structure_quality_Invalid := (le.ScrubsBits4 >> 14) & 3;
-    SELF.tax_dt_structure_quality_Invalid := (le.ScrubsBits4 >> 16) & 1;
-    SELF.water_Invalid := (le.ScrubsBits4 >> 17) & 1;
-    SELF.src_water_Invalid := (le.ScrubsBits4 >> 18) & 3;
-    SELF.tax_dt_water_Invalid := (le.ScrubsBits4 >> 20) & 1;
-    SELF.sewer_Invalid := (le.ScrubsBits4 >> 21) & 1;
-    SELF.src_sewer_Invalid := (le.ScrubsBits4 >> 22) & 3;
-    SELF.tax_dt_sewer_Invalid := (le.ScrubsBits4 >> 24) & 1;
-    SELF.assessed_land_value_Invalid := (le.ScrubsBits4 >> 25) & 3;
-    SELF.src_assessed_land_value_Invalid := (le.ScrubsBits4 >> 27) & 3;
-    SELF.tax_dt_assessed_land_value_Invalid := (le.ScrubsBits4 >> 29) & 1;
-    SELF.assessed_year_Invalid := (le.ScrubsBits4 >> 30) & 3;
-    SELF.src_assessed_year_Invalid := (le.ScrubsBits4 >> 32) & 3;
-    SELF.tax_dt_assessed_year_Invalid := (le.ScrubsBits4 >> 34) & 1;
-    SELF.tax_amount_Invalid := (le.ScrubsBits4 >> 35) & 3;
-    SELF.src_tax_amount_Invalid := (le.ScrubsBits4 >> 37) & 3;
-    SELF.tax_dt_tax_amount_Invalid := (le.ScrubsBits4 >> 39) & 1;
-    SELF.tax_year_Invalid := (le.ScrubsBits4 >> 40) & 3;
-    SELF.src_tax_year_Invalid := (le.ScrubsBits4 >> 42) & 3;
-    SELF.market_land_value_Invalid := (le.ScrubsBits4 >> 44) & 3;
-    SELF.src_market_land_value_Invalid := (le.ScrubsBits4 >> 46) & 3;
-    SELF.tax_dt_market_land_value_Invalid := (le.ScrubsBits4 >> 48) & 1;
-    SELF.improvement_value_Invalid := (le.ScrubsBits4 >> 49) & 3;
-    SELF.src_improvement_value_Invalid := (le.ScrubsBits4 >> 51) & 3;
-    SELF.tax_dt_improvement_value_Invalid := (le.ScrubsBits4 >> 53) & 1;
-    SELF.src_percent_improved_Invalid := (le.ScrubsBits4 >> 54) & 3;
-    SELF.tax_dt_percent_improved_Invalid := (le.ScrubsBits4 >> 56) & 1;
-    SELF.total_assessed_value_Invalid := (le.ScrubsBits4 >> 57) & 3;
-    SELF.src_total_assessed_value_Invalid := (le.ScrubsBits4 >> 59) & 3;
-    SELF.tax_dt_total_assessed_value_Invalid := (le.ScrubsBits4 >> 61) & 1;
-    SELF.total_calculated_value_Invalid := (le.ScrubsBits4 >> 62) & 3;
-    SELF.src_total_calculated_value_Invalid := (le.ScrubsBits5 >> 0) & 3;
-    SELF.tax_dt_total_calculated_value_Invalid := (le.ScrubsBits5 >> 2) & 1;
-    SELF.total_land_value_Invalid := (le.ScrubsBits5 >> 3) & 3;
-    SELF.src_total_land_value_Invalid := (le.ScrubsBits5 >> 5) & 3;
-    SELF.tax_dt_total_land_value_Invalid := (le.ScrubsBits5 >> 7) & 1;
-    SELF.total_market_value_Invalid := (le.ScrubsBits5 >> 8) & 3;
-    SELF.src_total_market_value_Invalid := (le.ScrubsBits5 >> 10) & 3;
-    SELF.tax_dt_total_market_value_Invalid := (le.ScrubsBits5 >> 12) & 1;
-    SELF.floor_type_Invalid := (le.ScrubsBits5 >> 13) & 1;
-    SELF.src_floor_type_Invalid := (le.ScrubsBits5 >> 14) & 3;
-    SELF.tax_dt_floor_type_Invalid := (le.ScrubsBits5 >> 16) & 1;
-    SELF.frame_type_Invalid := (le.ScrubsBits5 >> 17) & 1;
-    SELF.src_frame_type_Invalid := (le.ScrubsBits5 >> 18) & 3;
-    SELF.tax_dt_frame_type_Invalid := (le.ScrubsBits5 >> 20) & 1;
-    SELF.fuel_type_Invalid := (le.ScrubsBits5 >> 21) & 1;
-    SELF.src_fuel_type_Invalid := (le.ScrubsBits5 >> 22) & 3;
-    SELF.tax_dt_fuel_type_Invalid := (le.ScrubsBits5 >> 24) & 1;
-    SELF.no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 25) & 1;
-    SELF.src_no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 26) & 3;
-    SELF.tax_dt_no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 28) & 1;
-    SELF.no_of_rooms_Invalid := (le.ScrubsBits5 >> 29) & 1;
-    SELF.src_no_of_rooms_Invalid := (le.ScrubsBits5 >> 30) & 3;
-    SELF.tax_dt_no_of_rooms_Invalid := (le.ScrubsBits5 >> 32) & 1;
-    SELF.no_of_units_Invalid := (le.ScrubsBits5 >> 33) & 1;
-    SELF.src_no_of_units_Invalid := (le.ScrubsBits5 >> 34) & 3;
-    SELF.tax_dt_no_of_units_Invalid := (le.ScrubsBits5 >> 36) & 1;
-    SELF.style_type_Invalid := (le.ScrubsBits5 >> 37) & 1;
-    SELF.src_style_type_Invalid := (le.ScrubsBits5 >> 38) & 3;
-    SELF.tax_dt_style_type_Invalid := (le.ScrubsBits5 >> 40) & 1;
-    SELF.assessment_document_number_Invalid := (le.ScrubsBits5 >> 41) & 1;
-    SELF.src_assessment_document_number_Invalid := (le.ScrubsBits5 >> 42) & 3;
-    SELF.tax_dt_assessment_document_number_Invalid := (le.ScrubsBits5 >> 44) & 1;
-    SELF.assessment_recording_date_Invalid := (le.ScrubsBits5 >> 45) & 1;
-    SELF.src_assessment_recording_date_Invalid := (le.ScrubsBits5 >> 46) & 3;
-    SELF.tax_dt_assessment_recording_date_Invalid := (le.ScrubsBits5 >> 48) & 1;
-    SELF.deed_document_number_Invalid := (le.ScrubsBits5 >> 49) & 1;
-    SELF.src_deed_document_number_Invalid := (le.ScrubsBits5 >> 50) & 3;
-    SELF.rec_dt_deed_document_number_Invalid := (le.ScrubsBits5 >> 52) & 1;
-    SELF.deed_recording_date_Invalid := (le.ScrubsBits5 >> 53) & 1;
-    SELF.src_deed_recording_date_Invalid := (le.ScrubsBits5 >> 54) & 3;
-    SELF.full_part_sale_Invalid := (le.ScrubsBits5 >> 56) & 1;
-    SELF.src_full_part_sale_Invalid := (le.ScrubsBits5 >> 57) & 3;
-    SELF.rec_dt_full_part_sale_Invalid := (le.ScrubsBits5 >> 59) & 1;
-    SELF.sale_amount_Invalid := (le.ScrubsBits5 >> 60) & 3;
-    SELF.src_sale_amount_Invalid := (le.ScrubsBits5 >> 62) & 3;
-    SELF.rec_dt_sale_amount_Invalid := (le.ScrubsBits6 >> 0) & 1;
-    SELF.sale_date_Invalid := (le.ScrubsBits6 >> 1) & 1;
-    SELF.src_sale_date_Invalid := (le.ScrubsBits6 >> 2) & 3;
-    SELF.rec_dt_sale_date_Invalid := (le.ScrubsBits6 >> 4) & 1;
-    SELF.sale_type_code_Invalid := (le.ScrubsBits6 >> 5) & 1;
-    SELF.src_sale_type_code_Invalid := (le.ScrubsBits6 >> 6) & 3;
-    SELF.rec_dt_sale_type_code_Invalid := (le.ScrubsBits6 >> 8) & 1;
-    SELF.mortgage_company_name_Invalid := (le.ScrubsBits6 >> 9) & 1;
-    SELF.src_mortgage_company_name_Invalid := (le.ScrubsBits6 >> 10) & 3;
-    SELF.rec_dt_mortgage_company_name_Invalid := (le.ScrubsBits6 >> 12) & 1;
-    SELF.loan_amount_Invalid := (le.ScrubsBits6 >> 13) & 3;
-    SELF.src_loan_amount_Invalid := (le.ScrubsBits6 >> 15) & 3;
-    SELF.rec_dt_loan_amount_Invalid := (le.ScrubsBits6 >> 17) & 1;
-    SELF.second_loan_amount_Invalid := (le.ScrubsBits6 >> 18) & 3;
-    SELF.src_second_loan_amount_Invalid := (le.ScrubsBits6 >> 20) & 3;
-    SELF.rec_dt_second_loan_amount_Invalid := (le.ScrubsBits6 >> 22) & 1;
-    SELF.loan_type_code_Invalid := (le.ScrubsBits6 >> 23) & 1;
-    SELF.src_loan_type_code_Invalid := (le.ScrubsBits6 >> 24) & 3;
-    SELF.rec_dt_loan_type_code_Invalid := (le.ScrubsBits6 >> 26) & 1;
-    SELF.interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 27) & 1;
-    SELF.src_interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 28) & 3;
-    SELF.rec_dt_interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 30) & 1;
+    SELF.fares_unformatted_apn_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.property_street_address_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.property_city_state_zip_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.prim_range_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.predir_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.prim_name_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.addr_suffix_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.postdir_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.unit_desig_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.sec_range_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.p_city_name_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.v_city_name_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.zip_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.zip4_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.building_square_footage_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.src_building_square_footage_Invalid := (le.ScrubsBits1 >> 19) & 3;
+    SELF.tax_dt_building_square_footage_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.air_conditioning_type_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.src_air_conditioning_type_Invalid := (le.ScrubsBits1 >> 23) & 3;
+    SELF.tax_dt_air_conditioning_type_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.basement_finish_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.src_basement_finish_Invalid := (le.ScrubsBits1 >> 27) & 3;
+    SELF.tax_dt_basement_finish_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.construction_type_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.src_construction_type_Invalid := (le.ScrubsBits1 >> 31) & 3;
+    SELF.tax_dt_construction_type_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.exterior_wall_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.src_exterior_wall_Invalid := (le.ScrubsBits1 >> 35) & 3;
+    SELF.tax_dt_exterior_wall_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.fireplace_ind_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.src_fireplace_ind_Invalid := (le.ScrubsBits1 >> 39) & 3;
+    SELF.tax_dt_fireplace_ind_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.fireplace_type_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.src_fireplace_type_Invalid := (le.ScrubsBits1 >> 43) & 3;
+    SELF.tax_dt_fireplace_type_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.src_flood_zone_panel_Invalid := (le.ScrubsBits1 >> 46) & 3;
+    SELF.tax_dt_flood_zone_panel_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.garage_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.src_garage_Invalid := (le.ScrubsBits1 >> 50) & 3;
+    SELF.tax_dt_garage_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 53) & 1;
+    SELF.src_first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 54) & 3;
+    SELF.tax_dt_first_floor_square_footage_Invalid := (le.ScrubsBits1 >> 56) & 1;
+    SELF.heating_Invalid := (le.ScrubsBits1 >> 57) & 1;
+    SELF.src_heating_Invalid := (le.ScrubsBits1 >> 58) & 3;
+    SELF.tax_dt_heating_Invalid := (le.ScrubsBits1 >> 60) & 1;
+    SELF.living_area_square_footage_Invalid := (le.ScrubsBits1 >> 61) & 1;
+    SELF.src_living_area_square_footage_Invalid := (le.ScrubsBits1 >> 62) & 3;
+    SELF.tax_dt_living_area_square_footage_Invalid := (le.ScrubsBits2 >> 0) & 1;
+    SELF.no_of_baths_Invalid := (le.ScrubsBits2 >> 1) & 1;
+    SELF.src_no_of_baths_Invalid := (le.ScrubsBits2 >> 2) & 3;
+    SELF.tax_dt_no_of_baths_Invalid := (le.ScrubsBits2 >> 4) & 1;
+    SELF.no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 5) & 1;
+    SELF.src_no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 6) & 3;
+    SELF.tax_dt_no_of_bedrooms_Invalid := (le.ScrubsBits2 >> 8) & 1;
+    SELF.no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 9) & 1;
+    SELF.src_no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 10) & 3;
+    SELF.tax_dt_no_of_fireplaces_Invalid := (le.ScrubsBits2 >> 12) & 1;
+    SELF.no_of_full_baths_Invalid := (le.ScrubsBits2 >> 13) & 1;
+    SELF.src_no_of_full_baths_Invalid := (le.ScrubsBits2 >> 14) & 3;
+    SELF.tax_dt_no_of_full_baths_Invalid := (le.ScrubsBits2 >> 16) & 1;
+    SELF.no_of_half_baths_Invalid := (le.ScrubsBits2 >> 17) & 1;
+    SELF.src_no_of_half_baths_Invalid := (le.ScrubsBits2 >> 18) & 3;
+    SELF.tax_dt_no_of_half_baths_Invalid := (le.ScrubsBits2 >> 20) & 1;
+    SELF.no_of_stories_Invalid := (le.ScrubsBits2 >> 21) & 1;
+    SELF.src_no_of_stories_Invalid := (le.ScrubsBits2 >> 22) & 3;
+    SELF.tax_dt_no_of_stories_Invalid := (le.ScrubsBits2 >> 24) & 1;
+    SELF.parking_type_Invalid := (le.ScrubsBits2 >> 25) & 1;
+    SELF.src_parking_type_Invalid := (le.ScrubsBits2 >> 26) & 3;
+    SELF.tax_dt_parking_type_Invalid := (le.ScrubsBits2 >> 28) & 1;
+    SELF.src_pool_indicator_Invalid := (le.ScrubsBits2 >> 29) & 3;
+    SELF.tax_dt_pool_indicator_Invalid := (le.ScrubsBits2 >> 31) & 1;
+    SELF.pool_type_Invalid := (le.ScrubsBits2 >> 32) & 1;
+    SELF.src_pool_type_Invalid := (le.ScrubsBits2 >> 33) & 3;
+    SELF.tax_dt_pool_type_Invalid := (le.ScrubsBits2 >> 35) & 1;
+    SELF.roof_cover_Invalid := (le.ScrubsBits2 >> 36) & 1;
+    SELF.src_roof_cover_Invalid := (le.ScrubsBits2 >> 37) & 3;
+    SELF.tax_dt_roof_cover_Invalid := (le.ScrubsBits2 >> 39) & 1;
+    SELF.year_built_Invalid := (le.ScrubsBits2 >> 40) & 3;
+    SELF.src_year_built_Invalid := (le.ScrubsBits2 >> 42) & 3;
+    SELF.tax_dt_year_built_Invalid := (le.ScrubsBits2 >> 44) & 1;
+    SELF.foundation_Invalid := (le.ScrubsBits2 >> 45) & 1;
+    SELF.src_foundation_Invalid := (le.ScrubsBits2 >> 46) & 3;
+    SELF.tax_dt_foundation_Invalid := (le.ScrubsBits2 >> 48) & 1;
+    SELF.basement_square_footage_Invalid := (le.ScrubsBits2 >> 49) & 1;
+    SELF.src_basement_square_footage_Invalid := (le.ScrubsBits2 >> 50) & 3;
+    SELF.tax_dt_basement_square_footage_Invalid := (le.ScrubsBits2 >> 52) & 1;
+    SELF.effective_year_built_Invalid := (le.ScrubsBits2 >> 53) & 3;
+    SELF.src_effective_year_built_Invalid := (le.ScrubsBits2 >> 55) & 3;
+    SELF.tax_dt_effective_year_built_Invalid := (le.ScrubsBits2 >> 57) & 1;
+    SELF.garage_square_footage_Invalid := (le.ScrubsBits2 >> 58) & 1;
+    SELF.src_garage_square_footage_Invalid := (le.ScrubsBits2 >> 59) & 3;
+    SELF.tax_dt_garage_square_footage_Invalid := (le.ScrubsBits2 >> 61) & 1;
+    SELF.stories_type_Invalid := (le.ScrubsBits2 >> 62) & 1;
+    SELF.src_stories_type_Invalid := (le.ScrubsBits3 >> 0) & 3;
+    SELF.tax_dt_stories_type_Invalid := (le.ScrubsBits3 >> 2) & 1;
+    SELF.apn_number_Invalid := (le.ScrubsBits3 >> 3) & 1;
+    SELF.src_apn_number_Invalid := (le.ScrubsBits3 >> 4) & 3;
+    SELF.tax_dt_apn_number_Invalid := (le.ScrubsBits3 >> 6) & 1;
+    SELF.src_census_tract_Invalid := (le.ScrubsBits3 >> 7) & 3;
+    SELF.tax_dt_census_tract_Invalid := (le.ScrubsBits3 >> 9) & 1;
+    SELF.src_range_Invalid := (le.ScrubsBits3 >> 10) & 3;
+    SELF.tax_dt_range_Invalid := (le.ScrubsBits3 >> 12) & 1;
+    SELF.src_zoning_Invalid := (le.ScrubsBits3 >> 13) & 3;
+    SELF.tax_dt_zoning_Invalid := (le.ScrubsBits3 >> 15) & 1;
+    SELF.src_block_number_Invalid := (le.ScrubsBits3 >> 16) & 3;
+    SELF.tax_dt_block_number_Invalid := (le.ScrubsBits3 >> 18) & 1;
+    SELF.county_name_Invalid := (le.ScrubsBits3 >> 19) & 3;
+    SELF.src_county_name_Invalid := (le.ScrubsBits3 >> 21) & 3;
+    SELF.tax_dt_county_name_Invalid := (le.ScrubsBits3 >> 23) & 1;
+    SELF.fips_code_Invalid := (le.ScrubsBits3 >> 24) & 3;
+    SELF.src_fips_code_Invalid := (le.ScrubsBits3 >> 26) & 3;
+    SELF.tax_dt_fips_code_Invalid := (le.ScrubsBits3 >> 28) & 1;
+    SELF.src_subdivision_Invalid := (le.ScrubsBits3 >> 29) & 3;
+    SELF.tax_dt_subdivision_Invalid := (le.ScrubsBits3 >> 31) & 1;
+    SELF.src_municipality_Invalid := (le.ScrubsBits3 >> 32) & 3;
+    SELF.tax_dt_municipality_Invalid := (le.ScrubsBits3 >> 34) & 1;
+    SELF.src_township_Invalid := (le.ScrubsBits3 >> 35) & 3;
+    SELF.tax_dt_township_Invalid := (le.ScrubsBits3 >> 37) & 1;
+    SELF.src_homestead_exemption_ind_Invalid := (le.ScrubsBits3 >> 38) & 3;
+    SELF.tax_dt_homestead_exemption_ind_Invalid := (le.ScrubsBits3 >> 40) & 1;
+    SELF.land_use_code_Invalid := (le.ScrubsBits3 >> 41) & 1;
+    SELF.src_land_use_code_Invalid := (le.ScrubsBits3 >> 42) & 3;
+    SELF.tax_dt_land_use_code_Invalid := (le.ScrubsBits3 >> 44) & 1;
+    SELF.src_latitude_Invalid := (le.ScrubsBits3 >> 45) & 3;
+    SELF.tax_dt_latitude_Invalid := (le.ScrubsBits3 >> 47) & 1;
+    SELF.src_longitude_Invalid := (le.ScrubsBits3 >> 48) & 3;
+    SELF.tax_dt_longitude_Invalid := (le.ScrubsBits3 >> 50) & 1;
+    SELF.location_influence_code_Invalid := (le.ScrubsBits3 >> 51) & 1;
+    SELF.src_location_influence_code_Invalid := (le.ScrubsBits3 >> 52) & 3;
+    SELF.tax_dt_location_influence_code_Invalid := (le.ScrubsBits3 >> 54) & 1;
+    SELF.src_acres_Invalid := (le.ScrubsBits3 >> 55) & 3;
+    SELF.tax_dt_acres_Invalid := (le.ScrubsBits3 >> 57) & 1;
+    SELF.src_lot_depth_footage_Invalid := (le.ScrubsBits3 >> 58) & 3;
+    SELF.tax_dt_lot_depth_footage_Invalid := (le.ScrubsBits3 >> 60) & 1;
+    SELF.src_lot_front_footage_Invalid := (le.ScrubsBits3 >> 61) & 3;
+    SELF.tax_dt_lot_front_footage_Invalid := (le.ScrubsBits3 >> 63) & 1;
+    SELF.src_lot_number_Invalid := (le.ScrubsBits4 >> 0) & 3;
+    SELF.tax_dt_lot_number_Invalid := (le.ScrubsBits4 >> 2) & 1;
+    SELF.src_lot_size_Invalid := (le.ScrubsBits4 >> 3) & 3;
+    SELF.tax_dt_lot_size_Invalid := (le.ScrubsBits4 >> 5) & 1;
+    SELF.property_type_code_Invalid := (le.ScrubsBits4 >> 6) & 1;
+    SELF.src_property_type_code_Invalid := (le.ScrubsBits4 >> 7) & 3;
+    SELF.tax_dt_property_type_code_Invalid := (le.ScrubsBits4 >> 9) & 1;
+    SELF.structure_quality_Invalid := (le.ScrubsBits4 >> 10) & 1;
+    SELF.src_structure_quality_Invalid := (le.ScrubsBits4 >> 11) & 3;
+    SELF.tax_dt_structure_quality_Invalid := (le.ScrubsBits4 >> 13) & 1;
+    SELF.water_Invalid := (le.ScrubsBits4 >> 14) & 1;
+    SELF.src_water_Invalid := (le.ScrubsBits4 >> 15) & 3;
+    SELF.tax_dt_water_Invalid := (le.ScrubsBits4 >> 17) & 1;
+    SELF.sewer_Invalid := (le.ScrubsBits4 >> 18) & 1;
+    SELF.src_sewer_Invalid := (le.ScrubsBits4 >> 19) & 3;
+    SELF.tax_dt_sewer_Invalid := (le.ScrubsBits4 >> 21) & 1;
+    SELF.assessed_land_value_Invalid := (le.ScrubsBits4 >> 22) & 1;
+    SELF.src_assessed_land_value_Invalid := (le.ScrubsBits4 >> 23) & 3;
+    SELF.tax_dt_assessed_land_value_Invalid := (le.ScrubsBits4 >> 25) & 1;
+    SELF.assessed_year_Invalid := (le.ScrubsBits4 >> 26) & 3;
+    SELF.src_assessed_year_Invalid := (le.ScrubsBits4 >> 28) & 3;
+    SELF.tax_dt_assessed_year_Invalid := (le.ScrubsBits4 >> 30) & 1;
+    SELF.tax_amount_Invalid := (le.ScrubsBits4 >> 31) & 1;
+    SELF.src_tax_amount_Invalid := (le.ScrubsBits4 >> 32) & 3;
+    SELF.tax_dt_tax_amount_Invalid := (le.ScrubsBits4 >> 34) & 1;
+    SELF.tax_year_Invalid := (le.ScrubsBits4 >> 35) & 3;
+    SELF.src_tax_year_Invalid := (le.ScrubsBits4 >> 37) & 3;
+    SELF.market_land_value_Invalid := (le.ScrubsBits4 >> 39) & 1;
+    SELF.src_market_land_value_Invalid := (le.ScrubsBits4 >> 40) & 3;
+    SELF.tax_dt_market_land_value_Invalid := (le.ScrubsBits4 >> 42) & 1;
+    SELF.improvement_value_Invalid := (le.ScrubsBits4 >> 43) & 1;
+    SELF.src_improvement_value_Invalid := (le.ScrubsBits4 >> 44) & 3;
+    SELF.tax_dt_improvement_value_Invalid := (le.ScrubsBits4 >> 46) & 1;
+    SELF.src_percent_improved_Invalid := (le.ScrubsBits4 >> 47) & 3;
+    SELF.tax_dt_percent_improved_Invalid := (le.ScrubsBits4 >> 49) & 1;
+    SELF.total_assessed_value_Invalid := (le.ScrubsBits4 >> 50) & 1;
+    SELF.src_total_assessed_value_Invalid := (le.ScrubsBits4 >> 51) & 3;
+    SELF.tax_dt_total_assessed_value_Invalid := (le.ScrubsBits4 >> 53) & 1;
+    SELF.total_calculated_value_Invalid := (le.ScrubsBits4 >> 54) & 1;
+    SELF.src_total_calculated_value_Invalid := (le.ScrubsBits4 >> 55) & 3;
+    SELF.tax_dt_total_calculated_value_Invalid := (le.ScrubsBits4 >> 57) & 1;
+    SELF.total_land_value_Invalid := (le.ScrubsBits4 >> 58) & 1;
+    SELF.src_total_land_value_Invalid := (le.ScrubsBits4 >> 59) & 3;
+    SELF.tax_dt_total_land_value_Invalid := (le.ScrubsBits4 >> 61) & 1;
+    SELF.total_market_value_Invalid := (le.ScrubsBits4 >> 62) & 1;
+    SELF.src_total_market_value_Invalid := (le.ScrubsBits5 >> 0) & 3;
+    SELF.tax_dt_total_market_value_Invalid := (le.ScrubsBits5 >> 2) & 1;
+    SELF.floor_type_Invalid := (le.ScrubsBits5 >> 3) & 1;
+    SELF.src_floor_type_Invalid := (le.ScrubsBits5 >> 4) & 3;
+    SELF.tax_dt_floor_type_Invalid := (le.ScrubsBits5 >> 6) & 1;
+    SELF.frame_type_Invalid := (le.ScrubsBits5 >> 7) & 1;
+    SELF.src_frame_type_Invalid := (le.ScrubsBits5 >> 8) & 3;
+    SELF.tax_dt_frame_type_Invalid := (le.ScrubsBits5 >> 10) & 1;
+    SELF.fuel_type_Invalid := (le.ScrubsBits5 >> 11) & 1;
+    SELF.src_fuel_type_Invalid := (le.ScrubsBits5 >> 12) & 3;
+    SELF.tax_dt_fuel_type_Invalid := (le.ScrubsBits5 >> 14) & 1;
+    SELF.no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 15) & 1;
+    SELF.src_no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 16) & 3;
+    SELF.tax_dt_no_of_bath_fixtures_Invalid := (le.ScrubsBits5 >> 18) & 1;
+    SELF.no_of_rooms_Invalid := (le.ScrubsBits5 >> 19) & 1;
+    SELF.src_no_of_rooms_Invalid := (le.ScrubsBits5 >> 20) & 3;
+    SELF.tax_dt_no_of_rooms_Invalid := (le.ScrubsBits5 >> 22) & 1;
+    SELF.no_of_units_Invalid := (le.ScrubsBits5 >> 23) & 1;
+    SELF.src_no_of_units_Invalid := (le.ScrubsBits5 >> 24) & 3;
+    SELF.tax_dt_no_of_units_Invalid := (le.ScrubsBits5 >> 26) & 1;
+    SELF.style_type_Invalid := (le.ScrubsBits5 >> 27) & 1;
+    SELF.src_style_type_Invalid := (le.ScrubsBits5 >> 28) & 3;
+    SELF.tax_dt_style_type_Invalid := (le.ScrubsBits5 >> 30) & 1;
+    SELF.assessment_document_number_Invalid := (le.ScrubsBits5 >> 31) & 1;
+    SELF.src_assessment_document_number_Invalid := (le.ScrubsBits5 >> 32) & 3;
+    SELF.tax_dt_assessment_document_number_Invalid := (le.ScrubsBits5 >> 34) & 1;
+    SELF.assessment_recording_date_Invalid := (le.ScrubsBits5 >> 35) & 1;
+    SELF.src_assessment_recording_date_Invalid := (le.ScrubsBits5 >> 36) & 3;
+    SELF.tax_dt_assessment_recording_date_Invalid := (le.ScrubsBits5 >> 38) & 1;
+    SELF.deed_document_number_Invalid := (le.ScrubsBits5 >> 39) & 1;
+    SELF.src_deed_document_number_Invalid := (le.ScrubsBits5 >> 40) & 3;
+    SELF.rec_dt_deed_document_number_Invalid := (le.ScrubsBits5 >> 42) & 1;
+    SELF.deed_recording_date_Invalid := (le.ScrubsBits5 >> 43) & 1;
+    SELF.src_deed_recording_date_Invalid := (le.ScrubsBits5 >> 44) & 3;
+    SELF.full_part_sale_Invalid := (le.ScrubsBits5 >> 46) & 1;
+    SELF.src_full_part_sale_Invalid := (le.ScrubsBits5 >> 47) & 3;
+    SELF.rec_dt_full_part_sale_Invalid := (le.ScrubsBits5 >> 49) & 1;
+    SELF.sale_amount_Invalid := (le.ScrubsBits5 >> 50) & 1;
+    SELF.src_sale_amount_Invalid := (le.ScrubsBits5 >> 51) & 3;
+    SELF.rec_dt_sale_amount_Invalid := (le.ScrubsBits5 >> 53) & 1;
+    SELF.sale_date_Invalid := (le.ScrubsBits5 >> 54) & 1;
+    SELF.src_sale_date_Invalid := (le.ScrubsBits5 >> 55) & 3;
+    SELF.rec_dt_sale_date_Invalid := (le.ScrubsBits5 >> 57) & 1;
+    SELF.sale_type_code_Invalid := (le.ScrubsBits5 >> 58) & 1;
+    SELF.src_sale_type_code_Invalid := (le.ScrubsBits5 >> 59) & 3;
+    SELF.rec_dt_sale_type_code_Invalid := (le.ScrubsBits5 >> 61) & 1;
+    SELF.mortgage_company_name_Invalid := (le.ScrubsBits5 >> 62) & 1;
+    SELF.src_mortgage_company_name_Invalid := (le.ScrubsBits6 >> 0) & 3;
+    SELF.rec_dt_mortgage_company_name_Invalid := (le.ScrubsBits6 >> 2) & 1;
+    SELF.loan_amount_Invalid := (le.ScrubsBits6 >> 3) & 1;
+    SELF.src_loan_amount_Invalid := (le.ScrubsBits6 >> 4) & 3;
+    SELF.rec_dt_loan_amount_Invalid := (le.ScrubsBits6 >> 6) & 1;
+    SELF.second_loan_amount_Invalid := (le.ScrubsBits6 >> 7) & 1;
+    SELF.src_second_loan_amount_Invalid := (le.ScrubsBits6 >> 8) & 3;
+    SELF.rec_dt_second_loan_amount_Invalid := (le.ScrubsBits6 >> 10) & 1;
+    SELF.loan_type_code_Invalid := (le.ScrubsBits6 >> 11) & 1;
+    SELF.src_loan_type_code_Invalid := (le.ScrubsBits6 >> 12) & 3;
+    SELF.rec_dt_loan_type_code_Invalid := (le.ScrubsBits6 >> 14) & 1;
+    SELF.interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 15) & 1;
+    SELF.src_interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 16) & 3;
+    SELF.rec_dt_interest_rate_type_code_Invalid := (le.ScrubsBits6 >> 18) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -1324,8 +1324,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     tax_sortby_date_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_sortby_date_Invalid=1);
     deed_sortby_date_CUSTOM_ErrorCount := COUNT(GROUP,h.deed_sortby_date_Invalid=1);
     fares_unformatted_apn_ALLOW_ErrorCount := COUNT(GROUP,h.fares_unformatted_apn_Invalid=1);
-    fares_unformatted_apn_LENGTHS_ErrorCount := COUNT(GROUP,h.fares_unformatted_apn_Invalid=2);
-    fares_unformatted_apn_Total_ErrorCount := COUNT(GROUP,h.fares_unformatted_apn_Invalid>0);
     property_street_address_ALLOW_ErrorCount := COUNT(GROUP,h.property_street_address_Invalid=1);
     property_city_state_zip_ALLOW_ErrorCount := COUNT(GROUP,h.property_city_state_zip_Invalid=1);
     prim_range_ALLOW_ErrorCount := COUNT(GROUP,h.prim_range_Invalid=1);
@@ -1482,8 +1480,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_stories_type_Total_ErrorCount := COUNT(GROUP,h.src_stories_type_Invalid>0);
     tax_dt_stories_type_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_stories_type_Invalid=1);
     apn_number_ALLOW_ErrorCount := COUNT(GROUP,h.apn_number_Invalid=1);
-    apn_number_LENGTHS_ErrorCount := COUNT(GROUP,h.apn_number_Invalid=2);
-    apn_number_Total_ErrorCount := COUNT(GROUP,h.apn_number_Invalid>0);
     src_apn_number_ENUM_ErrorCount := COUNT(GROUP,h.src_apn_number_Invalid=1);
     src_apn_number_LENGTHS_ErrorCount := COUNT(GROUP,h.src_apn_number_Invalid=2);
     src_apn_number_Total_ErrorCount := COUNT(GROUP,h.src_apn_number_Invalid>0);
@@ -1594,8 +1590,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_sewer_Total_ErrorCount := COUNT(GROUP,h.src_sewer_Invalid>0);
     tax_dt_sewer_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_sewer_Invalid=1);
     assessed_land_value_ALLOW_ErrorCount := COUNT(GROUP,h.assessed_land_value_Invalid=1);
-    assessed_land_value_INRANGE_ErrorCount := COUNT(GROUP,h.assessed_land_value_Invalid=2);
-    assessed_land_value_Total_ErrorCount := COUNT(GROUP,h.assessed_land_value_Invalid>0);
     src_assessed_land_value_ENUM_ErrorCount := COUNT(GROUP,h.src_assessed_land_value_Invalid=1);
     src_assessed_land_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_assessed_land_value_Invalid=2);
     src_assessed_land_value_Total_ErrorCount := COUNT(GROUP,h.src_assessed_land_value_Invalid>0);
@@ -1608,8 +1602,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_assessed_year_Total_ErrorCount := COUNT(GROUP,h.src_assessed_year_Invalid>0);
     tax_dt_assessed_year_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_assessed_year_Invalid=1);
     tax_amount_ALLOW_ErrorCount := COUNT(GROUP,h.tax_amount_Invalid=1);
-    tax_amount_INRANGE_ErrorCount := COUNT(GROUP,h.tax_amount_Invalid=2);
-    tax_amount_Total_ErrorCount := COUNT(GROUP,h.tax_amount_Invalid>0);
     src_tax_amount_ENUM_ErrorCount := COUNT(GROUP,h.src_tax_amount_Invalid=1);
     src_tax_amount_LENGTHS_ErrorCount := COUNT(GROUP,h.src_tax_amount_Invalid=2);
     src_tax_amount_Total_ErrorCount := COUNT(GROUP,h.src_tax_amount_Invalid>0);
@@ -1621,15 +1613,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_tax_year_LENGTHS_ErrorCount := COUNT(GROUP,h.src_tax_year_Invalid=2);
     src_tax_year_Total_ErrorCount := COUNT(GROUP,h.src_tax_year_Invalid>0);
     market_land_value_ALLOW_ErrorCount := COUNT(GROUP,h.market_land_value_Invalid=1);
-    market_land_value_INRANGE_ErrorCount := COUNT(GROUP,h.market_land_value_Invalid=2);
-    market_land_value_Total_ErrorCount := COUNT(GROUP,h.market_land_value_Invalid>0);
     src_market_land_value_ENUM_ErrorCount := COUNT(GROUP,h.src_market_land_value_Invalid=1);
     src_market_land_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_market_land_value_Invalid=2);
     src_market_land_value_Total_ErrorCount := COUNT(GROUP,h.src_market_land_value_Invalid>0);
     tax_dt_market_land_value_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_market_land_value_Invalid=1);
     improvement_value_ALLOW_ErrorCount := COUNT(GROUP,h.improvement_value_Invalid=1);
-    improvement_value_INRANGE_ErrorCount := COUNT(GROUP,h.improvement_value_Invalid=2);
-    improvement_value_Total_ErrorCount := COUNT(GROUP,h.improvement_value_Invalid>0);
     src_improvement_value_ENUM_ErrorCount := COUNT(GROUP,h.src_improvement_value_Invalid=1);
     src_improvement_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_improvement_value_Invalid=2);
     src_improvement_value_Total_ErrorCount := COUNT(GROUP,h.src_improvement_value_Invalid>0);
@@ -1639,29 +1627,21 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_percent_improved_Total_ErrorCount := COUNT(GROUP,h.src_percent_improved_Invalid>0);
     tax_dt_percent_improved_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_percent_improved_Invalid=1);
     total_assessed_value_ALLOW_ErrorCount := COUNT(GROUP,h.total_assessed_value_Invalid=1);
-    total_assessed_value_INRANGE_ErrorCount := COUNT(GROUP,h.total_assessed_value_Invalid=2);
-    total_assessed_value_Total_ErrorCount := COUNT(GROUP,h.total_assessed_value_Invalid>0);
     src_total_assessed_value_ENUM_ErrorCount := COUNT(GROUP,h.src_total_assessed_value_Invalid=1);
     src_total_assessed_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_total_assessed_value_Invalid=2);
     src_total_assessed_value_Total_ErrorCount := COUNT(GROUP,h.src_total_assessed_value_Invalid>0);
     tax_dt_total_assessed_value_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_total_assessed_value_Invalid=1);
     total_calculated_value_ALLOW_ErrorCount := COUNT(GROUP,h.total_calculated_value_Invalid=1);
-    total_calculated_value_INRANGE_ErrorCount := COUNT(GROUP,h.total_calculated_value_Invalid=2);
-    total_calculated_value_Total_ErrorCount := COUNT(GROUP,h.total_calculated_value_Invalid>0);
     src_total_calculated_value_ENUM_ErrorCount := COUNT(GROUP,h.src_total_calculated_value_Invalid=1);
     src_total_calculated_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_total_calculated_value_Invalid=2);
     src_total_calculated_value_Total_ErrorCount := COUNT(GROUP,h.src_total_calculated_value_Invalid>0);
     tax_dt_total_calculated_value_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_total_calculated_value_Invalid=1);
     total_land_value_ALLOW_ErrorCount := COUNT(GROUP,h.total_land_value_Invalid=1);
-    total_land_value_INRANGE_ErrorCount := COUNT(GROUP,h.total_land_value_Invalid=2);
-    total_land_value_Total_ErrorCount := COUNT(GROUP,h.total_land_value_Invalid>0);
     src_total_land_value_ENUM_ErrorCount := COUNT(GROUP,h.src_total_land_value_Invalid=1);
     src_total_land_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_total_land_value_Invalid=2);
     src_total_land_value_Total_ErrorCount := COUNT(GROUP,h.src_total_land_value_Invalid>0);
     tax_dt_total_land_value_CUSTOM_ErrorCount := COUNT(GROUP,h.tax_dt_total_land_value_Invalid=1);
     total_market_value_ALLOW_ErrorCount := COUNT(GROUP,h.total_market_value_Invalid=1);
-    total_market_value_INRANGE_ErrorCount := COUNT(GROUP,h.total_market_value_Invalid=2);
-    total_market_value_Total_ErrorCount := COUNT(GROUP,h.total_market_value_Invalid>0);
     src_total_market_value_ENUM_ErrorCount := COUNT(GROUP,h.src_total_market_value_Invalid=1);
     src_total_market_value_LENGTHS_ErrorCount := COUNT(GROUP,h.src_total_market_value_Invalid=2);
     src_total_market_value_Total_ErrorCount := COUNT(GROUP,h.src_total_market_value_Invalid>0);
@@ -1726,8 +1706,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_full_part_sale_Total_ErrorCount := COUNT(GROUP,h.src_full_part_sale_Invalid>0);
     rec_dt_full_part_sale_CUSTOM_ErrorCount := COUNT(GROUP,h.rec_dt_full_part_sale_Invalid=1);
     sale_amount_ALLOW_ErrorCount := COUNT(GROUP,h.sale_amount_Invalid=1);
-    sale_amount_INRANGE_ErrorCount := COUNT(GROUP,h.sale_amount_Invalid=2);
-    sale_amount_Total_ErrorCount := COUNT(GROUP,h.sale_amount_Invalid>0);
     src_sale_amount_ENUM_ErrorCount := COUNT(GROUP,h.src_sale_amount_Invalid=1);
     src_sale_amount_LENGTHS_ErrorCount := COUNT(GROUP,h.src_sale_amount_Invalid=2);
     src_sale_amount_Total_ErrorCount := COUNT(GROUP,h.src_sale_amount_Invalid>0);
@@ -1748,15 +1726,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     src_mortgage_company_name_Total_ErrorCount := COUNT(GROUP,h.src_mortgage_company_name_Invalid>0);
     rec_dt_mortgage_company_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rec_dt_mortgage_company_name_Invalid=1);
     loan_amount_ALLOW_ErrorCount := COUNT(GROUP,h.loan_amount_Invalid=1);
-    loan_amount_INRANGE_ErrorCount := COUNT(GROUP,h.loan_amount_Invalid=2);
-    loan_amount_Total_ErrorCount := COUNT(GROUP,h.loan_amount_Invalid>0);
     src_loan_amount_ENUM_ErrorCount := COUNT(GROUP,h.src_loan_amount_Invalid=1);
     src_loan_amount_LENGTHS_ErrorCount := COUNT(GROUP,h.src_loan_amount_Invalid=2);
     src_loan_amount_Total_ErrorCount := COUNT(GROUP,h.src_loan_amount_Invalid>0);
     rec_dt_loan_amount_CUSTOM_ErrorCount := COUNT(GROUP,h.rec_dt_loan_amount_Invalid=1);
     second_loan_amount_ALLOW_ErrorCount := COUNT(GROUP,h.second_loan_amount_Invalid=1);
-    second_loan_amount_INRANGE_ErrorCount := COUNT(GROUP,h.second_loan_amount_Invalid=2);
-    second_loan_amount_Total_ErrorCount := COUNT(GROUP,h.second_loan_amount_Invalid>0);
     src_second_loan_amount_ENUM_ErrorCount := COUNT(GROUP,h.src_second_loan_amount_Invalid=1);
     src_second_loan_amount_LENGTHS_ErrorCount := COUNT(GROUP,h.src_second_loan_amount_Invalid=2);
     src_second_loan_amount_Total_ErrorCount := COUNT(GROUP,h.src_second_loan_amount_Invalid>0);
@@ -1779,9 +1753,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
   END;
   SummaryStats0 := IF(Glob, TABLE(h,r), TABLE(h,r,vendor_source,FEW));
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fares_unformatted_apn_Total_ErrorCount > 0, 1, 0) + IF(le.property_street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_city_state_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_building_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_flood_zone_panel_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_garage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_floor_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_first_floor_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_heating_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.living_area_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_living_area_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bedrooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bedrooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_fireplaces_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_fireplaces_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_full_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_full_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_half_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_half_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_stories_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_stories_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_indicator_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.year_built_Total_ErrorCount > 0, 1, 0) + IF(le.src_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_effective_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_number_Total_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_apn_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_census_tract_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_range_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_zoning_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_block_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_Total_ErrorCount > 0, 1, 0) + IF(le.src_county_name_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_county_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_code_Total_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fips_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_subdivision_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_municipality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_township_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_township_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_homestead_exemption_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_acres_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_acres_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_depth_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_front_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_size_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_water_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_year_Total_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_amount_Total_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_tax_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_year_Total_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_Total_ErrorCount > 0, 1, 0) + IF(le.market_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_market_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.improvement_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_improvement_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_percent_improved_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_assessed_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_assessed_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_calculated_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_calculated_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_market_value_Total_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_market_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bath_fixtures_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bath_fixtures_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_rooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_rooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_units_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_units_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_deed_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_amount_Total_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mortgage_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_second_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fares_unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_city_state_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_building_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_flood_zone_panel_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_garage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_floor_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_first_floor_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_heating_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.living_area_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_living_area_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bedrooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bedrooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_fireplaces_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_fireplaces_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_full_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_full_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_half_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_half_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_stories_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_stories_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_indicator_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.year_built_Total_ErrorCount > 0, 1, 0) + IF(le.src_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_effective_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_apn_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_census_tract_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_range_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_zoning_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_block_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_Total_ErrorCount > 0, 1, 0) + IF(le.src_county_name_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_county_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_code_Total_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fips_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_subdivision_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_municipality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_township_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_township_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_homestead_exemption_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_acres_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_acres_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_depth_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_front_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_size_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_water_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_year_Total_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_tax_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_year_Total_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_Total_ErrorCount > 0, 1, 0) + IF(le.market_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_market_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.improvement_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_improvement_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_percent_improved_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_assessed_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_assessed_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_calculated_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_calculated_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_market_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_market_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bath_fixtures_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bath_fixtures_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_rooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_rooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_units_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_units_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_deed_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mortgage_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_second_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_Total_ErrorCount > 0, 1, 0) + IF(le.rec_dt_interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fares_unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fares_unformatted_apn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.property_street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_city_state_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_building_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_flood_zone_panel_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_garage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_garage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_floor_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_first_floor_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_heating_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_heating_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.living_area_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_living_area_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bedrooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bedrooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_fireplaces_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_fireplaces_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_full_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_full_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_half_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_half_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_stories_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_stories_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_indicator_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.year_built_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_year_built_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_ALLOW_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_effective_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.apn_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_apn_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_census_tract_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_range_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_zoning_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_block_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_WORDS_ErrorCount > 0, 1, 0) + IF(le.src_county_name_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_county_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_county_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fips_code_WITHIN_FILE_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fips_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_subdivision_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_municipality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_township_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_township_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_township_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_homestead_exemption_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_acres_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_acres_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_acres_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_depth_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_front_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_size_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_water_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_water_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_land_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_amount_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_tax_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.market_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.market_land_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_market_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.improvement_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.improvement_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_improvement_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_percent_improved_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_assessed_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_assessed_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_assessed_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_calculated_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_calculated_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_calculated_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_land_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_market_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.total_market_value_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_market_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bath_fixtures_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bath_fixtures_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_rooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_rooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_units_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_units_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_deed_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sale_amount_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mortgage_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.loan_amount_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.second_loan_amount_INRANGE_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_second_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_sortby_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fares_unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.property_city_state_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_building_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_building_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_air_conditioning_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_air_conditioning_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_basement_finish_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_finish_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_construction_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_construction_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_exterior_wall_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_exterior_wall_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_ind_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fireplace_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fireplace_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_flood_zone_panel_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_flood_zone_panel_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_garage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_garage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_floor_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_first_floor_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_first_floor_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_heating_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_heating_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_heating_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.living_area_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_living_area_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_living_area_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bedrooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bedrooms_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bedrooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_fireplaces_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_fireplaces_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_fireplaces_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_full_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_full_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_full_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_half_baths_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_half_baths_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_half_baths_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_stories_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_stories_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_stories_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_parking_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_parking_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_pool_indicator_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_indicator_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_pool_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_pool_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_roof_cover_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_roof_cover_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.year_built_ALLOW_ErrorCount > 0, 1, 0) + IF(le.year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_year_built_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_foundation_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_foundation_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.basement_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_basement_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_basement_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_ALLOW_ErrorCount > 0, 1, 0) + IF(le.effective_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_effective_year_built_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_effective_year_built_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.garage_square_footage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_garage_square_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_garage_square_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_stories_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_stories_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_apn_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_apn_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_census_tract_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_census_tract_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_range_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_zoning_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_zoning_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_block_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_block_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_WORDS_ErrorCount > 0, 1, 0) + IF(le.src_county_name_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_county_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_county_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fips_code_WITHIN_FILE_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fips_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fips_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_subdivision_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_subdivision_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_municipality_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_municipality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_township_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_township_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_township_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_homestead_exemption_ind_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_homestead_exemption_ind_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_land_use_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_land_use_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_latitude_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_latitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_longitude_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_longitude_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_location_influence_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_location_influence_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_acres_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_acres_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_acres_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_depth_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_depth_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_front_footage_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_front_footage_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_lot_size_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_lot_size_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_property_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_property_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_structure_quality_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_structure_quality_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_water_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_water_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_water_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sewer_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_sewer_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessed_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessed_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessed_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_tax_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_tax_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.tax_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_tax_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.market_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_market_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_market_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.improvement_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_improvement_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_improvement_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_percent_improved_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_percent_improved_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_assessed_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_assessed_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_assessed_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_calculated_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_calculated_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_calculated_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_land_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_land_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_land_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.total_market_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_total_market_value_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_total_market_value_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_floor_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_floor_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_frame_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_frame_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_fuel_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_fuel_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_bath_fixtures_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_bath_fixtures_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_bath_fixtures_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_rooms_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_rooms_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_rooms_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.no_of_units_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_no_of_units_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_no_of_units_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_style_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_style_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_document_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_assessment_recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.tax_dt_assessment_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_document_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_deed_document_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_deed_document_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deed_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_deed_recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_full_part_sale_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_full_part_sale_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_sale_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_sale_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mortgage_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_mortgage_company_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_loan_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.second_loan_amount_ALLOW_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_second_loan_amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_second_loan_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_loan_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_loan_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.src_interest_rate_type_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rec_dt_interest_rate_type_code_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -1803,7 +1777,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.dt_vendor_last_reported_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.tax_sortby_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.deed_sortby_date_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.fares_unformatted_apn_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.fares_unformatted_apn_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.property_street_address_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.property_city_state_zip_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.prim_range_Invalid,'ALLOW','UNKNOWN')
@@ -1899,7 +1873,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.stories_type_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.src_stories_type_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_stories_type_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.apn_number_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.apn_number_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_apn_number_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_apn_number_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.src_census_tract_Invalid,'ENUM','LENGTHS','UNKNOWN')
@@ -1956,35 +1930,35 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.sewer_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.src_sewer_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_sewer_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.assessed_land_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.assessed_land_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_assessed_land_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_assessed_land_value_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.assessed_year_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.src_assessed_year_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_assessed_year_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.tax_amount_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.tax_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_tax_amount_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_tax_amount_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.tax_year_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.src_tax_year_Invalid,'ENUM','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.market_land_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.market_land_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_market_land_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_market_land_value_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.improvement_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.improvement_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_improvement_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_improvement_value_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.src_percent_improved_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_percent_improved_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.total_assessed_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.total_assessed_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_total_assessed_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_total_assessed_value_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.total_calculated_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.total_calculated_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_total_calculated_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_total_calculated_value_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.total_land_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.total_land_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_total_land_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_total_land_value_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.total_market_value_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.total_market_value_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_total_market_value_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.tax_dt_total_market_value_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.floor_type_Invalid,'CUSTOM','UNKNOWN')
@@ -2022,7 +1996,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.full_part_sale_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.src_full_part_sale_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rec_dt_full_part_sale_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.sale_amount_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.sale_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_sale_amount_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rec_dt_sale_amount_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.sale_date_Invalid,'CUSTOM','UNKNOWN')
@@ -2034,10 +2008,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.mortgage_company_name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_mortgage_company_name_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rec_dt_mortgage_company_name_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.loan_amount_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.loan_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_loan_amount_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rec_dt_loan_amount_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.second_loan_amount_Invalid,'ALLOW','INRANGE','UNKNOWN')
+          ,CHOOSE(le.second_loan_amount_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.src_second_loan_amount_Invalid,'ENUM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rec_dt_second_loan_amount_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.loan_type_code_Invalid,'CUSTOM','UNKNOWN')
@@ -2067,7 +2041,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.dt_vendor_last_reported_CUSTOM_ErrorCount
           ,le.tax_sortby_date_CUSTOM_ErrorCount
           ,le.deed_sortby_date_CUSTOM_ErrorCount
-          ,le.fares_unformatted_apn_ALLOW_ErrorCount,le.fares_unformatted_apn_LENGTHS_ErrorCount
+          ,le.fares_unformatted_apn_ALLOW_ErrorCount
           ,le.property_street_address_ALLOW_ErrorCount
           ,le.property_city_state_zip_ALLOW_ErrorCount
           ,le.prim_range_ALLOW_ErrorCount
@@ -2163,7 +2137,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.stories_type_CUSTOM_ErrorCount
           ,le.src_stories_type_ENUM_ErrorCount,le.src_stories_type_LENGTHS_ErrorCount
           ,le.tax_dt_stories_type_CUSTOM_ErrorCount
-          ,le.apn_number_ALLOW_ErrorCount,le.apn_number_LENGTHS_ErrorCount
+          ,le.apn_number_ALLOW_ErrorCount
           ,le.src_apn_number_ENUM_ErrorCount,le.src_apn_number_LENGTHS_ErrorCount
           ,le.tax_dt_apn_number_CUSTOM_ErrorCount
           ,le.src_census_tract_ENUM_ErrorCount,le.src_census_tract_LENGTHS_ErrorCount
@@ -2220,35 +2194,35 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.sewer_CUSTOM_ErrorCount
           ,le.src_sewer_ENUM_ErrorCount,le.src_sewer_LENGTHS_ErrorCount
           ,le.tax_dt_sewer_CUSTOM_ErrorCount
-          ,le.assessed_land_value_ALLOW_ErrorCount,le.assessed_land_value_INRANGE_ErrorCount
+          ,le.assessed_land_value_ALLOW_ErrorCount
           ,le.src_assessed_land_value_ENUM_ErrorCount,le.src_assessed_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_assessed_land_value_CUSTOM_ErrorCount
           ,le.assessed_year_ALLOW_ErrorCount,le.assessed_year_LENGTHS_ErrorCount
           ,le.src_assessed_year_ENUM_ErrorCount,le.src_assessed_year_LENGTHS_ErrorCount
           ,le.tax_dt_assessed_year_CUSTOM_ErrorCount
-          ,le.tax_amount_ALLOW_ErrorCount,le.tax_amount_INRANGE_ErrorCount
+          ,le.tax_amount_ALLOW_ErrorCount
           ,le.src_tax_amount_ENUM_ErrorCount,le.src_tax_amount_LENGTHS_ErrorCount
           ,le.tax_dt_tax_amount_CUSTOM_ErrorCount
           ,le.tax_year_ALLOW_ErrorCount,le.tax_year_LENGTHS_ErrorCount
           ,le.src_tax_year_ENUM_ErrorCount,le.src_tax_year_LENGTHS_ErrorCount
-          ,le.market_land_value_ALLOW_ErrorCount,le.market_land_value_INRANGE_ErrorCount
+          ,le.market_land_value_ALLOW_ErrorCount
           ,le.src_market_land_value_ENUM_ErrorCount,le.src_market_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_market_land_value_CUSTOM_ErrorCount
-          ,le.improvement_value_ALLOW_ErrorCount,le.improvement_value_INRANGE_ErrorCount
+          ,le.improvement_value_ALLOW_ErrorCount
           ,le.src_improvement_value_ENUM_ErrorCount,le.src_improvement_value_LENGTHS_ErrorCount
           ,le.tax_dt_improvement_value_CUSTOM_ErrorCount
           ,le.src_percent_improved_ENUM_ErrorCount,le.src_percent_improved_LENGTHS_ErrorCount
           ,le.tax_dt_percent_improved_CUSTOM_ErrorCount
-          ,le.total_assessed_value_ALLOW_ErrorCount,le.total_assessed_value_INRANGE_ErrorCount
+          ,le.total_assessed_value_ALLOW_ErrorCount
           ,le.src_total_assessed_value_ENUM_ErrorCount,le.src_total_assessed_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_assessed_value_CUSTOM_ErrorCount
-          ,le.total_calculated_value_ALLOW_ErrorCount,le.total_calculated_value_INRANGE_ErrorCount
+          ,le.total_calculated_value_ALLOW_ErrorCount
           ,le.src_total_calculated_value_ENUM_ErrorCount,le.src_total_calculated_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_calculated_value_CUSTOM_ErrorCount
-          ,le.total_land_value_ALLOW_ErrorCount,le.total_land_value_INRANGE_ErrorCount
+          ,le.total_land_value_ALLOW_ErrorCount
           ,le.src_total_land_value_ENUM_ErrorCount,le.src_total_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_land_value_CUSTOM_ErrorCount
-          ,le.total_market_value_ALLOW_ErrorCount,le.total_market_value_INRANGE_ErrorCount
+          ,le.total_market_value_ALLOW_ErrorCount
           ,le.src_total_market_value_ENUM_ErrorCount,le.src_total_market_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_market_value_CUSTOM_ErrorCount
           ,le.floor_type_CUSTOM_ErrorCount
@@ -2286,7 +2260,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.full_part_sale_CUSTOM_ErrorCount
           ,le.src_full_part_sale_ENUM_ErrorCount,le.src_full_part_sale_LENGTHS_ErrorCount
           ,le.rec_dt_full_part_sale_CUSTOM_ErrorCount
-          ,le.sale_amount_ALLOW_ErrorCount,le.sale_amount_INRANGE_ErrorCount
+          ,le.sale_amount_ALLOW_ErrorCount
           ,le.src_sale_amount_ENUM_ErrorCount,le.src_sale_amount_LENGTHS_ErrorCount
           ,le.rec_dt_sale_amount_CUSTOM_ErrorCount
           ,le.sale_date_CUSTOM_ErrorCount
@@ -2298,10 +2272,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.mortgage_company_name_ALLOW_ErrorCount
           ,le.src_mortgage_company_name_ENUM_ErrorCount,le.src_mortgage_company_name_LENGTHS_ErrorCount
           ,le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount
-          ,le.loan_amount_ALLOW_ErrorCount,le.loan_amount_INRANGE_ErrorCount
+          ,le.loan_amount_ALLOW_ErrorCount
           ,le.src_loan_amount_ENUM_ErrorCount,le.src_loan_amount_LENGTHS_ErrorCount
           ,le.rec_dt_loan_amount_CUSTOM_ErrorCount
-          ,le.second_loan_amount_ALLOW_ErrorCount,le.second_loan_amount_INRANGE_ErrorCount
+          ,le.second_loan_amount_ALLOW_ErrorCount
           ,le.src_second_loan_amount_ENUM_ErrorCount,le.src_second_loan_amount_LENGTHS_ErrorCount
           ,le.rec_dt_second_loan_amount_CUSTOM_ErrorCount
           ,le.loan_type_code_CUSTOM_ErrorCount
@@ -2322,7 +2296,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.dt_vendor_last_reported_CUSTOM_ErrorCount
           ,le.tax_sortby_date_CUSTOM_ErrorCount
           ,le.deed_sortby_date_CUSTOM_ErrorCount
-          ,le.fares_unformatted_apn_ALLOW_ErrorCount,le.fares_unformatted_apn_LENGTHS_ErrorCount
+          ,le.fares_unformatted_apn_ALLOW_ErrorCount
           ,le.property_street_address_ALLOW_ErrorCount
           ,le.property_city_state_zip_ALLOW_ErrorCount
           ,le.prim_range_ALLOW_ErrorCount
@@ -2418,7 +2392,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.stories_type_CUSTOM_ErrorCount
           ,le.src_stories_type_ENUM_ErrorCount,le.src_stories_type_LENGTHS_ErrorCount
           ,le.tax_dt_stories_type_CUSTOM_ErrorCount
-          ,le.apn_number_ALLOW_ErrorCount,le.apn_number_LENGTHS_ErrorCount
+          ,le.apn_number_ALLOW_ErrorCount
           ,le.src_apn_number_ENUM_ErrorCount,le.src_apn_number_LENGTHS_ErrorCount
           ,le.tax_dt_apn_number_CUSTOM_ErrorCount
           ,le.src_census_tract_ENUM_ErrorCount,le.src_census_tract_LENGTHS_ErrorCount
@@ -2475,35 +2449,35 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.sewer_CUSTOM_ErrorCount
           ,le.src_sewer_ENUM_ErrorCount,le.src_sewer_LENGTHS_ErrorCount
           ,le.tax_dt_sewer_CUSTOM_ErrorCount
-          ,le.assessed_land_value_ALLOW_ErrorCount,le.assessed_land_value_INRANGE_ErrorCount
+          ,le.assessed_land_value_ALLOW_ErrorCount
           ,le.src_assessed_land_value_ENUM_ErrorCount,le.src_assessed_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_assessed_land_value_CUSTOM_ErrorCount
           ,le.assessed_year_ALLOW_ErrorCount,le.assessed_year_LENGTHS_ErrorCount
           ,le.src_assessed_year_ENUM_ErrorCount,le.src_assessed_year_LENGTHS_ErrorCount
           ,le.tax_dt_assessed_year_CUSTOM_ErrorCount
-          ,le.tax_amount_ALLOW_ErrorCount,le.tax_amount_INRANGE_ErrorCount
+          ,le.tax_amount_ALLOW_ErrorCount
           ,le.src_tax_amount_ENUM_ErrorCount,le.src_tax_amount_LENGTHS_ErrorCount
           ,le.tax_dt_tax_amount_CUSTOM_ErrorCount
           ,le.tax_year_ALLOW_ErrorCount,le.tax_year_LENGTHS_ErrorCount
           ,le.src_tax_year_ENUM_ErrorCount,le.src_tax_year_LENGTHS_ErrorCount
-          ,le.market_land_value_ALLOW_ErrorCount,le.market_land_value_INRANGE_ErrorCount
+          ,le.market_land_value_ALLOW_ErrorCount
           ,le.src_market_land_value_ENUM_ErrorCount,le.src_market_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_market_land_value_CUSTOM_ErrorCount
-          ,le.improvement_value_ALLOW_ErrorCount,le.improvement_value_INRANGE_ErrorCount
+          ,le.improvement_value_ALLOW_ErrorCount
           ,le.src_improvement_value_ENUM_ErrorCount,le.src_improvement_value_LENGTHS_ErrorCount
           ,le.tax_dt_improvement_value_CUSTOM_ErrorCount
           ,le.src_percent_improved_ENUM_ErrorCount,le.src_percent_improved_LENGTHS_ErrorCount
           ,le.tax_dt_percent_improved_CUSTOM_ErrorCount
-          ,le.total_assessed_value_ALLOW_ErrorCount,le.total_assessed_value_INRANGE_ErrorCount
+          ,le.total_assessed_value_ALLOW_ErrorCount
           ,le.src_total_assessed_value_ENUM_ErrorCount,le.src_total_assessed_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_assessed_value_CUSTOM_ErrorCount
-          ,le.total_calculated_value_ALLOW_ErrorCount,le.total_calculated_value_INRANGE_ErrorCount
+          ,le.total_calculated_value_ALLOW_ErrorCount
           ,le.src_total_calculated_value_ENUM_ErrorCount,le.src_total_calculated_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_calculated_value_CUSTOM_ErrorCount
-          ,le.total_land_value_ALLOW_ErrorCount,le.total_land_value_INRANGE_ErrorCount
+          ,le.total_land_value_ALLOW_ErrorCount
           ,le.src_total_land_value_ENUM_ErrorCount,le.src_total_land_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_land_value_CUSTOM_ErrorCount
-          ,le.total_market_value_ALLOW_ErrorCount,le.total_market_value_INRANGE_ErrorCount
+          ,le.total_market_value_ALLOW_ErrorCount
           ,le.src_total_market_value_ENUM_ErrorCount,le.src_total_market_value_LENGTHS_ErrorCount
           ,le.tax_dt_total_market_value_CUSTOM_ErrorCount
           ,le.floor_type_CUSTOM_ErrorCount
@@ -2541,7 +2515,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.full_part_sale_CUSTOM_ErrorCount
           ,le.src_full_part_sale_ENUM_ErrorCount,le.src_full_part_sale_LENGTHS_ErrorCount
           ,le.rec_dt_full_part_sale_CUSTOM_ErrorCount
-          ,le.sale_amount_ALLOW_ErrorCount,le.sale_amount_INRANGE_ErrorCount
+          ,le.sale_amount_ALLOW_ErrorCount
           ,le.src_sale_amount_ENUM_ErrorCount,le.src_sale_amount_LENGTHS_ErrorCount
           ,le.rec_dt_sale_amount_CUSTOM_ErrorCount
           ,le.sale_date_CUSTOM_ErrorCount
@@ -2553,10 +2527,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.mortgage_company_name_ALLOW_ErrorCount
           ,le.src_mortgage_company_name_ENUM_ErrorCount,le.src_mortgage_company_name_LENGTHS_ErrorCount
           ,le.rec_dt_mortgage_company_name_CUSTOM_ErrorCount
-          ,le.loan_amount_ALLOW_ErrorCount,le.loan_amount_INRANGE_ErrorCount
+          ,le.loan_amount_ALLOW_ErrorCount
           ,le.src_loan_amount_ENUM_ErrorCount,le.src_loan_amount_LENGTHS_ErrorCount
           ,le.rec_dt_loan_amount_CUSTOM_ErrorCount
-          ,le.second_loan_amount_ALLOW_ErrorCount,le.second_loan_amount_INRANGE_ErrorCount
+          ,le.second_loan_amount_ALLOW_ErrorCount
           ,le.src_second_loan_amount_ENUM_ErrorCount,le.src_second_loan_amount_LENGTHS_ErrorCount
           ,le.rec_dt_second_loan_amount_CUSTOM_ErrorCount
           ,le.loan_type_code_CUSTOM_ErrorCount
