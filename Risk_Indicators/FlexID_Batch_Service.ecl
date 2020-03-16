@@ -198,6 +198,7 @@ ds_in := dataset([], batch_in_format) : stored('batch_in',few);
 unsigned1 DPPAPurpose := 0 								: stored('DPPAPurpose');
 unsigned1 GLBPurpose := 8 									: stored('GLBPurpose');
 string5 	 IndustryClassVal := '' 						: stored('IndustryClass');
+industryClassValue := STD.Str.ToUpperCase(IndustryClassVal);
 unsigned3 HistoryDate := 999999 							: stored('HistoryDateYYYYMM');
 boolean   IsPOBoxCompliant := false 					: stored('PoBoxCompliance');
 boolean   UseDobFilter := false 							: stored('UseDobFilter');
@@ -527,12 +528,18 @@ with_advo := join(prep, Advo.Key_Addr1,
 											atmost(riskwise.max_atmost), keep(1));	
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPAPurpose, GLBPurpose, isUtility, LNBrandedValue, 
-														OFACOnly, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists,
-														fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchListThreshold, DobRadiusUse,
-														BSVersion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones,
-														ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
-														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission,
-                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+                                          OFACOnly, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists,
+                                          fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, 
+                                          GlobalWatchListThreshold, DobRadiusUse, BSVersion, runSSNCodes, runBestAddrCheck, 
+                                          runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, 
+                                          DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
+                                          EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, 
+                                          CompanyID, DataPermission,
+                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID,
+                                          in_industryClass := industryClassValue);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
