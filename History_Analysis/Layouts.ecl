@@ -68,8 +68,10 @@ End;
         String25   datasetname;
         String60   superkey;
         String1    updateflag;
-        StatisticsPoints FileSize;
-        StatisticsPoints NumberOfRecords;
+        StatisticsPoints FileSizeReal;
+        StatisticsPoints FileSizePerc;
+        StatisticsPoints NumberOfRecordsReal;
+        StatisticsPoints NumberOfRecordsPerc;
     END;
 
 End;
