@@ -1,4 +1,4 @@
-  IMPORT Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut, SSNBest_Services;
+  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
 
   pfLayouts     := PhoneFinder_Services.Layouts;
   lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -350,6 +350,17 @@
     #END
 
     RETURN dAppendDIDs;
+  END;
+
+   EXPORT getSourceTypeByCode (DATASET($.Layouts.PhoneFinder.src_rec) dIn) := FUNCTION
+
+      $.Layouts.PhoneFinder._type type_it($.Layouts.PhoneFinder.src_rec l) := TRANSFORM
+        SELF._Type := $.Constants.MapSourceTypeDCT(l.Src);
+      end;
+
+      dsType := PROJECT(dIn, type_it(LEFT));
+
+    return DEDUP(SORT(dsType, _Type), _Type);
   END;
 
   // Format search results to IESP layout
