@@ -30,10 +30,11 @@
 </message>
 */
 
-IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, Royalty, WSInput;
+IMPORT Autokey_batch, BatchServices, BatchShare, FraudGovPlatform_Services, FraudShared_Services, Royalty, WSInput;
 
 EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#CONSTANT('useonlybestdid',true);
 
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_FraudGovPlatform_Services_BatchService();
@@ -44,7 +45,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   // **************************************************************************************
   batch_params  := FraudGovPlatform_Services.IParam.getBatchParams();
   ds_xml_in_raw := DATASET([], FraudShared_Services.Layouts.BatchIn_rec) : STORED('batch_in', FEW);
-  ds_in_temp    := IF(useCannedRecs, FraudGovPlatform_Services.BatchCannedInput, ds_xml_in_raw);
+  batch_in_temp    := IF(useCannedRecs, FraudGovPlatform_Services.BatchCannedInput, ds_xml_in_raw);
 
 	// **************************************************************************************
 	//Checking that gc_id, industry type, and product code have some values - they are required.
@@ -56,14 +57,29 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   // **************************************************************************************
   // Preprocess input as necessary
   // **************************************************************************************	
-	BatchShare.MAC_SequenceInput(ds_in_temp, ds_sequenced);
+	BatchShare.MAC_SequenceInput(batch_in_temp, ds_sequenced);
 	BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_cap_in);
 	BatchShare.MAC_CleanAddresses(ds_cap_in, ds_batch_in);
 
-  // **************************************************************************************
-  // Append DID for Input PII
-  // **************************************************************************************	  
-	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);																		
+	// **************************************************************************************
+	// Append DID for Input PII
+	// **************************************************************************************	  
+
+	get_input_in := PROJECT(ds_batch_in(did = 0), TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster, 
+																				SELF.homephone := LEFT.phoneno,
+																				SELF := LEFT,
+																				SELF := []));
+
+	batch_in_did := BatchServices.Functions.fn_find_dids_and_append_to_acctno(get_input_in);
+
+	ds_batch_in_with_did := JOIN(ds_batch_in, batch_in_did,
+														LEFT.acctno = RIGHT.acctno,
+														TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec,
+															SELF.did := IF(LEFT.did <> 0, LEFT.did, RIGHT.did),
+															SELF := LEFT,
+															SELF := []),
+															LEFT OUTER,
+															LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
 
 	// **************************************************************************************
 	// Call Batch Records attribute to fetch records. 
