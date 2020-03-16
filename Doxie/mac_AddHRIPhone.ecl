@@ -1,5 +1,5 @@
 export mac_AddHRIPhone(infile, outfile) := macro
-import ut,gong,codes,risk_indicators;
+import ut,dx_Gong,codes,risk_indicators;
 #uniquename(temp_rec)
 %temp_rec% := record
 	unsigned4	seq;
@@ -18,7 +18,7 @@ import ut,gong,codes,risk_indicators;
 	boolean missing := false;
 end;
 
-	
+
 #uniquename(into_temp)
 %temp_rec% %into_temp%(infile L, integer C) := transform
 	self.missing := L.phone = '' or length(trim(l.phone)) < 10;
@@ -28,7 +28,7 @@ end;
 
 #uniquename(tf)
 %tf% := group(project(infile,%into_temp%(LEFT, COUNTER)), seq);
-		
+
 #uniquename(addPhoneRisk1)
 %temp_rec% %addPhoneRisk1%(%temp_rec% L, Risk_Indicators.key_phone_table_v2 R) := transform
 	zpd := ut.zip_dist(L.zip,R.zip5);
@@ -112,7 +112,7 @@ end;
 end;
 
 #uniquename(outf4)
-%outf4% := join(%outf3%,gong.key_address_current, keyed(left.prim_name = right.prim_name) and
+%outf4% := join(%outf3%,dx_Gong.key_address_current(), keyed(left.prim_name = right.prim_name) and
 								  keyed(left.st = right.st) and
 								  keyed(left.zip = right.z5) and
 								  keyed(left.prim_range = right.prim_range) and
@@ -120,20 +120,20 @@ end;
 								  keyed(left.predir = right.predir) AND
 									left.phone = right.phone10,
 							%addRisk4%(LEFT,RIGHT.phone10),left outer, keep(1), ATMOST (ut.limits. PHONE_PER_ADDRESS));
-							
+
 #uniquename(addRisk5)
 %temp_rec% %addRisk5%(%temp_rec% L, string5 rz5) := transform
 	self.diffnum := IF(Rz5='', false, L.diffnum);
 	self := L;
 end;
 
-//problem down here is that we are currently saying 
+//problem down here is that we are currently saying
 //is it missing from either?
 //should be saying
 //is it missing from both?
 
 #uniquename(outf5)
-%outf5% := join(%outf4%,gong.key_address_current, 
+%outf5% := join(%outf4%,dx_Gong.key_address_current(),
 									LEFT.diffnum AND
 									keyed(left.prim_name = right.prim_name) and
 								  keyed(left.st = right.st) and
@@ -144,19 +144,19 @@ end;
 									right.phone10 != '',
 							%addRisk5%(LEFT,RIGHT.z5),left outer, keep(1), ATMOST (ut.limits. PHONE_PER_ADDRESS));
 
-/*	
-code='0007' => 'The input phone number may be disconnected.',  
-code='0009' => 'The input phone number is a pager number.',  
-code='0010' => 'The input phone number is a mobile number.',  
-code='0015' => 'The input phone number matches a transient commercial or institutional address.',  
-code='0016' => 'The input phone number and input zip code combination is invalid.',  
-code='0044' => 'The input phone area code is changing.',  
-code='0049' => 'The input phone and address are geographically distant (greater than 10 miles).',  
-code='0064' => 'The input address returns a different phone number.',  
-code='0073' => 'The input Telephone Number is not found in the public record databases.',  
-code='0074' => 'The input phone number is associated with a different name and address.',  
-code='0075' => 'The input name and address are associated with an unlisted/non-published phone number.',  
-code='0080' => 'The input phone was missing or incomplete.',  
+/*
+code='0007' => 'The input phone number may be disconnected.',
+code='0009' => 'The input phone number is a pager number.',
+code='0010' => 'The input phone number is a mobile number.',
+code='0015' => 'The input phone number matches a transient commercial or institutional address.',
+code='0016' => 'The input phone number and input zip code combination is invalid.',
+code='0044' => 'The input phone area code is changing.',
+code='0049' => 'The input phone and address are geographically distant (greater than 10 miles).',
+code='0064' => 'The input address returns a different phone number.',
+code='0073' => 'The input Telephone Number is not found in the public record databases.',
+code='0074' => 'The input phone number is associated with a different name and address.',
+code='0075' => 'The input name and address are associated with an unlisted/non-published phone number.',
+code='0080' => 'The input phone was missing or incomplete.',
 */
 #uniquename(assign_codes)
 typeof(infile) %assign_codes%(%temp_rec% L) := transform

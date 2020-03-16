@@ -1,4 +1,4 @@
-import Address,Gong;
+import Address, dx_Gong;
 
 export CensusBureau_Phone_Service_Layouts := module
 
@@ -10,21 +10,21 @@ export CensusBureau_Phone_Service_Layouts := module
 		string2  state;
 		string5  zip;
 	end;
-	
+
 	// Layout as cleaned for processing.
 	export Batch_Post_In := record
 		unsigned4 __seq;
 		Batch_In;
 		Address.Layout_Clean182_fips Clean_Address;
 	end;
-	
+
 	// Layout as retrieved.
 	export Batch_Pre_Out := record
 		Batch_Post_In;
 		string10 phone10;
-		Gong.Key_Address_Current.publish_code;
+		dx_Gong.layouts.i_address_current.publish_code;
 	end;
-	
+
 	// Layout as presented to user.
 	export Batch_Out := record
 		Batch_In;

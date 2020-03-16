@@ -1,8 +1,8 @@
 export Mac_RAN_phone_append(f_append_in, f_append_out,checkRNA = false, mod_access) := macro
-import gong, MDR, Phones, Phonesplus_v2,NID;
+import dx_Gong, Phones, Phonesplus_v2, NID;
 
 #uniquename(gong_addr_key)
-%gong_addr_key% := gong.Key_Address_current;
+%gong_addr_key% := dx_Gong.key_address_current();
 
 #uniquename(append_gong_phone)
 f_append_in %append_gong_phone%(f_append_in l, %gong_addr_key% r) := transform

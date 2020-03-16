@@ -1,4 +1,4 @@
-import gong, dx_header, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
+import dx_Gong, dx_header, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
 import lib_datalib, NID; // to be able to call a macro in a JOIN condition
 
 todays_date := (string) STD.Date.Today();
@@ -59,13 +59,15 @@ incoming_hhid := PROJECT(in_f,TRANSFORM(layout_hhidmatch,
 
 in_hhid := dedup(sort(rels2match_hhid+incoming_hhid(hhid<>0), did2return2, hhid, is_relat), did2return2, hhid);
 
-did_key := gong.key_did;
-hhid_key := gong.key_hhid;
+did_key := dx_Gong.key_did();
+hhid_key := dx_Gong.key_hhid();
+curr_addr_key := dx_Gong.key_address_current();
+history_phone_key := dx_Gong.key_history_phone();
 supp_key := suppress.key_pullPhone;
 
 layout_gong_out :=
 RECORD
-  gong.Layout_bscurrent_raw;
+  dx_Gong.layout_prepped_for_keys;
   unsigned6 did;
   unsigned6 did2return2 := 0;
   unsigned6 did2match := 0;
@@ -117,7 +119,7 @@ END;
 relats_hhids := PROJECT(final_hhid(is_relat), hhid2did(LEFT));
 
 non_relat_dids := project(dids(~is_relat),doxie.layout_references);
-doxie.mac_best_records(non_relat_dids,did,b,true,true,false,doxie.DataRestriction.fixed_DRM);
+doxie.mac_best_records(non_relat_dids,did,b,true,true,false,mod_access.DataRestrictionMask);
 /*NOTE: Notice that glb_per has been set as TRUE even when GLB_Purpose is a parameter received by this attribute.
         The reason for doing that is because the address of the best record (returned by mac_best_records) is used solely to categorize
         the address that the procedure actually returns.  GLB information is not exposed at this point.
@@ -339,16 +341,16 @@ END;
 out_roll := ROLLUP(SORT(withApt, rid, gong_score, -listed_phone, -listed_name), rid, keepBestTNT(LEFT, RIGHT));
 
 // extra work to add some phone number when no listing got appended
-doxie.Layout_Phones add_addr_phones(gong.key_address_current le, integer gong_score) :=
+doxie.Layout_Phones add_addr_phones(curr_addr_key le, integer gong_score) :=
 TRANSFORM
   SELF.match_type := 5;
   SELF.listed := true;
   SELF.did := 0;
   SELF.bdid := 0;
   SELF.gong_score := gong_score;
-  Self.listing_type_res := if (le.listing_type & Gong.Constants.PTYPE.RESIDENTIAL = Gong.Constants.PTYPE.RESIDENTIAL, 'R', '');
-  Self.listing_type_bus := if (le.listing_type & Gong.Constants.PTYPE.BUSINESS    = Gong.Constants.PTYPE.BUSINESS, 'B', '');
-  Self.listing_type_gov := if (le.listing_type & Gong.Constants.PTYPE.GOVERNMENT  = Gong.Constants.PTYPE.GOVERNMENT, 'G', '');
+  Self.listing_type_res := if (le.listing_type & dx_Gong.Constants.PTYPE.RESIDENTIAL = dx_Gong.Constants.PTYPE.RESIDENTIAL, 'R', '');
+  Self.listing_type_bus := if (le.listing_type & dx_Gong.Constants.PTYPE.BUSINESS    = dx_Gong.Constants.PTYPE.BUSINESS, 'B', '');
+  Self.listing_type_gov := if (le.listing_type & dx_Gong.Constants.PTYPE.GOVERNMENT  = dx_Gong.Constants.PTYPE.GOVERNMENT, 'G', '');
   SELF.phone_first_seen := (integer)le.date_first_seen[1..6];
   SELF.phone_last_seen := (integer)(todays_date[1..6]);
 //  Self.listing_type_cell; in the future can be read from listing_type as well
@@ -356,7 +358,7 @@ TRANSFORM
   SELF := [];//todo need more fields in key
 END;
 
-out_roll checkAddr(out_roll le, gong.key_address_current ri) := TRANSFORM
+out_roll checkAddr(out_roll le, curr_addr_key ri) := TRANSFORM
   SELF.listed_name := IF(le.listed_phone != '', le.listed_name, ri.listed_name);
   SELF.listed_name_prefix:= IF(le.listed_phone != '', le.listed_name_prefix, '');
   SELF.listed_name_first:= IF(le.listed_phone != '', le.listed_name_first, ri.fname);
@@ -385,7 +387,7 @@ END;
 // . . .  both dwellings have similar enough sec_ranges. OR . . .
 // . . .  both dwellings have differing sec_ranges but whose occupants have similar enough names ).
 
-j_addr := JOIN(out_roll, gong.key_address_current,
+j_addr := JOIN(out_roll, curr_addr_key,
   (ut.DaysApart((STRING6)LEFT.dt_last_seen+'31',todays_date) < 365 or dcp_value >= 5) AND
   keyed(LEFT.prim_name = RIGHT.prim_name) AND
   keyed(LEFT.st = RIGHT.st) AND
@@ -444,7 +446,7 @@ TRANSFORM
   SELF := ri;
 END;
 
-layout_new backOne(out_roll2 le, gong.Key_History_phone ri) := transform
+layout_new backOne(out_roll2 le, history_phone_key ri) := transform
   p1 := le.Phones((match_type<=dcp_value OR match_type=5 and dcp_value=4),match_type<5 OR phone10<>'');
   p2 := SORT(p1,match_type,gong_score,-phone10,-listed_name);
   p3 := ITERATE(p2, bump_match(LEFT,RIGHT));
@@ -463,7 +465,7 @@ out_roll3 := IF(dcp_value>=4,out_roll2,out_roll);
 //a lot of records of people working at a perticular business who share the same phone number.
 
 // Filter the key since the backOne transform is somewhat complex in how it uses key data.
-phone_hist_key_filtered := JOIN(out_roll3, gong.Key_History_phone,
+phone_hist_key_filtered := JOIN(out_roll3, history_phone_key,
   LENGTH(TRIM(LEFT.phone)) = 10 and
   LEFT.phone[4..10] = RIGHT.p7 and
   LEFT.phone[1..3] = RIGHT.p3 and
