@@ -73,6 +73,11 @@
     RECORD
       STRING3 Src;
     END;
+
+    EXPORT _type := RECORD
+      STRING40 _Type;
+    END;
+
     // Phones common layout
     EXPORT Common :=
     RECORD(doxie.layout_pp_raw_common)

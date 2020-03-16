@@ -1,4 +1,4 @@
-IMPORT PhonesPlus_V2, Royalty, MDR, Phones, iesp;
+IMPORT $, iesp;
 
 EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
                              ) := FUNCTION
@@ -43,7 +43,7 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
     dGrpSrc := DENORMALIZE(Src_Func, Src_Func, LEFT._Type = RIGHT._Type, GROUP, denormCats(LEFT, ROWS(RIGHT)));
      SELF.SourceInfo           := DEDUP(dGrpSrc, ALL);
      SELF.TotalSourceCount     := COUNT(dDedupSrc);
-     SELF.SelfReportedSourcesOnly := ~(EXISTS(Src_Func(_Type IN [$.Constants.PFSourceType.Account])));
+     SELF.SelfReportedSourcesOnly := ~(EXISTS(Src_Func(_Type = $.Constants.PFSourceType.Account)));
      SELF := l;
   END;
 

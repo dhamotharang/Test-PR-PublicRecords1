@@ -1,4 +1,4 @@
-﻿  IMPORT Doxie, Gateway, Phones, ut;
+﻿  IMPORT $, Doxie, Gateway, Phones, ut;
 
   lBatchIn := PhoneFinder_Services.Layouts.BatchInAppendDID;
   lCommon  := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -99,6 +99,7 @@
     SELF.deceased          := '';
     SELF.ssnmatch          := '';
     SELF.RealTimePhone_Ext := [];
+    SELF.phn_src_all       := DEDUP(SORT(pInput.phn_src_all, src), src);
     SELF                   := pInput;
     SELF                   := [];
   END;
