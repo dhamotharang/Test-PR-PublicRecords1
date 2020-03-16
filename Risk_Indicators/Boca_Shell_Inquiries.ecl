@@ -654,13 +654,12 @@ deltaBase_all_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Delt
 																														self.Sec_Range := left.shell_input.Sec_range;
 																														self.Zip5 := left.shell_input.z5;
 																														self.Phone10 := left.shell_input.Phone10;
-																														self.Email := left.shell_input.Email_Address));		
-deltaBase_all_results 		:= Inquiry_Deltabase.Search_All(deltaBase_all_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
-// did_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
-																														// self.seq := left.shell_input.seq;
-																														// self.did := left.shell_input.did));
+																														self.Email := left.shell_input.Email_Address));	
+
+// RQ-19982 - to speed up deltabase, we remove the function descriptions from the where clause and increased the limit on the SQL per join to 50 instead of 10																		
+deltaBase_all_results 		:= Inquiry_Deltabase.Search_All(deltaBase_all_ds, '50', DeltabaseGateway);
+
 deltaBase_did_results := deltaBase_all_results(S_DID <> 0 AND Search_Type='2');
-//deltaBase_did_results_old := Inquiry_Deltabase.Search_DID(did_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 MAC_raw_did_transform (add_inquiry_raw, Inquiry_AccLogs.Key_Inquiry_DID);
 MAC_raw_did_transform (add_inquiry_raw_update, Inquiry_AccLogs.Key_Inquiry_DID_Update);
 MAC_raw_did_transform (add_inquiry_raw_deltabase, deltaBase_did_results);
@@ -1938,11 +1937,7 @@ layout_temp_CCPA trans_name(layout_temp le, ssn_key rt) := transform
 end;
 ENDMACRO;
 
-// ssn_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_SSN,
-																														// self.seq := left.shell_input.seq;
-																														// self.SSN := left.shell_input.SSN));																										
 
-//deltaBase_ssn_results_old := Inquiry_Deltabase.Search_SSN(ssn_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltaBase_ssn_results := deltaBase_all_results(SSN <> '' AND Search_Type='7');
 MAC_raw_ssn_transform(add_ssn_raw, Inquiry_AccLogs.Key_Inquiry_SSN);
 MAC_raw_ssn_transform(add_ssn_raw_update, Inquiry_AccLogs.Key_Inquiry_SSN_update);
@@ -2334,14 +2329,7 @@ layout_temp_CCPA trans_name(layout_temp le, addr_key rt) := transform
 end;
 ENDMACRO;
 
-// address_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Address,
-																														// self.seq := left.shell_input.seq;
-																														// self.Prim_Range := left.shell_input.prim_range;
-																														// self.Prim_Name := left.shell_input.prim_name;
-																														// self.Sec_Range := left.shell_input.Sec_range;
-																														// self.Zip5 := left.shell_input.z5));
 
-// deltabase_address_results := Inquiry_Deltabase.Search_Address(address_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltabase_address_results := deltaBase_all_results(Zip5 <> '' AND Prim_Name <> '' AND Search_Type='1');
 
 MAC_raw_addr_transform(add_Addr_raw, Inquiry_AccLogs.Key_Inquiry_Address);
@@ -2702,12 +2690,7 @@ layout_temp_CCPA trans_name(layout_temp le, phone_key rt) := transform
 end;
 ENDMACRO;
 
-// phone_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Phone,
-																														// self.seq := left.shell_input.seq;
-																														// self.Phone10 := left.shell_input.Phone10));
 
-
-// deltaBase_phone_results := Inquiry_Deltabase.Search_Phone(phone_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltaBase_phone_results := deltaBase_all_results(Phone10 <> '' AND Search_Type='6');
 
 MAC_raw_phone_transform(add_Phone_raw, Inquiry_AccLogs.Key_Inquiry_Phone);
@@ -2821,6 +2804,10 @@ with_phone_velocities := rollup( grouped_Phone_raw, roll_Phone(left,right), true
 // -----------------------------------------------------
 MAC_raw_email_transform (trans_name, email_key) := MACRO
 layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
+
+	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number); //if no transaction_id, use sequence number
+	self.Sequence_Number := rt.search_info.Sequence_Number;
+	
     self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
@@ -2856,11 +2843,7 @@ layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
 	self := le;
 end;
 ENDMACRO;
-// email_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Email,
-																														// self.seq := left.shell_input.seq;
-																														// self.Email := left.shell_input.Email_Address));
-																														
-// deltaBase_email_results := Inquiry_Deltabase.Search_Email(email_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
+
 deltaBase_email_results := deltaBase_all_results(Email <> '' AND Search_Type='3');
 
 MAC_raw_email_transform(add_email_raw, Inquiry_AccLogs.Key_Inquiry_Email);
@@ -2958,6 +2941,17 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 // output(deltaBase_ssn_results_old, named('deltaBase_ssn_results_old'));
 // output(deltaBase_ssn_results, named('deltaBase_ssn_results'));
 
+// output(deltaBase_all_results,named('deltaBase_all_results'));
+// output(deltaBase_email_results, named('deltaBase_email_results'));
+
+// output(Email_raw_base,named('Email_raw_base'));
+// output(Email_raw_updates,named('Email_raw_updates'));
+// output(Email_raw_deltabase, named('Email_raw_deltabase'));
+
+// output(Email_raw, named('Email_raw'));
+// output(grouped_Email_raw, named('grouped_Email_raw'));
+// output(with_email_velocities, named('with_email_velocities'));
+
 // output(j_raw_nonfcra_full, all, named('j_raw_nonfcra_full'));
 // output(j_raw_nonfcra_update, all, named('j_raw_nonfcra_update'));
 // output(j_raw_nonfcra_deltabase, all, named('j_raw_nonfcra_deltabase'));
@@ -3033,7 +3027,7 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 
 // output(did_ds,named('old'));
 // output(deltaBase_all_ds,named('new'));
-//  output(deltaBase_all_results,named('deltaBase_all_results'));
+ // output(deltaBase_all_results,named('deltaBase_all_results'));
 
 	return inquiry_summary;
 END;

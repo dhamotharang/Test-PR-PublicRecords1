@@ -1,27 +1,20 @@
-﻿IMPORT Gateway, Inquiry_Deltabase, Suspicious_Fraud_LN;
+﻿IMPORT Gateway, Inquiry_Deltabase, STD;
 
 EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltabase.Layouts.Input_Deltabase_All) SearchInput,
-																																SET OF STRING100 FunctionDescriptions, // Example: Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions
 																																STRING4 SQLSelectLimit = '10', // Total number of records the Deltabase will return for a MAX
 																																DATASET(Gateway.Layouts.Config) Gateways = Gateway.Constants.void_gateway, 
 																																INTEGER gatewayTimeout = 2, // The Deltabase has a 2 second timeout
 																																INTEGER gatewayRetries = 0):= FUNCTION
 	
 	SelectLimit := TRIM(SQLSelectLimit, ALL);
-	
-	// We need to convert the Function Description SET into a DATASET so we can utilize the convertDelimited Function to get a giant string of Function Descriptions
-	FunctionDescriptionDataset := DATASET(FunctionDescriptions, Inquiry_Deltabase.Layouts.Function_Descriptions);
-	
-	// Create the Function_Description IN ('', '', ...) SQL syntax
-	FunctionDescriptionInSQL := '(\'' + Suspicious_Fraud_LN.Common.convertDelimited(FunctionDescriptionDataset, FunctionName, '\',\'') + '\')';
 
 	// Generate the Deltabase SELECT statement
 	Inquiry_Deltabase.Layouts.Deltabase_Input generateSelects(Inquiry_Deltabase.Layouts.Input_Deltabase_All le) := TRANSFORM
     //Address
     Zip5 := TRIM(le.Zip5, ALL);
-		Prim_Name := StringLib.StringToUpperCase(TRIM(le.Prim_Name, LEFT, RIGHT));
-		Prim_Range := StringLib.StringToUpperCase(TRIM(le.Prim_Range, LEFT, RIGHT));
-		Sec_Range := StringLib.StringToUpperCase(TRIM(le.Sec_Range, LEFT, RIGHT));
+		Prim_Name := STD.str.ToUpperCase(TRIM(le.Prim_Name, LEFT, RIGHT));
+		Prim_Range := STD.str.ToUpperCase(TRIM(le.Prim_Range, LEFT, RIGHT));
+		Sec_Range := STD.str.ToUpperCase(TRIM(le.Sec_Range, LEFT, RIGHT));
 		//DID
     DID := le.DID;
     //EMail
@@ -29,14 +22,14 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
     //IPAddr
     IPAddr := TRIM(le.IPAddress, LEFT, RIGHT);
     //Name
-    FirstName := TRIM(StringLib.StringToUpperCase(le.FirstName), LEFT, RIGHT);
-		MiddleName := TRIM(StringLib.StringToUpperCase(le.MiddleName), LEFT, RIGHT);
+    FirstName := TRIM(STD.str.ToUpperCase(le.FirstName), LEFT, RIGHT);
+		MiddleName := TRIM(STD.str.ToUpperCase(le.MiddleName), LEFT, RIGHT);
 		MiddleInitial := MiddleName[1];
-		LastName := TRIM(StringLib.StringToUpperCase(le.LastName), LEFT, RIGHT);
+		LastName := TRIM(STD.str.ToUpperCase(le.LastName), LEFT, RIGHT);
     //Phone
-    Phone10 := StringLib.StringFilter(le.Phone10, '0123456789');
+    Phone10 := STD.str.Filter(le.Phone10, '0123456789');
     //SSN
-    SSN := StringLib.StringFilter(le.SSN, '0123456789');
+    SSN := STD.str.Filter(le.SSN, '0123456789');
     //Transaction_ID
     Transaction_ID := le.Transaction_ID;
     
@@ -78,18 +71,17 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
     SQLWhereSSN       := IF(NOT Valid_Query_SSN,'',' i.SSN = \'' + SSN + '\' ');
     // need to create new or update KEY `ix_transaction_id` (`transaction_id`) to KEY `ix_transaction_id` (`transaction_id`,`function_description`)
     SQLWhereTransactionID := IF(NOT Valid_Query_TransactionID,'',' AND i.Transaction_ID = \'' + (STRING50)Transaction_ID + '\' ');
-    SQLWhereGlobal    := ' AND i.Function_Description IN ' + FunctionDescriptionInSQL + ' ';
 		// And make sure to LIMIT the response so the SQL server isn't overloaded
 		SQLUnion          := ' UNION ALL ';
     SQLLimit          := ' LIMIT ' + SelectLimit + ' ) ';
-    SQLAddress        := IF(Valid_Query_Address, SQLSelectFields + SQLSelectFieldAddress + SQLFrom + SQLWhereMain + SQLWhereAddress + SQLWhereGlobal,'');
-    SQLDID            := IF(Valid_Query_DID, SQLSelectFields + SQLSelectFieldDID + SQLFrom + SQLWhereMain + SQLWhereDID + SQLWhereGlobal,'');
-    SQLEmail          := IF(Valid_Query_Email, SQLSelectFields + SQLSelectFieldEmail + SQLFrom + SQLWhereMain + SQLWhereEmail + SQLWhereGlobal,'');
-    SQLIPAddr         := IF(Valid_Query_IPAddr, SQLSelectFields + SQLSelectFieldIPAddr + SQLFrom + SQLWhereMain + SQLWhereIPAddr + SQLWhereGlobal,'');
-    SQLName           := IF(Valid_Query_Name, SQLSelectFields + SQLSelectFieldName + SQLFrom + SQLWhereMain + SQLWhereName + SQLWhereGlobal,'');
-    SQLPhone          := IF(Valid_Query_Phone, SQLSelectFields + SQLSelectFieldPhone + SQLFrom + SQLWhereMain + SQLWherePhone + SQLWhereGlobal ,'');
-    SQLSSN            := IF(Valid_Query_SSN, SQLSelectFields + SQLSelectFieldSSN + SQLFrom + SQLWhereMain + SQLWhereSSN + SQLWhereGlobal,'');
-    SQLTransactionID  := IF(Valid_Query_TransactionID, SQLSelectFields + SQLSelectFieldTransactionID + SQLFrom + SQLWhereMain + SQLWhereTransactionID + SQLWhereGlobal,'');
+    SQLAddress        := IF(Valid_Query_Address, SQLSelectFields + SQLSelectFieldAddress + SQLFrom + SQLWhereMain + SQLWhereAddress,'');
+    SQLDID            := IF(Valid_Query_DID, SQLSelectFields + SQLSelectFieldDID + SQLFrom + SQLWhereMain + SQLWhereDID,'');
+    SQLEmail          := IF(Valid_Query_Email, SQLSelectFields + SQLSelectFieldEmail + SQLFrom + SQLWhereMain + SQLWhereEmail,'');
+    SQLIPAddr         := IF(Valid_Query_IPAddr, SQLSelectFields + SQLSelectFieldIPAddr + SQLFrom + SQLWhereMain + SQLWhereIPAddr,'');
+    SQLName           := IF(Valid_Query_Name, SQLSelectFields + SQLSelectFieldName + SQLFrom + SQLWhereMain + SQLWhereName,'');
+    SQLPhone          := IF(Valid_Query_Phone, SQLSelectFields + SQLSelectFieldPhone + SQLFrom + SQLWhereMain + SQLWherePhone ,'');
+    SQLSSN            := IF(Valid_Query_SSN, SQLSelectFields + SQLSelectFieldSSN + SQLFrom + SQLWhereMain + SQLWhereSSN,'');
+    SQLTransactionID  := IF(Valid_Query_TransactionID, SQLSelectFields + SQLSelectFieldTransactionID + SQLFrom + SQLWhereMain + SQLWhereTransactionID,'');
     GeneratedSelect := IF(Valid_Query_Address,SQLAddress + SQLLimit + SQLUnion,'')+
                        IF(Valid_Query_DID,SQLDID + SQLLimit + SQLUnion,'')+
                        IF(Valid_Query_Email,SQLEmail + SQLLimit + SQLUnion,'')+
@@ -99,7 +91,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
                        IF(Valid_Query_SSN,SQLSSN + SQLLimit + SQLUnion,'')+
                        IF(Valid_Query_TransactionID,SQLTransactionID + SQLLimit + SQLUnion,'');
     ValidCounter      := (integer)Valid_Query_Address + (integer)Valid_Query_DID + (integer)Valid_Query_Email + (integer)Valid_Query_IPAddr + (integer)Valid_Query_Name + (integer)Valid_Query_Phone + (integer)Valid_Query_SSN + (integer)Valid_Query_TransactionID;
-    ValidEndPos       := stringlib.stringfind(GeneratedSelect,'UNION ALL',ValidCounter)-1;
+    ValidEndPos       := STD.str.find(GeneratedSelect,'UNION ALL',ValidCounter)-1;
     SELF.Select := IF(Valid_Query, GeneratedSelect[1..ValidEndPos], '');
 		
 		SELF := [];
@@ -184,7 +176,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
 		SELF.Permissions.GLB_Purpose := le.GLB_Purpose;
 		SELF.Permissions.DPPA_Purpose := le.DPPA_Purpose;
 		// Need to reformat DateTime, as the Deltabase returns YYYY-MM-DD HH:MM:SS but the Inquiries Key is YYYYMMDD HHMMSSmm
-		CleanedDateTime := StringLib.StringFilter(le.DateTime, '0123456789');
+		CleanedDateTime := STD.str.Filter(le.DateTime, '0123456789');
 		SELF.Search_Info.DateTime := IF(CleanedDateTime = '', '', CleanedDateTime[1..8] + ' ' + CleanedDateTime[9..14] + '01');
 		SELF.Search_Info.Transaction_ID := le.Transaction_ID;
 		SELF.Search_Info.Transaction_Type := le.Transaction_Type;
