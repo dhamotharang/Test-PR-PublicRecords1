@@ -33,7 +33,8 @@ export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(G
 													unsigned1 LexIdSourceOptout = 1,
 													string TransactionID = '',
 													string BatchUID = '',
-													unsigned6 GlobalCompanyId = 0
+													unsigned6 GlobalCompanyId = 0,
+                          string5 IndustryClass = ''
 													) := FUNCTION
 
 mod_access := MODULE(Doxie.IDataAccess)
@@ -139,7 +140,8 @@ commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb
 															LexIdSourceOptout := LexIdSourceOptout, 
 															TransactionID := TransactionID, 
 															BatchUID := BatchUID, 
-															GlobalCompanyID := GlobalCompanyID);
+															GlobalCompanyID := GlobalCompanyID,
+                              IndustryClass := IndustryClass);
                               
 common_transformed := risk_indicators.iid_transform_common(commonstart, BSOptions);
 
@@ -174,6 +176,7 @@ with_ThreatMetrix := if(runThreatMetrix,
 
 // output(with_addrs, named('with_addrs'));
 // output(with_nap, named('with_nap'));
+// output(IndustryClass, named('industryClass_iidBaseFunction'));
 
 return with_ThreatMetrix;
 

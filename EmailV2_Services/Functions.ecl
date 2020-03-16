@@ -126,9 +126,7 @@ EXPORT Functions := MODULE
   ) := FUNCTION     // this function currently doesn't apply FCRA overrides, if FCRA functionality is requested the overrides logic need to be added
 
     email_raw_recs := $.Raw.getEmailRawData(batch_in,in_mod,search_by,data_environment);
-
     email_fltrd_recs := FilterEmailData(email_raw_recs,in_mod,search_by);
-
     // in case of search by PII we need to apply penalties for fuzzy matching
     email_matching_recs := IF(search_by = $.Constants.SearchBy.ByPII,
                                  ApplyFuzzyMatching(email_fltrd_recs, batch_in, in_mod),
