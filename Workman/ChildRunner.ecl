@@ -158,15 +158,15 @@ functionmacro
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
-  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)iteration);
-  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)iteration);  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
+  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)trim(iteration));
+  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)trim(iteration));  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
   // latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
-    default_start_iteration            := if(pOutputSuperfile != ''  
-    // default_start_iteration            := if((#TEXT(pStartIteration) = '' or trim((string)pStartIteration) = '') and pOutputSuperfile != '' //and trim(ds_previous_build_final_iterations[1].iteration) != '' 
-                                            ,(string)((unsigned)latest_previous_iteration + 1)
-                                            ,''
+    default_start_iteration            := map(
+                                              pOutputSuperfile != '' and (unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')   =  0  => (string)((unsigned)trim(latest_previous_iteration) + 1)
+                                             ,pOutputSuperfile != '' and (unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')  !=  0  => trim(WorkMan.get_Scalar_Result(workunit,'Start_Iteration'))
+                                            ,'1'
                                          );
     StartIteration := default_start_iteration;
   #ELSE
@@ -664,7 +664,9 @@ functionmacro
     ,output(pversion                                         ,named('Version'               ),overwrite)
     ,output((unsigned)result_Iteration_Number                ,named('Current_Iteration'     ),overwrite)  //just for organizing these results
 // #IF(trim(#TEXT(pStartIteration))  != '') 
+    ,if((unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')  =  0
     ,output(StartIteration                                   ,named('Start_Iteration'       ),overwrite)  //we will have a start iteration no matter if you pass one in or not
+    )
 // #END 
 #IF(trim(#TEXT(pNumMinIterations))  != '') 
     ,output(%'NumMinIterations'%                ,named('Minimum_Iterations'             ),overwrite)  //just for organizing these results
