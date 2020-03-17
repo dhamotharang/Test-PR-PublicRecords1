@@ -1,0 +1,92 @@
+﻿//-----------------------------
+// KEL Global Function Library
+//-----------------------------
+/*********
+* Notes *
+*********/
+// To use the functions in this library, simply add 
+// IMPORT KELFunctionLibraries.KELGlobalFunctionLibrary; to your relevant KEL file.
+// You can then simply call the reference name.
+// I.e. Person: => Age := AGE(dateofbirth);
+
+// Functions in this library may not contain refrences in their definition to other
+// local funcitons.
+
+// FOR MORE INFORMATION ON THE FUNCTIONS BELOW, VISIT THE WIKI PAGE:
+// https://gitlab.ins.risk.regn.net/risk-engineering/KnowledgeUniverse/wikis/KEL-Global-Function-Library-Definitions
+
+
+
+/*************************
+* Arithematic Functions *
+*************************/
+// NULLDIV: 
+// Returns NULL if dividing by zero.
+FUNCTION: NULLDIV(REAL numerator, REAL denominator) <= IF(denominator<>0, numerator/denominator);
+
+
+
+/*********************
+* Boolean Functions *
+*********************/
+//BETWEEN:
+// Returns true if the checkval is between (or equal to) the low and high value.
+FUNCTION: BETWEEN(REAL checkval, REAL low, REAL high) <= ((checkval >= low) AND (checkval <= high));
+
+//BETWEENEXC:
+// Returns true if the checkval is between the low and high value. Returns false if it equals the high or low value.
+FUNCTION: BETWEENEXC(REAL checkval, REAL low, REAL high) <= ((checkval > low) AND (checkval < high));
+
+
+
+/***************************
+* Date and Time Functions *
+***************************/
+// ABSDAYSBETWEEN: 
+// Returns the number of days between the from date and the to date, order does not matter.
+FUNCTION: ABSDAYSBETWEEN(DATE from, DATE to) <= ABS(DAYSBETWEEN(from, to));
+
+// ABSMONTSHBETWEEN: 
+// Returns the number of months between the from date and the to date, order does not matter.
+FUNCTION: ABSMONTHSBETWEEN(DATE from, DATE to) <= ABS(MONTHSBETWEEN(from, to));
+
+// ABSYEARSBETWEEN: 
+// Returns the number of years between the from date and the to date, order does not matter.
+FUNCTION: ABSYEARSBETWEEN(DATE from, DATE to) <= ABS(YEARSBETWEEN(from, to));
+
+// AGE:
+// Returns the number of years between the input date and the current date.
+FUNCTION: AGE(DATE indate) <= ABS(YEARSBETWEEN(indate, CURRENTDATE()));
+
+// AGEDAYS:
+// Returns the number of days between the input date and the current date.
+FUNCTION: AGEDAYS(DATE indate) <= ABS(DAYSBETWEEN(indate, CURRENTDATE()));
+
+// LESSTHANXDAYSOLD: 
+// Returns boolean value whether the input date is less days old than the input number of days.
+FUNCTION: LESSTHANXDAYSOLD(DATE dateCheck, INTEGER days) <= DAYSBETWEEN(dateCheck, CURRENTDATE()) <= days;
+
+
+
+/**********************
+* Rounding Functions *
+**********************/
+//NOTE: When viewing results in the ECL IDE it may tack on 00...01 to your rounded value.
+// However, if you view your results in ECL Watch it should display your values rounded to the proper precision.
+// Additionally, a rounded value used to calculate an attribute will use the correct rounded precision,
+// even though the ECL IDE may not display it this way.
+
+ // ROUNDPERCENT: 
+ // Takes an input ratio and turns it into a percentage, rounding to the specified number of decimal places.
+FUNCTION: ROUNDPERCENT(REAL ratio, INTEGER precision) <= ECL(ROUND(ratio*100, precision)) RETURNS REAL;
+
+// ROUNDTO: 
+// Takes and input REAL value and rounds to the specified number of decimal places. 
+FUNCTION: ROUNDTO(REAL inReal, INTEGER precision) <= ECL(ROUND(inReal, precision)) RETURNS REAL;
+
+/*******************
+* Search Functions *
+*******************/
+// REGEXFIND:
+// Searchs the Source for the SearchFor input and returns TRUE if found.
+FUNCTION: REGEXFIND(STRING SearchFor, STRING Source) <= ECL(REGEXFIND(SearchFor, Source, NOCASE)) RETURNS BOOLEAN;
