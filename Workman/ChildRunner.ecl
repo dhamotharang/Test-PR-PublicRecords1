@@ -50,7 +50,7 @@ EXPORT ChildRunner(
   ,pDebugValues       = 'dataset([],WsWorkunits.Layouts.DebugValues)' // for the spawning of the wuids.  can use other repositories using this.
   ,pOnlyCompile       = 'false'                                       // if true, then it will only compile the iteration, not run it.  Useful for testing a build.
   ,pAutoResubmit      = 'false'                                       // if true, then it will automatically resubmit the wuid upon failure.  FALSE it will not(the default)
-
+  ,pTestingIters      = 'false'                                       // use this to test the iteration numbers.  see what iteration it will start at, etc.  doesn't actually kick off wuids
 ) := 
 functionmacro
 
@@ -157,8 +157,9 @@ functionmacro
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
-  ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
-  latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
+  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)iteration);
+  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,iteration);  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
+  // latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := if(pOutputSuperfile != ''  
@@ -641,6 +642,12 @@ functionmacro
 
   child_status_result := trim(wk_ut.get_Scalar_Result(workunit ,'Iteration_Status'));
 
+  ds_iteration_info := dataset([
+     {1 ,'(unsigned)WorkMan.get_Scalar_Result(workunit,\'Current_Iteration\')  !=  0                                                                      ' ,(string)(unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration') +'  !=  0'                                                                           ,(unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  !=  0                                                                     ,WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  }
+    ,{2 ,'child_iteration1                                                   != \'\'  and (unsigned)StartIteration < (unsigned)child_iteration1           ' ,child_iteration1                                                 +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + child_iteration1            ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1          ,child_iteration1                                         }//if start iteration is more than what you find in a file, use the start iteration
+    ,{3 ,'latest_completed_iteration                                         != \'\'  and (unsigned)StartIteration < (unsigned)latest_completed_iteration ' ,latest_completed_iteration                                       +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + latest_completed_iteration  ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration,latest_completed_iteration                               }
+    ,{4 ,'Default (string)StartIteration                                                                                                                  ' ,(string)StartIteration                                                                                                                                         ,true                                                                                                                                         ,(string)StartIteration                                   }
+  ],{unsigned1 order,string condition_code,string condition_annotated,boolean evaluate_condition,string result});
 
   doit := sequential(
      fixstart_filename
@@ -662,6 +669,14 @@ functionmacro
 #END 
     ,output(dataset([{'doit',(unsigned)result_Iteration_Number  ,result_Iteration_Number,WorkMan.getTimeDate()}],{string action,unsigned int_iteration,string str_iteration,string datetime})              ,named('dsIteration'           ),extend   )  //just for organizing these results
     ,output(if((unsigned)Loop_Counter + 1 > 1, childstate,''),named('Iteration_Status'      ),overwrite)
+#IF(pTestingIters = true)
+
+    ,output(ds_previous_builds                                ,named('ds_previous_builds'                 ),overwrite)
+    ,output(ds_previous_build_final_iterations                ,named('ds_previous_build_final_iterations' ),overwrite)
+    ,output(latest_previous_iteration                         ,named('latest_previous_iteration'          ),overwrite)
+    ,output(ds_iteration_info                                 ,named('ds_iteration_calculation_info'      ),overwrite)
+    ,fail('Fail because testing')
+#END
     ,output(result_Iteration_Wuid                            ,named('Iteration_Wuid'        ),overwrite)
     ,output(result_Iteration_Wuid__html                      ,named('Iteration_Wuid__html'  ),overwrite)
     ,output(dataset([],lay_iterations)                       ,named('Iteration_Wuids__html' ),extend   )
