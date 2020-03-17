@@ -16,8 +16,8 @@ EXPORT Map_BV_Domain_Lookup := FUNCTION
 	
 	// Transform Bright Verify History records to domain lookup layout
 	dx_email.Layouts.i_Domain_lkp Xform(Email_Event.Layouts.BV_raw L) := TRANSFORM
-	  trimDomain_name  := ut.CleanSpacesAndUpper(L.email_address);
-  	tmpdomain_name   := email_data.Fn_Clean_Email_Domain(trimDomain_name);
+	  trimEmailAddress  := ut.CleanSpacesAndUpper(L.email_address);
+  	tmpdomain_name   := email_data.Fn_Clean_Email_Domain(trimEmailAddress);
 		SELF.domain_name := TRIM(ut.fn_KeepPrintableChars(tmpdomain_name),LEFT,RIGHT);	  
 		SELF.create_date := '';
 	  SELF.expire_date := '';

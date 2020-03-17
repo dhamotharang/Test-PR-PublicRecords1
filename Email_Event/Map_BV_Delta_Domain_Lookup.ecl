@@ -13,8 +13,8 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 
 	// Transform BV Delta to domain lookup layout
 	dx_email.Layouts.i_Domain_lkp Xform_Delta(Email_Event.Layouts.BV_Delta_raw L) := TRANSFORM
-	  trimDomain_name  := ut.CleanSpacesAndUpper(L.email_address);
-  	tmpdomain_name   := email_data.Fn_Clean_Email_Domain(trimDomain_name);
+	  triEmailAddress  := ut.CleanSpacesAndUpper(L.email_address);
+  	tmpdomain_name   := email_data.Fn_Clean_Email_Domain(triEmailAddress);
 		SELF.domain_name := TRIM(ut.fn_KeepPrintableChars(tmpdomain_name),LEFT,RIGHT);
 	  SELF.create_date := '';
 	  SELF.expire_date := '';
