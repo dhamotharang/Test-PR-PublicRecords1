@@ -140,6 +140,7 @@ functionmacro
 
   child_wuid1                 := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].wuid     ;
   child_iteration1            := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].iteration;
+  child_iteration1_status     := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].state    ;
   
   latest_completed_wuid       := outputfilename_dataset [if(count(outputfilename_dataset) = 0,1,count(outputfilename_dataset))].wuid     ;
   latest_completed_iteration  := outputfilename_dataset [if(count(outputfilename_dataset) = 0,1,count(outputfilename_dataset))].iteration;
@@ -157,15 +158,15 @@ functionmacro
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
-  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)iteration);
-  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)iteration);  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
+  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)trim(iteration));
+  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)trim(iteration));  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
   // latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
-    default_start_iteration            := if(pOutputSuperfile != ''  
-    // default_start_iteration            := if((#TEXT(pStartIteration) = '' or trim((string)pStartIteration) = '') and pOutputSuperfile != '' //and trim(ds_previous_build_final_iterations[1].iteration) != '' 
-                                            ,(string)((unsigned)latest_previous_iteration + 1)
-                                            ,''
+    default_start_iteration            := map(
+                                              pOutputSuperfile != '' and (unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')   =  0  => (string)((unsigned)trim(latest_previous_iteration) + 1)
+                                             ,pOutputSuperfile != '' and (unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')  !=  0  => trim(WorkMan.get_Scalar_Result(workunit,'Start_Iteration'))
+                                            ,'1'
                                          );
     StartIteration := default_start_iteration;
   #ELSE
@@ -178,6 +179,7 @@ functionmacro
   // -- Iteration #
   Iteration            := map(
      (unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  !=  0                                                                       => WorkMan.get_Scalar_Result(workunit,'Current_Iteration')
+    ,child_iteration1                                                   != ''  and (unsigned)StartIteration <= (unsigned)child_iteration1 and trim(STD.Str.ToLowerCase(child_iteration1_status)) = 'completed'           => (string)((unsigned)child_iteration1 + 1 )           //if start iteration is more than what you find in a file, use the start iteration
     ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1            => child_iteration1             //if start iteration is more than what you find in a file, use the start iteration
     ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration  => latest_completed_iteration
   ,                                                                                                                                                    (string)StartIteration
@@ -644,9 +646,12 @@ functionmacro
 
   ds_iteration_info := dataset([
      {1 ,'(unsigned)WorkMan.get_Scalar_Result(workunit,\'Current_Iteration\')  !=  0                                                                      ' ,(string)(unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration') +'  !=  0'                                                                           ,(unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  !=  0                                                                     ,WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  }
-    ,{2 ,'child_iteration1                                                   != \'\'  and (unsigned)StartIteration < (unsigned)child_iteration1           ' ,child_iteration1                                                 +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + child_iteration1            ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1          ,child_iteration1                                         }//if start iteration is more than what you find in a file, use the start iteration
-    ,{3 ,'latest_completed_iteration                                         != \'\'  and (unsigned)StartIteration < (unsigned)latest_completed_iteration ' ,latest_completed_iteration                                       +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + latest_completed_iteration  ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration,latest_completed_iteration                               }
-    ,{4 ,'Default (string)StartIteration                                                                                                                  ' ,(string)StartIteration                                                                                                                                         ,true                                                                                                                                         ,(string)StartIteration                                   }
+
+    ,{2 ,'child_iteration1                                                   != \'\'  and (unsigned)StartIteration <= (unsigned)child_iteration1            and trim(STD.Str.ToLowerCase(child_iteration1_status)) = \'completed\'' ,child_iteration1                                                 +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + child_iteration1 +' and ' + trim(STD.Str.ToLowerCase(child_iteration1_status)) + ' = \'completed\''           ,child_iteration1                                                   != ''  and (unsigned)StartIteration <= (unsigned)child_iteration1   and trim(STD.Str.ToLowerCase(child_iteration1_status)) = 'completed'        ,(string)((unsigned)child_iteration1  + 1)                                       }//if start iteration is more than what you find in a file, use the start iteration
+
+    ,{3 ,'child_iteration1                                                   != \'\'  and (unsigned)StartIteration < (unsigned)child_iteration1           ' ,child_iteration1                                                 +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + child_iteration1            ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1          ,child_iteration1                                         }//if start iteration is more than what you find in a file, use the start iteration
+    ,{4 ,'latest_completed_iteration                                         != \'\'  and (unsigned)StartIteration < (unsigned)latest_completed_iteration ' ,latest_completed_iteration                                       +'  != \'\'  and (unsigned)' + StartIteration + ' < (unsigned)' + latest_completed_iteration  ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration,latest_completed_iteration                               }
+    ,{5 ,'Default (string)StartIteration                                                                                                                  ' ,(string)StartIteration                                                                                                                                         ,true                                                                                                                                         ,(string)StartIteration                                   }
   ],{unsigned1 order,string condition_code,string condition_annotated,boolean evaluate_condition,string result});
 
   doit := sequential(
@@ -659,7 +664,9 @@ functionmacro
     ,output(pversion                                         ,named('Version'               ),overwrite)
     ,output((unsigned)result_Iteration_Number                ,named('Current_Iteration'     ),overwrite)  //just for organizing these results
 // #IF(trim(#TEXT(pStartIteration))  != '') 
+    ,if((unsigned)WorkMan.get_Scalar_Result(workunit,'Start_Iteration')  =  0
     ,output(StartIteration                                   ,named('Start_Iteration'       ),overwrite)  //we will have a start iteration no matter if you pass one in or not
+    )
 // #END 
 #IF(trim(#TEXT(pNumMinIterations))  != '') 
     ,output(%'NumMinIterations'%                ,named('Minimum_Iterations'             ),overwrite)  //just for organizing these results
@@ -675,6 +682,7 @@ functionmacro
     ,output(ds_previous_build_final_iterations                ,named('ds_previous_build_final_iterations' ),overwrite)
     ,output(latest_previous_iteration                         ,named('latest_previous_iteration'          ),overwrite)
     ,output(ds_iteration_info                                 ,named('ds_iteration_calculation_info'      ),overwrite)
+    ,output(Iteration                                        ,named('Iteration'      ),overwrite)
     ,fail('Fail because testing')
 #END
     ,output(result_Iteration_Wuid                            ,named('Iteration_Wuid'        ),overwrite)
