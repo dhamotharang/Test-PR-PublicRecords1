@@ -158,7 +158,7 @@ functionmacro
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)iteration);
-  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,iteration);  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
+  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)iteration);  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
   // latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
