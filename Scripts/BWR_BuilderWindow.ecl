@@ -48,12 +48,12 @@ IMPORT $, Watchdog;
 
 //Output($.Watchdog_Match_Report.ds_rollflagged_rec, Named('matches_header_watchdog'));
 //Output($.Watchdog_Match_Report.Watchdog_Match, Named('Not_Rolled'));
-//Output($.Watchdog_Match_Report.st_counted_fname, Named('counted_fname'));
-// Output($.Watchdog_Match_Report.st_counted_lname, Named('counted_lname'));
-// Output($.Watchdog_Match_Report.st_counted_dob, Named('counted_dob'));
-// Output($.Watchdog_Match_Report.st_counted_ssn, Named('counted_ssn'));
-// Output($.Watchdog_Match_Report.st_counted_address_match, Named('counted_Address_Match'));
-// Output($.Watchdog_Match_Report.st_counted_collectivematch_all, Named('Counted_collective_match'));
+Output($.Watchdog_Match_Report.st_counted_fname, Named('counted_fname'));
+Output($.Watchdog_Match_Report.st_counted_lname, Named('counted_lname'));
+Output($.Watchdog_Match_Report.st_counted_dob, Named('counted_dob'));
+Output($.Watchdog_Match_Report.st_counted_ssn, Named('counted_ssn'));
+Output($.Watchdog_Match_Report.st_counted_address_match, Named('counted_Address_Match'));
+Output($.Watchdog_Match_Report.st_counted_collectivematch_all, Named('Counted_collective_match'));
 // Still need to distribute for 21b records
 
 
@@ -65,9 +65,9 @@ IMPORT $, Watchdog;
 // $.Spray_input_file.build_3;
 
 
-kyedsizedhistory := $.History_Analysis.Keysizedhistory_report;
-master_build := $.History_Analysis.Master_Build_Frequence_Report;
-orbit_build := $.History_Analysis.Orbit_buildinstance;
+// kyedsizedhistory := $.History_Analysis.Keysizedhistory_report;
+// master_build := $.History_Analysis.Master_Build_Frequence_Report;
+// orbit_build := $.History_Analysis.Orbit_buildinstance;
 
 //Output(kyedsizedhistory, Named('Keyedsized_History_Report'));
 // Output(master_build, Named('Master_Build_Frequency_Report'));
@@ -79,13 +79,3 @@ orbit_build := $.History_Analysis.Orbit_buildinstance;
 
 
 // ========================================== Counted Deltas ======================================
-
-//Output($.Counted_Deltas.deltas_calculated, Named('Calculated_Deltas'));
-
-//Output($.Counted_Deltas.deltas_calculated);
-
-// Output($.Counted_Deltas.g_keysizedhistory_rec, Named('Grouped_Sorted_Record'));
-// Output($.Counted_Deltas.st_previousRec, Named('Sliced_Sorted_Record'));
-Output($.Counted_Deltas.deltas_calculated, Named('Calculated_Deltas'));
-//Output($.Counted_Deltas.st_previousRec, Named('Previous'));
-//Output($.Counted_Deltas.t_newRec, Named('New_Record'));

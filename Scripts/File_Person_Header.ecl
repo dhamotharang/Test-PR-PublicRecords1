@@ -48,7 +48,6 @@
   Unsigned8 persistent_record_id; // hash value for overides 
 End;
 
- 
 Export File := Dataset('~thor::test::jdb', Layout, Thor);
 
 END;

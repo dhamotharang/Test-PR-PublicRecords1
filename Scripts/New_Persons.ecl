@@ -34,6 +34,5 @@ sdt := Sort(dt, lexid, fname, mname, lname, dob, ssn, prim_range, predir, prim_n
                 suffix, postdir, unit_desig, sec_range, city_name, st, zip, zip4, county, cbsa, Local);
 
 Export File := Dedup(sdt, lexid, fname, mname, lname, dob, ssn, prim_range, predir, prim_name, 
-                        suffix, postdir, unit_desig, sec_range, city_name, st, zip, zip4, county, cbsa, src)
-    :Persist('~Online::MVH::Persist::New_Persons');
+                        suffix, postdir, unit_desig, sec_range, city_name, st, zip, zip4, county, cbsa, src);
 End;
