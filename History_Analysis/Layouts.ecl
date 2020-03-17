@@ -1,4 +1,4 @@
-export Layouts := Module
+Export Layouts := Module
 
     Export Layout_Master_Build := Record
     String25 build_name;
@@ -42,6 +42,7 @@ export Layouts := Module
     String10   prevbuild_version:= '';
     String10   build_version;
     String25   whenlive;
+    String1    updateflag;
     String60   superkey;
     Integer8   previous_size:=0;
     Integer8   size;    
