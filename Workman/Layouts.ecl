@@ -88,7 +88,13 @@ module
 	export wks_slim_filename :=
   record
     wks_slim;
-    string               __filename                                                                  { virtual(logicalfilename)};
+    string200               __filename                                                                  { virtual(logicalfilename)};
+  end;
+
+	export wks_slim_filename2 :=
+  record
+    wks_slim;
+    string200               __filename                                                                  ;
   end;
 
 
