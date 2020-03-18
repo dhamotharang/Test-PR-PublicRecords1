@@ -122,163 +122,163 @@ EXPORT InValidMessageFT_invalid_document_number(UNSIGNED1 wh) := CHOOSE(wh,SALT3
 EXPORT MakeFT_invalid_land_use(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_land_use(SALT311.StrType s,SALT311.StrType src_land_use_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_land_use_code,'LAND_USE_CODE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_land_use(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'LAND_USE_CODE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_land_use(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_air_conditioning_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_air_conditioning_type_code(SALT311.StrType s,SALT311.StrType src_air_conditioning_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_air_conditioning_type,'AIR_CONDITIONING_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_air_conditioning_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'AIR_CONDITIONING_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_air_conditioning_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_basement_finish_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_basement_finish_type_code(SALT311.StrType s,SALT311.StrType src_basement_finish) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_basement_finish,'BASEMENT_FINISH','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_basement_finish_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'BASEMENT_FINISH','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_basement_finish_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_construction_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_construction_type_code(SALT311.StrType s,SALT311.StrType src_construction_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_construction_type,'CONSTRUCTION_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_construction_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'CONSTRUCTION_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_construction_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_exterior_walls_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_exterior_walls_code(SALT311.StrType s,SALT311.StrType src_exterior_wall) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_exterior_wall,'EXTERIOR_WALL','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_exterior_walls_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'EXTERIOR_WALL','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_exterior_walls_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_fireplace_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_fireplace_type(SALT311.StrType s,SALT311.StrType src_fireplace_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_fireplace_type,'FIREPLACE_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_fireplace_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'FIREPLACE_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_fireplace_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_floor_cover_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_floor_cover_code(SALT311.StrType s,SALT311.StrType src_floor_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_floor_type,'FLOOR_COVER','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_floor_cover_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'FLOOR_COVER','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_floor_cover_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_frame_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_frame_code(SALT311.StrType s,SALT311.StrType src_frame_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_frame_type,'FRAME','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_frame_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'FRAME','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_frame_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_foundation_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_foundation_type(SALT311.StrType s,SALT311.StrType src_foundation) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_foundation,'FOUNDATION_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_foundation_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'FOUNDATION_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_foundation_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_garage_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_garage_type(SALT311.StrType s,SALT311.StrType src_garage) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_garage,'GARAGE_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_garage_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'GARAGE_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_garage_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_heating_fuel_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_heating_fuel_type(SALT311.StrType s,SALT311.StrType src_fuel_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_fuel_type,'FUEL_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_heating_fuel_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'FUEL_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_heating_fuel_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_heating_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_heating_type(SALT311.StrType s,SALT311.StrType src_heating) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_heating,'HEATING_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_heating_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'HEATING_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_heating_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_location_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_location_code(SALT311.StrType s,SALT311.StrType src_location_influence_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_location_influence_code,'LOCATION_INFLUENCE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_location_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'LOCATION_INFLUENCE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_location_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_parking_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_parking_type(SALT311.StrType s,SALT311.StrType src_parking_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_parking_type,'PARKING_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_parking_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'PARKING_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_parking_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_pool_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_pool_type(SALT311.StrType s,SALT311.StrType src_pool_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_pool_type,'POOL_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_pool_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'POOL_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_pool_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_property_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_property_code(SALT311.StrType s,SALT311.StrType src_property_type_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_property_type_code,'PROPERTY_IND','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_property_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'PROPERTY_IND','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_property_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_roof_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_roof_type(SALT311.StrType s,SALT311.StrType src_roof_cover) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_roof_cover,'ROOF_COVER_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_roof_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'ROOF_COVER_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_roof_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_sale_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_sale_code(SALT311.StrType s,SALT311.StrType src_full_part_sale) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_full_part_sale,'SALE_CODE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_sale_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'SALE_CODE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_sale_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_sale_tran_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_sale_tran_code(SALT311.StrType s,SALT311.StrType src_sale_type_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_sale_type_code,'SALE_TRANS_CODE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_sale_tran_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'SALE_TRANS_CODE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_sale_tran_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_sewer_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_sewer_type(SALT311.StrType s,SALT311.StrType src_sewer) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_sewer,'SEWER_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_sewer_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'SEWER_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_sewer_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_stories_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_stories_type(SALT311.StrType s,SALT311.StrType src_stories_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_stories_type,'STORIES_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_stories_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'STORIES_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_stories_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_structure_quality_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_structure_quality_code(SALT311.StrType s,SALT311.StrType src_structure_quality) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_structure_quality,'QUALITY','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_structure_quality_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'QUALITY','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_structure_quality_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_style_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_style_type(SALT311.StrType s,SALT311.StrType src_style_type) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_style_type,'STYLE_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_style_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'STYLE_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_style_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_water_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_water_type(SALT311.StrType s,SALT311.StrType src_water) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_water,'WATER_TYPE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_water_type(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'WATER_TYPE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_water_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_financing_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_financing_type_code(SALT311.StrType s,SALT311.StrType src_interest_rate_type_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_interest_rate_type_code,'TYPE_FINANCING','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_financing_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'TYPE_FINANCING','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_financing_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_mortgage_loan_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mortgage_loan_type_code(SALT311.StrType s,SALT311.StrType src_loan_type_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_loan_type_code,'MORTGAGE_LOAN_TYPE_CODE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_mortgage_loan_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'MORTGAGE_LOAN_TYPE_CODE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_mortgage_loan_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_mortgage_lender_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mortgage_lender_type_code(SALT311.StrType s,SALT311.StrType src_loan_type_code) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,src_loan_type_code,'MORTGAGE_LENDER_TYPE_CODE','PROPERTYINFO')>0);
+EXPORT InValidFT_invalid_mortgage_lender_type_code(SALT311.StrType s) := WHICH(~Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo(s,'MORTGAGE_LENDER_TYPE_CODE','PROPERTYINFO')>0);
 EXPORT InValidMessageFT_invalid_mortgage_lender_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Property_Characteristics.fn_valid_codesv3_propertyinfo'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'property_rid','dt_vendor_first_reported','dt_vendor_last_reported','tax_sortby_date','deed_sortby_date','vendor_source','fares_unformatted_apn','property_street_address','property_city_state_zip','property_raw_aid','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','building_square_footage','src_building_square_footage','tax_dt_building_square_footage','air_conditioning_type','src_air_conditioning_type','tax_dt_air_conditioning_type','basement_finish','src_basement_finish','tax_dt_basement_finish','construction_type','src_construction_type','tax_dt_construction_type','exterior_wall','src_exterior_wall','tax_dt_exterior_wall','fireplace_ind','src_fireplace_ind','tax_dt_fireplace_ind','fireplace_type','src_fireplace_type','tax_dt_fireplace_type','flood_zone_panel','src_flood_zone_panel','tax_dt_flood_zone_panel','garage','src_garage','tax_dt_garage','first_floor_square_footage','src_first_floor_square_footage','tax_dt_first_floor_square_footage','heating','src_heating','tax_dt_heating','living_area_square_footage','src_living_area_square_footage','tax_dt_living_area_square_footage','no_of_baths','src_no_of_baths','tax_dt_no_of_baths','no_of_bedrooms','src_no_of_bedrooms','tax_dt_no_of_bedrooms','no_of_fireplaces','src_no_of_fireplaces','tax_dt_no_of_fireplaces','no_of_full_baths','src_no_of_full_baths','tax_dt_no_of_full_baths','no_of_half_baths','src_no_of_half_baths','tax_dt_no_of_half_baths','no_of_stories','src_no_of_stories','tax_dt_no_of_stories','parking_type','src_parking_type','tax_dt_parking_type','pool_indicator','src_pool_indicator','tax_dt_pool_indicator','pool_type','src_pool_type','tax_dt_pool_type','roof_cover','src_roof_cover','tax_dt_roof_cover','year_built','src_year_built','tax_dt_year_built','foundation','src_foundation','tax_dt_foundation','basement_square_footage','src_basement_square_footage','tax_dt_basement_square_footage','effective_year_built','src_effective_year_built','tax_dt_effective_year_built','garage_square_footage','src_garage_square_footage','tax_dt_garage_square_footage','stories_type','src_stories_type','tax_dt_stories_type','apn_number','src_apn_number','tax_dt_apn_number','census_tract','src_census_tract','tax_dt_census_tract','range','src_range','tax_dt_range','zoning','src_zoning','tax_dt_zoning','block_number','src_block_number','tax_dt_block_number','county_name','src_county_name','tax_dt_county_name','fips_code','src_fips_code','tax_dt_fips_code','subdivision','src_subdivision','tax_dt_subdivision','municipality','src_municipality','tax_dt_municipality','township','src_township','tax_dt_township','homestead_exemption_ind','src_homestead_exemption_ind','tax_dt_homestead_exemption_ind','land_use_code','src_land_use_code','tax_dt_land_use_code','latitude','src_latitude','tax_dt_latitude','longitude','src_longitude','tax_dt_longitude','location_influence_code','src_location_influence_code','tax_dt_location_influence_code','acres','src_acres','tax_dt_acres','lot_depth_footage','src_lot_depth_footage','tax_dt_lot_depth_footage','lot_front_footage','src_lot_front_footage','tax_dt_lot_front_footage','lot_number','src_lot_number','tax_dt_lot_number','lot_size','src_lot_size','tax_dt_lot_size','property_type_code','src_property_type_code','tax_dt_property_type_code','structure_quality','src_structure_quality','tax_dt_structure_quality','water','src_water','tax_dt_water','sewer','src_sewer','tax_dt_sewer','assessed_land_value','src_assessed_land_value','tax_dt_assessed_land_value','assessed_year','src_assessed_year','tax_dt_assessed_year','tax_amount','src_tax_amount','tax_dt_tax_amount','tax_year','src_tax_year','market_land_value','src_market_land_value','tax_dt_market_land_value','improvement_value','src_improvement_value','tax_dt_improvement_value','percent_improved','src_percent_improved','tax_dt_percent_improved','total_assessed_value','src_total_assessed_value','tax_dt_total_assessed_value','total_calculated_value','src_total_calculated_value','tax_dt_total_calculated_value','total_land_value','src_total_land_value','tax_dt_total_land_value','total_market_value','src_total_market_value','tax_dt_total_market_value','floor_type','src_floor_type','tax_dt_floor_type','frame_type','src_frame_type','tax_dt_frame_type','fuel_type','src_fuel_type','tax_dt_fuel_type','no_of_bath_fixtures','src_no_of_bath_fixtures','tax_dt_no_of_bath_fixtures','no_of_rooms','src_no_of_rooms','tax_dt_no_of_rooms','no_of_units','src_no_of_units','tax_dt_no_of_units','style_type','src_style_type','tax_dt_style_type','assessment_document_number','src_assessment_document_number','tax_dt_assessment_document_number','assessment_recording_date','src_assessment_recording_date','tax_dt_assessment_recording_date','deed_document_number','src_deed_document_number','rec_dt_deed_document_number','deed_recording_date','src_deed_recording_date','full_part_sale','src_full_part_sale','rec_dt_full_part_sale','sale_amount','src_sale_amount','rec_dt_sale_amount','sale_date','src_sale_date','rec_dt_sale_date','sale_type_code','src_sale_type_code','rec_dt_sale_type_code','mortgage_company_name','src_mortgage_company_name','rec_dt_mortgage_company_name','loan_amount','src_loan_amount','rec_dt_loan_amount','second_loan_amount','src_second_loan_amount','rec_dt_second_loan_amount','loan_type_code','src_loan_type_code','rec_dt_loan_type_code','interest_rate_type_code','src_interest_rate_type_code','rec_dt_interest_rate_type_code');
@@ -446,7 +446,7 @@ EXPORT InValid_tax_dt_building_square_footage(SALT311.StrType s) := InValidFT_in
 EXPORT InValidMessage_tax_dt_building_square_footage(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_air_conditioning_type(SALT311.StrType s0) := MakeFT_invalid_air_conditioning_type_code(s0);
-EXPORT InValid_air_conditioning_type(SALT311.StrType s,SALT311.StrType src_air_conditioning_type) := InValidFT_invalid_air_conditioning_type_code(s,src_air_conditioning_type);
+EXPORT InValid_air_conditioning_type(SALT311.StrType s) := InValidFT_invalid_air_conditioning_type_code(s);
 EXPORT InValidMessage_air_conditioning_type(UNSIGNED1 wh) := InValidMessageFT_invalid_air_conditioning_type_code(wh);
  
 EXPORT Make_src_air_conditioning_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -458,7 +458,7 @@ EXPORT InValid_tax_dt_air_conditioning_type(SALT311.StrType s) := InValidFT_inva
 EXPORT InValidMessage_tax_dt_air_conditioning_type(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_basement_finish(SALT311.StrType s0) := MakeFT_invalid_basement_finish_type_code(s0);
-EXPORT InValid_basement_finish(SALT311.StrType s,SALT311.StrType src_basement_finish) := InValidFT_invalid_basement_finish_type_code(s,src_basement_finish);
+EXPORT InValid_basement_finish(SALT311.StrType s) := InValidFT_invalid_basement_finish_type_code(s);
 EXPORT InValidMessage_basement_finish(UNSIGNED1 wh) := InValidMessageFT_invalid_basement_finish_type_code(wh);
  
 EXPORT Make_src_basement_finish(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -470,7 +470,7 @@ EXPORT InValid_tax_dt_basement_finish(SALT311.StrType s) := InValidFT_invalid_da
 EXPORT InValidMessage_tax_dt_basement_finish(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_construction_type(SALT311.StrType s0) := MakeFT_invalid_construction_type_code(s0);
-EXPORT InValid_construction_type(SALT311.StrType s,SALT311.StrType src_construction_type) := InValidFT_invalid_construction_type_code(s,src_construction_type);
+EXPORT InValid_construction_type(SALT311.StrType s) := InValidFT_invalid_construction_type_code(s);
 EXPORT InValidMessage_construction_type(UNSIGNED1 wh) := InValidMessageFT_invalid_construction_type_code(wh);
  
 EXPORT Make_src_construction_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -482,7 +482,7 @@ EXPORT InValid_tax_dt_construction_type(SALT311.StrType s) := InValidFT_invalid_
 EXPORT InValidMessage_tax_dt_construction_type(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_exterior_wall(SALT311.StrType s0) := MakeFT_invalid_exterior_walls_code(s0);
-EXPORT InValid_exterior_wall(SALT311.StrType s,SALT311.StrType src_exterior_wall) := InValidFT_invalid_exterior_walls_code(s,src_exterior_wall);
+EXPORT InValid_exterior_wall(SALT311.StrType s) := InValidFT_invalid_exterior_walls_code(s);
 EXPORT InValidMessage_exterior_wall(UNSIGNED1 wh) := InValidMessageFT_invalid_exterior_walls_code(wh);
  
 EXPORT Make_src_exterior_wall(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -506,7 +506,7 @@ EXPORT InValid_tax_dt_fireplace_ind(SALT311.StrType s) := InValidFT_invalid_date
 EXPORT InValidMessage_tax_dt_fireplace_ind(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_fireplace_type(SALT311.StrType s0) := MakeFT_invalid_fireplace_type(s0);
-EXPORT InValid_fireplace_type(SALT311.StrType s,SALT311.StrType src_fireplace_type) := InValidFT_invalid_fireplace_type(s,src_fireplace_type);
+EXPORT InValid_fireplace_type(SALT311.StrType s) := InValidFT_invalid_fireplace_type(s);
 EXPORT InValidMessage_fireplace_type(UNSIGNED1 wh) := InValidMessageFT_invalid_fireplace_type(wh);
  
 EXPORT Make_src_fireplace_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -530,7 +530,7 @@ EXPORT InValid_tax_dt_flood_zone_panel(SALT311.StrType s) := InValidFT_invalid_d
 EXPORT InValidMessage_tax_dt_flood_zone_panel(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_garage(SALT311.StrType s0) := MakeFT_invalid_garage_type(s0);
-EXPORT InValid_garage(SALT311.StrType s,SALT311.StrType src_garage) := InValidFT_invalid_garage_type(s,src_garage);
+EXPORT InValid_garage(SALT311.StrType s) := InValidFT_invalid_garage_type(s);
 EXPORT InValidMessage_garage(UNSIGNED1 wh) := InValidMessageFT_invalid_garage_type(wh);
  
 EXPORT Make_src_garage(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -554,7 +554,7 @@ EXPORT InValid_tax_dt_first_floor_square_footage(SALT311.StrType s) := InValidFT
 EXPORT InValidMessage_tax_dt_first_floor_square_footage(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_heating(SALT311.StrType s0) := MakeFT_invalid_heating_type(s0);
-EXPORT InValid_heating(SALT311.StrType s,SALT311.StrType src_heating) := InValidFT_invalid_heating_type(s,src_heating);
+EXPORT InValid_heating(SALT311.StrType s) := InValidFT_invalid_heating_type(s);
 EXPORT InValidMessage_heating(UNSIGNED1 wh) := InValidMessageFT_invalid_heating_type(wh);
  
 EXPORT Make_src_heating(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -650,7 +650,7 @@ EXPORT InValid_tax_dt_no_of_stories(SALT311.StrType s) := InValidFT_invalid_date
 EXPORT InValidMessage_tax_dt_no_of_stories(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_parking_type(SALT311.StrType s0) := MakeFT_invalid_parking_type(s0);
-EXPORT InValid_parking_type(SALT311.StrType s,SALT311.StrType src_parking_type) := InValidFT_invalid_parking_type(s,src_parking_type);
+EXPORT InValid_parking_type(SALT311.StrType s) := InValidFT_invalid_parking_type(s);
 EXPORT InValidMessage_parking_type(UNSIGNED1 wh) := InValidMessageFT_invalid_parking_type(wh);
  
 EXPORT Make_src_parking_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -674,7 +674,7 @@ EXPORT InValid_tax_dt_pool_indicator(SALT311.StrType s) := InValidFT_invalid_dat
 EXPORT InValidMessage_tax_dt_pool_indicator(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_pool_type(SALT311.StrType s0) := MakeFT_invalid_pool_type(s0);
-EXPORT InValid_pool_type(SALT311.StrType s,SALT311.StrType src_pool_type) := InValidFT_invalid_pool_type(s,src_pool_type);
+EXPORT InValid_pool_type(SALT311.StrType s) := InValidFT_invalid_pool_type(s);
 EXPORT InValidMessage_pool_type(UNSIGNED1 wh) := InValidMessageFT_invalid_pool_type(wh);
  
 EXPORT Make_src_pool_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -686,7 +686,7 @@ EXPORT InValid_tax_dt_pool_type(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_tax_dt_pool_type(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_roof_cover(SALT311.StrType s0) := MakeFT_invalid_roof_type(s0);
-EXPORT InValid_roof_cover(SALT311.StrType s,SALT311.StrType src_roof_cover) := InValidFT_invalid_roof_type(s,src_roof_cover);
+EXPORT InValid_roof_cover(SALT311.StrType s) := InValidFT_invalid_roof_type(s);
 EXPORT InValidMessage_roof_cover(UNSIGNED1 wh) := InValidMessageFT_invalid_roof_type(wh);
  
 EXPORT Make_src_roof_cover(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -710,7 +710,7 @@ EXPORT InValid_tax_dt_year_built(SALT311.StrType s) := InValidFT_invalid_date(s)
 EXPORT InValidMessage_tax_dt_year_built(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_foundation(SALT311.StrType s0) := MakeFT_invalid_foundation_type(s0);
-EXPORT InValid_foundation(SALT311.StrType s,SALT311.StrType src_foundation) := InValidFT_invalid_foundation_type(s,src_foundation);
+EXPORT InValid_foundation(SALT311.StrType s) := InValidFT_invalid_foundation_type(s);
 EXPORT InValidMessage_foundation(UNSIGNED1 wh) := InValidMessageFT_invalid_foundation_type(wh);
  
 EXPORT Make_src_foundation(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -758,7 +758,7 @@ EXPORT InValid_tax_dt_garage_square_footage(SALT311.StrType s) := InValidFT_inva
 EXPORT InValidMessage_tax_dt_garage_square_footage(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_stories_type(SALT311.StrType s0) := MakeFT_invalid_stories_type(s0);
-EXPORT InValid_stories_type(SALT311.StrType s,SALT311.StrType src_stories_type) := InValidFT_invalid_stories_type(s,src_stories_type);
+EXPORT InValid_stories_type(SALT311.StrType s) := InValidFT_invalid_stories_type(s);
 EXPORT InValidMessage_stories_type(UNSIGNED1 wh) := InValidMessageFT_invalid_stories_type(wh);
  
 EXPORT Make_src_stories_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -902,7 +902,7 @@ EXPORT InValid_tax_dt_homestead_exemption_ind(SALT311.StrType s) := InValidFT_in
 EXPORT InValidMessage_tax_dt_homestead_exemption_ind(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_land_use_code(SALT311.StrType s0) := MakeFT_invalid_land_use(s0);
-EXPORT InValid_land_use_code(SALT311.StrType s,SALT311.StrType src_land_use_code) := InValidFT_invalid_land_use(s,src_land_use_code);
+EXPORT InValid_land_use_code(SALT311.StrType s) := InValidFT_invalid_land_use(s);
 EXPORT InValidMessage_land_use_code(UNSIGNED1 wh) := InValidMessageFT_invalid_land_use(wh);
  
 EXPORT Make_src_land_use_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -938,7 +938,7 @@ EXPORT InValid_tax_dt_longitude(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_tax_dt_longitude(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_location_influence_code(SALT311.StrType s0) := MakeFT_invalid_location_code(s0);
-EXPORT InValid_location_influence_code(SALT311.StrType s,SALT311.StrType src_location_influence_code) := InValidFT_invalid_location_code(s,src_location_influence_code);
+EXPORT InValid_location_influence_code(SALT311.StrType s) := InValidFT_invalid_location_code(s);
 EXPORT InValidMessage_location_influence_code(UNSIGNED1 wh) := InValidMessageFT_invalid_location_code(wh);
  
 EXPORT Make_src_location_influence_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1010,7 +1010,7 @@ EXPORT InValid_tax_dt_lot_size(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_tax_dt_lot_size(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_property_type_code(SALT311.StrType s0) := MakeFT_invalid_property_code(s0);
-EXPORT InValid_property_type_code(SALT311.StrType s,SALT311.StrType src_property_type_code) := InValidFT_invalid_property_code(s,src_property_type_code);
+EXPORT InValid_property_type_code(SALT311.StrType s) := InValidFT_invalid_property_code(s);
 EXPORT InValidMessage_property_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_property_code(wh);
  
 EXPORT Make_src_property_type_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1022,7 +1022,7 @@ EXPORT InValid_tax_dt_property_type_code(SALT311.StrType s) := InValidFT_invalid
 EXPORT InValidMessage_tax_dt_property_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_structure_quality(SALT311.StrType s0) := MakeFT_invalid_structure_quality_code(s0);
-EXPORT InValid_structure_quality(SALT311.StrType s,SALT311.StrType src_structure_quality) := InValidFT_invalid_structure_quality_code(s,src_structure_quality);
+EXPORT InValid_structure_quality(SALT311.StrType s) := InValidFT_invalid_structure_quality_code(s);
 EXPORT InValidMessage_structure_quality(UNSIGNED1 wh) := InValidMessageFT_invalid_structure_quality_code(wh);
  
 EXPORT Make_src_structure_quality(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1034,7 +1034,7 @@ EXPORT InValid_tax_dt_structure_quality(SALT311.StrType s) := InValidFT_invalid_
 EXPORT InValidMessage_tax_dt_structure_quality(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_water(SALT311.StrType s0) := MakeFT_invalid_water_type(s0);
-EXPORT InValid_water(SALT311.StrType s,SALT311.StrType src_water) := InValidFT_invalid_water_type(s,src_water);
+EXPORT InValid_water(SALT311.StrType s) := InValidFT_invalid_water_type(s);
 EXPORT InValidMessage_water(UNSIGNED1 wh) := InValidMessageFT_invalid_water_type(wh);
  
 EXPORT Make_src_water(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1046,7 +1046,7 @@ EXPORT InValid_tax_dt_water(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_tax_dt_water(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_sewer(SALT311.StrType s0) := MakeFT_invalid_sewer_type(s0);
-EXPORT InValid_sewer(SALT311.StrType s,SALT311.StrType src_sewer) := InValidFT_invalid_sewer_type(s,src_sewer);
+EXPORT InValid_sewer(SALT311.StrType s) := InValidFT_invalid_sewer_type(s);
 EXPORT InValidMessage_sewer(UNSIGNED1 wh) := InValidMessageFT_invalid_sewer_type(wh);
  
 EXPORT Make_src_sewer(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1186,7 +1186,7 @@ EXPORT InValid_tax_dt_total_market_value(SALT311.StrType s) := InValidFT_invalid
 EXPORT InValidMessage_tax_dt_total_market_value(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_floor_type(SALT311.StrType s0) := MakeFT_invalid_floor_cover_code(s0);
-EXPORT InValid_floor_type(SALT311.StrType s,SALT311.StrType src_floor_type) := InValidFT_invalid_floor_cover_code(s,src_floor_type);
+EXPORT InValid_floor_type(SALT311.StrType s) := InValidFT_invalid_floor_cover_code(s);
 EXPORT InValidMessage_floor_type(UNSIGNED1 wh) := InValidMessageFT_invalid_floor_cover_code(wh);
  
 EXPORT Make_src_floor_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1198,7 +1198,7 @@ EXPORT InValid_tax_dt_floor_type(SALT311.StrType s) := InValidFT_invalid_date(s)
 EXPORT InValidMessage_tax_dt_floor_type(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_frame_type(SALT311.StrType s0) := MakeFT_invalid_frame_code(s0);
-EXPORT InValid_frame_type(SALT311.StrType s,SALT311.StrType src_frame_type) := InValidFT_invalid_frame_code(s,src_frame_type);
+EXPORT InValid_frame_type(SALT311.StrType s) := InValidFT_invalid_frame_code(s);
 EXPORT InValidMessage_frame_type(UNSIGNED1 wh) := InValidMessageFT_invalid_frame_code(wh);
  
 EXPORT Make_src_frame_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1210,7 +1210,7 @@ EXPORT InValid_tax_dt_frame_type(SALT311.StrType s) := InValidFT_invalid_date(s)
 EXPORT InValidMessage_tax_dt_frame_type(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_fuel_type(SALT311.StrType s0) := MakeFT_invalid_heating_fuel_type(s0);
-EXPORT InValid_fuel_type(SALT311.StrType s,SALT311.StrType src_fuel_type) := InValidFT_invalid_heating_fuel_type(s,src_fuel_type);
+EXPORT InValid_fuel_type(SALT311.StrType s) := InValidFT_invalid_heating_fuel_type(s);
 EXPORT InValidMessage_fuel_type(UNSIGNED1 wh) := InValidMessageFT_invalid_heating_fuel_type(wh);
  
 EXPORT Make_src_fuel_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1258,7 +1258,7 @@ EXPORT InValid_tax_dt_no_of_units(SALT311.StrType s) := InValidFT_invalid_date(s
 EXPORT InValidMessage_tax_dt_no_of_units(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_style_type(SALT311.StrType s0) := MakeFT_invalid_style_type(s0);
-EXPORT InValid_style_type(SALT311.StrType s,SALT311.StrType src_style_type) := InValidFT_invalid_style_type(s,src_style_type);
+EXPORT InValid_style_type(SALT311.StrType s) := InValidFT_invalid_style_type(s);
 EXPORT InValidMessage_style_type(UNSIGNED1 wh) := InValidMessageFT_invalid_style_type(wh);
  
 EXPORT Make_src_style_type(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1314,7 +1314,7 @@ EXPORT InValid_src_deed_recording_date(SALT311.StrType s) := InValidFT_invalid_v
 EXPORT InValidMessage_src_deed_recording_date(UNSIGNED1 wh) := InValidMessageFT_invalid_vendor_source(wh);
  
 EXPORT Make_full_part_sale(SALT311.StrType s0) := MakeFT_invalid_sale_code(s0);
-EXPORT InValid_full_part_sale(SALT311.StrType s,SALT311.StrType src_full_part_sale) := InValidFT_invalid_sale_code(s,src_full_part_sale);
+EXPORT InValid_full_part_sale(SALT311.StrType s) := InValidFT_invalid_sale_code(s);
 EXPORT InValidMessage_full_part_sale(UNSIGNED1 wh) := InValidMessageFT_invalid_sale_code(wh);
  
 EXPORT Make_src_full_part_sale(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1350,7 +1350,7 @@ EXPORT InValid_rec_dt_sale_date(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_rec_dt_sale_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_sale_type_code(SALT311.StrType s0) := MakeFT_invalid_sale_tran_code(s0);
-EXPORT InValid_sale_type_code(SALT311.StrType s,SALT311.StrType src_sale_type_code) := InValidFT_invalid_sale_tran_code(s,src_sale_type_code);
+EXPORT InValid_sale_type_code(SALT311.StrType s) := InValidFT_invalid_sale_tran_code(s);
 EXPORT InValidMessage_sale_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_sale_tran_code(wh);
  
 EXPORT Make_src_sale_type_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1398,7 +1398,7 @@ EXPORT InValid_rec_dt_second_loan_amount(SALT311.StrType s) := InValidFT_invalid
 EXPORT InValidMessage_rec_dt_second_loan_amount(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_loan_type_code(SALT311.StrType s0) := MakeFT_invalid_mortgage_loan_type_code(s0);
-EXPORT InValid_loan_type_code(SALT311.StrType s,SALT311.StrType src_loan_type_code) := InValidFT_invalid_mortgage_loan_type_code(s,src_loan_type_code);
+EXPORT InValid_loan_type_code(SALT311.StrType s) := InValidFT_invalid_mortgage_loan_type_code(s);
 EXPORT InValidMessage_loan_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_mortgage_loan_type_code(wh);
  
 EXPORT Make_src_loan_type_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
@@ -1410,7 +1410,7 @@ EXPORT InValid_rec_dt_loan_type_code(SALT311.StrType s) := InValidFT_invalid_dat
 EXPORT InValidMessage_rec_dt_loan_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_interest_rate_type_code(SALT311.StrType s0) := MakeFT_invalid_financing_type_code(s0);
-EXPORT InValid_interest_rate_type_code(SALT311.StrType s,SALT311.StrType src_interest_rate_type_code) := InValidFT_invalid_financing_type_code(s,src_interest_rate_type_code);
+EXPORT InValid_interest_rate_type_code(SALT311.StrType s) := InValidFT_invalid_financing_type_code(s);
 EXPORT InValidMessage_interest_rate_type_code(UNSIGNED1 wh) := InValidMessageFT_invalid_financing_type_code(wh);
  
 EXPORT Make_src_interest_rate_type_code(SALT311.StrType s0) := MakeFT_invalid_vendor_source(s0);
