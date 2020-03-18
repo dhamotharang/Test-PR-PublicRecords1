@@ -9,8 +9,12 @@ Regression testing notes
 3. Save your code changes in your sandbox, deploy your query again (Risk_Indicators.Boca_Shell) to dev roxie for testing
 
 4.  run a test sample through each version of the query using a soapcall script
-(RiskProcessing.bwr_BocaShell50_FCRA or RiskProcessing.bwr_BocaShell50_NonFCRA)
+(RiskProcessing.bwr_test_bocashells or RiskProcessing.bwr_test_FCRA_bocashells
+)
 5. compare the results  (bwr_bocashell_regression)
+
+6. if there are differences and you want to see score impacts, use the runway which displays all of our models:  RiskProcessing.bwr_runway_regression
+
 */
 
 #workunit('name', 'shell comparison');
@@ -22,15 +26,14 @@ layout_internal := RECORD
 END;
 
 eyeball := 10;
-	
-// basefilename := '~dvstemp::out::audit::fcrashell_baselines_w20170309-140530';  
-// testfilename := '~dvstemp::out::audit::fcrashell_baselines_w20170309-140530 ';  
 
-basefilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509';  
-testfilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509';  
+basefilename := '~dvstemp::out::audit::nonfcrashell_test_w20200318-141536';  
+testfilename := '~dvstemp::out::audit::nonfcrashell_test_w20200318-141546';  
 
 baseline := dataset(basefilename, layout_internal, csv(quote('"'), maxlength(20000)))(errorcode='');
 testfile := dataset(testfilename, layout_internal, csv(quote('"'), maxlength(20000)))(errorcode='');
+output(choosen(baseline, eyeball), named('baseline'));
+output(choosen(testfile, eyeball), named('testfile'));
 
 diff_flags := record
 	string4 did;
@@ -125,14 +128,13 @@ cmpr := record, maxlength(45000)
 	dataset(riskprocessing.layouts.layout_internal_shell_noDatasets) eyeball;
 end;
 
-
 // for cases when you want to compare one version of the shell to another version of the shell in the same file, use this logic
 // version 5.0 are records between 300000 and 600000
-baseline_shell := project(baseline(seq between 300000 and 600000), transform(riskprocessing.layouts.layout_internal_shell_noDatasets, 
-		seq := left.seq - 300000;		self.seq := seq; 		self.shell_input.seq := seq;
+// baseline_shell := project(baseline(seq between 300000 and 600000), transform(riskprocessing.layouts.layout_internal_shell_noDatasets, 
+		// seq := left.seq - 300000;		self.seq := seq; 		self.shell_input.seq := seq;
 
 // otherwise run with this normal logic when comparing 2 files			
-// baseline_shell := project(baseline, transform(riskprocessing.layouts.layout_internal_shell_noDatasets,
+baseline_shell := project(baseline, transform(riskprocessing.layouts.layout_internal_shell_noDatasets,
 		self.time_ms := 0; // hard code the time_ms to blank during comparison step
 		self.historydatetimestamp := '';  // hard code the timestamp to blank during the comparison step
 		self := left, self := [];
