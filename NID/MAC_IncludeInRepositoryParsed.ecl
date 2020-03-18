@@ -39,7 +39,7 @@ useV2
 		self.cln_suffix2    := L.suffix2;
 		self.gender			:= if(L.namtype = 'P',
 								Address.NameTester.GenderEx(self.cln_fname,self.cln_mname),'');
-		self.nameind := Nid.NameIndicators.fn_setNameIndicator(self.NameType,0,self.gender,Length(trim(self.cln_fname))=1);
+		self.nameind := Nid.NameIndicators.fn_setNameIndicator(self.NameType,0,self.gender,true);
 		
 		self := [];
 	END;

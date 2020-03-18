@@ -1290,6 +1290,17 @@
 				trim(kword, left, right) = 'JPCAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPCAA,
 				trim(kword, left, right) = 'PHBOI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBOI,
 				trim(kword, left, right) = 'PHBIR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBIR,
+				trim(kword, left, right) = 'CGPALF' =>SubGroup_Constants.numKeywordsID.KEYWORD_CGPALF,
+				trim(kword, left, right) = 'PAISRSNF' =>SubGroup_Constants.numKeywordsID.KEYWORD_PAISRSNF,
+				trim(kword, left, right) = 'IQAML' =>SubGroup_Constants.numKeywordsID.KEYWORD_IQAML,
+				trim(kword, left, right) = 'UKTR' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKTR,
+				trim(kword, left, right) = 'PBC-AP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PBC_AP,
+				trim(kword, left, right) = 'MMACCM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MMACCM,
+				trim(kword, left, right) = 'EU-TUR' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_TUR,
+				trim(kword, left, right) = 'AOCMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_AOCMC,
+				trim(kword, left, right) = 'AOBNA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AOBNA,
+				trim(kword, left, right) = 'ATBMF-LSU' =>SubGroup_Constants.numKeywordsID.KEYWORD_ATBMF_LSU,
+				trim(kword, left, right) = 'KZACA' =>SubGroup_Constants.numKeywordsID.KEYWORD_KZACA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

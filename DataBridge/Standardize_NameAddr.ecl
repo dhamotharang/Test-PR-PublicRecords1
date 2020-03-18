@@ -66,7 +66,7 @@ EXPORT Standardize_NameAddr := MODULE
 			SELF.prep_Address_line1     := ut.CleanSpacesAndUpper(L.Address + ' ' + L.Address2);	
 			SELF.prep_Address_line_last := ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.City) + 
 												                IF(L.City <> '' and L.State <> '', ', ', '') + L.State + ' ' +
-											                  IF(LENGTH(L.Zip) = 5, L.Zip, ''));
+											                  IF(LENGTH(L.Zip_Code5) = 5, L.Zip_Code5, ''));
   		SELF											  := L;
 		END;   
 		

@@ -39,11 +39,6 @@ end;
 
   FLAccidents_Ecrash.Layout_BaseFile trecs2(fPreclean L, dvina R) := transform
 
-  string8     fSlashedMDYtoCYMD(string pDateIn) 
-               :=          intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-                     +     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-                     +     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
   self.date_vendor_first_reported  := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
 																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
@@ -58,9 +53,9 @@ end;
   self.creation_date					     := if(trim(L.creation_date,left,right)[1..10] !='0000-00-00'
 																	      ,stringlib.stringfilterout(trim(L.creation_date,left,right)[1..10],'-')
 																				,'');
-  self.date_of_birth					     := map(regexfind('-',L.date_of_birth) and trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
-																					=> stringlib.stringfilterout(trim(L.date_of_birth,left,right),'-'),
-																	     regexfind('/',L.date_of_birth)=> fSlashedMDYtoCYMD(L.date_of_birth),'');
+  self.date_of_birth					     := if(trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
+																	      ,Functions.dateconv(L.date_of_birth)
+																				,'');
   self.officer_report_date		     := if(trim(L.officer_report_date,left,right)[1..10] !='0000-00-00'
 																	      ,stringlib.stringfilterout(trim(L.officer_report_date,left,right)[1..10],'-')
 																				,'');																				
@@ -245,12 +240,7 @@ end;
 
 FLAccidents_Ecrash.Layout_BaseFile trecs3(fPreclean L) := transform
 
-string8     fSlashedMDYtoCYMD(string pDateIn) 
-:=    intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-  self.date_vendor_first_reported := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
+ self.date_vendor_first_reported := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
 																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
   self.date_vendor_last_reported  := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
@@ -265,9 +255,9 @@ string8     fSlashedMDYtoCYMD(string pDateIn)
 																	      ,stringlib.stringfilterout(trim(L.creation_date,left,right)[1..10],'-')
 																				,'');
 
-  self.date_of_birth					    := map(regexfind('-',L.date_of_birth) and trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
-																					=> stringlib.stringfilterout(trim(L.date_of_birth,left,right),'-'),
-																	     regexfind('/',L.date_of_birth)=> fSlashedMDYtoCYMD(L.date_of_birth),'');
+  self.date_of_birth					    := if(trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
+																	      ,Functions.dateconv(L.date_of_birth)
+																				,'');
   self.officer_report_date		    := if(trim(L.officer_report_date,left,right)[1..10] !='0000-00-00'
 																	      ,stringlib.stringfilterout(trim(L.officer_report_date,left,right)[1..10],'-')
 																				,'');																				
@@ -596,6 +586,7 @@ return sequential(  buildsuppBase
 									);
 
 end;
+
 
 
 

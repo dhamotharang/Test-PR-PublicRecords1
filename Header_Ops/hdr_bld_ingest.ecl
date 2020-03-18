@@ -21,7 +21,7 @@ ecl(string build_version) := '\n'
 + '#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest STAT\');\n\n'
 + 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');';
 
-sf_name(boolean incremental) := '~thor_data400::out::header_ingest_status_' + if(incremental, 'inc', 'mon');
+sf_name(boolean incremental) := Header_Ops._Constant.ingest_build_sf(incremental);
 update_status(unsigned2 new_status, string8 build_version, boolean incremental) := Header.LogBuildStatus(sf_name(incremental),build_version,new_status).Write;
 
 EXPORT hdr_bld_ingest(string8 build_version, boolean incremental, unsigned2 status) := sequential(

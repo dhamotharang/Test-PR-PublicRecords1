@@ -1,10 +1,29 @@
-import text_search, bankruptcyv2,codes;
+﻿import text_search, bankruptcyv2,codes;
 
 export Convert_BK_Func := function
 	
-	dmain := bankruptcyv2.file_bankruptcy_main;
-	dparty := bankruptcyv2.file_bankruptcy_search;
+	// dmain := bankruptcyv2.file_bankruptcy_main;
+	// dparty := bankruptcyv2.file_bankruptcy_search;
+	//VC DF-23528
+	dmain1    := bankruptcyv2.file_bankruptcy_main;	
+  dist_id 	:= distribute(dmain1, hash(TMSID));
+	sort_id 	:= sort(dist_id, TMSID, -process_Date, local);
+	dmain    	:= dedup(sort_id, TMSID,local);
+	//VC DF-23528
+	dparty1       := bankruptcyv2.file_bankruptcy_search;	
+	Partydist_id 	:= distribute(dparty1, hash(TMSID));
+	Partysort_id 	:= sort(Partydist_id, TMSID, -process_Date, local);
+	dparty  	    := dedup(Partysort_id, TMSID,local);	
 	
+  Partysort_id joinLatest(Partysort_id l, dparty r)	:=	transform
+		self	:= l;
+	end;
+	
+	joinedForLatest	:=	join(Partysort_id, dparty,
+	                         left.TMSID=right.TMSID and
+								           left.process_Date=right.process_Date,
+								           joinLatest(left,right),local	);
+                           
 	// Document Record Layout which has child dataset (The content is a child dataset)
 	text_bk_record := record(Text_Search.Layout_Document)
 		string50 tmsid;
@@ -152,7 +171,7 @@ export Convert_BK_Func := function
 	
 	dchild2 := project(dnorm2(description <> ''),convt_comment(left));
 	
-	text_bk_record convt_part(dparty l) := transform
+	text_bk_record convt_part(joinedForLatest l) := transform
 		self.tmsid := l.tmsid;
 		self.docref.src := (unsigned6)l.tmsid[1..3];
 		self.docref.doc := 0;
@@ -181,7 +200,7 @@ export Convert_BK_Func := function
 		],text_search.Layout_Segment);
 	end;
 	
-	party_proj := project(dparty,convt_part(left));
+	party_proj := project(joinedForLatest,convt_part(left));
 	
 	dist_full := distribute(main_proj + party_proj + dchild1 + dchild2,hash(tmsid));
 	
