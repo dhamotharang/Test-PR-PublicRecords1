@@ -294,7 +294,7 @@ export Functions := MODULE
 	END;
 	
 	EXPORT GetSuperReportId(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
-			Payload := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
+			Payload := FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
 				KEYED(
 					l_accnbr = ReportRecord.l_accnbr AND
 					jurisdiction_state = ReportRecord.jurisdiction_state AND
@@ -326,7 +326,7 @@ export Functions := MODULE
 
 	EXPORT GetReportPricingData(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
 			Payload := LIMIT(
-				FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
+				FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
 					KEYED(
 						l_accnbr = ReportRecord.l_accnbr AND
 						jurisdiction_state = ReportRecord.jurisdiction_state AND
@@ -702,7 +702,7 @@ export Functions := MODULE
 	
 		ReportPayloadRow := JOIN(
 			LastReportHashKeysFromKey,
-			FLAccidents_Ecrash.key_EcrashV2_accnbrv1,
+			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1,
 			KEYED(
 				LEFT.accident_nbr = RIGHT.l_accnbr AND
 				LEFT.report_code = RIGHT.report_code AND 
@@ -741,7 +741,7 @@ export Functions := MODULE
 		//don't use JOIN here because it will return multiplication of rows and we don't need that. PayloadRowByDeltabase has to contain as many rows as many parties report has.
 		//all the records in the ReportDeltabaseRow have the same fields l_accnbr, report_code, etc (fiels we filter by) and that's why we use the first row from it.
 		PayloadRowByDeltabaseRaw := LIMIT(
-			FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
+			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
 				KEYED(
 					l_accnbr = ReportDeltabaseRow[1].l_accnbr AND
 					//report_code IN ReportCodeDeltabase AND    //WE NEED to comment this out because if for example we found
