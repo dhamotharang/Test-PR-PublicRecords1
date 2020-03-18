@@ -56,9 +56,10 @@ End;
     export StatisticsPoints:=RECORD
         Real       Min;
         Real       Q1;
-        Real       Mean;
+        Real       Median;
         Real       Q3;
         Real       Max;
+        Real       Mean;
         Real       Variance;
         Real       StDev;
         Real       Plus2StDev;

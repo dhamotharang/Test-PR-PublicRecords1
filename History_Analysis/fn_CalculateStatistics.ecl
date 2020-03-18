@@ -1,16 +1,37 @@
-import History_Analysis;
+import History_Analysis,ML_Core;
 
 export fn_CalculateStatistics:=function
 
     loadfile:=History_Analysis.Files.History_Analysis_SF;
 
-    SortFile:=sort(loadfile,datasetname,superkey,updateflag,build_version);
+    addposrec:=record
+    History_Analysis.Layouts.BaseRec;
+    unsigned POS:=0;
+    string wi:=1;
+    end;
+
+    AddingPOSField:=project(loadfile,transform(addposrec,self:=left;));
+    SortFile:=sort(AddingPOSField,datasetname,superkey,updateflag,build_version);
 
     GroupFile:=group(SortFile,datasetname,superkey,updateflag);
 
-    History_Analysis.Layouts.StatisticsRec tCalculate(History_Analysis.Layouts.BaseRec L, dataset(History_Analysis.Layouts.BaseRec) R):=TRANSFORM
-        //File Size Calculations
-        //Real
+    History_Analysis.Layouts.StatisticsRec tCalculate(addposrec L, dataset(addposrec) R):=TRANSFORM
+        SortedListFileSizeReal:=sort(R,delta_size);
+        RankedListFileSizeReal:=ML_Core.Utils.SequenceInField(SortedListFileSizeReal,delta_size,POS);
+        FileSizeRealMedianPOS1:=MAX(RankedListFileSizeReal,pos)/2;
+        FileSizeRealMedianPOS2:=MAX(RankedListFileSizeReal,pos)/2+1;
+
+        Self.FileSizeReal.Median
+
+        SortedListFileSizePerc:=sort(R,delta_size_perc);
+        RankedListFileSizePerc:=ML_Core.Utils.SequenceInField(SortedListFileSizePerc,delta_size_perc,POS);
+
+        SortedListNumberOfRecordsReal:=sort(R,delta_count);
+        RankedListNumberOfRecordsReal:=ML_Core.Utils.SequenceInField(SortedListNumberOfRecordsReal,delta_count,POS);
+
+        SortedListNumberOfRecordsPerc:=sort(R,delta_count_perc);
+        RankedListNumberOfRecordsPerc:=ML_Core.Utils.SequenceInField(SortedListNumberOfRecordsPerc,delta_count_perc,POS);
+
         Self.FileSizeReal.Min:=min(R,delta_size);
         Self.FileSizeReal.Mean:=ave(R,delta_size);
         Self.FileSizeReal.Max:=max(R,delta_size);
