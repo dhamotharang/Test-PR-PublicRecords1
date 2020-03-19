@@ -49,8 +49,8 @@ EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneE
 EXPORT MakeFT_Invalid_CtyConvCd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_CtyConvCd(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['AA','99','17','PA','']);
-EXPORT InValidMessageFT_Invalid_CtyConvCd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('AA|99|17|PA|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_CtyConvCd(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['AA','99','17','PA','27','32','06','31','39','34','00','18','08','03','21','37','13','04','14','29','11']);
+EXPORT InValidMessageFT_Invalid_CtyConvCd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('AA|99|17|PA|27|32|06|31|39|34|00|18|08|03|21|37|13|04|14|29|11'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_FCRAConFlag(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -86,7 +86,7 @@ EXPORT InValidMessageFT_Invalid_OffenseScore(UNSIGNED1 wh) := CHOOSE(wh,SALT311.
 EXPORT MakeFT_Invalid_OffLev(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_OffLev(SALT311.StrType s,SALT311.StrType vendor) := WHICH(~Scrubs_Crim.fnDocOffenseV3Check(s,vendor)>0);
+EXPORT InValidFT_Invalid_OffLev(SALT311.StrType s) := WHICH(~Scrubs_Crim.fnDocOffenseV3Check(s,'')>0);
 EXPORT InValidMessageFT_Invalid_OffLev(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Crim.fnDocOffenseV3Check'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'process_date','offender_key','vendor','county_of_origin','source_file','data_type','record_type','orig_state','offense_key','off_date','arr_date','case_num','total_num_of_offenses','num_of_counts','off_code','chg','chg_typ_flg','off_of_record','off_desc_1','off_desc_2','add_off_cd','add_off_desc','off_typ','off_lev','arr_disp_date','arr_disp_cd','arr_disp_desc_1','arr_disp_desc_2','arr_disp_desc_3','court_cd','court_desc','ct_dist','ct_fnl_plea_cd','ct_fnl_plea','ct_off_code','ct_chg','ct_chg_typ_flg','ct_off_desc_1','ct_off_desc_2','ct_addl_desc_cd','ct_off_lev','ct_disp_dt','ct_disp_cd','ct_disp_desc_1','ct_disp_desc_2','cty_conv_cd','cty_conv','adj_wthd','stc_dt','stc_cd','stc_comp','stc_desc_1','stc_desc_2','stc_desc_3','stc_desc_4','stc_lgth','stc_lgth_desc','inc_adm_dt','min_term','min_term_desc','max_term','max_term_desc','parole','probation','offensetown','convict_dt','court_county','fcra_offense_key','fcra_conviction_flag','fcra_traffic_flag','fcra_date','fcra_date_type','conviction_override_date','conviction_override_date_type','offense_score','offense_persistent_id','offense_category','hyg_classification_code','old_ln_offense_score');
@@ -190,7 +190,7 @@ EXPORT InValid_off_typ(SALT311.StrType s) := InValidFT_Invalid_Off_Typ(s);
 EXPORT InValidMessage_off_typ(UNSIGNED1 wh) := InValidMessageFT_Invalid_Off_Typ(wh);
  
 EXPORT Make_off_lev(SALT311.StrType s0) := MakeFT_Invalid_OffLev(s0);
-EXPORT InValid_off_lev(SALT311.StrType s,SALT311.StrType vendor) := InValidFT_Invalid_OffLev(s,vendor);
+EXPORT InValid_off_lev(SALT311.StrType s) := InValidFT_Invalid_OffLev(s);
 EXPORT InValidMessage_off_lev(UNSIGNED1 wh) := InValidMessageFT_Invalid_OffLev(wh);
  
 EXPORT Make_arr_disp_date(SALT311.StrType s0) := MakeFT_Invalid_Current_Date(s0);

@@ -493,7 +493,7 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     Moxie_DOC_Offenses_Dev_Fields.InValid_add_off_cd((SALT311.StrType)le.add_off_cd),
     Moxie_DOC_Offenses_Dev_Fields.InValid_add_off_desc((SALT311.StrType)le.add_off_desc),
     Moxie_DOC_Offenses_Dev_Fields.InValid_off_typ((SALT311.StrType)le.off_typ),
-    Moxie_DOC_Offenses_Dev_Fields.InValid_off_lev((SALT311.StrType)le.off_lev,(SALT311.StrType)le.vendor),
+    Moxie_DOC_Offenses_Dev_Fields.InValid_off_lev((SALT311.StrType)le.off_lev),
     Moxie_DOC_Offenses_Dev_Fields.InValid_arr_disp_date((SALT311.StrType)le.arr_disp_date),
     Moxie_DOC_Offenses_Dev_Fields.InValid_arr_disp_cd((SALT311.StrType)le.arr_disp_cd),
     Moxie_DOC_Offenses_Dev_Fields.InValid_arr_disp_desc_1((SALT311.StrType)le.arr_disp_desc_1),
