@@ -17,33 +17,9 @@ EXPORT Append_CleanAdditionalAddress (
 													,self.additional_address.clean_address.sec_range	:= stringlib.stringfilterout(left.additional_address.clean_address.sec_range,'.?<&>*@!\\$=+%~\'')
 													,self:=left));
 													
-	dFileBase 		:= DISTRIBUTE(PULL(pFileBase), HASH(
-		additional_address.clean_address.prim_range,
-		additional_address.clean_address.predir,
-		additional_address.clean_address.prim_name,
-		additional_address.clean_address.addr_suffix,
-		additional_address.clean_address.postdir,
-		additional_address.clean_address.unit_desig,
-		additional_address.clean_address.sec_range,
-		additional_address.clean_address.p_city_name,
-		additional_address.clean_address.v_city_name,
-		additional_address.clean_address.zip,
-		additional_address.clean_address.st
-		));
+	dFileBase 		:= DISTRIBUTE(PULL(pFileBase), Random());
 
-	dAddressCache	:= DISTRIBUTE(PULL(pAddressCache), HASH(
-		prim_range,
-		predir,
-		prim_name,
-		addr_suffix,
-		postdir,
-		unit_desig,
-		sec_range,
-		p_city_name,
-		v_city_name,
-		zip,
-		st
-		));
+	dAddressCache	:= DISTRIBUTE(PULL(pAddressCache), Random());
 	
 	FraudShared.Layouts.Base.Main T_Append_Additional_Address_From_Cache(FraudShared.Layouts.Base.Main L, FraudGovPlatform.Layouts.Base.AddressCache R) := TRANSFORM
 
