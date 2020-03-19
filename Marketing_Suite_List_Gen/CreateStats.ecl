@@ -1122,7 +1122,7 @@ AllFileRollup := rollup(SrtAllFile, RollupAll(left, right), except Cnt_Companies
 												
 AllFileStats	:=	project(AllFileRollup,TRANSFORM(Marketing_Suite_List_Gen.Layouts.Layout_Stats,SELF := LEFT;));											
 												
-WriteStats		:=	output(AllFileStats,,'~thor_data400::marketing_suite_list_gen::stats::'+jobID,overwrite,__compressed__);												
+WriteStats		:=	output(AllFileStats,,'~thor_data400::marketing_suite_list_gen::stats::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20));												
 												
 export All 		:=  WriteStats; 
 						
