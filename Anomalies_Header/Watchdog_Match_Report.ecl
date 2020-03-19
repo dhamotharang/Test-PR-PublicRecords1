@@ -1,51 +1,17 @@
-Import Abnormalities_Analytics;
+Import Anomalies_Header;
 
-LeftFile := Abnormalities_Analytics.Files.Header; // did
-RightFile := Abnormalities_Analytics.Files.Watchdog; // did
-//
+LeftFile := Anomalies_Header.Files.Header; 
+RightFile := Anomalies_Header.Files.Watchdog; 
+
+// Layouts
+Header_Layout := Anomalies_Header.Layouts.MyRecLeft;
+Watchdog_Layout := Anomalies_Header.Layouts.MyRecright;
+
 Export Watchdog_Match_Report := Module
 
-MyRecLeft := Record
-    LeftFile.did;
-    LeftFile.fname;
-    LeftFile.lname;
-    LeftFile.dob;
-    LeftFile.ssn;
-    LeftFile.prim_range;
-    LeftFile.predir;
-    LeftFile.prim_name;
-    LeftFile.suffix;
-    LeftFile.postdir;
-    LeftFile.unit_desig;
-    LeftFile.sec_range;
-    LeftFile.city_name;
-    LeftFile.st;
-    LeftFile.zip;
-    LeftFile.zip4;
-    LeftFile.src;
-End;
 
-MyRecright := Record
-    RightFile.did;
-    RightFile.fname;
-    RightFile.lname;
-    RightFile.dob;
-    RightFile.ssn;
-    RightFile.prim_range;
-    RightFile.predir;
-    RightFile.prim_name;
-    RightFile.suffix;
-    RightFile.postdir;
-    RightFile.unit_desig;
-    RightFile.sec_range;
-    RightFile.city_name;
-    RightFile.st;
-    RightFile.zip;
-    RightFile.zip4;
-End;
-
-LeftRec := Project(Leftfile, MyRecLeft);
-RightRec := Project(RightFile, MyRecRight);
+LeftRec := Project(Leftfile, Header_Layout);
+RightRec := Project(RightFile, Watchdog_Layout);
 
 
 MyOutRec := Record
@@ -141,7 +107,7 @@ Export ds_rollflagged_rec := Rollup(st_flagged_rec,
 
 // counted fname_match t/f/b records per source
 r_fname_counted := Record
-    ds_rollflagged_rec.fname_match;
+    ds_rollflagged_rec.fname_match;//
     ds_rollflagged_rec.source_name; 
     RecordCnt := Count(Group);
 End;

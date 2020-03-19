@@ -4,14 +4,14 @@ Each export should populate one of these tables, and additional exports to provi
 Please ignor 1.c (business names). The deliverable here is a code module that we will add to the header folder which we can call to generate these tables and drill down
 */ 
 
-Import Abnormalities_Analytics;
+Import Anomalies_Header;
 Import STD;
 Import AID;
 
-Layout_Header := Abnormalities_Analytics.Layouts.Layout_Header;
+Layout_Header := Anomalies_Header.Layouts.Layout_Header;
 
 // Slimmed files from the original header file
-input := Abnormalities_Analytics.Files.Header; 
+input := Anomalies_Header.Files.Header; 
 
 // dedup here
 
@@ -28,14 +28,14 @@ dt := Distribute(t, Hash(did, fname, lname,
 sdt := Sort(dt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+                  city_name, st, zip, zip4, county, cbsa, src, Local);
 
 infile := Dedup(sdt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
                   city_name, st, zip, zip4, county, cbsa, src);
 
-Export Analytics_Report := Module 
+Export Header_Counts := Module 
 
 // 1. NAMES
 
@@ -136,10 +136,14 @@ END;
 Out_Crosstab_ssn := Table(dsdc_ssn2, crosstab_ssn, did, ssn);
 Export S_Crosstab_ssn := Sort(Out_Crosstab_ssn, -RecordCnt);
 
+
+
 // 3. Address
 //    A. Addresses with the highest count of different lexids
 
 // Get the multiples of addresses per lexids
+
+
 
 Rec_Address := Record
     infile.did;
@@ -152,11 +156,14 @@ Rec_Address := Record
 End;
 
 Addy_Rec := Table(infile, Rec_Address);
-sdc_Addy_Rec := Sort(Addy_Rec, Record, Local);                                        
-Export dsdc_Addy_Rec := Dedup(sdc_Addy_Rec, Record, Local);
+sdc_Addy_Rec := Sort(Addy_Rec, did, prim_range, prim_name, unit_desig, 
+                               sec_range, st, zip , Local);                                        
+Export dsdc_Addy_Rec := Dedup(sdc_Addy_Rec, did, prim_range, prim_name, unit_desig, 
+                               sec_range, st, zip , Local);
 
 C_Rec_Address := Record
     dsdc_Addy_Rec.did;
+    dsdc_Addy_Rec.prim_range;
     dsdc_Addy_Rec.prim_name;
     dsdc_Addy_Rec.unit_desig;
     dsdc_Addy_Rec.sec_range;
@@ -167,6 +174,9 @@ End;
 
 c_Addy_Rec := Table(dsdc_Addy_Rec, C_Rec_Address);
 Export st_Addy_Rec := Sort(c_Addy_Rec, -RecordCnt);
+
+
+
 
 // Write code that would elimate blank addresses
 // a blank address is defined as an address that is missing all fields
@@ -185,10 +195,15 @@ End;
 t_Crosstab_Dob := Table(Filtereddob, Sequencedob, dob);
 Export st_Crosstab_Dob := Sort(t_Crosstab_Dob, -RecordCnt);
 
+
+
+
+
+
 // B. Full Dob with the highest counts of different Lexids ( no 00/Blank)
 
 // dob is integer4
-// MMDDYY Dobs without trailing zeroes
+// MMDDYYYY Dobs without trailing zeroes
 LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
@@ -197,6 +212,7 @@ LoseTrailingZeroes(Unsigned4 indob) := Function
   Return (Unsigned8)(YY + MM + DD);
 End;
 
+// Filters to eliminate all 0s
 FilteredDobs := infile( Not dob = 0);
 
 Rec := Record
@@ -206,11 +222,11 @@ Rec := Record
 End;
 
 Rec SlimRec( Filtereddobs Le ) := Transform
-  Self.dob := LoseTrailingZeroes(le.dob);
+  Self.dob := LoseTrailingZeroes(Le.dob);
   Self := Le;
 End;
 
-Shared RecSlim := Project(FilteredDobs, SlimRec(Left));
+Export RecSlim := Project(FilteredDobs, SlimRec(Left));
 
 NonBlankDob := Record
   RecSlim.dob;
@@ -230,12 +246,22 @@ Out_Crosstab_dob := Table(RecSlim, crosstab_dob, dob);
 Export S_Crosstab_dob := Sort(Out_Crosstab_dob, -RecordCnt);
 
 
+
+
+
+
+
+
+
+
+
 // C. Partial Dob (MMDD : month and day) with the highest count of different lexids (no 00 / blank)
 
 // mm/dd dob without trailing zeroes
 LoseTrailingZeroesMD(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
-  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
+  String4 YY  := dob[1..4];
+  String2 DD  := if(dob[7..8]= '00','',dob[7..8]);
   String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
   Return (Unsigned8)(MM + DD);
 End;
@@ -254,7 +280,7 @@ Rec SlimRec1( Filtereddobs Le ) := Transform
     Self := Le;
 End;
 
-Shared RecSlimMMDD := Project(FilteredDobs, SlimRec1(Left));
+Export RecSlimMMDD := Project(FilteredDobs, SlimRec1(Left));
 
 NonblankDobMMDD := Record
     RecSlimMMDD.dob;
@@ -263,7 +289,7 @@ End;
 c_dobMMDD := Table(RecSlimMMDD, NonblankdobMMDD, dob);
 dc_dobMMDD := Distribute(c_dobMMDD, Hash(dob));
 sdc_dobMMDD := Sort(dc_dobMMDD, dob, Local);
-Shared dsdc_dobMMDD := Dedup(sdc_dobMMDD, dob, Local);
+Export dsdc_dobMMDD := Dedup(sdc_dobMMDD, dob, Local);
 
 crosstab_dobMMDD := Record
   RecSlimMMDD.dob;
@@ -276,6 +302,11 @@ Export S_Crosstab_dobMMDD := Sort(Out_Crosstab_dobMMDD, -RecordCnt);
 //Converting dates (optional)
 //converted_date := Std.Date.ConvertDateFormat(Result, '%Y%m%d', '%m/%d/%y'); // need to convert to this format
 //Output(converted_date, Named('Date_Results_Converted'));
+
+
+
+
+
 
 // D. Sources with the highest count of blank and partially blank dob
 
@@ -305,6 +336,33 @@ Sample_RecSLim1 := Table(RecSlimMMDD, Rec_BlankMMDD, dob, src);
 Export S_Sample_RecSlim1 := Sort(Sample_RecSlim1, -RecordCnt);
 
 // Count of blank dd (non-blank yyyymm)
+
+LoseTrailingZeroes(Unsigned4 indob) := Function
+  String8 dob := (String8)indob;
+  String4 YY  := dob[1..4];
+  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
+  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
+  Return (Unsigned8)(YY + MM );
+End;
+
+FilteredDobs := infile( Not dob = 0);
+
+Rec_x := Record
+    Filtereddobs.did;
+    Filtereddobs.dob;
+    Filtereddobs.src;
+End;
+
+Rec_x SlimRec( Filtereddobs Le ) := Transform
+  Self.dob := LoseTrailingZeroes(le.dob);
+  Self := Le;
+End;
+
+Export RecSlim_x := Project(FilteredDobs, SlimRec(Left));
+
+
+
+
 
 // E. Dob normal distribution score ( measure of normality accross all non-zero per lexid Dob)
 
