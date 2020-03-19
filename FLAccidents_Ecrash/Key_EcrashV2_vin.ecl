@@ -1,6 +1,6 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents;
 
-ecrash_vin_base := FLAccidents_Ecrash.File_KeybuildV2.out(vin<>'' and vin<>'0' );
+ecrash_vin_base := FLAccidents_Ecrash.File_KeybuildV2.prout(vin<>'' and vin<>'0' );
 
 dst_vin_base := distribute(ecrash_vin_base, hash(vin, orig_accnbr));
 srt_vin_base := sort(dst_vin_base, vin, orig_accnbr, local);
