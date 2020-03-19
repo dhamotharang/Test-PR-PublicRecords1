@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents,lib_stringlib;
+﻿Import Data_Services, doxie, FLAccidents, lib_stringlib, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -117,12 +117,10 @@ end;
 pflc6:= project(flc6,xpndrecs(left));
 
 //ecrash 
-
-ecrashFile := FLAccidents_Ecrash.BaseFile (StringLib.StringToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
-'PEDESTRIAN',
-'PEDETRIAN',
-'PEDISTRIAN']); 
-
+ecrashFile := eCrashBaseAgencyExclusion(StringLib.StringToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
+																																													 'PEDESTRIAN',
+																																								 					 'PEDETRIAN',
+																																													 'PEDISTRIAN']); 
 xpnd_layout xpndecrash(ecrashFile L) := transform
 
   self.did							    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
