@@ -201,7 +201,6 @@ export Build_List(
 													
 	BusList				:=	dedup(sort(BusList6, record, local), record, local);
 
-	
 	TempBusLayout AddSequence(TempBusLayout l, unsigned8 c) := transform
 			self.unique_id			:=	c;
 			self								:=	l;
@@ -443,12 +442,12 @@ export Build_List(
 	end;	
 
 	FormatBusinessFile	:=	Sequential(
-																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,overwrite,__compressed__),
-																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,overwrite,__compressed__)
+																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20)),
+																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20))
 																		 );
 	FormatLocationFile	:=	Sequential(
-																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,overwrite,__compressed__),
-																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,overwrite,__compressed__)
+																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20)),
+																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20))
 																		 );
 
 	export All := 
