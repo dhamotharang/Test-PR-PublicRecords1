@@ -1,4 +1,4 @@
-﻿import _Control, advo, riskwise, models, ut;
+﻿IMPORT _Control, advo, riskwise, models, ut, header, STD;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Address_History(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, 
@@ -64,7 +64,9 @@ with_advo_college_thor := with_advo_college_thor_pre +
 default_value := -9999;
 
 temprec := record
-	risk_indicators.iid_constants.layout_outx;
+	risk_indicators.layout_input;
+	header.layout_header h;
+	
 	// temp variables
 	risk_indicators.layouts.layout_address_history_summary;
 	unsigned h_dt_first_seen := 0;
@@ -103,8 +105,8 @@ badWords := [	'ST', 'APT', 'AVE', 'DR', 'RD', 'BOX', 'TH', 'PO', 'N', 'W', 'E', 
 // get the address key
 temprec getAddrKey(iid le) := transform
 
-	num_prim_range := stringlib.stringfilter(le.h.prim_range, '0123456789');
-	char_prim_range := stringlib.stringfilter(le.h.prim_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	num_prim_range := STD.str.filter(le.h.prim_range, '0123456789');
+	char_prim_range := STD.str.filter(le.h.prim_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	
 	prword1 := models.common.getw( char_prim_range, 1,' ');
 	prword2 := models.common.getw( char_prim_range, 2,' ');
@@ -122,8 +124,8 @@ temprec getAddrKey(iid le) := transform
 	// will need to check each word in these fields and check against the bad words list////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ex "summerhill rd b", should remove rd and the b
 	// use models.commen.getwords?  to get the words in the field?
-	num_prim_name := stringlib.stringfilter(le.h.prim_name, '0123456789');
-	char_prim_name := stringlib.stringfilter(le.h.prim_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	num_prim_name := STD.str.filter(le.h.prim_name, '0123456789');
+	char_prim_name := STD.str.filter(le.h.prim_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	
 	word1 := models.common.getw( char_prim_name, 1,' ');
 	word2 := models.common.getw( char_prim_name, 2,' ');
@@ -148,8 +150,8 @@ temprec getAddrKey(iid le) := transform
 	postdir := if(trim(le.h.postdir) in badWords, '', le.h.postdir);
 	unit_desig := if(trim(le.h.unit_desig) in badWords, '', le.h.unit_desig);
 	
-	num_sec_range := stringlib.stringfilter(le.h.sec_range, '0123456789');
-	char_sec_range := stringlib.stringfilter(le.h.sec_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -&');
+	num_sec_range := STD.str.filter(le.h.sec_range, '0123456789');
+	char_sec_range := STD.str.filter(le.h.sec_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -&');
 	
 	secword1 := models.common.getw( char_sec_range, 1,' -&');
 	secword2 := models.common.getw( char_sec_range, 2,' -&');
@@ -162,8 +164,8 @@ temprec getAddrKey(iid le) := transform
 	sec_range := num_sec_range + sw1 + sw2 + sw3;
 
 	concAddr := trim(prim_range) + trim(predir) + trim(prim_name) + trim(suffix) + trim(postdir) + trim(unit_desig) + trim(sec_range);
-	numerics := stringlib.stringfilter(concAddr, '0123456789');
-	chars := stringlib.stringfilter(concAddr, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	numerics := STD.str.filter(concAddr, '0123456789');
+	chars := STD.str.filter(concAddr, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	
 	//testing
 	self.prim_ranget := prim_range;
@@ -332,8 +334,8 @@ temprec getLOR(s5 le, s5 ri,integer i) := transform
 	self.unique_addr_cnt := if(ri.h.did=0, 0, ri.unique_addr_cnt);
 	
 	// get addrkey for input so that we can match to a addrkey on file to determine where in order it was found
-	num_prim_range := stringlib.stringfilter(ri.prim_range, '0123456789');
-	char_prim_range := stringlib.stringfilter(ri.prim_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	num_prim_range := STD.str.filter(ri.prim_range, '0123456789');
+	char_prim_range := STD.str.filter(ri.prim_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	
 	prword1 := models.common.getw( char_prim_range, 1,' ');
 	prword2 := models.common.getw( char_prim_range, 2,' ');
@@ -351,8 +353,8 @@ temprec getLOR(s5 le, s5 ri,integer i) := transform
 	// will need to check each word in these fields and check against the bad words list////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ex "summerhill rd b", should remove rd and the b
 	// use models.commen.getwords?  to get the words in the field?
-	num_prim_name := stringlib.stringfilter(ri.prim_name, '0123456789');
-	char_prim_name := stringlib.stringfilter(ri.prim_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	num_prim_name := STD.str.filter(ri.prim_name, '0123456789');
+	char_prim_name := STD.str.filter(ri.prim_name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	
 	word1 := models.common.getw( char_prim_name, 1,' ');
 	word2 := models.common.getw( char_prim_name, 2,' ');
@@ -377,8 +379,8 @@ temprec getLOR(s5 le, s5 ri,integer i) := transform
 	postdir := if(trim(ri.postdir) in badWords, '', ri.postdir);
 	unit_desig := if(trim(ri.unit_desig) in badWords, '', ri.unit_desig);
 	
-	num_sec_range := stringlib.stringfilter(ri.sec_range, '0123456789');
-	char_sec_range := stringlib.stringfilter(ri.sec_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -&');
+	num_sec_range := STD.str.filter(ri.sec_range, '0123456789');
+	char_sec_range := STD.str.filter(ri.sec_range, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -&');
 	
 	secword1 := models.common.getw( char_sec_range, 1,' -&');
 	secword2 := models.common.getw( char_sec_range, 2,' -&');
@@ -391,8 +393,8 @@ temprec getLOR(s5 le, s5 ri,integer i) := transform
 	sec_range := num_sec_range + sw1 + sw2 + sw3;
 
 	concAddr := trim(prim_range) + trim(predir) + trim(prim_name) + trim(suffix) + trim(postdir) + trim(unit_desig) + trim(sec_range);
-	numerics := stringlib.stringfilter(concAddr, '0123456789');
-	chars := stringlib.stringfilter(concAddr, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	numerics := STD.str.filter(concAddr, '0123456789');
+	chars := STD.str.filter(concAddr, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	
 	inputAddrKey := trim(numerics) + trim(chars);
 	self.inputaddrkey := inputAddrkey;
