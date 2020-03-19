@@ -12,9 +12,23 @@ addSingleQuotes:='\''+STD.STR.FindReplace(lowercaselist,',','\',\'')+'\'';
 
 RelevantOrbitProfiles:=ScrubsFiles(version=pVersion and STD.Str.ToLowerCase(ProfileName)in[#EXPAND(addSingleQuotes)]);
 
-output(RelevantOrbitProfiles,all);
+MessageStringRec:=RECORD
+    Scrubs.Layouts.OrbitLogLayout;
+    String MessageString:='';
+END;
+
+PrepDataForMessage:=project(RelevantOrbitProfiles,transform(MessageStringRec,self:=left;));
+
+MessageStringRec tGenerateMessage(MessageStringRec L, MessageStringRec R):=TRANSFORM
+    Self.MessageString:=if(L.MessageString='',
+    L.ProfileName+'\t'+L.ruledesc+'\t'+L.Rulecnt+'\t'+L.rulepcnt+'\n'+R.ProfileName+'\t'+R.ruledesc+'\t'+R.Rulecnt+'\t'+R.rulepcnt,
+    L.MessageString+'\n'+R.ProfileName+'\t'+R.ruledesc+'\t'+R.Rulecnt+'\t'+R.rulepcnt);
+END;
 
 TestProfile:=if(Exists(RelevantOrbitProfiles(RejectWarning='Y')),false,true);
+
+BodyMessage:=if(Exists(RelevantOrbitProfiles(RejectWarning='Y')),
+)
 
 return TestProfile;
 
