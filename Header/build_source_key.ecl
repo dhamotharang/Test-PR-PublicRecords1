@@ -27,7 +27,7 @@ Util_index        := Header.Key_Src_Util;
 water_index       := Header.Key_Src_Water;
 targus_index      := Header.Key_Src_Targus;
 voters_index      := header.key_src_voters;
-Census_MA_index   := header.key_src_census_MA;
+Census_MA_index   := header.key_src_census_UM;
 nod_index         := Header.key_src_nod;
 
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(dl_index,            '~thor_data400::key::dlv2_src_index_header',      '~thor_data400::key::header::'+filedate+'::dlv2_src_header',       bld_dl);
