@@ -424,8 +424,19 @@ EXPORT Functions := MODULE
     RETURN IF((company_populated OR person_populated) AND NOT (company_populated AND person_populated),1,0);
   END;
 
+  //****************************************************************************
+  //fn_validate_NAICSCode: 	returns true if NAICS code is found in lookup table or is zero/null
+  //****************************************************************************
+EXPORT integer fn_validate_NAICSCode(string code) := function
+  return ut.fn_NAICS_functions.fn_validate_NAICSCode(code);
+END;
 
-
+  //****************************************************************************
+  //fn_validate_SICCode: 	returns true if SIC code is found in lookup table or is zero/null
+  //****************************************************************************
+EXPORT integer fn_valid_SicCode(string code) := function
+	return ut.fn_SIC_functions.fn_validate_SicCode(code);
+END;
 
 //*********************************************************//
 //***************END BUSINESS SECTION**********************//
