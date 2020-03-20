@@ -2,9 +2,9 @@
 
 Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
 
-EXPORT MA_Census_As_Header(DATASET(Layout_in) pMA_Census_data = DATASET([], Layout_in)) := FUNCTION
+EXPORT MA_Census_As_Header := FUNCTION
 
-  dMA_CensusAsSource := pMA_Census_data;
+  dMA_CensusAsSource := header.Files_SeqdSrc().UM;
 
   dFiltered := dMA_CensusAsSource(lname <> '', LENGTH(TRIM(fname)) > 1, ~(REGEXFIND('[0-9]',fname)), ~(REGEXFIND('[0-9]',lname)), ~(REGEXFIND(', ',mname)));
 										

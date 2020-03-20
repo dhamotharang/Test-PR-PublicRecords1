@@ -161,7 +161,7 @@ EXPORT proc_build_history_keys(string rundate) := FUNCTION
   //Verify deprecated fields are blank or zero
   fcra_deprecate_stats := PARALLEL(cnt_fcra_address, cnt_fcra_did, cnt_fcra_phone);
 
-  build_keys := SEQUENTIAL(g_did, mv_gong2prod,     // Gong_did base file
+  build_keys := SEQUENTIAL( g_did, mv_gong2prod,     // Gong_did base file
     bk, 
     mv1, 
     mk,

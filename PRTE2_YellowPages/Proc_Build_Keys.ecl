@@ -6,7 +6,7 @@ EXPORT Proc_Build_Keys(string filedate) := FUNCTION
 	
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_YellowPages_Bdid,
 	Constants.Key_Bdid_Gen_Name,
-	Constants.KEY_PREFIX+filedate+Constants.BDID_SUFFIX, 
+    constants.key_prefix + filedate + Constants.BDID_SUFFIX,
 	YellowPages_Bdid_Key);
 
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_YellowPages_Linkids,
@@ -21,8 +21,8 @@ EXPORT Proc_Build_Keys(string filedate) := FUNCTION
 	
 /* MAC_SK_Move_To_Built_V2 definitions */
 
-	RoxieKeyBuild.MAC_SK_Move_To_Built_V2(Constants.Key_Bdid_Gen_Name, 
-	Constants.KEY_PREFIX+filedate+Constants.BDID_SUFFIX,
+	RoxieKeyBuild.MAC_SK_Move_To_Built_V2(Constants.Key_Bdid_Gen_Name,
+    constants.key_prefix + filedate + Constants.BDID_SUFFIX,
 	mv_YellowPages_Bdid_Key);
 
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2(Constants.Key_Linkids_Gen_Name, 

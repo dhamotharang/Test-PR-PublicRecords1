@@ -16,9 +16,11 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 
 	//export maxWU := max(ReadFileList,wuid);
 	
-	export maxWU := if (last_wuid <> '', last_wuid, if(count(ReadFileList) > 0, max(ReadFileList,wuid), thorbackup.Constants.Yogurt().startwudaysbehind));
+	export maxWU := if (last_wuid <> '', last_wuid, if(count(ReadFileList) > 0, sort(ReadFileList(max(ReadFileList,modified) = modified),wuid)[1].wuid, thorbackup.Constants.Yogurt().startwudaysbehind));
 
-	export getMaxWU := if (maxWU > thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
+	export getMaxWU := thorbackup.Constants.Yogurt().startwudaysbehind;//if (maxWU > thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
+
+	export maxModified := regexreplace('[^0-9]',max(ReadFileList,modified),'');
 
 	export GetFilesInWorkunit(string wid) := function
 		InRecord := record
@@ -144,7 +146,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 			self := l;
 		end;
 		
-		return project(wulist,getmodified(left))(regexreplace('[^0-9]',modified,'') >= regexreplace('[^0-9]',MaxWU,''));
+		return project(wulist,getmodified(left))(regexreplace('[^0-9]',modified,'') >= maxModified);
 	end;
 
 	export GetFileList(string wuid = '',boolean ignoreforeign = false) := function
@@ -391,7 +393,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 											
 											output(getMaxWU,named('Start_WUID')),
 											output(thorbackup.constants.yogurt().endwu,named('End_WUID')),
-											output(MaxWU,named('Last_Captured_WUID')),
+											output(maxModified,named('Last_Captured_Modified_Time')),
 											output(dataset([],{string1 dummy}),,'~yogurt::job::running'),
 											if (count(GetFileList()(~issuper)) > 0,
 												sequential(

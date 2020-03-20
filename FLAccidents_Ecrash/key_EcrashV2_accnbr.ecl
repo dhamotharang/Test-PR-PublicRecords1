@@ -1,8 +1,8 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents;
 
-Ecrash := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
+Ecrash := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
 
-Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.out(report_code not in ['EA','TM','TF']);
+Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code not in ['EA','TM','TF']);
 
 crash_accnbr_base := 	Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>'') ; 
 						

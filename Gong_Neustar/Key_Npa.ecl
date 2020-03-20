@@ -1,5 +1,2 @@
-import Data_Services, doxie;
-
-File_AreacodeZipRecords := File_Npa_Zip;
-export Key_Npa := INDEX(File_AreacodeZipRecords,{areacode},{File_AreacodeZipRecords},
-				Data_Services.Data_location.Prefix('Gong')+'thor_data400::key::gong::' + doxie.Version_SuperKey + '::npa');
+IMPORT dx_Gong;
+EXPORT Key_Npa := dx_Gong.key_npa() : DEPRECATED('Use dx_gong.key_npa instead');
