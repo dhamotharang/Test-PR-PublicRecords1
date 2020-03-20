@@ -144,7 +144,6 @@ Export S_Crosstab_ssn := Sort(Out_Crosstab_ssn, -RecordCnt);
 // Get the multiples of addresses per lexids
 
 
-
 Rec_Address := Record
     infile.did;
     infile.prim_range;

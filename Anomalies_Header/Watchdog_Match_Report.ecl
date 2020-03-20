@@ -1,5 +1,6 @@
 Import Anomalies_Header;
 
+// Files
 LeftFile := Anomalies_Header.Files.Header; 
 RightFile := Anomalies_Header.Files.Watchdog; 
 
@@ -90,10 +91,6 @@ End;
 t_flagged_rec := Table(Watchdog_Match, FLaggedRec);
 st_flagged_rec := Sort(t_flagged_rec, did);
 
-OutFlaggedRec := Record
-    String15 fname;
-End;
-
 FlaggedRec FormFlagged( st_flagged_rec Le, st_flagged_rec Ri ) := Transform
     Self := Le;
     Self := Ri;
@@ -103,65 +100,4 @@ Export ds_rollflagged_rec := Rollup(st_flagged_rec,
                             Left.did = Right.did,
                             FormFlagged(Left, Right));
 
-//count how many true and how many records per source 
-
-// counted fname_match t/f/b records per source
-r_fname_counted := Record
-    ds_rollflagged_rec.fname_match;//
-    ds_rollflagged_rec.source_name; 
-    RecordCnt := Count(Group);
-End;
-
-t_fname_counted := Table(ds_rollflagged_rec, r_fname_counted, fname_match, source_name);
-Export st_counted_fname := Sort(t_fname_counted, -RecordCnt);
-
-// counted lname_match t/f/b records per source
-r_lname_counted := Record
-    ds_rollflagged_rec.lname_match;
-    ds_rollflagged_rec.source_name;
-    RecordCnt := Count(Group);
-End;
-
-t_fname_counted := Table(ds_rollflagged_rec, r_lname_counted, lname_match, source_name);
-Export st_counted_lname := Sort(t_fname_counted, -RecordCnt); 
-
-// counted dob_match t/f/b records per source
-r_dob_counted := Record
-    ds_rollflagged_rec.dob_match;
-    ds_rollflagged_rec.source_name;
-    RecordCnt := Count(Group);
-End;
-
-t_dob_counted := Table(ds_rollflagged_rec, r_dob_counted, dob_match, source_name);
-Export st_counted_dob := Sort(t_dob_counted, -RecordCnt);
-
-// counted ssn_match t/f/b records per source
-r_ssn_counted := Record
-    ds_rollflagged_rec.ssn_match;
-    ds_rollflagged_rec.source_name;
-    RecordCnt := Count(Group);
-End;
-
-t_ssn_counted := Table(ds_rollflagged_rec, r_ssn_counted, ssn_match, source_name);
-Export st_counted_ssn := Sort(t_ssn_counted, -RecordCnt);
-
-r_address_match_counted := Record
-    ds_rollflagged_rec.address_match;
-    ds_rollflagged_rec.source_name;
-    RecordCnt := Count(Group);
-End;
-
-t_address_match_counted := Table(ds_rollflagged_rec, r_address_match_counted, address_match, source_name);
-Export st_counted_address_match := Sort(t_address_match_counted, -RecordCnt);
-
-r_address_collectivematch_counted := Record
-    ds_rollflagged_rec.address_match_All;
-    ds_rollflagged_rec.source_name;
-    RecordCnt := Count(Group);
-End;
-
-t_address_collectivematch_counted := Table(ds_rollflagged_rec, r_address_collectivematch_counted, address_match_all, source_name);
-Export st_counted_collectivematch_all := Sort(t_address_collectivematch_counted, -RecordCnt);
-//then get a percentage of the amount true 
-//Rollup by lexid & src, keep true recs, if not f, and if blank then b
 End;
