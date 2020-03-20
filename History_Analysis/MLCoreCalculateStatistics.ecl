@@ -99,6 +99,7 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
     END;
 
  CalculateDelta:=rollup(GroupFile,GROUP,tCalculate(left,ROWS(left)));
+
 return CalculateDelta;
 
 end;
