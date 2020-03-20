@@ -196,11 +196,17 @@ EXPORT Standardize_NameAddr := MODULE
 	EXPORT fAll( DATASET(Equifax_Business_Data.Layouts.Base) pBaseFile
 							,STRING pPersistname = Equifax_Business_Data.Persistnames().StandardizeNameAddr) := FUNCTION
 
-  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile);			 
+  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile)
+: PERSIST(pPersistname)		
+		;			 
 								 
-		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : PERSIST(pPersistname, REFRESH(TRUE), SINGLE);		
+		// dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : 
+		// PERSIST(pPersistname)
+		// PERSIST(pPersistname, REFRESH(TRUE), SINGLE)
+		;		
 		
-		RETURN dStandardizeAddr;
+		// RETURN dStandardizeAddr;
+		RETURN dStandardizeName;
 	
 	END;
 
