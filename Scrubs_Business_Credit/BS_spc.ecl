@@ -1,4 +1,3 @@
-﻿OPTIONS:-gh
 MODULE:Scrubs_Business_Credit
 FILENAME:Business_Credit
 NAMESCOPE:BS
@@ -19,7 +18,7 @@ FIELDTYPE:invalid_file_sequence_number:ALLOW(0123456789):LENGTHS(1..)
 FIELDTYPE:invalid_parent_sequence_number:ALLOW(0123456789):LENGTHS(1..)
 FIELDTYPE:invalid_account_base_ab_number:ALLOW(0123456789):LENGTHS(1..)
 FIELDTYPE:invalid_business_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.'-/#`+"!*@():;):LENGTHS(1..)
-FIELDTYPE:invalid_web_address:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./ )
+FIELDTYPE:invalid_web_address:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./)
 FIELDTYPE:invalid_guarantor_owner_indicator:ENUM(001|002|003)
 FIELDTYPE:invalid_relationship_to_business_indicator:ALLOW(0123456789)
 FIELDTYPE:invalid_percent_of_liability:ALLOW(0123456789)
