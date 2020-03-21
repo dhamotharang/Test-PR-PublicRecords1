@@ -33,8 +33,9 @@
 	EXPORT DEA:=dataset('~thor_data400::in::SeqdHeaderSrc_DEA_'+pVersion,Layouts_SeqdSrc.DEA_src_rec,flat);
 	EXPORT WP:=dataset('~thor_data400::in::SeqdHeaderSrc_WP_'+pVersion,Layouts_SeqdSrc.WP_src_rec,flat);
 	EXPORT SL:=dataset('~thor_data400::in::SeqdHeaderSrc_SL_'+pVersion,Layouts_SeqdSrc.SL_src_rec,flat);
-  EXPORT S1:=dataset('~thor_data400::in::SeqdHeaderSrc_S1_'+pVersion,Layouts_SeqdSrc.S1_src_rec,flat);
-	EXPORT VO:=dataset('~thor_data400::in::SeqdHeaderSrc_VO_'+pVersion,Layouts_SeqdSrc.VO_src_rec,flat);
+    EXPORT S1:=dataset('~thor_data400::in::SeqdHeaderSrc_S1_'+pVersion,Layouts_SeqdSrc.S1_src_rec,flat);
+    EXPORT VO:=dataset('~thor_data400::in::SeqdHeaderSrc_VO_'+pVersion,Layouts_SeqdSrc.VO_src_rec,flat);
+    EXPORT UM:=dataset('~thor_data400::in::SeqdHeaderSrc_UM_'+pVersion,Layouts_SeqdSrc.UM_src_rec,flat);
 	EXPORT CY:=dataset('~thor_data400::in::SeqdHeaderSrc_CY_'+pVersion,Layouts_SeqdSrc.CY_src_rec,flat);
 	EXPORT ND:=dataset('~thor_data400::in::SeqdHeaderSrc_ND_'+pVersion,Layouts_SeqdSrc.ND_src_rec,flat);
 	EXPORT EL:=dataset('~thor_data400::in::SeqdHeaderSrc_EL_'+pVersion,Layouts_SeqdSrc.EL_src_rec,flat);
