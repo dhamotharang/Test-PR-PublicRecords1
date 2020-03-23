@@ -66,6 +66,7 @@ export Proc_Accept_SRC_toQA(string filedate=header.version_build, boolean pFastH
 		MoveToQA('~thor_data400::key::boater_src_index');
 		MoveToQA('~thor_data400::key::targ_src_index');
 		MoveToQA('~thor_data400::key::voters_src_index');
+		MoveToQA('~thor_data400::key::census_src_index');
 		MoveToQA('~thor_data400::key::nod_src_index');
 	);
 

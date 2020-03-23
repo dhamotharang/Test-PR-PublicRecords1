@@ -1,4 +1,4 @@
-import Nid, Std, Address, did_add, BIPV2, business_header, business_header_ss, ut;
+﻿import Nid, Std, Address, did_add, BIPV2, business_header, business_header_ss, ut;
 
 
 EXPORT proc_createExecutives(dataset(Cortera.Layout_Header_Out) hdr) := FUNCTION
@@ -58,5 +58,5 @@ EXPORT proc_createExecutives(dataset(Cortera.Layout_Header_Out) hdr) := FUNCTION
 			 75, linked);
 			 
 		return  linked + names(EXECUTIVE_NAME='') + PROJECT(clean(cln_fname='' OR cln_lname=''), Cortera.Layout_Executives);
-
+    
 END;

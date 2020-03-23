@@ -155,6 +155,10 @@ EXPORT Mod_SetSources(boolean pFastHeader=false,string ver='default') := module
 	VO := votersv2.voters_as_Source(,true);
 	Mac_output(VO,SFname+'_VO',seq_VO);
 	EXPORT sequence_VO:=seq_VO;
+	
+    UM := votersv2.MA_Census_As_Source(,true);
+	Mac_output(UM,SFname+'_UM',seq_UM);
+	EXPORT sequence_UM:=seq_UM;
 
 	CY := Certegy.As_Source(,true);
 	Mac_output(CY,SFname+'_CY',seq_CY);
