@@ -1,71 +1,70 @@
 Import Anomalies_Header;
 
 
-infile := $.Files.Header;
-LeftFile := Anomalies_Header.Files.Header; 
-RightFile := Anomalies_Header.Files.Watchdog; 
+header := Anomalies_Header.Files.input_file; 
+watchdog := Anomalies_Header.Files.Watchdog; 
 
 Export Layouts := Module
    
     Export Layout_Header := Record
-        infile.did;
-        infile.fname;
-        infile.lname;
-        infile.dob;
-        infile.ssn;
-        infile.prim_range; 
-        infile.predir;
-        infile.prim_name;
-        infile.suffix;
-        infile.postdir;
-        infile.unit_desig;
-        infile.sec_range;
-        infile.city_name;
-        infile.st;
-        infile.zip;
-        infile.zip4;
-        infile.county;
-        infile.cbsa;
-        infile.src;
+        header.did;
+        header.fname;
+        header.lname;
+        header.dob;
+        header.ssn;
+        header.prim_range; 
+        header.predir;
+        header.prim_name;
+        header.suffix;
+        header.postdir;
+        header.unit_desig;
+        header.sec_range;
+        header.city_name;
+        header.st;
+        header.zip;
+        header.zip4;
+        header.county;
+        header.cbsa;
+        header.src;
     End;
 
    Export MyRecLeft := Record
-        LeftFile.did;
-        LeftFile.fname;
-        LeftFile.lname;
-        LeftFile.dob;
-        LeftFile.ssn;
-        LeftFile.prim_range;
-        LeftFile.predir;
-        LeftFile.prim_name;
-        LeftFile.suffix;
-        LeftFile.postdir;
-        LeftFile.unit_desig;
-        LeftFile.sec_range;
-        LeftFile.city_name;
-        LeftFile.st;
-        LeftFile.zip;
-        LeftFile.zip4;
-        LeftFile.src;
+        header.did;
+        header.fname;
+        header.lname;
+        header.dob;
+        header.ssn;
+        header.prim_range;
+        header.predir;
+        header.prim_name;
+        header.suffix;
+        header.postdir;
+        header.unit_desig;
+        header.sec_range;
+        header.city_name;
+        header.st;
+        header.zip;
+        header.zip4;
+        header.src;
     End;
 
     Export MyRecright := Record
-        RightFile.did;
-        RightFile.fname;
-        RightFile.lname;
-        RightFile.dob;
-        RightFile.ssn;
-        RightFile.prim_range;
-        RightFile.predir;
-        RightFile.prim_name;
-        RightFile.suffix;
-        RightFile.postdir;
-        RightFile.unit_desig;
-        RightFile.sec_range;
-        RightFile.city_name;
-        RightFile.st;
-        RightFile.zip;
-        RightFile.zip4;
+        watchdog.did;
+        watchdog.fname;
+        watchdog.lname;
+        watchdog.dob;
+        watchdog.ssn;
+        watchdog.prim_range;
+        watchdog.predir;
+        watchdog.prim_name;
+        watchdog.suffix;
+        watchdog.postdir;
+        watchdog.unit_desig;
+        watchdog.sec_range;
+        watchdog.city_name;
+        watchdog.st;
+        watchdog.zip;
+        watchdog.zip4;
     End;
 
 End;

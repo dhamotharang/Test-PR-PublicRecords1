@@ -15,27 +15,30 @@ input := Anomalies_Header.Files.Header;
 
 // dedup here
 
-t := Table(input, Layout_Header, did, fname, lname,
-                  dob, ssn, prim_range, predir, prim_name, 
-                  suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+// t := Table(input, Layout.Layout_Header, did, fname, lname,
+//                   dob, ssn, prim_range, predir, prim_name, 
+//                   suffix, postdir, unit_desig, sec_range, 
+//                   city_name, st, zip, zip4, county, cbsa, src);
 
-dt := Distribute(t, Hash(did, fname, lname,
-                  dob, ssn, prim_range, predir, prim_name, 
-                  suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src));
+// dt := Distribute(t, Hash(did, fname, lname,
+//                   dob, ssn, prim_range, predir, prim_name, 
+//                   suffix, postdir, unit_desig, sec_range, 
+//                   city_name, st, zip, zip4, county, cbsa, src));
 
-sdt := Sort(dt, did, fname, lname,
-                  dob, ssn, prim_range, predir, prim_name, 
-                  suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src, Local);
+// sdt := Sort(dt, did, fname, lname,
+//                   dob, ssn, prim_range, predir, prim_name, 
+//                   suffix, postdir, unit_desig, sec_range, 
+//                   city_name, st, zip, zip4, county, cbsa, src, Local);
 
-infile := Dedup(sdt, did, fname, lname,
-                  dob, ssn, prim_range, predir, prim_name, 
-                  suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+// infile := Dedup(sdt, did, fname, lname,
+//                   dob, ssn, prim_range, predir, prim_name, 
+//                   suffix, postdir, unit_desig, sec_range, 
+//                   city_name, st, zip, zip4, county, cbsa, src);
+
+
 
 Export Header_Counts := Module 
+
 
 // 1. NAMES
 
@@ -125,7 +128,7 @@ End;
 c_ssn2 := Table(Filteredssn, t_ssn2, did, ssn);
 dc_ssn2 := Distribute(c_ssn2, Hash(did, ssn));
 sdc_ssn2 := Sort(dc_ssn2, did, ssn, Local);
-dsdc_ssn2 := Dedup(sdc_ssn2, did, ssn, Local);
+Export dsdc_ssn2 := Dedup(sdc_ssn2, did, ssn, Local);
 
 crosstab_ssn := Record
     dsdc_ssn2.did;
@@ -154,25 +157,25 @@ Rec_Address := Record
     infile.zip;
 End;
 
-Addy_Rec := Table(infile, Rec_Address);
-sdc_Addy_Rec := Sort(Addy_Rec, did, prim_range, prim_name, unit_desig, 
+addressRec := Table(infile, Rec_Address);
+sdc_addressRec := Sort(addressRec, did, prim_range, prim_name, unit_desig, 
                                sec_range, st, zip , Local);                                        
-Export dsdc_Addy_Rec := Dedup(sdc_Addy_Rec, did, prim_range, prim_name, unit_desig, 
+Export dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, unit_desig, 
                                sec_range, st, zip , Local);
 
 C_Rec_Address := Record
-    dsdc_Addy_Rec.did;
-    dsdc_Addy_Rec.prim_range;
-    dsdc_Addy_Rec.prim_name;
-    dsdc_Addy_Rec.unit_desig;
-    dsdc_Addy_Rec.sec_range;
-    dsdc_Addy_Rec.st;
-    dsdc_Addy_Rec.zip;
+   // dsdc_addressRec.did;// take out
+    dsdc_addressRec.prim_range;
+    dsdc_addressRec.prim_name;
+    dsdc_addressRec.unit_desig;
+    dsdc_addressRec.sec_range;
+    dsdc_addressRec.st;
+    dsdc_addressRec.zip;
     RecordCnt := Count(Group);
 End;
 
-c_Addy_Rec := Table(dsdc_Addy_Rec, C_Rec_Address);
-Export st_Addy_Rec := Sort(c_Addy_Rec, -RecordCnt);
+c_addressRec := Table(dsdc_addressRec, C_Rec_Address);
+Export st_address_Rec := Sort(c_addressRec, -RecordCnt);
 
 
 
@@ -184,22 +187,30 @@ Export st_Addy_Rec := Sort(c_Addy_Rec, -RecordCnt);
 
 // Date of Birth
 //  A. Most common DOB accross all records
-Filtereddob := infile( NOT dob = 0);
 
 Sequencedob := Record
-    Filtereddob.dob;
+    infile.dob;
     RecordCnt := Count(Group);
 End;
 
-t_Crosstab_Dob := Table(Filtereddob, Sequencedob, dob);
+t_Crosstab_Dob := Table(infile, Sequencedob, dob);
 Export st_Crosstab_Dob := Sort(t_Crosstab_Dob, -RecordCnt);
 
-
-
-
-
-
 // B. Full Dob with the highest counts of different Lexids ( no 00/Blank)
+
+filteredDob := infile( NOT dob = 0);
+
+sequenceDobLexid := Record
+    filteredDob.did;
+    filteredDob.dob;
+    RecordCnt := Count(Group);
+End;
+
+t_crosstab_DobLexid := Table(filteredDob, sequenceDobLexid, did, dob);
+st_crosstab_DobLexid := Sort(t_crosstab_DobLexid, -RecordCnt);
+Export dst_crosstab_DobLexid := Dedup(st_crosstab_DobLexid, did, dob);
+
+
 
 // dob is integer4
 // MMDDYYYY Dobs without trailing zeroes
@@ -243,6 +254,8 @@ End;
 
 Out_Crosstab_dob := Table(RecSlim, crosstab_dob, dob);
 Export S_Crosstab_dob := Sort(Out_Crosstab_dob, -RecordCnt);
+
+
 
 
 
@@ -310,11 +323,8 @@ Export S_Crosstab_dobMMDD := Sort(Out_Crosstab_dobMMDD, -RecordCnt);
 // D. Sources with the highest count of blank and partially blank dob
 
 // Count of blank yyyymmdd
-Shared BlankDobsOnly := infile( dob =  0 );
+BlankDobsOnly := infile( dob =  0 );
 
-Export CountedBlankDobs := Count(BlankdobsOnly); // 33714
-
-// Count of blank mmdd (non-blank yyyy)
 Rec_BlankYYYYMMDD := Record
     BlankDobsOnly.dob;
     BlankDobsOnly.src;
