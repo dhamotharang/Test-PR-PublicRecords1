@@ -5,9 +5,15 @@ EXPORT CreateStats(
 										string	JobID
 									 )	:= module;
 									 
+/*---------------------------------------------------------------------------------------------------------------------
+| For the Business stats, we want to dedup the file by seleid/proxid. Counts will be based on this deduped file.
+|----------------------------------------------------------------------------------------------------------------------*/										 
 BusinessUnique	:=	dedup(sort(MktFile,seleid,proxid,local),seleid,proxid,local);
 StatLayout			:=	Marketing_Suite_List_Gen.Layouts.Layout_stats_temp;
 
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate Business type stats (business name, phone, state, county, city & zipcode
+|----------------------------------------------------------------------------------------------------------------------*/		
 BusinessStatRec	:=	record
 		unsigned8 CountGroup					:= count(group);
     NameCountNonZero              := sum(group,if(ut.CleanSpacesAndUpper(BusinessUnique.business_name)<>'',1,0));
@@ -26,6 +32,10 @@ end;
 
 pBusinessStat := table(BusinessUnique, BusinessStatRec, few);
 
+/*---------------------------------------------------------------------------------------------------------------------
+| Project this table into a stat file. We set unique_id to 1 in all these transforms so that we can roll all these 
+| up together. 
+|----------------------------------------------------------------------------------------------------------------------*/	
 BusinessStatFile	:=	project(pBusinessStat,
 															transform(StatLayout,
 															self.unique_id									:=	1;
@@ -46,6 +56,9 @@ BusinessStatFile	:=	project(pBusinessStat,
 															)
 															);
 
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate Revenue stats. These stats are grouped into buckets. 
+|----------------------------------------------------------------------------------------------------------------------*/	
 RevenueStatRec	:=	record
 		unsigned8 CountGroup							:= count(group);
     RevenueUnder150000            		:= sum(group,if(BusinessUnique.annual_revenue<150000,1,0));
@@ -102,7 +115,10 @@ RevenueStatFile	:=	project(pRevenueStat,
 														self																:=	[];
 														)
 														);												
-														
+
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate Number of Employee stats. These stats are grouped into buckets.
+|----------------------------------------------------------------------------------------------------------------------*/															
 EmployeeStatRec	:=	record
 		unsigned8 CountGroup							:= count(group);
     Employees1				            		:= sum(group,if(BusinessUnique.num_employees=1,1,0));
@@ -189,7 +205,11 @@ EmployeeStatFile	:=	project(pEmployeeStat,
 															self																	:=	[];
 															)
 															);												
-														
+
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate SIC code stats. The SIC stats are grouped into buckets however the buckets will be based on description
+| groupigs and not number groupings. We are also only generating stats on the PRIMARY field.
+|----------------------------------------------------------------------------------------------------------------------*/															
 SIC1_Set	:=	[	'01','02','03','04','05','06','07','08','09'];
 SIC2_Set	:=	[	'10','11','12','13','14'];
 SIC3_Set	:=	[	'15','16','17'];
@@ -256,7 +276,12 @@ SicStatFile	:=	project(pTopSICStat,
 												self																							:=	[];
 												)
 												);
-														
+												
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate NAICS code stats. The NAICS stats are grouped into buckets however the buckets will be based on description
+| groupings and not number groupings. We are also only generating stats on the PRIMARY field. Additionally, we are 
+| only providing stats on the top 10 NAICS codes (based on counts)
+|----------------------------------------------------------------------------------------------------------------------*/
 FindTopNAICSRec	:=	record
 		unsigned8		CountGroup	:= 	count(group);
     unsigned8		NAICS1_cnt	:= 	sum(group,if(	BusinessUnique.naics_primary[1..2] = '11',1,0));
@@ -483,6 +508,9 @@ NaicsStatFile					:=	project(FindTop10,
 														
 SrtNaicsStatFile	:=	Sort(NaicsStatFile,unique_id);
 
+/*---------------------------------------------------------------------------------------------------------------------
+| Since we are only generating stats on the top 10, we need to rollup the NAICS stat file.
+|----------------------------------------------------------------------------------------------------------------------*/
 Marketing_Suite_List_Gen.Layouts.Layout_stats_temp RollupNaics(Marketing_Suite_List_Gen.Layouts.Layout_stats_temp l, Marketing_Suite_List_Gen.Layouts.Layout_stats_temp r) := transform
 	self.Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting			:= 	if (l.Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting > r.Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting, 
 																																			l.Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting, 
@@ -635,7 +663,12 @@ NaicsRollup := rollup(	SrtNaicsStatFile, RollupNaics(left, right), except Cnt_NA
 												Cnt_NAICS_Other_Services_except_Public_Administration,
 												Per_NAICS_Other_Services_except_Public_Administration,
 												Cnt_NAICS_Public_Administration,Per_NAICS_Public_Administration);
+												
+/*---------------------------------------------------------------------------------------------------------------------
+| Now generate stats on the contact fields.
+|----------------------------------------------------------------------------------------------------------------------*/	
 
+// Get a set of Exective titles.											
 ExecTitleSet	:=	Marketing_Suite_List_Gen.fnGetExecTitles;
 
 ContactStatRec	:=	record
@@ -681,7 +714,10 @@ ContactStatFile	:=	project(pContactStat,
 															self															:=	[];
 															)
 															);
-												
+															
+/*---------------------------------------------------------------------------------------------------------------------
+| Combine all stats and then rollup based on the unique id. 
+|----------------------------------------------------------------------------------------------------------------------*/
 AllFiles		:=	BusinessStatFile + RevenueStatFile + EmployeeStatFile + SicStatFile + NaicsRollup + ContactStatFile;
 
 SrtAllFile	:=	Sort(AllFiles,unique_id);
@@ -1122,7 +1158,7 @@ AllFileRollup := rollup(SrtAllFile, RollupAll(left, right), except Cnt_Companies
 												
 AllFileStats	:=	project(AllFileRollup,TRANSFORM(Marketing_Suite_List_Gen.Layouts.Layout_Stats,SELF := LEFT;));											
 												
-WriteStats		:=	output(AllFileStats,,'~thor_data400::marketing_suite_list_gen::stats::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20));												
+WriteStats		:=	output(AllFileStats,,'~thor_data400::marketing_suite_list_gen::stats::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20));	
 												
 export All 		:=  WriteStats; 
 						
