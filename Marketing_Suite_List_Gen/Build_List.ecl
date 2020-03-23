@@ -4,20 +4,33 @@ export Build_List(
 										dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 										string	JobID
 									)	:= module;
-																
+									
+									
+  /*----------------------------------------------------------------------------------------------------------------------
+  | In this attribute, the lists (premium & basic) and stats are built using the validated parameters. 
+  |----------------------------------------------------------------------------------------------------------------------*/	
+	
+	/*----------------------------------------------------------------------------------------------------------------------
+  | These are the V1 Marketing files used as input.
+  |----------------------------------------------------------------------------------------------------------------------*/
 	MktBusBase			:=	Marketing_List.Files().business_information.built;
 	MktBusLayout		:=	Marketing_List.layouts.business_information;
 	MktContactBase	:=	Marketing_List.Files().business_contact.built;
-	MktContactLayout:=	Marketing_List.layouts.business_contact;	
+	MktContactLayout:=	Marketing_List.layouts.business_contact;
+	
+	/*----------------------------------------------------------------------------------------------------------------------
+  | Temporary layouts used in the building of the lists.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	TempBusLayout		:=	Marketing_Suite_List_Gen.Layouts.Layout_TempBus;
 	TempFullLayout	:=	Marketing_Suite_List_Gen.Layouts.Layout_TempFull;
 	TempNormLayout	:=	Marketing_Suite_List_Gen.Layouts.Layout_NormTemp;	
 	
+	/*----------------------------------------------------------------------------------------------------------------------
+  | The only search parameter we care about in this attribute is the Location Search Type. We determine what the 
+	| location search type and then slim the V1 file accordingly. 
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	string ParmFilterType_Location							:= 'SEARCHTYPE';
 
-  /*=======================================================================================================================================
-  | Filter the parameter file by individual filter values (1 rec per value), then execute function to validate values and format into set.
-  |======================================================================================================================================*/
   rs_record_SearchType												:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterType_Location);
 	
   set of string filter_SearchType  						:= 	IF(COUNT(rs_record_SearchType) > 0, rs_record_SearchType[1].set_filter_values, ['']);
@@ -104,8 +117,18 @@ export Build_List(
 		return SlimBusinessFile;
 	end;
 	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | In order to slim the marketing file to just the fields we need to deal with, we analyze the location search type and 
+	| based on this we project the full V1 marketing file down to a slimmer ones. If the loacation search type is a 'S' 
+	| (seleid), we populate the slim file with the necessary seleid fields. If it is a 'P' (proxid), we populate the slim
+	| file with the necessary proxid fields.
+  |----------------------------------------------------------------------------------------------------------------------*/
 	GetSlim							:=	ExtractBusinessFileSearchFields(SearchType);
 	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | For each parameter category, pass the slim file in the category function to build that list. So we build a phone  
+	| list, geography list, revenue list etc. 
+  |----------------------------------------------------------------------------------------------------------------------*/
 	PhoneList						:=	if (count(Marketing_Suite_List_Gen.MakePhoneList(inParmFile,GetSlim)) <> 0,
 																Marketing_Suite_List_Gen.MakePhoneList(inParmFile,GetSlim),
 																GetSlim
@@ -141,6 +164,9 @@ export Build_List(
 																GetSlim
 															);
 															
+	/*---------------------------------------------------------------------------------------------------------------------
+  | distribute each list  
+  |----------------------------------------------------------------------------------------------------------------------*/														
 	distPhoneList						:=	distribute(PhoneList, 					hash(seleid,proxid));
 	distGeoList							:=	distribute(GeoList, 						hash(seleid,proxid));
 	distRevenueList					:=	distribute(RevenueList, 				hash(seleid,proxid));
@@ -149,10 +175,11 @@ export Build_List(
 	distYearsInBusinessList	:=	distribute(YearsInBusinessList, hash(seleid,proxid));
 	distBusEmailList				:=	distribute(BusEmailList, 				hash(seleid,proxid));															
 		
-	//---------------------------------------------------------------------------------------------
-	// Make the list
-	//---------------------------------------------------------------------------------------------	
-	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Make the business section of the list. Do an inner join of each so that we get records that are in both.
+	| Each category is an AND, so if we had the toll free parameter and we had a state=OH parameter, then we would only
+	| want records that have both a toll free number and in the state of OH.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	TempBusLayout trfMakeBusList(TempBusLayout l, TempBusLayout r)	:=	transform
 		self	:=	l;
 	end;
@@ -198,9 +225,15 @@ export Build_List(
 													left.proxid=right.proxid,
 													trfMakeBusList(left,right),
 													local);	
-													
+
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Dedup the final business list
+  |----------------------------------------------------------------------------------------------------------------------*/													
 	BusList				:=	dedup(sort(BusList6, record, local), record, local);
 
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Normalize the business list so that we can look up the SIC/NAICS codes for their descriptions.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	TempBusLayout AddSequence(TempBusLayout l, unsigned8 c) := transform
 			self.unique_id			:=	c;
 			self								:=	l;
@@ -228,8 +261,12 @@ export Build_List(
 		
 	NormList				:=	dedup(sort(NormalizeIndustryFields, record), record);
 	
+	// Call to get the desriptions
 	ExplodeIndustry	:=	Marketing_Suite_List_Gen.fnGetIndustryDesc(NormList);
 	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Now lets put the file back together with the descriptions in place.
+  |----------------------------------------------------------------------------------------------------------------------*/		
 	dSeqFile_dist 	:= 	distribute(SeqFile,hash(unique_id));
 	dExploded_dist	:=	distribute(ExplodeIndustry,hash(unique_id));
 	
@@ -304,10 +341,11 @@ export Build_List(
 	
 	dIndustry									:=	distribute(dIndustry5,hash(seleid,proxid));
 	
-	//---------------------------------------------------------------------------------------------
-	// Make the contact list
-	//---------------------------------------------------------------------------------------------	
-	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Make the contact section of the list. Do an inner join of each so that we get records that are in both.
+	| Each category is an AND, so if we had contact email present parameter and we had executive title present parameter, 
+	| then we would only want records that have both a contact email and an executive title.
+  |----------------------------------------------------------------------------------------------------------------------*/		
 	ContactList					:=	if (count(Marketing_Suite_List_Gen.MakeContactList(inParmFile,MktContactBase)) <> 0,
 																Marketing_Suite_List_Gen.MakeContactList(inParmFile,MktContactBase),
 																MktContactBase
@@ -319,7 +357,7 @@ export Build_List(
 															);
 															
 	distContactList			:=	distribute(ContactList, hash(seleid,proxid));
-	distExecContactList	:=	distribute(ContactList, hash(seleid,proxid));
+	distExecContactList	:=	distribute(ExecContactList, hash(seleid,proxid));
 	
 	MktContactLayout trfMakeContactList(MktContactLayout l, MktContactLayout r)	:=	transform
 		self	:=	l;
@@ -335,7 +373,10 @@ export Build_List(
 																local);	
 																
 	distAllContactList	:=	distribute(ContList1, hash(seleid,proxid));
-
+	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Join the Business Information section of the list to the Contact section of the list.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	TempFullLayout trfJoinMkt(MktContactLayout l,  TempBusLayout r)	:=	transform
 		self.contact_city						:=	l.city;
 		self.contact_state					:=	l.state;
@@ -355,10 +396,21 @@ export Build_List(
 														right outer,
 														local);
 														
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Generate the statistical file. This uses the entire Marketing File created above.
+  |----------------------------------------------------------------------------------------------------------------------*/															
 	doStats					:=	Marketing_Suite_List_Gen.CreateStats(MarketingFile,JobID).all;
-	
+
+	/*---------------------------------------------------------------------------------------------------------------------
+  | The customer has the option of getting all the data fields returned (Premium) or a slimmed down file (Basic).
+	| In the basic file, we return only 3 contacts using the person hierarchy to keep the 3 lowest values. 
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	BasicFile				:=	Dedup(sort(MarketingFile,seleid,proxid,person_hierarchy,local),seleid,proxid,local, keep 3);
-								
+
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Transform the full marketing file created by joining the business information file and the contact file together 
+	| into the Company search (seleid) premium layout.
+  |----------------------------------------------------------------------------------------------------------------------*/									
 	Marketing_Suite_List_Gen.Layouts.Layout_CompanySearch	trfBusiness(TempFullLayout pInput)	:=	transform
     self.company_business_address	:=	pInput.address;
     self.company_city							:=	pInput.city;
@@ -380,7 +432,10 @@ export Build_List(
 		self.contact_email						:=	pInput.contact_email_address;
 		self													:= 	pInput;
 	end;
-
+	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Transform the slimmed down basic file into the Company search (seleid) basic layout.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	Marketing_Suite_List_Gen.Layouts.Layout_CompanySearchBasic	trfBusinessBasic(TempFullLayout pInput)	:=	transform
     self.company_business_address	:=	pInput.address;
     self.company_city							:=	pInput.city;
@@ -400,6 +455,10 @@ export Build_List(
 		self													:= 	pInput;
 	end;
 	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Transform the full marketing file created by joining the business information file and the contact file together 
+	| into the Location search (proxid) premium layout.
+  |----------------------------------------------------------------------------------------------------------------------*/		
 	Marketing_Suite_List_Gen.Layouts.Layout_LocationSearch	trfLocation(TempFullLayout pInput)	:=	transform
     self.location_business_address:=	pInput.address;
     self.location_city						:=	pInput.city;
@@ -422,6 +481,9 @@ export Build_List(
 		self													:= 	pInput;
 	end;
 	
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Transform the slimmed down basic file into the Location search (proxid) basic layout.
+  |----------------------------------------------------------------------------------------------------------------------*/	
 	Marketing_Suite_List_Gen.Layouts.Layout_LocationSearchBasic	trfLocationBasic(TempFullLayout pInput)	:=	transform
     self.location_business_address:=	pInput.address;
     self.location_city						:=	pInput.city;
@@ -442,14 +504,17 @@ export Build_List(
 	end;	
 
 	FormatBusinessFile	:=	Sequential(
-																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20)),
-																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20))
+																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20)),
+																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20))
 																		 );
 	FormatLocationFile	:=	Sequential(
-																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20)),
-																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|'])),overwrite,__compressed__, expire (20))
+																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20)),
+																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20))
 																		 );
 
+	/*---------------------------------------------------------------------------------------------------------------------
+  | Based on search type, output the appropriate premium and basic files (either seleid or proxid).
+  |----------------------------------------------------------------------------------------------------------------------*/		
 	export All := 
 	
 		parallel(
