@@ -1,13 +1,3 @@
-Import Data_Services, doxie, ut;
-
-Legacy_Layout := PROJECT(File_History_Full_Prepped_for_Keys, Layout_History_Legacy);
-
-export key_history_npa_nxx_line :=  
-       index(Legacy_Layout(length(TRIM(phone10))=10),
-             {string3 npa := phone10[1..3],
-		    string3 nxx := phone10[4..6],
-		    string4 line := phone10[7..10],
-		    boolean current_flag := if(current_record_flag='Y',true,false),
-		    boolean business_flag := if(listing_type_bus='B',true,false)},
-             {Legacy_Layout},
-		   Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_history_npa_nxx_line_' + doxie.Version_SuperKey);
+IMPORT dx_Gong;
+EXPORT key_history_npa_nxx_line := dx_Gong.key_history_npa_nxx_line() : DEPRECATED('Use dx_gong.key_history_npa_nxx_line instead');
+		   
