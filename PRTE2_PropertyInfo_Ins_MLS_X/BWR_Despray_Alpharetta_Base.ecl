@@ -8,7 +8,7 @@ ACTIVATE THE NEW CSV NAME AND REMOVE THE OLD V3 NAME (lINE 26-27)
 ************************************************************************************************************************ */
 
 IMPORT PRTE2_Common, ut;
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X as PII;
+IMPORT PRTE2_PropertyInfo_Ins_MLS as PII;
 #workunit('name', 'ALPHA PRCT PropertyInfo Despray');
 
 dateString 			:= PRTE2_Common.Constants.TodayString;

@@ -12,6 +12,7 @@ EXPORT After_Build_Actions := MODULE
 		EXPORT post_processing_actions(string filedate) := FUNCTION
 
 				boolean is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
+
 				PROD_SEQ_STEPS := SEQUENTIAL (
    							PRTE.UpdateVersion(	'PropertyInformationKeys',	//	Package name
    									filedate,										//	Package version
@@ -23,9 +24,8 @@ EXPORT After_Build_Actions := MODULE
 								);
 
 				DEV_STEPS := SEQUENTIAL(OUTPUT('Skipping Production steps'));
-				Production_Steps_To_Do := IF(is_running_in_prod, PROD_SEQ_STEPS, DEV_STEPS);
 
-				RETURN Production_Steps_To_Do;
+				RETURN IF(is_running_in_prod, PROD_SEQ_STEPS, DEV_STEPS);
 		END;
 
 END;

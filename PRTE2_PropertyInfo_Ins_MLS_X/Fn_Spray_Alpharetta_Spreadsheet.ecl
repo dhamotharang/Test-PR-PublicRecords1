@@ -3,14 +3,14 @@
 ***** MLS CONVERSION NOTES:
 **********************************************************************************************
 OLDER NOTES:
- PRTE2_PropertyInfo_Ins_MLS_X.Fn_Spray_Alpharetta_Spreadsheet
+ PRTE2_PropertyInfo_Ins_MLS.Fn_Spray_Alpharetta_Spreadsheet
 TEMP_ADDRESS_WORKAROUND TILL DATA3 IS DONE HERE
 ************************************************************************************************************************ */
 
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, ut;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, ut;
 IMPORT PRTE2_Common;
 
-EXPORT Fn_Spray_Alpharetta_Spreadsheet(STRING CSVName, STRING fileVersion, STRING overridePath='') := FUNCTION
+EXPORT Fn_Spray_Alpharetta_Spreadsheet(STRING CSVName, STRING overridePath='') := FUNCTION
 
 			//------------------------------------------------
 			// Everything in the fn_Spray process should happen in the full CSV layout (AlphaPropertyCSVRec_MLS)

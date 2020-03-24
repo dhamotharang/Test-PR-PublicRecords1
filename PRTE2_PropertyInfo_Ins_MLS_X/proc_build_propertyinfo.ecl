@@ -3,7 +3,7 @@
 ***** MLS CONVERSION NOTES:
 **********************************************************************************************
 OLDER NOTES:
-PRTE2_PropertyInfo_Ins_MLS_X.proc_build_propertyinfo 
+PRTE2_PropertyInfo_Ins_MLS.proc_build_propertyinfo 
 APRIL 2017 - for now the Boca layout file is just in memory - eventually make it a real base file
 that the Boca build process can read (whenever Boca creates an actual build process).
 **************************************************************************************************
@@ -12,12 +12,14 @@ that the Boca build process can read (whenever Boca creates an actual build proc
     CORRECTION: We found Property Info only has Ins. payload
 ************************************************************************************************************************ */
 
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PromoteSupers, RoxieKeyBuild;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, PromoteSupers, RoxieKeyBuild, PRTE2_Common;
 
 EXPORT proc_build_propertyinfo (string	Filedate)	:= FUNCTION
 
 		All_Expanded := Get_Payload.All_Expanded;		// no longer does record generation, just layout work.
-
+		Key_Prefix := '~prte::key::propertyinfo';
+		create_Addr_SFs := PRTE2_Common.SuperFiles.Create(Key_Prefix, 'address');
+		create_RID_SFs := PRTE2_Common.SuperFiles.Create(Key_Prefix, 'rid');
 		// MAC_SK_BuildProcess_v2_local(theindexprep, superkeyname, lkeyname, seq_name, one_node = 'false', diffing = 'false')
 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_PropertyInfo_rid(Filedate,All_Expanded), 
 											Files.BuildKeyRIDSimple,
@@ -48,6 +50,7 @@ EXPORT proc_build_propertyinfo (string	Filedate)	:= FUNCTION
 
 			RETURN SEQUENTIAL( buildFinalBase
 												, build_MV_base
+												, create_Addr_SFs, create_RID_SFs
 												, PARALLEL(bld_RID_key,bld_Addr_key)
 												, PARALLEL(mv_rid_key,mv_addr_key)
 												, PARALLEL(mv_rid_QA,mv_addr_QA)
