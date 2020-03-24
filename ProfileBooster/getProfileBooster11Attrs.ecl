@@ -1,5 +1,5 @@
 ﻿IMPORT ProfileBooster.ProfileBoosterV2_KEL, ProfileBooster, STD, Risk_Indicators;
-IMPORT KEL11 AS KEL;
+IMPORT KEL12 AS KEL;
 
 EXPORT getProfileBooster11Attrs(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_wseq, 
 																INTEGER Score_threshold = 80,

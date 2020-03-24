@@ -41,8 +41,8 @@ onThor := _Control.Environment.onThor;
 #OPTION('defaultSkewError', 1);
 
 	INTEGER		eyeball_count 						:= 10;
-	STRING50 	DataRestriction						:= Risk_Indicators.iid_constants.default_DataRestriction;;
-	STRING50 	DataPermission 						:= Risk_Indicators.iid_constants.default_DataPermission;
+	STRING50 	DataRestriction						:= '0000010001001100000000000';//Risk_Indicators.iid_constants.default_DataRestriction;
+	STRING50 	DataPermission 						:= '0000000000000';//Risk_Indicators.iid_constants.default_DataPermission;
 	STRING9   AttributesVersionRequest	:= 'PBATTRV1'; 
 
 	file := '~jpyon::in::iron_9396_list2_fs.csv';
