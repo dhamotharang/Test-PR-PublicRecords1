@@ -9,7 +9,7 @@ IT NO LONGER CHECKS SRC AND DATE FIELDS FOR ATTRIBUTES - THOSE MUST BE EDITED CO
 **********************************************************************************************
 
 OLDER NOTES:
-	PRTE2_PropertyInfo_Ins_MLS_X.BWR_Spray_Alpharetta_Adds
+	PRTE2_PropertyInfo_Ins_MLS.BWR_Spray_Alpharetta_Adds
 Simply spray new data file into HPCC files, run initializations, and append to base file.
 
 Run this in DEV/Dataland ... 
@@ -19,13 +19,13 @@ Run this in DEV/Dataland ...
 
 ************************************************************************************************************************ */
 
-IMPORT ut, PRTE2_PropertyInfo_Ins_MLS_X, PRTE2_Common;
+IMPORT ut, PRTE2_PropertyInfo_Ins_MLS, PRTE2_Common;
 #workunit('name', 'Boca PRCT Property Info Spray / Add');
 
 STRING fileVersion := PRTE2_Common.Constants.TodayString+'';
 CSVName := 'PropertyInfo_adds_travelets_20170818_upd.csv';
 isProdBase := TRUE; // TRUE = read PROD base file, append new cases then save as new Dev base.  FALSE = append new cases to the Local Dev Base.
 
-BuildFile := PRTE2_PropertyInfo_Ins_MLS_X.Fn_Spray_Alpharetta_Add_Records( CSVName, fileVersion, isProdBase);
+BuildFile := PRTE2_PropertyInfo_Ins_MLS.Fn_Spray_Alpharetta_Add_Records( CSVName, fileVersion, isProdBase);
 
 SEQUENTIAL (BuildFile);

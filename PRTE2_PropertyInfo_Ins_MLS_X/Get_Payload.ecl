@@ -3,7 +3,7 @@
 ***** MLS CONVERSION NOTES:
 **********************************************************************************************
 OLDER NOTES:
-// PRTE2_PropertyInfo_Ins_MLS_X.Get_Payload
+// PRTE2_PropertyInfo_Ins_MLS.Get_Payload
 // JOIN the existing Property Info key files into one expanded payload file. 
 // Create a new payload with new Customer Test data
 // (change 'propertybluebook' to 'propertyinfo').

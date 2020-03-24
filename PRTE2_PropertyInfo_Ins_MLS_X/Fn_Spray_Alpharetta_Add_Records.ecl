@@ -4,11 +4,11 @@
 TODO - We don't want to fill any SRC fields but might want to empty them if value is blank???
 **********************************************************************************************
 OLDER NOTES:
- PRTE2_PropertyInfo_Ins_MLS_X.Fn_Spray_Alpharetta_Add_Records
+ PRTE2_PropertyInfo_Ins_MLS.Fn_Spray_Alpharetta_Add_Records
 TEMP_ADDRESS_WORKAROUND TILL DATA3 IS DONE HERE
 ************************************************************************************************************************ */
 
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, ut;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, ut;
 IMPORT PRTE2_Common;
 
 //---------------------------------------------------------------------

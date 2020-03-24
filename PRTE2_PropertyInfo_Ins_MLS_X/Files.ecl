@@ -3,10 +3,10 @@
 ***** MLS CONVERSION NOTES:
 **********************************************************************************************
 OLDER NOTES:
-// PRTE2_PropertyInfo_Ins_MLS_X.Files
+// PRTE2_PropertyInfo_Ins_MLS.Files
 ************************************************************************************************************************ */
 
-IMPORT PRTE2_Common;
+IMPORT PRTE2_Common, PropertyCharacteristics;
 
 EXPORT Files := MODULE
 	EXPORT Add_Foreign_prod				:= PRTE2_Common.Constants.Add_Foreign_prod;
@@ -65,5 +65,21 @@ EXPORT Files := MODULE
 	EXPORT PII_ALPHA_BASE_SF_DS_Prod		:= DATASET(PII_ALPHA_BASE_SF_Prod, Layouts.AlphaPropertyCSVRec_MLS, THOR);
 	EXPORT Alpha_PII_Final_Base_Nm_Prod := Add_Foreign_prod(Alpha_PII_Final_Base_Name);
 	EXPORT Alpha_PII_Final_Base_DS_Prod	:= DATASET(Alpha_PII_Final_Base_Nm_Prod, Layouts.Boca_Official_Layout, THOR);
+	
+	// ****************************************************************************************************
+	// ***** These are here just for viewing keys contents as needed for auditing, etc.
+	// ****************************************************************************************************
+	EXPORT RealProdAddrKey := PropertyCharacteristics.Key_PropChar_Address;
+	EXPORT RealProdRidKey 	:= PropertyCharacteristics.Key_PropChar_RID;
+
+	SHARED CTRidKeyName := '~prte::key::propertyinfo::qa::rid';
+	SHARED CTAddrKeyName := '~prte::key::propertyinfo::qa::address';
+	SHARED CTRidKeyNameProd := Add_Foreign_prod(CTRidKeyName);
+	SHARED CTAddrKeyNameProd := Add_Foreign_prod(CTAddrKeyName);
+
+	EXPORT CT_Addr_Key := Index(RealProdAddrKey, CTAddrKeyName);		
+	EXPORT CT_Rid_Key := Index(RealProdRidKey, CTRidKeyName);		
+	EXPORT CT_Addr_KeyProd := Index(RealProdAddrKey, CTAddrKeyNameProd);		
+	EXPORT CT_Rid_KeyProd := Index(RealProdRidKey, CTAddrKeyNameProd);	
 	
 END;
