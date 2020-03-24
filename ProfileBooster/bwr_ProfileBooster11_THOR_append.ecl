@@ -36,7 +36,7 @@ onThor := _Control.Environment.onThor;
 
 #stored('did_add_force', if(onThor, 'thor', 'roxi') );  // this option is the stored parameter used inside the DID append macro to determine which version of the macro to use
 // The following options are for running KEL on THOR
-#OPTION('multiplePersistInstances', FALSE); // TRUE - to allow multiple files/jobs to run at same time
+#OPTION('multiplePersistInstances', TRUE); // TRUE - to allow multiple files/jobs to run at same time
 #OPTION('expandSelectCreateRow', TRUE);
 #OPTION('outputLimit', 2000);
 #OPTION('outputLimitMb', 1000);
@@ -45,12 +45,12 @@ onThor := _Control.Environment.onThor;
 #OPTION('globalAutoHoist', FALSE);
 
 	INTEGER		eyeball_count 						:= 10;
-	STRING50 	DataRestriction						:= Risk_Indicators.iid_constants.default_DataRestriction;;
-	STRING50 	DataPermission 						:= Risk_Indicators.iid_constants.default_DataPermission;
+	STRING50 	DataRestriction						:= '0000010001001100000000000';//Risk_Indicators.iid_constants.default_DataRestriction;
+	STRING50 	DataPermission 						:= '0000000000000';//Risk_Indicators.iid_constants.default_DataPermission;
 	STRING9   AttributesVersionRequest	:= 'PBATTRV1'; 
 
-	file := '~jpyon::in::iron_9396_list2_fs.csv'; //W //15,387 records
-	pb10file := '~jfrancis::out::profilebooster10_ironhorse__w20200227-160956';	
+	file := '~jfrancis::in::sample_iron_9396_list2_fs.csv';
+	pb10file := '~jfrancis::out::profilebooster10_sample_ironhorse__w20200227-160956';	
 	
 	file_name := file[(STD.Str.Find(file,'::',STD.Str.FindCount(file,'::'))+2)..LENGTH(file)];
 	
@@ -79,7 +79,7 @@ onThor := _Control.Environment.onThor;
 		// unsigned did;
 	END;
 
-	ds_in := DATASET(file, layout_file_input, CSV(HEADING(single), QUOTE('"')));	
+	ds_in := DATASET(file, layout_file_input, CSV(QUOTE('"')));	
 	dist_ds := DISTRIBUTE(ds_in, HASH64(Account));
 
   PB10_pre := OUTPUT(ds_in);
