@@ -72,7 +72,7 @@ EXPORT Metrics_Report (string pVersion, boolean pUseProd, string gcid, dataset (
 		prev_base					:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa;
 		prev_distinct_crk	:= sort(distribute(dedup(project(prev_base, crk_only), all)), crk);
 
-		new_only 					:= join(get_distinct_crk, prev_distinct_crk,
+		new_only 					:= join(prev_distinct_crk, get_distinct_crk,
 													left.crk = right.crk,
 													right only);
 
