@@ -57,9 +57,9 @@ export rClient := RECORD
 	string20		CaseID;
 	string20		ClientId;
 	string1			HHIndicator;			// head of household indicator Y or N
+	string1			ABAWDIndicator := 'U';		// Yes, No, Unavailable
 	string1			Relationship;			// H - Head of Household, P - Parent,  M - Mother, F - Father,
 																// G - Guardian,  T - Grandparent,  A - Aunt, U - Uncle, C - Cousin, D - Child, O - Other (etc versus Y/N)
-	string1			ABAWDIndicator := 'U';		// Yes, No, Unavailable
 	string30		LastName;
 	string25		FirstName;
 	string25		MiddleName;

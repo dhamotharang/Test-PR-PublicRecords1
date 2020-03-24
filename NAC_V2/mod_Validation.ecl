@@ -154,7 +154,8 @@ EXPORT mod_Validation := MODULE
 					self.Gender := IF(left.Gender = '' OR left.Gender not in Mod_sets.Gender, 'U', left.Gender);
 					self.Ethnicity := IF(left.Ethnicity = '' OR left.Ethnicity NOT IN Mod_Sets.Ethnicity, 'U', left.Ethnicity);
 					self.ABAWDIndicator := IF(left.ABAWDIndicator = '' OR left.ABAWDIndicator NOT IN Mod_Sets.ABAWD_Type, 'U', left.ABAWDIndicator);
-					self.Relationship := IF(left.Relationship='' OR left.Relationship NOT IN Mod_Sets.Relationship_Type, 'O', left.Relationship);
+					// relationship if optional
+					self.Relationship := IF(left.Relationship='' OR left.Relationship IN Mod_Sets.Relationship_Type, left.Relationship, 'O');
 
 					self := LEFT;
 					self := [];
