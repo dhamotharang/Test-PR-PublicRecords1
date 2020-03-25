@@ -1,7 +1,6 @@
 Import Anomalies_Header;
 
-
-header := Anomalies_Header.Files.input_file; 
+header := Anomalies_Header.Files.Header; 
 watchdog := Anomalies_Header.Files.Watchdog; 
 
 Export Layouts := Module

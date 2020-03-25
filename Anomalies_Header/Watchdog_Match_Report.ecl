@@ -1,8 +1,26 @@
 Import Anomalies_Header;
 
+t := Table(Anomalies_Header.Files.Header, Layouts.Layout_Header, did, fname, lname,
+                  dob, ssn, prim_range, predir, prim_name, 
+                  suffix, postdir, unit_desig, sec_range, 
+                  city_name, st, zip, zip4, county, cbsa, src );
+
+dt := Distribute(t, Skew(0.1,0.15));
+
+sdt := Sort(dt, did, fname, lname,
+                  dob, ssn, prim_range, predir, prim_name, 
+                  suffix, postdir, unit_desig, sec_range, 
+                  city_name, st, zip, zip4, county, cbsa, src, Local );
+
 // Files
-LeftFile := Anomalies_Header.Files.Header; 
-RightFile := Anomalies_Header.Files.Watchdog; 
+LeftFile := Dedup(sdt, did, fname, lname,
+                  dob, ssn, prim_range, predir, prim_name, 
+                  suffix, postdir, unit_desig, sec_range, 
+                  city_name, st, zip, zip4, county, cbsa, src, All );
+
+RightFile_input := Anomalies_Header.Files.Watchdog; 
+RightFile_sort := Distribute(RightFile_input, Skew(0.1,0.15));
+RightFile := Sort(RightFile_sort, did, Local );
 
 // Layouts
 Header_Layout := Anomalies_Header.Layouts.MyRecLeft;
@@ -11,7 +29,7 @@ Watchdog_Layout := Anomalies_Header.Layouts.MyRecright;
 Export Watchdog_Match_Report := Module
 
 
-LeftRec := Project(Leftfile, Header_Layout);
+Export LeftRec := Project(Leftfile, Header_Layout);
 RightRec := Project(RightFile, Watchdog_Layout);
 
 
@@ -70,10 +88,15 @@ MyOutRec MatchThem( LeftRec Le, RightRec Ri ) := Transform
 End;
 
 J_Watchdog_Match := Join(LeftRec, RightRec, Left.did = Right.did, MatchThem(Left, Right));
-S_Watchdog_Match := Sort(J_Watchdog_Match, Record, Local);
+d_Watchdog_Match := Distribute(J_Watchdog_Match, Skew(0.1,0.15));
+S_Watchdog_Match := Sort(d_Watchdog_Match, did, fname_match, lname_match, dob_match,
+                                           ssn_match, address_match, address_match_all,
+                                           source_name, Local ); // take a look
 
 //exports comparingson of header file agaisnt watchdog
-Export Watchdog_Match := Dedup(S_Watchdog_Match, Record, Local);
+Export Watchdog_Match := Dedup(S_Watchdog_Match, did, fname_match, lname_match, dob_match,
+                                                ssn_match, address_match, address_match_all, 
+                                                source_name, All ); // take a look
 
 
 // rollup by lexid

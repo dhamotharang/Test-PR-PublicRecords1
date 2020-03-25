@@ -81,8 +81,9 @@ Export st_counted_collectivematch_all := Sort(t_address_collectivematch_counted,
 //then get a percentage of the amount true 
 //Rollup by lexid & src, keep true recs, if not f, and if blank then b
 
-// Join 
 
+
+// Joins
 fnameTrue :=  st_counted_fname( fname_match = 'T');
 
 fnameLayout := Record
