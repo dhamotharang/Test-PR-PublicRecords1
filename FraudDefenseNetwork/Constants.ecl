@@ -26,7 +26,7 @@ EXPORT Constants(BOOLEAN pUseOtherEnvironment	= true) := MODULE
   EXPORT Did_Matchset            := ['D', 'S', 'P', 'A'];
   EXPORT Lexid_Header_Package_Env_Var   := 'header_build_version';
   EXPORT BIP_Header_Package_Env_Var     := 'bip_build_version';
-  EXPORT Email_List                     := 'Sudhir.Kasavajjala@lexisnexisrisk.com, ravi.gadi@lexisnexisrisk.com, kapildev.kanyagundla@lexisnexisrisk.com, john.freibaum@lexisnexisrisk.com';
+  EXPORT Email_List                     := 'Sudhir.Kasavajjala@lexisnexisrisk.com, ravi.gadi@lexisnexisrisk.com, kapildev.kanyagundla@lexisnexisrisk.com';
   EXPORT ErieAddrPhClnPersist           := '~thor_data400::base::fdn::erie::AddrPhCln::persist';
   EXPORT ErieWLClnLinkedPersist         := '~thor_data400::base::fdn::eriewatchlist::ClnLinked::persist';
   EXPORT OigAddrClnPersist              := '~thor_data400::base::fdn::oig::AddrCln::persist';

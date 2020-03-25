@@ -42,7 +42,7 @@ good_to_process_a_new_build :=  build_version = cert_version;
 
 header_version := (string) nothor(tools.fun_GetFilenameVersion ('~thor_data400::base::header_prod'));
 
-statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com,michael.gould@lexisnexis.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
+statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
 
 ds := dataset('~thor_data400::watchdog::newheader_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
