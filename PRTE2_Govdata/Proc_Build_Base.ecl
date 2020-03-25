@@ -9,7 +9,7 @@ EXPORT Proc_Build_Base(string pversion) := FUNCTION
 	In_SEC_BROKER := Files.Sec_Broker_In;
 
 	//uppercase and remove spaces from in file
-  PRTE2.CleanFields(In_FCID, In_FCID_clean_fields); //(Input,OutFile)
+  	PRTE2.CleanFields(In_FCID, In_FCID_clean_fields); //(Input,OutFile)
 	PRTE2.CleanFields(In_IRS, In_IRS_clean_fields); //(Input,OutFile)
 	PRTE2.CleanFields(In_SALESTAX_CA, In_SALESTAX_CA_clean_fields); //(Input,OutFile)
 	PRTE2.CleanFields(In_SALESTAX_IA, In_SALESTAX_IA_clean_fields); //(Input,OutFile)
@@ -51,10 +51,10 @@ EXPORT Proc_Build_Base(string pversion) := FUNCTION
 	In_SALESTAX_IA_Addr := PROJECT(In_SALESTAX_IA_sequenced, 
                              TRANSFORM(Layouts.temp_address_layout,
                                     	SELF.source_rec_id := LEFT.source_rec_id;
-										SELF.street_address := LEFT.location_street_1;
-										SELF.city := LEFT.location_city;
-										SELF.state := LEFT.location_state;
-										SELF.zip_code := LEFT.location_zip_code;
+										SELF.street_address := LEFT.mailing_street_1;
+										SELF.city := LEFT.mailing_city;
+										SELF.state := LEFT.mailing_state;
+										SELF.zip_code := LEFT.mailing_zip_code;
                                        )
                              );
 
@@ -225,35 +225,33 @@ EXPORT Proc_Build_Base(string pversion) := FUNCTION
 						addr_clean_all, 
 						LEFT.source_rec_id = RIGHT.source_rec_id,
 						TRANSFORM(RECORDOF(govdata.Layout_IA_SalesTax_Base),
-							/*
-							SELF.prim_range := RIGHT.clean_address.prim_range;
-							SELF.predir := RIGHT.clean_address.predir;
-							SELF.prim_name := RIGHT.clean_address.prim_name;
-							SELF.addr_suffix := RIGHT.clean_address.addr_suffix;
-							SELF.postdir := RIGHT.clean_address.postdir;
-							SELF.unit_desig := RIGHT.clean_address.unit_desig;
-							SELF.sec_range := RIGHT.clean_address.sec_range;
-							SELF.p_city_name := RIGHT.clean_address.p_city_name;
-							SELF.v_city_name := RIGHT.clean_address.v_city_name;
-							SELF.st := RIGHT.clean_address.st;
-							SELF.zip := RIGHT.clean_address.zip;
-							SELF.zip4 := RIGHT.clean_address.zip4;
-							SELF.cart := RIGHT.clean_address.cart;
-							SELF.cr_sort_sz := RIGHT.clean_address.cr_sort_sz;
-							SELF.lot := RIGHT.clean_address.lot;
-							SELF.lot_order := RIGHT.clean_address.lot_order;
-							SELF.dpbc := RIGHT.clean_address.dbpc;
-							SELF.chk_digit := RIGHT.clean_address.chk_digit;
-							SELF.record_type := RIGHT.clean_address.rec_type;
-							//SELF.ace_fips_st := RIGHT.clean_address.fips_state;
-							SELF.fips_county := RIGHT.clean_address.fips_county;
-							SELF.geo_lat := RIGHT.clean_address.geo_lat;
-							SELF.geo_long := RIGHT.clean_address.geo_long;
-							SELF.msa := RIGHT.clean_address.msa;
-							SELF.geo_blk := RIGHT.clean_address.geo_blk;
-							SELF.geo_match := RIGHT.clean_address.geo_match;
-							SELF.err_stat := RIGHT.clean_address.err_stat;
-							*/
+							SELF.mailingaddress.prim_range := RIGHT.clean_address.prim_range;
+							SELF.mailingaddress.predir := RIGHT.clean_address.predir;
+							SELF.mailingaddress.prim_name := RIGHT.clean_address.prim_name;
+							SELF.mailingaddress.addr_suffix := RIGHT.clean_address.addr_suffix;
+							SELF.mailingaddress.postdir := RIGHT.clean_address.postdir;
+							SELF.mailingaddress.unit_desig := RIGHT.clean_address.unit_desig;
+							SELF.mailingaddress.sec_range := RIGHT.clean_address.sec_range;
+							SELF.mailingaddress.p_city_name := RIGHT.clean_address.p_city_name;
+							SELF.mailingaddress.v_city_name := RIGHT.clean_address.v_city_name;
+							SELF.mailingaddress.st := RIGHT.clean_address.st;
+							SELF.mailingaddress.zip := RIGHT.clean_address.zip;
+							SELF.mailingaddress.zip4 := RIGHT.clean_address.zip4;
+							SELF.mailingaddress.cart := RIGHT.clean_address.cart;
+							SELF.mailingaddress.cr_sort_sz := RIGHT.clean_address.cr_sort_sz;
+							SELF.mailingaddress.lot := RIGHT.clean_address.lot;
+							SELF.mailingaddress.lot_order := RIGHT.clean_address.lot_order;
+							SELF.mailingaddress.dbpc := RIGHT.clean_address.dbpc;
+							SELF.mailingaddress.chk_digit := RIGHT.clean_address.chk_digit;
+							SELF.mailingaddress.rec_type := RIGHT.clean_address.rec_type;
+							SELF.mailingaddress.fips_state := RIGHT.clean_address.fips_state;
+							SELF.mailingaddress.fips_county := RIGHT.clean_address.fips_county;
+							SELF.mailingaddress.geo_lat := RIGHT.clean_address.geo_lat;
+							SELF.mailingaddress.geo_long := RIGHT.clean_address.geo_long;
+							SELF.mailingaddress.msa := RIGHT.clean_address.msa;
+							SELF.mailingaddress.geo_blk := RIGHT.clean_address.geo_blk;
+							SELF.mailingaddress.geo_match := RIGHT.clean_address.geo_match;
+							SELF.mailingaddress.err_stat := RIGHT.clean_address.err_stat;
 							//generating bid
 							SELF.bdid := prte2.fn_AppendFakeID.bdid(LEFT.trade_name,	RIGHT.clean_address.prim_range, RIGHT.clean_address.prim_name, RIGHT.clean_address.v_city_name, RIGHT.clean_address.st, RIGHT.clean_address.zip, LEFT.cust_name);
 							//generating linkids
