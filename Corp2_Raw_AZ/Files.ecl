@@ -14,6 +14,8 @@ EXPORT Files(STRING  pversion = '',
 			'CSV', , pTerminator := ['\r\n', '\n'], pSeparator := ',', pHeading := 1, pQuote := '"');
 		tools.mac_FilesInput(Corp2_Raw_AZ.Filenames(pversion, pUseOtherEnvironment).Input.OFFEXT,	Corp2_Raw_AZ.Layouts.OFFEXT_LayoutIn, OFFEXT,
 			'CSV', , pTerminator := ['\r\n', '\n'], pSeparator := ',', pHeading := 1, pQuote := '"');
+		tools.mac_FilesInput(Corp2_Raw_AZ.Filenames(pversion, pUseOtherEnvironment).Input.INACTV,	Corp2_Raw_AZ.Layouts.INACTV_LayoutIn, INACTV,
+			'CSV', , pTerminator := ['\r\n', '\n'], pSeparator := '|', pHeading := 1, pQuote := '"');
   END;
 
 END;
