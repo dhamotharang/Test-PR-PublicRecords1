@@ -1,4 +1,4 @@
-EXPORT Fn_Upcase ( dataset(recordof(FLAccidents_Ecrash.Layout_keybuild_SSv2)) infile):= function 
+﻿EXPORT Fn_Upcase ( dataset(recordof(Layout_keybuild_SSv2_NewAgencyORI)) infile):= function 
 
 
 in_upcase := project( infile , transform ({infile}, 
@@ -156,6 +156,7 @@ in_upcase := project( infile , transform ({infile},
 	self.next_street:= StringLib.StringToUpperCase(left.next_street  );  
 	self.addl_report_number:= StringLib.StringToUpperCase(left.addl_report_number  );  
         self.agency_ori:= StringLib.StringToUpperCase(left.agency_ori  );  
+        self.orig_agency_ori:= StringLib.StringToUpperCase(left.orig_agency_ori  );  
         self.Insurance_Company_Standardized := StringLib.StringToUpperCase(left.Insurance_Company_Standardized  );  
         self.is_available_for_public:= StringLib.StringToUpperCase(left.is_available_for_public  );  
         self.report_status := StringLib.StringToUpperCase(left.report_status  );  

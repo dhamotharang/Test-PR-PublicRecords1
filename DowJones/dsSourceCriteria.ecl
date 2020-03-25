@@ -1861,6 +1861,20 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/189 Democratic Republic of the Congo List','1848'},
 {'EC 2020/211 Syria List','1849'},
 {'EC 2020/218 ISIL (Da\'esh) and Al-Qaida List','1850'},
-{'EC 2020/219 Zimbabwe List','1851'}
+{'EC 2020/219 Zimbabwe List','1851'},
+{'EC (CFSP) 2020/275 Turkey List','1852'},
+{'EC 2020/274 Turkey List','1853'},
+{'EC 2020/288 ISIL (Da\'esh) and Al-Qaida List','1854'},
+{'EC (CFSP) 2020/373 Ukraine List','1855'},
+{'EC (CFSP) 2020/374 Libya List','1856'},
+{'EC 2020/370 Ukraine List','1857'},
+{'EC 2020/371 Libya List','1858'},
+{'EC (CFSP) 2020/399 Ukraine List','1859'},
+{'EC 2020/390 ISIL (Da\'esh) and Al-Qaida List','1860'},
+{'EC 2020/398 Ukraine List','1861'},
+{'EC (CFSP) 2020/417 Democratic Republic of the Congo List','1862'},
+{'EC (CFSP) 2020/418 Egypt List','1863'},
+{'EC 2020/415 Democratic Republic of the Congo List','1864'},
+{'EC 2020/416 Egypt List','1865'}
 ],r);
 

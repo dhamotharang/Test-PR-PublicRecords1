@@ -65,7 +65,7 @@ EXPORT ds_CompanyNameScore := DATASET([
 + '                                                                                                                                                                           )    // ,cnp_name_phonetic_score        >= 700 and string_similarity >= 0.70                                                                                            => 0                    //this is already counted as a regular field, so don\'t double count\n'
 + '\n'
 + '    ,                                                                                                                                                                      SKIP \n'
-+ '  );/*HACKCompanyNameScore*/ // Enforce FORCE parameter\n','company name replacement'}
++ '  );/*HACKCompanyNameScore*/ // Enforce FORCE parameter\n','company name replacement'}                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 			],tools.layout_attribute_hacks2);
 
 EXPORT ds_PrimNameExactMatch := DATASET([

@@ -52,7 +52,7 @@ EXPORT mod_Validation := MODULE
 	//shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(NOT IsValidName(name),
 	shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(name='',
 										DATASET([{errcodes.E110, 'E', 'F', FieldCode('E',errcodes.E110), name, state, RecordCode}], rErr)); 
-	shared suffix_set := ['II', 'III','IV', 'JR', 'SR'];
+	shared suffix_set := ['I','II', 'III','IV','V', 'JR', 'SR'];
 	
 	shared ValidSsn(string9 ssn, string1 ssnType, string2 state, string4 RecordCode) := 
 				IF(ssnType = Mod_Sets.Actual_Type AND NOT REGEXFIND('^\\d{9}$', TRIM(ssn)), 
@@ -124,7 +124,8 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcFirstName, left.FirstName, left.ProgramState, left.RecordCode}], rErr))
 							+	IF(left.MiddleName<> '' and HasInvalidChar(left.MiddleName),
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcMiddleName, left.MiddleName, left.ProgramState, left.RecordCode}], rErr))
-							+	IF(left.NameSuffix<> '' and Trim(left.NameSuffix) NOT IN suffix_set,
+							+	IF(left.NameSuffix<> '' and 
+										Trim(STD.Str.RemoveSuffix(Std.Str.ToUpperCase(left.NameSuffix),'.')) NOT IN suffix_set,
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcSuffixName, left.NameSuffix, left.ProgramState, left.RecordCode}], rErr))
 
 							+ IF(left.Race = '' OR left.Race not in Mod_sets.Race, 
@@ -133,7 +134,7 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W102, 'W', 'F', FieldCode('W', warningCodes.W102), left.Gender, left.ProgramState, left.RecordCode}], rErr))
 							+ IF(left.Ethnicity = '' OR left.Ethnicity not in Mod_sets.Ethnicity, 
 									DATASET([{warningCodes.W103, 'W', 'F', FieldCode('W', warningCodes.W103), left.Ethnicity, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(left.ABAWDIndicator = '', 
+							+ IF(left.ABAWDIndicator = '' OR left.ABAWDIndicator not in Mod_sets.ABAWD_Type, 
 									DATASET([{warningCodes.W104, 'W', 'F', FieldCode('W', warningCodes.W104), left.ABAWDIndicator, left.ProgramState, left.RecordCode}], rErr))
 							+ IF(left.Relationship<>'' AND left.Relationship NOT IN Mod_Sets.Relationship_Type, 
 									DATASET([{warningCodes.W106, 'W', 'F', FieldCode('W', warningCodes.W106), left.Relationship, left.ProgramState, left.RecordCode}], rErr))
@@ -149,10 +150,11 @@ EXPORT mod_Validation := MODULE
 					
 					//self.LastName := IF(HasInvalidChar(left.LastName), NormalizeName(left.LastName), left.LastName);
 					//self.FirstName := IF(HasInvalidChar(left.FirstName), NormalizeName(left.FirstName), left.FirstName);
-					self.Race := IF(left.Race = '', 'U', left.Race);
-					self.Gender := IF(left.Gender = '', 'U', left.Gender);
-					self.Ethnicity := IF(left.Ethnicity = '', 'U', left.Ethnicity);
-					self.ABAWDIndicator := IF(left.ABAWDIndicator = '', 'U', left.ABAWDIndicator);
+					self.Race := IF(left.Race = '' OR left.Race not in Mod_sets.Race, 'U', left.Race);
+					self.Gender := IF(left.Gender = '' OR left.Gender not in Mod_sets.Gender, 'U', left.Gender);
+					self.Ethnicity := IF(left.Ethnicity = '' OR left.Ethnicity NOT IN Mod_Sets.Ethnicity, 'U', left.Ethnicity);
+					self.ABAWDIndicator := IF(left.ABAWDIndicator = '' OR left.ABAWDIndicator NOT IN Mod_Sets.ABAWD_Type, 'U', left.ABAWDIndicator);
+					// relationship if optional
 					self.Relationship := IF(left.Relationship='' OR left.Relationship IN Mod_Sets.Relationship_Type, left.Relationship, 'O');
 
 					self := LEFT;
