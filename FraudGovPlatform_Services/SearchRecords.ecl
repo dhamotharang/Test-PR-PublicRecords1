@@ -31,21 +31,22 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
 	//prepare the layout for ADL_BEST DID call
 	SHARED get_input_in := PROJECT(ds_in, TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster, 
-																				SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII.
-																				SELF.homephone := LEFT.phoneno,
-																				SELF := LEFT,
-																				SELF := []));
+																					SELF.did := 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII.
+																					SELF.homephone := LEFT.phoneno,
+																					SELF := LEFT,
+																					SELF := []));
 
 	EXPORT ds_in_w_adl_did_appended := BatchServices.Functions.fn_find_dids_and_append_to_acctno(get_input_in);																										
 	
 	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended,
 												LEFT.acctno = RIGHT.acctno,
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
-													SELF.Seq := COUNTER,
+													SELF.Seq := (UNSIGNED)LEFT.acctno,
 													SELF.did := MAP(DidFoundInPR OR IsInputDidRINID => LEFT.DID,
 																					~DidFoundInPR => RIGHT.DID,
 																					0); 													
-													SELF	:= []));
+													SELF	:= []),
+													LEFT OUTER);
 													
 	BOOLEAN lexid_resolved := EXISTS(ds_adl(did>0));
 	

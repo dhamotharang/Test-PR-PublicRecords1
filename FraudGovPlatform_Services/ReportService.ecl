@@ -201,10 +201,12 @@ EXPORT ReportService() := MACRO
 	ds_in_with_did := JOIN(report_in, ds_in_w_adl_did_appended, 
 											LEFT.acctno = RIGHT.acctno,
 											TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec, 
+												SELF.Seq := (UNSIGNED)LEFT.acctno,
 												SELF.did := MAP(~DidFoundInPR => RIGHT.DID, 
 																				DidFoundInPR OR IsInputDidRINID => LEFT.DID,
 																				0); 
-												SELF := LEFT));
+												SELF := LEFT),
+												LEFT OUTER);
 												
 	report_in_final := PROJECT(report_in, FraudShared_Services.Layouts.BatchIn_rec);
 	

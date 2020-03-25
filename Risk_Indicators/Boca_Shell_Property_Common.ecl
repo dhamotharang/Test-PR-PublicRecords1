@@ -45,6 +45,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 // slim down the layouts as much as we can to reduce memory usage in here
 	layout_deed_slim := record
 		STRING8  contract_date;
+		STRING1 fares_transaction_type;
 		STRING33 fares_transaction_type_desc;
 		STRING8  first_td_due_date;
 		STRING11 first_td_loan_amount;
@@ -677,15 +678,11 @@ end;
 			)
 		);
 
-
-	ds_property_recs_with_naprop_grpd := 
-		GROUP( SORT( ds_property_recs_with_naprop, seq, inp_did, unique_prop_id ), seq, inp_did, unique_prop_id );
-	
 	tbl_naprop_values_local_roxie := 
 		TABLE( 
-			ds_property_recs_with_naprop_grpd, 
+			ds_property_recs_with_naprop, 
 			{seq, inp_did, unique_prop_id, max_naprop_local := MAX(GROUP, naprop)}, 
-			seq, inp_did, unique_prop_id, local
+			seq, inp_did, unique_prop_id
 		);
 		
 	tbl_naprop_values_local_thor := 
@@ -810,10 +807,14 @@ end;
 	// them out.
 	ds_deed_recs_filt_a := ds_deed_recs(EXISTS(parties(party_type = SELLER)));
 
+transaction_type_resale := ['1', '001']; // save time in query if we don't have to lookup what the description of resale is 
+
 	// 6.c. Filter out FARES Deed records that don't have to do with the sale of a property.
 	ds_deed_recs_filt_b := 
 		ds_deed_recs_filt_a(deed.fares_transaction_type_desc IN ['','RESALE']);
-	
+		// ds_deed_recs_filt_a(deed.fares_transaction_type IN ['',transaction_type_resale]);  
+	// checking the code value instead of the description saves us some time on records with a lot of properties if we don't have to lookup the codes_v3 descriptions
+  
 	// 6.d. Sort and group on unique property id and vendor_sorce_flag ('A' or 'B'). 
 	ds_deed_recs_grpd := 
 		GROUP(
