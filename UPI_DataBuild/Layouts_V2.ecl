@@ -247,7 +247,7 @@ EXPORT Layouts_V2 := MODULE
 		unsigned4		cnt_new_crk;
 	END;
 	
-	EXPORT slim_report := RECORD
+	EXPORT slim_history := RECORD
 		base.batch_jobid;
 		base.dt_vendor_last_reported;
 		base.source_rid;

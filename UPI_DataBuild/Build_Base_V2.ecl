@@ -156,7 +156,7 @@ export Build_Base_V2 := module
 	
 					shared build_slim_report := UPI_DataBuild.Update_Base_V2(pVersion,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).slim_report;
 					VersionControl.macBuildNewLogicalFile(
-																					 Filenames_V2(pVersion, pUseProd, gcid, pHistMode).slim_report_file.new
+																					 Filenames_V2(pVersion, pUseProd, gcid, pHistMode).slim_history_file.new
 																				 	,build_slim_report
 																					,Build_slim_file
 																					);
