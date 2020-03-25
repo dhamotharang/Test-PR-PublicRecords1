@@ -501,16 +501,41 @@ export Build_List(
 		self.contact_zip_code					:=	pInput.contact_zip5;
 		self.contact_county						:=	pInput.contact_county_name;
 		self													:= 	pInput;
-	end;	
+	end;
+	
+	PremiumBusHeading		:=	'seleid|proxid|ultid|orgid|business_name|company_business_address|company_city|company_state|' +
+													'company_zip_code|company_county|age_of_company|company_phone|email|annual_revenue|' +
+													'num_employees|sic_primary_desc|sic2_desc|sic3_desc|sic4_desc|sic5_desc|naics_primary_desc|' +
+													'naics2_desc|naics3_desc|naics4_desc|naics5_desc|lexid|empid|first_name|last_name|' +
+													'title|title_var2|title_var3|title_var4|title_var5|contact_street_address|contact_city|' +
+													'contact_state|contact_zip_code|contact_county|contact_email' + '\r\n';
+													
+	BasicBusHeading			:=	'seleid|proxid|ultid|orgid|business_name|company_business_address|company_city|' +
+													'company_state|company_zip_code|company_county|lexid|empid|first_name|last_name|title|' + 
+													'title_var2|title_var3|title_var4|title_var5|contact_street_address|contact_city|' +
+													'contact_state|contact_zip_code|contact_county' + '\r\n';
+													
+	PremiumLocHeading		:=	'seleid|proxid|ultid|orgid|business_name|location_business_address|location_city|' +
+													'location_state|location_zip_code|location_county|age_of_location|location_phone|email|' +
+													'annual_revenue|num_employees|sic_primary_desc|sic2_desc|sic3_desc|sic4_desc|sic5_desc|' +
+													'naics_primary_desc|naics2_desc|naics3_desc|naics4_desc|naics5_desc|lexid|empid|' +
+													'first_name|last_name|title|title_var2|title_var3|title_var4|title_var5|' +
+													'contact_street_address|contact_city|contact_state|contact_zip_code|contact_county|' +
+													'contact_email' + '\r\n';	
+													
+	BasicLocHeading			:=	'seleid|proxid|ultid|orgid|business_name|location_business_address|location_city|' +
+													'location_state|location_zip_code|location_county|lexid|empid|first_name|last_name|' +
+													'title|title_var2|title_var3|title_var4|title_var5|contact_street_address|contact_city|' +
+													'contact_state|contact_zip_code|contact_county' + '\r\n';											
 
 	FormatBusinessFile	:=	Sequential(
-																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20)),
-																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20))
-																		 );
+																			output(project(MarketingFile, trfBusiness(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(HEADING(PremiumBusHeading,SINGLE),SEPARATOR('|'),TERMINATOR(['\r\n', '\n'])),OVERWRITE, expire (20)),
+																			output(project(BasicFile,			trfBusinessBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(HEADING(BasicBusHeading,SINGLE),SEPARATOR('|'),TERMINATOR(['\r\n', '\n'])),OVERWRITE, expire (20))
+																		 )  : independent;
 	FormatLocationFile	:=	Sequential(
-																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20)),
-																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(SEPARATOR(['|']),HEADING),overwrite,__compressed__, expire (20))
-																		 );
+																			output(project(MarketingFile, trfLocation(left))			,,'~thor_data400::marketing_suite_list_gen::premium::'+jobID,CSV(HEADING(PremiumLocHeading,SINGLE),SEPARATOR('|'),TERMINATOR(['\r\n', '\n'])),OVERWRITE, expire (20)),
+																			output(project(BasicFile,			trfLocationBasic(left))	,,'~thor_data400::marketing_suite_list_gen::basic::'+jobID,CSV(HEADING(BasicLocHeading,SINGLE),SEPARATOR('|'),TERMINATOR(['\r\n', '\n'])),OVERWRITE, expire (20))
+																		 )  : independent;
 
 	/*---------------------------------------------------------------------------------------------------------------------
   | Based on search type, output the appropriate premium and basic files (either seleid or proxid).
