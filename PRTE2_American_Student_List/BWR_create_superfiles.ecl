@@ -1,6 +1,9 @@
 ﻿import promotesupers, roxiekeybuild, prte2;
 
-promotesupers.mac_create_superfiles(prte2.constants.Prefix +'in::american_student_list');
+promotesupers.mac_create_superfiles(prte2.constants.Prefix +'in::american_student_list::student_list');
+promotesupers.mac_create_superfiles(prte2.constants.Prefix +'in::american_student_list::student_list_Ins');
+
+
 promotesupers.mac_create_superfiles(prte2.constants.Prefix +'base::american_student_list');
 
 

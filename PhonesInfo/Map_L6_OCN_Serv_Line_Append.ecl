@@ -149,6 +149,8 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 		self.line												:= r.line;
 		self.spid												:= r.spid;
 		self.operator_fullname					:= r.operator_full_name;
+		self.high_risk_indicator				:= r.high_risk_indicator;
+		self.prepaid										:= r.prepaid;			
 		self														:= l;
 	end;
 
@@ -174,6 +176,8 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 		self.line												:= r.line;
 		self.spid												:= r.spid;
 		self.operator_fullname					:= r.operator_full_name;
+		self.high_risk_indicator				:= r.high_risk_indicator;
+		self.prepaid										:= r.prepaid;			
 		self														:= l;
 	end;
 

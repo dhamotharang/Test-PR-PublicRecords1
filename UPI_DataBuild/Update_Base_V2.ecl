@@ -638,7 +638,7 @@ EXPORT Update_Base_V2 (
    	
    				this_batch_only	:= prepReturn;
    				
-   				slim_down				:= project(this_batch_only, UPI_DataBuild.Layouts_V2.slim_report);
+   				slim_down				:= project(this_batch_only, UPI_DataBuild.Layouts_V2.slim_history);
    				
    			RETURN slim_down;
    	END;
