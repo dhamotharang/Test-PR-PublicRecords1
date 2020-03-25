@@ -42,7 +42,7 @@ EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', gsid_fiel
     TRANSFORM(l_out,
       SELF.is_suppressed := RIGHT.lexid > 0;
       SELF := LEFT;
-    ), LEFT OUTER, KEEP(1), LIMIT(0), LOCAL);
+    ), LEFT OUTER, KEEP(1), LIMIT(0), LOCAL) + ds_in((unsigned)did_field=0); // add back the records that have did=0
   #ELSE
   LOCAL suppressed_recs := JOIN(ds_in, key_optout,
 		(unsigned)left.did_field<>0 and 

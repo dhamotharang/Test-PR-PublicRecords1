@@ -1,9 +1,15 @@
-﻿IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services;	
+﻿IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services, risk_indicators;	
 
-EXPORT Boca_Shell_Accident (GROUPED DATASET(layout_bocashell_neutral) bs,INTEGER bsversion=3) := FUNCTION
+EXPORT Boca_Shell_Accident (GROUPED DATASET(risk_indicators.layout_bocashell_neutral) bs,INTEGER bsversion=3) := FUNCTION
 
 layout_extended := RECORD
-	layout_bocashell_neutral;
+  unsigned seq;
+  unsigned did;
+  unsigned historydate;
+  risk_indicators.Layouts.Layout_Accident_Data Accident_Data;
+
+// layout_bocashell_neutral;
+
 	STRING40 accident_nbr;
 	UNSIGNED accident_date;
 	UNSIGNED est_vehicle_damage;
@@ -153,5 +159,9 @@ END;
 
 recsAccRolled := ROLLUP(recsWithNumAcc,TRUE,rollAccidentData(LEFT,RIGHT));
 
-RETURN PROJECT(recsAccRolled,layout_bocashell_neutral);
+with_accident := join(bs, recsAccRolled, left.seq=right.seq, transform(layout_bocashell_neutral, 
+self.Accident_Data := right.Accident_Data, self := left), left outer, keep(1));
+
+RETURN group(with_accident, seq);
+
 END;
