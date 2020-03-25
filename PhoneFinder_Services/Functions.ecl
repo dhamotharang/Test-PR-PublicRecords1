@@ -436,17 +436,20 @@
       SELF.CarrierCity                      := pInput.phone_region_city;
       SELF.CarrierState                     := pInput.phone_region_st;
       SELF.ListingName                      := pInput.listed_name;
-      SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstPortedDate));
-      SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
+      SELF.FirstPortedDate                  := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstPortedDate)));
+      SELF.LastPortedDate                   := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate)));
       Phone_Status                          := pInput.PhoneStatus;
       SELF.ActivationDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));
       SELF.DisconnectDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-      SELF.PortingHistory                   := CHOOSEN(PROJECT(pInput.PortingHistory,
+      SELF.PortingHistory                   := IF(inMod.IncludePortingDetails,CHOOSEN(PROJECT(pInput.PortingHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortEndDate)),
                                                                           SELF               := LEFT)),
-                                                        iesp.Constants.Phone_Finder.MaxPorts);
+                                                        iesp.Constants.Phone_Finder.MaxPorts));
+      SELF.PortingCount                     := IF(inMod.IncludePortingDetails, pInput.PortingCount, 0);
+      SELF.PortingCode                      := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.PortingStatus                    := IF(inMod.IncludePortingDetails, pInput.PortingStatus, '');
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.FirstSpoofedDate)),
@@ -542,8 +545,8 @@
       SELF.CarrierCity             := pInput.phone_region_city;
       SELF.CarrierState            := pInput.phone_region_st;
       SELF.ListingName             := pInput.listed_name;
-      SELF.PortingCode             := pInput.PortingCode;
-      SELF.LastPortedDate          := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
+      SELF.PortingCode             := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.LastPortedDate          := IF(inMod.IncludePortingDetails,iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate)));
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
@@ -737,8 +740,8 @@
       SELF.CarrierCity             := pInput.phone_region_city;
       SELF.CarrierState            := pInput.phone_region_st;
       SELF.ListingName             := pInput.listed_name;
-      SELF.PortingCode             := pInput.PortingCode;
-      SELF.LastPortedDate          := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate));
+      SELF.PortingCode             := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.LastPortedDate          := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate)));
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed	           := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
@@ -799,17 +802,19 @@
       SELF.CarrierCity                      := pInput.phone_region_city;
       SELF.CarrierState                     := pInput.phone_region_st;
       SELF.ListingName                      := pInput.listed_name;
-      SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstPortedDate));
-      SELF.LastPortedDate                   := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate));
+      SELF.FirstPortedDate                  := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstPortedDate)));
+      SELF.LastPortedDate                   := IF(inMod.IncludePortingDetails,iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate)));
+      SELF.PortingCount                     := IF(inMod.IncludePortingDetails, pInput.PortingCount, 0);
+      SELF.PortingCode                      := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
       Phone_Status                          := pInput.PhoneStatus;
       SELF.ActivationDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));
       SELF.DisconnectDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-      SELF.PortingHistory                   := CHOOSEN(PROJECT(pInput.PortingHistory,
+      SELF.PortingHistory                   := IF(inMod.IncludePortingDetails, CHOOSEN(PROJECT(pInput.PortingHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortEndDate)),
                                                                           SELF               := LEFT)),
-                                                        iesp.Constants.Phone_Finder.MaxPorts);
+                                                        iesp.Constants.Phone_Finder.MaxPorts));
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.FirstSpoofedDate)),
