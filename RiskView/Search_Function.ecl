@@ -1319,7 +1319,7 @@ riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_r
  /* ****************************************************************
   *  Deferred Task ESP (DTE) Logging Functionality  *
   ******************************************************************/
-		IF(IncludeStatusRefreshChecks, 
+		IF(IncludeStatusRefreshChecks AND Status_Refresh_GW_Call[1].Response.Result.TaskID <> '', 
 			OUTPUT(Risk_Reporting.To_LOG_DTE.GetDTEOutput(
 						Status_Refresh_GW_Call[1].Response.Result.TaskID, 
 						'Status Refresh Task', 
