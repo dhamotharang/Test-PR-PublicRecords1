@@ -1,5 +1,5 @@
 ﻿ds := dataset('~thor::bipheader::validation::xlink_samples', 	BizLinkFull_QA.modLayouts.lSrcLayout, thor);			
-
+ 
 pj_data := project(ds, transform(BIPV2.IdAppendLayouts.AppendInput, 
 															SELF.Request_id 			:= COUNTER,
 														  SELF.company_name 		:=LEFT.company_name,

@@ -11,7 +11,7 @@ export IdAppendLocal := module
 
 	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
 
-	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel
+	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend, string fetchLevel
 	                  ,boolean allBest, boolean isMarketing = false
 					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
@@ -110,7 +110,7 @@ export IdAppendLocal := module
 
 	end;
 
-	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend
+	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend
 	                    ,string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
 	                    ,boolean dnbFullRemove = false
 						,Doxie.IDataAccess mod_access = defaultDataAccess) := function

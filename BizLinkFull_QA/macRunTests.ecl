@@ -1,4 +1,4 @@
-﻿EXPORT macRunTests(dInData, dInSamples) := FUNCTIONMACRO
+﻿EXPORT macRunTests(dInData, dInSamples) := FUNCTIONMACRO 
 // EXPORT macRunTests(dInData, dInSamples) := MACRO
   
   #DECLARE(sCodeStr);

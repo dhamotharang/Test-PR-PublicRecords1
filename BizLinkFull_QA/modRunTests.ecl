@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, SALT37;
+﻿IMPORT BIPV2, SALT37; 
 EXPORT modRunTests(DATASET(BIPV2.IdAppendLayouts.AppendInput) dInData, ROW(modLayouts.ProfileRec) rInRow):= MODULE  
  
 SHARED dThorInput := CHOOSEN(dInData(source not in ['T1','T2','T3','T4','T5', 'T', 'P', 'B#']),10);
