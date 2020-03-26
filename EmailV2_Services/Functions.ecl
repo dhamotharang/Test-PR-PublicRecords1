@@ -1,4 +1,4 @@
-IMPORT $, Data_Services, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, EmailService;
+IMPORT $, Address_Rank, Codes, Data_Services, DidVille, doxie, dx_BestRecords, EmailService, Royalty, Suppress;
 
 EXPORT Functions := MODULE
 
@@ -168,11 +168,85 @@ EXPORT Functions := MODULE
     perm_type := dx_BestRecords.Functions.get_perm_type_idata(PROJECT(in_mod,doxie.IDataAccess),
                        useMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase));
 
-    email_with_best_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
+    email_with_watchdog_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
                                     TRANSFORM($.Layouts.email_final_rec,
                                               SELF.bestinfo := LEFT._best,
                                               SELF:=LEFT,
                                               SELF:=[]));
+
+    // for best address we will use address ranking - req. EMAIL-205
+    addr_rank_in := PROJECT(DEDUP(SORT(ds_batch_in(did!=0),did),did),
+                           TRANSFORM(Address_Rank.Layouts.Batch_in,
+                                     SELF.acctno := (STRING) COUNTER,
+                                     SELF.did    := LEFT.did,
+                                     SELF := []));
+
+    //get all addresses from header based on LexIds
+    dids_for_header   := PROJECT(addr_rank_in, doxie.layout_references_hh);
+    // implementation similar to Address_Rank\fn_getHdrRecByDid_wBestdates.ecl  except we need to set IncludeAllRecords=true to by-pass penalties based on PII (pulled from stored) and skip search for dailies
+    hdr_recs := doxie.header_records_byDID(dids:=dids_for_header, include_dailies:=TRUE, IncludeAllRecords:=TRUE, DoSearch:=FALSE);
+
+    doxie.Layout_presentation roll_dates(doxie.Layout_presentation l, doxie.Layout_presentation r) := TRANSFORM
+      SELF.dt_first_seen := ut.min2(l.dt_first_seen, r.dt_first_seen);
+      SELF := l;
+      SELF := r;
+      SELF := [];
+    END;
+
+    hdr_roll_recs	:= ROLLUP(SORT(hdr_recs, did, zip, prim_range, predir, prim_name, postdir, suffix, sec_range, -dt_last_seen),
+                        LEFT.did 				= RIGHT.did 				AND
+                        LEFT.zip 		 		= RIGHT.zip					AND
+                        LEFT.prim_range = RIGHT.prim_range	AND
+                        LEFT.predir			= RIGHT.predir			AND
+                        LEFT.prim_name 	= RIGHT.prim_name		AND
+                        LEFT.postdir	 	= RIGHT.postdir			AND
+                        LEFT.suffix 		= RIGHT.suffix			AND
+                        LEFT.sec_range 	= RIGHT.sec_range,
+                        roll_dates(LEFT,RIGHT));
+
+    Address_Rank.Layouts.Bestrec xform_addrbest(Address_Rank.Layouts.Batch_in l, doxie.Layout_presentation r):= TRANSFORM
+                    SELF.acctno      := (STRING)l.acctno;
+                    SELF.dob         := (STRING)r.dob;
+                    SELF.name_first  := r.fname;
+                    SELF.name_middle := r.mname;
+                    SELF.name_last   := r.lname;
+                    SELF.suffix      := r.suffix;
+                    SELF.p_city_name := r.city_name;
+                    SELF.z5          := r.zip;
+                    SELF.addr_dt_first_seen := (STRING)r.dt_first_seen;
+                    SELF.addr_dt_last_seen  := (STRING)r.dt_last_seen;
+                    SELF.srcs := r.src;
+                    SELF := r;
+                    SELF := [];
+    END;
+    all_hdr_recs := JOIN(addr_rank_in, hdr_roll_recs,
+              LEFT.did = RIGHT.did,
+              xform_addrbest(LEFT, RIGHT),
+              LIMIT(0), LEFT OUTER);
+
+
+    //get address history from Address Rank Key and determine best address
+    addr_ranked_recs	:= Address_Rank.fn_getAddressHistory(all_hdr_recs, MaxRecordsToReturn:=1);
+
+    // adding best address to the results
+    email_with_best_recs :=
+      JOIN(email_with_watchdog_recs, addr_ranked_recs,
+           LEFT.did = RIGHT.did,
+           TRANSFORM($.Layouts.email_final_rec,
+                    SELF.bestinfo.prim_range := RIGHT.prim_range,
+                    SELF.bestinfo.predir := RIGHT.predir,
+                    SELF.bestinfo.prim_name := RIGHT.prim_name,
+                    SELF.bestinfo.postdir := RIGHT.postdir,
+                    SELF.bestinfo.suffix := RIGHT.suffix,
+                    SELF.bestinfo.unit_desig := RIGHT.unit_desig,
+                    SELF.bestinfo.sec_range := RIGHT.sec_range,
+                    SELF.bestinfo.zip := RIGHT.z5,
+                    SELF.bestinfo.zip4 := RIGHT.zip4,
+                    SELF.bestinfo.st := RIGHT.st,
+                    SELF.bestinfo.city_name := RIGHT.p_city_name,
+                    SELF := LEFT
+                  ),
+           LEFT OUTER, KEEP(1), LIMIT(0));
 
     Suppress.MAC_Suppress(email_with_best_recs,email_with_best_ready,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,bestinfo.ssn);
 

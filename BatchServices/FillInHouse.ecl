@@ -1,11 +1,12 @@
-import Gateway;
+import Gateway, doxie;
 
 input_layout:=BatchServices.Layouts.RTPhones.rec_batch_RTPhones_input;									
 
 export fillInhouse(BatchServices.RealTimePhones_Params.params gmod,
-									dataset(input_layout) f_in,
-									dataset(Gateway.Layouts.Config) in_gateways,
-									string20 searchType) := function
+  dataset(input_layout) f_in,
+  dataset(Gateway.Layouts.Config) in_gateways,
+  string20 searchType,
+  doxie.IDataAccess mod_access) := function
 									
   IH_ds := f_in;									
 	flat_out := BatchServices.Layouts.RTPhones.rec_output_internal;
@@ -15,7 +16,7 @@ export fillInhouse(BatchServices.RealTimePhones_Params.params gmod,
 	IH_resp := normalize(IH_ds,left.results,norm_resp(right));
 	// make a request ds out of the previous responses from inhouse search
 	f_in switch_trans(IH_resp L, integer c) := transform
-		//must have a unique acctno when calling BatchServices.RealTimePhones_BatchService_Gateway
+		// must have a unique acctno when calling BatchServices.RealTimePhones_Gateway
 		self.acctno := if (l.line_type <> '',skip,trim(l.acctno) + intformat(c,3,1));
 		self.phoneno := l.phone;
 		self.requeststatus := l.responsestatus;
@@ -26,7 +27,7 @@ export fillInhouse(BatchServices.RealTimePhones_Params.params gmod,
 	// remove rows from the request file when there is already a gateway response from a different row but the same phone number 
 	notsent := join(gw_req,ih_resp,left.phoneno=right.phone and right.line_type <> '',transform(input_layout,self := left),left only);
 	gw_d := dedup(sort(notsent,phoneno),phoneno);  
-	GW := BatchServices.RealTimePhones_BatchService_Gateway(gw_d, in_gateways, gmod,searchType);
+	GW := BatchServices.RealTimePhones_Gateway(gw_d, in_gateways, gmod, searchType, mod_access);
 	GW_resp := normalize(GW,left.results,norm_resp(right));
 	
 	flat_out comb_tran_response (flat_out LF,flat_out RF) := transform

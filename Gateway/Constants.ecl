@@ -73,6 +73,7 @@ export Constants := module
     export String40 BriteVerifyEmail := 'BriteVerifyEmail'; //Brite Verify Email validation
     export String40 NetWise := 'netwise'; //NetWise (Social Media Email Search) for use by the Virtual Identity Report V2 Accurint product
     export String40 SocialMediaLocator := 'socialmedialocator'; //Standalone Social Media Locator gateway.
+    export String40 CaAvmReport := 'caavmreport'; //Standalone CaAvmReport property valuation gateway.
   end;
 
   export ConfigProperties := module

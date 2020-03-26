@@ -210,7 +210,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     recs_c := get_seg_combined(recs_p);
 
     // get a payment summary for each of the subset of records in each segment category
-    recs_grp := group(sort(recs_in, uniqueid, _segment), uniqueid, _segment);
+      recs_grp := group(sort(recs_in, uniqueid, _segment, account_key, _age_days), uniqueid, _segment);
     recs_psum_g := get_pmt_summary(recs_grp);
     recs_psum := ungroup(recs_psum_g);
 
@@ -239,6 +239,10 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
 
   shared compose_account_summary(dataset(layout_ex) recs_in, integer active_age) := function
 
+    // 24-month limit on payment history
+    past_dt_24 := Std.Date.AdjustDate(current_date, 0, -24, 0);
+    d_age_24 := Std.Date.DaysBetween(past_dt_24, current_date);
+
     // sort order based on status (current, overdue, inactive)
     status_order(string stat) := map(
       stat = $.Constants.B2BAccountStatus.Current => 1, 
@@ -246,9 +250,20 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       3
     );
 
+    iesp.smallbusinessbipcombinedreport.t_AccountPaymentHistory history_trans(layout_ex l) := transform
+      self.DateReported := iesp.ECL2ESP.toDatestring8(l.ar_date);
+      self.TotalCurrentExposure := l.total_ar;
+      self.WithinTermsTotal := l.current_ar;
+      self.PastDueAgingAmount01to30Total := l.aging_1to30;
+      self.PastDueAgingAmount31to60Total := l.aging_31to60;
+      self.PastDueAgingAmount61to90Total := l.aging_61to90;
+      self.PastDueAgingAmount91PlusTotal := l.aging_91plus;
+    end;
+
     iesp.smallbusinessbipcombinedreport.t_B2BTradeAcctDetail roll_trans(layout_ex l, dataset(layout_ex) recs) := transform
       is_active := recs[1]._age_days <= active_age;
       amt_out := (integer)recs[1].total_ar - (integer)recs[1].current_ar;
+      pmt_recs := choosen(recs(_age_days <= d_age_24), iesp.Constants.BusinessCredit.MaxPaymentHistory);
 
       self.AccountNo := l.account_key;
       self.Status := map(
@@ -259,6 +274,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.IndustrySegment := l._segment;
       self.DateReported := iesp.ECL2ESP.toDatestring8(recs[1].ar_date);
       self.AmountOutstanding := (string)amt_out;
+      self.PaymentHistory := project(pmt_recs, history_trans(left));
     end;
 
     // currently we only use the top element in each account (and the below could be done with dedup), 

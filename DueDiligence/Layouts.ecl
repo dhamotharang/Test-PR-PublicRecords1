@@ -320,22 +320,6 @@ EXPORT Layouts := MODULE
     STRING800 naicCodes;
   END;
 
-
-
-  EXPORT CivilOffensesCounts := RECORD                               
-    /* LIENS and JUDGMENTS and EVICTIONS */  
-    UNSIGNED2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
-    UNSIGNED2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
-    UNSIGNED2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
-
-    UNSIGNED2   liensReleasedCnt;                                   //*** liens released EVER
-
-    UNSIGNED2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
-    UNSIGNED2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
-    UNSIGNED2   evictionsCnt;                                       //*** evictions EVER
-  END;  
-
-
   EXPORT GeographicRiskLayout := RECORD 
     STRING12    buildgeolink;
     STRING3	    EasiTotCrime;
@@ -353,8 +337,6 @@ EXPORT Layouts := MODULE
     BOOLEAN     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
     BOOLEAN     censusRecordExists;                     //populated in DueDiligence.Common.getGeographicRisk
   END;  	
-
-
 
 
   EXPORT BusSourceLayout := RECORD
@@ -377,6 +359,13 @@ EXPORT Layouts := MODULE
     UNSIGNED6 did;
     Name;
   END;	
+  
+  EXPORT DIDNameAddrTaxID := RECORD
+    DIDAndName;
+    AddressSlimDetail;
+    STRING countyName;
+    STRING9 taxID;
+  END;
 
   EXPORT LayoutAgent := RECORD
     UNSIGNED4 dateFirstSeen;
@@ -704,6 +693,23 @@ EXPORT Layouts := MODULE
     UNSIGNED4 dateFirstSeen;
     UNSIGNED4 dateLastSeen;
   END;
+  
+  EXPORT LiensJudgementsEvictionDetails := RECORD
+    STRING50 rmsid;
+    STRING50 tmsid;
+    STRING50 filingTypeDesc;
+    STRING11 filingAmount;
+    UNSIGNED4 filingDate;
+    STRING20 filingNumber;
+    STRING20 filingJurisdiction;
+    UNSIGNED4 releaseDate;
+    STRING1 eviction;
+    STRING75 agency;
+    STRING2 agencyState;
+    STRING25 agencyCounty;
+    DATASET(DIDNameAddrTaxID) debtors;
+    DATASET(DIDNameAddrTaxID) creditors;
+  END;
 
   EXPORT BusReportDetails := RECORD
     SlimBusiness bestBusInfo;
@@ -730,6 +736,7 @@ EXPORT Layouts := MODULE
     STRING parentCompanyName;
     UNSIGNED2 DIDlessBEOCount; 
     DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
+    DATASET(LiensJudgementsEvictionDetails) busLJEDetails {MAXCOUNT(DueDiligence.Constants.MAX_LIENS_JUDGEMENTS_EVICTIONS)};
   END;
 
   EXPORT IndReportDetails := RECORD
@@ -750,6 +757,7 @@ EXPORT Layouts := MODULE
     DATASET({STRING8 dob}) dobOnFile;
     DATASET(Name) akas;
     DATASET(addressDetails) residences {MAXCOUNT(DueDiligence.Constants.MAX_RESIDENCES)};
+    DATASET(LiensJudgementsEvictionDetails) ljeDetails {MAXCOUNT(DueDiligence.Constants.MAX_LIENS_JUDGEMENTS_EVICTIONS)};
   END;
 
 
@@ -842,9 +850,6 @@ EXPORT Layouts := MODULE
 
     //BusGeographicRisk
     GeographicRiskLayout;   
-
-    //Civil Offenses  
-    CivilOffensesCounts  Business;
 
     BusAttributes;
     BusReportDetails;

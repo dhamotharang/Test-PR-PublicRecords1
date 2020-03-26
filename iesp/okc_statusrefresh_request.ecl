@@ -6,13 +6,12 @@
 export okc_statusrefresh_request := MODULE
 			
 export t_OkcStatusRefreshOptions := record (share.t_BaseOption)
-	boolean TestOkcStatusRefreshService {xpath('TestOkcStatusRefreshService')};
-	string64 TransactionId {xpath('TransactionId')};
+	string16 TransactionId {xpath('TransactionId')};
 end;
 		
 export t_OkcStatusRefreshSearchBy := record
-	string17 RMSId {xpath('RMSId')};
-	string8 CustomerDueDate {xpath('CustomerDueDate')};
+	string10 RMSId {xpath('RMSId')};
+	string10 CustomerDueDate {xpath('CustomerDueDate')};
 end;
 		
 export t_OkcStatusRefreshResult := record

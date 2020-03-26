@@ -3,6 +3,10 @@ import iesp,Gateway,Phones,Royalty;
 /*
 IMPORTANT: unwanted calls to both gateways were made without the double condition before the SOAPCALL.
 DO NOT REMOVE!!!
+
+ALSO IMPORTANT: QSent GW data is subject to CCPA suppression, which is not done here.
+  Calls to QSent gateway should all go through Doxie_Raw.RealTimePhones_Raw. 
+  
 */
   
 EXPORT SoapCall_QsentV2(DATASET(iesp.gateway_qsent.t_QSentCISSearchRequest) pInF,

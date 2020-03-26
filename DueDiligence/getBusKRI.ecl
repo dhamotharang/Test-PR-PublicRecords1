@@ -457,8 +457,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
     //BUSINESS LEGAL EVENTS - CIVIL (LIENS, JUDGEMENTS and EVICTIONS)
-    totalBusCivilCount := le.Business.liensUnreleasedCntInThePastNYR + le.Business.evictionsCntInThePastNYR;
-    totalBusCivilCountOlder := le.Business.liensUnreleasedCntOVNYR + le.Business.evictionsCntOVNYR; 
+    totalBusCivilCount := le.liensUnreleasedCntInThePastNYR + le.evictionsCntInThePastNYR;
+    totalBusCivilCountOlder := le.liensUnreleasedCntOVNYR + le.evictionsCntOVNYR; 
      
     BusCivilLegalEvent_Flag9 := IF(totalBusCivilCount >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
     BusCivilLegalEvent_Flag8 := IF(totalBusCivilCount BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   											

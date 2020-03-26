@@ -1,5 +1,4 @@
-﻿// EXPORT BocaShell_54_FCRA_Production_MACRO := 'todo';
-EXPORT BocaShell_54_FCRA_Production_MACRO ( bs_version, fcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
+﻿EXPORT BocaShell_54_FCRA_Production_MACRO ( bs_version, fcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
 
 			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, std, UT, Scoring_Project_PIP;
 
@@ -97,7 +96,8 @@ EXPORT BocaShell_54_FCRA_Production_MACRO ( bs_version, fcraroxie_IP,neutralroxi
 
       //final file out to thor
 			OUTPUT (ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite,expire(30));
-			OUTPUT (ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
+//03/02/2020 -commented OUTPUT below		
+		// OUTPUT (ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
 
 			return 0;
 

@@ -70,7 +70,7 @@ string120 verify_l := '' : stored('Verify');
 string120 fuzzy_l := '' : stored('Fuzzies');
 boolean lookups := false : stored('Lookups');
 boolean livingsits := false : stored('LivingSits');
-boolean GLB := false  : stored('GLBData');
+boolean glb_ok := false  : stored('GLBData');
 boolean AllPos_l := false  : stored('AllPossibles');
 string3 thresh_val := '' : stored('AppendThreshold');
 boolean patriotproc := false : stored('PatriotProcess');
@@ -84,7 +84,11 @@ unsigned2 maxScoreFromPhone := DidVille.MaxScores.MMax.maxScoreFromPhone : store
 unsigned1 soap_xadl_version_value := 0 : stored('xADLVersion');
 boolean Limited_Output := false : stored('LimitedOutput');
 
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+mod_access_pre := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+mod_access := MODULE(mod_access_pre)
+                EXPORT unsigned1 unrestricted := mod_access_pre.unrestricted | IF (glb_ok, doxie.compliance.ALLOW.GLB, 0);
+              END;
+
 
 checkInputMax(unsigned2 inp) := if (inp > 100, 100, inp);
 
@@ -141,7 +145,7 @@ appends := STD.STR.ToUpperCase(append_l);
 verify := STD.STR.ToUpperCase(verify_l);
 fuzzy := STD.STR.ToUpperCase(fuzzy_l);
 thresh_num := (unsigned2)thresh_val;
-DidOnlySearch := ssn_value = '' and dob_value = '' 
+DidOnlySearch := ssn_value = '' and dob_value = ''
 and addr1_val = '' and addr2_val = '' and fname_val = '' and lname_val = '' and mname_val = ''
 and suffix_val = '' and state_val = '' and city_val = '' and zip_value = '' and phone_value = '' and prange_value = ''
 and sec_range_value = '' and pname_value = '' and name_value_clean = '';
@@ -178,7 +182,7 @@ precs := project(d,into(left));
 UseNonBlankKey := TRUE;
 
 res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy,
-                                                  dedup_these, thresh_num, GLB, false,
+                                                  dedup_these, thresh_num, mod_access.isValidGlb(), false,
                                                   lookups, livingsits, false, false,
                                                   mod_access.glb, mod_access.show_minors,
                                                   mod_MaxScores, UseNonBlankKey, mod_access.application_type,
@@ -188,7 +192,7 @@ res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy,
 patriot.MAC_AppendPatriot(res_ready, mod_access, did,fname,mname,lname,res_w_pat,ptys,false)
 res := if(patriotproc, res_w_pat, res_ready);
 
-pj1 := JOIN(res(name_match AND known), patriot.key_did_patriot_file, 
+pj1 := JOIN(res(name_match AND known), patriot.key_did_patriot_file,
   keyed(LEFT.did=RIGHT.did),
   TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
 pj2 := JOIN(ptys, patriot.key_patriot_file,

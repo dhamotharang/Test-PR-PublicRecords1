@@ -261,20 +261,26 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
                                          left.UniqueID = (string)right.DID,
                                            transform(recordof(rolled_records),
                                              firstAddress           := left.Addresses[1];
-                                             phones_pre             := project(right.phones,
-                                                                         transform(iesp.rightaddress.t_HighlightedPhoneInfo,
+                                             phones := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo,
                                                                            self.phone10 := left.phone10, self := [])) +
                                                                            firstAddress.phones;
-                                             phones                 := dedup(sort(phones_pre,phone10),phone10);
-                                             firstAddressWithPhones := project(firstAddress,
-                                                                         transform(iesp.rightaddress.t_RAAddressWithPhones,
+					                                        firstAddressWithPhones := project(firstAddress,transform(iesp.rightaddress.t_RAAddressWithPhones,
                                                                            self.phones := phones, self := left ));
+
                                              self.addresses         := firstAddressWithPhones + choosen(Left.Addresses,all,2),
                                              self := left), left outer,limit(0),keep(1)),
                                  rolled_records);
 
- BOOLEAN doHighlight := search_options.highlight;
- export highlighted_records_with_phones := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records_with_phones), rolled_records_with_phones);
+ rolled_records_with_phones_dedup := PROJECT(rolled_records_with_phones,
+                                       TRANSFORM(recordof(rolled_records_with_phones),
+                                         SELF.Addresses := PROJECT(LEFT.Addresses, TRANSFORM(iesp.rightaddress.t_RAAddressWithPhones,
+                                                             SELF.Phones := DEDUP(SORT(LEFT.Phones, phone10), phone10),
+                                                             SELF := LEFT));,
+                                         self := LEFT
+                                       ));
+
+  BOOLEAN doHighlight := search_options.highlight;
+  export highlighted_records_with_phones := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records_with_phones_dedup), rolled_records_with_phones_dedup);
 
 	//**** START TEMP DEMO CODE FOR CUSTOMER REVIEW
 	//**** This is temp because, if they want this behavior, we need to do the filtering much earlier.
