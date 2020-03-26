@@ -5,12 +5,17 @@
 +'#STORED (\'_Validate_Year_Range_high\', ut.GetDate[1..4]);\n'
 +'wuname := \'NAC Contributory Pilot\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
-;
+; 
+
+ 
+STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
+
 
 lECL1 :=
 envVars
 +'email(string msg):=fileservices.sendemail(\n'
-+'																					\'jose.bello@lexisnexis.com\'\n'
++'   \'' + ProcessRecipient +     '\'\n'
 +'																					,\'NAC Build\'\n'
 +'																					,msg\n'
 +'																					+\'Build wuid \'+workunit\n'
@@ -31,7 +36,7 @@ envVars
 ;
 
 import _Control;
-ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_30_sla');
+ThorName := 'thor400_44_sla_eclcc';
 
 // NOTE: Ssystem time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM
 #WORKUNIT('name', 'S-K NAC Contributory Build');

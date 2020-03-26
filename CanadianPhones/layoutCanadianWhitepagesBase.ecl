@@ -1,4 +1,4 @@
-export layoutCanadianWhitepagesBase := 
+﻿export layoutCanadianWhitepagesBase := 
 
  RECORD
   string8 Date_first_reported;
@@ -105,4 +105,7 @@ export layoutCanadianWhitepagesBase :=
 	string20 lname := '';
 	string5  name_suffix := '';
 	string3  name_score := '';
+	//Added for CCPA-88
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;

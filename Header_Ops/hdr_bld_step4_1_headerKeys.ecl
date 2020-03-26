@@ -1,4 +1,5 @@
-﻿import ut,header,dops;
+﻿import ut,header,dops,_control,std;
+
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -15,9 +16,15 @@
 build_version:= header.version_build;
 dops_datasetname:='PersonHeaderKeys';
 build_component:='KEY BUILD:nFCRA';
-dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
 
-sequential(dlog,Header.proc_postHeaderBuilds.headerKeys);
+preMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, _Constant.QH_path_ready + _Constant.QH_filename, _Constant.QH_path_done + _Constant.QH_filename);
+
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+sequential(
+    dlog,
+    Header.proc_postHeaderBuilds().headerKeys,
+    preMove);
+
 //  Builds file_header_building and all header keys including
 // Relatives and XADL1.  It moves all except source keys to _QA
 // superfiles. It also builds and desprays DISTRIX Hash
@@ -27,7 +34,8 @@ sequential(dlog,Header.proc_postHeaderBuilds.headerKeys);
 // This step will use all the base files created in earlier steps
 // Estimated THOR time: 72-96hrs
 
-
+// 20190324 W20190421-062917
+// 20190225 W20190320-072916
 // 20180926 W20181023-081707
 // 20180724 W20180821-161144
 // 20180522 W20180618-094216

@@ -1,10 +1,10 @@
-/* Converting New York / Real Estate Appraisers Licenses File to MARI common layout
+﻿/* Converting New York / Real Estate Appraisers Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
-#workunit('name','map_NYS0828_conversion');
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib,NID,STD;
 
 EXPORT map_NYS0828_conversion(STRING pVersion) := FUNCTION
+#workunit('name',' Yogurt:Prof License MARI - NYS0828 Build     ' + pVersion);
 
 	code 								:= 'NYS0828';
 	src_cd							:= code[3..7];
@@ -94,7 +94,7 @@ EXPORT map_NYS0828_conversion(STRING pVersion) := FUNCTION
 												  LEFT OUTER);	
    ut.CleanFields(cnv_cnty_name,clncnv_cnty_name);
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base 		xformToCommon(cnvrtLayout pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in 		xformToCommon(cnvrtLayout pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -431,7 +431,7 @@ EXPORT map_NYS0828_conversion(STRING pVersion) := FUNCTION
   ds_dedup_map := DEDUP(inFileLic,RECORD,ALL,LOCAL);
 
 //Populate STD_PROF_CD field via translation on license type field
- Prof_License_Mari.layouts.base 	trans_lic_type(ds_dedup_map L, cmvTransLkp R) := TRANSFORM
+ Prof_License_Mari.layout_base_in 	trans_lic_type(ds_dedup_map L, cmvTransLkp R) := TRANSFORM
 	 SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 	 SELF := L;
  END;
@@ -443,7 +443,7 @@ EXPORT map_NYS0828_conversion(STRING pVersion) := FUNCTION
 						 trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 	
 // Transform expanded dataset to MARIBASE layout
-	Prof_License_Mari.layouts.base xTransToBase( ds_map_lic_trans L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase( ds_map_lic_trans L) := TRANSFORM
 		SELF.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		SELF.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
 		SELF.ADDR_ADDR1_1		:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR1_1));

@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie, FLAccidents, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -118,7 +118,8 @@ pflc1:= project(flc1,xpndrecs(left));
 //ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 
-ecrashfile := FLAccidents_Ecrash.BaseFile; 
+ecrashfile := eCrashBaseAgencyExclusion; 
+
 xpnd_layout xpndecrash(ecrashfile L) := transform
 
 	self.rec_type_1 := '1'; 

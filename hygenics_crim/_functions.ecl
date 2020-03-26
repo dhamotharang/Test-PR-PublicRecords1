@@ -2,9 +2,6 @@
 C:\Users\ChikteVP\AppData\Roaming\HPCC Systems\eclide\vchikte\DATALAND_EOSS_Proxy\hygenics_crim\_functions\2015-01-30T16_17_48Z.ecl
 */
 import ut,STD,_validate;
-             
-                                                                                                                                        
-
 
 export _functions := module
 export StreetAddressToFilter := ['0 05181992','0 BONITA SPRINGS','0 GIVEN','0 IMMOKALEE','0 NAPLES','0 NOIT GIVEN','0 NOT GIVEN 15','0 NOT GIVEN 9204',
@@ -1387,26 +1384,39 @@ end;
 
 export fn_shorten_sourcename(string psourcename) := function
 		result1 :=  
+		
+		      // added for IE AOC phase2
+					regexreplace('SUPREME COURT JUDICIAL BRANCH',                // added by tp
+					regexreplace('OFFENDERS',                                    // added by tp 
+					regexreplace('DEPARTMENT OF PUBLIC SAFETY',                  // added by tp 				
+					regexreplace('VIOLENCE REGISTRY',                            // added by tp
+					regexreplace('JUDICIARY',                                    // added by tp
+					regexreplace('DISTRICT OF COLUMBIA',                         // added by tp
+					regexreplace('METHAMPHETAMINE',                              // added by tp 
+					regexreplace(' - FUGITIVES',                                 // added by tp  	
+					regexreplace('MAGISTRATE COURTS',                            // added by tp  		
+    		
 		      regexreplace('ARRESTS',
 					regexreplace('COMMON_PLEAS',
-					regexreplace('COMMON_PLEAS_COURT',
-					regexreplace('COUNTY',
-					regexreplace('DISTRICT_COURT',
-					regexreplace('CIRCUIT_COURT[S]*',
+					regexreplace('COMMON_PLEAS_COURT|COURT OF COMMON PLEAS',
+					regexreplace('COUNTY|COUNTY COURTS',
+					regexreplace('DISTRICT[ _]COURT',
+					regexreplace('CIRCUIT[_ ]COURT[S]*',
 					regexreplace('TRAFFIC_COURT',
-					regexreplace('MUNICIPAL_COURT',
+					regexreplace('MUNICIPAL[_ ]COURT',
 					regexreplace('MUNICIPAL_TRAFFIC_COURT',
-					//regexreplace('BROWN_MUNICIPAL',	
-					regexreplace('DEPARTMENT_OF_CORRECTIONS',
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_PROBATION',
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_PAROLE',	
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE',
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE',
-					regexreplace('SUMMARY_COURTS',
-					regexreplace('ADMINISTRATOR_OF_THE_COURTS',
-					regexreplace('JUSTICE_OF_THE_PEACE_COURTS',
-					regexreplace('SUPERIOR_COURT',
-					regexreplace('JUSTICE_COURT',
+					regexreplace('DEPARTMENT[_ ]OF[_ ]CORRECTIONS',
+					regexreplace('DEPARTMENT OF CORRECTIONS RELEASE[D]*|DEPARTMENT OF CORRECTIONS [-] RELEASE',
+					regexreplace('DEPARTMENT OF CORRECTIONS [-] INMATE',						
+					regexreplace('DEPARTMENT_OF_CORRECTIONS_PROBATION|DEPARTMENT OF CORRECTIONS [(]PROBATION[)]',
+					regexreplace('DEPARTMENT_OF_CORRECTIONS_PAROLE|DEPARTMENT OF CORRECTIONS [(]PAROLE[)]',	
+					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE|DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE',
+					regexreplace('DEPARTMENT OF CORRECTIONS - SUPERVISED|DEPARTMENT OF CORRECTIONS [(]SUPERVISION[)]',
+					regexreplace('SUMMARY_COURTS|SUMMARY COURT',
+					regexreplace('ADMINISTRATOR_OF_THE_COURTS| ADMINISTRATIVE OFFICE OF THE COURTS - |ADMINISTRATIVE OFFICE OF COURTS|ADMINISTRATOR OF COURTS|ADMIN OFFICE OF COURTS',
+					regexreplace('JUSTICE_OF_THE_PEACE_COURTS|JUSTICE OF THE PEACE',
+					regexreplace('SUPERIOR[_ ]COURT|SUPERIOR CLERK OF COURTS',
+					regexreplace('JUSTICE[_ ]COURT[S]*|JUSTICE',
 					//regexreplace('WEBSITE',
 					regexreplace('BOOKING',
 					regexreplace('COUNTY_POLICE',
@@ -1416,7 +1426,17 @@ export fn_shorten_sourcename(string psourcename) := function
           regexreplace('SHERIFFS_DEPARTMENT',
 					regexreplace('CURRENT_INMATES_LIST',
           regexreplace('DETENTION_CENTER',
-					regexreplace('_CW',psourcename,''),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),'DOC_ALT'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR');
+					regexreplace('GENERAL SESSIONS COURT',
+					regexreplace('COUNTY AND DISTRICT COURTS|DISTRICT AND COUNTY COURTS',
+					regexreplace('CLERK OF COURT',		
+					regexreplace('JUDICIAL SYSTEM',
+					regexreplace('_CW|_IE',psourcename,''),'JUD'),'COC'),'CCDC'),'GSC'),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),
+					                                      'DOC_SUP'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC_INM'),'DOC_REL'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR')
+																								
+																								// added for AOC phase2																							  
+																								 ,'MAGC'),'_FUGTV')
+																								 ,'METH'),'DC'),'JUD'),'VIOL_REG')
+																								   ,'DPS'),'OFND'),'SUP CT JUD BRNCH');   // added by tp
 			
 					
 	space_count := 
@@ -1602,36 +1622,80 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'MONTANA_VIOLENT_OFFENDER_REGISTRY                  '    => 'MT_VIOLENT_OFNREG',                   
 								 psourcename = 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN            '    => 'ND_OFFND_AGANST_CHIL',
 								 psourcename = 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC          '    => 'TX_DALAS_JUSPEACE_TR',
-								 psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES                    '    => 'GA_PAR_RELEASED_INM',
-								 
-								 
+								 psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES                    '    => 'GA_PAR_RELEASED_INM', 
+								 psourcename = 'FL CAREER OFFENDER REGISTRY_IE'                                         => 'FL_CAREER_OFNDER_REG',
+								 psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)_IE'                    => 'IA_AOC_MISD',
+								 psourcename = 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY_IE'=> 'IL_STPOL_MUR_VIO_REG',
+								 psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                       => 'KS_BUREAU_VIO_DRUG',
+                 psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '               => 'MD_AOC_DISTRICT_CRTS', 
+                 psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                    => 'ND_DISTRICT_MUN_CTRS',
+								 psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                  => 'OK_VIOLENT_OFNREG',   
+                 psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                     => 'RI_DISTRICT_SUP_CTRS',
+								 psourcename = 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT_IE'                          => 'GA_GWINET_LWRNCVILSC', 
+								 psourcename = 'LA ORLEANS PARISH DISTRICT COURT_IE'                                    => 'LA_ORLEANSPARISH_DC',
+								 psourcename = 'OH CUYAHOGA CLERK OF COURTS_IE'                                         => 'OH_CUYAHOGA_CLERKOC',
+								 psourcename = 'OH PORTAGE RAVENNA MUNICIPAL COURT_IE'                                  => 'OH_PORTAGERAVENNAMC',
+								 psourcename = 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                                 => 'TX_HARRIS_CTYCRTDISP',
+								 psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                             => 'SD_DOC_ABSCONDERS',   
+								 psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                => 'US_FED_PRISONINM REG',						 
+								 psourcename = 'NV CLARK LAS VEGAS JUSTICE COURT_IE'                                    => 'NV_CLARK_LASVEGAS_JC',
+								 psourcename = 'GA CARROLL SUPERIOR CLERK OF COURTS_IE'                                 => 'GA_CARROLL_SUP_COC',
+								 psourcename = 'NE LANCASTER COUNTY COURT_IE'                                           => 'NE_LANCASTER_CTY_CRT',
+								 psourcename = 'NORTH_CAROLINA_RUTHERFORD_COUNTY_DETENTION_CENTER_V2_CW'                => 'NC_RUTHERFRD_CTYDCV2',
+								 psourcename = 'FLORIDA_DIXIE_COUNTY_SHERIFF_CW'                                        => 'FL_DIXIE_CTY_SO_V2',
+								 psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS_CW'                                        => 'TX_RANDALL_CTY_ARRV2',  
+
+                 // added for IE county phase2
+                 psourcename = 'OH WARREN FRANKLIN MUNICIPAL COURT_IE'                => 'OHWARRENFRANKLIN_MC',       //added by tp
+								 psourcename = 'OH SANDUSKY FREMONT MUNICIPAL COURT_IE'               => 'OHSANDUSKYFREMONT_MC',      //added by tp
+								 psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'               => 'FL_PINELLAS_CIR_COC',       //added by tp
+								 psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'            => 'OH_SUMMIT_STOW_MTC',         //added by tp
+								 psourcename = 'FL CITRUS CLERK OF COURT DISPOSITION_IE'              => 'FLCITRS_COC_DISP',          //added by tp
+								 psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'          => 'FLORNGE_COC_TRAF',          //added by tp
+								 psourcename = 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT_IE'          => 'OHMNTGMRYMIASBRG_MC',       //added by tp
+								 psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                       => 'OH_WARN_LEBANON_MC',       //added by tp
+								 psourcename = 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT_IE'         => 'OHWYANDTUPRSNDSKY_MC',      //added by tp
+								 psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                     => 'OH_FRANKLIN_MTC',            //added by tp
+								 psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                     => 'OHWARNMORROW_MAYORSC',      //added by tp
+								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'      => 'FLMIADADE_CNTY_CRCWB',      //added by tp
+								 psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'                  => 'OH_CLARK_MTC',               //added by tp
+								 psourcename = 'OH WARREN SPRINGBORO MAYORS COURT_IE'                 => 'OH_WARNSPRBORO_MYRSC',      //added by tp
+								 psourcename = 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC_IE'   => 'OH_MONTGOMRYDAYTN_MT',      //added by tp
+								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_EDIV',       //added by tp
+								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_WDIV',       //added by tp
+								 psourcename = 'OH WARREN WAYNESVILLE MAYORS COURT_IE'                => 'OHWARNWAYNSVIL_MYRSC',      //added by tp
+								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'          => 'FLMIADADE_CTY_AND_CRT',     //added by tp
+
 								 result2);
-	return result3;    
+								 
+	return MAP(stringlib.stringfind(result3,'_',1)= 0 => stringlib.stringfindreplace(trim(result3),' ','_'),
+	           result3);    
 end;                 
                      
 export fn_sourcename_to_vendor(string psourcename, string2 statecode ) := function
 string5 vendor :=     
-map(                 
- //AOC	             
-	psourcename = 'ARIZONA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z1',
+map(      
+/***********************************************HYGENICS CRIM****************************************************************/           
+//------------------------------------------AOC Phase1 ---------------------------------------------------------------------
+ 	psourcename = 'ARIZONA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z1',
 	psourcename = 'ALASKA_ADMINISTRATOR_OF_THE_COURTS' 					=> 'RC',
 	psourcename = 'ARKANSAS_ADMINISTRATOR_OF_THE_COURTS' 				=> 'RD',
 	psourcename = 'CONNECTICUT_ADMINISTRATOR_OF_THE_COURTS' 		=> 'CP',
 	psourcename = 'FLORIDA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'FV',
 	psourcename = 'GEORGIA_BUREAU_OF_INVESTIGATION' 					  => 'GD',
-	psourcename = 'HAWAII_STATE_JUDICIARY' 								      => 'HA',
-	psourcename = 'INDIANA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z4', //replaced 'ID' with Z4,
-	psourcename = 'IOWA_ADMINISTRATOR_OF_THE_COURTS' 					  => 'IC',
+	//psourcename = 'HAWAII_STATE_JUDICIARY' 								      => 'HA', using IE HI STATE JUDICIARY ADMINISTRATIVE OFFICE OF COURTS 
+	//psourcename = 'INDIANA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z4', //replaced 'ID' with Z4,  //replace with IE IN ADMINISTRATOR OF COURTS (WEB)
+	//psourcename = 'IOWA_ADMINISTRATOR_OF_THE_COURTS' 					  => 'IC', //Using IE IA ADMINISTRATIVE OFFICE OF COURTS
 	psourcename = 'MARYLAND_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MF',
 	psourcename = 'MINNESOTA_DEPARTMENT_OF_PUBLIC_SAFETY' 			=> 'MH',
-	psourcename = 'MISSOURI_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MG',
+	//psourcename = 'MISSOURI_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MG', using IE MO ADMIN OFFICE OF COURTS
 	psourcename = 'NEW_JERSEY_ADMINISTRATOR_OF_THE_COURTS' 			=> 'NA',
 	psourcename = 'NEW_MEXICO_ADMINISTRATOR_OF_THE_COURTS' 			=> 'NB',
 	//psourcename = 'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS' 	=> 'NF', 			//removing vendor
 	psourcename = 'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS_DEMOGRAPHIC_INDEX' 	=> 'NF', //vc 20130917
 	psourcename = 'NORTH_DAKOTA_ADMINISTRATOR_OF_THE_COURTS' 		=> 'NG',
 	psourcename = 'OKLAHOMA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'PS',
-	psourcename = 'OREGON_ADMINISTRATOR_OF_THE_COURTS' 					=> 'PT',
+	//psourcename = 'OREGON_ADMINISTRATOR_OF_THE_COURTS' 					=> 'PT', using IE OR ADMINISTRATIVE OFFICE OF COURTS (OECI)
 	psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS' 		=> 'PU',
 	psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS_COURT_OF_COMMON_PLEAS' => 'PV',
 	psourcename = 'RHODE_ISLAND_ADMINISTRATOR_OF_THE_COURTS' 		=> 'RA',
@@ -1642,31 +1706,27 @@ map(
 	psourcename = 'VIRGINIA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'VB',
 	psourcename = 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS' 			=> 'WB',
 	                   
-	// Make sure th    ese vendor codes are not applied to warrants
+	// Make sure these vendor codes are not applied to warrants
 	psourcename = 'WASHINGTON_PUBLIC_SCOMIS_CRIMINAL_INDEX' 			=> 'Z8',
 	psourcename = 'WASHINGTON_COURTS_OF_LIMITED_JURISDICTION_CRIMINAL_INDEX' 			=> 'Z9',
 	               
-	//Phase2 - Batch 2
-	               
-	psourcename = 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC' 			=> 'PY',
-	//Phase3 sources. 07/13/2015--------------------------------------------------------- 
+//------------------------------------------AOC Phase2 ---------------------------------------------------------------------	               
+//	psourcename = 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC' 			=> 'PY', using IE WI ADMIN OFFICE OF COURTS TRAFFIC
+//------------------------------------------AOC Phase3 sources. 07/13/2015 --------------------------------------------------
   psourcename = 'SOUTH_CAROLINA_ADMINISTRATOR_OF_THE_COURTS'           => '7A', 
 	psourcename = 'UTAH_JUSTICE_COURT_TRAFFIC'                           => '7B',
   psourcename = 'MARYLAND_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC'         => '7Q',
-	//----------------------------------------------------------------------20151028
+//----------------------------------------------------------------------20151028
 	psourcename = 'ILLINOIS_VIOLENT_OFFENDER_AGAINST_YOUTH'              => '8F',
 	psourcename = 'UTAH_JUSTICE_COURT'                                   => '8G',
-  psourcename = 'WEST_VIRGINIA_CIRCUIT_COURTS'                         => '8H',
-	
-	
-/////////////////////////////////////////////////////////////20171025 
+  //psourcename = 'WEST_VIRGINIA_CIRCUIT_COURTS'                         => '8H', replaced with  I0012
+//----------------------------------------------------------------------20171025 
 	psourcename = 'UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY' 		       => '10D',
 	psourcename = 'MONTANA_VIOLENT_OFFENDER_REGISTRY        ' 			     => '10E',
 	psourcename = 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN  ' 			     => '10F',
-	 
- /**************************************************************/	
-  //DOC	
-	//stringlib.stringfind(psourcename,'DEPARTMENT_OF_CORRECTIONS',1) >0 	=> statecode,
+	
+                                                                                        
+//------------------------------------------DOC Phase1 ---------------------------------------------------------------------
 	psourcename = 'ALABAMA_DEPARTMENT_OF_CORRECTIONS' 								=> 'DA',
 	psourcename = 'ARKANSAS_DEPARTMENT_OF_CORRECTIONS' 								=> 'DB',
 	psourcename = 'ARIZONA_DEPARTMENT_OF_CORRECTIONS' 								=> 'DD',
@@ -1677,7 +1737,7 @@ map(
 	psourcename = 'FLORIDA_DEPARTMENT_OF_CORRECTIONS_HISTORY_FILE'	  => 'DI',
 	psourcename = 'GEORGIA_DEPARTMENT_OF_CORRECTIONS' 								=> 'DJ',
 	psourcename = 'GEORGIA_PAROLE' 																		=> 'DK',
-	psourcename = 'HAWAII_DEPARTMENT_OF_CORRECTIONS' 									=> 'DL',	
+	psourcename = 'HAWAII_DEPARTMENT_OF_CORRECTIONS' 				          => 'DL',	
 	psourcename = 'IDAHO_DEPARTMENT_OF_CORRECTIONS' 									=> 'DM',
 	psourcename = 'INDIANA_DEPARTMENT_OF_CORRECTIONS' 								=> 'DN',
 	psourcename = 'IOWA_DEPARTMENT_OF_CORRECTIONS' 										=> 'DO',
@@ -1711,7 +1771,7 @@ map(
 	psourcename = 'SOUTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS' 					=> 'EJ',
 	psourcename = 'TENNESSEE_DEPARTMENT_OF_CORRECTIONS' 							=> 'EK',
 	psourcename = 'TEXAS_DEPARTMENT_OF_CORRECTIONS' 									=> 'EL',
-	psourcename = 'UTAH_DEPARTMENT_OF_CORRECTIONS' 										=> 'EM',
+	psourcename = 'UTAH_DEPARTMENT_OF_CORRECTIONS' 										=> 'EM', //replaced with I0052 - on hold
 	psourcename = 'VIRGINIA_DEPARTMENT_OF_CORRECTIONS' 								=> 'EN',
 	psourcename = 'VERMONT_DEPARTMENT_OF_CORRECTIONS' 								=> 'EO',
 	psourcename = 'WASHINGTON_DEPARTMENT_OF_CORRECTIONS' 							=> 'EP',
@@ -1727,21 +1787,19 @@ map(
   psourcename = 'NORTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS_WEBSITE'  => 'WG',
   psourcename = 'OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE'        => 'WH',
   psourcename = 'OHIO_DEPARTMENT_OF_CORRECTIONS_WEBSITE'            => 'WJ',
-  psourcename = 'UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE' 	          => 'WK',
+  psourcename = 'UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE' 	          => 'WK', //replaced with I0052 - on hold
 	psourcename = 'GEORGIA_DEPARTMENT_OF_CORRECTIONS_WEBSITE' 				=> 'VE', //20130812
-//---------12092013 ---------Batch4
-  
+//---------------------------DOC Batch4 12092013-------------------------------------------
   psourcename = 'KENTUCKY_DEPARTMENT_OF_CORRECTIONS_WEBSITE'               => '6Z',      
   psourcename = 'MISSISSIPPI_PAROLE_BOARD'                                 => '6X', 
   psourcename = 'OKLAHOMA_DOC_VIOLENT_OFFENDER_REGISTRY'                   => 'ZB',
 	psourcename = 'SOUTH_CAROLINA_DEPARMENT_OF_PROBATION_PAROLE_AND_PARDON'  => '6H',
   psourcename = 'MICHIGAN_DEPARTMENT_OF_CORRECTIONS_WEBSITE'               => '6W', // VC 20141027
-	
-/////////////////////////////////////////////////////////////20171025 
+
+//---------------------------DOC Batch4 20171025-------------------------------------------
 	psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES'           		           => '10G',
 	
- /**************************************************************/
-  //County
+//------------------------------------------County Phase1 ---------------------------------------------------------------------
 	psourcename = 'ARIZONA_MARICOPA_COUNTY_GILBERT_MUNICIPAL_COURT' 	=> 'RE',                                                     
 	psourcename = 'ARIZONA_MARICOPA_COUNTY' 													=> 'RF',                                                                              
 	psourcename = 'ARIZONA_PIMA_COUNTY' 															=> 'RG',                                                                                  
@@ -1788,7 +1846,7 @@ map(
 	psourcename = 'OHIO_MONTGOMERY_COUNTY_DAYTON_MUNICIPAL_COURT' 		=> 'OC',                                                        
 	psourcename = 'OHIO_WARREN_COUNTY_MASON_MUNICIPAL_COURT' 					=> 'OD',                                                             
 	psourcename = 'OHIO_FRANKLIN_COUNTY_MUNICIPAL_COURT' 							=> 'OE',                                                                 
-	psourcename = 'OHIO_WARREN_COUNTY' 																=> 'OF',                                                                                   
+	//psourcename = 'OHIO_WARREN_COUNTY' 																=> 'OF',   using IE OH WARREN COUNTY COURT                                                                               
 	psourcename = 'OHIO_CLINTON_COUNTY' 															=> 'OG',                                                                                  
 	psourcename = 'OHIO_COLUMBIANA_COUNTY' 														=> 'OI',                                                                               
 	psourcename = 'OHIO_LAWRENCE_COUNTY_MUNICIPAL_COURT' 							=> 'OJ',                                                                 
@@ -1810,7 +1868,7 @@ map(
 	psourcename = 'OHIO_BUTLER_COUNTY' 																=> 'PB',                                                                                   
 	psourcename = 'OHIO_MONTGOMERY_COUNTY_VANDALIA_MUNICIPAL_COURT' 	=> 'PC',                                                      
 	psourcename = 'OHIO_DELAWARE_COUNTY' 															=> 'PD',                                                                                 
-	psourcename = 'OHIO_WARREN_COUNTY_COURT' 													=> 'PE',                                                                             
+	//psourcename = 'OHIO_WARREN_COUNTY_COURT' 													=> 'PE',    Using IE OH WARREN COUNTY COURT                                                                        
 	psourcename = 'OHIO_SUMMIT_COUNTY_AKRON_MUNICIPAL_COURT' 					=> 'PF',                                                             
 	psourcename = 'OHIO_FRANKLIN_COUNTY' 															=> 'PG',                                                                                 
 	psourcename = 'OHIO_STARK_COUNTY_COMMON_PLEAS_COURT' 							=> 'PH',                                                                 
@@ -1840,13 +1898,8 @@ map(
 	psourcename = 'TEXAS_MONTGOMERY_COUNTY'    												=> 'TQ', 
 	psourcename = 'VIRGINIA_FAIRFAX_COUNTY' 													=> 'PR', 
 	 
- /*********************************************************/
- 
- //PROM  'PW'
- /**************************************************************/
-  
-//-------------20120424
-    //psourcename = 'CALIFORNIA_SACRAMENTO_COUNTY' 									=> '',  
+//------------------------------------------County Phase2 20120424---------------------------------------------------------------------
+  //psourcename = 'CALIFORNIA_SACRAMENTO_COUNTY' 									=> '',  
   psourcename = 'CALIFORNIA_ALAMEDA_COUNTY' 										            => 'QK', 
   psourcename = 'CALIFORNIA_BUTTE_COUNTY'                                   => 'QX',  
 	psourcename = 'CALIFORNIA_MARIN_COUNTY_ALTERNATE_FILE' 						        => 'QL', 	
@@ -1865,7 +1918,7 @@ map(
 	psourcename = 'CALIFORNIA_SONOMA_COUNTY'                                  => 'UJ',
 	psourcename = 'CALIFORNIA_TEHAMA_COUNTY'                                  => 'UK', 
 	psourcename = 'CALIFORNIA_VENTURA_COUNTY_ALTERNATE_FILE'                  => 'UL',
-  psourcename = 'COLORADO_DENVER_COUNTY' 														=> 'QN',  
+  //psourcename = 'COLORADO_DENVER_COUNTY' 														=> 'QN',   replaced with I0015 
 	psourcename = 'FLORIDA_LAKE_COUNTY' 													    => 'QM', 
   psourcename = 'FLORIDA_INDIAN_RIVER_COUNTY' 											=> 'UO', 	
   psourcename = 'MISSISSIPPI_HARRISON_COUNTY' 											=> 'VD',
@@ -1900,7 +1953,8 @@ map(
   psourcename = 'TEXAS_TRAVIS_COUNTY' 															=> 'RV',
   psourcename = 'TEXAS_WILLIAMSON_COUNTY' 													=> 'RW',
   psourcename = 'TEXAS_WALLER_COUNTY' 															=> 'RX',
-  //-----------------------------------20130716--------------------------------
+  
+//------------------------------------------County Phase2 20130716---------------------------------------------------------------------
 	psourcename = 'FLORIDA_FLAGLER_COUNTY'  											=> 'UN',
   psourcename = 'FLORIDA_OKALOOSA_COUNTY' 											=> 'UP',
   psourcename = 'FLORIDA_SEMINOLE_COUNTY' 											=> 'UQ',
@@ -1957,7 +2011,7 @@ map(
   psourcename = 'OHIO_MUSKINGUM_COUNTY_MUNICIPAL_COURT' 							  => 'YL',
   psourcename = 'OHIO_OTTAWA_COUNTY_MUNICIPAL_COURT' 										=> 'YM',
   psourcename = 'OHIO_PERRY_COUNTY_COURT' 															=> 'YN',
- //-----------------------------20130909-----------------------------------------
+ //------------------------------------------County Phase2 20130909---------------------------------------------------------------------
   psourcename = 'SOUTH_CAROLINA_ABBEVILLE_COUNTY_CIRCUIT_COURTS'    => 'ZC',
   psourcename = 'SOUTH_CAROLINA_ABBEVILLE_COUNTY_SUMMARY_COURTS'    => 'ZD',
   psourcename = 'SOUTH_CAROLINA_AIKEN_COUNTY_CIRCUIT_COURTS'  	    => 'ZE',
@@ -2010,9 +2064,7 @@ map(
   psourcename = 'SOUTH_CAROLINA_MARION_COUNTY_CIRCUIT_COURTS'  	    => '4U',   
   psourcename = 'SOUTH_CAROLINA_MARION_COUNTY_SUMMARY_COURTS'  	    => '4V',
 
-  //------------------12092013-------------- Batch4
-	//
-	
+ //------------------------------------------County Phase2 20131209---------------------------------------------------------------------	
   psourcename = 'CALIFORNIA_SACRAMENTO_COUNTY_SUPERIOR_COURT_WEBSITE'	  => 'TU',
   psourcename = 'OHIO_CLERMONT_TRAFFIC'                               	=> '6K',
   psourcename = 'OHIO_PREBLE_COUNTY_COMMON_PLEAS_COURT'                 => 'YO',
@@ -2054,10 +2106,7 @@ map(
   psourcename = 'TEXAS_HOPKINS_COUNTY_DISTRICT_COURT'                 	=> '6A',
   psourcename = 'TEXAS_ORANGE_COUNTY_COURT'                             => '6C',
   psourcename = 'TEXAS_SMITH_COUNTY'                                    => '6E',
-	
-      
-// -----------------batch5                         
-// -----------------20150113--------------------------------------------------------- 
+ //------------------------------------------County Phase2 20150113---------------------------------------------------------------------	
   psourcename = 'TEXAS_BURNET_COUNTY'                                  => '6L',
   psourcename = 'OHIO_BUTLER_FAIRFIELD_MUNICIPAL_COURT'                => '6M',
   psourcename = 'OHIO_GEAUGA_COUNTY_CHARDON_MUNICIPAL_COURT_WEBSITE'   => '6N',
@@ -2065,14 +2114,12 @@ map(
   psourcename = 'TEXAS_CAMERON_COUNTY'                                 => '6Q',
   psourcename = 'TEXAS_CHAMBERS_COUNTY'                                => '6R',  
 	psourcename = 'TEXAS_EL_PASO_COUNTY_COURT'                           => '6S',                                                                         
-  //psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS_PHILADELPHIA MUNICIPAL COURT' => '6U',
-    
+  //psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS_PHILADELPHIA MUNICIPAL COURT' => '6U',    
   psourcename = 'OHIO_CLARK_MUNICIPAL_COURT'                           => '6O', 
 	psourcename = 'OHIO_CLARK_COUNTY_COMMON_PLEAS_COURT'                 => '6T',
   psourcename = 'OHIO_CUYAHOGA_COMMON_PLEAS_COURT'                     => '6Y',                                                                     
-                       
-//Phase3 sources. 07/13/2015--------------------------------------------------------- 
 
+//------------------------------------------County Phase3 20150713---------------------------------------------------------------------                       
 	psourcename = 'CALIFORNIA_SHASTA_COUNTY_SUPERIOR_COURT'              => '7C',
   psourcename = 'FLORIDA_COLLIER'                                      => '7D',
   psourcename = 'FLORIDA_COLLIER_TRAFFIC'                              => '7E',
@@ -2089,9 +2136,9 @@ map(
   psourcename = 'TEXAS_LIBERTY_COUNTY'                                 => '7P',
   psourcename = 'FLORIDA_PASCO_COUNTY'                                 => '7R',
 	psourcename = 'FLORIDA_PASCO_COUNTY_TRAFFIC'                         => '7S',
-//----------------------------------------------------------------------20151028
+//------------------------------------------County Phase3 20151028---------------------------------------------------------------------
 	psourcename = 'ARIZONA_MARICOPA_COUNTY_SUPERIOR_COURT_FILINGS'       => '7T',
-	psourcename = 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  => '7U',
+//	psourcename = 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  => '7U', using IE DISTRICT OF COLUMBIA SUPERIOR COURT
 	psourcename = 'FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT'                => '7V',
 	psourcename = 'FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT'                 => '7W',
 	psourcename = 'FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS'            => '7X',
@@ -2103,8 +2150,7 @@ map(
 	psourcename = 'OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT'                => '8D',
 	psourcename = 'TEXAS_LIBERTY_COUNTY_DISTRICT_COURT'                  => '8E',
 	psourcename = 'FLORIDA_HILLSBOROUGH_COUNTY_TRAFFIC'                  => '8I',
-
-//---------------------------------------------------------------------20160929
+//------------------------------------------County Phase3 20160929---------------------------------------------------------------------
 	psourcename = 'OHIO_MADISON_COMMON_PLEAS_COURT'                       => '8J',
 	psourcename = 'OHIO_SANDUSKY_COUNTY_COMMON_PLEAS_COURT'               => '8K',
 	psourcename = 'TEXAS_BEXAR_COUNTY_DISTRICT_COURTS'                    => '8L',
@@ -2117,13 +2163,10 @@ map(
 	psourcename = 'TENNESSEE_HAMILTON_CRIMINAL_COURT'                     => '8R',
 	psourcename = 'TEXAS_COLLIN_COUNTY_WEBSITE'                           => '8S',
 
-//Phase3////////////////////////////////////////////////////////////// VC 20160123 DF-18051(Dec) 
-
+//------------------------------------------County VC 20160123 DF-18051(Dec)-----------------------------------------------------
 	psourcename = 'FLORIDA_CITRUS_COUNTY'                                 => '8T',
 	psourcename = 'OHIO_STARK_COUNTY_ALLIANCE_MUNICIPAL_COURT'            => '8U',
-
-//Phase3////////////////////////////////////////////////////////////// VC 20160123 DF-18331(Jan)
-
+//------------------------------------------County VC 20160123 DF-18331(Jan)-----------------------------------------------------
 	psourcename = 'OHIO_COLUMBIANA_COUNTY_EASTLIVERPOOL_MUNICIPAL_COURT'  => '8V',
 	psourcename = 'OHIO_CUYAHOGA_COUNTY_LAKEWOOD_MUNICIPAL_COURT'         => '8W',
 	psourcename = 'OHIO_JEFFERSON_COUNTY_STEUBENVILLE'                    => '8X',
@@ -2143,11 +2186,12 @@ map(
 	psourcename = 'FLORIDA_ST_LUCIE_COUNTY_CIRCUIT_COURT'                 => '9L',
 	psourcename = 'OHIO_ASHTABULA_COMMON_PLEAS_COURT'                     => '9M',
 	psourcename = 'OHIO_DARKE_COUNTY_MUNICIPAL_COURT'                     => '9N',
-	psourcename = 'OHIO_FRANKLIN_COUNTY_COMMON_PLEAS'                     => '9O',
+	//psourcename = 'OHIO_FRANKLIN_COUNTY_COMMON_PLEAS'                     => '9O', Replaced with I0023
 	//20170227
 	psourcename = 'OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT'         => '9P',
 	psourcename = 'OHIO_SENECA_COUNTY_COMMON_PLEAS_COURT'                 => '9Q',	
-	//Phase3////////////////////////////////////////////////////////////// VC 20170303 DF-18331(Jan)
+	
+//------------------------------------------County VC 20170303 DF-18331(Jan)-----------------------------------------------------	
 	psourcename = 'OHIO_STARK_COUNTY_MASSILLON_MUNICIPAL_COURT'           => '9R',
 	psourcename = 'OHIO_STARK_COUNTY_CANTON_MUNICIPAL_COURT'              => '9S',
 	psourcename = 'OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT'                 => '9T',
@@ -2156,15 +2200,14 @@ map(
 	psourcename = 'TEXAS_KAUFMAN_COUNTY'                                  => '9W',
 	psourcename = 'TEXAS_RANDALL_COUNTY'                                  => '9X',
 
-	 /////////////////////////////////////////////////////////////20171025 
- 
+ //------------------------------------------County VC 20171025 -----------------------------------------------------
  psourcename = 'CALIFORNIA_EL_DORADO_COUNTY_SUPERIOR_COURT'            => '9Y',
  psourcename = 'FLORIDA_MANATEE_COUNTY'                                => '9Z',
  psourcename = 'OHIO_VINTON_COUNTY_COMMON_PLEAS_COURT'                 => '10A',
  psourcename = 'TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT'                   => '10B',
  psourcename = 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC'             => '10C',
- //Arrests( New Vendor_Code_Assignd by Neha)
  
+//------------------------------------------Hygenics Crim Arrest Phase1 ---------------------------------------------- 
  psourcename = 'ALABAMA_BALDWIN_COUNTY_ARRESTS' => 'BA',
  psourcename = 'ALABAMA_CALHOUN_COUNTY_ARRESTS' => 'BB',
  psourcename = 'ALABAMA_HOUSTON_COUNTY_ARRESTS' => 'BC',
@@ -2261,7 +2304,7 @@ map(
  psourcename = 'MONTANA_MISSOULA_COUNTY_ARRESTS' => 'IO',
  psourcename = 'MONTANA_YELLOWSTONE_COUNTY_ARRESTS' => 'IP',
  psourcename = 'NEBRASKA_HALL_COUNTY_ARRESTS' => 'IZ',
- psourcename = 'NEVADA_CLARK_COUNTY_ARRESTS' => 'KE',
+ //psourcename = 'NEVADA_CLARK_COUNTY_ARRESTS' => 'KE', replaced with I0053
  psourcename = 'NEVADA_HUMBOLDT_COUNTY_ARRESTS' => 'KF',
  psourcename = 'NEW_JERSEY_HUNTERDON_COUNTY_ARRESTS' => 'KA',
  psourcename = 'NEW_MEXICO_BERNALILLO_COUNTY_ARRESTS' => 'KB',
@@ -2331,7 +2374,7 @@ map(
  psourcename = 'TEXAS_MONTGOMERY_COUNTY_ARRESTS' => 'MX',
  psourcename = 'TEXAS_PARKER_COUNTY_ARRESTS' => 'MY',
  psourcename = 'TEXAS_POTTER_COUNTY_ARRESTS' => 'MZ',
- psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS' => 'Z6', // replaced 'ND' with Z6 (VC),
+ psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS' => 'Z6',
  psourcename = 'TEXAS_SMITH_COUNTY_ARRESTS' => 'NI',
  psourcename = 'TEXAS_TOM_GREEN_COUNTY_ARRESTS' => 'NK',
  psourcename = 'TEXAS_WISE_COUNTY_ARRESTS' => 'NL',
@@ -2354,19 +2397,23 @@ map(
  psourcename = 'WASHINGTON_WHATCOM_COUNTY_ARRESTS'  => 'QF',
  psourcename = 'WISCONSIN_KENOSHA_COUNTY_ARRESTS'   => 'QG',
  psourcename = 'WEST_VIRGINIA_REGIONAL_ARRESTS'     => 'QH',
- 
-  //Batch4
+
+//------------------------------------------Hygenics Crim Arrest Phase2 Batch4 ---------------------------------------------- 	
  psourcename = 'KENTUCKY_MONROE_COUNTY_ARRESTS' => '6I',
- 
- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- /************************************************CRIMWISE***************************************************************/
- //AOC Crimwise
+//------------------------------------------Hygenics Crim County 20181107 ---------------------------------------------- 
+ psourcename = 'TEXAS_WISE_COUNTY_DISTRICT_COURT                                       ' => '10H',
+//------------------------------------------Hygenics Crimwise DOC 20181107 ---------------------------------------------- 
+ psourcename = 'MINNESOTA_PREDATORY_OFFENDER_REGISTRY                                  ' => '10I', 
+/***************************************************HYGENICS CRIM END************************************************************/ 
+
+/************************************************HYGENICS CRIMWISE START*********************************************************/
+//------------------------------------------Hygenics Crimwise AOC Batch1----------------------------------------------
  psourcename = 'ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                        ' => 'W0001',
  psourcename = 'MINNESOTA_ADMINISTRATOR_OF_THE_COURTS_CW                       ' => 'W0002',
  psourcename = 'VIRGINIA_ADMINISTRATOR_OF_THE_COURTS_CIRCUIT_COURTS_WEBSITE_CW ' => 'W0003',
  psourcename = 'VIRGINIA_ADMINISTRATOR_OF_THE_COURTS_DISTRICT_COURTS_WEBSITE_CW' => 'W0004',          
 					
- //COUNTY Crimwise                                                                  
+//------------------------------------------Hygenics Crimwise County Batch1----------------------------------------------
  psourcename = 'CALIFORNIA_AMADOR_COUNTY_CW                                    ' => 'W0005',
  psourcename = 'CALIFORNIA_COLUSA_COUNTY_CW                                    ' => 'W0006',
  psourcename = 'CALIFORNIA_EL_DORADO_COUNTY_CW                                 ' => 'W0007',
@@ -2404,14 +2451,15 @@ map(
  psourcename = 'TEXAS_KAUFMAN_COUNTY_DISTRICT_COURT_CW                         ' => 'W0039',
  psourcename = 'FLORIDA_POLK_COUNTY_TRAFFIC_CW                                 ' => 'W0040',
  psourcename = 'FLORIDA_HIGHLANDS_COUNTY_TRAFFIC_CW                            ' => 'W0041',
- //Arrest Crimwise
+ 
+//------------------------------------------Hygenics Crimwise Arrest Batch1---------------------------------------------- 
  psourcename = 'CALIFORNIA_YUBA_COUNTY_BOOKINGS_CW                             ' => 'W0042',
  psourcename = 'CALIFORNIA_GLENN_COUNTY_BOOKINGS_CW                            ' => 'W0043',
  psourcename = 'CALIFORNIA_CALAVERAS_COUNTY_BOOKINGS_CW                        ' => 'W0044',
  psourcename = 'CALIFORNIA_NEVADA_COUNTY_BOOKINGS_CW                           ' => 'W0045',
 
- //Batch2.1---------------------------------------------------------------------20160929
  
+//------------------------------------------Hygenics Crimwise Arrest Batch2.1 20160929-------------------------------------
  psourcename = 'CALIFORNIA_SOLANO_COUNTY_JAIL_CW                                      ' => 'W0046',
  psourcename = 'FLORIDA_MANATEE_COUNTY_SHERIFFS_OFFICE_CW                             ' => 'W0047',
  psourcename = 'NORTH_CAROLINA_CHATHAM_COUNTY_SHERIFF_CW                              ' => 'W0048',
@@ -2468,7 +2516,7 @@ map(
  psourcename = 'MAINE_WELLS_POLICE_DEPARTMENT_CW                                      ' => 'W0099', 
  psourcename = 'MASSACHUSETTS_CARVER_POLICE_DEPARTMENT_CW                             ' => 'W0100',
  
- //Batch2.2
+//------------------------------------------Hygenics Crimwise Arrest Batch2.2 ------------------------------------- 
  psourcename = 'ALABAMA_BALDWIN_COUNTY_CORRECTIONS_CENTER_CW                          ' => 'W0101',
  psourcename = 'CALIFORNIA_KINGS_COUNTY_BOOKINGS_CW                                   ' => 'W0102',
  psourcename = 'CALIFORNIA_LAKE_COUNTY_BOOKINGS_CW                                    ' => 'W0103',
@@ -2517,14 +2565,12 @@ map(
  psourcename = 'NEW_HAMPSHIRE_MANCHESTER_POLICE_DEPARTMENT_CW                         ' => 'W0146',
  psourcename = 'TENNESSEE_HARDEMAN_COUNTY_ARRESTS_CW                                  ' => 'W0147',
  
- //Crimwise County
- //Batch2.1---------------------------------------------------------------------20160929
+//------------------------------------------Hygenics Crimwise County Batch2.1 20160929---------------------------------------------- 
  psourcename = 'CALIFORNIA_TULARE_COUNTY_CW                                           ' => 'W0148',
  // psourcename = 'OHIO_GREENE_COUNTY_FAIRBORN_MUNICIPAL_COURT_CW                        ' => 'W0149', Using crim instead due to address and offense fields
- psourcename = 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT_CW                         ' => 'W0150',          
- 
- //Batch3----------------------------------------------------------------------------------20170126 
- //county
+ //psourcename = 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT_CW                         ' => 'W0150', using IE  OH WARREN LEBANON MUNICIPAL       
+
+//------------------------------------------Hygenics Crimwise County Batch3 20160929---------------------------------------------- 
  psourcename = 'ARIZONA_MARICOPA_WEBSITE_CW                                            ' =>'W0151',//??
  psourcename = 'ARIZONA_PHOENIX_CW                                                     ' =>'W0152',
  psourcename = 'OHIO_ERIE_COUNTY_SANDUSKY_MUNICIPAL_COURT_CW                           ' =>'W0153',
@@ -2535,7 +2581,7 @@ map(
  // psourcename = 'OHIO_LAKE_COUNTY_PAINSVILLE_MUNICIPAL_COURT_CW                         ' =>'W0158',//QQ the crim version is current now.
  psourcename = 'OHIO_TUSCARAWAS_COUNTY_MUNICIPAL_COURT_CW                              ' =>'W0159',
  psourcename = 'TEXAS_JOHNSON_COUNTY_DISTRICT_COURT_CW                                 ' =>'W0160',
- //arrest
+//------------------------------------------Hygenics Crimwise arrest Batch3 20160929----------------------------------------------
  psourcename = 'ALABAMA_JEFFERSON_COUNTY_SHERIFFS_OFFICE_CW                            ' =>'W0161',
  psourcename = 'ARIZONA_MARICOPA_SHERIFFS_OFFICE_CW                                    ' =>'W0162',
  psourcename = 'LOUISIANA_SHREVEPORT_ARRESTS_CW                                        ' =>'W0163',
@@ -2570,9 +2616,8 @@ map(
  psourcename = 'TENNESSEE_SHELBY_COUNTY_SHERIFFS_OFFICE_CW                             ' =>'W0192',
  psourcename = 'TEXAS_POTTER_COUNTY_SHERIFFS_OFFICE_CW                                 ' =>'W0193',
  psourcename = 'UTAH_IRON_COUNTY_SHERIFFS_OFFICE_CW                                    ' =>'W0194',
- 
- //Batch4----------------------------------------------------------------------------------20170405
- //Arrest
+
+//------------------------------------------Hygenics Crimwise arrest Batch4 20170405---------------------------------------------- 
  psourcename = 'VIRGINIA_ARLINGTON_COUNTY_ARRESTS_CW                                   ' =>'W0195',                                   
  psourcename = 'NORTH_CAROLINA_ROWAN_COUNTY_SHERIFFS_OFFICE_CW                         ' =>'W0196', 
  psourcename = 'MASSACHUSETTS_ATTLEBORO_ARRESTS_CW                                     ' =>'W0197', 
@@ -2629,8 +2674,8 @@ map(
  psourcename = 'MASSACHUSETTS_DEDHAM_ARRESTS_CW                                        ' =>'W0248',
  psourcename = 'MASSACHUSETTS_MARBLEHEAD_ARRESTS_CW                                    ' =>'W0249',
  psourcename = 'MASSACHUSETTS_NORWELL_ARRESTS_CW                                       ' =>'W0250',
-                    
- //County
+
+//------------------------------------------Hygenics Crimwise Count Batch4 ---------------------------------------------- 
  psourcename = 'TEXAS_COLLIN_COUNTY_DISTRICT_COURT_CW                                  ' =>'W0251',
  // psourcename = 'OHIO_AUGLAIZE_COUNTY_MUNICIPAL_COURT_CW                                ' =>'W0252',    // most of the rec are in OHIO_AUGLAIZE_COUNTY           
  psourcename = 'FLORIDA_ESCAMBIA_COUNTY_CW                                             ' =>'W0253',
@@ -2651,9 +2696,8 @@ map(
  psourcename = 'ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY_CW                                 ' =>'W0267',
  //DOC
  psourcename = 'TEXAS_DEPARTMENT_OF_CRIMINAL_JUSTICE_INMATES_CW                        ' =>'W0268',
- 
- //Batch5----------------------------------------------------------------------------------20170627
- //Arrest 
+
+//------------------------------------------Hygenics Crimwise Arrest Batch5 ----------------------------------------------  
  psourcename = 'CALIFORNIA_MENDOCINO_COUNTY_BOOKINGS_CW                                ' => 'W0269',
  psourcename = 'CALIFORNIA_TEHAMA_COUNTY_BOOKINGS_CW                                   ' => 'W0270',
  psourcename = 'FLORIDA_CITRUS_COUNTY_SHERIFFS_OFFICE_CW                               ' => 'W0271',
@@ -2695,8 +2739,8 @@ map(
  psourcename = 'MASSACHUSETTS_YARMOUTH_ARRESTS_CW                                      ' => 'W0307',
  psourcename = 'MINNESOTA_BROWN_COUNTY_SHERIFF_CW                                      ' => 'W0308',
  psourcename = 'MONTANA_YELLOWSTONE_COUNTY_DETENTION_CW                                ' => 'W0309',
- psourcename = 'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS_CW                                  ' => 'W0310',
-//County                                                                               
+ psourcename = 'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS_CW                                  ' => 'W0310',                                                                              
+//------------------------------------------Hygenics Crimwise County Batch5 ----------------------------------------------
  psourcename = 'ARIZONA_AVONDALE_CW                                                    ' => 'W0311',
  psourcename = 'ARIZONA_BUCKEYE_CW                                                     ' => 'W0312',
  psourcename = 'ARIZONA_EL_MIRAGE_CW                                                   ' => 'W0313',
@@ -2708,8 +2752,170 @@ map(
  psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT_CW                           ' => 'W0319',
  //AOC                                                                                 
  psourcename = 'KANSAS_OFFENDER_REGISTRY_CW                                            ' => 'W0320',
- '');                                                                                                               
-                                                                                                        
+ 
+ //------------------------------------------Hygenics Crimwise Arrest 20181107 ----------------------------------------------
+ psourcename = 'CALIFORNIA_SANTA_CRUZ_POLICE_DEPARTMENT_CW                             ' => 'W0321',
+ psourcename = 'FLORIDA_ALACHUA_COUNTY_SHERIFFS_OFFICE_V2_CW                           ' => 'W0322',
+ psourcename = 'FLORIDA_CLAY_COUNTY_SHERIFF_CW                                         ' => 'W0323',
+ psourcename = 'FLORIDA_DIXIE_COUNTY_SHERIFF_CW                                        ' => 'W0324',
+ psourcename = 'INDIANA_HENDRICKS_COUNTY_SHERIFFS_OFFICE_CW                            ' => 'W0325',
+ psourcename = 'INDIANA_PORTER_COUNTY_SHERIFFS_OFFICE_CW                               ' => 'W0326',
+ psourcename = 'MASSACHUSETTS_BROOKLINE_POLICE_DEPARTMENT_CW                           ' => 'W0327',
+ psourcename = 'MASSACHUSETTS_HANOVER_POLICE_DEPARTMENT_CW                             ' => 'W0328',
+ psourcename = 'MASSACHUSETTS_HINGHAM_CW                                               ' => 'W0329',
+ psourcename = 'MASSACHUSETTS_IPSWICH_POLICE_DEPARTMENT_CW                             ' => 'W0330',
+ psourcename = 'MASSACHUSETTS_PEMBROKE_POLICE_DEPARTMENT_CW                            ' => 'W0331',
+ psourcename = 'MASSACHUSETTS_SANDWICH_POLICE_DEPARTMENT_CW                            ' => 'W0332',
+ psourcename = 'MASSACHUSETTS_WAYLAND_POLICE_DEPARTMENT_CW                             ' => 'W0333',
+ psourcename = 'MASSACHUSETTS_WHITMAN_CW                                               ' => 'W0334',
+ psourcename = 'MINNESOTA_HENNEPIN_COUNTY_JAIL_CW                                      ' => 'W0335',
+ psourcename = 'NEW_HAMPSHIRE_LACONIA_POLICE_DEPARTMENT_CW                             ' => 'W0336',
+ psourcename = 'NORTH_CAROLINA_DURHAM_COUNTY_SHERIFFS_OFFICE_CW                        ' => 'W0337',
+ psourcename = 'NORTH_CAROLINA_RUTHERFORD_COUNTY_DETENTION_CENTER_V2_CW                ' => 'W0338',
+ psourcename = 'OREGON_CLACKAMAS_COUNTY_SHERIFF_CW                                     ' => 'W0339',
+ psourcename = 'TEXAS_ANDERSON_COUNTY_JAIL_CW                                          ' => 'W0340',
+ psourcename = 'TEXAS_KNOX_COUNTY_SHERIFF_CW                                           ' => 'W0341',
+ psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS_CW                                        ' => 'W0342',
+ psourcename = 'TEXAS_WALLER_COUNTY_JAIL_CW                                            ' => 'W0343',
+  //------------------------------------------Hygenics Crimwise County 20181107 ----------------------------------------------
+ psourcename = 'OHIO_CARROLL_COUNTY_COMMON_PLEAS_COURT_CW                              ' => 'W0344',			
+
+/************************************************HYGENICS CRIMWISE END*************************************************************/
+
+/************************************************IE DATA START*************************************************************/ 	
+//-------------------------------IE AOC Batch 1 20181005 ---------------------------------------------------------
+  psourcename = 'FL CAREER OFFENDER REGISTRY_IE'                                          => 'I0001',
+	psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)_IE'                     => 'I0002',
+	psourcename = 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY_IE' => 'I0003',
+	psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                        => 'I0004',
+	psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '                => 'I0005',
+	psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                     => 'I0006',
+  psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  
+	psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                      => 'I0008',  		
+	
+//-------------------------------IE County Batch 1 20181005 ---------------------------------------------------
+	psourcename 	=	 'NE LANCASTER DISTRICT COURT_IE'                                      	=> 'I0009',
+  psourcename 	=	 'GA DEKALB COUNTY JUDICIAL SYSTEM_IE'                                  => 'I0010',
+	psourcename   =  'WV CIRCUIT COURTS_IE'                                                 => 'I0012',
+  psourcename 	=	 'CA KERN SUPERIOR COURT_IE'                                            => 'I0013',
+  psourcename 	=	 'CA SAN BERNARDINO SUPERIOR COURT_IE'                                  => 'I0014',
+  psourcename 	=	 'CO DENVER COUNTY COURT_IE'                                            => 'I0015',
+  psourcename 	=	 'GA CARROLL SUPERIOR CLERK OF COURTS_IE '                              => 'I0016',
+  psourcename 	=	 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT_IE'                        => 'I0017',
+  psourcename 	=	 'IL KANE CIRCUIT COURT_IE'                                           	=> 'I0018',
+  psourcename 	=	 'LA ORLEANS PARISH DISTRICT COURT_IE'                                	=> 'I0019',
+  psourcename 	=	 'NE LANCASTER COUNTY COURT_IE'                                       	=> 'I0020',                                                                      
+  psourcename 	=	 'OH CUYAHOGA CLERK OF COURTS_IE'                                       => 'I0021',
+  psourcename 	=	 'OH FAIRFIELD MUNICIPAL COURT_IE'                                      => 'I0022',
+  psourcename 	=	 'OH FRANKLIN COURT OF COMMON PLEAS_IE'                               	=> 'I0023',
+  psourcename 	=	 'OH PORTAGE RAVENNA MUNICIPAL COURT_IE'                              	=> 'I0024',
+  psourcename 	=	 'OK CLEVELAND DISTRICT COURT_IE'                                       => 'I0025',
+  psourcename 	=	 'OK COMANCHE DISTRICT COURT_IE'                                        => 'I0026',
+  psourcename 	=	 'OK OKLAHOMA DISTRICT COURT_IE'                                        => 'I0027',
+  psourcename 	=	 'OK PAYNE DISTRICT COURT_IE'                                           => 'I0028',
+  psourcename 	=	 'OK ROGERS DISTRICT COURT_IE'                                          => 'I0029',
+  psourcename 	=	 'OK TULSA DISTRICT COURT_IE'                                           => 'I0030',
+  psourcename 	=	 'SC JASPER SUMMARY COURT_IE'                                           => 'I0031', 
+  psourcename 	=	 'TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE'                     	=> 'I0032',
+  psourcename 	=	 'TN DAVIDSON GENERAL SESSIONS COURT_IE'                                => 'I0033',         
+  psourcename 	=	 'TN HAMILTON GENERAL SESSIONS COURT_IE'                                => 'I0034',
+  psourcename 	=	 'TX BOWIE DISTRICT AND COUNTY COURTS_IE'                               => 'I0035',
+  // psourcename 	=	 'TX EL PASO COUNTY COURTS_IE'                                          => 'I0036', not sure why this source was selected hygenics src looks better
+  psourcename 	=	 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                             	=> 'I0037',
+  psourcename 	=	 'TX TAYLOR COUNTY COURTS_IE'                                           => 'I0038',
+  psourcename 	=	 'TX TAYLOR JUSTICE OF THE PEACE_IE'                                    => 'I0039',
+  psourcename 	=	 'NV CLARK LAS VEGAS JUSTICE COURT_IE'  	                              => 'I0040',
+  psourcename 	=	 'FL SARASOTA CLERK OF COURT_IE'                                        => 'I0041', 
+	psourcename 	=	 'NV CLARK DISTRICT COURT_IE'  	                                        => 'I0056',
+//-------------------------------IE DOC Batch 1 20181005 ---------------------------------------------------
+  // psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
+  psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
+  psourcename = 'FL DEPARTMENT OF CORRECTIONS - RELEASE_IE'                               => 'I0044',
+  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045', //IE FIX sentences
+  psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
+	psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
+	psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                              => 'I0050',
+  psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
+  // psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052', //on hold since we don't have images
+	
+//-------------------------------IE ARREST Batch 1 20181005 ---------------------------------------------------	
+  psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0053',  
+  psourcename = 'SD MINNEHAHA ARREST_IE'                                                  => 'I0054',
+  psourcename = 'SD PENNINGTON ARREST_IE'                                                 => 'I0055',
+	
+//-------------------------------IE County Batch 2 20190621 ---------------------------------------------------	
+psourcename = 'AZ MARICOPA JUSTICE COURTS_IE'                      => 'I0057',  
+psourcename = 'CA LOS ANGELES SUPERIOR COURT_IE'                   => 'I0058',  
+psourcename = 'CA SANTA CRUZ SUPERIOR COURT_IE'                    => 'I0059',  
+psourcename = 'FL CITRUS CLERK OF COURT DISPOSITION_IE'            => 'I0060',  
+psourcename = 'FL CLAY COUNTY CLERK OF COURT_IE'                   => 'I0061',  
+psourcename = 'FL INDIAN RIVER CLERK OF COURT_IE'                  => 'I0062',  
+psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'    => 'I0063',  
+psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'     => 'I0064',  
+psourcename = 'FL MONROE CIRCUIT COURT_IE'                      => 'I0065',  
+psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'     => 'I0066',  
+psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'          => 'I0067',  
+psourcename = 'FL SAINT LUCIE CLERK OF COURTS_IE'               => 'I0068',  
+psourcename = 'KS JOHNSON DISTRICT COURT_IE'                    => 'I0069',  
+psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'             => 'I0070',  
+psourcename = 'OH DELAWARE MUNICIPAL COURT_IE'                  => 'I0071',  
+psourcename = 'OH ERIE MUNICIPAL COURT_IE'                      => 'I0072',  
+psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                => 'I0073',  
+psourcename = 'OH LUCAS OREGON MUNICIPAL COURT_IE'              => 'I0074',  
+psourcename = 'OH LUCAS TOLEDO MUNICIPAL COURT_IE'              => 'I0075',  
+psourcename = 'OH MADISON MUNICIPAL COURT_IE'                    => 'I0076',  
+psourcename = 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC_IE'  => 'I0077',  
+psourcename = 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT_IE'         => 'I0078',  
+psourcename = 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION_IE'  => 'I0079',  
+psourcename = 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION_IE'  => 'I0080',  
+psourcename = 'OH SANDUSKY CLERK OF COURTS_IE'                      => 'I0081',  
+psourcename = 'OH SANDUSKY FREMONT MUNICIPAL COURT_IE'              => 'I0082',  
+psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'           => 'I0083',  
+psourcename = 'OH WARREN COUNTY COURT_IE'                           => 'I0084',  
+//psourcename = 'OH WARREN COUNTY COURT_IE'                         => 
+psourcename = 'OH WARREN COURT OF COMMON PLEAS_IE'                  => 'I0085',  
+psourcename = 'OH WARREN FRANKLIN MUNICIPAL COURT_IE'               => 'I0086',  
+psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                      => 'I0087',  
+psourcename = 'OH WARREN MASON MUNICIPAL COURT_IE'                  => 'I0088',  
+psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                    => 'I0089',  
+psourcename = 'OH WARREN SPRINGBORO MAYORS COURT_IE'                => 'I0090',  
+psourcename = 'OH WARREN WAYNESVILLE MAYORS COURT_IE'               => 'I0091',  
+psourcename = 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT_IE'        => 'I0092',  
+psourcename = 'SC BEAUFORT SUMMARY COURT_IE'                        => 'I0093',  
+psourcename = 'SC SUMTER SUMMARY COURT_IE'                          => 'I0094',  
+psourcename = 'TX DENTON JUSTICE OF THE PEACE_IE'                   => 'I0095',  
+psourcename = 'TX EL PASO DISTRICT COURT_IE'                        => 'I0096',  
+
+//-------------------------------IE AOC Batch 2 20190621 ---------------------------------------------------
+
+
+psourcename = 'AZ SUPREME COURT JUDICIAL BRANCH_IE'                       => 'I0097',  
+psourcename = 'DISTRICT OF COLUMBIA SUPERIOR COURT_IE'                    => 'I0098',  
+psourcename = 'GUAM FAMILY VIOLENCE REGISTRY_IE'                          => 'I0099',  
+psourcename = 'HI STATE JUDICIARY ADMINISTRATIVE OFFICE OF COURTS_IE'     => 'I0100',  
+psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS_IE'                     => 'I0101',
+psourcename = 'ID STATE JUDICIARY_IE'                                     => 'I0102',
+psourcename = 'ID SUPREME COURT_IE'                                       => 'I0103',
+psourcename = 'IL METHAMPHETAMINE OFFENDER_IE'                            => 'I0104',
+psourcename = 'IN ADMINISTRATOR OF COURTS (WEB)_IE'                       => 'I0105',
+psourcename = 'KY COURT OF JUSTICE AOC_IE'                                => 'I0106',
+psourcename = 'MO ADMIN OFFICE OF COURTS_IE'                              => 'I0107',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - DISTRICT COURTS_IE'                => 'I0108',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS_IE'              => 'I0109',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS - FUGITIVES_IE'  => 'I0110',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MUNICIPAL COURTS_IE'               => 'I0111',
+psourcename = 'OH DEPARTMENT OF PUBLIC SAFETY HABITUAL OFFENDERS_IE'                       => 'I0112',
+psourcename = 'OK DISTRICT COURTS (WEB)_IE'                                                => 'I0113',
+psourcename = 'OR ADMINISTRATIVE OFFICE OF COURTS (OECI)_IE'                               => 'I0114',
+psourcename = 'WI ADMIN OFFICE OF COURTS CRIMINAL_IE'                                      => 'I0115',
+psourcename = 'WI ADMIN OFFICE OF COURTS TRAFFIC_IE'                                       => 'I0116',
+	
+	
+/************************************************IE DATA END*************************************************************/
+ '');                                                                            											
+
  return vendor;                                                                                       
 end;                                                                                   
                                                                                        
@@ -2724,17 +2930,17 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'CP' => 'CONNECTICUT ADMINISTRATOR OF THE COURTS',
  vendor_code = 'FV' => 'FLORIDA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'GD' => 'GEORGIA BUREAU OF INVESTIGATION',
- vendor_code = 'HA' => 'HAWAII STATE JUDICIARY',
- vendor_code = 'Z4' => 'INDIANA ADMINISTRATOR OF THE COURTS',
- vendor_code = 'IC' => 'IOWA ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'HA' => 'HAWAII STATE JUDICIARY',
+ //vendor_code = 'Z4' => 'INDIANA ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'IC' => 'IOWA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'MF' => 'MARYLAND ADMINISTRATOR OF THE COURTS',
  vendor_code = 'MH' => 'MINNESOTA DEPARTMENT OF PUBLIC SAFETY',
- vendor_code = 'MG' => 'MISSOURI ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'MG' => 'MISSOURI ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NA' => 'NEW JERSEY ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NB' => 'NEW MEXICO ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NG' => 'NORTH DAKOTA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PS' => 'OKLAHOMA ADMINISTRATOR OF THE COURTS',
- vendor_code = 'PT' => 'OREGON ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'PT' => 'OREGON ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PU' => 'PENNSYLVANIA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PV' => 'PENNSYLVANIA ADMINISTRATOR OF THE COURTS COURT OF COMMON PLEAS',
  vendor_code = 'RA' => 'RHODE ISLAND ADMINISTRATOR OF THE COURTS',
@@ -2862,7 +3068,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'OC' => 'OHIO MONTGOMERY COUNTY DAYTON MUNICIPAL COURT',
  vendor_code = 'OD' => 'OHIO WARREN COUNTY MASON MUNICIPAL COURT',
  vendor_code = 'OE' => 'OHIO FRANKLIN COUNTY MUNICIPAL COURT',
- vendor_code = 'OF' => 'OHIO WARREN COUNTY',
+ //vendor_code = 'OF' => 'OHIO WARREN COUNTY',
  vendor_code = 'OG' => 'OHIO CLINTON COUNTY',
  vendor_code = 'OI' => 'OHIO COLUMBIANA COUNTY',
  vendor_code = 'OJ' => 'OHIO LAWRENCE COUNTY MUNICIPAL COURT',
@@ -2884,7 +3090,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'PB' => 'OHIO BUTLER COUNTY',
  vendor_code = 'PC' => 'OHIO MONTGOMERY COUNTY VANDALIA MUNICIPAL COURT',
  vendor_code = 'PD' => 'OHIO DELAWARE COUNTY',
- vendor_code = 'PE' => 'OHIO WARREN COUNTY COURT',
+ //vendor_code = 'PE' => 'OHIO WARREN COUNTY COURT',
  vendor_code = 'PF' => 'OHIO SUMMIT COUNTY AKRON MUNICIPAL COURT',
  vendor_code = 'PG' => 'OHIO FRANKLIN COUNTY',
  vendor_code = 'PH' => 'OHIO STARK COUNTY COMMON PLEAS COURT',
@@ -2934,7 +3140,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
 	
   //VC 20151105	
 	vendor_code = '7T'=> 'ARIZONA_MARICOPA_COUNTY_SUPERIOR_COURT_FILINGS'       ,
-	vendor_code = '7U'=> 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  ,
+	//vendor_code = '7U'=> 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  ,
 	vendor_code = '7V'=> 'FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT'                ,
 	vendor_code = '7W'=> 'FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT'                 ,
 	vendor_code = '7X'=> 'FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS'            ,
@@ -3251,7 +3457,7 @@ vendor_code = 'YK' => 'OHIO_MONTGOMERY_MIAMISBURG_MUNICIPAL_COURT',
 vendor_code = 'YL' => 'OHIO_MUSKINGUM_COUNTY_MUNICIPAL_COURT',
 vendor_code = 'YM' => 'OHIO_OTTAWA_COUNTY_MUNICIPAL_COURT',
 vendor_code = 'YN' => 'OHIO_PERRY_COUNTY_COURT',
-vendor_code = 'PY' => 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC',
+//vendor_code = 'PY' => 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC',
  
 //-----------------------------Batch3-----------------------------------------
 vendor_code = 'ZC' => 'SOUTH_CAROLINA_ABBEVILLE_COUNTY_CIRCUIT_COURTS' ,
@@ -3575,7 +3781,7 @@ vendor_code = '10G' => 'GEORGIA_PAROLE_RELEASED_INMATES'                      ,
  vendor_code = 'W0147' => 'TENNESSEE_HARDEMAN_COUNTY_ARRESTS               ',
  vendor_code = 'W0148' => 'CALIFORNIA_TULARE_COUNTY                        ',
  vendor_code = 'W0149' => 'OHIO_GREENE_COUNTY_FAIRBORN_MUNICIPAL_COURT     ',
- vendor_code = 'W0150' => 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT      ',   
+ //vendor_code = 'W0150' => 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT      ',   
  
  vendor_code = 'W0151' =>'ARIZONA_MARICOPA_WEBSITE                         ',//??
  vendor_code = 'W0152' =>'ARIZONA_PHOENIX                                  ',
@@ -3698,61 +3904,218 @@ vendor_code = '10G' => 'GEORGIA_PAROLE_RELEASED_INMATES'                      ,
  vendor_code = 'W0267' =>'ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY              ' ,
  vendor_code = 'W0268' =>'TEXAS_DEPARTMENT_OF_CRIMINAL_JUSTICE_INMATES     ' ,
 
- vendor_code = 'W0269' =>'CALIFORNIA_MENDOCINO_COUNTY_BOOKINGS          ' ,
- vendor_code = 'W0270' =>'CALIFORNIA_TEHAMA_COUNTY_BOOKINGS             ' ,
- vendor_code = 'W0271' =>'FLORIDA_CITRUS_COUNTY_SHERIFFS_OFFICE         ' ,
- vendor_code = 'W0272' =>'FLORIDA_DIXIE_COUNTY_SHERIFFS_OFFICE          ' ,
- vendor_code = 'W0273' =>'FLORIDA_LEE_COUNTY_SHERIFFS_OFFICE            ' ,
- vendor_code = 'W0274' =>'FLORIDA_ST_JOHNS_COUNTY_SHERIFFS_OFFICE       ' ,
- vendor_code = 'W0275' =>'FLORIDA_ST_LUCIE_COUNTY_SHERIFFS_OFFICE       ' ,
- vendor_code = 'W0276' =>'LOUISIANA_SLIDELL_POLICE                      ' ,
- vendor_code = 'W0277' =>'MASSACHUSETTS_BOURNE_ARRESTS                  ' ,
- vendor_code = 'W0278' =>'MASSACHUSETTS_BRIDGEWATER_ARRESTS             ' ,
- vendor_code = 'W0279' =>'MASSACHUSETTS_CHICOPEE_ARRESTS                ' ,
- vendor_code = 'W0280' =>'MASSACHUSETTS_COHASSET_ARRESTS                ' ,
- vendor_code = 'W0281' =>'MASSACHUSETTS_DALTON_ARRESTS                  ' ,
- vendor_code = 'W0282' =>'MASSACHUSETTS_DENNIS_ARRESTS                  ' ,
- vendor_code = 'W0283' =>'MASSACHUSETTS_DUXBURY_ARRESTS                 ' ,
- vendor_code = 'W0284' =>'MASSACHUSETTS_FITCHBURG_ARRESTS               ' ,
- vendor_code = 'W0285' =>'MASSACHUSETTS_FOXBORO_ARRESTS                 ' ,
- vendor_code = 'W0286' =>'MASSACHUSETTS_GARDNER_ARRESTS                 ' ,
- vendor_code = 'W0287' =>'MASSACHUSETTS_LEOMINSTER_ARRESTS              ' ,
- vendor_code = 'W0288' =>'MASSACHUSETTS_LONGMEADOW_ARRESTS              ' ,
- vendor_code = 'W0289' =>'MASSACHUSETTS_MASHPEE_ARRESTS                 ' ,
- // vendor_code = 'W0290' =>'MASSACHUSETTS_MELROSE_POLICE_DEPARTMENT       ' ,
- vendor_code = 'W0291' =>'MASSACHUSETTS_MIDDLETON_POLICE_DEPARTMENT     ' ,
- vendor_code = 'W0292' =>'MASSACHUSETTS_MILFORD_ARRESTS                 ' ,
- vendor_code = 'W0293' =>'MASSACHUSETTS_NORTH_ATTLEBORO_ARRESTS         ' ,
- vendor_code = 'W0294' =>'MASSACHUSETTS_NORTHAMPTON_ARRESTS             ' ,
- vendor_code = 'W0295' =>'MASSACHUSETTS_ORLEANS_ARRESTS                 ' ,
- vendor_code = 'W0296' =>'MASSACHUSETTS_PALMER_ARRESTS                  ' ,
- vendor_code = 'W0297' =>'MASSACHUSETTS_PLYMPTON_ARRESTS                ' ,
- vendor_code = 'W0298' =>'MASSACHUSETTS_ROCHESTER_ARRESTS               ' ,
- vendor_code = 'W0299' =>'MASSACHUSETTS_SOUTHWICK_ARRESTS               ' ,
- vendor_code = 'W0300' =>'MASSACHUSETTS_TEWKSBURY_POLICE                ' , 
- vendor_code = 'W0301' =>'MASSACHUSETTS_TRURO_ARRESTS                   ' ,
- vendor_code = 'W0302' =>'MASSACHUSETTS_WAYLAND_ARRESTS                 ' ,
- vendor_code = 'W0303' =>'MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS        ' ,
- vendor_code = 'W0304' =>'MASSACHUSETTS_WESTFIELD_ARRESTS               ' ,
- vendor_code = 'W0305' =>'MASSACHUSETTS_WRETNAM_ARRESTS                 ' ,
- vendor_code = 'W0306' =>'MASSACHUSETTS_WRENTHAM_ARRESTS                ' , 
- vendor_code = 'W0307' =>'MASSACHUSETTS_YARMOUTH_ARRESTS                ' ,
- vendor_code = 'W0308' =>'MINNESOTA_BROWN_COUNTY_SHERIFF                ' ,
- vendor_code = 'W0309' =>'MONTANA_YELLOWSTONE_COUNTY_DETENTION          ' ,
- vendor_code = 'W0310' =>'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS            ' ,
+ vendor_code = 'W0269' =>'CALIFORNIA MENDOCINO COUNTY BOOKINGS          ' ,
+ vendor_code = 'W0270' =>'CALIFORNIA TEHAMA COUNTY BOOKINGS             ' ,
+ vendor_code = 'W0271' =>'FLORIDA CITRUS COUNTY SHERIFFS OFFICE         ' ,
+ vendor_code = 'W0272' =>'FLORIDA DIXIE COUNTY SHERIFFS OFFICE          ' ,
+ vendor_code = 'W0273' =>'FLORIDA LEE COUNTY SHERIFFS OFFICE            ' ,
+ vendor_code = 'W0274' =>'FLORIDA ST JOHNS COUNTY SHERIFFS OFFICE       ' ,
+ vendor_code = 'W0275' =>'FLORIDA ST LUCIE COUNTY SHERIFFS OFFICE       ' ,
+ vendor_code = 'W0276' =>'LOUISIANA SLIDELL POLICE                      ' ,
+ vendor_code = 'W0277' =>'MASSACHUSETTS BOURNE ARRESTS                  ' ,
+ vendor_code = 'W0278' =>'MASSACHUSETTS BRIDGEWATER ARRESTS             ' ,
+ vendor_code = 'W0279' =>'MASSACHUSETTS CHICOPEE ARRESTS                ' ,
+ vendor_code = 'W0280' =>'MASSACHUSETTS COHASSET ARRESTS                ' ,
+ vendor_code = 'W0281' =>'MASSACHUSETTS DALTON ARRESTS                  ' ,
+ vendor_code = 'W0282' =>'MASSACHUSETTS DENNIS ARRESTS                  ' ,
+ vendor_code = 'W0283' =>'MASSACHUSETTS DUXBURY ARRESTS                 ' ,
+ vendor_code = 'W0284' =>'MASSACHUSETTS FITCHBURG ARRESTS               ' ,
+ vendor_code = 'W0285' =>'MASSACHUSETTS FOXBORO ARRESTS                 ' ,
+ vendor_code = 'W0286' =>'MASSACHUSETTS GARDNER ARRESTS                 ' ,
+ vendor_code = 'W0287' =>'MASSACHUSETTS LEOMINSTER ARRESTS              ' ,
+ vendor_code = 'W0288' =>'MASSACHUSETTS LONGMEADOW ARRESTS              ' ,
+ vendor_code = 'W0289' =>'MASSACHUSETTS MASHPEE ARRESTS                 ' ,
+ // vendor_code = 'W0290' =>'MASSACHUSETTS MELROSE POLICE DEPARTMENT       ' ,
+ vendor_code = 'W0291' =>'MASSACHUSETTS MIDDLETON POLICE DEPARTMENT     ' ,
+ vendor_code = 'W0292' =>'MASSACHUSETTS MILFORD ARRESTS                 ' ,
+ vendor_code = 'W0293' =>'MASSACHUSETTS NORTH ATTLEBORO ARRESTS         ' ,
+ vendor_code = 'W0294' =>'MASSACHUSETTS NORTHAMPTON ARRESTS             ' ,
+ vendor_code = 'W0295' =>'MASSACHUSETTS ORLEANS ARRESTS                 ' ,
+ vendor_code = 'W0296' =>'MASSACHUSETTS PALMER ARRESTS                  ' ,
+ vendor_code = 'W0297' =>'MASSACHUSETTS PLYMPTON ARRESTS                ' ,
+ vendor_code = 'W0298' =>'MASSACHUSETTS ROCHESTER ARRESTS               ' ,
+ vendor_code = 'W0299' =>'MASSACHUSETTS SOUTHWICK ARRESTS               ' ,
+ vendor_code = 'W0300' =>'MASSACHUSETTS TEWKSBURY POLICE                ' , 
+ vendor_code = 'W0301' =>'MASSACHUSETTS TRURO ARRESTS                   ' ,
+ vendor_code = 'W0302' =>'MASSACHUSETTS WAYLAND ARRESTS                 ' ,
+ vendor_code = 'W0303' =>'MASSACHUSETTS WEST BRIDGEWATER ARRESTS        ' ,
+ vendor_code = 'W0304' =>'MASSACHUSETTS WESTFIELD ARRESTS               ' ,
+ vendor_code = 'W0305' =>'MASSACHUSETTS WRETNAM ARRESTS                 ' ,
+ vendor_code = 'W0306' =>'MASSACHUSETTS WRENTHAM ARRESTS                ' , 
+ vendor_code = 'W0307' =>'MASSACHUSETTS YARMOUTH ARRESTS                ' ,
+ vendor_code = 'W0308' =>'MINNESOTA BROWN COUNTY SHERIFF                ' ,
+ vendor_code = 'W0309' =>'MONTANA YELLOWSTONE COUNTY DETENTION          ' ,
+ vendor_code = 'W0310' =>'FLORIDA OSCEOLA COUNTY CORRECTIONS            ' ,
 //County                                                                   
- vendor_code = 'W0311' =>'ARIZONA_AVONDALE                              ' ,
- vendor_code = 'W0312' =>'ARIZONA_BUCKEYE                               ' ,
- vendor_code = 'W0313' =>'ARIZONA_EL_MIRAGE                             ' ,
- vendor_code = 'W0314' =>'ARIZONA_GOODYEAR                              ' ,
- vendor_code = 'W0315' =>'ARIZONA_SURPRISE                              ' ,
- vendor_code = 'W0316' =>'ARIZONA_TOLLESON                              ' ,
- vendor_code = 'W0317' =>'ARIZONA_WICKENBURG                            ' ,
- vendor_code = 'W0318' =>'OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT         ' ,
- vendor_code = 'W0319' =>'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT     ' ,
+ vendor_code = 'W0311' =>'ARIZONA AVONDALE                              ' ,
+ vendor_code = 'W0312' =>'ARIZONA BUCKEYE                               ' ,
+ vendor_code = 'W0313' =>'ARIZONA EL MIRAGE                             ' ,
+ vendor_code = 'W0314' =>'ARIZONA GOODYEAR                              ' ,
+ vendor_code = 'W0315' =>'ARIZONA SURPRISE                              ' ,
+ vendor_code = 'W0316' =>'ARIZONA TOLLESON                              ' ,
+ vendor_code = 'W0317' =>'ARIZONA WICKENBURG                            ' ,
+ vendor_code = 'W0318' =>'OHIO CHAMPAIGN COUNTY MUNICIPAL COURT         ' ,
+ vendor_code = 'W0319' =>'OHIO SENECA COUNTY TIFFIN MUNICIPAL COURT     ' ,
  //AOC                                                                     
- vendor_code = 'W0320' =>'KANSAS_OFFENDER_REGISTRY                      ' ,
+ vendor_code = 'W0320' =>'KANSAS OFFENDER REGISTRY                      ' ,
  
+
+//------------------------------------------Hygenics Crimwise Arrest 20181107 ------------------------------------
+ vendor_code = 'W0321' => 'CALIFORNIA SANTA CRUZ POLICE DEPARTMENT                             ',
+ vendor_code = 'W0322' => 'FLORIDA ALACHUA COUNTY SHERIFFS OFFICE V2                           ',
+ vendor_code = 'W0323' => 'FLORIDA CLAY COUNTY SHERIFF                                         ',
+ vendor_code = 'W0324' => 'FLORIDA DIXIE COUNTY SHERIFF                                        ',
+ vendor_code = 'W0325' => 'INDIANA HENDRICKS COUNTY SHERIFFS OFFICE                            ',
+ vendor_code = 'W0326' => 'INDIANA PORTER COUNTY SHERIFFS OFFICE                               ',
+ vendor_code = 'W0327' => 'MASSACHUSETTS BROOKLINE POLICE DEPARTMENT                           ',
+ vendor_code = 'W0328' => 'MASSACHUSETTS HANOVER POLICE DEPARTMENT                             ',
+ vendor_code = 'W0329' => 'MASSACHUSETTS HINGHAM                                               ',
+ vendor_code = 'W0330' => 'MASSACHUSETTS IPSWICH POLICE DEPARTMENT                             ',
+ vendor_code = 'W0331' => 'MASSACHUSETTS PEMBROKE POLICE DEPARTMENT                            ',
+ vendor_code = 'W0332' => 'MASSACHUSETTS SANDWICH POLICE DEPARTMENT                            ',
+ vendor_code = 'W0333' => 'MASSACHUSETTS WAYLAND POLICE DEPARTMENT                             ',
+ vendor_code = 'W0334' => 'MASSACHUSETTS WHITMAN                                               ',
+ vendor_code = 'W0335' => 'MINNESOTA HENNEPIN COUNTY JAIL                                      ',
+ vendor_code = 'W0336' => 'NEW HAMPSHIRE LACONIA POLICE DEPARTMENT                             ',
+ vendor_code = 'W0337' => 'NORTH CAROLINA DURHAM COUNTY SHERIFFS OFFICE                        ',
+ vendor_code = 'W0338' => 'NORTH CAROLINA RUTHERFORD COUNTY DETENTION CENTER V2                ',
+ vendor_code = 'W0339' => 'OREGON CLACKAMAS COUNTY SHERIFF                                     ',
+ vendor_code = 'W0340' => 'TEXAS ANDERSON COUNTY JAIL                                          ',
+ vendor_code = 'W0341' => 'TEXAS KNOX COUNTY SHERIFF                                           ',
+ vendor_code = 'W0342' => 'TEXAS RANDALL COUNTY ARRESTS                                        ',
+ vendor_code = 'W0343' => 'TEXAS WALLER COUNTY JAIL                                            ',
+//------------------------------------------Hygenics Crimwise County 20181107 ------------------------------------
+ vendor_code = 'W0344' => 'OHIO CARROLL COUNTY COMMON PLEAS COURT'                              , 
+//-------------------------------IE AOC Batch 1 20181005 ---------------------------------------------------------
+  vendor_code = 'I0001' => 'FL CAREER OFFENDER REGISTRY'                                         ,
+	vendor_code = 'I0002' => 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)'                    ,
+	vendor_code = 'I0003' => 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY',
+	vendor_code = 'I0004' => 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG'                       ,
+	vendor_code = 'I0005' => 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS   '               ,
+	vendor_code = 'I0006' => 'ND DISTRICT AND MUNICIPAL COURTS'                                    ,
+  vendor_code = 'I0007' => 'OK VIOLENT CRIME OFFENDER REGISTRY'                                  ,  
+	vendor_code = 'I0008' => 'RI DISTRICT AND SUPERIOR COURTS'                                     ,  
+//-------------------------------IE County Batch 1 20181005 ---------------------------------------------------
+  vendor_code =	'I0013' => 'CA KERN SUPERIOR COURT'                                            ,
+  vendor_code =	'I0014' => 'CA SAN BERNARDINO SUPERIOR COURT'                                  ,
+  vendor_code =	'I0015' => 'CO DENVER COUNTY COURT'                                            ,
+	vendor_code =	'I0010' => 'GA DEKALB COUNTY JUDICIAL SYSTEM'                                  ,
+  vendor_code =	'I0016' => 'GA CARROLL SUPERIOR CLERK OF COURTS '                              ,
+  vendor_code =	'I0017' => 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT'                        ,
+  vendor_code =	'I0018' => 'IL KANE CIRCUIT COURT'                                           	 ,
+  vendor_code =	'I0019' => 'LA ORLEANS PARISH DISTRICT COURT'                                	 ,
+  vendor_code =	'I0020' => 'NE LANCASTER COUNTY COURT'                                       	 ,
+	vendor_code =	'I0009' => 'NE LANCASTER DISTRICT COURT'                                       ,                                                                      
+  vendor_code =	'I0021' => 'OH CUYAHOGA CLERK OF COURTS'                                       ,
+  vendor_code =	'I0022' => 'OH FAIRFIELD MUNICIPAL COURT'                                      ,
+  vendor_code =	'I0023' => 'OH FRANKLIN COURT OF COMMON PLEAS'                               	 ,
+  vendor_code =	'I0024' => 'OH PORTAGE RAVENNA MUNICIPAL COURT'                              	 ,
+  vendor_code =	'I0025' => 'OK CLEVELAND DISTRICT COURT'                                       ,
+  vendor_code =	'I0026' => 'OK COMANCHE DISTRICT COURT'                                        ,
+  vendor_code =	'I0027' => 'OK OKLAHOMA DISTRICT COURT'                                        ,
+  vendor_code =	'I0028' => 'OK PAYNE DISTRICT COURT'                                           ,
+  vendor_code =	'I0029' => 'OK ROGERS DISTRICT COURT'                                          ,
+  vendor_code =	'I0030' => 'OK TULSA DISTRICT COURT'                                           ,
+  vendor_code =	'I0031' => 'SC JASPER SUMMARY COURT'                                           , 
+  vendor_code =	'I0032' => 'TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)'                     	 ,
+  vendor_code =	'I0033' => 'TN DAVIDSON GENERAL SESSIONS COURT'                                ,         
+  vendor_code =	'I0034' => 'TN HAMILTON GENERAL SESSIONS COURT'                                ,
+  vendor_code =	'I0035' => 'TX BOWIE DISTRICT AND COUNTY COURTS'                               ,
+  // vendor_code =	'I0036' => 'TX EL PASO COUNTY COURTS'                                          ,
+  vendor_code =	'I0037' => 'TX HARRIS COUNTY COURTS DISPOSITION'                             	 ,
+  vendor_code =	'I0038' => 'TX TAYLOR COUNTY COURTS'                                           ,
+  vendor_code =	'I0039' => 'TX TAYLOR JUSTICE OF THE PEACE'                                    ,
+  vendor_code =	'I0040' => 'NV CLARK LAS VEGAS JUSTICE COURT'  	                               ,
+	vendor_code =	'I0056' => 'NV CLARK DISTRICT COURT'  	                                       ,
+  vendor_code =	'I0041' => 'FL SARASOTA CLERK OF COURT'                                        , 
+  vendor_code = 'I0012' => 'WV CIRCUIT COURTS'                                                 ,
+//-------------------------------IE DOC Batch 1 20181005 ---------------------------------------------------
+  vendor_code = 'I0043' => 'FL DEPARTMENT OF CORRECTIONS - INMATE'                             ,
+  vendor_code = 'I0044' => 'FL DEPARTMENT OF CORRECTIONS - RELEASE'                            ,                          
+  vendor_code = 'I0046' => 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)'                        ,
+	vendor_code = 'I0047' => 'NY DEPARTMENT OF CORRECTIONS RELEASED'                             ,
+  vendor_code = 'I0048' => 'TX DEPARTMENT OF CORRECTIONS (PAROLE)'                             ,
+  vendor_code = 'I0049' => 'TX DEPARTMENT OF CORRECTIONS (PROBATION)'                          ,   
+	vendor_code = 'I0050' => 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS'                           ,
+  vendor_code = 'I0051' => 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY'              ,
+  //vendor_code = 'I0052' => 'UT DEPARTMENT OF CORRECTIONS'   images not available             ,
+	
+//-------------------------------IE ARREST Batch 1 20181005 ---------------------------------------------------	
+  vendor_code = 'I0053' => 'NV CLARK ARREST'                                                   ,  
+  vendor_code = 'I0054' => 'SD MINNEHAHA ARREST'                                               ,
+  vendor_code = 'I0055' => 'SD PENNINGTON ARREST'                                              ,
+//------------------------------------------Hygenics Crim County 20181107 ------------------------------------- 
+	vendor_code = '10H'   => 'TEXAS WISE COUNTY DISTRICT COURT'                                  ,
+//------------------------------------------Hygenics Crimwise DOC 20181107 ------------------------------------ 
+  vendor_code = '10I'   => 'MINNESOTA PREDATORY OFFENDER REGISTRY'                             , 
+ 
+ 
+ //-------------------------------IE County Batch 2 20190621 ---------------------------------------------------	
+vendor_code = 'I0057' => 'AZ MARICOPA JUSTICE COURTS',  
+vendor_code = 'I0058' => 'CA LOS ANGELES SUPERIOR COURT',  
+vendor_code = 'I0059' => 'CA SANTA CRUZ SUPERIOR COURT',  
+vendor_code = 'I0060' => 'FL CITRUS CLERK OF COURT DISPOSITION',
+vendor_code = 'I0061' => 'FL CLAY COUNTY CLERK OF COURT',
+vendor_code = 'I0062' => 'FL INDIAN RIVER CLERK OF COURT',
+vendor_code = 'I0063' => 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)',
+vendor_code = 'I0064' => 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC',
+vendor_code = 'I0065' => 'FL MONROE CIRCUIT COURT',
+vendor_code = 'I0066' => 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC',
+vendor_code = 'I0067' => 'FL PINELLAS CIRCUIT CLERK OF COURTS',
+vendor_code = 'I0068' => 'FL SAINT LUCIE CLERK OF COURTS',
+vendor_code = 'I0069' => 'KS JOHNSON DISTRICT COURT', 
+vendor_code = 'I0070' => 'OH CLARK MUNICIPAL TRAFFIC COURT',
+vendor_code = 'I0071' => 'OH DELAWARE MUNICIPAL COURT', 
+vendor_code = 'I0072' => 'OH ERIE MUNICIPAL COURT',   
+vendor_code = 'I0073' => 'OH FRANKLIN MUNICIPAL TRAFFIC',
+vendor_code = 'I0074' => 'OH LUCAS OREGON MUNICIPAL COURT',
+vendor_code = 'I0075' => 'OH LUCAS TOLEDO MUNICIPAL COURT',
+vendor_code = 'I0076' => 'OH MADISON MUNICIPAL COURT',    
+vendor_code = 'I0077' => 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC',
+vendor_code = 'I0078' => 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT', 
+vendor_code = 'I0079' => 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION',
+vendor_code = 'I0080' => 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION',
+vendor_code = 'I0081' => 'OH SANDUSKY CLERK OF COURTS',      
+vendor_code = 'I0082' => 'OH SANDUSKY FREMONT MUNICIPAL COURT', 
+vendor_code = 'I0083' => 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC',
+vendor_code = 'I0084' => 'OH WARREN COUNTY COURT',
+vendor_code = 'I0085' => 'OH WARREN COURT OF COMMON PLEAS',
+vendor_code = 'I0086' => 'OH WARREN FRANKLIN MUNICIPAL COURT',
+vendor_code = 'I0087' => 'OH WARREN LEBANON MUNICIPAL', 
+vendor_code = 'I0088' => 'OH WARREN MASON MUNICIPAL COURT',
+vendor_code = 'I0089' => 'OH WARREN MORROW MAYORS COURT', 
+vendor_code = 'I0090' => 'OH WARREN SPRINGBORO MAYORS COURT',
+vendor_code = 'I0091' => 'OH WARREN WAYNESVILLE MAYORS COURT', 
+vendor_code = 'I0092' => 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT', 
+vendor_code = 'I0093' => 'SC BEAUFORT SUMMARY COURT',
+vendor_code = 'I0094' => 'SC SUMTER SUMMARY COURT',
+vendor_code = 'I0095' => 'TX DENTON JUSTICE OF THE PEACE',  
+vendor_code = 'I0096' => 'TX EL PASO DISTRICT COURT',  
+
+//-------------------------------IE AOC Batch 2 20190621 ---------------------------------------------------
+
+
+vendor_code = 'I0097' => 'AZ SUPREME COURT JUDICIAL BRANCH',
+vendor_code = 'I0098' => 'DISTRICT OF COLUMBIA SUPERIOR COURT',
+vendor_code = 'I0099' => 'GUAM FAMILY VIOLENCE REGISTRY', 
+vendor_code = 'I0100' => 'HI STATE JUDICIARY ADMINISTRATIVE OFFICE OF COURTS', 
+vendor_code = 'I0101' => 'IA ADMINISTRATIVE OFFICE OF COURTS', 
+vendor_code = 'I0102' => 'ID STATE JUDICIARY', 
+vendor_code = 'I0103' => 'ID SUPREME COURT',    
+vendor_code = 'I0104' => 'IL METHAMPHETAMINE OFFENDER',
+vendor_code = 'I0105' => 'IN ADMINISTRATOR OF COURTS (WEB)',
+vendor_code = 'I0106' => 'KY COURT OF JUSTICE AOC', 
+vendor_code = 'I0107' => 'MO ADMIN OFFICE OF COURTS',    
+vendor_code = 'I0108' => 'NM ADMINISTRATIVE OFFICE OF THE COURTS - DISTRICT COURTS', 
+vendor_code = 'I0109' => 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS', 
+vendor_code = 'I0110' => 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS - FUGITIVES',
+vendor_code = 'I0111' => 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MUNICIPAL COURTS',
+vendor_code = 'I0112' => 'OH DEPARTMENT OF PUBLIC SAFETY HABITUAL OFFENDERS',
+vendor_code = 'I0113' => 'OK DISTRICT COURTS (WEB)',   
+vendor_code = 'I0114' => 'OR ADMINISTRATIVE OFFICE OF COURTS (OECI)',
+vendor_code = 'I0115' => 'WI ADMIN OFFICE OF COURTS CRIMINAL',
+vendor_code = 'I0116' => 'WI ADMIN OFFICE OF COURTS TRAFFIC',
+
  
  //************************LN Sources****************************/
  vendor_code = '3N' => 'LOUSIANA - EAST BATON ROUGE',

@@ -1,4 +1,4 @@
-IMPORT SANCTN_Mari,ut,Lib_FileServices,lib_stringlib,Lib_date,Standard,Address,AID,DID_Add,Business_Header_SS,Business_Header,Header_SlimSort,
+﻿IMPORT SANCTN_Mari,ut,Lib_FileServices,lib_stringlib,Lib_date,Standard,Address,AID,DID_Add,Business_Header_SS,Business_Header,Header_SlimSort,
 				Watchdog,mdr,header,PromoteSupers,BIPV2;
 		 
 export proc_Midex_incident_DID(string filedate) := function
@@ -32,6 +32,11 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_did cln_MidexIncident(dsIncide
    self.name_suffix 	:= if(NOT(is_company) AND NOT((INTEGER)tempSName[71..73] < 80) AND input.SUBMITTER_NAME <> '',CleanSName[66..70],CleanAgency[66..70]);
    self.name_score 		:= if(NOT(is_company) AND NOT((INTEGER)tempSName[71..73] < 80) AND input.SUBMITTER_NAME <> '',CleanSName[71..73],CleanAgency[71..73]); 
    self.cname         := if( is_company ,CleanCName,CleanCmpName);
+		//CCPA-97 Initialize new fields
+		self.date_vendor_first_reported := '';
+		self.date_vendor_last_reported 	:= '';
+		self.global_sid											 	:= 0;
+		self.record_sid											 	:= 0;
    self  := input;
 END;
 

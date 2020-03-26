@@ -1,4 +1,4 @@
-// layout for teaser base file
+﻿// layout for teaser base file
 export layout_teaser := RECORD
 
 		Layout_Header.title;
@@ -24,4 +24,8 @@ export layout_teaser := RECORD
 		boolean isCurrent := false;
 		unsigned2 totalRecords := 0;
 		unsigned1 nameOrder := 0;
+		//CCPA-101 add 2 CCPA new fields
+		UNSIGNED4			global_sid := 0;
+		UNSIGNED8			record_sid := 0;
+
 END;

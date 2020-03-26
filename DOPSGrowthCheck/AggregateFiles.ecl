@@ -1,31 +1,36 @@
 ﻿import data_services, dops, std, ut, _control,DopsGrowthCheck;
 
-ProdList:=dops.GetDeployedDatasets('P','B','F');
-
 oldrecsPlus:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
-
-UpdatePassed:=project(oldrecsPlus,transform(recordof(oldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
 
 newrecsPlus:=dataset('~thor_data400::DeltaStats::IndividualFileStats::using',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
 
 DeltaoldrecsPlus:=dataset('~thor_data400::DeltaStats::FullDeltaStats::full',DOPSGrowthCheck.layouts.Full_Delta_Stat_Layout,thor,__compressed__,opt);
 
-DeltaUpdatePassed:=project(DeltaoldrecsPlus,transform(recordof(DeltaoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
-
 DeltanewrecsPlus:=dataset('~thor_data400::DeltaStats::FullDeltaStats::using',DOPSGrowthCheck.layouts.Full_Delta_Stat_Layout,thor,__compressed__,opt);
 
 FieldoldrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::full',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
-
-FieldUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
 
 FieldnewrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::using',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
 
 PersistoldrecsPlus:=dataset('~thor_data400::DeltaStats::PersistenceCheck::full',DOPSGrowthCheck.layouts.PersistLayout,thor,__compressed__,opt);
 
-PersistUpdatePassed:=project(PersistoldrecsPlus,transform(recordof(PersistoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
-
 PersistnewrecsPlus:=dataset('~thor_data400::DeltaStats::PersistenceCheck::using',DOPSGrowthCheck.layouts.PersistLayout,thor,__compressed__,opt);
+
+#if(_Control.ThisEnvironment.Name='Prod_Thor')
+ProdList:=dops.GetDeployedDatasets('P','B','F');
+UpdatePassed:=project(oldrecsPlus,transform(recordof(oldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+DeltaUpdatePassed:=project(DeltaoldrecsPlus,transform(recordof(DeltaoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+FieldUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+PersistUpdatePassed:=project(PersistoldrecsPlus,transform(recordof(PersistoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+#else
+UpdatePassed:=project(oldrecsPlus,transform(recordof(oldrecsPlus),Self.Passed:='Y';Self:=Left;));
+DeltaUpdatePassed:=project(DeltaoldrecsPlus,transform(recordof(DeltaoldrecsPlus),Self.Passed:='Y';Self:=Left;));
+FieldUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus),Self.Passed:='Y';Self:=Left;));
+PersistUpdatePassed:=project(PersistoldrecsPlus,transform(recordof(PersistoldrecsPlus),Self.Passed:='Y';Self:=Left;));
+#end;
+
+
 
 CalculateStatsAlertsOld:=dataset('~thor_data400::DeltaStats::CalculateStatsAlerts::full',DOPSGrowthCheck.layouts.CalculateStatAlerts,thor,__compressed__,opt);
 

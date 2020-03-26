@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take DE Real Estate and Appraisers License raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -41,7 +41,7 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 
 
 	//DE Real Estate layout to Common
-	Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_DES0846 L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.layout_DES0846 L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -61,9 +61,9 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 		                                                                                   
 		//map license type to be used as reference for name and type_cd logic
 		//raw_license_type should be what is in the input file. Cathy Tio 1/25/13
-		TrimLicenseType				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LIC);
+		TrimLicenseType				:= ut.CleanSpacesAndUpper(L.LIC);
 		SELF.RAW_LICENSE_TYPE	:= TrimLicenseType;
- 		SELF.STD_LICENSE_TYPE	:= map(StringLib.StringFind(TrimLicenseType,'CERTIFIED GENERAL REAL PROPERTY APPRAISE',1)= 1 => 'CGRPA',
+ 		SELF.STD_LICENSE_TYPE	:= MAP(StringLib.StringFind(TrimLicenseType,'CERTIFIED GENERAL REAL PROPERTY APPRAISE',1)= 1 => 'CGRPA',
    														StringLib.StringFind(TrimLicenseType,'CERTIFIED RESIDENTIAL REAL PROPERTY APPR',1)= 1 => 'CGRPA',
    														StringLib.StringFind(TrimLicenseType,'LICENSED REAL PROPERTY APPRAISER',1)= 1 => 'LRPA',
    														StringLib.StringFind(TrimLicenseType,'NONRESIDENT BROKER',1)= 1 => 'NB',
@@ -96,49 +96,49 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 		//Clean and parse Org_name
 		ClnNameFull						:= IF(TrimLicenseType = 'BRANCH OFFICE PERMIT' OR TrimLicenseType = 'MAIN OFFICE PERMIT',
 														' ',Prof_License_Mari.mod_clean_name_addr.cleanLFMName(TRIM(L.ORG_NAME,LEFT,RIGHT)));
-		trim_org_name					:= if(ClnNameFull = ' ',
-														StringLib.StringToUpperCase(TRIM(L.ORG_NAME,left,right)),' ');
+		trim_org_name					:= IF(ClnNameFull = ' ',
+														StringLib.StringToUpperCase(TRIM(L.ORG_NAME,LEFT,RIGHT)),' ');
 		tmpNameOrg						:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(trim_org_name); //business name with standard corp abbr.
 		getCorpOnly						:= IF(REGEXFIND(DBApattern, tmpNameOrg), Prof_License_Mari.mod_clean_name_addr.GetCorpName(tmpNameOrg)
 														,tmpNameOrg);		 //get names without DBA names
 		tmpNameOrgSufx				:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(getCorpOnly);
-		self.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(getCorpOnly);
+		SELF.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(getCorpOnly);
 		//Need to remove leading and trailing /
 		name_org_prep					:= IF(ClnNameFull = ' ',Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',getCorpOnly,' CO'))
 															,StringLib.StringToUpperCase(TRIM(ClnNameFull[46..65],LEFT,RIGHT)+' '+TRIM(ClnNameFull[6..25],LEFT,RIGHT)));  //Without punct. and Sufx removed
-		self.NAME_ORG					:= TRIM(REGEXREPLACE('/$',name_org_prep,''),LEFT,RIGHT);
+		SELF.NAME_ORG					:= TRIM(REGEXREPLACE('/$',name_org_prep,''),LEFT,RIGHT);
 		//Without punct. and Sufx removed
-		self.NAME_ORG_SUFX 		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+		SELF.NAME_ORG_SUFX 		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 		
 		//get names with DBA prefix
 		temp_dba_name					:= Prof_License_Mari.mod_clean_name_addr.GetDBAName(tmpNameOrg);
-		clnDBA_name						:= regexreplace(DBApattern,StringLib.StringToUpperCase(temp_dba_name),'');
+		clnDBA_name						:= REGEXREPLACE(DBApattern,StringLib.StringToUpperCase(temp_dba_name),'');
 		tmpNameDBA						:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(clnDBA_name); //business name with standard corp abbr.
 		tmpNameDBASufx				:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(clnDBA_name);
-		self.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(clnDBA_name); //split corporation prefix from name
-		self.NAME_DBA					:= REGEXREPLACE(' COMPANY',clnDBA_name,' CO');
-		self.NAME_DBA_SUFX		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
-		self.DBA_FLAG					:= IF(trim(self.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
+		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(clnDBA_name); //split corporation prefix from name
+		SELF.NAME_DBA					:= REGEXREPLACE(' COMPANY',clnDBA_name,' CO');
+		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 		
-		self.NAME_FIRST				:= if(StringLib.StringToUpperCase(ClnNameFull[6..25]) != ' ',
+		SELF.NAME_FIRST				:= IF(StringLib.StringToUpperCase(ClnNameFull[6..25]) != ' ',
 																StringLib.StringToUpperCase(ClnNameFull[6..25]),
 																//'');  //for build 20121207 and before
-																Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.FIRST_NAME));
-		self.NAME_MID					:= if(StringLib.StringToUpperCase(ClnNameFull[26..45]) != ' ',
+																ut.CleanSpacesAndUpper(L.FIRST_NAME));
+		SELF.NAME_MID					:= IF(StringLib.StringToUpperCase(ClnNameFull[26..45]) != ' ',
 																StringLib.StringToUpperCase(ClnNameFull[26..45]),
 																//'');  //for build 20121207 and before
-																Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.MIDDLE_NAME));
-		self.NAME_LAST				:= if(StringLib.StringToUpperCase(ClnNameFull[46..65]) != ' ' AND
+																ut.CleanSpacesAndUpper(L.MIDDLE_NAME));
+		SELF.NAME_LAST				:= IF(StringLib.StringToUpperCase(ClnNameFull[46..65]) != ' ' AND
 																LENGTH(TRIM(ClnNameFull[46..65]))<>1,
 																StringLib.StringToUpperCase(ClnNameFull[46..65]),
 																//'');  //for build 20121207 and before
-																Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.LAST_NAME));
-		self.NAME_SUFX				:= StringLib.StringToUpperCase(ClnNameFull[66..70]);
+																ut.CleanSpacesAndUpper(L.LAST_NAME));
+		SELF.NAME_SUFX				:= StringLib.StringToUpperCase(ClnNameFull[66..70]);
 		
-		self.LICENSE_NBR			:= StringLib.StringToUpperCase(TRIM(L.SLNUM,LEFT,RIGHT));
-		self.LICENSE_STATE		:= src_st;
-		self.RAW_LICENSE_STATUS	:= TRIM(StringLib.StringToUpperCase(L.LIC_STAT),LEFT,RIGHT);
-		self.STD_LICENSE_STATUS	:= ' ';
+		SELF.LICENSE_NBR			:= StringLib.StringToUpperCase(TRIM(L.SLNUM,LEFT,RIGHT));
+		SELF.LICENSE_STATE		:= src_st;
+		SELF.RAW_LICENSE_STATUS	:= TRIM(StringLib.StringToUpperCase(L.LIC_STAT),LEFT,RIGHT);
+		SELF.STD_LICENSE_STATUS	:= ' ';
 		
 	//Default issue date is 17530101
  		SELF.CURR_ISSUE_DTE		:= '17530101';
@@ -148,36 +148,36 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 
 		SELF.EXPIRE_DTE					:= IF(L.EXPDT = ' ','17530101',
 																Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.EXPDT));
-		self.NAME_ORG_ORIG		:= StringLib.StringToUpperCase(TRIM(L.ORG_NAME,LEFT,RIGHT));
+		SELF.NAME_ORG_ORIG		:= StringLib.StringToUpperCase(TRIM(L.ORG_NAME,LEFT,RIGHT));
 		SELF.NAME_FORMAT			:= IF(ClnNameFull<>'','L','F');
 
-		self.NAME_DBA_ORIG		:= IF(self.NAME_DBA != ' ',self.NAME_DBA,' ');
+		SELF.NAME_DBA_ORIG		:= IF(SELF.NAME_DBA != ' ',SELF.NAME_DBA,' ');
  		SELF.NAME_MARI_ORG		:= IF(getCorpOnly != ' ',
    																//getCorpOnly, Need to clean up the ending / 1/28/13 Cathy Tio
    																TRIM(REGEXREPLACE('/$',getCorpOnly,''),LEFT,RIGHT),
    																' ');
 
-		self.NAME_MARI_DBA	  := IF(self.NAME_DBA != ' ',self.NAME_DBA_ORIG,' ');
+		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != ' ',SELF.NAME_DBA_ORIG,' ');
 		
-		self.ADDR_CITY_1		  := StringLib.StringToUpperCase(TRIM(L.CITY_1,LEFT,RIGHT));
-		self.ADDR_STATE_1			:= StringLib.StringToUpperCase(TRIM(L.STATE_1,LEFT,RIGHT));
-		self.ADDR_ZIP5_1		  := IF(length(TRIM(L.ZIP))=4,'0'+TRIM(L.ZIP,left,right)[1..5],TRIM(L.ZIP,left,right)[1..5]);
-		self.ADDR_ZIP4_1		  := IF(StringLib.StringFind(L.ZIP,'-',1)>0,TRIM(L.ZIP,left,right)[7..11],
-																 TRIM(L.ZIP,left,right)[6..10]);
-		self.ADDR_CNTY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTY,LEFT,RIGHT));
+		SELF.ADDR_CITY_1		  := StringLib.StringToUpperCase(TRIM(L.CITY_1,LEFT,RIGHT));
+		SELF.ADDR_STATE_1			:= StringLib.StringToUpperCase(TRIM(L.STATE_1,LEFT,RIGHT));
+		SELF.ADDR_ZIP5_1		  := IF(LENGTH(TRIM(L.ZIP))=4,'0'+TRIM(L.ZIP,LEFT,RIGHT)[1..5],TRIM(L.ZIP,LEFT,RIGHT)[1..5]);
+		SELF.ADDR_ZIP4_1		  := IF(StringLib.StringFind(L.ZIP,'-',1)>0,TRIM(L.ZIP,LEFT,RIGHT)[7..11],
+																 TRIM(L.ZIP,LEFT,RIGHT)[6..10]);
+		SELF.ADDR_CNTY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTY,LEFT,RIGHT));
 
-		self.ADDR_BUS_IND			:= IF(TRIM(L.CITY_1+L.STATE_1+L.ZIP)<>'','B','');
+		SELF.ADDR_BUS_IND			:= IF(TRIM(L.CITY_1+L.STATE_1+L.ZIP)<>'','B','');
 		SELF.ADDR_CNTRY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTRY_1,LEFT,RIGHT));
 		SELF.OOC_IND_1				:= IF(TRIM(SELF.ADDR_CNTRY_1,LEFT,RIGHT)='UNITED STATES',0,1);
 
 		//Street address left out of cmc_slpk because state only provides city/state
-		self.cmc_slpk  				:= hash64(trim(self.license_nbr,left,right) 
-																		+IF(self.std_license_type<>'',trim(self.std_license_type,left,right),trim(self.raw_license_type,left,right))
-																		+trim(self.std_source_upd,left,right)
-												 						+trim(self.NAME_ORG_ORIG,left,right)
-												 						+trim(self.ADDR_CITY_1,left,right)
-												 						+trim(self.ADDR_STATE_1,left,right)
-												 						+trim(self.ADDR_ZIP5_1,left,right));
+		SELF.cmc_slpk  				:= HASH64(TRIM(SELF.license_nbr,LEFT,RIGHT) 
+																		+IF(SELF.std_license_type<>'',TRIM(SELF.std_license_type,LEFT,RIGHT),TRIM(SELF.raw_license_type,LEFT,RIGHT))
+																		+TRIM(SELF.std_source_upd,LEFT,RIGHT)
+												 						+TRIM(SELF.NAME_ORG_ORIG,LEFT,RIGHT)
+												 						+TRIM(SELF.ADDR_CITY_1,LEFT,RIGHT)
+												 						+TRIM(SELF.ADDR_STATE_1,LEFT,RIGHT)
+												 						+TRIM(SELF.ADDR_ZIP5_1,LEFT,RIGHT));
 											 
 		SELF		 							:= [];		   		   
 	END;
@@ -185,7 +185,7 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 	ds_map := project(ValidDEFile, transformToCommon(LEFT));
 
 	// populate std_license_status field via translation on raw_license_status field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map L, cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map L, cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -196,7 +196,7 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_TYPE := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -207,7 +207,7 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 																trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_prof_cd(ds_map_lictype_trans L, cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_prof_cd(ds_map_lictype_trans L, cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := IF(L.STD_LICENSE_TYPE = 'MOP','RLE',R.DM_VALUE1);
 		SELF := L;
 	END;
@@ -216,17 +216,14 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 																	LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(TRIM(LEFT.STD_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																	trans_prof_cd(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
-	remove_logical 					:= sequential(fileservices.startsuperfiletransaction(),
+	remove_logical 					:= SEQUENTIAL(fileservices.startsuperfiletransaction(),
 																				fileservices.RemoveSuperfile(mari_dest+src_cd,mari_dest+pVersion+'::'+src_cd),
 																				fileservices.finishsuperfiletransaction()
 																				);
 
-	d_final := output(ds_map_lic_trans, ,'~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,__compressed__,overwrite);
+	d_final := OUTPUT(ds_map_lic_trans, ,'~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,__compressed__,overwrite);
 		
-	// add_super := sequential(fileservices.startsuperfiletransaction(),
-														// fileservices.addsuperfile('~thor_data400::in::proflic_mari::'+src_cd,'~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd),
-														// fileservices.finishsuperfiletransaction()
-														// );
+
 	add_super := Prof_License_Mari.fAddNewUpdate(ds_map_lic_trans);
 	
 	move_to_used := PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 'apr', 'using', 'used'),

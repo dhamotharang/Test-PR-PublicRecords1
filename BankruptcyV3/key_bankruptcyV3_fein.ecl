@@ -19,7 +19,10 @@ export key_bankruptcyV3_fein(boolean isFCRA = false) := function
 	slim_sort   := sort(slim_dist, tmsid,  tax_id, local);
 	slim_dedup  := dedup(slim_sort, tmsid, tax_id, local);
 
+	// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys - thor_data400::key::bankruptcyv3::fcra::taxid_qa
+	dummy_ds					:= DATASET([],{slim_dedup});
+	
 	key_name := BuildKeyName(isFCRA, 'TAXID');
 
-	return index(slim_dedup, {tax_id}, {TMSID}, key_name);
+	return index(if(isFCRA,dummy_ds,slim_dedup), {tax_id}, {TMSID}, key_name);
 end;

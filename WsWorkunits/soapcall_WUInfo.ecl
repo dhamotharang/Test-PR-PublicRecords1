@@ -78,7 +78,7 @@ SuppressResultSchemas      =1
 
 		string FileCluster {xpath('FileCluster')};
 		string Name{xpath('Name')};
-		boolean IsSuperFile{xpath('IsSuperFile')};
+	  boolean IsSuperFile{xpath('IsSuperFile')};
 		integer Subs {xpath('Subs')};
 		integer Count{xpath('Count')};
 		dataset(SubfileLayout       ) Subfiles {xpath('ECLSourceFiles/ECLSourceFile')};
@@ -221,8 +221,10 @@ SuppressResultSchemas      =1
 
 
 
+    import ut,Workman;
+    
 		results := SOAPCALL(
-			'http://' + esp + '/WsWorkunits'//?ver_=1.48'
+			'http://' + esp + '/WsWorkunits?ver_=1.69'
 			,'WUInfo'
 			,wuinfoInRecord
 			,dataset(wuinfoOutRecord)
@@ -230,7 +232,22 @@ SuppressResultSchemas      =1
 			,xpath('WUInfoResponse')
       ,timelimit(600) //5 minutes
 		);
+
+		results_remote := SOAPCALL(
+			'http://' + esp + '/WsWorkunits'//?ver_=1.48'
+			,'WUInfo'
+			,wuinfoInRecord
+			,dataset(wuinfoOutRecord)
+//		 ,heading('<WUInfoRequest>','</WUInfoRequest>')
+			,xpath('WUInfoResponse')
+      ,timelimit(600) //5 minutes
+      ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
+		);
+
+    returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,results  ,results_remote);
     
-		return if(Is_Valid_Wuid(pWorkunitID)  ,results ,dataset([],wuinfoOutRecord));
+    // returnresult := results_remote;
+
+		return if(Is_Valid_Wuid(pWorkunitID)  ,returnresult ,dataset([],wuinfoOutRecord));
 		
 end;

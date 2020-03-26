@@ -1,7 +1,7 @@
-// WVS0816 / West Virginia Real Estate Appr Lic & Cert Board / Real Estate Appraisers //
+﻿// WVS0816 / West Virginia Real Estate Appr Lic & Cert Board / Real Estate Appraisers //
 EXPORT layout_WVS0816 := MODULE
 
-	EXPORT LAYOUT_DATA := RECORD
+	EXPORT LAYOUT_RAW := RECORD
 		STRING30	 COUNTY; 				//New 20130415
    	//string2    LIC_STATE;		//Removed 20130415
    	//string10   LAST_UPDT;		//Removed 20130425
@@ -13,34 +13,6 @@ EXPORT layout_WVS0816 := MODULE
    	STRING30   PHONE;
    	STRING30   LIC_TYPE;
    	STRING30   LIC_NO;
-	END;
-
-	EXPORT LAYOUT_RAW := RECORD
-			STRING COL_A;
-			STRING COL_B;
-			STRING COL_C;
-			STRING COL_D;
-			STRING COL_E;
-			STRING COL_F;
-			STRING COL_G;
-			STRING COL_H;
-			STRING COL_I;
-			STRING COL_J;
-			STRING COL_K;
-			STRING COL_L;
-			STRING COL_M;
-			STRING COL_N;
-			STRING COL_O;
-			STRING COL_P;
-			STRING COL_Q;
-			STRING COL_R;
-			STRING COL_S;
-			STRING COL_T;
-			STRING COL_U;
-			STRING COL_V;
-			STRING COL_W;
-			STRING COL_X;
-			STRING COL_Y;
 	END;
 
 END;

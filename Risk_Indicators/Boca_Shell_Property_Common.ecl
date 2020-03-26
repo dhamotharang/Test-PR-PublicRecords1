@@ -1,14 +1,14 @@
-﻿IMPORT Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_address,
-                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
+EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_PropertyRecord) p_address,
+                                  GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
 																  BOOLEAN includeRelatives = TRUE,
 																  BOOLEAN filter_out_fares = FALSE,
 																  BOOLEAN is_FCRA = FALSE,
 																	LN_PropertyV2_Services.interfaces.Iinput_report input_mod,
 																  BOOLEAN ViewDebugs = FALSE,
-																	BOOLEAN is_from_PB = FALSE,
-																	boolean onThor = false) := FUNCTION
+																	BOOLEAN is_from_PB = FALSE) := FUNCTION
 
 	// --------------------[ CONSTANTS ]-------------------
 
@@ -181,7 +181,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			loan_type_code := TRIM(stringlib.stringtouppercase(mortgage_loan_type_code));
 			is_fares       := vendor_source_flag = FARES;
 			is_fidelity    := vendor_source_flag = FIDELITY;
-			mortgage_type  := iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
+			mortgage_type  := risk_indicators.iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
 			RETURN mortgage_type;
 		END;
 
@@ -190,7 +190,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			finance_type_cd := TRIM(stringlib.stringtouppercase(finance_type_code));
 			is_fares        := vendor_source_flag = FARES;
 			is_fidelity     := vendor_source_flag = FIDELITY;
-			mortgage_type   := iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
+			mortgage_type   := risk_indicators.iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
 			RETURN mortgage_type;
 		END;
 	
@@ -199,23 +199,23 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			// NOTE: Someone who's "family" has the same last name but a different first name.
 			is_good_match := Risk_Indicators.g;
 			
-			fname_match_owner1 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[1].fname));
-			lname_match_owner1 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[1].lname));
-			fname_match_owner2 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[2].fname));
-			lname_match_owner2 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[2].lname));
-			fname_match_owner3 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[3].fname));
-			lname_match_owner3 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[3].lname));
-			fname_match_owner4 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[4].fname));
-			lname_match_owner4 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[4].lname));
+			fname_match_owner1 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[1].fname));
+			lname_match_owner1 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[1].lname));
+			fname_match_owner2 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[2].fname));
+			lname_match_owner2 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[2].lname));
+			fname_match_owner3 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[3].fname));
+			lname_match_owner3 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[3].lname));
+			fname_match_owner4 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[4].fname));
+			lname_match_owner4 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[4].lname));
 
-			fname_match_sellr1 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[1].fname));
-			lname_match_sellr1 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[1].lname));
-			fname_match_sellr2 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[2].fname));
-			lname_match_sellr2 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[2].lname));
-			fname_match_sellr3 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[3].fname));
-			lname_match_sellr3 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[3].lname));
-			fname_match_sellr4 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[4].fname));
-			lname_match_sellr4 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[4].lname));
+			fname_match_sellr1 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[1].fname));
+			lname_match_sellr1 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[1].lname));
+			fname_match_sellr2 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[2].fname));
+			lname_match_sellr2 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[2].lname));
+			fname_match_sellr3 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[3].fname));
+			lname_match_sellr3 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[3].lname));
+			fname_match_sellr4 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[4].fname));
+			lname_match_sellr4 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[4].lname));
 		
 			property_status :=
 				MAP(
@@ -364,7 +364,7 @@ end;
 
 		JOIN( 
 			unique_dids, 
-			distribute(pull(temp_key_property_did(source_code_2 = PROPERTY)), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
+			distribute(pull(temp_key_property_did)(source_code_2 = PROPERTY), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
 			LEFT.did = RIGHT.s_did,
 			append_fares_id_by_DID(left, right),
 			KEEP(100), 
@@ -372,8 +372,12 @@ end;
 			local
 		);
 
-																		// add group by seq to make both branches have same grouping
-ids_plus_fares_by_did := if(onThor, group(ids_plus_fares_by_did_thor, seq), ids_plus_fares_by_did_roxie);
+#IF(onThor)
+	ids_plus_fares_by_did := group(ids_plus_fares_by_did_thor, seq); // add group by seq to make both branches have same grouping
+#ELSE
+	ids_plus_fares_by_did := ids_plus_fares_by_did_roxie;
+#END
+
 	// 1.b. Now get ln_fares_ids by Address. Note that if the applicant lived in an apartment,
 	// this join won't return any records for it, unless it was a condo.
 	p_addr_roxie := 
@@ -395,8 +399,11 @@ ids_plus_fares_by_did := if(onThor, group(ids_plus_fares_by_did_thor, seq), ids_
 			did, prim_range, prim_name, sec_range, city_name, st, zip5, local
 		);
 		
-	p_addr := if(onThor, group(p_addr_thor, seq), p_addr_roxie);
-	
+	#IF(onThor)
+		p_addr := group(p_addr_thor, seq);
+	#ELSE
+		p_addr := p_addr_roxie;
+	#END
 
 kaf := LN_PropertyV2.key_addr_fid(is_FCRA);
 
@@ -434,7 +441,7 @@ end;
 		ids_plus_fares_by_address_thor := 
 		JOIN(
 			distribute(p_addr(prim_name<>''), hash64(prim_name, prim_range, zip5, sec_range)), 
-			distribute(pull(kaf(source_code_2 = PROPERTY)), hash64(prim_name, prim_range, zip, sec_range)),
+			distribute(pull(kaf)(source_code_2 = PROPERTY), hash64(prim_name, prim_range, zip, sec_range)),
 			LEFT.prim_name = RIGHT.prim_name AND
 			LEFT.prim_range = RIGHT.prim_range AND
 			LEFT.zip5 = RIGHT.zip AND
@@ -449,8 +456,12 @@ end;
 			local
 		);
 		
-		ids_plus_fares_by_address := if(onThor, group(ids_plus_fares_by_address_thor, seq), ids_plus_fares_by_address_roxie);
-		
+	#IF(onThor)
+		ids_plus_fares_by_address := group(ids_plus_fares_by_address_thor, seq);
+	#ELSE
+		ids_plus_fares_by_address := ids_plus_fares_by_address_roxie;
+	#END
+  
 	ids_plus_fares_temp := ungroup(ids_plus_fares_by_did + ids_plus_fares_by_address);
 	
 	ids_plus_fares_roxie := 
@@ -481,8 +492,11 @@ end;
 				inp_did, ln_fares_id, -(UNSIGNED)(dataSrce = SEARCHED_BY_LEXID), local),
 				inp_did, ln_fares_id, local);
 	
-	ids_plus_fares := if(onThor, ids_plus_fares_thor,  ids_plus_fares_roxie);  // don't perform the persist if this code is being run on roxie
-	
+	#IF(onThor)
+		ids_plus_fares := ids_plus_fares_thor;
+	#ELSE
+		ids_plus_fares := ids_plus_fares_roxie;
+	#END
 
 	// output(ids_plus_fares_by_address,all, named('ids_plus_fares_by_address'));
 	// output(ids_plus_fares_by_did_ddpd,all, named('ids_plus_fares_by_did_ddpd'));
@@ -513,8 +527,7 @@ end;
 			inTrimBySortBy    := FALSE,
 			nonSS             := suppress.constants.NonSubjectSuppression.doNothing,
 			isFCRA            := is_FCRA,
-			in_mod            := input_mod,
-			onthor						:= onThor);
+			in_mod            := input_mod);
 
 	// 2.b. Convert single-record child datasets into datarows for rolling up later.
 	// (You can't rollup a child dataset within a dataset.)
@@ -576,7 +589,9 @@ end;
 			(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 			((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 			// remove records that are after the history date
-			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+			(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999 ), 
 			TRANSFORM( layout_full_plus_ids,
 				self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 				SELF := RIGHT, 
@@ -596,7 +611,9 @@ end;
 				(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 				((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 				// remove records that are after the history date
-				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+				(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999 ), 
 				TRANSFORM( layout_full_plus_ids,
 					self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 					SELF := RIGHT, 
@@ -608,8 +625,12 @@ end;
 			seq, inp_did, ln_fares_id, -(UNSIGNED)(dataSrce = SEARCHED_BY_LEXID)) 
 			;
 	
-	ds_property_recs_filt_a := if(onThor, ds_property_recs_filt_a_local, ds_property_recs_filt_a_roxie);
-		
+	#IF(onThor)
+		ds_property_recs_filt_a := ds_property_recs_filt_a_local;
+	#ELSE
+		ds_property_recs_filt_a := ds_property_recs_filt_a_roxie;
+	#END
+  
 	// 4.b. Filter out FARES records if indicated.
 	ds_property_recs_filt_b := ds_property_recs_filt_a(vendor_source_flag = FIDELITY OR NOT filter_out_fares);
 	
@@ -671,8 +692,12 @@ end;
 			seq, inp_did, unique_prop_id, local
 		);
 	
-	tbl_naprop_values_local := if(onThor, tbl_naprop_values_local_thor, tbl_naprop_values_local_roxie);
-	
+	#IF(onThor)
+		tbl_naprop_values_local := tbl_naprop_values_local_thor;
+	#ELSE
+		tbl_naprop_values_local := tbl_naprop_values_local_roxie;
+	#END
+  
 	tbl_naprop_values := 
 		TABLE( 
 			tbl_naprop_values_local, 
@@ -1156,14 +1181,10 @@ end;
 	// output(onThor, named('onThor'));
 	
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
-	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did_ddpd, NAMED('ids_plus_fares_by_did_ddpd') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_a, NAMED('p_address_filt_a') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_b, NAMED('p_address_filt_b') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_address, NAMED('ids_plus_fares_by_address') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') ) );
 // OUTPUT( ids_plus_fares_temp, NAMED('ids_plus_fares_temp') );
-// OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') );
 	
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_raw_with_uniqueid, NAMED('property_recs_all') ) );
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a, NAMED('property_recs_filt_a') ) );
@@ -1176,19 +1197,20 @@ end;
 	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FARES, NAMED('assess_recs_FARES') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY, NAMED('assess_recs_FIDELITY') ) );
+	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie') ) );	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY_rolled, NAMED('assess_recs_FIDELITY_rolled') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_most_recent, NAMED('assess_recs_most_recent') ) );
 	
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs, NAMED('deed_recs') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_filt_b, NAMED('deed_recs_filt') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_most_recent, NAMED('deed_recs_most_recent') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_most_recent, NAMED('all_recs_most_recent') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_best_vendor_source, NAMED('best_vendor_source') ) );
 	// IF( ViewDebugs, OUTPUT( ds_best_vendor_source_rolled, NAMED('best_vendor_source_rolled') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_found, NAMED('ds_final_found') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final, NAMED('ds_final_found') ) );
 	// IF( ViewDebugs, OUTPUT( ds_final_pre, NAMED('final_pre') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// output(ids_only, named('ids_only'));
 	// output(p_address, named('p_address'));
@@ -1201,9 +1223,16 @@ end;
 	// output(property_records_full, named('property_records_full'));
 	// output(ds_property_recs_raw_with_uniqueid, named('ds_property_recs_raw_with_uniqueid'));
 	// output(ds_property_recs_filt_d2, named('ds_property_recs_filt_d2'));
+	// output(ds_property_recs_filt_a, NAMED('property_recs_filt_a'));
+	// output(ds_property_recs_filt_a);
+	// output(ds_property_recs_filt_b, NAMED('property_recs_filt_b'));
+	// output(ds_property_recs_filt_c, NAMED('property_recs_filt_c'));
+	// output(ds_property_recs_filt_d, NAMED('property_recs_filt_d'));
 	// output(ds_property_recs_filt_e, named('ds_property_recs_filt_e'));
 	// output(ds_assess_recs_FARES, named('ds_assess_recs_FARES'));
 	// output(ds_assess_recs_FIDELITY, named('ds_assess_recs_FIDELITY'));
+	// output(ids_plus_fares_roxie, NAMED('ids_plus_fares_roxie'));
+	// output(ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie'));
 	// output(ds_assess_recs_FIDELITY_rolled, named('ds_assess_recs_FIDELITY_rolled'));
 	// output(ds_assess_recs_most_recent_pre, named('ds_assess_recs_most_recent_pre'));
 	// output(ds_assess_recs_most_recent, named('ds_assess_recs_most_recent'));

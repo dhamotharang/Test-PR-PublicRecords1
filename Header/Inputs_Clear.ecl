@@ -50,6 +50,7 @@ updt_in(base_status,'DLV2Keys','~thor_data400::BASE::dl2::DLHeader_Building','~t
 ,if(base_status(pk='AmericanstudentKeys')[1].update,cleanSuper('~thor_data400::Base::ASLHeader_Building'))
 ,if(base_status(pk='AmericanstudentKeys')[1].update,cleanSuper('~thor_data400::Base::OKC_SLHeader_Building'))
 ,if(base_status(pk='VotersV2Keys')[1].update,cleanSuper('~thor_data400::BASE::Voters_Header_Building'))
+,if(base_status(pk='VotersV2Keys')[1].update,cleanSuper('~thor_data400::BASE::Census_Header_Building'))
 ,updt_in(base_status,'VehicleV2Keys'  ,'~thor_data400::base::vehicles_v2_main_header_building','~thor_data400::base::vehiclev2::main')
 ,updt_in(base_status,'VehicleV2Keys'  ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party')
 ,if(base_status(pk='CertegyKeys')[1].update,cleanSuper('~thor_data400::base::certegyheader_building'))
@@ -60,6 +61,7 @@ updt_in(base_status,'DLV2Keys','~thor_data400::BASE::dl2::DLHeader_Building','~t
 ,if(base_status(pk='transunion')[1].update,cleanSuper('~thor_data400::base::transunioncredheader_building'),output('SKIPPING transunioncredheader_building'))
 ,if(base_status(pk='eq_hist')[1].update,cleanSuper('~thor_data400::base::eq_histHeader_building'))                         // STALE
 ,if(base_status(pk='alloymedia')[1].update,cleanSuper('~thor_data400::base::alloymedia_student_list_Header_Building'))        // STALE
+,if(base_status(pk='cd_seed')[1].update, cleanSuper('~thor_data::base::cd_seed_building'))        // always clear cd_seed building sf
 ,updt_in(base_status,'TargusKeys'  ,'~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus')
               
 );

@@ -34,7 +34,7 @@ EXPORT Functions := MODULE
 
 				isValidCD		:= map(s in [ '3LP','AUT','BNK','CAS','COP','CRU','FBS','FMA','FRA',
 																	'GRG','INS','LLC','LLP','LTD','MAS','MIL','MIN','MMC',
-																	'PBC','PLC','PRO','PUB','REG','REG','RFN','SAL','SOL',
+																	'PBC','PLC','PLP','PRO','PUB','REG','REG','RFN','SAL','SOL',
 																	'SPC','' ]	=> true,false);
 
 			 RETURN if(isValidCD,1,0);

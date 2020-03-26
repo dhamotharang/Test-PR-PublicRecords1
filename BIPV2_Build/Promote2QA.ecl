@@ -11,17 +11,21 @@ export Promote2QA(
   ,pShouldDoDataland       = 'true'
   ,pShouldCheckfullKeys    = 'true'
   ,pShouldCheckWeeklyKeys  = 'true'
+  ,pShouldDoAlpha          = 'true'
 ) :=
 functionmacro
 
   import BIPV2,tools,BizLinkFull,wk_ut,bipv2_build;
 
-  Promote2QAonDataland    := '#workunit(\'name\',\'BIPV2_Build.Promote2QA @version@\');\nBIPV2_Build.Promote2QA(\n\n   pversion         := \'@version@\'\n  ,pShouldUpdateDOPS       := false\n  ,pPerformCleanup := true);';
-	KickPromote2QADataland	:= wk_ut.mac_ChainWuids(Promote2QAonDataland,1,1,pversion,,wk_ut._Constants.Esp2Hthor(wk_ut._Constants.DevEsp),pESP := wk_ut._Constants.DevEsp,pOutputEcl := false,pUniqueOutput := 'Promote2QAOnDataland',pNotifyEmails := BIPV2_Build.mod_email.emailList
-  ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::Promote2QA'
-  ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
-  );  //kick off on dataland
+  // Promote2QAonDataland    := '#workunit(\'name\',\'BIPV2_Build.Promote2QA @version@\');\nBIPV2_Build.Promote2QA(\n\n   pversion         := \'@version@\'\n  ,pShouldUpdateDOPS       := false\n  ,pPerformCleanup := true);';
+	// KickPromote2QADataland	:= wk_ut.mac_ChainWuids(Promote2QAonDataland,1,1,pversion,,wk_ut._Constants.Esp2Hthor(wk_ut._Constants.DevEsp),pESP := wk_ut._Constants.DevEsp,pOutputEcl := false,pUniqueOutput := 'Promote2QAOnDataland',pNotifyEmails := BIPV2_Build.mod_email.emailList
+  // ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::Promote2QA'
+  // ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
+  // );  //kick off on dataland
 
+  KickPromote2QADataland := BIPV2_Build.proc_Promote2QA_Dataland(pversion);
+  kickPromote2QA_Alpha   := BIPV2_Build.proc_Promote2QA_Alpha   (pversion);
+  
   cluster44 := tools.fun_Groupname('44');
   cluster36 := tools.fun_Groupname('36');
 
@@ -43,18 +47,21 @@ functionmacro
        if(pShouldCheckfullKeys    = true ,outputBIPV2Fullkeys   )
       ,if(pShouldCheckWeeklyKeys  = true ,outputBIPV2Weeklykeys )
        // BIPV2.CommonBase.updateSuperfiles(f_out) //update base file
-      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
+      // ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
       ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).built2qa  //update commonbase file
+      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Clean_Common_Base.dall_filenames,pnGenerations := 1).built2qa  //update clean commonbase file
       ,BIPV2_Build.Promote().Built2QA //this includes everything
       ,UpdateFullKeysDops
       ,UpdateWeeklyKeysDops
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44).Built2QA )
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36).Built2QA )
       ,if(pShouldDoDataland ,KickPromote2QADataland)
+      ,if(pShouldDoAlpha    ,kickPromote2QA_Alpha  )
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 2)
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44,pDelete := true).Cleanup  )
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36,pDelete := true).Cleanup  )
       ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,'^(?!.*?(wkhistory|precision|space|dashboard).*).*$',pDelete := true).Cleanup )
+      ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,,,false,BIPV2.Filenames(pversion).Clean_Common_Base.dall_filenames,pnGenerations := 1,pDelete := true).Cleanup )
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 3)
     )
     ,sequential(

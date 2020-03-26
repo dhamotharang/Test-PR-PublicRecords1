@@ -96,6 +96,27 @@ def dKeys():
 
 	
 ##---------------------------------------------------------------------------
+##Keys
+##hacks
+##---------------------------------------------------------------------------
+def dLinkBlockers():
+	return [
+	    ('LinkBlockers', 
+		 'BadPairRec NotePair.*?export AllBadPairs := JOIN(AllIds,AllIds,',
+		'HACKLinkBlockers',
+          '  ds_allids_dedup :=  SORT( distribute(table(AllIds  ,{RuleNum ,LGID3,Good} ,RuleNum ,LGID3,Good ,merge)/*HACKLinkBlockers*/ ,HASH(RuleNum)) ,RuleNum,LGID3,Good,LOCAL );\n\n'
+        + '  BadPairRec NotePair(ds_allids_dedup le,ds_allids_dedup ri) := TRANSFORM\n'
+        + '    SELF.LGID31 := le.LGID3;\n'
+        + '    SELF.LGID32 := ri.LGID3;\n'
+        + '    SELF.RuleNum := le.RuleNum;\n'
+        + '  END;\n\n'
+        + 'export AllBadPairs := JOIN(ds_allids_dedup,ds_allids_dedup',
+		
+		'hack linkblockers to prevent skew')
+	]
+
+	
+##---------------------------------------------------------------------------
 ##Config
 ##hacks
 ##---------------------------------------------------------------------------
@@ -111,5 +132,6 @@ getHacks = 	dMatches() + \
 			dMatchCandidates() + \
 			dMOD_Attr_UnderLinks() + \
 			dConfig() + \
-			dKeys
+			dKeys() + \
+			dLinkBlockers()
 

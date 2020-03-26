@@ -4,6 +4,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib,STD;
 
 EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
+ #workunit('name',' Yogurt:Prof License MARI - NMS0843 Build     ' + pVersion);
 
 	code 								:= 'NMS0843';
 	src_cd							:= code[3..7];
@@ -61,7 +62,7 @@ EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
  	ut.CleanFields(GoodFilterRec, ClnRec);
 																		
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_NMS0843.common pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in 		xformToCommon(Prof_License_Mari.layout_NMS0843.common pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -142,7 +143,7 @@ EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
 		
 		// License Information
 		SELF.LICENSE_NBR	  	:= ut.CleanSpacesAndUpper(pInput.SLNUM);
-		TrimLIC_TYPE          := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC);		
+		TrimLIC_TYPE          := ut.CleanSpacesAndUpper(pInput.LIC);		
 		SELF.RAW_LICENSE_TYPE	:= TrimLIC_TYPE;
 		SELF.STD_LICENSE_TYPE := CASE(TrimLIC_TYPE,
 																	'APPRENTICE APPRAISER' => 'AA',
@@ -298,7 +299,7 @@ EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(ClnRec,xformToCommon(LEFT));
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 		//patch. remove it once SURRENDERED is defined.																	
 		SELF.STD_LICENSE_STATUS :=  IF(L.RAW_LICENSE_STATUS = 'SURRENDERED',
 																	'U',
@@ -315,7 +316,7 @@ EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;

@@ -36,9 +36,9 @@ EXPORT fn_Spray_Alpharetta_Base(STRING CSVName, STRING fileVersion, STRING overr
 			
 			speadsheetIncomingUpper := Common.mac_ConvertToUpperCase(speadsheetIncoming , fname, mname, lname);
 			
-			buildSteps := fn_Save_BaseAndRels_Alpharetta_Base(speadsheetIncomingUpper, fileVersion);
+			buildSteps 			:= fn_Save_Alpharetta_Base(speadsheetIncomingUpper, fileVersion);
 			delSprayedFile  := FileServices.DeleteLogicalFile (Files.FILE_SPRAY_NAME);
-			ShowResults := CHOOSEN(Files.HDR_BASE_ALPHA_DS, 400);	
+			ShowResults 		:= CHOOSEN(Files.HDR_BASE_ALPHA_DS, 400);	
 			// --------------------------------------------------
 
 			sequentialSteps	:= SEQUENTIAL (

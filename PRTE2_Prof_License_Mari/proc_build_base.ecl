@@ -30,7 +30,7 @@ dsLicenseState		:=	JOIN(dsStdDesc, Prof_License_Mari.files_References.cmvtransla
 																left outer, lookup);	
 																
 													
-Layouts.search		xformOriginalBase(layouts.search le) := transform
+Layouts.search	xformOriginalBase(layouts.search le) := transform
 self.cln_license_nbr	:= IF(trim(le.license_nbr) in ['','NR'],'', Prof_license_mari.fCleanLicenseNbr(le.license_nbr));
 self.addr_zip5_1			:= if(length(le.addr_zip5_1) < 5, INTFORMAT((integer)le.addr_zip5_1,5,1),le.addr_zip5_1);
 self.primary_key			:= IF(trim(le.license_nbr)  <> '' and trim(le.license_nbr) <> 'NR', 
@@ -109,7 +109,7 @@ self.cln_Action_dte:=if(left.Action_dte !='',Prof_License_Mari.DateCleaner.ToYYY
 Self:=Left;
 ));
 
-
+//export proc_build_base:=reformatsearch;
 PromoteSupers.Mac_SF_BuildProcess (cln_disciplinary,Constants.base_prefix_name+'disciplinary_actions',displinary_out,,,true);
 PromoteSupers.Mac_SF_BuildProcess (cln_individual,Constants.base_prefix_name+'individual_detail',detail_out,,,true);
 PromoteSupers.Mac_SF_BuildProcess (cln_regulatory,Constants.base_prefix_name+'regulatory_actions',regulatory_out,,,true);

@@ -1,4 +1,4 @@
-export layout_MI := 
+﻿export layout_MI := 
 
 record
 string3	STATEABREV;

@@ -10,7 +10,7 @@ function
 
   rename_soap_results := FileSpray.soapcall_Rename(psrcname,pdstname,poverwrite,pESp);
   
-  rename_description      := 'Workman.Rename_File: Renaming ' + psrcname + ' to ' + pdstname + ' in ' + pESp + ' on date ' + ut.GetTimeDate() + ' in ' + workunit;
+  rename_description      := 'Workman.Rename_File: Renaming ' + psrcname + ' to ' + pdstname + ' in ' + pESp + ' on date ' + Workman.GetTimeDate() + ' in ' + workunit;
   superfileowners         := WsDFU.LogicalFileSuperOwners(psrcname,pESp) /*: independent*/;
   FsLogicalFileNameRecord := {  STRING name };
   ds_superowners          := Workman.get_DS_Result(workunit,'Workman_Rename_File_Superfileowners',FsLogicalFileNameRecord,pESp,true);

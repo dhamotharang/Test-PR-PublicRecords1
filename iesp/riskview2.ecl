@@ -290,6 +290,7 @@ export t_RiskView2LiensJudgmentsReportForLien := record
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
+	string7 AgencyID {xpath('AgencyID')};
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
@@ -310,6 +311,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
 	string1 Eviction {xpath('Eviction')};
+	string7 AgencyID {xpath('AgencyID')};
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};

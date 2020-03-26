@@ -20,7 +20,7 @@ Dedup2 := DEDUP(ds_keybuild_analytics (DID = '0'), Vehicle_Incident_Id,fname, ln
 EXPORT DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
 // CRU Inq/Natational Accident Reports
-EcrashAndCru 	 := File_KeybuildV2.out(report_code in ['EA','TM','TF'] and  (work_type_id not in ['0','1']  OR trim(report_type_id,all) in ['A','DE']) );   
+EcrashAndCru 	 := File_KeybuildV2.out/*(report_code in ['EA','TM','TF'] and  (work_type_id not in ['0','1']  OR trim(report_type_id,all) in ['A','DE']) )*/;   
 Filter_CRU 		:= File_KeybuildV2.out(report_code not in ['EA','TM','TF']);
 				
 // eCrash Reports:  normalize addl_report_number for ecrash TM,TF and EA work type 1,0
@@ -34,7 +34,7 @@ crash_accnbr_base_norm := (EcrashAndCru + NormAddlRpt + Filter_CRU (vin+driver_l
 EXPORT ds_accnbrv1 	:= project(crash_accnbr_base_norm, transform(layouts.ecrashv2_accnbrv1, self.l_accnbr := left.accident_nbr, self.date_report_submitted:='', self := left, self:= []));
 
 //Key Accnbr
-Ecrash 			:= File_KeybuildV2.out(report_code in ['EA','TM','TF']);
+Ecrash 			:= File_KeybuildV2.out/*(report_code in ['EA','TM','TF'])*/;
 Filter_CRU 	:= File_KeybuildV2.out(report_code not in ['EA','TM','TF']);
 
 crash_accnbr_base := Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname+cname <>''); 
@@ -92,5 +92,20 @@ EXPORT ds_LicensePlateNbr := dsKeybuildSearchSlim(tag_nbr <> '');
 EXPORT ds_OfficerBadgeNbr := dsKeybuildSearchSlim(officer_id <> '');
 
 EXPORT ds_VinNbr := dsKeybuildSearchSlim(vin <> '');
+
+//Dedupping Logic related to key_ecrashv2_did
+dst_did_base := distribute(prte2_ecrash.file_keybuildV2.out(did<>'',did<>'000000000000'), hash(did, orig_accnbr));
+srt_did_base := sort(dst_did_base, did, orig_accnbr,vin, local);
+export ded_did_base := dedup(srt_did_base, did, orig_accnbr,vin, local);  
+
+// EXPORT key_ecrashv2_bdid 		:= INDEX(dedup(file_keybuildV2.out(b_did <> '',b_did <> '0'),all), {unsigned6 l_bdid := (integer)b_did}, {accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::bdid');
+	
+// EXPORT key_ecrashv2_did 		:= INDEX(dedup(sort(file_keybuildV2.out(did <> '',did <> '0'),did),record), {unsigned6 l_did := (integer)did},{accident_nbr,vin,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::did');
+
+// EXPORT key_ecrashv2_dlnbr 	:= INDEX(file_keybuildV2.out(driver_license_nbr<>''), {l_dlnbr := driver_license_nbr},{accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::dlnbr');
+
+// EXPORT key_ecrashv2_dol 		:= INDEX(files_addl.ds_dol,{accident_date,report_code,jurisdiction_state, jurisdiction},{files_addl.ds_dol}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::dol');
+
+// EXPORT key_ecrashv2_vin 		:= INDEX(file_keybuildV2.out(vin<>'' and vin<>'0' ), {l_vin := vin}, {accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::vin'); 
 
 END;

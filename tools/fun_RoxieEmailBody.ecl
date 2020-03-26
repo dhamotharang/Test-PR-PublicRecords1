@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////
 // -- fun_RoxieEmailBody()
 // -- Parameters:
 // -- 	pall_superkeynames	-- dataset of superkeynames to include in email body
@@ -13,6 +13,7 @@ import ut;
 export fun_RoxieEmailBody(
 	 dataset(Layout_Names)	pall_superkeynames				// dataset of superkeynames to include in email
 	,string									pversion 						= ''	// optional version that all subkeys will be compared to
+  ,boolean                pDebug              = false
 ) :=
 function
 	
@@ -33,7 +34,7 @@ function
 	layout_twonames tgetcontents(Layout_Names l) :=
 	transform
     supercontents := fileservices.superfilecontents(l.name);
-    findversion   := supercontents(pversion = '' or regexfind(pversion,name,nocase));
+    findversion   := supercontents;//(pversion = '' or regexfind(pversion,name,nocase));
     subcount      := count(findversion);
     
 		self.superfilecontents	:= map(fileservices.superfileexists(l.name) = true => findversion[subcount].name 
@@ -115,7 +116,7 @@ function
 												,''
 									);
 	
-	return 		decision_time
+	returnresult := decision_time
 					+ if(count(getcontents_goodversion) > 0
 							,		if(count(getcontents_badversion) > 0
 										,'\nList of keys with correct version follows.\n'
@@ -127,5 +128,25 @@ function
 								+ stringlib.StringToLowerCase(trim(projectcontents_good.emailine))
 						);
 
-//  return getcontents;
+  outputdebug := parallel(
+    output(pall_superkeynames ,named('pall_superkeynames'))
+   ,output(getcontents ,named('getcontents'))
+   ,output(getcontents_goodversion  ,named('getcontents_goodversion'))
+   ,output(getcontents_badversion	 ,named('getcontents_badversion'))
+   ,output(contents_seq_good  ,named('contents_seq_good'))
+   ,output(contents_seq_bad	 ,named('contents_seq_bad'))
+   ,output(rollupcontents_good  ,named('rollupcontents_good'))
+   ,output(rollupcontents_bad	 ,named('rollupcontents_bad'))
+   ,output(projectcontents_good	 ,named('projectcontents_good'))
+   ,output(projectcontents_bad		 ,named('projectcontents_bad'))
+   ,output(versions_table 				 ,named('versions_table'))
+   ,output(ExistMultipleVersions ,named('ExistMultipleVersions'))
+   ,output(versions_table_email ,named('versions_table_email'))
+   ,output(versions_rollup ,named('versions_rollup'))
+   ,output(correct_version ,named('correct_version'))
+   ,output(decision_time ,named('decision_time'))
+  
+  );
+
+  return when(returnresult,if(pDebug = true ,outputdebug));
 end;

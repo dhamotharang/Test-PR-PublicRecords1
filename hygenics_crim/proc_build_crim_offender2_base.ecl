@@ -15,6 +15,7 @@ off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode not in ['N
 		off.Fileddate;
 		off.Courtname;
 		off.sourceid;
+		off.casestatus;  //added by tp
 	end;
 
 	slimOffense_rec slimOff(off l):= transform
@@ -216,7 +217,7 @@ Layout_almostfinal_offender to_crim_offender(sort_slim_off l, sort_with_ssn r) :
                             '0' );
  self.nitro_flag		:= '';
  self.orig_ssn			:= r.orig_ssn;
- self.dle_num			  := r.stateidnumber;
+ self.dle_num			  := stringlib.stringfilterout(r.stateidnumber,'@ RI');
  self.fbi_num			  := r.fbinumber;
  self.doc_num			  := r.docnumber;
  self.ins_num			  := r.aliennumber;
@@ -333,7 +334,19 @@ Layout_almostfinal_offender to_crim_offender(sort_slim_off l, sort_with_ssn r) :
  self.weight				    := if((integer) stringlib.stringfilter(r.weight,'1234567890')<>0, stringlib.stringfilter(r.weight,'1234567890'), '');							
 
  self.party_status			:= '';
- self.party_status_desc	:= if(r.statecode not in ['TN', 'NC', 'AR'],	r.defendantstatus,	'');
+ 
+ party_status_desc_I0107 := trim(map(vVendor = 'I0107' and r.defendantstatus <> '' =>	r.defendantstatus,
+                                         vVendor = 'I0107' //and r.defendantstatus = ''
+                                  	        and l.CaseStatus in ['INCARCERATION DOC','INCARCERATION DOC (SUSPENDED EXECUTION OF SENTENCE)',                                                 
+								                                                  'NO CLASSIFICATION','REPORT ORDERED','SUPERVISED','SUSPENDED IMPOSITION OF SENT.','UNSUPERVISED'] 
+							                                => l.CaseStatus,																							
+																							''));		// added by tp
+ 
+ //self.party_status_desc	:= if(r.statecode not in ['TN', 'NC', 'AR'],	r.defendantstatus,	'');  //removed by tp
+ 
+ self.party_status_desc	:= map(vVendor = 'I0107' => party_status_desc_I0107,
+                               r.statecode not in ['TN', 'NC', 'AR'] => r.defendantstatus,'');    //added by tp
+ 
  self.pgid					    := '';
  self.src_upload_date		:= r.recorduploaddate;
  self.age         			:= r.age;

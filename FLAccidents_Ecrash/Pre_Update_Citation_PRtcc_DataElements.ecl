@@ -35,6 +35,7 @@ EXPORT Pre_Update_Citation_PRtcc_DataElements := FUNCTION
 													 
 
  FLAccidents_Ecrash.Layout_Infiles.citation ExpandCitationLayout(ds_citation L) := TRANSFORM
+																																									  SELF.Citation_Type := '';
 																																									  SELF.Violation_Code3 := '';
 																																									  SELF.Violation_Code4 := '';
 																																									  SELF := L;

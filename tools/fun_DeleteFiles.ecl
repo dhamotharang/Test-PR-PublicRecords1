@@ -1,4 +1,4 @@
-/*2015-09-24T21:56:10Z (lbentley_prod)
+﻿/*2015-09-24T21:56:10Z (lbentley_prod)
 C:\Users\bentlela\AppData\Roaming\HPCC Systems\eclide\lbentley_prod\prod_run_build\tools\fun_DeleteFiles\2015-09-24T21_56_10Z.ecl
 */
 ////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ Tools.fun_DeleteFiles(
 ////////////////////////////////////////////////////////////////////////////
 #option ('globalAutoHoist', false);	// added because of bug 28526
 #option('maxLength', 131072); 				// have to increase for the remote directory child datasets
-import ut,wk_ut;
+import ut,wk_ut,WsDFU,std;
 
 export fun_DeleteFiles(
 	 string			pOwner							= ''		// regex to filter the file owner
@@ -57,24 +57,43 @@ function
   
   file_list          := wk_ut.get_DFUQuery(,pCluster,pOwner := lowner,pFirstN := 300000).largest;  //hack
 
-	file_list2				 := fileservices.LogicalFileList(includenormal := pIncludeNormalFiles,includesuper := pIncludeSuperFiles);
+	file_list2				 := STD.File.LogicalFileList(includenormal := pIncludeNormalFiles,includesuper := pIncludeSuperFiles);
 	
-	owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list.owner		    , nocase), true);
-	filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list.name		    , nocase), true);
-	cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list.ClusterName	, nocase), true);
-	modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list.modified    , nocase), true);
-	size_filter							:= if(pSizeMinimum	!= 0 , file_list.longsize >= pSizeMinimum						, true);
-	size_max_filter				  := if(pSizeMaximum	!= 0 , file_list.longsize <= pSizeMaximum						, true);
+	// owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list.owner		    , nocase), true);
+	// filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list.name		    , nocase), true);
+	// cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list.ClusterName	, nocase), true);
+	// modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list.modified    , nocase), true);
+	// size_filter							:= if(pSizeMinimum	!= 0 , file_list.longsize >= pSizeMinimum						, true);
+	// size_max_filter				  := if(pSizeMaximum	!= 0 , file_list.longsize <= pSizeMaximum						, true);
 	
-	myfile_list1							:= file_list(owner_filter
+	// myfile_list1							:= file_list(owner_filter
+																			// ,filename_filter
+																			// ,cluster_filter
+																			// ,modified_filter
+																			// ,size_filter
+                                      // ,size_max_filter
+																			// );
+  //get uncompressed file size
+  // myfile_list             := join(myfile_list1,file_list2 ,left.name = right.name,transform(recordof(left),self.longsize := right.size,self.realsize := if(left.realsize = 0,right.size,left.realsize),self := right,self := left),hash,right outer);
+
+	owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list2.owner		    , nocase), true);
+	filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list2.name		    , nocase), true);
+	// cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list2.ClusterName	, nocase), true); //need this
+	modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list2.modified    , nocase), true);  
+	size_filter							:= if(pSizeMinimum	!= 0 , file_list2.size >= pSizeMinimum						, true);
+	size_max_filter				  := if(pSizeMaximum	!= 0 , file_list2.size <= pSizeMaximum						, true);
+
+	myfile_list2_filtered							:= file_list2(owner_filter
 																			,filename_filter
-																			,cluster_filter
+																			// ,cluster_filter
 																			,modified_filter
 																			,size_filter
                                       ,size_max_filter
 																			);
-  //get uncompressed file size
-  myfile_list             := join(myfile_list1,file_list2 ,left.name = right.name,transform(recordof(left),self.longsize := right.size,self.realsize := if(left.realsize = 0,right.size,left.realsize),self := left),hash);
+
+  myfile_list             := project(myfile_list2_filtered ,transform({recordof(left),string ClusterName,integer8 longsize,integer8 realsize},self.ClusterName := STD.File.GetLogicalFileAttribute('~' + trim(left.name),'clusterName'),self.longsize := left.size,self.realsize := left.size,self := left))
+  (pCluster			= '' or  regexfind(pCluster		,ClusterName	, nocase)) 
+  : independent;
                                       
 	myfile_list_notinsupers := myfile_list(fileservices.fileexists('~' + name), pIncludeSubfiles or count(fileservices.LogicalFileSuperOwners('~' + name)) = 0) ;	
   
@@ -158,14 +177,15 @@ function
   // ------------------------
   // -- examine skews
   // ------------------------
+  lay_dfuparts := recordof(WsDFU.GetFileParts());
   
-  add_Skews := project(largest,transform({recordof(largest),dataset(wk_ut.get_DFUInfo().Parts_Lay) DfuPartsInfo },
+  add_Skews := project(largest,transform({recordof(largest),dataset(lay_dfuparts) DfuPartsInfo },
      self               := left                                       ;
-     self.DfuPartsInfo  := wk_ut.get_DFUInfo('~' + left.name).parts_  ;
+     self.DfuPartsInfo  := WsDFU.GetFileParts('~' + left.name)  ;
   ));
   
- lay_skews := {largest.name,largest.sizepretty,largest.realsize,largest.realsize_,wk_ut.get_DFUInfo().Parts_Lay.diff_avg_,wk_ut.get_DFUInfo().Parts_Lay.minskew,wk_ut.get_DFUInfo().Parts_Lay.maxskew,wk_ut.get_DFUInfo().Parts_Lay.partsize_,wk_ut.get_DFUInfo().Parts_Lay.avg_part_size_  
-  ,recordof(largest) -name - sizepretty - realsize - realsize_ or wk_ut.get_DFUInfo().Parts_Lay - diff_avg_ - minskew - maxskew - partsize_ - avg_part_size_}  ;
+ lay_skews := {largest.name,largest.sizepretty,largest.realsize,largest.realsize_,lay_dfuparts.diff_avg_,lay_dfuparts.minskew,lay_dfuparts.maxskew,lay_dfuparts.partsize_,lay_dfuparts.avg_part_size_  
+  ,recordof(largest) -name - sizepretty - realsize - realsize_ or lay_dfuparts - diff_avg_ - minskew - maxskew - partsize_ - avg_part_size_}  ;
   
   
   add_skews_norm := normalize(add_skews,left.DfuPartsInfo,transform(lay_skews,self := left, self := right));

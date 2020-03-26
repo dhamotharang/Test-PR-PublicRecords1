@@ -36,6 +36,11 @@ function
 
   esp				:= pesp + ':8010';	//oss is 242,infiniband is '10.241.3.242'
 
+  import ut,Workman;
+
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   results := SOAPCALL(
      'http://'+esp+'/WsWorkunits?ver_=1.48'
     ,'WUGetStats'
@@ -45,6 +50,18 @@ function
     ,timelimit(600) //5 minutes
   );
     
-  return if(Is_Valid_Wuid(pWorkunitID)  ,results ,dataset([],checkoutAttributeOutRecord));
+  results_remote := SOAPCALL(
+     'http://'+esp+'/WsWorkunits?ver_=1.48'
+    ,'WUGetStats'
+    ,checkoutAttributeInRecord
+    ,dataset(checkoutAttributeOutRecord)
+    ,xpath('WUGetStatsResponse')
+    ,timelimit(600) //5 minutes
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,results  ,results_remote);
+
+  return if(Is_Valid_Wuid(pWorkunitID)  ,returnresult ,dataset([],checkoutAttributeOutRecord));
 		
 end;

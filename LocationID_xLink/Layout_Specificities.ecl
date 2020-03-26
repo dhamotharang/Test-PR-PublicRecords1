@@ -11,18 +11,23 @@ EXPORT predir_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
-EXPORT prim_name_ChildRec := RECORD
-  TYPEOF(l.prim_name) prim_name;
+EXPORT prim_name_derived_ChildRec := RECORD
+  TYPEOF(l.prim_name_derived) prim_name_derived;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
-EXPORT addr_suffix_ChildRec := RECORD
-  TYPEOF(l.addr_suffix) addr_suffix;
+EXPORT addr_suffix_derived_ChildRec := RECORD
+  TYPEOF(l.addr_suffix_derived) addr_suffix_derived;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
 EXPORT postdir_ChildRec := RECORD
   TYPEOF(l.postdir) postdir;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT err_stat_ChildRec := RECORD
+  TYPEOF(l.err_stat) err_stat;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
@@ -61,18 +66,22 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 predir_switch;
   REAL4 predir_maximum;
   DATASET(predir_ChildRec) nulls_predir {MAXCOUNT(100)};
-  REAL4 prim_name_specificity;
-  REAL4 prim_name_switch;
-  REAL4 prim_name_maximum;
-  DATASET(prim_name_ChildRec) nulls_prim_name {MAXCOUNT(100)};
-  REAL4 addr_suffix_specificity;
-  REAL4 addr_suffix_switch;
-  REAL4 addr_suffix_maximum;
-  DATASET(addr_suffix_ChildRec) nulls_addr_suffix {MAXCOUNT(100)};
+  REAL4 prim_name_derived_specificity;
+  REAL4 prim_name_derived_switch;
+  REAL4 prim_name_derived_maximum;
+  DATASET(prim_name_derived_ChildRec) nulls_prim_name_derived {MAXCOUNT(100)};
+  REAL4 addr_suffix_derived_specificity;
+  REAL4 addr_suffix_derived_switch;
+  REAL4 addr_suffix_derived_maximum;
+  DATASET(addr_suffix_derived_ChildRec) nulls_addr_suffix_derived {MAXCOUNT(100)};
   REAL4 postdir_specificity;
   REAL4 postdir_switch;
   REAL4 postdir_maximum;
   DATASET(postdir_ChildRec) nulls_postdir {MAXCOUNT(100)};
+  REAL4 err_stat_specificity;
+  REAL4 err_stat_switch;
+  REAL4 err_stat_maximum;
+  DATASET(err_stat_ChildRec) nulls_err_stat {MAXCOUNT(100)};
   REAL4 unit_desig_specificity;
   REAL4 unit_desig_switch;
   REAL4 unit_desig_maximum;

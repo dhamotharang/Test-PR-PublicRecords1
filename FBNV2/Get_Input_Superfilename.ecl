@@ -1,12 +1,12 @@
-import FBNV2 ;
+﻿import FBNV2 ;
 
-export Get_Input_Superfilename(string sourcetype)  := 
+export Get_Input_Superfilename(string source)  := 
 
-	map(sourcetype='San_Diego'=>Filenames().San_diego_raw,
-			sourcetype='Ventura'=>Filenames().Ventura_raw,
-			sourcetype='Orange'=>Filenames().Orange_raw,
-			sourcetype='Santa_Clara'=>Filenames().Santa_Clara_raw,
-			sourcetype='Harris'=>Filenames().Harris_raw,
-			sourcetype='Filing'=>Filenames().Filing_raw,
-			sourcetype='Event'=>Filenames().Event_raw,						
+	map(source='SAN_DIEGO'=>Filenames().San_diego_raw,
+			source='VENTURA'=>Filenames().Ventura_raw,
+			source='ORANGE'=>Filenames().Orange_raw,
+			source='SANTA_CLARA'=>Filenames().Santa_Clara_raw,
+			source='HARRIS'=>Filenames().Harris_raw,
+			source='FILING'=>Filenames().Filing_raw,
+			source='EVENT'=>Filenames().Event_raw,						
 			'');

@@ -1,10 +1,14 @@
 ﻿
-import std, header_services, vehiclev2, Watercraft;
+import std, header_services, vehiclev2, Watercraft; 
 
 export applyRegulatory := module
-			export IP := header_services.ProductionLZ.IP_Loc; 
-			export thor_path := header_services.ProductionLZ.Directory_Loc;
-			shared unix_path := header_services.ProductionLZ.Directory_Loc1;
+
+			export debug_ar := false : stored('debug_ar');
+			
+			export IP := header_services.ProductionLZ.IP_Loc; 	
+			export unix_path := header_services.ProductionLZ.Directory_Loc1 : stored('unix_path_override');
+			export thor_path := header_services.ProductionLZ.Directory_Loc  : stored('thor_path_override');
+
 			export enhFileName := 'file_enhanced_fnames.txt';
 			
 			export notification_email_addr := header_services.ProductionLZ.notification_email; 
@@ -53,7 +57,8 @@ export applyRegulatory := module
 
 			export determine_file( fname, layout) := 
 					functionmacro
-				
+							debug_ar := false : stored('debug_ar');
+
 							enhanced_layout := 
 										record 
 												unsigned8 record_source_id; 
@@ -67,15 +72,7 @@ export applyRegulatory := module
 									transform(layout,
 											self := left;
 											self := []));
-
-							// output('isenhancedfile = /' + is_enhancedfile + '/');
-							// d:= enh_base_file;
-							// e:= base_file;
-							// b:= output('need to unenhance');
-							// c:= output('no need');
-							// if (is_enhancedFile, b, c);
-							// if (is_enhancedFile, output(d), output(e));
-						
+					
 							final_file := if(is_enhancedFile, unenhanced_base_ds, base_file); 
 								
 							return final_file;
@@ -126,15 +123,23 @@ export applyRegulatory := module
 																		, dataset([], layout)))));
 
 					endmacro;
+				
+			// layouts and transformation need for suppression. 
+			// moved here from header_services.Supplemental_Data 10-7-19
+			export layout_in := record
+					string32 hval_s;
+					string2  nl;
+			end;
 
+			export layout_out := record
+					data16 hval;
+			end;
 
-			export layout_in := 
-					record
-							string32 hval_s;
-							string2  nl;
-					end;
-
-
+			export layout_out in_to_out(layout_in l) := transform
+					self.hval := stringlib.string2data(l.hval_s);
+			end;
+			//
+			
 			export complex_append(base_ds, filename, Drop_Layout, trans) := 
 					functionmacro
 							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
@@ -192,7 +197,26 @@ export applyRegulatory := module
 
 							return base_ds + Base_file_append;						
 					endmacro; // CR_simple_append_Punish	
+					
+			export CCW_simple_append(base_ds, filename, Drop_Layout, endrec=false) := 
+					functionmacro
+							import std;
+							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
+			
+							max_unique_id := max(base_ds, unique_id);
+							
+							recordof(base_ds) reformat_append(Base_File_Append_In L, UNSIGNED c ) := 
+									transform
+											// obviously this equation is a little weak, but will give us a unique id
+											self.unique_id :=  intformat((c*thorlib.nodes() + (integer) max_unique_id), 8, 1); 
+											self := L;
+											self := [];
+									end;
+			
+							Base_File_Append := project(Base_File_Append_In, reformat_append(left, counter));															
 
+							return base_ds + Base_file_append;						
+					endmacro; // CCW_simple_append		
 
 					
       export simple_sup(base_ds, filename, hashFunc) := 
@@ -342,6 +366,7 @@ export applyRegulatory := module
 											string8   zip;
 											string5   prim_range;
 											string1   same_lname;
+											string2   title ;
 											string5   number_cohabits;
 											string2   eor;
 									end; 
@@ -386,7 +411,7 @@ export applyRegulatory := module
 											self.confidence 						:= 'HIGH';
 											self.cluster    						:= 'CORE';
 											self.generation 						:= 'S';
-											self.title 									:= 43;
+											self.title 									:= (unsigned1) L.title;
 											self.personal 							:= TRUE;
 											self.lname_cnt 							:= 1;
 											self 												:= L;
@@ -488,7 +513,8 @@ export applyRegulatory := module
 						
 							sup_in := suppress.applyregulatory.getFile(filename, supLayout);																			
 
-							local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							// local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							local dSuppressedIn := project(sup_In, suppress.applyRegulatory.in_to_out(left));
 					
 							return join (base_ds, dSuppressedIn, 
 									hashFunc1(left) = right.hval or
@@ -507,9 +533,7 @@ export applyRegulatory := module
 	            HF_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));				
 							HF_DID_SOURCE_STATE_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right), trim(l.source_state, 	left, right));
 							HF_PERSISTENT_ID_Hash(recordof(ds) L) := hashmd5(l.persistent_record_id);
-
-							// complex_hunt_fish_sup(base_ds, filename, hashFunc1, hashFunc2)
-							
+						
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_hunt_fish_sup.txt', HF_DID_SOURCE_STATE_Hash, HF_DID_Hash, HF_PERSISTENT_ID_Hash);
 						
 							return suppress.applyRegulatory.simple_append(ds1, 'file_hunt_fish_inj.thor', emerges.layout_hunters_out); 
@@ -527,7 +551,7 @@ export applyRegulatory := module
 
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_ccw_sup.txt', CCW_Hash1, CCW_Hash2, CCW_Hash3);
 
-							return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
+							return Suppress.applyRegulatory.CCW_simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
 					endmacro; // applyCCW
 
 
@@ -719,7 +743,7 @@ export applyRegulatory := module
 							
 			export hdr_incremental_sup(ds) := 
 				functionmacro
-					local hashFunc(recordof(ds) l) := hashmd5(l.rid);
+					local hashFunc(recordof(ds) l) := hashmd5(intformat((unsigned6)l.rid,15,1));
 					local reverse_sup_result := Suppress.applyRegulatory.simple_reverse_sup(ds, 'hdr_incremental_sup.txt', hashFunc);
 					return reverse_sup_result;
 				endmacro;

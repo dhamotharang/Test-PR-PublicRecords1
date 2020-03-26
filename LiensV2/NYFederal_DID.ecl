@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////
 // Attribute 	: NYFederal_DID
 
 // DEPENDENT ON : liensV2.Mapping_NYFDLN_party,
@@ -150,7 +150,7 @@ Business_Header_SS.MAC_Add_FEIN_By_BDID(file_party_ssn, temp_bdid, app_tax_id, f
 
 liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags tremovetempDID(rec_temp L) := transform
 self := L;
-
+self := [];
 end;
 
 post_append_ssn := project(file_party_fein,tremovetempDID(left));

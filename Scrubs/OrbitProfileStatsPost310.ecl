@@ -69,7 +69,8 @@ output(RemoveBlankRules),
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
 																																		 ,std.system.job.target())));
 																																		 
-																																		 
+
+EXPORT SubmitStatsInWU :=	Scrubs.StatSubmit(CleanStats,CompareToProfile_for_Orbit,pProfileName,CustomTag,pProfileType,versionDate,FileType,workunit);																																						 
 
 EXPORT SummaryStats := dedup(sort(project(CleanStats,
 																					transform(Salt311.ScrubsOrbitLayout and not [rejectwarning, rawcodemissing, rawcodemissingcnt],

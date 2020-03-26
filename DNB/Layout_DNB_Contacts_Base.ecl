@@ -1,4 +1,4 @@
-export Layout_DNB_Contacts_Base := record
+﻿export Layout_DNB_Contacts_Base := record
 unsigned6 did := 0;
 unsigned6 bdid := 0;
 // From DNB Names record
@@ -40,4 +40,8 @@ string10 company_phone10 := '';
 string1   record_type := 'H';           // 'C' Current
                                         // 'H' Historical
 string1   active_duns_number := 'Y';    // 'Y' Active Duns Number
+// Jira# CCPA-93, The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+unsigned4 global_sid := 0;
+unsigned8 record_sid := 0;
  end;

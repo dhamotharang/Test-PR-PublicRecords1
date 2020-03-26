@@ -1,4 +1,4 @@
-import standard, ut, doxie, Vehiclev2; 
+﻿import standard, ut, doxie, Vehiclev2; 
 
 dParty := Vehiclev2.File_VehicleV2_Party;
 
@@ -26,6 +26,11 @@ rec := record
 	unsigned4 lookup_bit := 0;
 	unsigned1 zero := 0;
 	string1  blank:='';
+	//Added for CCPA-103
+	dParty.global_sid;
+	dParty.record_sid;
+	//Added for DF-25578
+	dParty.raw_name;
 end;
 
 //make orig_ssn and append_ssn searchable
@@ -134,6 +139,9 @@ dwr := record
 	standard.Name person_name;
 	dParty.Orig_Name_Type;
 	dParty.history;
+	//Added for CCPA-103 
+	d2.global_sid;
+	d2.record_sid;
 	unsigned4 Reg_Latest_Effective_Date;
 	unsigned4 Reg_Latest_Expiration_Date;
 	unsigned4 Ttl_Latest_Issue_Date;

@@ -20,17 +20,18 @@ import tools,Workman,std,ut,WsDFU,FileSpray,WsWorkunits;
 
 EXPORT Rewind_Build(
 
-   string                               pversion                      // version of the build you are rolling back
-  ,string                               PWuid                         // all files created in this workunit and subsequent workunits in this build will be deleted.
-  ,dataset(Workman.Layouts.wks_slim_  ) pWorkman_Superfile            // the workman superfile for your build.  it should contain all of the workman build files.
-  ,boolean                              pDeleteFiles        = false   // true = output the files to the workunit + delete them.  false = output the files to the workunit
-  ,string                               pFilter             = ''      // optional regex filter for the files to delete.
-  ,dataset({string name,string esp}   ) pExtraFiles         = dataset([],{string name,string esp})
+   string                                       pversion                      // version of the build you are rolling back
+  ,string                                       PWuid                         // all files created in this workunit and subsequent workunits in this build will be deleted.
+  ,dataset(Workman.Layouts.wks_slim_filename  ) pWorkman_Superfile            // the workman superfile for your build.  it should contain all of the workman build files.
+  ,boolean                                      pDeleteFiles        = false   // true = output the files to the workunit + delete them.  false = output the files to the workunit
+  ,string                                       pFilter             = ''      // optional regex filter for the files to delete.
+  ,dataset({string name,string esp}           ) pExtraFiles         = dataset([],{string name,string esp})
+  ,boolean                                      pRestoreWuids       = true
 ) :=
 function
              
   ds_workman                          := pWorkman_Superfile(wuid != '',pWuid = '' or wuid >= pWuid,pversion = '' or version = pversion);
-  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(WsWorkunits.layouts.WsFileWritten) files} ,self.files := Workman.get_FilesWritten(left.wuid,left.esp),self := left));
+  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(WsWorkunits.layouts.WsFileWritten) files} ,self.files := WsWorkunits.get_FilesWritten(left.wuid,left.esp,false),self := left));
   ds_workman_files_written_norm       := normalize(ds_workman_files_written ,left.files ,transform({string name,string esp},self.name := '~' + right.name,self := left));
   ds_workman_files_written_norm_filt  := ds_workman_files_written_norm(regexfind('[[:digit:]]{8}',name,nocase),pFilter = '' or regexfind(pFilter,name,nocase));
 
@@ -44,24 +45,27 @@ function
   ds_workman_skipped_files            := project(ds_workman  ,transform({dataset({string name}) files,string esp} ,self.files := project(WsWorkunits.get_Results(left.wuid)(filename = '',regexfind('not building',value,nocase)),transform({string name},self.name := regexreplace('not building (.*?) because it already exists',left.value,'$1',nocase))),self := left));
   ds_workman_skipped_files_norm       := normalize(ds_workman_skipped_files ,left.files ,transform({string name,string esp},self.name := right.name,self := left));
 
-  ds_workman_timings  := project(ds_workman ,transform({string esp,dataset(Layouts.WsTiming) timings},
+  ds_workman_timings  := project(ds_workman ,transform({string name,string wuid,string esp,dataset(Layouts.WsTiming) timings},
     self.timings := WorkMan.get_WsTiming(left.wuid,left.esp),self := left));
-  ds_workman_timings_filter := normalize(ds_workman_timings ,left.timings,transform({string esp,WsTiming},self := right,self := left)) (regexfind('copy',name,nocase));
-  ds_dfuwuids               := dedup(project(ds_workman_timings_filter  ,transform({string wuid,string esp},self.wuid := regexfind('D[[:digit:]]{8}[-][[:alnum:]-]+',left.name,0),self := left)),all);
-  ds_dfu_files              := project(ds_dfuwuids  ,transform({string name,string esp},self.name := '~' + FileSpray.get_DestLogicalName(left.wuid,left.esp),self := left));
+  ds_workman_timings_filter := normalize(ds_workman_timings ,left.timings,transform({string name,string wuid,string esp,WsTiming},self := right,self := left)) (regexfind('copy',name,nocase));
+  ds_dfuwuids               := dedup(project(ds_workman_timings_filter  ,transform({string name,string wuid,string dfu_wuid,string esp},self.dfu_wuid := regexfind('D[[:digit:]]{8}[-][[:alnum:]-]+',left.name,0),self := left)),all);
+  ds_dfu_files              := project(ds_dfuwuids  ,transform({string dfu_wuid,string name,string esp},self.name := '~' + FileSpray.get_DestLogicalName(left.dfu_wuid,left.esp),self := left));
 
   ds_workman_extra_fnames_filtered := dedup(ds_workman_extra_fnames(pFilter = '' or regexfind(pFilter,srcname,nocase)),srcname,all);
 
   ds_concat                 := project(
       ds_workman_files_written_norm_filt 
     // + ds_workman_extra_fnames_filtered 
-    + ds_dfu_files
+    + project(ds_dfu_files  ,recordof(ds_workman_files_written_norm_filt))
     + pExtraFiles
     + ds_workman_skipped_files_norm       
+    + project(ds_workman_extra_fnames_filtered  ,transform({string name,string esp},self.name := left.srcname,self.esp := left.esp))
     ,transform({recordof(left),boolean isLocal},self.isLocal := if(left.esp = Workman._Config.LocalEsp,true,false)  ,self := left));
 
-  total_cnt1        := count(ds_concat);
-  files2delete      := project(sort(dedup(sort(ds_concat,name,esp),name,esp,all),isLocal,name,esp),transform({unsigned rid,string name,string esp,unsigned total_cnt,boolean isLocal},self.rid := counter,self := left,self.total_cnt := total_cnt1));
+  files2delete1      := project(sort(dedup(sort(ds_concat,name,esp),name,esp,all),isLocal,name,esp),transform({unsigned rid,string name,string esp,boolean isLocal},self.rid := counter,self := left));
+  files2delete      := project(files2delete1,transform({recordof(left),unsigned total_cnt},self.total_cnt := count(files2delete1),self := left)) : independent;
+
+  total_cnt1        := count(files2delete);
 
   outputdebug := 
   parallel(
@@ -73,44 +77,50 @@ function
     ,output(files2delete                        ,named('files2delete'                        ),all)
     ,output(ds_workman_extra_fnames_filtered    ,named('files2rename'                        ),all)
     ,output(ds_workman_files_written_norm_filt  ,named('ds_workman_files_written_norm_filt'  ))
-    ,output(ds_dfu_files                        ,named('ds_dfu_files'                        ))   //good
+    ,output(ds_dfu_files                        ,named('ds_dfu_files'                        ),all)   //good
     ,output(pExtraFiles                         ,named('pExtraFiles'                         ))
     ,output(ds_workman_skipped_files_norm       ,named('ds_workman_skipped_files_norm'       ))
 
-    ,output(ds_workman                         ,named('ds_workman'                         ))
-    ,output(ds_workman_files_written           ,named('ds_workman_files_written'           ))   //up to here works
-    ,output(ds_workman_files_written_norm      ,named('ds_workman_files_written_norm'      ))   //good
-    ,output(ds_workman_extra_fnames            ,named('ds_workman_extra_fnames'            ))
-    ,output(ds_workman_timings                 ,named('ds_workman_timings'                 ))
-    ,output(ds_workman_timings_filter          ,named('ds_workman_timings_filter'          )) //good
+    ,output(ds_workman                         ,named('ds_workman'                         ),all)
+    ,output(ds_workman_files_written           ,named('ds_workman_files_written'           ),all)   //up to here works
+    ,output(ds_workman_files_written_norm      ,named('ds_workman_files_written_norm'      ),all)   //good
+    ,output(ds_workman_extra_fnames            ,named('ds_workman_extra_fnames'            ),all)
+    ,output(ds_workman_timings                 ,named('ds_workman_timings'                 ),all)
+    ,output(ds_workman_timings_filter          ,named('ds_workman_timings_filter'          ),all) //good
     // ,output(ds_workman_skipped_files_norm      ,named('ds_workman_skipped_files_norm'      ))
-    ,output(ds_dfuwuids                        ,named('ds_dfuwuids'                        )) //good
-    // ,output(ds_dfu_files                       ,named('ds_dfu_files'                       ))
-    ,output(ds_concat                          ,named('ds_concat'                          ))
+    ,output(ds_dfuwuids                        ,named('ds_dfuwuids'                        ),all) //good
+    // ,output(ds_dfu_files                       ,named('ds_dfu_files'                       ),all)
+    ,output(ds_concat                          ,named('ds_concat'                          ),all)
   );
 
   rename_workman_files := apply(global(ds_workman_extra_fnames_filtered,few)  ,sequential(Workman.Rename_File(srcname,dstname,true,esp)));
   
-  return sequential(
+  return sequential(iff(pRestoreWuids = true,
      apply(global(ds_workman,few) ,sequential(
-         STD.System.Log.addWorkunitInformation('Restoring '       + wuid + ' on ' + ut.GetTimeDate())
+         STD.System.Log.addWorkunitInformation('Restoring '       + wuid + ' on ' + Workman.getTimeDate())
         ,output(Workman.Restore_Workunit(wuid,esp),named('restoring_wuids'),extend) 
-        ,STD.System.Log.addWorkunitInformation('Done restoring '  + wuid + ' on ' + ut.GetTimeDate())
-     ))
-    ,outputdebug
+        ,STD.System.Log.addWorkunitInformation('Done restoring '  + wuid + ' on ' + Workman.getTimeDate())
+     )))
+    ,iff(pRestoreWuids = true,
+     apply(global(ds_dfuwuids,few) ,sequential(
+         STD.System.Log.addWorkunitInformation('Restoring '       + dfu_wuid + ' on ' + Workman.getTimeDate())
+        ,output(FileSpray.Wuid_Restore(dfu_wuid,esp),named('restoring_DFU_wuids'),extend) 
+        ,STD.System.Log.addWorkunitInformation('Done restoring '  + dfu_wuid + ' on ' + Workman.getTimeDate())
+     )))
+     ,outputdebug
     // -- delete remote files first
     ,iff(pDeleteFiles  = true 
-      ,apply(global(files2delete(isLocal = false),few)
+      ,iff(exists(files2delete(isLocal = false)) ,apply(global(files2delete(isLocal = false),few)
         ,sequential(
            output(WsDFU.DeleteLogicalFile(name,true,,esp) ,named('Remote_Files_Deleted'),extend)
           ,output(rid                               ,named('Number_Files_Deleted'),overwrite)
           ,STD.System.Log.addWorkunitInformation ('Number of files deleted so far: ' + (string)rid + ' out of a total of ' + total_cnt + ' files.')
         )
-      )
+      ))
     )
     // -- delete local files next
     ,iff(pDeleteFiles  = true ,nothor(apply(global(files2delete(isLocal = true ),few), tools.Delete_File(/*'~' + */name,rid,total_cnt))))
-    ,iff(pDeleteFiles  = true ,rename_workman_files)
+    // ,iff(pDeleteFiles  = true ,rename_workman_files)
   );
 
 end;

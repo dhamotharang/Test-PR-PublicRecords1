@@ -1,6 +1,10 @@
 ﻿import BIPV2;
 import BIPV2_Files;
 import lib_thorlib;
+import BIPV2_Build;
+import dops;
+import Tools;
+import BIPV2_Suppression;
 
 export ManualSuppression := module
 	export inRec := record
@@ -81,7 +85,13 @@ export ManualSuppression := module
 	end;
 	
 
-	
+	export viewSuppressionList() := function
+		action1 := output(BIPV2_Files.files_suppressions().ds_suppressions, named('Internal_Linking_Suppressions'));
+		action2 := output(pull(BIPV2_Files.files_suppressions().key_suppressions()), named('Append_Suppressions'));
+		
+		return parallel(action1,action2);
+	end;
+		
 	export getHdrbyRcid(dataset(inRec) inDS) := function
 		hdrRecs    := BIPV2.CommonBase.DS_STATIC;
 		matchRidDS := join(hdrRecs,inDS,
@@ -90,46 +100,129 @@ export ManualSuppression := module
 		return matchRidDS;
 	end;		
 	
-	export createLogicalFile(dataset(BIPV2_Files.files_suppressions().Layout_Suppression) inRecs) := function
+	export createLogicalFile(
+	                          dataset(BIPV2_Files.files_suppressions().Layout_Suppression)     inRecs
+	                         ,dataset(BIPV2_Files.files_suppressions().Layout_Suppression_Key) inKeyRecs
+						,string version
+					    ) := function
 		newFileName := BIPV2_Files.files_suppressions().filename;
+		newKeyName  := BIPV2_Files.files_suppressions().keyname(version);
 		oldData     := BIPV2_Files.files_suppressions().ds_suppressions;
+		oldKey      := project(pull(BIPV2_Files.files_suppressions().key_suppressions()), BIPV2_Files.files_suppressions().Layout_Suppression_Key);
 		newData     := inRecs;
+		newKey      := inKeyRecs;
 		allData     := oldData + newData;
+		allKey      := oldKey  + newKey;
 		distData    := distribute(allData, hash32(rcid));
 		sortedData  := sort(distData, rcid, -dt_added, local);
 		dedupedData := dedup(sortedData, rcid, local);		
-		a           := output(dedupedData,,newFileName,named('Suppressed_Data'));
-		return a;
+		dedupedKey  := dedup(allKey, rcid, all);		
+		outputData  := output(dedupedData,,newFileName,named('Suppressed_Data'));
+		buildKey    := build(BIPV2_Files.files_suppressions().key_suppressions(dedupedKey,newKeyName));
+		
+		action      := parallel(outputData, buildKey);
+		return action;
 	end;
 
-	export createLogicalFileRemovedData(dataset(BIPV2_Files.files_suppressions().Layout_Suppression) inRecs) := function
+	export createLogicalFileRemovedData(
+	                                     dataset(BIPV2_Files.files_suppressions().Layout_Suppression)     inRecs
+	                                    ,dataset(BIPV2_Files.files_suppressions().Layout_Suppression_Key) inKeyRecs
+								 ,string version
+								) := function
 		newFileName := BIPV2_Files.files_suppressions().filename;
+		newKeyName  := BIPV2_Files.files_suppressions().keyname(version);
 		allData     := inRecs;
+		allKeyData  := inKeyRecs;
 		distData    := distribute(allData, hash32(rcid));
 		sortedData  := sort(distData, rcid, -dt_added, local);
 		dedupedData := dedup(sortedData, rcid, local);		
-		a           := output(dedupedData,,newFileName,named('Suppressed_Data'));
-		return a;
+		dedupedKey  := dedup(allKeyData, rcid, all);;		
+		outputData  := output(dedupedData,,newFileName,named('Suppressed_Data'));
+		buildKey    := build(BIPV2_Files.files_suppressions().key_suppressions(dedupedKey,newKeyName));
+		
+		action      := parallel(outputData, buildKey);
+		return action;
 	end;
 	
-	export updateSuppressedSuperFile() := function
+	export updateSuppressedSuperFile(string version) := function
 			superfile   := BIPV2_Files.files_suppressions().sfFileName;
+			superkey    := BIPV2_Files.files_suppressions().sfKeyName;
 			logicalFile := BIPV2_Files.files_suppressions().filename;
-			action := FileServices.PromoteSuperFileList([superfile], logicalFile, true);
-			return action;
+			logicalKey  := BIPV2_Files.files_suppressions().keyname(version);
+			
+			promoteSuppression         := FileServices.PromoteSuperFileList([superfile], logicalFile, true);
+			promoteSuppressionKey      := FileServices.PromoteSuperFileList([superkey],  logicalKey, true);
+			buildEntitySupressionKey   := buildindex(BIPV2_Suppression.modSuppression.kSeleProx(version),width(1));
+			promoteEntitySupressionKey := BIPV2_Suppression.CreateUpdateSuperFile.updateSuperFile(BIPV2_Suppression.FileNames.Keyseleprox,	
+			                                                                       BIPV2_Suppression.FileNames.Keyseleproxfather, 
+																	 BIPV2_Suppression.FileNames.KeyLogicalF(version));
+			
+			dopsupdate :=  dops.updateversion('BipV2SuppressionKeys',Version,BIPV2_Build.mod_email.emailList,,'N');
+			
+			return sequential(
+			                    buildEntitySupressionKey
+			                   ,parallel(promoteSuppression,promoteSuppressionKey,promoteEntitySupressionKey)
+						    ,if(not Tools._Constants.IsDataland,evaluate(dopsupdate),output('Not a prod environment'))
+						   );
 	end;
 	
-	export addCandidates(dataset(inRec) inDs) := function
-		recsToSuppress  := getHdrbyRcid(inDs);
-		addTrackingInfo := project(recsToSuppress,
-		                           transform(BIPV2_Files.files_suppressions().Layout_Suppression,
-                                          self.userid     := lib_thorlib.thorlib.jobowner();
-                                          self.dt_added   := (unsigned4)lib_thorlib.thorlib.wuid()[2..9];
-								                      self.suppressed := true;
-								                      self            := left));
-								                      
-		a                := createLogicalFile(addTrackingInfo);
-		b                := updateSuppressedSuperFile();
+	export addCandidates(dataset(inRec) inDs, string version) := function
+		recsToSuppress   := getHdrbyRcid(inDs);
+		addTrackingInfo  := project(recsToSuppress,
+		                            transform(BIPV2_Files.files_suppressions().Layout_Suppression,
+                                                self.userid     := lib_thorlib.thorlib.jobowner();
+                                                self.dt_added   := (unsigned4)lib_thorlib.thorlib.wuid()[2..9];
+								        self.suppressed := true;
+								        self            := left));
+
+          findAllMatchingRids := join(BIPV2.CommonBase.DS_STATIC, recsToSuppress,
+							   left.fname = right.fname and
+							   left.mname = right.mname and
+							   left.lname = right.lname and
+							   left.name_suffix = right.name_suffix and
+							   left.cnp_name = right.cnp_name and
+							   left.cnp_number = right.cnp_number and
+							   left.cnp_store_number = right.cnp_store_number and
+							   left.prim_range = right.prim_range and
+							   left.predir = right.predir and
+							   left.prim_name = right.prim_name and
+							   left.addr_suffix = right.addr_suffix and
+							   left.postdir = right.postdir and
+							   left.unit_desig = right.unit_desig and
+							   left.sec_range = right.sec_range and
+							   left.v_city_name = right.v_city_name and
+							   left.st = right.st and
+							   left.zip = right.zip and
+							   left.active_duns_number = right.active_duns_number and
+							   left.active_enterprise_number = right.active_enterprise_number and
+							   left.ebr_file_number = right.ebr_file_number and
+							   left.active_domestic_corp_key = right.active_domestic_corp_key and
+							   left.foreign_corp_key = right.foreign_corp_key and
+							   left.unk_corp_key = right.unk_corp_key and
+							   left.company_fein = right.company_fein and
+							   left.company_phone = right.company_phone and
+							   left.company_ticker = right.company_ticker and
+							   left.company_ticker_exchange = right.company_ticker_exchange and
+							   left.company_foreign_domestic = right.company_foreign_domestic and
+							   left.company_url = right.company_url and
+							   left.company_inc_state = right.company_inc_state and
+							   left.company_charter_number = right.company_charter_number and
+							   left.vl_id = right.vl_id and
+							   left.duns_number = right.duns_number and
+							   left.contact_ssn = right.contact_ssn and
+							   left.contact_dob = right.contact_dob and					
+							   left.company_name = right.company_name and
+							   left.contact_dob = right.contact_dob and
+							   left.contact_email = right.contact_email,
+						        transform(BIPV2_Files.files_suppressions().Layout_Suppression_Key,
+							             self := left,
+									   self.userid     := lib_thorlib.thorlib.jobowner(),
+                                                self.dt_added   := (unsigned4)lib_thorlib.thorlib.wuid()[2..9],
+								        self.suppressed := true,
+							            ), lookup);
+											   
+		a                := createLogicalFile(addTrackingInfo,findAllMatchingRids,version);
+		b                := updateSuppressedSuperFile(version);
 		
 		c                := sequential(a, b);
 		return c;
@@ -159,19 +252,30 @@ export ManualSuppression := module
 		return recs;
 	end;
 	
-	export removeCandidates(dataset(inRec) inDs) := function
+	export removeCandidates(dataset(inRec) inDs, string version) := function
 		suppressedData   :=  BIPV2_Files.files_suppressions().ds_suppressions;
+		suppressedKey    :=  BIPV2_Files.files_suppressions().key_suppressions();
+		
 		removeRecs       := join(suppressedData, inDs,
 		                         left.rcid = right.rcid,
-                              transform(recordof(left),
-						                         self.suppressed := if(right.rcid > 0, false, true),
-                                        self.userid     := if(right.rcid > 0, lib_thorlib.thorlib.jobowner(), left.userid),
-                                        self.dt_added   := if(right.rcid > 0, (unsigned4)lib_thorlib.thorlib.wuid()[2..9], left.dt_added),
-								                    self            := left,
-								                    ), left outer, hash);
-						
-		a                := createLogicalFileRemovedData(removeRecs);
-		b                := updateSuppressedSuperFile();
+                                   transform(recordof(left),
+						               self.suppressed := if(right.rcid > 0, false, true),
+                                             self.userid     := if(right.rcid > 0, lib_thorlib.thorlib.jobowner(), left.userid),
+                                             self.dt_added   := if(right.rcid > 0, (unsigned4)lib_thorlib.thorlib.wuid()[2..9], left.dt_added),
+								     self            := left,
+								    ), left outer, hash);
+								    
+		removeKeys       := join(suppressedKey, inDs,
+		                         left.rcid = right.rcid,
+                                   transform(BIPV2_Files.files_suppressions().Layout_Suppression_Key,
+						               self.suppressed := if(right.rcid > 0, false, true),
+                                             self.userid     := if(right.rcid > 0, lib_thorlib.thorlib.jobowner(), left.userid),
+                                             self.dt_added   := if(right.rcid > 0, (unsigned4)lib_thorlib.thorlib.wuid()[2..9], left.dt_added),
+								     self            := left,
+								    ), left outer, hash);
+											   
+		a                := createLogicalFileRemovedData(removeRecs,removeKeys,version);
+		b                := updateSuppressedSuperFile(version);
 		
 		c                := sequential(a, b);
 		return c;

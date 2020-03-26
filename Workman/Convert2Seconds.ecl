@@ -7,6 +7,7 @@ so, '23:1:36.318' to 82896.318 seconds
 
 WorkMan.Convert2Seconds('1 days,14 hours,18 minutes,25 seconds');
 
+7h50m09s
 */
 import std;
 
@@ -16,6 +17,7 @@ function
   //convert to seconds
   //days have 3 colons, so:  1:4:58:20.64
   //or                      1 days 4:58:20.64
+// 7h50m09s
 
 //thregex := '^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)';  
   
@@ -39,12 +41,13 @@ function
 //  return days + ':' + hours + ':' + minutes + ':' + seconds;
   totalsecs := (real)seconds + minutessec + hourssec + daysssec;
 
-  theregex := '^(([[:digit:]]+)( day[s]?,))?(([[:digit:]]+)( hour[s]?,))?(([[:digit:]]+)( minute[s]?,))?(([[:digit:]]+)( second[s]?))?$';
+  // theregex      := '^(([[:digit:]]+)( day[s]?,))?(([[:digit:]]+)( hour[s]?,))?(([[:digit:]]+)( minute[s]?,))?(([[:digit:]]+)( second[s]?))?$';
+  theregex      := '^(([[:digit:]]+)(( day[s]?,|d)))?(([[:digit:]]+)(( hour[s]?,|h)))?(([[:digit:]]+)(( minute[s]?,|m)))?(([[:digit:]]+)(( second[s]?|s)))?$';
 
   days2    := regexfind(theregex,time, 2,nocase);
-  hours2   := regexfind(theregex,time, 5,nocase);
-  minutes2 := regexfind(theregex,time, 8,nocase);
-  seconds2 := regexfind(theregex,time,11,nocase);
+  hours2   := regexfind(theregex,time, 6,nocase);
+  minutes2 := regexfind(theregex,time,10,nocase);
+  seconds2 := regexfind(theregex,time,14,nocase);
 
   minutessec2  := (real)minutes2           * 60;
   hourssec2    := (real)hours2        * 60 * 60;

@@ -1,4 +1,4 @@
-// NCS0840 / North Carolina Real Estate Commission / Real Estate //
+﻿// NCS0840 / North Carolina Real Estate Commission / Real Estate //
 
 export layout_NCS0840 := RECORD
 	string30    ID;
@@ -22,6 +22,7 @@ export layout_NCS0840 := RECORD
 	string30    STATUS;			
 	string30    FAX;				
 	string100   EMAIL;
+	string30		PHONE;
 	string30    BIC_INDIC;	// Broker In Charge Indicator("Y" for BICs)
 	string150   F22;				// Education Commnets
 	string150   F23;				// Education Commnets

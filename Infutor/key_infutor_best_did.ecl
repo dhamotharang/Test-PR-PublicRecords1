@@ -1,7 +1,7 @@
-import Data_Services, infutor,doxie,ut;
+﻿import Data_Services, Doxie, Infutor;
 
-file_best := PROJECT(Infutor.file_infutor_best(did > 0), infutor.layout_best.lbest - name_suffix);
+file_best := Infutor.File_Infutor_Best_Keybuilding;
 
 export Key_infutor_best_DID := 
        index(file_best,{did},{file_best},
-ut.Data_Location.Person_header + 'thor_data400::key::infutor::best.did_' + doxie.Version_SuperKey);
+					Data_Services.Data_Location.Person_header + 'thor_data400::key::infutor::best.did_' + doxie.Version_SuperKey);

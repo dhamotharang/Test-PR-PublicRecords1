@@ -1,4 +1,4 @@
-import address;
+﻿import address;
 export layouts := module
 
 	export certegy_DL_monthly := record
@@ -244,6 +244,9 @@ export layouts := module
 		,address.Layout_Clean182.geo_blk
 		,address.Layout_Clean182.geo_match
 		,address.Layout_Clean182.err_stat
+		//DF-24226 - add global_sid and record_sid for CCPA 
+		,unsigned4 global_sid
+		,unsigned8 record_sid
 	end;
 
 end;

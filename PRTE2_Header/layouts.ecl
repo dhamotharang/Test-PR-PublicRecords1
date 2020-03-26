@@ -1,7 +1,10 @@
-﻿IMPORT header;
+﻿IMPORT header, prte2;
+import dx_header;
+
 EXPORT layouts := MODULE
 
     EXPORT header := header.Layout_Header;
+		// export header := dx_header.layout_header;
     h:=header;
     EXPORT Header_layout_prep_for_keys := record
       h.zip;
@@ -65,7 +68,7 @@ EXPORT layouts := MODULE
   end;
 
 		export insuranceheader_xlink_did := record
-						unsigned6 s_did;
+						// unsigned6 s_did;
 						unsigned6 did;
 						unsigned6 rid;
 						string1 pflag1;
@@ -108,6 +111,7 @@ EXPORT layouts := MODULE
 						string1 jflag3;
 						unsigned8 rawaid;
 						unsigned8 persistent_record_id;
+						prte2.Layouts.deflt_cpa;
 						string1 valid_dob;
 						unsigned6 hhid;
 						string18 county_name;

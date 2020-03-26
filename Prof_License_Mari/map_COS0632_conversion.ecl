@@ -124,7 +124,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 	oUccc3 := OUTPUT(clean_uccc_3);
 	
 	maribase_plus_dbas := RECORD,MAXLENGTH(5500)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -164,7 +164,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameOrg);
 		SELF.NAME_ORG					:= IF(REGEXFIND('.COM',getCorpOnly),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')),
 																Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')));  //Without punct. and Sufx removed
-		SELF.NAME_ORG_SUFX 		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+		SELF.NAME_ORG_SUFX 		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 		
 	  // Identified DBA names
 		SELF.NAME_ORG_ORIG		:= TrimOrgName;
@@ -185,7 +185,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(temp_dba); //split corporation prefix from name
 		SELF.NAME_DBA					:= IF(REGEXFIND('.COM',tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',temp_dba,' CO')),
 														    Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',temp_dba,' CO')));
-		SELF.NAME_DBA_SUFX		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 		SELF.NAME_DBA_ORIG		:= IF(SELF.NAME_DBA = '','',std_org_name[slashchar+1..]);		 //get names without DBA names
 		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != '',temp_dba,'');
@@ -310,7 +310,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		StdDBASufx				:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(L.TMP_DBA);	
 		TrimDBASufx				:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',StdDBASufx) => StringLib.StringFindReplace(StdDBASufx,'CO',''),
 													NOT REGEXFIND('([Cc][Oo][\\.]?)$',StdDBASufx) AND NOT REGEXFIND('.COM',StdDBASufx) => Prof_License_Mari.mod_clean_name_addr.cleanFName(StdDBASufx),
@@ -330,7 +330,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) :=TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) :=TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;

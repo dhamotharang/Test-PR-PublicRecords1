@@ -340,8 +340,13 @@ EXPORT Pre_Update_Incident_PRtcc_DataElements := FUNCTION
 
  FLAccidents_Ecrash.Layout_Infiles.incident_NEW ExpandIncidentLayout(ds_incident L) := TRANSFORM
 																																									  SELF.Dispatch_Time := '';
-																																									  SELF.Additional_Keying := '';
-																																									  SELF := L;
+																																									  SELF.Photograph_Type := '';
+																																									  SELF.Ready_To_Sell_Data := '';
+																																									  SELF.Posted_Satutory_Speed_Limit := '';
+																																									  SELF.Dispatch_Date := '';
+																																									  SELF.Drug_Involvement := '';
+																																									  SELF.Alcohol_Involved := '';
+																																										SELF := L;
 																																								   END;
 																									 
  upd_incident_layout := PROJECT(ds_incident, ExpandIncidentLayout(LEFT));

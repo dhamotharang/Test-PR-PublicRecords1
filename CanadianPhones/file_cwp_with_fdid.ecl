@@ -1,4 +1,4 @@
-import CanadianPhones, autokey, ut;
+﻿import CanadianPhones, autokey, ut;
 
 canadianWP := CanadianPhones.file_CanadianWhitePagesBase;
 
@@ -102,6 +102,9 @@ slim_canadianWP := RECORD
 	string1  Transaction_Code;
     string1  listing_type;
 	unsigned6 fdid;
+	//Added for CCPA-88
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;
 
 slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM 

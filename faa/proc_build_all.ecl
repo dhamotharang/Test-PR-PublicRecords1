@@ -1,4 +1,5 @@
-﻿
+﻿import orbit3;
+
 export proc_build_all(string version) :=
 function
 	#workunit('name','FAA Build ' + version)
@@ -11,5 +12,8 @@ function
 	build_strata := out_base_dev_stats(version) : success(output('STRATA STATS BUILT SUCCESSFULLY')), failure(output('STRATA STATS FAILED'));
 	orbit_report.Aircraft_Stats(getaircraft);
 	orbit_report.Airmen_Stats(getairmen);
-	return sequential(spray_all,build_in,build_base,build_keys,build_sample,build_strata,Scrubs_FAA.fnRunScrubs(version,''),getaircraft,getairmen,faa.coverage);
+	Orbit_UpdateFcra := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA FAA','version','F');
+	Orbit_UpdateAC := Orbit3.proc_Orbit3_CreateBuild_AddItem('FAA Aircraft','version','N');
+	Orbit_UpdateAM := Orbit3.proc_Orbit3_CreateBuild_AddItem('FAA Airmen','version','N');
+	return sequential(spray_all,build_in,build_base,build_keys,build_sample,build_strata,Scrubs_FAA.fnRunScrubs(version,''),getaircraft,getairmen,faa.coverage,Orbit_UpdateFcra,Orbit_UpdateAC,Orbit_UpdateAM);
 end;

@@ -1,3 +1,5 @@
+﻿import _control, MDR, std;
+
 export Update_Contacts(
 
 	 dataset(layouts.Input.Sprayed		)	pUpdateFile
@@ -15,7 +17,9 @@ function
 																														,dStandardizedInputFile
 															);
 
-	dStandardizedAddr				:= Standardize_Addr_Contacts	(update_combined		);	
+	addGlobalSID						:= MDR.macGetGlobalSid(update_combined, 'SheilaGrecoContact', '', 'global_sid'); //DF : Populate Global_SID;
+	
+	dStandardizedAddr				:= Standardize_Addr_Contacts	(addGlobalSID		);	
 	dAppendIds							:= Append_Ids.fAppendDid			(dStandardizedAddr	);
 	dRollup									:= Rollup_Contacts						(dAppendIds					);
 

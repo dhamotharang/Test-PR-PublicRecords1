@@ -864,14 +864,26 @@ EXPORT Update_Base_PRtcc_DataElements := FUNCTION
 													 
 
  FLAccidents_Ecrash.Layout_Basefile ExpandBaseLayout(ds_Base L) := TRANSFORM
+																																			SELF.Citation_Type := '';
 																																			SELF.Violation_Code3 := '';
 																																			SELF.Violation_Code4 := '';
 																																			SELF.Dispatch_Time := '';
-																																			SELF.Additional_Keying := '';
-																																			SELF.Dui_Suspected := '';
-																																			SELF.Report_Contributing_Circumstances_p := '';
+																																			SELF.Photograph_Type := '';
+																																			SELF.Ready_To_Sell_Data := '';
+																																			SELF.Posted_Satutory_Speed_Limit := '';
+																																			SELF.Condition_At_Time_Of_Crash := '';
+																																			SELF.Drug_Use_Suspected := '';
+																																			SELF.Alcohol_Use_Suspected := '';
+																																			SELF.Drug_Test_Status := '';
+																																			SELF.Contributing_Circumstances_P := '';
+																																			SELF.Driver_Actions_At_Time_Of_Crash := '';
+																																			SELF.Prior_Nonmotorist_Action := '';
+																																			SELF.Pedestrian_Actions_At_Time_Of_Crash := '';
+																																			SELF.Pedalcyclist_Actions_At_Time_Of_Crash := '';
+																																			SELF.Passenger_Actions_At_Time_Of_Crash := '';
+																																			SELF.Report_Road_Condition := '';
 																																			SELF := L;
-																																	 END;
+																																		END;
 																									 
  upd_base_layout := PROJECT(ds_Base, ExpandBaseLayout(LEFT));
 		

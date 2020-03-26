@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT IL_Main_GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT IL_Main_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_UCCV2';
   EXPORT spc_NAMESCOPE := 'IL_Main';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'UCCV2';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,tmsid,rmsid,process_date,static_value,date_vendor_removed,date_vendor_changed,filing_jurisdiction,orig_filing_number,orig_filing_type,orig_filing_date,orig_filing_time,filing_number,filing_number_indc,filing_type,filing_date,filing_time,filing_status,status_type,page,expiration_date,contract_type,vendor_entry_date,vendor_upd_date,statements_filed,continuious_expiration,microfilm_number,amount,irs_serial_number,effective_date,signer_name,title,filing_agency,address,city,state,county,zip,duns_number,cmnt_effective_date,description,collateral_desc,prim_machine,sec_machine,manufacturer_code,manufacturer_name,model,model_year,model_desc,collateral_count,manufactured_year,new_used,serial_number,property_desc,borough,block,lot,collateral_address,air_rights_indc,subterranean_rights_indc,easment_indc,volume,persistent_record_id';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -50,6 +72,7 @@ EXPORT IL_Main_GenerationMod := MODULE
     + 'FIELDTYPE:invalid_orig_filing_type:CUSTOM(Scrubs_UCCV2.Functions.fn_il_orig_filing_type>0)\n'
     + 'FIELDTYPE:invalid_orig_filing_date:CUSTOM(Scrubs_UCCV2.Functions.fn_orig_filing_date>0)\n'
     + 'FIELDTYPE:invalid_orig_filing_time:CUSTOM(Scrubs_UCCV2.Functions.fn_check_time>0)\n'
+    + 'FIELDTYPE:invalid_filing_number:CUSTOM(Scrubs_UCCV2.Functions.fn_numeric_or_blank>0)\n'
     + 'FIELDTYPE:invalid_filing_type:CUSTOM(Scrubs_UCCV2.Functions.fn_il_filing_type>0)\n'
     + 'FIELDTYPE:invalid_filing_date:CUSTOM(Scrubs_UCCV2.Functions.fn_past_yyyymmdd>0)\n'
     + 'FIELDTYPE:invalid_filing_time:CUSTOM(Scrubs_UCCV2.Functions.fn_check_time>0)\n'
@@ -67,7 +90,7 @@ EXPORT IL_Main_GenerationMod := MODULE
     + 'FIELD:orig_filing_type:TYPE(STRING40):LIKE(invalid_orig_filing_type):0,0\n'
     + 'FIELD:orig_filing_date:TYPE(STRING8):LIKE(invalid_orig_filing_date):0,0\n'
     + 'FIELD:orig_filing_time:TYPE(STRING4):LIKE(invalid_orig_filing_time):0,0\n'
-    + 'FIELD:filing_number:TYPE(STRING25):LIKE(invalid_mandatory):0,0\n'
+    + 'FIELD:filing_number:TYPE(STRING25):LIKE(invalid_filing_number):0,0\n'
     + 'FIELD:filing_number_indc:TYPE(STRING1):0,0\n'
     + 'FIELD:filing_type:TYPE(STRING40):LIKE(invalid_filing_type):0,0\n'
     + 'FIELD:filing_date:TYPE(STRING8):LIKE(invalid_filing_date):0,0\n'
@@ -129,3 +152,4 @@ EXPORT IL_Main_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

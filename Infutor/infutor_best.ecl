@@ -1,4 +1,4 @@
-import doxie_build,mdr,watchdog,doxie,address,ut,PRTE2_Header,PromoteSupers;
+﻿import doxie_build,mdr,watchdog,doxie,address,ut,PRTE2_Header,PromoteSupers,header;
 
 r1 := RECORD
   unsigned6 did;
@@ -62,14 +62,17 @@ key_watchdog_best :=dedup(distribute(index(watchdog.Key_Prep_Watchdog_GLB(),'~pr
 #ELSE
 infutor_into_header := if(excludeForeclosure, 
 	//distribute(infutor.infutor_header_filtered(true), hash(did)),
-	distribute(DATASET('~thor::spokeo::infutor_header',r1,thor), hash(did)),
+	distribute(PROJECT(DATASET('~thor::spokeo::infutor_header',r1,thor),RECORDOF(infutor.infutor_header)), hash(did)),
 	distribute(infutor.infutor_header, hash(did)));
 key_watchdog_best :=dedup(distribute(watchdog.Key_Prep_Watchdog_GLB(),hash(did)),did,all,local);
 #END;
 
+// apply CCPA suppression
+infutor_into_header_ccpa_applied:=header.fn_suppress_ccpa(infutor_into_header,true);
+
 //mapping to scored layout
 
-infutor.layout_best.lscored tscored(infutor_into_header le) := transform
+infutor.layout_best.lscored tscored(infutor_into_header_ccpa_applied le) := transform
 
 self.addr1:=stringlib.stringcleanspaces(if(length(stringlib.stringfilterout(le.prim_range,'%0-. '))=0,'',trim(le.prim_range))
 															+' '+if(length(stringlib.stringfilterout(le.predir,'%0-. '))=0,'',trim(le.predir))
@@ -87,7 +90,7 @@ self := [];
 
 end;
 
-pre_scored := project(infutor_into_header, tscored(left));
+pre_scored := project(infutor_into_header_ccpa_applied, tscored(left));
 
 //join with watchdog best
 

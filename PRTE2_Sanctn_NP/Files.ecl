@@ -145,6 +145,10 @@ export dsPartyTIN := dedup(project(base_party(TIN != ''),transform(layouts.TIN_K
 
 export party_aka_dba_new	:= project(base_party_aka_dba, TRANSFORM(layouts.PARTY_AKA_DBA_Key, SELF := LEFT));																																			
 
+export party_linkids := project(base_party, transform(layouts.Party_LinkId_Key, self := left));
+
+export incident_linkids := project(base_incident, transform(layouts.incident_linkid_key, self := left, self := []));
+
 
 //Autokeys
 ds_party			:= base_party(batch <> '');
@@ -180,6 +184,10 @@ layouts.autokeys 	transform_party(ds_party Linput) := transform
 		self.TIN			:= Linput.TIN;
 		self.DBCODE		:= Linput.DBCODE;
 		self.SRCE_CD	:= '';
+		self.date_vendor_first_reported := Linput.date_vendor_first_reported;
+		self.date_vendor_last_reported 	:= Linput.date_vendor_last_reported;
+		self.global_sid 								:= Linput.global_sid;
+		self.record_sid 								:= Linput.record_sid;
 end;
 
 s1 := dedup(project(ds_party,transform_party(left)),record,all,local);
@@ -231,6 +239,10 @@ layouts.autokeys transform_party_aka(ds_CleanParsedAKA Linput) := transform
 		self.TIN					:= '';
 		self.DBCODE				:= Linput.DBCODE;
 		self.SRCE_CD			:= '';
+		self.date_vendor_first_reported := Linput.date_vendor_first_reported;
+		self.date_vendor_last_reported 	:= Linput.date_vendor_last_reported;
+		self.global_sid 	:= Linput.global_sid;
+		self.record_sid 	:= Linput.record_sid;
 end;
 
 s2 := dedup(project(ds_CleanParsedAKA,transform_party_aka(left)),record,all,local);

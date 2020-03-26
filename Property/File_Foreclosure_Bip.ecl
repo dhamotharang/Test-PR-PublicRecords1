@@ -1,6 +1,6 @@
-import BIPV2;
+﻿import BIPV2;
 
-file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='U');
+file_in := Property.File_Foreclosure_Normalized(trim(deed_category)IN ['U','F','T','Q','G']);
 
 BIP_layout:=record
 	string70		foreclosure_id;
@@ -30,6 +30,7 @@ BIP_layout:=record
 	string1		blank :='';
 	BIPV2.IDlayouts.l_xlink_ids;	//Added for BIP project
 	unsigned8 source_rec_id :=0; //Added for BIP project
+	string2		source;
 end;
 
 export File_Foreclosure_Bip := dedup(sort(project(file_in(site_prim_name<>'' and site_zip<>''),BIP_layout),record),record);

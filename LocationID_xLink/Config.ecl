@@ -16,8 +16,8 @@ EXPORT ExternalFilePrefetch := 30; //Number of transforms called at once
 EXPORT LinkpathCandidateCount := 50; // Number of candidates to consider from each linkpath in batch. Higher = better result and slower execution.
 EXPORT meow_dedup := 'AUTO'; // Values: ALWAYS, NEVER, or anything else to automatically decide what to dedup from MEOW inputs
  
-EXPORT MAC_MEOW_LocationID_Batch_Wrapper(infile,Ref='',Input_LocId = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip5 = '',OutFile,AsIndex='true',UpdateIDs='false',Stats='') := MACRO
-	LocationId_xLink.MAC_MEOW_LocationID_Batch(infile,Ref,Input_LocId,Input_prim_range,Input_predir,Input_prim_name,Input_addr_suffix,Input_postdir,Input_unit_desig,Input_sec_range,Input_v_city_name,Input_st,Input_zip5,OutFile,AsIndex,UpdateIDs,Stats);
+EXPORT MAC_MEOW_LocationID_Batch_Wrapper(infile,Ref='',Input_LocId = '',Input_prim_range = '',Input_predir = '',Input_prim_name_derived = '',Input_addr_suffix_derived = '',Input_postdir = '',Input_err_stat = '',Input_unit_desig = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip5 = '',OutFile,AsIndex='true',UpdateIDs='false',Stats='') := MACRO
+	LocationId_xLink.MAC_MEOW_LocationID_Batch(infile,Ref,Input_LocId,Input_prim_range,Input_predir,Input_prim_name_derived,Input_addr_suffix_derived,Input_postdir,Input_err_stat,Input_unit_desig,Input_sec_range,Input_v_city_name,Input_st,Input_zip5,OutFile,AsIndex,UpdateIDs,Stats);
 ENDMACRO;
 EXPORT KeyInfix := KeyInfix;
 EXPORT JoinLimit := 10000;

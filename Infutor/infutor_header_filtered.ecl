@@ -1,14 +1,17 @@
-﻿import autokeyb2,doxie,header, ut, codes,RoxieKeyBuild, infutor,mdr, doxie_build, watchdog, mdr, census_data, lib_Datalib;
+﻿import autokeyb2,doxie,header, ut, codes,RoxieKeyBuild, infutor,mdr, doxie_build, watchdog, mdr, census_data, lib_Datalib,STD;
 
 
 
 export infutor_header_filtered(boolean excludeForeclosure = false) := function
 
 Test_Count := 0;
+loadfile:=nothor(STD.File.SUPERFILECONTENTS(infutor.filename_infutor));
 
+SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
+cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1);
 /* //INFUTOR into Header base layout */
 header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l, integer c) := transform
-cversion_dev := infutor._config.get_cversion_dev; 
+
 /* //check date validity by length, number values, and between 1901 and today */
 
 Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDate[1..6];

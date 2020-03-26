@@ -1,4 +1,4 @@
-import ut,fbnv2,address, lib_stringlib, VersionControl;
+﻿import ut,fbnv2,address, lib_stringlib, VersionControl;
 
 export Standardize_FBN_FL:=
 module
@@ -22,6 +22,7 @@ module
 					self.FIC_OWNER_DOC_NUM 				:= trim(l.FIC_OWNERS[c].FIC_OWNER_DOC_NUM);
 					self.FIC_OWNER_NAME 	  	 		:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_NAME));
 					self.FIC_OWNER_NAME_FORMAT  	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_NAME_FORMAT));
+					
 					self.FIC_OWNER_ADDR 	  		 	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_ADDR));
 					self.FIC_OWNER_CITY 	  		 	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_CITY));
 					self.FIC_OWNER_STATE   		 		:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_STATE));
@@ -119,10 +120,12 @@ module
 			
 			logicalfile_filing := '~thor_data400::in::fbnv2::FL::Filing::'+pversion+'::Cleaned';
 			
-			VersionControl.macBuildNewLogicalFile(logicalfile_filing	,PrepFilings	,filing_out		,,,pOverwrite);		
+			VersionControl.macBuildNewLogicalFile(logicalfile_filing	,PrepFilings	,filing_out		,false,,pOverwrite);		
 	
-			mapped_Filing 	:= 	sequential(filing_out);
-			source					:= 'Filing';
+			mapped_Filing 	:= 	sequential(filing_out)
+			
+														 : persist('~thor_data400::mappedfiling::fbnv2::fl::filing',SINGLE);
+			source					:= 'FILING';
 			superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 			Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 			
@@ -130,7 +133,8 @@ module
 				sequential(
 					mapped_Filing
 					,if(~FileServices.FileExists(superfilename), Create_Super)
-					,fileservices.addsuperfile( superfilename,logicalfile_filing)								  
+					,fileservices.clearSuperFile(superfilename)
+					,fileservices.addsuperfile(superfilename,logicalfile_filing) 
 				);	
 
 			return result;
@@ -290,11 +294,11 @@ module
 			Clean_Event_Names	:=project(dCleanName ,CleanUpName(left));
 			
 			logicalfile_event := '~thor_data400::in::fbnv2::FL::Event::'+pversion+'::Cleaned';
-			
-			VersionControl.macBuildNewLogicalFile(logicalfile_event	,Clean_Event_Names	,Event_out		,,,pOverwrite);		
+	
+			VersionControl.macBuildNewLogicalFile(logicalfile_event	,Clean_Event_Names	,Event_out		,false,,pOverwrite);
 	
 			mapped_Event 	:= 	sequential(Event_out);
-			source				:= 'Event';
+			source				:= 'EVENT';
 			superfilename := FBNV2.Get_Update_SupperFilename(source);
 			Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 			
@@ -302,7 +306,8 @@ module
 				sequential(
 					mapped_Event
 					,if(~FileServices.FileExists(superfilename), Create_Super)
-					,fileservices.addsuperfile( superfilename,logicalfile_event)								  
+					,fileservices.clearSuperFile( superfilename)
+					,fileservices.addsuperfile( superfilename,logicalfile_event)
 				);	
 			
 			return result;

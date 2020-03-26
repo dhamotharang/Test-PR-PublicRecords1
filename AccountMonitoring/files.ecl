@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring;
+﻿IMPORT AccountMonitoring;
 
 EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 
@@ -62,6 +62,8 @@ EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 		documents_template(mvr);
 		documents_template(aircraft);
 		documents_template(watercraft);
+		documents_template(personheader);
+		documents_template(email);
 	END;
 	
 	EXPORT history := MODULE
@@ -95,6 +97,8 @@ EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 		EXPORT mvr	 					 := history_template(filenames(pseudo_environment).history.mvr);
 		EXPORT aircraft 			 := history_template(filenames(pseudo_environment).history.aircraft);
 		EXPORT watercraft			 := history_template(filenames(pseudo_environment).history.watercraft);
+		EXPORT personheader			 := history_template(filenames(pseudo_environment).history.personheader);
+		EXPORT email    			 := history_template(filenames(pseudo_environment).history.email);
 	END;
 	
 	// Creates the dataset that the results will be written to

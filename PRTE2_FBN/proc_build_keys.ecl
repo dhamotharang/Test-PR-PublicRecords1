@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_FBN, AutoKeyB2,FBNV2;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_FBN, AutoKeyB2,FBNV2;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 

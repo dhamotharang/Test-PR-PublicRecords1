@@ -1,4 +1,4 @@
-IMPORT DNB,DNB_DMI, BIPV2, STANDARD;
+﻿IMPORT DNB,DNB_DMI, BIPV2, STANDARD;
 EXPORT Layouts := module
 
 	shared Working_Fields := Record
@@ -22,6 +22,7 @@ EXPORT Layouts := module
 	  Layout_DNB_autokey;
 	  unsigned1 zero := 0;
 	  string1 blank := '';
+		dnb_dmi.layouts.Base.CCPA_fields;
 	end;
   EXPORT CompaniesForBIP2 := DNB_DMI.Layouts.Base.CompaniesForBIP2;
 	EXPORT Layout_DNB_Base := RECORD(DNB.Layout_DNB_Base)

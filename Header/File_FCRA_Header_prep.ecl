@@ -45,7 +45,7 @@ join_old_new_en :=  join( distribute(old_en_fcra_prep,hash(prim_name,zip,lname))
                 ,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist('~thor_data400::persist::hbm::fcra_en::' ,expire(14),REFRESH(TRUE));
+				): persist('~thor_data400::persist::hbm::fcra_en::' + filedate ,expire(14),REFRESH(TRUE));
 
 with_no_rid_no_uid := join_old_new_en(rid=0):independent;
 with_old_rid_w_uid := join_old_new_en(rid>0):independent;

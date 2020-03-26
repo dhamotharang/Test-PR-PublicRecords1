@@ -1,4 +1,4 @@
-every_10_min := '*/10 0-23 * * *';
+﻿every_10_min := '*/10 0-23 * * *';
 IP:=NAC.Constants.LandingZoneServer;
 RootDir := NAC.Constants.LandingZonePathBaseEx;
 
@@ -7,7 +7,7 @@ lECL1 :=
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_44_sla,thor400_44\');\n'
++'#OPTION(\'AllowedClusters\',\'thor400_44_sla_eclcc,thor400_44_eclcc\');\n'
 +'#OPTION(\'AllowAutoQueueSwitch\',\'1\');\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'jose.bello@lexisnexis.com\'\n'

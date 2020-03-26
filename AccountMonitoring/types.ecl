@@ -1,4 +1,4 @@
-EXPORT types := MODULE 
+﻿EXPORT types := MODULE 
 
 	// Assigns numeric values to available products using bitwise calculations (associated numbers in comment)
 	EXPORT productMask := ENUM(UNSIGNED8, none = 0,
@@ -27,7 +27,9 @@ EXPORT types := MODULE
 																				 mvr = corp << 1,			 					 					 //	 4194304
 																				 aircraft = mvr << 1,			 					 			 //	 8388608
 																				 watercraft = aircraft << 1,			 				 //	 16777216
-                                         allProducts = (watercraft << 1) - 1); 		 //  33554431
+                                     personheader =  watercraft << 1,         //33554432
+                                     email =  personheader << 1,         //67108864
+                                     allProducts = (email << 1) - 1); 		 //  134217727
 																				 
 
 	// Function used to verify whether a customer product mask (tstBits) contains a particular product 

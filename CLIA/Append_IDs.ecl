@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Header, Business_Header_SS, Business_HeaderV2, DID_Add, ut, Health_Provider_Services;
+﻿IMPORT BIPV2, Business_Header, Business_Header_SS, Business_HeaderV2, DID_Add, ut, Health_Provider_Services;
 
 EXPORT Append_IDs := MODULE
 
@@ -40,8 +40,10 @@ EXPORT Append_IDs := MODULE
 			SELF := L;
 		END;
 
-		dForBdiding := PROJECT(pDataset, tForBdiding(LEFT));
-
+		dForBdiding := sort(distribute(PROJECT(pDataset, tForBdiding(LEFT)), 
+												hash(zip5, prim_range, prim_name, sec_range, phone, company_name, clia_number)),
+												zip5, prim_range, prim_name, sec_range, phone, company_name, clia_number, skew(1), local);
+												
 		BDID_Matchset := ['A', 'P'];
 
 		Business_Header_SS.MAC_Add_BDID_Flex(
@@ -69,7 +71,6 @@ EXPORT Append_IDs := MODULE
 			,p_city_name													// city
 		
 		);
-
     RETURN PROJECT(dBdidOut, Layouts.Base);
 
 	END;
@@ -114,7 +115,9 @@ EXPORT Append_IDs := MODULE
 
 		dAppendBdid := fAppendBdid(pDataset) : PERSIST(Persistnames.AppendIdsBdid);
 		
-		dAppendLNpid	:= fAppendLNpid(dAppendBdid) : PERSIST(Persistnames.AppendIdsLNpid);
+		sort_Bdid		:= sort(distribute(dAppendBdid, hash(clean_company_address.zip, clean_phones.phone, clia_number)), clean_company_address.zip, clean_phones.phone, clia_number, skew(1), local);
+		
+		dAppendLNpid	:= fAppendLNpid(sort_Bdid) : PERSIST(Persistnames.AppendIdsLNpid);
 
 		RETURN dAppendLNpid;
 

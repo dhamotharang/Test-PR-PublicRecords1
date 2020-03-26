@@ -1,6 +1,8 @@
-import business_header,business_header_ss,did_add,ut,mdr,TopBusiness_External,AID, NCPDP,Health_Provider_Services ;
+﻿import business_header,business_header_ss,did_add,ut,mdr,TopBusiness_External,AID, NCPDP,Health_Provider_Services, 
+				Health_Facility_Services, BIPV2_Company_Names, HealthCareFacility ;
 
 export Update_Base	:= MODULE
+#OPTION('multiplePersistInstances',FALSE);
 	
 	SHARED fn_scale_ncpdp_id(string7 ncpdp_id) := function
 		unsigned6 max_pid := 281474976710655;  //max unsigned6
@@ -571,7 +573,7 @@ export Update_Base	:= MODULE
 
 	export combined_base (string pversion):= function
 	
-		prov_info_ncpdp 	:= distribute(Files().prov_info_base.built, hash(ncpdp_provider_id));
+		prov_info_ncpdp 	:= dedup(sort(distribute(Files().prov_info_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local), record, local);
 
 		Layouts.Base.Combined_File combine1(prov_info_ncpdp L)	:= TRANSFORM
 			self.pid                      							:=	fn_scale_ncpdp_id(l.ncpdp_provider_id);
@@ -727,11 +729,12 @@ export Update_Base	:= MODULE
 			self														            := 	l;
 			self																				:=	[];
 		end;
-		base_a	:= project(prov_info_ncpdp, combine1(LEFT));
+		base_a0	:= dedup(sort(project(prov_info_ncpdp, combine1(LEFT)), record, local), record, local);
+		base_a	:= sort(distribute(base_a0, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
 		
-		prov_relat_ncpdp	:= distribute(Files().prov_relat_base.built, hash(ncpdp_provider_id));
+		prov_relat_ncpdp	:= sort(distribute(Files().prov_relat_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
 
-		base_b	:= dedup(JOIN(base_a, prov_relat_ncpdp,
+		base_b0	:= JOIN(base_a, prov_relat_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_a},
 											self.record_type														:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -746,10 +749,12 @@ export Update_Base	:= MODULE
 											self.prov_relat_clean_effect_through_date		:=	right.clean_effect_through_date;
 											self																				:=	left)
 										,left outer
-										,local), all);
+										,local);
 										
-		medicaid_ncpdp	:= distribute(Files().medicaid_base.built, hash(ncpdp_provider_id));
-		base_c	:= dedup(JOIN(base_b, medicaid_ncpdp,
+		base_b	:= dedup(sort(base_b0, record, local), record, local);
+										
+		medicaid_ncpdp	:= sort(distribute(Files().medicaid_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		base_c0	:= JOIN(sort(distribute(base_b, hash(ncpdp_provider_id)), ncpdp_provider_id, local), medicaid_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_b},
 											self.record_type								:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -758,10 +763,11 @@ export Update_Base	:= MODULE
 											self.medicaid_clean_delete_date	:=	right.clean_delete_date;
 											self														:=	left)
 										,left outer
-										,local),all);
-
-		taxonomy_ncpdp	:= distribute(Files().taxonomy_base.built, hash(ncpdp_provider_id));
-		base_d	:= dedup(JOIN(base_c,	taxonomy_ncpdp, 			
+										,local);
+		base_c	:= dedup(sort(base_c0, record, local), record, local);
+		
+		taxonomy_ncpdp	:= sort(distribute(Files().taxonomy_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		base_d0	:= JOIN(sort(distribute(base_c, hash(ncpdp_provider_id)), ncpdp_provider_id, local),	taxonomy_ncpdp, 			
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_c},
 											self.record_type									:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -770,10 +776,11 @@ export Update_Base	:= MODULE
 											self.taxonomy_clean_delete_date		:=	right.clean_delete_date;
 											self															:=	left)
 										,left outer
-										,local), all);
+										,local);
+		base_d	:= dedup(sort(base_d0, record, local), record, local);
 
-		demog_id	:= distribute(Files().demographic_base.built, hash(relationship_id));
-		base_e	:= dedup(JOIN(distribute(base_d, hash(prov_relat_relationship_id)), demog_id,
+		demog_id	:= sort(distribute(Files().demographic_base.built, hash(relationship_id)), relationship_id, local);
+		base_e0	:= JOIN(sort(distribute(base_d, hash(prov_relat_relationship_id)), prov_relat_relationship_id, local), demog_id,
 										LEFT.prov_relat_relationship_id	= RIGHT.relationship_id,
 										TRANSFORM({base_d},
 											self.record_type													:=	if(right.record_type = 'H', right.record_type, left.record_type);	
@@ -855,10 +862,11 @@ export Update_Base	:= MODULE
 											self.demographic_err_stat									:=	right.err_stat;
 											self																			:=	left)
 										,left outer
-										,local),all);
-
-		pay_center_id	:= distribute(Files().pay_center_base.built, hash(id));
-		base_f	:= dedup(JOIN(distribute(base_e, hash(prov_relat_payment_center_id)), pay_center_id,
+										,local);
+		base_e	:= dedup(sort(base_e0, record, local), record, local);
+		
+		pay_center_id	:= sort(distribute(Files().pay_center_base.built, hash(id)), id, local);
+		base_f0	:= JOIN(sort(distribute(base_e, hash(prov_relat_payment_center_id)), prov_relat_payment_center_id, local), pay_center_id,
 										LEFT.prov_relat_payment_center_id = RIGHT.id,
 										TRANSFORM({base_e},
 											self.record_type									:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -914,10 +922,11 @@ export Update_Base	:= MODULE
 											self.pay_center_err_stat					:=	right.err_stat;
 											self															:=	left)
 										,left outer
-										,local),all);
+										,local);
+		base_f	:= dedup(sort(base_f0, record, local), record, local);
 							
-		parent_org_id	:= distribute(Files().parent_org_base.built, hash(id));
-		base_g	:= dedup(JOIN(distribute(base_f, hash(demographic_parent_organization_id)), parent_org_id,
+		parent_org_id	:= sort(distribute(Files().parent_org_base.built, hash(id)), id, local);
+		base_g0	:= JOIN(sort(distribute(base_f, hash(demographic_parent_organization_id)), demographic_parent_organization_id, local), parent_org_id,
 										LEFT.demographic_parent_organization_id = RIGHT.id,
 										TRANSFORM({base_f},
 											self.record_type									:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -973,10 +982,11 @@ export Update_Base	:= MODULE
 											self.parent_org_err_stat					:=	right.err_stat;
 											self															:=	left)
 										,left outer
-										,local),all);
+										,local);
+		base_g	:= dedup(sort(base_g0, record, local), record, local);
 
-		eprescribe_ncpdp	:= distribute(Files().eprescribe_base.built, hash(ncpdp_provider_id));
-		base_h	:= dedup(JOIN(distribute(base_g, hash(ncpdp_provider_id)), eprescribe_ncpdp,
+		eprescribe_ncpdp	:= sort(distribute(Files().eprescribe_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		base_h0	:= JOIN(sort(distribute(base_g, hash(ncpdp_provider_id)), ncpdp_provider_id, local), eprescribe_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_g},
 											self.record_type													:=	if(right.record_type = 'H', right.record_type, left.record_type);					
@@ -986,10 +996,10 @@ export Update_Base	:= MODULE
 											self.eprescribe_clean_effect_through_date	:=	right.clean_effect_through_date;
 											self																			:=	left)
 										,left outer
-										,local),all);
-
-		remit_id	:= distribute(Files().remit_info_base.built, hash(id));
-		base_i	:= dedup(JOIN(distribute(base_h, hash(prov_relat_remit_and_reconciliation_id)), remit_id,
+										,local);
+		base_h	:= dedup(sort(base_h0, record, local), record, local);
+		remit_id	:= sort(distribute(Files().remit_info_base.built, hash(id)), id, local);
+		base_i0	:= JOIN(sort(distribute(base_h, hash(prov_relat_remit_and_reconciliation_id)), prov_relat_remit_and_reconciliation_id, local), remit_id,
 										LEFT.prov_relat_remit_and_reconciliation_id = RIGHT.id,
 										TRANSFORM({base_h},
 											self.record_type						:=	if(right.record_type = 'H', right.record_type, left.record_type);					
@@ -1046,10 +1056,12 @@ export Update_Base	:= MODULE
 											self.remit_err_stat					:=	right.err_stat;
 											self												:=	left)
 										,left outer
-										,local),all);
-
-		state_lic_ncpdp	:= distribute(Files().state_license_base.built, hash(ncpdp_provider_id));
-		base_j	:= dedup(JOIN(distribute(base_i, hash(ncpdp_provider_id)), state_lic_ncpdp,
+										,local);
+		
+		base_i	:= dedup(sort(base_i0, record, local), record, local);
+		state_lic_ncpdp	:= sort(distribute(Files().state_license_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		
+		base_j0	:= JOIN(sort(distribute(base_i, hash(ncpdp_provider_id)), ncpdp_provider_id, local), state_lic_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_i},
 											self.record_type												:=	if(right.record_type = 'H', right.record_type, left.record_type);				
@@ -1059,10 +1071,11 @@ export Update_Base	:= MODULE
 											self.state_license_clean_delete_date		:=	right.clean_delete_date;
 											self																		:=	left)
 										,left outer
-										,local),all);
+										,local);
+		base_j	:= dedup(sort(base_j0, ncpdp_provider_id, local), record, local);
 
-		services_ncpdp	:= distribute(Files().services_info_base.built, hash(ncpdp_provider_id));
-		base_k	:= dedup(JOIN(base_j, services_ncpdp,
+		services_ncpdp	:= sort(distribute(Files().services_info_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		base_k0	:= JOIN(sort(distribute(base_j, hash(ncpdp_provider_id)), ncpdp_provider_id, local), services_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_j},
 											self.record_type															:=	if(right.record_type = 'H', right.record_type, left.record_type);				
@@ -1092,10 +1105,11 @@ export Update_Base	:= MODULE
 											self.service_closed_door_facility_code				:=	right.closed_door_facility_code;
 											self																					:=	left)
 										,left outer
-										,local),all);
-				
-		change_owner_ncpdp	:= distribute(Files().change_owner_base.built, hash(ncpdp_provider_id));
-		base_l	:= dedup(JOIN(base_k, change_owner_ncpdp,
+										,local);
+		base_k	:= dedup(sort(base_k0, record, local), record, local);
+		
+		change_owner_ncpdp	:= sort(distribute(Files().change_owner_base.built, hash(ncpdp_provider_id)), ncpdp_provider_id, local);
+		base_l0	:= JOIN(sort(distribute(base_k, hash(ncpdp_provider_id)), ncpdp_provider_id, local), change_owner_ncpdp,
 										LEFT.ncpdp_provider_id = RIGHT.ncpdp_provider_id,
 										TRANSFORM({base_k},
 											self.record_type																		:=	if(right.record_type = 'H', right.record_type, left.record_type);
@@ -1104,8 +1118,8 @@ export Update_Base	:= MODULE
 											self.change_ownership_clean_change_owner_effect_date:=	right.clean_change_owner_effect_date;
 											self																		:=	left)
 										,left outer
-										,local),all);
-		
+										,local);
+		base_l	:= dedup(sort(base_l0, record, local), record, local);
 		base_l GetSourceRID(base_l L)	:= TRANSFORM
 						self.source_rid 		:= HASH64(hashmd5(
 																	trim(l.prov_info_legal_business_name)
@@ -1142,10 +1156,28 @@ export Update_Base	:= MODULE
 			SELF											:= L;
 		END;
 		
-		base_m	:= PROJECT(base_l, GetSourceRID(left));
+		dist_base_l	:= distribute(base_l);// get even distribution and order does not matter
+		base_m0 := project(dist_base_l, GetSourceRID(left));//:persist('~thor_data400::persist::ncpdp_after_source_rid');
+		base_m	:= dedup(sort(base_m0, record, local), record, local);
+		
+		base_m_dedup	:= dedup(sort(distribute(base_m, hash(ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid)),
+											ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local), 
+											ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local);
 		
 		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-				base_m
+				base_m_dedup
 				,lnpid
 				,prov_info_clean_dr_fname//FNAME
 				,prov_info_clean_dr_mname//MNAME
@@ -1172,15 +1204,115 @@ export Update_Base	:= MODULE
 				,BDID
 				,//src//SRC
 				,source_rid//SOURCE_RID
-				,base_n,false,38
+				,result1,false,38
 			);
+			
+			still_blank := distribute(result1(lnpid = 0));
+			has_lnpid		:= distribute(result1(lnpid > 0));
+			
+	Health_Facility_Services.mac_get_best_lnpid_on_thor (
+					still_blank
+					,LNPID
+					,prov_info_legal_business_name	
+					,prov_info_Phys_prim_range
+					,prov_info_Phys_prim_name
+					,prov_info_Phys_sec_range
+					,prov_info_Phys_p_city_name
+					,prov_info_Phys_state
+					,prov_info_Phys_zip5
+					,//
+					,parent_org_federal_tax_id//TAX_ID
+					,parent_org_npi
+					,parent_org_fax
+					,state_code
+					,state_license_number
+					,prov_info_DEA_registration_id
+					,NCPDP_provider_id
+					,prov_info_national_provider_id
+					,//clia_num
+					,//medicare_fac_num
+					,//Input_MEDICAID_NUMBER
+					,NCPDP_provider_id
+					,taxonomy_code
+					,BDID
+					,//SRC
+					,//SOURCE_RID
+					,result2
+					,false
+					,30
+					);
+			
+			result := has_lnpid + result2;
+			
+			sort_base_m	:= sort(distribute(base_m, hash(ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid)), 
+											ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname, 
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local);
+											
+			sort_result	:= sort(distribute(result, hash(ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid)), 
+											ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
+											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
+											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
+											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local);
+
+			rejoin_lnpid	:= join(sort_base_m, sort_result,
+							left.ncpdp_provider_id					= right.ncpdp_provider_id
+					and	left.prov_info_clean_dr_fname		= right.prov_info_clean_dr_fname
+					and left.prov_info_clean_dr_mname		= right.prov_info_clean_dr_mname
+					and left.prov_info_clean_dr_lname		= right.prov_info_clean_dr_lname
+					and left.prov_info_clean_dr_suffix	= right.prov_info_clean_dr_suffix
+					and left.prov_info_phys_prim_range	= right.prov_info_phys_prim_range
+					and left.prov_info_phys_prim_name		= right.prov_info_phys_prim_name
+					and left.prov_info_phys_sec_range		= right.prov_info_phys_sec_range
+					and left.prov_info_phys_p_city_name	= right.prov_info_phys_p_city_name
+					and left.prov_info_phys_state				= right.prov_info_phys_state
+					and left.prov_info_phys_zip5				= right.prov_info_phys_zip5
+					and left.prov_info_contact_phone		= right.prov_info_contact_phone
+					and left.state_code									= right.state_code
+					and left.state_license_number				= right.state_license_number
+					and left.prov_info_federal_tax_id		= right.prov_info_federal_tax_id
+					and left.prov_info_national_provider_id		= right.prov_info_national_provider_id
+					and left.did					= right.did
+					and left.bdid 				= right.bdid
+					and left.source_rid		= right.source_rid
+			,TRANSFORM({base_m}
+					,SELF.lnpid						:= right.lnpid
+					,SELF									:= left)
+					,LEFT OUTER
+					,LOCAL);					
+		
+			all_lnpid	:= dedup(sort(rejoin_lnpid, record, local), record, local);
 							
 			//base_o	:= dedup(base_n, all);		
-			dDistributed  := distribute(base_n,hash(NCPDP_provider_id));	
-			BaseSort := SORT(dDistributed, ncpdp_provider_id,  dt_first_seen,	dt_last_seen, record_type, local);
-      BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, local); 
+			// dDistributed  := distribute(all_lnpid,hash(NCPDP_provider_id));	
+			dDistributed  := distribute(all_lnpid);	
+			// BaseSort := SORT(dDistributed, ncpdp_provider_id,  dt_first_seen,	dt_last_seen, record_type, local);
+			BaseSort := SORT(dDistributed, record);
+      // BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, local); 
+      BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, BEST(record_type)); 
 			
-		return BaseDedup;
+			BaseDedup add_sid(BaseDedup L) := TRANSFORM
+				SELF.global_sid								:= 23921;
+				SELF.record_sid								:= L.source_rid;
+				SELF						 							:= L;
+			END;
+	
+			with_ccpa := project(BaseDedup, add_sid (left));
+			
+			dist_with_ccpa	:= sort(distribute(with_ccpa), record);
+			
+		return dist_with_ccpa;
 	end;
 	
     export keybuild (string pversion)    := function
@@ -1327,8 +1459,10 @@ export Update_Base	:= MODULE
             self.Mail_err_stat                    :=    l.prov_info_Mail_err_stat;
             self                                  :=    l;
         end;                                      
-                                                  				
-				dDedup:=dedup(distribute(project(giant_file, combine1(LEFT)), hash(ncpdp_provider_id, record_type, state_license_number)), except state_license_number, local);
+        
+				slimmed_file	:= project(giant_file, combine1(LEFT));
+				
+				dDedup:=dedup(sort(slimmed_file, record, local), record, local);
 				
 				return dDedup;
     end;

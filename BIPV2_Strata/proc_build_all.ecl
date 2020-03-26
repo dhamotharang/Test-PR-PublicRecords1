@@ -1,4 +1,4 @@
-﻿import bipv2,bipv2_postprocess,strata,BIPV2_Build,tools,BIPV2_QA_Tool;
+﻿import bipv2,bipv2_postprocess,strata,BIPV2_Build,tools,BIPV2_QA_Tool,BIPV2_Tools;
 
 EXPORT proc_build_all(
 
@@ -65,10 +65,12 @@ function
   returnresult :=  parallel(
      if(pDoBiz  = true  ,BuildBizStrat    )
     ,if(pDoDemo = true  ,BuildDemoStrata  )
-    ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID(pversion)
-    ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS(pversion)
-    ,BIPV2_Strata.mac_Unique_Ids(pversion)
-    ,BIPV2_QA_Tool.proc_PostProcess_Stats(pversion)
+    ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID        (pversion)
+    ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS      (pversion)
+    ,BIPV2_Strata.mac_Unique_Ids                    (pversion)
+    ,BIPV2_QA_Tool.proc_PostProcess_Stats           (pversion)
+    ,BIPV2_Strata.mac_gold_seleid_orgid_persistence (pversion)
+    ,BIPV2_Tools.compare_statuses_and_gold          (pversion)
     ,semail.BuildSuccess
   ) : failure(semail.BuildFailure)
   ;

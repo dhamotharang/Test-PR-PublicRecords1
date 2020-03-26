@@ -167,8 +167,18 @@ EXPORT Pre_Update_Person_PRtcc_DataElements := FUNCTION
 													 
 
  FLAccidents_Ecrash.Layout_Infiles.persn_NEW ExpandPersonLayout(ds_person L) := TRANSFORM
+																																									SELF.Condition_At_Time_Of_Crash := '';
+																																									SELF.Drug_Use_Suspected := '';
+																																									SELF.Alcohol_Use_Suspected := '';
+																																									SELF.Drug_Test_Status := '';
+																																									SELF.Report_Contributing_Circumstances_P := '';
+																																									SELF.Driver_Actions_At_Time_Of_Crash := '';
+																																									SELF.Prior_Nonmotorist_Action := '';
+																																									SELF.Pedestrian_Actions_At_Time_Of_Crash := '';
+																																									SELF.Pedalcyclist_Actions_At_Time_Of_Crash := '';
+																																									SELF.Passenger_Actions_At_Time_Of_Crash := '';
 																																									SELF.Dui_Suspected := '';
-																																									SELF.Report_Contributing_Circumstances_p := '';
+																																									SELF.Drug_Test_Result := '';
 																																									SELF := L;
 																																								 END;
 																									 

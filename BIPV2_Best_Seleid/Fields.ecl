@@ -1,8 +1,10 @@
-IMPORT ut,SALT30;
+﻿IMPORT ut,SALT30;
 EXPORT Fields := MODULE
+ 
 // Processing for each FieldType
 EXPORT SALT30.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'wordbag','alpha','number','upper','cname');
 EXPORT FieldTypeNum(SALT30.StrType fn) := CASE(fn,'wordbag' => 1,'alpha' => 2,'number' => 3,'upper' => 4,'cname' => 5,0);
+ 
 EXPORT MakeFT_wordbag(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringtouppercase(s0); // Force to upper case
   s2 := SALT30.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' <>{}[]-^=!+&,./'); // Only allow valid symbols
@@ -11,6 +13,7 @@ EXPORT MakeFT_wordbag(SALT30.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_wordbag(SALT30.StrType s) := WHICH(SALT30.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' <>{}[]-^=!+&,./'))));
 EXPORT InValidMessageFT_wordbag(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotCaps,SALT30.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' <>{}[]-^=!+&,./'),SALT30.HygieneErrors.Good);
+ 
 EXPORT MakeFT_alpha(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringtouppercase(s0); // Force to upper case
   s2 := SALT30.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -18,99 +21,133 @@ EXPORT MakeFT_alpha(SALT30.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_alpha(SALT30.StrType s) := WHICH(SALT30.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
 EXPORT InValidMessageFT_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotCaps,SALT30.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT30.HygieneErrors.Good);
+ 
 EXPORT MakeFT_number(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
 EXPORT InValidFT_number(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'0123456789'))));
 EXPORT InValidMessageFT_number(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('0123456789'),SALT30.HygieneErrors.Good);
+ 
 EXPORT MakeFT_upper(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringtouppercase(s0); // Force to upper case
   RETURN  s1;
 END;
 EXPORT InValidFT_upper(SALT30.StrType s) := WHICH(SALT30.stringtouppercase(s)<>s);
 EXPORT InValidMessageFT_upper(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotCaps,SALT30.HygieneErrors.Good);
+ 
 EXPORT MakeFT_cname(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringtouppercase(s0); // Force to upper case
   RETURN  s1;
 END;
 EXPORT InValidFT_cname(SALT30.StrType s) := WHICH(SALT30.stringtouppercase(s)<>s);
 EXPORT InValidMessageFT_cname(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotCaps,SALT30.HygieneErrors.Good);
-EXPORT SALT30.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','source_for_votes','company_name','company_fein','company_phone','company_url','duns_number','company_sic_code1','company_naics_code1','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','fips_state','fips_county','address');
-EXPORT FieldNum(SALT30.StrType fn) := CASE(fn,'dt_first_seen' => 1,'dt_last_seen' => 2,'source_for_votes' => 3,'company_name' => 4,'company_fein' => 5,'company_phone' => 6,'company_url' => 7,'duns_number' => 8,'company_sic_code1' => 9,'company_naics_code1' => 10,'prim_range' => 11,'predir' => 12,'prim_name' => 13,'addr_suffix' => 14,'postdir' => 15,'unit_desig' => 16,'sec_range' => 17,'p_city_name' => 18,'v_city_name' => 19,'st' => 20,'zip' => 21,'zip4' => 22,'fips_state' => 23,'fips_county' => 24,'address' => 25,0);
+ 
+EXPORT SALT30.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','source_for_votes','company_name','company_fein','company_phone','company_url','duns_number','company_sic_code1','company_naics_code1','dba_name','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','fips_state','fips_county','address');
+EXPORT FieldNum(SALT30.StrType fn) := CASE(fn,'dt_first_seen' => 1,'dt_last_seen' => 2,'source_for_votes' => 3,'company_name' => 4,'company_fein' => 5,'company_phone' => 6,'company_url' => 7,'duns_number' => 8,'company_sic_code1' => 9,'company_naics_code1' => 10,'dba_name' => 11,'prim_range' => 12,'predir' => 13,'prim_name' => 14,'addr_suffix' => 15,'postdir' => 16,'unit_desig' => 17,'sec_range' => 18,'p_city_name' => 19,'v_city_name' => 20,'st' => 21,'zip' => 22,'zip4' => 23,'fips_state' => 24,'fips_county' => 25,'address' => 26,0);
+ 
 //Individual field level validation
+ 
 EXPORT Make_dt_first_seen(SALT30.StrType s0) := s0;
 EXPORT InValid_dt_first_seen(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_dt_last_seen(SALT30.StrType s0) := s0;
 EXPORT InValid_dt_last_seen(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_source_for_votes(SALT30.StrType s0) := s0;
 EXPORT InValid_source_for_votes(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_source_for_votes(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_company_name(SALT30.StrType s0) := MakeFT_cname(s0);
 EXPORT InValid_company_name(SALT30.StrType s) := InValidFT_cname(s);
 EXPORT InValidMessage_company_name(UNSIGNED1 wh) := InValidMessageFT_cname(wh);
+ 
 EXPORT Make_company_fein(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_company_fein(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_company_fein(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_company_phone(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_company_phone(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_company_phone(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_company_url(SALT30.StrType s0) := s0;
 EXPORT InValid_company_url(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_company_url(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_duns_number(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_duns_number(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_duns_number(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_company_sic_code1(SALT30.StrType s0) := s0;
 EXPORT InValid_company_sic_code1(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_company_sic_code1(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_company_naics_code1(SALT30.StrType s0) := s0;
 EXPORT InValid_company_naics_code1(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_company_naics_code1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_dba_name(SALT30.StrType s0) := MakeFT_cname(s0);
+EXPORT InValid_dba_name(SALT30.StrType s) := InValidFT_cname(s);
+EXPORT InValidMessage_dba_name(UNSIGNED1 wh) := InValidMessageFT_cname(wh);
+ 
 EXPORT Make_prim_range(SALT30.StrType s0) := s0;
 EXPORT InValid_prim_range(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_prim_range(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_predir(SALT30.StrType s0) := s0;
 EXPORT InValid_predir(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_predir(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_prim_name(SALT30.StrType s0) := s0;
 EXPORT InValid_prim_name(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_addr_suffix(SALT30.StrType s0) := s0;
 EXPORT InValid_addr_suffix(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_addr_suffix(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_postdir(SALT30.StrType s0) := s0;
 EXPORT InValid_postdir(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_postdir(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_unit_desig(SALT30.StrType s0) := s0;
 EXPORT InValid_unit_desig(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_unit_desig(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_sec_range(SALT30.StrType s0) := s0;
 EXPORT InValid_sec_range(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_p_city_name(SALT30.StrType s0) := s0;
 EXPORT InValid_p_city_name(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_p_city_name(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_v_city_name(SALT30.StrType s0) := s0;
 EXPORT InValid_v_city_name(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_v_city_name(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_st(SALT30.StrType s0) := MakeFT_alpha(s0);
 EXPORT InValid_st(SALT30.StrType s) := InValidFT_alpha(s);
 EXPORT InValidMessage_st(UNSIGNED1 wh) := InValidMessageFT_alpha(wh);
+ 
 EXPORT Make_zip(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_zip(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_zip(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_zip4(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_zip4(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_zip4(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_fips_state(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_fips_state(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_fips_state(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_fips_county(SALT30.StrType s0) := MakeFT_number(s0);
 EXPORT InValid_fips_county(SALT30.StrType s) := InValidFT_number(s);
 EXPORT InValidMessage_fips_county(UNSIGNED1 wh) := InValidMessageFT_number(wh);
+ 
 EXPORT Make_address(SALT30.StrType s0) := s0;
 EXPORT InValid_address(SALT30.StrType prim_range,SALT30.StrType predir,SALT30.StrType prim_name,SALT30.StrType addr_suffix,SALT30.StrType postdir,SALT30.StrType unit_desig,SALT30.StrType sec_range,SALT30.StrType st,SALT30.StrType zip) := FALSE;
 EXPORT InValidMessage_address(UNSIGNED1 wh) := '';
@@ -145,6 +182,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_duns_number;
     BOOLEAN Diff_company_sic_code1;
     BOOLEAN Diff_company_naics_code1;
+    BOOLEAN Diff_dba_name;
     BOOLEAN Diff_prim_range;
     BOOLEAN Diff_predir;
     BOOLEAN Diff_prim_name;
@@ -175,6 +213,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_duns_number := le.duns_number <> ri.duns_number;
     SELF.Diff_company_sic_code1 := le.company_sic_code1 <> ri.company_sic_code1;
     SELF.Diff_company_naics_code1 := le.company_naics_code1 <> ri.company_naics_code1;
+    SELF.Diff_dba_name := le.dba_name <> ri.dba_name;
     SELF.Diff_prim_range := le.prim_range <> ri.prim_range;
     SELF.Diff_predir := le.predir <> ri.predir;
     SELF.Diff_prim_name := le.prim_name <> ri.prim_name;
@@ -191,7 +230,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_fips_county := le.fips_county <> ri.fips_county;
     SELF.Val := (SALT30.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source_for_votes;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_source_for_votes,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_company_url,1,0)+ IF( SELF.Diff_duns_number,1,0)+ IF( SELF.Diff_company_sic_code1,1,0)+ IF( SELF.Diff_company_naics_code1,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_fips_state,1,0)+ IF( SELF.Diff_fips_county,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_source_for_votes,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_company_url,1,0)+ IF( SELF.Diff_duns_number,1,0)+ IF( SELF.Diff_company_sic_code1,1,0)+ IF( SELF.Diff_company_naics_code1,1,0)+ IF( SELF.Diff_dba_name,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_fips_state,1,0)+ IF( SELF.Diff_fips_county,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -214,6 +253,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_duns_number := COUNT(GROUP,%Closest%.Diff_duns_number);
     Count_Diff_company_sic_code1 := COUNT(GROUP,%Closest%.Diff_company_sic_code1);
     Count_Diff_company_naics_code1 := COUNT(GROUP,%Closest%.Diff_company_naics_code1);
+    Count_Diff_dba_name := COUNT(GROUP,%Closest%.Diff_dba_name);
     Count_Diff_prim_range := COUNT(GROUP,%Closest%.Diff_prim_range);
     Count_Diff_predir := COUNT(GROUP,%Closest%.Diff_predir);
     Count_Diff_prim_name := COUNT(GROUP,%Closest%.Diff_prim_name);

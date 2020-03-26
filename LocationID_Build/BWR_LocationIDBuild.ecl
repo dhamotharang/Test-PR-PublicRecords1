@@ -1,1 +1,0 @@
-﻿evaluate(LocationID_Build.proc_build_all);

@@ -62,12 +62,12 @@ export constants := module
 																											,environment not in healthcareset and l_loc = 'B'
 																																=> 'uspr-dopsservices.risk.regn.net'
 																											,environment not in healthcareset and l_loc = 'A'
-																																=> 'usins-dopsservices.risk.regn.net'
+																																=> 'usins-dopsservices.risk.regn.net'																																
 																											,'NA'
 																											)
 																										,MAP (
-																												l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'DEV196'
-																																=> 'uspr-dopsservices.risk.regn.net/dev196'
+																												l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'DATAQA'
+																																=> 'uspr-dopsservices.risk.regn.net/dataqa'
 																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'CORE'
 																																=> 'uspr-dopsservices.risk.regn.net/core'
 																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'PRTE'
@@ -80,7 +80,10 @@ export constants := module
 																											(environment in healthcareset) and (l_loc in locationset)
 																																=> 'devdopsservices.risk.regn.net/hc'
 																											,environment not in healthcareset and l_loc = 'B'
-																																=> 'devdopsservices.risk.regn.net/pr'
+																																=> 'devdopsservices.risk.regn.net/' + 
+																																					if (l_testenv <> 'NA' and l_testenv <> ''
+																																							,l_testenv
+																																							,'pr')
 																											,environment not in healthcareset and l_loc = 'A'
 																																=> 'devdopsservices.risk.regn.net/ins'
 																											,'NA'
@@ -123,5 +126,99 @@ export constants := module
 																							['hthor_sta',
 																							 'hthor_dev']
 																				);
+	
+	export vFileScope(string l_loc = location
+										,string environment = '') := MAP (
+																(environment in healthcareset) and (l_loc in locationset)
+																		=> 'ushc'
+																,environment not in healthcareset and l_loc = 'B'
+																		=> 'uspr'
+																,environment not in healthcareset and l_loc = 'A'
+																		=> 'usins'																																
+																,'NA'
+													);
+	
+	export vESPSet(string p_cluster
+									,string p_environment
+									,string p_loc = location
+										) := MAP(vFileScope(p_loc) = 'uspr'
+																																=> MAP(
+																																			p_cluster = 'fcra' and p_environment = 'cert' =>  ['10.173.162.41'
+																																																												,'10.173.164.41'
+																																																												,'10.173.165.41']
+																																			,p_cluster = 'fcra' and p_environment = 'prod' =>  ['10.173.166.41'
+																																																													,'10.173.167.41'
+																																																													,'10.173.168.41'
+																																																													,'10.173.169.41'
+																																																													,'10.173.170.41'
+																																																													,'10.173.171.41'
+																																																													,'10.173.172.41'
+																																																													,'10.173.173.41'
+																																																													,'10.173.174.41'
+																																																													,'10.173.175.41'
+																																																													,'10.173.176.41'
+																																																													,'10.173.177.41'
+																																																													]
+																																			,p_cluster = 'nonfcra' and p_environment = 'cert' =>  ['10.173.101.101'
+																																																											,'10.173.102.101'
+																																																											,'10.173.103.101']
+																																			,p_cluster = 'nonfcra' and p_environment = 'prod' =>  ['10.173.104.101'
+																																																											,'10.173.105.101'
+																																																											,'10.173.106.101'
+																																																											,'10.173.107.101'
+																																																											,'10.173.108.101'
+																																																											,'10.173.109.101'
+																																																											,'10.173.110.101'
+																																																											,'10.173.111.101'
+																																																											,'10.173.112.101'
+																																																											,'10.173.113.101'
+																																																											,'10.173.114.101']
+																																				,['NA']
+																																				)
+																																,vFileScope(p_loc) = 'usins'
+																																=> MAP(
+																																			p_cluster = 'fcra' and p_environment = 'cert' =>  ['10.194.21.18']
+																																			,p_cluster = 'fcra' and p_environment = 'prod' =>  ['10.194.21.98','10.194.21.66']
+																																			,p_cluster = 'nonfcra' and p_environment = 'cert' =>  ['10.194.21.34'
+																																																											,'10.194.219.101'
+																																																											,'10.194.220.101']
+																																			,p_cluster = 'nonfcra' and p_environment = 'prod' =>  ['10.194.21.82'
+																																																											,'10.194.21.50'
+																																																											,'10.194.221.101'
+																																																											,'10.194.222.101'
+																																																											,'10.194.223.101'
+																																																											,'10.194.224.101'
+																																																											,'10.194.225.101'
+																																																											,'10.194.226.101'
+																																																											,'10.194.227.101'
+																																																											,'10.194.228.101'
+																																																											,'10.194.229.101'
+																																																											,'10.194.230.101'
+																																																											,'10.194.231.101'
+																																																											,'10.194.232.101']
+																																				,['NA']
+																																				)
+																																	,['NA']);
+	
+	export vRoxieVIP(string p_cluster
+										,string p_environment
+										,string p_loc = location) := MAP(vFileScope(p_loc) = 'uspr'
+																																			=> MAP(
+																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://certfcraroxievip.sc.seisint.com:9876'
+																																					,p_cluster = 'fcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prod_batch_fcra
+																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://roxiestaging.sc.seisint.com:9876'
+																																					,p_cluster = 'nonfcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prodvip
+																																					,'NA')
+																																	,vFileScope(p_loc) = 'usins'
+																																			=> MAP(
+																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://ifcraqaroxievip.sc.seisint.com:9876'
+																																					,p_cluster = 'fcra' and p_environment = 'prod' =>  'http://ifcraroxievip.sc.seisint.com:9876'
+																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://iroxieqavip.sc.seisint.com:9876'
+																																					,p_cluster = 'nonfcra' and p_environment = 'prod' =>  'http://iroxievip.sc.seisint.com:9876'
+																																					,'NA')
+																																	,'NA'
+																																	);	
+	
+	
 	
 end;

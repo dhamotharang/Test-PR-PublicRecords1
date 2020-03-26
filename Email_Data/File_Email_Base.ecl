@@ -1,7 +1,8 @@
 ﻿import Email_Data, ut, Data_Services, Header;
 //New base layout with scrubbits field appended
-	ds_base := dataset('~thor_data400::base::email_data', Email_Data.Layout_Email.Scrubs_bits_base, thor);
-	fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
+ds_base := dataset(Data_Services.Data_location.Prefix('Email_Data')+'thor_data400::base::email_data', Email_Data.Layout_Email.Scrubs_bits_base, thor);
+
+fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
 	
 //Flag invalid emails
 pValidEmail	:= PROJECT(ds_base, TRANSFORM(Layout_email.temp_Validate, SELF.SkipRec := Email_Data.Fn_InvalidEmail(LEFT.clean_email, LEFT.append_domain);
@@ -10,7 +11,8 @@ pValidEmail	:= PROJECT(ds_base, TRANSFORM(Layout_email.temp_Validate, SELF.SkipR
 											);
 																						 
 //Determine if record meets DOD filter
-fNoDeathRecs	:= Email_Data.Fn_ApplyDeathRule(pValidEmail) : PERSIST('~thor_data400::persist::file_email_base_death');
+fNoDeathRecs	:= Email_Data.Fn_ApplyDeathRule(pValidEmail);
+//persist removed to avoid using previous base.
 									
 //Concat Emails that do not meet death criteria with valid emails with no DID(these were removed from the death join)
 ValidEmailAll := fNoDeathRecs + pValidEmail(SkipRec = FALSE and DID = 0);

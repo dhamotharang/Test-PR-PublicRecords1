@@ -92,10 +92,10 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_royalty_
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
-
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_did','Q',mv2qa_did);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_fdids','Q',mv2qa_fdids);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_companyname','Q',mv2qa_pcname);
+//Jira DF-24336 change from ut.mac_sk_move to ut.mac_sk_move_v2 because files were not being promoted correctly.  Prior version was getting deleted on rebuild.
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_did','Q',mv2qa_did);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_fdids','Q',mv2qa_fdids);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_companyname','Q',mv2qa_pcname);
 CellPhone.MAC_AcceptSK_to_QA('~thor_data400::key::phonesplusv2_royalty_' ,mv_autokey,false);
 
 /////////////////////////////////////////////////////////////////////////////////

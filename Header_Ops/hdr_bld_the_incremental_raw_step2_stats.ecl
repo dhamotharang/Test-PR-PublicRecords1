@@ -1,8 +1,8 @@
-﻿IMPORT header_avb,header,_control;
-EXPORT run_stats(string oEList, boolean incremental=false, string versionBuild) := FUNCTION
+﻿IMPORT header_avb, header, _control,dops;
+
+EXPORT run_stats(boolean incremental=false, string versionBuild,string operatorEmailList) := FUNCTION
 
 wuname := 'Create Raw Header Stats: '+ versionBuild;
-
 #WORKUNIT('priority','high');
 #WORKUNIT('name', wuname);
 #OPTION('AllowedClusters','thor400_36 ,thor400_44');
@@ -18,7 +18,7 @@ send_email(string msg):=fileservices.sendemail(
                                                 +FAILMESSAGE
                                                 );
 
-stats:= Header_AVB.Stat(incremental,versionBuild,oEList).build_file(statsEmailRecepients)
+stats:= Header_AVB.Stat(incremental,versionBuild,operatorEmailList).build_file(statsEmailRecepients)
 	: success(send_email('Completed, a new header_raw is ready for transfer to Alpharetta\n\n'))
 	, failure(send_email('failed\n\n'))
 	;
@@ -26,10 +26,29 @@ stats:= Header_AVB.Stat(incremental,versionBuild,oEList).build_file(statsEmailRe
 run_rel_avb:= output(_control.fSubmitNewWorkunit('Relative_AVB.BWR_proc_BuildData','thor400_44_eclcc'));
 
 return sequential(stats, if(~incremental,run_rel_avb));
+
 END;
 
-boolean incremental:=true;
-run_stats(Header.email_list.BocaDevelopers,incremental,'20181113');
+build_version := '20191128';
+// run_stats(true,build_version,Header.email_list.BocaDevelopers);
+
+inc_bld := '~thor_data400::out::header_ingest_status_inc';
+inc_ver    := Header.LogBuildStatus(inc_bld).Read[1].version;
+inc_status := Header.LogBuildStatus(inc_bld).Read[1].status;
+
+incremental := if(build_version = inc_ver, true, false);
+dops_datasetname:='PersonHeaderKeys';
+build_component:='STATS:INGEST';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+//incremental
+// run_stats(true,build_version,Header.email_list.BocaDevelopers);
+
+//monthly
+sequential(
+     dlog,
+     run_stats(false,build_version,Header.email_list.BocaDevelopers)
+     );
 
 // run on p_svc_person_header: Header_AVB.Stat is sandboxed
 // run on thor (eg 44) 
@@ -39,13 +58,30 @@ run_stats(Header.email_list.BocaDevelopers,incremental,'20181113');
 // whether a new header_raw needs to be copyed to Alpharetta
 // Estimated THOR time: 20Min
 
-
 // "W:\Projects\Header\Incremental Raw\Boca Header RAW Stats.ecl"
-
 /*
-
-Previous runs
+Previous runs-
 -------------
+20191023 W20191025-123841(M)
+20191010 W20191014-101348(W)
+20190610 W20190614-173136
+20190513 W20190516-224841
+20190506 W20190509-100743
+20190429 W20190502-091949
+20190415 W20190417-193427
+20190407 W20190409-091004
+20190324 W20190325-110601(M)
+20190317 W20190319-154804
+20190310 W20190311-092702
+20190225 W20190227-142320(M)
+20190122 W20190123-125213
+20190113 W20190114-220641
+20190106 W20190108-101646
+20181231 W20190102-092518
+20181216 W20181219-133600
+20181209 W20181211-062743
+20181202 W20181203-100549
+20181118 W20181119-171109
 20181031 W20181102-125955
 20181002 W20181003-155000
 20180911 W20180912-233629
@@ -60,9 +96,9 @@ Previous runs
 20180501 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180503-182425#/stub/Summary
 20180418 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-103607#/stub/Summary
 20180417 
+
 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180412-090333#/stub/Summary
 http://prod_esp.br.seisint.com:8010/?Wuid=W20180405-103558&Widget=WUDetailsWidget#/stub/Summary
-
 // 20180313 W20180315-112303
 // 20180306 W20180312-115106
 // 20180227 W20180301-112650
@@ -95,7 +131,7 @@ http://prod_esp.br.seisint.com:8010/?Wuid=W20180405-103558&Widget=WUDetailsWidge
 // W20170518-114932 20170516 inc
 // W20170512-102342 20170509
 //                  20170430 full
-// W20170421-100154 20170418 
+// W20170421-100154 20170418
 // W20170411-114133 20170404
 // W20170330-121443 20170328 (ran on _60)
 // W20170317-115600 20170315
@@ -106,5 +142,4 @@ http://prod_esp.br.seisint.com:8010/?Wuid=W20180405-103558&Widget=WUDetailsWidge
 // W20170118-112640
 // W20161229-074438
 // W20161214-131255
-
 // */

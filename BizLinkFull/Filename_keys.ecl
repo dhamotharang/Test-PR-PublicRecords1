@@ -1,8 +1,4 @@
-﻿/*2016-06-02T23:05:56Z (Andi Koenen)
-checkin for review so code can get pushed to 196 for testing without key errors
-*/
-
-IMPORT ut,Data_services,Doxie,_control,bipv2;
+﻿IMPORT ut,Data_services,Doxie,_control,bipv2;
 EXPORT Filename_Keys := module
 
   SHARED THISMODULE:='BizLinkFull';
@@ -16,15 +12,17 @@ EXPORT Filename_Keys := module
   // ));
 
   SHARED STRING basename:=Data_services.Data_location.Prefix('biz_linking') + 'key::'+THISMODULE+'::'+superkey_version+'::proxid::';
+  
+  
   // Key_BizHead_
   EXPORT Refs                      := basename+'refs';
   EXPORT Words                     := basename+'words';
-  
   // Key_BizHead_*
   EXPORT L_ADDRESS1                := basename+'refs::l_address1';
   EXPORT L_ADDRESS2                := basename+'refs::l_address2';
   EXPORT L_ADDRESS3                := basename+'refs::l_address3';
   EXPORT L_CNPNAME                 := basename+'refs::l_cnpname';
+  EXPORT L_CNPNAME_SLIM            := basename+'refs::l_cnpname_slim';
   EXPORT L_CNPNAME_FUZZY           := basename+'refs::l_cnpname_fuzzy';
   EXPORT L_CNPNAME_ST              := basename+'refs::l_cnpname_st';
   EXPORT L_CNPNAME_ZIP             := basename+'refs::l_cnpname_zip';
@@ -37,6 +35,24 @@ EXPORT Filename_Keys := module
   EXPORT L_SIC                     := basename+'refs::l_sic';
   EXPORT L_SOURCE                  := basename+'refs::l_source';
   EXPORT L_URL                     := basename+'refs::l_url';
+// Key_BizHead_* External Files
+	EXPORT EXT_PAYLOADBYPROXID		   := basename+'ext_databyproxid::payload';
+  EXPORT EXT_L_ADDRESS1            := basename+'l_address1::ext_data';
+  EXPORT EXT_L_ADDRESS2            := basename+'l_address2::ext_data';
+  EXPORT EXT_L_ADDRESS3            := basename+'l_address3::ext_data';
+  EXPORT EXT_L_CNPNAME             := basename+'l_cnpname::ext_data';
+  EXPORT EXT_L_CNPNAME_FUZZY       := basename+'l_cnpname_fuzzy::ext_data';
+  EXPORT EXT_L_CNPNAME_ST          := basename+'l_cnpname_st::ext_data';
+  EXPORT EXT_L_CNPNAME_ZIP         := basename+'l_cnpname_zip::ext_data';
+  EXPORT EXT_L_CONTACT             := basename+'l_contact::ext_data';
+  EXPORT EXT_L_CONTACT_DID         := basename+'l_contact_did::ext_data';
+  EXPORT EXT_L_CONTACT_SSN         := basename+'l_contact_ssn::ext_data';
+  EXPORT EXT_L_EMAIL               := basename+'l_email::ext_data';
+  EXPORT EXT_L_FEIN                := basename+'l_fein::ext_data';
+  EXPORT EXT_L_PHONE               := basename+'l_phone::ext_data';
+  EXPORT EXT_L_SIC                 := basename+'l_sic::ext_data';
+  EXPORT EXT_L_SOURCE              := basename+'l_source::ext_data';
+  EXPORT EXT_L_URL                 := basename+'l_url::ext_data';	
   // Process_Biz_Layouts
   EXPORT meow                      := basename+'meow';
   EXPORT sup_proxid                := basename+'sup::proxid';
@@ -51,35 +67,33 @@ EXPORT Filename_Keys := module
   EXPORT Wheel_city_clean          := basename+'wheel::city_clean';
   EXPORT Wheel_Quick_company_name  := basename+'wheel_quick::company_name';
   EXPORT Wheel_company_name        := basename+'wheel::company_name';
-  
   //Hierarchy
   EXPORT hierarchy                 := basename+'hierarchy';
 END;
 /*
 //for testing
-output(BizLinkFull02.Key_BizHead_.Key);
-output(BizLinkFull02.Key_BizHead_.ValueKey);
-output(BizLinkFull02.Key_BizHead_L_ADDRESS1.key);
-output(BizLinkFull02.Key_BizHead_L_ADDRESS2.key);
-output(BizLinkFull02.Key_BizHead_L_ADDRESS3.key);
-output(BizLinkFull02.Key_BizHead_L_CNPNAME.key);
-output(BizLinkFull02.Key_BizHead_L_CNPNAME_FUZZY.key);
-output(BizLinkFull02.Key_BizHead_L_CNPNAME_ST.key);
-output(BizLinkFull02.Key_BizHead_L_CONTACT.key);
-output(BizLinkFull02.Key_BizHead_L_CONTACT_SSN.key);
-output(BizLinkFull02.Key_BizHead_L_EMAIL.key);
-output(BizLinkFull02.Key_BizHead_L_FEIN.key);
-output(BizLinkFull02.Key_BizHead_L_PHONE.key);
-output(BizLinkFull02.Key_BizHead_L_SIC.key);
-output(BizLinkFull02.Key_BizHead_L_SOURCE.key);
-output(BizLinkFull02.Key_BizHead_L_URL.key);
-output(BizLinkFull02.Process_Biz_Layouts.key);
-output(BizLinkFull02.Process_Biz_Layouts.KeyproxidUp);
-output(BizLinkFull02.Process_Biz_Layouts.KeyseleidUp);
-output(BizLinkFull02.Process_Biz_Layouts.KeyorgidUp);
-output(BizLinkFull02.specificities(DATASET([], BizLinkFull02.layout_BizHead)).cnp_name_values_key);
-output(BizLinkFull02.specificities(DATASET([], BizLinkFull02.layout_BizHead)).company_url_values_key);
-output(BizLinkFull02.Wheel.Key_city_clean);
-output(BizLinkFull02.Wheel.KeyQuick_city_clean);
+output(BizLinkFull.Key_BizHead_.Key);
+output(BizLinkFull.Key_BizHead_.ValueKey);
+output(BizLinkFull.Key_BizHead_L_ADDRESS1.key);
+output(BizLinkFull.Key_BizHead_L_ADDRESS2.key);
+output(BizLinkFull.Key_BizHead_L_ADDRESS3.key);
+output(BizLinkFull.Key_BizHead_L_CNPNAME.key);
+output(BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.key);
+output(BizLinkFull.Key_BizHead_L_CNPNAME_ST.key);
+output(BizLinkFull.Key_BizHead_L_CONTACT.key);
+output(BizLinkFull.Key_BizHead_L_CONTACT_SSN.key);
+output(BizLinkFull.Key_BizHead_L_EMAIL.key);
+output(BizLinkFull.Key_BizHead_L_FEIN.key);
+output(BizLinkFull.Key_BizHead_L_PHONE.key);
+output(BizLinkFull.Key_BizHead_L_SIC.key);
+output(BizLinkFull.Key_BizHead_L_SOURCE.key);
+output(BizLinkFull.Key_BizHead_L_URL.key);
+output(BizLinkFull.Process_Biz_Layouts.key);
+output(BizLinkFull.Process_Biz_Layouts.KeyproxidUp);
+output(BizLinkFull.Process_Biz_Layouts.KeyseleidUp);
+output(BizLinkFull.Process_Biz_Layouts.KeyorgidUp);
+output(BizLinkFull.specificities(DATASET([], BizLinkFull.layout_BizHead)).cnp_name_values_key);
+output(BizLinkFull.specificities(DATASET([], BizLinkFull.layout_BizHead)).company_url_values_key);
+output(BizLinkFull.Wheel.Key_city_clean);
+output(BizLinkFull.Wheel.KeyQuick_city_clean);
 */
-

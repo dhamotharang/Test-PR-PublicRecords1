@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_FBNV2.Input_CA_Santa_Clara_BWR_PopulationStatistics - Population Statistics - SALT V3.11.4');
+IMPORT Scrubs_FBNV2,SALT311;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_FBNV2.Input_CA_Santa_Clara_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* status_field */,/* process_date_field */,/* FIlED_DATE_field */,/* FBN_TYPE_field */,/* FILING_TYPE_field */,/* BUSINESS_NAME_field */,/* BUSINESS_TYPE_field */,/* ORIG_FILED_DATE_field */,/* ORIG_FBN_NUM_field */,/* RECORD_CODE1_field */,/* FBN_NUM_field */,/* BUSINESS_ADDR1_field */,/* RECORD_CODE2_field */,/* BUSINESS_ADDR2_field */,/* RECORD_CODE3_field */,/* BUS_CITY_field */,/* BUS_ST_field */,/* BUS_ZIP_field */,/* RECORD_CODE4_field */,/* ADDTL_BUSINESS_field */,/* RECORD_CODE5_field */,/* owner_name_field */,/* OWNER_TYPE_field */,/* RECORD_CODE6_field */,/* OWNER_ADDR1_field */,/* OWNER_CITY_field */,/* OWNER_ST_field */,/* OWNER_ZIP_field */,/* Owner_title_field */,/* Owner_fname_field */,/* Owner_mname_field */,/* Owner_lname_field */,/* Owner_name_suffix_field */,/* Owner_name_score_field */,/* prep_addr_line1_field */,/* prep_addr_line_last_field */,/* prep_owner_addr_line1_field */,/* prep_owner_addr_line_last_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

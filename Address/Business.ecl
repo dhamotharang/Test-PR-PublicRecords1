@@ -238,6 +238,7 @@ export boolean MatchPattern(string s) := MAP(
 		REGEXFIND('^[A-Z]+ [A-Z] [A-Z] [A-Z] [A-Z]$',s) => true, 	// SUNTRUST B A N K
 		REGEXFIND('^[A-Z]+ +[A-Z]+ *( AND |&) *[A-Z]+ +(MD(S)?|DDS|DPM|ATTY|CPA|VETERINARIANS)?$',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
 		REGEXFIND('\\bA (GUY|LOCK|WING) *( AND |&) *A (GIRL|SAFE|PRAYER)\\b',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
+		REGEXFIND('\\b(CARPET|RUG|GOLF|SNOW|NEWS|TAX|SPA|DIESEL|SALES|MOBILE|TRAILER|HOME|LIMO|TRUCKING) +SERVICE\\b', s) => true,
 		REGEXFIND(rgxHoa,s) => true,
 		false
 	);
@@ -424,9 +425,10 @@ CoTrustees := '\\bCO[ -]+(TRUSTEE|TRUSTE|TRUSTEES|TRSTEE|TTEE|TRS|TRSTE|TRU|TTE|
 
 rgxTrustDated := '\\(?(DATED|DTD|UTD) +\\d{1,2}[/-] *\\d{1,2} *[/-] *\\d{2,4}\\)?';
 TrustAbbreviations := '(TRUST|TRU|TR|TRS)';
-boolean LikelyTrust(string s) := 
-	REGEXFIND('([A-Z]+) +(TRUST(S)?|TRUS|TRU|TRST|TR|T, RUST|TR, UST|TRU, ST|TRUS, T|TRU ST|(IR)?REVOCABLE LIVING)$', s, 1) in TrustWords
-	OR REGEXFIND('\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$',s);
+boolean LikelyTrust(string s) := Nid.Trusts.LikelyTrust(s);
+//	REGEXFIND('([A-Z]+) +(TRUST(S)?|TRUS|TRU|TRST|TR|T, RUST|TR, UST|TRU, ST|TRUS, T|TRU ST|(IR)?REVOCABLE LIVING)$', s, 1) in TrustWords
+//	OR REGEXFIND('\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$',s)
+//	OR Nid.Trusts.IsTrust2BeginOrEnd(s);
 
 MatchType CheckTrust(string s, DATASET(NameTester.rWord) words, DATASET(NameTester.rWord) digraphs,string name) := 
 	MAP(
@@ -451,7 +453,7 @@ MatchType CheckTrust(string s, DATASET(NameTester.rWord) words, DATASET(NameTest
 		REGEXFIND('^[A-Z] +[A-Z] +TRUST$', s) => MatchType.Trust,			// A S TRUST
 		REGEXFIND('\\b[A-Z]/+[A-Z] +TRUST$', s) => MatchType.Trust,
 		REGEXFIND('\\(TRUST\\)$', s) => MatchType.TRUST,		// (TRUST)
-
+		
 		REGEXFIND('^[A-Z] +[A-Z] +[A-Z] +TRUST$',s) => MatchType.Trust, // A B C TRUST
 		REGEXFIND('\\bTRUST +[0-9]+',s) => MatchType.TRUST,
 		REGEXFIND(' TRUST (TRUSTY|TTEE|OFFICER|BENEFICIARY|BENEFICIAR|DATED|PT|COMP|A|B|C|1|2|3|I|II|III)\\b', s) => MatchType.Trust,
@@ -575,6 +577,8 @@ string1 GetNameClass(string nm) :=
 string3 GetNameTypes(string s) :=
 		GetNameClass(REGEXFIND(rgxFirm, s, 1)) +
 			GetNameClass(REGEXFIND(rgxFirm, s, 2)) + GetNameClass(REGEXFIND(rgxFirm, s, 4));
+			
+NonFirmNames := ['JR','SR','II','III','MC'];
 
 boolean LikelyFirmName(string s) := FUNCTION
 	//t := GetNameTypes(s);
@@ -589,7 +593,9 @@ boolean LikelyFirmName(string s) := FUNCTION
 		REGEXFIND(rgxFirm1, s) => true,
 		REGEXFIND('^([A-Z]+) +(\\1+) *(&| AND ) *([A-Z]+)[.,/\\\']?$',s) => true,		// MORGAN MORGAN AND JONES
 		KnownFirmName(s) => true,
-		Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => false,
+		REGEXFIND(rgxFirm, s, 1) IN NonFirmNames OR REGEXFIND(rgxFirm, s, 2) IN NonFirmNames OR
+							REGEXFIND(rgxFirm, s, 4) IN NonFirmNames => false,
+		NOT Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
 		//t[2] = 'F' OR t[3] = 'F' => false,
 		//t IN ['LFF','LBF','LFB','LBB','BLF','FLF','FLB'] => false,
 		//t in ['LBL','BBL','BLL','BLB','LLL','LXL','LLX'] => true,
@@ -825,6 +831,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		COUNT(words) = 0 => MatchType.Inv,
 		CrazyBizName(str) => MatchType.Inv,
 		SpecialNames.IsInvalidName(s) => MatchType.Inv,
+		LikelyTrust(s) => MatchType.Trust,
 		LENGTH(Std.Str.Filter(name, '"^~!:')) > 4 => MatchType.Inv,
 		// Rule 14: check for invalid or obscene patterns
 		SpecialNames.IsInvalidToken(words, digraphs) => MatchType.Inv,
@@ -832,6 +839,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		REGEXFIND(rgxCaseNum, s) => MatchType.Inv,
 		REGEXFIND('^CREDIT[A-Z ]+APPLICANT$', s) => MatchType.Inv,
 		REGEXFIND(rgxStreet,s) => MatchType.Inv,
+		REGEXFIND('^CEO +[A-Z]+$', TRIM(s)) => MatchType.Inv,
 		IsInvalidTaxpayer(s) => MatchType.Inv,
 		REGEXFIND('^[0-9]+ +(PERCENT|PER CENT)$', s) => MatchType.Inv,
 		//***** UNKNOWN
@@ -856,7 +864,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// business words
 		//REGEXFIND('\\bTRUST(S)?\\b',s) => CheckTrust(s, words, digraphs, name),
 		NOT REGEXFIND(CoTrustees, s) AND REGEXFIND('\\b(TRUST|TRUS|TRU|TRST|TST|TRUSTS)\\b',s) => CheckTrust(s, words, digraphs, name),
-		LikelyTrust(s) => MatchType.Trust,
+//		LikelyTrust(s) => MatchType.Trust,
 		REGEXFIND('\\bEXECUT(OR|RIX) +(OF|FOR)\\b', s) => MatchType.Inv,				//MatchType.Unclass,
 		NOT REGEXFIND(CoTrustees, s) AND	NOT REGEXFIND(Positions, s) AND	// avoiding interpreting CO as company
 				NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,
@@ -873,7 +881,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsSaintWord(REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS|FIRST|LIFE) +[A-Z ]+ +([A-Z]+)\\b', s, 2))
 										=> MatchType.Business,
 		REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS) +[A-Z]+ *( AND |&) *[A-Z]+', s) => MatchType.Business,
-		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) => MatchType.Business, 
+		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) 
+				OR CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, name, 1), preferBiz)=> MatchType.Business, 
 		
 		StringLib.StringFind(s, 'CORPORATION', 1) > 0 OR
 		StringLib.StringFind(s, 'MORTGAGE', 1) > 0 OR
@@ -917,8 +926,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsGeo(s) => MatchType.Business,
 		IsGeo(name) => MatchType.Business,
 		
-		// other unclassified names
-		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
+		// other invalid names
+		REGEXFIND('^DIVORCED +[A-Z]+$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
 //$		SpecialNames.IsCityState(s) => MatchType.Unclass,
 		// final checks before person
@@ -934,7 +944,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
 
-		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|MDN) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
 		//REGEXFIND('^(EST|TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Trust,		//MatchType.Unclass,
 		//REGEXFIND('\\b(LT|FT)$',s) => MatchType.Inv,		//MatchType.Unclass,
 //		SpecialNames.IsAbbreviation(tokens[NumTokens]) => MatchType.Inv,		//MatchType.Unclass,
@@ -955,9 +966,11 @@ MatchType MatchX(string str, string options) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
+		NameTester.IsAmbiguousWord(REGEXFIND('\\b([A-Z]+) +SERVICE\\b', TRIM(name), 1)) => MatchType.Business,
+		Persons.IsDualName(name) => MatchType.Dual,
+		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		IsFirmName(s, name) => MatchType.Business,
 		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
-		Persons.IsDualName(name) => MatchType.Dual,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,
 		NameTester.IsAmbiguousWord(REGEXFIND('^[A-Z]+ *& *[A-Z]+ +([A-Z]+)$',s,1)) => MatchType.Business,
 		// from Gong

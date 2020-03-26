@@ -1,4 +1,4 @@
-﻿Import watercraft, watercraft_infutor;
+﻿Import watercraft, watercraft_infutor, ut;
 
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -64,6 +64,18 @@ watercraft_propulsion_desc(string1 code)
 						'6' => 'OTHER',
 						'7' => 'JET BOAT',
 						'');
+lengthFttoInch(STRING10 lenft) := FUNCTION
+		lengthRecord := RECORD
+			DECIMAL5_2 MyLenft;
+			DECIMAL5_2 MyLenin;
+			STRING10 FinalLenin := '0';
+		END;
+			MyLenft := (DECIMAL5_2) lenft;
+			MyLenin := MyLenft * 12;
+	FinalLenin := (STRING10)MyLenin;
+	LengthIn := IF(FinalLenin = '0', '', FinalLenin);
+	RETURN LengthIn;
+END;
 
 //Filter out blank name records since there are no registration/hull information to identify watercraft info
 ds_watercraft_in := dataset('~thor_data400::base::infutor_watercraft_raw',Watercraft_infutor.layouts.layout_CleanFields,flat);
@@ -93,7 +105,7 @@ watercraft_infutor.layouts.Watercraft_Main_Base main_mapping_format(ds_watercraf
 	self.hull_type_description				:=	watercraft_hull_shape(L.boat_hull_material);
 	self.use_code							:=	L.boat_use;
 	self.use_description					:=	watercraft_use_desc(L.boat_use);
-	self.watercraft_length					:=	L.boat_length;
+	self.watercraft_length					:=	lengthFttoInch(L.boat_length);
 	self.model_year							:=	L.year;
 	self.watercraft_name					:=	'';
 	self.watercraft_class_code				:=	L.boat_size;

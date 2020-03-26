@@ -1,5 +1,5 @@
 ﻿import std;
-office_in := files.ds_office;
+office_in := files.ds_office(summary.status='active');
 layout_raw := layout_office;
 layout_expanded := record(layout_raw)
 	string institution_id;
@@ -91,6 +91,6 @@ office_w_country_name := join(office_w_iso2, Ares.Files.ds_country, left.primary
 
 
 
-EXPORT file_office_flat := office_w_country_name  : persist('persist::ares::file_office_flat');;
+EXPORT file_office_flat := office_w_country_name ;// : persist('persist::ares::file_office_flat', SINGLE);
 
 

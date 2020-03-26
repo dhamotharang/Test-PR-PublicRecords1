@@ -188,7 +188,6 @@ EXPORT Rollup_Base(DATASET(Equifax_Business_Data.Layouts.Base) pDataset) := FUNC
 												,AT_CERTEXP9
 												,AT_CERTEXP10
 												,EFX_FOREIGN
-												,EFX_DATE_CREATED
 												,NormCompany_Type
 												,NormAddress_Type
 												,LOCAL );
@@ -394,7 +393,6 @@ EXPORT Rollup_Base(DATASET(Equifax_Business_Data.Layouts.Base) pDataset) := FUNC
 												,AT_CERTEXP9
 												,AT_CERTEXP10
 												,EFX_FOREIGN
-												,EFX_DATE_CREATED
 												,NormCompany_Type
 												,NormAddress_Type
 												,LOCAL );

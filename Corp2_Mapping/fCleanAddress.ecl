@@ -232,7 +232,7 @@ export fCleanAddress(string pStateOrigin,string pStateOriginDesc,string pAddr1 =
 
 		//If Addr2 is only one character, then blank out Addr2
 		export CleanAddr2Size		:= map(CleanAddr2 = ''																								=> '',
-																	 length(stringlib.stringfilter(CleanAddr2,alpha))>1 						=> CleanAddr2,
+																	 length(stringlib.stringfilter(CleanAddr2,alpha_numeric))>1 		=> CleanAddr2,
 																	 ''
 																	);
 		//If Addr1 ends with a special character, then remove the last special character (e.g. 374 MAIN STREET- becomes 374 MAIN STREET)
@@ -251,12 +251,12 @@ export fCleanAddress(string pStateOrigin,string pStateOriginDesc,string pAddr1 =
 																	''
 																 );
 		export TempCity				  := if(Corp2.t2u(Addr1+Addr2+UC_City+UC_State+UC_Zip+UC_Country)<>'',
-																	Corp2_Mapping.fCleanCity(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr,UC_City,TempZip[1..5]).City,
+																	Corp2_Mapping.fCleanCity(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr,UC_City,TempZip[1..5],UC_Country).City,
 																	''
 																 );	
-		export TempState		 	  := map(Corp2.t2u(Addr1+Addr2+UC_City+UC_State+UC_Zip+UC_Country) = ''																					=> '',
-																	 Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr).State <> '' 						=> Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr).State,
-																	 Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempCity+' '+TempZip).State <> '' => Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempCity+' '+TempZip).State,
+		export TempState		 	  := map(Corp2.t2u(Addr1+Addr2+UC_City+UC_State+UC_Zip+UC_Country) = ''																											=> '',
+																	 Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr,UC_Country).State <> '' 							=> Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempAddr,UC_Country).State,
+																	 Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempCity+' '+TempZip,UC_Country).State <> '' 	=> Corp2_Mapping.fCleanState(UC_StateOrigin,UC_StateOriginDesc,UC_State,TempCity+' '+TempZip,UC_Country).State,
 																	 ''
 																	);
 		export TempAddrLine1 	  := map(TempAddr = ''																						=> '',
@@ -267,7 +267,7 @@ export fCleanAddress(string pStateOrigin,string pStateOriginDesc,string pAddr1 =
 		export TempAddrLine2 	  := if(Corp2.t2u(TempCity+TempState+TempZip)<>'',Corp2.t2u(TempCity)+if(Corp2.t2u(TempCity) <> '' and Corp2.t2u(TempState)<>'',', ',' ')+Corp2.t2u(TempState)+' '+if(stringlib.stringfilterout(TempZip,'0- ')<>'',TempZip,''),'');
 		export AddressLine1  	  := if(stringlib.stringfilterout(TempAddrLine1,numeric)<>'',Corp2.t2u(TempAddrLine1),'');
 		export AddressLine2  	  := if(AddressLine1='' and Corp2.t2u(TempAddrLine2) = UC_StateOrigin,'',Corp2.t2u(TempAddrLine2));
-		export Country 				  := if(AddressLine2='','',Corp2_Mapping.fCleanCountry(UC_StateOrigin,UC_StateOriginDesc,TempState,UC_Country).Country);
+		export Country 				  := Corp2_Mapping.fCleanCountry(UC_StateOrigin,UC_StateOriginDesc,TempState,UC_Country).Country;
 		export AddressLine3 		:= Country;
 		export TempAddress		 	:= if(Corp2.t2u(AddressLine1+AddressLine2)<>'',Address.CleanAddress182(AddressLine1,AddressLine2),'');	
 		export City							:= map(TempAddress = '' 			 	=> '',

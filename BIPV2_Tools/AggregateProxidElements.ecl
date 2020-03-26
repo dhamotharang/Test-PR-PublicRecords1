@@ -1,4 +1,4 @@
-import bipv2_proxid,tools;
+﻿import bipv2_proxid,tools;
 EXPORT AggregateProxidElements(
 	  pDataset
    ,pID                         = 'proxid'
@@ -6,6 +6,7 @@ EXPORT AggregateProxidElements(
    ,pPrepend_Source_to_Address  = 'true'
    ,pPrepend_Source_to_Phone    = 'true'
    ,pAddDotid                   = 'false'
+   ,pOnlyPassedInID             = 'false'
 ) :=
 functionmacro
 
@@ -24,21 +25,22 @@ functionmacro
     ,pDataset.dotid
    #END
 
-   #IF(#TEXT(pID) not in ['proxid'])
-    ,pDataset.proxid
-   #END
-
-   #IF(#TEXT(pID) not in ['lgid3'])
-    ,pDataset.lgid3
-   #END
-   #IF(#TEXT(pID) not in ['seleid'])
-    ,pDataset.seleid
-   #END
-   #IF(#TEXT(pID) not in ['orgid'])
-    ,pDataset.orgid
-   #END
-   #IF(#TEXT(pID) not in ['ultid'])
-    ,pDataset.ultid
+   #IF(pOnlyPassedInID = false)
+     #IF(#TEXT(pID) not in ['proxid'])
+      ,pDataset.proxid
+     #END
+     #IF(#TEXT(pID) not in ['lgid3'])
+      ,pDataset.lgid3
+     #END
+     #IF(#TEXT(pID) not in ['seleid'])
+      ,pDataset.seleid
+     #END
+     #IF(#TEXT(pID) not in ['orgid'])
+      ,pDataset.orgid
+     #END
+     #IF(#TEXT(pID) not in ['ultid'])
+      ,pDataset.ultid
+     #END
    #END
   ,pDataset.cnp_name
   ,string cnp_name_raw
@@ -61,7 +63,7 @@ functionmacro
 
     self.sbfe_id           := if(mdr.sourcetools.SourceIsBusiness_Credit(left.source),left.vl_id ,'');
     self.source            :=                                 left.source + '- ' + trim(mdr.sourceTools.translatesource(left.source));
-    self.cnp_name          :=                                 left.source + '- ' + trim(left.cnp_name                               );
+    self.cnp_name          :=                                 left.source + '- ' + trim(left.ingest_status) + '- '+ trim(left.cnp_name                               );
     self.vl_id             := if(trim(left.vl_id)      != '' ,left.source + '- ' + trim(left.vl_id                                  ) ,'');
     self.source_record_id  := if(left.source_record_id != 0  ,left.source + '- ' + trim((string)left.source_record_id               ) ,'');
     self.cnp_name_raw      := left.cnp_name;

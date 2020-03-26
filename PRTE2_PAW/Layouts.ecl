@@ -1,7 +1,16 @@
-Import paw, Standard;
+﻿Import paw, Standard, prte2;
 EXPORT Layouts := module
 
-	EXPORT Layout_Base := {paw.Layout.Employment_Out_BIPv2,string50 domain} ;
+	// EXPORT Layout_Base := {paw.Layout.Employment_Out_BIPv2,string50 domain} ;
+	EXPORT Layout_Base := {paw.Layout.Employment_Out_BIPv2,
+																								string50 domain,
+																								string10 cust_name,
+																								string10 bug_num,
+																								string8		link_dob,
+																								string9		link_ssn,	
+																								string9		link_fein,	
+																								string8		link_inc_date	
+																								};
 	
 	EXPORT Employment_Out_BIPv2 := paw.Layout.Employment_Out_BIPv2;
 	
@@ -19,7 +28,9 @@ EXPORT Layouts := module
 		Standard.L_Address.base person_addr	;
 		standard.name person_name			;
 		unsigned1 zero 					:= 0;
+		prte2.Layouts.deflt_cpa;
 	end;
+	
 	EXPORT layout_paw_companyname_domain := RECORD
 		string50 domain;
 		string120 company_name;
@@ -106,8 +117,16 @@ EXPORT Layouts := module
 		unsigned6 ultid;
 		unsigned2 ultscore;
 		unsigned2 ultweight;
-		string100 cust_name;
-		string20 bug_num;
+		string10 cust_name;
+		string10 	bug_num;
+		string8		link_dob;
+		string9		link_ssn;	
+		string9		link_fein;	
+		string8		link_inc_date;	
+		string5		name_format;	
+		string50	raw_indv_name;	
+		string40	raw_company_addr1;	
+		string30	raw_company_addr2;
 	END;
 
 END;

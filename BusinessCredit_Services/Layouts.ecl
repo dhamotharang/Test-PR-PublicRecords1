@@ -274,6 +274,7 @@ EXPORT InputEcho := RECORD
 		string3  PaySumm_PastDueAgingAmount91PlusPercent ;
 
 	// AccountDetail1
+	     
 		string30 AcctDet1_BusinessContributorNumber ;
 		string50 AcctDet1_BusinessAccountNumber ;
 		string30 AcctDet1_AccountStatus ;
@@ -328,7 +329,20 @@ EXPORT InputEcho := RECORD
 		string15 AcctDet1_Pay_Hist_PaymentStatus;
 		string12 AcctDet1_Pay_Hist_PastDueAmount;
 		boolean AcctDet1_Pay_Hist_IsExtendedOverdue;
+		 // small bus credit report with SBFE data additions
+		unsigned8 AcctDet1_UniqueAccountDetailNumber;
+		string1 AcctDet1_ChargedOff;
+		string25 AcctDet1_PaymentStatus;
+		integer2  AcctDet1_ChargedOffDate_Year;
+		integer2  AcctDet1_ChargedOffDate_Month;
+		integer2  AcctDet1_ChargedOffDate_Day;
+	     string12 AcctDet1_ChargedOffAmount;
+	     string3    AcctDet1_ChargedOffType_Code;
+	     string35 AcctDet1_ChargedOffType_Description;
+	     string12 AcctDet1_TotalChargedOffRecoveries;
+         string1  AcctDet1_ContributedByInquirer;
 	// AccountDetail2
+	      
 		string30 AcctDet2_BusinessContributorNumber ;
 		string50 AcctDet2_BusinessAccountNumber ;
 		string30 AcctDet2_AccountStatus ;
@@ -383,7 +397,18 @@ EXPORT InputEcho := RECORD
 		string15 AcctDet2_Pay_Hist_PaymentStatus;
 		string12 AcctDet2_Pay_Hist_PastDueAmount;
 		boolean AcctDet2_Pay_Hist_IsExtendedOverdue;
-
+           // small bus credit report with SBFE data additions
+           unsigned8 AcctDet2_UniqueAccountDetailNumber;					 
+		string1 AcctDet2_ChargedOff;
+		string25 AcctDet2_PaymentStatus;
+		integer2  AcctDet2_ChargedOffDate_Year;
+		integer2  AcctDet2_ChargedOffDate_Month;
+		integer2  AcctDet2_ChargedOffDate_Day;
+	     string12 AcctDet2_ChargedOffAmount;
+	     string3    AcctDet2_ChargedOffType_code;
+	     string35 AcctDet2_ChargedOffType_Description;
+	     string12 AcctDet2_TotalChargedOffRecoveries;
+             string1  AcctDet2_ContributedByInquirer;
 	// CreditUtils1
 		string12 Cred_Util1_CreditLimit ;
 		string12 Cred_Util1_CreditUtilized ;
@@ -4289,7 +4314,136 @@ EXPORT InputEcho := RECORD
 		unsigned4 Phone2_RecordCount ;
 	
 	END;	
+    // small business Credit report with SBFE data project addition
+      EXPORT MatchInfo := record	
+	 // MatchInfo
+	  in_key;
+       string120 CompanyName;
+       string9  Tin;
+       string10 CompanyPhone;
+	  string10 StreetNumber; // not used
+	  string2 StreetPreDirection;   // not used
+	  string28 StreetName;   // not used
+	  string4 StreetSuffix;  // not used
+	   string2 StreetPostDirection;  // not used
+	   string10 UnitDesignation;   // not used
+	   string8 UnitNumber;  // not used
+	   string120 StreetAddress;
+	   string60 StreetAddress2;  // not used
+        string25 city;
+        string2   state; 
+        string5 zip;
+	END;
+	
+	// Cortera B2B tradeline
+  EXPORT CorteraB2B := record	
+			in_key;
+			// Trade Summary 
+			unsigned2 TradeSumm_OpenAccountsCount;
+			string8 TradeSumm_AccountOpenDate; 
+			string12 TradeSumm_TotalOverdue; 
+			string30 TradeSumm_MostSevereStatus; 
+			string12 TradeSumm_HighestCredit;
+			string12 TradeSumm_TotalCurrentExposure; 
+			string12 TradeSumm_MedianBalance;
+			string12 TradeSumm_AvgOpenBalance;
+			unsigned2 TradeSumm_ChargeOffRecorded; 
+			unsigned2 TradeSumm_AccountsWithGuarantor;
+			//Current Payment Summary
+			string12 CurrPaySumm_TotalCurrentExposure; 
+			string3 CurrPaySumm_WithinTermsPercent; 
+			string3 CurrPaySumm_PastDueAgingAmount01to30Percent;
+			string3 CurrPaySumm_PastDueAgingAmount31to60Percent;
+			string3 CurrPaySumm_PastDueAgingAmount61to90Percent; 
+			string3 CurrPaySumm_PastDueAgingAmount91PlusPercent;
+			//Payment Summary
+			string12 PaySumm_TotalCurrentExposure; 
+			string3 PaySumm_WithinTermsPercent;
+			string3 PaySumm_PastDueAgingAmount01to30Percent;
+			string3 PaySumm_PastDueAgingAmount31to60Percent;
+			string3 PaySumm_PastDueAgingAmount61to90Percent;
+			string3 PaySumm_PastDueAgingAmount91PlusPercent;
+			string8 PaySumm_DateReported; 
+			unsigned2 PaySumm_ProviderCount; 
+			string12 PaySumm_WithinTermsTotal; 
+			string12 PaySumm_PastDueAgingAmount01to30Total; 
+			string12 PaySumm_PastDueAgingAmount31to60Total;
+			string12 PaySumm_PastDueAgingAmount61to90Total;
+			string12 PaySumm_PastDueAgingAmount91PlusTotal;
+			// 24 Month Payment History
+			string12 Pay24Mth_TotalCurrentExposure;
+			string3 Pay24Mth_WithinTermsPercent;
+			string3 Pay24Mth_PastDueAgingAmount01to30Percent;
+			string3 Pay24Mth_PastDueAgingAmount31to60Percent;
+			string3 Pay24Mth_PastDueAgingAmount61to90Percent;
+			string3 Pay24Mth_PastDueAgingAmount91PlusPercent;
+			string8 Pay24Mth_DateReported; 
+			// Industry Segments
+			string25 IndustrySeg1_IndustrySegment; 
+			unsigned2 IndustrySeg1_ProviderCount;
+			string12 IndustrySeg1_AverageBalance;
+			string12 IndustrySeg1_AverageDBT;
+			string12 IndustrySeg1_HighestBalance; 
+			string3 IndustrySeg1_PastDueAgingAmount31to60Percent; 
+			string3 IndustrySeg1_PastDueAgingAmount61to90Percent; 
+			string3 IndustrySeg1_PastDueAgingAmount91PlusPercent;
+			string25 IndustrySeg2_IndustrySegment; 
+			unsigned2 IndustrySeg2_ProviderCount;
+			string12 IndustrySeg2_AverageBalance;
+			string12 IndustrySeg2_AverageDBT;
+			string12 IndustrySeg2_HighestBalance; 
+			string3 IndustrySeg2_PastDueAgingAmount31to60Percent; 
+			string3 IndustrySeg2_PastDueAgingAmount61to90Percent; 
+			string3 IndustrySeg2_PastDueAgingAmount91PlusPercent;
+			
+      // Account Detail - AcctDet1
+			string20 AcctDet1_AccountNo; 
+			string10 AcctDet1_Status;
+			string25 AcctDet1_IndustrySegment;
+			string8 AcctDet1_AccountDateReported; 
+			string12 AcctDet1_AmountOutstanding; 
 
+      // Account Detail, AcctDet1, 24 Month Payment History - two accounts
+      STRING12 AcctDet1_1_TotalCurrentExposure;
+      STRING3  AcctDet1_1_WithinTermsTotal;
+      STRING3  AcctDet1_1_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet1_1_DateReported;
+      STRING12 AcctDet1_2_TotalCurrentExposure;
+      STRING3  AcctDet1_2_WithinTermsTotal;
+      STRING3  AcctDet1_2_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet1_2_DateReported;
+
+      // Account Detail - AcctDet2
+      STRING20 AcctDet2_AccountNo; 
+      STRING10 AcctDet2_Status; 
+      STRING25 AcctDet2_IndustrySegment;
+      STRING8 AcctDet2_AccountDateReported; 
+      STRING12 AcctDet2_AmountOutstanding;
+
+      // Account Detail, AcctDet2, 24 Month Payment History - two accounts
+      STRING12 AcctDet2_1_TotalCurrentExposure;
+      STRING3  AcctDet2_1_WithinTermsTotal;
+      STRING3  AcctDet2_1_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet2_1_DateReported;
+      STRING12 AcctDet2_2_TotalCurrentExposure;
+      STRING3  AcctDet2_2_WithinTermsTotal;
+      STRING3  AcctDet2_2_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet2_2_DateReported;
+      string5 StatusCode;
+      string40 StatusDescription;
+	END;
 	
 	EXPORT Flat_BusinessCreditReport := record
 	  InputEcho;                //Section 1
@@ -4311,6 +4465,8 @@ EXPORT InputEcho := RECORD
 	  TopBusConnected;          //Section 17
 	  TopBusContacts;           //Section 18 
     OtherBusInfo;             //Section 19
+	MatchInfo;                  //Section 20
+	  CorteraB2B;								//Section 21
 
 END;
 

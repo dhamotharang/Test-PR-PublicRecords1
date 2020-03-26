@@ -6,7 +6,7 @@ Gong_in := dataset('~thor_data400::base::gong',Gong.layout_gong,flat);
 f_dist :=distribute(f,hash(prim_name,prim_range,sec_range,zip,lname,fname)); 
 gong_dist := distribute(gong_in,hash(prim_name,prim_range,sec_range,z5,name_last,name_first)); 
 
-f_dist  tjoin(f_dist l , gong_dist r ) := transform
+header.layout_header  tjoin(f_dist l , gong_dist r ) := transform
 
 boolean is_match := if(l.prim_range = r.prim_range and 
 										l.prim_name = r.prim_name and

@@ -27,7 +27,7 @@ EXPORT UpdateDOPSForPkgValidation(
 
 	export GetKeyInfo() := function
 		
-		dGetKeyswithVersion := dops.GetRoxieKeys(l_dopsdatasetname,l_locationflag,l_clusterflag,dopsenv := l_dopsenv);
+		dGetKeyswithVersion := dops.GetRoxieKeys(l_dopsdatasetname,l_locationflag,l_clusterflag,dopsenv := l_dopsenv,l_testenv := l_testenv);
 	
 		
 	

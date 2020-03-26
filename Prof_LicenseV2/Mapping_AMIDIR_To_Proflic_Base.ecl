@@ -1,4 +1,4 @@
-// Mapping INFOUSA's - American Medical Information Directory (AMIDIR) to professional license data.
+﻿// Mapping INFOUSA's - American Medical Information Directory (AMIDIR) to professional license data.
 import AMIDIR, aid, Prof_License, Address,idl_header;
 
 
@@ -152,6 +152,9 @@ layout_out trfAmidirToProflic(amidir_base l) := transform
 																							 trim(self.license_type) = 'M.D.'   => 'PHYSICIAN',
 																							 ''
 																							);
+	 //DF-24056 CCPA new fields
+		self.global_sid											:= 0;																					
+		self.record_sid											:= 0;																					
    self 																:= l;
 	 self 																:= [];
 end;

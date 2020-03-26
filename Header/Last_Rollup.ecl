@@ -169,11 +169,13 @@ sj := sort(distribute(j,old_rid),old_rid,new_rid,local);
 
 rolled_rids := dedup(sj,old_rid,local);
 
-ut.MAC_Patch_Id(inf, rid, rolled_rids, old_rid, new_rid, old_and_new);
+inf_seqd:=project(inf,transform({inf},self.persistent_record_ID:=left.rid,self:=left));
+
+ut.MAC_Patch_Id(inf_seqd, rid, rolled_rids, old_rid, new_rid, old_and_new);
 
 dinfile := distribute(old_and_new,hash(rid));
 
-BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_last_seen,local);
+BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_last_seen,persistent_record_ID,local);
 
 merged := rollup(BR_s,left.rid=right.rid,header.tra_merge_headers(left,right),local);
 
@@ -182,6 +184,6 @@ set_titles := header.fn_apply_title(fix_dates);
 
 if ( count(set_titles(did>rid)) <> 0, output('DID > RID constraint violated') );
 
-_Last_Rollup := (set_titles + Dummy_records.NonFCRAseed) : persist('persist::last_rollup');
+_Last_Rollup := (set_titles + Dummy_records.NonFCRAseed);// : persist('persist::last_rollup');
 return _Last_Rollup;
 END;

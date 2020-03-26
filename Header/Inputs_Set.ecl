@@ -36,11 +36,13 @@ output('Nothing added to base::LiensHeader_Building'),
 fileservices.addsuperfile('~thor_data400::base::LiensHeader_Building','~thor_data400::base::liens',,true));
 
 
+File_liens_party_headerIngest := PROJECT(LiensV2.File_Liens_Party_BIPV2_with_Linkflags_build,LiensV2.Layout_Liens_party_HeaderIngest);
+
 liensv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::base::LiensV2_mainHeader_Building')>0,
 output('Nothing added to base::LiensV2Header_Building'),
 sequential(
-output(liensv2.file_liens_main,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
-output(liensv2.file_liens_party,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
+output(liensv2.file_liens_main_build,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
+output(File_liens_party_headerIngest,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
 fileservices.addsuperfile('~thor_data400::base::LiensV2_mainHeader_Building','~thor_data400::base::liens::main'),
 fileservices.addsuperfile('~thor_data400::base::LiensV2_partyHeader_Building','~thor_data400::base::liens::party')
 ));
@@ -130,6 +132,10 @@ voters_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::Voters_H
 output('Nothing added to Base::Voters_Header_Building'),
 fileservices.addsuperfile('~thor_data400::Base::Voters_Header_Building','~thor_data400::Base::Voters_Reg',,true));
 
+UM_Census_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::base::Census_Header_Building')>0,
+output('Nothing added to base::Census_Header_Building'),
+fileservices.addsuperfile('~thor_data400::base::Census_Header_Building','~thor_data400::Base::MA_Census',,true));
+
 certegy_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::certegyHeader_Building')>0,
 output('Nothing added to Base::certegyHeader_Building'),
 fileservices.addsuperfile('~thor_data400::Base::certegyHeader_Building','~thor_data400::base::certegy',,true));
@@ -166,6 +172,10 @@ targus := if(fileservices.getsuperfilesubcount('~thor_data400::base::consumer_ta
 output('Nothing added to Base::consumer_targusHeader_Building'),
 fileservices.addsuperfile('~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus',,true));
 
+cd_seed := if(fileservices.getsuperfilesubcount('~thor_data::base::cd_seed_building')>0,
+output('Nothing added to Base::cd_seed_Building'),
+fileservices.addsuperfile('~thor_data::base::cd_seed_building','~thor_data::base::CD_Seed::built',,true));
+
 add_super := sequential(
                             parallel(
                                              dLv2_file
@@ -197,6 +207,7 @@ add_super := sequential(
                                             ,asl_file
                                             ,osl_file
                                             ,voters_v2
+                                            ,UM_Census_v2
                                             ,certegy_file
                                             ,tucs_file
                                             ,experian_file
@@ -208,6 +219,7 @@ add_super := sequential(
                                             ,targus
                                             )
                     ,liensv2_file
+                    ,cd_seed
                     );
 
 return add_super;

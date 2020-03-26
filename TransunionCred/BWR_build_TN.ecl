@@ -13,8 +13,8 @@
 #option('multiplePersistInstances',FALSE);
 import std,orbit3;
 
-
-DoBuild := TransunionCred.Build_All(version);
+IsFullUpdate := false;// need to determine the build type
+DoBuild := TransunionCred.Build_All(version, IsFullUpdate);
 
 SampleRecs := choosen(sort(TransunionCred.Files.Base,record),1000);
 					

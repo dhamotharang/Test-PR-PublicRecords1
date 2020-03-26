@@ -1,4 +1,4 @@
-//****************Maps infutor CID to a common layout********************
+﻿//****************Maps infutor CID to a common layout********************
 import Gong, ut, _validate, InfutorCID, Mdr;
 
 base_history := infutorCID.File_InfutorCID_Base;
@@ -103,6 +103,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.did 						:= if(input.did > 0,  input.did, input.did_instantID);
 	//self.did_score 					:= if(input.did_score > 0,  input.did_score, input.did_score_instantID);
 	self.phone7_did_key         	:= hashmd5((data)input.phone [length(input.phone) - 6 ..length(input.phone)] + (data)(unsigned)self.did);
+	self.source				:= mdr.sourceTools.src_InfutorCID; //DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

@@ -25,16 +25,13 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
-		
+		,fDOPSGrowthCheck(pversion).GrowthCheck
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	
 	return
 		if(tools.fun_IsValidVersion(pversion),
-				if(count(pSprayedFile(stringlib.stringfind(frn_start_date,'/',1) = 0 and frn_start_date<>'')) = 0,
-						full_build,
-						output('Invalid frn_start_Date field. Please contact data development. Skipping the Frandx Build.')
-					),
-				output('No Valid version parameter passed, skipping Frandx.Build_All')
-			 );
+			 full_build,
+			 output('No Valid version parameter passed, skipping Frandx.Build_All')
+			);
 
 end;

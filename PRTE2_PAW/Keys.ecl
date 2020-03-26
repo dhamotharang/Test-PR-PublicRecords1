@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr, PRTE2_PAW, paw,BIPV2;
+﻿IMPORT  doxie,mdr, PRTE2_PAW, paw,BIPV2, ut;
 
 EXPORT keys := MODULE
 
@@ -19,11 +19,13 @@ EXPORT keys := MODULE
    		{contact_id}, 
    		{FILES.file_contactid}, 
    		Constants.KeyName_paw + doxie.Version_SuperKey + '::contactid');
-   	EXPORT key_did := INDEX(
+   	
+		EXPORT key_did := INDEX(
    		FILES.file_did(did>0), 
    		{did}, 
    		{contact_id}, 
    		Constants.KeyName_paw + doxie.Version_SuperKey + '::did');
+	
 	/////////LinkIDs////////////
 	EXPORT Key_LinkIds := MODULE
 		shared DedupBase := dedup(sort(PAW.File_keybuild_BIPv2(Files.file_Employment_Out_BIPv2),record, local),record,local);
@@ -45,11 +47,13 @@ EXPORT keys := MODULE
 	END;
 	
 	
-    	EXPORT key_did_fcra := INDEX(
-   		FILES.file_Employment_Out(did>0 and source in Constants.PAW_FCRA_sources), 
-   		 {did}, 
-   		 {Files.file_Employment_Out}, 
-   		Constants.KeyName_paw + doxie.Version_SuperKey + '::did_fcra');
+    	EXPORT key_did_fcra := function
+			
+			//DF-11712: FCRA Consumer Data Field Depreciation	
+			ut.MAC_CLEAR_FIELDS(FILES.file_Employment_Out(did>0 and source in Constants.PAW_FCRA_sources), 
+													Employment_Out_cleared, constants.fields_to_clear);
+			return INDEX(Employment_Out_cleared, {did}, {Employment_Out_cleared}, 
+										Constants.KeyName_paw + doxie.Version_SuperKey + '::did_fcra');
 
-
+			end;
 END;

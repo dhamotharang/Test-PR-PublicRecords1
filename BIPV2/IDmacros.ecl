@@ -103,7 +103,8 @@ MACRO
 		transform(
 			BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self := left,
-			self.weight := 0
+			self.weight := 0,
+			self := []
 		)
 	);	
 	

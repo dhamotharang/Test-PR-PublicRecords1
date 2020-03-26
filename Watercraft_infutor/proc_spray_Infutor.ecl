@@ -1,4 +1,4 @@
-import VersionControl,_Control, tools;
+﻿import VersionControl,_Control, tools;
 
 srcCSVseparator					:=	'\t';
 srcCSVterminator				:=	'\\n,\\r\\n';
@@ -52,7 +52,7 @@ RETURN IF(pDir != '',
 					,							// pReplicate
 					,TRUE					// pAddCounter
 					,pIsTesting		// pIsTesting
-					,'shannon.lucero@lexisnexis.com'				// pEmailNotificationList
+					,'Sudhir.Kasavajjala@lexisnexisrisk.com; Michael.Gould@lexisnexisrisk.com'			// pEmailNotificationList
 					,'Infutor Watercraft spray' + ' ' + pVersionDate	// pEmailSubjectDataset
 					,pNameOutput 	// pOutputName
 					,FALSE 				// pShouldClearSuperfileFirst

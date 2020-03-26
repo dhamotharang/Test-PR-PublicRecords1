@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie, MDR, STD, _control;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.Update(bus_intel.industry <> '' and 
 						trim(person_q.email_address) <> '' and 
@@ -11,11 +11,14 @@ slim := record
 	df.person_q;
 	df.search_info;
 	df.fraudpoint_score;
+	inquiry_acclogs.Layout.ccpaLayout ccpa;
 end;
 
-p := project(df, transform(slim, 
+p_ := project(df, transform(slim, 
 	self.person_q.email_address := stringlib.stringtouppercase(left.person_q.email_address), 
 	self := left));
+p  := MDR.macGetGlobalSid(p_,'InquiryTracking_Virtual','', 'ccpa.global_sid');
+
 
 export Key_Inquiry_Email_Update := INDEX(p, {string50 email_address := person_q.email_address}, {p},
 						'~thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::email_update');

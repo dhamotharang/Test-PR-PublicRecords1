@@ -9,7 +9,7 @@ IMPORT ut
 		 ;
 
 EXPORT  map_WIS0854_conversion(STRING pVersion) := FUNCTION
-#workunit('name','Prof License MARI- WIS0854 ' + pVersion);	
+#workunit('name',' Yogurt:Prof License MARI - WIS0854     ' + pVersion);	
 	
 code 		:= 'WIS0854';  
 src_cd	:= 'S0854';
@@ -85,7 +85,7 @@ END;
 	                    REF_Vehicle_Blank);
 
 //WI Licensing to common MARIBASE layout
-Prof_License_Mari.layouts.base	xformToCommon(Prof_License_Mari.layout_WIS0854.src pInput) 
+Prof_License_Mari.layout_base_in	xformToCommon(Prof_License_Mari.layout_WIS0854.src pInput) 
 	:= 
 	 TRANSFORM
 		SELF.PRIMARY_KEY	    := 0;  
@@ -352,7 +352,7 @@ END;
 inFileLic	  := PROJECT(clnFile,xformToCommon(LEFT));
 
 // Populate STD_LICENSE_TYPE field via translation on RAW_LICENSE_STATUS field
-Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -363,7 +363,7 @@ ds_map_stat_trans := JOIN(inFileLic, cmvTransLkp,
 							     trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -377,7 +377,7 @@ ds_map_lic_trans := JOIN(ds_map_stat_trans, cmvTransLkp,
 //Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 company_only_lookup := ds_map_lic_trans(affil_type_cd= 'CO');
 
-Prof_License_Mari.layouts.base 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -386,7 +386,7 @@ ds_map_affil := JOIN(ds_map_lic_trans, company_only_lookup,
 										AND LEFT.affil_type_cd = 'IN',
 										assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER);	
 
-Prof_License_Mari.layouts.base  xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+Prof_License_Mari.layout_base_in  xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 	SELF.PROVNOTE_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + Comments,
 												 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => Comments,
 						  												       L.PROVNOTE_1);

@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring, BIPV2;
+﻿IMPORT AccountMonitoring, BIPV2;
 
 EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -14,21 +14,21 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 		// Business_Credit.Key_LinkIds.key
 		Key_Linkids := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.sbfe.sbfeLinkid_key, 
+				AccountMonitoring.product_files.sbfe.r_sbfeLinkid_key, 
 				HASH64(seleid)
 			);
 		
 		// Tradeline key Business_Credit.key_tradeline
 		Key_Tradeline := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.sbfe.sbfeTrade_key, 
+				AccountMonitoring.product_files.sbfe.r_sbfeTrade_key, 
 				HASH64(sbfe_contributor_number,contract_account_number)
 			);
 		
 		// Credit Score Key Business_Credit_Scoring.Key_ScoringIndex.Key
 		Key_Score := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.sbfe.sbfeScore_key, 
+				AccountMonitoring.product_files.sbfe.r_sbfeScore_key, 
 				HASH64(seleid)
 			);
 		

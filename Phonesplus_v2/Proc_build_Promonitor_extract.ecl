@@ -1,4 +1,4 @@
-import phonesplus,_control,ut,watchdog, mdr;
+﻿import phonesplus,_control,ut,watchdog, mdr;
 
 /*
 
@@ -9,14 +9,14 @@ import phonesplus,_control,ut,watchdog, mdr;
  5) Despray the (new records and updated records) to be sent to Promonitor.
  
 */
-#workunit('name','Phonesplus Promonitor Extract');
+
 DestinationIP         := _control.IPAddress.bctlpedata11; 
 string v_process_date := ut.GetDate[1..8];
 // string v_process_date := '20111204';
 
 //thor_data400::base::phonesplusv2_20100809
 //thor_data400::base::phonesplusv2_20100816
-phones_plus_file    := dataset('~thor_data400::base::phonesplusv2', phonesplus_v2.Layout_Phonesplus_Base, thor);
+phones_plus_file    := dataset(PhonesPlus_V2.Names.phonesplusv2_base, phonesplus_v2.Layout_Phonesplus_Base, thor);
  // phones_plus_file    := dataset(ut.foreign_prod+ '~thor_data400::base::phonesplusv2_20111128', phonesplus_v2.Layout_Phonesplus_Base, thor);
 //phones_plus_file    := dataset(ut.foreign_prod+ '~thor_data400::base::phonesplusv2_20111204', phonesplus_v2.Layout_Phonesplus_Base, thor);
 

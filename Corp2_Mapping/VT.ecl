@@ -1,4 +1,4 @@
-import ut, tools, corp2, versioncontrol, scrubs, std, corp2_raw_vt, scrubs_corp2_mapping_vt_main;
+﻿import ut, tools, corp2, versioncontrol, scrubs, std, corp2_raw_vt, scrubs_corp2_mapping_vt_main;
 
 export VT  := MODULE;
 
@@ -284,7 +284,18 @@ export VT  := MODULE;
 																				self.Corp_Legal_Name := left.Corp_Legal_Name;
 																				self         			   := right;), 
 															inner,local);
-										 
+															
+															
+		Corp2_Mapping.LayoutsCommon.Main legalNameFix_Trans(Corp2_Mapping.LayoutsCommon.Main  l):= transform
+			
+			self.corp_legal_name :=if(Corp2_Mapping.fSpecialChars(l.corp_legal_name)='FOUND', Corp2_Raw_VT.Functions.fix_ForeignChar(l.corp_legal_name), l.corp_legal_name);
+			self								 :=l;
+			
+		end;
+		
+		legalNameFix          := project(mapCorp_dedup + Cont_recs_LName, legalNameFix_Trans(left)) ;
+		MapMain 							:= dedup(sort(distribute(legalNameFix, hash(corp_key)),record,local),record,local) :independent;		
+																 
 		//---------- END CONT Mapping	
 		//---------- END  MAIN Mapping	
 		
@@ -316,7 +327,7 @@ export VT  := MODULE;
 		//--------------------------------------------------------------------	
 		//@@@@@@@@@@@@@@	Scrubs for MAIN
 		//--------------------------------------------------------------------
-		Main_F 										:= dedup(sort(distribute(mapCorp_dedup + Cont_recs_LName, hash(corp_key)),record,local),record,local) :independent;
+		Main_F 										:= MapMain; 
 		Main_S 										:= Scrubs_corp2_mapping_VT_Main.Scrubs; 				     // Scrubs module
 		Main_N 										:= Main_S.FromNone(Main_F); 											  // Generate the error flags
 		Main_T 										:= Main_S.FromBits(Main_N.BitmapInfile);     		 	 // Use the FromBits module; makes my bitmap datafile easier to get to
@@ -341,16 +352,13 @@ export VT  := MODULE;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_VT Report' 	//subject
 																																	 ,'Scrubs CorpMain_VT Report'  //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpVTMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 																				 
 		EXPORT Main_BadRecords		 := Main_N.ExpandedInFile( dt_vendor_first_reported_Invalid       <> 0 or
 																												 dt_vendor_last_reported_Invalid 	      <> 0 or

@@ -20,6 +20,7 @@ EXPORT corrections_court_offenses 			:= Project(file_court_offenses_plus, Layout
 EXPORT file_offenders_keybuilding 			:= Project(file_offenders_base_plus, Layouts.layout_offender);
 
 EXPORT corrections_punishment 					:= Project(file_punishment_plus, Layouts.Layout_CrimPunishment);
+EXPORT corrections_activity_fcra                                                           := DATASET([], Layouts.layout_corrections_activity_public);
 
 xl := RECORD
 	file_offenders_keybuilding;

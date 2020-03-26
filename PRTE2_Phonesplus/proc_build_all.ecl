@@ -1,6 +1,7 @@
 ﻿EXPORT proc_build_all (string filedate, boolean skipTest=FALSE, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 
-	run_all := SEQUENTIAL(fSpray, 
+	run_all := SEQUENTIAL(
+													fSpray, 
 																							proc_build_base, 
 																							fn_DeltaBaseFile(filedate),
 																								if(skipTest=true, 

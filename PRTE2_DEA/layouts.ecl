@@ -1,4 +1,4 @@
-//	Summary:			Layouts for the PRTE DEA process based originally from the DEA module
+﻿//	Summary:			Layouts for the PRTE DEA process based originally from the DEA module
 
 IMPORT BIPV2,dea;
 EXPORT layouts := MODULE
@@ -15,6 +15,9 @@ EXPORT layouts := MODULE
 	end;
 	EXPORT layout_DEA_In 			:= dea.Layout_DEA_OUT_baseV2 or working_layout;
 	EXPORT layout_DEA_Out_Base 		:= dea.Layout_DEA_OUT_base;
+	
+	EXPORT layout_DEA_Out_Base_2 		:= dea.Layout_DEA_OUT_base-[xadl2_weight,xadl2_score,xadl2_distance,xadl2_keys_used, xadl2_keys_desc, xadl2_matches,xadl2_matches_desc];
+
 	EXPORT layout_DEA_Out 			:= dea.layout_DEA_Out;
 	EXPORT layout_DEA_Out_BaseV2 	:= dea.Layout_DEA_OUT_baseV2 or working_layout;
  

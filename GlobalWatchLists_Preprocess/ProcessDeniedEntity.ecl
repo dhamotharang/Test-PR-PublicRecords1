@@ -1,4 +1,4 @@
-import GlobalWatchLists_Preprocess, STD, lib_StringLib, ut;
+﻿import GlobalWatchLists_Preprocess, STD, lib_StringLib, ut;
 
 EXPORT ProcessDeniedEntity := FUNCTION
 	
@@ -25,7 +25,7 @@ EXPORT ProcessDeniedEntity := FUNCTION
 	END;
 	
 	GlobalWatchLists_Preprocess.IntermediaryLayoutDeniedEntity.tempLayout1 RemoveDoubleQuoteANDaddEntKey(GlobalWatchLists_Preprocess.IntermediaryLayoutDeniedEntity.tempLayout L, INTEGER Ctr) := TRANSFORM
-		self.Ent_Key 										:= 'DEL' + INTFORMAT(Ctr, 3, 1);
+		self.Ent_Key 										:= 'DEL' + INTFORMAT(Ctr, 4, 1);
 		self.Country 										:= regexreplace('\"$', regexreplace('^\"', L.Country, ''), '');
 		self.Entities 									:= regexreplace('\"$', regexreplace('^\"', L.Entities[1..350], ''), '');
 		self.License_Requirement 				:= regexreplace('\"$', regexreplace('^\"', L.License_Requirement, ''), '');

@@ -1,7 +1,15 @@
+﻿import ut,BIPV2,Data_Services;
 
-import ut;
-lnold := ut.foreign_prod + 'thor_data_400::bipv2external.113sfullw20130801-102404';	//20130521
-lnnew := ut.foreign_prod + 'thor_data_400::bipv2external.113sfullW20130805-164906';//sprint 1, keep 10
+s3 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20130828-144156';
+s4 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20130916-174324';
+s5 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20131014-144156';
+s6 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullw20131022-130415';
+s7 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20131105-085822';
+s7a := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20131109-005723';
+s8 := Data_Services.foreign_prod + 'thor_data_400::bipv2external.113sfullW20131126-173746';
+
+lnold := s7a;	
+lnnew := s8; 
 
 
 
@@ -127,8 +135,10 @@ f(
 	) :=
 function
 
-k := bizlinkfull.Process_Biz_Layouts.key;
-mykrec := {k, unsigned6 rid,unsigned4 ProxScore, unsigned4 ProxWeight};
+k := 
+// bizlinkfull.Process_Biz_Layouts.key;
+BIPV2.Key_BH_Linking_Ids.key;
+mykrec := {k, unsigned6 rid/*,unsigned4 ProxScore, unsigned4 ProxWeight*/};
 mykold := 
 join(
 	old, k, 
@@ -270,7 +280,7 @@ return parallel(
 	// output(mykslim, named(s+'_mykslim')),
 	// output(choosen(forcompare, 500), named(s+'forcompare'));
 	
-	output(choosen(sort(krolled, rids[1].rid, notes[1].note), 300), named(s+'_header_srtd_rid'))
+	output(enth(sort(krolled, rids[1].rid, notes[1].note), 300), all, named(s+'_header_srtd_rid'))
 	// output(old, named(s+'_old'))
 );
 

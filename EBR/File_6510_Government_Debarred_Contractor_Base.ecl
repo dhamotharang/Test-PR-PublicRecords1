@@ -1,3 +1,5 @@
+import _control, Mdr, Std;
+
 EBR.Layout_6510_Government_Debarred_Contractor_Base	trfBaseToOrig(Layout_6510_Government_Debarred_Contractor_Base_AID	l)	:=	transform
 	self.clean_business_address.prim_range	:=	l.clean_Business_Address.prim_range	;
 	self.clean_business_address.predir			:=	l.clean_Business_Address.predir	;
@@ -35,4 +37,8 @@ EBR.Layout_6510_Government_Debarred_Contractor_Base	trfBaseToOrig(Layout_6510_Go
 	self							:=	[];
 end;
 
-export File_6510_Government_Debarred_Contractor_Base := project(File_6510_Government_Debarred_Contractor_Base_AID, trfBaseToOrig(left));
+projectBase  := project(File_6510_Government_Debarred_Contractor_Base_AID, trfBaseToOrig(left));
+
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export File_6510_Government_Debarred_Contractor_Base := addGlobalSID;

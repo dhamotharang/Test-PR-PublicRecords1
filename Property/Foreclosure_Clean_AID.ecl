@@ -1,4 +1,4 @@
-IMPORT ut
+﻿IMPORT ut
 		 , address
 		 , AID
 		 , DID_Add
@@ -26,7 +26,7 @@ IMPORT ut
 				self	:=	[];
 			END;
 
-	rsBaseInLayout	:=	PROJECT(File_Foreclosure_Base_v2, tProjectBasetoIn(LEFT));
+	rsBaseInLayout	:=	PROJECT(File_Foreclosure_Base_v2(source NOT IN ['B7','I5']), tProjectBasetoIn(LEFT)); //BK data not needed as it is built seperately
 	
 
 	//Combine the Raw input with the existing base file

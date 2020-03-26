@@ -1,4 +1,7 @@
-﻿IMPORT Address, BIPV2, AID, HMS_STLIC;
+﻿/*2019-06-19T17:11:54Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-260
+*/
+IMPORT Address, BIPV2, AID, HMS_STLIC;
 
 EXPORT layouts := MODULE
 
@@ -28,6 +31,36 @@ EXPORT layouts := MODULE
 				string20 fax3;	
 				string20 other_phone1;
 		END;
+		
+		EXPORT address_layout_new := RECORD ,MAXLENGTH(max_size)
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100		ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string25 		address_id;
+				string100		raw_full_address;
+				string50 		firmname;
+				string50 		street1;
+				string25 		street2;
+				string25 		street3;
+				string50 		city;
+				string2 		state;
+				string12 		zip;
+				string50 		county;
+				string50 		country;
+				string 			type;
+				string20 		phone1;
+				string20 		phone2;
+				string20 		phone3;
+				string20 		fax1;
+				string20 		fax2;
+				string20 		fax3;	
+				string20 other_phone1; // dropped previously and now back?
+		END;		
 			
 		EXPORT csr_layout := RECORD
 				string100 ln_key;
@@ -38,6 +71,38 @@ EXPORT layouts := MODULE
 				string50 csr_number;
 		END;
 		
+		EXPORT csr_layout_new := RECORD
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string25		address_id;
+				string2			state;
+				string25		credential_type;
+				string50 		csr_number;
+				string25		status;
+				string25		sub_status;
+				string25		issue_date;
+				string25		effective_date;
+				string25		renewal_date;
+				string25		expiration_date;
+				string25		status_date;
+				string25		discipline;
+				string25		all_schedules;
+				string2			schedule_1;
+				string2			schedule_2;
+				string2			schedule_2N;
+				string2			schedule_3;
+				string2			schedule_3N;
+				string2			schedule_4;
+				string2			schedule_5;
+				string2			schedule_6;
+				string25		raw_status;
+				string25		raw_sub_status1;
+				string25		raw_sub_status2;
+		END;
+		
 		EXPORT dea_layout := RECORD
 				string100 ln_key;
 				string25 hms_src;
@@ -45,6 +110,18 @@ EXPORT layouts := MODULE
 				string25 id;
 				string100 entityid;
 				string50 dea_number;
+		END;
+		
+		EXPORT dea_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string50 		dea_number;
 		END;
 
 		EXPORT disciplinaryact_layout := RECORD
@@ -62,6 +139,26 @@ EXPORT layouts := MODULE
 				string20 action_end;
 		END;
 		
+		EXPORT disciplinaryact_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string50 		board; 
+				string50 		offense;
+				string20 		offense_date;
+				string50 		action;
+				string20 		action_date;
+				string20 		action_start;
+				string20 		action_end;
+				string25		reinstatement_date;
+				string25		fine;
+		END;
+		
 		EXPORT education_layout := RECORD
 				string100 ln_key;
 				string25 hms_src;
@@ -71,6 +168,22 @@ EXPORT layouts := MODULE
 				string50 graduated; 
 				string50 school;
 				string50 location;
+		END;
+		
+		EXPORT education_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string25		degree;
+				string50 		graduated; 
+				string50 		school;
+				string25		department;
+				string50 		location;
 		END;
 		
 		EXPORT entity_layout := RECORD
@@ -92,6 +205,31 @@ EXPORT layouts := MODULE
 				string20 dateofdeath;
 		END;
 		
+		EXPORT entity_layout_new := RECORD
+				string12		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string100 	name;
+				string25		prefix;
+				string50 		first;
+				string10 		middle;
+				string50 		last;
+				string10 		suffix;
+				string25		typecode;
+				string25		position;
+				string10 		cred;
+				string6			gender;
+				unsigned3 	age;
+				string20 		dateofbirth;
+				string25		dateofdeath;
+				string50 		email;
+		END;
+		
 		EXPORT language_layout := RECORD
 				string100 ln_key;
 				string25 hms_src;
@@ -99,6 +237,20 @@ EXPORT layouts := MODULE
 				string25 id;
 				string100 entityid;
 				string50 language;
+		END;
+		
+		EXPORT language_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string2			ranking;
+				string50 		language;
+				string25		language_code;
 		END;
 				
 		EXPORT license_layout := RECORD
@@ -125,6 +277,44 @@ EXPORT layouts := MODULE
 				string raw_number;
 		END;
 		
+		EXPORT license_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string2 		state;
+				string 			class_type;
+				string25		subtype;
+				string 			number;
+				string 			status;
+				string25		sub_status;
+				string 			issue_date;
+				string25		effective_date;
+				string25		renewal_date;
+				string 			expiration_date;
+				string25		status_date;
+				string25		disciplined;
+				string 			qualifier1;
+				string 			qualifier2;
+				string 			qualifier3;
+				string 			qualifier4;
+				string 			qualifier5;
+				string 			rawclass;
+				string25		raw_subtype;
+				string25		raw_number;
+				string25		rawstatus;
+				string25		raw_sub_status;
+				string 			rawissue_date;
+				string25		raw_effective_date;
+				string25		rawrenewal_date;
+				string 			rawexpiration_date;
+				string25		raw_status_date;
+		END;
+		
 		EXPORT npi_layout := RECORD
 				string100 ln_key;
 				string25 hms_src;
@@ -132,6 +322,19 @@ EXPORT layouts := MODULE
 				string25 id;
 				string100 entityid;
 				string50 npi_number;
+		END;
+		
+		EXPORT npi_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
+				string100 	ln_key;
+				string25 		hms_src;
+				string100 	key;
+				string25 		id;
+				string100 	entityid;
+				string50 		npi_number;
+				string2			type_code;
 		END;
 		
 		EXPORT phone_layout := RECORD
@@ -144,6 +347,13 @@ EXPORT layouts := MODULE
 				string50 type;				
 		END;
 		
+		EXPORT phone_layout_new := RECORD
+			string15	load_id;
+			string10	load_source_data_date;
+			string10	load_qa_approval_date;
+			phone_layout;
+		END;
+		
 		EXPORT specialty_layout := RECORD
 				string100 ln_key;
 				string25 hms_src;
@@ -154,6 +364,12 @@ EXPORT layouts := MODULE
 				string class_type;
 		END;
 		
+		EXPORT specialty_layout_new	:= RECORD
+			string15	load_id;
+			string10	load_source_data_date;
+			string10	load_qa_approval_date;
+			specialty_layout;
+		END;
 		
 		EXPORT stliclookup_layout := RECORD
 			STRING state := ''; //License State
@@ -167,6 +383,10 @@ EXPORT layouts := MODULE
 			STRING mapped_qualifier2 := '';
 			STRING mapped_pdma := '';
 			STRING mapped_pract_type := '';
+		END;
+		
+		EXPORT stliclookup_layout_new := RECORD
+				stliclookup_layout;
 		END;
 		
 		EXPORT statelicense_layout := RECORD
@@ -245,7 +465,10 @@ EXPORT layouts := MODULE
 					string50 source_code := '';
 					string15 taxonomy_code := '';
 		END;
-		
+
+		EXPORT statelicense_layout_new := RECORD
+				statelicense_layout;
+		END;		
 		
 	//===================================================
 	//  BASE LAYOUTS
@@ -584,6 +807,8 @@ EXPORT layouts := MODULE
 			string50 	source_code;
 			string15 	taxonomy_code;
 			string 		file_date;
+			unsigned4 								global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
+			unsigned8 								record_sid; 
 		END;
 		
 		EXPORT autokey_common	:= RECORD

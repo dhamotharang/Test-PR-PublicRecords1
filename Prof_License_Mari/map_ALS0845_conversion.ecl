@@ -1,4 +1,4 @@
-
+﻿
 IMPORT ut, Prof_License_Mari, lib_stringlib;
 
 EXPORT map_ALS0845_conversion(STRING pVersion) := FUNCTION
@@ -22,7 +22,7 @@ LicStatusLkp	:=	Prof_License_Mari.files_References.MARIcmvLicStatus;
 numset := ['0','1','2','3','4','5','6','7','8','9'];
 
 maribase_plus_dbas := RECORD, maxsize(5000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
 	STRING60 dba1;
 	STRING60 dba2;
 	STRING60 dba3;
@@ -212,7 +212,7 @@ END;
 ds_map_assign := PROJECT(ds_map_affil, xTransPROVNOTE(LEFT));																		
 
 // transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base 	xTransToBase(ds_map_assign L) := TRANSFORM
+Prof_License_Mari.layout_base_in 	xTransToBase(ds_map_assign L) := TRANSFORM
 		SELF.NAME_ORG_SUFX	:= Prof_License_Mari.mod_clean_name_addr.strippunctName(L.NAME_ORG_SUFX);
 		SELF.NAME_DBA_SUFX	:= StringLib.StringFilterOut(L.NAME_DBA_SUFX, '.'); 
 		SELF.ADDR_ADDR1_1	:= Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR1_1);

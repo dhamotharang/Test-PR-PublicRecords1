@@ -29,7 +29,7 @@
 	export	string	aprod_thor_esp	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.202
 	export	string	aprod_thor_dali	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.201
 	export	string	prod_thor_esp	      :=	'prod_esp.br.seisint.com';				// 10.173.84.202
-	export	string	prod_thor_dali	    :=	'prod_dali.br.seisint.com';				// 10.173.84.201
+	export	string	prod_thor_dali	    :=	'uspr-prod-thor-dali.risk.regn.net';				// 10.173.84.201
 	export	string	prod_thor_sasha	    :=	'10.173.85.204';						// No br domain DNS entry
 
   // request for DNS at some point later
@@ -52,6 +52,8 @@
 	export  string bair_LZ_VIP      := 'bair-batchlz.risk.regn.net';
 	export  string bair_batchlz01      := 'bair-batchlz.risk.regn.net';//10.240.0.47
 	export  string abair_batchlz01     := 'abair-batchlz.risk.regn.net';//10.240.128.41
+  
+  export string CargoDayton       := '10.140.128.250';          //cargodayton
 
   end
  ;

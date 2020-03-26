@@ -26,7 +26,7 @@ TRANSFORM
 
 	// Convert the DOB and DOD to a common format and calculate AGE
 	fmtsin_dob := '%m/%d/%Y'; // Ex. 6/7/2018
-	fmtsin_dod := '%m/%d/%y'; // Ex. 6/7/18
+	fmtsin_dod := '%m/%d/%Y'; // Ex. 6/7/2018
 	fmtout					:=	'%Y%m%d';
 	STRING8 	clean_dob 		:=	Std.date.ConvertDateFormat(pInput.dob,fmtsin_dob,fmtout);
 	//	California may send in two digit year (1/1/15) so we add 20 to the beginning

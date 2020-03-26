@@ -132,10 +132,11 @@ prte2_sanctn_np.Layouts.incident_base		xformIncident(jIncident l) := transform
 			self.ultid	:= vLinkingIds.ultid;
 			self.submitter_email := STD.Str.FindReplace(trim(L.submitter_email,left,right),' ','.');
 			self := L;
+			self := [];
 end;			
 			
 dsIncident := PROJECT(dedup(jIncident, record), xformIncident(left)) +
-										PROJECT(CleanIncident(cust_name = ''), transform(prte2_sanctn_np.Layouts.incident_base, self := left));			
+										PROJECT(CleanIncident(cust_name = ''), transform(prte2_sanctn_np.Layouts.incident_base, self := left, self := []));			
 		
 
 
@@ -169,7 +170,7 @@ prte2_sanctn_np.layouts.party_base xformParty(jParty l) := transform
 	end;
 
 	dsParty := PROJECT(dedup(jParty, record), xformParty(left)) +
-								PROJECT(CleanParty(cust_name = ''), transform(prte2_sanctn_np.layouts.party_base, self := left));
+								PROJECT(CleanParty(cust_name = ''), transform(prte2_sanctn_np.layouts.party_base, self := left, self := []));
 						    
 	
 

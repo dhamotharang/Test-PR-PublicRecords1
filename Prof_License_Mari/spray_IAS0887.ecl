@@ -44,14 +44,16 @@ END;
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list1.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list2.csv','comma');
 	);
 
 
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list1.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list1.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list2.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list2.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
 					 	);	
 
 
@@ -60,7 +62,8 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile_rel('choicepoint_RE_mailing_list.csv'),
+		AddToSuperfile_rel('choicepoint_RE_mailing_list1.csv'),
+		AddToSuperfile_rel('choicepoint_RE_mailing_list2.csv'),
 		FileServices.FinishSuperFileTransaction()
 	);
 
@@ -68,7 +71,8 @@ super_all
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list1.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list2.raw'),
 							 );
 
 

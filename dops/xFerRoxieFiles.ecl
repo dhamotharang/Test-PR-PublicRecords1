@@ -37,8 +37,8 @@ EXPORT xFerRoxieFiles(
 											,boolean MoveToLive = false
 											,boolean spawnWU = true
 											,string roxieip = _Control.RoxieEnv.prod_batch_neutral
-											,string srcthoresp = 'prod_esp.br.seisint.com'
-											,string srcthordali = 'prod_dali.br.seisint.com'
+											,string srcthoresp = _Control.Config.LocalEsp
+											,string srcthordali = _Control.Config.prod_dali
 											,string srcthorespport = '8010'
 											,set of string srcthorclusters = ['thor400_20'
 																											,'thor400_30'

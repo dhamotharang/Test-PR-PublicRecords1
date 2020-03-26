@@ -1,5 +1,5 @@
 ﻿
-import VersionControl,_Control,ut,lib_fileservices;
+import VersionControl,_Control,ut,lib_fileservices,std;
 
 export Spray_In(
 
@@ -11,18 +11,19 @@ function
 
 	lfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword + '.@version@.csv';
 	sfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword;
+	 agency_date :=  (STRING8) Std.Date.Today();
 
 	spry_raw:=DATASET([
-             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'
-									,'mbs_ecrash_v_agency_hpcc_export_'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt'
-																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,'','[0-9]{8}','VARIABLE'}
+             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/'
+									,'mbs_ecrash_v_agency_hpcc_export.txt'
+																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,agency_date,'[0-9]{8}','VARIABLE'}
 		 	], VersionControl.Layout_Sprays.Info);
 	
-verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/','*ecrash_v_agency*'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt');
+verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/','*ecrash_v_agency*.txt');
 
 Agency_sp :=  if( ( EXISTS(verify_agency) and verify_agency[1].size <> 0 )  ,                  
-                                                                                                              sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
-                                                                                                              output('NO Agency Files Recieved')); 
+										sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
+										output('NO Agency Files Recieved')); 
 
 //Incident Spray
 
@@ -170,7 +171,7 @@ Commercial_move := nothor(apply(Commercial_FileListing,FileServices.MoveExternal
 																 
 
 Commercial_spy := if (ut.Weekday((integer) ut.GetDate) <> 'SUNDAY', if (  COUNT(Commercial_FileListing) > 0 , Sequential(Commercial_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCommercial + Constants.FileSeparator + Constants.CommercialFileMask,,,,'"',
-       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),FAIL('Commercial_Files_not_in_unix')),Output('No_Commercial_Files_On_Sunday'));
+       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),Output('Commercial_Files_not_in_unix')),Output('No_Commercial_Files_On_Sunday'));
 
 
 //Citation Spray
@@ -219,7 +220,7 @@ PTYD_move := nothor(apply(PTYD_FileListing,FileServices.MoveExternalFile(Constan
 
 
 PTYD_spy := if ( ut.Weekday((integer) ut.GetDate) <> 'SUNDAY' , if (  COUNT(PTYD_FileListing) > 0 , Sequential(PTYD_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPtyDamage + Constants.FileSeparator + Constants.PtyDamageFileMask,50000,,,'"',
-       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),FAIL('PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
+       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),Output('PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
 
 
 

@@ -62,8 +62,13 @@ post1 := sequential(
 		fileservices.addsuperfile('~thor_data400::base::file_header_building_BUILT','~thor_Data400::base::file_header_building_BUILDING',0,true),
 		fileservices.clearsuperfile('~thor_Data400::base::file_header_building_BUILDING'));
 
+// dFile:=dataset('~thor_data400::BASE::file_header_building',header.layout_header,thor);
+dFile:=DoBuild;
+check_file:=assert( count(dFile)=count(dedup(dFile+dFile,rid,all)),'Duplicate rids found',FAIL);
+check_file;
+
 full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::header',1),
 		output('Header Base = BUILT. Nothing Done.'),
-		sequential(pre1, bld ,post1));
+		sequential(pre1, bld ,post1,check_file));
 
 export Proc_file_header_building := full1;

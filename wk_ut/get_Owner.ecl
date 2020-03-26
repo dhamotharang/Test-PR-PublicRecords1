@@ -1,1 +1,2 @@
-EXPORT get_Owner(string wuid,string pesp = _constants.LocalEsp) := wk_ut.get_WUInfo(wuid,pesp).Owner;
+﻿import Workman;
+EXPORT get_Owner := Workman.get_Owner;

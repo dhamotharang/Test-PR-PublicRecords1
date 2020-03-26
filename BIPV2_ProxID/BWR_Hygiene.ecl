@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Hygiene - Hygiene & Stats - SALT V3.11.3');
+#workunit('name','BIPV2_ProxID.BWR_Hygiene - Hygiene & Stats - SALT V3.11.4');
 IMPORT BIPV2_ProxID,SALT311;
 // First create an instantiated hygiene module
   infile := BIPV2_ProxID.In_DOT_Base;
@@ -44,15 +44,17 @@ IMPORT BIPV2_ProxID,SALT311;
    Examples := 10;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_duns_number,Examples),NAMED('active_duns_numberBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_enterprise_number,Examples),NAMED('active_enterprise_numberBysource'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_domestic_corp_key,Examples),NAMED('active_domestic_corp_keyBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_inc_state,Examples),NAMED('company_inc_stateBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_charter_number,Examples),NAMED('company_charter_numberBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_corp_key,Examples),NAMED('active_corp_keyBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,sbfe_id,Examples),NAMED('sbfe_idBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_enterprise_number,Examples),NAMED('hist_enterprise_numberBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_duns_number,Examples),NAMED('hist_duns_numberBysource'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_domestic_corp_key,Examples),NAMED('hist_domestic_corp_keyBysource'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,foreign_corp_key,Examples),NAMED('foreign_corp_keyBysource'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,unk_corp_key,Examples),NAMED('unk_corp_keyBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_corp_key,Examples),NAMED('hist_corp_keyBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,ebr_file_number,Examples),NAMED('ebr_file_numberBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_fein,Examples),NAMED('company_feinBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_name,Examples),NAMED('company_nameBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cnp_name_phonetic,Examples),NAMED('cnp_name_phoneticBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cnp_name,Examples),NAMED('cnp_nameBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_name_type_raw,Examples),NAMED('company_name_type_rawBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_name_type_derived,Examples),NAMED('company_name_type_derivedBysource'));

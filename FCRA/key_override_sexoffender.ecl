@@ -1,4 +1,4 @@
-IMPORT Data_Services, sexoffender;
+﻿IMPORT Data_Services, sexoffender, ut;
 
 EXPORT key_override_sexoffender := module
 	shared fname_prefix := data_services.data_location.prefix('fcra_overrides') + 'thor_data400::base::override::fcra::qa::';
@@ -14,7 +14,9 @@ EXPORT key_override_sexoffender := module
 	dailyds_SOff := dataset (daily_prefix + 'so_main', SOff_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf_SOff := dedup (sort (ds_SOff, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf_soff,dailyds_soff,seisint_primary_key,replaceds);
-  export so_main := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'so_main::qa::ffid', OPT);
+	// DF-22458 Blank out specified fields in thor_data400::key::override::fcra::so_main::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, SexOffender.Constants.fields_to_clear_spkpublic);
+  export so_main := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'so_main::qa::ffid', OPT);
 		
 	//TODO: this should be in a defined layout...
 	offense_rec := record
@@ -26,5 +28,7 @@ EXPORT key_override_sexoffender := module
 	dailyds_offenses := dataset (daily_prefix + 'so_offenses', offense_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf_offenses := dedup (sort (ds_offenses, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf_offenses,dailyds_offenses,seisint_primary_key,replaceds);
-  export so_offenses := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'so_offenses::qa::ffid', OPT);
+	// DF-22458 Blank out specified fields in thor_data400::key::override::fcra::so_offenses::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, SexOffender.Constants.fields_to_clear_offenses_public);
+  export so_offenses := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'so_offenses::qa::ffid', OPT);
 end;

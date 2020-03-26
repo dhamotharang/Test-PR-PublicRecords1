@@ -1,19 +1,16 @@
 ﻿import ut;
 
-//1) Only for Accurint - Filter out first 200 transactions entered before November,6th for company_id = 6706483
-//2) Get company_id gc_id from "MBS" file
-//3) Get orig_company_id, orig_global_company_id, description orig_function_name,
+//1) Get company_id gc_id from "MBS" file
+//2) Get orig_company_id, orig_global_company_id, description orig_function_name,
 //   unique_id_code, allowflags from "UniqueId and Transaction_desc" file
-//4) clean fields
-//5) project into common layout
+//3) clean fields
+//4) project into common layout
 
 EXPORT fnMap_Custom_and_Accurint(boolean fcra = false, unsigned logType = 0) := function
 		
-		n := INQL_v2.test_count; /* n - to test a sample set, 0 to run all */
-		stdIn := choosen(map(logType = 2 => INQL_v2.Standardize_input(fcra, logType).Custom, 
-												// logs[1] = 'F' => FraudDefenseNetwork.Files().temp.glb5,
-												INQL_v2.Standardize_input(fcra, logType).Accurint
-												)(orig_company_id <> '') ,IF(n > 0, n, choosen:ALL));
+		stdIn :=  map(logType = 2 => 	INQL_v2.Standardize_input(fcra, logType).Custom, 
+																	INQL_v2.Standardize_input(fcra, logType).Accurint
+									)(orig_company_id <> '');
 														
 		addglobal_input := project(stdIn
 												,transform({string orig_global_company_id := '', recordof(stdIn) - [orig_END_USER_ID, orig_LOGINID, orig_BILLING_CODE]},
@@ -52,7 +49,7 @@ EXPORT fnMap_Custom_and_Accurint(boolean fcra = false, unsigned logType = 0) := 
 			
 			self.SOURCE_FILE 		:= if(logType = 2, 'CUSTOM', 'ACCURINT');			
 			//TBD
-			self.PERSON_ORIG_IP_ADDRESS1 := '';//INQL_v2.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);
+			self.PERSON_ORIG_IP_ADDRESS1 := INQL_v2.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);//'';//INQL_v2.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);
 			
 			self.ORIG_IP_ADDRESS2 := map(self.PERSON_ORIG_IP_ADDRESS1 = '' => left.ORIG_IP_ADDRESS, '');
 			
@@ -65,7 +62,7 @@ EXPORT fnMap_Custom_and_Accurint(boolean fcra = false, unsigned logType = 0) := 
 			self.PRODUCT_CODE := '1';
 			self.TRANSACTION_TYPE := left.orig_transaction_type;
 			//TBD
-			self.FUNCTION_DESCRIPTION := '';//left.description;
+			self.FUNCTION_DESCRIPTION := left.description;//'';//left.description;
 
 			self.ALLOWFLAGS := left.allowflags;
 			self.Login_History_ID := left.orig_login_history_id;
@@ -94,7 +91,10 @@ EXPORT fnMap_Custom_and_Accurint(boolean fcra = false, unsigned logType = 0) := 
 			self.COMPANY_ID 				:= left.orig_company_id;
 			self.INDUSTRY_1_CODE 		:= left.industry_code_1;
 			self.INDUSTRY_2_CODE 		:= left.industry_code_2;
-            
+			self.REPFLAG            :=  map(regexfind('SMLLBUSANALYTICS|SMBUSAN|RELIDENTSEARCH|CPRELIDENTRPT|VERIFICATION|AUTHENTICATION|BUSINSID'
+			                                          ,stringlib.stringtouppercase(left.orig_function_name))	
+																			and (left.orig_lname <> '' or left.orig_full_name <> '')
+																			and fcra = false => 'Y', '');
       self := left; 
 			self := []
 			));			

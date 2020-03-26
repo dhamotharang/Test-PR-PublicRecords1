@@ -15,6 +15,7 @@ EXPORT mac_persistence_records_stats(
    pStrata_Persistence_Stats  // result of BIPV2_Strata.PersistenceStats
   ,pID
   ,pversion
+  ,pOutputFile                = 'true'
 
 ) :=
 functionmacro
@@ -35,17 +36,21 @@ functionmacro
     ,{trim(pID) ,trim(pversion) ,'Split Records'          ,(real8)ds_persistence_stats(trim(cluster_type) = '2 Persistent Records Diff Cluster' ,trim(stat_desc) = 'Split Records'      )[1].stat_value }
     ,{trim(pID) ,trim(pversion) ,'Shuffled Records'       ,(real8)ds_persistence_stats(trim(cluster_type) = '2 Persistent Records Diff Cluster' ,trim(stat_desc) = 'Shuffled Records'   )[1].stat_value }
     ,{trim(pID) ,trim(pversion) ,'Shifted Records'        ,(real8)ds_persistence_stats(trim(cluster_type) = '2 Persistent Records Diff Cluster' ,trim(stat_desc) = 'Shifted Records'    )[1].stat_value }
-    ,{trim(pID) ,trim(pversion) ,'Persistent Record Pct'  ,(real8)ds_persistence_stats(trim(cluster_type) = 'pct_persistent_records'            ,trim(stat_desc) = '(Persistent Records Same Cluster)/(Previous Records Total)')[1].stat_value }
+    ,{trim(pID) ,trim(pversion) ,'Persistent Record Pct'  ,(real8)ds_persistence_stats(trim(cluster_type) = 'pct_persistent_records'            ,trim(stat_desc) = '(Persistent Records Same Cluster)/(Previous Records Total)')[1].stat_value / 100 }
   ],BIPV2_QA_Tool.Layouts.persistence_stats);
 
-  thefilename                     := BIPV2_QA_Tool.Filenames(trim(pversion),,trim(pID)).Persistence_Record_Stats.logical;
-  output_persistence_record_stats := tools.macf_WriteFile(thefilename  ,ds_persistence_record_stats_qa_tool ,pOverwrite := true);
+  #IF(pOutputFile = true)
 
-  result := sequential(
-     output_persistence_record_stats
-    ,BIPV2_QA_Tool.Promote(trim(pversion),trim(pID)).new2qaMult
-  );
+    thefilename                     := BIPV2_QA_Tool.Filenames(trim(pversion),,trim(pID)).Persistence_Record_Stats.logical;
+    output_persistence_record_stats := tools.macf_WriteFile(thefilename  ,ds_persistence_record_stats_qa_tool ,pOverwrite := true);
 
-  return result;
-  
+    result := sequential(
+       output_persistence_record_stats
+      ,BIPV2_QA_Tool.Promote(trim(pversion),trim(pID)).new2qaMult
+    );
+
+    return result;
+  #ELSE
+    return ds_persistence_record_stats_qa_tool;
+  #END
 endmacro;

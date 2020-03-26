@@ -45,7 +45,21 @@ MODULE
 		''
 	);
 
-	EXPORT	lkp_marital_status(UNSIGNED1 casetype) := CASE(casetype,
+  EXPORT  lkp_education(UNSIGNED2 casetype) := CASE(casetype,
+		01  =>  '8TH GRADE OR LESS',
+		02  =>  '9TH-12TH GRADE BUT NO DIPLOMA',
+		03  =>  'HIGH SCHOOL GRADUATE',
+		04  =>  'SOME COLLEGE CREDIT BUT NO DEGREE',
+		05  =>  'ASSOCIATE DEGREE',
+		06  =>  'BACHELOR\'S DEGREE',
+		07  =>  'MASTER\'S DEGREE',
+		08  =>  'DOCTORATE OR PROFESSIONAL DEGREE',
+		09  =>  'UNKNOWN',
+		10  =>  'NOT AVAILABLE',
+		''
+);
+
+	EXPORT	lkp_marital_status(UNSIGNED2 casetype) := CASE(casetype,
 		1	=>	'MARRIED',
 		2	=>	'NEVER MARRIED',
 		3	=>	'WIDOWED',
@@ -82,6 +96,14 @@ MODULE
 		1	=>	'YES',
 		2	=>	'NO',
 		9	=>	'UNKNOWN',
+		''
+	);
+
+	EXPORT	lkp_autopsy_avail(string1 casetype) := CASE(casetype,
+		'N'	=>	'NO',
+		'Y'	=>	'YES',
+		'U'	=>	'UNKNOWN',
+		'X' =>  'NOT APPLICABLE',
 		''
 	);
 

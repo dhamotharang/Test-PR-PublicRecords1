@@ -7,5 +7,5 @@ IMPORT PRTE2_Common, PRTE2_Header_Ins;
 
 fileVersion := PRTE2_Common.Constants.TodayString+'';			// DATE PLUS LETTER IF NEEDED
 BaseAlpha		:= PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS_Prod;
-build_main_base := PRTE2_Header_Ins.fn_Save_BaseAndRels_Alpharetta_Base(BaseAlpha, fileVersion);
+build_main_base := PRTE2_Header_Ins.fn_Save_Alpharetta_Base(BaseAlpha, fileVersion);
 SEQUENTIAL(build_main_base);

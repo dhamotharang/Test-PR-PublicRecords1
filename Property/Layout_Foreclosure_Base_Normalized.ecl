@@ -1,4 +1,4 @@
-import BIPV2, Property;
+﻿import BIPV2, Property;
 
 export Layout_Foreclosure_Base_Normalized := record
 	string20 	name_first;
@@ -27,5 +27,5 @@ export Layout_Foreclosure_Base_Normalized := record
 	unsigned1 bdid_score := 0;
 	BIPV2.IDlayouts.l_xlink_ids;
 	unsigned8 sequence := 0;	
-	Property.Layout_Fares_Foreclosure_v2;
+	Property.Layout_Fares_Foreclosure_v2 - source;
 end;

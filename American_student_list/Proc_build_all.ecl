@@ -3,7 +3,7 @@ import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List
 
 export Proc_build_all(string filedate, string filename) :=
 function
-#workunit('name','American Student List Build');
+
 GroupName	:=	VersionControl.GroupName('44');
 
 American_student_list.Mac_spray_american_student_V2(_control.IPAddress.bctlpedata11

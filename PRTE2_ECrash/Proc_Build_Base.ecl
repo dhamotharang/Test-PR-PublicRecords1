@@ -1,4 +1,4 @@
-import  PRTE2_ECrash, ut, PromoteSupers, Data_Services, prte2, BIPV2,prte_bip, AID, Address, std, FLAccidents;
+﻿import  PRTE2_ECrash, ut, PromoteSupers, Data_Services, prte2, BIPV2,prte_bip, AID, Address, std, FLAccidents;
 
 //Uppercase, CleanSpaces, and remove unprintable characters
 PRTE2.CleanFields(Files.infile, dsClnEcrash);
@@ -6,7 +6,7 @@ PRTE2.CleanFields(Files.infile, dsClnEcrash);
 //Cleaning Address/Name fields for New Records
 temp_layout := record
   Layouts.Input;
-	string5   suffix := '',
+	// string5   suffix := '',
 	BIPV2.IDlayouts.l_xlink_ids;
 	AID.Common.xAID	rawaid	:=	0;
 end;
@@ -45,8 +45,9 @@ temp_layout  tCleanAddressAppended(dAddressCleaned pInput) := transform
 																				and pInput.orig_full_name <> '', pInput.orig_full_name, '');
 	
 	
-  self.report_code						     := map(pInput.source_id ='TF'=>'TF', pInput.source_id ='TM' => 'TM', 'EA');
-  self.report_category				     := CASE(pInput.report_type_id
+  self.report_code						     := if(pInput.report_code <> '', pInput.report_code, 'EA');
+	// map(pInput.source_id ='TF'=>'TF', pInput.source_id ='TM' => 'TM', 'EA');
+  self.report_category				     := CASE(pInput.report_code
 																					,'A'=>'AUTO REPORT'
 																					,'B'=>'AUTO REPORT'
 																					,'C'=>'AUTO REPORT'
@@ -82,9 +83,10 @@ temp_layout  tCleanAddressAppended(dAddressCleaned pInput) := transform
 																					,'5'=>'INTERACTIVE REPORT'
 																					,'6'=>'INTERACTIVE REPORT'
 																					,'7'=>'INTERACTIVE REPORT'
-																					,'8'=>'INTERACTIVE REPORT','');
+																					,'8'=>'INTERACTIVE REPORT',
+																								pInput.report_category);
 
-  self.report_code_desc				     := CASE(pInput.report_type_id
+  self.report_code_desc				     := CASE(pInput.report_code
 																					,'A'=>'AUTO ACCIDENT'
 																					,'B'=>'AUTO THEFT'
 																					,'C'=>'AUTO THEFT RECOVERY'
@@ -120,7 +122,8 @@ temp_layout  tCleanAddressAppended(dAddressCleaned pInput) := transform
 																					,'5'=>'AUTOCHECKING - VIN HISTORY REPORT'
 																					,'6'=>'CLAIMS MVR (DRIVING HISTORY)'
 																					,'7'=>'CARRIER DISCOVERY'
-																					,'8'=>'CLAIMS DISCOVERY','');	
+																					,'8'=>'CLAIMS DISCOVERY',
+																							pInput.report_code_desc);	
 	
 	self.dob := if(pInput.dob <> '', pInput.dob, pInput.link_dob);
 	self :=	pInput;
@@ -131,8 +134,10 @@ dCleanAddressAppended	:=	project(dAddressCleaned,tCleanAddressAppended(left));
 
 //Append ID(s)
 temp_layout		trecs1(dCleanAddressAppended L) := transform
-	self.b_did 	:=(string) prte2.fn_AppendFakeID.bdid(L.cname, L.prim_range, L.prim_name, L.v_city_name, L.st, l.zip, L.cust_name);
-	self.did	 	:= (string)prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name);
+	v_bdid			:= prte2.fn_AppendFakeID.bdid(L.cname, L.prim_range, L.prim_name, L.v_city_name, L.st, l.zip, L.cust_name);
+	v_did				:= prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name);
+	self.b_did 	:= intformat(v_bdid,12,1);
+	self.did	 	:= intformat(v_did,12,1);
 
 	vLinkingIds := prte2.fn_AppendFakeID.LinkIds(L.cname, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
 	self.powid	:= vLinkingIds.powid;
@@ -221,11 +226,18 @@ layouts.Base_flcrash2v		xform_2(combine_file L) := transform
 	self.vehicle_owner_st					:= v_state;
 	self.vehicle_owner_zip				:= v_zip;
 	self.filler4 									:= '';
+	self.ins_company_name					:= L.insurance_company_standardized;
+	self.ins_policy_nbr						:= L.policy_num;
+	self.vehicle_owner_dl_nbr			:= L.driver_license_nbr;
+	self.vehicle_owner_dob				:= L.link_dob;
+	self.vehicle_tag_nbr					:= L.tag_nbr;
+	self.vehicle_reg_state				:= L.tagnbr_st;
+	self.vehicle_id_nbr						:= L.vin;
 	self := l;	
 	self := [];
 end;
 
-file_2	:= dedup(sort(project(combine_file(record_type = 'VEHICLE OWNER'), xform_2(left)), accident_nbr), record, all);
+file_2	:= dedup(sort(project(combine_file(record_type = 'VEHICLE OWNER' or orig_full_name <> ''), xform_2(left)), accident_nbr), record, all);
 
 
 layouts.base_flcrash3v	xform_3(combine_file L) := transform
@@ -245,7 +257,7 @@ layouts.base_flcrash3v	xform_3(combine_file L) := transform
 	self := [];
 end;
 
-file_3 	:= dedup(sort(project(combine_file(record_type = 'VEHICLE OWNER'), xform_3(left)), accident_nbr), record, all); 
+file_3 	:= dedup(sort(project(combine_file(record_type = 'VEHICLE OWNER' or orig_full_name <> ''), xform_3(left)), accident_nbr), record, all); 
 																																				
 
 set_generation := ['II','11','2ND','III','111','3RD','IV','1V','4TH','FOURTH','JR','JUNIOR','SECOND','SENIOR','SR'];
@@ -287,11 +299,13 @@ layouts.base_flcrash4		xform_4(combine_file L) := transform
 	self.driver_race						:= L.driver_race;
 	self.driver_sex							:= L.driver_sex;
 	self.filler4 := '';	
+	self.ins_company_name				:= L.insurance_company_standardized;
+	self.ins_policy_nbr					:= L.policy_num;
 	self := L;
 	self := [];
 end;	
 
-file_4	:= dedup(sort(project(combine_file(record_type = 'VEHICLE DRIVER'), xform_4(left)), accident_nbr), record, all);
+file_4	:= dedup(sort(project(combine_file(record_type = 'VEHICLE DRIVER' or driver_full_name <> ''), xform_4(left)), accident_nbr), record, all);
 																					
 																
 layouts.base_flcrash5		xform_5(combine_file L) := transform
@@ -315,7 +329,7 @@ layouts.base_flcrash5		xform_5(combine_file L) := transform
 	self := [];
 end;
 	
-file_5	:= dedup(sort(project(combine_file(record_type = 'PASSENGER'), xform_5(left)), accident_nbr), record, all);
+file_5	:= dedup(sort(project(combine_file(record_type = 'PASSENGER' or passenger_full_name <> ''), xform_5(left)), accident_nbr), record, all);
 											
 																
 
@@ -364,4 +378,4 @@ PromoteSupers.MAC_SF_BuildProcess(file_7,Constants.base_prefix_ecrash+ '7', ecra
 PromoteSupers.MAC_SF_BuildProcess(file_8(carrier_name <> ''),Constants.base_prefix_ecrash+ '8', ecrash8,,,true);
 PromoteSupers.MAC_SF_BuildProcess(file_9(witness_full_name <> ''),Constants.base_prefix_ecrash+ '9', ecrash9,,,true);
 
-export PROC_BUILD_BASE := parallel(base_file,ecrash0,ecrash1,ecrash2,ecrash3,ecrash4,ecrash5,ecrash6,ecrash7,ecrash8,ecrash9);
+export PROC_BUILD_BASE := sequential(base_file,ecrash0,ecrash1,ecrash2,ecrash3,ecrash4,ecrash5,ecrash6,ecrash7,ecrash8,ecrash9);

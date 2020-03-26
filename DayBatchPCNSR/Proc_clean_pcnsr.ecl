@@ -1,4 +1,4 @@
-﻿import InfoUSA,address,did_add,didville,ut,header_slimsort,standard, header, idl_header;
+﻿import _control, MDR, Std, InfoUSA,address,did_add,didville,ut,header_slimsort,standard, header, idl_header;
 
 ebc_p_cnsr_in := InfoUSA.File_PCNSR_In;
 
@@ -351,6 +351,9 @@ f_out := join(out_no_hhid(did<>0), header.File_HHID_Current(ver=1),
                     left.did = right.did, get_hhid_by_did(left,right),
 left outer, hash) + out_no_hhid (did=0) + out_with_hhid; 
 
-ut.MAC_SF_BuildProcess(f_out,'~thor_data400::base::daybatch_pcnsr',out_file,3,,true)
+//Add Global_SID
+addGlobalSID	:= MDR.macGetGlobalSid(f_out, 'PCNSR', '', 'global_sid');
+
+ut.MAC_SF_BuildProcess(addGlobalSID,'~thor_data400::base::daybatch_pcnsr',out_file,3,,true)
 
 export Proc_clean_pcnsr := out_file;

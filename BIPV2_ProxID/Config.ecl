@@ -1,8 +1,5 @@
 ﻿IMPORT SALT311,STD;
 EXPORT Config := MODULE,VIRTUAL
-EXPORT DoSliceouts := false/*HACKConfig*/; // If set to false slice-outs do not occur (saves time)
-EXPORT SliceDistance := 10;
-EXPORT FastSlice := TRUE; // Set to false for a more aggressive mode of slicing
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
 EXPORT ByPassCleave := FALSE; // If set to true Cleave process will not run in the next internal linking iteration.
 EXPORT PersistExpire := 30; // PERSIST file expiration time in days.
@@ -20,12 +17,16 @@ EXPORT JoinLimit := 10000;
 // Configuration of individual fields
 EXPORT active_duns_number_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 EXPORT active_enterprise_number_Force := 0; 
-EXPORT active_domestic_corp_key_Force := 0; 
+EXPORT company_charter_number_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
+EXPORT sbfe_id_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 EXPORT company_fein_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
+EXPORT cnp_name_phonetic_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 EXPORT cnp_name_Force := 6; 
-EXPORT cnp_name_OR1_active_domestic_corp_key_Force := 0;
+EXPORT cnp_name_OR1_company_charter_number_Force := 0;
 EXPORT cnp_name_OR2_active_duns_number_Force := 0;
 EXPORT cnp_name_OR3_company_fein_Force := 0;
+EXPORT cnp_name_OR4_cnp_name_phonetic_Force := 0;
+EXPORT cnp_name_OR5_sbfe_id_Force := 0;
 EXPORT cnp_number_Force := 0; 
 EXPORT prim_name_derived_Force := 5; 
 EXPORT st_Force := 0; 

@@ -1,4 +1,4 @@
-IMPORT PRTE2_DEADCO, InfoUSA, Standard;
+﻿IMPORT PRTE2_DEADCO, InfoUSA, Standard, Prte2;
 
 EXPORT Layouts := MODULE
 
@@ -47,6 +47,8 @@ EXPORT Layouts := MODULE
 		Standard.L_Address.base addr;
 		UNSIGNED1 zero := 0;
 		UNSIGNED6 fdid := 0;
+		Prte2.Layouts.DEFLT_CPA;
 	END;
 	
-END;
+
+end;

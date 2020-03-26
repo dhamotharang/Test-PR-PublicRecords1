@@ -1,4 +1,4 @@
-MODULE:Scrubs_Infogroup
+﻿MODULE:Scrubs_Infogroup
 OPTIONS:-gh
 FILENAME:Infogroup
 NAMESCOPE:Input
@@ -28,7 +28,7 @@ FIELDTYPE:invalid_match_code:ENUM(0|2|4|X|P| )
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)
 FIELDTYPE:invalid_occupational_title:ALLOW( ,/-()&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(1..)
 FIELDTYPE:invalid_past_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastDate>0)
-FIELDTYPE:invalid_residential_business_ind:ENUM(R|B|U)
+FIELDTYPE:invalid_residential_business_ind:ENUM(B|U)
 FIELDTYPE:invalid_status_code:ENUM(A|C|O|P|R|X| ):LENGTHS(1..)
 FIELDTYPE:invalid_suffix:ENUM(SR|JR|I|II|III|IV|V|VI|VII|VIII|IX| )
 FIELDTYPE:invalid_unit_type:ENUM(#|APT|BLDG|BOX|BSMT|DEPT|FL|FRNT|HNGR|KEY|LBBY|LOT|LOWR|OFC|PH|PIER|REAR|RM|SIDE|SLIP|SPC|STE|STOP|TRLR|UNIT|UPPR| )

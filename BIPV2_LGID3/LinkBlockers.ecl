@@ -31,19 +31,23 @@ SHARED bp := OverLinks;
     AND (LEFT.cnp_btype = RIGHT.cnp_btype OR RIGHT.cnp_btype = (TYPEOF(RIGHT.cnp_btype))'')
     , FilterHits(LEFT, RIGHT), MANY LOOKUP);
   SHARED AllIds1 := DISTRIBUTE(AllIds0,HASH(RuleNum));
-  SHARED AllIds := DEDUP( SORT( AllIds1,RuleNum,LGID3,Good,LOCAL ), WHOLE RECORD, LOCAL );
+  export AllIds := DEDUP( SORT( AllIds1,RuleNum,LGID3,Good,LOCAL ), WHOLE RECORD, LOCAL );
   EXPORT RuleBreakers0 := JOIN(AllIds,AllIds,LEFT.RuleNum=RIGHT.RuleNum AND LEFT.good <> RIGHT.good AND LEFT.rcid=RIGHT.rcid,LOCAL); // Records spanning good and bad of one rule!
   SHARED BadPairRec := RECORD
     SALT311.UIDType LGID31;
     SALT311.UIDType LGID32;
     SALT311.UIDType RuleNum; // Really for debug purposes - find rule being violated
   END;
-  BadPairRec NotePair(AllIds le,AllIds ri) := TRANSFORM
+
+  ds_allids_dedup :=  SORT( distribute(table(AllIds  ,{RuleNum ,LGID3,Good} ,RuleNum ,LGID3,Good ,merge) ,HASH(RuleNum)) ,RuleNum,LGID3,Good,LOCAL );
+  
+  BadPairRec NotePair(ds_allids_dedup le,ds_allids_dedup ri) := TRANSFORM
     SELF.LGID31 := le.LGID3;
     SELF.LGID32 := ri.LGID3;
     SELF.RuleNum := le.RuleNum;
   END;
-SHARED AllBadPairs := JOIN(AllIds,AllIds,LEFT.RuleNum = RIGHT.RuleNum AND LEFT.LGID3 >= RIGHT.LGID3 AND LEFT.Good <> RIGHT.Good,NotePair(LEFT,RIGHT),LOCAL);
+  
+export AllBadPairs := JOIN(ds_allids_dedup,ds_allids_dedup,LEFT.RuleNum = RIGHT.RuleNum AND LEFT.LGID3 >= RIGHT.LGID3 AND LEFT.Good <> RIGHT.Good,NotePair(LEFT,RIGHT),LOCAL);
 EXPORT BrokenLGID3 := DEDUP(AllBadPairs(LGID31=LGID32),ALL);
 // Now we need to create the 'patch' file for those we wish to split
 // Format is RID - New DID

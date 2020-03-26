@@ -10,18 +10,23 @@ EXPORT Build_weekly_keys(
 ) :=
 module
 
-  export BuildLinkids_dataset           := tools.macf_WriteFile (filenames(pversion).contact_linkids.new      ,BIPV2_Build.key_contact_linkids.dkeybuild    );
-  export BuildLinkIds                   := tools.macf_writeindex('BIPV2_Build.key_contact_linkids.key         ,keynames(pversion).contact_linkids.new'      );
-  export BuildDirLinkIdsOutsideBIPBuild := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.key     ,keynames(pversion).directories_linkids.new'  );  //uses qa supers
-  export BuildDirLinkIdsInsideBIPBuild  := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.kbuilt  ,keynames(pversion).directories_linkids.new'  );  //uses built supers
+  export BuildLinkids_dataset             := tools.macf_WriteFile (filenames(pversion).contact_linkids.new      ,BIPV2_Build.key_contact_linkids.dkeybuild    );
+  export BuildLinkIds                     := tools.macf_writeindex('BIPV2_Build.key_contact_linkids.key         ,keynames(pversion).contact_linkids.new'      );
+  export BuildContactTitleLinkids_dataset := tools.macf_WriteFile (filenames(pversion).contact_title_linkids.new,BIPV2_Build.key_contact_title_linkids(pversion).dkeybuild    );
+  export BuildContactTitleLinkIds         := tools.macf_writeindex('BIPV2_Build.key_contact_title_linkids(pversion).key   ,keynames(pversion).contact_title_linkids.new'      );
+  export BuildDirLinkIdsOutsideBIPBuild   := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.key     ,keynames(pversion).directories_linkids.new'  );  //uses qa supers
+  export BuildDirLinkIdsInsideBIPBuild    := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.kbuilt  ,keynames(pversion).directories_linkids.new'  );  //uses built supers
 
   export BuildDirLinkIds    := if(pInBIPBuild  ,BuildDirLinkIdsInsideBIPBuild  ,BuildDirLinkIdsOutsideBIPBuild);
   
-  shared keyfilt            := '(directories_linkids|contact_linkids)';
+  shared keyfilt            := '(directories_linkids|contact_linkids|contact_title_linkids)';
   
   shared keyfiltcont        := 'contact_linkids';
   export promote2builtcont  := promote(pversion,keyfiltcont).new2built;
 
+  shared keyfilt_ct         := 'contact_title_linkids';
+  export promote2built_ct   := promote(pversion,keyfilt_ct).new2built;
+	
   shared keyfiltdir         := 'directories_linkids';
   export promote2builtdir   := promote(pversion,keyfiltdir).new2built;
 
@@ -36,6 +41,9 @@ module
      BuildLinkids_dataset
     ,BuildLinkIds
     ,promote2builtcont
+    ,BuildContactTitleLinkids_dataset // uses contact key
+    ,BuildContactTitleLinkids
+    ,promote2built_ct
     ,BuildDirLinkIds // uses contact key
     ,promote2builtdir
     ,if(pIsDataland = false ,SendOrbitItemList                                )

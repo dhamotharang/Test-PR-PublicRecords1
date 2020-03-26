@@ -1,4 +1,4 @@
-/* Converting Tennessee Reg Board and Commission Commerce & Ins Professional License File to MARI common layout
+﻿/* Converting Tennessee Reg Board and Commission Commerce & Ins Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT ut, Address, Prof_License_Mari,lib_stringlib,Lib_FileServices,STD ;
@@ -33,7 +33,7 @@ GoodNameRec 	:= inFile(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, ST
 ut.CleanFields(GoodNameRec,clnGoodNameRec);
 																			
 //Real Estate License to common MARIBASE layout
-Prof_License_Mari.layouts.base			xformToCommon(Prof_License_Mari.layout_TNS0513.src pInput) 
+Prof_License_Mari.layout_base_in			xformToCommon(Prof_License_Mari.layout_TNS0513.src pInput) 
 	:= 
 	 TRANSFORM
 		SELF.PRIMARY_KEY	    := 0;  
@@ -395,7 +395,7 @@ inFileLic	:= PROJECT(clnGoodNameRec,xformToCommon(LEFT));
 
 
 //Populate STD_STATUS_CD field via translation on statu field
-Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_LICENSE_STATUS :=  STD.Str.touppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 	SELF := L;
 END;
@@ -406,7 +406,7 @@ ds_map_status_trans := JOIN(inFileLic, cmvTransLkp,
 						trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 						
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := STD.Str.touppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 	SELF := L;
 END;
@@ -421,7 +421,7 @@ ds_map_lic_trans := JOIN(ds_map_status_trans, cmvTransLkp,
 
 //***IN to CO Real Estate License Records
 company_only_lookup := ds_map_lic_trans(affil_type_cd = 'CO' AND license_nbr_contact != '');
-Prof_License_Mari.layouts.base  	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in  	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -434,7 +434,7 @@ ds_map_affil := JOIN(ds_map_lic_trans, company_only_lookup,
 
 // Transform expanded dataset to MARIBASE layout
 // Apply DBA Business Rules
-Prof_License_Mari.layouts.base xTransToBase(ds_map_affil L) := transform
+Prof_License_Mari.layout_base_in xTransToBase(ds_map_affil L) := transform
 	SELF.NAME_ORG				:= STD.Str.CleanSpaces(STD.Str.FindReplace(L.NAME_ORG,'/',' '));
 	SELF.NAME_ORG_SUFX 	:= IF(STD.Str.Find(L.NAME_ORG_SUFX,'/',1) > 0,STD.Str.FindReplace(L.NAME_ORG_SUFX,'/',' '), 
 															Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.NAME_ORG_SUFX));

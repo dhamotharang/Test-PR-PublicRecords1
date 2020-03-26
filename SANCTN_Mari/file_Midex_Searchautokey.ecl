@@ -1,4 +1,4 @@
-import standard, ut, doxie, SANCTN_Mari, address, Lib_FileServices, lib_stringlib ; 
+﻿import standard, ut, doxie, SANCTN_Mari, address, Lib_FileServices, lib_stringlib ; 
 
 //** Incident Information(Submitter Information is not searchable or to be seen **
 // ds_incident := distribute(SANCTN_Mari.files_SANCTN_did.clnIncident_did, hash(incident_num));
@@ -38,6 +38,12 @@ r0 := record
 		STRING1		DBCODE;
 		unsigned1 zero := 0;
 		string1   blank:='';
+		//CCPA-97 Per requirement, all in scope data needs to have a date when the data was collected
+		STRING8 date_vendor_first_reported;
+		STRING8 date_vendor_last_reported;
+		//CCPA-97 Add 2 new fields for CCPA
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 end;
 
 
@@ -70,6 +76,12 @@ r0 transform_party(ds_party Linput) := transform
 		self.TIN			:= Linput.TIN;
 		self.DBCODE		:= Linput.DBCODE;
 		self.SRCE_CD	:= '';
+		//CCPA-97 
+		self.date_vendor_first_reported := Linput.date_vendor_first_reported;
+		self.date_vendor_last_reported := Linput.date_vendor_last_reported;
+		self.global_sid := Linput.global_sid;
+		self.record_sid := Linput.record_sid;
+
 end;
 
 s1 := dedup(project(ds_party,transform_party(left)),record,all,local);
@@ -84,6 +96,11 @@ r1 := record
 	string5  	name_suffix;
 	string3  	name_score;
 	string100 cname;
+	//CCPA-97 new fields for CCPA. However these fields are not in thor_data400::base::sanctn::np::party_aka_dba
+	STRING8 date_vendor_first_reported:='';
+	STRING8 date_vendor_last_reported:='';
+	unsigned4 global_sid:=0;
+	unsigned8 record_sid:=0;
 end;
 
 
@@ -133,6 +150,11 @@ r0 transform_party_aka(ds_CleanParsedAKA Linput) := transform
 		self.TIN					:= '';
 		self.DBCODE				:= Linput.DBCODE;
 		self.SRCE_CD			:= '';
+		//CCPA-97 
+		self.date_vendor_first_reported := Linput.date_vendor_first_reported;
+		self.date_vendor_last_reported := Linput.date_vendor_last_reported;
+		self.global_sid := Linput.global_sid;
+		self.record_sid := Linput.record_sid;
 end;
 
 s2 := dedup(project(ds_CleanParsedAKA,transform_party_aka(left)),record,all,local);

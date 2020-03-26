@@ -1,4 +1,4 @@
-EXPORT layout_patriot_common := record
+﻿EXPORT layout_patriot_common := record
 STRING10 pty_key;
 STRING60 source;
 STRING350 orig_pty_name;
@@ -80,4 +80,8 @@ STRING4 msa;
 STRING7 geo_blk;
 STRING1 geo_match;
 STRING4 err_stat;
+//Added for CCPA-393
+UNSIGNED4 global_sid := 0;
+UNSIGNED8 record_sid := 0;
+UNSIGNED6 did        := 0;
 END;

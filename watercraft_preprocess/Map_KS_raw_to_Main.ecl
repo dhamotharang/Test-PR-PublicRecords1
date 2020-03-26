@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates  ks_phase01.mp Ab intio graph into ECL
 
@@ -34,7 +34,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) :
 	self.registration_date					:=	IF(IsValidRegDate,L.REG_DATE,'');
 	IsValidExpireDate								:=	STD.DATE.IsValidDate((integer) L.EXPIRATION_DATE);
 	self.registration_expiration_date	:=	IF(IsValidExpireDate,L.EXPIRATION_DATE,'');
-	self.registration_status_code			:=	L.STATUS;
+	self.registration_status_code			:=	L.STATUS[1];
 	self.registration_status_description	:=	case(L.STATUS[1], 'A' => 'ACTIVE', 'C' => 'CANCELLED','E' =>'EXPIRED','');
 	self := L;
 	self := [];

@@ -1,4 +1,4 @@
-import civ_court;
+﻿import civ_court;
 
 Civil_Court.Macro_Input_File_List('_matter',Civil_Court.Layout_In_Matter,dTempDataset)
 
@@ -38,4 +38,5 @@ export File_In_Matter := dTempDataset
 						 + Civ_Court.map_TX_Denton_Matter
 						 + Civ_Court.Map_CT_Matter
 						 + Civ_Court.Map_CA_Santa_Barbara_Matter
-						 + Civ_Court.Map_CA_San_Bernardino_Matter;
+						 + Civ_Court.Map_CA_San_Bernardino_Matter
+						 + Civ_Court.Map_CA_Stanislaus_Matter;

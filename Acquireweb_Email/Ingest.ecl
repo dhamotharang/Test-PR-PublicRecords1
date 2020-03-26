@@ -21,10 +21,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
  
   SHARED WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
-    SELF.address1 := ri.address1; // Derived(NEW)
     SELF.address2 := ri.address2; // Derived(NEW)
     SELF.emailid := ri.emailid; // Derived(NEW)
-    SELF.activecode := ri.activecode; // Derived(NEW)
     SELF.did := ri.did; // Derived(NEW)
     SELF.did_score := ri.did_score; // Derived(NEW)
     SELF.aid := ri.aid; // Derived(NEW)
@@ -86,20 +84,28 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Ingest Files: Rollup to get unique new records
-  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(awid,firstname,lastname,city,state,zip,zip4,email));
-  SortIngest0 := SORT(DistIngest0,awid,firstname,lastname,city,state,zip,zip4,email, __Tpe, RCID, LOCAL);
-  GroupIngest0 := GROUP(SortIngest0,awid,firstname,lastname,city,state,zip,zip4,email, LOCAL, ORDERED, STABLE);
+  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode));
+  SortIngest0 := SORT(DistIngest0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode, __Tpe, RCID, LOCAL);
+  GroupIngest0 := GROUP(SortIngest0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
-  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(awid,firstname,lastname,city,state,zip,zip4,email));
-  SortBase0 := SORT(DistBase0,awid,firstname,lastname,city,state,zip,zip4,email, __Tpe, RCID, LOCAL);
-  GroupBase0 := GROUP(SortBase0,awid,firstname,lastname,city,state,zip,zip4,email, LOCAL, ORDERED, STABLE);
+  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode));
+  SortBase0 := SORT(DistBase0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode, __Tpe, RCID, LOCAL);
+  GroupBase0 := GROUP(SortBase0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,awid,firstname,lastname,city,state,zip,zip4,email, __Tpe,RCID,LOCAL);
-  Group0 := GROUP(Sort0,awid,firstname,lastname,city,state,zip,zip4,email,LOCAL, ORDERED, STABLE);
+  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode, __Tpe,RCID,LOCAL);
+  Group0 := GROUP(Sort0,awid,firstname,lastname,address1,city,state,zip,zip4
+             ,Phone,DOB,email,activecode,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records

@@ -1,11 +1,11 @@
-import ut, cellphone, phonesplus_v2;
+﻿import ut, cellphone, phonesplus_v2, _control;
 				   
 
 export spray_NeustarInputFile(string filedate) := 
 function
 												
-a := fileservices.SprayVariable('bctlpedata10.risk.regn.net',
-                        '/data/hds_2/phonesplus/sources/neustar/'+ filedate +'/WIRELINE-TO-WIRELESS-NORANGE.TXT',
+a := fileservices.SprayVariable(_control.IPAddress.bctlpedata10,
+                        '/data/hds_2/phonesplus/sources/neustar/data_files/neustar/'+ filedate +'/WIRELINE-TO-WIRELESS-NORANGE.TXT',
                         ,                   // max rec size
                         ',',               // separator
 						'\r\n',           // end of rec terminator
@@ -27,8 +27,8 @@ c := fileservices.AddSuperFile('~thor_data400::base::neustarupdate','~thor400_44
 	+filedate+
 	'::wireline-to-wireless-norange.txt',,false,false);
 	
-d := fileservices.SprayVariable('bctlpedata10.risk.regn.net',
-                        '/data/hds_2/phonesplus/sources/neustar/'+ filedate +'/WIRELESS-TO-WIRELINE-NORANGE.TXT',
+d := fileservices.SprayVariable(_control.IPAddress.bctlpedata10,
+                        '/data/hds_2/phonesplus/sources/neustar/data_files/neustar/'+ filedate +'/WIRELESS-TO-WIRELINE-NORANGE.TXT',
                         ,                   // max rec size
                         ',',               // separator
 						'\r\n',           // end of rec terminator

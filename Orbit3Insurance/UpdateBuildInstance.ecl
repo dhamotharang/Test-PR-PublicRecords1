@@ -1,15 +1,14 @@
 ﻿EXPORT UpdateBuildInstance(string		pLoginToken,
 															DATASET(Layouts.OrbitUpdateBuildInstanceLayout)	pBuildInfo,						
 															String 	pBuildStatus,
-															String	pPlatformName,
-															String	pPlatformStatus,
-															String 	pHpccWorkUnit) := function					
+								dataset(Layouts.OrbitPlatformUpdateLayout) platformupdates = dataset([],Layouts.OrbitPlatformUpdateLayout),
+			
+
+															String 	pHpccWorkUnit = workunit) := function					
 
 
-	pPlatformStatusInfo	:=	DATASET([{ pPlatformName, pPlatformStatus }], Layouts.OrbitPlatformUpdateLayout);
  
 	rUpdateRequest := RECORD
-		// string 	BuildId										{xpath('BuildId')};
 		string 	BuildName											{xpath('BuildName')};
 		string 	BuildVersion									{xpath('BuildVersion')};
 		string 	BuildStatus										{xpath('BuildStatus')};
@@ -19,12 +18,11 @@
 
 	fCreateBuildUpdateInstanceRequest() := FUNCTION
 		 rUpdateRequest tUpdateBuildInstance(Layouts.OrbitUpdateBuildInstanceLayout pBuildInfo) := TRANSFORM
-				// SELF.BuildId				:= pBuildInfo.BuildInstanceId;
 				SELF.BuildName			:= trim(pBuildInfo.BuildInstanceName,LEFT,RIGHT);
 				SELF.BuildVersion		:= trim(pBuildInfo.BuildInstanceVersion,LEFT,RIGHT);
 				SELF.BuildStatus		:= pBuildStatus;
 				SELF.HpccWorkUnit		:= pHpccWorkUnit;
-				Self.PlatformStatusUpdates	:= pPlatformStatusInfo;
+				Self.PlatformStatusUpdates	:= platformupdates;
 			END;
 	
 		RETURN PROJECT(pBuildInfo, tUpdateBuildInstance(left));
@@ -70,54 +68,25 @@
 		DATASET (rOrbitResponse)		RecordResponseUpdateBuildInstance	{XPATH('RecordResponseUpdateBuildInstance')};
 	END;	
 	
-	rresponse	:= RECORD
-		rRecordUpdateBuild Result 						{XPATH('Result')};
-		STRING						Status							{XPATH('Status')};
-		STRING						Message							{XPATH('Message')};
-	END;
-	
-  rBuildResult := RECORD
-		rresponse 	UpdateBuildInstanceResult	{XPATH('UpdateBuildInstanceResult')};
-		STRING			Status										{XPATH('Status')};
-		STRING			Message										{XPATH('Message')};
-  END;	
-	
-	rFault    := RECORD
-		STRING         FaultCode							{XPATH('faultcode')};
-		STRING         FaultString						{XPATH('faultSTRING')};
-	END;
-	
-  rSOAPResponse	:= RECORD
-		rFault  			FaultRecord							{XPATH('Fault')};
-		rBuildResult	UpdateBuildInstanceResponse	{XPATH('UpdateBuildInstanceResponse'), 		MAXLENGTH(81920)};
-	END;
+		rStatus := RECORD
+		STRING	Status	{XPATH('UpdateBuildInstanceResponse/UpdateBuildInstanceResult/Result/RecordResponseUpdateBuildInstance/Status')};
+	  STRING	Message {XPATH('UpdateBuildInstanceResponse/UpdateBuildInstanceResult/Result/RecordResponseUpdateBuildInstance/Message')};
 
-	// EXPORT 	fUpdateBuildInstance()	:= FUNCTION
-	
-		// SERVICE_DEBUG:= FALSE;
-		// SERVICE_DEBUG:= TRUE;
+end;
+
+
+
 		
-		rSOAPResponse lResponse	:=	  SOAPCALL(Orbit3Insurance.EnvironmentVariables.serviceURL,
+		rStatus lResponse	:=	  SOAPCALL(Orbit3Insurance.EnvironmentVariables.serviceURL,
 																					 'UpdateBuildInstance',
 																					 rRequestCapsule,
-																					 rSOAPResponse,
+																					 rStatus,
 																					 NAMESPACE(Orbit3Insurance.EnvironmentVariables.Namespace),
 																					 LITERAL,
 																					 SOAPACTION(Orbit3Insurance.EnvironmentVariables.SOAPActionPrefix + 'UpdateBuildInstance'),
 																					 LOG
 																					);
-		// #IF(SERVICE_DEBUG)																			
-			// output(lResponse, named('UpdateBuildResponse'), OVERWRITE);
-			// output(lResponse.FaultRecord.FaultCode, named('FaultCode'), OVERWRITE);
-			// output(lResponse.FaultRecord.FaultString, named('FaultString'), OVERWRITE);
-			// output(lResponse.XMLResponse.UpdateBuildInstanceResult.Result.RecordResponseUpdateBuildInstance[1].Result);
-			// output(lResponse.XMLResponse.UpdateBuildInstanceResult.Result.RecordResponseUpdateBuildInstance[1].Status);
-			// output(lResponse.XMLResponse.UpdateBuildInstanceResult.Result.RecordResponseUpdateBuildInstance[1].Message);
-		// #END
-	
-		// xmlds := dataset([rReceivings ],rOrbitRequest - logintoken);
-		// output(xmlds);
-		// output(lResponse,named('updatebuildinstance'));
+		
 		RETURN	lResponse;
 	// END;
 

@@ -1,6 +1,6 @@
-import Data_Services, doxie,FLAccidents;
+﻿import Data_Services, doxie,FLAccidents;
 
-allrecs := FLAccidents_Ecrash.File_KeybuildV2.out(vin+driver_license_nbr+tag_nbr+lname <>'');
+allrecs := FLAccidents_Ecrash.File_KeybuildV2.prout(vin+driver_license_nbr+tag_nbr+lname <>'');
 
 crash_accnbr_base := allrecs
 						(accident_nbr<>'');

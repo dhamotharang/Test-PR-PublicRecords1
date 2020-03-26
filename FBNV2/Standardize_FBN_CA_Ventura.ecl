@@ -1,4 +1,4 @@
-import ut,fbnv2,address, lib_stringlib, VersionControl;
+﻿import ut,fbnv2,address, lib_stringlib, VersionControl;
 
 export Standardize_FBN_CA_Ventura(	 
 	string									pversion
@@ -160,7 +160,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'Ventura';
+	source					:= 'VENTURA';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source); 
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	
@@ -168,6 +168,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);	
 	

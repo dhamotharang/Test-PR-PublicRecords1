@@ -1,4 +1,4 @@
-IMPORT	Orbit_report,header,Death_Master,Obituaries,UtilFile,RoxieKeyBuild,Orbit3;
+﻿IMPORT	Orbit_report,header,Death_Master,Obituaries,UtilFile,RoxieKeyBuild,Orbit3;
 EXPORT	proc_deathmaster_buildall(string	filedate, string emailTarget='')	:=
 FUNCTION
 
@@ -48,15 +48,13 @@ FUNCTION
 											,Death_Master.Proc_Create_Relationships_SSA(filedate)
 											,getretval
 											,clearHeaderKeyBuilding
-											,updateDops
-											,header.proc_OrbitI_CreateBuild_Death(filedate)
-											,header.proc_OrbitI_CreateBuild_Death(filedate,'FCRA')
 											,extractIncremental
+											,updateDops																					
 											,Orbit3.proc_Orbit3_CreateBuild ('Death Master',filedate, 'N|B')
 											,Orbit3.proc_Orbit3_CreateBuild ('Death Master SSA',filedate, 'N|B')
 											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master',filedate,'F')
 											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master SSA',filedate,'F')
-										): SUCCESS(sendSuccMsg), FAILURE(sendFailMsg);
+												): SUCCESS(sendSuccMsg), FAILURE(sendFailMsg);
 	RETURN result;
 	
 END;

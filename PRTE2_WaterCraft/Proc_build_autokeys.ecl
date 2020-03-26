@@ -1,4 +1,4 @@
-/********************************************************************************************************** 
+﻿/********************************************************************************************************** 
 	Name: 			Build_Keys_Autokeys
 	Created On: 08/10/2013
 	By: 				ssivasubramanian
@@ -29,7 +29,7 @@ EXPORT Proc_build_autokeys(STRING filedate) := FUNCTION
 			STRING5 	bzip5 :='';
 			STRING9 	fein_use :='';
 			STRING9 	ssn_use := '';
-	END;
+			END;
 
 	layout_watercraft both_cities(Base_file le,INTEGER C)		:=TRANSFORM
 		SELF.city 		:=	CHOOSE(C,le.p_city_name,IF(le.v_city_name = '' OR le.v_city_name = le.p_city_name, skip, le.v_city_name ));
@@ -79,6 +79,8 @@ EXPORT Proc_build_autokeys(STRING filedate) := FUNCTION
 		STRING5 		bzip5 :='';
 		STRING9 		fein_use :='';
 		STRING9 		ssn_use := '';
+		unsigned4 global_sid;
+    unsigned8 record_sid;
 	END;
 
 	layout_watercraft_use w_bState(layout_watercraft le)	:=	TRANSFORM

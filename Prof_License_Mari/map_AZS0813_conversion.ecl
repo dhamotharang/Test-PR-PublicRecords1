@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take AZ Real Estate Company and Broker raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -41,7 +41,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 	IPpattern	:= '^(.*)(.COM[,]* |.NET |.ORG |.GOV |.EDU |.MIL |.INT )(.*)';
 
 	//AZ Real Estate Company layout to Common
-	Prof_License_Mari.layouts.base	transformCompToCommon(Prof_License_Mari.layout_AZS0813.entity L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformCompToCommon(Prof_License_Mari.layout_AZS0813.entity L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9]; //yyyymmdd
@@ -75,7 +75,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 														Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',clnNameOrg,' CO'))); //Without punct. and Sufx removed
 		
 		self.NAME_ORG_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameOrg);
-		self.NAME_ORG_SUFX 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+		self.NAME_ORG_SUFX 	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 		
 		tmpNameDBA				:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(L.DBA); //business name with standard corp abbr.
 		clnNameDBA				:= StringLib.StringFindReplace(tmpNameDBA, '/',' ');
@@ -83,7 +83,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		self.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameDBA); //split corporation prefix from name
 		self.NAME_DBA			:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',clnNameDBA,' CO')),
 														Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',clnNameDBA,' CO')));
-		self.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		self.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		self.DBA_FLAG				:= If(trim(self.NAME_DBA,left,right) != '',1,0); //1=TRUE, 0=FALSE
 		self.LICENSE_NBR		:= StringLib.StringToUpperCase(TRIM(L.LIC_NUMBER,LEFT,RIGHT));
 	
@@ -178,8 +178,8 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 					 'LINE 1|LINE 2|LEGAL DEPT\\.|SALES OFFICE|BUSINESS OFFICE' +
 					 ')';
 
-		trimAddress1          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1);
-	  trimAddress2          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2);
+		trimAddress1          := ut.CleanSpacesAndUpper(L.ADDRESS1);
+	  trimAddress2          := ut.CleanSpacesAndUpper(L.ADDRESS2);
   		
 	  //Extract company name
 		tmpNameContact1				:= Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(trimAddress1, CoPattern);
@@ -204,8 +204,8 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		self.ADDR_ADDR1_1			:= IF(AddrWithContact != ' ' and tmpADDR_ADDR2_1 != '',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),
 																StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));	
 		self.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
-		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.CITY));
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.STATE));
+		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),ut.CleanSpacesAndUpper(L.CITY));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(L.STATE));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),TRIM(L.ZIP,left,right)[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
 		//self.provnote_1 := trimAddress1+'|'+trimAddress2+'|'+trim(self.ADDR_ADDR1_1)+'|'+self.ADDR_ADDR2_1;
@@ -219,7 +219,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 																		=> 'ABBA REAL EATATE',
 																 REGEXFIND('LEGACY PARTNERS RESIDENTIAL INC.', L.ADDRESS1, NOCASE)
 																		=> 'LEGACY PARTNERS RESIDENTIAL INC.',
-																 //Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2)='C/O TERRAMOR PROPERTIES'
+																 //ut.CleanSpacesAndUpper(L.ADDRESS2)='C/O TERRAMOR PROPERTIES'
 																 //		=> 'TERRAMOR PROPERTIES',
 																 REGEXFIND('C/O TERRAMOR PROPERTIES', L.ADDRESS2, NOCASE)
 																		=> 'TERRAMOR PROPERTIES',
@@ -273,7 +273,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 	company_only_lookup := ds_map_company(ds_map_company.affil_type_cd='CO');
 
 	//perform lookup to join children to parents and assign cmc_slpk field value of parent to pcmc_slpk field of child  
-	Prof_License_Mari.layouts.base assign_pcmcslpk_co(ds_map_company L, company_only_lookup R) := transform
+	Prof_License_Mari.layout_base_in assign_pcmcslpk_co(ds_map_company L, company_only_lookup R) := transform
 
 
 		self.pcmc_slpk := R.cmc_slpk;
@@ -289,7 +289,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 																		assign_pcmcslpk_co(left,right),left outer,lookup);	
 
 	//AZ Real Estate brokers layout to Common
-	Prof_License_Mari.layouts.base	transformBrokerToCommon(Prof_License_Mari.layout_AZS0813.individual L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformBrokerToCommon(Prof_License_Mari.layout_AZS0813.individual L) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9]; //yyyymmdd
@@ -323,8 +323,8 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 														'');
 							
 		self.NAME_ORG		  := IF(TRIM(L.LAST_NAME)!=' ',
-														Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(tempLastName)+' '+
-														Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(stripNickFName),
+														ut.CleanSpacesAndUpper(tempLastName)+' '+
+														ut.CleanSpacesAndUpper(stripNickFName),
 													  ' ');
 														
 
@@ -332,7 +332,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 													, StringLib.StringToUpperCase(TRIM(L.EMPLOYER_DBA,LEFT,RIGHT)), ' ');
 		self.DBA_FLAG			:= If(trim(self.NAME_DBA,left,right) != '',1,0); //1=TRUE, 0=FALSE
 		
-		tmpNameOffice					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.EMPLOYER_LEGAL_NAME);
+		tmpNameOffice					:= ut.CleanSpacesAndUpper(L.EMPLOYER_LEGAL_NAME);
 		prepNameOffice				:= Prof_License_mari.mod_clean_name_addr.strippunctName(tmpNameOffice);
 		clnNameOffice					:= StringLib.StringCleanSpaces(prepNameOffice);
 		self.NAME_OFFICE			:= MAP(clnNameOffice!='' => clnNameOffice,
@@ -354,11 +354,11 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 														 SELF.NAME_OFFICE != ''  AND 
 														 NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) =>'MD',
 														 '');
- 		self.NAME_FIRST		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(stripNickFName);
-		self.NAME_MID			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(stripNickMName);
-		self.NAME_LAST		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(tempLastName);
-		SELF.NAME_NICK 		:= MAP(tempFNick<>'' => Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(REGEXREPLACE('\\.',tempFNick,'')),
-		                         tempFNick<>'' => Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(REGEXREPLACE('\\.',tempMNick,'')),
+ 		self.NAME_FIRST		:= ut.CleanSpacesAndUpper(stripNickFName);
+		self.NAME_MID			:= ut.CleanSpacesAndUpper(stripNickMName);
+		self.NAME_LAST		:= ut.CleanSpacesAndUpper(tempLastName);
+		SELF.NAME_NICK 		:= MAP(tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempFNick,'')),
+		                         tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempMNick,'')),
 														 '');
 		SELF.NAME_SUFX		:= tempSufxName;
 		
@@ -450,8 +450,8 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 					 'LINE 1|LINE 2|LEGAL DEPT\\.|SALES OFFICE|BUSINESS OFFICE' +
 					 ')';
 
-		trimAddress1          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.MAILING_ADDRESS1);
-	  trimAddress2          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.MAILING_ADDRESS2);
+		trimAddress1          := ut.CleanSpacesAndUpper(L.MAILING_ADDRESS1);
+	  trimAddress2          := ut.CleanSpacesAndUpper(L.MAILING_ADDRESS2);
   		
 	  //Extract company name
 		tmpNameContact1				:= Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(trimAddress1, CoPattern);
@@ -476,8 +476,8 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		self.ADDR_ADDR1_1			:= IF(AddrWithContact != ' ' and tmpADDR_ADDR2_1 != '',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),
 																StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));	
 		self.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
-		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.MAILING_CITY));
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.MAILING_STATE));
+		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),ut.CleanSpacesAndUpper(L.MAILING_CITY));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(L.MAILING_STATE));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),TRIM(L.MAILING_ZIP,left,right)[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
 		//self.provnote_1 := trimAddress1+'|'+trimAddress2+'|'+trim(self.ADDR_ADDR1_1)+'|'+self.ADDR_ADDR2_1;
@@ -522,7 +522,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 	ds_map_deduped := dedup(sort(distribute(ds_map,hash(cmc_slpk,name_org,license_nbr,std_license_type,addr_addr1_1)),record,local),record,all,local);
 
 	// populate std_license_status field via translation on raw_license_status field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map_deduped L, ds_Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map_deduped L, ds_Cmvtranslation R) := transform
 		self.STD_LICENSE_STATUS := R.DM_VALUE1;
 		self := L;
 	end;
@@ -533,7 +533,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 
 	// populate prof code field via translation on license type field
 	//Prof_License_Mari.layouts_reference.MARIBASE trans_lic_type(ds_map L, ds_Cmvtranslation R) := transform
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := transform
 		self.STD_PROF_CD := R.DM_VALUE1;
 		self := L;
 	end;
@@ -542,7 +542,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 													 left.STD_SOURCE_UPD=right.source_upd AND right.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(trim(left.STD_LICENSE_TYPE,left,right))=trim(right.fld_value,left,right),
 													 trans_lic_type(left,right),left outer,lookup);
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := transform
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := transform
 		self.pcmc_slpk := IF(L.affil_type_cd = 'IN',R.cmc_slpk,L.pcmc_slpk);
 		self := L;
 	end;

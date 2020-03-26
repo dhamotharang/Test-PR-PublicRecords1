@@ -61,13 +61,4 @@
 		STRING1 address_type_derived;
 	END;
 
-  EXPORT profileRec := RECORD
-    STRING srcCategory;
-    STRING srcFilter;
-    UNSIGNED2 weight := 0;
-    UNSIGNED2 distance := 0;
-    UNSIGNED2 score := 0;
-    UNSIGNED2 macroCall := 0;
-  END;
-	
 END;

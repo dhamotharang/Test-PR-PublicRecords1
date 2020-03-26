@@ -282,7 +282,13 @@ function
 				self.company_address.geo_match 		:= choose(c,l.corp_addr1_geo_match,			l.corp_addr2_geo_match);
 				self.company_address.err_stat 		:= choose(c,l.corp_addr1_err_stat,			l.corp_addr2_err_stat);
 				self.company_address_type_raw			:= choose(c,l.corp_address1_type_desc,	l.corp_address2_type_desc);
-				self.company_fein 								:= IF (Business_Header.ValidFEIN((unsigned4)stringLib.stringFilter(l.corp_fed_tax_id,'0123456789')), stringLib.stringFilter(l.corp_fed_tax_id,'0123456789'), '');
+				self.company_fein 								:= IF (Business_Header.ValidFEIN((unsigned4)stringLib.stringFilter(l.corp_fed_tax_id,'0123456789')), 
+																										stringLib.stringFilter(l.corp_fed_tax_id,'0123456789'), 
+																										IF(Business_Header.ValidFEIN((unsigned4)stringLib.stringFilter(l.corp_forgn_fed_tax_id,'0123456789')) and l.corp_state_origin ='TX',
+																													stringLib.stringFilter(l.corp_forgn_fed_tax_id,'0123456789'),
+																													''
+																											 )
+																								 );
 				self.company_status_raw						:= corp2.Linking_filters.company_status(l.corp_status_desc,l.corp_state_origin, l.corp_status_comment);
 				self.company_ticker								:= l.corp_ticker_symbol;
 				self.company_ticker_exchange			:= l.corp_stock_exchange;

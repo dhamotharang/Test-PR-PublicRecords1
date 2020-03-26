@@ -35,7 +35,8 @@ string l_tagdelta = '',
 string l_dopsenv = dops.constants.dopsenvironment,
 boolean l_overrideupdateflag = false,
 string l_esp = dops.constants.esp(dops.constants.dopsenvironment),
-string l_espport = '8010') := function
+string l_espport = '8010',
+string l_testenv = 'NA') := function
 
 	// trim all string variables when a value is passed from a deprecated function/macro
 	// the values are being padded with space
@@ -53,7 +54,8 @@ string l_espport = '8010') := function
 	string updateflag := trim(l_updateflag);
 	string tagdelta := trim(l_tagdelta);
 	string dopsenv := trim(l_dopsenv);
-	string subjectprefixstring := if (dopsenv = 'dev', '**WARNING UPDATING DOPS DEV DB**','');
+	string subjectprefixstring := if (l_testenv <> 'NA' and l_testenv <> '',l_testenv+' ', '') + 
+																		if (dopsenv = 'dev', '**WARNING UPDATING DOPS DEV DB**','');
 
 	emailme_function(string email_t,string datasetname,string cversion, string uversion,
 					string emailmessage) := function
@@ -111,7 +113,7 @@ string l_espport = '8010') := function
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H',''),l_inloc),
+				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H',''),l_inloc,l_testenv),
 				'iUpdateVersion',
 				InputRec,
 				outrec,
@@ -122,7 +124,7 @@ string l_espport = '8010') := function
 
 	codeval := emailme_function(email_t,datasetname,soapresults.Code+':'+uversion,uversion,soapresults.description);
 
-	string builtkeys := dops.isRoxieKeysBuilt(datasetname,uversion,inloc,inenvment,includeboolean,indaliip,dopsenv); 
+	string builtkeys := dops.isRoxieKeysBuilt(datasetname,uversion,inloc,inenvment,includeboolean,indaliip,dopsenv,l_testenv := l_testenv); 
 
 	missingkeys := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Missing Keys:' + builtkeys);
 
@@ -142,7 +144,7 @@ string l_espport = '8010') := function
 																		,dops.constants.hthorcluster(l_dopsenv))
 																	);*/
 
-	updatekeyinfo := dops.UpdateDOPSForPkgValidation(datasetname,uversion,l_environmentflag:=if(l_isprodready = 'Y','P','Q'),l_clusterflag:=inenvment,l_locationflag:=l_inloc,l_dopsenv:=l_dopsenv,l_daliip := l_indaliip,l_email:=l_email_t).RunUpdate();
+	updatekeyinfo := dops.UpdateDOPSForPkgValidation(datasetname,uversion,l_environmentflag:=if(l_isprodready = 'Y','P','Q'),l_clusterflag:=inenvment,l_locationflag:=l_inloc,l_dopsenv:=l_dopsenv,l_daliip := l_indaliip,l_email:=l_email_t,l_testenv:=l_testenv).RunUpdate();
 	
 	return if(dops.constants.dopsenvironment <> 'na'
 							,if (builtkeys <> ''

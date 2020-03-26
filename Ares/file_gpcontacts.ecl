@@ -65,8 +65,8 @@ end;
 
 STRING convertToCodes(STRING type_) := FUNCTION
 		STRING code := ares.files.ds_lookup(fid ='TELECOM_TYPE').lookupbody(id = type_)[1].id;
-		STRING result := IF(std.str.EqualIgnoreCase(code,'telephone'),'tel',code);
-	RETURN result;
+		STRING result := IF(std.str.EqualIgnoreCase(code,'telephone'),'Tel',code);
+	RETURN std.str.ToCapitalCase(result);
 END;
 
 layout_w_telecom telecoms_xform(layout_tel L, STRING id, STRING dptCode, STRING tfpuid):= TRANSFORM
@@ -88,17 +88,7 @@ result := department_telecoms_normed + office_telecoms_normed;
 sorted_result := SORT(result,RECORD);
 deduped_result := DEDUP (sorted_result,RECORD);
 
-layout_contacts := RECORD
-	STRING Update_Flag;
-	STRING Primary_Key;
-	STRING Accuity_Location_ID;
-	STRING Department := '';
-	STRING Contact_Type;
-	STRING Contact_Information;
-	STRING Filler;
-END;
-
-layout_contacts final_xform(result L) := Transform
+recordof(ares.layout_gpcnt) final_xform(result L) := Transform
 	SELF.Update_Flag := 'A';
 	SELF.Primary_Key := '';
 	SELF.Accuity_Location_ID := L.office_tfpuid;

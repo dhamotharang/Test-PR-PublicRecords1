@@ -1,4 +1,4 @@
-import mdr,InsuranceHeader_xLink;
+import mdr,InsuranceHeader_xLink,dx_header;
 export fn_incremental_payload := function
 
 Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key; 
@@ -10,7 +10,7 @@ Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key;
  hr  := DISTRIBUTE(hr0(header.Blocked_data()), HASH(rid));
  
  t:= { 
-  header.layout_header,
+    dx_header.layout_header,
  	string1 valid_dob := '';
 	unsigned6 hhid := 0;
 	STRING18 county_name := '';

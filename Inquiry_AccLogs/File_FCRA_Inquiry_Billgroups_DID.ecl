@@ -1,4 +1,4 @@
-/*2014-05-30T19:22:05Z (Wendy Ma)
+﻿/*2014-05-30T19:22:05Z (Wendy Ma)
 bug# 155802
 */
 /*2014-05-09T22:37:36Z (Wendy Ma)
@@ -7,7 +7,7 @@ additional healthcare account detection
 /*2014-05-08T02:36:59Z (cecelie guyton_logs)
 sub market and other translation changes
 */
-import doxie, ut, risk_indicators;
+import doxie, ut, risk_indicators, data_services;
 
 EXPORT File_FCRA_Inquiry_Billgroups_DID() := MODULE
 
@@ -111,6 +111,7 @@ did_table := table(did_billgroups_table, {
 
 EXPORT create_file := did_table;
 
-EXPORT file := DATASET(ut.foreign_fcra_logs + 'thor20_21::out::inquiry_acclogs::fcra::Inquiry_Billgroups_DID', RECORDOF(create_file), THOR);
-
+EXPORT file := /*DATASET(ut.foreign_fcra_logs + 'thor20_21::out::inquiry_acclogs::fcra::Inquiry_Billgroups_DID', RECORDOF(create_file), THOR);*/
+dataset(Data_Services.foreign_prod + 'uspr::inql::fcra::base::weekly::qa::billgroups_did', RECORDOF(create_file), THOR);
+	
 END;

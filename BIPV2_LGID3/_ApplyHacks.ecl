@@ -92,6 +92,25 @@ EXPORT ds_MOD_Attr_UnderLinks  :=  DATASET([
 		}
   ],Tools.layout_attribute_hacks2);
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//LinkBlockers
+EXPORT ds_LinkBlockers  :=  DATASET([
+       {pModule,'LinkBlockers'
+       ,'BadPairRec NotePair.*?export AllBadPairs := JOIN(AllIds,AllIds,'  
+       ,'HACKLinkBlockers'  
+       ,
+          '  ds_allids_dedup :=  SORT( distribute(table(AllIds  ,{RuleNum ,LGID3,Good} ,RuleNum ,LGID3,Good ,merge)/*HACKLinkBlockers*/ ,HASH(RuleNum)) ,RuleNum,LGID3,Good,LOCAL );\n\n'
+        + '  BadPairRec NotePair(ds_allids_dedup le,ds_allids_dedup ri) := TRANSFORM\n'
+        + '    SELF.LGID31 := le.LGID3;\n'
+        + '    SELF.LGID32 := ri.LGID3;\n'
+        + '    SELF.RuleNum := le.RuleNum;\n'
+        + '  END;\n\n'
+        + 'export AllBadPairs := JOIN(ds_allids_dedup,ds_allids_dedup'
+       
+       
+       ,'hack linkblockers to prevent skew'}
+  ],Tools.layout_attribute_hacks2);
+
 /*-------------------------------Hack Action-------------------------------------------*/
 EXPORT aHack(DATASET(Tools.Layout_attribute_hacks2) d,bSaveIt=TRUE):=Tools.HackAttribute2(d,bSaveIt,pESP).saveit;
 
@@ -101,7 +120,8 @@ ds_BasicMatch+
 ds_ProcIterate+
 ds_config+
 ds_MatchCandidates+
-ds_MOD_Attr_UnderLinks;
+ds_MOD_Attr_UnderLinks+
+ds_LinkBlockers;
 
 EXPORT aHackIt := aHack(dAll);
 END;

@@ -1,4 +1,4 @@
-﻿import fcra, ut;
+﻿import fcra, ut, AVM_V2, data_services;
 
 Layout_Override_AVM1 := RECORD
 	string28 prim_name;
@@ -61,13 +61,14 @@ Layout_Override_AVM1 := RECORD
 end;
 ds := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::avm',layout_override_avm1,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt),-flag_file_id),except flag_file_id,keep(1));
 
-
-
 FCRA.Layout_Override_AVM proj_recs(ds l) := transform
 	self := l;
 end;
 
 kf := project(ds,proj_recs(left));//dedup(sort(dataset(ut.foreign_prod+'thor_data400::base::override::fcra::qa::avm',fcra.layout_override_avm,flat),-flag_file_id),except flag_file_id,keep(1));
 
-export Key_Override_AVM_FFID := index(kf,{flag_file_id}, {kf},
+//DF-22458 blank out specifed fields in thor_data400::key::avm_v2::fcra::qa::address
+ut.MAC_CLEAR_FIELDS(kf, kf_cleared, AVM_V2.Constants.fields_to_clear);
+
+export Key_Override_AVM_FFID := index(kf_cleared,{flag_file_id}, {kf_cleared},
   '~thor_data400::key::override::fcra::avm::qa::ffid');

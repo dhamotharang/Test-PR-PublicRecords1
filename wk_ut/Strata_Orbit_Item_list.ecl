@@ -1,4 +1,4 @@
-import tools,_control;
+﻿import tools,_control;
 
 EXPORT Strata_Orbit_Item_list(
 
@@ -16,20 +16,19 @@ EXPORT Strata_Orbit_Item_list(
 ) :=
 functionmacro
 
-  import strata,wk_ut;
-  
-  prep_items         := wk_ut.get_Slim_FilesRead    (pWuid      ,pFileRegex );  
-  dedup_items        := wk_ut.custom_dedup_filesread(prep_items ,pRegexToken);
-  fileitems          := project(dedup_items,transform({string sortfield,string name,unsigned Countgroup := 0,unsigned cnt := 0},self := left));  
-
-  send_to_strata     := Strata.macf_CreateXMLStats (fileitems ,pBuildName,pBuildSubSet  ,pversion	,pEmailNotifyList	,pBuildView ,pBuildType	,pIsTesting,pOverwrite := false);
-
-  stats := parallel(
-     output(prep_items  ,named(pBuildName + '_prep_items' ))
-    ,output(dedup_items ,named(pBuildName + '_dedup_items'))
-    ,output(fileitems   ,named(pBuildName + '_fileitems'  ))
-  );
-
-  return when(send_to_strata  ,stats);
+ import Workman;
+ 
+ return Workman.Strata_Orbit_Item_list(
+   pWuid
+  ,pBuildName
+  ,pBuildSubSet
+  ,pversion
+  ,pFileRegex       
+  ,pRegexToken      
+  ,pEmailNotifyList 
+  ,pBuildView				
+  ,pBuildType				
+  ,pIsTesting				
+ );
 
 endmacro;

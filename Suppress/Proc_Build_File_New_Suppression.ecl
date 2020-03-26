@@ -47,7 +47,7 @@ Suppress.Layout_New_Suppression AllRecords(df_Supplemental l) := transform
  self.Linking_type :=  map(length(trim(l.ssn))=12 => 'DID',
 						   length(trim(l.ssn))=9 => 'SSN','');
  self.Linking_ID := l.ssn;
- self.Comment := 'BOBS ALL RECORDS';
+ self.Comment := 'PULLSSN DATA';
  self := [];
 end;
 //###########################################################################################################

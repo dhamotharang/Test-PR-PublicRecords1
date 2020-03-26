@@ -119,8 +119,8 @@ Prof_License.Layout_proLic_in pharm_common( Files_AR_raw.pharmacy l) := transfor
 self.date_first_seen      := infile(ftype = 'pharmacy')[1].fdate;                                                 
 self.date_last_seen       := infile(ftype = 'pharmacy')[1].fdate;                                                 
 self.profession_or_board           := 'Pharmacist';                                                   
-self.orig_name            := l.Name;                                                         
-self.name_order           := '';                                                          
+self.orig_name            :=STD.Str.CleanSpaces ( trim(l.First_Name) + ' '+ trim(l.Middle_Name) + ' '+ trim(l.Last_Name));                                       
+self.name_order           := 'FML';                                                          
 self.orig_addr_1          := l.Mail_Street;                                                  
 self.orig_city            := StringLib.stringfilterout(l.Mail_City,'"');                     
 self.orig_st              := trim(l.Mail_State);                                             

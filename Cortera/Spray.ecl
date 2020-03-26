@@ -6,7 +6,7 @@ EXPORT Spray(string8 version) := function
 srcdir := '/data/projects/cortera/data/'+version+'/';
 
 root := '~thor::cortera::in::';
-ip := _control.IPAddress.bctlpedata10;
+ip :=  IF(_control.ThisEnvironment.Name='Dataland', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 clusta := IF(_control.ThisEnvironment.Name='Dataland','thor400_sta01','thor400_44');
 
 sprayfile(string filename) := 

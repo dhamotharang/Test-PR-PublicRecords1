@@ -4,6 +4,7 @@
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 
 EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
+#workunit('name','Yogurt:Prof License MARI - OKS0817 Build ' + pVersion);
 
 	//Define constants
 	code 								:= 'OKS0817';
@@ -37,7 +38,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 																AND StringLib.StringToUpperCase(MID_NAME) != 'A');
 																		
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_OKS0817 pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(Prof_License_Mari.layout_OKS0817 pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -315,7 +316,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic L, Cmvtranslation R) := transform
 		SELF.STD_LICENSE_STATUS :=  StringLib.stringtouppercase(trim(R.DM_VALUE1,left,right));
 																
 		self := L;
@@ -328,7 +329,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := transform
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 		self := L;
 	end;
@@ -346,7 +347,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 
 
 	//***BR to CO Mortgage License Records
-	Prof_License_Mari.layouts.base assign_pcmcslpk_1(ds_map_lic_trans L, company_only_lookup_co R) := transform
+	Prof_License_Mari.layout_base_in assign_pcmcslpk_1(ds_map_lic_trans L, company_only_lookup_co R) := transform
 		SELF.pcmc_slpk := R.cmc_slpk;
 		self := L;
 	end;
@@ -358,7 +359,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 
 
 	//***MD to CO Mortgage License Records
-	Prof_License_Mari.layouts.base assign_pcmcslpk_2(ds_map_affil_br L, company_only_lookup_gr R) := transform
+	Prof_License_Mari.layout_base_in assign_pcmcslpk_2(ds_map_affil_br L, company_only_lookup_gr R) := transform
 		SELF.pcmc_slpk := R.cmc_slpk;
 		self := L;
 	end;
@@ -368,7 +369,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 							and left.TYPE_CD ='MD',
 							assign_pcmcslpk_2(left,right),left outer,local);
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil_md L) := transform
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil_md L) := transform
 		SELF.PROVNOTE_1 := map(	L.provnote_1 != '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => TRIM(L.provnote_1,left,right)+ '|' + Comments,
 														L.provnote_1 = '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => Comments,
 																																												L.PROVNOTE_1);
@@ -379,7 +380,7 @@ EXPORT map_OKS0817_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(OutRecs L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(OutRecs L) := transform
 		SELF.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, ' ');
 		SELF.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		SELF.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));

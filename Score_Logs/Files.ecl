@@ -1,12 +1,12 @@
-IMPORT UT, Inquiry_Acclogs, data_services;
+﻿IMPORT UT, Inquiry_Acclogs, data_services;
 EXPORT Files := MODULE
 
 //MBS transaction files
-EXPORT NonFCRA_Transaction := dataset('~thor_data400::in::score_tracking::log_mbs_transaction_online', Score_Logs.Layouts.Input, csv(separator('~~'), terminator('~~^~~')));
-EXPORT FCRA_Transaction := dataset('~thor_data400::in::score_tracking::log_mbs_fcra_transaction_online', Score_Logs.Layouts.Input, csv(separator('~~'), terminator('~~^~~')));
+EXPORT NonFCRA_Transaction := dataset('~thor_data400::in::score_tracking::log_mbs_transaction_online', Score_Logs.Layouts.Input, csv(separator('|\t|'), terminator('|\n')));
+EXPORT FCRA_Transaction := dataset('~thor_data400::in::score_tracking::log_mbs_fcra_transaction_online', Score_Logs.Layouts.Input, csv(separator('|\t|'), terminator('|\n')));
 
-EXPORT NonFCRA_Intermediate := dataset('~thor_data400::in::score_tracking::log_mbs_intermediate', Score_Logs.Layouts.Input_Intermediate, csv(separator('~~'), terminator('~~ENDOFRECORD~~')));
-EXPORT FCRA_Intermediate := dataset('~thor_data400::in::score_tracking::log_mbs_fcra_intermediate', Score_Logs.Layouts.Input_Intermediate, csv(separator('~~'), terminator('~~ENDOFRECORD~~')));
+EXPORT NonFCRA_Intermediate := dataset('~thor_data400::in::score_tracking::log_mbs_intermediate', Score_Logs.Layouts.Input_Intermediate, csv(separator('|\t|'), terminator('|\n')));
+EXPORT FCRA_Intermediate := dataset('~thor_data400::in::score_tracking::log_mbs_fcra_intermediate', Score_Logs.Layouts.Input_Intermediate, csv(separator('|\t|'), terminator('|\n')));
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

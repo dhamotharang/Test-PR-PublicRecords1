@@ -1,4 +1,4 @@
-﻿IMPORT tools;
+﻿IMPORT tools, dx_Infutor_NARB;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
@@ -10,7 +10,7 @@ EXPORT Promote(
 	,BOOLEAN							pIsTesting			= 	FALSE
 	,DATASET(lay_inputs)	pInputFilenames = 	Filenames	(pversion).Input.dAll_filenames 
 	,DATASET(lay_builds)	pBuildFilenames = 	Filenames	(pversion).dAll_filenames
-																						+ Keynames(pversion).dAll_filenames
+																						+ dx_Infutor_NARB.Keynames(pversion).dAll_filenames
 ) := MODULE
 	
 	EXPORT inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);

@@ -85,7 +85,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
   ut.CleanFields(ValidMTGFile,clnValidMTGFile);
 
 //mortgage and lenders to MARIBASE layout
- Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.Layout_COS0865.common pInput) 
+ Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.Layout_COS0865.common pInput) 
     := 
 	   TRANSFORM
 			SELF.PRIMARY_KEY	    := 0;  //Generate sequence number (not yet initiated)
@@ -383,7 +383,7 @@ END;
 ds_map   := PROJECT(clnValidMTGFile, transformToCommon(LEFT));
 
 // Populate std_license_status field via translation
- Prof_License_Mari.layouts.base 		trans_lic_status(ds_map L, SrcCmvTrans R) := TRANSFORM
+ Prof_License_Mari.layout_base_in 		trans_lic_status(ds_map L, SrcCmvTrans R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 END;
@@ -394,7 +394,7 @@ ds_map_stat_trans := JOIN(ds_map, SrcCmvTrans,
 							trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 // Populate STD_PROF_CD field via translation on license type field
- Prof_License_Mari.layouts.base 		trans_lic_type(ds_map_stat_trans L, SrcCmvTrans R) := TRANSFORM
+ Prof_License_Mari.layout_base_in 		trans_lic_type(ds_map_stat_trans L, SrcCmvTrans R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 END;
@@ -408,7 +408,7 @@ ds_map_lic_trans := JOIN(ds_map_stat_trans, SrcCmvTrans,
 //Perform LOOKUP to assign pcmcslpk of child to cmcslpk of parent
  company_only_lookup := ds_map_lic_trans(affil_type_cd='CO');
 
- Prof_License_Mari.layouts.base 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+ Prof_License_Mari.layout_base_in 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -419,7 +419,7 @@ ds_map_affil := JOIN(ds_map_lic_trans, company_only_lookup,
 						assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
 
- Prof_License_Mari.layouts.base 	xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+ Prof_License_Mari.layout_base_in 	xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 	SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 							TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 						   L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

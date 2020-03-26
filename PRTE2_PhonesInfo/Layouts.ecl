@@ -1,9 +1,10 @@
-﻿IMPORT PhonesInfo;
+﻿IMPORT PhonesInfo,dx_phonesInfo;
 
 EXPORT Layouts := MODULE
  
 	 EXPORT layout_phones_ported_metadata_base_in := PhonesInfo.Layout_Common.portedMetadata_Main;
-	 EXPORT layout_carrier_reference_base := PhonesInfo.Layout_Common.sourceRefBase;
+	 EXPORT layout_carrier_reference_base := dx_PhonesInfo.Layouts.sourceRefBase;
+	 Export lerg6Main := dx_PhonesInfo.Layouts.lerg6Main;
 	 
 		//phones ported metadata in plus additional fields to save off original values before the update
 		EXPORT layout_phones_ported_metadata_base_ext	:= RECORD	
@@ -26,8 +27,7 @@ EXPORT Layouts := MODULE
 			unsigned8		orig_react_end_dt														:= 0;
 			string6				orig_react_end_time												:= '';
 		END;
-
-
+	 
  END;
 
 

@@ -1,9 +1,9 @@
-import address,corp2,corp2_mapping,corp2_raw_al,corp2_raw_ar,corp2_raw_az,corp2_raw_co,corp2_raw_ct,corp2_raw_dc,corp2_raw_fl,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_ks,corp2_raw_ky,
+﻿import address,corp2,corp2_mapping,corp2_raw_al,corp2_raw_ar,corp2_raw_az,corp2_raw_co,corp2_raw_ct,corp2_raw_dc,corp2_raw_fl,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_ks,corp2_raw_ky,
 			 corp2_raw_il,corp2_raw_la,corp2_raw_id,corp2_raw_in, corp2_raw_ma,corp2_raw_md,corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_ms,corp2_raw_mt,corp2_raw_nd,corp2_raw_ne,corp2_raw_nc,corp2_raw_nh,corp2_raw_nm,
 			 corp2_raw_nv,corp2_raw_oh,corp2_raw_ok,corp2_raw_or,corp2_raw_pa,corp2_raw_ri,corp2_raw_sc,corp2_raw_sd,corp2_raw_tn,corp2_raw_tx,corp2_raw_ut,corp2_raw_vt,corp2_raw_wa,corp2_raw_wi,corp2_raw_wv,
-			 corp2_raw_wy,ut;
+			 corp2_raw_wy;
 			 
-export fCleanState(string pStateOrigin,string pStateOriginDesc,string pState='',string pAddress='') := module
+export fCleanState(string pStateOrigin,string pStateOriginDesc,string pState='',string pAddress='',string pCountry='') := module
 		//********************************************************************
 		//CleanState: The input parameters are as follows:
 		//						pState: 						the state being validated
@@ -11,10 +11,12 @@ export fCleanState(string pStateOrigin,string pStateOriginDesc,string pState='',
 		//						pStateOrigin: 			used for deriving/validating state
 		//						pStateOriginDesc: 	used for deriving/validating state
 		//*******************************************************************
-		shared UC_StateOrigin			:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		shared UC_StateOriginDesc	:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));
-		shared UC_Address	 				:= ut.fn_RemoveSpecialChars(corp2.t2u(pAddress));
-		shared UC_State		 				:= ut.fn_RemoveSpecialChars(corp2.t2u(pState));
+		shared UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));
+		shared UC_Address	 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pAddress));
+		shared UC_State		 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pState));
+		shared UC_Country	 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCountry));
+		shared StandardCountry		:= corp2_Mapping.fCleanCountry(UC_StateOrigin,UC_StateOriginDesc,UC_State,UC_COUNTRY).Country;		
 		
 		export CleanChars  		:= Map(UC_StateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.State.InvalidChars,UC_State,''),
 																 UC_StateOrigin = 'AR' => regexreplace(corp2_raw_ar.fGetRegExPattern.State.InvalidChars,UC_State,''),
@@ -115,7 +117,7 @@ export fCleanState(string pStateOrigin,string pStateOriginDesc,string pState='',
 		//Try and derive state from pAddress if pState is blank; Checking for a zip in pAddress		
 		export TempZip		  	:= if(CleanState= '',regexfind('[0-9]{5}\\-*[0-9]{0,4}$',corp2.t2u(UC_Address),0),'');
 		//Try and derive state using CleanAddress182 if pState is blank
-		export TempAddress		:= if(CleanState = '',Address.CleanAddress182(UC_Address,TempZip),'');
+		export TempAddress		:= if(CleanState = '' and standardCountry = 'US',Address.CleanAddress182(UC_Address,TempZip),'');
 		//Remove invalid characters from state
 		export TempState	 	  := if(CleanState = '',TempAddress[115..116],CleanState);												
 		//Get the first word in TempState
@@ -127,7 +129,7 @@ export fCleanState(string pStateOrigin,string pStateOriginDesc,string pState='',
 																 stringlib.stringfind(tempstate,uc_stateorigindesc,1)	<> 0  										=> uc_stateorigin,
 																 corp2_mapping.functions.valid_us_state_desc(tempstate)													=> corp2_mapping.functions.USStateDesc2Code(tempstate),
 																 corp2_mapping.functions.valid_us_state_desc(tempst1stword) 										=> corp2_mapping.functions.USStateDesc2Code(tempst1stword),							 
-																 ''
+																 UC_State
 																);
 		//Do final UC and trim
 		export State					:= corp2.t2u(DeriveState);														

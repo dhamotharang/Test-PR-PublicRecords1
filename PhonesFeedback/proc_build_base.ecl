@@ -1,4 +1,4 @@
-import didville, did_add, Header_Slimsort, ut, WatchDog, AID;
+﻿import didville, did_add, Header_Slimsort, Mdr, ut, WatchDog, AID;
 
 //***********************************************************************************
 baseLayout := phonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base;
@@ -141,6 +141,9 @@ ded_cleaned := dedup(sort(distribute(dAID_Cleaned_Addr,hash32(phone_number)),rec
 didTempRec trans(ded_cleaned input) := transform
 	self.did          := (unsigned6) input.did;
 	self.phone_number := stringlib.stringfilter(input.phone_number,'0123456789');
+	//Added for CCPA-355
+	self.global_sid   := 0;
+	self.record_sid   := 0;
 	self              := input;
 	end;
 				
@@ -167,5 +170,7 @@ didville.MAC_HHID_Append_By_Address(
 				street_number, street_name, unit_number, state, zip5);
 
 baseOnly := PROJECT(dsHHID,baseLayout);
+
+addGlobalSID := mdr.macGetGlobalSID(baseOnly, 'PhoneFeedback_Virtual', '', 'global_sid'); //DF-26434: Populate Global_SID
 				
-export proc_build_base := baseOnly;
+export proc_build_base := addGlobalSID;

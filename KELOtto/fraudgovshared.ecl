@@ -5,8 +5,24 @@ This is specifically to work around the massive skews because of the input data.
 
 */
 
-CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgov(clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and did > 0),
-                                   KELOtto.SharingRules, 
+Set_associated71 :=[2727638882, 1139485299];
+
+Set_associated91 :=[3635312545, 1026679856];
+
+Set_associated81 :=[3005794324, 866735130];
+
+Set_DCF := [324153257];  // SIU Account
+
+SetFLSnap := [324153257]; // SIU Account
+SetFLDsnap := [240265095]; // SIU Account
+SetTNUnemployment := [1613712331]; // SIU Account
+
+SetFLIrma := [1454157906]; // SIU Account
+
+DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
+// take this distribute out jp
+CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(KELOtto.fraudgovprep)(/*clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and */),
+                                   KELOtto.SharingRules/*(targetcustomerhash not in demohashes)*/, 
                        //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
                        
                        LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id,// AND LEFT.classification_Permissible_use_access.Ind_type = RIGHT.ind_type,
@@ -17,7 +33,18 @@ CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgov(clean_address.prim_range != 
                            UNSIGNED SourceCustomerFileInfo,
                            UNSIGNED AssociatedCustomerFileInfo,
                          },
-                           SELF.SourceCustomerFileInfo := RIGHT.sourcecustomerhash,
+												   // Code here to fake the demo customers in cert/prod to look like they have contributed...
+                           SELF.SourceCustomerFileInfo := 
+													              MAP(RIGHT.targetcustomerhash in Set_associated71 AND RIGHT.sourcecustomerhash = 3977509724 => RIGHT.targetcustomerhash,
+													              MAP(RIGHT.targetcustomerhash in Set_associated91 AND RIGHT.sourcecustomerhash = 2459821998 => RIGHT.targetcustomerhash,
+													              MAP(RIGHT.targetcustomerhash in Set_associated81 AND RIGHT.sourcecustomerhash = 4401323 => RIGHT.targetcustomerhash,
+                                        MAP(RIGHT.targetcustomerhash in Set_DCF AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetFLSnap AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetFLDsnap AND RIGHT.sourcecustomerhash = 2887396112 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetTNUnemployment AND RIGHT.sourcecustomerhash = 2481802344 => RIGHT.targetcustomerhash, // TN UI
+                                        MAP(RIGHT.targetcustomerhash in SetFLIrma AND RIGHT.sourcecustomerhash = 2274708080 => RIGHT.targetcustomerhash, // FL IRMA
+													                      RIGHT.sourcecustomerhash))))))));
+
                            SELF.AssociatedCustomerFileInfo := RIGHT.targetcustomerhash,
 //                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
 //                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
@@ -97,5 +124,8 @@ or ssn in ['595637941','589650781','770703763'])
 */
                            : PERSIST('~temp::deleteme27');
                            
-                           
-EXPORT FraudGovShared := CustomerAddressPersonPrep1;
+// output this to setup ramps cert to be able to build without having all the appends.
+tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
+//output(distribute(KELOtto.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
+
+EXPORT FraudGovShared := CustomerAddressPersonPrep1; // tempbuild;

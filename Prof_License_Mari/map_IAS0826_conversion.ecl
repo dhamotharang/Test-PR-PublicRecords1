@@ -38,7 +38,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
   oValidFile:= OUTPUT(ValidFile);
 	ut.CleanFields(ValidFile,clnValidFile);
 
-	Prof_License_Mari.layouts.base	transformToCommon2014(clnValidFile pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon2014(clnValidFile pInput) := TRANSFORM
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
 		SELF.LAST_UPD_DTE			:= pInput.LN_FILEDATE;		//it was set to process_date before
@@ -162,7 +162,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameDBA); //split corporation prefix from name
 		SELF.NAME_DBA					:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')),
 															  Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')));
-		SELF.NAME_DBA_SUFX		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false				
 		SELF.NAME_MARI_DBA		:= StringLib.StringCleanSpaces(tmpNameDBA);
 		
@@ -171,7 +171,8 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 
 		//Prepare the input to address cleaner
 		temp_preaddr1 				:= IF(IsAddress <> '',IsAddress + ' ','') + StringLib.StringCleanSpaces(trimAddress); 
-		temp_preaddr2 				:= StringLib.StringCleanSpaces(pInput.CITY+' '+pInput.STATE +' '+pInput.ZIP); 
+		temp_preaddr2 				:= IF(ut.CleanSpacesAndUpper(pInput.CITYSTZIP)<> '', ut.CleanSpacesAndUpper(pInput.CITYSTZIP),
+		                            ut.CleanSpacesAndUpper(pInput.CITY+' '+pInput.STATE +' '+pInput.ZIP)); 
 		clnAddrAddr1				 	:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(temp_preaddr1,temp_preaddr2); //Address cleaner to remove 'c/o' and 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -189,7 +190,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_CNTRY_1  := ut.CleanSpacesAndUpper(pInput.COUNTRY);
 
 		// assign business address indicator to true (B) if business address fields are not empty
-		SELF.ADDR_BUS_IND	:= IF(TRIM(pInput.ADDR_LINE1 + pInput.CITY + pInput.STATE + pInput.ZIP,LEFT,RIGHT) != '','B','');
+		SELF.ADDR_BUS_IND	:= IF(TRIM(pInput.ADDR_LINE1 + pInput.CITYSTZIP + pInput.CITY + pInput.STATE + pInput.ZIP,LEFT,RIGHT) != '','B','');
 
 		//populate phone field
 		SELF.PHN_PHONE_1    := IF(ut.CleanSpacesAndUpper(pInput.PHONE) = 'NULL',' ',
@@ -238,7 +239,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 
 	ds_map := PROJECT(clnValidFile, transformToCommon2014(LEFT));
 	// Clean-up Fields
-	Prof_License_Mari.layouts.base	transformClean(ds_map pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformClean(ds_map pInput) := TRANSFORM
 			SELF.ADDR_ADDR1_1		:= MAP(StringLib.stringfind(pInput.ADDR_ADDR1_1,'.',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, '.'),
 											 StringLib.stringfind(pInput.ADDR_ADDR1_1,',',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, ','),
 											 StringLib.stringfind(pInput.ADDR_ADDR1_1,'#',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, '#'),	
@@ -256,7 +257,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 	ds_map_clean := PROJECT(ds_map , transformClean(LEFT));						   
 
 	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map_clean L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map_clean L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := IF(L.STD_LICENSE_STATUS = '',R.DM_VALUE1,L.STD_LICENSE_STATUS);
 		SELF := L;
 	END;
@@ -267,7 +268,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 								trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -281,7 +282,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -291,7 +292,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 							AND LEFT.AFFIL_TYPE_CD = 'BR',
 							assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);						
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

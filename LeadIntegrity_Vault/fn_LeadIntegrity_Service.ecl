@@ -28,7 +28,9 @@ EXPORT fn_LeadIntegrity_Service (STRING8 date_in, STRING part_nbr, STRING filena
 		outputFile := outputFileName;
 
 		//  Reads in the input file created by Melissas process
-		f_inp := DATASET(inputFile, LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout, CSV);
+		f_inp := DATASET(inputFile, LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout, CSV):Independent;
+		
+		OT0 := OUTPUT(count(f_inp),NAMED('CntIN_' + part_nbr));
 
 		//  Does a transform into the layout needed by the LI service call
 		// f_inp := project(input_ds, transform(LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Service_Input,
@@ -512,9 +514,47 @@ EXPORT fn_LeadIntegrity_Service (STRING8 date_in, STRING part_nbr, STRING filena
 		final := Project(finalnolexid, Transform(finalLayout,
 																				 SELF.seq := 0;
 																				 SELF.lexid := (INTEGER)LEFT.accountnumber;
-																				 SELF := LEFT));
+																				 SELF := LEFT)):Independent;
+																				 
+		OT1 := OUTPUT(count(final),NAMED('Cntout_' + part_nbr));																				 
+																				 
+    //DF-24838 - Return Lexid for Records with ReceivedRoxieException: (Failed to get response)
+		f_Keep := final(scorename1 IN ['MSN1106_0']):Independent;
+		
+		OT2 := OUTPUT(count(f_Keep),NAMED('CntKeep_' + part_nbr));
+		
+		f_Missing := Join(f_inp(acctno <> 'acctno'),f_Keep,
+						              trim(left.acctno,all) = trim(right.accountnumber,all),
+						              transform(LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout,
+ 									        self := left),left only):Independent;
+													
+    fout1 := output(f_Missing,named('Missing_' + part_nbr));		
+		OT3 := OUTPUT(count(f_Missing),NAMED('CntMissing_' + part_nbr));													
+		
+		finalLayout FReset(f_Missing l) := TRANSFORM	
+			SELF.seq 					 := 0;
+			SELF.AccountNumber := L.acctno;
+			SELF.lexid 				 := (unsigned6)L.acctno;
+			SELF.did 					 := L.acctno;
+			SELF.score1 			 := '999';
+			SELF.scorename1 	 := 'MSN1106_0';
+			SELF.Reason1 			 := '';
+			SELF.errorcode     := '1406ReceivedRoxieException: (Failed to get response from slave(s)';
+			SELF               := l;
+			SELF               := []; 
+			END;
+		f_Reset := PROJECT(f_Missing,FReset(LEFT)):independent;
+		
+		OT4 := OUTPUT(count(f_Reset),NAMED('CntFixed_' + part_nbr));
+		
+		fout2 := output(f_Reset,named('Display_Fixed_' + part_nbr));
+		
+		fmerge := f_Keep + f_Reset :Independent;
+		
+		OT5 := OUTPUT(count(fmerge),NAMED('CntMerge_' + part_nbr));
+		OT6 := OUTPUT(count(fmerge(scorename1 NOT IN ['MSN1106_0'])),named('VerifyMerge_' + part_nbr));
 
-		LI_Output_File := output(final(accountnumber<>'acctno'),, outputFile, CSV(SEPARATOR('|'), TERMINATOR('\n'), QUOTE('"'), ASCII), overwrite, __COMPRESSED__);
+		LI_Output_File := output(fmerge(accountnumber<>'acctno'),, outputFile, CSV(SEPARATOR('|'), TERMINATOR('\n'), QUOTE('"'), ASCII), overwrite, __COMPRESSED__);
 
 		// Validate Attributes Output
 
@@ -539,7 +579,7 @@ EXPORT fn_LeadIntegrity_Service (STRING8 date_in, STRING part_nbr, STRING filena
 
 		// End of output validation block
 
-		RETURN SEQUENTIAL(LI_Output_File,
+		RETURN SEQUENTIAL(OT0,OT1,OT2,fout1,OT3,OT4,fout2,OT5,OT6,LI_Output_File,
 											IF(COUNT(Validation) > 0, ValidationFailEmail));
 
 END;

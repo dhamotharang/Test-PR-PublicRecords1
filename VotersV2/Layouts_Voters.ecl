@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 
 export Layouts_Voters := MODULE
 
@@ -374,6 +374,7 @@ export Layouts_Voters := MODULE
 	Export Layout_Voters_Common_new := record
 	  Voters_new;
 		VoteHistory_new;
+		unsigned6 rid := 0;
 	end;
 	
 	Export Layout_Voters_base := record
@@ -386,6 +387,7 @@ export Layouts_Voters := MODULE
 		string1    addr_type;
 	end;
 	
+//Added AID Fields	
 	Export Layout_Voters_base_new := record
 		unsigned6  rid;
 		unsigned6  did;
@@ -394,6 +396,8 @@ export Layouts_Voters := MODULE
 		Voters_new;
 		string1    name_type;
 		string1    addr_type;
+	  unsigned8	 raw_aid := 0;
+	  unsigned8	 ace_aid := 0;
 	end;
 	
 	Export Layout_Voters_Autokeys := record

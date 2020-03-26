@@ -1,10 +1,11 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ND Real Estate License raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI, and PL_BASE development.
 //************************************************************************************************************* */	
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 
 EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
+#workunit('name','Yogurt:Prof License MARI - NDS0855 Build ' + pVersion);
 
 	code 								:= 'NDS0855';
 	src_cd							:= code[3..7];
@@ -21,7 +22,7 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 																	);
 
 	//ND input files
-	re									:= Prof_License_Mari.files_NDS0855.RE(Prof_License_Mari.mod_clean_name_addr.TrimUpper(ORG_NAME) NOT IN ['','NAME'] AND
+	re									:= Prof_License_Mari.files_NDS0855.RE(ut.CleanSpacesAndUpper(ORG_NAME) NOT IN ['','NAME'] AND
 	                                                          LICSTAT<>'');
 	oRe									:= OUTPUT(re);
 
@@ -65,7 +66,7 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(ds_ND_clnName,ds_Cln_Record);
 
 	//ND Real Estate layout to Common
-	Prof_License_Mari.layouts.base TransformToCommon(Layout_clean_name L) := TRANSFORM
+	Prof_License_Mari.layout_base_in TransformToCommon(Layout_clean_name L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
@@ -82,12 +83,12 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD					:= 'MD';
 		
-    TrimOrgName           := Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ORG_NAME);
-		TrimOfficeName        := Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.OFFICENAME);
-		TrimFirmName          := Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.fname);
+    TrimOrgName           := ut.CleanSpacesAndUpper(L.ORG_NAME);
+		TrimOfficeName        := ut.CleanSpacesAndUpper(L.OFFICENAME);
+		TrimFirmName          := ut.CleanSpacesAndUpper(L.fname);
 
-		TrimAddress1          := Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ADDRESS1);
-		TrimCityStZip         := Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.CITYSTZIP);
+		TrimAddress1          := ut.CleanSpacesAndUpper(L.ADDRESS1);
+		TrimCityStZip         := ut.CleanSpacesAndUpper(L.CITYSTZIP);
 		
 		//Remove nickname. Parse name using F M. and L, Sx. pattern
 		tmpNick_Name          := IF(REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName),REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName,2,NOCASE),Prof_License_Mari.fGetNickname(TrimOrgName,'nick'));		
@@ -165,7 +166,7 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1			:= TRIM(ClnAddress[115..116],LEFT,RIGHT);
 		SELF.ADDR_ZIP5_1		  := TRIM(ClnAddress[117..121],LEFT,RIGHT);
 		SELF.ADDR_ZIP4_1		  := TRIM(ClnAddress[122..125],LEFT,RIGHT);
-		SELF.ADDR_CNTY_1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.COUNTY);
+		SELF.ADDR_CNTY_1			:= ut.CleanSpacesAndUpper(L.COUNTY);
 		
 		//Clean Phone #
 		SELF.PHN_PHONE_1			:= ut.CleanPhone(L.PHONE);
@@ -192,8 +193,8 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 		tmpCmcSlpk						:= SELF.std_license_type
 													 + SELF.std_source_upd
 												   + SELF.NAME_ORG_ORIG
-												   + Prof_License_Mari.mod_clean_name_addr.TrimUpper(TrimAddress1)
-													 + Prof_License_Mari.mod_clean_name_addr.TrimUpper(TrimCityStZip);
+												   + ut.CleanSpacesAndUpper(TrimAddress1)
+													 + ut.CleanSpacesAndUpper(TrimCityStZip);
 
  		tmpCmcSlpk_1					:= REGEXREPLACE(x'00',tmpCmcSlpk,'');
    	tmpCmcSlpk_2					:= REGEXREPLACE(x'0a',tmpCmcSlpk_1,'');
@@ -209,7 +210,7 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ds_Cln_Record, TransformToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -219,7 +220,7 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 		
 	// look up standard license status 
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;

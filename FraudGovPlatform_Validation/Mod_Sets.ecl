@@ -8,53 +8,38 @@ EXPORT validTerminators := '~<EOL>~';
 EXPORT validDelimiterDeltabase := '|\t|';
 EXPORT validTerminatorsDeltabase := '|\n';
 
-EXPORT IdentityData_numberOfColumns := 58;
-EXPORT KnownFraud_numberOfColumns	:= 117;
-EXPORT SafeList_numberOfColumns	:= 117;
+EXPORT IdentityData_numberOfColumns := 51;
+EXPORT KnownFraud_numberOfColumns	:= 111;
+EXPORT SafeList_numberOfColumns	:= 111;
 EXPORT Deltabase_numberOfColumns	:=56;
 EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
-															'Customer_Name'
-															,'Customer_Account_Number'
-															,'Customer_State'
-															,'Customer_County'
-															,'Customer_Agency'
-															,'Customer_Agency_Vertical_Type'
-															,'Customer_Program'
-															,'Customer_Job_ID'
-															,'Batch_Record_ID'
-															,'Reason_for_Transaction_Activity'
-															,'Date_of_Transaction'
-															,'First_name'
-															,'Last_Name'
-														];
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
+		,'field5'
+	];
 EXPORT CriticalFieldError_KnownFraud	:= [
-															'Customer_Name'
-															,'Customer_Account_Number'
-															,'Customer_Job_ID'
-															,'Customer_State'														
-															,'Customer_County'
-															,'Customer_Agency'
-															,'Customer_Agency_Vertical_Type'
-															,'Customer_Job_ID'
-															,'customer_event_id'
-															,'reported_date'
-															,'reported_time'
-															,'reported_by'
-														];	
-														
-EXPORT CriticalFieldError_Deltabase	:= [
-															'Customer_Account_Number'
-															,'Customer_program'								
-															,'reported_date'
-														];			
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
+	];	
 
-EXPORT CriticalFieldError_SafeList		:= [
-															'Customer_Account_Number'
-															,'Customer_program'								
-															,'reported_date'
-														];			
+EXPORT CriticalFieldError_Deltabase	:= [
+		 'field1'
+		,'field2'
+		,'field3'
+	];			
+
+EXPORT CriticalFieldError_SafeList := [
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
+	];			
 EXPORT Agency_Vertical_Type 
 		:= 
 			[

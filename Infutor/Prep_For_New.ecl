@@ -1,72 +1,16 @@
 ﻿import infutor;
 
-EXPORT Prep_For_New := Function
+EXPORT Prep_For_New(String9 cversion_dev) := Function
 
-STRING pversion := trim(Infutor._config.get_pversion,all);
-STRING cversion := trim(Infutor._config.get_cversion_dev,all);
+STRING cversion := trim(cversion_dev,left,right);
 
 step1 := sequential(
  fileservices.startsuperfiletransaction(),
- fileservices.clearsuperfile(infutor.filename_infutor),
+ fileservices.clearsuperfile(infutor.filename_infutor,true),
  fileservices.finishsuperfiletransaction()
 	                 ) : success(output('superfile emptied - success')), failure(output('superfile emptied - failure'));
 
-step2 := parallel(
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ak'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::al'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ar'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::az'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ca'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::co'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ct'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::dc'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::de'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::fl'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ga'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::hi'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ia'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::id'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::il'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::in'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ks'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ky'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::la'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ma'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::md'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::me'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::mi'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::mn'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::mo'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ms'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::mt'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nc'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nd'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ne'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nh'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nj'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nm'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::nv'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ny'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::oh'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ok'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::or'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::pa'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::pr'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ri'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::sc'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::sd'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::tn'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::tx'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::ut'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::va'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::vt'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::wa'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::wi'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::wv'),
- fileservices.deletelogicalfile('~thor_dell400::in::infutor::'+pversion+'::wy')
-) : success(output('old files deleted - success')), failure(output('old files deleted - failure'));
-
-step3 := sequential(
+step2 := sequential(
  fileservices.addsuperfile(infutor.filename_infutor,'~thor_dell400::in::infutor::'+cversion+'::ak'),
  fileservices.addsuperfile(infutor.filename_infutor,'~thor_dell400::in::infutor::'+cversion+'::al'),
  fileservices.addsuperfile(infutor.filename_infutor,'~thor_dell400::in::infutor::'+cversion+'::ar'),
@@ -121,7 +65,7 @@ step3 := sequential(
  fileservices.addsuperfile(infutor.filename_infutor,'~thor_dell400::in::infutor::'+cversion+'::wy')
 ) : success(output('new files added - success')), failure(output('new files added - failure'));
 
-return sequential(step1,step2,step3);
+return sequential(step1,step2);
 
  
  END;

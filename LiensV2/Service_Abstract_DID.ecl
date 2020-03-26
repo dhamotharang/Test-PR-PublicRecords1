@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////
 // Attribute 	: Service_Abstract_DID
 
 // DEPENDENT ON : liensV2.Mapping_Service_Abstract_party,
@@ -132,6 +132,7 @@ rec_temp tappendSSN(liensv2.layout_liens_party_BIPV2 L) := transform
 self := L;
 self.temp_did := (unsigned6)L.did;
 self.temp_bdid := (unsigned6)L.bdid;
+self := [];
 end;
 
 file_party_SSN_temp := project(proj_tbdid,tappendSSN(left)); 

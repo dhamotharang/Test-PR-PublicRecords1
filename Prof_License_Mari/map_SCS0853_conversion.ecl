@@ -36,7 +36,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	                                        NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
 	
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base			xformToCommon(GoodNameRec pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in			xformToCommon(GoodNameRec pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
@@ -266,7 +266,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(GoodNameRec,xformToCommon(LEFT));
 
 // Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := IF(L.STD_LICENSE_STATUS = '',R.DM_VALUE1, L.STD_LICENSE_STATUS);
 		SELF := L;
 	END;
@@ -277,7 +277,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 								trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 								
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := IF(L.STD_PROF_CD = '' AND L.STD_LICENSE_TYPE = 'ICRM','APR',
 															StringLib.stringtouppercase(TRIM(R.DM_VALUE1)));
 		SELF := L;

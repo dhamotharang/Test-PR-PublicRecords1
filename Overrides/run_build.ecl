@@ -61,6 +61,8 @@ EXPORT run_build(string infiledate
 											(
 													build_keys
 													,move_keys
+													//DF-22458 Show non-blank/no-zero record counts of deprecated fields in override keys
+													,overrides.Verify_Deprecated_Keys
 													,dops_update
 													,orbit_update
 													,if (~isprte

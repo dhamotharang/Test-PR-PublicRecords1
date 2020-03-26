@@ -1,4 +1,4 @@
-import property,ut,RoxieKeyBuild,Risk_Indicators,VersionControl,promotesupers;
+﻿import property,ut,RoxieKeyBuild,Risk_Indicators,VersionControl,promotesupers;
 
 export proc_build_forclosure_key(string filedate) := 
 function
@@ -10,6 +10,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(property.Key_Foreclosure_DID,'~thor_d
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(property.Key_Foreclosures_BDID,'~thor_data400::key::foreclosure_bdid','~thor_data400::key::foreclosure::'+filedate+'::bdid',do3);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(property.Key_Foreclosures_Addr,'~thor_data400::key::foreclosure_address','~thor_data400::key::foreclosure::'+filedate+'::address',do4);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(property.Key_Foreclosures_FID_Linkids,'~thor_data400::key::foreclosure_fid::linkids','~thor_data400::key::foreclosure::'+filedate+'::fid::linkids',do9);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(property.Key_Foreclosure_ParcelNum,'~thor_data400::key::foreclosure_parcelNum','~thor_data400::key::foreclosure::'+filedate+'::parcelNum',do10);
 
 // Bug# 48040
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(risk_indicators.Key_FI_Module.Key_FI_Geo11,'~thor_data400::key::foreclosure::@version@::index_geo11','~thor_data400::key::foreclosure::'+filedate+'::index_geo11',do5);
@@ -25,6 +26,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosures_did','~t
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosure_bdid','~thor_data400::key::foreclosure::'+filedate+'::bdid',do23);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosure_address','~thor_data400::key::foreclosure::'+filedate+'::address',do24);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosure_fid::linkids','~thor_data400::key::foreclosure::'+filedate+'::fid::linkids',do29);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosure_parcelNum','~thor_data400::key::foreclosure::'+filedate+'::parcelNum',do30);
 
 // Bug# 48040
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::foreclosure::@version@::index_geo11','~thor_data400::key::foreclosure::'+filedate+'::index_geo11',do25);
@@ -40,6 +42,7 @@ promotesupers.Mac_SK_Move_v2('~thor_data400::key::foreclosures_did','Q',do32,2);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::foreclosure_bdid','Q',do33,2);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::foreclosure_address','Q',do34,2);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::foreclosure_fid::linkids','Q',do39,2);
+promotesupers.Mac_SK_Move_v2('~thor_data400::key::foreclosure_parcelNum','Q',do40,2);
 // Bug# 48040
 RoxieKeyBuild.MAC_SK_Move_V2('~thor_data400::key::foreclosure::@version@::index_geo11','Q',do35,2);
 RoxieKeyBuild.MAC_SK_Move_V2('~thor_data400::key::foreclosure::@version@::index_geo12','Q',do36,2);
@@ -74,7 +77,8 @@ bldsucc := fileservices.sendemail(Property.Roxie_Email_List,
 								'			 19) thor_data400::key::foreclosure_address_qa(thor_data400::key::foreclosure::'+filedate+'::address)\n' +
 								'			 20) thor_data400::key::foreclosure_bdid_qa(thor_data400::key::foreclosure::'+filedate+'::bdid)\n'+
 								'			 21) thor_data400::key::foreclosure_fid_qa(thor_data400::key::foreclosure::'+filedate+'::fid)\n' +								
-								'			 22) thor_data400::key::foreclosure_fid::linkids_qa(thor_data400::key::foreclosure::'+filedate+'::fid::linkids)\n' +	
+								'			 22) thor_data400::key::foreclosure_fid::linkids_qa(thor_data400::key::foreclosure::'+filedate+'::fid::linkids)\n' +
+								'			 23) thor_data400::key::foreclosures_parcelNum_qa(thor_data400::key::foreclosure::'+filedate+'::parcelNum)\n' +
 								'have been built and ready to be deployed to QA.');
 
 bldfail := fileservices.sendemail('kgummadi@seisint.com;vniemela@seisint.com',
@@ -85,9 +89,9 @@ bldfail := fileservices.sendemail('kgummadi@seisint.com;vniemela@seisint.com',
 ak := Property.Proc_Build_Autokeys(filedate);
 
 buildkey := sequential(
-					parallel(do1,do2,do3,do4,do5,do6,do7,do8,do9),
-					parallel(do21,do22,do23,do24,do25,do26,do27,do28,do29),
-					parallel(do31,do32,do33,do34,do35,do36,do37,do38,do39),
+					parallel(do1,do2,do3,do4,do5,do6,do7,do8,do9,do10),
+					parallel(do21,do22,do23,do24,do25,do26,do27,do28,do29,do30),
+					parallel(do31,do32,do33,do34,do35,do36,do37,do38,do39,do40),
 					ak) : 
 			success(bldsucc),
 			failure(bldfail);

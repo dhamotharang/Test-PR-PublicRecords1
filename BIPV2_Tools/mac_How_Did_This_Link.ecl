@@ -1,4 +1,4 @@
-/*
+﻿/*
   Run this on HTHOR if you use the keys passed in or you pass in other keys.  if you pass in a file(s), run it on thor.
   it should run on hthor very quickly, like in 4 minutes or so.
 
@@ -13,6 +13,22 @@ Examples:
 BIPV2_Tools.mac_How_Did_This_Link(87324387,'LIBERTY BAY CREDIT UNION' ,'SMITH & BRINK'                        );
 BIPV2_Tools.mac_How_Did_This_Link(29825   ,'BRITLEY'                  ,'(7[- ]11|7[- ]ELEVEN|seven[- ]eleven)');
 
+my_id       := 2301108            ;
+my_id_type  := 'seleid'           ;
+regexname1  := 'ASCHER CHARITABLE';
+regexname2  := 'BARBARA J SMELEK' ;
+keyversion  := 'built'            ;
+
+BIPV2_Tools.mac_How_Did_This_Link(
+   my_id 
+  ,regexname1 
+  ,regexname2                        
+  ,pID_Type             := #EXPAND(my_id_type)
+  ,pLinkids_key         := BIPV2_Build.BIPV2FullKeys_Package(keyversion).linkids.logical
+  ,pLinkids_key_hidden  := BIPV2_Build.BIPV2FullKeys_Package(keyversion).linkids_hidden.logical
+  ,pKeyproxidUp         := BIPV2_Build.BIPV2FullKeys_Package(keyversion).Xlinksup_proxid.logical
+  ,pKeyseleidUp         := BIPV2_Build.BIPV2FullKeys_Package(keyversion).Xlinksup_seleid.logical
+);
 */
 EXPORT mac_How_Did_This_Link(
 
@@ -44,6 +60,19 @@ functionmacro
                           
   ds_filtered := ds_filtered_prep : independent;
   
+  key_cnp_name_words := BIPV2_proxid.specificities(BIPV2_proxid.In_DOT_Base).cnp_name_values_index;
+  ds_get_bow_field := join(dataset([{trim(pCnp_Name1_regex)},{trim(pCnp_Name2_regex)}],{string cnp_name})  ,key_cnp_name_words, left.cnp_name = right.cnp_name ,transform({string bow_field,real field_specificity,integer4 bow_spec,recordof(left)}
+    ,self.bow_field         := (unsigned)(right.field_specificity * 100) +' '+ trim(right.word)
+    ,self.field_specificity := right.field_specificity
+    ,self.bow_spec          := (integer4)(right.field_specificity * 100)
+    ,self                   := left
+  ),hash,keyed);
+  
+  bow_field1 := ds_get_bow_field(trim(cnp_name) = trim(pCnp_Name1_regex))[1].bow_field;
+  bow_field2 := ds_get_bow_field(trim(cnp_name) = trim(pCnp_Name2_regex))[1].bow_field;
+  
+  get_BOW_Score := SALT311.MatchBagOfWords(bow_field1,bow_field2,46614,1);
+
   ds_agg_ultid            := BIPV2_Tools.AggregateProxidElements(ds_filtered,ultid ,pLimitChildDatasets);
   ds_agg_orgid            := BIPV2_Tools.AggregateProxidElements(ds_filtered,orgid ,pLimitChildDatasets);
   ds_agg_seleid           := BIPV2_Tools.AggregateProxidElements(ds_filtered,seleid,pLimitChildDatasets);
@@ -202,7 +231,10 @@ functionmacro
     ,output(#TEXT(pID_Type)   ,named('ID_Type'  ))
     ,output(pCnp_Name1_regex  ,named('Cnp_Name1'))
     ,output(pCnp_Name2_regex  ,named('Cnp_Name2'))
-    
+    ,output(ds_get_bow_field  ,named('ds_get_bow_field'))
+    ,output(bow_field1        ,named('bow_field1'))
+    ,output(bow_field2        ,named('bow_field2'))
+    ,output(get_BOW_Score     ,named('get_BOW_Score'))
     ,output('----------------------------------------',named('____________________'))
     ,if(exists(ds_agg_dotid_filtered            ) ,output(ds_agg_dotid_filtered             ,named('overlinked_dotids'            ),all))
     ,if(exists(ds_agg_proxid_filtered           ) ,output(ds_agg_proxid_filtered            ,named('overlinked_proxids'           ),all))

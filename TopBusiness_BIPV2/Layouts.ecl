@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -9,7 +9,8 @@ EXPORT Layouts := MODULE
   end;
 
  shared rec_industry_section_fields := record
-   string4 siccode; 
+   string8 siccode; 
+   string4 siccode_plus := ''; 
    string6 naics; 
    string350 industry_description;
    string1502 business_description;
@@ -122,6 +123,8 @@ EXPORT Layouts := MODULE
 	BIPV2.IDlayouts.l_key_ids;
   rec_industry_combined_layout - BIPV2.IDlayouts.l_key_ids industry_fields;
 	BIPV2.Layout_Business_Linking_Full contacts_fields;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
  end;
 
 END;

@@ -1,4 +1,4 @@
-import ut, doxie;
+﻿import ut, doxie, data_services;
 
 baseCID := distribute(InfutorCID.File_InfutorCID_Base(did > 0 or did_instantID > 0), hash(did));
 
@@ -34,6 +34,11 @@ slim_layout := RECORD
 	/* Standard Additional Base Fields */
 	unsigned6 dt_first_seen:=0;
 	unsigned6 dt_last_seen:=0;
+	
+	//CCPA-9 Add CCPA fields
+	unsigned4 global_sid:=0;
+	unsigned8 record_sid:=0;
+
 end;
 
 // remove all seemingly unnecessary fields
@@ -43,4 +48,4 @@ slim_layout into_slim(baseCID le) := transform
 end;
 p := dedup(sort(project(baseCID, into_slim(left)), record, except persistent_record_id, local), record, except persistent_record_id, local);
 
-export Key_Infutor_DID_FCRA := index(p,{did},{p},'~thor_data400::key::infutorcid::fcra::did_' + doxie.Version_SuperKey);
+export Key_Infutor_DID_FCRA := index(p,{did},{p},data_services.data_location.prefix() + 'thor_data400::key::infutorcid::fcra::did_' + doxie.Version_SuperKey);

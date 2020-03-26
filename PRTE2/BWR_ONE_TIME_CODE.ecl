@@ -12,8 +12,10 @@ END;
 EXPORT DO := FUNCTION
 
 MakeSuperFiles ('~PRTE::BASE::lnpr::relate@version@');
+MakeSuperFiles ('~PRTE::BASE::lnpr::dba@version@');
 
 FileServices.CreateSuperFile ('~PRTE::IN::lnpr::relate');
+FileServices.CreateSuperFile ('~PRTE::IN::lnpr::dba');
 
 RETURN 'SUCCESS';
 

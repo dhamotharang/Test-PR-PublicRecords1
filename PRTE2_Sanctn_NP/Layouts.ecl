@@ -1,4 +1,4 @@
-﻿import prte2_sanctn_np, prte_csv, bipv2, sanctn_mari, standard,aid;
+﻿import prte2_sanctn_np, prte_csv, bipv2, sanctn_mari, standard,aid, prte2;
 
 EXPORT Layouts := module
 //Raw Layouts		
@@ -306,6 +306,9 @@ end;
 		SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_srch;
 		string26 midex_rpt_nbr;
 		BIPV2.IDlayouts.l_xlink_ids;
+		STRING8 date_vendor_first_reported;
+		STRING8 date_vendor_last_reported;
+		prte2.Layouts.DEFLT_CPA;
 	end;
 
 
@@ -362,6 +365,10 @@ export autokeys := record
 		STRING1		DBCODE;
 		unsigned1 zero := 0;
 		string1   blank:='';
+		STRING8 date_vendor_first_reported;
+		STRING8 date_vendor_last_reported;
+		prte2.Layouts.DEFLT_CPA;
+		
 end;
 
 	export autokeys2 := record
@@ -373,8 +380,36 @@ end;
 		string5  	name_suffix;
 		string3  	name_score;
 		string100 cname;
+		string8 	date_vendor_first_reported :='';
+		string8 	date_vendor_last_reported :='';
+		unsigned4 global_sid :=0;
+		unsigned8 record_sid :=0;
 end;
 	
+//Party Key
+	export Party_LinkId_Key := record
+			party_base AND NOT 
+			[LINK_DOB,
+		  LINK_SSN,
+	  	LINK_FEIN,
+		  LINK_INC_DATE,
+			CUST_NAME,
+		  BUG_NUM,
+		  REQ,
+			enh_did_src
+			]
+	end;
+
+	export Incident_linkid_key 	:= record
+	incident_base AND NOT
+	[CUST_NAME,
+	 BUG_NUM,
+	 LINK_DOB,
+	 LINK_SSN,
+	 LINK_FEIN,
+	 LINK_INC_DATE
+	 ];
+	end; 
 	
 	
 end;

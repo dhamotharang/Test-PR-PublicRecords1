@@ -1,4 +1,4 @@
-MODULE:Scrubs_Prof_License
+﻿MODULE:Scrubs_Prof_License
 OPTIONS:-gh
 FILENAME:Prof_License
 NAMESCOPE:Base
@@ -83,7 +83,7 @@ FIELD:sex:TYPE(STRING8):LIKE(invalid_sex):0,0
 // has 6 and 8... for dob, not sure 6 should be valid?
 FIELD:dob:TYPE(STRING8):LIKE(invalid_0468pastdate):0,0
 // shows 4, 6, and 8 digit dates in there
-FIELD:issue_date:TYPE(STRING8):LIKE(invalid_0468pastdate):0,0
+FIELD:issue_date:TYPE(STRING8):LIKE(invalid_0468date):0,0
 // got 4, 6, and 8 digits
 FIELD:expiration_date:TYPE(STRING8):LIKE(invalid_0468date):0,0
 // only 8

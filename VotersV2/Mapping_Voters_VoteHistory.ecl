@@ -5,6 +5,7 @@ import VotersV2;
 
 In_File    := VotersV2.Updated_Voters;
 VoteHistoryBase_File  := VotersV2.File_Voters_VoteHistory_base;
+MA_CensusHistoryBase_File  := VotersV2.File_MA_Census_History;
 
 Layout_History := record
    In_File.process_date;
@@ -102,6 +103,7 @@ end;
 vote_hist := project(rollup_vote_hist, trfVoteHist(left));
 
 //Barb O'Neill modified for DOPS-461.
-allVoteHistory := vote_hist + voteHistoryBase_File;
+//DF-26929 added for maintaining MA_Census History Base 
+allVoteHistory := vote_hist + voteHistoryBase_File + MA_CensusHistoryBase_File;
 
 export Mapping_Voters_VoteHistory := allVoteHistory : persist(VotersV2.Cluster + 'persist::Voters_VoteHistory_Base');

@@ -37,7 +37,15 @@ EXPORT Functions := MODULE
     RETURN IF(IF(size = 0, LENGTH(TRIM(alphanum, ALL)) > 0, LENGTH(TRIM(alphanum, ALL)) = size) AND
               Stringlib.StringFilterOut(alphanum, ' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') = '',1,0);
   END;	
-
+		
+  //****************************************************************************
+  //fn_alpha: 	returns true if only populated with letters
+  //****************************************************************************
+  EXPORT fn_alpha(STRING alpha, UNSIGNED1 size = 0) := FUNCTION
+    RETURN IF(IF(size = 0, LENGTH(TRIM(alpha, ALL)) > 0, LENGTH(TRIM(alpha, ALL)) >= size) AND
+              Stringlib.StringFilterOut(alpha, ' ABCDEFGHIJKLMNOPQRSTUVWXYZ\'-') = '',1,0);
+  END;	
+	
   //****************************************************************************
   //fn_addr_rec_type: 	returns true or false based upon the incoming
   //										code.

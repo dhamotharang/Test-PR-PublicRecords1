@@ -1,6 +1,7 @@
-﻿IMPORT american_student_list, RiskWise, ut, mdr, risk_indicators;
+﻿IMPORT _Control, american_student_list, RiskWise, ut, mdr, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getStudent(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor ) := FUNCTION
+EXPORT getStudent(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 ProfileBooster.Layouts.Layout_PB_Slim_student	addStudent(PBslim le, american_student_list.key_DID ri) := transform
 		self.student_date_first_seen	:= ri.date_first_seen;
@@ -28,8 +29,12 @@ students_thor := join(
 		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing), // can't use this source in marketing products
 		addStudent(left,right), left outer, local);
 			
-students := if(onthor, students_thor, students_roxie);
-			
+#IF(onThor)
+	students := students_thor;
+#ELSE
+	students := students_roxie;
+#END
+
 dedupStudent := dedup(sort(students, seq, DID2, -student_date_last_seen, -student_date_first_seen,src),seq, DID2);
 										
 // output(students, named('students'));

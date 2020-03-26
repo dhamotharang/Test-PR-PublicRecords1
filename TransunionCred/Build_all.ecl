@@ -1,14 +1,16 @@
 ﻿import VersionControl,lib_stringlib,lib_fileservices,_control,Orbit3,STD,PromoteSupers;
-export Build_all(string ver) := function
+export Build_all(string ver, boolean IsFullUpdate = false) := function
 
 //-----------Spray input and delete files
-#IF (IsFullUpdate = false)
-spray_it := VersionControl.fSprayInputFiles(Spray(ver).Updates);
-consolidate_them := TransunionCred.fn_consolidate_inputs.Updates;
-#ELSE
-spray_it := VersionControl.fSprayInputFiles(Spray(ver).Load);
-consolidate_them := TransunionCred.fn_consolidate_inputs.Load;
-#END
+
+spray_it_delta := VersionControl.fSprayInputFiles(Spray(ver).Updates);
+consolidate_them_delta := TransunionCred.fn_consolidate_inputs.Updates;
+
+spray_it_full := VersionControl.fSprayInputFiles(Spray(ver).Load);
+consolidate_them_full := TransunionCred.fn_consolidate_inputs.Load;
+
+spray_it         := if(IsFullUpdate, spray_it_full, spray_it_delta);
+consolidate_them := if(IsFullUpdate, consolidate_them_full, consolidate_them_delta);
 
 deletefilename := 'DPART1';
 
@@ -32,14 +34,15 @@ delete_deletes := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) =
 												,output('no_delete_this_time')
 ,FileServices.ClearSuperFile(Superfile_List.deletes));
 
-PromoteSupers.Mac_SF_BuildProcess(TransunionCred.Build_base(ver).all,Superfile_List.Base, TransunionCred,2,,true);
+PromoteSupers.Mac_SF_BuildProcess(TransunionCred.Build_base(ver, IsFullUpdate).all,Superfile_List.Base, TransunionCred,2,,true);
 
 zDoPopulationStats := Strata(ver);
 
 built := sequential(
 					spray_it,
-		      consolidate_them,
-#IF (IsFullUpdate = false)
+		            consolidate_them,
+if(IsFullUpdate = false
+   ,sequential(
 					spray_deletes,
 					TransunionCred
 					//Archive processed files in history
@@ -51,13 +54,15 @@ built := sequential(
 					,FileServices.AddSuperFile(Superfile_List.updates_father,Superfile_List.updates,,true)
 					,FileServices.ClearSuperFile(Superfile_List.updates)
 					,FileServices.FinishSuperFileTransaction()
-#ELSE
-					,TransunionCred
+               )
+   ,sequential(
+					 TransunionCred
 				    ,FileServices.StartSuperFileTransaction()
 					,FileServices.AddSuperFile(Superfile_List.load_father,Superfile_List.load,,true)
 					,FileServices.ClearSuperFile(Superfile_List.load)
 					,FileServices.FinishSuperFileTransaction()
-#END
+               )
+   )
 					,zDoPopulationStats
 					);
 

@@ -8,5 +8,5 @@ string40	AKAMiddleName;
 string15	AKASuffix;
 string8	AKADOB;
 string100	SourceName;
-string20	SourceId;
+string100	SourceId;
 end;

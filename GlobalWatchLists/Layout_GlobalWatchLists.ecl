@@ -1,4 +1,4 @@
-export Layout_GlobalWatchLists := 
+﻿export Layout_GlobalWatchLists := 
 RECORD
 	STRING20 pty_key;
 	STRING60 source;
@@ -432,4 +432,8 @@ RECORD
     STRING1 registrant_terminated_flag;
     STRING1 foreign_principal_terminated_flag;
     STRING1 short_form_terminated_flag;
+		//Added for CCPA-94
+		UNSIGNED4 global_sid;
+		UNSIGNED8 record_sid;
+		UNSIGNED6 did;
 END;

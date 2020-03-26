@@ -1,8 +1,11 @@
-
+﻿
 EXPORT Constants := module
 
-		EXPORT in_prefix_name           := '~prte::in::utility_file';
-    EXPORT base_prefix_name         := '~prte::base::utility_file';
+		EXPORT in_prefix_name           := '~prte::in::utility::utilitydaily';
+   
+	  Export in_Ins                   := '~prte::in::utility::utilitydailyins';
+	  EXPORT base_prefix_name         := '~prte::base::utility_file';
+		Export dops_name                := 'UtilityDailyKeys';
 	
 		
 		//roxie keys

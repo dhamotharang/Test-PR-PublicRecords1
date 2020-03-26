@@ -1,4 +1,5 @@
-﻿EXPORT Layouts :=
+﻿import workman;
+EXPORT Layouts :=
 module
 
 /*
@@ -20,7 +21,9 @@ module
 //    ,string notify_event
   };
 */
-	export wks_slim :=
+  export lay_results := Workman.layouts.lay_results;
+	export wks_slim := Workman.layouts.wks_slim;
+	export wks_slim_old :=
 	record
 		string               name                                                                        {xpath('name')};
 		string               wuid                                                                        {xpath('wuid')};
@@ -37,10 +40,11 @@ module
 		real8                subtotal_time_secs                                                          {xpath('subtotal_time_secs')}  := 0.0;
 		string               time_finished                                                               {xpath('time_finished')}       := '' ;
 		string               Errors                                                                      {xpath('errors')}              := '' ;
-    // string               __filename                                                                  { virtual(logicalfilename)};
+    string               __filename                                                                  { virtual(logicalfilename)};
 	end;
 
-	export wks_slim_filename :=
+	export wks_slim_filename := Workman.layouts.wks_slim_filename;
+	export wks_slim_filename_old :=
 	record
 		string               name                                                                        {xpath('name')};
 		string               wuid                                                                        {xpath('wuid')};

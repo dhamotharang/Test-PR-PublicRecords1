@@ -35,7 +35,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 	O_ValidMOFile	:= OUTPUT(ValidMOFile);																
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(6800)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -213,7 +213,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG					:= IF(SELF.TYPE_CD = 'GR',
 		                            StringLib.StringCleanSpaces(StripOrgName),
 																TRIM(SELF.NAME_LAST) + ' ' + TRIM(SELF.NAME_FIRST));
-		SELF.NAME_ORG_SUFX 		:= IF(SELF.TYPE_CD = 'GR',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, '')),'');
+		SELF.NAME_ORG_SUFX 		:= IF(SELF.TYPE_CD = 'GR',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, '')),'');
 
 		//Mari name fields
 		SELF.NAME_ORG_ORIG		:= IF(SELF.NAME_ORG<>'',TrimNameOrg,'');
@@ -397,7 +397,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 														+TrimLicType
 														+TRIM(src_cd,LEFT,RIGHT)
 														+TrimNameOrg
-														+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdNAME_DBA)
+														+ut.CleanSpacesAndUpper(StdNAME_DBA)
 														+TrimAddress1
 														+TrimCity
 														+TrimState
@@ -450,7 +450,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		//Fix some irregular syntax
 		tmpDBA							:= TRIM(REGEXREPLACE('AND D B A',L.TMP_DBA,''),LEFT,RIGHT);
 		tmpDBA1							:= REGEXREPLACE(' AND$',tmpDBA,'');
@@ -462,7 +462,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);
 		SELF.NAME_DBA				:= IF(TRIM(ClnDBA) != TRIM(L.NAME_ORG), ClnDBA,'');
 		SELF.DBA_FLAG       := IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',1,0); // 1: true  0: false
-		SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
+		SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
 		SELF.NAME_MARI_DBA	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(StdNAME_DBA,LEFT,RIGHT),'');  
 		SELF := L;
 	END;
@@ -473,7 +473,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;

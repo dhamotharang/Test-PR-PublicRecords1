@@ -1,4 +1,4 @@
-import ut,BusReg;
+﻿import ut,BusReg;
 	
 B := fbnv2.File_BUSREG_Company_in(br_id>0);
 Bd := dedup(sort(distribute(B,hash(br_id)),br_id,local),br_id,local);

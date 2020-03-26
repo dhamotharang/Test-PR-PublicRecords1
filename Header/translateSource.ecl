@@ -1,2 +1,3 @@
-import mdr;
-export translateSource(string2 src) := mdr.sourceTools.translateSource(src);
+IMPORT dx_Header;
+
+EXPORT translateSource(string2 src) := dx_Header.functions.translateSource(src);

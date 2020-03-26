@@ -225,16 +225,13 @@ Export SD	:= Module
 	
 	Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 	Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-	Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+	Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_SD Report' //subject
 																																 ,'Scrubs CorpMain_SD Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpSDMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray
-																															);
+																																 );
 
 		Main_BadRecords		  := Main_N.ExpandedInFile(  dt_vendor_first_reported_Invalid					<> 0 or
 																									 dt_vendor_last_reported_Invalid					<> 0 or
@@ -357,15 +354,13 @@ Export SD	:= Module
 	
 	Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 	Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-	Event_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+	Event_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_SD Report' //Subject
 																																 ,'Scrubs CorpEvent_SD Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpSDEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
  Event_BadRecords		  := event_N.ExpandedInFile(corp_key_Invalid 							  <> 0 or
 																								corp_vendor_Invalid 					  <> 0 or

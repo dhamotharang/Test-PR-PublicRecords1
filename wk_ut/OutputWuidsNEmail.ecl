@@ -1,4 +1,4 @@
-import _control,tools,ut;
+﻿import _control,tools,ut;
 
 EXPORT OutputWuidsNEmail(
 
@@ -18,14 +18,15 @@ function
   thor_time_secs  := wk_ut.Convert2Seconds(thor_time1);
   jobname1        := wk_ut.get_Jobname(pWuid,pEsp);   
   Errors          := wk_ut.get_Errors(pWuid,pEsp);
-
+  owner           := wk_ut.get_Owner(pWuid,pEsp);
+  
   // -- get total time for existing wuids to calculate the running total.
   thiswuid            := if(wk_ut.get_Scalar_Result(workunit       ,'Workunits') != '',wk_ut.get_DS_Result(workunit        ,'Workunits',wk_ut.layouts.wks_slim),dataset([],wk_ut.layouts.wks_slim));
   Run_Total_Time_secs := sum(thiswuid(not regexfind('^.*?total$',trim(name),nocase)),Total_Time_secs) + thor_time_secs;
   Run_Total_Thor_Time := wk_ut.ConvertSecs2ReadableTime((real8)Run_Total_Time_secs);
   
   //name, wuid, iteration#, version, thor time, etc
-  dWUDetails1 := dataset([{jobname1 ,pWuid ,pEsp,wk_ut._Constants.Esp2Name(pesp),getstate1 ,piteration ,pversion ,thor_time1,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0,'',Errors}] ,layouts.wks_slim);
+  dWUDetails1 := dataset([{jobname1 ,'',pWuid ,owner,pEsp,wk_ut._Constants.Esp2Name(pesp),getstate1 ,piteration ,pversion ,thor_time1,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0,'',Errors}] ,layouts.wks_slim);
   jobname2 := if(jobname1 != '' ,jobname1 ,pWuid);
   sendemail1 := wk_ut.Send_Email(
                              pNotifyEmails

@@ -59,7 +59,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,prepFilings	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'San_Diego';
+	source					:= 'SAN_DIEGO';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source); 
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	
@@ -67,6 +67,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)		
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);	
 	

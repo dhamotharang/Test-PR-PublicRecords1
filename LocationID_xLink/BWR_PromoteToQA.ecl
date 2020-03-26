@@ -1,6 +1,0 @@
-﻿FileServices.CreateSuperFile(LocationID_xLink.Key_LocationId_.KeyName_sf);
-FileServices.CreateSuperFile(LocationID_xLink.Key_LocationId_.ValueKeyName_sf);
-FileServices.CreateSuperFile(LocationID_xLink.Process_LocationID_Layouts.KeyName_sf);
-FileServices.CreateSuperFile(LocationID_xLink.Process_LocationID_Layouts.KeyIDHistoryName_sf);
-FileServices.CreateSuperFile(LocationID_xLink.Key_LocationId_STATECITY.KeyName_sf);
-FileServices.CreateSuperFile(LocationID_xLink.Key_LocationId_ZIP.KeyName_sf);

@@ -1,4 +1,4 @@
-import doxie,Data_Services,UT;
+﻿import doxie,Data_Services,UT, MDR, STD, _control;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.Update(bus_intel.industry <> '' and 
 						trim(person_q.IPaddr) <> '' and 
@@ -10,14 +10,17 @@ slim := record
 	df.bus_intel;
 	df.person_q;
 	df.search_info;
+	inquiry_acclogs.layout.ccpaLayout ccpa;
 end;
 
-p := project(df, transform(slim, 
+p_ := project(df, transform(slim, 
 	self.person_q.IPADDR := trim(left.person_q.IPaddr, left,right), 
 	self := left));
+p  := MDR.macGetGlobalSid(p_,'InquiryTracking_Virtual','', 'ccpa.global_sid');
+
 
 export Key_Inquiry_IPaddr_update := INDEX(p, {string20 IPaddr := person_q.IPaddr}, {p},
-				Data_Services.Data_location.Prefix('Inquiry') + 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::IPAddr_update');
+				 Data_Services.Data_location.Prefix('Inquiry') + 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::IPAddr_update');
 						
 						
 						

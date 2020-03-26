@@ -1,4 +1,4 @@
-export		Layout_Watercraft_Main_Base
+﻿export		Layout_Watercraft_Main_Base
  :=
   record
 	string30	watercraft_key;
@@ -99,7 +99,10 @@ export		Layout_Watercraft_Main_Base
 	string1		coastguard_flag;
 	string4     signatory := '' ;
 	unsigned8  persistent_record_id :=0;
-  end
+	//CCPA-206 Add 2 CCPA fields
+	UNSIGNED4	global_sid:=0;
+	UNSIGNED8	record_sid:=0;
+end
  ;
 
 

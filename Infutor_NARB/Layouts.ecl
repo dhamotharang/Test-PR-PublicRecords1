@@ -125,6 +125,13 @@ EXPORT Layouts := MODULE
 		UNSIGNED8											ace_aid														:= 0;
 	  STRING100											prep_address_line1		    			 	:= '';
 	  STRING50											prep_address_line_last		    		:= '';
+		// Added for CCPA (California Consumer Protection Act)
+		UNSIGNED4                     global_sid                        := 0; // Unique source ID from Orbit. The Orbit infrastructure 
+		                                                                      // is not available yet, so leaving unpopulated for now.  
+    UNSIGNED8 										record_sid 												:= 0; // Source specific unique and persistent record id.  
+																																					// Same as persistent record id generated in the SALT 
+																																					// ingest process which for Infutor_NARB is "rcid". 
+																																					// Not required for CCPA, so leaving unpopulated for now.  
   END; //End Base
 	
   		

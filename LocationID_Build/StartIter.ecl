@@ -1,1 +1,0 @@
-﻿EXPORT StartIter := 6;

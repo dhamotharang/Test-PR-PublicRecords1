@@ -1,11 +1,13 @@
-export map_axciomCanBus(string8 abusFileDate) := function
+﻿export map_axciomCanBus(string8 abusFileDate) := function
 
 import CanadianPhones,Address,VersionControl;
 
 dacb := distribute(CanadianPhones.file_axciomCanBus.v2,random());
 
+layoutCanadianWhitepagesBaseWOCCPA := layoutCanadianWhitepagesBase - [global_sid,record_sid];
 
-layoutCanadianWhitepagesBase tacb(dacb input) := transform
+
+layoutCanadianWhitepagesBaseWOCCPA tacb(dacb input) := transform
 self.Date_first_reported:=abusFileDate;
 self.Date_last_reported:=abusFileDate;
 

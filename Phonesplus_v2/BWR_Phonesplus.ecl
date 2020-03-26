@@ -1,20 +1,19 @@
-﻿#workunit('name','Phonesplus v2');
-import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild,infutorcid, phonesplus_v2, ut,buildlogger;
+﻿import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild,infutorcid, phonesplus_v2, ut,buildlogger;
 export BWR_Phonesplus(string pversion,string emailList='', string tversion):=function
 
 e_mail_success := FileServices.sendemail
-('john.freibaum@lexisnexis.com;qualityassurance@seisint.com;Sudhir.Kasavajjala@lexisnexis.com;aherzberg@lexisnexis.com;kevin.reeder@lexisnexis.com','PHONESPLUS/QSENT '+ pversion +' weekly sample available ','at ' + thorlib.WUID());
+('jason.allerdings@lexisnexisrisk.com;qualityassurance@seisint.com;Sudhir.Kasavajjala@lexisnexisrisk.com;aherzberg@lexisnexis.com;kevin.reeder@lexisnexisrisk.com','PHONESPLUS/QSENT '+ pversion +' weekly sample available ','at ' + thorlib.WUID());
 
 e_mail_failure := FileServices.sendemail
-('john.freibaum@lexisnexis.com;Sudhir.Kasavajjala@lexisnexis.com;aherzberg@lexisnexis.com;kevin.reeder@lexisnexis.com','Phonesplus/Qsent Build Failure',failmessage+'at ' + thorlib.WUID());
+('jason.allerdings@lexisnexisrisk.com;Sudhir.Kasavajjala@lexisnexisrisk.com;aherzberg@lexisnexis.com;kevin.reeder@lexisnexisrisk.com','Phonesplus/Qsent Build Failure',failmessage+'at ' + thorlib.WUID());
 
 phonesplus_dops_update  := sequential(
-																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'john.freibaum@lexisneis.com',,'N'),
-																			RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N'));
+																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'jason.allerdings@lexisneisrisk.com',,'N'),
+																			RoxieKeybuild.updateversion('QsentKeys',pversion,'jason.allerdings@lexisnexisrisk.com',,'N'));
 																														
-phonesplus_idops_update := sequential(RoxieKeybuild.updateversion('PhonesPlusKeys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'),
-																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'),
-																			RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'));
+phonesplus_idops_update := sequential(RoxieKeybuild.updateversion('PhonesPlusKeys',pversion,'jason.allerdings@lexisnexisrisk.com',,'N',,,'A'),
+																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'jason.allerdings@lexisnexisrisk.com',,'N',,,'A'),
+																			RoxieKeybuild.updateversion('QsentKeys',pversion,'jason.allerdings@lexisnexisrisk.com',,'N',,,'A'));
 
 addHeaderKeyBuilding 		:= if(fileservices.getsuperfilesubcount('~thor_data400::Base::HeaderKey_Building')>0, 
 															output('Nothing added to thor_data400::Base::HeaderKey_Building'), 
@@ -27,7 +26,7 @@ BuildAll:= sequential
 			 	BuildLogger.BuildStart(false),
 				BuildLogger.PrepStart(false),
 	  		Phonesplus_v2.Spray_Telcordia(tversion);  
-				Phonesplus.spray_NeustarInputFile(pversion),     		
+				Phonesplus.Proc_Build_iConectiv_Ported_Phone_Type_Changes(pversion),
 				addHeaderKeyBuilding,
 				BuildLogger.PrepEnd(false),
 				BuildLogger.BaseStart(false),

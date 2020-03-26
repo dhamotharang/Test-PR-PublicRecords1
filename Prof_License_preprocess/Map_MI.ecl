@@ -43,16 +43,23 @@ dMITradeSF := Sequential(
 											 );
 											 
 											 
-//Health
-
+//Health License
+//#########################################################################################
 getboard( string2 code) := case ( code, '16'  =>    'Audiology                       ',  
 '23'  =>    'Chiropractors                   ',
+'26'  =>    'Athletic Trainer                   ',
 '29'  =>    'Dentistry                       ',
 '32'  =>    'EMS-Personnel                   ',
 '41'  =>    'Marriage and Family Therapy     ',
 '43'  =>    'Medicine                        ',
 '44'  =>    'Respiratory Care                ',
 '47'  =>    'Nursing                         ',
+'48'  =>    'Nursing Home Administrators                         ',
+'49'  =>    'Optometry                        ',
+'51'  =>    'Osteopathic Medicine & Surgery                        ',
+'52'  =>    'Occupational Therapists                        ',
+'53'  =>    'Pharmacy                        ',
+'54'  =>    'Acupuncture                        ',
 '55'  =>    'Physical Therapy                ',
 '56'  =>    'Physicians Assistants           ',
 '59'  =>    'Podiatric Medicine & Surgery    ',
@@ -62,17 +69,14 @@ getboard( string2 code) := case ( code, '16'  =>    'Audiology                  
 '68'  =>    'Social Workers                  ',
 '69'  =>    'Veterinary Medicine             ',
 '71'  =>    'Speech-Language Pathologist     ',
-'48'  =>    'Nursing Home Administrators     ',
-'49'  =>    'Optometry                       ',
-'51'  =>    'Osteopathic Medicine & Surgery  ',
-'52'  =>    'Occupational Therapists         ',
-'53'  =>    'Pharmacy                        ','' );
-
+'75'  =>    'Massage Therapist     '
+,'' );
 
 get_lictype(string code) := case ( code,'1600' =>   'Audioloist                                   ',     
 '1601' =>   'Audiologist-Limited                          ',     
 '2300' =>   'Chiropractor                                 ',     
 '2303' =>   'Chiropractor - Educational Limited           ',     
+'2600' =>   'Athletic Trainer          ',     
 '2900' =>   'Dentist                                      ',     
 '2901' =>   'Dentist - Clinical Academic Limited          ',     
 '2902' =>   'Dentist - Nonclinical Limited                ',     
@@ -116,19 +120,23 @@ get_lictype(string code) := case ( code,'1600' =>   'Audioloist                 
 '4401' =>   'Respiratory Therapist - Temporary            ',     
 '4700' =>   'LPN                                          ',     
 '4701' =>   'LPN - Clinical Academic Limited              ',     
-'4702' =>   'LPN - Nonclinical Academic                   ',     
-'4704' =>   'LPN - Limited                                ',     
-'4710' =>   'RN                                           ',     
+'4702' =>   'LPN - Nonclinical Academic                   ',  
+'4703' =>   'LPN                    ',        
+'4704' =>   'RN                                ',     
+'4706' =>   'LPN - Special Volunteer                                           ',     
 '4711' =>   'RN - Clinical Academic Limited               ',     
 '4712' =>   'RN - NonClinical Academic Limited            ',     
 '4713' =>   'RN - Provisional                             ',     
 '4714' =>   'RN - Limited                                 ',     
 '4715' =>   'RN - Temporary                               ',     
 '4716' =>   'LPN - Special Circumstances                  ',     
-'4717' =>   'RN - Special Circumstances                   ',     
+'4717' =>   'RN - Special Circumstances                   ',  
+'4718' =>   'RN - Special Volunteer                   ',      
 '4720' =>   'Nurse Anesthetist                            ',     
 '4721' =>   'Nurse Midwife                                ',     
-'4722' =>   'Nurse Practitioner                           ',     
+'4723' =>   'Nurse Practitioner  - Special Volunteer                          ',     
+'4769' =>   'Designated Instructor                           ',     
+'4770' =>   'Train the Trainer                           ',     
 '4800' =>   'Nursing Home Administrator                   ',     
 '4803' =>   'NHA - Special Circumstances                  ',     
 '4900' =>   'Optometrist                                  ',     
@@ -166,6 +174,12 @@ get_lictype(string code) := case ( code,'1600' =>   'Audioloist                 
 '5326' =>   'CS - 3                                       ',     
 '5330' =>   'CS - 2 Optometry                             ',     
 '5331' =>   'Pharmacist - Special Circumstances           ',     
+'5340' =>   'Pharmacy Technician          ',     
+'5341' =>   'Pharmacy Technician Limited           ',     
+'5342' =>   'Pharmacy Technician Temporary           ',     
+'5344' =>   'CS - Hospital Automated Device          ',     
+'5345' =>   'CS - Nursing Home Automated Device           ',     
+'5346' =>   'Non - CS Automated Device           ',     
 '5400' =>   'Acupuncturist                                ',     
 '5500' =>   'Physical Therapist                           ',     
 '5501' =>   'Physical Therapist - Clinical Academic       ',     
@@ -200,11 +214,15 @@ get_lictype(string code) := case ( code,'1600' =>   'Audioloist                 
 '6704' =>   'Sanitarian - Limited                         ',     
 '6800' =>   'Masters Social Worker                        ',     
 '6801' =>   'Masters Ltd Social Worker                    ',     
-'6810' =>   'Bachelors Social Worker                      ',     
+'6802' =>   'Masters Social Worker-Special                    ',     
+'6810' =>   'Bachelors Social Worker                      ',   
+'6811' =>   'Bachelors Ltd Social Worker                      ',     
 '6820' =>   'Social Service Techinician                   ',     
 '6821' =>   'Social Service Ltd Techinician               ',     
+'6830' =>   'MSW Macro Specialty               ',     
 '6850' =>   'MA Social Worker - Special Circumstances     ',     
 '6860' =>   'BA Social Worker - Special Circumstances     ',     
+'6880' =>   'MastersSocialWorker-Temp Military     ',     
 '6900' =>   'Veterinarian                                 ',     
 '6901' =>   'Veterinarian - Clinical Academic Limited     ',     
 '6902' =>   'Veterinarian - Nonclinical Academic          ',     
@@ -215,9 +233,94 @@ get_lictype(string code) := case ( code,'1600' =>   'Audioloist                 
 '6914' =>   'Veterinary Tech - Limited                    ',     
 '6916' =>   'Veterinarian - Special Circumstances         ',     
 '6917' =>   'Veterinary Tech - Special Circumstances      ',     
+'6919' =>   'Veterinarian - Special Volunteer      ',     
 '7100' =>   'Speech-Language Pathologist                  ',     
 '7101' =>   'Speech-Language Pathologist Limited          ',     
-'7102' =>   'Speech-Language Pathologist Ed Limited       ',     '' );
+'7102' =>   'Speech-Language Pathologist Ed Limited       ',    
+'7501' =>   'Massage Therapist       ', '' );
+
+//############################################################################################################
+
+
+//Occupational License
+//DF-24196
+
+getOccboard( string2 code) := case ( code, '11'  =>    'Accountancy                       ',  
+'12'  =>    'Real Estate Appraisers                   ',
+'13'  =>    'Architects                       ',
+'17'  =>    'Barbers                   ',
+'24'  =>    'Collection Practices     ',
+'27'  =>    'Cosmetology                        ',
+'35'  =>    'Hearing Aid Dealers                ',
+'39'  =>    'Landscape Architects                         ',
+'40'  =>    'Professional Surveyors                ',
+'61'  =>    'Personnel Agency           ',
+'62'  =>    'Professional Engineers    ',
+'65'  =>    'Real Estate                      '
+,'' );
+
+
+
+
+
+get_Occlictype(string code) := case ( code,'1101' =>   'Registered Accountant                                   ',     
+'1102' =>   'Licensed Accountant                         ',     
+'1103' =>   'Accountancy Firm                                 ',     
+'1200' =>   'Limited Real Estate Appraiser           ',     
+'1201' =>   'State Licensed Real Estate                                      ',     
+'1202' =>   'Certified General Real Estate          ',     
+'1203' =>   'Certified Residential RE Appraiser                ',     
+'1204' =>   'Temporary Practice Permit                ',     
+'1205' =>   'Education Provider                          ',     
+'1206' =>   'Appraisal Management Company                  ',     
+'1300' =>   'Architect          ',     
+'1700' =>   'Barber        ',     
+'1702' =>   'Barber Instructor        ',     
+'1703' =>   'Barber Student                              ',     
+'1704' =>   'Barber Shop         ',     
+'1708' =>   'Barber Student Instructor       ',     
+'1709' =>   'Barber College - Private       ',     
+'2400' =>   'Agency - Non-Owner Manager                             ',     
+'2401' =>   'Non-Owner Manager                               ',     
+'2403' =>   'Agency - Owner Manager                                  ',     
+'2700' =>   'Cosmetologist                                 ',     
+'2701' =>   'Cosmetology Instructor                                 ',     
+'2702' =>   'Cosmetology Ltd Instructor                            ',     
+'2703' =>   'Cosmetology School - Private                                 ',     
+'2705' =>   'Cosmetology Shop                           ',     
+'2706' =>   'Cosmetology Shop Ltd              ',     
+'2707' =>   'Electrologist                     ',     
+'2710' =>   'Esthetician                  ',     
+'2712' =>   'Manicurist                                          ',     
+'2714' =>   'Nat. Hair Culturist                                       ',     
+'2716' =>   'Apprentice Cosmetologist                               ',     
+'2717' =>   'Apprentice Electrologist                          ',     
+'2718' =>   'Apprentice Esthetician                                    ',     
+'2719' =>   'Apprentice Manicurist                               ',     
+'2720' =>   'Apprentice Nat. Hair Culturist                  ',     
+'2721' =>   'Manicurist Ltd Instructor       ',     
+'2722' =>   'Esthetician Ltd Instructor           ',     
+'2724' =>   'Electrologist Ltd Instructor                     ',     
+'2725' =>   'Electrologist Instructor         ',     
+'2726' =>   'Cosmetology School - Public                              ',     
+'2738' =>   'Cosmetology School Branch       ',     
+'3500' =>   'Hearing Aid Trainee            ',     
+'3501' =>   'Hearing Aid Dealer           ',     
+'3502' =>   'Hearing Aid Salesperson                       ',     
+'3901' =>   'Licensed Landscape Architect            ',     
+'4000' =>   'Professional Surveyor                                          ',     
+'6100' =>   'Type A Personnel Agency              ',     
+'6101' =>   'Type B Personnel Agency                   ',     
+'6102' =>   'Agent                                ',     
+'6200' =>   'Professional Engineer                                           ',     
+'6501' =>   'Salesperson               ',     
+'6502' =>   'Associate Broker            ',     
+'6503' =>   'Branch Office                            ',     
+'6504' =>   'Individual Broker                                ',     
+'6505' =>   'Broker Company                              ',     
+     '' );
+		 
+//############################################################################################################		 
 
 get_licstatus(string code ) := case ( code, '1'    => 'Active                                    ',
 '2'    => 'Pending                                   ',
@@ -368,33 +471,33 @@ get_country(string code) := case( code, '52'   =>   'Greece            ',
 '103'  =>   'Guyana            ',
 '104'  =>   'Northern Ireland  ','' );
 
-inHLTH := File_MI.Health;
+//inHLTH := File_MI.Health +  File_MI.Occup;
 
-Prof_License.Layout_proLic_in map2Health ( inHLTH l) := transform
+Prof_License.Layout_proLic_in map2Occup ( File_MI.Occup l) := transform
 
- self.license_number          := l.orig_license_no;
-  self.orig_name              := if ( trim(l.orig_name_type) = 'N' , trim(l.name) , '' );
-  self.company_name           := if ( trim(l.orig_name_type) = 'Y' , trim(l.name) , '');
-  self.issue_date              := l.orig_issue_date;
-  self.orig_zip                := StringLib.stringfilter(l.orig_zip, '0123456789')[1..9];
-  self.county_str              := l.orig_county_desc;
-  self.orig_addr_1             := l.orig_address_1;
-  self.orig_city               := l.orig_city;
-  self.orig_st                 := l.orig_st;
-  self.orig_addr_2             := l.orig_address_2;
-  self.orig_addr_3             := l.orig_address_3;
+ self.license_number          := l.license_no;
+  self.orig_name              := STD.Str.CleanSpaces ( trim(l.first_name) + ' '+ trim(l.middle_name) + ' '+ trim(l.last_name));
+  self.company_name           := if ( trim(l.Is_Org) = 'Y' , trim(l.sort_name) , '');
+  self.issue_date              := dateconv(l.issue_date);
+  self.orig_zip                := StringLib.stringfilter(l.addr_zipcode, '0123456789')[1..9];
+  self.county_str              := l.addr_county;
+  self.orig_addr_1             := l.addr_line_1;
+  self.orig_city               := l.addr_city;
+  self.orig_st                 := l.addr_state;
+  self.orig_addr_2             := l.addr_line_2;
+  self.orig_addr_3             := l.addr_line_3;
   self.orig_addr_4             := '';
-  self.last_renewal_date       := l.orig_status_change_date;
-  self.expiration_date         := l.orig_expiration_date;
+  self.last_renewal_date       :='';
+  self.expiration_date         :=dateconv( l.expiration_date);
   self.source_st               := 'MI';
-  self.business_flag          := l.orig_name_type;
-  self.previous_license_number := l.orig_prev_license_no;
+  self.business_flag          :=l.Is_Org;
+  self.previous_license_number :='';
   self.orig_former_name        := '';
   self.license_obtained_by     := '';
-  self.profession_or_board     := trim(getboard(trim(l.orig_prof_id))); 
-  self.license_type            := trim(get_lictype(trim(l.orig_license_code)));
-  self.status                  := trim(get_licstatus(trim(l.orig_license_status_code)));
-  self.country_str             := trim(get_country(trim(l.orig_country_code)));
+  self.profession_or_board     := trim(getOccboard(trim(l.profession_id))); 
+  self.license_type            := trim(get_Occlictype(trim(l.license_type)));
+  self.status                  := '';
+  self.country_str             := '';
   self.name_order              := 'FML';
   self.vendor                  := 'Michigan Department of Consumer/Industr';
   self.date_first_seen         := infile(ftype = 'Health')[1].fdate;
@@ -402,13 +505,51 @@ Prof_License.Layout_proLic_in map2Health ( inHLTH l) := transform
 self := [];
 end;
 
-dMIHealth := project(  inHLTH,  map2Health(left));
+dMIOccup := project(  File_MI.Occup,  map2Occup(left));
+
+
+
+Prof_License.Layout_proLic_in map2Health ( File_MI.Health l) := transform
+
+ self.license_number          := l.license_no;
+  self.orig_name              := STD.Str.CleanSpaces(trim(l.first_name) + ' '+ trim(l.middle_name) + ' '+ trim(l.last_name));
+  self.company_name           := if ( trim(l.first_name) = '' and   trim(l.last_name) = '', trim(l.sort_name) , '');
+  self.issue_date              :=dateconv(l.issue_date);
+  self.orig_zip                := StringLib.stringfilter(l.addr_zipcode, '0123456789')[1..9];
+  self.county_str              := l.addr_county;
+  self.orig_addr_1             := l.addr_line_1;
+  self.orig_city               := l.addr_city;
+  self.orig_st                 := l.addr_state;
+  self.orig_addr_2             := l.addr_line_2;
+  self.orig_addr_3             := l.addr_line_3;
+  self.orig_addr_4             := '';
+  self.last_renewal_date       :='';
+  self.expiration_date         := dateconv(l.expiration_date);
+  self.source_st               := 'MI';
+  self.business_flag          :='';
+  self.previous_license_number :='';
+  self.orig_former_name        := '';
+  self.license_obtained_by     := '';
+  self.profession_or_board     := trim(getboard(trim(l.profession_id))); 
+  self.license_type            := trim(get_lictype(trim(l.license_type)));
+  self.status                  := '';
+  self.country_str             := '';
+  self.name_order              := 'FML';
+  self.vendor                  := 'Michigan Department of Consumer/Industr';
+  self.date_first_seen         := infile(ftype = 'Health')[1].fdate;
+  self.date_last_seen          := infile(ftype = 'Health')[1].fdate;
+self := [];
+end;
+
+dMIHealth := project(  File_MI.Health,  map2Health(left));
+
+dMIHealthall := dMIHealth + dMIOccup;
 
 dMIHealthSF := Sequential( 
                          if ( NOT FileServices.SuperFileExists( '~thor_data400::in::prolic::mi::health'),FileServices.CreateSuperfile('~thor_data400::in::prolic::mi::health'),
                                                                                                          FileServices.ClearSuperfile( '~thor_data400::in::prolic::mi::health')),
 
-                        output(dMIHealth,,'~thor_data400::in::prolic::mi::health_'+curdate,overwrite),
+                        output(dMIHealthall,,'~thor_data400::in::prolic::mi::health_'+curdate,overwrite),
                          FileServices.StartSuperfiletransaction(),
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::mi::health','~thor_data400::in::prolic::mi::health_'+curdate),

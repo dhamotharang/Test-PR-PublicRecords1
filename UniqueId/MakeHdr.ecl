@@ -46,6 +46,7 @@ shared string HdrSearchCriteria(string Watchlistname) := TRIM(
 				+	'<value id="7" name="Lebanon"/>\r\n'
 				+	'<value id="6" name="Liberia"/>\r\n'
 				+	'<value id="11" name="Libya"/>\r\n'
+				+	'<value id="22" name="Mali"/>\r\n'
 				+	'<value id="8" name="North Korea - Democratic People\'s Republic of Korea"/>\r\n'
 				+	'<value id="19" name="Resolution 1718 (2006) and Resolution 2270 (2016)"/>\r\n'
 				+	'<value id="17" name="Resolution 2270 (2016)-Annex III"/>\r\n'
@@ -90,7 +91,7 @@ export OutputDataXMLFile(dataset(recordof(Layout_Watchlist.routp)) infile
 
 	cnt := count(infile);
 	hdr := MakeXMLHdr(Watchlistname, cnt, 'Entity_List');
-	return OUTPUT(infile,,'~thor::uniqueid::'+filename,
+	return OUTPUT(Distribute(infile,0),,'~thor::uniqueid::'+filename,
 			xml('Entity', heading(hdr,Footer),trim, OPT), overwrite);
 END;
 
@@ -105,7 +106,7 @@ export OutputGeoXMLFile(dataset(recordof(Layout_Watchlist.rgeo)) infile
 	outfile := PROJECT(infile, Layout_Watchlist.rgeoOut);
 
 	hdr := MakeXMLHdr(Watchlistname, cnt, 'Country_List');
-	return OUTPUT(outfile,,'~thor::uniqueid::'+filename,
+	return OUTPUT(Distribute(outfile,0),,'~thor::uniqueid::'+filename,
 			xml('Country', heading(hdr,GeoFooter),trim, OPT), overwrite);
 END;
 

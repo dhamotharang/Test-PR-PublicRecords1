@@ -5,10 +5,13 @@ export Promote(
 	,boolean							pUseProd			= 	false
 	,string								pFilter					= 	''
 	,boolean							pDelete					= 	false
-	,boolean							pisTesting			= 	false
-	,dataset(lay_builds)	pBuildFilenames = 	Filenames(pversion,pUseProd).base.dAll_filenames
+	,boolean							pisTesting			= 	false	
 ) :=
 module
-	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting);
+
+    export Promote_Seed_AsSrc := module
+       dataset(lay_builds) pBuildFilenames := Filenames(pversion,pUseProd).Base_AsSrc.dAll_filenames;
+       export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting);
+    end;
 	
 end;

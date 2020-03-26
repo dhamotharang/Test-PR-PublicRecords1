@@ -34,14 +34,14 @@ export soapcall_WUGetGraph(
 ) :=                           
 function
 
-	export WUGetGraphRequest_Record :=
+	WUGetGraphRequest_Record :=
 	record
   	string                      Wuid                  {xpath('Wuid'        )} := pWuid                 ;
 		string                      GraphName             {xpath('GraphName'   )} := pGraphName            ;
 		string                      SubGraphId            {xpath('SubGraphId'  )} := pSubGraphId           ;    
 	end;
 
-	export lECLGraphEx :=
+	lECLGraphEx :=
 	record
   	string                      Name              {xpath('Name'               )};
   	string                      Label             {xpath('Label'              )};
@@ -53,12 +53,12 @@ function
   	boolean                     Failed            {xpath('Failed'             )};
   end;
   
-	export lGraphs :=
+	lGraphs :=
 	record
   	Dataset(lECLGraphEx)        ECLGraphEx          {xpath('ECLGraphEx'       )};
   end;                                                                                              
   
-	export WUGetGraphResponse_Record :=
+	WUGetGraphResponse_Record :=
 	record	
   
 		string                exception_code     {xpath('Exceptions/Exception/Code'    )};
@@ -72,7 +72,12 @@ function
 
   esp				:= pesp + ':8010'	;
 
-  results := SOAPCALL(
+  import ut,Workman;
+
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
+  results_local := SOAPCALL(
     'http://' + esp + '/WsWorkunits?ver_=1.48'
     // 'http://' + esp + '/WsWorkunits'
     ,'WUGetGraph'
@@ -82,6 +87,19 @@ function
     ,xpath('WUGetGraphResponse')
   );
   
+  results_remote := SOAPCALL(
+    'http://' + esp + '/WsWorkunits?ver_=1.48'
+    // 'http://' + esp + '/WsWorkunits'
+    ,'WUGetGraph'
+    ,WUGetGraphRequest_Record
+    ,dataset(WUGetGraphResponse_Record)
+    // ,heading('<WUInfoRequest>','</WUInfoRequest>')
+    ,xpath('WUGetGraphResponse')
+    %SOAPCALLCREDENTIALS%
+  );
+
+  results := iff(trim(pesp) in Workman._Config.LocalEsps ,results_local  ,results_remote);
+
   dprep  := normalize(results,left.Graphs     ,transform(lGraphs    ,self := right));
   dprep2 := normalize(dprep  ,left.ECLGraphEx ,transform(lECLGraphEx,
     fix1 := STD.Str.FindReplace(right.GraphXml ,'&lt;'   ,'<' );
@@ -96,7 +114,7 @@ function
   ));
   
   
-	export subgraphatts :=
+	subgraphatts :=
 	record
   	string         definition   ;
   	string         _kind        ;
@@ -106,20 +124,20 @@ function
   	boolean        _internal    ;
   end;
 
-	export latts :=
+	latts :=
 	record
   	string         name         {xpath('@name'     )};
   	string         value        {xpath('@value'    )};
   end;
 
-  export lsubgraphs := 
+  lsubgraphs := 
   record
   	string                  id           {xpath('@id'       )};
   	string                  label        {xpath('@label'    )};
     dataset(latts)          Attributes   {xpath('att'       )};
   end;
 
-  export lEdges := 
+  lEdges := 
   record
   	string                  id           {xpath('@id'       )};
   	string                  source       {xpath('@source'    )};
@@ -127,20 +145,20 @@ function
     dataset(latts)          Attributes   {xpath('att'       )};
   end;
 
-	export lNodes :=
+	lNodes :=
 	record
   	dataset(lsubgraphs)         subgraphs         {xpath('att/graph/node'          )};
   	dataset(latts     )         attributes        {xpath('att/graph/att'           )};
   	dataset(lEdges    )         Edges             {xpath('att/graph/edge'          )};
   end;
   
-	export lGraphs2 :=
+	lGraphs2 :=
 	record
   	Dataset(lNodes)        Nodes          {xpath('node'       )};
   	Dataset(lEdges)        Edges          {xpath('edge'       )};
   end;                                                                                              
   
-	export lGraphExtra :=
+	lGraphExtra :=
 	record	
   
  //   lECLGraphEx;

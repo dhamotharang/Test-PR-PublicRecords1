@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	Business_Header,	Business_Header_SS,	DID_Add,	NID,	ut,	STD;
+﻿IMPORT	Business_Credit,	Business_Header,	Business_Header_SS,	DID_Add,	MDR, NID,	ut,	STD;
 EXPORT	fn_linkSBFEFile(STRING	pVersion,
 												Constants().buildType	pBuildType	= Constants().buildType.Daily)	:=	FUNCTION
 
@@ -216,14 +216,14 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 																			 ,													 		// use prod version of superfiles
 																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
 																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
-																			 ,Comp_Website           		 // Url
+																			 ,Company_Website           		 // Url
 																			 ,													// Email
 																			 ,p_city_name							 // City
 																			 ,												// fname
 																			 ,											 // mname
 																			 ,											// lname
 																			 ,										 // Contact_SSN
-																			 ,source							// Source Â– MDR.sourceTools
+																			 ,source							// Source Ã‚â€“ MDR.sourceTools
 																			 ,persistent_record_ID	// Source_Record_Id
 																			 ,									// Src_Matching_is_priorty
 																		);
@@ -248,14 +248,14 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 																			 ,													 		// use prod version of superfiles
 																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
 																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
-																			 ,Comp_Website           		 // Url
+																			 ,Company_Website           		 // Url
 																			 ,E_Mail_Address						// Email
 																			 ,p_city_name							 // City
 																			 ,Clean_fname							// fname
 																			 ,Clean_mname						 // mname
 																			 ,Clean_lname						// lname
 																			 ,Federal_TaxID_SSN		 // Contact_SSN
-																			 ,source							// Source Â– MDR.sourceTools
+																			 ,source							// Source Ã‚â€“ MDR.sourceTools
 																			 ,persistent_record_ID	// Source_Record_Id
 																			 ,									// Src_Matching_is_priorty
 																		);
@@ -350,9 +350,11 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 										LOCAL
 									);
 
+	addGlobalSID:=  MDR.macGetGlobalSID(dFillDates,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
+
 	// Determine which records are active and inactive as of today's build
 	dSetActive	:=	JOIN(
-										SORT(DISTRIBUTE(dFillDates,
+										SORT(DISTRIBUTE(addGlobalSID,
 											HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,extracted_date,Cycle_End_Date,process_date)),
 														Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,extracted_date,Cycle_End_Date,process_date,LOCAL),
 										DEDUP(SORT(DISTRIBUTE(dActive,
@@ -398,7 +400,7 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 
 		// If this is a daily, don't worry about changing the active flag
 	dBuildResult	:=	IF(	pBuildType	= Constants().buildType.Daily,
-												dFillDates,																				//	Only new records are added
+												addGlobalSID,																			//	Only new records are added
 											IF(	pBuildType	= Constants().buildType.FullBuild,
 												dPreservePersistentRecordID,											//	All records have been rebuild
 												dSetActive                                        //	All records have been linked but not rebuilt

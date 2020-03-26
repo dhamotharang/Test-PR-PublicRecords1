@@ -61,4 +61,5 @@ export Proc_BuildStats := parallel(
 									,header.fn_new_dids_by_src(h_new,h_old)
 									,output(Header.fn_ADLSegmentation_v2(h_new).tab,named('SegmentationStats'))
 									,header.fn_adl_segmentStats_across_builds(h_new,h_old)
+									,header.stats.GenerateLinkingStats
 									);

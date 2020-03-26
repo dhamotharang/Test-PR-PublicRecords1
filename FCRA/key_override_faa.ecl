@@ -1,4 +1,4 @@
-import data_services, faa, ut;
+﻿import data_services, faa, ut;
 
 // TODO: OPT options should be removed from basefile and index definitions;
 //       'temp' should be removed from index names
@@ -23,7 +23,9 @@ export key_override_faa := MODULE
 	dailyds_aircraft := dataset (daily_prefix + 'aircraft', aircraft_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_aircraft, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_aircraft,persistent_record_id,replaceds);
-  export aircraft := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'aircrafts::qa::ffid', OPT);
+	//DF-22458 Clear speicifed fields in thor_data400::key::override::fcra::aircrafts::qa::ffid 
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, faa.Constants.fields_to_clear_aircraft);
+  export aircraft := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'aircrafts::qa::ffid', OPT);
 
 
   // aircraft detailed info record
@@ -36,7 +38,9 @@ export key_override_faa := MODULE
 	dailyds_aircraft_details := dataset (daily_prefix + 'aircraft_details', aircraft_detailes_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_aircraft_details, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_aircraft_details,aircraft_mfr_model_code,replaceds);
-  export aircraft_details := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'aircraft_details::qa::ffid', OPT);
+	//DF-22458 Clear specified fields in thor_data400::key::override::fcra::aircraft_details::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, faa.Constants.fields_to_clear_aircraft_details);
+  export aircraft_details := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'aircraft_details::qa::ffid', OPT);
 
 
   // aircraft engine info
@@ -49,7 +53,9 @@ export key_override_faa := MODULE
 	dailyds_aircraft_engine := dataset (daily_prefix + 'aircraft_engine', aircraft_engine_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_aircraft_engine, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_aircraft_engine,engine_mfr_model_code,replaceds);
-  export aircraft_engine := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'aircraft_engine::qa::ffid', OPT);
+	// DF-22458 Blank out specified fields in thor_data400::key::override::fcra::aircraft_engine::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, faa.Constants.fields_to_clear_aircraft_engine);
+  export aircraft_engine := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'aircraft_engine::qa::ffid', OPT);
 
 
 
@@ -70,8 +76,10 @@ export key_override_faa := MODULE
 	dailyds_airmen := dataset (daily_prefix + 'pilot_registration', airmen_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_airmen, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_airmen,persistent_record_id,replaceds);
+	//DF-22458 Clear specified fields in thor_data400::key::override::fcra::pilot_registration::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, faa.Constants.fields_to_clear_pilot_registration);
   // "using "airmen" breaks the syntax check
-  export airmen_reg := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix_airmen + 'registration::qa::ffid', OPT);
+  export airmen_reg := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix_airmen + 'registration::qa::ffid', OPT);
 
 
   // certification
@@ -84,7 +92,9 @@ export key_override_faa := MODULE
 	dailyds_cert := dataset (daily_prefix + 'pilot_certificate', cert_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_cert, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_cert,persistent_record_id,replaceds);
+	//DF-22458 Clear specified fields in thor_data400::key::override::fcra::pilot_certificate::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, faa.Constants.fields_to_clear_pilot_certificate);
   // "using "airmen" breaks the syntax check
-  export airmen_cert := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix_airmen + 'certificate::qa::ffid', OPT);
+  export airmen_cert := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix_airmen + 'certificate::qa::ffid', OPT);
 
 END;

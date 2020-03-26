@@ -1,0 +1,45 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FBNV2
+FILENAME:FBNV2
+NAMESCOPE:Input_CA_San_Diego
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_past_date:CUSTOM(Scrubs.fn_valid_pastDate > 0)
+
+//--------------------------------------------------------------- 
+//FIELDS -- Commented out fields are not being scrubbed
+//---------------------------------------------------------------
+// FIELD:process_date:TYPE(STRING):0,0
+// FIELD:TYPE_OF_RECORD:TYPE(STRING):0,0	       //exists only in old layout
+// FIELD:OWNER_NAME:TYPE(STRING):0,0	           //exists only in old layout
+// FIELD:fbn_type:TYPE(STRING):0,0	             //exists only in old layout
+// FIELD:PNAME:TYPE(STRING):0,0                 //exists only in old layout
+FIELD:FILE_NUMBER:TYPE(STRING20):LIKE(invalid_mandatory):0,0
+FIELD:FILE_DATE:TYPE(STRING8):LIKE(invalid_past_date):0,0
+// FIELD:EXPIRATION_DATE:TYPE(STRING):0,0
+FIELD:PREV_FILE_NUMBER:TYPE(STRING20):LIKE(invalid_mandatory):0,0
+FIELD:PREV_FILE_DATE:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:FILING_TYPE:TYPE(STRING48):LIKE(invalid_mandatory):0,0
+// FIELD:BUSINESS_START_DATE:TYPE(STRING):0,0
+// FIELD:OWNERSHIP_TYPE:TYPE(STRING):0,0
+FIELD:BUSINESS_NAME:TYPE(STRING192):LIKE(invalid_mandatory):0,0
+// FIELD:TYPE_OF_NAME:TYPE(STRING):0,0
+// FIELD:TYPE_OF_NAME_SEQ_NUM:TYPE(STRING):0,0
+// FIELD:STREET_ADDRESS1:TYPE(STRING):0,0
+// FIELD:STREET_ADDRESS2:TYPE(STRING):0,0
+// FIELD:CITY:TYPE(STRING):0,0
+// FIELD:STATE:TYPE(STRING):0,0
+// FIELD:ZIP_CODE:TYPE(STRING):0,0
+// FIELD:COUNTRY:TYPE(STRING):0,0
+// FIELD:MAILING_ADDRESS1:TYPE(STRING):0,0
+// FIELD:MAILING_ADDRESS2:TYPE(STRING):0,0
+// FIELD:MAILING_CITY:TYPE(STRING):0,0
+// FIELD:MAILING_STATE:TYPE(STRING):0,0
+// FIELD:MAILING_ZIP_CODE:TYPE(STRING):0,0
+// FIELD:MAILING_COUNTRY:TYPE(STRING):0,0
+FIELD:prep_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+// FIELD:prep_mail_addr_line1:TYPE(STRING):0,0
+// FIELD:prep_mail_addr_line_last:TYPE(STRING):0,0

@@ -1,4 +1,4 @@
-import DID_Add,Header_slimsort,ut,watchdog,didville,fair_isaac,census_data, business_Header, business_Header_ss;
+import _control, DID_Add,Header_slimsort,ut,watchdog,didville,fair_isaac,census_data, business_Header, business_Header_ss, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -123,4 +123,8 @@ ssn_records	:= join(File_Watchdog_Best,withdid_sort,
 					getssn(LEFT,RIGHT),
 					right outer,local);
 
-export DID_5610_Demographic_Data := distribute(ssn_records + withoutdid, hash(FILE_NUMBER))/*: persist(EBR_thor + 'TEMP::DID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;
+concatBase   := ssn_records + withoutdid;
+
+addGlobalSID := mdr.macGetGlobalSID(concatBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export DID_5610_Demographic_Data := distribute(addGlobalSID, hash(FILE_NUMBER))/*: persist(EBR_thor + 'TEMP::DID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

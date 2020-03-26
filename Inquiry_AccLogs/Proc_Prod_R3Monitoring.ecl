@@ -1,15 +1,15 @@
-import ut, Data_Services, _control;
+﻿import ut, Data_Services, _control;
 
 export Proc_Prod_R3Monitoring := module
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export File_NCO := dataset('~thor_10_219::base::account_monitoring::prod::inquirytracking', inquiry_acclogs.Layout.Common, thor, opt);
+export File_NCO := dataset(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::inquirytracking', inquiry_acclogs.Layout.Common, thor, opt);
 
-export File_Monitoring := dataset('~thor_10_219::base::account_monitoring::prod::inquirytracking', inquiry_acclogs.Layout.Common, thor, opt);
+export File_Monitoring := dataset(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::inquirytracking', inquiry_acclogs.Layout.Common, thor, opt);
 
-export File_PIDs := dataset(Data_Services.foreign_r3 + 'thor_10_219::base::account_monitoring::prod::inquirytracking::pidmapping', 
+export File_PIDs := dataset(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::inquirytracking::pidmapping', 
 			// {string pid, string gcid, boolean isFcra}, csv(separator('|')));
 			{string pid, string product_id, string company_id, string gcid, boolean isFcra}, csv(separator('|'))); // new layout, waiting on file
 			
@@ -30,12 +30,12 @@ ProcessedDS := dataset(Data_Services.foreign_logs + 'thor100_21::in::BatchR3_acc
 							 
 ProcessedDsSet := set(ProcessedDS, name);
 
-logs_R3fcra := nothor(fileservices.superfilecontents('~thor_10_219::base::account_monitoring::prod::fcra::inquirytracking')('foreign::10.173.219.13::'+name in ProcessedDsSet));
-logs_R3nonfcra := nothor(fileservices.superfilecontents('~thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking')('foreign::10.173.219.13::'+name in ProcessedDsSet));
-logs_inNCO  := nothor(fileservices.superfilecontents('~thor_data400::base::monitoring_customer_base_delta')('foreign::10.173.219.13::'+name in ProcessedDsSet));
+logs_R3fcra := nothor(fileservices.superfilecontents(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::fcra::inquirytracking')(Data_Services.foreign_prod+'::'+name in ProcessedDsSet));
+logs_R3nonfcra := nothor(fileservices.superfilecontents(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::nonfcra::inquirytracking')(Data_Services.foreign_prod+'::'+name in ProcessedDsSet));
+logs_inNCO  := nothor(fileservices.superfilecontents('~thor_data400::base::monitoring_customer_base_delta')(Data_Services.foreign_prod+'::'+name in ProcessedDsSet));
 
 fnRemoveFromSupers(string lname, string ftype) := function
-	superswap1 := nothor(fileservices.removesuperfile('~thor_10_219::base::account_monitoring::'+ftype+'::inquirytracking', lname, true));
+	superswap1 := nothor(fileservices.removesuperfile('~batchr3::base::account_monitoring::'+ftype+'::inquirytracking', lname, true));
 return parallel(superswap1);
 end;
 
@@ -162,8 +162,8 @@ AppendableFile := join(File_Monitoring, File_PIDs, left.mbs.company_id = right.p
 
 dtTime := regexreplace('[^0-9]',ut.GetTimeDate(),'') : independent;
 
-AvailFiles := nothor(fileservices.superfilecontents('~thor_10_219::base::account_monitoring::prod::inquirytracking'));
-AvailRecs := count(nothor(fileservices.superfilecontents('~thor_10_219::base::account_monitoring::prod::inquirytracking'))) > 0;
+AvailFiles := nothor(fileservices.superfilecontents(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::inquirytracking'));
+AvailRecs := count(nothor(fileservices.superfilecontents(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::inquirytracking'))) > 0;
 output(AvailFiles, named('Available_Files'));
 
 GCIDs_Valid := count(AppendableFile(orig_global_company_id = '')) = 0;
@@ -171,31 +171,31 @@ GCIDs_Valid := count(AppendableFile(orig_global_company_id = '')) = 0;
 GCIDs_inValid_List := sort(table(AppendableFile(orig_global_company_id = ''), {orig_pid, ct := count(group)}, orig_pid, few), -ct);
 
 fcra_output_move := sequential(
-													output(AppendableFile(isFCRA),,'~thor_10_219::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime,__compressed__,overwrite);
-													nothor(fileservices.addsuperfile('~thor_10_219::base::account_monitoring::prod::fcra::inquirytracking','~thor_10_219::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime));
-													despray('thor_10_219::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime,'fcra')
+													output(AppendableFile(isFCRA),,'~batchr3::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime,__compressed__,overwrite);
+													nothor(fileservices.addsuperfile('~batchr3::base::account_monitoring::prod::fcra::inquirytracking','~batchr3::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime));
+													despray('~batchr3::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime,'fcra')
 													);
 
 nonfcra_output_move := sequential(
-													output(AppendableFile(~isFCRA),,'~thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime,__compressed__,overwrite);
-													nothor(fileservices.addsuperfile('~thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking','~thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime));
-													despray('thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime,'nonfcra')
+													output(AppendableFile(~isFCRA),,'~batchr3::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime,__compressed__,overwrite);
+													nothor(fileservices.addsuperfile('~batchr3::base::account_monitoring::prod::nonfcra::inquirytracking','~batchr3::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime));
+													despray(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime,'nonfcra')
 													);
 													
-clear_input := nothor(fileservices.clearsuperfile('~thor_10_219::base::account_monitoring::prod::inquirytracking'));
+clear_input := nothor(fileservices.clearsuperfile('~batchr3::base::account_monitoring::prod::inquirytracking'));
 
-emailDR := nothor(fileservices.sendemail('John.Freibaum@lexisnexisrisk.com, Cecelie.Reid@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com, Franz.Nisswandt@lexisnexisrisk.com',
+emailDR := nothor(fileservices.sendemail('charles.pettola@lexisnexisrisk.com, Cecelie.Reid@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com, Franz.Nisswandt@lexisnexisrisk.com',
 																	'Inquiry Tracking Incoming Prod R3 Files',
 																	'File names on Prod R3 http:// ' +_Control.IPAddress.prod_watch_dev + ':8010/\n\n'  +
-																	'~thor_10_219::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime + '\n' +
-																	'~thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime));
+																	Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::fcra::inquirytracking::'+dtTime + '\n' +
+																	Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::nonfcra::inquirytracking::'+dtTime));
 
 export Separate_R3_Records := if(AvailRecs and GCIDs_Valid, 
-																	sequential(parallel(fcra_output_move, nonfcra_output_move), clear_input, emailDR), 
+																	sequential(parallel(fcra_output_move, nonfcra_output_move),clear_input, emailDR), 
 																	if(~GCIDs_Valid, sequential(output(choosen(GCIDs_inValid_List, 100), named('Unmatched_PIds')),  
-																						 nothor(FileServices.SendEmail('John.Freibaum@lexisnexisrisk.com, Cecelie.Reid@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com, Franz.Nisswandt@lexisnexisrisk.com', 'ProdR3 PID Failure', thorlib.wuid() + '\n' + 'Please view WU to see empty missing PID assignment')))));
+																						 nothor(FileServices.SendEmail('charles.pettola@lexisnexisrisk.com, Cecelie.Reid@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com, Franz.Nisswandt@lexisnexisrisk.com', 'ProdR3 PID Failure', thorlib.wuid() + '\n' + 'Please view WU to see empty missing PID assignment')))));
 
-export File_Monitoring_FCRA := dataset(Data_Services.foreign_r3 + 'thor_10_219::base::account_monitoring::prod::fcra::inquirytracking', Appendable_Layout, thor, opt);
-export File_Monitoring_NONFCRA := dataset(Data_Services.foreign_r3 + 'thor_10_219::base::account_monitoring::prod::nonfcra::inquirytracking', Appendable_Layout, thor, opt);
+export File_Monitoring_FCRA := dataset(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::fcra::inquirytracking', Appendable_Layout, thor, opt);
+export File_Monitoring_NONFCRA := dataset(Data_Services.foreign_prod + 'batchr3::base::account_monitoring::prod::nonfcra::inquirytracking', Appendable_Layout, thor, opt);
 
 end;

@@ -1,9 +1,10 @@
 ﻿IMPORT SALT31,ut;
 import mdr;//HACK
-EXPORT Relationships(DATASET(layout_Base) ih,DATASET(match_candidates(ih).layout_candidates) mc = Match_Candidates(ih).candidates, layout_specificities.R s = Specificities(ih).specificities[1]) := INLINE MODULE
+EXPORT Relationships(DATASET(layout_Base) ih,DATASET(match_candidates(ih).layout_candidates) mc = Match_Candidates(ih).candidates, layout_specificities.R s = Specificities(ih).specificities[1]) := INLINE MODULE/*HACK INLINE FOR ROXIE*/
 SHARED h := Scaled_Candidates(ih,mc);
 // Create code to find relationships between clusters based upon multiple records
-// Code for NAMEST relationship
+ 
+// Code for NAMEST relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -17,11 +18,13 @@ SHARED h := Scaled_Candidates(ih,mc);
 /*HACK FOLLOWS*/
 /******* To filter any franchise from name st relationship *****/
 CandidatesNAMEST1 := BaseFile (cnp_name_weight100 + st_weight100>=2000);
+
 // select the franchise seleids in the basefile.
-frandxSeleId := DEDUP(TABLE(basefile(MDR.sourceTools.SourceIsFrandx(source)),
+frandxSeleId := DEDUP(TABLE(basefile(MDR.sourceTools.SourceIsFrandx(source)), 
 									{basefile.seleId}), ALL);
+
 // left only here to eliminate all the franchise seleids from name relationship.
-noFrandxCandidates := JOIN(DISTRIBUTE(CandidatesNAMEST1, HASH(seleid)),
+noFrandxCandidates := JOIN(DISTRIBUTE(CandidatesNAMEST1, HASH(seleid)), 
 														DISTRIBUTE(frandxSeleId, HASH(seleid)),
 														left.seleid = right.seleid, left only, local);
 SlimRec1 := RECORD
@@ -74,7 +77,7 @@ SHARED SortedCandNAMEST := SORT(DISTRIBUTE(CandidatesNAMEST,HASH(cnp_name,st)),c
   SHARED RelJoinNAMEST0 := RelJoinNAMEST0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::NAMEST0',EXPIRE(Config.PersistExpire));
 EXPORT NAMEST_Links_np := RelJoinNAMEST0_np;
 EXPORT NAMEST_Links := RelJoinNAMEST0;
-// Code for CHARTER relationship
+// Code for CHARTER relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -125,7 +128,7 @@ SHARED SortedCandCHARTER := SORT(DISTRIBUTE(CandidatesCHARTER,HASH(company_chart
   SHARED RelJoinCHARTER0 := RelJoinCHARTER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::CHARTER0',EXPIRE(Config.PersistExpire));
 EXPORT CHARTER_Links_np := RelJoinCHARTER0_np;
 EXPORT CHARTER_Links := RelJoinCHARTER0;
-// Code for FEIN relationship
+// Code for FEIN relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -174,7 +177,7 @@ SHARED SortedCandFEIN := SORT(DISTRIBUTE(CandidatesFEIN,HASH(company_fein)),comp
   SHARED RelJoinFEIN0 := RelJoinFEIN0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::FEIN0',EXPIRE(Config.PersistExpire));
 EXPORT FEIN_Links_np := RelJoinFEIN0_np;
 EXPORT FEIN_Links := RelJoinFEIN0;
-// Code for CONTACT relationship
+// Code for CONTACT relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -277,7 +280,7 @@ SHARED SortedCandCONTACT := SORT(DISTRIBUTE(CandidatesCONTACT,HASH(fname,lname))
   SHARED RelJoinCONTACT0 := RelJoinCONTACT0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::CONTACT0',EXPIRE(Config.PersistExpire));
 EXPORT CONTACT_Links_np := RelJoinCONTACT0_np;
 EXPORT CONTACT_Links := RelJoinCONTACT0;
-// Code for ADDRESS relationship
+// Code for ADDRESS relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -369,7 +372,7 @@ SHARED SortedCandADDRESS := SORT(DISTRIBUTE(CandidatesADDRESS,HASH(prim_name,pri
   SHARED RelJoinADDRESS15 := RelJoinADDRESS15_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::ADDRESS15',EXPIRE(Config.PersistExpire));
 EXPORT ADDRESS_Links_np := RelJoinADDRESS0_np + RelJoinADDRESS1_np + RelJoinADDRESS2_np + RelJoinADDRESS3_np + RelJoinADDRESS4_np + RelJoinADDRESS5_np + RelJoinADDRESS6_np + RelJoinADDRESS7_np + RelJoinADDRESS8_np + RelJoinADDRESS9_np + RelJoinADDRESS10_np + RelJoinADDRESS11_np + RelJoinADDRESS12_np + RelJoinADDRESS13_np + RelJoinADDRESS14_np + RelJoinADDRESS15_np;
 EXPORT ADDRESS_Links := RelJoinADDRESS0 + RelJoinADDRESS1 + RelJoinADDRESS2 + RelJoinADDRESS3 + RelJoinADDRESS4 + RelJoinADDRESS5 + RelJoinADDRESS6 + RelJoinADDRESS7 + RelJoinADDRESS8 + RelJoinADDRESS9 + RelJoinADDRESS10 + RelJoinADDRESS11 + RelJoinADDRESS12 + RelJoinADDRESS13 + RelJoinADDRESS14 + RelJoinADDRESS15;
-// Code for DUNS_NUMBER relationship
+// Code for DUNS_NUMBER relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -418,7 +421,7 @@ SHARED SortedCandDUNS_NUMBER := SORT(DISTRIBUTE(CandidatesDUNS_NUMBER,HASH(activ
   SHARED RelJoinDUNS_NUMBER0 := RelJoinDUNS_NUMBER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::DUNS_NUMBER0',EXPIRE(Config.PersistExpire));
 EXPORT DUNS_NUMBER_Links_np := RelJoinDUNS_NUMBER0_np;
 EXPORT DUNS_NUMBER_Links := RelJoinDUNS_NUMBER0;
-// Code for ENTERPRISE_NUMBER relationship
+// Code for ENTERPRISE_NUMBER relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -467,7 +470,7 @@ SHARED SortedCandENTERPRISE_NUMBER := SORT(DISTRIBUTE(CandidatesENTERPRISE_NUMBE
   SHARED RelJoinENTERPRISE_NUMBER0 := RelJoinENTERPRISE_NUMBER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::ENTERPRISE_NUMBER0',EXPIRE(Config.PersistExpire));
 EXPORT ENTERPRISE_NUMBER_Links_np := RelJoinENTERPRISE_NUMBER0_np;
 EXPORT ENTERPRISE_NUMBER_Links := RelJoinENTERPRISE_NUMBER0;
-// Code for SOURCE relationship
+// Code for SOURCE relationship 
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -518,7 +521,7 @@ SHARED SortedCandSOURCE := SORT(DISTRIBUTE(CandidatesSOURCE,HASH(source,source_r
   SHARED RelJoinSOURCE0 := RelJoinSOURCE0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::SOURCE0',EXPIRE(Config.PersistExpire));
 EXPORT SOURCE_Links_np := RelJoinSOURCE0_np;
 EXPORT SOURCE_Links := RelJoinSOURCE0;
-// Code for ASSOC relationship
+// Code for ASSOC relationship 
 SHARED ASSOCCRec := RECORD
     SALT31.UIDType Seleid1;
     SALT31.UIDType Seleid2;

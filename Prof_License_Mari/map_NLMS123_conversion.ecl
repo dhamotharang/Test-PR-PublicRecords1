@@ -7,7 +7,7 @@ IMPORT ut, Address, Standard, Prof_License_Mari, lib_stringlib ,Lib_FileServices
 
 EXPORT map_NLMS123_conversion(STRING process_dte) := FUNCTION		
 
-#workunit('name','Prof License NLMS MARI Build ' + process_dte);		
+#workunit('name','Yogurt:Prof License NLMS MARI Build ' + process_dte);		
 
 src_cd	:= 'S0900'; //Vendor code
 src_st	:= 'US';	//License state
@@ -462,7 +462,7 @@ Datepattern := '^(.*)/(.*)/(.*)$';
 
 
 maribase_plus_dbas := RECORD,MAXLENGTH(8000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
   STRING60 dba1;
   STRING60 dba2;
   STRING60 dba3;
@@ -527,7 +527,7 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 															Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')))));  //Without punct. and Sufx removed
 	SELF.NAME_ORG_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameOrg);
 	SELF.NAME_ORG				:= REGEXREPLACE('/',clnOrgName,' ');
-	SELF.NAME_ORG_SUFX 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+	SELF.NAME_ORG_SUFX 	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 	
 	SELF.NAME_PREFX   	:= IF(tempTypeCd ='MD',TRIM(pInput.title,LEFT,RIGHT),'');
 	SELF.NAME_FIRST			:= IF(tempTypeCd ='MD',TRIM(pInput.fname,LEFT,RIGHT),'');
@@ -580,9 +580,9 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 			
 	
   prepAddr_Line_11			:= tempAdd1_1_1 + ' ' + tempAdd2_1_1;
-	prepAddr_Line_21			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.City) + ' ' +
-	                         Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE) + ' ' +
-													 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZipCode);
+	prepAddr_Line_21			:= ut.CleanSpacesAndUpper(pInput.City) + ' ' +
+	                         ut.CleanSpacesAndUpper(pInput.STATE) + ' ' +
+													 ut.CleanSpacesAndUpper(pInput.ZipCode);
 	clnAddrAddr1					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(prepAddr_Line_11,prepAddr_Line_21);
 	tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 	tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -1062,9 +1062,9 @@ maribase_plus_dbas		transformToCommon_Indv(rRawIndividual_layout pInput) := TRAN
 		
 	
   prepAddr_Line_11	  := tempAdd1_1_1 ;
-	prepAddr_Line_21		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.City) + ' ' +
-	                        Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE) + ' ' +
-												 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZipCode);
+	prepAddr_Line_21		:= ut.CleanSpacesAndUpper(pInput.City) + ' ' +
+	                        ut.CleanSpacesAndUpper(pInput.STATE) + ' ' +
+												 ut.CleanSpacesAndUpper(pInput.ZipCode);
 													 
 	clnAddrAddr1				:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(prepAddr_Line_11,prepAddr_Line_21);
 	tmpADDR_ADDR1_1			:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
@@ -1242,7 +1242,7 @@ DBARecs 	:= NormDBAs(TMP_DBA != '');
 
 FilteredRecs  := DBARecs + NoDBARecs;
 
-Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 	RmvDBA							:= IF(TRIM(L.TMP_DBA,LEFT,RIGHT) = 'DBA','',L.TMP_DBA);
   StdNAME_DBA					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(RmvDBA);
   DBA_SUFX						:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA);		   
@@ -1251,7 +1251,7 @@ Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
 	SELF.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);
 	SELF.NAME_DBA				:= IF(TRIM(ClnDBA,LEFT,RIGHT) != TRIM(L.NAME_ORG,LEFT,RIGHT), stringlib.stringfindreplace(ClnDBA,'"',''),'');
 	SELF.DBA_FLAG       := IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',1,0); // 1: true  0: FALSE
-	SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
+	SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
 	SELF.NAME_DBA_ORIG	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',L.NAME_DBA_ORIG,'');
 	SELF.NAME_MARI_DBA	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(StdNAME_DBA,LEFT,RIGHT),'');
 	SELF.MLTRECKEY 		  := IF(TRIM(SELF.NAME_DBA,LEFT,RIGHT) = '',0,L.MLTRECKEY);
@@ -1265,7 +1265,7 @@ ds_map_base := PROJECT(FilteredRecs, xTransToBase(LEFT));
 company_only_lookup := ds_map_base(affil_type_cd='CO');
 
 //assign pcmc_slpk for linked records and remove temporary place holder for COMPANY_NMLS_ID used for linking
-Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -1276,7 +1276,7 @@ ds_map_affil := JOIN(ds_map_base, company_only_lookup,
 						      assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
 
-Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 	SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 							TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 						   L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

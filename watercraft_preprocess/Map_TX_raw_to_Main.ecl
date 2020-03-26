@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, header, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, header, STD;
 
 // translates  tx_phase01.mp Ab intio graph into ECL
 
@@ -485,8 +485,8 @@ prop_desc(string1 code)
 '4' => 'OTHER',
 '5' => 'SAIL','');
 
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_TX_clean_in, watercraft.layout_TX_new,hull_clean_in)
-watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.layout_TX_new, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_TX_clean_in, watercraft.layout_TX_new_18q3,hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.layout_TX_new_18q3, wDatasetwithflag)
 
 string fFixHullID(string pHullIDIn)
  := lib_stringlib.StringLib.StringFilter(lib_stringlib.stringlib.stringtouppercase(pHullIDIn),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ');

@@ -67,7 +67,7 @@ RemovePattern	   := '(^.* LLC[.]?$|^.* LLC\\.$|^.* INC[.]?$|^.* INC |^.* COMPANY
 Addr_Pattern     := '(STREET| ST$|ROAD|DRIVE|PO BOX| RD$| DR | APT| AVE| AVENUE|ROUTE|SUITE| STE |HWY|BLVD|BLDG|PKWY| PARKWAY$| LANE$|WAY$)';	
 		
 //VT Real Estate License to common MARIBASE layout
-Prof_License_Mari.layouts.base		xformToCommon(Prof_License_Mari.layout_VTS0356.common pInput) 
+Prof_License_Mari.layout_base_in		xformToCommon(Prof_License_Mari.layout_VTS0356.common pInput) 
     := 
 	  TRANSFORM
 		SELF.PRIMARY_KEY	    := 0;  
@@ -362,7 +362,7 @@ END;
 inFileLic	:= DEDUP(SORT(PROJECT(GoodRecs, xformToCommon(LEFT)),cmc_slpk,LOCAL), RECORD,ALL);
 
 // Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -373,7 +373,7 @@ ds_map_stat_trans := JOIN(inFileLic, cmvTransLkp,
 							trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -385,7 +385,7 @@ ds_map_lic_trans := JOIN(ds_map_stat_trans, cmvTransLkp,
 						trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 																		
 //Populate PROV_STAT
-Prof_License_Mari.layouts.base 	trans_prov_stat(ds_map_lic_trans L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_prov_stat(ds_map_lic_trans L, cmvTransLkp R) := TRANSFORM
 	SELF.PROV_STAT := IF(L.PROV_STAT != '',L.PROV_STAT,R.DM_VALUE2);
 	SELF := L;
 END;
@@ -401,7 +401,7 @@ ds_map_prov_trans := JOIN(ds_map_lic_trans, cmvTransLkp,
 company_only_lookup := ds_map_prov_trans(affil_type_cd='CO');
 company_only_lookup_gr := ds_map_prov_trans(type_cd ='GR' AND NAME_MARI_ORG != '');
 
-Prof_License_Mari.layouts.base 	assign_pcmcslpk_br(ds_map_prov_trans L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	assign_pcmcslpk_br(ds_map_prov_trans L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -411,7 +411,7 @@ ds_map_affil_br := JOIN(ds_map_prov_trans, company_only_lookup,
 						AND LEFT.AFFIL_TYPE_CD = 'BR',
 						assign_pcmcslpk_br(LEFT,RIGHT),LEFT OUTER,LOCAL,LOOKUP);	
 						
-Prof_License_Mari.layouts.base 	assign_pcmcslpk_gr(ds_map_affil_br L, company_only_lookup_gr R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	assign_pcmcslpk_gr(ds_map_affil_br L, company_only_lookup_gr R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -420,7 +420,7 @@ ds_map_affil_gr := JOIN(ds_map_affil_br, company_only_lookup_gr,
 						AND LEFT.STD_LICENSE_TYPE IN ['081','082'],
 						assign_pcmcslpk_gr(LEFT,RIGHT),LEFT OUTER,LOCAL);	
 
-Prof_License_Mari.layouts.base  xTransPROVNOTE(ds_map_affil_gr L) := TRANSFORM
+Prof_License_Mari.layout_base_in  xTransPROVNOTE(ds_map_affil_gr L) := TRANSFORM
 	SELF.PROVNOTE_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + BrComnt,
 												 L.provnote_1 != '' AND L.pcmc_slpk = 0 
 												 AND L.affil_type_cd = 'IN' AND REGEXFIND(BranchIdent,TRIM(L.name_mari_org,LEFT,RIGHT)) => TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + INComnt,
@@ -436,7 +436,7 @@ END;
 OutRecs := PROJECT(ds_map_affil_gr, xTransPROVNOTE(LEFT));
 
 // Transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base xTransToBase(OutRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransToBase(OutRecs L) := TRANSFORM
 	SELF.NAME_ORG_PREFX	:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(L.NAME_ORG_PREFX)); 
 	SELF.NAME_DBA 			:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_DBA,'/',' '));
 	SELF := L;

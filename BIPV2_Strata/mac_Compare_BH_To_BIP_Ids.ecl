@@ -1,4 +1,4 @@
-/*
+﻿/*
 Bug: 178358 - Linking 2.2 : consolidate contacts index with EmpID
 next steps are:
 create table by source and file(bip or old bh) on bdid->lexid and powid->lexid
@@ -79,7 +79,8 @@ functionmacro
 
   ],lay_strata);
 
-  ds_total := sort(ds_join_source_table           ,source) + ds_totals;
+  ds_total := sort(ds_join_source_table           ,source) + ds_totals
+  : independent;
 
   // return parallel(
      // output(sort(ds_join_empid           ,source) + ds_totals ,named('Bdid_Lexid_Powid_lexid_table' ),all)

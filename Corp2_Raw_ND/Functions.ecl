@@ -1,331 +1,95 @@
-IMPORT corp2_raw_nd, corp2, corp2_mapping;
+﻿IMPORT corp2_raw_nd, corp2, corp2_mapping;
 
 EXPORT FUNCTIONs := Module
-			
-			// Several Status descriptions are abbreviated below from what is specified  
-			// in the CI due to the layout field length only being 60 characters.
-			EXPORT GetStatusDesc(string code, string type)		 
-				:= map(// CORP Recs                          
-							 type = 'C' and corp2.t2u(code)  = 'A'  => 'ACTIVE ORGANIZATION',
-						   type = 'C' and corp2.t2u(code)  = 'C'  => 'CONSOLIDATED W/ ANOTHER ORG. NO LONGER CONSIDERED ACTIVE REC',
-							 type = 'C' and corp2.t2u(code)  = 'CV' => 'CONVERTED',
-						   type = 'C' and corp2.t2u(code)  = 'E'  => 'EXPIRED. NO LONGER CONSIDERED AN ACTIVE RECORD',
-							 type = 'C' and corp2.t2u(code)  = 'I'  => 'INVOLUNTARY TERMINATED',
-							 type = 'C' and corp2.t2u(code)  = 'M'  => 'RETIRE BY MERGER INTO OTHER ORG. NO LONGER CONSIDERED ACTIVE',
-							 type = 'C' and corp2.t2u(code)  = 'N'  => 'NOT GOOD STANDINGS',
-							 type = 'C' and corp2.t2u(code)  = 'R'  => 'IN RECEIVERSHIP',
-							 type = 'C' and corp2.t2u(code)  = 'RD' => 'RE-DOMESTICATED',
-							 type = 'C' and corp2.t2u(code)  = 'T'  => 'TERMINATED BY COURT ORDER',
-							 type = 'C' and corp2.t2u(code)  = 'V'  => 'VOLUNTARY TERMINATION DISSOLUTION',
-							 // FICTITIOUS NAME Recs 
-							 type = 'F' and corp2.t2u(code)  = 'A'  => 'ACTIVE FICTITIOUS NAME',
-               type = 'F' and corp2.t2u(code)  = 'E'  => 'EXPIRED. NO LONGER CONSIDERED AN ACTIVE RECORD.',
-               type = 'F' and corp2.t2u(code)  = 'I'  => 'INACTIVE',
-               type = 'F' and corp2.t2u(code)  = 'V'  => 'VOLUNTARILY TERMINATED',
-							 // PARTNERSHIP Recs
-							 type = 'P' and corp2.t2u(code)  = 'A'  => 'ACTIVE PARTNERSHIP',
-			         type = 'P' and corp2.t2u(code)  = 'CV' => 'CONVERTED TO ANOTHER ORG TYPE. NO LONGER CONSIDERED ACTIVE',
-               type = 'P' and corp2.t2u(code)  = 'E'  => 'EXPIRED. NO LONGER CONSIDERED AN ACTIVE RECORD',
-               type = 'P' and corp2.t2u(code)  = 'I'  => 'INVOLUNTARILY TERMINATED ORGANIZATION FOR FAILURE TO RENEW',
-							 type = 'P' and corp2.t2u(code)  = 'M'  => 'MERGED INTO ANOTHER ORG. NO LONGER CONSIDERED AN ACTIVE REC.',
-							 type = 'P' and corp2.t2u(code)  = 'N'  => 'NOT GOOD STANDG FOR FAILURE TO FILE RENEWAL,TERMINATION PEND',
-               type = 'P' and corp2.t2u(code)  = 'V'  => 'VOLUNTARILY TERMINATED PARTNERSHIP',
-						   // TRADEMARK Recs						 
-							 type = 'TM' and corp2.t2u(code) = 'A'  => 'ACTIVE TRADEMARK/SERVICE MARK',
-               type = 'TM' and corp2.t2u(code) = 'E'  => 'EXPIRED. NO LONGER CONSIDERED AN ACTIVE RECORD.',
-               type = 'TM' and corp2.t2u(code) = 'I'  => 'INACTIVE',
-               type = 'TM' and corp2.t2u(code) = 'V'  => 'VOLUNTARILY TERMINATED',
-							 // TRADENAME Recs							 
-							 type = 'TN' and corp2.t2u(code) = 'A'  => 'ACTIVE TRADE NAME',
-               type = 'TN' and corp2.t2u(code) = 'E'  => 'EXPIRED. NO LONGER CONSIDERED AN ACTIVE RECORD.',
-               type = 'TN' and corp2.t2u(code) = 'I'  => 'INACTIVE',
-               type = 'TN' and corp2.t2u(code) = 'V'  => 'VOLUNTARILY TERMINATED',
-							 '');
-							 
-			// A couple Structure descriptions are abbreviated below from what is specified  
-			// in the CI due to the layout field length only being 60 characters.
-			EXPORT GetStructureDesc(string code, string type) 
-		    := map(type = 'C' and corp2.t2u(code) = 'AA'   => 'AIRPORT AUTHORITIES',
-							 type = 'C' and corp2.t2u(code) = 'BANK' => 'NORTH DAKOTA STATE BANK',
-							 type = 'C' and corp2.t2u(code) = 'BC'   => 'NORTH DAKOTA BUSINESS CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'C'    => 'NORTH DAKOTA COOPERATIVE ASSOCIATION',
-							 type = 'C' and corp2.t2u(code) = 'CH'   => 'NORTH DAKOTA INCORPORATED CHURCH',
-							 type = 'C' and corp2.t2u(code) = 'CITY' => 'NORTH DAKOTA CITY',
-							 type = 'C' and corp2.t2u(code) = 'CNPD' => 'NORTH DAKOTA CERTIFIED NONPROFIT DEVELOPMENT CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'CU'   => 'NORTH DAKOTA CREDIT UNION',
-							 type = 'C' and corp2.t2u(code) = 'EC'   => 'NORTH DAKOTA ELECTRIC COOPERATIVE',
-							 type = 'C' and corp2.t2u(code) = 'F'    => 'FOREIGN (NOT NORTH DAKOTA) BUSINESS CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'FARM' => 'NORTH DAKOTA FARM CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'FC'   => 'FOREIGN (NOT NORTH DAKOTA) COOPERATIVE ASSOCIATION',
-							 type = 'C' and corp2.t2u(code) = 'FID'  => 'FIDUCIARY',
-							 type = 'C' and corp2.t2u(code) = 'FLC'  => 'FOREIGN (NOT NORTH DAKOTA) LIMITED LIABILITY COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'FMLC' => 'NORTH DAKOTA FARM LIMITED LIABILITY COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'FNLC' => 'CHARITABLE ORGANIZATION',
-							 type = 'C' and corp2.t2u(code) = 'FNP'  => 'FOREIGN (NOT NORTH DAKOTA) NONPROFIT CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'FPC'  => 'FOREIGN (NOT NORTH DAKOTA) PROFESSIONAL CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'FPLC' => 'FOREIGN (NOT NORTH DAKOTA) PROFESSIONAL LLC',
-							 type = 'C' and corp2.t2u(code) = 'GA'   => 'NORTH DAKOTA GRAZING ASSOCIATION',
-							 type = 'C' and corp2.t2u(code) = 'IC'   => 'NORTH DAKOTA INSURANCE COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'ID'   => 'NORTH DAKOTA IRRIGATION DISTRICT',
-							 type = 'C' and corp2.t2u(code) = 'LC'   => 'NORTH DAKOTA LIMITED LIABILITY COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'MAC'  => 'NORTH DAKOTA MUTUAL AID CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'MP'   => 'NORTH DAKOTA MUNICIPAL POWER AGENCY',
-							 type = 'C' and corp2.t2u(code) = 'NP'   => 'NORTH DAKOTA NONPROFIT CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'NPLC' => 'NONPROFIT LIMITED LIABILITY COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'PC'   => 'NORTH DAKOTA PROFESSIONAL CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'PLC'  => 'NORTH DAKOTA PROFESSIONAL LIMITED LIABILITY COMPANY',
-							 type = 'C' and corp2.t2u(code) = 'PTC'  => 'PUBLICLY TRADED CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'REIT' => 'REAL ESTATE INVESTMENT TRUST',
-							 type = 'C' and corp2.t2u(code) = 'SCD'  => 'NORTH DAKOTA SOIL CONSERVATION DISTRICT',
-							 type = 'C' and corp2.t2u(code) = 'VC'   => 'NORTH DAKOTA VENTURE CAPITAL CORPORATION',
-							 type = 'C' and corp2.t2u(code) = 'VCD'  => 'VECTOR CONTROL DISTRICT',
-							 type = 'C' and corp2.t2u(code) = 'WMD'  => 'NORTH DAKOTA WATER MANAGEMENT DISTRICT',
-						    
-							 type = 'P' and corp2.t2u(code) = 'G'    => 'GENERAL PARTNERSHIP',
-               type = 'P' and corp2.t2u(code) = 'L'    => 'LIMITED PARTNERSHIP',
-							 type = 'P' and corp2.t2u(code) = 'LLP'  => 'LIMITED LIABILITY PARTNERSHIP',
-               type = 'P' and corp2.t2u(code) = 'LLLP' => 'LIMITED LIABILITY LIMITED PARTNERSHIP',
-               type = 'P' and corp2.t2u(code) = 'LP'   => 'LIMITED PARTNERSHIP',
-               type = 'P' and corp2.t2u(code) = 'PLLP' => 'PROFESSIONAL LIMITED LIABILITY PARTNERSHIP',
-							 '');
-
-		EXPORT GetRAName(string n1, string n2) := FUNCTION
-			raname1 := if (StringLib.StringFind(corp2.t2u(n1),'AGENT FOR'        ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'NONE'             ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'AGENT RESIGN'     ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'AGENT NOT'        ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'AGENT RESIGNED'   ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'RESIGNED'         ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'NONE APPOINTED'   ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n1),'AGENT RESIGNATION',1) >0
-										 ,'' ,corp2.t2u(n1));									
-			raname2 := if (StringLib.StringFind(corp2.t2u(n2),'AGENT FOR'        ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'NONE'             ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'AGENT RESIGN'     ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'AGENT NOT'        ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'AGENT RESIGNED'   ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'RESIGNED'         ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'NONE APPOINTED'   ,1) >0 or
-										 StringLib.StringFind(corp2.t2u(n2),'AGENT RESIGNATION',1) >0  
-										 ,'' ,corp2.t2u(n2));
-			RETURN Corp2_mapping.fCleanBusinessName('ND','NORTH DAKOTA',corp2.t2u(raname1 + ' ' + raname2)).BusinessName;
-		END;	
-				
-	  EXPORT GetForgnDesc(string code) 
-	      := case(corp2.t2u(code),
-								// US States 
-								'AL' => 'ALABAMA',
-								'AK' => 'ALASKA',
-								'AZ' => 'ARIZONA',
-								'AR' => 'ARKANSAS',
-								'CA' => 'CALIFORNIA',
-								'CO' => 'COLORADO',
-								'CT' => 'CONNECTICUT',
-								'DE' => 'DELAWARE',
-								'DC' => 'DISTRICT OF COLUMBIA',
-								'FL' => 'FLORIDA',
-								'GA' => 'GEORGIA',
-								'HI' => 'HAWAII',
-								'ID' => 'IDAHO',
-								'IL' => 'ILLINOIS',
-								'IN' => 'INDIANA',
-								'IA' => 'IOWA',
-								'KS' => 'KANSAS',
-								'KY' => 'KENTUCKY',
-								'LA' => 'LOUISIANA',
-								'ME' => 'MAINE',
-								'MD' => 'MARYLAND',
-								'MA' => 'MASSACHUSETTS',
-								'MI' => 'MICHIGAN',
-								'MN' => 'MINNESOTA',
-								'MS' => 'MISSISSIPPI',
-								'MO' => 'MISSOURI',
-								'MT' => 'MONTANA',
-								'NE' => 'NEBRASKA',
-								'NV' => 'NEVADA',
-								'NH' => 'NEW HAMPSHIRE',
-								'NJ' => 'NEW JERSEY',
-								'NM' => 'NEW MEXICO',
-								'NY' => 'NEW YORK',
-								'NC' => 'NORTH CAROLINA',
-								'ND' => 'NORTH DAKOTA',
-								'OH' => 'OHIO',
-								'OK' => 'OKLAHOMA',
-								'OR' => 'OREGON',
-								'PA' => 'PENNSYLVANIA',
-								'RI' => 'RHODE ISLAND',
-								'SC' => 'SOUTH CAROLINA',
-								'SD' => 'SOUTH DAKOTA',
-								'TN' => 'TENNESSEE',
-								'TX' => 'TEXAS',
-								'UT' => 'UTAH',
-								'VT' => 'VERMONT',
-								'VA' => 'VIRGINIA',
-								'WA' => 'WASHINGTON',
-								'WV' => 'WEST VIRGINIA',
-								'WI' => 'WISCONSIN',
-								'WY' => 'WYOMING',
-								// US Territories
-								'AA' => 'ARMED FORCES AMERICAS',
-								'AE' => 'ARMED FORCES EUROPE',
-								'AP' => 'ARMED FORCES PACIFIC',
-								'CM' => 'NORTHERN MARIANA ISLANDS',
-								'CZ' => 'CANAL ZONE',
-								'FM' => 'FEDERATED STATES OF MICRONESIA',
-								'MH' => 'MARSHALL ISLANDS',
-								'PW' => 'PALAU',
-								'UM' => 'US MINOR OUTLYING ISLANDS',
-								'US' => 'US',
-								'MP' => 'NORTHERN MARIANA ISLANDS',
-								'AS' => 'AMERICAN SAMOA',
-								'VI' => 'VIRGIN ISLANDS',
-								'PR' => 'PUERTO RICO',
-								'GU' => 'GUAM',
-								// Native American Tribes
-								'AT' => 'AFFILIATED TRIBES',
-								'RL' => 'RED LAKE BAND OF CHIPPEWA INDIANS',
-								'SS' => 'SPIRIT LAKE TRIBES',
-								'ST' => 'SISSETON-WAHPETON SIOUX TRIBE',
-								'TM' => 'TURTLE MT. BAND OF CHIPPEWA',
-								'WH' => 'WHITE EARTH BAND OF CHIPPEWA INDIANS',
-								'WT' => 'WINNEBAGO TRIBE OF NEBRASKA',
-								// Canadian Provinces
-								'AB' => 'ALBERTA',
-								'BC' => 'BRITISH COLUMBIA',
-								'MB' => 'MANITOBA',
-								'NB' => 'NEW BRUNSWICK',
-								'NF' => 'NEWFOUNDLAND',
-								'NS' => 'NOVA SCOTIA',
-								'NT' => 'NORTHWEST TERRITORY',
-								'ON' => 'ONTARIO',
-								'PE' => 'PRINCE EDWARD ISLAND',
-								'PQ' => 'QUEBEC',
-								'QC' => 'QUEBEC',
-								'SK' => 'SASKATCHEWAN',
-								'YT' => 'YUKON TERRITORY',
-								// Other Countries
-								'AU' => 'AUSTRALIA',
-								'BA' => 'BAHAMAS',
-								'BB' => 'BARBADOS',
-								'BG' => 'BELGIUM',
-								'BM' => 'BERMUDA',
-								'BW' => 'BRITISH WEST INDIES',
-								'CH' => 'CHINA',
-								'CI' => 'COOK ISLANDS',
-								'CK' => 'COOK ISLANDS',
-								'CN' => 'CANADA',
-								'CR' => 'COSTA RICA',
-								'CS' => 'SERBIA AND MONTENEGRO',
-								'CU' => 'CUBA',
-								'CY' => 'CYPRUS',
-								'DL' => 'DELHI',
-								'EM' => 'EAST MALAYSIA',
-								'EN' => 'ENGLAND',
-								'FI' => 'FINLAND',
-								'FR' => 'FRANCE',
-								'GE' => 'GERMANY',
-								'HK' => 'HONG KONG',
-								'HO' => 'HOLLAND',
-								'HU' => 'HUNGARY',
-								'I'  => 'INDIA',
-								'IT' => 'ITALY',
-								'JP' => 'JAPAN',
-								'JR' => 'JORDAN',
-								'LX' => 'LUXEMBOURG',
-								'M'  => 'MUMBAI INDIA',
-								'MX' => 'MEXICO',
-								'NA' => 'NAMIBIA',
-								'NL' => 'NETHERLANDS',
-								'NN' => 'NASSAU',
-								'NW' => 'NORWAY',
-								'NZ' => 'NEW ZEALAND',
-								'PH' => 'PHILLIPINES',
-								'PN' => 'PITCAIRN',
-								'QL' => 'QUEENSLAND',
-								'RF' => 'RUSSIAN FEDERATION',
-								'SA' => 'SAUDI ARABIA',
-								'SE' => 'SWEDEN',
-								'SI' => 'SINGAPORE',
-								'SL' => 'SCOTLAND',
-								'SP' => 'SPAIN',
-								'SR' => 'SURINAME',
-								'SW' => 'SWITZERLAND',
-								'TW' => 'TAIWAN, REPUBLIC OF CHINA',
-								'UA' => 'UKRAINE',
-								'UK' => 'UNITED KINGDOM',
-								'OS' => '',
-								'UR' => '',
-								''   => '',
-								'**|'+corp2.t2u(code));
-		
-		EXPORT GetCountry(string code) 
-	      := map(				    
-						// US States, Territories, and Native American Tribes 
-						corp2.t2u(code) in ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IA',
-															  'IN','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
-																'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT',
-																'VT','VA','WA','WV','WI','WY','AA','AE','AP','CM','CZ','FM','MH','PW','UM',
-																'US','MP','AS','VI','PR','GU','AT','RL','SS','ST','TM','WH','WT'] => 'US',    
-					  
-						// Canadian Provinces
-						corp2.t2u(code) in ['AB','BC','MB','NB','NF','NS','NT','ON','PE','PQ','QC','SK','YT']	=> 'CANADA', 
-						
-						// Other Countries
-						corp2.t2u(code) = 'AU' => 'AUSTRALIA',
-						corp2.t2u(code) = 'BA' => 'BAHAMAS',
-						corp2.t2u(code) = 'BB' => 'BARBADOS',
-						corp2.t2u(code) = 'BG' => 'BELGIUM',
-						corp2.t2u(code) = 'BM' => 'BERMUDA',
-						corp2.t2u(code) = 'BW' => 'BRITISH WEST INDIES',
-						corp2.t2u(code) = 'CH' => 'CHINA',
-						corp2.t2u(code) = 'CI' => 'COOK ISLANDS',
-						corp2.t2u(code) = 'CK' => 'COOK ISLANDS',
-						corp2.t2u(code) = 'CN' => 'CANADA',
-						corp2.t2u(code) = 'CR' => 'COSTA RICA',
-						corp2.t2u(code) = 'CS' => 'SERBIA AND MONTENEGRO',
-						corp2.t2u(code) = 'CU' => 'CUBA',
-						corp2.t2u(code) = 'CY' => 'CYPRUS',
-						corp2.t2u(code) = 'DL' => 'DELHI',
-						corp2.t2u(code) = 'EM' => 'EAST MALAYSIA',
-						corp2.t2u(code) = 'EN' => 'ENGLAND',
-						corp2.t2u(code) = 'FI' => 'FINLAND',
-						corp2.t2u(code) = 'FR' => 'FRANCE',
-						corp2.t2u(code) = 'GE' => 'GERMANY',
-						corp2.t2u(code) = 'HK' => 'HONG KONG',
-						corp2.t2u(code) = 'HO' => 'HOLLAND',
-						corp2.t2u(code) = 'HU' => 'HUNGARY',
-						corp2.t2u(code) = 'I'  => 'INDIA',
-						corp2.t2u(code) = 'IT' => 'ITALY',
-						corp2.t2u(code) = 'JP' => 'JAPAN',
-						corp2.t2u(code) = 'JR' => 'JORDAN',
-						corp2.t2u(code) = 'LX' => 'LUXEMBOURG',
-						corp2.t2u(code) = 'M'  => 'MUMBAI INDIA',
-						corp2.t2u(code) = 'MX' => 'MEXICO',
-						corp2.t2u(code) = 'NA' => 'NAMIBIA',
-						corp2.t2u(code) = 'NL' => 'NETHERLANDS',
-						corp2.t2u(code) = 'NN' => 'NASSAU',
-						corp2.t2u(code) = 'NW' => 'NORWAY',
-						corp2.t2u(code) = 'NZ' => 'NEW ZEALAND',
-						corp2.t2u(code) = 'PH' => 'PHILLIPINES',
-						corp2.t2u(code) = 'PN' => 'PITCAIRN',
-						corp2.t2u(code) = 'QL' => 'QUEENSLAND',
-						corp2.t2u(code) = 'RF' => 'RUSSIAN FEDERATION',
-						corp2.t2u(code) = 'SA' => 'SAUDI ARABIA',
-						corp2.t2u(code) = 'SE' => 'SWEDEN',
-						corp2.t2u(code) = 'SI' => 'SINGAPORE',
-						corp2.t2u(code) = 'SL' => 'SCOTLAND',
-						corp2.t2u(code) = 'SP' => 'SPAIN',
-						corp2.t2u(code) = 'SR' => 'SURINAME',
-						corp2.t2u(code) = 'SW' => 'SWITZERLAND',
-						corp2.t2u(code) = 'TW' => 'TAIWAN, REPUBLIC OF CHINA',
-						corp2.t2u(code) = 'UA' => 'UKRAINE',
-						corp2.t2u(code) = 'UK' => 'UNITED KINGDOM',
-						corp2.t2u(code) = ''   => '',
-						corp2.t2u(code));		
-
-END; 
-      
-
+	
+	//********************************************************************
+	//  For_Profit: Returns "N" or blank
+	//********************************************************************	
+	EXPORT  For_Profit(STRING filtyp) 
+				:= map (corp2.t2u(filtyp) in ['CORPORATION - NONPROFIT - DOMESTIC',
+																			'CORPORATION - NONPROFIT - FOREIGN',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - FOREIGN']  => 'N',
+								'');
+								
+	//********************************************************************
+	//  For_or_Dom: Returns "F" or "D"
+	//********************************************************************	
+	EXPORT  For_or_Dom(STRING filtyp) 
+				:= map (corp2.t2u(filtyp) in ['COOPERATIVE - ELECTRIC CORPORATION',
+																			'COOPERATIVE - GRAZING ASSOCIATION',
+																			'COOPERATIVE - MUTUAL AID',
+																			'COOPERATIVE ASSOCIATION - DOMESTIC',
+																			'CORPORATION - BUSINESS - DOMESTIC',
+																			'CORPORATION - FARM/RANCH - IN-STATE',
+																			'CORPORATION - NONPROFIT - DOMESTIC',
+																			'CORPORATION - PROFESSIONAL - DOMESTIC',
+																			'FICTITIOUS PARTNERSHIP NAME',
+																			'INSURANCE COMPANY',
+																			'LIMITED LIABILITY COMPANY - BUSINESS - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - FARM/RANCH - IN-STATE',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - PROFESSIONAL - DOMESTIC',
+																			'LIMITED LIABILITY LIMITED PARTNERSHIP - DOMESTIC',
+																			'LIMITED LIABILITY PARTNERSHIP - DOMESTIC',
+																			'LIMITED LIABILITY PARTNERSHIP - PROFESSIONAL - DOMESTIC',
+																			'LIMITED PARTNERSHIP - DOMESTIC',
+																			'REAL ESTATE INVESTMENT TRUST']	            => 'D',
+								corp2.t2u(filtyp) in ['COOPERATIVE ASSOCIATION - FOREIGN',
+																			'CORPORATION - BUSINESS - FOREIGN',
+																			'CORPORATION - FARM/RANCH - OUT-OF-STATE',
+																			'CORPORATION - NONPROFIT - FOREIGN',
+																			'CORPORATION - PROFESSIONAL - FOREIGN', 
+																			'LIMITED LIABILITY COMPANY - BUSINESS - FOREIGN',
+																			'LIMITED LIABILITY COMPANY - FARM/RANCH - OUT-OF-STATE',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - FOREIGN',
+																			'LIMITED LIABILITY COMPANY - PROFESSIONAL - FOREIGN',
+																			'LIMITED LIABILITY LIMITED PARTNERSHIP - FOREIGN',
+																			'LIMITED LIABILITY PARTNERSHIP - FOREIGN', 
+																			'LIMITED LIABILITY PARTNERSHIP - PROFESSIONAL - FOREIGN',
+																			'LIMITED PARTNERSHIP - FOREIGN']	          => 'F',
+								'');
+								
+  //********************************************************************
+	//  NameTyp_desc: Returns value for CORP_LN_NAME_TYPE_DESC
+	//********************************************************************	
+	EXPORT  NameTyp_desc(STRING filtyp) 
+				:= map (corp2.t2u(filtyp) in ['COOPERATIVE - ELECTRIC CORPORATION',
+																			'COOPERATIVE - GRAZING ASSOCIATION',
+																			'COOPERATIVE - MUTUAL AID',
+																			'COOPERATIVE ASSOCIATION - DOMESTIC',
+																			'COOPERATIVE ASSOCIATION - FOREIGN',
+																			'CORPORATION - BUSINESS - DOMESTIC',
+																			'CORPORATION - BUSINESS - FOREIGN',
+																			'CORPORATION - FARM/RANCH - IN-STATE',
+																			'CORPORATION - FARM/RANCH - OUT-OF-STATE',
+																			'CORPORATION - NONPROFIT - DOMESTIC',
+																			'CORPORATION - NONPROFIT - FOREIGN',
+																			'CORPORATION - PROFESSIONAL - DOMESTIC',
+																			'CORPORATION - PROFESSIONAL - FOREIGN', 
+																			'INSURANCE COMPANY',
+																			'LIMITED LIABILITY COMPANY - BUSINESS - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - BUSINESS - FOREIGN',
+																			'LIMITED LIABILITY COMPANY - FARM/RANCH - IN-STATE',
+																			'LIMITED LIABILITY COMPANY - FARM/RANCH - OUT-OF-STATE',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - NONPROFIT - FOREIGN',
+																			'LIMITED LIABILITY COMPANY - PROFESSIONAL - DOMESTIC',
+																			'LIMITED LIABILITY COMPANY - PROFESSIONAL - FOREIGN',
+																			'LIMITED LIABILITY LIMITED PARTNERSHIP - DOMESTIC',
+																			'LIMITED LIABILITY LIMITED PARTNERSHIP - FOREIGN',
+																			'LIMITED LIABILITY PARTNERSHIP - DOMESTIC',
+																			'LIMITED LIABILITY PARTNERSHIP - FOREIGN', 
+																			'LIMITED LIABILITY PARTNERSHIP - PROFESSIONAL - DOMESTIC',
+																			'LIMITED LIABILITY PARTNERSHIP - PROFESSIONAL - FOREIGN',
+																			'LIMITED PARTNERSHIP - DOMESTIC',
+																			'LIMITED PARTNERSHIP - FOREIGN',
+																			'REAL ESTATE INVESTMENT TRUST']	      => 'LEGAL',
+								corp2.t2u(filtyp) =   'TRADE NAME'  				                => 'TRADENAME',
+								corp2.t2u(filtyp) =   'FICTITIOUS PARTNERSHIP NAME'  			  => 'FBN',
+								'**|'+ corp2.t2u(filtyp));
+								
+END;
          
                             
 

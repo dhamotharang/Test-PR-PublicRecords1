@@ -23,8 +23,6 @@ macro
 #uniquename(super_main_delimited)
 #uniquename(super_offenses_delimited)
 
-#workunit('name','SexOffender Build ' + filedate);
-
 %recordsizeMain% :=18899;
 %recordsizeOffense% :=1524;
 

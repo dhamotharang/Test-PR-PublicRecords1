@@ -72,7 +72,7 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 				 ')';      
 				 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		string60 dba;
 		string60 dba1;
 		string60 dba2;
@@ -113,14 +113,14 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
   	SELF.STD_LICENSE_TYPE := tempStdLicType;
 			
 		// assigning dates per business rules
-		tempExpDt            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.EXPDT);
+		tempExpDt            := ut.CleanSpacesAndUpper(pInput.EXPDT);
 		SELF.EXPIRE_DTE		   := IF(tempExpDt='','17530101',tempExpDt);
-		tempIssueDate        := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ISSUEDT);
+		tempIssueDate        := ut.CleanSpacesAndUpper(pInput.ISSUEDT);
 		SELF.ORIG_ISSUE_DTE  := IF(tempIssueDate='','17530101',tempIssueDate);
 		SELF.CURR_ISSUE_DTE	 := '17530101';
 				
 		//initialize raw_license_status from raw data
-		tempRawStatus 			 := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.licstat);
+		tempRawStatus 			 := ut.CleanSpacesAndUpper(pInput.licstat);
 		SELF.RAW_LICENSE_STATUS := IF(tempRawStatus='FAC TERMINATED',
 																	'TERMINATED',
 																	tempRawStatus);
@@ -338,7 +338,7 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 		SELF.DISP_TYPE_CD  := IF(tempDispType = 'Y','D','');
 						
 		// Business rules to parse contacts
-		tempContact     := Prof_License_Mari.mod_clean_name_addr.trimupper(pInput.attline);
+		tempContact     := ut.CleanSpacesAndUpper(pInput.attline);
 		tempContact2    := IF(Prof_License_Mari.func_is_company(tempContact) = true,'',tempContact);
 		prepContact			:= tempContact2;
 															
@@ -437,10 +437,10 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 		mltreckeyHash := hash64(TRIM(tempLicNum,LEFT,RIGHT) 
 														 +TRIM(tempStdLicType,LEFT,RIGHT)
 														 +TRIM(src_cd,LEFT,RIGHT)
-														 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdName_Org)
-														 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_1)
+														 +ut.CleanSpacesAndUpper(StdName_Org)
+														 +ut.CleanSpacesAndUpper(pInput.ADDRESS1_1)
 														 +tmpZip
-														 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StripDBA)
+														 +ut.CleanSpacesAndUpper(StripDBA)
 														); 
 			
 		SELF.mltreckey 				:= IF(temp_dba1 != ' ',mltreckeyHash, 0);
@@ -454,8 +454,8 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 		SELF.cmc_slpk         := hash64(TRIM(tempLicNum,LEFT,RIGHT) 
 														 +TRIM(tempStdLicType,LEFT,RIGHT)
 														 +TRIM(src_cd,LEFT,RIGHT)
-														 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdName_Org)
-														 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_1));									 
+														 +ut.CleanSpacesAndUpper(StdName_Org)
+														 +ut.CleanSpacesAndUpper(pInput.ADDRESS1_1));									 
 			//Patch them in for now
 	  SELF.STD_PROF_CD		  := MAP(TRIM(SELF.STD_LICENSE_TYPE,LEFT,RIGHT)='474' => 'RLE',
 																 TRIM(SELF.STD_LICENSE_TYPE,LEFT,RIGHT)='480' => 'RLE',
@@ -539,7 +539,7 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 			SELF.NAME_ORG_SUFX	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 			TrimDBASufx			:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 												 NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
@@ -559,7 +559,7 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -569,7 +569,7 @@ EXPORT map_ILS0829_conversion(STRING pVersion) := FUNCTION
 							AND LEFT.AFFIL_TYPE_CD in ['IN', 'BR'],
 							assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 								 L.provnote_1 = '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => 

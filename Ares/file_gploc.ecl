@@ -1,6 +1,6 @@
 ﻿import std;
 
-office := Ares.file_office_flat(tfpuid != '');
+office := Ares.file_office_flat(summary.status='active');
 
 expanded_legal_layout := recordof(Ares.Files.ds_legal_entity) or {string c_type_source, string c_type_value, string headoffice_id};
 
@@ -30,11 +30,12 @@ layout_w_institution_type instit_xform(office l, expanded_legal r) := Transform
 	inst_type := trim(r.c_type_value, left,right);
 	self.legal_entity_id := r.id;
 	self.l_types := r.summary.types;
-	alltypes := project(r.summary.types, transform(	recordof(r.summary.types) or {string type_id},
+	source_types := if(count(r.summary.types(type_source = 'TFP')) > 0, r.summary.types(type_source = 'TFP'), r.summary.types);
+	alltypes := project(source_types, transform(	recordof(r.summary.types) or {string type_id},
 																									self.type_id := Ares.Files.ds_lookup(fid='LEGAL_ENTITY_CATEGORY').lookupbody(id = left.type_value)[1].intl_type,
 																									self := left));
 	maxtype := max(alltypes,alltypes.type_id);
-	self.institution_type := maxtype;
+	self.institution_type := str_functions.pad(maxtype, '>', '0', 2);
 	abbrev_names := r.Summary.Names.Names(Type = 'Abbreviated Name');
 	legal_names := r.Summary.Names.Names(Type = 'Legal Title');
 	abbrev_name := MAP (count(abbrev_names) > 0 => abbrev_names[1].Value, count(legal_names) >0 => legal_names[1].Value,'' );
@@ -46,22 +47,22 @@ end;
 
 
 with_inst_type := join(office, expanded_legal, left.institution_id = right.id , instit_xform(left, right));
-abbreviated_short := with_inst_type(length(abbrev_name)<=35);
-abbreviated_long  := with_inst_type(length(abbrev_name)>35); 
-
+// abbreviated_short := with_inst_type(length(abbrev_name)<=35);
+// abbreviated_long  := with_inst_type(length(abbrev_name)>35); 
+abbreviate_all := with_inst_type;
 // count(abbreviated_long);
 
 
-recordof(abbreviated_long) xform_trans_abbv(abbreviated_long l) := Transform
+recordof(abbreviate_all) xform_trans_abbv(abbreviate_all l) := Transform
 	rep_ds  := Ares.Files.ds_lookup(fid ='ABBREVIATION_RULE').lookupBody(RegExFind(completetext, l.abbrev_name, NOCASE));
 	
   iterator_layout := recordof(rep_ds) or {string abbv_name};
 	
-	iterator_ds := project(rep_ds, transform(iterator_layout, self.abbv_name := l.abbrev_name, self := left));
+	iterator_ds := sort( project(rep_ds, transform(iterator_layout, self.abbv_name := l.abbrev_name, self := left)),seq);
 
 	iterator_layout iter_xform(iterator_ds l, iterator_ds r) := transform
 		current_name := if(l.abbv_name = '', r.abbv_name, l.abbv_name);
-		self.abbv_name := regexreplace(r.completetext, current_name, r.abbreviatedtext);
+		self.abbv_name := if (length(current_name) > 35, regexreplace('\\b'+r.completetext+'\\b', current_name, r.abbreviatedtext), current_name);
 		self := R;
 	End;
 	
@@ -70,7 +71,7 @@ recordof(abbreviated_long) xform_trans_abbv(abbreviated_long l) := Transform
 	self := l;
 End;
 
-trans_abbr := project(abbreviated_long, xform_trans_abbv(left));
+trans_abbr := project(abbreviate_all, xform_trans_abbv(left));
 // abbreviated_long;
 // trans_abbr;
 
@@ -86,7 +87,7 @@ with_office_type_layout add_ofc_type( with_inst_type l) := Transform
 	self := l;
 End;
 
-w_office_type := Project(abbreviated_short + trans_abbr , add_ofc_type(left));
+w_office_type := Project( trans_abbr , add_ofc_type(left));
 
 w_headoffice_layout := record(recordof(w_office_type))
 	string headoffice_tfpuid;
@@ -172,4 +173,4 @@ layout_gploc final_xform(w_current_assets l) := Transform
 	self.Institution_Identifier := std.str.splitwords(l.tfpid, '-')[1];
 End;
 	final := Project(w_current_assets, final_xform(left));
-EXPORT file_gploc := final;
+EXPORT file_gploc := final;// : persist('persist::ares::file_gploc', SINGLE);

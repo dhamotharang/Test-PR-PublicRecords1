@@ -368,15 +368,32 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor =	'W0002' => if(trim(pOffenseLevel,right) in ['MT','GMT','T','PMT','FT'],'Y','N'),
 	pVendor IN ['W0016'] => if(trim(pOffenseLevel,right) in ['TI','CT'],'Y','N'),
   pVendor IN ['W0017'] => if(trim(pOffenseLevel,right) in ['T','TI'],'Y','N'),
+	
+	pVendor IN ['W0027','8R',	'W0271','W0272','W0273','W0274','W0275','W0277','W0278','W0279','W0280',
+	            'W0281','W0282','W0283','W0284','W0285','W0286','W0287','W0288','W0289','W0292','W0294',
+							'W0295','W0296','W0297','W0298','W0299','W0301','W0302','W0304','W0306','W0307','W0309',
+							'I0002','I0010','I0031','I0015','I0016','I0032','I0005','I0006' ,'I0041'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+						 
 
-	pVendor IN ['W0027','8R',	'W0271','W0272','W0273','W0274','W0275','W0277','W0278','W0279',
-	            'W0280','W0281','W0282','W0283','W0284','W0285','W0286','W0287','W0288','W0289',
-							'W0292','W0294','W0295','W0296','W0297','W0298','W0299','W0301','W0302','W0304',
-							'W0306','W0307','W0309'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
 	pVendor IN ['W0037','10B','10C'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
   pVendor IN ['W0038'] => if(trim(pOffenseLevel,right) in ['T','TA'],'Y','N'),  
 	pVendor IN ['W0156'] => if(trim(pOffenseLevel,right) in ['T','MT'],'Y','N'),
 	pVendor IN ['W0253'] => if(trim(pOffenseLevel,right) in ['CT'],'Y','N'),
+	pVendor IN ['I0008'] => if(trim(pOffenseLevel,right) in ['T','V'],'Y','N'),
+	pVendor IN ['I0018'] => if(trim(pOffenseLevel,right) in ['T','PO'],'Y','N'),
+  
+  //IE phase2
+	pVendor IN ['I0057','I0060','I0061','I0062','I0067', 
+							'I0068','I0071','I0072','I0074',  
+							'I0075','I0076','I0078','I0079',  
+							'I0080','I0081','I0082','I0084',  
+							'I0086','I0087','I0089','I0090','I0091',  
+							'I0092','I0093','I0094'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+							
+	pVendor IN ['I0097','I0098','I0107','I0108','I0109','I0113','I0115'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+  pVendor IN ['I0114','I0102','I0103','I0105'] => if(trim(pOffenseLevel,right) in ['I'],'Y','N'),
+  pVendor IN ['I0100'] => if(trim(pOffenseLevel,right) in ['T','I'],'Y','N'),						
+
   ''
 	)
  ;			 

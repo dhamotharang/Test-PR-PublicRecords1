@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft;
+﻿import lib_stringlib, watercraft;
 
 Layout_Watercraft_Search_Group_temp := record
 
@@ -72,5 +72,6 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L,
 Mapping_ME_as_Search_norm			:= normalize(hull_clean_in,4,search_mapping_format(left,counter));
 
 export Mapping_ME_as_Search        := Mapping_ME_as_Search_norm(clean_pname <> '' or company_name <> '');
+
 
 

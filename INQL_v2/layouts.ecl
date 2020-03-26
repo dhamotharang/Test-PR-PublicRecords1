@@ -24,7 +24,7 @@ EXPORT layouts := MODULE
   string50 abstracted_vertical_market;
   string100 subaccount_name;
   integer8 bip_prox_id;
-  string50 inquiry_tracking_industry;
+ // string50 inquiry_tracking_industry;
   string4 ranked_sic_code;
   string100 industry;
   string30 use;
@@ -255,10 +255,11 @@ EXPORT layouts := MODULE
 		string	orig_IP_ADDRESS;
 		string	orig_SOURCE_CODE;
 		string	orig_RETAIL_PRICE;
+		string filename{VIRTUAL(logicalfilename)};
 	end;
 	
   export rAccurint_In_Ext := RECORD
-    unsigned1 src_id;
+    unsigned1  src_id;
     unsigned4 filedate;
     unsigned4 vendor_f_rpt_date;
     unsigned4 vendor_l_rpt_date;
@@ -316,6 +317,7 @@ EXPORT layouts := MODULE
 		string	orig_out_zip;
 		string	orig_out_case_number;
 		string	orig_transaction_type := '';
+		string filename{VIRTUAL(logicalfilename)};
 	end;
 	
 	export rBanko_In_Ext := record
@@ -555,7 +557,7 @@ EXPORT layouts := MODULE
 		string orig_subj8_company_name;
 		string orig_subj8_fein;
 		string orig_company_alternate_name;
-	
+
 	end; 
 	
 	export rBatch_In := record, maxlength(10000)
@@ -624,7 +626,7 @@ EXPORT layouts := MODULE
 		string orig_fcra_purpose;
 		string orig_process_id;
 		rBatch_In_PIIs;
-		
+		string filename{VIRTUAL(logicalfilename)};		
 	end;
     
   export rBatch_In_Ext := record
@@ -636,6 +638,10 @@ EXPORT layouts := MODULE
 	end;
 
 	export	rBatch_PIIs_Base := record
+	  
+//		unsigned1 src_id;
+//    unsigned4 filedate;
+		string9 version              := '';
 		string datetime;
 		string20 transaction_id;
 		string sequence_number;   
@@ -1014,6 +1020,7 @@ EXPORT layouts := MODULE
 		boolean isFCRA;
 		string null := '';
 		string source;
+		string filename{VIRTUAL(logicalfilename)};
 	end;
 	
 	export rBatchR3_In_Ext := record
@@ -1046,6 +1053,7 @@ EXPORT layouts := MODULE
 		string field14 := '';
 		string field15 := '';
 		string field16 := '';
+		string filename{VIRTUAL(logicalfilename)};
 	end;
 	
 	export rBridger_In_Ext := record
@@ -1136,6 +1144,7 @@ EXPORT layouts := MODULE
 		string20	orig_dls;
 		string20	orig_mvs;
 		string15	orig_ip_address;
+		string filename{VIRTUAL(logicalfilename)};
 	end;
     
   export rRiskwise_In_Ext := record
@@ -1167,6 +1176,7 @@ EXPORT layouts := MODULE
 		string orig_glb;
 		string orig_dppa;
 		string orig_fcra;
+		string filename{VIRTUAL(logicalfilename)};		
 	end;
 	
 	export rIDM_In_Ext := record
@@ -1529,6 +1539,7 @@ EXPORT layouts := MODULE
 		string2 	pii8_clean_geo_match;   
 		string5 	pii8_clean_err_stat;     
 		string2 	pii8_clean_predir;
+		string filename{VIRTUAL(logicalfilename)};		
 	end;
 	
   export rSBA_In_Ext := record
@@ -1542,7 +1553,8 @@ EXPORT layouts := MODULE
 	export rSBA_Base := record
   unsigned1 src_id;
   unsigned4 filedate;
-  
+  string9 version              := '';
+	
   string16 transaction_id; 
   string22 datetime;   
 
@@ -2153,6 +2165,12 @@ EXPORT layouts := MODULE
 		{Common_ThorAdditions_non_FCRA}-source-bus_q-bususer_q;
 	end;
 
+	export Common_indexes_address := record
+		Common_indexes;
+		string5 zip; 
+	end;
+  
+
 	export Common_indexes_DID_SBA := record
 		mbslayout 				 			MBS;
 		allowlayout 			 			Allow_Flags;
@@ -2301,6 +2319,120 @@ EXPORT layouts := MODULE
    string    source               :='';
    string3   fraudpoint_score     :='';
  end;
+
+ export i_nonfcra_slim  := record
+		{Common_indexes.bus_intel} bus_intel;
+		{Common_indexes.person_q} person_q;
+		{Common_indexes.search_info} search_info  ;
+ end; 
+
+ export base_history_newids := RECORD
+  
+	unsigned8 person_q_id;
+  string person_q_apssn;
+  unsigned6 person_q_apdid;
+  unsigned6 person_q_apdidold;
+	
+  unsigned8 bus_q_id;
+  string bus_q_apfein;
+  unsigned6 bus_q_apbdid;
+  unsigned6 bus_q_apbdidold;
+	
+  unsigned8 bususer_q_id;
+  string bususer_q_apssn;
+  unsigned6 bususer_q_apdid;
+  unsigned6 bususer_q_apdidold;
+	boolean change;
+	
+ END;
+
+
+
+ export i_nonfcra_email := record 
+		{i_nonfcra_slim};
+		{Common_indexes.fraudpoint_score};
+ end; 
+
+export i_nonfcra_transaction_id := record
+			  common_indexes.search_info.transaction_id;		
+				common_indexes.person_q.appended_adl;
+				common_indexes.search_info.datetime;		
+				common_indexes.bus_intel.industry;		
+				common_indexes.bus_intel.vertical;		
+				common_indexes.bus_intel.sub_market;		
+				common_indexes.search_info.function_description;	
+				common_indexes.search_info.product_code;
+				common_indexes.bus_intel.use;		
+				common_indexes.search_info.Sequence_Number;		
+end;
+
+export i_lookup_func_desc := record
+
+	string product_id;
+	string transaction_type;
+	string function_name;
+	string description;
+
+end; 
+
+export i_billgoups_did  := record
+
+  unsigned6 did;
+  integer8 total_inquiries;
+  integer8 billgroup_counttotal;
+  integer8 billgroup_count01;
+  integer8 billgroup_count03;
+  integer8 billgroup_count06;
+  integer8 billgroup_count12;
+  integer8 billgroup_count24;
+
+end;
+
+export i_linkids  := record
+
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned6 powid;
+  unsigned6 empid;
+  unsigned6 dotid;
+  unsigned2 ultscore;
+  unsigned2 orgscore;
+  unsigned2 selescore;
+  unsigned2 proxscore;
+  unsigned2 powscore;
+  unsigned2 empscore;
+  unsigned2 dotscore;
+  unsigned2 ultweight;
+  unsigned2 orgweight;
+  unsigned2 seleweight;
+  unsigned2 proxweight;
+  unsigned2 powweight;
+  unsigned2 empweight;
+  unsigned2 dotweight;
+  mbslayout mbs;
+  allowlayout allow_flags;
+  businfolayout bus_intel;
+  persondatalayout person_q;
+  busdatalayoutplus bus_q;
+  bususerdatalayoutplus bususer_q;
+  bususerdatalayoutplus bususer_q2;
+  bususerdatalayoutplus bususer_q3;
+  bususerdatalayoutplus bususer_q4;
+  bususerdatalayoutplus bususer_q5;
+  bususerdatalayoutplus bususer_q6;
+  bususerdatalayoutplus bususer_q7;
+  bususerdatalayoutplus bususer_q8;
+  permissablelayout permissions;
+  searchlayout search_info;
+  string source;
+  string3 fraudpoint_score;
+  integer1 fp;
+
+ END;
+
+
 
 END;
 

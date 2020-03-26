@@ -7,7 +7,7 @@ DF- 20615
 IMPORT ut, Address, Prof_License_Mari, lib_stringlib,NID,STD;
 
 EXPORT  map_TXS0819_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt:Prof License MARI- TXS0819  ' + pVersion);
 code 								:= 'TXS0819';
 src_cd							:= code[3..7];
 src_st							:= code[1..2];	//License state  
@@ -121,7 +121,7 @@ convert_bus_cnty_cd := JOIN(convert_mail_cnty_cd, dsCounty,
 OCnty := OUTPUT(convert_bus_cnty_cd);
 															
 //Real Estate License to common MARIBASE layout
-Prof_License_Mari.layouts.base			xformToCommon(rCountyName pInput) 
+Prof_License_Mari.layout_base_in			xformToCommon(rCountyName pInput) 
 	:= 
 	 TRANSFORM
 		SELF.PRIMARY_KEY	    := 0;  
@@ -575,7 +575,7 @@ inFileLicName := inFileLic(NAME_ORG_ORIG[1] != ',' AND NAME_ORG_ORIG != '');
 
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(inFileLicName L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(inFileLicName L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1));
 	SELF := L;
 END;
@@ -588,7 +588,7 @@ ds_map_lic_trans := JOIN(inFileLicName, cmvTransLkp,
 																		
 
 //***Link Related Real Estate License Records
-Prof_License_Mari.layouts.base  	assign_pcmcslpk(ds_map_lic_trans L, ds_map_lic_trans R) := TRANSFORM
+Prof_License_Mari.layout_base_in  	assign_pcmcslpk(ds_map_lic_trans L, ds_map_lic_trans R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -601,7 +601,7 @@ ds_map_affil := JOIN(ds_map_lic_trans, ds_map_lic_trans,
 						
 
 // Transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base xTransToBase(ds_map_affil L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransToBase(ds_map_affil L) := TRANSFORM
 	SELF.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX,' ');
 	SELF.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'%',' '));
 	SELF := L;

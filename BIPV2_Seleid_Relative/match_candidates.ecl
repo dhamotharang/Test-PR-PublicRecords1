@@ -1,9 +1,10 @@
-// Begin code to produce match candidates
+﻿// Begin code to produce match candidates
 IMPORT SALT31,ut;
 EXPORT match_candidates(DATASET(layout_Base) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := BasicMatch(ih).input_file;
 SHARED thin_table := DISTRIBUTE(TABLE(h00,{rcid,cnp_name,company_inc_state,company_charter_number,company_fein,prim_range,prim_name,postdir,unit_desig,sec_range,v_city_name,st,active_duns_number,active_enterprise_number,source,source_record_id,fname,mname,lname,contact_ssn,contact_phone,company_department,contact_email_username,dt_first_seen,dt_last_seen,dt_first_seen_contact,dt_last_seen_contact,Seleid}),HASH(Seleid));
+ 
 //Prepare for field propagations ...
 PrePropCounts := RECORD
   REAL8 cnp_name_pop := AVE(GROUP,IF(thin_table.cnp_name  IN SET(s.nulls_cnp_name,cnp_name),0,100));
@@ -36,6 +37,7 @@ SHARED layout_withpropvars := RECORD
   UNSIGNED1 sec_range_prop := 0;
 END;
 SHARED with_props := TABLE(thin_table,layout_withpropvars);
+ 
 SALT31.mac_prop_field(with_props(company_inc_state NOT IN SET(s.nulls_company_inc_state,company_inc_state)),company_inc_state,Seleid,company_inc_state_props); // For every DID find the best FULL company_inc_state
 layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props ri) := TRANSFORM
   SELF.company_inc_state := IF ( le.company_inc_state IN SET(s.nulls_company_inc_state,company_inc_state) and ri.Seleid<>(TYPEOF(ri.Seleid))'', ri.company_inc_state, le.company_inc_state );
@@ -43,6 +45,7 @@ layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props
   SELF := le;
   END;
 SHARED pj1 := JOIN(with_props,company_inc_state_props,left.Seleid=right.Seleid,take_company_inc_state(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK*/);
+ 
 SALT31.mac_prop_field(with_props(company_charter_number NOT IN SET(s.nulls_company_charter_number,company_charter_number)),company_charter_number,Seleid,company_charter_number_props); // For every DID find the best FULL company_charter_number
 layout_withpropvars take_company_charter_number(with_props le,company_charter_number_props ri) := TRANSFORM
   SELF.company_charter_number := IF ( le.company_charter_number IN SET(s.nulls_company_charter_number,company_charter_number) and ri.Seleid<>(TYPEOF(ri.Seleid))'', ri.company_charter_number, le.company_charter_number );
@@ -50,6 +53,7 @@ layout_withpropvars take_company_charter_number(with_props le,company_charter_nu
   SELF := le;
   END;
 SHARED pj2 := JOIN(pj1,company_charter_number_props,left.Seleid=right.Seleid,take_company_charter_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK*/);
+ 
 SALT31.mac_prop_field(with_props(company_fein NOT IN SET(s.nulls_company_fein,company_fein)),company_fein,Seleid,company_fein_props); // For every DID find the best FULL company_fein
 layout_withpropvars take_company_fein(with_props le,company_fein_props ri) := TRANSFORM
   SELF.company_fein := IF ( le.company_fein IN SET(s.nulls_company_fein,company_fein) and ri.Seleid<>(TYPEOF(ri.Seleid))'', ri.company_fein, le.company_fein );
@@ -57,6 +61,7 @@ layout_withpropvars take_company_fein(with_props le,company_fein_props ri) := TR
   SELF := le;
   END;
 SHARED pj3 := JOIN(pj2,company_fein_props,left.Seleid=right.Seleid,take_company_fein(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK*/);
+ 
 SALT31.mac_prop_field(with_props(sec_range NOT IN SET(s.nulls_sec_range,sec_range)),sec_range,Seleid,sec_range_props); // For every DID find the best FULL sec_range
 layout_withpropvars take_sec_range(with_props le,sec_range_props ri) := TRANSFORM
   SELF.sec_range := IF ( le.sec_range IN SET(s.nulls_sec_range,sec_range) and ri.Seleid<>(TYPEOF(ri.Seleid))'', ri.sec_range, le.sec_range );
@@ -64,6 +69,7 @@ layout_withpropvars take_sec_range(with_props le,sec_range_props ri) := TRANSFOR
   SELF := le;
   END;
 SHARED pj8 := JOIN(pj3,sec_range_props,left.Seleid=right.Seleid,take_sec_range(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK*/);
+ 
 pj8 do_computes(pj8 le) := TRANSFORM
   SELF := le;
 END;
@@ -92,6 +98,7 @@ PostPropCounts := RECORD
 END;
 EXPORT PostPropogationStats := TABLE(propogated,PostPropCounts);
 SHARED h0 := DEDUP( SORT ( DISTRIBUTE(propogated,HASH(Seleid)),  EXCEPT rcid, LOCAL ), EXCEPT rcid, LOCAL );// Only one copy of each record
+ 
 EXPORT Layout_Matches := RECORD//in this module for because of ,foward bug
   UNSIGNED2 Rule;
   INTEGER2 Conf := 0;
@@ -108,53 +115,55 @@ END;
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
   {h0};
   INTEGER2 cnp_name_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN cnp_name_isnull := h0.cnp_name  IN SET(s.nulls_cnp_name,cnp_name); // Simplify later processing
+  BOOLEAN cnp_name_isnull := h0.cnp_name  IN SET(s.nulls_cnp_name,cnp_name); // Simplify later processing 
   UNSIGNED cnp_name_cnt := 0; // Number of instances with this particular field value
   UNSIGNED cnp_name_e1_cnt := 0; // Number of names instances matching this one by edit distance
   INTEGER2 company_inc_state_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN company_inc_state_isnull := h0.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state); // Simplify later processing
+  BOOLEAN company_inc_state_isnull := h0.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state); // Simplify later processing 
   INTEGER2 company_charter_number_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN company_charter_number_isnull := h0.company_charter_number  IN SET(s.nulls_company_charter_number,company_charter_number); // Simplify later processing
+  BOOLEAN company_charter_number_isnull := h0.company_charter_number  IN SET(s.nulls_company_charter_number,company_charter_number); // Simplify later processing 
   UNSIGNED company_charter_number_cnt := 0; // Number of instances with this particular field value
   UNSIGNED company_charter_number_e1_cnt := 0; // Number of names instances matching this one by edit distance
   INTEGER2 company_fein_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN company_fein_isnull := h0.company_fein  IN SET(s.nulls_company_fein,company_fein); // Simplify later processing
+  BOOLEAN company_fein_isnull := h0.company_fein  IN SET(s.nulls_company_fein,company_fein); // Simplify later processing 
   INTEGER2 prim_range_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN prim_range_isnull := h0.prim_range  IN SET(s.nulls_prim_range,prim_range); // Simplify later processing
+  BOOLEAN prim_range_isnull := h0.prim_range  IN SET(s.nulls_prim_range,prim_range); // Simplify later processing 
   INTEGER2 prim_name_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN prim_name_isnull := h0.prim_name  IN SET(s.nulls_prim_name,prim_name); // Simplify later processing
+  BOOLEAN prim_name_isnull := h0.prim_name  IN SET(s.nulls_prim_name,prim_name); // Simplify later processing 
   INTEGER2 postdir_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN postdir_isnull := h0.postdir  IN SET(s.nulls_postdir,postdir); // Simplify later processing
+  BOOLEAN postdir_isnull := h0.postdir  IN SET(s.nulls_postdir,postdir); // Simplify later processing 
   INTEGER2 sec_range_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN sec_range_isnull := h0.sec_range  IN SET(s.nulls_sec_range,sec_range); // Simplify later processing
+  BOOLEAN sec_range_isnull := h0.sec_range  IN SET(s.nulls_sec_range,sec_range); // Simplify later processing 
   INTEGER2 v_city_name_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN v_city_name_isnull := h0.v_city_name  IN SET(s.nulls_v_city_name,v_city_name); // Simplify later processing
+  BOOLEAN v_city_name_isnull := h0.v_city_name  IN SET(s.nulls_v_city_name,v_city_name); // Simplify later processing 
   INTEGER2 st_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN st_isnull := h0.st  IN SET(s.nulls_st,st); // Simplify later processing
+  BOOLEAN st_isnull := h0.st  IN SET(s.nulls_st,st); // Simplify later processing 
   INTEGER2 active_duns_number_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN active_duns_number_isnull := h0.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number); // Simplify later processing
+  BOOLEAN active_duns_number_isnull := h0.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number); // Simplify later processing 
   INTEGER2 active_enterprise_number_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN active_enterprise_number_isnull := h0.active_enterprise_number  IN SET(s.nulls_active_enterprise_number,active_enterprise_number); // Simplify later processing
+  BOOLEAN active_enterprise_number_isnull := h0.active_enterprise_number  IN SET(s.nulls_active_enterprise_number,active_enterprise_number); // Simplify later processing 
   INTEGER2 source_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN source_isnull := h0.source  IN SET(s.nulls_source,source); // Simplify later processing
+  BOOLEAN source_isnull := h0.source  IN SET(s.nulls_source,source); // Simplify later processing 
   INTEGER2 source_record_id_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN source_record_id_isnull := h0.source_record_id  IN SET(s.nulls_source_record_id,source_record_id); // Simplify later processing
+  BOOLEAN source_record_id_isnull := h0.source_record_id  IN SET(s.nulls_source_record_id,source_record_id); // Simplify later processing 
   INTEGER2 fname_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN fname_isnull := h0.fname  IN SET(s.nulls_fname,fname); // Simplify later processing
+  BOOLEAN fname_isnull := h0.fname  IN SET(s.nulls_fname,fname); // Simplify later processing 
   INTEGER2 mname_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN mname_isnull := h0.mname  IN SET(s.nulls_mname,mname); // Simplify later processing
+  BOOLEAN mname_isnull := h0.mname  IN SET(s.nulls_mname,mname); // Simplify later processing 
   INTEGER2 lname_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN lname_isnull := h0.lname  IN SET(s.nulls_lname,lname); // Simplify later processing
+  BOOLEAN lname_isnull := h0.lname  IN SET(s.nulls_lname,lname); // Simplify later processing 
   INTEGER2 contact_ssn_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN contact_ssn_isnull := h0.contact_ssn  IN SET(s.nulls_contact_ssn,contact_ssn); // Simplify later processing
+  BOOLEAN contact_ssn_isnull := h0.contact_ssn  IN SET(s.nulls_contact_ssn,contact_ssn); // Simplify later processing 
   INTEGER2 contact_phone_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN contact_phone_isnull := h0.contact_phone  IN SET(s.nulls_contact_phone,contact_phone); // Simplify later processing
+  BOOLEAN contact_phone_isnull := h0.contact_phone  IN SET(s.nulls_contact_phone,contact_phone); // Simplify later processing 
   INTEGER2 contact_email_username_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN contact_email_username_isnull := h0.contact_email_username  IN SET(s.nulls_contact_email_username,contact_email_username); // Simplify later processing
+  BOOLEAN contact_email_username_isnull := h0.contact_email_username  IN SET(s.nulls_contact_email_username,contact_email_username); // Simplify later processing 
 END;
 h1 := TABLE(h0,layout_candidates);
 //Now add the weights of each field one by one
+ 
 //Would also create auto-id fields here
+ 
 layout_candidates add_source(layout_candidates le,Specificities(ih).source_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.source_weight100 := MAP (le.source_isnull => 0, patch_default and ri.field_specificity=0 => s.source_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;

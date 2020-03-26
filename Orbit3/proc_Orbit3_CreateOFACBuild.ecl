@@ -1,4 +1,4 @@
-
+﻿
 import ut,Orbit3,_Control;
 export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
 
@@ -54,11 +54,12 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 		
 		
 		
-		send_email(string keyword,string status) := function 
+		sendemail(string keyword,string status) := function 
 		
-		error_description := map ( keyword = 'CREATE' and status in ['FAIL','SKIP'] => 'Build Instance Already Exists in Orbit',
-		                     keyword = 'UPDATE' and status = 'FAIL' => 'Build Instance Already Exists and Updated to On Develelopment in Orbit',
-												 keyword = 'UPDATE' and status = 'SKIP' => 'Build Instance did not get Updated to On Develelopment as skipupdatebuild parameter is passed true',
+	description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
+		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
+		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
+						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
 												 );
@@ -73,7 +74,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+error_description+'\n'+
+												'Description:'+description+'\n'+
 												'---------------------'+'\n'+
 												'Workunit:'+workunit);
 	   end;
@@ -83,7 +84,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 	
 	run_additem :=  sequential( 
 												       output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add'),EXTEND),
-															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,send_email('ADD_ITEMS','SUCCESS')),send_email('NO_ITEMS_FOUND','FAIL'))
+															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,sendemail('ADD_ITEMS','SUCCESS')),sendemail('NO_ITEMS_FOUND','FAIL'))
 										 
 									      );
 												
@@ -98,24 +99,24 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 	                      Sequential
 								         (
 									        if ( skipcreatebuild , 
-											                send_email('CREATE','SKIP'),
+											                sendemail('CREATE','SKIP'),
 														 
 													           if( create_build.Status = 'Success',
-															        send_email('CREATE','SUCCESS'),
-																			send_email('CREATE','FAIL')
+															        sendemail('CREATE','SUCCESS'),
+																			sendemail('CREATE','FAIL')
 																			)
 															),
 														
 													if ( skipupdatebuild ,
-																				Sequential(send_email('UPDATE','SKIP'),Update_build_1.Status)	,
+																				Sequential(sendemail('UPDATE','SKIP'),Update_build_1.Status)	,
 												
 													              if ( Update_build.Status = 'Success', 
-													                 send_email('UPDATE','SUCCESS'),
-																					 send_email('UPDATE','FAIL')
+													                 sendemail('UPDATE','SUCCESS'),
+																					 sendemail('UPDATE','FAIL')
 																					 )
 														),
 													 if ( skipaddcomponents,	
-										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add')),send_email('SKIP_ADD_ITEMS','SUCCESS')),
+										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add')),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
 														     
 										                                   run_additem
 																																

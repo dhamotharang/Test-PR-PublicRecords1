@@ -6,7 +6,8 @@ MbsInclusion	:= Fraudshared.files().Input.mbsfdnmasteridindtypeinclusion.Sprayed
 MbsInclusion_Demo	:= FraudGovPlatform.files().Input.mbsinclusiondemodata.Sprayed;
 
 
-MbsCombine	:= MbsInclusion + MbsInclusion_Demo;
+MbsCombine	:= MbsInclusion_Demo + 
+	if(nothor(STD.File.GetSuperFileSubCount(FraudShared.Filenames().Input.MbsFdnMasterIDIndTypeInclusion.Sprayed)) > 0 ,MbsInclusion);
 
 MbsSrt			:= Sort(MbsCombine,Record, Except date_added,user_added,date_changed, user_changed);
 
@@ -20,7 +21,7 @@ tools.mac_WriteFile(Fraudshared.Filenames().Input.mbsfdnmasteridindtypeinclusion
 									pCsvout := true,
 									pSeparator := '|\t|',
 									pOverwrite := true,
-									pTerminator := '\n',
+									pTerminator := '|\n',
 									pQuote:= '');
 
 Export MbsIncl		:= Sequential( Build_MbsInclusion_PatchFile

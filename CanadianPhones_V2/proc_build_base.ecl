@@ -1,4 +1,4 @@
-import ut, CanadianPhones, PromoteSupers;
+﻿import ut, CanadianPhones, PromoteSupers;
 
 CanadianPhones_V2.layoutCanadianWhitepagesBase fnRollupNewUpdates(CanadianPhones_V2.layoutCanadianWhitepagesBase L, CanadianPhones_V2.layoutCanadianWhitepagesBase R) := TRANSFORM
 
@@ -25,7 +25,9 @@ EXPORT proc_build_base := FUNCTION
 	base := CanadianPhones_V2.file_CanadianWhitePagesBase;
 	
 	//Mark all records in existing records  to be historical
-	base_hist := PROJECT(base, TRANSFORM({base}, SELF.history_flag:=IF(LEFT.history_flag='U','U','H');SELF:=LEFT;));
+	base_hist := PROJECT(base, TRANSFORM({base}, 
+	                                     SELF.history_flag :=IF(LEFT.history_flag='U','U','H');;
+																			 SELF:=LEFT;));
 
 	//Combine updates with existing base
   canadianwp := axciom_res + axciom_bus + base;

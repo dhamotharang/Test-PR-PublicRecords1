@@ -1,4 +1,4 @@
-﻿IMPORT STD, ut,wk_ut,tools;
+﻿IMPORT STD, ut,wk_ut,tools,WsDFU;
 //works on thor and hthor now
 export  Copy2_Storage_Thor(
 
@@ -6,8 +6,8 @@ export  Copy2_Storage_Thor(
   ,string  tempname          = ''
   ,string  pCluster          = 'thor400_24_store'
   ,boolean pDeleteSourceFile = false
-  ,string  pEclserver        = 'prod_esp.br.seisint.com'//10.241.20.202
-  ,string  pSourceDali       = 'prod_dali.br.seisint.com'
+  ,string  pEclserver        = 'uspr-prod-thor-esp.risk.regn.net'//10.241.20.202
+  ,string  pSourceDali       = 'uspr-prod-thor-dali.risk.regn.net'
 ) := 
 Function
 
@@ -31,7 +31,7 @@ Function
   
   copyfilecmd := serv + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + comp + srcdali;
                     
-  getorigcreatewuid := wk_ut.get_DFUInfo(lfilename).wuid;
+  getorigcreatewuid := WsDFU.GetFileCreationWuid(lfilename);
   copywuid          := workunit                         ;
 
   // -- Execute command

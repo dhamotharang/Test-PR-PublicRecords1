@@ -1,4 +1,4 @@
-﻿import prte_csv, sanctn;
+﻿import prte_csv, sanctn, prte2;
 
 EXPORT Layouts := module
 
@@ -12,7 +12,7 @@ string10 req;
 end;
 
 export Party_in := record
-SANCTN.layout_SANCTN_did;
+SANCTN.layout_SANCTN_did and not [global_sid,record_sid];
 UNSIGNED8 __internal_fpos__;
 string10 cust_name;
 string10 bug_num;
@@ -50,7 +50,14 @@ Incident_in and not __internal_fpos__;
 end;
 
 export Party_ext := record
-Party_in and not __internal_fpos__;
+SANCTN.layout_SANCTN_did;
+string10 cust_name;
+string10 bug_num;
+string8 link_dob;
+string9 link_ssn;
+string9 link_fein;
+string8 link_inc_date;
+string10 req;	
 end;
 
 export License_ext := record
@@ -67,13 +74,11 @@ end;
 
 
 export INCIDENT_base := record
-// SANCTN.layout_SANCTN_incident_clean AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
 Incident_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM, REQ];
 end;
 
 
 export PARTY_base := record
-// SANCTN.layout_SANCTN_did AND NOT [RECORD_TYPE, SOURCE_REC_ID, enh_did_src];
 Party_ext AND NOT [RECORD_TYPE, 
 										SOURCE_REC_ID, 
 										enh_did_src, 
@@ -87,13 +92,11 @@ Party_ext AND NOT [RECORD_TYPE,
 end;
 
 EXPORT LICENSE_base := RECORD
-// SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
 License_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
 end;
 
 
 EXPORT PARTY_AKA_DBA_base := RECORD
-// SANCTN.layout_SANCTN_aka_dba_in AND NOT [RECORD_TYPE,LAST_NAME,FIRST_NAME,MIDDLE_NAME,CUST_NAME, BUG_NUM];
 Party_AKA_DBA_ext AND NOT [RECORD_TYPE,LAST_NAME,FIRST_NAME,MIDDLE_NAME,CUST_NAME, BUG_NUM];
 end;
 
@@ -116,16 +119,13 @@ export casenum_key := RECORD
 	STRING20 	case_number;
 	STRING8 	batch_number;
 	STRING8 	incident_number;
-	// UNSIGNED8 __internal_fpos__;
 	END;
 	
 export did_key := RECORD
-
 	UNSIGNED6 did;
 	STRING8 	batch_number;
 	STRING8 	incident_number;
 	STRING8 	party_number;
-	// UNSIGNED8 __internal_fpos__;	
 end;
 
 //Incident Key Layout
@@ -154,7 +154,6 @@ END;
 
 
 export NMLS_MIDEX_KEY := RECORD
- // SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
  license_base and not [CLN_LICENSE_NUMBER];
  STRING26 		midex_rpt_nbr;
  STRING20 		NMLS_ID;
@@ -162,7 +161,6 @@ END;
 
 
 export NMLS_ID_Key := RECORD
-  // SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
 	license_base and not [CLN_LICENSE_NUMBER];
 	STRING20 		NMLS_ID;
 	STRING26 		MIDEX_RPT_NBR;
@@ -198,36 +196,7 @@ export PARTY_AKA_DBA_Key := RECORD
   PARTY_AKA_DBA_base;
 END;
 
-
 	
-// export nmls_id_key := RECORD
-	// STRING20	nmls_id;
-	// STRING8 	batch_number;
-	// STRING8 	incident_number;
-	// STRING8 	party_number;
-	// STRING4 	order_number;
-	// STRING50 	license_number;
-	// STRING50 	license_type;
-	// STRING20 	license_state;
-	// STRING50 	std_type_desc;
-	// STRING26 	midex_rpt_nbr;
-	// UNSIGNED8 __internal_fpos__;	
-// end;	
-
-// export nmls_midex_key := RECORD
-	// STRING26 	midex_rpt_nbr;
-	// STRING8 	batch_number;
-	// STRING8 	incident_number;
-	// STRING8 	party_number;
-	// STRING4 	order_number;
-	// STRING50 	license_number;
-	// STRING50 	license_type;
-	// STRING20 	license_state;
-	// STRING50 	std_type_desc;
-	// STRING20	nmls_id;
-	// UNSIGNED8 __internal_fpos__;
-// END;
-
 export ssn4_key := RECORD
 	STRING4 ssn4;
 	STRING8 batch_number;
@@ -318,8 +287,16 @@ export linkids_key := RECORD
 	string9 ssn_appended;
 	string60 dba_name;
 	string30 contact_name;
-	// integer1 fp;
+	unsigned4 global_sid;
+  unsigned8 record_sid;
  END;
 
-	export autokeys := sanctn.layout_autokeys;
+export autokeys := record
+	SANCTN.layout_autokeys;
+  INTEGER8 zero := 0;
+	blk  := '';
+	//CCPA-283 Adding CCPA new fields
+	PRTE2.Layouts.DEFLT_CPA;
+	end;
+	
 end;

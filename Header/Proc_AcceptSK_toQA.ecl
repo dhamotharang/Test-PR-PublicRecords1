@@ -2,6 +2,8 @@
 
 export Proc_AcceptSK_toQA(string filedate, boolean pFastHeader=false) := function
 
+/*** roxiekeybuild.Mac_SK_Move - Move the content of built into QA ***/
+/*** Move to QA ***/
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::did_hhid','Q',out1);
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::hhid','Q',out2a);
@@ -22,9 +24,7 @@ roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.zip.lname.fname','Q',out21
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.pname.zip.name.range','Q',out27);
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header','Q',out13);
-
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header_lookups','Q',out14);
-roxiekeybuild.Mac_SK_Move('~thor_data400::key::lssi.determiner','Q',out14b)
 
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::rid_did','Q',out25)
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::rid_did2','Q',out26)
@@ -53,7 +53,6 @@ roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.ssn5.did','Q',out62);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header_address','Q',out63);
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.dob','Q',out64);
-roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.parentlnames','Q',out65);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.zipprlname','Q',out67);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header::minors','Q',out68);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::header.dobname','Q',out69);
@@ -80,20 +79,23 @@ roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::header::DMV_restricted','Q',mq
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::insuranceheader_xlink::did','Q',mq_ins_did);
 
 out40 := doxie_build.proc_accept_header_wildkeys_toQA;
+/*** Move to QA ***/
 
+/*** Move to prod ***/
 out15 := sequential(fileservices.clearsuperfile('~thor_data400::base::header_prod'),
 fileservices.addsuperfile('~thor_data400::base::header_prod','~thor_data400::base::header',,true));
-
-out16 := sequential(fileservices.clearsuperfile('~thor_data400::base::relatives_prod'),
-fileservices.addsuperfile('~thor_data400::base::relatives_prod','~thor_data400::base::relatives',,true));
 
 out17 := sequential(fileservices.clearsuperfile('~thor_data400::base::hhid_prod'),
 fileservices.addsuperfile('~thor_data400::base::hhid_prod','~thor_data400::base::hhid',,true));
 
 out18 := header_slimsort.proc_accept_sf_to_Prod; 
+/*** Move to prod ***/
+
+/*** Move to QA ***/
 out19 := header_slimsort.Proc_AcceptSK_toQA;
 
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::nbr_address','Q',out22,2);
+/*** Move to QA ***/
 
 gong_did := output(dataset([],header.Layout_Header),,'~thor_data400::temp::gong_history_redid',overwrite);
 bank_did := output(dataset([],header.Layout_Header),,'~thor_data400::temp::bankruptcy_redid',overwrite);
@@ -103,6 +105,7 @@ mv_nm_src := sequential(fileservices.clearsuperfile('~thor_data400::base::hss_na
 fileservices.addsuperfile('~thor_data400::base::hss_name_source_prod','~thor_data400::base::hss_name_source',,true));
 
 //external sources
+/*** ut.mac_SF_Move - Copy the content of thor_data400::base::tucs_did into thor_data400::base::tucs_did_prod ***/
 ut.mac_SF_Move('~thor_data400::base::tucs_did','P',mv_tucs2prod);
 ut.mac_SF_Move('~thor_data400::base::transunion_did','P',mv_tult2prod);
 ut.mac_SF_Move('~thor_data400::base::transunionCred_did','P',mv_transunionCred2prod);
@@ -113,8 +116,11 @@ ut.mac_SF_Move('~thor_data400::base::header_raw_syncd','P',mv_hrs2prod);
 ut.mac_SF_Move('~thor_data400::base::file_header_building','P',mv_fhb2prod);
 ut.mac_SF_Move('~thor_data400::base::gong_did','P',mv_gong2prod);
 
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::header::d2c_header_relatives','Q',out81);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::header::marketing_header_relatives','Q',out82);
+
 e_mail_success := fileservices.sendemail(
-'roxiedeployment@seisint.com,' + Header.email_list.BocaDevelopers,
+ Header.email_list.BocaDevelopers,
 'Header Roxie Build Succeeded ' + filedate,
 'keys:  1)   thor_data400::key::did_hhid_qa(thor_data400::key::header::HHID::'+filedate+'::did.ver),\n' + 
 '       2)   thor_data400::key::hhid_did_qa(thor_data400::key::header::HHID::'+filedate+'::hhid.ver),\n' + 
@@ -190,10 +196,10 @@ e_mail_success := fileservices.sendemail(
 '       73)   thor_data400::key::header.ssn4_v2.did(thor_data400::key::header::'+filedate+'::ssn4_v2.did),\n' +
 '       74)   thor_data400::key::aid::RawAID_to_ACECahe(thor_data400::key::aid::'+filedate+'::RawAID_to_ACECahe),\n' +
 '       75)   thor_data400::key::relatives_v2_qa(thor_data400::key::header::'+filedate+'::relatives_v2),\n' +
-'      have been built and ready to be deployed to QA.');
+'       76)   thor_data400::key::header::'+filedate+'::d2c_header_relatives),\n' +
+'       77)   thor_data400::key::header::'+filedate+'::marketing_header_relatives),\n' +
+'      ');
 							
-
-
 all_keys := sequential(
 											out1
 											,out2a
@@ -209,9 +215,7 @@ all_keys := sequential(
 											,out12
 											,out13
 											,out14
-											,out14b
 											,out15
-											,out16
 											,out17
 											,out18
 											,out19
@@ -243,7 +247,6 @@ all_keys := sequential(
 											,out62
 											,out63
 											,out64
-											,out65
 											,out67
 											,out68
 											,out69
@@ -264,9 +267,9 @@ all_keys := sequential(
 											,mq_rel_title
 											,mq_DMV_restricted
 											,mq_ins_did
-											,gong_did
-											,bank_did
-											,lien_did
+											// ,gong_did
+											// ,bank_did
+											// ,lien_did
 											,mv_tucs2prod
 											,mv_tult2prod
 											,mv_hr2prod
@@ -275,6 +278,8 @@ all_keys := sequential(
 											,mv_gong2prod
 											,mv_transunionCred2prod
 											,e_mail_success
+                                            ,out81
+                                            ,out82
 											);
 
 return all_keys;

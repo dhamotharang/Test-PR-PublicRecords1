@@ -12,7 +12,17 @@ EXPORT match_active_enterprise_number(TYPEOF(h.active_enterprise_number) L, TYPE
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
-EXPORT match_active_domestic_corp_key(TYPEOF(h.active_domestic_corp_key) L, TYPEOF(h.active_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_company_inc_state(TYPEOF(h.company_inc_state) L, TYPEOF(h.company_inc_state) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
+EXPORT match_company_charter_number(TYPEOF(h.company_charter_number) L, TYPEOF(h.company_charter_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
+EXPORT match_sbfe_id(TYPEOF(h.sbfe_id) L, TYPEOF(h.sbfe_id) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
@@ -27,17 +37,7 @@ EXPORT match_hist_duns_number(TYPEOF(h.hist_duns_number) L, TYPEOF(h.hist_duns_n
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
-EXPORT match_hist_domestic_corp_key(TYPEOF(h.hist_domestic_corp_key) L, TYPEOF(h.hist_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-   MAP(L = R => SALT311.MatchCode.ExactMatch,
-    SALT311.MatchCode.NoMatch),
-     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
-);
-EXPORT match_foreign_corp_key(TYPEOF(h.foreign_corp_key) L, TYPEOF(h.foreign_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-   MAP(L = R => SALT311.MatchCode.ExactMatch,
-    SALT311.MatchCode.NoMatch),
-     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
-);
-EXPORT match_unk_corp_key(TYPEOF(h.unk_corp_key) L, TYPEOF(h.unk_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_hist_corp_key(TYPEOF(h.hist_corp_key) L, TYPEOF(h.hist_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
@@ -50,6 +50,12 @@ EXPORT match_ebr_file_number(TYPEOF(h.ebr_file_number) L, TYPEOF(h.ebr_file_numb
 EXPORT match_company_fein(TYPEOF(h.company_fein) L, TYPEOF(h.company_fein) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
 	Config.WithinEditN(L,LL,R,RL,1,0)=> SALT311.MatchCode.EditDistanceMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
+EXPORT match_cnp_name_phonetic(TYPEOF(h.cnp_name_phonetic) L, TYPEOF(h.cnp_name_phonetic) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+	metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT311.MatchCode.PhoneticMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
