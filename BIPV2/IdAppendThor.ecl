@@ -51,6 +51,7 @@ export IdAppendThor(
 		,weightThreshold := weightThreshold
 		,disableSaltForce := not primForce
 		,segmentation := segmentation
+		,reAppend := reAppend
 	);
 	#END
 
@@ -81,7 +82,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -96,7 +97,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -111,7 +112,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;

@@ -10,6 +10,7 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT CHGEXT := tools.mod_FilenamesInput(Template('CHGEXT::AZ'), pversion);	
 		EXPORT FLMEXT := tools.mod_FilenamesInput(Template('FLMEXT::AZ'), pversion);		
 		EXPORT OFFEXT := tools.mod_FilenamesInput(Template('OFFEXT::AZ'), pversion);	
+		EXPORT INACTV := tools.mod_FilenamesInput(Template('INACTV::AZ'), pversion);
 	END;
 
 END;
