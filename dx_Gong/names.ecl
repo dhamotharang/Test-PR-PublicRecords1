@@ -1,4 +1,4 @@
-﻿IMPORT data_services, doxie, STD;
+﻿IMPORT data_services, doxie;
 
 EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
@@ -6,8 +6,8 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   SHARED string postfix       := IF (file_version != '', '_' + file_version, '');
 
   EXPORT i_phone              := prefix + 'gong_phone'           + postfix;
-  EXPORT i_czsslf             := prefix + 'gong_czsslf'          + postfix;
-  EXPORT i_lczf               := prefix + 'gong_lczf'            + postfix;
+  EXPORT i_czsslf             := prefix + 'gong_czsslf'          + postfix; //TODO: delete
+  EXPORT i_lczf               := prefix + 'gong_lczf'            + postfix; //TODO: delete
   EXPORT i_address_current    := prefix + 'gong_address_current' + postfix;
   EXPORT i_surname_count      := prefix + 'gong_surnamecnt'      + postfix;
   EXPORT i_phone10            := prefix + 'cbrs.phone10_gong'    + postfix;
@@ -22,7 +22,7 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_history_hhid          := prefix + 'gong_history_hhid'          + postfix;
   EXPORT i_history_bdid          := prefix + 'gong_hist_bdid'             + postfix;
   EXPORT i_history_name          := prefix + 'gong_history_name'          + postfix;
-  EXPORT i_history_zip_name      := prefix + 'gong_history_zip_name'      + postfix;				
+  EXPORT i_history_zip_name      := prefix + 'gong_history_zip_name'      + postfix;
   EXPORT i_history_npa_nxx_line  := prefix + 'gong_history_npa_nxx_line'  + postfix;
   EXPORT i_history_surname       := prefix + 'gong_history::' + IF(file_version='', '@version@', file_version) + '::surnames';
   EXPORT i_history_wdtg          := prefix + 'gong_history_wdtg'          + postfix;
@@ -33,9 +33,9 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_history_LinkIDs       := prefix + 'gong_history_linkids'       + postfix;
 
   // FCRA Keys
-  EXPORT i_history_address_fcra  := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::address'; 
-  EXPORT i_history_phone_fcra    := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::phone'; 
-  EXPORT i_history_did_fcra      := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::did'; 
+  EXPORT i_history_address_fcra  := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::address';
+  EXPORT i_history_phone_fcra    := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::phone';
+  EXPORT i_history_did_fcra      := prefix + 'gong_history::fcra::' + IF(file_version='', '@version@', file_version) + '::did';
 
   EXPORT i_did                   := prefix + 'gong_did'                   + postfix;
   EXPORT i_hhid                  := prefix + 'gong_hhid'                  + postfix;
