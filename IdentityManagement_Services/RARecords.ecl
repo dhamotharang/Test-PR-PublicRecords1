@@ -32,8 +32,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 			boolean is_relative;
 		END;
 
-		slim_addr_rec := record 
-			iesp.identitymanagementreport.t_IdmReportAddressSlim;
+		slim_addr_rec := record(iesp.identitymanagementreport.t_IdmReportAddressSlim) 
 			unsigned6 did;  // this is for linking...
 			string5 county; // need these to get census, if required - county "number"
 			string7	geo_blk;
@@ -169,9 +168,24 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 				self := left),
 			limit(0), keep(1),
 			left outer);
-			
-		//Get addresses for relatives
-		slim_addr_rec ProjAddr (doxie.Layout_Comp_Addresses L) := transform
+		
+		// defenestrate any "PO BOX" before deduping into the "ready" address
+		addr_ready_hdr := dedup(doxie.Comp_Addresses(STD.STR.touppercase(prim_name[1..6]) <> 'PO BOX'), record); 
+		rec_tmp_hdr := record(doxie.Layout_Comp_Addresses)
+                     string2   addr_ind := '';
+		               end;
+		addr_ranked_metadata_in := PROJECT(addr_ready_hdr,rec_tmp_hdr) ;
+		addr_ranked_metadata := Header.MAC_Append_Addr_Ind(
+                              addr_ranked_metadata_in, addr_ind, /*src*/, did, prim_range , 
+                              prim_name, sec_range, city_name, st, zip, 
+                             /*predir*/, /*postdir*/, /*addr_suffix */, 
+                             /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/, 
+                             /*dt_vendor_last_reported*/ , /*isTrusted*/ , 
+                             /*isFCRA*/, /*hitQH*/, /*debug*/);
+     
+    //Get addresses for relatives
+		//slim_addr_rec ProjAddr (doxie.Layout_Comp_Addresses L) := transform
+		slim_addr_rec ProjAddr (recordof(addr_ranked_metadata) L) := transform
 			Self.did := L.did;
 			Self.county := L.county;
 			Self.geo_blk := L.geo_blk;
@@ -187,12 +201,28 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 			Self._Shared := (L.shared_address='S');
 			// filter Address if not shared with subject, or if first and last in same month
 			Self.filtered := STD.STR.touppercase(L.shared_address) <> 'S' OR L.dt_first_seen = L.dt_last_seen;
+			//Self.Best_addr_ind := L.Best_addr_ind;
+			Self.AddressHierarchy.BestAddress := (L.Best_addr_rank = '1');
+			Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDate(L.dt_first_seen_addr);
+			Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDate(L.dt_last_seen_addr);
+			Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDate(L.dt_vendor_first_reported_addr);
+			Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDate(L.dt_vendor_last_reported_addr);
+			Self.AddressHierarchy.SourceCounts.UnitNumberVariations := L.apt_cnt;
+			Self.AddressHierarchy.SourceCounts.UniqueSources := L.src_cnt;
+			Self.AddressHierarchy.SourceCounts.Insurance := L.insurance_src_cnt;
+			Self.AddressHierarchy.SourceCounts.Bureau := L.bureau_src_cnt;
+			Self.AddressHierarchy.SourceCounts.Property := L.property_src_cnt;
+			Self.AddressHierarchy.SourceCounts.Utility := L.utility_src_cnt;
+			Self.AddressHierarchy.SourceCounts.Vehicle := L.vehicle_src_cnt;
+			Self.AddressHierarchy.SourceCounts.DriverLicense := L.dl_src_cnt;
+			Self.AddressHierarchy.SourceCounts.Voter := L.voter_src_cnt;
+			Self.AddressHierarchy.AddressStatus := L.addressstatus;
+			Self.AddressHierarchy.AddressType := L.addresstype;
+     Self := L;
 		end;
-		
-		// defenestrate any "PO BOX" before deduping into the "ready" address
-		addr_ready := dedup(project(doxie.Comp_Addresses(STD.STR.touppercase(prim_name[1..6]) <> 'PO BOX'),
-                              ProjAddr (Left)), record); 
-
+                                         
+		addr_formatted := 	project( addr_ranked_metadata, ProjAddr (Left));
+    
 		// Format rel/assoc addresses
 		iesp.identitymanagementreport.t_IdmReportAddressSlim FormatThisPersonAddressSlim (slim_addr_rec L) := TRANSFORM
 			Self.Address := L.Address;
@@ -200,6 +230,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 			Self.DateFirstSeen := L.DateFirstSeen;
 			Self._Shared := L._Shared;
 			Self.Filtered := False; // innocent until proven guilty
+			Self := L;      
 		END;
 
 		record_addr_did_slim SetAddressSlim (slim_addr_rec L) := transform
@@ -208,7 +239,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		end;
 		
 		// sort and group by DID
-		grp_addr_ready := project(group(sort (addr_ready, did), did), SetAddressSlim (left));
+		grp_addr_ready := project(group(sort (addr_formatted, did), did), SetAddressSlim (left));
 
 		record_addr_did_slim RollAddressSlim (record_addr_did_slim L, dataset (record_addr_did_slim) R):=transform
 			self.addresses := choosen (R.Addresses, iesp.Constants.IDM.MaxRNA_Address);
