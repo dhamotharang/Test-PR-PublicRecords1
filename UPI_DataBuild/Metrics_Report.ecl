@@ -68,8 +68,14 @@ EXPORT Metrics_Report (string pVersion, boolean pUseProd, string gcid, dataset (
 			UPI_DataBuild.Layouts_V2.base.crk;
 		end;
 		
+		prev_base		:= map(												 
+									pHistMode = 'N'	=> dataset([],upi_databuild.Layouts_V2.base),
+									IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_base.father)) = 0
+												 ,dataset([],upi_databuild.Layouts_V2.base)
+												 ,UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.father)); 
+ 									
+		
 		get_distinct_crk 	:= sort(distribute(dedup(project(pBaseFile, crk_only), all)), crk);
-		prev_base					:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa;
 		prev_distinct_crk	:= sort(distribute(dedup(project(prev_base, crk_only), all)), crk);
 
 		new_only 					:= join(prev_distinct_crk, get_distinct_crk,
