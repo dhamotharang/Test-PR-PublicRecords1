@@ -49,6 +49,7 @@ Indicator ID  Risk Alert
 46  Surname of Phone's Listing Name Does Not Match Identity Found
 47  Phone returned more than X times in past Y days.
 48  Phone linked to identity by self-reported sources only
+49  Phone Service Type is Other/Unknown
 */
 
 IMPORT $, iesp, MDR, STD;
@@ -135,6 +136,7 @@ FUNCTION
                                 46 => inMod.isPrimarySearchPII AND ~pInput.isLNameMatch,
                                 47 => pInput.phone_inresponse_count > le.ThresholdA,
                                 48 => isSelfReportedSourcesOnly,
+                                49 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Other,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);
