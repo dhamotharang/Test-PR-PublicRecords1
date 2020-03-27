@@ -69,7 +69,7 @@ _sn := join(baf3, kap,
 					 companies_match(left.company_name,right.company_name) and
 					 ut.NNEQ(left.sec_range, right.sec_range),
 					 keepk(right),
-					 limit(50000));
+					 limit(50000, SKIP));
 
 sn_suppressed := Suppress.MAC_SuppressSource(_sn, mod_access);
 Doxie.compliance.logSoldToSources(sn_suppressed, mod_access);
