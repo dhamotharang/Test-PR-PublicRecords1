@@ -27,7 +27,7 @@ wchk := if(fileservices.fileexists('~thor_data400::in::watchdog_check'),
 
 set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
-send_bad_email := fileservices.SendEmail('michael.gould@lexisnexisrisk.com,sudhir.kasavajjala@lexisnexis.com','Watchdog Build Failed',thorlib.wuid());
+send_bad_email := fileservices.SendEmail('sudhir.kasavajjala@lexisnexis.com','Watchdog Build Failed',thorlib.wuid());
 
 out_all :=  sequential(verify_hdr,wchk,set_inputs,watchdog.BWR_Best(isnewheader,build_type)) : FAILURE(send_bad_email);
 return out_all;

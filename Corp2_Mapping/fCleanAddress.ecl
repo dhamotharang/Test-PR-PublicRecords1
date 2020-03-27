@@ -232,7 +232,7 @@ export fCleanAddress(string pStateOrigin,string pStateOriginDesc,string pAddr1 =
 
 		//If Addr2 is only one character, then blank out Addr2
 		export CleanAddr2Size		:= map(CleanAddr2 = ''																								=> '',
-																	 length(stringlib.stringfilter(CleanAddr2,alpha))>1 						=> CleanAddr2,
+																	 length(stringlib.stringfilter(CleanAddr2,alpha_numeric))>1 		=> CleanAddr2,
 																	 ''
 																	);
 		//If Addr1 ends with a special character, then remove the last special character (e.g. 374 MAIN STREET- becomes 374 MAIN STREET)

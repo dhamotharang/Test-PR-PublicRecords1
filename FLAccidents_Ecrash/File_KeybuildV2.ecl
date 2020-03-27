@@ -7,7 +7,7 @@ export File_KeybuildV2 := module
 
 flc_ss 	:= FLAccidents.basefile_flcrash_ss(lname+cname+prim_name<>'');
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs(flc_ss L, FLAccidents.basefile_flcrash2v R) := transform
+Layout_keybuild_SSv2_NewAgencyORI xpndrecs(flc_ss L, FLAccidents.basefile_flcrash2v R) := transform
 		self.ultid                := L.ultid;
 		self.orgid                := L.orgid;
 		self.seleid               := L.seleid;
@@ -74,7 +74,7 @@ end;
 				
 // get Carrier_info from driver file 98385
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs1(pflc_ss L,FLAccidents.BaseFile_FLCrash4 R) := transform
+Layout_keybuild_SSv2_NewAgencyORI xpndrecs1(pflc_ss L,FLAccidents.BaseFile_FLCrash4 R) := transform
 
 	self.carrier_name := if(l.carrier_name <> '', l.carrier_name,  R.ins_company_name);
 	self.Policy_num   := if(l.Policy_num <>'',l.Policy_num, R.ins_policy_nbr); 
@@ -94,7 +94,7 @@ pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash(accident_nbr))
 															xpndrecs1(left,right),left outer,local)),all,local);
 				 
 /////////////////////////////////////////////////////////////////
-FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
+Layout_keybuild_SSv2_NewAgencyORI xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
 
 	self.vehicle_incident_city			:= stringlib.stringtouppercase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
 	//Appriss Integration
@@ -113,7 +113,7 @@ pflc_ss2 := distribute(join(distribute(pflc_ss1,hash(accident_nbr))
 ///////////////////////////////////////////////////////////////// 
 ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 
-pflc_ss slimrec(ntlFile L) := transform
+Layout_keybuild_SSv2_NewAgencyORI slimrec(ntlFile L) := transform
 
 		string8     fSlashedMDYtoCYMD(string pDateIn) :=
 								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
@@ -195,7 +195,7 @@ pntl := project(ntlFile,slimrec(left));
 ///////////////////////////////////////////////////////////////// 
 inqFile := FLAccidents_Ecrash.File_CRU_inquiries;
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrec2(inqFile L ,unsigned1 cnt) := transform
+Layout_keybuild_SSv2_NewAgencyORI slimrec2(inqFile L ,unsigned1 cnt) := transform
 
     string8     fSlashedMDYtoCYMD(string pDateIn) :=
 								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
@@ -320,7 +320,7 @@ jdropMetadata := join( IyetekMeta,IyetekFull, left.state_report_number = right.S
 ///////////////////////////////////////////////////////////////// 
 eFile := FLAccidents_Ecrash.BaseFile(source_id <>'TM') + jdropMetadata ; //contains EA , TF, TM
 
-pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
+Layout_keybuild_SSv2_NewAgencyORI slimrec3(eFile L, unsigned1 cnt) := transform
 		self.accident_nbr 					        := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 		self.accident_date					        := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
 		self.b_did									        := if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
@@ -390,6 +390,7 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 		self.next_street 										:= l.next_street;
 		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
 		self.agency_ori											:= l.ori_number;
+		self.orig_agency_ori								:= l.agency_ori;
 		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
 		self.is_available_for_public				:= if(l.report_code in ['TF','EA'],'1',l.is_available_for_public);
 		self.report_status 									:= l.report_status;
@@ -444,7 +445,7 @@ ddrecs := dedup(sort(distribute(total,hash(accident_nbr))
 
 //scrub the accident number and UNK issue   
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrecs(ddrecs L) := transform
+Layout_keybuild_SSv2_NewAgencyORI slimrecs(ddrecs L) := transform
 
      t_scrub := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
      self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
@@ -458,20 +459,28 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrecs(ddrecs L) := transform
 		 
 self 								:= L;
 end;
-
 shared outrecs0  := project(ddrecs,slimrecs(left)): persist('~thor_data400::persist::ecrash_ssV2');
+
 //ALpha files only need records with below reason ID's for IA
-
 shared InteractiveReports :=  ['I0','I1','I2','I3','I4','I5','I6','I7','I8','I9'];
-AlphaIA     := outrecs0 (report_code[1] = 'I' and report_code not in InteractiveReports); 
-AlphaOther  := outrecs0 (report_code[1] <>'I');
+shared AlphaIA     := outrecs0 (report_code[1] = 'I' and report_code not in InteractiveReports); 
+shared AlphaOther  := outrecs0 (report_code[1] <>'I');
 shared AlphaCmbnd := AlphaOther +  AlphaIA (reason_id in ['HOLD','AFYI','ASSI','AUTO','CALL','PRAC','SEAR','SECR','WAIT','PRAI']);
-
 shared AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGIC');
-//export Coplogic :=  AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC');
-AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
-export Alpha  :=  AlphaOtherVendors + AlphaCoplogic;
-export out    := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+shared AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
+export Alpha  :=  project(AlphaOtherVendors + AlphaCoplogic, transform(Layout_keybuild_SSv2, self := left;));
+
+shared foutrecs0 := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+export out    := project(foutrecs0, transform(Layout_keybuild_SSv2, self := left;));
+												 
+shared EcrashAgencyExclusionAgencyOri := foutrecs0(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
+                                                   STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
+																					         );
+																																					
+shared EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
+                                                               STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
+																				                       );
+export prout := project(EcrashAgencyExclusion, transform(Layout_keybuild_SSv2, self := left;));
 
 shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
 export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;

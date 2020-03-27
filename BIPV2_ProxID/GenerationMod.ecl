@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'DOT_Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,active_domestic_corp_key,sbfe_id,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,company_name,cnp_name_phonetic,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,company_inc_state,company_charter_number,active_corp_key,sbfe_id,hist_enterprise_number,hist_duns_number,hist_corp_key,ebr_file_number,company_fein,company_name,cnp_name_phonetic,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
   EXPORT spc_HAS_TWOSTEP := TRUE;
   EXPORT spc_HAS_PARTITION := TRUE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -51,6 +51,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'THRESHOLD:30\n'
     + 'BLOCKTHRESHOLD:5\n'
     + 'HACK:MAXBLOCKSIZE:20000\n'
+    + 'HACK:NOSLICE\n'
+    + 'HACK:NO_PARALLEL_MATCH\n'
     + '// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields \n'
     + '//FIELDTYPE:wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)\n'
     + 'FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
@@ -70,20 +72,22 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// Active ID fields from reliable sources\n'
     + 'FIELD:active_duns_number:PROP:18,78\n'
     + 'FIELD:active_enterprise_number:FORCE(--):PROP:20,15\n'
-    + 'FIELD:active_domestic_corp_key:FORCE(--):PROP:19,1\n'
+    + 'FIELD:company_inc_state:6,34\n'
+    + 'FIELD:company_charter_number:CONTEXT(company_inc_state):26,110\n'
+    + 'FIELD:active_corp_key:CARRY:0,0\n'
     + 'FIELD:sbfe_id:SWITCH0:27,475\n'
     + '// Historical and non-domestic IDs from reliable sources\n'
     + '// If match, add to score, if not, don\'t care(SWITCH0)\n'
     + 'FIELD:hist_enterprise_number:PROP:20,22\n'
     + 'FIELD:hist_duns_number:PROP:18,72\n'
-    + 'FIELD:hist_domestic_corp_key:PROP:19,151\n'
-    + 'FIELD:foreign_corp_key:SWITCH0:PROP:19,418\n'
-    + 'FIELD:unk_corp_key:SWITCH0:PROP:19,133\n'
+    + 'FIELD:hist_corp_key:SWITCH0:PROP:19,151\n'
+    + '// FIELD:foreign_corp_key:SWITCH0:PROP:19,418\n'
+    + '// FIELD:unk_corp_key:SWITCH0:PROP:19,133\n'
     + 'FIELD:ebr_file_number:PROP:20,427\n'
     + 'FIELD:company_fein:PROP:EDIT1:17,227\n'
     + 'FIELD:company_name:CARRY:0,0\n'
     + 'FIELD:cnp_name_phonetic:PHONETIC:12,334\n'
-    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic),OR(sbfe_id)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334\n'
+    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(company_charter_number),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic),OR(sbfe_id)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334\n'
     + '// FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137\n'
     + '//FIELD:source:CARRY:0,0\n'
     + 'FIELD:company_name_type_raw:CARRY:0,0\n'
@@ -148,14 +152,14 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// ------------------------------------\n'
     + '//  Cleaves\n'
     + '// ------------------------------------\n'
-    + 'CLEAVE:solo_corp_key:BASIS(active_domestic_corp_key):MINIMUM(1)\n'
+    + '// CLEAVE:solo_corp_key:BASIS(active_domestic_corp_key):MINIMUM(1)\n'
     + '//CLEAVE:solo_active_duns:BASIS(active_duns_number):MINIMUM(1)\n'
     + 'CLEAVE:solo_cnp_number:BASIS(cnp_number):MINIMUM(1)\n'
     + '// ------------------------------------\n'
     + '//  Attribute Files\n'
     + '// ------------------------------------\n'
     + 'ATTRIBUTEFILE:SrcRidVlid:NAMED(file_SrcRidVlid):VALUES(source:source_record_id:vl_id):IDFIELD(Proxid):SUPPORTS(cnp_name):19,753\n'
-    + 'ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):19,321\n'
+    + 'ATTRIBUTEFILE:ActiveCorpKeys:NAMED(_File_Active_Corpkeys):VALUES(charter_number<inc_state):FORCE(--,ALL):SUPPORTS(cnp_name):IDFIELD(Proxid):19,321\n'
     + 'ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):18,196\n'
     + 'ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):12,5\n'
     + 'ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):SUPPORTS(cnp_name):IDFIELD(ProxID):20,0\n'
