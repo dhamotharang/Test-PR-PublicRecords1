@@ -1,4 +1,4 @@
-IMPORT	Address, DriversV2, EmailService, iesp, doxie, ut, 
+﻿IMPORT	Address, DriversV2, EmailService, iesp, doxie, ut, 
 	Risk_Indicators, Header, suppress, models, Gateway, Royalty, STD;
 
 ifr := iesp.identityfraudreport;
@@ -525,7 +525,7 @@ EXPORT Functions := MODULE
 		boolean		IncludeDLverification	:=	true;
 
 		// Options for FraudPointAttrV2 indices
-		unsigned	bsVersion							:=	4;			// to get the fraud point indices
+		unsigned	bsVersion							:=	51;			// to get the fraud point indices
 		unsigned8	bsOptions							:=	risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
 																				risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity;
 		
