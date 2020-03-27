@@ -1,4 +1,4 @@
-IMPORT liensV2_preprocess, liensv2, ut;
+﻿IMPORT liensV2_preprocess, liensv2, ut;
 /*
 Updatetype = 'Caf' for CA_Federal
 						'Ma' for MA build
@@ -23,7 +23,7 @@ EXPORT MAC_Build_Liens(filedate, updatetype) := MACRO
 											IF(updatetype = 'Okclien', LiensV2.proc_build_liens_all(filedate)));
 
 // -- Send email notification
-%send_completion_email% := fileservices.sendemail('Sudhir.Kasavajjala@lexisnexis.com;michael.gould@lexisnexis.com',
+%send_completion_email% := fileservices.sendemail('Sudhir.Kasavajjala@lexisnexis.com',
 				'Liens Build completed:',
 				'Update type: ' + updatetype + 
 				'\r\nworkunit: ' + workunit);

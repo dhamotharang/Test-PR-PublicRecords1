@@ -1,6 +1,6 @@
-Import Data_Services, doxie_files, doxie,data_services;
+﻿Import Data_Services, doxie_files, doxie,data_services;
 
-dPhoneMart_base := PhoneMart.Files.base;
+dPhoneMart_base := PhoneMart.Prep_Build.applyRegulatoryPhoneMart(PhoneMart.Files.base);
 //remore scrub data
 layout_key_base := record
 	PhoneMart.Layouts.base - [ScrubsBits1, ScrubsBits2];
