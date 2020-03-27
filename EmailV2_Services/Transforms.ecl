@@ -1,4 +1,4 @@
-﻿IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
+IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
 
 EXPORT Transforms := MODULE
 
@@ -97,8 +97,10 @@ EXPORT Transforms := MODULE
       SELF.cleaned.Name    := RI.Clean_Name,
       SELF.cleaned.Address := RI.clean_address,
       SELF.cleaned := RI;
-                              SELF := RI;
-                              SELF := [];
+      SELF.ln_date_last := (UNSIGNED) RI.date_last_seen;
+      SELF.ln_date_first := (UNSIGNED) RI.date_first_seen;
+      SELF := RI;
+      SELF := [];
   END;
 
   SHARED BatchShare.Layouts.ShareAddress xfAddrPenalties($.Layouts.email_internal_rec le) := TRANSFORM
@@ -419,6 +421,8 @@ EXPORT Transforms := MODULE
                                      le.additional_status_info<>'' => le.additional_status_info,
                                      _last_verified<>'' => _last_verified,
                                      '');
+      SELF.ln_date_first := IF(le.ln_date_first>0, (STRING) le.ln_date_first,'');
+      SELF.ln_date_last := IF(le.ln_date_last>0, (STRING) le.ln_date_last,'');
       SELF := le;
   END;
 
