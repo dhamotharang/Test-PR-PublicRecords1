@@ -6,7 +6,7 @@ EXPORT Copy_Xlink_to_Alpha_Prod(
   ,pistesting           = 'false'
   ,pSkipSuperStuff      = 'true'
   ,pOverwrite           = 'false'
-  ,pkeyfilter2AlphaProd = '\'bizlinkfull\''              // copy everything in BIPV2FullKeys package
+  ,pkeyfilter2AlphaProd = '\'(bizlinkfull|segmentation_linkids)\''              // copy everything in BIPV2FullKeys package
   ,psuperversions       = '\'built\''         //add them to these supers after copying
   ,pSrcDali             = '\'uspr-prod-thor-dali.risk.regn.net:7070\''
   ,pDestinationThor     = '\'thor400_112\''

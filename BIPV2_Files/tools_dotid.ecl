@@ -512,6 +512,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
   // -------
 	export dataset(l_dot) SetPrimRangeDerived(
     dataset(l_dot) ds_in
+    ,string pPersistname = ''
   ) := 
   function
     import BIPV2;
@@ -558,7 +559,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         self:= left
       )
       ,limit(1000, skip)
-    ) : persist('~persist::BIPV2_Files::tools_dotid.jprd0', expire(7));
+    ) : persist('~persist::BIPV2_Files::tools_dotid.jprd0' + trim(pPersistname), expire(7));
     //if a prim_range matches to more than one derived prim_range, then dont let it derive
     jprd0d := dedup(jprd0, all);
     jprd :=
@@ -609,6 +610,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
      dataset(l_dot                  ) ds_in
     // ,dataset(header.Layout_Header_v2) pHeaders = Header.File_Headers
     ,boolean pDebugOutputs  = true
+    ,string  pPersistUnique = ''
   
   ) := 
   function
@@ -628,7 +630,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ds_joinback := join(ds_setaddr_res,ds_setaddr_res_clean,left.cnp_name = right.cnp_name,transform({recordof(left)/*,Address.Layout_Clean_Name clean_cname*/},self := right,self := left),hash);
     ds_joinback_rid := project(ds_joinback,transform({unsigned6 rid,string coname,recordof(left)},self.rid := counter,self.coname := left.cnp_name,self := left)); 
     CompanyNameAnalysis.Mac_isVanityName(ds_joinback_rid,coname,outvanity,outvanity2,rid,,pDebugOutputs);
-    outvanity_persist := outvanity(vanity = true)  : persist('~persist::BIPV2_Files::tools_dotid.Set_Vanity_Owner_Did.outvanity_persist');
+    outvanity_persist := outvanity(vanity = true)  : persist('~persist::BIPV2_Files::tools_dotid.Set_Vanity_Owner_Did.outvanity_persist' + pPersistUnique);
     outvanity_clean := project(dedup(outvanity_persist,full_name,all)  ,transform({recordof(left),Address.Layout_Clean_Name clean_cname},self.clean_cname := Address.CleanPersonFML73_fields(left.full_name).CleanNameRecord,self := left));
     ds_joinback4addr := join(ds_residential,outvanity_clean,left.cnp_name = right.full_name,transform({recordof(left),string20 owner_fname,string20 owner_mname,string20 owner_lname,string5 owner_name_suffix}
     ,self.owner_fname := right.clean_cname.fname
@@ -841,18 +843,45 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		end;
 		return project(ds_in, toNull(left));
 	end;
+	export boolean isgoodsic(string psic,string2 psource) := 
+      (
+        (     mdr.sourceTools.SourceIsDunn_Bradstreet     (psource) 
+          or  mdr.sourceTools.SourceIsInfutor_NARB        (psource) 
+          or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(psource)
+        ) 
+        and length(trim(psic)) in [4,8]
+      )
+      or length(trim(psic)) = 4
+      ;
 	
+	export dataset(l_dot) SetSICNAICS(dataset(l_dot) ds_in) := function
+		l_dot tCleanSIC(l_dot L) := transform
+			self.company_sic_code1							:= if (trim(l.company_sic_code1  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code1  ) = 1 and isgoodsic   (l.company_sic_code1    ,l.source ) = true, trim(l.company_sic_code1   )   ,'');
+			self.company_sic_code2							:= if (trim(l.company_sic_code2  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code2  ) = 1 and isgoodsic   (l.company_sic_code2    ,l.source ) = true, trim(l.company_sic_code2   )   ,'');
+			self.company_sic_code3							:= if (trim(l.company_sic_code3  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code3  ) = 1 and isgoodsic   (l.company_sic_code3    ,l.source ) = true, trim(l.company_sic_code3   )   ,'');
+			self.company_sic_code4							:= if (trim(l.company_sic_code4  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code4  ) = 1 and isgoodsic   (l.company_sic_code4    ,l.source ) = true, trim(l.company_sic_code4   )   ,'');
+			self.company_sic_code5							:= if (trim(l.company_sic_code5  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code5  ) = 1 and isgoodsic   (l.company_sic_code5    ,l.source ) = true, trim(l.company_sic_code5   )   ,'');
+			self.company_naics_code1						:= if (trim(l.company_naics_code1) != '' and ut.fn_valid_NAICSCode(l.company_naics_code1) = 1 and length(trim (l.company_naics_code1)           ) = 6   , trim(l.company_naics_code1 )   ,'');
+			self.company_naics_code2						:= if (trim(l.company_naics_code2) != '' and ut.fn_valid_NAICSCode(l.company_naics_code2) = 1 and length(trim (l.company_naics_code2)           ) = 6   , trim(l.company_naics_code2 )   ,'');
+			self.company_naics_code3						:= if (trim(l.company_naics_code3) != '' and ut.fn_valid_NAICSCode(l.company_naics_code3) = 1 and length(trim (l.company_naics_code3)           ) = 6   , trim(l.company_naics_code3 )   ,'');
+			self.company_naics_code4						:= if (trim(l.company_naics_code4) != '' and ut.fn_valid_NAICSCode(l.company_naics_code4) = 1 and length(trim (l.company_naics_code4)           ) = 6   , trim(l.company_naics_code4 )   ,'');
+			self.company_naics_code5						:= if (trim(l.company_naics_code5) != '' and ut.fn_valid_NAICSCode(l.company_naics_code5) = 1 and length(trim (l.company_naics_code5)           ) = 6   , trim(l.company_naics_code5 )   ,'');
+			self := L;
+		end;
+		return project(ds_in, tCleanSIC(left));
+	end;
 	// rerun selected routines on an existing DOT file
 	export dataset(l_dot) reclean(dataset(l_dot) ds_in) := function
 		ds_cnp	:= SetCompanyFields     (ds_in    );
-		ds_duns	:= Set_Duns              (ds_cnp   ,true,,'reclean');
+		ds_duns	:= Set_Duns             (ds_cnp   ,false,,'reclean',pDebug_Outputs := false);
 		ds_ent	:= SetEnterprise        (ds_duns  );
 		ds_sos	:= SetSOS               (ds_ent   );
 		ds_pn		:= SetPrimNameDerived   (ds_sos   );
-    ds_pr		:= SetPrimRangeDerived  (ds_pn    );
+    ds_pr		:= SetPrimRangeDerived  (ds_pn    ,'reclean');
     ds_at   := SetAddrType          (ds_pr    );
-    ds_owner:= Set_Vanity_Owner_Did (ds_at    );
-		return ds_owner;
+    ds_owner:= Set_Vanity_Owner_Did (ds_at    ,false,'reclean');
+    ds_sic  := SetSICNAICS          (ds_owner    );
+		return ds_sic;
 	end;
 	
 	export city_samp(ds_in, st_field, city_field) := functionmacro

@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_American_Student_List';
   EXPORT spc_NAMESCOPE := '';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'American_Student_List';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,key,ssn,did,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,historical_flag,full_name,first_name,last_name,address_1,address_2,city,state,zip,zip_4,crrt_code,delivery_point_barcode,zip4_check_digit,address_type_code,address_type,county_number,county_name,gender_code,gender,age,birth_date,dob_formatted,telephone,class,college_class,college_name,ln_college_name,college_major,new_college_major,college_code,college_code_exploded,college_type,college_type_exploded,head_of_household_first_name,head_of_household_gender_code,head_of_household_gender,income_level_code,income_level,new_income_level_code,new_income_level,file_type,tier,school_size_code,competitive_code,tuition_code,title,fname,mname,lname,name_suffix,name_score,rawaid,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5,zip4,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,county,ace_fips_st,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,tier2,source';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -34,16 +56,16 @@ EXPORT GenerationMod := MODULE
     + 'FIELDTYPE:invalid_nums:ALLOW(0123456789):SPACES( )\n'
     + 'FIELDTYPE:invalid_gender:ENUM(MALE|FEMALE|)\n'
     + 'FIELDTYPE:invalid_gender_code:ENUM(1|2|)\n'
-    + 'FIELDTYPE:invalid_alpha:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-):LENGTHS(1..)\n'
+    + 'FIELDTYPE:invalid_alpha:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-)\n'
     + 'FIELDTYPE:invalid_address:SPACES( ):ALLOW(\',./#-&/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-\'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)\n'
     + 'FIELDTYPE:invalid_county_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\'):SPACES( -):WORDS(1,2,3,4,5)\n'
-    + 'FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(5,9)\n'
+    + 'FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(0,5,9)\n'
     + 'FIELDTYPE:invalid_date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:invalid_suffix:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ENUM(SR|JR|I|II|III|IV|V|VI|VII|VIII|IX|X|)\n'
     + 'FIELDTYPE:invalid_college_class:ENUM(FR|GR|JR|SO|SR|UN|)\n'
     + 'FIELDTYPE:invalid_college_code:ENUM(1|2|4|)\n'
-    + 'FIELDTYPE:invalid_code_code_exploded:ENUM(FOUR YEAR COLLEGE|GRADUATE SCHOOL|TWO YEAR COLLEGE|)\n'
+    + 'FIELDTYPE:invalid_code_code_exploded:ENUM(FOUR YEAR COLLEGE|GRADUATE SCHOOL|TWO YEAR COLLEGE|UNDERGRADUATE SCHOOL|)\n'
     + 'FIELDTYPE:invalid_college_type_exploded:ENUM(CHURCH/RELIGIOUS SCHOOL|PRIVATE SCHOOL|PUBLIC/STATE SCHOOL|)\n'
     + 'FIELDTYPE:invalid_address_type:ENUM(GENERAL DELIVERY|HIGH-RISE DWELLING|POST OFFICE BOX|RURAL ROUTE|SINGLE FAMILY DWELLING|)\n'
     + 'FIELDTYPE:invalid_college_type:ENUM(N|P|R|S|)\n'
@@ -150,3 +172,4 @@ EXPORT GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

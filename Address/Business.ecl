@@ -926,8 +926,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsGeo(s) => MatchType.Business,
 		IsGeo(name) => MatchType.Business,
 		
-		// other unclassified names
-		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
+		// other invalid names
+		REGEXFIND('^DIVORCED +[A-Z]+$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
 //$		SpecialNames.IsCityState(s) => MatchType.Unclass,
 		// final checks before person
@@ -943,7 +944,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
 
-		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|MDN) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
 		//REGEXFIND('^(EST|TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Trust,		//MatchType.Unclass,
 		//REGEXFIND('\\b(LT|FT)$',s) => MatchType.Inv,		//MatchType.Unclass,
 //		SpecialNames.IsAbbreviation(tokens[NumTokens]) => MatchType.Inv,		//MatchType.Unclass,

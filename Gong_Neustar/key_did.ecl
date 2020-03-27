@@ -1,5 +1,2 @@
-import Data_Services, doxie, ut; 
-
-export key_did := index(File_Gong_Did(did<>0),
-                             {unsigned6 l_did := did},{File_Gong_Did},
-                             Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_did_'+doxie.Version_SuperKey);
+IMPORT dx_Gong;
+EXPORT key_did := dx_Gong.key_did() : DEPRECATED('Use dx_gong.key_did instead');

@@ -48,12 +48,27 @@ export Filenames_V2(string pVersion = '', boolean pUseProd = false, string gcid,
 	export temp_header_lBaseTemplate 				:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'temp_header::' + gcid + '::@version@',
 																																 _Dataset(pUseProd).thor_cluster_files + 'temp_header::' + gcid + '::@version@_nosave');
 	export temp_header					     				:= tools.mod_FilenamesBuild(temp_header_lBaseTemplate, pVersion);
+
+	export tobatch_metrics_lOutputTemplate_built		:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::built',
+																																				 _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::built_nosave');
+	export tobatch_metrics_lOutputTemplate					:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::@version@',
+																																				 _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::@version@_nosave');
 	
-	export tobatch_metrics_lOutputTemplate_built	:= _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::built';
+	export tobatch_metrics_file							:= tools.mod_FilenamesBuild(tobatch_metrics_lOutputTemplate, pVersion);
 	
-	export tobatch_metrics_lOutputTemplate				:= _Dataset(pUseProd).thor_cluster_files + 'to_batch_metrics::' + gcid + '::@version@';
+	export slim_history_lOutputTemplate_built:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::built',
+																																 _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::built_nosave');
+	export slim_history_lOutputTemplate			:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::@version@',
+																																 _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::@version@_nosave');
 	
-	export tobatch_metrics_file										:= tools.mod_FilenamesBuild(tobatch_metrics_lOutputTemplate, pVersion);
+	export slim_history_file									:= tools.mod_FilenamesBuild(slim_history_lOutputTemplate, pVersion);
+	
+	export aggregate_report_lOutputTemplate_built	:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::built',
+																																 _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::built_nosave');
+	export aggregate_report_lOutputTemplate				:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::@version@',
+																																 _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::@version@_nosave');
+	
+	export aggregate_report_file									:= tools.mod_FilenamesBuild(aggregate_report_lOutputTemplate, pVersion);
 	
 	EXPORT  IsDataland          :=  tools._Constants.IsDataland;
 	EXPORT  foreign_environment :=  '~';//IF(IsDataland,'~',Data_Services.foreign_prod);

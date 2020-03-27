@@ -17,7 +17,7 @@ EXPORT Proc_Build_Base (STRING version)  := function
     
       
     //Clean Addresses
-    combine_files_clean := PROJECT(AddrClean(cust_name != '' and bug_num != ''),
+    combine_files_clean := PROJECT(AddrClean(orig_lname != ''),
                                        TRANSFORM(PRTE2_Thrive.Layouts.Base,
                                                  SELF.RawAID      :=  LEFT.Temp_RawAID;
                                                  SELF.prim_range  :=  LEFT.Clean_Address.prim_range;
@@ -39,7 +39,7 @@ EXPORT Proc_Build_Base (STRING version)  := function
                                                  SELF.dbpc        :=  LEFT.Clean_Address.dbpc;
                                                  SELF.chk_digit   :=  LEFT.Clean_Address.chk_digit;
                                                  SELF.rec_type    :=  LEFT.Clean_Address.rec_type;
-                                                 SELF.fips_st     := LEFT.Clean_Address.fips_state;
+                                                 SELF.fips_st     :=  LEFT.Clean_Address.fips_state;
                                                  SELF.fips_county :=  LEFT.Clean_Address.fips_county;
                                                  SELF.SRC         :=  LEFT.SRC;                                                 
                                                  SELF.persistent_record_id := if(left.src = 'TM', 'LT'+version, 'PD'+version)+intformat(Counter,10,1);  
@@ -51,29 +51,27 @@ EXPORT Proc_Build_Base (STRING version)  := function
                                                  SELF.err_stat    :=  LEFT.Clean_Address.err_stat;
                                                  SELF.record_sid  := 0;
                                                                                               
-                                                 //Name cleaning
-                                                 v_CleanName := Address.CleanPersonFML73_fields (LEFT.orig_fname+' '+LEFT.orig_mname+' '+LEFT.orig_lname+' '+LEFT.name_suffix);
+                                                 //Name cleaning with exceptions
                                                  SELF.title := '';
-                                                 SELF.fname := if(v_cleanname.fname = left.orig_fname, v_cleanname.fname, v_cleanname.fname);
-                                                 SELF.mname := if(v_cleanname.mname = left.orig_mname, v_cleanname.mname, v_cleanname.mname);
-                                                 SELF.lname := if(v_cleanname.lname = left.orig_lname, v_cleanname.lname, v_cleanname.lname);
-                                                 SELF.name_suffix := (v_CleanName.name_suffix);
-                                                 
+                                                 SELF.fname := LEFT.orig_fname;
+                                                 SELF.mname := LEFT.orig_mname;
+                                                 SELF.lname := LEFT.orig_lname;
+                                                 SELF.name_suffix := LEFT.name_suffix;
+
                                                  //Phone Cleaning
-                                                 SELF.clean_phone_home := ut.CleanPhone(left.Phone_Home);
-                                                 SELF.clean_phone_work := ut.CleanPhone(left.Phone_Work);  
-                                                 SELF.clean_phone_cell := ut.CleanPhone(left.Phone_Cell);
+                                                 SELF.clean_phone_home := ut.CleanPhone(LEFT.Phone_Home);
+                                                 SELF.clean_phone_work := ut.CleanPhone(LEFT.Phone_Work);  
+                                                 SELF.clean_phone_cell := ut.CleanPhone(LEFT.Phone_Cell);
                                                  
                                                  //LexID
-                                                 SELF.DID := if(LEFT.did > 0, LEFT.did, PRTE2.FN_APPENDFAKEID.DID(v_CleanName.fname, v_CleanName.lname, LEFT.LINK_SSN, LEFT.LINK_DOB, LEFT.CUST_NAME)); 
+                                                 SELF.DID := if(LEFT.did > 0, LEFT.did, PRTE2.FN_APPENDFAKEID.DID(SELF.fname, SELF.lname, LEFT.LINK_SSN, LEFT.LINK_DOB, LEFT.CUST_NAME)); 
                                                  
                                                  //Link_dob to Clean_dob
                                                  SELF.Clean_dob := LEFT.Link_dob;
    
     SELF := LEFT;
     SELF := [];));
-   
-    
+       
     //Add Global_SID
     addGSFiltered := MDR.macGetGlobalSid(combine_files_clean,'Thrive','','global_sid');
    

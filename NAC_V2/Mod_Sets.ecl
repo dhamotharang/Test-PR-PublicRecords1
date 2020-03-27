@@ -110,6 +110,10 @@ EXPORT Relationship_Type :=
 		'O'			// Other (etc versus Y/N)			
 	];
 	
+EXPORT ABAWD_Type
+		:= ['Y', 'N', 'U']; // YES NO UNAVAILABLE
+
+	
 EXPORT Address_Type
 		:=
 			[
