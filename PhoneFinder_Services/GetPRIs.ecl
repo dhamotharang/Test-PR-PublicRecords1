@@ -1,4 +1,4 @@
-﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
+﻿﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)              dInBestInfo,
@@ -141,22 +141,23 @@ FUNCTION
                                 SELF.lname             := IF(isResExists, RIGHT.lname, LEFT.name_last),
                                 SELF.isPrimaryPhone    := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF.isPrimaryIdentity := IF(isResExists, RIGHT.isPrimaryIdentity, TRUE), // This will process the RiskIndicators for "no identity and no phone"
+                                SELF.phonestatus       := IF(RIGHT.PhoneOwnershipIndicator, $.Constants.PhoneStatus.Active, RIGHT.phonestatus); // PHPR- 483 If Phone verified by zumigo then update phonestatus to be ACTIVE;
                                 SELF                   := RIGHT,
                                 SELF                   := []),
                       LEFT OUTER,
                       LIMIT(100, SKIP));
 
- // ThreatMetrix                  
+ // ThreatMetrix
   dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrepForRIs, phone), phone), Phones.Layouts.PhoneAcctno);
-  
+
   dThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
-                                
-  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
+
+  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM
    SELF.ReasonCodes := r.response.Summary.ReasonCodes;
    SELF.TmxVariables := r.response._data.TmxVariables;
    SELF := l;
   END;
- 
+
   dPrepThreatMetrix	:= JOIN(dPrepForRIs, dThreatMetrixRecs,
                             LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
                             getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));

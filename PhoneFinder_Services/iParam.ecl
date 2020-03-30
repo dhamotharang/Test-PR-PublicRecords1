@@ -153,7 +153,7 @@ MODULE
       EXPORT STRING6   PrimarySearch        := PrimarySearchCriteria;
       EXPORT BOOLEAN   IsPrimarySearchPII   := PrimarySearch = $.Constants.PrimarySearchCriteria;
       EXPORT BOOLEAN   StrictMatch          := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
-      EXPORT BOOLEAN   PhoneticMatch        := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
+
       EXPORT UNSIGNED  ScoreThreshold       := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
       EXPORT UNSIGNED  PenaltyThreshold     := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
       EXPORT BOOLEAN   useWaterfallv6	      := FALSE : STORED('useWaterfallv6');	// internal
@@ -167,6 +167,7 @@ MODULE
       EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress;
       EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive;
       EXPORT BOOLEAN   VerifyPhoneLastName    := pfOptions.VerificationOptions.VerifyPhoneLastName;
+      EXPORT BOOLEAN   PhoneticMatch          := VerifyPhoneName OR VerifyPhoneNameAddress OR VerifyPhoneLastName OR AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
       EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold;
       EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold;
       EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold;
@@ -208,8 +209,8 @@ MODULE
       EXPORT BOOLEAN   IncludeRiskIndicators           := ((IncludePhoneMetadata AND displayAll) OR IncludeRiskIndicators_internal);
       EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators := IncludeRiskIndicators_internal OR pfOptions.IncludeOtherPhoneRiskIndicators;
 
-      UserRules	:= pfOptions.RiskIndicators;
-      AllRules  := IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.DefaultRiskIndicatorRules  + UserRules);
+      UserRules	:= DEDUP(SORT(pfOptions.RiskIndicators, riskid), riskid);
+      AllRules  := DEDUP(SORT(IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.DefaultRiskIndicatorRules  + UserRules), riskid), riskid);
 
       EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
       EXPORT BOOLEAN IsGetPortedData         := ReturnPortingInfo OR IncludePhoneMetadata;
@@ -371,7 +372,7 @@ MODULE
 
       UserRules := DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator) : STORED('RiskIndicators');
       AllRules  := IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.defaultRiskIndicatorRules + UserRules);
-      EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
+      EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := DEDUP(SORT(IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules), riskid), riskid);
 
 		  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
 		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;

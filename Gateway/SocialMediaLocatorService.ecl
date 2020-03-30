@@ -15,5 +15,5 @@ EXPORT SocialMediaLocatorService := MACRO
   recs_bundled := Gateway.SocialMediaLocator.Records(first_row, mod_access, gws);
 
   OUTPUT(recs_bundled.recs, NAMED('Results'));
-  OUTPUT(recs_bundled.royalties, NAMED('Royalties'));
+  OUTPUT(recs_bundled.royalties, NAMED('RoyaltySet'));
 ENDMACRO;

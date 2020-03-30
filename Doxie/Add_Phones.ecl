@@ -1,7 +1,7 @@
 ﻿IMPORT business_header, doxie_raw, ut, risk_indicators, paw, doxie, STD, suppress;
 
 EXPORT Add_Phones(DATASET(layout_references) in_dids,
-	DATASET(doxie.layout_relative_dids_v3) rels,
+  DATASET(doxie.layout_relative_dids) rels,
   Doxie.IDataAccess mod_access,
   integer dbd_value = 0) :=
 FUNCTION

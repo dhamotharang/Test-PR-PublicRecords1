@@ -1,9 +1,5 @@
-import AddrBest;
-
-LB := AddrBest.Layout_BestAddr;
-
 EXPORT Layouts_Batch := MODULE
-		
+
 		EXPORT InRecord := RECORD
 			STRING20  acctno;
 			QSTRING30	ChannelIdentifier;
@@ -23,23 +19,23 @@ EXPORT Layouts_Batch := MODULE
 			QSTRING65	Current_AddressLine2;
 			QSTRING25	Current_City;
 			STRING2		Current_State;
-			STRING10	Current_ZipCode;						
+			STRING10	Current_ZipCode;
 			QSTRING65	Previous_AddressLine1;
 			QSTRING65	Previous_AddressLine2;
 			QSTRING25	Previous_City;
 			STRING2		Previous_State;
 			STRING10	Previous_ZipCode;
-		END;		
-		
+		END;
+
 		EXPORT OutRecord := RECORD
 			STRING20  acctno;
-			STRING5  Search_title;				
+			STRING5  Search_title;
 			STRING20 Search_fname;
 			STRING20 Search_mname;
 			STRING20 Search_lname;
 			STRING5  Search_name_suffix;
 			QSTRING20 Search_PFname;
-			QSTRING20 Search_PhoneticLname;	
+			QSTRING20 Search_PhoneticLname;
 			STRING9 	Search_SSN;
 			STRING10 	Search_DOB_YYYYMMDD;
 			UNSIGNED2 Search_GIID_AddressID;
@@ -71,14 +67,14 @@ EXPORT Layouts_Batch := MODULE
 			string5  Search_Previous_zip5;
 			string4  Search_Previous_zip4;
 			string3  Search_Previous_fips_county;
-			string4  Search_Previous_err_stat;			
-			STRING5  		Output_Clean_title;				
+			string4  Search_Previous_err_stat;
+			STRING5  		Output_Clean_title;
 			STRING20 		Output_Clean_fname;
 			STRING20 		Output_Clean_mname;
 			STRING20 		Output_Clean_lname;
 			STRING5  		Output_Clean_name_suffix;
 			QSTRING20 	Output_Clean_PFname;
-			QSTRING20 	Output_Clean_PhoneticLname;					
+			QSTRING20 	Output_Clean_PhoneticLname;
 			string10 Output_Clean_prim_range;
 			string28 Output_Clean_prim_name;
 			string8  Output_Clean_sec_range;
@@ -129,10 +125,10 @@ EXPORT Layouts_Batch := MODULE
 			string1	   	 Output_raw_valid_SSN := '';
 			string1	   	 Output_raw_jflag1 := '';
 			string1      Output_raw_jflag2 := '';
-			string1			 Output_raw_jflag3 := '';		
-			STRING8					DateProcessed_YYYYMMDD := '';				
+			string1			 Output_raw_jflag3 := '';
+			STRING8					DateProcessed_YYYYMMDD := '';
 			STRING1 				AgeVerified		:= Constants.DISPLAY_NO;
-			STRING1 				UnderAge			:= Constants.DISPLAY_UNDEFINED_OR_BLANK;			
+			STRING1 				UnderAge			:= Constants.DISPLAY_UNDEFINED_OR_BLANK;
 			UNSIGNED2				AgeMatchType	:= Constants.SortAgeMatchTypeEnum.NONE;
 			String2					AgeMatchTypeDisplay	:= Constants.DISPLAY_UNDEFINED_OR_BLANK;
 			UNSIGNED2				SourceNameSort := Constants.SortSourceEnum.UNK;
@@ -154,107 +150,11 @@ EXPORT Layouts_Batch := MODULE
 			boolean			MatchesFirstLastInstring;
 			boolean 		MatchesZipCode;
 			boolean			MatchesStreetNameExact;
-			boolean			MatchesHouseNumberExact;			
+			boolean			MatchesHouseNumberExact;
 			boolean			MatchesStreetNameFirst4;
-			boolean			MatchesHouseNumberFirst3;			
-			boolean			MatchesSSN4;	
+			boolean			MatchesHouseNumberFirst3;
+			boolean			MatchesSSN4;
 			UNSIGNED2		FailureCode;
-		END;
-
-		EXPORT InAddrRecord := RECORD
-			STRING20  AcctNo;
-			STRING3   Name_Prefix;
-			STRING15  Name_First;
-			STRING20  Name_Middle;
-			STRING25  Name_Last;
-			STRING5   Name_Suffix;
-			STRING8   DOB;
-			STRING10  PhoneNo;
-			STRING10  addr1_Prim_Range;
-			STRING2   addr1_PreDir;
-			STRING28  addr1_Prim_Name;
-			STRING4   addr1_Suffix;
-			STRING2   addr1_PostDir;
-			STRING10  addr1_Unit_Desig;
-			STRING8   addr1_Sec_Range;
-			STRING25  addr1_City;
-			STRING2   addr1_State;
-			STRING5   addr1_Zip5;
-			STRING4   addr1_Zip4;
-			STRING10  addr2_Prim_Range;
-			STRING2   addr2_PreDir;
-			STRING28  addr2_Prim_Name;
-			STRING4   addr2_Suffix;
-			STRING2   addr2_PostDir;
-			STRING10  addr2_Unit_Desig;
-			STRING8   addr2_Sec_Range;
-			STRING25  addr2_City;
-			STRING2   addr2_State;
-			STRING5   addr2_Zip5;
-			STRING4   addr2_Zip4;
-			STRING10  addr3_Prim_Range;
-			STRING2   addr3_PreDir;
-			STRING28  addr3_Prim_Name;
-			STRING4   addr3_Suffix;
-			STRING2   addr3_PostDir;
-			STRING10  addr3_Unit_Desig;
-			STRING8   addr3_Sec_Range;
-			STRING25  addr3_City;
-			STRING2   addr3_State;
-			STRING5   addr3_Zip5;
-			STRING4   addr3_Zip4;
-		END;
-
-		EXPORT InAddrRec := RECORD
-			STRING15 preferredFirst;
-			InAddrRecord;
-		END;
-
-		EXPORT AddrRecord := RECORD
-			STRING10  Prim_Range;
-			STRING2   PreDir;
-			STRING28  Prim_Name;
-			STRING4   Suffix;
-			STRING2   PostDir;
-			STRING10  Unit_Desig;
-			STRING8   Sec_Range;
-			STRING25  City;
-			STRING2   State;
-			STRING5   Zip5;
-			STRING4   Zip4;
-		END;
-
-		EXPORT OutAddrRecord := RECORD            
-			STRING20  AcctNo;
-			UNSIGNED6 DID;
-			STRING3   Name_Prefix;
-			STRING15  Name_First;
-			STRING20  Name_Middle;
-			STRING25  Name_Last;
-			STRING5   Name_Suffix;
-			STRING8   DOB;
-			STRING10  PhoneNo;
-			AddrRecord;
-		END;
-
-		EXPORT processRec := RECORD
-			STRING1  matchType;
-			STRING6  dateLastSeen;
-			INTEGER  seq;
-			STRING15 preferredFirst;
-			OutAddrRecord;
-		END;
-
-		EXPORT bestAddrRec := RECORD
-      LB.service_Out;
-			BOOLEAN matchFirst;
-			BOOLEAN matchExactFirst;
-			BOOLEAN matchExactLast;
-			BOOLEAN matchPartialAddr;
-			BOOLEAN matchZip;
-			BOOLEAN matchPhone10;
-			BOOLEAN matchDOB4;
-			BOOLEAN matchDOB8;
 		END;
 
 END;

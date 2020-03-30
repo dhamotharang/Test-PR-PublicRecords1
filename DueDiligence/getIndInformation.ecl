@@ -34,7 +34,7 @@ EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
         //since bestData will not have seq just DID, lets make sure we have unique DIDs
         uniqueDIDs := DEDUP(SORT(projData, did), did);
         
-        doxie.mac_best_records(uniqueDIDs, did, bestData, dppaOK, glbaOK, , doxie.DataRestriction.fixed_DRM);
+        doxie.mac_best_records(uniqueDIDs, did, bestData, dppaOK, glbaOK, , options.DataRestrictionMask);
         
 
         allBestData := JOIN(highestDIDScore, bestData,

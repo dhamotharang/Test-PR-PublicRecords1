@@ -5,15 +5,14 @@ IMPORT iesp, Gateway, eCrash_Services;
 
 EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	
-	IsSafeToPerformSoap := gatewayCfg.Url <> '' AND gatewayCfg.ServiceName <> '';
-	
 	EXPORT GetImages(DATASET(iesp.accident_image.t_AccidentImageRequest) Request) := FUNCTION
-		EmptyDataset := dataset([], iesp.accident_image.t_AccidentImageResponseEx);
+		IsSafeToPerformSoap := gatewayCfg.Url <> '' AND gatewayCfg.ServiceName <> '';
+		EmptyResponse := dataset([], iesp.accident_image.t_AccidentImageResponseEx);
 
 		RETURN IF(
 			EXISTS(Request) AND IsSafeToPerformSoap, 
 			Gateway.SoapCall_GetReportImage(gatewayCfg, Request), 
-			EmptyDataset
+			EmptyResponse
 		);
 	END;
 	
@@ -31,7 +30,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 		BOOLEAN isOnlyTm,
 		BOOLEAN ColoredImage,
 		BOOLEAN Redact,
-		STRING  RequestType) := FUNCTION
+		STRING  RequestType,
+		INTEGER MaxWaitSeconds) := FUNCTION
 		
 		//special logic for 'KYCrashLogic'
 		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
@@ -65,6 +65,7 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.SearchBy.ReportType := ReportType;
 			SELF.SearchBy.DateOfCrash := DateOfCrash;
 			SELF.SearchBy.State := State;
+			SELF.User.MaxWaitSeconds := MaxWaitSeconds;
 			
 			SELF := [];	
 		END;	
@@ -81,13 +82,13 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF := [];	
 		END;	
 		
+		EmptyRequest := DATASET([], iesp.accident_image.t_AccidentImageRequest);
 		Result := 
 			MAP(
-				NOT EXISTS(SuperReportRow) AND NOT IsVendorCrashLogic => DATASET(
-					[TRANSFORM(iesp.accident_image.t_AccidentImageRequest, SELF := [])]
-				),
+				NOT EXISTS(SuperReportRow) AND NOT IsVendorCrashLogic => EmptyRequest,
 				EXISTS(ImageHashes) => DATASET([CreateRequest]),
-				isOnlyTm => DATASET([CreateRequestTm])
+				isOnlyTm => DATASET([CreateRequestTm]),
+				EmptyRequest
 		);
 		
 		RETURN Result;

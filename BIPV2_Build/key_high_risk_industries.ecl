@@ -1,6 +1,8 @@
-﻿import tools, LocationID, LocationID_xLink;
+﻿import tools, LocationID, LocationID_xLink, BIPV2_Build;
 
 export key_high_risk_industries := module	
+	shared atmost_limit := 2000;
+	
   export Key_Phone      := BIPV2_Build.HighRiskIndustries.phoneIndexDef();
   export Key_Addr       := BIPV2_Build.HighRiskIndustries.addrIndexDef();
   export Key_Code       := BIPV2_Build.HighRiskIndustries.codeIndexDef();
@@ -63,11 +65,11 @@ export key_high_risk_industries := module
 			 
 	  getSeleIds := join(locid_results, Key_Addr,
 			                   left.locid = right.locid,
-									             transform(outputRec, self.uniqueID := left.request_id, self := right, self := left)); 
+									             transform(outputRec, self.uniqueID := left.request_id, self := right, self := left), atmost(atmost_limit)); 
 													
 	  getCodes   := join(getSeleIds, Key_Code,
 		                    left.seleid = right.seleid,
-													         transform(finalRec, self := right, self := left)); 
+													         transform(finalRec, self := right, self := left), atmost(atmost_limit)); 
        
 			return getCodes;
 	end;
@@ -101,11 +103,11 @@ export key_high_risk_industries := module
 			 
 	     getSeleIds := join(locid_results, Key_Addr,
 			                    left.locid = right.locid,
-													transform(outputRec, self := right, self := left)); 
+													transform(outputRec, self := right, self := left), atmost(atmost_limit)); 
 													
 	     getCodes   := join(getSeleIds, Key_Code,
 			                    left.seleid = right.seleid,
-													transform(finalRec, self := right, self := left)); 
+													transform(finalRec, self := right, self := left), atmost(atmost_limit)); 
        
 			 return getCodes;
 	end;
@@ -127,11 +129,11 @@ export key_high_risk_industries := module
 			 
 	     getSeleIds := join(phoneSearchDs, Key_Phone,
 			                    left.company_phone = right.company_phone,
-													transform(outputRec, self := right, self := left)); 
+													transform(outputRec, self := right, self := left), atmost(atmost_limit)); 
 													
 	     getCodes   := join(getSeleIds, Key_Code,
 			                    left.seleid = right.seleid,
-													transform(finalRec, self := right, self := left)); 
+													transform(finalRec, self := right, self := left), atmost(atmost_limit)); 
        
 			 return getCodes;
 	end;

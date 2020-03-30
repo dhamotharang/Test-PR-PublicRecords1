@@ -4,7 +4,7 @@ import lib_datalib, NID; // to be able to call a macro in a JOIN condition
 todays_date := (string) STD.Date.Today();
 
 export Append_Gong(DATASET(doxie.layout_presentation) in_f,
-  DATASET(doxie.layout_relative_dids_v3) rels,
+  DATASET(doxie.layout_relative_dids) rels,
   Doxie.IDataAccess mod_access,
   integer dcp_value = 5,
   boolean include_phonesPlus = FALSE,

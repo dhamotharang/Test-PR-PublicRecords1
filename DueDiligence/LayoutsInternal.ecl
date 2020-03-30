@@ -118,6 +118,8 @@ EXPORT LayoutsInternal := MODULE
   END;
   
   EXPORT LegalFlags := RECORD
+    BOOLEAN trafficOffenseFound;
+    BOOLEAN otherOffenseFound;
     BOOLEAN currIncar;
     BOOLEAN currParole;
     BOOLEAN currProbation;
@@ -287,76 +289,32 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED6 maxBasePrice;
     DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};
   END;
-
-
-  //------                                      ------
-  //------      COMMON SECTION                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT common_layout_liens_judgments := RECORD
-    STRING50 tmsid;
-    UNSIGNED4	HistoryDate;
-    UNSIGNED4 DateToUse; 
-    UNSIGNED3 NumOfDaysAgo; 
-    STRING20 filing_number;                      //***all these fields are from:  liensV2.key_liens_main_ID
-    STRING20 filing_jurisdiction;             
-    STRING8  date_first_seen;
-    STRING8  date_last_seen;
-    STRING1  eviction;
-    STRING8  orig_filing_date;
-    STRING50 filing_type_desc;
-    STRING11 amount;
-    STRING8  release_date;
-    STRING8  lapse_date;
-    STRING30 filing_status;
-    STRING75 agency;
-    STRING2  agency_state;
-    STRING25 agency_county; 
+  
+  
+  
+  EXPORT SharedSlimLiens := RECORD
+    InternalSeqAndIdentifiersLayout; 
+    UNSIGNED4 historyDate;
+    DueDiligence.Layouts.LiensJudgementsEvictionDetails;
+    UNSIGNED4 global_sid;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+    STRING30 filingStatus;    
+    UNSIGNED4 lapseDate;
+    UNSIGNED totalEvictionsOver3Yrs;
+    UNSIGNED totalEvictionsPast3Yrs;
+    UNSIGNED totalUnreleasedLiensOver3Yrs;
+    UNSIGNED totalUnreleasedLiensPast3Yrs; 
+    
+    //additional for report
+    STRING1 nameType;
+    DueDiligence.Layouts.Name;
+    UNSIGNED6 partyLexID;    
+    STRING9 taxID;
+    STRING120 streetAddress1;
+    DueDiligence.Layouts.AddressSlimDetail;
+    STRING countyName;
   END;
-
-
-  EXPORT plus_category_liens_judgments := RECORD
-    STRING  lien_type_category;
-    STRING  judgment_type_category;
-    STRING  filing_status_category;
-  END;
-
-  //------                                      ------
-  //------      For Businesses                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT layout_liens_judgments := RECORD
-    InternalSeqAndIdentifiersLayout;
-    common_layout_liens_judgments;   
-  END;
-
-  //------                                      ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-  EXPORT 	layout_liens_judgments_categorized := RECORD
-    layout_liens_judgments;
-    plus_category_liens_judgments;
-  END;
-
-  //------                                      ------
-  //------      For Individual                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT LiensLayout_by_DID:= RECORD
-    unsigned4		seq := 0;
-    unsigned6 	did;
-    STRING50 		rmsid; // liens extras
-    common_layout_liens_judgments;  
-  END;
-
-  EXPORT 	ByDID_liens_judgments_categorized := RECORD
-    LiensLayout_by_DID;
-    plus_category_liens_judgments; 
-  END;
-
 
 
   EXPORT CriminalOffenses := RECORD

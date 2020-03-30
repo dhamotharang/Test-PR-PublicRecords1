@@ -653,10 +653,9 @@ clam_BtSt := //Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bil
   easi_census := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models), easi_census1, Dataset([], easi.layout_census));
   //End for Paro
   
-ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
-ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose); 
-  
- 
+ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value, self.did := left.did) );
+ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose, applyOptOut := TRUE); 
+
 clam_ip := join( clam, ipdata, left.seq=right.seq,
 	transform( models.layouts.bs_with_ip,
 		self.bs := left,

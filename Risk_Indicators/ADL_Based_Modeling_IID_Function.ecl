@@ -1,4 +1,4 @@
-﻿import _Control, gong,suppress, riskwise, ut,doxie, FCRA,gateway, risk_indicators;
+﻿import _Control, gong, suppress, riskwise, ut, doxie, FCRA, gateway, risk_indicators, data_services, STD;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used on Neutral roxie only
@@ -29,6 +29,8 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		string BatchUID = '',
 																		unsigned6 GlobalCompanyId = 0
 																		 ) := function		
+																		 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 mod_access := MODULE(Doxie.IDataAccess)
 		EXPORT glb := GLB_Purpose;
@@ -152,8 +154,8 @@ END;
 
 		Prim_Range_From_Prim_Name := IF(TRIM(LEFT.Prim_Range) = '' AND // If Prim_Range isn't populated AND 
 																		TRIM(Prim_Name) <> '' AND // Prim_Name IS populated AND
-																		LENGTH(StringLib.StringFilter(Prim_Name, '0123456789')) = LENGTH(Prim_Name) AND // Prim_Name is all numeric AND
-																		StringLib.StringFind(Prim_Name, ' ', 1) <= 0, // Prim_Name contains no spaces, we can assume that just the house number was passed in and the address cleaner just didn't handle it properly
+																		LENGTH(STD.Str.Filter(Prim_Name, '0123456789')) = LENGTH(Prim_Name) AND // Prim_Name is all numeric AND
+																		STD.Str.Find(Prim_Name, ' ', 1) <= 0, // Prim_Name contains no spaces, we can assume that just the house number was passed in and the address cleaner just didn't handle it properly
 																Prim_Name, // Pretend the all numeric Prim_Name is really Prim_Range
 																LEFT.Prim_Range); // Otherwise just keep whatever the address cleaner came up with for Prim_Range
 		Prim_Range := IF(DoAddressAppend = FALSE, LEFT.Prim_Range, Prim_Range_From_Prim_Name); // This isn't an address append, use whatever the address cleaner came up with for Prim_Range
@@ -296,11 +298,12 @@ gong_correct_thor := join(best_of_header(gong_correct_ffid<>[]), pull(FCRA.Key_O
 #END
 
 // search gong file for phones we may not have found on header search
-risk_indicators_iid_getHeader_ccpa_c := Record
+temp_CCPA := Record
 	temp;
 	Unsigned4 Global_sid;
 	end;
-risk_indicators_iid_getHeader_ccpa_c add_gong(temp le, gong.Key_History_did rt) := transform
+	
+temp_CCPA add_gong(temp le, gong.Key_History_did rt) := transform
 	self.Global_Sid := rt.Global_Sid;
 	self.did := rt.did;
   self.gong_phone10 := rt.phone10;
@@ -323,16 +326,29 @@ risk_indicators_iid_getHeader_ccpa_c add_gong(temp le, gong.Key_History_did rt) 
 end;
 
 gong_key := if(isFCRA, gong.Key_FCRA_History_did, gong.Key_History_did);
-with_gong_did1_roxie := join(best_of_header, gong_key, 
+with_gong_did1_roxie_unsuppressed := join(best_of_header, gong_key, 
 									left.did!=0 and keyed(right.l_did=left.did) and 
 									// check date first seen before history date.  per Brent, don't need to check if phone was current at the time
 									((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) and
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(riskwise.max_atmost), keep(100));
-add_gong_risk_indicators_iid_getHeader_ccpa_c := Suppress.Suppress_ReturnOldLayout(with_gong_did1_roxie, mod_access,temp);
+									
+with_gong_did1_roxie_flagged := Suppress.MAC_FlagSuppressedSource(with_gong_did1_roxie_unsuppressed, mod_access, data_env := data_environment);
 
-with_gong_did1_thor := join(distribute(best_of_header, hash64(did)), 
+with_gong_did1_roxie := PROJECT(with_gong_did1_roxie_flagged, TRANSFORM(temp, 
+	self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);
+	self.gong_phone10 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_phone10);
+	self.gong_current_flag := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.gong_current_flag);
+	self.gong_phonescore := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_phonescore);
+	self.in_hphnpop_found := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.in_hphnpop_found);											 
+	self.adl_hphn := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.adl_hphn);	 
+	self.gong_dt_first_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_dt_first_seen);
+	self.gong_dt_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_dt_last_seen);
+    SELF := LEFT;
+)); 
+
+with_gong_did1_thor_unsuppressed := join(distribute(best_of_header, hash64(did)), 
 									distribute(pull(gong_key), hash64(did)), 
 									left.did!=0 and (right.l_did=left.did) and 
 									// check date first seen before history date.  per Brent, don't need to check if phone was current at the time
@@ -340,12 +356,25 @@ with_gong_did1_thor := join(distribute(best_of_header, hash64(did)),
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), keep(100), LOCAL);
-add_gong_risk_indicators_iid_getHeader_ccpa := Suppress.Suppress_ReturnOldLayout(with_gong_did1_thor, mod_access,temp);
+									
+with_gong_did1_thor_flagged := Suppress.MAC_FlagSuppressedSource(with_gong_did1_thor_unsuppressed, mod_access, data_env := data_environment);
+
+with_gong_did1_thor := PROJECT(with_gong_did1_thor_flagged, TRANSFORM(temp, 
+	self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);
+	self.gong_phone10 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_phone10);
+	self.gong_current_flag := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.gong_current_flag);
+	self.gong_phonescore := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_phonescore);
+	self.in_hphnpop_found := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.in_hphnpop_found);											 
+	self.adl_hphn := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.adl_hphn);	 
+	self.gong_dt_first_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_dt_first_seen);
+	self.gong_dt_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_dt_last_seen);
+    SELF := LEFT;
+)); 
 
 #IF(onThor)
-	with_gong_did1 := add_gong_risk_indicators_iid_getHeader_ccpa;
+	with_gong_did1 := with_gong_did1_thor;
 #ELSE
-	with_gong_did1 := add_gong_risk_indicators_iid_getHeader_ccpa_c;
+	with_gong_did1 := with_gong_did1_roxie;
 #END
 
 with_gong_did := if(isFCRA, gong_correct + with_gong_did1, with_gong_did1);

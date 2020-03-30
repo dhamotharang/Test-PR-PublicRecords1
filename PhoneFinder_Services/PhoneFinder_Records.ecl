@@ -13,6 +13,8 @@ MODULE
   SHARED BOOLEAN vPhoneBlank := (UNSIGNED)first_row.homephone = 0;
   SHARED BOOLEAN vIsPhone10  := LENGTH(TRIM(first_row.homephone)) = 10;
   SHARED BOOLEAN vDIDBlank   := (UNSIGNED)first_row.did = 0;
+  BOOLEAN vSSNBlank          := (UNSIGNED)first_row.ssn = 0;
+  SHARED BOOLEAN vPIISearch  := (first_row.name_first != '' and first_row.name_last != '')  or ~vSSNBlank or ~vDIDBlank;
 
   BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
 
@@ -28,8 +30,6 @@ MODULE
   // verification will fail and the appropriate status will be returned.
   SHARED INTEGER verifyRequest := IF(tmpMod.VerifyPhoneIsActive, 1, 0) + IF(tmpMod.VerifyPhoneName, 1, 0) + IF(tmpMod.VerifyPhoneNameAddress, 1, 0) + IF(tmpMod.VerifyPhoneLastName, 1, 0);
   SHARED BOOLEAN verifyInputDID := (verifyRequest > 0) OR ~tmpMod.IsPrimarySearchPII;
-
-  useADL := tmpMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (tmpMod.VerifyPhoneNameAddress OR tmpMod.VerifyPhoneName));
 
   SHARED dGetDIDs := IF(~IsPhoneRiskAssessment AND vDIDBlank, PhoneFinder_Services.GetDIDs(dProcessInput));
 
@@ -161,7 +161,7 @@ MODULE
 
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
   MAP(inMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
-      ~vPhoneBlank and ~vIsPhone10                   => FAIL(301, doxie.ErrorCodes(301)),
+     ~vPhoneBlank and ~vIsPhone10 => FAIL(301, doxie.ErrorCodes(301)),
       // FAIL the service if multiple subjects found
       vPhoneBlank and vDIDBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203, doxie.ErrorCodes(203)),
       // If phoneFinder were to run as a verification tool, only one type of verification should be selected.
@@ -170,7 +170,8 @@ MODULE
       verifyRequest > 1                         => FAIL(100, PhoneFinder_Services.Constants.ErrorCodes(100)),
       ((BOOLEAN)verifyRequest AND ~vIsPhone10)  => FAIL(101, PhoneFinder_Services.Constants.ErrorCodes(101)),
       //If no trasaction type selected and no data source option selected
-      IsValidTransactionType AND ~inputOptionCheck  => FAIL(102, PhoneFinder_Services.Constants.ErrorCodes(102)));
+      IsValidTransactionType AND ~inputOptionCheck  => FAIL(102, PhoneFinder_Services.Constants.ErrorCodes(102)),
+      vPhoneBlank and ~vPIISearch => FAIL(301, doxie.ErrorCodes(301)));
 
   // Format to iesp layout
   EXPORT dFormat2IESP := PhoneFinder_Services.Functions.FormatResults2IESP(dFinalResults, tmpMod);

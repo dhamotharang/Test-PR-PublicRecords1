@@ -103,8 +103,9 @@ with_DL_verification := if(runDLverification, dlverify, combined_verification);
 runThreatMetrix := (BSOptions & risk_indicators.iid_constants.BSOptions.runThreatMetrix) > 0;
 
 with_ThreatMetrix := if(runThreatMetrix, 
-	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID), 
+	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID, DataRestriction), 
 	with_dl_verification);
+		
 	
 export results := with_ThreatMetrix;
 

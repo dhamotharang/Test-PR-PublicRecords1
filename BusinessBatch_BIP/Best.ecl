@@ -594,8 +594,8 @@ END;
                                                         source <> '' AND
                                                         ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)));
 
-  // Filter out marketing-restricted records
-  ds_busHeaderRecsMark := ds_busHeaderRecsRaw(source IN MDR.sourceTools.set_Marketing_Sources);
+  // Filter out marketing-restricted records.
+	ds_busHeaderRecsMark := ds_busHeaderRecsRaw(Doxie.compliance.isMarketingAllowed(source));
   
   ds_busHeaderRecsSlim := IF (inMod.ExcludeMarketing, ds_busHeaderRecsMark, ds_busHeaderRecsRaw);
 
