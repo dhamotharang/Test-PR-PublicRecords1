@@ -5,6 +5,7 @@ export MakeExecContactList(
 														dataset(Marketing_List.layouts.business_contact) inContactFile
 													)	:= function;
 													
+	// Make the Executive Contact portion of the file from the filters
 	string ParmFilterName_ContactExecTitlePresent	:= 'CONTACTEXECTITLEPRESENT';												
 	
 	rs_record_contact_exec_title_present			:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_ContactExecTitlePresent);

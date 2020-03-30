@@ -12,7 +12,7 @@ BusinessUnique	:=	dedup(sort(MktFile,seleid,proxid,local),seleid,proxid,local);
 StatLayout			:=	Marketing_Suite_List_Gen.Layouts.Layout_stats_temp;
 
 /*---------------------------------------------------------------------------------------------------------------------
-| Generate Business type stats (business name, phone, state, county, city & zipcode
+| Generate Business type stats (business name, phone, state, county, city & zipcode)
 |----------------------------------------------------------------------------------------------------------------------*/		
 BusinessStatRec	:=	record
 		unsigned8 CountGroup					:= count(group);

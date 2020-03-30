@@ -4,7 +4,8 @@ export MakeEmployeeList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
-												
+	
+	// Make the eployee portion of the file from the filters
 	string ParmFilterName_EmployeeRange					:= 'EMPLOYEERANGE';
 	string ParmFilterName_EmployeeGT						:= 'EMPLOYEEGT';
 	string ParmFilterName_EmployeeLT						:= 'EMPLOYEELT';	

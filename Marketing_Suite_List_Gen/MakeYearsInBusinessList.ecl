@@ -4,7 +4,8 @@ export MakeYearsInBusinessList(
 																dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 																dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 															)	:= function;
-															
+
+	// Make the Years in Business (Age) portion of the file from the filters
 	string ParmFilterName_BusYearsRange					:= 'BUSYEARSRANGE';	
 	string ParmFilterName_BusYearsGT						:= 'BUSYEARSGT';	
 	string ParmFilterName_BusYearsLT						:= 'BUSYEARSLT';

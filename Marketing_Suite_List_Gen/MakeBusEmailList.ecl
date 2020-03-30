@@ -5,6 +5,8 @@ export MakeBusEmailList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
 												
+												
+	// Build the Bus Email file from the filter											
 	string ParmFilterName_BusEmailPresent				:= 'BUSEMAILPRESENT';
 	
 	/*---------------------------------------------------------------------------------------------------------------------------------------

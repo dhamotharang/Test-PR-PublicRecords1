@@ -1,14 +1,31 @@
 ﻿export Build_All(
 									string	pFilename				=	''
 								) := module
+								
+  /*=======================================================================================================================================
+  | Batch kicks off this process by calling this attribute and passing it the name of the customer criteria file. Prior to this
+	| this point, Batch will be spraying the parameter to thor. After this code completes, then Batch will pick up the files
+	| created byt this job to return to the customer.
+  |======================================================================================================================================*/
 
+	// 	Define the parameter file with the file name being passed to this attribute.
 	export ParmFile			:=	dataset(pFileName,Marketing_Suite_List_Gen.Layouts.Layout_ParmFile,CSV(SEPARATOR(['|']), quote('"'), TERMINATOR(['\n','\r\n','\n\r']), HEADING(1)));
+	
+	//	Determine the jobId from the file name so that we can attach it to the result filenames.
 	IdBegPos						:=	StringLib.Stringfind(pFilename, '-', 1);
 	IdEndPos						:=	StringLib.Stringfind(pFilename, '.', 1);
 	export JobID				:=	pFilename[IdBegPos + 1..IdEndPos-1];
-	export resultsCheck	:=	Marketing_Suite_List_Gen.ValidateBatchParmFile(ParmFile);
+	
+	//	Validate the parameter file.
+	export resultsCheck	:=	Marketing_Suite_List_Gen.ValidateBatchParmFile(ParmFile,JobID);
+	
+	//	Take the Validated parameter file and build the list and stats that get returned to the customer.
 	export ReturnList		:=	Marketing_Suite_List_Gen.Build_List(resultsCheck,JobID).all;
 	
-	export All	:=	sequential(ReturnList);
+	export string failString		:= 'Marketing List Gen job failed.';
+	export string successString	:= 'Marketing List Gen job completed sucessfully.';
+	
+	export All	:=	sequential(ReturnList): FAILURE(Marketing_Suite_List_Gen.mod_email.SendFailureEmail(failString, jobId)),
+																					SUCCESS(Marketing_Suite_List_Gen.mod_email.SendSuccessEmail(successString, jobId)); ;
 
 end;

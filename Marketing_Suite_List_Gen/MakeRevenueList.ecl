@@ -5,6 +5,7 @@ export MakeRevenueList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
 												
+	// Make the Revenue portion of the file from the filters
 	string ParmFilterName_RevenueRange					:= 'SALESRANGE';
 	string ParmFilterName_RevenueGT							:= 'SALESGT';
 	string ParmFilterName_RevenueLT							:= 'SALESLT';

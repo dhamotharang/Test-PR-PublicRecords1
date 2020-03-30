@@ -1,11 +1,8 @@
 ﻿import STD, ut;
 
 /*=========================================================================================================
-| Function...: SetFromString
-| Parameters.: STRING  SetValues - the string of characters that contain the set of values
-|              INTEGER FieldLen  - the length of each value
-| Description: This function takes in a string of values, cleans out any special characters, then outputs
-|              a SET of those values
+| This function takes in a string of values, cleans out any special characters, validates the values &
+| then outputs a SET of those values.
 |========================================================================================================*/
 export SetFromString := module
 

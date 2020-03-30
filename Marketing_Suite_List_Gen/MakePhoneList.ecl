@@ -5,6 +5,7 @@ EXPORT MakePhoneList(
 											dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 										 )	:= function;
 										 
+	// Make the Phone portion of the file from the filters
   string ParmFilterName_PhonePresent   				:= 'PHONEPRESENT';
 	string ParmFilterName_PhoneTollFree			  	:= 'TOLLFREE';	
 	string ParmFilterName_PhoneAreaCode					:= 'AREACODE';

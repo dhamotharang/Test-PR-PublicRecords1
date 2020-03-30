@@ -4,7 +4,8 @@ EXPORT MakeGeographyList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
-												
+
+	// Make the Geography portion of the file from the filters
 	string ParmFilterName_GeoState   						:= 'STATE';	
 	string ParmFilterName_GeoStateCounty  			:= 'STATECOUNTY';	
 	string ParmFilterName_GeoStateCity  				:= 'STATECITY';	

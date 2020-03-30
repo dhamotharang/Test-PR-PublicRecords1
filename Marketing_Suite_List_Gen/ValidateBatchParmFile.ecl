@@ -1,17 +1,24 @@
 ﻿import Marketing_Suite_List_Gen, STD, ut;
 
 export ValidateBatchParmFile(
-															dataset(Marketing_Suite_List_Gen.Layouts.Layout_ParmFile)	inParmFile
+															dataset(Marketing_Suite_List_Gen.Layouts.Layout_ParmFile)	inParmFile,
+															string	JobID
 														 )	:= function
 
-  /*------------------------------------------------------------------------------------------------------------------------------: layouts
-  | 
-  |--------------------------------------------------------------------------------------------------------------------------------------*/ 
+  /*----------------------------------------------------------------------------------------------------------------------
+  | This function will take the parameter file we are receiving from batch and validate it to make sure that 
+	|	the structure of the file is as expected as well as some values being passed to us. 	
+  |----------------------------------------------------------------------------------------------------------------------*/ 
+	
+	//	input parameter file layout
   Layout_ParmFile          											:= Marketing_Suite_List_Gen.Layouts.Layout_ParmFile;
+	
+	//	validated parameter file layout
   Layout_Valid_ParmFile    											:= Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile;
  
   /*---------------------------------------------------------------------------------------------------------------------------: attributes
-  | 
+  |	These are the current parameter keywords in the parameter file. We expect 1 parameter per line. If multiple values 
+	|	are being passed in, they will be separated by a comma.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 	string ParmFilterType_Location								:= 'SEARCHTYPE';
   string ParmFilterName_PhonePresent   					:= 'PHONEPRESENT';
@@ -46,11 +53,16 @@ export ValidateBatchParmFile(
 	string ParmFilterName_ContactExecTitlePresent	:= 'CONTACTEXECTITLEPRESENT';
 
   /*=======================================================================================================================================
-  | Filter the parameter file by individual filter values (1 rec per value), then execute function to validate values and format into set.
+  | Filter the parameter file by individual filter values (1 rec per value), then execute necessary functions 
+	|	to validate the values and format them into set.
   |======================================================================================================================================*/
  
 	/*---------------------------------------------------------------------------------------------------------------------------------------
-  | Location Search Type - Mandatory criteria             
+  | Location Search Type - This is a mandatory criteria. It determines whether the customer wants results at a seleid
+	|	level or a proxid level. The marketing V1 file being used to hit against has both levels. So if the customer wants
+	|	a proxid level search, then location address will be returned instead of business address. Not only is this parameter
+  | mandatory, it also has to be accompanied by at least 2 other parameter categories. You will see this check further 
+  | down in the code.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 
   rs_record_SearchType											:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterType_Location);
@@ -58,7 +70,14 @@ export ValidateBatchParmFile(
 	set of string filt_SearchType							:= 	Marketing_Suite_List_Gen.SetFromString.SearchType(input_filt_SearchType);	
 																					 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Phone            
+  | Phone - There are three subcategories with in the phone parameter. 
+	|	1) Customer wants records where the phone number is present.
+	|	2) Customer wants records where the phone number is a toll free phone number.
+	|	3) Customer wants records where the phone number has certain area codes. 
+	|
+	|	If the customer requests records where the phone number is toll free, it will need an area code in the toll free 
+	|	set defined below. If the customer requests specific area codes, we validate that the value requested is a 3 
+	|	digit number.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
   
 	rs_record_phone_present										:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_PhonePresent);
@@ -75,7 +94,21 @@ export ValidateBatchParmFile(
 	set of string filt_areacode								:= 	Marketing_Suite_List_Gen.SetFromString.AreaCode(input_filt_areacode);
 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Geography              
+  | Geography - Due to the nature of different states having the same city and county names as well as zipcodes that 
+	|	cross cities and counties, the parameters for geography are very specific. There are 9 parameters possible in the 
+	|	geography category.
+	|	1) Customer wants records from a particular state.
+	|	2) Customer wants records from a particular city & state.
+	|	3) Customer wants records from a particular county & state.
+	| 4) Customer wants records from a particular city, state and county.
+	| 5) Customer wants records from a particular city, state, county and zip.
+	|	6) Customer wants records from a particular state and zip.	
+	|	7) Customer wants records from a particular state, city and zip.
+	|	8) Customer wants records from a particular state, county and zip.
+	|	9) Customer wants records from a particular zip.	
+	|
+	|	Appropriate validation is done on each parameter. The county parameter comes in as a county name, so conversion 
+	|	to a digit for filtering is done. 
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 
   rs_record_GeoState												:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_GeoState);
@@ -115,7 +148,12 @@ export ValidateBatchParmFile(
 	set of string filt_GeoZipCode							:= 	Marketing_Suite_List_Gen.SetFromString.GeoZipCode(input_filt_GeoZipCode);	
 		
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Revenue              
+  | Revenue - There are three Revenue parameters possible.
+	|	1) Customer wants records with an annual revenue within a range.
+	|	2) Customer wants records with an annual revenue greater than a value.
+	|	3) Customer wants records with an annual revenue less than a value.
+	|
+	|	Appropriate validation is done on each parameter.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
   
 	rs_record_RevenueRange										:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_RevenueRange);
@@ -131,9 +169,14 @@ export ValidateBatchParmFile(
 	set of string filt_RevenueLT							:= 	Marketing_Suite_List_Gen.SetFromString.RevenueLT(input_filt_RevenueLT);
 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Employee              
+  | Employee - There are three Employee parameters possible.
+	|	1) Customer wants records with the number of employees within a range.
+	|	2) Customer wants records with the number of employees greater than a value.
+	|	3) Customer wants records with the number of employees less than a value.
+	|
+	|	Appropriate validation is done on each parameter.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
-  
+	
 	rs_record_EmployeeRange										:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_EmployeeRange);
   string input_filt_EmployeeRange						:= 	if(count(rs_record_EmployeeRange) > 0, rs_record_EmployeeRange[1].filter_values, '');
 	set of string filt_EmployeeRange					:= 	Marketing_Suite_List_Gen.SetFromString.EmployeeRange(input_filt_EmployeeRange);
@@ -146,8 +189,16 @@ export ValidateBatchParmFile(
   string input_filt_EmployeeLT							:= 	if(count(rs_record_EmployeeLT) > 0, rs_record_EmployeeLT[1].filter_values, '');
 	set of string filt_EmployeeLT							:= 	Marketing_Suite_List_Gen.SetFromString.EmployeeLT(input_filt_EmployeeLT);	
 	
-	/*---------------------------------------------------------------------------------------------------------------------------------------
-  | Industry              
+  /*---------------------------------------------------------------------------------------------------------------------------------------
+  | Industry - There are four Industry parameters possible. The Marketing V1 file that we are hitting against has a primary SIC 
+	|	as well as 4 secondary SICs. The same is true for the NAICS codes (primary plus 4 secondary).
+	|	1) Customer wants records with the primary sic code to be a specific value or list of values.
+	|	2) Customer wants records with any (primary or secondary) sic codes to be a specific value or list of values.
+	|	3) Customer wants records with the primary NAICS code to be a specific value or list of values.
+	|	4) Customer wants records with any (primary or secondary) NAICS codes to be a specific value or list of values.
+	|
+	|	Appropriate validation is done on each parameter. Customers are permitted to request 2,3 & 4 digit filters for the SIC 
+	|	Code(s). Customers are permitted to request 2,3,4,5 & 6 digit filters for the NAICS code(s). 
   |--------------------------------------------------------------------------------------------------------------------------------------*/
   
 	rs_record_IndustryPrimarySIC							:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_IndustryPrimarySIC);
@@ -167,7 +218,12 @@ export ValidateBatchParmFile(
 	set of string filt_IndustryAllNAICS				:= 	Marketing_Suite_List_Gen.SetFromString.IndustryAllNAICS(input_filt_IndustryAllNAICS);
 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Years in Business              
+  | Years in Business - There are three Years in Business parameters possible.
+	|	1) Customer wants records with the age of the company within a range.
+	|	2) Customer wants records with the age of the company greater than a value.
+	|	3) Customer wants records with the age of the company less than a value.
+	|
+	|	Appropriate validation is done on each parameter.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
   
 	rs_record_BusYearsRange										:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_BusYearsRange);
@@ -183,16 +239,27 @@ export ValidateBatchParmFile(
 	set of string filt_BusYearsLT							:= 	Marketing_Suite_List_Gen.SetFromString.BusYearsLT(input_filt_BusYearsLT);
 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Business Email Address              
+  | Business Email Present
+	|	1) Customer wants records where a business email is present.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
  
 	rs_record_bus_email_present								:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_BusEmailPresent);
 	set of string filt_BusEmailPresent				:=	if(count(rs_record_bus_email_present) > 0,['Y'],['']);
 	
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Contact              
-  |--------------------------------------------------------------------------------------------------------------------------------------*/
+  | We split the Contact parameters out into two categories: A generic contact parameter group and an executive
+	|	title parameter group. 
+  |--------------------------------------------------------------------------------------------------------------------------------------*/             
 
+  /*---------------------------------------------------------------------------------------------------------------------------------------
+  | Contact - There are three Contact parameters possible.
+	|	1) Customer wants records with a full (street address, city, state & zip) contact address present.
+	|	2) Customer wants records with a contact email present.
+	|	3) Customer wants records with a contact lexid present.
+	|
+	|	Appropriate validation is done on each parameter.
+  |--------------------------------------------------------------------------------------------------------------------------------------*/
+	
 	rs_record_contact_addr_present						:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_ContactAddressPresent);
 	set of string filt_ContactAddrPresent			:=	if(count(rs_record_contact_addr_present) > 0,['Y'],['']);	
 	
@@ -203,7 +270,10 @@ export ValidateBatchParmFile(
 	set of string filt_ContactLexidPresent		:=	if(count(rs_record_contact_lexid_present) > 0,['Y'],['']);	
 
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Executive Title              
+  | Executive Title
+	|	1) Customer wants records with a contact who has an executive title.
+	|
+	|	A list of executives were provided by product for this filter.
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 	
 	ExecTitleSet	:=	fnGetExecTitles;
@@ -249,6 +319,11 @@ export ValidateBatchParmFile(
 																, Layout_Valid_Parmfile
 															 )(set_filter_values[1] != '');
 															 
+  /*---------------------------------------------------------------------------------------------------------------------------------------
+  | Below is a list of each filter cateory and each parameter within that category. This is needed because there is a 
+	|	requirement where at least two categories are needed in addition to the Location Search (seleid/proxid) parameter.
+  |--------------------------------------------------------------------------------------------------------------------------------------*/ 															 
+															 
 	PhoneFilterSet		:=	['PHONEPRESENT','TOLLFREE','AREACODE'];
 	GeoFilterSet			:=	['STATE','STATECOUNTY','STATECITY','STATECITYCOUNTY','STATECITYCOUNTYZIP','STATEZIP','STATECITYZIP','STATECOUNTYZIP','ZIPCODE'];
 	RevenueFilterSet	:=	['SALESRANGE','SALESGT','SALESLT'];
@@ -259,6 +334,11 @@ export ValidateBatchParmFile(
 	ContactFilterSet	:=	['CONTACTADDRPRESENT','CONTACTEMAILPRESENT','CONTACTLEXIDPRESENT'];
 	ExecTitleFilterSet:=	['CONTACTEXECTITLEPRESENT'];
 
+  /*---------------------------------------------------------------------------------------------------------------------------------------
+  | For each parameter we have, assign a value of 1 to each parameter, otherwise assign a value of 0. Then add up all the 
+	|	counts to see if we have 2 or more categories. If not, send an error. 
+  |--------------------------------------------------------------------------------------------------------------------------------------*/ 
+	
 	PhoneCount				:=	if(count(DS_STDfilterFile(filter_name in PhoneFilterSet))>0,1,0);
 	GeoCount					:=	if(count(DS_STDfilterFile(filter_name in GeoFilterSet))>0,1,0);
 	RevenueCount			:=	if(count(DS_STDfilterFile(filter_name in RevenueFilterSet))>0,1,0);
@@ -272,12 +352,14 @@ export ValidateBatchParmFile(
 	SectionCount			:=	PhoneCount + GeoCount + RevenueCount + IndustryCodeCount + EmployeeCount + 
 												BusYearsCount + BusEmailCount + ContactCount + ExecTitleCount;
 	
-	string failString := 'Criteria for at least 2 input sections in addition to the SearchType criteria is needed. Please check parameter file values';
+	string failString		:= 'Criteria for at least 2 input sections in addition to the SearchType criteria is needed. Please check parameter file values';
+	string successString:= 'Marketing List Gen job completed sucessfully';
+
     										 
 	Result 						:=  if(SectionCount > 1 
 														, DS_STDfilterFile
 														, FAIL(DS_STDfilterFile,99,failString)
-													 ) : FAILURE(mod_email.SendFailureEmail(failString, '')); 
+													 ) : 	FAILURE(mod_email.SendFailureEmail(failString, jobId)); 
 											
   return Result;
 

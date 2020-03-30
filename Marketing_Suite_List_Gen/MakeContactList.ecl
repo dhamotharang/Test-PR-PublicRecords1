@@ -4,7 +4,8 @@ export MakeContactList(
 												dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 												dataset(Marketing_List.layouts.business_contact) inContactFile
 											)	:= function;
-												
+	
+	// Make the contact portion of the file from the filters
 	string ParmFilterName_ContactAddressPresent	:= 'CONTACTADDRPRESENT';
 	string ParmFilterName_ContactEmailPresent		:= 'CONTACTEMAILPRESENT';
 	string ParmFilterName_ContactLexidPresent		:= 'CONTACTLEXIDPRESENT';

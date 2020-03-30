@@ -1,5 +1,7 @@
 ﻿import Risk_Indicators, ut; 
 
+// Grab the descriptions for the SIC codes and NAICS codes. We only have 4 digit SIC codes & 6 digit NAICS codes
+// in this data.
 EXPORT fnGetIndustryDesc(dataset(Marketing_Suite_List_Gen.Layouts.Layout_NormTemp)	NormFile) := function
 
 	NormLayout	:=	Marketing_Suite_List_Gen.Layouts.Layout_NormTemp;

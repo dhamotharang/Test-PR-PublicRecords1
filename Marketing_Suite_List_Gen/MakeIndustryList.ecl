@@ -4,7 +4,8 @@ export MakeIndustryList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
-												
+
+	// Make the Industry (SIC & NAICS) portion of the file from the filters
 	string ParmFilterName_IndustryPrimarySIC		:= 'PRIMARYSICCODE';
 	string ParmFilterName_IndustryALLSIC				:= 'ALLSICCODE';
 	string ParmFilterName_IndustryPrimaryNAICS	:= 'PRIMARYNAICSCODE';

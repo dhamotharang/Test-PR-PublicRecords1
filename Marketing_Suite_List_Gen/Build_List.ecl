@@ -7,7 +7,8 @@ export Build_List(
 									
 									
   /*----------------------------------------------------------------------------------------------------------------------
-  | In this attribute, the lists (premium & basic) and stats are built using the validated parameters. 
+  | In this attribute, the lists (premium & basic) and stats are built using the validated parameters from 
+	| the ValidateBatchParmFile attribute
   |----------------------------------------------------------------------------------------------------------------------*/	
 	
 	/*----------------------------------------------------------------------------------------------------------------------
