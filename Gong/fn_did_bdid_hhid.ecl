@@ -1,4 +1,4 @@
-import gong,gong_v2,did_add,didville,header,business_header,Address,ut,header_slimsort,business_header_ss,_control, BIPv2, mdr;
+import gong,did_add,didville,header,business_header_ss, BIPv2;
 
 export fn_did_bdid_hhid(dataset(recordof(gong.layout_historyaid)) history_in) := function
 
@@ -21,7 +21,7 @@ layout_history_did_hhid_bdid := record
 	string pclean;
 	string5 pdid := '';
 	unsigned8	persistent_record_id;
-	BIPV2.IDlayouts.l_xlink_ids;	
+	BIPV2.IDlayouts.l_xlink_ids;
 end;
 
 layout_history_did_hhid_bdid init_did_hhid(history_in l) := transform
@@ -43,11 +43,11 @@ did_add.MAC_Match_Flex(history_init,history_matchset,
 				   prim_range,prim_name,sec_range,z5,st,phone10,
 				   did,layout_history_did_hhid_bdid,true,did_score,75,history_did);
 
-history_did_dist := distribute(history_did(name_last<>''), hash(name_last,prim_name));		
+history_did_dist := distribute(history_did(name_last<>''), hash(name_last,prim_name));
 
 didville.MAC_HHID_Append_By_Address(
 	history_did_dist, history_hhid, hhid, name_last,
-	prim_range, prim_name, sec_range, st, z5)		
+	prim_range, prim_name, sec_range, st, z5)
 
 bdid_matchset := ['A','P'];
 bdid_inrecs := history_hhid(listing_type_bus<>'',publish_code IN ['P','U']) + history_did(name_last = '', listing_type_bus<>'',publish_code IN ['P','U']);
@@ -69,10 +69,10 @@ business_header_ss.MAC_match_FLEX(bdid_inrecs
 																	,														// keep count
 																	,														// default threshold
 																	,														// use prod version of superfiles
-																	,														// default is to hit prod from dataland, and on prod hit prod.		
+																	,														// default is to hit prod from dataland, and on prod hit prod.
 																	,BIPV2.xlink_version_set		// create BIP keys only
 																	,														// url
-																	,														// email 
+																	,														// email
 																	,v_city_name								// city
 																	,name_first									// fname
 																	,name_middle								// mname
@@ -81,8 +81,8 @@ business_header_ss.MAC_match_FLEX(bdid_inrecs
 																	,														// source
 																	,														// source_record_id
 																	,false
-																	);												
-	
+																	);
+
 layout_history_out := record
 	gong.Layout_bscurrent_raw,
 	unsigned6 did,
@@ -103,19 +103,19 @@ layout_history_out := record
   unsigned8 nid := 0;
   unsigned2 name_ind := 0;
   unsigned8	persistent_record_id;
-	BIPV2.IDlayouts.l_xlink_ids;	
+	BIPV2.IDlayouts.l_xlink_ids;
 end;
 
 layout_history_out get_history_out(history_hhid l) := transform
 	self := l;
 end;
 
-out_raw := project(history_bdid + 
-		  	      history_hhid(~(listing_type_bus<>'' and publish_code IN ['P','U'])) + 
-				 history_did (name_last='' and ~(listing_type_bus<>'' and publish_code IN ['P','U'])), 
+out_raw := project(history_bdid +
+		  	      history_hhid(~(listing_type_bus<>'' and publish_code IN ['P','U'])) +
+				 history_did (name_last='' and ~(listing_type_bus<>'' and publish_code IN ['P','U'])),
 				 get_history_out(left));
-				 
-out_with_hhid := out_raw(hhid<>0);	
+
+out_with_hhid := out_raw(hhid<>0);
 
 out_no_hhid := out_raw(hhid=0);
 
@@ -123,10 +123,10 @@ layout_history_out get_hhid_by_did(out_no_hhid l, header.File_HHID_Current r) :=
 	self.hhid := r.hhid;
 	self := l;
 end;
-		
+
 history_out := join(out_no_hhid(did<>0), header.File_HHID_Current(ver=1),
                     left.did = right.did, get_hhid_by_did(left,right),
-				left outer, hash) + out_no_hhid(did=0) + out_with_hhid;					   
+				left outer, hash) + out_no_hhid(did=0) + out_with_hhid;
 
 return history_out;
 

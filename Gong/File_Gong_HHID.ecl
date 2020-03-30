@@ -1,9 +1,9 @@
-IMPORT ut, didville, header_slimsort,_control, header, gong_v2;
+IMPORT ut, didville, header_slimsort,_control, header;
 
 ////// Changed to match hhid process for master and history files. after hhid append find hhids by did
 
 g_raw := gong.File_Gong_Did;
-	
+
 layout_gng_hhid_temp := RECORD
 	UNSIGNED6 did := 0;
 	UNSIGNED6 hhid := 0;
@@ -39,7 +39,7 @@ layout_gng_hhid get_hhid_by_did(outf_dist l, hhid_file r) := transform
 	self      := l;
 end;
 
-out := join(outf_dist,hhid_file,left.did=right.did,get_hhid_by_did(left,right),left outer,keep(1)) + 
+out := join(outf_dist,hhid_file,left.did=right.did,get_hhid_by_did(left,right),left outer,keep(1)) +
 			 project(suppress, layout_gng_hhid);
 
 export File_Gong_HHID := out : persist('~thor_dell400_2::persist::file_gong_hhid'/*, _control.TargetQueue.ADL_400*/);
