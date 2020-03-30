@@ -2875,7 +2875,7 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.CompanyNameAttributes.best_bus_name_mechan := -1;
 		SELF.CompanyNameAttributes.best_bus_name_refriger := -1;
 		SELF.CompanyNameAttributes.best_bus_name_window := -1;
-
+/* STM - fix - for RQ-19898 - to remove -1 being returned for B2B fields.
 		SELF.KELB2BAttributes.G_BuildB2BDt := '-1';
 		SELF.KELB2BAttributes.BE_B2BCntEv := -1;
 		SELF.KELB2BAttributes.BE_B2BCnt2Y := -1;
@@ -3050,6 +3050,7 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.KELB2BAttributes.BE_B2BMatBalVol24Mc := -1;
 		SELF.KELB2BAttributes.BE_B2BOpsBalVol24Mc := -1;
 		SELF.KELB2BAttributes.BE_B2BOthBalVol24Mc := -1;
-
+END STM - fix - for RQ-19898 - to remove -1 being returned for B2B fields.
+*/ 
 		SELF := le;
 	END;
