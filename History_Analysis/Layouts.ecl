@@ -64,11 +64,15 @@ End;
         Real       StDev;
         Real       Plus2StDev;
         Real       Minus2StDev;
+        Unsigned   NumLessThanQ1;
+        Unsigned   BtwnQ1AndQ3;
+        Unsigned   NumMoreThanQ3;
     END;
     export StatisticsRec:=RECORD
         String25   datasetname;
         String60   superkey;
         String1    updateflag;
+        unsigned   numberofdeltas;
         StatisticsPoints FileSizeReal;
         StatisticsPoints FileSizePerc;
         StatisticsPoints NumberOfRecordsReal;

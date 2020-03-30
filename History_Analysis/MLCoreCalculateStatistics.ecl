@@ -50,6 +50,7 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
         ReduceToML:=project(R,transform(ML_Core.Types.NumericField,Self:=left;));
         SimpleStats:=sort(ML_Core.FieldAggregates(ReduceToML).simple,number);
         MedianStats:=sort(ML_Core.FieldAggregates(ReduceToML).medians,number);
+        self.numberofdeltas:=count(R);
         
         Self.FileSizeReal.Min:=SimpleStats[1].minval;
         Self.FileSizeReal.Mean:=SimpleStats[1].mean;
@@ -61,6 +62,9 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.FileSizeReal.StDev:=SimpleStats[1].sd;
         Self.FileSizeReal.Plus2StDev:=Self.FileSizeReal.Mean+(2*Self.FileSizeReal.StDev);
         Self.FileSizeReal.Minus2StDev:=Self.FileSizeReal.Mean-(2*Self.FileSizeReal.StDev);
+        self.FileSizeReal.NumLessThanQ1:=count(R(number=1 and value<Self.FileSizeReal.Q1));
+        self.FileSizeReal.BtwnQ1AndQ3:=count(R(number=1 and value>=Self.FileSizeReal.Q1 and value<=Self.FileSizeReal.Q3));
+        self.FileSizeReal.NumMoreThanQ3:=count(R(number=1 and value>Self.FileSizeReal.Q3));
         //Percent
         Self.FileSizePerc.Min:=SimpleStats[2].minval;
         Self.FileSizePerc.Mean:=SimpleStats[2].mean;
@@ -72,6 +76,9 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.FileSizePerc.StDev:=SimpleStats[2].sd;
         Self.FileSizePerc.Plus2StDev:=Self.FileSizePerc.Mean+(2*Self.FileSizePerc.StDev);
         Self.FileSizePerc.Minus2StDev:=Self.FileSizePerc.Mean-(2*Self.FileSizePerc.StDev);
+        self.FileSizePerc.NumLessThanQ1:=count(R(number=2 and value<Self.FileSizePerc.Q1));
+        self.FileSizePerc.BtwnQ1AndQ3:=count(R(number=2 and value>=Self.FileSizePerc.Q1 and value<=Self.FileSizePerc.Q3));
+        self.FileSizePerc.NumMoreThanQ3:=count(R(number=2 and value>Self.FileSizePerc.Q3));
         //Record Count Calculations
         //Real
         Self.NumberOfRecordsReal.Min:=SimpleStats[3].minval;
@@ -84,6 +91,9 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.NumberOfRecordsReal.StDev:=SimpleStats[3].sd;
         Self.NumberOfRecordsReal.Plus2StDev:=Self.NumberOfRecordsReal.Mean+(2*Self.NumberOfRecordsReal.StDev);
         Self.NumberOfRecordsReal.Minus2StDev:=Self.NumberOfRecordsReal.Mean-(2*Self.NumberOfRecordsReal.StDev);
+        self.NumberOfRecordsReal.NumLessThanQ1:=count(R(number=3 and value<Self.NumberOfRecordsReal.Q1));
+        self.NumberOfRecordsReal.BtwnQ1AndQ3:=count(R(number=3 and value>=Self.NumberOfRecordsReal.Q1 and value<=Self.NumberOfRecordsReal.Q3));
+        self.NumberOfRecordsReal.NumMoreThanQ3:=count(R(number=3 and value>Self.NumberOfRecordsReal.Q3));
         //Perc
         Self.NumberOfRecordsPerc.Min:=SimpleStats[4].minval;
         Self.NumberOfRecordsPerc.Mean:=SimpleStats[4].mean;
@@ -95,11 +105,16 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.NumberOfRecordsPerc.StDev:=SimpleStats[4].sd;
         Self.NumberOfRecordsPerc.Plus2StDev:=Self.NumberOfRecordsPerc.Mean+(2*Self.NumberOfRecordsPerc.StDev);
         Self.NumberOfRecordsPerc.Minus2StDev:=Self.NumberOfRecordsPerc.Mean-(2*Self.NumberOfRecordsPerc.StDev);
+        self.NumberOfRecordsPerc.NumLessThanQ1:=count(R(number=4 and value<Self.NumberOfRecordsPerc.Q1));
+        self.NumberOfRecordsPerc.BtwnQ1AndQ3:=count(R(number=4 and value>=Self.NumberOfRecordsPerc.Q1 and value<=Self.NumberOfRecordsPerc.Q3));
+        self.NumberOfRecordsPerc.NumMoreThanQ3:=count(R(number=4 and value>Self.NumberOfRecordsPerc.Q3));
         Self:=L;
     END;
 
  CalculateDelta:=rollup(GroupFile,GROUP,tCalculate(left,ROWS(left)));
 
-return CalculateDelta;
+ CreateFile:=output(CalculateDelta,,'~thor_data400::history_analysis::base::Delta_Statistics',thor,__compressed__,overwrite);
+
+return CreateFile;
 
 end;
