@@ -1,4 +1,4 @@
-import doxie, didville, address, ut, gong, Marketing_Best, dx_header;
+import doxie, didville, address, ut, dx_Gong, Marketing_Best, dx_header;
 
 Loadxml('<FOO/>');
 
@@ -192,7 +192,8 @@ export ClickData_Best_Function(
           left.seq = right.seq,
         into_out(LEFT,RIGHT), LOOKUP);
 
-  outseq_optout_layout get_EDA(outseq L, gong.Key_History_Hhid R) := transform
+  Key_History_Hhid := dx_Gong.key_history_hhid();
+  outseq_optout_layout get_EDA(outseq L, Key_History_Hhid R) := transform
     self.eda_connect := R.dt_first_seen;
     self.eda_disconnect := R.deletion_date;
     self.global_sid := R.global_sid;
@@ -201,7 +202,8 @@ export ClickData_Best_Function(
     self := l;
   end;
 
-  outseq_optout_layout get_EDA_Did(outseq_optout_layout L, gong.Key_History_Did R) := transform
+  Key_History_Did := dx_Gong.key_history_did();
+  outseq_optout_layout get_EDA_Did(outseq_optout_layout L, Key_History_Did R) := transform
     self.eda_connect := R.dt_first_seen;
     self.eda_disconnect := R.deletion_date;
     self.global_sid := R.global_sid;
@@ -210,11 +212,11 @@ export ClickData_Best_Function(
     self := l;
   end;
 
-  outf5a := join(outf4, gong.key_history_hhid,
+  outf5a := join(outf4, key_history_hhid,
           keyed((integer)Left.hhid = right.s_hhid),
         get_EDA(LEFT,RIGHT), left outer, KEEP(20));
 
-  pre_outf5 := join(outf5a(eda_connect = ''), gong.Key_History_Did,
+  pre_outf5 := join(outf5a(eda_connect = ''), Key_History_Did,
           keyed((integer)Left.adl = right.l_did),
         get_EDA_Did(LEFT,RIGHT), left outer, KEEP(20)) + outf5a(eda_connect != '');
 

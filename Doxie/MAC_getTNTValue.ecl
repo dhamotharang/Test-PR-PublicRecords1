@@ -29,7 +29,7 @@ EXPORT MAC_getTNTValue(infile,
               dtlastseenfield = 'dt_last_seen'
               ) := macro
 
-		import gong, ut, DID_Add, Suppress, std;
+		import dx_Gong, ut, DID_Add, Suppress, std;
 
     //1. Check best records to determine if best address
     #uniquename(trans_best)
@@ -49,7 +49,7 @@ EXPORT MAC_getTNTValue(infile,
     #uniquename(layout_gong_out)
     %layout_gong_out% :=
     RECORD
-      gong.Layout_bscurrent_raw;
+      dx_Gong.layout_prepped_for_keys;
       string15 did;
       unsigned6 hhid;
       unsigned6 bdid := 0;
@@ -58,17 +58,19 @@ EXPORT MAC_getTNTValue(infile,
     END;
 
     //use the most current gong did records
+    #uniquename(key_did)
+    %key_did% := dx_Gong.key_did();
     #uniquename(get_did_base)
     #uniquename(did_base_recs)
     #uniquename(did_base_recs_suppressed)
     #uniquename(final_did)
-    %layout_gong_out% %get_did_base%(infile le, gong.key_did ri) := transform
+    %layout_gong_out% %get_did_base%(infile le, %key_did% ri) := transform
       self.did := le.didfield;
       self := ri;
       self := [];
     end;
 
-    %did_base_recs% := join(%results_best%,gong.key_did,
+    %did_base_recs% := join(%results_best%, %key_did%,
                             keyed((integer)left.didfield = right.l_did),%get_did_base%(left,right), ATMOST(50));
 
     %did_base_recs_suppressed% := Suppress.MAC_SuppressSource(%did_base_recs%, mod_access);
@@ -98,16 +100,18 @@ EXPORT MAC_getTNTValue(infile,
 
     //3. Check for HHID match to the Gong file
     //use the most current gong hhid records
+    #uniquename(key_hhid)
+    %key_hhid% := dx_Gong.key_hhid();
     #uniquename(get_hhid_base)
     #uniquename(hhid_base_recs)
     #uniquename(final_hhid)
-    %layout_gong_out% %get_hhid_base%(%results_best_tnt% le, gong.key_hhid ri) := transform
+    %layout_gong_out% %get_hhid_base%(%results_best_tnt% le, %key_hhid% ri) := transform
       SELF.didfield := '';
       self := ri;
       self := [];
     end;
 
-    %hhid_base_recs% := join(%results_best_tnt%,gong.key_hhid,
+    %hhid_base_recs% := join(%results_best_tnt%, %key_hhid%,
                              (integer)left.hhidfield = right.s_hhid,%get_hhid_base%(LEFT, RIGHT), ATMOST(50));
 
     %final_hhid% := dedup(sort(%hhid_base_recs%,bdid,did,listed_name,phone10)

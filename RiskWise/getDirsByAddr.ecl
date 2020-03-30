@@ -1,11 +1,16 @@
-﻿﻿import _Control, risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
+﻿﻿import _Control, risk_indicators, dx_Gong, ut, targus, FCRA, Phonesplus_v2, data_services;
 onThor := _Control.Environment.OnThor;
 
 export getDirsByAddr(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, boolean isFCRA=false, unsigned1 glb=0, unsigned8 BSOptions=0) := function
 
-glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);	
-	
-layout_dirs_address add_gong(input le, gong.Key_History_Address rt) := transform
+integer1 iType := IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
+glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);
+
+key_history_address := dx_Gong.key_history_address(data_services.data_env.iNonFCRA);
+key_FCRA_history_address := dx_Gong.key_history_address(data_services.data_env.iFCRA);
+
+layout_dirs_address add_gong(input le, key_history_address rt) := transform
 	self.src := 'GH';
 	self := rt;
 end;
@@ -23,7 +28,7 @@ gong_correct_roxie := join(input, FCRA.Key_Override_Gong_FFID,
 gong_correct_thor := join(input(gong_correct_ffid <> []), pull(FCRA.Key_Override_Gong_FFID),
 												(right.flag_file_id in left.gong_correct_ffid),
 												gong_corr(left, right), all, LOCAL);
-												
+
 #IF(onThor)
 	gong_correct := gong_correct_thor;
 #ELSE
@@ -31,7 +36,7 @@ gong_correct_thor := join(input(gong_correct_ffid <> []), pull(FCRA.Key_Override
 #END
 
 // get gong history using the input address
-g_history_non_fcra_roxie := join(input, gong.Key_History_Address,
+g_history_non_fcra_roxie := join(input, key_history_address,
 										trim(left.prim_name)!='' and trim(left.z5)!='' and
 										(keyed(right.prim_name=left.prim_name) and keyed(right.st=left.st) and keyed(right.z5=left.z5) and
 										keyed(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
@@ -43,8 +48,8 @@ g_history_non_fcra_roxie := join(input, gong.Key_History_Address,
 										),
 										keep(100));
 
-g_history_non_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)), 
-										distribute(pull(gong.Key_History_Address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, z5, prim_range)),
+g_history_non_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),
+										distribute(pull(key_history_address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, z5, prim_range)),
 										((right.prim_name=left.prim_name) and (right.st=left.st) and (right.z5=left.z5) and
 										(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
 										add_gong(left,right),
@@ -61,7 +66,7 @@ g_history_non_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5
 	g_history_non_fcra := g_history_non_fcra_roxie;
 #END
 
-g_history_fcra_roxie := join(input, gong.Key_FCRA_History_Address,
+g_history_fcra_roxie := join(input, key_FCRA_History_Address,
 										trim(left.prim_name)!='' and trim(left.z5)!='' and
 										(keyed(right.prim_name=left.prim_name) and keyed(right.st=left.st) and keyed(right.z5=left.z5) and
 										keyed(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)) and
@@ -73,9 +78,9 @@ g_history_fcra_roxie := join(input, gong.Key_FCRA_History_Address,
 											RiskWise.max_atmost
 										),
 										keep(100));
-										
-g_history_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)), 
-										distribute(pull(gong.Key_FCRA_History_Address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, z5, prim_range)),
+
+g_history_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),
+										distribute(pull(Key_FCRA_History_Address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, z5, prim_range)),
 										((right.prim_name=left.prim_name) and (right.st=left.st) and (right.z5=left.z5) and
 										(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)) and
 										trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id,
@@ -86,23 +91,23 @@ g_history_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!='
 											RiskWise.max_atmost
 										),
 										keep(100), LOCAL);
-										
+
 #IF(onThor)
 	g_history_fcra := g_history_fcra_thor;
 #ELSE
 	g_history_fcra := g_history_fcra_roxie;
 #END
 
-g_history := if(isFCRA, g_history_fcra, g_history_non_fcra);										
+g_history := if(isFCRA, g_history_fcra, g_history_non_fcra);
 
-							 // do we need to group here?		
+							 // do we need to group here?
 combined := ungroup(gong_correct + g_history);
-combo := if(isFCRA, /*group( sort (*/ combined/*, seq), seq)*/, g_history);	
-						
+combo := if(isFCRA, /*group( sort (*/ combined/*, seq), seq)*/, g_history);
 
-// no longer use today's date for the calculation, use the build date							
+
+// no longer use today's date for the calculation, use the build date
 cdate := Risk_Indicators.get_Build_date('targus_build_version');
-												
+
 targus_address_key := if(isFCRA, targus.Key_Targus_FCRA_Address, targus.Key_Targus_Address);
 
 Layout_Dirs_Address add_targus(input le, targus_address_key rt) := transform
@@ -142,8 +147,8 @@ targus_wp_nonfcra_roxie := join(input, targus_address_key,
 															RiskWise.max_atmost
 														),
 														keep(100));
-														
-targus_wp_nonfcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),  
+
+targus_wp_nonfcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),
 														distribute(pull(targus_address_key(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
 														((right.prim_name=left.prim_name) and (right.zip=left.z5) and
 														(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
@@ -154,7 +159,7 @@ targus_wp_nonfcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)
 															RiskWise.max_atmost
 														),
 														keep(100), LOCAL);
-														
+
 #IF(onThor)
 	targus_wp_nonfcra := targus_wp_nonfcra_thor;
 #ELSE
@@ -172,7 +177,7 @@ targus_wp_fcra_roxie := join(input, targus_address_key,
 													RiskWise.max_atmost
 												),
 												keep(100));
-targus_wp_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),  
+targus_wp_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),
 												distribute(pull(targus_address_key(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
 												((right.prim_name=left.prim_name) and (right.zip=left.z5) and
 												(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
@@ -217,7 +222,7 @@ Layout_Dirs_Address addPP(input le, Phonesplus_v2.Keys_Scoring().address.qa rt) 
 	self.publish_code := 'P';
 	self.suffix := rt.addr_suffix;
 	self := rt;
-	self := [];			
+	self := [];
 end;
 // get phones plus using the input address
 phonesPlusNonFcraTemp_roxie := join(input, Phonesplus_v2.Keys_Scoring().address.qa,
@@ -233,7 +238,7 @@ phonesPlusNonFcraTemp_roxie := join(input, Phonesplus_v2.Keys_Scoring().address.
 																	),
 																	keep(100));
 
-phonesPlusNonFcraTemp_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)), 
+phonesPlusNonFcraTemp_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),
 																	distribute(pull(Phonesplus_v2.Keys_Scoring().address.qa(trim(prim_name)!='' and trim(zip5)!='')), hash64(prim_name, zip5, prim_range)),
 																	((right.prim_name=left.prim_name) and  (right.zip5=left.z5) and
 																	(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)) and
@@ -253,8 +258,8 @@ phonesPlusNonFcraTemp_thor := join(distribute(input(trim(prim_name)!='' and trim
 #END
 
 phonesPlusNonFcra := if((BSOptions & risk_indicators.iid_constants.BSOptions.IsInstantIDv1) > 0 and ~isFCRA, phonesPlusNonFcraTemp);
-			
-in_house := dedup(sort(combo + targus_wp + phonesPlusNonFcra, -phone10, -dt_last_seen, name_last, name_first,listed_name, record), record);  
+
+in_house := dedup(sort(combo + targus_wp + phonesPlusNonFcra, -phone10, -dt_last_seen, name_last, name_first,listed_name, record), record);
 
 return in_house;
 
