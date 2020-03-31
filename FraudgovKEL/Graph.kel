@@ -218,13 +218,15 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     InternetProtocol rInternetProtocol=UID(AssociatedCustomerFileInfo, OttoIpAddressId),
     BankAccount rBankAccount=UID(AssociatedCustomerFileInfo, OttoBankAccountId),
     DriversLicense rDriversLicense=UID(AssociatedCustomerFileInfo, OttoDriversLicenseId),
+
+    INTEGER LexId, 
     STRING PhoneNumber,
     STRING OttoAddressId,
     STRING OttoEmailId,
     STRING OttoIpAddressId,
     STRING OttoDriversLicenseId,
 		STRING OttoSSNId,
-
+    STRING CaseId,
     INTEGER RecordId=record_id,
     DATE EventDate,
     STRING EventType, 
@@ -317,6 +319,12 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING state_death_flag,
     STRING death_rec_src,
     STRING state_death_id,
+    
+		// Crim
+    STRING curr_incar_flag,
+    STRING off_cat_list,
+    INTEGER name_ssn_dob_match,
+
 		STRING Hri,
 
     STRING IpAddress=ip_address,
@@ -394,6 +402,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
       EventTypes{EventType},
 
     rPhone,rEmail,rInternetProtocol,rBankAccount,rDriversLicense,rSsn,
+    LexId,
     OttoAddressId,
     DateOfBirth,
     DeceasedDate,
@@ -406,7 +415,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     OttoEmailId,
     OttoIpAddressId,
 		OttoSSNId,
-
+    CaseId,
     OttoDriversLicenseId,
 
     DeceasedMatchCode,
@@ -468,6 +477,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		v2_divssnidentitycountnew,
     
 		HriList { Hri },
+
+    curr_incar_flag,
+    off_cat_list,
+    name_ssn_dob_match,
 
     IpAddress,iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname,
     Confidence_that_activity_was_deceitful_id, name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
@@ -847,9 +860,9 @@ PersonPerson := ASSOCIATION(FLAT(
 USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,
+		CaseId = household_id,
     EventDate = event_date,
 		PhoneNumber = clean_phones.phone_number
-
     ),
 	Person(FILTER((UNSIGNED)did <> 0),
     LexId = did,
@@ -1211,6 +1224,11 @@ Event: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCus
 Event: => CustomerId := rCustomer.CustomerId;
 Event: => IndustryType := rCustomer.IndustryType;
 Event: => DeceasedPriorToEvent := MAP(Subject.DeceasedMatch = 1 AND Subject.DeceasedDate < EventDate => 1, 0);
+Event: => CurrentlyIncarceratedFlag := MAP(name_ssn_dob_match = 1 AND curr_incar_flag='Y' => 1, 0);
+Event: => IdAge := YEARSBETWEEN(DateOfBirth, EventDate); // Age at time of transaction.
+Event: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
+Event: => NoLexIdAdult := MAP(NoLexId = 1 AND IdAge > 17 => 1, 0);
+
 Event: => EventYearMonth := INTEGER(EventDate) DIV 100;
 Event: => DeceasedToEventYearDiff := MAP(Subject.DeceasedMatch = 1 => YEARSBETWEEN(EventDate, Subject.DeceasedDate), 0);
 Event: => FullAddress := Location.FullAddress;
@@ -1229,7 +1247,12 @@ Event: => InvalidAddress := MAP(ACECleanerErrorCode IN ['E101','E212','E213','E2
 Event: => AddressOutOfState := MAP(Location.State != rCustomer.JurisdictionState => 1, 0);
 
 Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
-Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
+Event: => EventAge := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
+
+
+Event: => Nas9Flag := MAP(COUNT(PersonEvent.Transaction(IdNas9Flag=1)) > 0 => 1, 0); // SSN and Last Name not associated with identity per public records
+Event: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
+
 Event: => Hri03Flag := MAP(COUNT(HriList(CONTAINS(Hri,'|03|'))) > 0 => 1, 0);
 Event: => Hri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'|06|'))) > 0 => 1, 0);
 Event: => Hri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'|07|'))) > 0 => 1, 0);
@@ -1272,7 +1295,11 @@ Event: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'|VA|'))) > 0 => 1, 0);
 
 Event: => IdNas9OnlyFlag := MAP(nas_summary = '9' => 1, 0); // Address not associated with identity per public records
 Event: => IdNas9Flag := MAP(nas_summary = '9' /*AND relativeaddressmatch = 0 */=> 1, 0); // Address not associated with identity per public records and not relative address
-Event: => IdNap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
+
+// jp temp attr
+Event: => IdAddressNotVerified := MAP(nas_summary IN ['4','7','9'] => 1, 0); 
+Event: => IdSsnNotVerifiedFlag := MAP(nas_summary IN ['2','3','5','8'] => 1, 0); 
+Event: => IdContradictorySsnFlag := MAP(nas_summary IN ['1'] => 1, 0); // 
 
 Event: => KrIdentityRisk := MAP(name_risk_code != 0 OR dob_risk_code != 0 OR identity_risk_code != 0 => 1, 0);
 Event: => KrHighRiskIdentityFlag := MAP(KrIdentityRisk = 1 OR COUNT(EventTypes(EventType IN ['10000','10001','10002','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400','14901']))>0 => 1, 0); 
@@ -1463,9 +1490,6 @@ Event: => KrId14901Flag := MAP(COUNT(EventTypes(EventType IN ['14901']))>0 => 1,
 Event: => KrId14902Flag := MAP(COUNT(EventTypes(EventType IN ['14902']))>0 => 1, 0);
 Event: => KrId14903Flag := MAP(COUNT(EventTypes(EventType IN ['14903']))>0 => 1, 0);
 
-
-Event: => IdAge := YEARSBETWEEN(DateOfBirth, rCustomer.EventDateMax);
-
 Event: => SsnHri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
 Event: => SsnHri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
 Event: => SsnHri29Flag := MAP(COUNT(HriList(CONTAINS(Hri,'29'))) > 0 => 1, 0);
@@ -1528,6 +1552,45 @@ Event: => BankAccountEntityContextUid := rBankAccount.EntityContextUid;
 Event: => DriversLicenseEntityContextUid := rDriversLicense.EntityContextUid;
 
 
+Event: => AddrEvent30Count := Location.VlEvent30Count;
+Event: => SsnEvent30Count := rSsn.VlEvent30Count;
+Event: => PersonEvent30Count := Subject.VlEvent30Count;
+Event: => PhoneEvent30Count := rPhone.VlEvent30Count;
+Event: => EmailEvent30Count := rEmail.VlEvent30Count;
+Event: => IpEvent30Count := rInternetProtocol.VlEvent30Count;
+Event: => BankAccountEvent30Count := rBankAccount.VlEvent30Count;
+Event: => DriversLicenseEvent30Count := rDriversLicense.VlEvent30Count;
+
+Event: => AddrEvent365Count := Location.VlEvent365Count;
+Event: => SsnEvent365Count := rSsn.VlEvent365Count;
+Event: => PersonEvent365Count := Subject.VlEvent365Count;
+Event: => PhoneEvent365Count := rPhone.VlEvent365Count;
+Event: => EmailEvent365Count := rEmail.VlEvent365Count;
+Event: => IpEvent365Count := rInternetProtocol.VlEvent365Count;
+Event: => BankAccountEvent365Count := rBankAccount.VlEvent365Count;
+Event: => DriversLicenseEvent365Count := rDriversLicense.VlEvent365Count;
+
+Event: => AddrEventAfterKrFlag := Location.KrEventAfterLastKnownRiskFlag;
+Event: => SsnEventAfterKrFlag := rSsn.KrEventAfterLastKnownRiskFlag;
+Event: => PersonEventAfterKrFlag := Subject.KrEventAfterLastKnownRiskFlag;
+Event: => PhoneEventAfterKrFlag := rPhone.KrEventAfterLastKnownRiskFlag;
+Event: => EmailEventAfterKrFlag := rEmail.KrEventAfterLastKnownRiskFlag;
+Event: => IpEventAfterKrFlag := rInternetProtocol.KrEventAfterLastKnownRiskFlag;
+Event: => BankAccountEventAfterKrFlag := rBankAccount.KrEventAfterLastKnownRiskFlag;
+Event: => DriversLicenseEventAfterKrFlag := rDriversLicense.KrEventAfterLastKnownRiskFlag;
+
+Event: => AddrEventAfterKrCount := Location.KrEventAfterLastKnownRiskCount;
+Event: => SsnEventAfterKrCount := rSsn.KrEventAfterLastKnownRiskCount;
+Event: => PersonEventAfterKrCount := Subject.KrEventAfterLastKnownRiskCount;
+Event: => PhoneEventAfterKrCount := rPhone.KrEventAfterLastKnownRiskCount;
+Event: => EmailEventAfterKrCount := rEmail.KrEventAfterLastKnownRiskCount;
+Event: => IpEventAfterKrCount := rInternetProtocol.KrEventAfterLastKnownRiskCount;
+Event: => BankAccountEventAfterKrCount := rBankAccount.KrEventAfterLastKnownRiskCount;
+Event: => DriversLicenseEventAfterKrCount := rDriversLicense.KrEventAfterLastKnownRiskCount;
+
+Event: => AbbreviatedBankname := rBankAccount.AbbreviatedBankname;
+Event: => DlState := rDriversLicense.State;
+
 /*
 Event: => KrEventAfterKnownRisk := MAP(Location.KrLastEventDate < EventDate OR 
                                        rPhone.KrLastEventDate < EventDate OR 
@@ -1589,13 +1652,13 @@ Person: => FraudOffensesFlag := MAP(name_ssn_dob_match = 1 AND FraudOffenseCount
 Person: => AssociatedWithIncarceratedFlag := MAP(name_ssn_dob_match = 0 AND curr_incar_flag='Y' => 1, 0);
 Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND FraudOffenseCount > 0 => 1, 0);
 
-Person: => AddressIsCmra30Count := COUNT(PersonEvent.Transaction(AddressIsCmra=1 AND Age < 30));
+Person: => AddressIsCmra30Count := COUNT(PersonEvent.Transaction(AddressIsCmra=1 AND EventAge < 30));
 Person: => AddressIsCmra30Flag := MAP(AddressIsCmra30Count>0 => 1, 0);
-Person: => AddressInvalid30Count := COUNT(PersonEvent.Transaction((InvalidAddress=1 OR Hri11Flag=1) AND Age < 30));
+Person: => AddressInvalid30Count := COUNT(PersonEvent.Transaction((InvalidAddress=1 OR Hri11Flag=1) AND EventAge < 30));
 Person: => AddressInvalid30Flag := MAP(AddressInvalid30Count>0 => 1, 0);
-Person: => ValidationAddrProblems30Count := COUNT(PersonEvent.Transaction(v2_validationaddrproblems=1 AND Age < 30));
+Person: => ValidationAddrProblems30Count := COUNT(PersonEvent.Transaction(v2_validationaddrproblems=1 AND EventAge < 30));
 Person: => ValidationAddrProblems30Flag := MAP(ValidationAddrProblems30Count>0 => 1, 0);
-Person: => AddressIsOutOfState30Count := COUNT(PersonEvent.Transaction(AddressOutOfState=1 AND Age < 30));
+Person: => AddressIsOutOfState30Count := COUNT(PersonEvent.Transaction(AddressOutOfState=1 AND EventAge < 30));
 Person: => AddressIsOfState30Flag := MAP(AddressIsOutOfState30Count>0 => 1, 0);
  
 // NOTE: This is "best" from the contributed not Best Best.
@@ -1651,7 +1714,7 @@ Person: => Hri08Flag := MAP(COUNT(PersonEvent.Transaction(Hri08Flag=1)) > 0 => 1
 Person: => Hri11Flag := MAP(COUNT(PersonEvent.Transaction(Hri11Flag=1)) > 0 => 1, 0);
 Person: => Hri12Flag := MAP(COUNT(PersonEvent.Transaction(Hri12Flag=1)) > 0 => 1, 0);
 Person: => Hri14Flag := MAP(COUNT(PersonEvent.Transaction(Hri14Flag=1)) > 0 => 1, 0);
-Person: => Hri14Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri14Flag=1 AND Age < 30)) > 0 => 1, 0);
+Person: => Hri14Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri14Flag=1 AND EventAge < 30)) > 0 => 1, 0);
 Person: => Hri15Flag := MAP(COUNT(PersonEvent.Transaction(Hri15Flag=1)) > 0 => 1, 0);
 Person: => Hri19Flag := MAP(COUNT(PersonEvent.Transaction(Hri19Flag=1)) > 0 => 1, 0);
 Person: => Hri25Flag := MAP(COUNT(PersonEvent.Transaction(Hri25Flag=1)) > 0 => 1, 0);
@@ -1666,7 +1729,7 @@ Person: => Hri38Flag := MAP(COUNT(PersonEvent.Transaction(Hri38Flag=1)) > 0 => 1
 Person: => Hri41Flag := MAP(COUNT(PersonEvent.Transaction(Hri41Flag=1)) > 0 => 1, 0);
 Person: => Hri48Flag := MAP(COUNT(PersonEvent.Transaction(Hri48Flag=1)) > 0 => 1, 0);
 Person: => Hri50Flag := MAP(COUNT(PersonEvent.Transaction(Hri50Flag=1)) > 0 => 1, 0);
-Person: => Hri50Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri50Flag=1 AND Age < 30)) > 0 => 1, 0);
+Person: => Hri50Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri50Flag=1 AND EventAge < 30)) > 0 => 1, 0);
 Person: => Hri51Flag := MAP(COUNT(PersonEvent.Transaction(Hri51Flag=1)) > 0 => 1, 0);
 Person: => Hri52Flag := MAP(COUNT(PersonEvent.Transaction(Hri52Flag=1)) > 0 => 1, 0);
 Person: => Hri71Flag := MAP(COUNT(PersonEvent.Transaction(Hri71Flag=1)) > 0 => 1, 0);
@@ -1686,8 +1749,8 @@ Person: => HriPaFlag := MAP(COUNT(PersonEvent.Transaction(HriPaFlag=1)) > 0 => 1
 Person: => HriPoFlag := MAP(COUNT(PersonEvent.Transaction(HriPoFlag=1)) > 0 => 1, 0);
 Person: => HriVaFlag := MAP(COUNT(PersonEvent.Transaction(HriVaFlag=1)) > 0 => 1, 0);
 
-Person: => Nas9Flag := MAP(COUNT(PersonEvent.Transaction(IdNas9Flag=1)) > 0 => 1, 0); // SSN and Last Name not associated with identity per public records
-Person: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
+//Person: => Nas9Flag := MAP(COUNT(PersonEvent.Transaction(IdNas9Flag=1)) > 0 => 1, 0); // SSN and Last Name not associated with identity per public records
+//Person: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
 
 Person: => IpNotUs := MAP(COUNT(PersonEvent.Transaction(IpNotUs=1))>0 => 1, 0); 
 Person: => IpVpn := MAP(COUNT(PersonEvent.Transaction(IpVpn=1))>0 => 1, 0); 
@@ -1776,18 +1839,18 @@ Person: => ContributorSafeFlag := MAP(COUNT(PersonEvent.Transaction(ContributorS
 
 // Velocity
 
-Person: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
-Person: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
-Person: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
-Person: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+Person: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(EventAge<2));
+Person: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(EventAge<8));
+Person: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(EventAge<31));
+Person: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(EventAge<366));
 
 Person: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 Person: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-Person: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-Person: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-Person: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-Person: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+Person: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+Person: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+Person: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+Person: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 Person: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 Person: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -1845,16 +1908,16 @@ SocialSecurityNumber: => KrSsn193Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn193
 
 // Velocity
 
-SocialSecurityNumber: => VlEvent1AllCount := COUNT(SsnEvent.Transaction(Age<2));
-SocialSecurityNumber: => VlEvent7AllCount := COUNT(SsnEvent.Transaction(Age<8));
-SocialSecurityNumber: => VlEvent30AllDayCount := COUNT(SsnEvent.Transaction(Age<31));
-SocialSecurityNumber: => VlEvent365AllDayCount := COUNT(SsnEvent.Transaction(Age<366));
+SocialSecurityNumber: => VlEvent1AllCount := COUNT(SsnEvent.Transaction(EventAge<2));
+SocialSecurityNumber: => VlEvent7AllCount := COUNT(SsnEvent.Transaction(EventAge<8));
+SocialSecurityNumber: => VlEvent30AllDayCount := COUNT(SsnEvent.Transaction(EventAge<31));
+SocialSecurityNumber: => VlEvent365AllDayCount := COUNT(SsnEvent.Transaction(EventAge<366));
 SocialSecurityNumber: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 SocialSecurityNumber: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
-SocialSecurityNumber: => VlEvent1Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-SocialSecurityNumber: => VlEvent7Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-SocialSecurityNumber: => VlEvent30Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-SocialSecurityNumber: => VlEvent365Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+SocialSecurityNumber: => VlEvent1Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+SocialSecurityNumber: => VlEvent7Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+SocialSecurityNumber: => VlEvent30Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+SocialSecurityNumber: => VlEvent365Count := COUNT(SsnEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 SocialSecurityNumber: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 SocialSecurityNumber: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -1906,18 +1969,18 @@ Phone: => KrPhn493Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn493Flag=1))>0 =>
 
 // Velocity
 
-Phone: => VlEvent1AllCount := COUNT(PhoneEvent.Transaction(Age<2));
-Phone: => VlEvent7AllCount := COUNT(PhoneEvent.Transaction(Age<8));
-Phone: => VlEvent30AllDayCount := COUNT(PhoneEvent.Transaction(Age<31));
-Phone: => VlEvent365AllDayCount := COUNT(PhoneEvent.Transaction(Age<366));
+Phone: => VlEvent1AllCount := COUNT(PhoneEvent.Transaction(EventAge<2));
+Phone: => VlEvent7AllCount := COUNT(PhoneEvent.Transaction(EventAge<8));
+Phone: => VlEvent30AllDayCount := COUNT(PhoneEvent.Transaction(EventAge<31));
+Phone: => VlEvent365AllDayCount := COUNT(PhoneEvent.Transaction(EventAge<366));
 
 Phone: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 Phone: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-Phone: => VlEvent1Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-Phone: => VlEvent7Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-Phone: => VlEvent30Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-Phone: => VlEvent365Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+Phone: => VlEvent1Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+Phone: => VlEvent7Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+Phone: => VlEvent30Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+Phone: => VlEvent365Count := COUNT(PhoneEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 Phone: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 Phone: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -1963,18 +2026,18 @@ Email: => KrEml593Flag := MAP(COUNT(EmailEvent.Transaction(KrEml593Flag=1))>0 =>
 
 // Velocity
 
-Email: => VlEvent1AllCount := COUNT(EmailEvent.Transaction(Age<2));
-Email: => VlEvent7AllCount := COUNT(EmailEvent.Transaction(Age<8));
-Email: => VlEvent30AllDayCount := COUNT(EmailEvent.Transaction(Age<31));
-Email: => VlEvent365AllDayCount := COUNT(EmailEvent.Transaction(Age<366));
+Email: => VlEvent1AllCount := COUNT(EmailEvent.Transaction(EventAge<2));
+Email: => VlEvent7AllCount := COUNT(EmailEvent.Transaction(EventAge<8));
+Email: => VlEvent30AllDayCount := COUNT(EmailEvent.Transaction(EventAge<31));
+Email: => VlEvent365AllDayCount := COUNT(EmailEvent.Transaction(EventAge<366));
 
 Email: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 Email: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-Email: => VlEvent1Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-Email: => VlEvent7Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-Email: => VlEvent30Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-Email: => VlEvent365Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+Email: => VlEvent1Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+Email: => VlEvent7Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+Email: => VlEvent30Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+Email: => VlEvent365Count := COUNT(EmailEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 Email: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 Email: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -2027,18 +2090,18 @@ BankAccount: => KrBnk892Flag := MAP(COUNT(BankAccountEvent.Transaction(KrBnk892F
 BankAccount: => KrBnk893Flag := MAP(COUNT(BankAccountEvent.Transaction(KrBnk893Flag=1))>0 => 1, 0);
 
 // Velocity
-BankAccount: => VlEvent1AllCount := COUNT(BankAccountEvent.Transaction(Age<2));
-BankAccount: => VlEvent7AllCount := COUNT(BankAccountEvent.Transaction(Age<8));
-BankAccount: => VlEvent30AllDayCount := COUNT(BankAccountEvent.Transaction(Age<31));
-BankAccount: => VlEvent365AllDayCount := COUNT(BankAccountEvent.Transaction(Age<366));
+BankAccount: => VlEvent1AllCount := COUNT(BankAccountEvent.Transaction(EventAge<2));
+BankAccount: => VlEvent7AllCount := COUNT(BankAccountEvent.Transaction(EventAge<8));
+BankAccount: => VlEvent30AllDayCount := COUNT(BankAccountEvent.Transaction(EventAge<31));
+BankAccount: => VlEvent365AllDayCount := COUNT(BankAccountEvent.Transaction(EventAge<366));
 
 BankAccount: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 BankAccount: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-BankAccount: => VlEvent1Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-BankAccount: => VlEvent7Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-BankAccount: => VlEvent30Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-BankAccount: => VlEvent365Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+BankAccount: => VlEvent1Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+BankAccount: => VlEvent7Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+BankAccount: => VlEvent30Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+BankAccount: => VlEvent365Count := COUNT(BankAccountEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 BankAccount: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 BankAccount: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -2092,18 +2155,18 @@ DriversLicense: => KrDl293Flag := MAP(COUNT(DriversLicenseEvent.Transaction(KrDl
 
 
 // Velocity
-DriversLicense: => VlEvent1AllCount := COUNT(DriversLicenseEvent.Transaction(Age<2));
-DriversLicense: => VlEvent7AllCount := COUNT(DriversLicenseEvent.Transaction(Age<8));
-DriversLicense: => VlEvent30AllDayCount := COUNT(DriversLicenseEvent.Transaction(Age<31));
-DriversLicense: => VlEvent365AllDayCount := COUNT(DriversLicenseEvent.Transaction(Age<366));
+DriversLicense: => VlEvent1AllCount := COUNT(DriversLicenseEvent.Transaction(EventAge<2));
+DriversLicense: => VlEvent7AllCount := COUNT(DriversLicenseEvent.Transaction(EventAge<8));
+DriversLicense: => VlEvent30AllDayCount := COUNT(DriversLicenseEvent.Transaction(EventAge<31));
+DriversLicense: => VlEvent365AllDayCount := COUNT(DriversLicenseEvent.Transaction(EventAge<366));
 
 DriversLicense: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 DriversLicense: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-DriversLicense: => VlEvent1Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-DriversLicense: => VlEvent7Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-DriversLicense: => VlEvent30Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-DriversLicense: => VlEvent365Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+DriversLicense: => VlEvent1Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+DriversLicense: => VlEvent7Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+DriversLicense: => VlEvent30Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+DriversLicense: => VlEvent365Count := COUNT(DriversLicenseEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 DriversLicense: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 DriversLicense: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -2165,18 +2228,18 @@ InternetProtocol: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownR
 
 // Velocity
 
-InternetProtocol: => VlEvent1AllCount := COUNT(InternetProtocolEvent.Transaction(Age<2));
-InternetProtocol: => VlEvent7AllCount := COUNT(InternetProtocolEvent.Transaction(Age<8));
-InternetProtocol: => VlEvent30AllDayCount := COUNT(InternetProtocolEvent.Transaction(Age<31));
-InternetProtocol: => VlEvent365AllDayCount := COUNT(InternetProtocolEvent.Transaction(Age<366));
+InternetProtocol: => VlEvent1AllCount := COUNT(InternetProtocolEvent.Transaction(EventAge<2));
+InternetProtocol: => VlEvent7AllCount := COUNT(InternetProtocolEvent.Transaction(EventAge<8));
+InternetProtocol: => VlEvent30AllDayCount := COUNT(InternetProtocolEvent.Transaction(EventAge<31));
+InternetProtocol: => VlEvent365AllDayCount := COUNT(InternetProtocolEvent.Transaction(EventAge<366));
 
 InternetProtocol: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 InternetProtocol: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-InternetProtocol: => VlEvent1Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-InternetProtocol: => VlEvent7Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-InternetProtocol: => VlEvent30Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-InternetProtocol: => VlEvent365Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+InternetProtocol: => VlEvent1Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+InternetProtocol: => VlEvent7Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+InternetProtocol: => VlEvent30Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+InternetProtocol: => VlEvent365Count := COUNT(InternetProtocolEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 InternetProtocol: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 InternetProtocol: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -2246,18 +2309,18 @@ Address: => HriVaFlag := MAP(COUNT(AddressEvent.Transaction(HriVaFlag=1)) > 0 =>
 
 // Velocity
 
-Address: => VlEvent1AllCount := COUNT(AddressEvent.Transaction(Age<2));
-Address: => VlEvent7AllCount := COUNT(AddressEvent.Transaction(Age<8));
-Address: => VlEvent30AllDayCount := COUNT(AddressEvent.Transaction(Age<31));
-Address: => VlEvent365AllDayCount := COUNT(AddressEvent.Transaction(Age<366));
+Address: => VlEvent1AllCount := COUNT(AddressEvent.Transaction(EventAge<2));
+Address: => VlEvent7AllCount := COUNT(AddressEvent.Transaction(EventAge<8));
+Address: => VlEvent30AllDayCount := COUNT(AddressEvent.Transaction(EventAge<31));
+Address: => VlEvent365AllDayCount := COUNT(AddressEvent.Transaction(EventAge<366));
 
 Address: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
 Address: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
 
-Address: => VlEvent1Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
-Address: => VlEvent7Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
-Address: => VlEvent30Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
-Address: => VlEvent365Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+Address: => VlEvent1Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND EventAge<2));
+Address: => VlEvent7Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND EventAge<8));
+Address: => VlEvent30Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND EventAge<31));
+Address: => VlEvent365Count := COUNT(AddressEvent.Transaction(InCustomerPopulation = 1 AND EventAge<366));
 
 Address: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
 Address: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
@@ -2382,8 +2445,6 @@ QUERY: showCustomerPersonEntities <= Person
 															
 															
                               DeathPriorToAllEvents,
-                              Nas9Flag,
-                              Nap3Flag,
 															DtFirstSeen,
 															DtLastSeen,
                               

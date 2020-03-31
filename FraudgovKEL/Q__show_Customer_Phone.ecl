@@ -4,6 +4,6 @@ IMPORT B_Phone,E_Customer,E_Phone FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Phone := MODULE
   SHARED TYPEOF(B_Phone.__ENH_Phone) __ENH_Phone := B_Phone.__ENH_Phone;
-  SHARED __EE1215195 := __ENH_Phone;
-  EXPORT Res0 := __UNWRAP(__EE1215195);
+  SHARED __EE1234600 := __ENH_Phone;
+  EXPORT Res0 := __UNWRAP(__EE1234600);
 END;
