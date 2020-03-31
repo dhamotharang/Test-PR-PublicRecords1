@@ -22,7 +22,7 @@
  *
 */
 EXPORT MAC_SuppressSource (ds_in, mod_access, did_field = 'did', gsid_field = 'global_sid', use_distributed = FALSE, data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
-
+/*
   LOCAL key_optout := suppress.key_OptOutSrc(data_env);
   #IF(use_distributed)
   LOCAL suppressed_recs := JOIN(DISTRIBUTE(ds_in, HASH(did_field)), DISTRIBUTE(PULL(key_optout), HASH(lexid)), 
@@ -45,5 +45,5 @@ EXPORT MAC_SuppressSource (ds_in, mod_access, did_field = 'did', gsid_field = 'g
   #END
 
   RETURN IF (mod_access.lexid_source_optout > 0, suppressed_recs, ds_in);
-
+*/ RETURN ds_in;
 ENDMACRO;

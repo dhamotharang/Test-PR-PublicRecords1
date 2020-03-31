@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
-IMPORT KELOtto;
+IMPORT FraudgovKEL;
 IMPORT E_Customer FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT E_Drivers_License := MODULE
@@ -21,7 +21,7 @@ EXPORT E_Drivers_License := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := KELOtto.fraudgovshared((UNSIGNED)did <> 0 AND TRIM(drivers_license) != '');
+  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)did <> 0 AND TRIM(drivers_license) != '');
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoDriversLicenseId)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
@@ -40,11 +40,11 @@ EXPORT E_Drivers_License := MODULE
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),drivers_license(License_Number_:\'\'),drivers_license_state(State_:\'\'),ottodriverslicenseid(Otto_Drivers_License_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Out := RECORD
-    RECORDOF(KELOtto.fraudgovshared);
+    RECORDOF(FraudgovKEL.fraudgovshared);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoDriversLicenseId) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT KELOtto_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT FraudgovKEL_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
@@ -92,15 +92,15 @@ EXPORT E_Drivers_License := MODULE
   EXPORT Otto_Drivers_License_Id__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Otto_Drivers_License_Id_);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT _r_Source_Customer__Orphan := JOIN(InData(__NN(_r_Source_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Source_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(KELOtto_fraudgovshared_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(License_Number__SingleValue_Invalid),COUNT(State__SingleValue_Invalid),COUNT(Otto_Drivers_License_Id__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int KELOtto_fraudgovshared_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int License_Number__SingleValue_Invalid,KEL.typ.int State__SingleValue_Invalid,KEL.typ.int Otto_Drivers_License_Id__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(FraudgovKEL_fraudgovshared_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(License_Number__SingleValue_Invalid),COUNT(State__SingleValue_Invalid),COUNT(Otto_Drivers_License_Id__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int FraudgovKEL_fraudgovshared_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int License_Number__SingleValue_Invalid,KEL.typ.int State__SingleValue_Invalid,KEL.typ.int Otto_Drivers_License_Id__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'DriversLicense','KELOtto.fraudgovshared','UID',COUNT(KELOtto_fraudgovshared_Invalid),COUNT(__d0)},
-    {'DriversLicense','KELOtto.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
-    {'DriversLicense','KELOtto.fraudgovshared','SourceCustomerFileInfo',COUNT(__d0(__NL(_r_Source_Customer_))),COUNT(__d0(__NN(_r_Source_Customer_)))},
-    {'DriversLicense','KELOtto.fraudgovshared','drivers_license',COUNT(__d0(__NL(License_Number_))),COUNT(__d0(__NN(License_Number_)))},
-    {'DriversLicense','KELOtto.fraudgovshared','drivers_license_state',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
-    {'DriversLicense','KELOtto.fraudgovshared','OttoDriversLicenseId',COUNT(__d0(__NL(Otto_Drivers_License_Id_))),COUNT(__d0(__NN(Otto_Drivers_License_Id_)))},
-    {'DriversLicense','KELOtto.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'DriversLicense','KELOtto.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'DriversLicense','FraudgovKEL.fraudgovshared','UID',COUNT(FraudgovKEL_fraudgovshared_Invalid),COUNT(__d0)},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','SourceCustomerFileInfo',COUNT(__d0(__NL(_r_Source_Customer_))),COUNT(__d0(__NN(_r_Source_Customer_)))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','drivers_license',COUNT(__d0(__NL(License_Number_))),COUNT(__d0(__NN(License_Number_)))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','drivers_license_state',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','OttoDriversLicenseId',COUNT(__d0(__NL(Otto_Drivers_License_Id_))),COUNT(__d0(__NN(Otto_Drivers_License_Id_)))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'DriversLicense','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
