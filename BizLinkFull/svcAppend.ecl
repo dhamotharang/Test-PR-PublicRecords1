@@ -75,6 +75,7 @@
 		,weightThreshold := weight_threshold
 		,disableSaltForce := disable_salt_force
 		,segmentation := do_segmentation
+		,reAppend := re_append
 	);
 
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);

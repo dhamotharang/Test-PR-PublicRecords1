@@ -121,7 +121,7 @@ dout_all :=  Sequential(output( dout ,,'~thor::wdog::wuinfo::'+var2+'::'+workuni
 									     STD.File.AddSuperfile('~thor::wdog::wuinfo::'+var2  , '~thor::wdog::wuinfo::'+var2+'::'+workunit[2..9]),
 											 STD.File.FinishSuperFileTransaction()
 									);
-send_bad_email := STD.System.Email.SendEmail('michael.gould@lexisnexisrisk.com,sudhir.kasavajjala@lexisnexis.com','Watchdog '+ var1 + ' Build Failed',workunit);
+send_bad_email := STD.System.Email.SendEmail('sudhir.kasavajjala@lexisnexis.com','Watchdog '+ var1 + ' Build Failed',workunit);
   	
  result:= sequential(if(build_type ='fcra_best_append', 
                      map(var1 = 'fcra_best_append' => Sequential(
