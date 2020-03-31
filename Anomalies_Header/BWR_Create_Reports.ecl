@@ -11,7 +11,7 @@ Import Anomalies_Header.Create_Reports;
 
 //Output(Files.Header, Named('Header_Raw_File')); 
 //Output(Files.Watchdog, Named('Watchdog_Raw_File'));
-//Output($.Watchdog_Match_Report.Watchdog_Match, Named('Matches_Header_NotRolled'));
+//Output(Watchdog_Match_Report.Watchdog_Match, Named('Matches_Header_NotRolled'));
 //Output(Watchdog_Match_Report.ds_rollflagged_rec, Named('Matches_Header_Watchdog'));
 //Output(Watchdog_Match_Report.st_counted_fname, Named('Counted_Fname_Matches'));
 //Output(Watchdog_Match_Report.st_counted_lname, Named('Counted_Lname_Matches'));
@@ -36,19 +36,27 @@ Import Anomalies_Header.Create_Reports;
 
 // =============================== Counts Report ====================================
 
-// Output(Header_Counts.Sorted_c_fname,   Named('Firstnames_Accross_File')); // Most common fnames across all records 
-// Output(Header_Counts.S_Crosstab_fname, Named('Firstnames_Accross_Lexids')); // Most common fnames across different Lexids 
-// Output(Header_Counts.Sorted_c_lanme,   Named('Lastnames_Accross_File')); // Most common lnames across all records
-// Output(Header_Counts.S_Crosstab_lname, Named('Lastnames_Accross_Lexids')); // Most common lnames across different Lexids
-// Output(Header_Counts.Sorted_c_ssn,     Named('SSN_Accross_File')); // Most common ssn accross all records (non-blank)
-// Output(Header_Counts.S_Crosstab_ssn,   Named('SSN_Accross_Lexid')); // Most common ssn accross different lexids (nin-blank)
-//Output(Header_Counts.st_address_Rec,   Named('Count_Address_PerLExid')); // Most common address across different lexids 
-// Output(Header_Counts.st_Crosstab_Dob, Named('Common_Dob_AccrossFile')); // Most common dob across all records
-// Output(Header_Counts.dst_crosstab_DobLexid, Named('Dobs_Without_Blanks')); // Most common dob across different lexids (non-blanks)
-//Output(Header_Counts.S_Crosstab_dobMMDD, Named('Dobs_Without_No_blanksMMDD')); // Most common dob with only month and day
-//Output(Header_Counts.S_Sample_RecSlim, Named('Count_of_BlankDobs_PerSource')); // Count of blank dob across file
-// Output(Header_Counts.S_Sample_RecSlim1, Named('Count_BlankDobs_With_MMDD1')); // Count of dob with blank day and month across file
-// Output(Header_Counts.RecSlim_x, Named('Counted_Blank_DD'));
+// Create_Reports.fname_across_file;
+// Create_Reports.lname_across_file;
+// Create_Reports.fname_across_lexids;
+// Create_Reports.lname_across_lexids;
+// Create_Reports.ssn_across_file;
+// Create_Reports.lexids_per_ssn;
+//Create_Reports.address_across_lexids;
+// Create_Reports.dobs_across_file;
 
-// Testing 
-Create_Reports.full_count_reports;
+
+
+
+// Create_Reports.nonblank_dobs;
+// Create_Reports.dobs_mmdd_only;
+// Create_Reports.blank_dobs_persource;
+// Create_Reports.blank_dobs_mmdd;
+// Create_Reports.blank_dobs_dd;
+// Create_Reports.normal_distribution;
+
+
+
+//Create_Reports.lexids_per_ssn;
+
+Create_Reports.lexids_per_dob;

@@ -37,8 +37,6 @@ header := Dedup(sdt, did, fname, lname,
 
 
 Export Header_Counts := Module 
-
-
 // 1. NAMES
 // A. Most common names accross all records
 
@@ -48,7 +46,7 @@ t_fname := Record
     Integer RecordCnt := Count(Group);
 End;
 c_fname := Table(header, t_fname, fname);
-Export sorted_c_fname := Sort(c_fname, -RecordCnt);
+Export fnames_across_file := Sort(c_fname, -RecordCnt);
 
 
 // Most common last names
@@ -57,7 +55,7 @@ t_lname := Record
     Integer RecordCnt := Count(Group);
 End;
 c_lname := Table(header, t_lname, lname);
-Export Sorted_c_lanme := Sort(c_lname, -RecordCnt);
+Export lanmes_across_file := Sort(c_lname, -RecordCnt);
 
 
 // B. Most common names across diffeent lexids 
@@ -78,7 +76,7 @@ crosstab_fname := Record
 End;
 
 out_crosstab_fname := Table(dsdc_fname2, crosstab_fname, fname);
-Export s_crosstab_fname := Sort(out_crosstab_fname, -RecordCnt);
+Export fnames_across_lexid := Sort(out_crosstab_fname, -RecordCnt);
 
 
 // Most common last names accross lexids
@@ -98,7 +96,7 @@ crosstab_lname := Record
 End;
 
 out_crosstab_lname := Table(dsdc_lname2, crosstab_lname, lname);
-Export s_crosstab_lname := Sort(out_crosstab_lname, -RecordCnt);
+Export lnames_across_lexid := Sort(out_crosstab_lname, -RecordCnt);
 
 
 // 2. SSN
@@ -111,7 +109,7 @@ t_ssn := Record
     integer recordcnt := Count(Group);
 End;
 c_ssn := Table(Filteredssn, t_ssn, ssn);
-Export sorted_c_ssn := Sort(c_ssn, -RecordCnt);
+Export ssn_across_file := Sort(c_ssn, -RecordCnt);
 
 
 // SSN with top count of Different lexids (no blank SSN nor blank lexids)
@@ -133,23 +131,19 @@ Shared lexidperssn := Record
  integer did;
 End;
 
-Shared parentRecord := Project(dsdc_ssn2, lexidperssn);
+Shared parentRecordssn := Project(dsdc_ssn2, lexidperssn);
 
-t1 := Table(parentRecord, {ssn, did}, ssn, did);
+t1_ssn := Table(parentRecordssn, {ssn, did}, ssn, did);
 
-t2 := Table(t1, {ssn, lexidcnt := count(group)}, ssn);
+t2_ssn := Table(t1_ssn, {ssn, lexidcnt := count(group)}, ssn);
 
-Export t3 := Sort(t2, -lexidcnt);
-
-// denormed to show multiple lexid per ssn
+Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt);
 
 
 // 3. Address
 //    A. Addresses with the highest count of (Different) LexIds 
 
 // Get the multiples of addresses per lexids
-
-
 Rec_Address := Record
     header.did;
     header.prim_range;
@@ -164,53 +158,83 @@ addressRec := Table(header, Rec_Address, did, prim_range, prim_name, unit_desig,
                                sec_range, st, zip);
 sdc_addressRec := Sort(addressRec, did, prim_range, prim_name, unit_desig, 
                                sec_range, st, zip , Local);                                        
-Export dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, unit_desig, 
+Shared dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, unit_desig, 
                                sec_range, st, zip , Local);
 
-c_rec_address := Record
-    dsdc_addressRec.prim_range;
-    dsdc_addressRec.prim_name;
-    dsdc_addressRec.unit_desig;
-    dsdc_addressRec.sec_range;
-    dsdc_addressRec.st;
-    dsdc_addressRec.zip;
-    RecordCnt := Count(Group);
+Shared lexidperaddress := Record
+  string  prim_range;
+  string  unit_desig;
+  string  sec_range;
+  string  st;
+  string  zip;
+  integer did;
 End;
 
-c_addressRec := Table(dsdc_addressrec, c_rec_address, prim_range, 
-                                       prim_name, unit_desig, sec_range, 
-                                       st, zip);
-Export st_address_rec := Sort(c_addressrec, -RecordCnt);
+Shared parentRecordAddress := Project(dsdc_addressRec, lexidperaddress);
+
+t1_address := Table(parentRecordAddress, {prim_range, unit_desig, sec_range, st, zip, did},
+                                         prim_range, unit_desig, sec_range, st, zip, did);
+
+t2_address := Table(t1_address, {prim_range, unit_desig, sec_range, st, zip, lexidcnt := count(group)}, 
+                                prim_range, unit_desig, sec_range, st, zip);
+
+Export lexids_per_address := Sort(t2_address, -lexidcnt);
+
+
 
 
 // ========================================== Second Part of Report ======================================================
 
 // Date of Birth
 //  A. Most common DOB accross all records
-
 Sequencedob := Record
     header.dob;
     recordcnt := Count(Group);
 End;
 
 t_Crosstab_Dob := Table(header, Sequencedob, dob);
-Export st_crosstab_Dob := Sort(t_crosstab_Dob, -RecordCnt);
+Export dob_across_file := Sort(t_crosstab_Dob, -RecordCnt);
 
 
 // B. Full Dob with the highest counts of (different Lexids) ( no 00/Blank)
+LoseTrailingZeroes(Unsigned4 indob) := Function
+  String8 dob := (String8)indob;
+  String4 YY  := dob[1..4];
+  String2 DD  := if(dob[7..8]= '00','',dob[7..8]);
+  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
+  Return (Unsigned8)(MM + DD + YY );
+End;
 
 filteredDob := header( NOT dob = 0);
+
+// Filter to capture full dobs only
 
 sequenceDobLexid := Record
     filteredDob.did;
     filteredDob.dob;
-    RecordCnt := Count(Group);
 End;
 
-t_crosstab_DobLexid := Table(filteredDob, sequenceDobLexid, did, dob);
-st_crosstab_DobLexid := Sort(t_crosstab_DobLexid, did, dob);
-Export dst_crosstab_DobLexid := Dedup(st_crosstab_DobLexid, did, dob);
+sequenceDobLexid SlimRecdob( filteredDob Le ) := TRANSFORM
+  Self.dob := LoseTrailingZeroes(Le.dob);
+  Self := Le;
+END;
 
+t_crosstab_DobLexid := Project(filteredDob, slimrecDob(Left));
+st_crosstab_DobLexid := Sort(t_crosstab_DobLexid, did, dob);
+Shared dst_crosstab_DobLexid := Dedup(st_crosstab_DobLexid, did, dob);
+
+Shared lexiddob := Record
+  integer dob;
+  integer did;
+End;
+
+Shared parentRecordsDob := Project(dst_crosstab_DobLexid, lexiddob);
+
+t1_dob := Table(parentRecordsDob, {dob, did}, dob, did);
+
+t2_dob := Table(t1_dob, {dob, lexidcnt := Count(Group)}, dob);
+
+Export lexids_per_dob := Sort(t2_dob, -lexidcnt);
 
 // C. Partial Dob (MMDD : month and day) with the highest count of (different lexids) (no 00 / blank)
 // still shows zeroes 
@@ -223,7 +247,9 @@ LoseTrailingZeroesMD(Unsigned4 indob) := Function
   Return (Unsigned8)(MM + DD + YY );
 End;
 
-FilteredDobs := header( Not dob = 0);
+filteredDobs := header( Not dob = 0);
+
+// filter to capture partial dobs only
 
 Rec := Record
     Filtereddobs.did;
@@ -237,7 +263,7 @@ Rec SlimRec1( Filtereddobs Le ) := Transform
     Self := Le;
 End;
 
-Export RecSlimMMDD := Project(FilteredDobs, SlimRec1(Left));
+RecSlimMMDD := Project(FilteredDobs, SlimRec1(Left));
 
 NonblankDobMMDD := Record
     RecSlimMMDD.dob;
@@ -249,17 +275,20 @@ sdc_dobMMDD := Sort(dc_dobMMDD, dob, Local);
 Export dsdc_dobMMDD := Dedup(sdc_dobMMDD, dob, Local);
 
 crosstab_dobMMDD := Record
-  RecSlimMMDD.dob;
+  dsdc_dobMMDD.dob;
   RecordCnt := Count(Group);
 End;
 
-Out_Crosstab_dobMMDD := Table(RecSlimMMDD, crosstab_dobMMDD, dob);
+Out_Crosstab_dobMMDD := Table(dsdc_dobMMDD, crosstab_dobMMDD, dob);
 Export S_Crosstab_MMDD := Sort(Out_Crosstab_dobMMDD, -RecordCnt);
 
 
 
-// dob is integer4
-// MMDDYYYY Dobs without trailing zeroes
+
+
+// D. Sources with the highest count of blank and partially blank DOB  
+
+// Count of blank YYYYMMDD 
 LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
@@ -294,37 +323,15 @@ sdc_dob := Sort(dc_dob, dob, Local);
 Shared dsdc_dob := Dedup(sdc_dob, dob, Local);
 
 crosstab_dob := Record
-  RecSlim.dob;
+  dsdc_dob.dob;
   RecordCnt := Count(Group);
 End;
 
 Out_Crosstab_dob := Table(RecSlim, crosstab_dob, dob);
 Export s_crosstab_blankdob := Sort(Out_Crosstab_dob, -RecordCnt);
 
+// Count of blank MMDD (non-blank YYYY) 
 
-
-// D. Sources with the highest count of blank and partially blank dob
-
-// Count of blank yyyymmdd
-BlankDobsOnly := header( Not dob =  0 );
-
-Rec_BlankYYYYMMDD := Record
-    BlankDobsOnly.src;
-    RecordCnt := Count(Group);
-End;
-
-Sample_RecSlim := Table(BlankDobsOnly, Rec_BlankYYYYMMDD, src);
-Export S_Sample_RecSlim := Sort(Sample_Recslim, -RecordCnt);
-
-// Count blank DD ( non-blank YYYYMM )
-Rec_BlankMMDD := Record
-    RecSlimMMDD.dob;
-    RecSlimMMDD.src;
-    RecordCnt := Count(Group);
-End;
-
-Sample_RecSLim1 := Table(RecSlimMMDD, Rec_BlankMMDD, dob, src);
-Export S_Sample_RecSlim1 := Sort(Sample_RecSlim1, -RecordCnt);
 
 
 
