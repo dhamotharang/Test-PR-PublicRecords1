@@ -28,8 +28,7 @@ Export normal_distribution  := Output(Header_Counts.normal_distribution, Named('
 // Full Counts Reports
 Export full_count_reports := Sequential(Parallel(fname_across_file, lname_across_file, fname_across_lexids,
                                     lname_across_lexids, ssn_across_file, lexids_per_ssn, lexids_per_address,
-                                    dob_across_file, lexids_per_dob, dobs_mmdd_only, 
-                                    blank_dobs_persource, blank_dobs_dd, normal_distribution ));
+                                    dob_across_file ));
 // ======================================== Percentage Reports ============================================
 
 // Partial Percentages Reports 

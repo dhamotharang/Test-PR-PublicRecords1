@@ -88,7 +88,7 @@ fnameTrue :=  st_counted_fname( fname_match = 'T');
 
 fnameLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_fname_cnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -99,7 +99,7 @@ fnamePercentage := Join(
     Transform(
         fnameLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_fname_cnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )
@@ -112,7 +112,7 @@ lnameTrue := st_counted_lname( lname_match = 'T' );
 
 lnameLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_lname_cnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -123,7 +123,7 @@ lnamePercentage := Join(
     Transform(
         lnameLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_lname_cnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )
@@ -136,7 +136,7 @@ dobTrue := st_counted_dob( dob_match = 'T' );
 
 dobLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_dob_cnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -147,7 +147,7 @@ dobPercentage := Join(
     Transform(
         dobLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_dob_cnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )
@@ -159,7 +159,7 @@ ssnTrue := st_counted_ssn( ssn_match = 'T' );
 
 ssnLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_ssn_cnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -170,7 +170,7 @@ ssnPercentage := Join(
     Transform(
         ssnLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_ssn_cnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )
@@ -182,7 +182,7 @@ addressTrue := st_counted_address_match( address_match = 'T' );
 
 addressLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_address_cnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -193,7 +193,7 @@ addressPercentage := Join(
     Transform(
         addressLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_address_cnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )
@@ -205,7 +205,7 @@ addressAllTrue := st_counted_collectivematch_all( address_match_all = 'T' );
 
 addressAllLayout := Record
     String2    source_name;
-    Integer    recordcnt;
+    Integer    unique_address_allcnt;
     Integer    totalcount;
     Decimal5_2 percentage;
 End;
@@ -216,7 +216,7 @@ addressAllPercentage := Join(
     Transform(
         addressAllLayout,
         Self.source_name := Left.source_name;
-        Self.recordcnt   := Left.recordcnt;
+        Self.unique_address_allcnt := Left.recordcnt;
         Self.totalcount  := Right.totalcount_persource;
         Self.percentage  := (Decimal5_2)( Left.recordcnt / Right.totalcount_persource * 100);
     )

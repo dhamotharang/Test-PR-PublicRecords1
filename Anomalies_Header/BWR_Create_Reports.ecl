@@ -59,4 +59,6 @@ Import Anomalies_Header.Create_Reports;
 
 //Create_Reports.lexids_per_ssn;
 
-Create_Reports.lexids_per_dob;
+//Create_Reports.full_count_reports;
+
+Create_Reports.full_percentage_reports;

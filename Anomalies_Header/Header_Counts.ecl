@@ -207,8 +207,6 @@ End;
 
 filteredDob := header( NOT dob = 0);
 
-// Filter to capture full dobs only
-
 sequenceDobLexid := Record
     filteredDob.did;
     filteredDob.dob;
@@ -220,8 +218,14 @@ sequenceDobLexid SlimRecdob( filteredDob Le ) := TRANSFORM
 END;
 
 t_crosstab_DobLexid := Project(filteredDob, slimrecDob(Left));
+
+// Filter to only output full dobs without blanks 
+
+
 st_crosstab_DobLexid := Sort(t_crosstab_DobLexid, did, dob);
 Shared dst_crosstab_DobLexid := Dedup(st_crosstab_DobLexid, did, dob);
+
+// Filter to capture full dobs only
 
 Shared lexiddob := Record
   integer dob;
