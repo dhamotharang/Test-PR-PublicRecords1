@@ -13,7 +13,7 @@ EXPORT Aggregate_Report(boolean pUseProd, string gcid, string pHistMode, dataset
     return d;
 	endmacro;
 	
-	export startFile					:= sort(dataset('~ushc::crk::slim_history::' + gcid + '::qa', UPI_DataBuild.Layouts_V2.slim_report, thor), source_rid, batch_jobID);
+	export startFile				:= sort(dataset('~ushc::crk::slim_history::' + gcid + '::qa', UPI_DataBuild.Layouts_V2.slim_history, thor), source_rid, batch_jobID);
 
   export pBatch_jobID_set	:= set(pBatch_jobID_list,batch_jobID);
 	

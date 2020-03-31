@@ -11,7 +11,7 @@ end;
 
 //Added Base File to DID to refresh dids
 //DF-26929 Adding the MA Census base to re-DID
-baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Header : persist('~thor_data400::persist::voters::BaseFile',SINGLE) ;
+baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base : persist('~thor_data400::persist::voters::BaseFile',SINGLE) ;
 
 Layout_outfile := VotersV2.Layouts_Voters.Layout_Voters_Common_new;
 
