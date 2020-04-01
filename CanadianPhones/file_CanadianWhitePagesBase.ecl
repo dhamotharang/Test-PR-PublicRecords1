@@ -26,8 +26,18 @@ ax_infiles := PROJECT(
 																SELF            := LEFT
 											         )
 										 );
+										 
+//Infutor files - replace Axiom files so axiom files are now only historical records
+inf_infiles := PROJECT(CanadianPhones.file_InfutorWP().Base, 
+												TRANSFORM(CanadianPhones.layoutCanadianWhitepagesBase,
+																	SELF.record_id	:= (string)LEFT.record_id;
+																	SELF.global_sid := 0;
+																	SELF.record_sid := 0;
+																	SELF						:= LEFT;
+																	)
+												);
+												
 //ax_infiles (axciom files) are ff replace but we are keeping history which causes several dupes											
-
 dd_ax := dedup(ax_infiles,phonenumber
 					,stringlib.stringtouppercase(lastname)
 					,stringlib.stringtouppercase(firstname)
@@ -47,11 +57,25 @@ dd_infiles:= dedup(sort(distribute(iu_infiles+dd_ax,hash(phonenumber))
 					,stringlib.stringtouppercase(lastname)
 					,stringlib.stringtouppercase(firstname)
 					,stringlib.stringfilter(stringlib.stringtouppercase(company_name),'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
-					,left,local);	
+					,left,local);
+					
+//Ingest should take care of duplicates, but adding sort/distribute to match IU and AX files of keeping only one phone, name, vendor record
+dd_Infutor	:= DEDUP(SORT(DISTRIBUTE(inf_infiles,HASH(phonenumber))
+													,phonenumber
+													,lastname
+													,firstname
+													,stringlib.stringfilter(company_name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
+													,vendor
+													,LOCAL)
+										,phonenumber
+										,lastname
+										,firstname
+										,stringlib.stringfilter(company_name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
+										,LEFT,LOCAL);
 					
 //The infousa and axciom files are combined and deduped on phone, name, and vendor.  Keeping first so that when there is the existence of matching axciom and infousa records the axciom record is kept.
-//due to contractual agreement:  infoUSA records must make up less than 50% of the file.
-cmbnd_files := dd_infiles + ax_infiles;
+//due to contractual agreement:  infoUSA records must make up less than 50% of the file. - NOTE Infutor will take precedence as it has replaced Axiom
+cmbnd_files := dd_infiles + ax_infiles + dd_Infutor;
 
 //Add Global_SID
 addGlobalSID:= MDR.macGetGlobalSID(cmbnd_files,'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
