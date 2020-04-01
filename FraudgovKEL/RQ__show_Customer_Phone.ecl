@@ -3,6 +3,6 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Phone,E_Customer,E_Phone FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer_Phone := MODULE
-  SHARED __EE1380885 := B_Phone.IDX_Phone_UID_Wrapped;
-  EXPORT Res0 := __UNWRAP(__EE1380885);
+  SHARED __EE1363808 := B_Phone.IDX_Phone_UID_Wrapped;
+  EXPORT Res0 := __UNWRAP(__EE1363808);
 END;

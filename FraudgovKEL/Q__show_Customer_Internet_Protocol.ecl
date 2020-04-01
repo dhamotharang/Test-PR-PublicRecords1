@@ -4,6 +4,6 @@ IMPORT B_Internet_Protocol,E_Customer,E_Internet_Protocol FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Internet_Protocol := MODULE
   SHARED TYPEOF(B_Internet_Protocol.__ENH_Internet_Protocol) __ENH_Internet_Protocol := B_Internet_Protocol.__ENH_Internet_Protocol;
-  SHARED __EE1234595 := __ENH_Internet_Protocol;
-  EXPORT Res0 := __UNWRAP(__EE1234595);
+  SHARED __EE1217510 := __ENH_Internet_Protocol;
+  EXPORT Res0 := __UNWRAP(__EE1217510);
 END;
