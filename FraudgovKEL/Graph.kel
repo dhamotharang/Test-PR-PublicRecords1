@@ -1551,6 +1551,14 @@ Event: => IpEntityContextUid := rInternetProtocol.EntityContextUid;
 Event: => BankAccountEntityContextUid := rBankAccount.EntityContextUid;
 Event: => DriversLicenseEntityContextUid := rDriversLicense.EntityContextUid;
 
+Event: => AddrEventCount := Location.EventCount;
+Event: => SsnEventCount := rSsn.EventCount;
+Event: => PersonEventCount := Subject.EventCount;
+Event: => PhoneEventCount := rPhone.EventCount;
+Event: => EmailEventCount := rEmail.EventCount;
+Event: => IpEventCount := rInternetProtocol.EventCount;
+Event: => BankAccountEventCount := rBankAccount.EventCount;
+Event: => DriversLicenseEventCount := rDriversLicense.EventCount;
 
 Event: => AddrEvent30Count := Location.VlEvent30Count;
 Event: => SsnEvent30Count := rSsn.VlEvent30Count;
