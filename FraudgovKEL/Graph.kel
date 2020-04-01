@@ -1524,6 +1524,18 @@ Event: => IpTor := MAP(UPCASE(proxydescription) IN ['TOR EXIT','TOR RELAY'] /*OR
 Event: => IpHighRiskCity := MAP(rCustomer.JurisdictionState != 'FL' AND UPCASE(edgecity) IN ['MIAMI'] => 1, 0);
 Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydescription) IN ['CLOUD-SECURITY','CLOUD'] => 1, 0);
 
+
+
+
+
+//Jo don't edit above here ---------
+
+
+
+
+
+
+
 Event: => IdIsLastEventId := MAP(Subject.LastRecordId = RecordId => 1, 0);
 Event: => EmlIsLastEventId := MAP(rEmail.LastRecordId = RecordId => 1, 0);
 Event: => AddrIsLastEventId := MAP(Location.LastRecordId = RecordId => 1, 0);
