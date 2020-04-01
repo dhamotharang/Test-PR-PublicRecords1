@@ -27,6 +27,7 @@ Util_index        := Header.Key_Src_Util;
 water_index       := Header.Key_Src_Water;
 targus_index      := Header.Key_Src_Targus;
 voters_index      := header.key_src_voters;
+Census_MA_index   := header.key_src_census_UM;
 nod_index         := Header.key_src_nod;
 
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(dl_index,            '~thor_data400::key::dlv2_src_index_header',      '~thor_data400::key::header::'+filedate+'::dlv2_src_header',       bld_dl);
@@ -54,7 +55,8 @@ RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(Util_index,       '~thor_data400::key
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(water_index,      '~thor_data400::key::water_src_index',     '~thor_data400::key::header::'+filedate+'::water_src',      bld_water);
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(targus_index,     '~thor_data400::key::targ_src_index',      '~thor_data400::key::header::'+filedate+'::targus_src',     bld_targus);
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(voters_index,     '~thor_data400::key::voters_src_index',    '~thor_data400::key::header::'+filedate+'::voters_src',     bld_voters);
-RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(nod_index,  		 '~thor_data400::key::nod_src_index',         '~thor_data400::key::header::'+filedate+'::nod_src',        bld_nod);
+RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(Census_MA_index,  '~thor_data400::key::census_src_index',    '~thor_data400::key::header::'+filedate+'::census_src',     bld_vcensus);
+RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(nod_index,  		 '~thor_data400::key::nod_src_index',       '~thor_data400::key::header::'+filedate+'::nod_src',        bld_nod);
 
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::PropDeed_src_index_header',  '~thor_data400::key::header::'+filedate+'::PropDeed_src_header',   mv_PropDeed,,,true);
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::dlv2_src_index_header',      '~thor_data400::key::header::'+filedate+'::dlv2_src_header',       mv_dl,,,true);
@@ -81,6 +83,7 @@ RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::Util_src_index',     
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::water_src_index',     '~thor_data400::key::header::'+filedate+'::water_src',      mv_water,,,true);
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::targ_src_index',      '~thor_data400::key::header::'+filedate+'::targus_src',     mv_targus,,,true);
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::voters_src_index',    '~thor_data400::key::header::'+filedate+'::voters_src',     mv_voters,,,true);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::census_src_index',    '~thor_data400::key::header::'+filedate+'::census_src',     mv_census,,,true);
 RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::nod_src_index',       '~thor_data400::key::header::'+filedate+'::nod_src',        mv_nod,,,true);
 
 return	sequential(
@@ -109,6 +112,7 @@ return	sequential(
 													,bld_boat
 													,bld_targus
 													,bld_voters
+                                                    ,bld_vcensus
 													,bld_nod
 													,bld_em
 													)
@@ -138,6 +142,7 @@ return	sequential(
 													,mv_boat
 													,mv_targus
 													,mv_voters
+                                                    ,mv_census
 													,mv_nod
 													)
 							    );

@@ -11,11 +11,11 @@ export NOD_as_Source(
   src_rec := header.layouts_SeqdSrc.ND_src_rec;
 
 //Core Logic Records
-  header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N' and source = 'FR'),
+  header.Mac_Set_Header_Source(dSrcData(trim(deed_category) in ['N','L','R'] and source = 'FR'),
                                Property.Layout_Fares_Foreclosure,
                                src_rec,'NT',withUID1);
 //BlackKnight Records                                
-  header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N' and source = 'B7'),
+  header.Mac_Set_Header_Source(dSrcData(trim(deed_category) in ['N','L','R'] and source = 'B7'),
                                Property.Layout_Fares_Foreclosure,
                                src_rec,'B7',withUID2);
 

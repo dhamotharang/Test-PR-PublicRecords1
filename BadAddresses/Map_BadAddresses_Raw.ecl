@@ -1,4 +1,4 @@
-Import ut, std;
+﻿Import ut, std;
 Export Map_BadAddresses_Raw := Module
 
 Export Str(String s) :=  Trim(StringLib.StringCleanSpaces(Stringlib.StringtoUpperCase(s)), Left, Right);
@@ -20,7 +20,7 @@ Export File_In := Dataset('~thor400_92::in::BadAddresses', BadAddresses.Layouts.
 
 // Adding Unique Number to Each Record
 // SeqNum_in := Project(File_In, Layouts.Lay_Seq_In);
-SeqNum_in := Project(File_In(trim(Address) <> ' '  and (STD.Str.Find(trim(Address),'affected',1) = 0 and STD.Str.Find(trim(Address),'AFFECTED',1) = 0)),TRANSFORM(Layouts.Lay_Seq_In, self := left, self := []));
+SeqNum_in := Project(File_In(trim(Address) <> ' '  and ~REGEXFIND('affected|completion',address,NOCASE)),TRANSFORM(Layouts.Lay_Seq_In, self := left, self := []));
 
                                                                               
 

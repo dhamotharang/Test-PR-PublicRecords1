@@ -1,0 +1,43 @@
+﻿EXPORT fn_Report_Type_To_Category (STRING11  Report_Type_ID) := FUNCTION
+  Category := CASE(Report_Type_ID
+              ,'A'=>'Auto Report'
+              ,'B'=>'Auto Report'
+              ,'C'=>'Auto Report'
+              ,'D'=>'Other Report'
+              ,'E'=>'Other Report'
+              ,'F'=>'Other Report'
+              ,'G'=>'Other Report'
+              ,'H'=>'Auto Report'
+              ,'I'=>'Other Report'
+              ,'J'=>'Auto Report'
+              ,'K'=>'Other Report'
+              ,'L'=>'Other Report'
+              ,'M'=>'Other Report'
+              ,'N'=>'Other Report'
+              ,'O'=>'Other Report'
+              ,'P'=>'Auto Report'
+              ,'Q'=>'Auto Report'
+              ,'R'=>'Auto Report'
+              ,'S'=>'Certificates'
+              ,'T'=>'Certificates'
+              ,'U'=>'Other Report'
+              ,'V'=>'Other Report'
+              ,'W'=>'Other Report'
+              ,'X'=>'Auto Report'
+              ,'Y'=>'Other Report'
+              ,'Z'=>'Other Report'
+              ,'FS'=>'Auto Report' 
+              ,'0'=>'Interactive Report'
+              ,'1'=>'Interactive Report'
+              ,'2'=>'Interactive Report'
+              ,'3'=>'Interactive Report'
+              ,'4'=>'Interactive Report'
+              ,'5'=>'Interactive Report'
+              ,'6'=>'Interactive Report'
+              ,'7'=>'Interactive Report'
+              ,'8'=>'Interactive Report'
+	          ,'');
+	
+  RETURN Category;
+												 
+END;

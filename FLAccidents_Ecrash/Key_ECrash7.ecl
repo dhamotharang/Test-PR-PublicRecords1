@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents,lib_stringlib;
+﻿Import Data_Services, doxie, FLAccidents, lib_stringlib, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -76,8 +76,7 @@ end;
 pflc7:= project(flc7,xpndrecs(left));
 
 //ecrash 
-
-pecrshFile := FLAccidents_Ecrash.BaseFile ( StringLib.StringToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
+pecrshFile := eCrashBaseAgencyExclusion( StringLib.StringToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
 
 xpnd_layout xpndecrash(pecrshFile L) := transform
 

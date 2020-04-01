@@ -344,7 +344,7 @@ functionmacro
   ds_rollup_match_scores_Any_not_All_side_by_side   := join(ds_rollup_match_scores_Any_not_All   ,ds_rollup_match_scores_all  ,left.proxid1 = right.proxid1 and left.proxid2 = right.proxid2  ,tsidebyside(left,right,'Any' ,'All' )  ,hash);
 
   // -- add summary and match rank to rolled up matches
-  ds_rollup_match_scores_add_summary := join(ds_rollup_match_scores  ,ds_summary_add_rank  ,left.proxid1 = right.proxid1 and left.proxid2 = right.proxid2  
+  ds_rollup_match_scores_add_summary_prep := join(ds_rollup_match_scores  ,ds_summary_add_rank  ,left.proxid1 = right.proxid1 and left.proxid2 = right.proxid2  
     ,transform({unsigned match_rank,string summary,unsigned cnt,dataset(recordof(left.child)) child,recordof(left) - child - match_rank - summary - cnt}
       ,self.summary     := right.summary
       ,self.match_rank  := right.match_rank
@@ -352,8 +352,41 @@ functionmacro
       ,self             := left
     )  
     ,hash)
+   : PERSIST('~persist::BIPV2_ProxID::_Underlinks::ds_rollup_match_scores_add_summary_prep'   );
+   
+// ------------------------------------------------------------------------------------------------------------------------------------------
+lay_rec_child := {unsigned6 proxid ,string company_name,string address ,string active_corpkey  ,string active_duns ,string fein};
+layspecs := RECORD
+   string fieldname;
+   string fieldvalue;
+  END;
+ 
+ lay_new_rollup := RECORD
+  integer2 conf;
+  unsigned8 match_rank;
+  string summary;
+  unsigned8 cnt;
+  DATASET({ DATASET(layspecs) child, string score, string skipped }) scores;
+  dataset(lay_rec_child)  recs;
+end;
+ 
+ // ds_rollup;
+ 
+ // -- get address and name
+ ds_get_address1 := join(pih  ,ds_rollup_match_scores_add_summary_prep  ,left.rcid = right.rcid1  ,transform({unsigned6 rcid2,lay_new_rollup}
+    ,self.recs := dataset([{left.proxid ,left.cnp_name  ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_domestic_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
+    ,self.scores := right.child
+    ,self      := right
+ )  ,hash);
+ 
+ ds_rollup_match_scores_add_summary := join(pih  ,ds_get_address1  ,left.rcid = right.rcid2  ,transform(lay_new_rollup
+    ,self.recs := right.recs + dataset([{left.proxid  ,left.cnp_name ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_domestic_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
+    ,self.scores := right.scores(~exists(child(regexfind('(left_company_name|right_company_name|left_cnp_name_phonetic|right_cnp_name_phonetic)',trim(fieldname),nocase))) )
+    ,self      := right
+ )  ,hash)
    : PERSIST('~persist::BIPV2_ProxID::_Underlinks::ds_rollup_match_scores_add_summary'   );
-
+// ------------------------------------------------------------------------------------------------------------------------------------------
+ 
   lay_rollup_summary := {unsigned match_rank,string summary,unsigned cnt,recordof(ds_rollup_match_scores_Most_not_Many_side_by_side)};
   lay_rollup_summary tadd_summary(recordof(ds_rollup_match_scores_Most_not_Many_side_by_side) l ,recordof(ds_summary_add_rank) r) := 
   transform

@@ -13,6 +13,11 @@ export IdAppendThor(
 		,boolean useFuzzy = false
 		,boolean doZipExpansion = false
 		,boolean segmentation = true
+		,unsigned soapTimeout = 300
+		,unsigned soapTimeLimit = 0
+		,unsigned soapRetries = 0
+		,unsigned remoteBatchSize = 100
+		,boolean allowHighErrorRate = false
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -46,6 +51,7 @@ export IdAppendThor(
 		,weightThreshold := weightThreshold
 		,disableSaltForce := not primForce
 		,segmentation := segmentation
+		,reAppend := reAppend
 	);
 	#END
 
@@ -59,7 +65,13 @@ export IdAppendThor(
 			,reAppend := reAppend
 			,mimicRoxie := mimicRoxie
 			,svcAppendUrl := svcAppendUrl
-			,segmentation := segmentation);
+			,segmentation := segmentation
+			,soapTimeout := soapTimeout
+			,soapTimeLimit := soapTimeLimit
+			,soapRetries := soapRetries
+			,remoteBatchSize := remoteBatchSize
+			,allowHighErrorRate := allowHighErrorRate
+			);
 
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
@@ -70,7 +82,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -85,7 +97,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -100,7 +112,7 @@ export IdAppendThor(
 			res := resRemote;
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
