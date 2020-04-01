@@ -3,7 +3,7 @@
 EXPORT Proc_Build_Keys(string filedate) := FUNCTION
 
 	/* MAC_SK_BuildProcess_v2_local definitions */
-	
+	OUTPUT('TEST');
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_Salestax_CA_Bdid_Key,
 	Constants.Key_Salestax_CA_Bdid_Gen_Name,
 	Constants.SALES_TAX_PREFIX+filedate+Constants.CA_State_DBID_Suffix, 

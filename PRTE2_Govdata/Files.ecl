@@ -10,11 +10,11 @@ export Files := module
 	EXPORT Sec_Broker_In := DATASET(Constants.Sec_Broker_In, Layouts.Sec_Broker_In_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
 	//Base files
-	EXPORT FDIC_Base		:= DATASET(Constants.FDIC_Base_Name, 		govdata.Layouts_FDIC.Base_AID, 			FLAT);
-	EXPORT IRS_Base			:= DATASET(Constants.IRS_Base_Name, 			govdata.Layouts_IRS_NonProfit.Base_AID, FLAT);
-	EXPORT Salestax_CA_Base	:= DATASET(Constants.Salestax_CA_Base_Name, 	govdata.Layout_CA_Sales_Tax,			FLAT);
-	EXPORT Salestax_IA_Base	:= DATASET(Constants.Salestax_IA_Base_Name, 	govdata.Layout_IA_SalesTax_Base, 		FLAT);
-	EXPORT Sec_Broker_Base	:= DATASET(Constants.Sec_Broker_Base_Name, 	govdata.Layout_SEC_Broker_Dealer_BDID, 	FLAT);
+	EXPORT FDIC_Base				:= DATASET(Constants.FDIC_Base_Name, 				Layouts.FDIC_Base_Layout, 							FLAT);
+	EXPORT IRS_Base					:= DATASET(Constants.IRS_Base_Name, 				Layouts.IRS_NonProfit_Base_Layout, 			FLAT);
+	EXPORT Salestax_CA_Base	:= DATASET(Constants.Salestax_CA_Base_Name, Layouts.CA_Sales_Tax_Base_Layout,				FLAT);
+	EXPORT Salestax_IA_Base	:= DATASET(Constants.Salestax_IA_Base_Name, Layouts.IA_Sales_Tax_Base_Layout, 			FLAT);
+	EXPORT Sec_Broker_Base	:= DATASET(Constants.Sec_Broker_Base_Name, 	Layouts.SEC_Broker_Dealer_Base_Layout, 	FLAT);
 
 	//Key files
 	EXPORT Key_Salestax_CA_Bdid 	:= PROJECT(Salestax_CA_Base(bdid != 0), TRANSFORM(govdata.Layout_CA_Sales_Tax-BIPV2.IDlayouts.l_xlink_ids-source_rec_id, SELF := LEFT, SELF := []));
@@ -23,8 +23,9 @@ export Files := module
 	EXPORT Key_FDIC_Bdid 	:= PROJECT(FDIC_Base(bdid != 0), TRANSFORM(govdata.layout_FDIC_BDID, 		SELF := LEFT, SELF := []));
 	EXPORT Key_FDIC_Linkids := PROJECT(FDIC_Base, 		  	 TRANSFORM(govdata.Layouts_FDIC.Base_AID, 	SELF := LEFT, SELF := []));
 
-	EXPORT Key_Salestax_IA_Bdid 	:= PROJECT(Salestax_IA_Base(bdid != 0), TRANSFORM(govdata.Layout_IA_Sales_Tax_In-BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT,SELF := []));
-	EXPORT Key_Salestax_IA_Linkids  := PROJECT(Salestax_IA_Base, 			TRANSFORM(Layouts.Key_Salestax_IA_Linkids_Layout, 					  SELF := LEFT, SELF := []));
+	EXPORT Key_Salestax_IA_In 		:= fBase_To_In_Layout(Salestax_IA_Base);
+	EXPORT Key_Salestax_IA_Bdid 	:= PROJECT(Key_Salestax_IA_In(bdid != 0), TRANSFORM(govdata.Layout_IA_Sales_Tax_In-BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT,SELF := []));
+	EXPORT Key_Salestax_IA_Linkids  := PROJECT(Key_Salestax_IA_In, 			TRANSFORM(govdata.Layout_IA_Sales_Tax_In, 					  SELF := LEFT, SELF := []));
 
 	EXPORT Key_Irsnonprofit_Bdid 	:= PROJECT(IRS_Base(bdid != 0), TRANSFORM(govdata.Layout_IRS_NonProfit_Base-[exempt_org_status_code], 		SELF := LEFT, SELF := []));
 	EXPORT Key_Irsnonprofit_Linkids	:= PROJECT(IRS_Base, 			TRANSFORM(govdata.Layouts_IRS_NonProfit.Base_AID-[exempt_org_status_code],	SELF := LEFT, SELF := []));

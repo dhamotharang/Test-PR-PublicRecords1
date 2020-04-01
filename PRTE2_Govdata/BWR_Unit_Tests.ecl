@@ -35,7 +35,6 @@ OUTPUT(COUNT(Sec_Broker_Base),NAMED('Sec_Broker_Base_Count'));
 OUTPUT(Sec_Broker_Base,NAMED('Sec_Broker_Base_Results'));
 
 /* b.	Keys are populated */
-
 Key_Salestax_CA_Bdid_Key := PULL(Keys.Key_Salestax_CA_Bdid_Key);
 Key_Salestax_CA_Linkids_Key := PULL(Keys.Key_Salestax_CA_Linkids_Key);
 Key_FDIC_Bdid_Key := PULL(Keys.Key_FDIC_Bdid_Key);
@@ -83,16 +82,9 @@ OUTPUT(Key_or_workers_comp_Linkids_Key,NAMED('or_workers_comp_Linkids_Key_Result
 OUTPUT(COUNT(Key_sec_broker_dealer_Linkids_Key),NAMED('sec_broker_dealer_Linkids_Key_Count'));
 OUTPUT(Key_sec_broker_dealer_Linkids_Key,NAMED('sec_broker_dealer_Linkids_Key_Results'));
 
-
 //g. Verify name/address are cleaned properly
 OUTPUT(FDIC_Base,{prim_range,predir,prim_name}, NAMED('FDIC_address_population'));
 OUTPUT(IRS_Base,{prim_range,predir,prim_name}, NAMED('IRS_address_population'));
 OUTPUT(Salestax_CA_Base,{prim_range,predir,prim_name}, NAMED('Salestax_CA_address_population'));
 OUTPUT(Salestax_IA_Base,{mailingaddress.prim_range,mailingaddress.predir,mailingaddress.prim_name}, NAMED('Salestax_IA_address_population'));
 OUTPUT(Sec_Broker_Base,{prim_range,predir,prim_name}, NAMED('Sec_Broker_Base_address_population'));
-
-//i. Verify global_sid field is populated correctly
-//OUTPUT(Govdata,{global_sid}, NAMED('global_sid_population'));
-
-//j. Verify bdid field is populated correctly
-//OUTPUT(Govdata,{bdid}, NAMED('bdid_population'));

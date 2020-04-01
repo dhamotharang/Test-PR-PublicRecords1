@@ -767,5 +767,44 @@ EXPORT Layouts := MODULE
 		STRING  city;
 		STRING  state;
 		STRING  zip_code;
+		STRING  location_type;
 	END;
+	
+	EXPORT Link_Layout := RECORD
+		STRING cust_name;	
+		STRING bug_num;
+		STRING link_fein;
+		STRING link_inc_date;
+		STRING link_ssn;
+		STRING link_dob;
+	END;
+
+	EXPORT FDIC_Base_Layout := RECORD
+		govdata.Layouts_FDIC.Base_AID;
+		Link_Layout;
+	END;
+
+	EXPORT IRS_NonProfit_Base_Layout := RECORD
+		govdata.Layouts_IRS_NonProfit.Base_AID;
+		Link_Layout;
+	END;
+
+	EXPORT CA_Sales_Tax_Base_Layout := RECORD
+		govdata.Layout_CA_Sales_Tax;
+		Link_Layout;
+	END;
+
+	EXPORT IA_Sales_Tax_Base_Layout := RECORD
+		govdata.Layout_IA_SalesTax_Base;
+		INTEGER source_rec_id;
+		Link_Layout;
+	END;
+
+	EXPORT SEC_Broker_Dealer_Base_Layout := RECORD
+		govdata.Layout_SEC_Broker_Dealer_BDID;
+		Link_Layout;
+	END;
+
+
+
 END;
