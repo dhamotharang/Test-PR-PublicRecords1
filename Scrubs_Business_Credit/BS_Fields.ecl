@@ -1,102 +1,131 @@
-IMPORT ut,SALT31;
+﻿IMPORT SALT311;
 EXPORT BS_Fields := MODULE
+ 
+EXPORT NumFields := 10;
+ 
 // Processing for each FieldType
-EXPORT SALT31.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_segment_identifier','invalid_file_sequence_number','invalid_parent_sequence_number','invalid_account_base_ab_number','invalid_business_name','invalid_web_address','invalid_guarantor_owner_indicator','invalid_relationship_to_business_indicator','invalid_percent_of_liability','invalid_percent_of_ownership_if_owner_principal');
-EXPORT FieldTypeNum(SALT31.StrType fn) := CASE(fn,'invalid_segment_identifier' => 1,'invalid_file_sequence_number' => 2,'invalid_parent_sequence_number' => 3,'invalid_account_base_ab_number' => 4,'invalid_business_name' => 5,'invalid_web_address' => 6,'invalid_guarantor_owner_indicator' => 7,'invalid_relationship_to_business_indicator' => 8,'invalid_percent_of_liability' => 9,'invalid_percent_of_ownership_if_owner_principal' => 10,0);
-EXPORT MakeFT_invalid_segment_identifier(SALT31.StrType s0) := FUNCTION
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_segment_identifier','invalid_file_sequence_number','invalid_parent_sequence_number','invalid_account_base_ab_number','invalid_business_name','invalid_web_address','invalid_guarantor_owner_indicator','invalid_relationship_to_business_indicator','invalid_percent_of_liability','invalid_percent_of_ownership_if_owner_principal');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_segment_identifier' => 1,'invalid_file_sequence_number' => 2,'invalid_parent_sequence_number' => 3,'invalid_account_base_ab_number' => 4,'invalid_business_name' => 5,'invalid_web_address' => 6,'invalid_guarantor_owner_indicator' => 7,'invalid_relationship_to_business_indicator' => 8,'invalid_percent_of_liability' => 9,'invalid_percent_of_ownership_if_owner_principal' => 10,0);
+ 
+EXPORT MakeFT_invalid_segment_identifier(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_segment_identifier(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['BS','BS']);
-EXPORT InValidMessageFT_invalid_segment_identifier(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('BS|BS'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_file_sequence_number(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_segment_identifier(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['BS','BS']);
+EXPORT InValidMessageFT_invalid_segment_identifier(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('BS|BS'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_file_sequence_number(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_file_sequence_number(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_file_sequence_number(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.NotLength('1..'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_parent_sequence_number(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_file_sequence_number(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_file_sequence_number(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_parent_sequence_number(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_parent_sequence_number(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_parent_sequence_number(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.NotLength('1..'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_account_base_ab_number(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_parent_sequence_number(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_parent_sequence_number(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_account_base_ab_number(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_account_base_ab_number(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_account_base_ab_number(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.NotLength('1..'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_business_name(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'); // Only allow valid symbols
+EXPORT InValidFT_invalid_account_base_ab_number(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_account_base_ab_number(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_business_name(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_business_name(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_business_name(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'),SALT31.HygieneErrors.NotLength('1..'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_web_address(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./'); // Only allow valid symbols
+EXPORT InValidFT_invalid_business_name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_business_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,&.\'-/#`+"!*@():;'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_web_address(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./ '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_web_address(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./'))));
-EXPORT InValidMessageFT_invalid_web_address(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_guarantor_owner_indicator(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_invalid_web_address(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./ '))));
+EXPORT InValidMessageFT_invalid_web_address(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./ '),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_guarantor_owner_indicator(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_guarantor_owner_indicator(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['001','002','003']);
-EXPORT InValidMessageFT_invalid_guarantor_owner_indicator(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('001|002|003'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_relationship_to_business_indicator(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_guarantor_owner_indicator(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['001','002','003']);
+EXPORT InValidMessageFT_invalid_guarantor_owner_indicator(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('001|002|003'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_relationship_to_business_indicator(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_relationship_to_business_indicator(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_invalid_relationship_to_business_indicator(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_percent_of_liability(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_relationship_to_business_indicator(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_invalid_relationship_to_business_indicator(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_percent_of_liability(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_percent_of_liability(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_invalid_percent_of_liability(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_invalid_percent_of_ownership_if_owner_principal(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_invalid_percent_of_liability(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_invalid_percent_of_liability(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_percent_of_ownership_if_owner_principal(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_percent_of_ownership_if_owner_principal(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_invalid_percent_of_ownership_if_owner_principal(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.Good);
-EXPORT SALT31.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'segment_identifier','file_sequence_number','parent_sequence_number','account_base_number','business_name','web_address','guarantor_owner_indicator','relationship_to_business_indicator','percent_of_liability','percent_of_ownership_if_owner_principal');
-EXPORT FieldNum(SALT31.StrType fn) := CASE(fn,'segment_identifier' => 1,'file_sequence_number' => 2,'parent_sequence_number' => 3,'account_base_number' => 4,'business_name' => 5,'web_address' => 6,'guarantor_owner_indicator' => 7,'relationship_to_business_indicator' => 8,'percent_of_liability' => 9,'percent_of_ownership_if_owner_principal' => 10,0);
+EXPORT InValidFT_invalid_percent_of_ownership_if_owner_principal(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_invalid_percent_of_ownership_if_owner_principal(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'segment_identifier','file_sequence_number','parent_sequence_number','account_base_number','business_name','web_address','guarantor_owner_indicator','relationship_to_business_indicator','percent_of_liability','percent_of_ownership_if_owner_principal');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'segment_identifier','file_sequence_number','parent_sequence_number','account_base_number','business_name','web_address','guarantor_owner_indicator','relationship_to_business_indicator','percent_of_liability','percent_of_ownership_if_owner_principal');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'segment_identifier' => 0,'file_sequence_number' => 1,'parent_sequence_number' => 2,'account_base_number' => 3,'business_name' => 4,'web_address' => 5,'guarantor_owner_indicator' => 6,'relationship_to_business_indicator' => 7,'percent_of_liability' => 8,'percent_of_ownership_if_owner_principal' => 9,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ENUM'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ENUM'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+ 
 //Individual field level validation
-EXPORT Make_segment_identifier(SALT31.StrType s0) := MakeFT_invalid_segment_identifier(s0);
-EXPORT InValid_segment_identifier(SALT31.StrType s) := InValidFT_invalid_segment_identifier(s);
+ 
+EXPORT Make_segment_identifier(SALT311.StrType s0) := MakeFT_invalid_segment_identifier(s0);
+EXPORT InValid_segment_identifier(SALT311.StrType s) := InValidFT_invalid_segment_identifier(s);
 EXPORT InValidMessage_segment_identifier(UNSIGNED1 wh) := InValidMessageFT_invalid_segment_identifier(wh);
-EXPORT Make_file_sequence_number(SALT31.StrType s0) := MakeFT_invalid_file_sequence_number(s0);
-EXPORT InValid_file_sequence_number(SALT31.StrType s) := InValidFT_invalid_file_sequence_number(s);
+ 
+EXPORT Make_file_sequence_number(SALT311.StrType s0) := MakeFT_invalid_file_sequence_number(s0);
+EXPORT InValid_file_sequence_number(SALT311.StrType s) := InValidFT_invalid_file_sequence_number(s);
 EXPORT InValidMessage_file_sequence_number(UNSIGNED1 wh) := InValidMessageFT_invalid_file_sequence_number(wh);
-EXPORT Make_parent_sequence_number(SALT31.StrType s0) := MakeFT_invalid_parent_sequence_number(s0);
-EXPORT InValid_parent_sequence_number(SALT31.StrType s) := InValidFT_invalid_parent_sequence_number(s);
+ 
+EXPORT Make_parent_sequence_number(SALT311.StrType s0) := MakeFT_invalid_parent_sequence_number(s0);
+EXPORT InValid_parent_sequence_number(SALT311.StrType s) := InValidFT_invalid_parent_sequence_number(s);
 EXPORT InValidMessage_parent_sequence_number(UNSIGNED1 wh) := InValidMessageFT_invalid_parent_sequence_number(wh);
-EXPORT Make_account_base_number(SALT31.StrType s0) := MakeFT_invalid_account_base_ab_number(s0);
-EXPORT InValid_account_base_number(SALT31.StrType s) := InValidFT_invalid_account_base_ab_number(s);
+ 
+EXPORT Make_account_base_number(SALT311.StrType s0) := MakeFT_invalid_account_base_ab_number(s0);
+EXPORT InValid_account_base_number(SALT311.StrType s) := InValidFT_invalid_account_base_ab_number(s);
 EXPORT InValidMessage_account_base_number(UNSIGNED1 wh) := InValidMessageFT_invalid_account_base_ab_number(wh);
-EXPORT Make_business_name(SALT31.StrType s0) := MakeFT_invalid_business_name(s0);
-EXPORT InValid_business_name(SALT31.StrType s) := InValidFT_invalid_business_name(s);
+ 
+EXPORT Make_business_name(SALT311.StrType s0) := MakeFT_invalid_business_name(s0);
+EXPORT InValid_business_name(SALT311.StrType s) := InValidFT_invalid_business_name(s);
 EXPORT InValidMessage_business_name(UNSIGNED1 wh) := InValidMessageFT_invalid_business_name(wh);
-EXPORT Make_web_address(SALT31.StrType s0) := MakeFT_invalid_web_address(s0);
-EXPORT InValid_web_address(SALT31.StrType s) := InValidFT_invalid_web_address(s);
+ 
+EXPORT Make_web_address(SALT311.StrType s0) := MakeFT_invalid_web_address(s0);
+EXPORT InValid_web_address(SALT311.StrType s) := InValidFT_invalid_web_address(s);
 EXPORT InValidMessage_web_address(UNSIGNED1 wh) := InValidMessageFT_invalid_web_address(wh);
-EXPORT Make_guarantor_owner_indicator(SALT31.StrType s0) := MakeFT_invalid_guarantor_owner_indicator(s0);
-EXPORT InValid_guarantor_owner_indicator(SALT31.StrType s) := InValidFT_invalid_guarantor_owner_indicator(s);
+ 
+EXPORT Make_guarantor_owner_indicator(SALT311.StrType s0) := MakeFT_invalid_guarantor_owner_indicator(s0);
+EXPORT InValid_guarantor_owner_indicator(SALT311.StrType s) := InValidFT_invalid_guarantor_owner_indicator(s);
 EXPORT InValidMessage_guarantor_owner_indicator(UNSIGNED1 wh) := InValidMessageFT_invalid_guarantor_owner_indicator(wh);
-EXPORT Make_relationship_to_business_indicator(SALT31.StrType s0) := MakeFT_invalid_relationship_to_business_indicator(s0);
-EXPORT InValid_relationship_to_business_indicator(SALT31.StrType s) := InValidFT_invalid_relationship_to_business_indicator(s);
+ 
+EXPORT Make_relationship_to_business_indicator(SALT311.StrType s0) := MakeFT_invalid_relationship_to_business_indicator(s0);
+EXPORT InValid_relationship_to_business_indicator(SALT311.StrType s) := InValidFT_invalid_relationship_to_business_indicator(s);
 EXPORT InValidMessage_relationship_to_business_indicator(UNSIGNED1 wh) := InValidMessageFT_invalid_relationship_to_business_indicator(wh);
-EXPORT Make_percent_of_liability(SALT31.StrType s0) := MakeFT_invalid_percent_of_liability(s0);
-EXPORT InValid_percent_of_liability(SALT31.StrType s) := InValidFT_invalid_percent_of_liability(s);
+ 
+EXPORT Make_percent_of_liability(SALT311.StrType s0) := MakeFT_invalid_percent_of_liability(s0);
+EXPORT InValid_percent_of_liability(SALT311.StrType s) := InValidFT_invalid_percent_of_liability(s);
 EXPORT InValidMessage_percent_of_liability(UNSIGNED1 wh) := InValidMessageFT_invalid_percent_of_liability(wh);
-EXPORT Make_percent_of_ownership_if_owner_principal(SALT31.StrType s0) := MakeFT_invalid_percent_of_ownership_if_owner_principal(s0);
-EXPORT InValid_percent_of_ownership_if_owner_principal(SALT31.StrType s) := InValidFT_invalid_percent_of_ownership_if_owner_principal(s);
+ 
+EXPORT Make_percent_of_ownership_if_owner_principal(SALT311.StrType s0) := MakeFT_invalid_percent_of_ownership_if_owner_principal(s0);
+EXPORT InValid_percent_of_ownership_if_owner_principal(SALT311.StrType s) := InValidFT_invalid_percent_of_ownership_if_owner_principal(s);
 EXPORT InValidMessage_percent_of_ownership_if_owner_principal(UNSIGNED1 wh) := InValidMessageFT_invalid_percent_of_ownership_if_owner_principal(wh);
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT31,Scrubs_Business_Credit;
+  IMPORT SALT311,Scrubs_Business_Credit;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -126,7 +155,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_percent_of_liability;
     BOOLEAN Diff_percent_of_ownership_if_owner_principal;
     UNSIGNED Num_Diffs;
-    SALT31.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -140,7 +169,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_relationship_to_business_indicator := le.relationship_to_business_indicator <> ri.relationship_to_business_indicator;
     SELF.Diff_percent_of_liability := le.percent_of_liability <> ri.percent_of_liability;
     SELF.Diff_percent_of_ownership_if_owner_principal := le.percent_of_ownership_if_owner_principal <> ri.percent_of_ownership_if_owner_principal;
-    SELF.Val := (SALT31.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_segment_identifier,1,0)+ IF( SELF.Diff_file_sequence_number,1,0)+ IF( SELF.Diff_parent_sequence_number,1,0)+ IF( SELF.Diff_account_base_number,1,0)+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_web_address,1,0)+ IF( SELF.Diff_guarantor_owner_indicator,1,0)+ IF( SELF.Diff_relationship_to_business_indicator,1,0)+ IF( SELF.Diff_percent_of_liability,1,0)+ IF( SELF.Diff_percent_of_ownership_if_owner_principal,1,0);
   END;
 // Now need to remove bad pivots from comparison

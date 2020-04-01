@@ -15,7 +15,7 @@ import STRATA;
     #uniquename(dDIDstats_pParty);
 	#uniquename(zPartyDIDStats);
 	
-string email_notify := 'Sudhir.Kasavajjala@lexisnexisrisk.com; Michael.Gould@lexisnexisrisk.com; Kevin.Garrity@lexisnexisrisk.com'; 
+string email_notify := 'Sudhir.Kasavajjala@lexisnexisrisk.com;  Kevin.Garrity@lexisnexisrisk.com'; 
 
 
 %rPopulationStats_pMain%

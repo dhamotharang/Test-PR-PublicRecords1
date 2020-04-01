@@ -56,12 +56,12 @@ export Filenames_V2(string pVersion = '', boolean pUseProd = false, string gcid,
 	
 	export tobatch_metrics_file							:= tools.mod_FilenamesBuild(tobatch_metrics_lOutputTemplate, pVersion);
 	
-	export slim_report_lOutputTemplate_built:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::built',
+	export slim_history_lOutputTemplate_built:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::built',
 																																 _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::built_nosave');
-	export slim_report_lOutputTemplate			:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::@version@',
+	export slim_history_lOutputTemplate			:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::@version@',
 																																 _Dataset(pUseProd).thor_cluster_files + 'slim_history::' + gcid + '::@version@_nosave');
 	
-	export slim_report_file									:= tools.mod_FilenamesBuild(slim_report_lOutputTemplate, pVersion);
+	export slim_history_file									:= tools.mod_FilenamesBuild(slim_history_lOutputTemplate, pVersion);
 	
 	export aggregate_report_lOutputTemplate_built	:= if(pHistMode = 'A', _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::built',
 																																 _Dataset(pUseProd).thor_cluster_files + 'aggregate_report::' + gcid + '::built_nosave');

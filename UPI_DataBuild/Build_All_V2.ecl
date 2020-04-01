@@ -62,16 +62,27 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		superFile_base_delete						:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::base::' + gcid + '::delete'),
 																													FileServices.SuperFileExists('~ushc::crk::base::' + gcid + '::delete_nosave'));
 	
-		superFile_processed_input_building		:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::building'),
-																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::building_nosave'));
-		superFile_processed_input_built				:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::built'),
-																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::built_nosave'));
-		superFile_processed_input_qa					:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::qa'),
-																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::qa_nosave'));
-		superFile_processed_input_father			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::father'),
-																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::father_nosave'));
-		superFile_processed_input_delete			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete'),
-																													FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete_nosave'));
+		superFile_processed_input_building	:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::building'),
+																															FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::building_nosave'));
+		superFile_processed_input_built			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::built'),
+																															FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::built_nosave'));
+		superFile_processed_input_qa				:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::qa'),
+																															FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::qa_nosave'));
+		superFile_processed_input_father		:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::father'),
+																															FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::father_nosave'));
+		superFile_processed_input_delete		:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete'),
+																															FileServices.SuperFileExists('~ushc::crk::processed_input::' + gcid + '::delete_nosave'));
+		
+		superFile_slim_history_building		:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::building'),
+																														FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::building_nosave'));
+		superFile_slim_history_built			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::built'),
+																														FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::built_nosave'));
+		superFile_slim_history_qa					:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::qa'),
+																														FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::qa_nosave'));
+		superFile_slim_history_father			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::father'),
+																														FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::father_nosave'));
+		superFile_slim_history_delete			:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::delete'),
+																														FileServices.SuperFileExists('~ushc::crk::slim_history::' + gcid + '::delete_nosave'));
 																												
 	// make sure superfiles are created	
 		make_frombatch					:= map(not superFile_frombatch and pHistMode = 'A'	=> FileServices.CreateSuperFile('~ushc::crk::from_batch::' + gcid),
@@ -193,7 +204,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 			,UPI_DataBuild.Build_Base_V2.Build_slim_report(pVersion_unique,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).full_build_slim_report
 			,sequential(
 						 fileservices.startsuperfiletransaction()
-						,fileservices.addsuperfile('~ushc::crk::slim_history::' + gcid + '::qa',UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).slim_history.new)
+						,fileservices.addsuperfile('~ushc::crk::slim_history::' + gcid + '::qa',UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).slim_history_file.new)
 						,fileservices.finishsuperfiletransaction())
 						// push slim history files to qa superfile - no deletes and no automatic promote through additional generations
 													
