@@ -1179,6 +1179,28 @@
 		export string KEYWORD_PHAMLC								:= '865';
 		export string KEYWORD_PHDOF_IC							:= '866';
 		export string KEYWORD_PKCNGOA								:= '867';
+		export string KEYWORD_LUICIJ_WC							:= '868';
+		export string KEYWORD_SAMA									:= '869';
+		export string KEYWORD_CMLAGA								:= '870';
+		export string KEYWORD_EGMLCU								:= '871';
+		export string KEYWORD_FRAFA									:= '872';
+		export string KEYWORD_PTIMPIC								:= '873';
+		export string KEYWORD_JPCAA									:= '874';
+		export string KEYWORD_PHBOI									:= '875';
+		export string KEYWORD_PHBIR									:= '876';
+		export string KEYWORD_CGPALF								:= '877';
+		export string KEYWORD_PAISRSNF							:= '878';
+		export string KEYWORD_IQAML									:= '879';
+		export string KEYWORD_UKTR									:= '880';
+		export string KEYWORD_PBC_AP								:= '881';
+		export string KEYWORD_MMACCM								:= '882';
+		export string KEYWORD_EU_TUR								:= '883';
+		export string KEYWORD_AOCMC									:= '884';
+		export string KEYWORD_AOBNA									:= '885';
+		export string KEYWORD_ATBMF_LSU							:= '886';
+		export string KEYWORD_KZACA									:= '887';
+		export string KEYWORD_CNMPS_IF							:= '888';
+		export string KEYWORD_LTGCA									:= '889';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

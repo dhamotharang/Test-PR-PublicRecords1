@@ -81,8 +81,9 @@ EXPORT CommonBase := MODULE
   
   export Clean_Common_Base        (string pversion = '',boolean	pUseOtherEnvironment	= false) := tools.macf_FilesBase(BIPV2.Filenames(pversion,pUseOtherEnvironment).Clean_Common_Base ,Layout       );
   
-  clean_built_filename := BIPV2.Filenames().Clean_Common_Base.built;
-	EXPORT DS_CLEAN                 := DATASET(clean_built_filename        ,Layout         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+  shared clean_built_filename := BIPV2.Filenames().Clean_Common_Base.built;
+	EXPORT DS_CLEAN_old             := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout_S40_old         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+	EXPORT DS_CLEAN                 := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	// EXPORT DS_CLEAN                 := clean(DS_BUILT         );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	EXPORT DS_CLEAN_BASE            := clean(DS_BASE          );//USED OUTSIDE OF THE BUILD  
 	EXPORT DS_FATHER_CLEAN          := clean(DS_FATHER        );

@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_DL_CT
 FILENAME:In_CT
 // Uncomment up to NINES for internal or external adl
@@ -15,99 +15,68 @@ FILENAME:In_CT
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
-
-
-//FIELDTYPE DEFINITIONS
-FIELDTYPE:invalid_mandatory:LENGTHS(1..)
-FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
-FIELDTYPE:invalid_alpha_blank:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ )
-FIELDTYPE:invalid_alpha_special:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -)
-FIELDTYPE:invalid_alpha_num_specials:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ @-)
-FIELDTYPE:invalid_numeric:ALLOW(0123456789)
-FIELDTYPE:invalid_numeric_blank:ALLOW(0123456789 )
-FIELDTYPE:invalid_alpha_num:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ )
-FIELDTYPE:invalid_empty:LENGTHS(0)
-FIELDTYPE:invalid_boolean_yn_empty:ENUM(N|Y|)
-FIELDTYPE:invalid_wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]()-^:;!&,`./#@*'\|_"%~)
-FIELDTYPE:invalid_8pastdate:LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
-FIELDTYPE:invalid_08pastdate:LENGTHS(0,8):CUSTOM(Scrubs.fn_valid_pastDate>0)
-
-//2 or more parameters are needed for ENUM().  If 1 parameter is passed, ENUM() looks for an attribute with that name instead of a literal
-FIELDTYPE:invalid_orig_dlstate:ENUM(CT|CT)
-FIELDTYPE:invalid_orig_dlnumber:LENGTHS(9):LIKE(invalid_numeric):CUSTOM(Scrubs_DL_CT.Functions.fn_check_dl_number>0)
-FIELDTYPE:invalid_orig_name:LENGTHS(1..):LIKE(invalid_alpha_num_specials)
-FIELDTYPE:invalid_orig_sex:ENUM(1|2)
-FIELDTYPE:invalid_orig_height:CUSTOM(Scrubs_DL_CT.Functions.fn_verify_height>0,orig_height2)
-FIELDTYPE:invalid_inches:ENUM(00|01|02|03|04|05|06|07|08|09|10|11)
-FIELDTYPE:invalid_orig_eye_color:CUSTOM(Scrubs_DL_CT.Functions.fn_check_eye_color>0)
-FIELDTYPE:invalid_orig_classification:CUSTOM(Scrubs_DL_CT.Functions.fn_class>0)
-FIELDTYPE:invalid_orig_issue_date:LENGTHS(0,6):CUSTOM(Scrubs_DL_CT.Functions.fn_check_pastdate>0,orig_issue_date_dd)
-FIELDTYPE:invalid_day:ENUM(01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|)
-FIELDTYPE:invalid_orig_expire_date:LENGTHS(0,6):CUSTOM(Scrubs_DL_CT.Functions.fn_check_date>0,orig_expire_date_dd)
-FIELDTYPE:invalid_orig_status:CUSTOM(Scrubs_DL_CT.Functions.fn_check_status_code>0)
-FIELDTYPE:invalid_orig_restrictions:CUSTOM(Scrubs_DL_CT.Functions.fn_check_restriction_codes>0)
-FIELDTYPE:invalid_state:LENGTHS(0,2):LIKE(invalid_alpha)
-FIELDTYPE:invalid_clean_name:LIKE(invalid_alpha_special):CUSTOM(Scrubs_DL_CT.Functions.fn_valid_name>0,clean_name_first,clean_name_middle)
+FIELDTYPE:invalid_credentialstate:ENUM(CT|CT)
+FIELDTYPE:invalid_credentialnumber:CUSTOM(Scrubs_DL_CT.Functions.fn_check_dl_number>0,9)
+FIELDTYPE:invalid_name:CUSTOM(Scrubs_DL_CT.Functions.fn_valid_name>0,firstname,middleinitial)
+FIELDTYPE:invalid_sex:ENUM(F|M|U|)
+FIELDTYPE:invalid_height:CUSTOM(Scrubs_DL_CT.Functions.fn_verify_height>0)
+FIELDTYPE:invalid_eye_color:CUSTOM(Scrubs_DL_CT.Functions.fn_check_eye_color>0)
+FIELDTYPE:invalid_past_date:CUSTOM(Scrubs_DL_CT.Functions.fn_check_past_date>0)
+FIELDTYPE:invalid_general_date:CUSTOM(Scrubs_DL_CT.Functions.fn_check_general_date>0)
+FIELDTYPE:invalid_city:ALLOW(\ABCDEFGHIJKLMNOPQRSTUVWXYZ )
+FIELDTYPE:invalid_street:ALLOW(/\#-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ )
+FIELDTYPE:invalid_state:CUSTOM(Scrubs_DL_CT.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_zip:CUSTOM(Scrubs_DL_CT.Functions.fn_verify_zip>0)
+FIELDTYPE:invalid_credentialtype:ENUM(CDL|ID|LP|LIC|)
+FIELDTYPE:invalid_class:CUSTOM(Scrubs_DL_CT.Functions.fn_class>0)
+FIELDTYPE:invalid_endorsements:ALLOW(AFHMNPQSTVX )
+FIELDTYPE:invalid_restrictions:ALLOW(3BCDEFGJKLMNOQRTUVWYZ )
+FIELDTYPE:invalid_status:CUSTOM(Scrubs_DL_CT.Functions.fn_check_status_code>0)
+FIELDTYPE:invalid_status_cdl:CUSTOM(Scrubs_DL_CT.Functions.fn_check_cdl_status_code>0)
+FIELDTYPE:invalid_clean_name:CUSTOM(Scrubs_DL_CT.Functions.fn_valid_name>0,clean_name_first,clean_name_middle)
 
 
 //FIELD DEFINITIONS
-FIELD:append_process_date:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
-FIELD:orig_dlstate:TYPE(STRING2):LIKE(invalid_orig_dlstate):0,0
-FIELD:orig_dlnumber:TYPE(STRING9):LIKE(invalid_orig_dlnumber):0,0
-FIELD:orig_name:TYPE(STRING35):LIKE(invalid_orig_name):0,0
-FIELD:orig_dob:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
-FIELD:orig_sex:TYPE(STRING1):LIKE(invalid_orig_sex):0,0
-FIELD:orig_height1:TYPE(STRING1):LIKE(invalid_orig_height):0,0
-FIELD:orig_height2:TYPE(STRING2):LIKE(invalid_inches):0,0
-FIELD:orig_eye_color:TYPE(STRING3):LIKE(invalid_orig_eye_color):0,0
-FIELD:orig_mailaddress:TYPE(STRING61):LIKE(invalid_wordbag):0,0
-FIELD:orig_classification:TYPE(STRING6):LIKE(invalid_orig_classification):0,0
-FIELD:orig_endorsements:TYPE(STRING5):0,0
-FIELD:orig_issue_date:TYPE(STRING6):LIKE(invalid_orig_issue_date):0,0
-FIELD:orig_issue_date_dd:TYPE(STRING2):LIKE(invalid_day):0,0
-FIELD:orig_expire_date:TYPE(STRING6):LIKE(invalid_orig_expire_date):0,0
-FIELD:orig_expire_date_dd:TYPE(STRING2):LIKE(invalid_day):0,0
-FIELD:orig_noncdlstatus:TYPE(STRING3):LIKE(invalid_orig_status):0,0
-FIELD:orig_cdlstatus:TYPE(STRING3):LIKE(invalid_orig_status):0,0
-FIELD:orig_restrictions:TYPE(STRING12):LIKE(invalid_orig_restrictions):0,0
-FIELD:orig_origdate:TYPE(STRING8):LIKE(invalid_08pastdate):0,0
-FIELD:orig_origcdldate:TYPE(STRING8):LIKE(invalid_08pastdate):0,0
-FIELD:orig_cancelst:TYPE(STRING2):LIKE(invalid_state):0,0
-FIELD:orig_canceldate:TYPE(STRING8):LIKE(invalid_08pastdate):0,0
-FIELD:orig_crlf:TYPE(STRING2):0,0
+FIELD:append_process_date:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:credentialstate:TYPE(STRING2):LIKE(invalid_credentialstate):0,0
+FIELD:credentialnumber:TYPE(STRING25):LIKE(invalid_credentialnumber):0,0
+FIELD:lastname:TYPE(STRING40):LIKE(invalid_name):0,0
+FIELD:firstname:TYPE(STRING40):0,0
+FIELD:middleinitial:TYPE(STRING35):0,0
+FIELD:gender:TYPE(STRING1):LIKE(invalid_sex):0,0
+FIELD:height:TYPE(STRING3):LIKE(invalid_height):0,0
+FIELD:eyecolor:TYPE(STRING3):LIKE(invalid_eye_color):0,0
+FIELD:date_birth:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:resiaddrstreet:TYPE(STRING35):LIKE(invalid_street):0,0
+FIELD:residencycity:TYPE(STRING20):LIKE(invalid_city):0,0
+FIELD:residencystate:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:residencyzip:TYPE(STRING9):LIKE(invalid_zip):0,0
+FIELD:mailaddrstreet:TYPE(STRING35):LIKE(invalid_street):0,0
+FIELD:mailingcity:TYPE(STRING20):LIKE(invalid_city):0,0
+FIELD:mailingstate:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:mailingzip:TYPE(STRING9):LIKE(invalid_zip):0,0
+FIELD:credentialtype:TYPE(STRING3):LIKE(invalid_credentialtype):0,0
+FIELD:credential_class:TYPE(STRING1):LIKE(invalid_class):0,0
+FIELD:endorsements:TYPE(STRING5):LIKE(invalid_endorsements):0,0
+FIELD:restrictions:TYPE(STRING12):LIKE(invalid_restrictions):0,0
+FIELD:expdate:TYPE(STRING8):LIKE(invalid_general_date):0,0
+FIELD:lastissuerenewaldate:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:date_noncdl:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:originaldate_cdl:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:statusnoncdl:TYPE(STRING3):LIKE(invalid_status):0,0
+FIELD:licensestatuscdl:TYPE(STRING3):LIKE(invalid_status_cdl):0,0
+FIELD:originaldate_lp:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:originaldate_id:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:cancelstate:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:canceldate:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:cdlmedicertissuedate:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:cdlmedicertexpdate:TYPE(STRING8):LIKE(invalid_general_date):0,0
 FIELD:clean_name_prefix:TYPE(STRING5):0,0
 FIELD:clean_name_first:TYPE(STRING20):0,0
 FIELD:clean_name_middle:TYPE(STRING20):0,0
 FIELD:clean_name_last:TYPE(STRING20):LIKE(invalid_clean_name):0,0
 FIELD:clean_name_suffix:TYPE(STRING5):0,0
 FIELD:clean_name_score:TYPE(STRING3):0,0
-FIELD:clean_prim_range:TYPE(STRING10):LIKE(invalid_empty):0,0
-FIELD:clean_predir:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_prim_name:TYPE(STRING28):LIKE(invalid_empty):0,0
-FIELD:clean_addr_suffix:TYPE(STRING4):LIKE(invalid_empty):0,0
-FIELD:clean_postdir:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_unit_desig:TYPE(STRING10):LIKE(invalid_empty):0,0
-FIELD:clean_sec_range:TYPE(STRING8):LIKE(invalid_empty):0,0
-FIELD:clean_p_city_name:TYPE(STRING25):LIKE(invalid_empty):0,0
-FIELD:clean_v_city_name:TYPE(STRING25):LIKE(invalid_empty):0,0
-FIELD:clean_st:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_zip:TYPE(STRING5):LIKE(invalid_empty):0,0
-FIELD:clean_zip4:TYPE(STRING4):LIKE(invalid_empty):0,0
-FIELD:clean_cart:TYPE(STRING4):LIKE(invalid_empty):0,0
-FIELD:clean_cr_sort_sz:TYPE(STRING1):LIKE(invalid_empty):0,0
-FIELD:clean_lot:TYPE(STRING4):LIKE(invalid_empty):0,0
-FIELD:clean_lot_order:TYPE(STRING1):LIKE(invalid_empty):0,0
-FIELD:clean_dpbc:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_chk_digit:TYPE(STRING1):LIKE(invalid_empty):0,0
-FIELD:clean_record_type:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_ace_fips_st:TYPE(STRING2):LIKE(invalid_empty):0,0
-FIELD:clean_fipscounty:TYPE(STRING3):LIKE(invalid_empty):0,0
-FIELD:clean_geo_lat:TYPE(STRING10):LIKE(invalid_empty):0,0
-FIELD:clean_geo_long:TYPE(STRING11):LIKE(invalid_empty):0,0
-FIELD:clean_msa:TYPE(STRING4):LIKE(invalid_empty):0,0
-FIELD:clean_geo_blk:TYPE(STRING7):LIKE(invalid_empty):0,0
-FIELD:clean_geo_match:TYPE(STRING1):LIKE(invalid_empty):0,0
-FIELD:clean_err_stat:TYPE(STRING4):LIKE(invalid_empty):0,0
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file

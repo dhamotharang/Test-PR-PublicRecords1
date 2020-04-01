@@ -1,7 +1,8 @@
 ﻿import Email_Data, ut, Data_Services, Header;
 //New base layout with scrubbits field appended
-	ds_base := dataset('~thor_data400::base::email_data', Email_Data.Layout_Email.Scrubs_bits_base, thor);
-	fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
+ds_base := dataset(Data_Services.Data_location.Prefix('Email_Data')+'thor_data400::base::email_data', Email_Data.Layout_Email.Scrubs_bits_base, thor);
+
+fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
 	
 //Flag invalid emails
 pValidEmail	:= PROJECT(ds_base, TRANSFORM(Layout_email.temp_Validate, SELF.SkipRec := Email_Data.Fn_InvalidEmail(LEFT.clean_email, LEFT.append_domain);

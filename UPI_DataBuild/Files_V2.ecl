@@ -14,5 +14,7 @@ EXPORT Files_V2(STRING pVersion, boolean pUseProd, string gcid, string pHistMode
 	 tools.mac_FilesBase(Filenames_V2(pVersion,pUseProd,gcid,pHistMode).temp_header, UPI_DataBuild.layouts_V2.temp_header, temp_header);
 	 tools.mac_FilesBase(Filenames_V2(pVersion,pUseProd,gcid,pHistMode).tobatch_file, UPI_DataBuild.layouts_V2.to_batch, tobatch_file);
 	 tools.mac_FilesBase(Filenames_V2(pVersion,pUseProd,gcid,pHistMode).tobatch_metrics_file, UPI_DataBuild.layouts_V2.metrics_fields, tobatch_metrics_file);
+	 tools.mac_FilesBase(Filenames_V2(pVersion,pUseProd,gcid,pHistMode).slim_history_file, UPI_DataBuild.layouts_V2.slim_history, slim_history);
+	 tools.mac_FilesBase(Filenames_V2(pVersion,pUseProd,gcid,pHistMode).aggregate_report_file, UPI_DataBuild.layouts_V2.aggregate_fields, aggregate_report_file);
 	 	 
 END;

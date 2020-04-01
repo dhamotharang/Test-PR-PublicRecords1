@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents;
 
 Ecrash := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
 

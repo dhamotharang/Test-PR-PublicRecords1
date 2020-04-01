@@ -1,4 +1,4 @@
-export sCourt_Vendors_With_Only_Traffic := ['34', 	//FL_DUVAL_CRIMTRAFFIC
+﻿export sCourt_Vendors_With_Only_Traffic := ['34', 	//FL_DUVAL_CRIMTRAFFIC
 											'43',	//FL-Pasco_Cty_Traffic
 											'63',	//FL-LAKE_CTY_TRAFFIC
 											'67',	//FL_Alachua_Traffic
@@ -14,7 +14,16 @@ export sCourt_Vendors_With_Only_Traffic := ['34', 	//FL_DUVAL_CRIMTRAFFIC
                       '8I', //FL_HILLSBORO_CTY_TRA
 											'W0040',//FLORIDA_POLK_COUNTY_TRAFFIC_CW     
 											'W0041',//FLORIDA_HIGHLANDS_COUNTY_TRAFFIC_CW
-											'W0266' //CALIFORNIA_PLACER_COUNTY_TRAFFIC_CW
-											
+											'W0266', //CALIFORNIA_PLACER_COUNTY_TRAFFIC_CW
+
+                      //IE phase2
+                      'I0064',	//FLMIADADE_CTY_AND_CR
+											'I0066',	//FLORNGE_COC_TRAF    
+											'I0070',	//OH_CLARK_MT         
+											'I0073',	//OH_FRANKLIN_MT      
+											'I0077',	//OH_MONTGOMRYDAYTN_MT
+											'I0083',	//OH_SUMMIT_STOW_MT   
+											'I0116'	  //WI_AOC_TRAFFIC      
+
 
 											];

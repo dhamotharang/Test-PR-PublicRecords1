@@ -1,8 +1,8 @@
-Import didville, did_add, Header_Slimsort, ut, WatchDog, AID, lib_stringlib, Address, STD;
+﻿Import didville, did_add, Header_Slimsort, ut, WatchDog, AID, lib_stringlib, Address, STD;
 
 Export Proc_Build_Base(String Filedate) := Function
 
-InFile := BadAddresses.Map_BadAddresses_Raw.File_SeqNum_in(STD.Str.Find(trim(Address),'AFFECTED',1) = 0 and trim(Address) <> ' '); 
+InFile := BadAddresses.Map_BadAddresses_Raw.File_SeqNum_in(~REGEXFIND('affected|completion',address,NOCASE) and trim(Address) <> ' '); 
 
 Layouts.AID_prep xAid(InFile L) := Transform
 		Self.Append_Prep_Address_Situs			:=	Address.fn_addr_clean_prep(if(L.address = '', '', L.address), 'first');

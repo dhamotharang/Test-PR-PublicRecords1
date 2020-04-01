@@ -1,5 +1,5 @@
 ﻿IMPORT BIPV2_Files, BIPV2, BIPV2_POWID_DOWN_Platform,wk_ut,tools,std,BIPV2_Testing;
-l_base := BIPV2_Testing.Test_Layout;
+l_base := BIPV2.CommonBase.Layout;
 EXPORT proc_powid_down_platform(
 	DATASET(l_base) input = DATASET([],l_base),
 	STRING iter = '') := MODULE

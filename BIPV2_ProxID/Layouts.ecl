@@ -155,7 +155,8 @@ end;
 ,orig_DOT_Base.ultid
 ,orig_DOT_Base.source
 ,orig_DOT_Base.source_record_id
-,orig_DOT_Base.active_domestic_corp_key
+// ,orig_DOT_Base.active_domestic_corp_key
+,typeof(orig_DOT_Base.active_domestic_corp_key) active_corp_key
 ,orig_DOT_Base.active_duns_number
 ,orig_DOT_Base.active_enterprise_number
 ,typeof(orig_DOT_Base.vl_id) sbfe_id
@@ -179,8 +180,9 @@ end;
 ,orig_DOT_Base.dt_first_seen
 ,orig_DOT_Base.dt_last_seen
 ,orig_DOT_Base.ebr_file_number
-,orig_DOT_Base.foreign_corp_key
-,orig_DOT_Base.hist_domestic_corp_key
+,typeof(orig_DOT_Base.hist_domestic_corp_key) hist_corp_key
+// ,orig_DOT_Base.foreign_corp_key
+// ,orig_DOT_Base.hist_domestic_corp_key
 ,orig_DOT_Base.hist_duns_number
 ,orig_DOT_Base.hist_enterprise_number
 ,orig_DOT_Base.prim_range
@@ -191,7 +193,7 @@ end;
 ,orig_DOT_Base.v_city_name
 ,orig_DOT_Base.st
 ,orig_DOT_Base.zip
-,orig_DOT_Base.unk_corp_key
+// ,orig_DOT_Base.unk_corp_key
 ,orig_DOT_Base.vl_id  
 ,orig_DOT_Base.deleted_key
 };

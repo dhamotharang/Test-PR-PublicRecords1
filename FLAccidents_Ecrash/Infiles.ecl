@@ -153,9 +153,11 @@ dincident_TF :=  	dedup(sort(distribute(
 											
 dincidentCombined := dincident_EA + dincident_EA_Coplogic + dincident_EA_CRU	+ dincident_TF ;										
 //------------------------------------------------------------------------------------------------------------------							
-tincident trecs0(tincident L, agency R) := transform
+Layout_Infiles_Fixed.incident_ori trecs0(dincidentCombined L, agency R) := transform
 self.agency_name := if(L.agency_id = R.agency_id,R.Agency_Name,'');// use this for QC ,if(work_type_id not in ['2','3'],l.agency_name,''));
+self.agency_ori := if(L.agency_id = R.agency_id,R.Agency_Ori,'');
 self := L;
+self := [];
 end;
 
 jrecs0 := distribute(join(dincidentCombined,agency,
@@ -165,6 +167,9 @@ jrecs0 := distribute(join(dincidentCombined,agency,
 //------------------------------------------------------------------------------------------------------------------								
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs1(jrecs0 L, tvehicl R) := transform
 self.incident_id         := L.incident_id;
+self.agency_id           := L.agency_id;
+self.agency_name         := L.agency_name;
+self.agency_ori          := L.agency_ori;
 self.creation_date       := L.creation_date;
 self.Avoidance_Maneuver2 := R.Avoidance_Maneuver2;
 self.Avoidance_Maneuver3 := R.Avoidance_Maneuver3;
@@ -206,6 +211,9 @@ d_person :=		dedup(
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs2(jrecs1 L, tpersn R) := transform
 self.incident_id         := L.incident_id;
+self.agency_id           := L.agency_id;
+self.agency_name         := L.agency_name;
+self.agency_ori          := L.agency_ori;
 self.creation_date       := L.creation_date;
 self.law_enforcement_suspects_alcohol_use1 := R.law_enforcement_suspects_alcohol_use1;
 self.law_enforcement_suspects_drug_use1 := R.law_enforcement_suspects_drug_use1 ;
@@ -255,6 +263,9 @@ allrecs := dedup(sort(jrecs2 + jrecsOthersPerson + Jperson,record,local),record,
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs3(allrecs L, tcommercial R) := transform
 self.incident_id := L.incident_id;
+self.agency_id           := L.agency_id;
+self.agency_name         := L.agency_name;
+self.agency_ori          := L.agency_ori;
 self.vehicle_id := L.vehicle_id;
 self.creation_date := L.creation_date;
 self := R;
@@ -271,6 +282,9 @@ jrecs3 := join(distribute(allrecs,hash(vehicle_id))
 //------------------------------------------------------------------------------------------------------------------								
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs4(jrecs3 L, tcitation R) := transform
 self.incident_id := L.incident_id;
+self.agency_id           := L.agency_id;
+self.agency_name         := L.agency_name;
+self.agency_ori          := L.agency_ori;
 self.creation_date := L.creation_date;
 self.person_id := l.person_id ; 
 self := R;

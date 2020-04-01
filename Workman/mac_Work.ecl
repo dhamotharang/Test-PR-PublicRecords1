@@ -90,22 +90,26 @@ EXPORT mac_Work(
   ,pBuildName         = '\'\''                                        // name of your build/sub-build
   ,pESP               = 'WorkMan._Config.LocalEsp'                    // esp of environment you want your iteration to run on.
   ,pNotifyEmails      = 'WorkMan._Config.EmailAddressNotify'          // email addresses to which to send user communications 
-  ,pFailureEmails     = 'WorkMan._Config.EmailAddressNotify'          // email addresses to which to send any failures 
+  ,pFailureEmails     = ''                                            // email addresses to which to send any failures. maybe an email address to send a text to your cell phone?
   ,pShouldEmail       = 'true'                                        // boolean on whether to email or not
   ,pPollingFrequency  = '\'5\''                                       // polling frequency of how often the watcher wuid should check the status of the iteration.  Default is 5 which is 5 minutes.
   ,pForceRun          = 'false'                                       // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                                       // if true, then it will skip all failures and continue with the next iteration.  FALSE will ask if you want to rerun, skip or fail.
   ,pCleanupSuper      = 'false'                                       // if true, then it will cleanup the superfile for all subfiles except ones that contain this version(pversion above)
-  ,pDebugValues       = 'dataset([],WsWorkunits.Layouts.DebugValues)' // for the spawning of the wuids.  can use other repositories using this.
+  ,pDebugValues       = '\'dataset([],WsWorkunits.Layouts.DebugValues)\'' // for the spawning of the wuids.  can use other repositories using this.
   ,pDont_Wait         = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will just submit the childrunner
   ,pParallel          = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will submit the childrunner and also compile set results with the previous call
   ,pCompileOnly       = 'false'                                       // if false, will run the build as normal.  true = it will compile the wuid.  this also means it will only compile one iteration of it.  it will not save the workman files either.  this is mainly for testing.
+  ,pAutoResubmit      = 'false'                                       // if true, then it will automatically resubmit the wuid upon failure.  FALSE it will not(the default)
 ) :=
 functionmacro
 
   // -- Set max and min iterations
   #UNIQUENAME(MAX_ITERATIONS)
   #UNIQUENAME(MIN_ITERATIONS)
+  #UNIQUENAME(WUID_DEBUG_VALUES)
+
+  #SET(WUID_DEBUG_VALUES  ,STD.Str.FilterOut(pDebugValues,' '))
 
   #IF(trim(#TEXT(pNumMaxIterations))  != '')
     #SET(MAX_ITERATIONS ,pNumMaxIterations)
@@ -206,7 +210,7 @@ functionmacro
     Is_Already_Done := false;
   #ELSE
     Is_Already_Done := if(    count_outputfile > 0 
-                          and( (     (unsigned)pStartIteration        = (unsigned)previous_start_iteration 
+                          and ( (   (unsigned)pStartIteration         = (unsigned)previous_start_iteration 
                                 and (unsigned)%MAX_ITERATIONS%        = (unsigned)previous_max_iterations 
                                 and (unsigned)%'MIN_ITERATIONS'%      = (unsigned)previous_min_iterations
                                 and trim(pStopCondition)              = trim(previous_stop_condition_formula)
@@ -237,6 +241,12 @@ string_set_name_calcs := if(count(pSetNameCalculations) != 0  ,WorkMan.set2strin
 // string_set_results    := if(count(pSetResults) != 0           ,'\'' + WorkMan.set2string(pSetResults          ) + '\''  ,'[]');
 // string_set_name_calcs := if(count(pSetNameCalculations) != 0  ,'\'' + WorkMan.set2string(pSetNameCalculations ) + '\''  ,'[]');
 
+#UNIQUENAME(FAILUREEMAILS)
+#IF(trim(#TEXT(pFailureEmails)) = '')
+  #SET(FAILUREEMAILS  ,'')
+#ELSE
+  #SET(FAILUREEMAILS  ,pFailureEmails)
+#END
 
 // -- Put together the ecl code for the childrunner
 fbool(boolean pboolean) := if(pboolean = true,'true','false');
@@ -257,20 +267,31 @@ childrunner_ecl_code :=
   + '  ,'   + string_set_name_calcs       + '\n'         
   + '  ,\'' + pBuildName                  + '\'\n'        
   + '  ,\'' + localesp                    + '\'\n'               
-  + '  ,\'' + pNotifyEmails               + '\'\n'   
-  + '  ,\'' + pFailureEmails              + '\'\n'   
+  + '  ,\'' + pNotifyEmails               + '\'\n'  
+  + '  ,\'' + %'FAILUREEMAILS'%           + '\'\n'   
   + '  ,'   + fbool(pShouldEmail)         + '\n'     
   + '  ,\'' + pPollingFrequency           + '\'\n' 
-  + '  ,'   + fbool(pForceRun   )         + '\n'                                         
-  + '  ,'   + fbool(pForceSkip  )         + '\n'  
-  + '  ,'   + #TEXT(pDebugValues  )         + '\n'  
-  + '  ,'   + fbool(pCompileOnly  )         + '\n'  
+  + '  ,'   + fbool(pForceRun     )       + '\n'                                         
+  + '  ,'   + fbool(pForceSkip    )       + '\n'  
+  + '  ,'   + pDebugValues                + '\n'  
+  + '  ,'   + fbool(pCompileOnly  )       + '\n'  
+  + '  ,'   + fbool(pAutoResubmit )       + '\n'  
   + ');\n'
   ;
 
   // -- kickoff the childrunner
   childrunner_hthor   := WorkMan._Config.Esp2Hthor(pESP);
-  kickoff_childrunner := WorkMan.CreateWuid(childrunner_ecl_code  ,childrunner_hthor   ,pESP,,pDebugValues);
+  kickoff_childrunner := WorkMan.CreateWuid(childrunner_ecl_code  ,childrunner_hthor   ,pESP,,%WUID_DEBUG_VALUES%);
+ 
+// parallel(
+      // output(dataset([
+      // {'childrunner_ecl_code'     ,childrunner_ecl_code}
+     // ,{'childrunner_hthor' ,childrunner_hthor}
+     // ,{'pESP    ' ,pESP    }
+    // ],{string stat,string statvalue}) ,named('Workman_mac_Work'))
+    // ,output(%WUID_DEBUG_VALUES%  ,named('Workman_mac_Work_Debugvalues'))
+    // );
+ 
  
   // -- get info after child is finished
   current_childrunner       := STD.Str.FilterOut(workman.get_set_Result(workunit,'Current_Running_Wuid',localesp)[1],'\'');
@@ -346,11 +367,10 @@ childrunner_ecl_code :=
     iff((
           (   get_child_wuid_state not in ['completed'] 
           and get_child_wuid_state not in ['completed']
-          )
+          ) 
        and not regexfind('(skip|move on)',get_Advice,nocase)
        )
        and pCompileOnly = false
-
           ,fail('Fail workunit because wuid ' + get_child_wuid + ' has/is ' + get_child_wuid_state + ' with the following error(s):\n' + get_child_wuid_errors)
     );
 

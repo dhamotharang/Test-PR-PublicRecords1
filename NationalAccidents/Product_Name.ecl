@@ -1,0 +1,3 @@
+﻿EXPORT PRODUCT_NAME := MODULE
+  EXPORT NAI_BUILD_ID := 'NtlAccidentsInquiryBuild';
+END;
