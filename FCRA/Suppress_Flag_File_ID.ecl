@@ -138,7 +138,8 @@
 '9733401',
 '9994421',
 '6412071',
-'13710031' //CC-2887
+'13710031', //CC-2887 Dempsey correction removal
+'8350301' //DF-27536 Dulplicate record removal 
 ];
 
 
