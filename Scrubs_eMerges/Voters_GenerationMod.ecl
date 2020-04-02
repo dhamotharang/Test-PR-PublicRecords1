@@ -59,7 +59,7 @@ EXPORT Voters_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:did_out:TYPE(STRING12):LIKE(Invalid_No):0,0\n'
     + 'FIELD:source:TYPE(STRING7):0,0\n'
     + 'FIELD:file_id:TYPE(STRING4):LIKE(Invalid_Alpha):0,0\n'
-    + 'FIELD:vendor_id:TYPE(STRING13):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:vendor_id:TYPE(STRING13):0,0\n'
     + 'FIELD:source_state:TYPE(STRING2):LIKE(Invalid_State):0,0\n'
     + 'FIELD:source_code:TYPE(STRING2):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:file_acquired_date:TYPE(STRING8):LIKE(Invalid_Date):0,0\n'
