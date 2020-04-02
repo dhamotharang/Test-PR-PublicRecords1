@@ -1,10 +1,10 @@
 ﻿/*--SOAP--
 <message name="AML Attributes" wuTimeout="300000">
-	<part name="AntiMoneyLaunderingRiskAttributesRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	 </message>
+  <part name="AntiMoneyLaunderingRiskAttributesRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
+  <part name="HistoryDateYYYYMM" type="xsd:integer"/>
+  <part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
+  <part name="DataPermissionMask" type="xsd:string"/>
+   </message>
 */
 
 IMPORT iesp, AML, AutoStandardI, Gateway;
@@ -14,111 +14,101 @@ EXPORT AML_Service := MACRO
 //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_AML_Service();
 
-	// Get XML input 
-	ds_in    				:= dataset([], iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesRequest)  	: stored('AntiMoneyLaunderingRiskAttributesRequest', few);
-	gateways				:= Gateway.Configuration.Get();
+  // Get XML input
+  ds_in           := dataset([], iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesRequest)    : stored('AntiMoneyLaunderingRiskAttributesRequest', few);
+  gateways        := Gateway.Configuration.Get();
 
-	optionsIn 			:= GLOBAL(ds_in[1].options);
-	userIn 					:= ds_in[1].user;
-	
+  optionsIn       := GLOBAL(ds_in[1].options);
+  userIn          := ds_in[1].user;
+
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
    **********************************************/
-	string32 _LoginID               := ''	: STORED('_LoginID');
-	outofbandCompanyID							:= '' : STORED('_CompanyID');
-	string20 CompanyID              := if(userIn.CompanyId != '', userIn.CompanyId, outofbandCompanyID);
-	string20 FunctionName           := '' : STORED('_LogFunctionName');
-	string50 ESPMethod              := '' : STORED('_ESPMethodName');
-	string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
-	string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
-	string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-	outofbandssnmask                := '' : STORED('SSNMask');
-	string10 SSN_Mask               := if(userIn.SSNMask != '', userIn.SSNMask, outofbandssnmask);
-	outofbanddobmask                := '' : STORED('DOBMask');
-	string10 DOB_Mask               := if(userIn.DOBMask != '', userIn.DOBMask, outofbanddobmask);
-	BOOLEAN DL_Mask                 := userIn.DLMask;
-	BOOLEAN ExcludeDMVPII           := userIn.ExcludeDMVPII;
-	BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
-	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
-	
-	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.AML__AML_Service);
+  string32 _LoginID               := ''  : STORED('_LoginID');
+  outofbandCompanyID              := '' : STORED('_CompanyID');
+  string20 CompanyID              := if(userIn.CompanyId != '', userIn.CompanyId, outofbandCompanyID);
+  string20 FunctionName           := '' : STORED('_LogFunctionName');
+  string50 ESPMethod              := '' : STORED('_ESPMethodName');
+  string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
+  string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
+  string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
+  BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
+  BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+
+  //Look up the industry by the company ID.
+  Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.AML__AML_Service);
 /* ************* End Scout Fields **************/
 
-//CCPA fields
-    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
-    string TransactionID := '' : stored ('_TransactionId');
-    string BatchUID := '' : stored('_BatchUID');
-    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
-	mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-    END;
-    
-	string6 outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
-	integer3 history_date    :=  MAP(	(integer3)(optionsIn.historyDateYYYYMM) <> 0  => (Integer3)optionsIn.historyDateYYYYMM,
-																						TRIM(outOfBandHistoryDate)  <> ''  => (integer3)outOfBandHistoryDate,
-																						999999);
-															
-	STRING50 DataRestrictionMask 			:= MAP(	TRIM(userIn.DataRestrictionMask) <> ''  => userIn.DataRestrictionMask,
-																						AutoStandardI.GlobalModule().DataRestrictionMask); 
+  string6 outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
+  integer3 history_date    :=  MAP(  (integer3)(optionsIn.historyDateYYYYMM) <> 0  => (Integer3)optionsIn.historyDateYYYYMM,
+                                            TRIM(outOfBandHistoryDate)  <> ''  => (integer3)outOfBandHistoryDate,
+                                            999999);
+
+  BOOLEAN IncludeNewsProfile := ~optionsIn.ExcludeNewsAttributes;
+
+  // '0' - do not call XG5
+  // '1' - full XG5 response will be returned for AML report
+  // '2' - Call Bridger XG5 for KRIs but not full response
+
+  // Always call Bridger XG5 for KRIs but not full response
+  UseXG5 := '2';
+
+
+  TestDataEnabled         := userIn.TestDataEnabled;
+  TestDataTableName       := Trim(userIn.TestDataTableName);
+
+  attribsVersionUC := STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest);
+
+  attributesVersion := Map(
+                            attribsVersionUC= 'AMLRBUSATTRV1' => 'BUS',
+                            attribsVersionUC= 'AMLRBUSATTRV2' => 'BUSV2',
+                            attribsVersionUC= 'AMLRINDVATTRV1' => 'IND',
+                            attribsVersionUC= 'AMLRINDVATTRV2' => 'INDV2',
+                          'INVALID');
+
+  IncludeNegativeNews := FALSE; // should never be called
+
+
   STRING50 outOfBandDataPermissionMask 	:= '' : STORED('DataPermissionMask');
-  STRING50 DataPermissionMask						:= MAP(	TRIM(userIn.DataPermissionMask)    <> '' => userIn.DataPermissionMask,
-																								TRIM(outOfBandDataPermissionMask)  <> '' => outOfBandDataPermissionMask,
-																																														Risk_Indicators.iid_constants.default_DataPermission);
 
-	BOOLEAN IncludeNewsProfile := ~optionsIn.ExcludeNewsAttributes;
-	
-	// '0' - do not call XG5
-	// '1' - full XG5 response will be returned for AML report
-	// '2' - Call Bridger XG5 for KRIs but not full response
 
-	// Always call Bridger XG5 for KRIs but not full response
-	UseXG5 := '2'; 
-		 
-						 
-	TestDataEnabled 				:= userIn.TestDataEnabled;
-	TestDataTableName 			:= Trim(userIn.TestDataTableName);
-	
-	attribsVersionUC := StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest);
+  mod_pre := AML.IParam.GetAmlInputModule();
+  mod_aml := MODULE(PROJECT(mod_pre, AML.IParam.IAml))
+    EXPORT unsigned1 dppa := (unsigned1)userIn.DLPurpose;
+    EXPORT unsigned1 glb := (unsigned1)userIn.GLBPurpose;
+    EXPORT string DataRestrictionMask := IF(TRIM(userIn.DataRestrictionMask) <> '', userIn.DataRestrictionMask, mod_pre.DataRestrictionMask);
+    EXPORT string DataPermissionMask := IF(TRIM(userIn.DataPermissionMask) <> '', userIn.DataPermissionMask, mod_pre.DataPermissionMask);
+    EXPORT boolean suppress_dmv := userIn.ExcludeDMVPII;
+    EXPORT string ssn_mask := IF(userIn.SSNMask != '', userIn.SSNMask, mod_pre.ssn_mask);
+    EXPORT unsigned1 dob_mask := IF(userIn.DOBMask != '', suppress.date_mask_math.MaskIndicator (userIn.DOBMask), mod_pre.dob_mask);
+    EXPORT unsigned1 dl_mask := IF(userIn.DLMask, 1, 0);
 
-	attributesVersion := Map(
-														attribsVersionUC= 'AMLRBUSATTRV1' => 'BUS', 	
-														attribsVersionUC= 'AMLRBUSATTRV2' => 'BUSV2', 	
-													  attribsVersionUC= 'AMLRINDVATTRV1' => 'IND', 
-													  attribsVersionUC= 'AMLRINDVATTRV2' => 'INDV2',									
-													'INVALID');
-  integer bsversion := Map(attributesVersion = 'IND' => 	41,
-														attributesVersion =  'INDV2' => 50,
-														50);
-	
-	IncludeNegativeNews := FALSE; // should never be called
-	
-	DPPA := 	(unsigned1)userIn.DLPurpose;
-	GLBA := 	(unsigned1)userIn.GLBPurpose;
-								
-	
+    EXPORT unsigned1 bs_version := MAP(attributesVersion = 'IND' => 41,
+                                       attributesVersion =  'INDV2' => 50,
+                                       50);
+  END;
+
+
   requestIn := ds_in;
   firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
-	search := GLOBAL(firstRow.SearchBy);
+  search := GLOBAL(firstRow.SearchBy);
 
-	boolean IndFNameCheck		  := TRIM(search.Individual.name.full) <>'' or (TRIM(search.Individual.name.first) <> '');
-	boolean IndFAddrCheck		  := TRIM(search.Individual.address.streetaddress1)<>'' or (TRIM(search.Individual.address.streetnumber) <> '' or TRIM(search.Individual.address.streetname) <>'');
-	boolean IndFLastCheck		  := TRIM(search.Individual.name.full)<>''  or TRIM(search.Individual.name.last)<>'';
-	boolean IndZipCheck		    := TRIM(search.Individual.address.zip5) <>'';
-	boolean IndSSNCheck		    := TRIM(search.Individual.ssn)<>'';
-	boolean BusTaxIDCheck		  := TRIM(search.Business.FEIN)<>'';
-	boolean BusAddrCheck		  := TRIM(search.Business.address.streetaddress1)<>'' or (TRIM(search.Business.address.streetnumber)<>'' and TRIM(search.Business.address.streetname)<>'');
-	boolean BusZipCheck		    := TRIM(search.Business.address.zip5)<>'';
-	boolean BusNameCheck		  := TRIM(search.Business.CompanyName)<>'' or TRIM(search.Business.AlternateCompanyName)<>'';
-	boolean LexIDCheck		  	:= TRIM(search.Individual.UniqueId)<>'';
-	boolean BDIDCheck		  	  := TRIM(search.Business.BusinessId)<>'';
-	boolean DPPACheck		  		:= TRIM(userIn.DLPurpose)<>'' and ((integer)(userIn.DLPurpose) >= 0 and (integer)(userIn.DLPurpose) < 8);
-	boolean GLBCheck		  		:= TRIM(userIn.GLBPurpose)<>''  and ((integer)(userIn.GLBPurpose) >= 0 and (integer)(userIn.GLBPurpose) < 8 or (integer)(userIn.GLBPurpose)=11 or (integer)(userIn.GLBPurpose)=12);
+  boolean IndFNameCheck     := TRIM(search.Individual.name.full) <>'' or (TRIM(search.Individual.name.first) <> '');
+  boolean IndFAddrCheck     := TRIM(search.Individual.address.streetaddress1)<>'' or (TRIM(search.Individual.address.streetnumber) <> '' or TRIM(search.Individual.address.streetname) <>'');
+  boolean IndFLastCheck     := TRIM(search.Individual.name.full)<>''  or TRIM(search.Individual.name.last)<>'';
+  boolean IndZipCheck       := TRIM(search.Individual.address.zip5) <>'';
+  boolean IndSSNCheck       := TRIM(search.Individual.ssn)<>'';
+  boolean BusTaxIDCheck     := TRIM(search.Business.FEIN)<>'';
+  boolean BusAddrCheck      := TRIM(search.Business.address.streetaddress1)<>'' or (TRIM(search.Business.address.streetnumber)<>'' and TRIM(search.Business.address.streetname)<>'');
+  boolean BusZipCheck       := TRIM(search.Business.address.zip5)<>'';
+  boolean BusNameCheck      := TRIM(search.Business.CompanyName)<>'' or TRIM(search.Business.AlternateCompanyName)<>'';
+  boolean LexIDCheck        := TRIM(search.Individual.UniqueId)<>'';
+  boolean BDIDCheck         := TRIM(search.Business.BusinessId)<>'';
+  boolean DPPACheck         := TRIM(userIn.DLPurpose)<>'' and ((integer)(userIn.DLPurpose) >= 0 and (integer)(userIn.DLPurpose) < 8);
+  boolean GLBCheck          := TRIM(userIn.GLBPurpose)<>''  and ((integer)(userIn.GLBPurpose) >= 0 and (integer)(userIn.GLBPurpose) < 8 or (integer)(userIn.GLBPurpose)=11 or (integer)(userIn.GLBPurpose)=12);
 
-	
+
 boolean IndividualInvalid :=  if (attributesVersion in ['IND', 'INDV2'] and (~(IndFNameCheck and IndFAddrCheck and IndFLastCheck and IndZipCheck) and ~(IndSSNCheck and IndFNameCheck and IndFLastCheck) and ~LexIDCheck), 1, 0);
 boolean BusinessInvalid :=  if (attributesVersion in ['BUS', 'BUSV2'] and (~(BusNameCheck and BusAddrCheck and BusZipCheck) and ~(BusTaxIDCheck and BusNameCheck) and ~BDIDCheck), 1, 0);
 boolean RequestInvalid :=  if (attributesVersion= 'INVALID' , 1, 0);
@@ -131,411 +121,391 @@ if(RequestInvalid,FAIL('Please enter a valid attributes version: AMLRBUSATTRV1 o
 if(PermissionGLB,FAIL('Not an allowable GLB permissible purpose'));
 if(PermissionDPPA,FAIL('Not an allowable DPPA permissible purpose'));
 
-	layout_acctseq := record
-		integer4 seq;
-		ds_in;
-	end;
-	wseq := project( ds_in, transform( layout_acctseq, self.seq := counter, self := left ) );
-		
-	// IID and Boca Shell
-	Risk_Indicators.Layout_Input into(wseq l) := TRANSFORM
-		self.did := (integer)l.searchby.Individual.UniqueId;
-		self.seq := l.seq;
-		self.historydate := history_date;
-		self.ssn := l.searchby.Individual.ssn;
-		dob :=                    l.searchby.Individual.dob.year
-		    + intformat((integer1)l.searchby.Individual.dob.month, 2, 1)
-		    + intformat((integer1)l.searchby.Individual.dob.day,   2, 1);
-		self.dob := if((unsigned)dob=0, '', dob);
-		self.age := (STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date));
-		
-		fullname := trim(l.searchby.Individual.name.full);
-		cleanname := address.CleanPerson73( fullname );
-		title  := if(l.searchby.Individual.name.prefix='' and fullname!='', trim((cleanname[1..5]))  , l.searchby.Individual.name.prefix);
-		fname  := if(l.searchby.Individual.name.first ='' and fullname!='', trim((cleanname[6..25])) , l.searchby.Individual.name.first );
-		mname  := if(l.searchby.Individual.name.middle='' and fullname!='', trim((cleanname[26..45])), l.searchby.Individual.name.middle);
-		lname  := if(l.searchby.Individual.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.Individual.name.last  );
-		suffix := if(l.searchby.Individual.name.suffix='' and fullname!='', trim((cleanname[66..70])), l.searchby.Individual.name.suffix);
-		
-		self.title  := stringlib.stringtouppercase(title);
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
-		
-		addr_value := if(trim(l.searchby.Individual.address.streetaddress1)!='', l.searchby.Individual.address.streetaddress1,
-				Address.Addr1FromComponents(l.searchby.Individual.address.streetnumber, l.searchby.Individual.address.streetpredirection, l.searchby.Individual.address.streetname,
-					l.searchby.Individual.address.streetsuffix, l.searchby.Individual.address.streetpostdirection, l.searchby.Individual.address.unitdesignation, l.searchby.Individual.address.unitnumber));
+  layout_acctseq := record
+    integer4 seq;
+    ds_in;
+  end;
+  wseq := project( ds_in, transform( layout_acctseq, self.seq := counter, self := left ) );
 
-		clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.searchby.Individual.address.city, l.searchby.Individual.address.state, l.searchby.Individual.address.zip5);
+  // IID and Boca Shell
+  Risk_Indicators.Layout_Input into(wseq l) := TRANSFORM
+    self.did := (integer)l.searchby.Individual.UniqueId;
+    self.seq := l.seq;
+    self.historydate := history_date;
+    self.ssn := l.searchby.Individual.ssn;
+    dob :=                    l.searchby.Individual.dob.year
+        + intformat((integer1)l.searchby.Individual.dob.month, 2, 1)
+        + intformat((integer1)l.searchby.Individual.dob.day,   2, 1);
+    self.dob := if((unsigned)dob=0, '', dob);
+    self.age := (STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date));
 
-		self.in_streetAddress:= addr_value;
-		self.in_city         := l.searchby.Individual.address.city;
-		self.in_state        := l.searchby.Individual.address.state;
-		self.in_zipCode      := l.searchby.Individual.address.zip5;	
-		self.prim_range      := clean_a2[1..10];
-		self.predir          := clean_a2[11..12];
-		self.prim_name       := clean_a2[13..40];
-		self.addr_suffix     := clean_a2[41..44];
-		self.postdir         := clean_a2[45..46];
-		self.unit_desig      := clean_a2[47..56];
-		self.sec_range       := clean_a2[57..64];
-		self.p_city_name     := clean_a2[90..114];
-		self.st              := clean_a2[115..116];
-		self.z5              := clean_a2[117..121];
-		self.zip4            := clean_a2[122..125];
-		self.lat             := clean_a2[146..155];
-		self.long            := clean_a2[156..166];
-		self.addr_type 				:= risk_indicators.iid_constants.override_addr_type(addr_value, clean_a2[139],clean_a2[126..129]);
-		self.addr_status     := clean_a2[179..182];
-		self.county          := clean_a2[143..145];
-		self.geo_blk         := clean_a2[171..177];
-		
-		self.dl_number       := '';
-		self.dl_state        := '';;
-		self.phone10 			   := l.searchby.Individual.Phone;
-		self.wphone10			   := '';
-		self.email_address	 := '';
-		self.ip_address		   := '';
-		self.in_country        := '';
-		self.country         := '';
-		// self := [];
-	END;
-	iid_prep := PROJECT(wseq, into(left));	
+    fullname := trim(l.searchby.Individual.name.full);
+    cleanname := address.CleanPerson73( fullname );
+    title  := if(l.searchby.Individual.name.prefix='' and fullname!='', trim((cleanname[1..5]))  , l.searchby.Individual.name.prefix);
+    fname  := if(l.searchby.Individual.name.first ='' and fullname!='', trim((cleanname[6..25])) , l.searchby.Individual.name.first );
+    mname  := if(l.searchby.Individual.name.middle='' and fullname!='', trim((cleanname[26..45])), l.searchby.Individual.name.middle);
+    lname  := if(l.searchby.Individual.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.Individual.name.last  );
+    suffix := if(l.searchby.Individual.name.suffix='' and fullname!='', trim((cleanname[66..70])), l.searchby.Individual.name.suffix);
+
+    self.title  := STD.Str.ToUpperCase(title);
+    self.fname  := STD.Str.ToUpperCase(fname);
+    self.mname  := STD.Str.ToUpperCase(mname);
+    self.lname  := STD.Str.ToUpperCase(lname);
+    self.suffix := STD.Str.ToUpperCase(suffix);
+
+    addr_value := if(trim(l.searchby.Individual.address.streetaddress1)!='', l.searchby.Individual.address.streetaddress1,
+        Address.Addr1FromComponents(l.searchby.Individual.address.streetnumber, l.searchby.Individual.address.streetpredirection, l.searchby.Individual.address.streetname,
+          l.searchby.Individual.address.streetsuffix, l.searchby.Individual.address.streetpostdirection, l.searchby.Individual.address.unitdesignation, l.searchby.Individual.address.unitnumber));
+
+    clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.searchby.Individual.address.city, l.searchby.Individual.address.state, l.searchby.Individual.address.zip5);
+
+    self.in_streetAddress:= addr_value;
+    self.in_city         := l.searchby.Individual.address.city;
+    self.in_state        := l.searchby.Individual.address.state;
+    self.in_zipCode      := l.searchby.Individual.address.zip5;
+    self.prim_range      := clean_a2[1..10];
+    self.predir          := clean_a2[11..12];
+    self.prim_name       := clean_a2[13..40];
+    self.addr_suffix     := clean_a2[41..44];
+    self.postdir         := clean_a2[45..46];
+    self.unit_desig      := clean_a2[47..56];
+    self.sec_range       := clean_a2[57..64];
+    self.p_city_name     := clean_a2[90..114];
+    self.st              := clean_a2[115..116];
+    self.z5              := clean_a2[117..121];
+    self.zip4            := clean_a2[122..125];
+    self.lat             := clean_a2[146..155];
+    self.long            := clean_a2[156..166];
+    self.addr_type       := risk_indicators.iid_constants.override_addr_type(addr_value, clean_a2[139],clean_a2[126..129]);
+    self.addr_status     := clean_a2[179..182];
+    self.county          := clean_a2[143..145];
+    self.geo_blk         := clean_a2[171..177];
+
+    self.dl_number       := '';
+    self.dl_state        := '';;
+    self.phone10         := l.searchby.Individual.Phone;
+    self.wphone10        := '';
+    self.email_address   := '';
+    self.ip_address      := '';
+    self.in_country      := '';
+    self.country         := '';
+    // self := [];
+  END;
+  iid_prep := PROJECT(wseq, into(left));
 
 //  TEST SEEDS
-	risk_indicators.layout_input intoTestPrep(wseq l) := transform
-		self.seq := l.seq;	
-		self.ssn := l.searchby.Individual.ssn;
-		self.phone10 := l.searchby.Individual.Phone;
-		self.fname := stringlib.stringtouppercase(l.searchby.Individual.name.first);
-		self.lname := stringlib.stringtouppercase(l.searchby.Individual.name.last);
-		SELF.in_zipCode := l.searchby.Individual.address.zip5;
-		self := [];
-	end;
-	test_prep := PROJECT(wseq, intoTestPrep(LEFT));
+  risk_indicators.layout_input intoTestPrep(wseq l) := transform
+    self.seq := l.seq;
+    self.ssn := l.searchby.Individual.ssn;
+    self.phone10 := l.searchby.Individual.Phone;
+    self.fname := STD.Str.ToUpperCase(l.searchby.Individual.name.first);
+    self.lname := STD.Str.ToUpperCase(l.searchby.Individual.name.last);
+    SELF.in_zipCode := l.searchby.Individual.address.zip5;
+    self := [];
+  end;
+  test_prep := PROJECT(wseq, intoTestPrep(LEFT));
 
 
-	consumerAttributes := IF(TestDataEnabled, AML.AMLRiskAttributes_TestSeed_Function(test_prep, TestDataTableName),
-																	AML.getAMLattributes(iid_prep, 
-																						 DataRestrictionMask,
-																						 DPPA,
-																						 GLBA,
-																						 gateways,
-																						 IncludeNegativeNews, 
-                                                                                         bsversion, 
-                                                                                         DataPermissionMask,
-                                                                                         mod_access));  // will be in  final layout when returned  boca shell	
+  consumerAttributes := IF(TestDataEnabled, AML.AMLRiskAttributes_TestSeed_Function(test_prep, TestDataTableName),
+                                  AML.getAMLattributes(iid_prep,
+                                             mod_aml,
+                                             gateways,
+                                             IncludeNegativeNews
+                                                                                         ));  // will be in  final layout when returned  boca shell
 
-																
+
   consumerAttributesV2 :=  IF(TestDataEnabled, AML.AMLRiskAttributesV2_TestSeed_Function(test_prep, TestDataTableName),
-																AML.getAMLAttributesV2(iid_prep, 
-																						 DataRestrictionMask,
-																						 DPPA,
-																						 GLBA,
-																						 gateways, 
-																						 bsversion,
-																						 DataPermissionMask,
-                                                                                         mod_access,
-																						 UseXG5,
-																						 IncludeNewsProfile));
-																						 
+                                AML.getAMLAttributesV2(iid_prep,
+                                             mod_aml,
+                                             gateways,
+                                             UseXG5,
+                                             IncludeNewsProfile));
+
 
 iesp.share.t_NameValuePair createrec(consumerAttributes le, integer C) := TRANSFORM
-			self.Name:= case( C,
-				1 => 'IndCitizenshipIndex' ,
-				2 => 'IndMobilityIndex' ,
-				3 => 'IndLegalEventsIndex' ,
-				4 => 'IndAccesstoFundsIndex',
-				5 => 'IndBusinessAssocationIndex',
-				6 => 'IndHighValueAssetIndex', 
-				7 => 'IndGeographicIndex', 
-				8 => 'IndAssociatesIndex', 
-				9 => 'IndAgeRange', 
-				10 => 'IndAMLNegativeNews90',  
-				11 => 'IndAMLNegativeNews24',  
+      self.Name:= case( C,
+        1 => 'IndCitizenshipIndex' ,
+        2 => 'IndMobilityIndex' ,
+        3 => 'IndLegalEventsIndex' ,
+        4 => 'IndAccesstoFundsIndex',
+        5 => 'IndBusinessAssocationIndex',
+        6 => 'IndHighValueAssetIndex',
+        7 => 'IndGeographicIndex',
+        8 => 'IndAssociatesIndex',
+        9 => 'IndAgeRange',
+        10 => 'IndAMLNegativeNews90',
+        11 => 'IndAMLNegativeNews24',
               'Invalid');
-			self.Value:=  case(C,
-			 1 =>  le.AMLAttributes.IndCitizenshipIndex ,
-			 2 =>  le.AMLAttributes.IndMobilityIndex ,
-			 3 =>  le.AMLAttributes.IndLegalEventsIndex ,
-			 4 =>  le.AMLAttributes.IndAccesstoFundsIndex,
-			 5 =>  le.AMLAttributes.IndBusinessAssocationIndex ,
-			 6 =>  le.AMLAttributes.IndHighValueAssetIndex ,
-			 7 =>  le.AMLAttributes.IndGeographicIndex ,
-			 8 =>  le.AMLAttributes.IndAssociatesIndex ,
-			 9 =>  le.AMLAttributes.IndAgeRange ,
-			10 =>  le.AMLAttributes.IndAMLNegativeNews90 ,
-			11 =>  le.AMLAttributes.IndAMLNegativeNews24 ,
+      self.Value:=  case(C,
+       1 =>  le.AMLAttributes.IndCitizenshipIndex ,
+       2 =>  le.AMLAttributes.IndMobilityIndex ,
+       3 =>  le.AMLAttributes.IndLegalEventsIndex ,
+       4 =>  le.AMLAttributes.IndAccesstoFundsIndex,
+       5 =>  le.AMLAttributes.IndBusinessAssocationIndex ,
+       6 =>  le.AMLAttributes.IndHighValueAssetIndex ,
+       7 =>  le.AMLAttributes.IndGeographicIndex ,
+       8 =>  le.AMLAttributes.IndAssociatesIndex ,
+       9 =>  le.AMLAttributes.IndAgeRange ,
+      10 =>  le.AMLAttributes.IndAMLNegativeNews90 ,
+      11 =>  le.AMLAttributes.IndAMLNegativeNews24 ,
 
-				'Invalid');
-		
-	END;
- 	
-	IndIndex := normalize(ungroup(consumerAttributes), 11,createrec(LEFT,COUNTER ));
-	
+        'Invalid');
+
+  END;
+
+  IndIndex := normalize(ungroup(consumerAttributes), 11,createrec(LEFT,COUNTER ));
+
 iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesResponse IntoConsumerAttributes(wseq le,consumerAttributes ri ) := Transform
-			// self.Result.InputEcho.Individual.UniqueId := (string)ri.did;
-    	self.Result.InputEcho := le.searchby;	
-			SELF.Result.AttributeGroup.attributes :=  IndIndex;
-			self.Result.UniqueId := (string)ri.did;
-			self.Result.AttributeGroup.Name := 'AMLRINDVATTRV1';
-		  self := le;
-			self := [];
+      // self.Result.InputEcho.Individual.UniqueId := (string)ri.did;
+      self.Result.InputEcho := le.searchby;
+      SELF.Result.AttributeGroup.attributes :=  IndIndex;
+      self.Result.UniqueId := (string)ri.did;
+      self.Result.AttributeGroup.Name := 'AMLRINDVATTRV1';
+      self := le;
+      self := [];
 END;
-	
-	
-	IndAttributes := join(wseq, 	consumerAttributes,
-	                     right.seq = left.seq,
-											 IntoConsumerAttributes(LEFT, RIGHT));
 
-// Version 2  
+
+  IndAttributes := join(wseq,   consumerAttributes,
+                       right.seq = left.seq,
+                       IntoConsumerAttributes(LEFT, RIGHT));
+
+// Version 2
 iesp.share.t_NameValuePair createrecV2(consumerAttributesV2 le, integer C) := TRANSFORM
-			self.Name:= case( C,
-				1 => 'IndHighValueAssetsV2' ,
-				2 => 'IndAccessToFundsV2' ,
-				3 => 'IndGeographicRiskV2' ,
-				4 => 'IndMobilityV2',
-				5 => 'IndLegalEventsV2',
-				6 => 'IndHighRiskNewsProfilesV2', 
-				7 => 'IndHighRiskNewsProfileTypeV2', 
-				8 => 'IndAgeRangeV2', 
-				9 => 'IndIdentityRiskV2', 
-				10 => 'IndResidencyRiskV2',  
-				11 => 'IndMatchLevelV2',  
-				12 => 'IndPersonalAssocRiskV2',  
-				13 => 'IndAssocResidencyRiskV2',  
-				14 => 'IndProfessionalRiskV2',  
-				15 => 'IndBusExecOffAssocRiskV2',  
+      self.Name:= case( C,
+        1 => 'IndHighValueAssetsV2' ,
+        2 => 'IndAccessToFundsV2' ,
+        3 => 'IndGeographicRiskV2' ,
+        4 => 'IndMobilityV2',
+        5 => 'IndLegalEventsV2',
+        6 => 'IndHighRiskNewsProfilesV2',
+        7 => 'IndHighRiskNewsProfileTypeV2',
+        8 => 'IndAgeRangeV2',
+        9 => 'IndIdentityRiskV2',
+        10 => 'IndResidencyRiskV2',
+        11 => 'IndMatchLevelV2',
+        12 => 'IndPersonalAssocRiskV2',
+        13 => 'IndAssocResidencyRiskV2',
+        14 => 'IndProfessionalRiskV2',
+        15 => 'IndBusExecOffAssocRiskV2',
               'Invalid');
-			self.Value:=  case(C,
-			 1 =>  le.IndHighValueAssets ,
-			 2 =>  le.IndAccesstoFunds ,
-			 3 =>  le.IndGeographicRisk ,
-			 4 =>  le.IndMobility,
-			 5 =>  le.IndLegalEvents ,
-			 6 =>  le.IndHighRiskNewsProfiles ,
-			 7 =>  le.IndHighRiskNewsProfileType ,
-			 8 =>  le.IndAgeRange ,
-			 9 =>  le.IndIdentityRisk ,
-			10 =>  le.IndResidencyRisk ,
-			11 =>  le.IndMatchLevel ,
-			12 =>  le.IndPersonalAssocRisk ,
-			13 =>  le.IndAssocResidencyRisk ,
-			14 =>  le.IndProfessionalRisk ,
-			15 =>  le.IndBusExecOffAssocRisk ,
+      self.Value:=  case(C,
+       1 =>  le.IndHighValueAssets ,
+       2 =>  le.IndAccesstoFunds ,
+       3 =>  le.IndGeographicRisk ,
+       4 =>  le.IndMobility,
+       5 =>  le.IndLegalEvents ,
+       6 =>  le.IndHighRiskNewsProfiles ,
+       7 =>  le.IndHighRiskNewsProfileType ,
+       8 =>  le.IndAgeRange ,
+       9 =>  le.IndIdentityRisk ,
+      10 =>  le.IndResidencyRisk ,
+      11 =>  le.IndMatchLevel ,
+      12 =>  le.IndPersonalAssocRisk ,
+      13 =>  le.IndAssocResidencyRisk ,
+      14 =>  le.IndProfessionalRisk ,
+      15 =>  le.IndBusExecOffAssocRisk ,
 
-				'Invalid');
-		
-	END;
- 	
-	IndIndexV2 := normalize(ungroup(consumerAttributesV2), 15,createrecV2(LEFT,COUNTER ));
-	
+        'Invalid');
+
+  END;
+
+  IndIndexV2 := normalize(ungroup(consumerAttributesV2), 15,createrecV2(LEFT,COUNTER ));
+
 iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesResponse IntoConsumerAttributesV2(wseq le,consumerAttributesV2 ri ) := Transform
-    	self.Result.InputEcho := le.searchby;	
-			SELF.Result.AttributeGroup.attributes :=  IndIndexV2;
-			self.Result.UniqueId := (string)ri.did;
-			self.Result.AttributeGroup.Name := 'AMLRINDVATTRV2';
-		  self := le;
-			self := [];
+      self.Result.InputEcho := le.searchby;
+      SELF.Result.AttributeGroup.attributes :=  IndIndexV2;
+      self.Result.UniqueId := (string)ri.did;
+      self.Result.AttributeGroup.Name := 'AMLRINDVATTRV2';
+      self := le;
+      self := [];
 END;
-	
-	
-	IndAttributesV2 := join(wseq, 	consumerAttributesV2,
-	                     right.seq = left.seq,
-											 IntoConsumerAttributesV2(LEFT, RIGHT));
+
+
+  IndAttributesV2 := join(wseq,   consumerAttributesV2,
+                       right.seq = left.seq,
+                       IntoConsumerAttributesV2(LEFT, RIGHT));
 
 //  BUSINESS ATTRIBUTES STARTS HERE********************************************************
 
 
 business_risk.Layout_Input into_input(wseq L) := transform
   self.seq := l.seq;
-	self.bdid := (integer)l.searchby.Business.BusinessId;
-	self.historydate := history_date;
-	self.Account := (string)l.seq;
-	self.company_name := if(stringlib.stringtouppercase(l.searchby.Business.CompanyName) <> '',stringlib.stringtouppercase(l.searchby.Business.CompanyName), stringlib.stringtouppercase(l.searchby.Business.AlternateCompanyName));
-	
-	  addr_value := if(trim(l.searchby.Business.address.streetaddress1)!='', l.searchby.Business.address.streetaddress1,
-				Address.Addr1FromComponents(l.searchby.Business.address.streetnumber, l.searchby.Business.address.streetpredirection, l.searchby.Business.address.streetname,
-					l.searchby.Business.address.streetsuffix, l.searchby.Business.address.streetpostdirection, l.searchby.Business.address.unitdesignation, l.searchby.Business.address.unitnumber));
+  self.bdid := (integer)l.searchby.Business.BusinessId;
+  self.historydate := history_date;
+  self.Account := (string)l.seq;
+  self.company_name := if(STD.Str.ToUpperCase(l.searchby.Business.CompanyName) <> '',STD.Str.ToUpperCase(l.searchby.Business.CompanyName), STD.Str.ToUpperCase(l.searchby.Business.AlternateCompanyName));
 
-		clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.searchby.Business.address.city, l.searchby.Business.address.state, l.searchby.Business.address.zip5);
+    addr_value := if(trim(l.searchby.Business.address.streetaddress1)!='', l.searchby.Business.address.streetaddress1,
+        Address.Addr1FromComponents(l.searchby.Business.address.streetnumber, l.searchby.Business.address.streetpredirection, l.searchby.Business.address.streetname,
+          l.searchby.Business.address.streetsuffix, l.searchby.Business.address.streetpostdirection, l.searchby.Business.address.unitdesignation, l.searchby.Business.address.unitnumber));
 
-		self.prim_range      := clean_a2[1..10];
-		self.predir          := clean_a2[11..12];
-		self.prim_name       := clean_a2[13..40];
-		self.addr_suffix     := clean_a2[41..44];
-		self.postdir         := clean_a2[45..46];
-		self.unit_desig      := clean_a2[47..56];
-		self.sec_range       := clean_a2[57..64];
-		self.p_city_name     := clean_a2[90..114];
-		self.st              := clean_a2[115..116];
-		self.z5              := clean_a2[117..121];
-		self.zip4            := clean_a2[122..125];
-		self.lat             := clean_a2[146..155];
-		self.long            := clean_a2[156..166];
-		self.addr_type       := clean_a2[139];
-		self.addr_status     := clean_a2[179..182];
-		self.county          := clean_a2[143..145];
-		self.geo_blk         := clean_a2[171..177];
-		self.fein		 				 := l.searchby.Business.fein;
-	  self.phone10    		 := l.searchby.Business.phone;
+    clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.searchby.Business.address.city, l.searchby.Business.address.state, l.searchby.Business.address.zip5);
+
+    self.prim_range      := clean_a2[1..10];
+    self.predir          := clean_a2[11..12];
+    self.prim_name       := clean_a2[13..40];
+    self.addr_suffix     := clean_a2[41..44];
+    self.postdir         := clean_a2[45..46];
+    self.unit_desig      := clean_a2[47..56];
+    self.sec_range       := clean_a2[57..64];
+    self.p_city_name     := clean_a2[90..114];
+    self.st              := clean_a2[115..116];
+    self.z5              := clean_a2[117..121];
+    self.zip4            := clean_a2[122..125];
+    self.lat             := clean_a2[146..155];
+    self.long            := clean_a2[156..166];
+    self.addr_type       := clean_a2[139];
+    self.addr_status     := clean_a2[179..182];
+    self.county          := clean_a2[143..145];
+    self.geo_blk         := clean_a2[171..177];
+    self.fein            := l.searchby.Business.fein;
+    self.phone10         := l.searchby.Business.phone;
 
 end;
-	
+
 busInput := project(wseq,into_input(LEFT));
 
 
 
 business_risk.Layout_Input into_test_Busnprep(wseq l) := transform
   self.seq := l.seq;
-	self.historydate := history_date;
-	self.Account := (string)l.seq;
-	self.company_name := stringlib.stringtouppercase(l.searchby.Business.CompanyName);
-	self.z5              := l.searchby.business.address.zip5;
-	self.fein		 				 := l.searchby.Business.FEIN;
-	self.phone10    	   := l.searchby.Business.phone;
-	self := [];
+  self.historydate := history_date;
+  self.Account := (string)l.seq;
+  self.company_name := STD.Str.ToUpperCase(l.searchby.Business.CompanyName);
+  self.z5              := l.searchby.business.address.zip5;
+  self.fein            := l.searchby.Business.FEIN;
+  self.phone10         := l.searchby.Business.phone;
+  self := [];
 END;
-	test_Busnprep := PROJECT(wseq, into_test_Busnprep(LEFT));
+  test_Busnprep := PROJECT(wseq, into_test_Busnprep(LEFT));
 
 businessResults :=  if(TestDataEnabled, AML.AMLRiskAttributes_BusnTestSeed_Function(test_Busnprep, TestDataTableName),
-											AML.AMLBusinessShellFunction(busInput, 
-																								DataRestrictionMask,
-																								DPPA,
-																								GLBA,
-																								IncludeNegativeNews, 
-																								bsversion, 
-																								DataPermissionMask,
-																								mod_access));
+                      AML.AMLBusinessShellFunction(busInput,
+                                                mod_aml,
+                                                IncludeNegativeNews
+                                                ));
 
 
-businessResultsV2 :=  if(TestDataEnabled, AML.AMLRiskAttributesV2_BusnTestSeed_Function(test_Busnprep, TestDataTableName), 
-											AML.GetAMLAttribBusnV2(busInput, 
-											DataRestrictionMask,
-											DPPA,
-											GLBA,
-											gateways,
-											bsversion,
-                                            LexIdSourceOptout,
-                                            TransactionID,
-                                            BatchUID,
-                                            GlobalCompanyId,
-											UseXG5,
-											IncludeNewsProfile));
+businessResultsV2 :=  if(TestDataEnabled, AML.AMLRiskAttributesV2_BusnTestSeed_Function(test_Busnprep, TestDataTableName),
+                      AML.GetAMLAttribBusnV2(busInput,
+                      mod_aml,
+                      gateways,
+                      UseXG5,
+                      IncludeNewsProfile));
 
 iesp.share.t_NameValuePair BusnCreateRec(businessResults le, integer C) := TRANSFORM
-			self.Name:= case(c,
-			 1 => 'BusValidityIndex', 
-			 2 => 'BusStabilityIndex', 
-			 3 => 'BusLegalEventsIndex', 
-			 4 => 'BusAccesstoFundsIndex', 
-			 5 => 'BusGeographicIndex', 
-			 6 => 'BusAssociatesIndex',
-			 7 => 'BusIndustryRiskIndex',
-			 8 => 'BusAMLNegativeNews90', 
-			 9 => 'BusAMLNegativeNews24', 
-					  'Invalid');
-			self.Value:= case(c,
-			 1 =>  le.BusValidityIndex,
-			 2 =>  le.BusStabilityIndex,
-			 3 =>  le.BusLegalEventsIndex,
-			 4 =>  le.BusAccesstoFundsIndex,
-			 5 =>  le.BusGeographicIndex,
-			 6 =>  le.BusAssociatesIndex,
-			 7 =>  le.BusIndustryRiskIndex,
-			 8 =>  le.BusAMLNegativeNews90,
-			 9 =>  le.BusAMLNegativeNews24,
-			      'Invalid');
+      self.Name:= case(c,
+       1 => 'BusValidityIndex',
+       2 => 'BusStabilityIndex',
+       3 => 'BusLegalEventsIndex',
+       4 => 'BusAccesstoFundsIndex',
+       5 => 'BusGeographicIndex',
+       6 => 'BusAssociatesIndex',
+       7 => 'BusIndustryRiskIndex',
+       8 => 'BusAMLNegativeNews90',
+       9 => 'BusAMLNegativeNews24',
+            'Invalid');
+      self.Value:= case(c,
+       1 =>  le.BusValidityIndex,
+       2 =>  le.BusStabilityIndex,
+       3 =>  le.BusLegalEventsIndex,
+       4 =>  le.BusAccesstoFundsIndex,
+       5 =>  le.BusGeographicIndex,
+       6 =>  le.BusAssociatesIndex,
+       7 =>  le.BusIndustryRiskIndex,
+       8 =>  le.BusAMLNegativeNews90,
+       9 =>  le.BusAMLNegativeNews24,
+            'Invalid');
 END;
 
-	BusnIndex := normalize(businessResults, 9 ,BusnCreateRec(LEFT,COUNTER ));
-	
+  BusnIndex := normalize(businessResults, 9 ,BusnCreateRec(LEFT,COUNTER ));
+
 iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesResponse IntoBusnAttributes(wseq le,businessResults ri ) := Transform
-    	self.result.inputecho := le.searchby;	
-			SELF.Result.AttributeGroup.attributes :=  BusnIndex;
-			self.Result.BusinessId  := (string)ri.bdid;
-			self.Result.AttributeGroup.Name := 'AMLRBUSATTRV1';
-		  self := le;
-			self := [];
+      self.result.inputecho := le.searchby;
+      SELF.Result.AttributeGroup.attributes :=  BusnIndex;
+      self.Result.BusinessId  := (string)ri.bdid;
+      self.Result.AttributeGroup.Name := 'AMLRBUSATTRV1';
+      self := le;
+      self := [];
 END;
-	
-	
-	BusnAttributes := join(wseq, 	businessResults, 
-	                      right.seq = left.seq,
-												IntoBusnAttributes(LEFT, RIGHT));
+
+
+  BusnAttributes := join(wseq,   businessResults,
+                        right.seq = left.seq,
+                        IntoBusnAttributes(LEFT, RIGHT));
 
 //version 2
 iesp.share.t_NameValuePair BusnCreateRecV2(businessResultsV2 le, integer C) := TRANSFORM
-			self.Name:= case(c,
-			 1 => 'BusHighValueAssets', 
-			 2 => 'BusAccessToFunds', 
-			 3 => 'BusGeographicRisk', 
-			 4 => 'BusValidityRisk', 
-			 5 => 'BusStabilityRisk', 
-			 6 => 'BusIndustryRisk',
-			 7 => 'BusShellShelfRisk',
-			 8 => 'BusStructureType', 
-			 9 => 'BusSOSAgeRange', 
-			 10 => 'BusPublicRecordAgeRange',  
-			 11 => 'BusMatchLevel', 
-			 12 => 'BusLegalEvents', 
-			 13 => 'BusHighRiskNewsProfiles', 
-			 14 => 'BusHighRiskNewsProfileType', 
-			 15 => 'BusLinkedBusRisk', 
-			 16 => 'BusExecOfficersRisk', 
-			 17 => 'BusExecOfficersResidencyRisk',
-					  'Invalid');
-			self.Value:= case(c,
-			 1 =>  le.BusHighValueAssets,
-			 2 =>  le.BusAccessToFunds,
-			 3 =>  le.BusGeographicRisk,
-			 4 =>  le.BusValidityRisk,
-			 5 =>  le.BusStabilityRisk,
-			 6 =>  le.BusIndustryRisk,
-			 7 =>  le.BusShellShelfRisk,
-			 8 =>  le.BusStructureType,
-			 9 =>  le.BusSOSAgeRange,
-			 10 =>  le.BusPublicRecordAgeRange,
-			 11 =>  le.BusMatchLevel,
-			 12 =>  le.BusLegalEvents,
-			 13 =>  le.BusHighRiskNewsProfiles,
-			 14 =>  le.BusHighRiskNewsProfileType,
-			 15 =>  le.BusLinkedBusRisk,
-			 16 =>  le.BusExecOfficersRisk,
-			 17 =>  le.BusExecOfficersResidencyRisk,
-			      'Invalid');
+      self.Name:= case(c,
+       1 => 'BusHighValueAssets',
+       2 => 'BusAccessToFunds',
+       3 => 'BusGeographicRisk',
+       4 => 'BusValidityRisk',
+       5 => 'BusStabilityRisk',
+       6 => 'BusIndustryRisk',
+       7 => 'BusShellShelfRisk',
+       8 => 'BusStructureType',
+       9 => 'BusSOSAgeRange',
+       10 => 'BusPublicRecordAgeRange',
+       11 => 'BusMatchLevel',
+       12 => 'BusLegalEvents',
+       13 => 'BusHighRiskNewsProfiles',
+       14 => 'BusHighRiskNewsProfileType',
+       15 => 'BusLinkedBusRisk',
+       16 => 'BusExecOfficersRisk',
+       17 => 'BusExecOfficersResidencyRisk',
+            'Invalid');
+      self.Value:= case(c,
+       1 =>  le.BusHighValueAssets,
+       2 =>  le.BusAccessToFunds,
+       3 =>  le.BusGeographicRisk,
+       4 =>  le.BusValidityRisk,
+       5 =>  le.BusStabilityRisk,
+       6 =>  le.BusIndustryRisk,
+       7 =>  le.BusShellShelfRisk,
+       8 =>  le.BusStructureType,
+       9 =>  le.BusSOSAgeRange,
+       10 =>  le.BusPublicRecordAgeRange,
+       11 =>  le.BusMatchLevel,
+       12 =>  le.BusLegalEvents,
+       13 =>  le.BusHighRiskNewsProfiles,
+       14 =>  le.BusHighRiskNewsProfileType,
+       15 =>  le.BusLinkedBusRisk,
+       16 =>  le.BusExecOfficersRisk,
+       17 =>  le.BusExecOfficersResidencyRisk,
+            'Invalid');
 END;
 
-	BusnIndexV2 := normalize(businessResultsV2, 17 ,BusnCreateRecV2(LEFT,COUNTER ));
-	
+  BusnIndexV2 := normalize(businessResultsV2, 17 ,BusnCreateRecV2(LEFT,COUNTER ));
+
 iesp.amlrattributes.t_AntiMoneyLaunderingRiskAttributesResponse IntoBusnAttributesV2(wseq le,businessResultsV2 ri ) := Transform
-			// SELF.Result.InputEcho.Business.BusinessId  := (string)ri.bdid;
-    	self.result.inputecho := le.searchby;	
-			SELF.Result.AttributeGroup.attributes :=  BusnIndexV2;
-			self.Result.BusinessId  := (string)ri.OrigBdid;
-			self.Result.AttributeGroup.Name := 'AMLRBUSATTRV2';
-		  self := le;
-			self := [];
+      // SELF.Result.InputEcho.Business.BusinessId  := (string)ri.bdid;
+      self.result.inputecho := le.searchby;
+      SELF.Result.AttributeGroup.attributes :=  BusnIndexV2;
+      self.Result.BusinessId  := (string)ri.OrigBdid;
+      self.Result.AttributeGroup.Name := 'AMLRBUSATTRV2';
+      self := le;
+      self := [];
 END;
-	
-	
-	BusnAttributesV2 := join(wseq, 	businessResultsV2, 
-	                      right.seq = left.seq,
-												IntoBusnAttributesV2(LEFT, RIGHT));
+
+
+  BusnAttributesV2 := join(wseq,   businessResultsV2,
+                        right.seq = left.seq,
+                        IntoBusnAttributesV2(LEFT, RIGHT));
 
 // debugging section
 // output(test_Busnprep, named('test_Busnprep'));
 // output(search, named('search'));
 
 // output(IndFNameCheck, named('IndFNameCheck'));
-// output(IndFAddrCheck, named('IndFAddrCheck'));	
+// output(IndFAddrCheck, named('IndFAddrCheck'));
 // output(IndFLastCheck, named('IndFLastCheck'));
 // output(IndZipCheck, named('IndZipCheck'));
-// output(IndSSNCheck, named('IndSSNCheck'));	b
+// output(IndSSNCheck, named('IndSSNCheck'));  b
 // output(BusTaxIDCheck, named('BusTaxIDCheck'));
 // output(BusAddrCheck, named('BusAddrCheck'));
-// output(BusZipCheck, named('BusZipCheck'));	
+// output(BusZipCheck, named('BusZipCheck'));
 // output(BusNameCheck, named('BusNameCheck'));
 
 AttrVersionInd := if(attributesVersion = 'IND',IndAttributes, IndAttributesV2);
@@ -555,16 +525,16 @@ Deltabase_Logging_prep := project(FINAL, transform(Risk_Reporting.Layouts.LOG_De
                                                   self.delivery_method := DeliveryMethod,
                                                   self.date_added := (STRING8)Std.Date.Today(),
                                                   self.death_master_purpose := DeathMasterPurpose,
-                                                  self.ssn_mask := SSN_Mask,
-                                                  self.dob_mask := DOB_Mask,
-                                                  self.dl_mask := (String)(Integer)DL_Mask,
-                                                  self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
+                                                  self.ssn_mask := mod_aml.ssn_mask,
+                                                  self.dob_mask := suppress.date_mask_math.MaskValue(mod_aml.dob_mask),
+                                                  self.dl_mask := (String)(Integer)(mod_aml.dl_mask >0),
+                                                  self.exclude_dmv_pii := (String)(Integer)mod_aml.suppress_dmv,
                                                   self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
                                                   self.archive_opt_in := (String)(Integer)ArchiveOptIn,
-                                                  self.glb := GLBA,
-                                                  self.dppa := DPPA,
-                                                  self.data_restriction_mask := DataRestrictionMask,
-                                                  self.data_permission_mask := DataPermissionMask,
+                                                  self.glb := mod_aml.glb,
+                                                  self.dppa := mod_aml.dppa,
+                                                  self.data_restriction_mask := mod_aml.DataRestrictionMask,
+                                                  self.data_permission_mask := mod_aml.DataPermissionMask,
                                                   self.industry := Industry_Search[1].Industry,
                                                   self.i_attributes_name := optionsIn.AttributesVersionRequest,
                                                   self.i_ssn := search.Individual.SSN,
@@ -575,7 +545,7 @@ Deltabase_Logging_prep := project(FINAL, transform(Risk_Reporting.Layouts.LOG_De
                                                   self.i_name_full := search.Individual.Name.Full,
                                                   self.i_name_first := search.Individual.Name.First,
                                                   self.i_name_last := search.Individual.Name.Last,
-                                                  self.i_lexid := (Integer)search.Individual.UniqueId, 
+                                                  self.i_lexid := (Integer)search.Individual.UniqueId,
                                                   self.i_address := If(trim(search.Individual.address.streetaddress1)!='',
                                                                         trim(search.Individual.address.streetaddress1 + ' ' + search.Individual.address.streetaddress2),
                                                                            Address.Addr1FromComponents(search.Individual.address.streetnumber,
@@ -610,89 +580,3 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 ENDMACRO;
-
-
-/*--HELP-- 
-<pre>
-&lt;AMLRequest&gt;
- &lt;Row&gt;
- &lt;User&gt;
-  &lt;GLBPurpose&gt;&lt;/GLBPurpose&gt; 
-  &lt;DLPurpose&gt;&lt;/DLPurpose&gt; 
-  &lt;DataRestrictionMask&gt;&lt;/DataRestrictionMask&gt; 
-  &lt;TestDataEnabled&gt;false&lt;/TestDataEnabled&gt;
-  &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt;
-  &lt;/User&gt; 
- &lt;Options&gt;
-	&lt;IncludeWcoNews&gt;&lt;/IncludeWcoNews&gt;
-  &lt;AttributesVersionRequest&gt;&lt;/AttributesVersionRequest&gt;
-  &lt;ExcludeNewsAttributes&gt;&lt;/ExcludeNewsAttributes&gt;
-  &lt;HistoryDateYYYYMM&gt;&lt;/HistoryDateYYYYMM&gt;
-  &lt;/Options&gt;
- &lt;SearchBy&gt;
-&lt;Individual&gt;
-	&lt;UniqueId&gt;&lt;/UniqueId&gt;
-	&lt;Name&gt;
-  &lt;Full&gt;&lt;/Full&gt; 
-  &lt;First&gt;&lt;/First&gt; 
-  &lt;Middle&gt;&lt;/Middle&gt; 
-  &lt;Last&gt;&lt;/Last&gt; 
-  &lt;Suffix&gt;&lt;/Suffix&gt; 
-  &lt;Prefix&gt;&lt;/Prefix&gt; 
-  &lt;/Name&gt;
- &lt;Address&gt;
-  &lt;StreetNumber&gt;&lt;/StreetNumber&gt; 
-  &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt; 
-  &lt;StreetName&gt;&lt;/StreetName&gt; 
-  &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt; 
-  &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt; 
-  &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt; 
-  &lt;UnitNumber&gt;&lt;/UnitNumber&gt; 
-  &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt; 
-  &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt; 
-  &lt;City&gt;&lt;/City&gt; 
-  &lt;State&gt;&lt;/State&gt; 
-  &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;Zip4&gt;&lt;/Zip4&gt; 
-  &lt;County&gt;&lt;/County&gt; 
-  &lt;PostalCode&gt;&lt;/PostalCode&gt; 
-  &lt;StateCityZip&gt;&lt;/StateCityZip&gt; 
-  &lt;/Address&gt;
- &lt;DOB&gt;
-  &lt;Year&gt;0&lt;/Year&gt; 
-  &lt;Month&gt;0&lt;/Month&gt; 
-  &lt;Day&gt;0&lt;/Day&gt; 
-  &lt;/DOB&gt;
-  &lt;SSN&gt;&lt;/SSN&gt;
-  &lt;Phone&gt;&lt;/Phone&gt;
-&lt;/Individual&gt; 
-&lt;Business&gt;
- &lt;BusinessId&gt;&lt;/BusinessId&gt;
- &lt;CompanyName&gt;&lt;/CompanyName&gt;
- &lt;AlternateCompanyName&gt;&lt;/AlternateCompanyName&gt;
- &lt;Address&gt;
-  &lt;StreetNumber&gt;&lt;/StreetNumber&gt; 
-  &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt; 
-  &lt;StreetName&gt;&lt;/StreetName&gt; 
-  &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt; 
-  &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt; 
-  &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt; 
-  &lt;UnitNumber&gt;&lt;/UnitNumber&gt; 
-  &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt; 
-  &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt; 
-  &lt;City&gt;&lt;/City&gt; 
-  &lt;State&gt;&lt;/State&gt; 
-  &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;Zip4&gt;&lt;/Zip4&gt; 
-  &lt;County&gt;&lt;/County&gt; 
-  &lt;PostalCode&gt;&lt;/PostalCode&gt; 
-  &lt;StateCityZip&gt;&lt;/StateCityZip&gt;   
- &lt;/Address&gt;
-  &lt;FEIN&gt;&lt;/FEIN&gt;
-  &lt;Phone&gt;&lt/Phone&gt; 
- &lt;/Business&gt;
-  &lt;/SearchBy&gt;
- &lt;/Row&gt;
-&lt;/AMLRequest&gt;
-</pre>
-*/
