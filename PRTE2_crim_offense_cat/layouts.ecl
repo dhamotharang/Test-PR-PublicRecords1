@@ -7,9 +7,7 @@
 				
 		export layout_off_desc_1:=record
 		string75	off_desc_1;
+		string cust_name;
 		end;
-		
-		export layout_court_off_desc_1:=record
-		string75	court_off_desc_1;
-		end;
+
 end;
