@@ -786,6 +786,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT IRS_NonProfit_Base_Layout := RECORD
 		govdata.Layouts_IRS_NonProfit.Base_AID;
+		STRING did;
 		Link_Layout;
 	END;
 
@@ -797,6 +798,7 @@ EXPORT Layouts := MODULE
 	EXPORT IA_Sales_Tax_Base_Layout := RECORD
 		govdata.Layout_IA_SalesTax_Base;
 		INTEGER source_rec_id;
+		STRING did;
 		Link_Layout;
 	END;
 
