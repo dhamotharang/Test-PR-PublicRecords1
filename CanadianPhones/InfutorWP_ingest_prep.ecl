@@ -11,12 +11,12 @@ CanadianPhones.Layout_InfutorWP.BaseOut xfrmFields(ClnRawIn L) := TRANSFORM
 	SELF.Date_first_reported	:= (string)VersionControl.fGetFilenameVersion('~thor_data400::in::infutorwp');//thorlib.wuid()[2..9];
 	SELF.Date_last_reported		:= (string)VersionControl.fGetFilenameVersion('~thor_data400::in::infutorwp');
 
-	SELF.vendor					:= 'IP';
+	SELF.vendor					:= 'I7';
 	SELF.Source_file		:= 'INFUTOR_WHITEPAGES';
 	SELF.lastname				:= L.CAN_LNAME;
-	SELF.firstname			:= L.CAN_FNAME;
+	SELF.firstname			:= STD.Str.CleanSpaces(STD.Str.FindReplace(L.CAN_FNAME, '_',' '));
 	SELF.generational		:= L.CAN_SUFFIX;
-	SELF.title					:= L.CAN_TITLE;;
+	SELF.title					:= L.CAN_TITLE;
 	SELF.housenumber		:= L.CAN_HOUSE;
 	SELF.directional		:= L.CAN_PREDIR;
 	SELF.streetname			:= TRIM(L.CAN_STREET) +' '+ TRIM(L.CAN_STRTYPE);

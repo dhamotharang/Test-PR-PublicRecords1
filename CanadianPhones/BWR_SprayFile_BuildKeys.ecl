@@ -20,7 +20,9 @@ export BWR_SprayFile_BuildKeys(STRING  pVersion,
 //Actions: Spray Input Files, SuperFile Moves, Process Input Files, Build keys, Pull and Distribute QA Samples
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //pVersion := '20100727';
-//vsDate   := ut.GetDate;
+//pSource  := '/data/Builds/builds/CanadianPhones/data'
+//pHostname := 'bctlpedata12.risk.regn.net'
+
 dops_update := DOPS.updateversion('CanadianPhonesKeys',pVersion,'kevin.reeder@lexisnexisrisk.com',,'N');
 dops_update_v2 := DOPS.updateversion('CanadianPhonesV2Keys',pVersion,'kevin.reeder@lexisnexisrisk.com',,'N');
 

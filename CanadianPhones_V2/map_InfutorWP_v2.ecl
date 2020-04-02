@@ -8,7 +8,7 @@ EXPORT map_InfutorWP_v2(string8 filedate) := FUNCTION
 	
 	CanadianPhones_V2.layoutCanadianWhitepagesBase tInfWP(ds L) := TRANSFORM
 		SELF.history_flag 	:= 'C';
-		SELF.vendor					:= 'IP';
+		SELF.vendor					:= 'I7';
 		SELF.Source_file		:= 'INFUTOR_WHITEPAGES';
 		SELF.record_id			:= (string)L.record_id;
 		SELF 								:= L;
