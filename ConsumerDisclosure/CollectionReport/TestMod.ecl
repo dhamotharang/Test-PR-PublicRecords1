@@ -1,5 +1,5 @@
 IMPORT $, iesp, gateway, STD, Risk_Indicators, ut;
-IMPORT AlloyMedia_student_list, American_student_list, doxie, dx_Email, dx_header, gong, infutor, infutorcid, Impulse_Email;
+IMPORT AlloyMedia_student_list, American_student_list, doxie, dx_Email, dx_header, dx_gong, infutor, infutorcid, Impulse_Email;
 IMPORT DayBatchPCNSR, header_quick, PhonesFeedback, phonesplus, phonesplus_v2, ProfileBooster, Prof_License_Mari, prof_licensev2, POE, POEsFromEmails;
 IMPORT one_click_data, saleschannel, spoke, targus, thrive, vehiclev2, zoom;
 
@@ -33,12 +33,12 @@ EXPORT TestMod := MODULE
   SHARED doRawCompare(lexID, collection_name, collection_report_recs, raw_recs, date_field = '', sort_field = '') := FUNCTIONMACRO
 
     LOCAL layout_raw := RECORD
-      STRING1 #expand(FieldComparePrefix+'src');      
+      STRING1 #expand(FieldComparePrefix+'src');
       RECORDOF(raw_recs);
     END;
     LOCAL this_collection := collection_report_recs(STD.STR.CompareIgnoreCase(metadata.name, collection_name) = 0);
-    LOCAL this_collection_recs := PROJECT(this_collection.Records, TRANSFORM(layout_raw, 
-      SELF.#expand(FieldComparePrefix+'src') := 'Q';      
+    LOCAL this_collection_recs := PROJECT(this_collection.Records, TRANSFORM(layout_raw,
+      SELF.#expand(FieldComparePrefix+'src') := 'Q';
       SELF := FROMJSON(layout_raw, '{'+LEFT.content+'}');
       ));
 
@@ -47,18 +47,18 @@ EXPORT TestMod := MODULE
       #IF(#TEXT(sort_field) != '') sort_field,#END
       #IF(#TEXT(date_field) != '') -date_field,#END
       RECORD);
-    LOCAL this_raw_recs := PROJECT(this_raw_recs_sorted, TRANSFORM(layout_raw, 
+    LOCAL this_raw_recs := PROJECT(this_raw_recs_sorted, TRANSFORM(layout_raw,
       SELF.#expand(FieldComparePrefix+'src') := 'K';
       SELF := LEFT;
       ));
 
     this_recs := ut.CompareDatasets(this_collection_recs, this_raw_recs, FieldComparePrefix,  FieldExclusionREGEX);
-    RETURN this_recs(~in_mod.return_diff_only OR #expand(FieldComparePrefix + 'diff')); 
+    RETURN this_recs(~in_mod.return_diff_only OR #expand(FieldComparePrefix + 'diff'));
 
   ENDMACRO;
 
-  SHARED mac_output(in_mod, cname, recs) := MACRO 
-    if(STD.STR.CompareIgnoreCase(cname, in_mod.collection) = 0 OR in_mod.collection = '', OUTPUT(CHOOSEN(recs,MaxRecsOut), named(cname), ALL)); 
+  SHARED mac_output(in_mod, cname, recs) := MACRO
+    if(STD.STR.CompareIgnoreCase(cname, in_mod.collection) = 0 OR in_mod.collection = '', OUTPUT(CHOOSEN(recs,MaxRecsOut), named(cname), ALL));
   ENDMACRO;
 
   SHARED mac_get_payload(lexID, key, k_did_field) := FUNCTIONMACRO
@@ -72,15 +72,15 @@ EXPORT TestMod := MODULE
     collection_report_t1 := $.SOAP.callReport(in_mod).Result.Collections(metadata.name not in duplicate_set);
     collection_report_t2 := $.SOAP.callReportTier2(in_mod).Result.Collections;
     collection_report := collection_report_t1 + collection_report_t2;
-    
+
     lexid := in_mod.LexID;
     dids := DATASET([{lexid}], doxie.layout_references);
-    
+
     alloy_raw_recs := mac_get_payload(lexid, AlloyMedia_student_list.Key_DID, did);
     asl_raw_recs := mac_get_payload(lexid, American_student_list.key_DID, l_did);
     death_raw_recs := mac_get_payload(lexid, doxie.key_death_masterV2_ssa_DID, l_did);
     email_raw_recs := $.Raw.GetEmailRecs(dids);
-    gong_raw_recs := mac_get_payload(lexid, Gong.Key_History_did, l_did);
+    gong_raw_recs := mac_get_payload(lexid, dx_Gong.key_history_did(), l_did);
     impulse_raw_recs := mac_get_payload(lexid, Impulse_Email.Key_Impulse_DID, did);
     infutor_raw_recs := mac_get_payload(lexid, infutor.Key_Header_Infutor_Knowx, s_did);
     infutor_cid_raw_recs := mac_get_payload(lexid, InfutorCID.Key_Infutor_DID, did);
@@ -106,7 +106,7 @@ EXPORT TestMod := MODULE
     veh_party_raw_recs := $.Raw.GetVehiclePartyRecs(vehicle_ids);
     veh_main_raw_recs := $.Raw.GetVehicleMainRecs(vehicle_ids);
     zoom_raw_recs := mac_get_payload(lexid, zoom.keys().did.qa, did);
-    
+
     alloy_recs := doRawCompare(lexid, $.Constants.Collection.ALLOY, collection_report, alloy_raw_recs, date_last_seen);
     asl_recs := doRawCompare(lexid, $.Constants.Collection.ASL, collection_report, asl_raw_recs, date_last_seen);
     deathmaster_recs := doRawCompare(lexid, $.Constants.Collection.DEATH_MASTER, collection_report, death_raw_recs, filedate);
@@ -168,7 +168,7 @@ EXPORT TestMod := MODULE
 
     output(collection_report_t1, named('collection_report_t1'));
     output(collection_report_t2, named('collection_report_t2'));
-    
+
     return TRUE;
   end;
 
@@ -180,8 +180,8 @@ EXPORT TestMod := MODULE
   // Runs validation from BWR window.
   EXPORT runBWRValidation := FUNCTION
 
-    #WORKUNIT('name', '-- CCPA: Collection Report Validation --');  
-    gateways := dataset([{'neutralroxie', 'http://roxiestaging.br.seisint.com:9876'}], risk_indicators.layout_gateways_in); 
+    #WORKUNIT('name', '-- CCPA: Collection Report Validation --');
+    gateways := dataset([{'neutralroxie', 'http://roxiestaging.br.seisint.com:9876'}], risk_indicators.layout_gateways_in);
     #STORED('Gateways', gateways);
 
     RETURN doCompare(getParams());

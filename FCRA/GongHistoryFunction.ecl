@@ -1,6 +1,6 @@
-import risk_indicators, doxie_files, riskwise, codes, gong, address;
+import risk_indicators, dx_Gong, address, data_services;
 
-export GongHistoryFunction(dataset(Risk_Indicators.Layout_Input) bsprep, dataset(risk_indicators.Layout_BocaShell_Neutral) shell, 
+export GongHistoryFunction(dataset(Risk_Indicators.Layout_Input) bsprep, dataset(risk_indicators.Layout_BocaShell_Neutral) shell,
 														string30 account_value, unsigned6 adl_value) := function
 
 	// search for overrides
@@ -40,13 +40,13 @@ export GongHistoryFunction(dataset(Risk_Indicators.Layout_Input) bsprep, dataset
 		TRANSFORM(fcra.Layout_override_flag, SELF := Right)
 	);
 
-	Layout_Gong := recordof(gong.key_fcra_history_did);
+	Layout_Gong := dx_Gong.layouts.i_history_did;
 
 	gong_ffids := SET(ds_flagfile(file_id = FCRA.FILE_ID.GONG), flag_file_id );
 	gong_keys  := SET(ds_flagfile(file_id = FCRA.FILE_ID.GONG), trim(record_id) );
 	gong_corr  := CHOOSEN(FCRA.key_override_gong_ffid( keyed( flag_file_id in gong_ffids ) ), MAX_OVERRIDE_LIMIT );
 
-	gong_main := join(input_with_did,gong.Key_FCRA_History_did,
+	gong_main := join(input_with_did, dx_Gong.key_history_did(data_services.data_env.iFCRA),
 		(unsigned)left.did<>0
 			and keyed((unsigned)left.did=right.l_did)
 			and trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in gong_keys // old way - prior to 11/13/2012
@@ -73,7 +73,7 @@ export GongHistoryFunction(dataset(Risk_Indicators.Layout_Input) bsprep, dataset
 
 	gong_final := project( gong_recs, finalize(left) );
 
-	gong_final2 := dedup(sort(gong_final, -gong.dt_first_seen, -gong.dt_last_seen, gong.phone10, -gong.listing_type_bus, -gong.listing_type_res, -gong.listing_type_gov), 
+	gong_final2 := dedup(sort(gong_final, -gong.dt_first_seen, -gong.dt_last_seen, gong.phone10, -gong.listing_type_bus, -gong.listing_type_res, -gong.listing_type_gov),
 		gong.dt_first_seen, gong.dt_last_seen, gong.phone10);
 
 	return gong_final2;

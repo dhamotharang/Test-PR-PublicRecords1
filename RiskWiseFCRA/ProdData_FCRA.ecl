@@ -45,7 +45,7 @@
 */
 
 import american_student_list, avm_v2, doxie, doxie_files, fcra, liensv2, ln_propertyv2, riskwise, risk_indicators,
-       watercraft, bankruptcyv3, bankruptcyv2, gong, impulse_email, infutorcid, email_data, paw,
+       watercraft, bankruptcyv3, bankruptcyv2, dx_Gong, impulse_email, infutorcid, email_data, paw,
        advo, inquiry_acclogs,  prof_licenseV2, header_quick, AlloyMedia_student_list,
 	 SexOffender, _Control, watchdog, data_services, std, gateway,dx_ConsumerFinancialProtectionBureau;
 
@@ -63,7 +63,7 @@ export ProdData_FCRA := MACRO
 	'socs',
 	'dob',
 	'phone',
-	'IncludeAllFiles',	
+	'IncludeAllFiles',
 	'IncludeADVO',
   'IncludeAircraft',
 	'IncludeAVM',
@@ -87,8 +87,8 @@ export ProdData_FCRA := MACRO
   'IncludeSSNTable',
   'IncludeStudent',
 	'IncludeThrive',
-	'IncludeWatercraft',	
-	'IncludeCFPB',	
+	'IncludeWatercraft',
+	'IncludeCFPB',
 	'DisplayDeployedEnvironment',
 	'DataRestrictionMask',
   'IntendedPurpose',
@@ -133,7 +133,7 @@ boolean Include_Mari := false : stored('IncludeMari');
 boolean Include_Thrive := false : stored('IncludeThrive');
 boolean Include_DeathMaster := false : stored('IncludeDeathMaster');
 boolean Include_CFPB := false : stored('IncludeCFPB');
-	
+
 unsigned1 DPPA := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose');
 BOOLEAN DisplayDeployedEnvironment := FALSE : STORED('DisplayDeployedEnvironment');
@@ -161,14 +161,14 @@ input_rec parseAddr(emptySet l) := transform
 	self.fname := std.str.touppercase(in_first);
 	self.mname := std.str.touppercase(in_middle);
 	self.lname := std.str.touppercase(in_last);
-	
+
 	clean_addr := Risk_Indicators.MOD_AddressClean.clean_addr(in_addr, in_city, in_state, in_zip);
-	
+
 	self.in_streetaddress := in_addr;
 	self.in_city := in_city;
 	self.in_state := in_state;
 	self.in_zipcode := in_zip;
-	
+
 	self.prim_range := clean_addr[1..10];
 	self.predir := clean_addr[11..12];
 	self.prim_name := clean_addr[13..40];
@@ -203,9 +203,9 @@ END;
 clean_a2 := Project(clean_a2_geolink,TRANSFORM(InputLayout,self := LEFT));
 output(clean_a2, named('cleaned_input'));
 
-bsversion := 54; 
+bsversion := 54;
 neutral_gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
-								
+
 neutral_did_response := if(input_did=0, Risk_Indicators.Neutral_DID_Soapcall(clean_a2, neutral_gateways, bsversion, 2, DataRestrictionMask, true),
 	project(clean_a2, transform(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, self := left, self := []) ) );
 output(neutral_did_response, named('neutral_did_response'));
@@ -214,39 +214,39 @@ in_did := neutral_did_response[1].did;
 
 // DID section
 	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
-	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;	
-	
+	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;
+
 	qheader_recs := choosen(header_quick.key_DID_fcra(keyed(did=in_did)), 200);
-	if(include_header or Include_All_Files, output(qheader_recs, named('quick_header_records'))) ;	
-	
+	if(include_header or Include_All_Files, output(qheader_recs, named('quick_header_records'))) ;
+
 	header_corr := choosen(FCRA.Key_Override_Header_DID(keyed(did=in_did)), 500);
 	if(include_header or Include_All_Files, output(header_corr, named('header_corrections'))) ;
-	
+
 	address_hierarchy_recs := choosen(dx_header.key_addr_hist(iType)(keyed(s_did=in_did)), 200);
-	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
-	
+	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;
+
   address_hierarchy_unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded(iType)(keyed(did=in_did)), 200);
-	if(include_header or Include_All_Files, output(sort(address_hierarchy_unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
-	
+	if(include_header or Include_All_Files, output(sort(address_hierarchy_unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;
+
 	deathMaster_Recs := choosen(doxie.key_death_masterV2_ssa_DID_fcra(keyed(l_did=in_did)), 10);
 	if(Include_DeathMaster or Include_All_Files, output(deathMaster_Recs, named('deathMaster_Recs')));
-										
+
 	ssn_table_recs := choosen(risk_indicators.Key_SSN_Table_v4_filtered_FCRA(keyed(ssn=in_socs)), 10);
 	if(Include_SSN_Table or Include_All_Files, output(ssn_table_recs, named('ssn_table'))) ;
-	
+
 	prof_license_recs := choosen(prof_licenseV2.key_proflic_did (true)(keyed(did=in_did)), max_recs);
 	if(include_ProfessionalLicense or Include_All_Files, output(prof_license_recs, named('prof_license_records'))) ;
-	
+
 	american_student2 := choosen(american_student_list.key_did_fcra(keyed(l_did=in_did)), max_recs);
 	if(Include_Student or Include_All_Files, output(american_student2, named('american_student2')));
 
 	alloy := choosen(AlloyMedia_student_list.Key_DID_FCRA(keyed(did=in_did)), max_recs);
 	if(Include_Student or Include_All_Files, output(alloy, named('alloy_student')));
-	
+
 	watercraft_recs := choosen(watercraft.key_watercraft_did (true)(keyed(l_did=in_did)), max_recs);
 	watercraft_data :=
 	if(include_watercraft or Include_All_Files, output(watercraft_recs, named('watercraft_records'))) ;
-	
+
 	aircraft_recs := choosen(faa.key_aircraft_did(isFCRA)(keyed(did=in_did)), max_recs);
 	aircraft_data := Join(aircraft_recs, faa.key_aircraft_id(IsFCRA),
 											keyed( left.aircraft_id=right.aircraft_id ),
@@ -259,14 +259,14 @@ in_did := neutral_did_response[1].did;
 	layout_property_search := RECORDOF (ln_propertyv2.key_search_fid(isFCRA));
 	layout_assessments  := RECORDOF (ln_propertyv2.key_assessor_fid(isFCRA));
 	layout_deeds        := RECORDOF (ln_propertyv2.key_deed_fid(isFCRA));
-		
+
 	prop_search := JOIN (property_by_did, ln_propertyv2.key_search_fid(isFCRA),
                       keyed (Left.ln_fares_id = Right.ln_fares_id) and left.ln_fares_id<>'',
                       TRANSFORM (layout_property_search, SELF := Right),
                       ATMOST (max_recs));
 	if(include_property or Include_All_Files, output(prop_search, named('property_search'))) ;
 
-					  		
+
 	assessments := JOIN (property_by_did, ln_propertyv2.key_assessor_fid(isFCRA),
 						 keyed (Left.ln_fares_id = Right.ln_fares_id) and left.ln_fares_id<>'',
 						 TRANSFORM (layout_assessments, SELF := Right), atmost(max_recs));
@@ -286,58 +286,58 @@ in_did := neutral_did_response[1].did;
 							  keyed (Left.tmsid = Right.tmsid),
 							  transform(BankruptcyV2.layout_bankruptcy_search_v3, self := right), atmost(max_recs));
 	if(include_bankruptcy or Include_All_Files, output(bankruptcyv3_search, named('bankruptcyv3_search')));
-	
+
 	bankruptcyv3_main := JOIN (bkruptv3_by_did, BankruptcyV3.key_bankruptcyV3_main_full(isFCRA),
 							  Left.case_number<>'' AND Left.court_code<>'' AND
 							   keyed (Left.tmsid = Right.tmsid),
 							  transform(bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing, self := right), atmost(max_recs));
 	if(include_bankruptcy or Include_All_Files, output(bankruptcyv3_main, named('bankruptcyv3_main')));
-	
+
 
 	liens_by_did := choosen(liensv2.key_liens_DID_FCRA(keyed(did=in_did)), max_recs);
-	if(include_liens or Include_All_Files, output(liens_by_did, named('liens_by_did'))) ;	
+	if(include_liens or Include_All_Files, output(liens_by_did, named('liens_by_did'))) ;
 
-	  
-	liens_main := JOIN (liens_by_did, liensv2.key_liens_main_id_FCRA, 
+
+	liens_main := JOIN (liens_by_did, liensv2.key_liens_main_id_FCRA,
 						 Left.tmsid<>'' AND right.orig_filing_date<>'' and
 						 keyed (Left.tmsid = Right.tmsid) and keyed (Left.rmsid = Right.rmsid),
 						 transform(recordof(liensv2.key_liens_main_ID_FCRA), self := right),
 						 atmost(max_recs));
-	if(include_liens or Include_All_Files, output(liens_main, named('liens_main')) );	
-			
-	liens_party := JOIN (liens_by_did, liensv2.key_liens_party_id_FCRA, 
+	if(include_liens or Include_All_Files, output(liens_main, named('liens_main')) );
+
+	liens_party := JOIN (liens_by_did, liensv2.key_liens_party_id_FCRA,
 						 Left.tmsid<>'' AND keyed (Left.tmsid = Right.tmsid) and keyed (Left.rmsid = Right.rmsid) ,
-						 transform(recordof(liensv2.key_liens_party_id_FCRA), self := right), 
+						 transform(recordof(liensv2.key_liens_party_id_FCRA), self := right),
 						 atmost(max_recs));
-	if(include_liens or Include_All_Files, output(liens_party, named('liens_party')) );	
+	if(include_liens or Include_All_Files, output(liens_party, named('liens_party')) );
 
 
-  boolean include_crim := include_criminal or Include_All_Files;		
+  boolean include_crim := include_criminal or Include_All_Files;
 	offender_by_did := choosen(doxie_files.Key_Offenders(isFCRA)(keyed (sdid = in_did)), max_recs);
-	if(include_crim, output(offender_by_did, named('offender_by_did')) );				   
+	if(include_crim, output(offender_by_did, named('offender_by_did')) );
 
   ofks := dedup (project (offender_by_did, {offender_by_did.offender_key}), ALL);
-	offenses := JOIN (ofks, doxie_files.Key_Offenses(isFCRA), 
+	offenses := JOIN (ofks, doxie_files.Key_Offenses(isFCRA),
 					Left.offender_key<>'' AND keyed (Left.offender_key = Right.ok),
 					TRANSFORM (recordof(doxie_files.Key_Offenses(isFCRA)), SELF := Right), atmost(max_recs));
-	if(include_crim, output(offenses, named('offenses'))) ;				   
+	if(include_crim, output(offenses, named('offenses'))) ;
 
-	punishments := JOIN (ofks, doxie_files.Key_Punishment(isFCRA), 
-				  Left.offender_key <> '' AND keyed (Left.offender_key = Right.ok), 
+	punishments := JOIN (ofks, doxie_files.Key_Punishment(isFCRA),
+				  Left.offender_key <> '' AND keyed (Left.offender_key = Right.ok),
 				  transform(recordof(doxie_files.Key_Punishment(isFCRA)), self := right), atmost(max_recs));
-	if(include_crim, output(punishments, named('punishments'))) ;	
-	
+	if(include_crim, output(punishments, named('punishments'))) ;
+
   offender_plus := join (ofks, doxie_files.Key_Offenders_OffenderKey(isFCRA),
                   keyed (Left.offender_key = Right.ofk),
                   transform (recordof(doxie_files.Key_Offenders_OffenderKey(isFCRA)), Self := Right),
                   atmost (max_recs));
-	if(include_crim, output(offender_plus, named('offender_plus'))) ;	
+	if(include_crim, output(offender_plus, named('offender_plus'))) ;
 
   court_offenses := join (ofks, doxie_files.key_court_offenses(isFCRA),
                   keyed (Left.offender_key = Right.ofk),
                   transform (recordof(doxie_files.key_court_offenses(isFCRA)), Self := Right),
                   atmost(max_recs));
-	if(include_crim, output(court_offenses, named('court_offenses'))) ;	
+	if(include_crim, output(court_offenses, named('court_offenses'))) ;
 
 	sex_offender_by_did := choosen (SexOffender.Key_SexOffender_DID(isFCRA)(keyed (did = in_did)), max_recs);
   sspks := dedup (project (sex_offender_by_did, {sex_offender_by_did.seisint_primary_key}), ALL);
@@ -346,14 +346,14 @@ in_did := neutral_did_response[1].did;
                         keyed(left.seisint_primary_key=right.sspk),
                         transform(recordof (SexOffender.key_SexOffender_SPK(isFCRA)), self := right),
                         atmost(max_recs));
-	if(include_crim, output(sex_offenders, named('sex_offenders'))) ;	
+	if(include_crim, output(sex_offenders, named('sex_offenders'))) ;
 
 
   sex_offenses := join(sspks, SexOffender.Key_SexOffender_offenses(isFCRA),
                        keyed(left.seisint_primary_key=right.sspk),
                        transform(right),
                        atmost(max_recs));
-	if(include_crim, output(sex_offenses, named('sex_offenses'))) ;	
+	if(include_crim, output(sex_offenses, named('sex_offenses'))) ;
 
 	avm_addr := join(clean_a2, avm_v2.Key_AVM_Address_FCRA,
 					left.prim_name!='' and left.z5!='' and
@@ -362,29 +362,29 @@ in_did := neutral_did_response[1].did;
 					keyed(left.z5 = right.zip) and
 					keyed(left.prim_range = right.prim_range) and
 					keyed(left.sec_range = right.sec_range) and
-					left.predir=right.predir and 
+					left.predir=right.predir and
 					left.postdir=right.postdir,
 				  transform(recordof(avm_v2.Key_AVM_Address_FCRA), self := right), left outer, atmost(max_recs));
 	if(include_avm or Include_All_Files, output(avm_addr, named('avm_addr')) );
 
-gong_main := join(clean_a2,gong.Key_FCRA_History_did,
+gong_main := join(clean_a2,dx_Gong.key_history_did(iType),
 	left.did<>0 and keyed(left.did=right.l_did) ,
-	transform( recordof(gong.Key_FCRA_History_did), self := right ),
+	transform( dx_Gong.layouts.i_history_did, self := right ),
 	KEEP(100), LIMIT(1000));
 if(include_gong or Include_All_Files, output(gong_main, named('gong')));
 
 impulse_main := join(clean_a2,Impulse_Email.Key_Impulse_DID_FCRA,
-												left.did<>0 and keyed(left.did=right.did), 
+												left.did<>0 and keyed(left.did=right.did),
 												transform( recordof(Impulse_Email.Key_Impulse_DID_FCRA), self := right ),
 												KEEP(100), LIMIT(1000));
 if(include_impulse or Include_All_Files, output(impulse_main, named('impulse')));
-											
+
 infutor_main  := join(clean_a2, InfutorCID.Key_Infutor_DID_FCRA,
 												left.did<>0 and keyed(left.did=right.did) ,
 												transform( recordof(InfutorCID.Key_Infutor_DID_FCRA), self := right),
-												KEEP(100), LIMIT(1000));											
+												KEEP(100), LIMIT(1000));
 if(include_infutor or Include_All_Files, output(infutor_main, named('infutor')));
-	
+
 email_main  := join(clean_a2, email_data.Key_Did_FCRA,
 												left.did<>0 and keyed(left.did=right.did),
 												transform(recordof(email_data.Key_Did_FCRA), self := right),
@@ -409,7 +409,7 @@ advo_main  := join(clean_a2, Advo.Key_Addr1_FCRA,
 	transform( recordof(Advo.Key_Addr1_FCRA), self := right, self := [] ),
 	KEEP(1), LIMIT(1000));
 if(include_advo or Include_All_Files, output(advo_main, named('advo')));
-						
+
 inquiry_main  := join(clean_a2, Inquiry_AccLogs.Key_FCRA_DID,
 												left.did<>0 and keyed(left.did=right.appended_adl),
 												transform(recordof(Inquiry_AccLogs.Key_FCRA_DID), self := right),
@@ -439,8 +439,8 @@ best_data_noEQ  := join(clean_a2, Watchdog.Key_Watchdog_FCRA_nonEQ,
 												left.did<>0 and keyed(left.did=right.did),
 												transform(recordof(Watchdog.Key_Watchdog_FCRA_nonEQ), self := right),
 												KEEP(100), atmost(10000));
-if(Include_All_Files, 
-	if(datarestrictionmask[risk_indicators.iid_constants.posEquifaxRestriction]='1', 
+if(Include_All_Files,
+	if(datarestrictionmask[risk_indicators.iid_constants.posEquifaxRestriction]='1',
 		output(best_data_noEQ, named('best_data_noEQ')),
 		output(best_data_noEN, named('best_data_noEN'))
 		)
@@ -448,16 +448,16 @@ if(Include_All_Files,
 
 // FCRA Overrides section
 	if(include_overrides, output(choosen(fcra.key_override_pcr_ssn(keyed(ssn=in_socs)),max_recs), named('fcra_pcr_ssn')) );
-	
+
 	if(include_overrides, output(choosen(fcra.Key_Override_PCR_DID(keyed(s_did=in_did)),max_recs), named('fcra_pcr_did')) ) ;
 	ffid_by_did := choosen(fcra.key_override_flag_did(keyed(l_did=(string)in_did) and in_did<>0),max_recs);
 	ffid_by_ssn := choosen(fcra.Key_Override_Flag_SSN(keyed(l_ssn=in_socs) and in_socs<>''),max_recs);
-	
+
 	ffids := project(ffid_by_did, transform(fcra.Layout_override_flag, self := left)) + project(ffid_by_ssn, transform(fcra.Layout_override_flag, self := left));
 	if(include_overrides, output(ffids, named('fcra_flag_file')) ) ;
 
 	if(include_overrides, output(choosen(fcra.key_override_faa.aircraft(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_aircraft_ffid')) ) ;
-	if(include_overrides, output(choosen(fcra.Key_Override_AVM_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_avm_ffid')) ) ;	
+	if(include_overrides, output(choosen(fcra.Key_Override_AVM_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_avm_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.key_override_bkv3_search_ffid(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_bans_search_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.key_override_bkv3_main_ffid(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_bans_main_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.Key_Override_Crim.Offenders(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_crim_offender_ffid')) ) ;
@@ -470,15 +470,15 @@ if(Include_All_Files,
 	if(include_overrides, output(choosen(fcra.key_override_sexoffender.so_offenses(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_so_offenses_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.key_Override_liensv2_main_ffid(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_liens_main_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.key_Override_liensv2_party_ffid(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_liens_party_ffid')) ) ;
-	if(include_overrides, output(choosen(fcra.key_override_proflic_ffid(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_professional_license_ffid')) ) ;	
+	if(include_overrides, output(choosen(fcra.key_override_proflic_ffid(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_professional_license_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.key_override_property.search(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_prop_search_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.key_override_property.assessment(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_prop_assessment_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.key_override_property.deed(keyed(flag_file_id in set(ffids, flag_file_id))),max_recs), named('fcra_prop_deed_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.key_override_property.ownership(keyed(did=in_did)),max_recs), named('fcra_prop_ownership_did')) ) ;
-	if(include_overrides, output(choosen(fcra.Key_Override_Student_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_student_ffid')) ) ;	
-	if(include_overrides, output(choosen(FCRA.Key_Override_Student_New_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_student_new_ffid')) ) ;	
+	if(include_overrides, output(choosen(fcra.Key_Override_Student_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_student_ffid')) ) ;
+	if(include_overrides, output(choosen(FCRA.Key_Override_Student_New_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_student_new_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.Key_Override_Watercraft.sid(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_watercraft_ffid_sid')) ) ;
-	
+
 // ADDING 3.0 AND 4.0 OVERRIDE CONTENT
 	if(include_overrides, output(choosen(fcra.Key_Override_ADVO_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_ADVO_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.Key_Override_GONG_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_GONG_ffid')) ) ;
@@ -489,7 +489,7 @@ if(Include_All_Files,
 	if(include_overrides, output(choosen(fcra.Key_Override_PAW_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_PAW_ffid')) ) ;
 	if(include_overrides, output(choosen(fcra.Key_Override_PROFLIC_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_PROFLIC_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.Key_Override_SSN_Table_FFID(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('fcra_ssn_table_ffid')) ) ;
-	
+
 	if(include_overrides, output(choosen(FCRA.Key_Override_Proflic_Mari_ffid.proflic_mari(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('Override_Proflic_Mari_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.Key_Override_Thrive_ffid.THRIVE(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('Override_Thrive_ffid')) ) ;
 	if(include_overrides, output(choosen(FCRA.key_override_avm.avm_medians(keyed(flag_file_id in set(ffids, flag_file_id))), max_recs), named('avm_medians')) ) ;
@@ -497,13 +497,13 @@ if(Include_All_Files,
 	// For Score and Outcome Tracking we need to be able to determine if we are deployed to Cert or Prod - using this as a test.
 	IF(DisplayDeployedEnvironment, OUTPUT(_Control.ThisEnvironment.RoxieEnv, NAMED('Current_Environment')));
 
-input_with_did := project(clean_a2, transform(risk_indicators.layout_output, self := left; self := []));  
+input_with_did := project(clean_a2, transform(risk_indicators.layout_output, self := left; self := []));
 // gw_personcontext := dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
 gw_personcontext := dataset( [{'delta_personcontext',delta_PersonContext_gateway}], risk_indicators.layout_gateways_in );
 gateways := project(gw_personContext, transform(gateway.layouts.config, self := left, self := []) );
 
 
-    
+
 pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion, intendedPurpose);
 if(include_personContext or delta_personcontext_gateway <> '', output(pc, named('person_context')) );
 
@@ -514,19 +514,19 @@ withCFPB_surnames := join(clean_a2,CFPB_key_surnames,
 							        keyed(right.name=left.lname),
 							        transform(recordof(CFPB_key_surnames), self.name := left.lname,
 							        self := right, self := []), left outer,atmost(max_recs),keep(10));
-              
+
 if(include_all_files=true or include_CFPB=true, output(withCFPB_surnames, named('CFPB_surnames')) );
 
 CFPB_key_BLKGRP := dx_ConsumerFinancialProtectionBureau.key_BLKGRP(isFCRA);
 withCFPB_BLKGRP := join(clean_a2_geolink,CFPB_key_BLKGRP,
 		             keyed(right.GEOID10_BlkGrp =left.statecode+left.county+left.geo_blk) ,
-                transform(recordof(CFPB_key_BLKGRP), 
+                transform(recordof(CFPB_key_BLKGRP),
                 self.State_FIPS10 := left.statecode,
                 self.County_FIPS10 := left.county,
                 self.Tract_FIPS10 := left.geo_blk[1..6],
                 self.BlkGrp_FIPS10 := (INTEGER)left.geo_blk[7],
 							      self := right, self := []), left outer,atmost(max_recs),keep(10));
-              
+
 if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP, named('withCFPB_BLKGRP')) );
 
 
@@ -535,7 +535,7 @@ withCFPB_BLKGRP_attr_over18 := join(clean_a2_geolink,CFPB_key_BLKGRP_attr_over18
 							                  keyed(right.GeoInd = left.statecode+left.county+left.geo_blk),
 							                  transform(recordof(CFPB_key_BLKGRP_attr_over18),
 							                  self := right, self := []), left outer,atmost(max_recs),keep(10));
-              
+
 if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over18, named('withCFPB_BLKGRP_attr_over18')) );
 
 ENDMACRO;

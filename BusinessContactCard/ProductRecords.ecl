@@ -1,5 +1,5 @@
 
-IMPORT AutoStandardI, doxie, doxie_cbrs, iesp, Gong, moxie_phonesplus_server, Suppress, ut;
+IMPORT AutoStandardI, doxie, doxie_cbrs, iesp, dx_Gong, moxie_phonesplus_server, Suppress, ut;
 
 // The following module makes available to consuming services all attributes that fulfill
 // the data requirements for BusinessContactCard. These exported attributes may be therefore
@@ -125,7 +125,7 @@ EXPORT ProductRecords := MODULE
       UNSIGNED8 record_sid := 0;
     END;
 
-    _gong_records_acctno_no_timezone := JOIN(ds_in, Gong.key_did,
+    _gong_records_acctno_no_timezone := JOIN(ds_in, dx_Gong.key_did(),
       KEYED(LEFT.did = RIGHT.l_did),
       TRANSFORM(tmp_layout,
         SELF.acctno := LEFT.acctno,
