@@ -103,6 +103,10 @@ module
 	//Validate Deltabase 
 	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
+	//Identify RIN Source
+	Export NewBaseSources	:= Append_RinSource(NewBaseDelta):independent;
+
+
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseSources);
 
 END;

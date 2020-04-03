@@ -511,7 +511,8 @@ export Main         :=
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
 	unsigned4					global_sid := 0;
-	unsigned8					record_sid := 0; 	
+	unsigned8					record_sid := 0;
+	unsigned1					RIN_Source := 0; 	
 end; 
 
 end; 
@@ -718,6 +719,7 @@ export keybuild
 	string250					reason_cleared_code := ''; 
 	unsigned4					global_sid := 0;
 	unsigned8 				record_sid := 0; 	
+	unsigned1					RIN_Source := 0; 	
 
 end; 
 
