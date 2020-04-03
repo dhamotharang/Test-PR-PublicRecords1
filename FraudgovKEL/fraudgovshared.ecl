@@ -21,7 +21,7 @@ SetFLIrma := [1454157906]; // SIU Account
 
 DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
 // take this distribute out jp
-CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(FraudgovKEL.fraudgovprep)(/*clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and */),
+CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(FraudgovKEL.fraudgovprep),
                                    FraudgovKEL.SharingRules/*(targetcustomerhash not in demohashes)*/, 
                        //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
                        
@@ -125,7 +125,10 @@ or ssn in ['595637941','589650781','770703763'])
                            : PERSIST('~temp::deleteme27');
                            
 // output this to setup ramps cert to be able to build without having all the appends.
-tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
+tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR))
+               ((zip = '33136' and (UNSIGNED)event_date < 20130825) OR
+							   OttoIpAddressId % 100 = 0
+							 );
 //output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
 EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; // tempbuild;
