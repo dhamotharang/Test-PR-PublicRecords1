@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, ut, gong, CriminalRecords_Services, Suppress;
+IMPORT doxie, iesp, ut, dx_Gong, CriminalRecords_Services, Suppress;
 
 export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
   Doxie.IDataAccess mod_access,
@@ -127,7 +127,7 @@ export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
 
   nbr:=project(p_neighbors,transform(nbr_phone_layout,self:=left,self:=[]));
 
-  gong_key:=Gong.Key_History_phone;
+  gong_key:=dx_Gong.key_history_phone();
 
   nbr_phone_layout_optout addgong (nbr l, gong_key r):=transform
     self.Phone10         :=r.phone10;

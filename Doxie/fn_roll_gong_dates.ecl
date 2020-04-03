@@ -1,4 +1,4 @@
-import Doxie, gong, Suppress;
+import Doxie, dx_Gong, Suppress;
 
 export fn_roll_gong_dates(DATASET(layout_presentation) in_f, doxie.IDataAccess mod_access) := FUNCTION
 
@@ -25,7 +25,8 @@ f_slim_ap := project(in_f, transform(slim_addr_phone_rec,self := left));
 
 f_slim_ap_dep := dedup(sort(f_slim_ap(prim_name<>''),record),record);
 
-slim_addr_phone_rec_optout get_phone_dates(f_slim_ap_dep l, gong.Key_History_Address r) := transform
+key_history_address := dx_Gong.key_history_address();
+slim_addr_phone_rec_optout get_phone_dates(f_slim_ap_dep l, key_history_address r) := transform
   self.phone_first_seen := (integer)r.dt_first_seen[1..6];
   self.phone_last_seen := (integer)r.dt_last_seen[1..6];
   self.global_sid := r.global_sid;
@@ -34,7 +35,7 @@ slim_addr_phone_rec_optout get_phone_dates(f_slim_ap_dep l, gong.Key_History_Add
   self := l;
 end;
 
-_f_slim_ap_with_dates := join(f_slim_ap_dep, gong.Key_History_Address,
+_f_slim_ap_with_dates := join(f_slim_ap_dep, key_history_address,
   keyed(left.prim_name = right.prim_name) and
   keyed(left.st = right.st) and
   keyed(left.zip = right.z5) and

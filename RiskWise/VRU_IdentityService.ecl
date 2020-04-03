@@ -9,18 +9,18 @@
 	<part name="zip5" type="xsd:string" description=" (5-digit)"/>
   <separator />
 
-	<part name="first" type="xsd:string" /> 
+	<part name="first" type="xsd:string" />
 	<part name="middle" type="xsd:string" />
-	<part name="last" type="xsd:string" /> 
+	<part name="last" type="xsd:string" />
 	<part name="suffix" type="xsd:string"/>
-	<part name="addr" type="xsd:string" /> 
-	<part name="city" type="xsd:string" /> 
-	<part name="state" type="xsd:string" /> 
+	<part name="addr" type="xsd:string" />
+	<part name="city" type="xsd:string" />
+	<part name="state" type="xsd:string" />
 	<part name="zip" type="xsd:string" description=" (9-digit)"/>
 	<part name="dob" type="xsd:string" description=" full date of birth"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
   <separator />
-	
+
 	<part name="seq" type="xsd:unsigned" />
 	<part name="neutralIP" type="xsd:string" default="http://roxiestaging.br.seisint.com:9876" description=" gateway to Neutral DID Service"/>
 </message>
@@ -28,7 +28,7 @@
 /*--INFO-- Returns DID based on VRU input. */
 
 EXPORT VRU_IdentityService := MACRO
-IMPORT doxie, gong, header, FCRA, Address, risk_indicators, header_quick, AutoStandardI, DeathV2_Services, did_add, gateway;
+IMPORT doxie, dx_Gong, header, FCRA, Address, risk_indicators, header_quick, AutoStandardI, DeathV2_Services, did_add, gateway;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
@@ -98,7 +98,7 @@ layout_output   := RiskWise.layouts_vru.layout_output;
 
 // formal projection to encapsulate input parameters
 layout_temp := RECORD
-  unsigned1 x := 0; 
+  unsigned1 x := 0;
 END;
 
 layout_input GetInput (layout_temp L) := TRANSFORM
@@ -132,7 +132,7 @@ ds_input := PROJECT (DATASET ([{1}], {layout_temp}), GetInput (Left));
 
 layout_did := RECORD
   unsigned6 did := 0;
-END;	
+END;
 
 index_header := dx_header.key_header();
 layout_person GetPersonData (index_header R) := TRANSFORM
@@ -170,7 +170,7 @@ dids_ssn2 := JOIN (DEDUP (ds_DidsFromSSN, did, ALL), header_quick.key_DID,
 dids_ssn := sort(ungroup(dids_ssn1+dids_ssn2),did);
 
 //Find Gong records by phone
-ds_DidsFromGong := JOIN (DATASET ([{phone_val}], {string10 phone}), gong.Key_History_Phone,
+ds_DidsFromGong := JOIN (DATASET ([{phone_val}], {string10 phone}), dx_Gong.key_history_phone(),
                     Right.did != 0 AND
                     keyed (Left.phone[4..10] = Right.p7) AND
                     keyed (Left.phone[1..3] = Right.p3),
@@ -196,14 +196,14 @@ dids_phone := sort(ungroup(dids_phone1+dids_phone2),did);
 
 
 
-csz := Address.Addr2FromComponents(city_val, state_val, zip9_val);	
+csz := Address.Addr2FromComponents(city_val, state_val, zip9_val);
 clean_a := if(address_val='' or csz='', '', Address.CleanAddress182(address_val,csz));
 cleaned := Address.CleanAddress182(address_val,csz);
 clean_pr := clean_a[1..10]; // cleaned prim range
 clean_pn := clean_a[13..40]; // cleaned prim name
 clean_sr := clean_a[57..64]; // cleaned sec range
 clean_z5 := if(clean_a[117..121]<>'', clean_a[117..121], zip9_val[1..5]);	// use the input zip if cass zip is empty
-			
+
 tscore(UNSIGNED1 i) := IF(i=255,0,i);
 
 
@@ -227,18 +227,18 @@ layout_person ChooseAddress (layout_person L, layout_person R ) := TRANSFORM
 
   SELF.dt_first_seen := IF (takeAddress, R.dt_first_seen, L.dt_first_seen);
   SELF.dt_last_seen  := IF (takeAddress, R.dt_last_seen, L.dt_last_seen);
-  
+
   // best name
   // see how both records do against the input
   lfScore := risk_indicators.FnameScore(first_val,l.fname); // left's fname score
   rfScore := risk_indicators.FnameScore(first_val,r.fname); // right's fname score
   llScore := risk_indicators.LnameScore(last_val,l.lname);  // left's lname score
   rlScore := risk_indicators.LnameScore(last_val,r.lname);  // right's lname score
-  
+
   // on blank input, simply follow what takeAddress indicates; on valid input, use which ever one scores higher (but not 255)
   fnameRight := first_val='' and takeAddress or tscore(rfscore) > tscore(lfscore);
   lnameRight := last_val ='' and takeAddress or tscore(rlscore) > tscore(llscore);
-  
+
   self.fname := if( fnameRight, r.fname, l.fname );
   self.lname := if( lnameRight, r.lname, l.lname );
   self.mname := map(
@@ -250,7 +250,7 @@ layout_person ChooseAddress (layout_person L, layout_person R ) := TRANSFORM
 	length(l.mname) > length(r.mname) => l.mname,
 	r.mname
   );
-	
+
 
   SELF.predir     := IF (takeAddress, R.predir,     L.predir);
   SELF.prim_name  := IF (takeAddress, R.prim_name,  L.prim_name);
@@ -263,12 +263,12 @@ layout_person ChooseAddress (layout_person L, layout_person R ) := TRANSFORM
   SELF.st         := IF (takeAddress, R.st,         L.st);
   SELF.zip        := IF (takeAddress, R.zip,        L.zip);
   SELF.zip4       := IF (takeAddress, R.zip4,       L.zip4);
-  
+
   // score the SSNs and pick the best match
   LSSNScore := did_add.ssn_match_score( ssn_val, L.ssn );
   RSSNScore := did_add.ssn_match_score( ssn_val, R.ssn );
   self.ssn := if(tscore(LSSNScore) > tscore(RSSNScore), L.ssn, R.ssn );
-  
+
   self.did := if( L.did=0, R.did, L.did );
 END;
 
@@ -279,11 +279,11 @@ END;
 // ====================================================================
 ///////////////////////////////////////////////////////////////////////
 
-// ---------------------------- I. BY SSN ----------------------------- 
-  
+// ---------------------------- I. BY SSN -----------------------------
+
 //    A. Unless phone is present, or both housenum and zip are present;
 ds_ssn_noparams := Risk_Indicators.iid_constants.GetVRUDataset (1, 'ssn: no phone or address');
-		
+
 //    B. Find dids by ssn, filter by zip/hnumber/yob, don't eliminate if dob is blank
 boolean match_dob     := (yob_val     = '') OR (dids_ssn.dob = 0) OR (yob_val = ((string) dids_ssn.dob)[3..4]);
 boolean match_hnumber := (hnumber_val = '') OR (hnumber_val = dids_ssn.prim_range);
@@ -299,7 +299,7 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
 
 //    C. If there were no dids found;
     ds_ssn_nodids := Risk_Indicators.iid_constants.GetVRUDataset (1, 'ssn: no dids found');
-	
+
 //    D. If there is a phone number, find the phone number in gong.
 //        2.If there were no gong hits;
 //            a) If single did found, and the customer supplied housenum and zip;
@@ -329,7 +329,7 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
                          TRANSFORM (layout_person, SELF := Left),
                          LOOKUP);
         CNT_by_dids := COUNT (DEDUP (ds_join_did, did, ALL));
-        
+
         // join by HHID
         ds_join_hhid := JOIN (dids_ssn_filtered, DEDUP (dids_phone (hhid != 0), hhid, ALL),
                          Left.hhid = Right.hhid,
@@ -362,7 +362,7 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
                                     keyed (Left.did = Right.did),
                                     getRelativesHHID (Right),
                                     LEFT OUTER, LIMIT (MAX_HHID_DID, SKIP));
-        
+
         // cross them, take those dids (header spawned), for which hhid match
         ds_did_hhid := JOIN (ds_rel_hhid_header, ds_rel_hhid_gong,
                              Left.hhid = Right.hhid,
@@ -374,8 +374,8 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
                              LOOKUP);
         CNT_by_rel_hhids := COUNT (DEDUP (ds_join_rel, did, ALL));
 
-        phones_filtered := DEDUP (SORT (dids_phone (prim_range != '', prim_name != '', zip != ''), 
-                                       prim_range, prim_name, zip, sec_range), 
+        phones_filtered := DEDUP (SORT (dids_phone (prim_range != '', prim_name != '', zip != ''),
+                                       prim_range, prim_name, zip, sec_range),
                                   prim_range, prim_name, zip, sec_range);
 
         ds_join_address := JOIN (dids_ssn_filtered, phones_filtered,
@@ -386,10 +386,10 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
                                  LOOKUP);
 
         // choose the non-empty one, if any
-        ds_join := IF (CNT_by_dids = 0, 
+        ds_join := IF (CNT_by_dids = 0,
                        IF (CNT_by_hhids = 0, IF (CNT_by_rel_hhids = 0, ds_join_address, ds_join_rel),
                        ds_join_hhid), ds_join_did);
-        str_log := IF (CNT_by_dids = 0, 
+        str_log := IF (CNT_by_dids = 0,
                        IF (CNT_by_hhids = 0, IF (CNT_by_rel_hhids = 0, '(address)', '(rhhid)'),
                        '(hhid)'), '(did)');
 //==========================================================================
@@ -437,7 +437,7 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
 
     // choose among: C:no dids OR (D:dids+phone OR E:dids+nophone)
     ds_by_ssn := IF (CNT_DidsBySSN = 0, ds_ssn_nodids, IF (phone_present, ds_ssn_phone, ds_ssn_nophone));
-	
+
 ds_social := IF (phone_present OR address_present, ds_by_ssn, ds_ssn_noparams);
 
 
@@ -466,7 +466,7 @@ ds_social := IF (phone_present OR address_present, ds_by_ssn, ds_ssn_noparams);
 //    D. Otherwise, if there were multiple gong records; 1.VRU = 1. 2.Stop.
 //    E. Finally, if there were no gong records; 1.VRU = 1 2.Stop.
     ds_phone_gong := IF (CNT_DidsByPhone = 1, phone_single_did, Risk_Indicators.iid_constants.GetVRUDataset (1, 'phone: multiple or no dids'));
-    
+
 ds_phone := IF (address_present, ds_phone_gong, ds_phone_noaddress);
 verified_dids := IF (ssn_present, ds_social, ds_phone);
 
@@ -488,7 +488,7 @@ ds_phone_best := ROLLUP (ds_phone_filtered, TRUE, ChooseAddress (Left, Right));
 dids_numeric_pre := IF (ssn_present, ds_ssn_best, ds_phone_best);
 
 gongByDID := if( dids_numeric_pre[1].did != 0,
-	project( gong.Key_History_did( keyed (l_did = dids_numeric_pre[1].did ) ),
+	project( dx_Gong.key_history_did()( keyed (l_did = dids_numeric_pre[1].did ) ),
 	transform( layout_person,
 		self.phone := left.phone10,
 		self.dt_first_seen:=(integer)left.dt_first_seen,
@@ -534,7 +534,7 @@ risk_indicators.layout_input SetInput () := TRANSFORM
 	SELF.z5          := clean_addr[117..121];
 	SELF.zip4        := clean_addr[122..125];
 	SELF.historydate := 999999;
-  SELF := [];   
+  SELF := [];
 END;
 pre_iid := PROJECT(DATASET ([{0}], {integer int}), SetInput());
 
@@ -607,7 +607,7 @@ ds_general_vru := map(
 // ds_general_vru, dids_general --  non-numeric case
 
 // choose numeric or non-numeric data
-ds_verified := IF (IsVRU, ds_numeric_vru, ds_general_vru);	
+ds_verified := IF (IsVRU, ds_numeric_vru, ds_general_vru);
 dids_append := IF (IsVRU, dids_numeric, dids_general);
 
 
@@ -624,7 +624,7 @@ layout_output SetOutput (layout_output L) := TRANSFORM
 // add DIDs if vru-code is OK; special Numeric case: code=1, identified: address absent
   addID := /*~exists(corrected_person) and*/ // if corrected person is found using SSN override, don't used dids
 			( (L.VRU_code != 1) OR (IsVRU AND ssn_present AND phone_present AND ~address_present AND (CNT_JoinDids = 1)) );
-  
+
   SELF.VRU_code := IF (IsDeceased, 0, L.VRU_code);
   SELF.VRU_message := IF (IsDeceased, trim (L.VRU_message) + ' [deceased]', L.VRU_message);
   SELF.id := IF (addID, dids_adjusted, L.id);
@@ -634,7 +634,7 @@ layout_output SetOutput (layout_output L) := TRANSFORM
 END;
 ds_result :=  PROJECT (ds_verified, SetOutput (Left));
 
-OUTPUT(ds_result, NAMED('result'));	
+OUTPUT(ds_result, NAMED('result'));
 
 ENDMACRO;
 // RiskWise.VRU_IdentityService()

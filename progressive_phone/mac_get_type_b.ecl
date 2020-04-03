@@ -1,6 +1,6 @@
 export mac_get_type_b(f_b_did, f_b_acctno, f_b_out, mod_access, use_input=false) := macro
 
-import STD, gong, ut, progressive_phone, NID, Lib_Word;
+import STD, dx_Gong, ut, progressive_phone, NID, Lib_Word;
 
 #uniquename(f_b_did_set)
 %f_b_did_set% := SET(f_b_did, did);
@@ -8,9 +8,9 @@ import STD, gong, ut, progressive_phone, NID, Lib_Word;
 #uniquename(gong_addr_key)
 #uniquename(gong_history_phone_key)
 #uniquename(gong_did)
-%gong_addr_key% := gong.Key_History_Address;
-%gong_history_phone_key% := gong.Key_History_phone;
-%gong_did% := gong.key_history_did;
+%gong_addr_key% := dx_Gong.key_history_address();
+%gong_history_phone_key% := dx_Gong.key_history_phone();
+%gong_did% := dx_Gong.key_history_did();
 
 #uniquename(blue_recs)
 progressive_phone.mac_get_blue(f_b_did, %blue_recs%, true, false, false, mod_access)
