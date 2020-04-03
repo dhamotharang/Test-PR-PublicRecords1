@@ -18,7 +18,7 @@ EXPORT Constants := MODULE
 		EXPORT LandingZoneIP := PRTE2_Common.Constants.InsLandingZone;
 																 
 		// EXPORT SourcePathForPIICSV		    		:= '/load01/prct2/PropertyInfo/';		
-		InsLandingPathPrefix     := PRTE2_Common.Constants.InsLandingPathPrefix;
+		InsLandingPathPrefix     := PRTE2_Common.Constants.InsLandingPathPrefix+'PropertyInfo/';
     EXPORT SourcePathForPIICSV  := InsLandingPathPrefix;     // New Boca LZ doesn't allow but 1 directory                 
 
 		EXPORT CSVSprayFieldSeparator				:= '\\,';

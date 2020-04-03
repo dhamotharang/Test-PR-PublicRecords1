@@ -10,14 +10,14 @@ Also while I'm doing this create logic to add "E" and "F" records, then despray 
 ************************************************************************************************************************ */
 
 IMPORT PRTE2_Common, ut;
-IMPORT PRTE2_PropertyInfo_Ins as PII;
+IMPORT PRTE2_PropertyInfo_Ins_PreMLS;
 IMPORT PRTE2_PropertyInfo_Ins_MLS_X;
 
 #workunit('name', 'ALPHA PRCT PropertyInfo Despray');
 
 dateString 		:= PRTE2_Common.Constants.TodayString;
-LandingZoneIP 	:= PII.Constants.LandingZoneIP;
-TempCSV			:= PII.Files.Alpha_Spray_Name;
+LandingZoneIP 	:= PRTE2_PropertyInfo_Ins_PreMLS.Constants.LandingZoneIP;
+TempCSV			:= PRTE2_PropertyInfo_Ins_PreMLS.Files.Alpha_Spray_Name;
 appendIfCSZ 	:= PRTE2_Common.Functions.appendIfCSZ;
 
 //----------- Prepare the Alpharetta Export_DS desired ----------------
@@ -65,7 +65,7 @@ ViewLayout := RECORD
 END;
 OUTPUT(PROJECT(EXPORT_DS,viewLayout));
 //---------------------------------------------------------------------
-lzFilePathFile	:= PII.Constants.SourcePathForPIICSV + desprayName;
+lzFilePathFile	:= PRTE2_PropertyInfo_Ins_PreMLS.Constants.SourcePathForPIICSV + desprayName;
 
 PRTE2_Common.DesprayCSV(EXPORT_DS, TempCSV, LandingZoneIP, lzFilePathFile);
 
