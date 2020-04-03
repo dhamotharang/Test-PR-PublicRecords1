@@ -8,11 +8,13 @@ file_offenses_base_plus_2:=project(PRTE2_DOC.files.file_offenses_base_plus,Layou
 file_court_offenses_plus_2 := project(PRTE2_DOC.files.file_court_offenses_plus,
 Transform(Layouts.layout_off_desc_1,
 SELF.off_desc_1:= Left.court_off_desc_1;
+self.cust_name:=Left.cust_name;
 ));
 
 file_arrests := project(PRTE2_DOC.files.file_court_offenses_plus,
 Transform(Layouts.layout_off_desc_1,
 SELF.off_desc_1:= Left.arr_off_desc_1;
+self.cust_name:=left.cust_name;
 ));
 
 all_files:=file_offenses_base_plus_2 + file_court_offenses_plus_2 + file_arrests;
@@ -30,8 +32,17 @@ my_index := index({
 											 self.offensecharge:=right.off_desc_1;
 											 self:=left;));		
 											 
-base_file:=sort(dedup(Join_file),record);
-	
+Join_file2:= JOIN(file_offenses_base_plus_3(off_desc_1 !=''),
+                  my_index,
+                  LEFT.off_desc_1 = RIGHT.offensecharge, 
+                  TRANSFORM(layouts.base_layout,
+								            self.offensecharge:=left.off_desc_1;
+														self.category:= 'Uncategorized';
+                            self.id:= '0';),
+														left only);
+
+base_file:=sort(dedup(Join_file+Join_file2),record);
+
 PromoteSupers.Mac_SF_BuildProcess(base_file,Constants.base_name,base_out,,,true);
 
 EXPORT proc_build_base :=   base_out;	
