@@ -9,7 +9,7 @@ Receive recordset with "E" records.
 ************************************************************************************************************************ */
 IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PropertyCharacteristics;
 
-BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec;
+BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec_MLS;
 
 cleanValue(STRING someValue) := PropertyCharacteristics.Functions.fn_remove_zeroes(someValue);
 isEMPTY(STRING s1) := cleanValue(s1)='';
