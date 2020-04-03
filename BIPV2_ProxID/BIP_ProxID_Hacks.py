@@ -275,6 +275,8 @@ def dMatches():
             + 'o := BIPV2_ProxID.mac_avoid_transitives_scalene(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,MatchThreshold,10); // HACKMatches05 - Use new transitives macro, bucket size 5*/\n','Hack replacing transitives macro'),
 		('matches','(Patch)(lgid3|orgid|ultid|dotid)( := SALT311)(.*?$)'  ,'HACKMatches06', '\g<1>\g<2> := BIPV2_Tools\g<4>/*HACKMatches06*/','replacing parentid and childid patch call'),
 		('matches','SALT311\.MAC_Reassign_UID\(ihbp,Cleave\(ih\)\.patch_file,Proxid,rcid,ih1\);'  ,'HACKMatches07a','SALT311.MAC_Reassign_UID(ihbp,Cleave(ih).patch_file,Proxid,rcid,ihbp01/*HACKMatches07a*/);','github 3140 issue'),
+		
+                ('matches','SALT311\.utMAC_Patch_Id\(ih1'  ,'HACKMatches07b','SALT311.utMAC_Patch_Id(ihbp01/*HACKMatches07b*/','Call Basicmatch'),
 
 		('matches','attr_match := JOIN\(DISTRIBUTE\(j1,HASH\(Proxid1\)\),hd,LEFT\.Proxid1 = RIGHT\.Proxid AND \( LEFT\.SALT_Partition = RIGHT\.SALT_Partition OR LEFT\.SALT_Partition=\'\' OR RIGHT\.SALT_Partition = \'\' \).*?,LOCAL\);'  ,'HACKMatches08'  		
             , 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition=\'\' OR RIGHT.SALT_Partition = \'\' )\n'                    
