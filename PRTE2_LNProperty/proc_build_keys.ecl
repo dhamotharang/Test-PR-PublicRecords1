@@ -1,4 +1,4 @@
-﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_LNProperty, doxie, prte, strata, _control, prte2_common;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_LNProperty, doxie, prte, strata, _control, prte2_common, prte2, dops, orbit3;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 
@@ -102,10 +102,6 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 		Constants.KeyName_ln_propertyv2 + '@version@::search.bdid',
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.bdid', build_key_ln_propertyv2_search_bdid);
 
-
-	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_search_fid_linkids,
-		Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids',
-		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_linkids', build_key_ln_propertyv2_search_fid_linkids);
 
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.Key_LinkIds.Key,
 		Constants.KeyName_ln_propertyv2 + '@version@::search.linkids',
@@ -237,10 +233,6 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.fid_county', 
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_county',
 		move_built_key_ln_propertyv2_search_fid_county);
-
-	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids', 
-		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_linkids',
-		move_built_key_ln_propertyv2_search_fid_linkids);
 
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.linkids', 
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.linkids',
@@ -377,10 +369,6 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_ln_propertyv2 + '@version@::search.fid_county', 
 		'Q', 
 		move_qa_key_ln_propertyv2_search_fid_county);
-
-	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids', 
-		'Q', 
-		move_qa_key_ln_propertyv2_search_fid_linkids);
 
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_ln_propertyv2 + '@version@::search.linkids', 
 		'Q', 
@@ -567,8 +555,13 @@ cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_asses
 
 	
 	
-	
+	key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                   output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
 
+create_orbit_build := parallel(
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - LNPropertyV2', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - LNPropertyV2', filedate, 'F', true, true, false,  _control.MyInfo.EmailAddressNormal),
+															);	
 	RETURN 		sequential(		
 				build_key_ln_propertyv2fcra_addllegal_fid, 
 				build_key_ln_propertyv2fcra_addlnames_fid, 
@@ -592,7 +585,6 @@ cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_asses
 				build_key_ln_propertyv2_search_did, 
 				build_key_ln_propertyv2_search_fid, 
 				build_key_ln_propertyv2_search_fid_county, 
-				build_key_ln_propertyv2_search_fid_linkids, 
 				build_key_ln_propertyv2_search_linkids, 
 				build_key_ln_propertyv2_addr_full_v4, 
 				build_key_ln_propertyv2_addr_full_v4_no_fares, 
@@ -627,8 +619,7 @@ cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_asses
 				move_built_key_ln_propertyv2_search_did, 
 				move_built_key_ln_propertyv2_search_fid, 
 				move_built_key_ln_propertyv2_search_fid_county, 
-				move_built_key_ln_propertyv2_search_fid_linkids, 
-				move_built_key_ln_propertyv2_search_linkids, 
+			 	move_built_key_ln_propertyv2_search_linkids, 
 				move_built_key_ln_propertyv2_addr_full_v4, 
 				move_built_key_ln_propertyv2_addr_full_v4_no_fares, 
 				move_built_key_ln_propertyv2_deedzip_avg_sales_price, 
@@ -665,7 +656,6 @@ cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_asses
 				move_qa_key_ln_propertyv2_search_did, 
 				move_qa_key_ln_propertyv2_search_fid, 
 				move_qa_key_ln_propertyv2_search_fid_county, 
-				move_qa_key_ln_propertyv2_search_fid_linkids, 
 				move_qa_key_ln_propertyv2_search_linkids,
 				move_qa_key_ln_propertyv2_addr_full_v4, 
 				move_qa_key_ln_propertyv2_addr_full_v4_no_fares, 
@@ -680,7 +670,9 @@ cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_asses
 				move_qa_key_ln_propertyv2fcra_did_ownership_v4,	
 				retval,
 				parallel(cnt_assessor_fid, cnt_deed_fid, cnt_fcra_assessor_fid,cnt_fcra_deed_fid),
-				PerformUpdateOrNot
+				PerformUpdateOrNot,
+				key_validations,
+				create_orbit_build
 				);
 
 END;
