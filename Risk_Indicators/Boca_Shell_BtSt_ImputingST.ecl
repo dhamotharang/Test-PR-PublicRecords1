@@ -1,11 +1,11 @@
-﻿import ut, Risk_Indicators, RiskWise, Gong, AutoKey, Phones, Phonesplus_v2, Data_Services ,Email_Data, doxie;
+﻿import ut, Risk_Indicators, RiskWise, dx_Gong, AutoKey, Phones, Phonesplus_v2, Data_Services, Email_Data, doxie;
 
 export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) BtSt_In,
-	UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING30 IndustryClass = '', 
+	UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING30 IndustryClass = '',
 	STRING DataRestriction,
     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
- integer8 ValidDaysApart(string8 d1, string8 d2) := 
+ integer8 ValidDaysApart(string8 d1, string8 d2) :=
 	UT.DaysSince1900(d1[1..4], d1[5..6], d1[7..8]) -
 	UT.DaysSince1900(d2[1..4], d2[5..6], d2[7..8]);
 	//Gets the input on digital ST records
@@ -15,20 +15,20 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 	//Gets the input on digital ST records
 	getSTInput := BtSt_In(Bill_To_In.TypeOfOrder = risk_indicators.iid_constants.DigitalOrder);
 	//grab any ship to information that does not have ship to information
-	getSTInput_missingInput := getSTInput(Ship_To_In.fname = '' and Ship_To_In.mname = '' and Ship_To_In.lname = '' and Ship_To_In.suffix= '' and 
-			Ship_To_In.in_streetAddress = '' and Ship_To_In.in_city = '' and  Ship_To_In.in_state = '' and Ship_To_In.in_zipCode  = '' and                 
-			Ship_To_In.prim_range  = '' and Ship_To_In.predir = '' and Ship_To_In.prim_name   = '' and                 
-			Ship_To_In.addr_suffix  = '' and Ship_To_In.postdir  = '' and Ship_To_In.unit_desig    = '' and               
-			Ship_To_In.sec_range    = '' and Ship_To_In.p_city_name = '' and               
-			Ship_To_In.st = '' and Ship_To_In.z5 = '' and Ship_To_In.zip4 = '' and                      
-			Ship_To_In.lat = '' and Ship_To_In.long = '' and Ship_To_In.addr_type = '' and                 
-			Ship_To_In.addr_status  = '' and Ship_To_In.county = '' and Ship_To_In.geo_blk   = '' and                                                         
-			Ship_To_In.dl_number= '' and Ship_To_In.dl_state  = '' and  Ship_To_In.dob  = '' and 
+	getSTInput_missingInput := getSTInput(Ship_To_In.fname = '' and Ship_To_In.mname = '' and Ship_To_In.lname = '' and Ship_To_In.suffix= '' and
+			Ship_To_In.in_streetAddress = '' and Ship_To_In.in_city = '' and  Ship_To_In.in_state = '' and Ship_To_In.in_zipCode  = '' and
+			Ship_To_In.prim_range  = '' and Ship_To_In.predir = '' and Ship_To_In.prim_name   = '' and
+			Ship_To_In.addr_suffix  = '' and Ship_To_In.postdir  = '' and Ship_To_In.unit_desig    = '' and
+			Ship_To_In.sec_range    = '' and Ship_To_In.p_city_name = '' and
+			Ship_To_In.st = '' and Ship_To_In.z5 = '' and Ship_To_In.zip4 = '' and
+			Ship_To_In.lat = '' and Ship_To_In.long = '' and Ship_To_In.addr_type = '' and
+			Ship_To_In.addr_status  = '' and Ship_To_In.county = '' and Ship_To_In.geo_blk   = '' and
+			Ship_To_In.dl_number= '' and Ship_To_In.dl_state  = '' and  Ship_To_In.dob  = '' and
 			Ship_To_In.did  = 0
 			and Ship_To_In.score  = 0);
 
 	getSTInput_impute := getSTInput_missingInput( Ship_To_In.phone10 != '' or Ship_To_In.email_address != ''); //phone only populated
-	
+
 	//if only phone is provided for ST input phone do reverse phone lookup
 	//1A. Risk_Indicators.iid_getACsplit
 
@@ -53,7 +53,7 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 	END;
 
 	// Seeing if any other area codes area available
-	getSTInput_phoneOnlyAC := JOIN(getSTInput_impute, risk_indicators.Key_AreaCode_Change_plus, 
+	getSTInput_phoneOnlyAC := JOIN(getSTInput_impute, risk_indicators.Key_AreaCode_Change_plus,
 										(integer) LEFT.Ship_To_In.Phone10 <>0 AND
 										LENGTH(TRIM(LEFT.Ship_To_In.phone10))=10 AND
 										keyed(LEFT.Ship_To_In.phone10[1..3]=RIGHT.old_NPA) AND
@@ -63,46 +63,46 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 									keep(100));
 
 	//1B. EDA to get most recent Lexid from last year of EDA phones
-	EDA_Phones_possibilites1 := JOIN (getSTInput_phoneOnlyAC, Gong.Key_History_phone,
+	EDA_Phones_possibilites1 := JOIN (getSTInput_phoneOnlyAC, dx_Gong.key_history_phone(),
 															(integer) LEFT.Ship_To_In.Phone10 <>0 AND
-																keyed ((LEFT.Ship_To_In.Phone10[4..10] = RIGHT.p7 AND 
+																keyed ((LEFT.Ship_To_In.Phone10[4..10] = RIGHT.p7 AND
 																LEFT.Ship_To_In.Phone10[1..3] = RIGHT.p3)) and
-																RIGHT.did <> 0 and 
-															 ((LEFT.Ship_To_In.historydate = 999999 and RIGHT.current_flag = TRUE) or 
-															 (LEFT.Ship_To_In.historydate = 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate) or 
-																(LEFT.Ship_To_In.historydate <> 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate)) and 
+																RIGHT.did <> 0 and
+															 ((LEFT.Ship_To_In.historydate = 999999 and RIGHT.current_flag = TRUE) or
+															 (LEFT.Ship_To_In.historydate = 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate) or
+																(LEFT.Ship_To_In.historydate <> 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate)) and
 																//keep only EDA records with phones in last year
 																ValidDaysApart(risk_indicators.iid_constants.mygetdate(LEFT.Ship_To_In.historydate), RIGHT.dt_first_seen) < ut.DaysInNYears(1),
-															TRANSFORM (tmp_dids, 
-																			SELF.SEQ := LEFT.Bill_To_In.seq, 
-																			SELF.DateSeen := RIGHT.dt_last_seen,//should this be date_first_seen? Don't think so 
+															TRANSFORM (tmp_dids,
+																			SELF.SEQ := LEFT.Bill_To_In.seq,
+																			SELF.DateSeen := RIGHT.dt_last_seen,//should this be date_first_seen? Don't think so
 																			SELF.did := RIGHT.did,
 																			SELF.Fdid := 0,
 																			self.phone10 := right.p3 + right.p7;
 																			self.email := '';
-																			SELF.historydate := LEFT.Ship_To_In.historydate), 
+																			SELF.historydate := LEFT.Ship_To_In.historydate),
 																		ATMOST(RiskWise.max_atmost),
 															keep(100));
-		EDA_Phones_possibilites2 := JOIN (getSTInput_phoneOnlyAC, Gong.Key_History_phone,
+		EDA_Phones_possibilites2 := JOIN (getSTInput_phoneOnlyAC, dx_Gong.key_history_phone(),
 															(integer) LEFT.Ship_To_In.Phone10 <>0
-															AND keyed ((LEFT.Ship_To_In.Phone10[4..10] = RIGHT.p7 AND //see if alternate area code returns records 
+															AND keyed ((LEFT.Ship_To_In.Phone10[4..10] = RIGHT.p7 AND //see if alternate area code returns records
 																LEFT.altareacode[1..3] = RIGHT.p3)) and
-																RIGHT.did <> 0 and 
+																RIGHT.did <> 0 and
 															 ((LEFT.Ship_To_In.historydate = 999999 and RIGHT.current_flag = TRUE) or
-															 (LEFT.Ship_To_In.historydate = 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate) or 
-																(LEFT.Ship_To_In.historydate <> 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate)) and 
+															 (LEFT.Ship_To_In.historydate = 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate) or
+																(LEFT.Ship_To_In.historydate <> 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Ship_To_In.historydate)) and
 																//keep only EDA records with phones in last year
 																ValidDaysApart(risk_indicators.iid_constants.mygetdate(LEFT.Ship_To_In.historydate), RIGHT.dt_first_seen) < ut.DaysInNYears(1),
-															TRANSFORM (tmp_dids, 
-																			SELF.SEQ := LEFT.Bill_To_In.seq, 
-																			SELF.DateSeen := RIGHT.dt_last_seen,//should this be date_first_seen? Don't think so 
+															TRANSFORM (tmp_dids,
+																			SELF.SEQ := LEFT.Bill_To_In.seq,
+																			SELF.DateSeen := RIGHT.dt_last_seen,//should this be date_first_seen? Don't think so
 																			SELF.did := RIGHT.did,
 																			SELF.Fdid := 0,
 																			self.phone10 := right.p3 + right.p7;
 																			self.email := '';
-																			SELF.historydate := LEFT.Ship_To_In.historydate), 
+																			SELF.historydate := LEFT.Ship_To_In.historydate),
 																		ATMOST(RiskWise.max_atmost),
-															keep(100));														
+															keep(100));
 	EDA_Phones_possibilites := EDA_Phones_possibilites1 + EDA_Phones_possibilites2;
 	EDA_Phones := DEDUP(SORT(EDA_Phones_possibilites, seq, -(integer) DateSeen, -(integer) did), seq);
 
@@ -110,16 +110,16 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 	getSTInput_phoneOnlyAC_NO_EDA := join(getSTInput_phoneOnlyAC, EDA_Phones,
 		LEFT.Bill_To_In.seq = RIGHT.seq,
 		transform(LEFT),LEFT ONLY);
-	
+
 	PhoneAutoKey := AutoKey.Key_Phone(Data_Services.Data_Location.Prefix('phonesPlus') + 'thor_data400::key::phonesplusv2_');
 
-	PP_Phones_fdid1 := JOIN(getSTInput_phoneOnlyAC_NO_EDA, PhoneAutoKey, 
-				TRIM(LEFT.Ship_To_In.Phone10) NOT IN ['', '0'] AND 
-				keyed(RIGHT.p7 = LEFT.Ship_To_In.Phone10[4..10]) AND 
+	PP_Phones_fdid1 := JOIN(getSTInput_phoneOnlyAC_NO_EDA, PhoneAutoKey,
+				TRIM(LEFT.Ship_To_In.Phone10) NOT IN ['', '0'] AND
+				keyed(RIGHT.p7 = LEFT.Ship_To_In.Phone10[4..10]) AND
 				keyed(RIGHT.p3 = LEFT.Ship_To_In.Phone10[1..3]) ,
-					TRANSFORM(tmp_dids, 
-											SELF.SEQ := LEFT.Bill_To_In.seq, 
-											SELF.DateSeen := '', 
+					TRANSFORM(tmp_dids,
+											SELF.SEQ := LEFT.Bill_To_In.seq,
+											SELF.DateSeen := '',
 											SELF.did := 0,
 											self.FDID := RIGHT.did,
 											self.phone10 := right.p3 + right.p7;
@@ -127,12 +127,12 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 											self.historydate := LEFT.Ship_To_In.HistoryDate),
 											KEEP(1000), ATMOST(RiskWise.max_atmost));
 
-	PP_Phones_fdid2 := JOIN(getSTInput_phoneOnlyAC_NO_EDA, PhoneAutoKey, 
-				TRIM(LEFT.Ship_To_In.Phone10) NOT IN ['', '0'] AND 
-				keyed(RIGHT.p7 = LEFT.Ship_To_In.Phone10[4..10]) AND 
+	PP_Phones_fdid2 := JOIN(getSTInput_phoneOnlyAC_NO_EDA, PhoneAutoKey,
+				TRIM(LEFT.Ship_To_In.Phone10) NOT IN ['', '0'] AND
+				keyed(RIGHT.p7 = LEFT.Ship_To_In.Phone10[4..10]) AND
 				keyed(RIGHT.p3 = LEFT.altareacode),
-					TRANSFORM(tmp_dids, 
-											SELF.SEQ := LEFT.Ship_To_In.seq, 
+					TRANSFORM(tmp_dids,
+											SELF.SEQ := LEFT.Ship_To_In.seq,
 											SELF.DateSeen := '',
 											SELF.did := 0,
 											self.FDID := RIGHT.did,
@@ -141,12 +141,12 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 											self.historydate := LEFT.Ship_To_In.HistoryDate),
 											KEEP(1000), ATMOST(RiskWise.max_atmost));
  PP_Phones_fdid := PP_Phones_fdid1 + PP_Phones_fdid2;
- PP_Phones_possibilites := JOIN(PP_Phones_fdid, Phonesplus_v2.key_phonesplus_fdid, 
+ PP_Phones_possibilites := JOIN(PP_Phones_fdid, Phonesplus_v2.key_phonesplus_fdid,
 			LEFT.FDID <> 0 AND KEYED(LEFT.FDID = RIGHT.FDID) AND
 			Phones.Functions.IsPhoneRestricted(
-					RIGHT.origstate, 
-					GLBPurpose, 
-					DPPAPurpose, 
+					RIGHT.origstate,
+					GLBPurpose,
+					DPPAPurpose,
 					IndustryClass,
 					, //checkRNA
 				  RIGHT.datefirstseen,
@@ -154,14 +154,14 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 					RIGHT.rules,
 					RIGHT.src_all,
 					DataRestriction
-				 ) = FALSE 
+				 ) = FALSE
 				 AND RIGHT.did > 0 //saw that sometimes the key has a did of 0
 				 and (unsigned3) ((STRING)RIGHT.datelastseen)[1..6] < (unsigned3) left.historydate
-				 	and ValidDaysApart(risk_indicators.iid_constants.mygetdate(LEFT.historydate), 
-					if(((string6) RIGHT.datelastseen)[5..6] = '00', ((string4) RIGHT.datelastseen)[1..4] + '0101', 
+				 	and ValidDaysApart(risk_indicators.iid_constants.mygetdate(LEFT.historydate),
+					if(((string6) RIGHT.datelastseen)[5..6] = '00', ((string4) RIGHT.datelastseen)[1..4] + '0101',
 					(string6) RIGHT.datelastseen + '01')) < ut.DaysInNYears(1),
-				TRANSFORM(tmp_dids, 
-											SELF.SEQ := LEFT.seq, 
+				TRANSFORM(tmp_dids,
+											SELF.SEQ := LEFT.seq,
 											SELF.DateSeen := (STRING)RIGHT.datelastseen;
 											SELF.did := RIGHT.did,
 											self.FDID := RIGHT.did,
@@ -169,8 +169,8 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 											self.email := '',
 											SELF.historydate := LEFT.historydate)
 											, KEEP(100), ATMOST(RiskWise.max_atmost));
-	
-	
+
+
 	PP_Phones := DEDUP(SORT(PP_Phones_possibilites, seq, -(integer) DateSeen, -(integer) did), seq);
 
 	tempCIID_btst_in := record
@@ -192,14 +192,14 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 
 	Email_possibilites := join(getSTInput_impute, Email_Data.Key_Email_Address,
 		LEFT.Ship_To_In.email_address <> '' AND
-		keyed(LEFT.Ship_To_In.email_address = RIGHT.clean_email)	
+		keyed(LEFT.Ship_To_In.email_address = RIGHT.clean_email)
 		and right.email_src IN Risk_Indicators.iid_constants.setEmailsources
 		and right.did <  Risk_Indicators.iid_constants.EmailFakeIds  // don't include Fake DIDs
 		and (unsigned)right.date_first_seen[1..6] < left.Ship_To_In.historydate,
 		TRANSFORM(tmp_dids,
-							SELF.SEQ := LEFT.Bill_To_In.seq, // + 1, 
+							SELF.SEQ := LEFT.Bill_To_In.seq, // + 1,
 							SELF.DateSeen := (STRING)RIGHT.date_last_seen, //uses last seen so latest email
-							SELF.did := RIGHT.did, 
+							SELF.did := RIGHT.did,
 							self.FDID := RIGHT.did,
 							self.email := RIGHT.clean_email,
 							self.phone10 := '';
@@ -231,7 +231,7 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 
 //Get best info for the ST input fields
 //Doxie.Mac_Best_Records
-glb_ok := ut.PermissionTools.glb.ok(GLBPurpose);		 
+glb_ok := ut.PermissionTools.glb.ok(GLBPurpose);
 dppa_ok := ut.PermissionTools.dppa.ok(DPPAPurpose);
 
 tmp_CBD_STin := record
@@ -244,12 +244,12 @@ doxie.mac_best_records(digital_prep,
 											 did,
 											 outfile,
 											 dppa_ok,
-											 glb_ok, 
+											 glb_ok,
 											 ,
 											 doxie.DataRestriction.fixed_DRM);
 
-tmp_CBD_STin AppendBest(tmp_CBD_STin l, recordof(outfile) r) := transform		
-		self.did := if(l.did != 0, l.did, (UNSIGNED6) R.did); 
+tmp_CBD_STin AppendBest(tmp_CBD_STin l, recordof(outfile) r) := transform
+		self.did := if(l.did != 0, l.did, (UNSIGNED6) R.did);
 		self.fname := if(l.fname != '', l.fname, R.fname);
 		self.mname := if(l.mname != '', l.mname, R.mname);
 		self.lname := if(l.lname != '', l.lname, R.lname);
@@ -294,8 +294,8 @@ STwithBest := dedup(sort(STwithBest_ALL, seq, did), seq, did);
 BtStWithSTBest := join(STwithBest, BtSt_In,
 	left.seq = right.Bill_To_In.seq,
 	transform(Risk_Indicators.Layout_CIID_BtSt_In,
-		self.Ship_To_In.seq := left.seq; 
-		self.Ship_To_In.did := left.did; 
+		self.Ship_To_In.seq := left.seq;
+		self.Ship_To_In.did := left.did;
 		self.Ship_To_In.fname := left.fname;
 		self.Ship_To_In.mname := left.mname;
 		self.Ship_To_In.lname := left.lname;
@@ -313,12 +313,12 @@ BtStWithSTBest := join(STwithBest, BtSt_In,
 		self.Ship_To_In.p_city_name := left.p_city_name;
 		self.Ship_To_In.st := left.st;
 		self.Ship_To_In.z5 := left.z5;
-		self.Ship_To_In.zip4 := left.zip4;	
+		self.Ship_To_In.zip4 := left.zip4;
 		self.Ship_To_In.phone10 := left.phone10;
 		self.Ship_To_In.ssn := left.ssn;
 		self.Ship_To_In.dob := left.dob;
-		self.Ship_To_In.historydate := RIGHT.Ship_To_In.historydate;		
-		self.Ship_To_In.historydatetimestamp := RIGHT.Ship_To_In.historydatetimestamp;		
+		self.Ship_To_In.historydate := RIGHT.Ship_To_In.historydate;
+		self.Ship_To_In.historydatetimestamp := RIGHT.Ship_To_In.historydatetimestamp;
 		self.Ship_To_In.lat := left.lat;
 		self.Ship_To_In.long := left.long;
 		self.Ship_To_In.addr_type :=  left.addr_type;
@@ -326,11 +326,11 @@ BtStWithSTBest := join(STwithBest, BtSt_In,
 		self.Ship_To_In.county := left.county;
 		self.Ship_To_In.geo_blk := left.geo_blk;
 		self.Ship_To_In.email_address := left.email_address;
-	
+
 		self.Bill_To_In := right.Bill_To_In,
 		self := []));
 
-	 BtStWithSTBest_info := join(BtSt_In, BtStWithSTBest, 
+	 BtStWithSTBest_info := join(BtSt_In, BtStWithSTBest,
 	 left.Bill_To_In.seq = right.Bill_To_In.seq,
 		transform(Risk_Indicators.Layout_CIID_BtSt_In,
 			self.bill_to_in := left.bill_to_in;
@@ -345,7 +345,7 @@ BtStWithSTBest := join(STwithBest, BtSt_In,
 		// output(getSTInput_phoneOnlyAC, named('getSTInput_phoneOnlyAC'));
 		// output(EDA_Phones_possibilites1, named('EDA_Phones_possibilites1'));
 		// output(EDA_Phones_possibilites2, named('EDA_Phones_possibilites2'));
-		// output(EDA_Phones_possibilites, named('EDA_Phones_possibilites'));		
+		// output(EDA_Phones_possibilites, named('EDA_Phones_possibilites'));
 		// output(getSTInput_phoneOnlyAC_NO_EDA, named('getSTInput_phoneOnlyAC_NO_EDA'));
 		// output(PP_Phones_fdid1, named('PP_Phones_fdid1'));
 		// output(PP_Phones_fdid2, named('PP_Phones_fdid2'));

@@ -1,12 +1,12 @@
 export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, mod_access, includeRelativeCell=false) := macro
 
-import doxie_raw, didville, ut, NID, Header, Suppress, STD;
+import dx_Gong, doxie_raw, didville, ut, NID, Header, Suppress, STD;
 
 #uniquename(gong_addr_key)
-%gong_addr_key% := gong.Key_History_Address;
+%gong_addr_key% := dx_Gong.key_history_address();
 
 #uniquename(gong_did_key)
-%gong_did_key% := gong.key_did;
+%gong_did_key% := dx_Gong.key_did();
 
 //get relatives and roomies
 #uniquename(get_rel)

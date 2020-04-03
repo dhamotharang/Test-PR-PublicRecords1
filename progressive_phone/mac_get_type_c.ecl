@@ -1,8 +1,8 @@
 export mac_get_type_c(f_c_did, f_c_acctno, f_c_out, mod_access, use_landlord=false, use_input_only=false) := macro
-  import progressive_phone, dx_header, ut, gong, risk_indicators, NID, Std;
+  import progressive_phone, dx_header, ut, dx_Gong, risk_indicators, NID, Std;
 
 #uniquename(gong_addr_key)
-%gong_addr_key% := gong.Key_History_Address;
+%gong_addr_key% := dx_Gong.key_history_address();
 
 #uniquename(apt_building_key)
 %apt_building_key% := dx_header.Key_AptBuildings();
@@ -125,7 +125,7 @@ end;
 
 #uniquename(f_c_out_found)
 %f_c_out_found% := IF(strict_apsx,
-					JOIN(%f_c_out_found_precheck%, gong.Key_History_phone,
+					JOIN(%f_c_out_found_precheck%, dx_Gong.key_history_phone(),
 						keyed(LEFT.subj_phone10[4..10]=RIGHT.p7) AND
 						keyed(LEFT.subj_phone10[1..3]=RIGHT.p3) AND
 						RIGHT.current_flag AND (LEFT.did=RIGHT.did OR RIGHT.did=0),
