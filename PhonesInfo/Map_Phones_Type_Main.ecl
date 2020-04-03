@@ -10,7 +10,7 @@
 	srcLidb						:= PhonesInfo.File_LIDB.Response_Processed_CR_Append_PType;																																													//Historical LIDB File w/ Carrier Reference Info Appended			
 	srcLidbDelt				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_LIDB_Results_CR_Append_PType;																																		//Historical LIDB Gateway File w/ Carrier Reference Info Appended						
 	dsL6Phones				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), dx_PhonesInfo.Layouts.Phones_Type_Main);	
-	dsCarrRef					:= PhonesInfo.File_Source_Reference.Main;																																																			//Carrier Reference Base File
+	dsCarrRef					:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);																																																			//Carrier Reference Base File
 
 	//////////////////////////////////////////////	
 	//iConectiv Ported Phone File - Join by SPID//
@@ -98,15 +98,15 @@
 		self 														:= l;
 	end;
 
-	rollupiConDates		:= rollup(srtDdiConAddFields, 
-															left.phone = right.phone and
-															left.carrier_name = right.carrier_name and
-															left.account_owner = right.account_owner and
-															left.serv = right.serv and
-															left.line = right.line and
-															left.high_risk_indicator = right.high_risk_indicator and
-															left.prepaid = right.prepaid,
-															rollupiConDate(left, right), local);
+	rollupiConDates	:= rollup(srtDdiConAddFields, 
+																	left.phone = right.phone and
+																	left.carrier_name = right.carrier_name and
+																	left.account_owner = right.account_owner and
+																	left.serv = right.serv and
+																	left.line = right.line and
+																	left.high_risk_indicator = right.high_risk_indicator and
+																	left.prepaid = right.prepaid,
+																	rollupiConDate(left, right), local);
 	
 	//Fix Vendor First/Last Reported Date/Time
 	dx_PhonesInfo.Layouts.Phones_Type_Main dtTr(rollupiConDates l):= transform
@@ -117,7 +117,7 @@
 		self														:= l;
 	end;
 	
-	applyiConDates 		:= project(rollupiConDates, dtTr(left));
+	applyiConDates 				:= project(rollupiConDates, dtTr(left));
 																	
 	/////////////////////////////////////////////////////////	
 	//LIDB File - Join by Account Owner & Carrier Name///////
@@ -133,7 +133,7 @@
 	end;
 	
 	reformatLIDB			:= project(concatLIDB, fixLIDB(left));	
-
+	
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Concat All Records//////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////
