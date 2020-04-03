@@ -33,8 +33,6 @@ CanadianPhones.spray_CanadianWhitepages(pVersion, pSource,	pHostname)
 //,Canadianphones.map_axciomCanBus(pVersion) - no longer updating, historical data only
 //,Canadianphones.map_axciomCanRes(pVersion) - no longer updating, historical data only
 ,Canadianphones.map_InfutorWP(pVersion)
-// ,Scrubs_CanadianPhones.Axciom_Bus_Proc_Submit_Stats(pVersion)			//BUG201215
-// ,Scrubs_CanadianPhones.Axciom_Res_Proc_Submit_Stats(pVersion)			//BUG201215
 ,Scrubs_CanadianPhones.PreBuildScrubs(pVersion)
 ,CanadianPhones.strata_popCanadianPhonesInfutor(pVersion).all
 ,CanadianPhones.proc_build_cwp_keys(pVersion) 
