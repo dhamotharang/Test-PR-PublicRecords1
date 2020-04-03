@@ -18,17 +18,17 @@ Export ssn_across_file      := Output(Header_Counts.ssn_across_file,     Named('
 Export lexids_per_ssn       := Output(Header_Counts.lexids_per_ssn,      Named('lexid_per_ssn')); // Most common ssn accross different lexids (non-blank)
 Export lexids_per_address   := Output(Header_Counts.lexids_per_address,  Named('Lexid_Per_Address')); // Most common address across different lexids 
 Export dob_across_file      := Output(Header_Counts.dob_across_file,     Named('Dobs_Across_File')); // Most common dob across different lexids (non-blanks)
-Export lexids_per_dob       := Output(Header_Counts.lexids_per_dob,      Named('Lexid_per_dob')); // Most common dob across all records
-Export dobs_mmdd_only       := Output(Header_Counts.s_crosstab_MMDD,     Named('Dobs_Without_No_blanksMMDD')); // Most common dob with only month and day
-Export blank_dobs_persource := Output(Header_Counts.s_crosstab_blankdob, Named('Count_of_BlankDobs_PerSource')); // Count of blank dob across file
-//Export blank_dobs_mmdd      := Output(Header_Counts.s_sample_recslim1,   Named('Count_BlankDobs_With_MMDD1')); // Count of dob with blank day and month across file
-Export blank_dobs_dd        := Output(Header_Counts.s_crosstab_dobdd,    Named('Counted_Blank_DD'));
-Export normal_distribution  := Output(Header_Counts.normal_distribution, Named('Normal_Distribution_Dob')); // DOB normal distribution score (measure for normality across all non-zero 1 per lexid DOB) 
+Export lexids_per_fulldob   := Output(Header_Counts.lexids_per_fulldob,  Named('Lexid_per_fulldob')); // Most common dob across all records
+Export lexids_per_mmdddob   := Output(Header_Counts.lexids_per_mmdddob,  Named('Lexid_per_mmdddob')); // Most comm
+Export blank_dobs_persource := Output(Header_Counts.blank_dob_persource,   Named('Count_of_BlankDobs_PerSource')); // Count of blank dob across file
+Export blank_mmyyyy_persource := Output(Header_Counts.blank_mmdd_persource,Named('Count_Blank_Month_Day')); // Count of dob with blank day and month across file
+Export blank_dd_persource   := Output(Header_Counts.blank_dd_persource,  Named('Counted_Blank_DD'));
+//Export normal_distribution  := Output(Header_Counts.normal_distribution, Named('Normal_Distribution_Dob')); // DOB normal distribution score (measure for normality across all non-zero 1 per lexid DOB) 
 
 // Full Counts Reports
 Export full_count_reports := Sequential(Parallel(fname_across_file, lname_across_file, fname_across_lexids,
                                     lname_across_lexids, ssn_across_file, lexids_per_ssn, lexids_per_address,
-                                    dob_across_file ));
+                                    dob_across_file, lexids_per_fulldob, lexids_per_mmdddob, blank_dobs_persource, blank_mmyyyy_persource, blank_dd_persource ));
 // ======================================== Percentage Reports ============================================
 
 // Partial Percentages Reports 

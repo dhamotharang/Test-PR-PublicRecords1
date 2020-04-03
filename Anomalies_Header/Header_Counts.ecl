@@ -8,13 +8,15 @@ Import Anomalies_Header;
 Import STD;
 Import AID;
 
-Layout_Header := Anomalies_Header.Layouts.Layout_Header;
 
+
+Layout_Header := Anomalies_Header.Layouts.Layout_Header;
 // Slimmed files from the original header file
 input := Anomalies_Header.Files.Header; 
 
-// dedup here
 
+
+// dedup here
 t := Table(input, Layouts.Layout_Header, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
@@ -36,6 +38,7 @@ header := Dedup(sdt, did, fname, lname,
                   city_name, st, zip, zip4, county, cbsa, src);
 
 
+
 Export Header_Counts := Module 
 // 1. NAMES
 // A. Most common names accross all records
@@ -49,6 +52,7 @@ c_fname := Table(header, t_fname, fname);
 Export fnames_across_file := Sort(c_fname, -RecordCnt);
 
 
+
 // Most common last names
 t_lname := Record
     lname := header.lname;
@@ -56,6 +60,7 @@ t_lname := Record
 End;
 c_lname := Table(header, t_lname, lname);
 Export lanmes_across_file := Sort(c_lname, -RecordCnt);
+
 
 
 // B. Most common names across diffeent lexids 
@@ -79,6 +84,7 @@ out_crosstab_fname := Table(dsdc_fname2, crosstab_fname, fname);
 Export fnames_across_lexid := Sort(out_crosstab_fname, -RecordCnt);
 
 
+
 // Most common last names accross lexids
 t_lname2 := Record
     header.lname;
@@ -99,17 +105,18 @@ out_crosstab_lname := Table(dsdc_lname2, crosstab_lname, lname);
 Export lnames_across_lexid := Sort(out_crosstab_lname, -RecordCnt);
 
 
+
 // 2. SSN
 // A. Most common SSN accross ALL records( non blank); 
-
 filteredssn := header( NOT ssn = ''); // non blank
 
 t_ssn := Record
-    ssn := Filteredssn.ssn;
+    ssn := filteredssn.ssn;
     integer recordcnt := Count(Group);
 End;
-c_ssn := Table(Filteredssn, t_ssn, ssn);
+c_ssn := Table(filteredssn, t_ssn, ssn);
 Export ssn_across_file := Sort(c_ssn, -RecordCnt);
+
 
 
 // SSN with top count of Different lexids (no blank SSN nor blank lexids)
@@ -138,6 +145,7 @@ t1_ssn := Table(parentRecordssn, {ssn, did}, ssn, did);
 t2_ssn := Table(t1_ssn, {ssn, lexidcnt := count(group)}, ssn);
 
 Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt);
+
 
 
 // 3. Address
@@ -182,8 +190,9 @@ Export lexids_per_address := Sort(t2_address, -lexidcnt);
 
 
 
-
 // ========================================== Second Part of Report ======================================================
+
+
 
 // Date of Birth
 //  A. Most common DOB accross all records
@@ -196,214 +205,203 @@ t_Crosstab_Dob := Table(header, Sequencedob, dob);
 Export dob_across_file := Sort(t_crosstab_Dob, -RecordCnt);
 
 
-// B. Full Dob with the highest counts of (different Lexids) ( no 00/Blank)
+
+// Filters dobs from header to dobs without trailing zeros
+// From here we filter to partial dob filtering
 LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
-  String2 DD  := if(dob[7..8]= '00','',dob[7..8]);
+  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
   String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
-  Return (Unsigned8)(MM + DD + YY );
+  Return (Unsigned8)(YY + MM + DD );
 End;
 
-filteredDob := header( NOT dob = 0);
-
-sequenceDobLexid := Record
-    filteredDob.did;
-    filteredDob.dob;
+dobFile := Record
+  unsigned dob;
+  integer  did;
 End;
 
-sequenceDobLexid SlimRecdob( filteredDob Le ) := TRANSFORM
+dobFile SlimRec( header Le ) := Transform
+  Self.did := Le.did;
   Self.dob := LoseTrailingZeroes(Le.dob);
-  Self := Le;
-END;
-
-t_crosstab_DobLexid := Project(filteredDob, slimrecDob(Left));
-
-// Filter to only output full dobs without blanks 
-
-
-st_crosstab_DobLexid := Sort(t_crosstab_DobLexid, did, dob);
-Shared dst_crosstab_DobLexid := Dedup(st_crosstab_DobLexid, did, dob);
-
-// Filter to capture full dobs only
-
-Shared lexiddob := Record
-  integer dob;
-  integer did;
 End;
 
-Shared parentRecordsDob := Project(dst_crosstab_DobLexid, lexiddob);
+dob_file := Project(Header, SlimRec(Left));
+filteredDob := dob_file( Not dob = 0 AND Not did = 0 );
+input_dobs := Sort(filteredDob, did, dob);
+Shared dst_crosstab_DobLexid := Dedup(input_dobs, did, dob);
 
-t1_dob := Table(parentRecordsDob, {dob, did}, dob, did);
+// B. Full Dob with the highest counts of (different Lexids) ( no 00/Blank)
+// // Filter to only output full dobs without any blanks 
+lexidDob := Record
+  unsigned validDob;
+  unsigned dob;
+  integer  did;
+End;
+
+// Validate full dobs 
+lexidDob FilterDates( dst_crosstab_DobLexid Le ) := Transform
+  Self.validDob :=(unsigned)STD.Date.IsValidDate(Le.dob);
+  Self.dob := Le.dob;
+  Self.did := Le.did;
+End;
+
+// Validated full dobs with 0s and 1s
+Shared parentRecordsDob := Project(dst_crosstab_DobLexid, FilterDates(Left));
+
+// Filtering valids dobs only (flagged with 1s)
+Shared filterFullDob := parentRecordsDob( validDob = 1 );
+
+t1_dob := Table(filterFullDob, {dob, did}, dob, did);
 
 t2_dob := Table(t1_dob, {dob, lexidcnt := Count(Group)}, dob);
 
-Export lexids_per_dob := Sort(t2_dob, -lexidcnt);
+Export lexids_per_fulldob := Sort(t2_dob, -lexidcnt);
+
+
 
 // C. Partial Dob (MMDD : month and day) with the highest count of (different lexids) (no 00 / blank)
-// still shows zeroes 
-// mm/dd dob without trailing zeroes
-LoseTrailingZeroesMD(Unsigned4 indob) := Function
+
+LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
-  String2 DD  := if(dob[7..8]= '00','',dob[7..8]);
+  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
   String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
-  Return (Unsigned8)(MM + DD + YY );
+  Return (Unsigned8)( MM + DD );
 End;
 
-filteredDobs := header( Not dob = 0);
-
-// filter to capture partial dobs only
-
-Rec := Record
-    Filtereddobs.did;
-    Filtereddobs.dob;
-    Filtereddobs.src;
+mmdd_dob_only := Record
+  unsigned mmdd_dob;
+  integer  did;
 End;
 
-// MMDD dobs
-Rec SlimRec1( Filtereddobs Le ) := Transform
-    Self.dob := LoseTrailingZeroesMD(Le.dob);
-    Self := Le;
+
+mmdd_dob_only FilterMMDD( Header Le ) := Transform
+  Self.mmdd_dob := LoseTrailingZeroes(Le.dob);
+  Self.did := Le.did;
 End;
 
-RecSlimMMDD := Project(FilteredDobs, SlimRec1(Left));
+result_mmdd_only := Project(Header, FilterMMDD(Left));
 
-NonblankDobMMDD := Record
-    RecSlimMMDD.dob;
-End;
+sorted_input := Sort(result_mmdd_only, mmdd_dob, did, local);
 
-c_dobMMDD := Table(RecSlimMMDD, NonblankdobMMDD, dob);
-dc_dobMMDD := Distribute(c_dobMMDD, Hash(dob));
-sdc_dobMMDD := Sort(dc_dobMMDD, dob, Local);
-Export dsdc_dobMMDD := Dedup(sdc_dobMMDD, dob, Local);
+dedup_input := Dedup(sorted_input, mmdd_dob, did);
 
-crosstab_dobMMDD := Record
-  dsdc_dobMMDD.dob;
-  RecordCnt := Count(Group);
-End;
+t1_dob_mmdd := Table(dedup_input, {mmdd_dob, did}, mmdd_dob, did);
 
-Out_Crosstab_dobMMDD := Table(dsdc_dobMMDD, crosstab_dobMMDD, dob);
-Export S_Crosstab_MMDD := Sort(Out_Crosstab_dobMMDD, -RecordCnt);
+t2_dob_mmdd := Table(t1_dob_mmdd, {mmdd_dob, lexidcnt := Count(Group)}, mmdd_dob);
 
-
-
+Export lexids_per_mmdddob := Sort(t2_dob_mmdd, -lexidcnt);
 
 
 // D. Sources with the highest count of blank and partially blank DOB  
-
 // Count of blank YYYYMMDD 
-LoseTrailingZeroes(Unsigned4 indob) := Function
-  String8 dob := (String8)indob;
-  String4 YY  := dob[1..4];
-  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
-  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
-  Return (Unsigned8)(MM + DD + YY );
-End;
-
-// Filters to eliminate all 0s
-FilteredDobs := header( dob = 0 );
-
-Rec := Record
-    Filtereddobs.did;
-    Filtereddobs.dob;
-    Filtereddobs.src;
-End;
-
-Rec SlimRec( Filtereddobs Le ) := Transform
-  Self.dob := LoseTrailingZeroes(Le.dob);
-  Self := Le;
-End;
-
-Export RecSlim := Project(FilteredDobs, SlimRec(Left));
+Export blankDobs := Header( dob = 0);
 
 NonBlankDob := Record
-  RecSlim.dob;
+  blankDobs.dob;
+  blankDobs.src;
 End;
 
-c_dob := Table(RecSlim, Nonblankdob, dob);
-dc_dob := Distribute(c_dob, Hash(dob));
-sdc_dob := Sort(dc_dob, dob, Local);
-Shared dsdc_dob := Dedup(sdc_dob, dob, Local);
+t_dob := Table(blankDobs, Nonblankdob );
 
 crosstab_dob := Record
-  dsdc_dob.dob;
-  RecordCnt := Count(Group);
+  t_dob.src;
+  blank_dob_cnt := Count(Group);
 End;
 
-Out_Crosstab_dob := Table(RecSlim, crosstab_dob, dob);
-Export s_crosstab_blankdob := Sort(Out_Crosstab_dob, -RecordCnt);
+Out_Crosstab_dob := Table(t_dob, crosstab_dob, src);
+Export blank_dob_persource := Sort(Out_Crosstab_dob, -blank_dob_cnt);
 
-// Count of blank MMDD (non-blank YYYY) 
+/// Count of blank MMDD (non-blank YYYY) 
 
-
-
-
-// Count of blank dd (non-blank yyyymm)
 LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
   String2 DD  := if(dob[7..8]='00','',dob[7..8]);
   String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
-  Return (Unsigned8)( MM + YY );
+  Return (Unsigned8)( YY );
 End;
 
-filteredDobs := header( Not dob = 0 );
-
-rec_dd := Record
-    unsigned6 did;
-    integer6  dob;
-    string2   src;
+blankmmdd := Record
+  unsigned dob_year;
+  integer  did;
+  string   src;
 End;
 
-rec_dd SlimRec( filteredDobs Le ) := Transform
-  Self.dob := LoseTrailingZeroes(le.dob);
-  Self := Le;
+blankmmdd FliterDobsYYYY( Header Le ) := Transform
+  Self.dob_year := LoseTrailingZeroes(Le.dob);
+  Self.did := Le.did;
+  Self.src := Le.src;
 End;
 
-Export recslim_dd := Project(filteredDobs, SlimRec(Left));
+result_dob_year := Project(Header, FliterDobsYYYY(Left));
+
+nonblank_year := result_dob_year( Not dob_year = 0);
+
+crosstab_dobyear := Record
+  nonblank_year.src;
+  blank_mmdd_cnt := Count(Group);
+End;
+
+Out_Crosstab_dob := Table(nonblank_year, crosstab_dobyear, src);
+Export blank_mmdd_persource := Sort(Out_Crosstab_dob, -blank_mmdd_cnt);
+
+
+// // Count of blank dd (non-blank yyyymm)
+LoseTrailingZeroes(Unsigned4 indob) := Function
+  String8 dob := (String8)indob;
+  String4 YY  := dob[1..4];
+  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
+  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
+  Return (Unsigned8)( YY + MM );
+End;
 
 blankdd := Record
-  recslim_dd.dob;
+  unsigned dob_yyyymm;
+  integer  did;
+  string   src;
 End;
 
-c_dob := Table(recslim_dd, blankdd, dob);
-dc_dob := Distribute(c_dob, Hash(dob));
-sdc_dob := Sort(dc_dob, dob, Local);
-Shared dsdc_dobdd := Dedup(sdc_dob, dob, Local);
-
-crosstab_dob := Record
-  dsdc_dobdd.dob;
-  recordCnt := Count(Group);
+blankdd FilterDobsMMYYYY( Header Le ) := Transform
+  Self.dob_yyyymm := LoseTrailingZeroes(Le.dob);
+  Self.did := Le.did;
+  Self.src := Le.src;
 End;
 
-out_crosstab_dobdd := Table(dsdc_dobdd, crosstab_dob, dob);
-Export s_crosstab_dobdd := Sort(out_Crosstab_dobdd, -RecordCnt);
+result_dob_mmyyyy := Project(Header, FilterDobsMMYYYY(Left));
 
+nonblank_mmyyyy := result_dob_mmyyyy( Not dob_yyyymm = 0 );
 
-// E. Dob normal distribution score ( measure of normality accross all non-zero per lexid Dob)
-LoseTrailingZeroes(Unsigned4 indob) := Function
-  String8 dob := (String8)indob;
-  String4 YY  := dob[1..4];
-  String2 DD  := if(dob[7..8]='00','',dob[7..8]);
-  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
-  Return (Unsigned8)(MM + DD + YY );
+crosstab_mmyyyy := Record
+  nonblank_mmyyyy.src;
+  blank_dd_cnt := Count(Group);
 End;
 
-filteredDobLexid := header( NOT dob = 0 AND Not did = 0);
+out_crosstab_dob := Table(nonblank_mmyyyy, crosstab_mmyyyy);
+Export blank_dd_persource := Sort(out_crosstab_dob, - blank_dd_cnt);
 
-normaldist := Record
-    Integer6  dob;
-    Unsigned6 lexid_count;
-End;
 
-normaldist SlimRec( filteredDobLexid Le ) := Transform
-    did := Group(filteredDobLexid, did);
-    Self.dob := LoseTrailingZeroes(Le.dob);
-    Self.lexid_count := Count(did);
-End;
+// // E. Dob normal distribution score ( measure of normality accross all non-zero per lexid Dob)
 
-Export normal_distribution := Project(filteredDobLexid, SlimRec(Left));
+// filteredFullDobLexid := filterFullDob( NOT dob = 0 AND Not did = 0);
 
+// normaldist := Record
+//     Integer   did;
+//     string  dob_mmdd;
+// End;
+
+// normaldist distSlim( filteredFullDobLexid Le ) := Transform
+//   Self.did := Le.did;
+//   Self.dob_mmdd := Le.dob[5..8];
+// End;
+
+// result_normdist := Project(filteredFullDobLexid, distSlim(Left));
+
+// t1_dob := Table(result_normdist, {dob_mmdd, did}, dob_mmdd, did);
+
+// t2_dob := Table(t1_dob, {dob_mmdd, lexidcnt := Count(Group)}, dob_mmdd);
+
+// Export normal_distribution := Sort(t2_dob, -lexidcnt);
 
 End; // Do not delete 
