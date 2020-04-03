@@ -7,7 +7,7 @@ IMPORT $, AutoStandardI, Doxie, iesp, Gateway;
 
 EXPORT SocialMediaLocatorService := MACRO
 
-  ds_in := DATASET([], iesp.socialmedialocatorsearch.t_SocialMediaLocatorSearchRequest) : STORED('SocialMediaLocatorRequest', FEW);
+  ds_in := DATASET([], iesp.socialmedialocatorsearch.t_SocialMediaLocatorSearchRequest) : STORED('SocialMediaLocatorSearchRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
   iesp.ECL2ESP.SetInputBaseRequest(first_row);
   gws := Gateway.Configuration.Get();
