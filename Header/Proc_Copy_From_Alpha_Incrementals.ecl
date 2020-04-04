@@ -121,10 +121,15 @@ EXPORT copy_from_alpha(string filedt) := function
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
 
+    aPrefLoc := 'thor_data400::key::insuranceheader_locid::';
+    
+//thor_data400::key::insuranceheader_locid::qa::locid
+//thor_data400::key::insuranceheader_locid::20200401::locid
+
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-
-     bldSegmentation // creates blank segmentation did_ind key    
+     bldSegmentation // creates blank segmentation did_ind key  
+    ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
     ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedt, '::did::refs::dob'))
@@ -290,9 +295,19 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpCAminor, cpLab, cpUniqEx);
 END;
 
+aPrefLoc := '~thor_data400::key::insuranceheader_locid::';
+father := aPrefLoc + 'father::locid';
+qa     := aPrefLoc + 'qa::locid';
+
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
+    STD.File.StartSuperFileTransaction(),
+    STD.File.ClearSuperFile(father, true),
+    STD.File.AddSuperFile(father,qa),
+    STD.File.ClearSuperFile(qa),
+    STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
+    STD.File.FinishSuperFileTransaction(),
     update_inc_superfiles(,filedt),
     );
         
