@@ -12,7 +12,6 @@ module
 
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
 ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
-ECLHThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
 
 GenerateDashboards := 
  'import ut,FraudGovPlatform_Analytics,_control;\n'
@@ -46,21 +45,7 @@ BuildStatusReport :=
 +'FraudGovPlatform.Build_Summary(\''+pversion+'\').send:failure(email(\'Build Status Report failed\'));\n'
 ;
 
-BuildCoverageDates := 
- 'import ut,FraudGovPlatform;\n'
-+'wuname := \'FraudGov Build Coverage Dates\';\n'
-+'#WORKUNIT(\'name\', wuname);\n'
-+'#WORKUNIT(\'protect\', true);\n'
-+'#OPTION(\'defaultSkewError\', 1);\n'
-+'email(string msg):=fileservices.sendemail(\n'
-+'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
-+' 	 ,\'FraudGov Build Coverage Dates\'\n'
-+' 	 ,msg\n'
-+' 	 +\'Build wuid \'+workunit\n'
-+' 	 );\n\n'
-+'FraudGovPlatform.Build_CoverageDates_Push(\''+pversion+'\').push:failure(email(\'Build Coverage Dates failed\'));\n'
-;
-
+			
 	Export	All := Sequential(
 										 Build_Keys(pVersion).Delta_All
 										,Build_Base_Kel(pVersion).Delta_All
@@ -74,7 +59,6 @@ BuildCoverageDates :=
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
-										,_Control.fSubmitNewWorkunit(BuildCoverageDates,ECLHThorName)
 										,FraudGovPlatform.Send_Emails(pversion).Roxie										
 									);
 		
