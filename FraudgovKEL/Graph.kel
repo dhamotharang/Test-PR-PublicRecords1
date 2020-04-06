@@ -1530,14 +1530,14 @@ Event: => AgencyUID := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
-// Event: => T_SrcAgencyUID := SourceCustomers{rSourceCustomer.CustomerId}; //CHECKME - are there multiple source customers? do we want a list? does this even give a list? 
+// Event: => T_SrcAgencyUID := SourceCustomers{rSourceCustomer.CustomerId}; //CHECKME - need to ask about source agency
 // Event: => T_SrcAgencyProgType := SourceCustomers{rSourceCustomer.IndustryType}; //CHECKME - same as above
 
 Event: => T_ActUID := EntityContextUid; //CHECKME - not sure if this is right, maybe RecordID instead?
-Event: => T_ActDtEcho := EventDate; //CHECKME - check date format, should be YYYYMMDD
+Event: => T_ActDtEcho := EventDate; //CHECKME - double check date format, should be YYYYMMDD
 
 Event: => T_SrcType := -99997; //FIXME - where do I find this?
-Event: => T_IDActFlag := MAP(T_SrcType = -99997 => -99997, //DOUBLECHECKME - dependant on T_SrcType to be configured
+Event: => T_IDActFlag := MAP(T_SrcType = -99997 => -99997, //will always be -99997 until SrcType is configured
 														 T_SrcType IN [1,7,8,9,10,12] => 1,
 														 0);
 														 
@@ -1625,44 +1625,6 @@ Event: => T18_IPAddrLocMiamiFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IPAddrCity < 1 => -99997,
 																AgencyProgJurSt != 'FL' AND T18_IPAddrCity = 'MIAMI' => 1,
 																0);
-
-
-
-
-//test query 
-
-QUERY: showIPAddressLocStuff <= InternetProtocol
-                            {
-                              SourceCustomer := rCustomer, 
-                              rCustomer.CustomerId,
-                              rCustomer.IndustryType,
-                              EntityContextUid,
-                              Label,
-                              EntityType,
-															location,
-    v2_ipstate,
-    v2_ipcountry,
-    v2_ipcontinent,
-    edgecountry,
-    edgeregion,
-    edgecity,
-    edgelatitude,
-    edgelongitude,
-    edgepostalcode,
-    edgecountrycode,
-    edgeregioncode,
-    edgecitycode,
-    edgecontinentcode,
-    edgetwolettercountry,
-    edgeinternalcode,
-    edgeareacodes,
-    edgecountryconf,
-    edgeregionconf,
-    edgecitycong,
-    edgepostalconf};
-
-
-
 
 
 
