@@ -37,7 +37,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 										' ALLEY|SECOND|APT |FLOOR| AV |PAVILION| RD|TOWN$|LEVEL|CREEK| CENTER WEST| SHOPPING CENTER|'+
 										'CLASSROOM|THE COLONADE|GARDEN|RIVERWALK|FAIRGROUND|FAIR GROUND|GENERAL DELIVERY)';
 
-	invalid_addr  := '(N/A|NONE |NO VALID|SAME )';
+	invalid_addr  := '(N/A|NONE |NO VALID|SAME|ATTN |EY )';
 	C_O_Ind       := '(C/O |ATTN: |ATTN )';
 	DBA_Ind       := '( DBA |D/B/A |/DBA | A/K/A | AKA )';
 	CoPattern	    := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
@@ -48,7 +48,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 					         ')';
 	RemovePattern := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					         '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
-					         '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
+					         '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|^EY.*$|' +
 					         '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 					         '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|' +
 					         '^SACKS$|^.* AT GLACIER$|^.* RENTALS$|^.* BY WYNDHAM$|^.* OFFICE$|GENERAL DELIVERY| VISTA VILLAGE$|' +
@@ -192,7 +192,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 		SELF.OFFICE_PARSE			:= IF(SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'GR',
 																	IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'MD',
 																							''));
-		//Populating MARI Name Fields
+		//Populating MARI Name Fields 
 		SELF.NAME_DBA_ORIG	  := '';
 		SELF.NAME_MARI_ORG	  := SELF.NAME_OFFICE;
 		SELF.NAME_MARI_DBA	  := StdNAME_DBA;
@@ -206,9 +206,10 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 																 TRIM(pInput.Zip));
 		tmpNameContact1				:= Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(TrimAddress1, CoPattern);
 		clnAddress1						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(TrimAddress1, RemovePattern);
+		clnAddress2						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(TrimAddress1, invalid_addr);
 
 		//Prepare the input to address cleaner
-		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddress1); 
+		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddress1+' '+clnAddress2); 
 		temp_preaddr2 				:= StringLib.StringCleanSpaces(TrimCity+' '+pInput.STATE_1 +' '+tmpZip); 
 		clnAddrAddr1					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(temp_preaddr1,temp_preaddr2); //Address cleaner to remove 'c/o' and 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
