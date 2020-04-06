@@ -15,7 +15,7 @@ EXPORT E_Ssn_Event := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'associatedcustomerfileinfo(_r_Customer_:0),Social_(Social_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Social_(Social_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Social_(Social_:0),event_date(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   EXPORT __d0_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)SSN <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0);
   SHARED __d0_Social__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
@@ -49,7 +49,7 @@ EXPORT E_Ssn_Event := MODULE
   EXPORT NullCounts := DATASET([
     {'SsnEvent','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
     {'SsnEvent','FraudgovKEL.fraudgovshared','Social',COUNT(__d0(__NL(Social_))),COUNT(__d0(__NN(Social_)))},
-    {'SsnEvent','FraudgovKEL.fraudgovshared','EventDate',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
+    {'SsnEvent','FraudgovKEL.fraudgovshared','event_date',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
     {'SsnEvent','FraudgovKEL.fraudgovshared','Transaction',COUNT(__d0(__NL(Transaction_))),COUNT(__d0(__NN(Transaction_)))},
     {'SsnEvent','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'SsnEvent','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]

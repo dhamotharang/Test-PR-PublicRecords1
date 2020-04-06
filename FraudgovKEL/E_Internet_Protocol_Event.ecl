@@ -15,7 +15,7 @@ EXPORT E_Internet_Protocol_Event := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'associatedcustomerfileinfo(_r_Customer_:0),Ip_(Ip_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Ip_(Ip_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Ip_(Ip_:0),event_date(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   EXPORT __d0_KELfiltered := FraudgovKEL.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']);
   SHARED __d0_Ip__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
@@ -49,7 +49,7 @@ EXPORT E_Internet_Protocol_Event := MODULE
   EXPORT NullCounts := DATASET([
     {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
     {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','Ip',COUNT(__d0(__NL(Ip_))),COUNT(__d0(__NN(Ip_)))},
-    {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','EventDate',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
+    {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','event_date',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
     {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','Transaction',COUNT(__d0(__NL(Transaction_))),COUNT(__d0(__NN(Transaction_)))},
     {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'InternetProtocolEvent','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]

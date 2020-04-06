@@ -15,7 +15,7 @@ EXPORT E_Phone_Event := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'associatedcustomerfileinfo(_r_Customer_:0),Phone_Number_(Phone_Number_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Phone_Number_(Phone_Number_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Phone_Number_(Phone_Number_:0),event_date(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   EXPORT __d0_KELfiltered := FraudgovKEL.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.cell_phone != '');
   SHARED __d0_Phone_Number__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
@@ -29,7 +29,7 @@ EXPORT E_Phone_Event := MODULE
   SHARED __d0_Transaction__Mapped := JOIN(__d0_Phone_Number__Mapped,E_Event.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.record_id) = RIGHT.KeyVal,TRANSFORM(__d0_Transaction__Layout,SELF.Transaction_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d0_Prefiltered := __d0_Transaction__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
-  SHARED __Mapping1 := 'associatedcustomerfileinfo(_r_Customer_:0),Phone_Number_(Phone_Number_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping1 := 'associatedcustomerfileinfo(_r_Customer_:0),Phone_Number_(Phone_Number_:0),event_date(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   EXPORT __d1_KELfiltered := FraudgovKEL.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.phone_number != '');
   SHARED __d1_Phone_Number__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
@@ -63,13 +63,13 @@ EXPORT E_Phone_Event := MODULE
   EXPORT NullCounts := DATASET([
     {'PhoneEvent','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','PhoneNumber',COUNT(__d0(__NL(Phone_Number_))),COUNT(__d0(__NN(Phone_Number_)))},
-    {'PhoneEvent','FraudgovKEL.fraudgovshared','EventDate',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
+    {'PhoneEvent','FraudgovKEL.fraudgovshared','event_date',COUNT(__d0(__NL(Event_Date_))),COUNT(__d0(__NN(Event_Date_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','Transaction',COUNT(__d0(__NL(Transaction_))),COUNT(__d0(__NN(Transaction_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d1(__NL(_r_Customer_))),COUNT(__d1(__NN(_r_Customer_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','PhoneNumber',COUNT(__d1(__NL(Phone_Number_))),COUNT(__d1(__NN(Phone_Number_)))},
-    {'PhoneEvent','FraudgovKEL.fraudgovshared','EventDate',COUNT(__d1(__NL(Event_Date_))),COUNT(__d1(__NN(Event_Date_)))},
+    {'PhoneEvent','FraudgovKEL.fraudgovshared','event_date',COUNT(__d1(__NL(Event_Date_))),COUNT(__d1(__NN(Event_Date_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','Transaction',COUNT(__d1(__NL(Transaction_))),COUNT(__d1(__NN(Transaction_)))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
     {'PhoneEvent','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
