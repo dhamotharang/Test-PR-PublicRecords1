@@ -1303,6 +1303,7 @@
 				trim(kword, left, right) = 'KZACA' =>SubGroup_Constants.numKeywordsID.KEYWORD_KZACA,
 				trim(kword, left, right) = 'CNMPS-IF' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNMPS_IF,
 				trim(kword, left, right) = 'LTGCA' =>SubGroup_Constants.numKeywordsID.KEYWORD_LTGCA,
+				trim(kword, left, right) = 'CNPPSD-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNPPSD_MW,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
