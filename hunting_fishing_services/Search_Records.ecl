@@ -23,11 +23,11 @@ export Search_Records := module
         export suffix_field   := left.suffix;
         export postdir_field  := left.postdir;
         export sec_range_field := left.sec_range;
-        export city_field     := left.p_city_name;      
+        export city_field     := left.p_city_name;
         export city2_field    := left.city_name;
         export state_field    := left.st;
         export zip_field      := left.zip;
-        export ssn_field      := left.best_ssn;  
+        export ssn_field      := left.best_ssn;
         export did_field      := left.did_out;
         export dob_field      := '';
         export county_field   := left.county;
@@ -35,7 +35,7 @@ export Search_Records := module
       end;
 
       tempPenaltIndv := AutoStandardI.LIBCALL_PenaltyI_Indv.val(tempindvmod);
-      
+
       // if its deepdive or isFCRA, don't apply the penalty
       self.penalt := if (left.isDeepDive or isFCRA, 0, tempPenaltIndv),
       self := left));
@@ -79,36 +79,36 @@ export Search_Records := module
     return recs_proj;
   end;
   export val(params in_mod, boolean isFCRA = false) := function
-  
+
     // Get the IDs and pull the payload records
     ids := hunting_fishing_services.Search_IDs.val(in_mod, isFCRA);
-    
-    ds_best := project(ids,transform(doxie.layout_best,self:=left,self:=[]));
-    
+
     //FCRA FFD
     dsDIDs := dataset([{FFD.Constants.SingleSearchAcctno,(unsigned)in_mod.DID}], FFD.Layouts.DidBatch);
-    
+
+    ds_best := project(dsDIDs, transform(doxie.layout_best,self:=left,self:=[]));
+
     pc_recs := if(isFCRA, FFD.FetchPersonContext(dsDIDs, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.Hunting_Fishing, in_mod.FFDOptionsMask));
-    
+
     slim_pc_recs := FFD.SlimPersonContext(pc_recs);
-    
+
     alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
     suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
-    
+
     consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
-                                       
+
     ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs), FCRA.compliance.blank_flagfile);
-    
+
     recs := Hunting_Fishing_Services.Raw.byRids(ids, isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask);
-      
+
     recs_proj := if (suppress_results_due_alerts, dataset([], iesp.huntingfishing_fcra.t_FcraHuntFishRecord),
                      formatandFilterRawRecords(recs,in_mod, isFCRA));
-    
+
     boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
     consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 
     FFD.MAC.PrepareResultRecord(recs_proj, final_rec, consumer_statements, consumer_alerts, iesp.huntingfishing_fcra.t_FcraHuntFishRecord);
-    
+
     return final_rec;
   end;
 end;
