@@ -1,4 +1,4 @@
-IMPORT doxie, FCRA, FFD, Gong, Gong_Services, Suppress;
+IMPORT doxie, FCRA, FFD, dx_Gong, Gong_Services, Suppress, data_services;
 
 EXPORT Records := MODULE
 
@@ -18,7 +18,7 @@ EXPORT Records := MODULE
 				KEEP(FCRA.compliance.MAX_OVERRIDE_LIMIT),LIMIT(0));
 
 			// get gong records
-			ds_gong_recs:=JOIN(ds_dids,gong.Key_FCRA_History_did,
+			ds_gong_recs:=JOIN(ds_dids,dx_Gong.key_history_did(data_services.data_env.iFCRA),
 				KEYED(LEFT.did=RIGHT.l_did),
 				TRANSFORM(FCRA.Layout_Override_Gong,SELF:=RIGHT,SELF:=[]),
 				KEEP(Gong_Services.Constants.FCRA.MaxGongPerDID),
