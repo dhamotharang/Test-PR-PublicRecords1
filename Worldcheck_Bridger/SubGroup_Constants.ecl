@@ -1201,6 +1201,7 @@
 		export string KEYWORD_KZACA									:= '887';
 		export string KEYWORD_CNMPS_IF							:= '888';
 		export string KEYWORD_LTGCA									:= '889';
+		export string KEYWORD_CNPPSD_MW							:= '890';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
