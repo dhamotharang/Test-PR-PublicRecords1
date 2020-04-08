@@ -90,7 +90,8 @@ EXPORT JudgmentsAndLiens_BatchService(useCannedRecs = 'false') :=
       EXPORT STRING1 BIPFetchLevel            := STD.Str.ToUpperCase(BIPFetchLevel_in);
 		END;
 		
-		BatchShare.MAC_SequenceInput(ds_xml_in, ds_batch_in);
+		BatchShare.MAC_SequenceInput(ds_xml_in, ds_xml_in_seq);
+		BatchShare.MAC_CapitalizeInput(ds_xml_in_seq, ds_batch_in);
 		
 		// Search for J&L records by party.
 		ds_batch_out := LiensV2_Services.Batch_records(ds_batch_in, jl_batch_params);

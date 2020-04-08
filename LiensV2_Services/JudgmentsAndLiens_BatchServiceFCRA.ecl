@@ -79,7 +79,8 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 			EXPORT INTEGER  FCRAPurpose    								    := inFCRAPurpose;
 		END;
 		
-		BatchShare.MAC_SequenceInput(ds_xml_in, ds_batch_in);
+		BatchShare.MAC_SequenceInput(ds_xml_in, ds_xml_in_seq);
+		BatchShare.MAC_CapitalizeInput(ds_xml_in_seq, ds_batch_in);
 		
 		// append DID (a soap call to Picklist service
 		BatchShare.MAC_AppendPicklistDID (ds_batch_in, ds_batch_did, jl_batch_params, IsFCRA);	
