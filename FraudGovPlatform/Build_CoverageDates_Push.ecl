@@ -1,11 +1,11 @@
 Import FraudGovPlatform, MySQL, ut;
-EXPORT Build_CoverageDates_Push(string pversion) := MODULE
+EXPORT Build_CoverageDates_Push := MODULE
 
 shared coverage_dates := FraudGovPlatform.Files().Base.CoverageDates.Built;
 
-
-shared mysql_username := ut.Credentials().fGetAppUserInfo('mysql')[1].username;
-shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql')[1].password;
+//mysql_prod for Prod, mysql_qa for QA, mysql_dev for Dev
+shared mysql_username := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].username;
+shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].password;
 
 
 shared  MySQLServer                 :=  'dbdgov-bct.risk.regn.net';
