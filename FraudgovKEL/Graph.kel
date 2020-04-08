@@ -1545,7 +1545,7 @@ Event: => IpTor := MAP(UPCASE(proxydescription) IN ['TOR EXIT','TOR RELAY'] /*OR
 Event: => IpHighRiskCity := MAP(rCustomer.JurisdictionState != 'FL' AND UPCASE(edgecity) IN ['MIAMI'] => 1, 0);
 Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydescription) IN ['CLOUD-SECURITY','CLOUD'] => 1, 0);
 
-//attributes from Nicole D. 3/26/20
+//attributes from Nicole D. 
 
 
 Event: => AgencyUID := CustomerId;
@@ -1555,8 +1555,8 @@ Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 // Event: => T_SrcAgencyUID := SourceCustomers{rSourceCustomer.CustomerId}; //CHECKME - need to ask about source agency
 // Event: => T_SrcAgencyProgType := SourceCustomers{rSourceCustomer.IndustryType}; //CHECKME - same as above
 
-Event: => T_ActUID := EntityContextUid; //CHECKME - not sure if this is right, maybe RecordID instead?
-Event: => T_ActDtEcho := EventDate; //CHECKME - double check date format, should be YYYYMMDD
+Event: => T_ActUID := RecordId;
+Event: => T_ActDtEcho := EventDate; 
 
 Event: => T_SrcType := -99997; //FIXME - where do I find this?
 Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
@@ -1564,11 +1564,55 @@ Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
 																T_SrcType IN [4,5] => 2,
 																T_SrcType IN [2,3] => 3,
 																4);
+																
+Event: => T_InpClnTitleEcho := MAP(Subject.FullName.Title = '' => -99999,
+																	 Subject.FullName.Title);
+Event: => T_InpClnFirstNmEcho := MAP(Subject.FullName.FirstName = '' => -99999,
+																	 Subject.FullName.FirstName);
+Event: => T_InpClnLastNmEcho := MAP(Subject.FullName.LastName = '' => -99999,
+																	 Subject.FullName.LastName);
+Event: => T_InpClnNmSuffixEcho := MAP(Subject.FullName.NameSuffix = '' => -99999,
+																	 Subject.FullName.NameSuffix);
+																	 
+Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' => -99999,
+																					 Location.PrimaryRange);
+Event: => T_InpClnAddrPreDirEcho := MAP(Location.Predirectional = '' => -99999,
+																					 Location.Predirectional);
+Event: => T_InpClnAddrPrimNmEcho := MAP(Location.PrimaryName = '' => -99999,
+																					 Location.PrimaryName);
+Event: => T_InpClnAddrSuffixEcho := MAP(Location.Suffix = '' => -99999,
+																					 Location.Suffix);
+Event: => T_InpClnAddrPostDirEcho := MAP(Location.Postdirectional = '' => -99999,
+																					 Location.Postdirectional);
 
-Event: => T_InpClnIPAddrEcho := MAP(IpAddress = '' => -99999, //CHECKME - is IP ever blank? What does that look like
+Event: => T_InpClnAddrUnitDesigEcho := MAP(Location.UnitDesignation = '' => -99999,
+																					 Location.UnitDesignation);
+Event: => T_InpClnAddrSecRangeEcho := MAP(Location.SecondaryRange = '' => -99999,
+																					 Location.SecondaryRange);
+Event: => T_InpClnAddrCityEcho := MAP(Location.PostalCity = '' => -99999,
+																					 Location.PostalCity);
+Event: => T_InpClnAddrStEcho := MAP(Location.State = '' => -99999,
+																					 Location.State);
+Event: => T_InpClnAddrAddrZip5Echo := MAP(Location.Zip = '' => -99999, //CHECKME - make sure this is the 5 digit zip code
+																					 Location.Zip);
+Event: => T_InpClnAddrZip4Echo := MAP(Location.Zip4 = '' => -99999,
+																					 Location.Zip4);
+Event: => T_InpClnAddrLatEcho := MAP(Location.Latitude:Null => -99999,
+																					 Location.Latitude);
+Event: => T_InpClnAddrLongEcho := MAP(Location.Longitude:Null => -99999,
+																					 Location.Longitude);
+Event: => T_InpClnAddrCountyEcho := MAP(Location.County = '' => -99999,
+																					 Location.County);
+Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' => -99999,
+																					 Location.GeoBlock);
+// Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, //is country listed anywhere?
+																					 // Location.Country);
+
+
+Event: => T_InpClnIPAddrEcho := MAP(IpAddress = '' => -99999, 
 																		IpAddress);
 																		
-Event: => T18_IsIPMetaHitFlag := MAP(T_InpClnIPAddrEcho = -99999 => -99999, //FIXME - is this the hit/no hit thing we keep talking about? if so Jo is on it
+Event: => T18_IsIPMetaHitFlag := MAP(T_InpClnIPAddrEcho = -99999 => -99999, //FIXME - Jo is creating a hit/nohit field
                                      0);
 																		 
 Event: => T18_IPAddrCity := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
