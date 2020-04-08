@@ -44,6 +44,7 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
      SELF.SourceInfo           := dGrpSrc;
      SELF.TotalSourceCount     := COUNT(dDedupSrc);
      SELF.SelfReportedSourcesOnly := ~(EXISTS(Src_Func(_Type = $.Constants.PFSourceType.Account)));
+     SELF.phn_src_all          := dDedupSrc;
      SELF := l;
   END;
 
