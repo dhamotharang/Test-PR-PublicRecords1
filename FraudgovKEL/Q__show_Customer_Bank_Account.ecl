@@ -4,6 +4,6 @@ IMPORT B_Bank_Account,E_Bank,E_Bank_Account,E_Customer FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Bank_Account := MODULE
   SHARED TYPEOF(B_Bank_Account.__ENH_Bank_Account) __ENH_Bank_Account := B_Bank_Account.__ENH_Bank_Account;
-  SHARED __EE1217530 := __ENH_Bank_Account;
-  EXPORT Res0 := __UNWRAP(__EE1217530);
+  SHARED __EE1241616 := __ENH_Bank_Account;
+  EXPORT Res0 := __UNWRAP(__EE1241616);
 END;

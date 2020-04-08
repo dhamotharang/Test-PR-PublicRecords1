@@ -42,7 +42,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
 		STRING MiddleName=NULL(),
 		STRING LastName=NULL(),
 		STRING NameSuffix=NULL(),
-    
+    INTEGER rin_source,
     // CIID Columns
 
     STRING verfirst,
@@ -137,7 +137,8 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
 		ReportedSsn{EventDate, Ssn},
 		ReportedEmailAddress{EventDate, EmailAddress},
 		FullName{EventDate, Title,FirstName,MiddleName,LastName,NameSuffix},
-
+    
+		rin_source,
     DeceasedDate,
     DeceasedDateOfBirth,
     DeceasedFirst,
@@ -218,7 +219,9 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     InternetProtocol rInternetProtocol=UID(AssociatedCustomerFileInfo, OttoIpAddressId),
     BankAccount rBankAccount=UID(AssociatedCustomerFileInfo, OttoBankAccountId),
     DriversLicense rDriversLicense=UID(AssociatedCustomerFileInfo, OttoDriversLicenseId),
-
+		
+    INTEGER rin_source,
+		
     INTEGER LexId, 
     STRING PhoneNumber,
     STRING OttoAddressId,
@@ -402,6 +405,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
       EventTypes{EventType},
 
     rPhone,rEmail,rInternetProtocol,rBankAccount,rDriversLicense,rSsn,
+		rin_source,
     LexId,
     OttoAddressId,
     DateOfBirth,
@@ -751,7 +755,8 @@ PersonEmail := ASSOCIATION(FLAT(
 AddressSSN := ASSOCIATION(FLAT(
     Customer rCustomer=AssociatedCustomerFileInfo,
 		Address Location=UID(AssociatedCustomerFileInfo, OttoAddressId),
-		SocialSecurityNumber Social=UID(AssociatedCustomerFileInfo, Ssn)));	
+		SocialSecurityNumber Social=UID(AssociatedCustomerFileInfo, Ssn),
+		DATE EventDate));	
 		
 		
 /*
@@ -988,6 +993,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		DateLastSeen = dt_last_seen),
 	PersonAddress(FILTER((UNSIGNED)did <> 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND AssociatedCustomerFileInfo > 0),
     LexId = did,
+		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 
@@ -998,23 +1004,28 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		
 	PersonSSN(FILTER((UNSIGNED)did<>0 AND (UNSIGNED)ssn<>0 AND AssociatedCustomerFileInfo > 0),
     LexId = did,
+		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 	AddressSSN(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND (UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
+		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
     LexId = did,
+		EventDate = event_date,
 		PhoneNumber = clean_phones.cell_phone,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.phone_number != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
     LexId = did,
+		EventDate = event_date,
 		PhoneNumber = clean_phones.phone_number,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 	PersonEmail(FILTER((UNSIGNED)did <> 0 AND (STRING50)email_address <> '' AND AssociatedCustomerFileInfo > 0),
-    LexId = did
+    LexId = did,
+		EventDate = event_date
   ),
   PersonEvent(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
     LexId = did,
@@ -1022,34 +1033,44 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id    
   ),
   PersonAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
-    LexId = did
+    LexId = did,
+		EventDate = event_date
+		
   ),  
   SsnEvent(FILTER((UNSIGNED)SSN <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
-    Transaction = record_id    
+    Transaction = record_id,
+		EventDate = event_date   
   ),
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.cell_phone != ''),
 		PhoneNumber = clean_phones.cell_phone,
+		EventDate = event_date,
     Transaction = record_id    
   ),
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.phone_number != ''),
 		PhoneNumber = clean_phones.phone_number,
+		EventDate = event_date,
     Transaction = record_id    
   ),
   EmailEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND email_address != ''),
 		Emailof=email_address,  		
+		EventDate = event_date,
     Transaction = record_id    
   ),
   BankAccountEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_1 != ''),
-    Transaction = record_id    
+    Transaction = record_id,    
+		EventDate = event_date
   ),
   BankAccountEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_2 != ''),
     OttoBankAccountId = OttoBankAccountId2,
+		EventDate = event_date,		
     Transaction = record_id    
   ),
   DriversLicenseEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND drivers_license != ''),
+		EventDate = event_date,
     Transaction = record_id    
   ),  
   InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+		EventDate = event_date,
     Transaction = record_id    
   ),
   AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
@@ -1526,6 +1547,7 @@ Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydesc
 
 //attributes from Nicole D. 3/26/20
 
+
 Event: => AgencyUID := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
@@ -1710,6 +1732,9 @@ Event: => DriversLicenseEventAfterKrCount := rDriversLicense.KrEventAfterLastKno
 
 Event: => AbbreviatedBankname := rBankAccount.AbbreviatedBankname;
 Event: => DlState := rDriversLicense.State;
+
+Event: => AddrIdentityCount := COUNT(Location.PersonAddress(EventDates.EventDate < Event.EventDate){Subject});
+Event: => AddrIdentityFullCount := COUNT(Location.PersonAddress{Subject});
 
 /*
 Event: => KrEventAfterKnownRisk := MAP(Location.KrLastEventDate < EventDate OR 
@@ -2377,7 +2402,6 @@ Address: => DtFirstSeen := MIN(AddressEvent.Transaction, EventDate);
 Address: => DtLastSeen := MAX(AddressEvent.Transaction, EventDate);
 Address: => LastRecordId := MAX(AddressEvent.Transaction, RecordId);
 
-
 Address: => NotInJurisdictionState := MAP(State != rCustomer.JurisdictionState => 1, 0);
 Address: => InvalidAddress := MAP(ACECleanerErrorCode IN ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E422','E423','E425','E427','E428','E429','E430','E431','E439','E500','E501','E502','E503','E504','E505','E600'] => 1, 0);
 Address: => AddressIsVacant := MAX(AddressEvent, Transaction.AddressIsVacant);
@@ -2495,26 +2519,6 @@ Customer: => JurisdictionState := JurisdictionStateTop.State;
 
 Customer: => EventDateMax := MAX(PersonEvent/*(Transaction.EventTypeCount=0)*/, EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
 
-
-QUERY: Temp <= Event;
-
-/*PersonPerson
-{rCustomer, FromPerson.LexId, ToPerson.LexId, PublicRecords,
-    ContributoryRecords,
-    SameAddressEmailMatch,
-    SameAddressSsnMatch,
-    SameAddressPhoneNumberMatch,
-    NonHighFrequencyAddressCount,
-    SameAddressSameDayCount,
-    HighFrequencySameAddressSameDayCount,
-    SharedAddressCount,
-		ToPerson.Deceased,
-    ToPerson.DeceasedEventCount,
-		ToPerson.DeathPriorToAllEvents
-		
-    }
-;	
-*/
 
 QUERY: showCustomerPersonEvent <= Event;
 QUERY: showCustomerPerson <= Person;
