@@ -8,7 +8,7 @@ shared mysql_username := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].usern
 shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].password;
 
 
-shared  MySQLServer                 :=  'dbdgov-bct.risk.regn.net';
+shared  MySQLServer                 :=  'dbpgov-bct.risk.regn.net';
 shared  MySQLPort                   :=  '3306';
 shared  MySQLDatabase               :=  'ring_web';
 shared  MySQLUser                   :=  mysql_username;
