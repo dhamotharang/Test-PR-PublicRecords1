@@ -93,9 +93,11 @@ J_Watchdog_Match := Join(LeftRec, RightRec, Left.did = Right.did, MatchThem(Left
 
 
 //exports comparingson of header file agaisnt watchdog
-Export Watchdog_Match := Dedup(J_Watchdog_Match, did, fname_match, lname_match, dob_match,
+D_Watchdog_Match := Dedup(J_Watchdog_Match, did, fname_match, lname_match, dob_match,
                                                 ssn_match, address_match, address_match_all, 
                                                 source_name, All ); // take a look
+
+Export Watchdog_Match  := Sort(D_Watchdog_Match, did);
 
 
 // rollup by lexid
