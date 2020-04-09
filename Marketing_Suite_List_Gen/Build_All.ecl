@@ -2,16 +2,17 @@
 									string	pFilename				=	''
 								) := module
 								
-  /*=======================================================================================================================================
-  | Batch kicks off this process by calling this attribute and passing it the name of the customer criteria file. Prior to this
+  /*========================================================================================================================
+  | Batch kicks off this process by calling this attribute and passing it the name of the customer criteria file. Prior to 
 	| this point, Batch will be spraying the parameter to thor. After this code completes, then Batch will pick up the files
-	| created byt this job to return to the customer.
-  |======================================================================================================================================*/
+	| created by this job to return to the customer.
+  |=========================================================================================================================*/
 
 	// 	Define the parameter file with the file name being passed to this attribute.
 	export ParmFile			:=	dataset(pFileName,Marketing_Suite_List_Gen.Layouts.Layout_ParmFile,CSV(SEPARATOR(['|']), quote('"'), TERMINATOR(['\n','\r\n','\n\r']), HEADING(1)));
 	
-	//	Determine the jobId from the file name so that we can attach it to the result filenames.
+	//	Determine the jobId from the file name so that we can attach it to the result filenames. The JobId follows the dash
+	//  in the jobname. Example filename expected: ~batchr3::marketing_suite_list::sampledespray-121281517.csv
 	IdBegPos						:=	StringLib.Stringfind(pFilename, '-', 1);
 	IdEndPos						:=	StringLib.Stringfind(pFilename, '.', 1);
 	export JobID				:=	pFilename[IdBegPos + 1..IdEndPos-1];

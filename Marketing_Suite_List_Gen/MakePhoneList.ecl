@@ -26,13 +26,13 @@ EXPORT MakePhoneList(
 	| Phone Filters
 	|--------------------------------------------------------------------------------------------------------------------------------------*/
 	PhonePresent		:=	if (filter_PhonePresent='Y',
-													inSlimFile(	ut.CleanSpacesAndUpper(phone)<>''));
+													inSlimFile(	trim(phone)<>''));
 													
 	PhoneTollFree		:=	if (filter_tollfree[1] <> '', 
-													inSlimFile(	ut.CleanSpacesAndUpper(phone[1..3]) in filter_tollfree));
+													inSlimFile(	trim(phone[1..3]) in filter_tollfree));
 													
 	PhoneAreaCode		:=	if (filter_areacode[1] <> '', 
-													inSlimFile(	ut.CleanSpacesAndUpper(phone[1..3]) in filter_areacode));
+													inSlimFile(	trim(phone[1..3]) in filter_areacode));
 													
 	PhoneRecords		:=	dedup(sort(PhonePresent + PhoneTollFree + PhoneAreaCode,record),record);
 	

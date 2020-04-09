@@ -127,8 +127,14 @@ export Build_List(
 	GetSlim							:=	ExtractBusinessFileSearchFields(SearchType);
 	
 	/*---------------------------------------------------------------------------------------------------------------------
-  | For each parameter category, pass the slim file in the category function to build that list. So we build a phone  
-	| list, geography list, revenue list etc. 
+  | For each parameter category, pass the slim file in to the category function to build that list. So we build a phone  
+	| list, geography list, revenue list etc. In each of these cases, we check to see if that parameter group is being
+	| used. If it isn't then we assign the entire GetSlim file to that group. We do this because we do a join later and if 
+	| either file in the join is empty, we end up with an empty result file. So, for instance, if we don't care about the
+	| phone numbers, then our MakePhoneList file is empty. We don't want to join an empty file to another file because the
+	| inner join will result in an empty file. So we assign the entire file to the empty parameter group (PhoneList in this
+	| example). When we do the join between PhoneList and GeoList, the resulting records are just the GeoList ones, which is
+	| what we want. And this logic continues for all Lists being built.
   |----------------------------------------------------------------------------------------------------------------------*/
 	PhoneList						:=	if (count(Marketing_Suite_List_Gen.MakePhoneList(inParmFile,GetSlim)) <> 0,
 																Marketing_Suite_List_Gen.MakePhoneList(inParmFile,GetSlim),
@@ -179,7 +185,11 @@ export Build_List(
 	/*---------------------------------------------------------------------------------------------------------------------
   | Make the business section of the list. Do an inner join of each so that we get records that are in both.
 	| Each category is an AND, so if we had the toll free parameter and we had a state=OH parameter, then we would only
-	| want records that have both a toll free number and in the state of OH.
+	| want records that have both a toll free number and in the state of OH. If one of our parameter groups isn't present,
+	| then we have assigned that parameter group to the full slim list (see comments above where we build the lists), so 
+	| that the inner join works. Remember this is an inner join, so even if we default the PhoneList to the full file 
+	|	because the customer doesn't care about Phone Numbers, when we join that to the GeoList, we are only returning 
+	|	the GeoList records bc of the inner join.
   |----------------------------------------------------------------------------------------------------------------------*/	
 	TempBusLayout trfMakeBusList(TempBusLayout l, TempBusLayout r)	:=	transform
 		self	:=	l;

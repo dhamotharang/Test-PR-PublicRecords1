@@ -11,7 +11,7 @@ export MakeContactList(
 	string ParmFilterName_ContactLexidPresent		:= 'CONTACTLEXIDPRESENT';
 	
 	/*---------------------------------------------------------------------------------------------------------------------------------------
-  | Contact              
+  | Check to see if any of the 'contact present' parameters are in our list. If so set the appropriate filters to 'Y'.            
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 
 	rs_record_contact_addr_present						:=	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_ContactAddressPresent and set_filter_values[1] = 'Y');
@@ -24,7 +24,10 @@ export MakeContactList(
 	string filter_ContactLexidPresent					:=	if(count(rs_record_contact_lexid_present) > 0,'Y','');	
 														 
 	/*---------------------------------------------------------------------------------------------------------------------------------------
-	| Contact Filters
+	| Check each filter. If it is set to 'Y', then grab all records that meet this criteria. So, if we want records
+	| where a contact full address is present (i.e. filter_ContactAddrPresent = 'Y', then grab all records where a
+	| contact address is present. The ame holds for the other two contact parameters (email and lexid). Once we have grabbed
+	| all records needed, combine and dedup those records and return them.
 	|--------------------------------------------------------------------------------------------------------------------------------------*/
 
 	AddressPresent		:=	if (filter_ContactAddrPresent='Y',

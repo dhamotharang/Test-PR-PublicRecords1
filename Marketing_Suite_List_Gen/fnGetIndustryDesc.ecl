@@ -32,7 +32,7 @@ EXPORT fnGetIndustryDesc(dataset(Marketing_Suite_List_Gen.Layouts.Layout_NormTem
 
 	GetSicDescription		:=	join(	dist_normFile,
 																dSicFile,
-																ut.CleanSpacesAndUpper(left.sic_code)=ut.CleanSpacesAndUpper(right.sic_code),
+																trim(left.sic_code)=trim(right.sic_code),
 																trfJoinSic(left,right),
 																left outer,
 																local
@@ -43,7 +43,7 @@ EXPORT fnGetIndustryDesc(dataset(Marketing_Suite_List_Gen.Layouts.Layout_NormTem
 													 
 	GetNaicsDescription	:=	join(	distByNaics,
 																dNaicsFile,
-																ut.CleanSpacesAndUpper(left.naics_code)=ut.CleanSpacesAndUpper(right.naics_code),
+																trim(left.naics_code)=trim(right.naics_code),
 																trfJoinNaics(left,right),
 																left outer,
 																local
