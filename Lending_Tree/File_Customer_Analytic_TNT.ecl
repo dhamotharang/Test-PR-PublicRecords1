@@ -1,1 +1,0 @@
-EXPORT File_Customer_Analytic_TNT := DATASET('LendTree::Customer_Analytic_TNT', Layout_Customer_Analytic, THOR);
