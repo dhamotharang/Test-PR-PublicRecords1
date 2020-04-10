@@ -7,6 +7,15 @@ IMPORT AutoStandardI, BIPV2, iesp, MDR, Suppress, UCCV2, UCCV2_Services;
 
 EXPORT UCCSection := MODULE;
 
+EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
+                                                  string1 FETCH_LEVEL, 
+                                                  unsigned4 FETCH_KEEP_LIMIT) := 
+                     TopBusiness_Services.Key_Fetches(
+	                    ds_in_unique_ids_only // input file to join key with
+				    ,FETCH_LEVEL // level of ids to join with				    						              
+                          ,FETCH_KEEP_LIMIT  
+					 ).ds_ucc_linkidskey_recs;			
+
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
    dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
@@ -25,10 +34,9 @@ EXPORT UCCSection := MODULE;
   // ****** Get UCC tmsids/rmsids or each set of input linkids
   //
   // *** Key fetch to get ucc tmsid/rmsid data from new bip2 linkids key file.
-  ds_linkids_keyrecs := TopBusiness_Services.Key_Fetches(
-	                         ds_in_ids_only,
-													 FETCH_LEVEL,TopBusiness_Services.Constants.UCCKfetchMaxLimit).ds_ucc_linkidskey_recs;
-
+  ds_linkids_keyrecs := GetUCCBipLinkids(ds_in_ids_only
+                                                                            ,FETCH_LEVEL                                                                          
+                                                                            ,TopBusiness_Services.Constants.UCCKfetchMaxLimit);
 	// Filter to only use recs that are not 'A'/Assignee (bug 138650) and 
 	// then project onto a slimmed layout.
   ds_linkids_keyrecs_slimmed := project (ds_linkids_keyrecs(party_type != 'A'),

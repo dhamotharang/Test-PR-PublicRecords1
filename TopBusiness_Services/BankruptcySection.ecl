@@ -1,7 +1,15 @@
-import TopBusiness,iesp,AutoStandardI, BankruptcyV3, BIPV2, MDR, Codes,
+﻿import TopBusiness,iesp,AutoStandardI, BankruptcyV3, BIPV2, MDR, Codes,
 Suppress, ut;
 
 export BankruptcySection := module
+
+EXPORT GetBankruptcyBipLinkids(DATASET(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
+                    STRING1 FETCH_LEVEL) :=  
+                     TopBusiness_Services.Key_Fetches(
+	                    ds_in_unique_ids_only // input file to join key with
+				    ,FETCH_LEVEL // level of ids to join with
+										              // 3rd parm is ScoreThreshold, take default of 0
+					 ).ds_bankr_linkidskey_recs;
 
 export fn_fullView(
 	dataset(TopBusiness_Services.BankruptcySection_Layouts.rec_Input) ds_in_data,
@@ -44,20 +52,13 @@ export fn_fullView(
 			
 	// get the main data from the new linkds key
 	FETCH_LEVEL := in_options.BusinessReportFetchLevel;
-  // ds_bk_BIP_raw_recs := BankruptcyV3.key_bankruptcyV3_linkids.kfetch( 
-	                        // project(ds_deduped_linkids, 
-	                        // transform(BIPV2.IDlayouts.l_xlink_ids,
-													// self := left)),
-													// FETCH_LEVEL )(name_type[1] = 'D'); // only want debtor recs not attorney recs
-													// very important to have this filter
-													
-   ds_bk_bip_raw_recs := TopBusiness_Services.Key_Fetches(project(ds_deduped_linkids, 
+ 
+    ds_bk_bip_raw_recs := GetBankruptcyBipLinkids(project(ds_deduped_linkids, 
 	                        transform(BIPV2.IDlayouts.l_xlink_ids,
-													self := left)),
-													FETCH_LEVEL).ds_bankr_linkidskey_recs 													
-													(name_type[1] = 'D'); // only want debtor recs not attorney recs.												
-													
-													// that have the same TMSID
+													self := left)), 
+                                                                      FETCH_LEVEL)(name_type[1] = 'D'); // only want debtor recs not attorney recs
+                                                                        // that have the same TMSID
+
   ds_bk_bip_raw_recs2 := join(ds_normalized_linkids,ds_bk_bip_raw_recs,
 														BIPV2.IDmacros.mac_JoinTop3Linkids(),
 														 transform({string1 party_type; recordof(right);},

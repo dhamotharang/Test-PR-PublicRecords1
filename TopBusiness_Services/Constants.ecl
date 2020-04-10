@@ -319,5 +319,10 @@ export constants:= module;
 		EXPORT Foreign    := 'Foreign';
 		EXPORT Domestic  	:= 'Domestic';
 	END;
+     
+     EXPORT BusinessInsight := MODULE
+         	export unsigned4 UCCBusinessInsightKfetchMaxLimit := 5000;	
+          EXPORT unsigned2 MaxIndicatorCodesReturned := 5;
+      END;
 	
 end;

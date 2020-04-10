@@ -86,6 +86,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeAssociatedBusinesses',report_options.IncludeAssociatedBusinesses);
 	#stored('IncludeBankruptcies',report_options.IncludeBankruptcies);
 	#stored('IncludeBusinessRegistrations', report_options.IncludeBusinessRegistrations);
+     #stored('IncludeBusinessInsight',report_options.IncludeBusinessInsight);
 	#stored('IncludeCompanyVerification', report_options.IncludeCompanyVerification);
 	#stored('IncludeConnectedBusinesses', report_options.IncludeConnectedBusinesses);
 	#stored('IncludeContacts',report_options.IncludeContacts);
@@ -111,7 +112,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeExperianBusinessReports',report_options.IncludeExperianBusinessReports);
 	#stored('IncludeCriminalIndicators',report_options.IncludeCriminalIndicators);
 	#stored('LnBranded',user_options.LnBranded);
-
+	
   #WEBSERVICE(FIELDS('ULTID',
 	                    'ORGID',
 											'SELEID',
@@ -121,6 +122,7 @@ export BusinessReportComprehensive() := macro
 											'DOTID',
 											'BusinessReportFetchLevel',
 											'IncludeAssociatedBusinesses',
+                                                           'IncludeBusinessInsight',
 											'IncludeParents',
 											'IncludeContacts',
 											'IncludeFinances',
@@ -153,7 +155,8 @@ export BusinessReportComprehensive() := macro
 											'DataPermissionMask',
 											'DPPAPurpose',
 											'GLBPurpose',
-											'SSNMASK'));
+											'SSNMASK'									
+											));
 
 	boolean AssociateBus 					:= false :  stored('IncludeAssociatedBusinesses');
 	boolean Parent		 						:= false :  stored('IncludeParents');
@@ -183,14 +186,16 @@ export BusinessReportComprehensive() := macro
 	boolean DNBSect 							:= false : stored('IncludeDunBradStreet');
 	boolean ExperianBusReport 		:= false : stored('IncludeExperianBusinessReports');
 	boolean CriminalIndicators 		:= false : stored('IncludeCriminalIndicators');
+      boolean BusinessInsight 		:= false : stored('IncludeBusinessInsight');
 	boolean lnbranded 						:= false : stored('LnBranded');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
 	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel');
-
+	  
 	TopBusiness_Services.BusinessReportComprehensive_Layouts init_options() := transform
 	  self.ApplicationType 								:= AutoStandardI.GlobalModule().ApplicationType;
 	  self.IncludeAssociatedBusinesses 		:= AssociateBus;
 		self.IncludeParents 								:= Parent;
+           self.IncludeBusinessInsight                        := BusinessInsight;
 		self.IncludeContacts  							:=  Con;
 		self.IncludeFinances   							:= Finance;
 		self.IncludeOpsSites 								:= OpsSites;
@@ -219,7 +224,7 @@ export BusinessReportComprehensive() := macro
 		self.IncludeCriminalIndicators			:= CriminalIndicators;
 		self.lnbranded 											:= lnbranded;
 		self.internal_testing 							:= false ; //internal_testing;
-		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(stringlib.stringToUpperCase(BusinessReportFetchLevel),left,right)[1]);
+		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(stringlib.stringToUpperCase(BusinessReportFetchLevel),left,right)[1]);    
 		self := [];
 	end;
 
@@ -254,9 +259,10 @@ export BusinessReportComprehensive() := macro
 	end;
 
 	// Get report
-	tmpresults := TopBusiness_Services.Guts.getReport(ds,options,tempmod);
-
-  tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord,
+	tmpresults := TopBusiness_Services.Guts.getReport(ds,options,tempmod);   
+    // scoutLogInfo := tmpresults[1].businessInsightSection;   
+     // output(scoutLogInfo, named('ScoutLogInfo'));  // tmp output for QA testing will remove later.               
+    tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord,
 	                             self := left, self := []));
 
 	iesp.topbusinessReport.t_TopBusinessReportResponse format() := transform
@@ -266,6 +272,43 @@ export BusinessReportComprehensive() := macro
   end;
 
 	results := dataset([format()]);
+  
+  	//Log to Deltabase
+		// Deltabase_Logging_prep := project(results, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+																										 // self.company_id := (Integer)CompanyID,
+																										 // self.login_id := _LoginID,
+																										 //self.product_id := Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Combined_Service,
+																										 //self.function_name := FunctionName,
+																										// self.esp_method := ESPMethod,
+																										// self.interface_version := InterfaceVersion,
+																										// self.delivery_method := DeliveryMethod,
+																										 // self.date_added := (STRING8)Std.Date.Today(),
+																										// self.death_master_purpose := DeathMasterPurpose,
+																										// self.ssn_mask := SSN_Mask,
+																										// self.dob_mask := DOB_Mask,
+																										// self.dl_mask := (String)(Integer)DL_Mask,
+																										// self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
+																										// self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+																										// self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                     // self.glb := inmod.GLBAPurpose,
+                                                     // self.dppa := inmod.DPPAPurpose,
+																										 // self.data_restriction_mask := users.DataRestrictionMask,
+																										 // self.data_permission_mask := users.DataPermissionMask,
+																										 // self.industry := Industry_Search[1].Industry,
+																										 // self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
+																										 // self.i_ssn := search.AuthorizedRep1.SSN,
+                                                     // self.i_dob := Rep_1_DOB,
+                                               
+																									
+                                                     // self.o_seleid := left.SmallBusinessAnalyticsResults.BusinessIds.SeleID,
+                                                     // self := left,
+																										 // self := [] ));
+		// Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
+		// #stored('Deltabase_Log', Deltabase_Logging);
+
+		//Improved Scout Logging
+		// IF(~DisableOutcomeTracking and ~TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		
 	output(Results,named('Results'));
 
 endmacro;
