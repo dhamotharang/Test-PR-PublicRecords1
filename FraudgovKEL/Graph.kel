@@ -1548,14 +1548,14 @@ Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydesc
 //attributes from Nicole D. 
 
 
-Event: => AgencyUID := CustomerId;
+Event: => AgencyUid := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
 // Event: => T_SrcAgencyUID := SourceCustomers{rSourceCustomer.CustomerId}; //CHECKME - need to ask about source agency
 // Event: => T_SrcAgencyProgType := SourceCustomers{rSourceCustomer.IndustryType}; //CHECKME - same as above
 
-Event: => T_ActUID := RecordId;
+Event: => T_ActUid := RecordId;
 Event: => T_ActDtEcho := EventDate; 
 
 Event: => T_SrcType := // MAP(rin_source = 0 => -99997,
@@ -1610,11 +1610,11 @@ Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' => -99999,
 																					 // Location.Country);
 // Event: => T_InpClnSSNEcho := MAP(Subject.ReportedSsn.Ssn = '' => -99999, //are there multiple reported SSNs/Do I need to specify the latest?
 																 // Subject.ReportedSsn.Ssn);
-Event: => T_InpClnDOBEcho := MAP(Subject.DateOfBirth:Null => -99999,
+Event: => T_InpClnDobEcho := MAP(Subject.DateOfBirth:Null => -99999,
 																	INTEGER(Subject.DateOfBirth));
-Event: => T_InpClnDLEcho := MAP(rDriversLicense.LicenseNumber = '' => -99999,
+Event: => T_InpClnDlEcho := MAP(rDriversLicense.LicenseNumber = '' => -99999,
 																rDriversLicense.LicenseNumber);
-Event: => T_InpClnDLStEcho := MAP(rDriversLicense.State = '' => -99999,
+Event: => T_InpClnDlStEcho := MAP(rDriversLicense.State = '' => -99999,
 																	rDriversLicense.State);
 Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' => -99999,
 																	 rEmail.EmailAddress);
@@ -1624,89 +1624,89 @@ Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' =>
 																				rBankAccount.rBank.RoutingNumber);
 
 
-Event: => T_InpClnIPAddrEcho := MAP(IpAddress = '' => -99999, 
+Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' => -99999, 
 																		IpAddress);
-Event: => T18_IsIPMetaHitFlag := MAP(T_InpClnIPAddrEcho = -99999 => -99999, 
-                                     T_InpClnIPAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
+Event: => T18_IsIpMetaHitFlag := MAP(T_InpClnIpAddrEcho = -99999 => -99999, 
+                                     T_InpClnIpAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
 																		 1);
 																		 
-Event: => T18_IPAddrCity := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrCity := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																edgecity = '' => -99997,
 																edgecity);
-Event: => T18_IPAddrCountry := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrCountry := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																edgecountry = '' => -99997,
 																edgecountry);
-Event: => T18_IPAddrRegion := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrRegion := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																edgeregion = '' => -99997,
 																edgeregion);
-Event: => T18_IPAddrDomain := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrDomain := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																domainname = '' => -99997,
 																domainname);
-Event: => T18_IPAddrISPNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrIspNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																ispname = '' => -99997,
 															  ispname);
-Event: => T18_IPAddrLocType := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrLocType := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																homebiztype = '' => -99997,
 															  homebiztype);
-Event: => T18_IPAddrProxyType := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrProxyType := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																proxytype = '' => -99997,
 															  proxytype);
-Event: => T18_IPAddrProxyDesc := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrProxyDesc := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																proxydescription = '' => -99997,
 															  proxydescription);
-Event: => T18_IPAddrIsISPFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrIsIspFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																isanisp:Null => -99997,
 															  isanisp);
-Event: => T18_IPAddrASN := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrAsn:= MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																asnname = '' => -99997,
 															  asnname);
-Event: => T18_IPAddrIsASNFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrIsAsnFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																asn:Null => -99997,
 															  asn);
-Event: => T18_IPAddrCompNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrCompNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																companyname = '' => -99997,
 															  companyname);
-Event: => T18_IPAddrOrgNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+Event: => T18_IpAddrOrgNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																organizationname = '' => -99997,
 															  organizationname);
 																
-Event: => T18_IPAddrHostedFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																T18_IPAddrProxyType<1 OR T18_IPAddrProxyDesc<1 => -99997,
-															  T18_IPAddrProxyType='HOSTING' AND (T18_IPAddrProxyDesc != 'CLOUD-SECURITY' OR T18_IPAddrProxyDesc != 'CLOUD') => 1, //CHECKME - double check this logic make sure it matches reqs
+Event: => T18_IpAddrHostedFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T18_IpAddrProxyType<1 OR T18_IpAddrProxyDesc<1 => -99997,
+															  T18_IpAddrProxyType='HOSTING' AND (T18_IpAddrProxyDesc != 'CLOUD-SECURITY' OR T18_IpAddrProxyDesc != 'CLOUD') => 1, //CHECKME - double check this logic make sure it matches reqs
 																0);
-Event: => T18_IPAddrVPNFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																T18_IPAddrProxyDesc < 1 => -99997,
-															  T18_IPAddrProxyDesc = 'VPN' => 1,
+Event: => T18_IpAddrVpnFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T18_IpAddrProxyDesc < 1 => -99997,
+															  T18_IpAddrProxyDesc = 'VPN' => 1,
 																0);
-Event: => T18_IPAddrTORnodeFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																T18_IPAddrProxyDesc < 1 => -99997,
-																T18_IPAddrProxyDesc IN ['TOR EXIT','TOR RELAY'] => 1,
+Event: => T18_IpAddrTorNnodeFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T18_IpAddrProxyDesc < 1 => -99997,
+																T18_IpAddrProxyDesc IN ['TOR EXIT','TOR RELAY'] => 1,
 																0);
-Event: => T18_IPAddrLocNonUSFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																T18_IPAddrCountry < 1 => -99997,
-																T18_IPAddrCountry != 'USA' => 1,
+Event: => T18_IpAddrLocNonUsFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T18_IpAddrCountry < 1 => -99997,
+																T18_IpAddrCountry != 'USA' => 1,
 																0);
-Event: => T18_IPAddrLocMiamiFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
-																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																T18_IPAddrCity < 1 => -99997,
-																AgencyProgJurSt != 'FL' AND T18_IPAddrCity = 'MIAMI' => 1,
+Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T18_IpAddrCity < 1 => -99997,
+																AgencyProgJurSt != 'FL' AND T18_IpAddrCity = 'MIAMI' => 1,
 																0);
 																
 Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho < -99997 OR T_InpClnBnkAcctRtgEcho < -99997  => 0,
