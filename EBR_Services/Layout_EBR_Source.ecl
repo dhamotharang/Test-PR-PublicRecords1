@@ -1,4 +1,4 @@
-import ebr;
+import ebr, $;
 
 export Layout_EBR_Source := 
 RECORD
@@ -17,7 +17,7 @@ RECORD
 	dataset(ebr.Layout_4500_Collateral_Accounts_In)											collateral_account_recs {MAXCOUNT(constants.maxcounts.Collateral_Accounts)};
 	dataset(ebr.Layout_4510_UCC_Filings_In)															ucc_filing_recs {MAXCOUNT(constants.maxcounts.public_records)};
 	dataset(Layout_5000_Bank_Details_Expanded)													bank_detail_recs {MAXCOUNT(constants.maxcounts.Bank_Details)};
-	dataset(ebr.Layout_5600_demographic_data_In)												demographic_data_5600_recs {MAXCOUNT(constants.maxcounts.Demographic_Data)};
+	dataset($.Layouts.demographic_5600_output_Rec)											demographic_data_5600_recs {MAXCOUNT(constants.maxcounts.Demographic_Data)};
 	dataset(ebr.Layout_5610_demographic_data_Out)												demographic_data_5610_recs {MAXCOUNT(constants.maxcounts.Demographic_Data)};
 	dataset(Layout_6000_Inquiries_Base_Rolled.top_level)								inquiry_recs {MAXCOUNT(constants.maxcounts.Inquiry_counts)};
 	dataset(ebr.Layout_6500_Government_Trade_In)												government_trade_recs {MAXCOUNT(constants.maxcounts.Government_Trade)};
