@@ -1,3 +1,4 @@
+﻿import TopBusiness_services, iesp, bipv2;
 export BranchReport_Layouts := module
 
 	// export Input := record
@@ -5,112 +6,118 @@ export BranchReport_Layouts := module
 	// end;
 	
 	export BestSection := record
-		BestSection_Layouts.Final - [acctno];
+		TopBusiness_services.BestSection_Layouts.Final - [acctno];
+	end;
+  
+  export BusinessInsightSection := record
+           BIPV2.IDlayouts.l_key_ids_bare - [proxid, powid, empid, dotid];
+           iesp.TopBusinessReport.t_TopBusinessBusinessInsightSection;
 	end;
 
 	export ContactSection := record
-		ContactSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.ContactSection_Layouts.rec_Final - [acctno];
 	end;
 
 	export InCorporationSection := record
-	  IncorporationSection_Layouts.rec_Final - [acctno];
+	  TopBusiness_services.IncorporationSection_Layouts.rec_Final - [acctno];
   end;	
 
 	export OperationsSitesSection := record
-	  OperationsSitesSection_Layouts.rec_Final - [acctno];
+	  TopBusiness_services.OperationsSitesSection_Layouts.rec_Final - [acctno];
   end;	
 
 	export FinanceSection := record
-	  FinanceSection_Layouts.rec_Final - [acctno];
+	  TopBusiness_services.FinanceSection_Layouts.rec_Final - [acctno];
   end;		
 	
 	export ParentSection := record
-		ParentSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.ParentSection_Layouts.rec_Final - [acctno];
 	end;
 
 	export IndustrySection := record
-	  IndustrySection_Layouts.rec_Final - [acctno];
+	  TopBusiness_services.IndustrySection_Layouts.rec_Final - [acctno];
   end;		
 	
 	export LicenseSection := record
-	   LicenseSection_layouts.rec_final - acctno;
+	   TopBusiness_services.LicenseSection_layouts.rec_final - acctno;
   end;
 
 	export URLSection := record
-		URLSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.URLSection_Layouts.rec_Final - [acctno];
 	end;
 
 	export BankruptcySection := record
-	   BankruptcySection_layouts.rec_final - acctno;
+	   TopBusiness_services.BankruptcySection_layouts.rec_final - acctno;
   end;
 
 	export LienSection := record
-	  LienSection_Layouts.rec_Final - [acctno];		
+	  TopBusiness_services.LienSection_Layouts.rec_Final - [acctno];		
 	end;
 
 	export uccSection := record
-	  UccSection_Layouts.rec_Final - [acctno];		
+	  TopBusiness_services.UccSection_Layouts.rec_Final - [acctno];		
 	end;
 	
 	export PropertySection := record
-	   PropertySection_layouts.rec_final - acctno;
+	   TopBusiness_services.PropertySection_layouts.rec_final - acctno;
   end;
 
 	export AircraftSection := record
-	  AircraftSection_Layouts.rec_Final - [acctno];		
+	  TopBusiness_services.AircraftSection_Layouts.rec_Final - [acctno];		
 	end;
 
 	export MotorVehicleSection := record
-	 MotorVehicleSection_Layouts.rec_Final - [acctno];		
+	    TopBusiness_services.MotorVehicleSection_Layouts.rec_Final - [acctno];		
 	end;	
 	
 	export WatercraftSection := record
-	  WatercraftSection_Layouts.rec_Final - [acctno];		
+	    TopBusiness_services.WatercraftSection_Layouts.rec_Final - [acctno];		
 	end;
 	
 	export RegisteredAgentSection := record
-	   RegisteredAgentSection_layouts.rec_final - acctno;
-  end;
+	   TopBusiness_services.RegisteredAgentSection_layouts.rec_final - acctno;
+     end;
 
 	export ConnectedBusinessSection := record
-	   ConnectedBusinessSection_layouts.rec_final - acctno;
+	    TopBusiness_services.ConnectedBusinessSection_layouts.rec_final - acctno;
 	end;
 
 	export AssociateSection := record
-		AssociateSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.AssociateSection_Layouts.rec_Final - [acctno];
 	end;
 
   export IRS5500Section := record
-		IRS5500Section_Layouts.rec_Final - [acctno];
+		TopBusiness_services.IRS5500Section_Layouts.rec_Final - [acctno];
 	end;
 	
 	export BusinessRegistrationSection := record
-		BusinessRegistrationSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.BusinessRegistrationSection_Layouts.rec_Final - [acctno];
 	end;
 
  	export CompanyVerificationSection := record
-		CompanyVerificationSection_Layouts.rec_Final - [acctno];
+		TopBusiness_services.CompanyVerificationSection_Layouts.rec_Final - [acctno];
 	end;
 	
 	export SanctionSection := record
-	  SanctionSection_layouts.rec_final - acctno;
+	    TopBusiness_services.SanctionSection_layouts.rec_final - acctno;
 	end;
 	
 	export DunBradStreetSection := record
-	  DNBSection_Layouts.rec_final - acctno;
+	    TopBusiness_services.DNBSection_Layouts.rec_final - acctno;
 	end;
 	
 	 export ExperianBusinessReportSection := record
-	   EBRSection_Layouts.rec_final - acctno;
+	     TopBusiness_services.EBRSection_Layouts.rec_final - acctno;
 	 end;
 	 
 	export SourceSection := record
-	  SourceSection_layouts.rec_final - acctno;
-  end;
+	     TopBusiness_services.SourceSection_layouts.rec_final - acctno;
+      end;
 	
 	export Final := record
 		string25 acctno;
 		BestSection bestSection;
+           BusinessInsightSection businessInsightSection;
 		ContactSection contactSection;
 		InCorporationSection incorporationSection;
 		OperationsSitesSection operationsSitesSection;
@@ -135,7 +142,7 @@ export BranchReport_Layouts := module
 		DunBradStreetSection dunBradStreetSection;		
 		ExperianBusinessReportSection   experianBusinessReportSection;
 		SanctionSection sanctionSection;
-		SourceSection sourceSection;
+		SourceSection sourceSection;           
 	end;
 	
 end;

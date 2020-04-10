@@ -11,6 +11,7 @@ export t_TopBusinessReportOption := record (iesp.share.t_BaseReportOption)
 	boolean IncludeAircrafts {xpath('IncludeAircrafts')};
 	boolean IncludeAssociatedBusinesses {xpath('IncludeAssociatedBusinesses')};
 	boolean IncludeBankruptcies {xpath('IncludeBankruptcies')};
+     boolean IncludeBusinessInsight {xpath('IncludeBusinessInsight')};
 	boolean IncludeContacts {xpath('IncludeContacts')};
 	boolean IncludeFinances {xpath('IncludeFinances')};
 	boolean IncludeIndustries {xpath('IncludeIndustries')};
@@ -1213,6 +1214,19 @@ export t_TopBusinessSanctionSection := record
 	t_TopBusinessSanctionFiling FilingDetail {xpath('FilingDetail')};
 	dataset(t_TopBusinessSanctionRecord) Sanctions {xpath('Sanctions/Sanction'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_SANCTION_RECORDS)};
 end;
+
+export t_TopBusinessBusinessRiskIndicator := record  
+     boolean RiskFlag {xpath('RiskFlag')}; 
+     string1 RiskIndicatorFlag {xpath('RiskIndicatorFlag')}; 
+     string100 RiskIndicatorName {xpath('RiskIndicatorName')}; 
+end;
+
+export t_TopBusinessBusinessInsightSection := record
+         dataset(t_TopBusinessBusinessRiskIndicator)  BusinessEvidences {xpath('BusinessEvidences/BusinessEvidence'), MAXCOUNT(iesp.constants.TOPBUSINESS.MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE)};         
+         String1 BusinessEvidenceStatus {xpath('BusinessEvidenceStatus')};       
+         dataset(t_TopBusinessBusinessRiskIndicator)  BusinessRisks  {xpath('BusinessRisks/BusinessRisk'), MAXCOUNT(iesp.constants.TOPBUSINESS.MAX_COUNT_BUSINESS_RISK_RISKCODE)};
+         String1 BusinessRiskStatus {xpath('BusinessRiskStatus')};      
+end;
 		
 export t_TopBusinessReportRecord := record
 	t_TopBusinessBestSection BestSection {xpath('BestSection')};
@@ -1241,6 +1255,7 @@ export t_TopBusinessReportRecord := record
 	t_TopBusinessCompanyVerificationSection CompanyVerificationSection {xpath('CompanyVerificationSection')};
 	t_TopBusinessBusinessRegistrationSection BusinessRegistrationSection {xpath('BusinessRegistrationSection')};
 	t_TopBusinessSourceSection SourceSection {xpath('SourceSection')};
+      t_TopBusinessBusinessInsightSection  BusinessInsightSection {xpath('BusinessInsightSection')};
 end;
 		
 export t_TopBusinessReportResponse := record

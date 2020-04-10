@@ -1,9 +1,18 @@
-/* TBD:
+﻿/* TBD:
    1. Research/resolve open issues, search on "???".
 */
 IMPORT AutoStandardI, BIPV2, BusReg, Corp2, iesp, MDR;
 
+
 EXPORT IncorporationSection := MODULE;
+
+EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
+                     string1 FETCH_LEVEL) := 
+                     TopBusiness_Services.Key_Fetches(
+	                    ds_in_unique_ids_only // input file to join key with
+				    ,FETCH_LEVEL // level of ids to join with
+										              // 3rd parm is ScoreThreshold, take default of 0
+					 ).ds_corp_linkidskey_recs;			
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
@@ -24,12 +33,12 @@ EXPORT IncorporationSection := MODULE;
   // ****** Get all Incorporation and Business Registration info for each set of input linkids
   //
   // *** Key fetch to get Incorporation(Secretary of State) data from the linkids key.
-  
-   ds_corplirecs :=  TopBusiness_Services.Key_Fetches(
-	                    ds_in_unique_ids_only // input file to join key with
-										 ,FETCH_LEVEL // level of ids to join with
-										              // 3rd parm is ScoreThreshold, take default of 0
-										 ).ds_corp_linkidskey_recs;			
+   ds_corplirecs := GetCorpBIPlinkids(ds_in_unique_ids_only, FETCH_LEVEL);
+   // ds_corplirecs :=  TopBusiness_Services.Key_Fetches(
+	                    // ds_in_unique_ids_only // input file to join key with
+										 // ,FETCH_LEVEL // level of ids to join with
+										              //3rd parm is ScoreThreshold, take default of 0
+										 // ).ds_corp_linkidskey_recs;			
 										 
 
   // Sort/dedup corp linkids recs by linkids & corp_key to keep 1 (doesn't matter which???)

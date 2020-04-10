@@ -3,7 +3,17 @@
 */
 IMPORT AutoStandardI, BIPV2, iesp, LiensV2, MDR, Suppress,  liensv2_services, TopBusiness_Services;
 
+
+           
 EXPORT LienSection := MODULE;
+
+EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
+                                                  string1 FETCH_LEVEL) := 
+                     TopBusiness_Services.Key_Fetches(
+	                    ds_in_unique_ids_only // input file to join key with
+				    ,FETCH_LEVEL // level of ids to join with
+										              // 3rd parm is ScoreThreshold, take default of 0
+					 ).ds_liens_linkidskey_recs;		
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
@@ -17,15 +27,11 @@ EXPORT LienSection := MODULE;
   // Strip off the input acctno from each record, will re-attach them later.
 	ds_in_ids_only := project(ds_in_ids,transform(BIPV2.IDlayouts.l_xlink_ids,
 	                                                       self := left, self := []));
-
-
+                                                         
   // ****** Get the needed linkids key J&Ls info for each set of input linkids
   //
   // *** Key fetch to get Liens tmsid/rmsid data from new bip2 linkids key file.
-  ds_linkids_keyrecs := TopBusiness_Services.Key_Fetches(
-	                        ds_in_ids_only, // input file to join key with
-								          FETCH_LEVEL).ds_liens_linkidskey_recs;
-
+   ds_linkids_keyrecs := GetLienBipLinkids( ds_in_ids_only, FETCH_LEVEL);
   // Project onto a slimmed layout and filter linkids key recs to only use ones where
 	// "name_type" is a D(Debtor) or C(Creditor), but not A(Attorney) or AD(Attorney for Debtor 
 	// or T=Third Party?); per req 0717?). ???
