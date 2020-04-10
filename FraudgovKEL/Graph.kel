@@ -1558,21 +1558,22 @@ Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 Event: => T_ActUID := RecordId;
 Event: => T_ActDtEcho := EventDate; 
 
-Event: => T_SrcType := -99997; //FIXME - where do I find this?
+Event: => T_SrcType := // MAP(rin_source = 0 => -99997,
+                       rin_source; //FIXME - need to update once rin_source is actually showing up
 Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
 																T_SrcType IN [6,11] => 1,
 																T_SrcType IN [4,5] => 2,
 																T_SrcType IN [2,3] => 3,
 																4);
 																
-Event: => T_InpClnTitleEcho := MAP(Subject.FullName.Title = '' => -99999,
-																	 Subject.FullName.Title);
-Event: => T_InpClnFirstNmEcho := MAP(Subject.FullName.FirstName = '' => -99999,
-																	 Subject.FullName.FirstName);
-Event: => T_InpClnLastNmEcho := MAP(Subject.FullName.LastName = '' => -99999,
-																	 Subject.FullName.LastName);
-Event: => T_InpClnNmSuffixEcho := MAP(Subject.FullName.NameSuffix = '' => -99999,
-																	 Subject.FullName.NameSuffix);
+// Event: => T_InpClnTitleEcho := MAP(Subject.FullName.Title = '' => -99999,
+																	 // Subject.FullName.Title);
+// Event: => T_InpClnFirstNmEcho := MAP(Subject.FullName.FirstName ='' => -99999,
+																	 // Subject.FullName.FirstName);
+// Event: => T_InpClnLastNmEcho := MAP(Subject.FullName.LastName = '' => -99999,
+																	 // Subject.FullName.LastName);
+// Event: => T_InpClnNmSuffixEcho := MAP(Subject.FullName.NameSuffix = '' => -99999,
+																	 // Subject.FullName.NameSuffix);
 																	 
 Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' => -99999,
 																					 Location.PrimaryRange);
@@ -1607,65 +1608,79 @@ Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' => -99999,
 																					 Location.GeoBlock);
 // Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, //is country listed anywhere?
 																					 // Location.Country);
+// Event: => T_InpClnSSNEcho := MAP(Subject.ReportedSsn.Ssn = '' => -99999, //are there multiple reported SSNs/Do I need to specify the latest?
+																 // Subject.ReportedSsn.Ssn);
+Event: => T_InpClnDOBEcho := MAP(Subject.DateOfBirth:Null => -99999,
+																	INTEGER(Subject.DateOfBirth));
+Event: => T_InpClnDLEcho := MAP(rDriversLicense.LicenseNumber = '' => -99999,
+																rDriversLicense.LicenseNumber);
+Event: => T_InpClnDLStEcho := MAP(rDriversLicense.State = '' => -99999,
+																	rDriversLicense.State);
+Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' => -99999,
+																	 rEmail.EmailAddress);
+Event: => T_InpClnBnkAcctEcho := MAP(rBankAccount.AccountNumber = '' => -99999,
+																		 rBankAccount.AccountNumber);
+Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' => -99999,
+																				rBankAccount.rBank.RoutingNumber);
 
 
 Event: => T_InpClnIPAddrEcho := MAP(IpAddress = '' => -99999, 
 																		IpAddress);
-																		
-Event: => T18_IsIPMetaHitFlag := MAP(T_InpClnIPAddrEcho = -99999 => -99999, //FIXME - Jo is creating a hit/nohit field
-                                     0);
+Event: => T18_IsIPMetaHitFlag := MAP(T_InpClnIPAddrEcho = -99999 => -99999, 
+                                     T_InpClnIPAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
+																		 1);
 																		 
 Event: => T18_IPAddrCity := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																edgecity = '' => -99997,
 																edgecity);
 Event: => T18_IPAddrCountry := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																edgecountry = '' => -99997,
 																edgecountry);
 Event: => T18_IPAddrRegion := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																edgeregion = '' => -99997,
 																edgeregion);
 Event: => T18_IPAddrDomain := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																domainname = '' => -99997,
 																domainname);
 Event: => T18_IPAddrISPNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																ispname = '' => -99997,
 															  ispname);
 Event: => T18_IPAddrLocType := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																homebiztype = '' => -99997,
 															  homebiztype);
 Event: => T18_IPAddrProxyType := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																proxytype = '' => -99997,
 															  proxytype);
 Event: => T18_IPAddrProxyDesc := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																proxydescription = '' => -99997,
 															  proxydescription);
 Event: => T18_IPAddrIsISPFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																isanisp:Null => -99997,
 															  isanisp);
 Event: => T18_IPAddrASN := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																asnname = '' => -99997,
 															  asnname);
 Event: => T18_IPAddrIsASNFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																asn:Null => -99997,
 															  asn);
 Event: => T18_IPAddrCompNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																companyname = '' => -99997,
 															  companyname);
 Event: => T18_IPAddrOrgNm := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IsIPMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																//-99997, //FIXME - need to figure out how to format -99997
+																organizationname = '' => -99997,
 															  organizationname);
 																
 Event: => T18_IPAddrHostedFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
@@ -1693,6 +1708,39 @@ Event: => T18_IPAddrLocMiamiFlag := MAP(T_InpClnIPAddrEcho=-99999 => -99999,
 																T18_IPAddrCity < 1 => -99997,
 																AgencyProgJurSt != 'FL' AND T18_IPAddrCity = 'MIAMI' => 1,
 																0);
+																
+Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho < -99997 OR T_InpClnBnkAcctRtgEcho < -99997  => 0,
+																    T_InpClnBnkAcctEcho > -99997 AND T_InpClnBnkAcctRtgEcho > -99997 => 1);
+Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //where is this? bank has a hit field
+																		 0); 
+Event: => T19_BnkAcctBnkNm := MAP(T19_BnkAcctPopFlag=0 => -99999,
+																	T19_IsBnkAppHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	rBankAccount.rBank.FullBankname); //could also use AbbreviatedBankname
+Event: => T19_BnkAcctHRPrePdRtgFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
+																					 T_SrcClassType < 4 => -99998,
+																					 T_InpClnBnkAcctRtgEcho IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'] => 1,
+																					 0);
+																					 
+Event: => T17_EmailPopFlag := MAP(T_InpClnEmailEcho < -99997 OR rEmail.EmailLastDomain = '' => 0, //DOUBLECHECK this - not exactly sure emaillastdomain is what I think it is
+																	1);
+Event: => T17_EmailDomain := MAP(T17_EmailPopFlag = 0 => -99999,
+																 T_SrcClassType < 4 => -99998,
+																 rEmail.EmailLastDomain); //CHECKME - check that this is actually just the domain name
+Event: => T17_EmailDomainDispFlag := MAP(T17_EmailPopFlag = 0 => -99999,
+																				 T_SrcClassType < 4 => -99998,
+																				 rEmail.isdisposableemail);
+//FIXME 
+Event: => T9_AddrPopFlag := 1;//MAP((street != '' AND T_InpClnAddrCityEcho=-99999 AND T_InpClnAddrStEcho=-99999) OR (street != '' AND T_InpClnAddrZip5Echo=-99999),
+//																0);
+Event: => T9_AddrType := MAP(T9_AddrPopFlag < 1 => -99999,
+														 Location.TypeCode = '' => -99997,
+														 Location.TypeCode);
+Event: => T9_AddrStatus := MAP(T9_AddrPopFlag < 1 => -99999,
+															 Location.ACECleanerErrorCode = '' => -99997,
+															 Location.ACECleanerErrorCode);
+
+
+
 
 
 
