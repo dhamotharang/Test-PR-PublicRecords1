@@ -112,7 +112,6 @@ EXPORT Layouts := MODULE
     STRING    orig_CompanyName;
     STRING    cln_CompanyName;
     STRING    CompanyTitle;
-    STRING1   possible_work_email := '';  // possible values will be 'Y' or blank
     UNSIGNED6 DotID;
     UNSIGNED6 EmpID;
     UNSIGNED6 POWID;
@@ -305,7 +304,6 @@ EXPORT Layouts := MODULE
     UNSIGNED2 record_err_code := 0;
     STRING8   ln_date_first := '';    // LN calculated date based on vendor's date_first_seen
     STRING8   ln_date_last := '';    // LN calculated date based on vendor's date_last_seen
-    STRING1   possible_work_email := '';  // possible values will be 'Y' or blank
   END;
 
   EXPORT batch_combined_rec := RECORD
