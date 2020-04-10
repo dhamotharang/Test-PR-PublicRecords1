@@ -1,4 +1,4 @@
-﻿﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO  
+﻿﻿EXPORT AC_automated_file(logical_file_name, unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO  
 
 
 IMPORT STD;
@@ -117,11 +117,11 @@ op2:=join(dedup(sort(AC_result,Raw_Acceptance_Criteria,result),Raw_Acceptance_Cr
 			
 final_report:=output(choosen(op,all),,'~kel_shell::out::Acceptance_Criteria_results_'+ tag + Category_par, CSV(heading(single), quote('"')), overwrite);
 
-final_report_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Acceptance_Criteria_results_'+ tag + Category_par, ' Acceptance Criteria Report ' , tag + Category_par  );
+final_report_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::Acceptance_Criteria_results_'+ tag + Category_par, ' Acceptance Criteria Report ' , 'AC_Report ' + Category_par, Tag  );
 
 final_report_summary:=output(distribute(op2,random()),,'~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par, CSV(heading(single), quote('"')), overwrite, EXPIRE(15));
 
-final_report_summary_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par , ' Acceptance Criteria Report Summary ' , tag + Category_par  );
+final_report_summary_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par , ' Acceptance Criteria Report Summary ' , 'AC_Summary_Report ' + Category_par, Tag  );
 
 seq:=sequential(final_report, final_report_summary, final_report_excel, final_report_summary_excel);
 
