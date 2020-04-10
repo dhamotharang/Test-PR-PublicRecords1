@@ -8,7 +8,7 @@ export spray_CanadianWhitepages(
 															) := function
 
 
-sprayupdate     := FileServices.SprayVariable(pHostname,
+sprayupdate     := STD.File.SprayVariable(pHostname,
                         pSource,
 												//'/data/hds_2/telephones/canadian/axciom/data/business/20200305/CANADADA.txt',
                         ,                  					// max rec size

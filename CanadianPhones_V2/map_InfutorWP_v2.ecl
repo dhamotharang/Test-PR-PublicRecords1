@@ -1,13 +1,13 @@
-﻿IMPORT _Control, Address, CanadianPhones, MDR, VersionControl, Std, ut;
+﻿IMPORT _Control, Address, CanadianPhones, MDR, VersionControl, Std, ut, Data_services;
 
 //Using mapping output for version 1 as it already includes history setting using Ingest
 EXPORT map_InfutorWP_v2(string8 filedate) := FUNCTION
 
-	//filter out history based on current_rec flag in base file to get only current records
-	ds := CanadianPhones.file_InfutorWP().Base(CurrentRec = TRUE);
-	
+
+	ds := CanadianPhones.file_InfutorWP().Base;
+		
 	CanadianPhones_V2.layoutCanadianWhitepagesBase tInfWP(ds L) := TRANSFORM
-		SELF.history_flag 	:= 'C';
+		SELF.history_flag 	:= IF(L.CurrentRec = TRUE, 'C','H');
 		SELF.vendor					:= 'I7';
 		SELF.Source_file		:= 'INFUTOR_WHITEPAGES';
 		SELF.record_id			:= (string)L.record_id;

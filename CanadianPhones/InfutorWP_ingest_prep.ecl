@@ -14,7 +14,7 @@ CanadianPhones.Layout_InfutorWP.BaseOut xfrmFields(ClnRawIn L) := TRANSFORM
 	SELF.vendor					:= 'I7';
 	SELF.Source_file		:= 'INFUTOR_WHITEPAGES';
 	SELF.lastname				:= L.CAN_LNAME;
-	SELF.firstname			:= STD.Str.CleanSpaces(STD.Str.FindReplace(L.CAN_FNAME, '_',' '));
+	SELF.firstname			:= STD.Str.CleanSpaces(REGEXREPLACE('_|=',L.CAN_FNAME,' '));
 	SELF.generational		:= L.CAN_SUFFIX;
 	SELF.title					:= L.CAN_TITLE;
 	SELF.housenumber		:= L.CAN_HOUSE;

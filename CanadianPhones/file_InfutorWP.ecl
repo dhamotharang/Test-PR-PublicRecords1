@@ -1,6 +1,6 @@
 ﻿IMPORT $, Data_Services;
 
-EXPORT file_InfutorWP(BOOLEAN	pUseProd	=	TRUE) := MODULE
+EXPORT file_InfutorWP(BOOLEAN	pUseProd	=	FALSE) := MODULE
 	SHARED fileprefix	:= IF(pUseProd, data_services.foreign_prod, '~');
 
 	EXPORT RawIn	:=	DATASET(fileprefix+'thor_data400::in::infutorwp',
