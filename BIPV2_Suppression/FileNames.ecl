@@ -1,4 +1,4 @@
-IMPORT Data_Services; 
+﻿IMPORT Data_Services,tools; 
 
 EXPORT FileNames := MODULE
   
@@ -15,4 +15,7 @@ EXPORT BaseLogicalF(STRING Version) := Baseprefix +'::' + Version +'::' + Suffix
 EXPORT Keyseleprox                := prefix + '::' + KeySuper+ '::' + Suffix;
 EXPORT Keyseleproxfather          := prefix + '::' + keyFather+ '::' + Suffix;
 EXPORT KeyLogicalF(STRING version) := prefix + '::' + Version +'::' + Suffix;
+
+	export key_sele_prox_names(string pversion)            := tools.mod_FilenamesBuild(prefix + '::' + '@version@' +'::' + Suffix     ,pversion);
+
 END; 
