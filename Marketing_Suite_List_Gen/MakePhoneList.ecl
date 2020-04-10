@@ -5,6 +5,7 @@ EXPORT MakePhoneList(
 											dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 										 )	:= function;
 										 
+	// Make the Phone portion of the file from the filters
   string ParmFilterName_PhonePresent   				:= 'PHONEPRESENT';
 	string ParmFilterName_PhoneTollFree			  	:= 'TOLLFREE';	
 	string ParmFilterName_PhoneAreaCode					:= 'AREACODE';
@@ -25,13 +26,13 @@ EXPORT MakePhoneList(
 	| Phone Filters
 	|--------------------------------------------------------------------------------------------------------------------------------------*/
 	PhonePresent		:=	if (filter_PhonePresent='Y',
-													inSlimFile(	ut.CleanSpacesAndUpper(phone)<>''));
+													inSlimFile(	trim(phone)<>''));
 													
 	PhoneTollFree		:=	if (filter_tollfree[1] <> '', 
-													inSlimFile(	ut.CleanSpacesAndUpper(phone[1..3]) in filter_tollfree));
+													inSlimFile(	trim(phone[1..3]) in filter_tollfree));
 													
 	PhoneAreaCode		:=	if (filter_areacode[1] <> '', 
-													inSlimFile(	ut.CleanSpacesAndUpper(phone[1..3]) in filter_areacode));
+													inSlimFile(	trim(phone[1..3]) in filter_areacode));
 													
 	PhoneRecords		:=	dedup(sort(PhonePresent + PhoneTollFree + PhoneAreaCode,record),record);
 	

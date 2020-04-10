@@ -1,24 +1,30 @@
 ﻿import Marketing_List;
 
+// Layouts for Marketing List Gen Files
 export Layouts := module
 
+	// Input paramter layout from batch
 	export Layout_ParmFile	:= record
 		string50			filter_type;
 		string50			filter_name;
 		string2000  	filter_values;
 	end;
 	
+	// Formated layout of parameters after verification
 	export Layout_Valid_ParmFile	:=	record
     string50    	filter_name;
     set of string set_filter_values;
   end;
 	
+	// County table layout used to convert county name to county number.
 	export countyTable_Layout	:=	record
 		string				CountyCode;
 		string				CountyName;
 		string				CountyState;
 	end;
 	
+	// This is a temporary layout of the BusinessInfo file. Depending on Location Search parameter, 
+	// we project either the seleid or proxid fields to this layout. 
 	export Layout_TempBus	:=	record
 		unsigned8			unique_id;
 	  unsigned6			seleid;
@@ -59,6 +65,7 @@ export Layouts := module
 		string100			naics5_desc;		
 	end;
 	
+	// This is a temporary layout of the full file Business Informatio + Contact.
 	export Layout_TempFull	:=	record
 		unsigned8			unique_id;
 	  unsigned6			seleid;
@@ -118,6 +125,7 @@ export Layouts := module
     unsigned			person_hierarchy;		
 	end;
 	
+	// Temporary layout used for normalizing the industry fields.
 	export Layout_NormTemp	:=	record
 		unsigned8			unique_id;
 		unsigned8			IndustryType;
@@ -142,6 +150,7 @@ export Layouts := module
 		string100			naics_desc;
 	end;	
 	
+	// Contact Layout
 	export Layout_ContactInfo	:=	record
 		unsigned6			lexid;
     unsigned6			empid;
@@ -159,7 +168,8 @@ export Layouts := module
 		string31			contact_county;
 		string60			contact_email;		
 	end;
-	
+
+	// Company (seleid) Premium Result layout
 	export Layout_CompanySearch	:=	record
 	  unsigned6			seleid;
     unsigned6			proxid;
@@ -188,7 +198,8 @@ export Layouts := module
 		string100			naics5_desc;		
 		Layout_ContactInfo;
 	end;
-	
+
+	// Company (seleid) Basic Result layout
 	export Layout_CompanySearchBasic	:=	record
 	  unsigned6			seleid;
     unsigned6			proxid;
@@ -215,7 +226,8 @@ export Layouts := module
 		string5				contact_zip_code;
 		string31			contact_county;
 	end;
-	
+
+	// Location (proxid) Premium Result layout
 	export Layout_LocationSearch	:=	record
 		unsigned6			seleid;
     unsigned6			proxid;
@@ -244,7 +256,8 @@ export Layouts := module
 		string100			naics5_desc;		
 		Layout_ContactInfo;
 	end;	
-	
+
+	// Location (proxid) Basic Result layout
 	export Layout_LocationSearchBasic	:=	record
 		unsigned6			seleid;
     unsigned6			proxid;
@@ -271,7 +284,8 @@ export Layouts := module
 		string5				contact_zip_code;
 		string31			contact_county;
 	end;
-	
+
+	// Temporary layout used for stats
 	export Layout_Stats_Temp	:=	record
 		unsigned8 	unique_id;
 		unsigned8		Cnt_Unique_Business_Recs;
@@ -404,18 +418,19 @@ export Layouts := module
 		unsigned8		Cnt_Contact_Lexid;
 		decimal8_2	Per_Contact_Lexid;
 	end;
-	
+
+  // Final Stat Layout
 	export Layout_Stats	:=	record
 		Layout_Stats_Temp - unique_id;
 	end;
-	
+
+  // Log File Layout	
 	export Layout_LogFile := RECORD
-		integer id; 				// Unique ID
-		string user; 				// Person running a build - owner
+		string user; 				
 		string TimeStamp;
-		string SubProduct; 	// Ex Customer Name
+		string JobId; 			
 		string WorkunitName;
-		string status; 			// COMPLETED, FAILED
+		string status; 			
 		string Description;			
 	end;
 	

@@ -4,14 +4,19 @@ export MakeIndustryList(
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 													dataset(Marketing_Suite_List_Gen.Layouts.Layout_TempBus) inSlimFile
 												)	:= function;
-												
+
+	// Make the Industry (SIC & NAICS) portion of the file from the filters
 	string ParmFilterName_IndustryPrimarySIC		:= 'PRIMARYSICCODE';
 	string ParmFilterName_IndustryALLSIC				:= 'ALLSICCODE';
 	string ParmFilterName_IndustryPrimaryNAICS	:= 'PRIMARYNAICSCODE';
 	string ParmFilterName_IndustryALLNAICS			:= 'ALLNAICSCODE';
 	
   /*---------------------------------------------------------------------------------------------------------------------------------------
-  | Industry              
+  | There are 4 Industry parameters possible. 1) The customer can ask for the primary SIC code match a value(s) 2) The
+	| customer can ask for the primary and/or secondary SIC codes to match a value(s) 3) The customer can ask for the primary 
+	| NAICS code to match a value(s) 4) The customer can ask for the primary and/or secondary NAICS code to match a value(s). 
+	| Determine which one(s) are needed. Also in addition to the above criteria, the customer can restrict how many digits 
+	| of the code need to match. So a customer can say give me all records where SIC code starts with '53'. 
   |--------------------------------------------------------------------------------------------------------------------------------------*/
 
   rs_record_IndustryPrimarySIC								:= 	inParmFile(ut.CleanSpacesAndUpper(filter_name) = ParmFilterName_IndustryPrimarySIC);
@@ -34,7 +39,7 @@ export MakeIndustryList(
 	// SIC Code Processing
 	//---------------------------------------------------------------------------------------------
 	
-	// Primary SIC Only
+	// Only the primary SIC code needs to be evaluated for a match.
 	dsPrimarySic		:=	DATASET(filter_IndustryPrimarySIC,{STRING PrimarySICVal}); 
 
 	IndustryPrimarySICLayout	:=	record
@@ -57,7 +62,7 @@ export MakeIndustryList(
 																			trfMakePrimarySICList(left,right),ALL
 														);
 														
-	// ALL SIC filtering	
+	// ALL SIC codes need to be evaluated for a match.
 	dsAllSIC							:=	DATASET(filter_IndustryAllSIC,{STRING AllSICVal}); 
 
 	IndustryAllSICLayout	:=	record
@@ -88,9 +93,9 @@ export MakeIndustryList(
 	// NAICS Code Processing
 	//---------------------------------------------------------------------------------------------
 	
-	// Primary NAICS Only
+	// Only the primary NAICS code needs to be evaluated for a match.	
 	dsPrimaryNAICS		:=	DATASET(filter_IndustryPrimaryNAICS,{STRING PrimaryNAICSVal}); 
-
+	
 	IndustryPrimaryNAICSLayout	:=	record
 		string PrimaryNAICSValue;
 	end;
@@ -111,7 +116,7 @@ export MakeIndustryList(
 																				trfMakePrimaryNAICSList(left,right),ALL
 																			);
 														
-	// ALL NAICS filtering	
+	// All NAICS codes need to be evaluated for a match.
 	dsAllNAICS										:=	DATASET(filter_IndustryAllNAICS,{STRING AllNAICSVal}); 
 
 	IndustryAllNAICSLayout	:=	record

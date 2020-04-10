@@ -12,7 +12,7 @@ BusinessUnique	:=	dedup(sort(MktFile,seleid,proxid,local),seleid,proxid,local);
 StatLayout			:=	Marketing_Suite_List_Gen.Layouts.Layout_stats_temp;
 
 /*---------------------------------------------------------------------------------------------------------------------
-| Generate Business type stats (business name, phone, state, county, city & zipcode
+| Generate Business type stats (business name, phone, state, county, city & zipcode)
 |----------------------------------------------------------------------------------------------------------------------*/		
 BusinessStatRec	:=	record
 		unsigned8 CountGroup					:= count(group);
@@ -376,8 +376,8 @@ TempLayout NormalizeNaics(FindTopNAICSRec l, unsigned4 c) := transform
 																		l.NAICS16_Per,	l.NAICS17_Per,	l.NAICS18_Per,	l.NAICS19_Per,	l.NAICS20_Per);																		
 end;
 	
-NormalizeTop10Fields 	:= 	normalize(pTopNAICSStat,20,NormalizeNaics(left, counter));
-FindTop10							:=	dedup(sort(NormalizeTop10Fields,key,-naicsCnt),key,keep 10);
+NormalizeNAICSFields 	:= 	normalize(pTopNAICSStat,20,NormalizeNaics(left, counter));
+FindTop10							:=	dedup(sort(NormalizeNAICSFields,key,-naicsCnt),key,keep 10);
 
 NaicsStatFile					:=	project(FindTop10,
 											transform(Marketing_Suite_List_Gen.Layouts.Layout_stats_temp,
@@ -636,33 +636,7 @@ Marketing_Suite_List_Gen.Layouts.Layout_stats_temp RollupNaics(Marketing_Suite_L
 	self := l;
 end;
 
-NaicsRollup := rollup(	SrtNaicsStatFile, RollupNaics(left, right), except Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting,
-												Per_NAICS_Agriculture_Forestry_Fishing_And_Hunting,
-												Cnt_NAICS_Mining_Quarrying_and_Oil_and_Gas_Extraction,
-												Per_NAICS_Mining_Quarrying_and_Oil_and_Gas_Extraction,
-												Cnt_NAICS_Utilities,Per_NAICS_Utilities,
-												Cnt_NAICS_Construction,Per_NAICS_Construction,
-												Cnt_NAICS_Manufacturing,Per_NAICS_Manufacturing,
-												Cnt_NAICS_Wholesale_Trade,Per_NAICS_Wholesale_Trade,
-												Cnt_NAICS_Retail_Trade,Per_NAICS_Retail_Trade,
-												Cnt_NAICS_Transportation_and_Warehousing,Per_NAICS_Transportation_and_Warehousing,
-												Cnt_NAICS_Information,Per_NAICS_Information,
-												Cnt_NAICS_Finance_and_Insurance,Per_NAICS_Finance_and_Insurance,
-												Cnt_NAICS_Real_Estate_Rental_and_Leasing,Per_NAICS_Real_Estate_Rental_and_Leasing,
-												Cnt_NAICS_Professional_Scientific_Technical_Services,
-												Per_NAICS_Professional_Scientific_Technical_Services,
-												Cnt_NAICS_Management_of_Companies_and_Enterprises,
-												Per_NAICS_Management_of_Companies_and_Enterprises,
-												Cnt_NAICS_Admin_Support_WasteMgmt_RemediationServices,
-												Per_NAICS_Admin_Support_WasteMgmt_RemediationServices,
-												Cnt_NAICS_Educational_Services,Per_NAICS_Educational_Services,
-												Cnt_NAICS_HealthCare_and_SocialAssistance,Per_NAICS_HealthCare_and_SocialAssistance,
-												Cnt_NAICS_Arts_Entertainment_and_Recreation,
-												Per_NAICS_Arts_Entertainment_and_Recreation,
-												Cnt_NAICS_Accommodation_and_Food_Services,Per_NAICS_Accommodation_and_Food_Services,
-												Cnt_NAICS_Other_Services_except_Public_Administration,
-												Per_NAICS_Other_Services_except_Public_Administration,
-												Cnt_NAICS_Public_Administration,Per_NAICS_Public_Administration);
+NaicsRollup := rollup(	SrtNaicsStatFile, RollupNaics(left, right), unique_id);
 												
 /*---------------------------------------------------------------------------------------------------------------------
 | Now generate stats on the contact fields.
@@ -1099,62 +1073,7 @@ StatLayout RollupAll(StatLayout l, StatLayout r) := transform
 	self := l;
 end;
 
-AllFileRollup := rollup(SrtAllFile, RollupAll(left, right), except Cnt_Companies_Returned,
-												Per_Companies_Returned,Cnt_Phones_Returned,Per_Phones_Returned,		
-												Cnt_States_Returned,Per_States_Returned,Cnt_Counties_Returned,
-												Per_Counties_Returned,Cnt_Cities_Returned,Per_Cities_Returned,		
-												Cnt_Zip_Codes_Returned,Per_Zip_Codes_Returned,Cnt_Unique_Business_Recs,
-												Cnt_Revenue_Less_150000,Per_Revenue_Less_150000,Cnt_Revenue_150000_249999,
-												Per_Revenue_150000_249999,Cnt_Revenue_250000_499999,Per_Revenue_250000_499999,
-												Cnt_Revenue_500000_999999,Per_Revenue_500000_999999,Cnt_Revenue_1000000_2499999,
-												Per_Revenue_1000000_2499999,Cnt_Revenue_2500000_4999999,Per_Revenue_2500000_4999999,
-												Cnt_Revenue_5000000_9999999,Per_Revenue_5000000_9999999,Cnt_Revenue_10000000_and_Above,
-												Per_Revenue_10000000_and_Above,Cnt_1_Employee,Per_1_Employee,Cnt_2_4_Employees,
-												Per_2_4_Employees,Cnt_5_9_Employees,Per_5_9_Employees,Cnt_10_19_Employees,
-												Per_10_19_Employees,Cnt_20_49_Employees,Per_20_49_Employees,Cnt_50_99_Employees,
-												Per_50_99_Employees,Cnt_100_249_Employees,Per_100_249_Employees,
-												Cnt_250_499_Employees,Per_250_499_Employees,Cnt_500_749_Employees,
-												Per_500_749_Employees,Cnt_750_999_Employees,Per_750_999_Employees,
-												Cnt_1000_1249_Employees,Per_1000_1249_Employees,Cnt_1250_1499_Employees,
-												Per_1250_1499_Employees,Cnt_1500_and_Above_Employees,Per_1500_and_Above_Employees,
-												Cnt_SIC_Agriculture_Forestry_And_Fishing,Per_SIC_Agriculture_Forestry_And_Fishing,	
-												Cnt_SIC_Mining,Per_SIC_Mining,Cnt_SIC_Construction,Per_SIC_Construction,
-												Cnt_SIC_Manufacturing,Per_SIC_Manufacturing,
-												Cnt_SIC_Transportation_and_Public_Utilities,
-												Per_SIC_Transportation_and_Public_Utilities,Cnt_SIC_Wholesale_Trade,
-												Per_SIC_Wholesale_Trade,Cnt_SIC_Retail_Trade,Per_SIC_Retail_Trade,
-												Cnt_SIC_Finance_Insurance_and_Real_Estate,Per_SIC_Finance_Insurance_and_Real_Estate,
-												Cnt_SIC_Services,Per_SIC_Services,Cnt_SIC_Public_Administration,
-												Per_SIC_Public_Administration,Cnt_NAICS_Agriculture_Forestry_Fishing_And_Hunting,
-												Per_NAICS_Agriculture_Forestry_Fishing_And_Hunting,
-												Cnt_NAICS_Mining_Quarrying_and_Oil_and_Gas_Extraction,
-												Per_NAICS_Mining_Quarrying_and_Oil_and_Gas_Extraction,
-												Cnt_NAICS_Utilities,Per_NAICS_Utilities,
-												Cnt_NAICS_Construction,Per_NAICS_Construction,
-												Cnt_NAICS_Manufacturing,Per_NAICS_Manufacturing,
-												Cnt_NAICS_Wholesale_Trade,Per_NAICS_Wholesale_Trade,
-												Cnt_NAICS_Retail_Trade,Per_NAICS_Retail_Trade,
-												Cnt_NAICS_Transportation_and_Warehousing,Per_NAICS_Transportation_and_Warehousing,
-												Cnt_NAICS_Information,Per_NAICS_Information,
-												Cnt_NAICS_Finance_and_Insurance,Per_NAICS_Finance_and_Insurance,
-												Cnt_NAICS_Real_Estate_Rental_and_Leasing,Per_NAICS_Real_Estate_Rental_and_Leasing,
-												Cnt_NAICS_Professional_Scientific_Technical_Services,
-												Per_NAICS_Professional_Scientific_Technical_Services,
-												Cnt_NAICS_Management_of_Companies_and_Enterprises,
-												Per_NAICS_Management_of_Companies_and_Enterprises,
-												Cnt_NAICS_Admin_Support_WasteMgmt_RemediationServices,
-												Per_NAICS_Admin_Support_WasteMgmt_RemediationServices,
-												Cnt_NAICS_Educational_Services,Per_NAICS_Educational_Services,
-												Cnt_NAICS_HealthCare_and_SocialAssistance,Per_NAICS_HealthCare_and_SocialAssistance,
-												Cnt_NAICS_Arts_Entertainment_and_Recreation,
-												Per_NAICS_Arts_Entertainment_and_Recreation,
-												Cnt_NAICS_Accommodation_and_Food_Services,Per_NAICS_Accommodation_and_Food_Services,
-												Cnt_NAICS_Other_Services_except_Public_Administration,
-												Per_NAICS_Other_Services_except_Public_Administration,
-												Cnt_NAICS_Public_Administration,Per_NAICS_Public_Administration,
-												Cnt_Contact_Address,Per_Contact_Address,Cnt_Contact_Email,Per_Contact_Email,
-												Cnt_Contact_Title,Per_Contact_Title,Cnt_Contact_Lexid,Per_Contact_Lexid,
-												Cnt_Unique_Contact_Recs);
+AllFileRollup := rollup(SrtAllFile, RollupAll(left, right), unique_id);
 												
 AllFileStats	:=	project(AllFileRollup,TRANSFORM(Marketing_Suite_List_Gen.Layouts.Layout_Stats,SELF := LEFT;));
 
