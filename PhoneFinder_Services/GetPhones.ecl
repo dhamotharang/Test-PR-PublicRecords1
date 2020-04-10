@@ -127,7 +127,7 @@
   // Call the gateway again with the primary phone number using service type 'PVSD' to get the phone info
   dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dIn_PVSD)AND inMod.UseTransUnionPVS
 	                                    AND ~inMod.UseInHousePhoneMetadata AND qSentGateway.url != '',
-                                        $.GetQSentPhones.GetQSentPVSData(dIn_PVSD, inMod, phone, acctno, TRUE, qSentGateway));
+                                        $.GetQSentPhones.GetQSentPVSData(dIn_PVSD, inMod, qSentGateway));
 
 
   // Get QSent PVSD gateway records only for ultimate transaction type
