@@ -10,32 +10,32 @@ Import AID;
 
 
 
-Layout_Header := Anomalies_Header.Layouts.Layout_Header;
+layout_header := Anomalies_Header.Layouts.Layout_Header;
 // Slimmed files from the original header file
 input := Anomalies_Header.Files.Header; 
 
 
 
 // dedup here
-t := Table(input, Layouts.Layout_Header, did, fname, lname,
+t := Table(input, layouts.layout_header, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+                  city_name, st, zip, zip4, county, cbsa, src );
 
 dt := Distribute(t, hash(did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src));
+                  city_name, st, zip, zip4, county, cbsa, src ));
 
 sdt := Sort(dt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src, Local);
+                  city_name, st, zip, zip4, county, cbsa, src, Local );
 
 header := Dedup(sdt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+                  city_name, st, zip, zip4, county, cbsa, src );
 
 
 
@@ -70,18 +70,18 @@ t_fname2 := Record
     header.fname;
 End;
 
-c_fname2 := Table(header, t_fname2, did, fname);
-dc_fname2 := Distribute(c_fname2, Hash(did, fname));
-sdc_fname2 := Sort(dc_fname2, did, fname, Local);
-dsdc_fname2 := Dedup(sdc_fname2, did, fname, Local);
+c_fname2 := Table(header, t_fname2, did, fname );
+dc_fname2 := Distribute(c_fname2, Hash(did, fname ));
+sdc_fname2 := Sort(dc_fname2, did, fname, Local );
+dsdc_fname2 := Dedup(sdc_fname2, did, fname, Local );
 
 crosstab_fname := Record
     dsdc_fname2.fname;
-    count_per_lexid := Count(Group);
+    fnamecnt_across_lexid := Count(Group);
 End;
 
 out_crosstab_fname := Table(dsdc_fname2, crosstab_fname, fname );
-Export fnames_across_lexid := Sort(out_crosstab_fname, -count_per_lexid );
+Export fnames_across_lexid := Sort(out_crosstab_fname, -fnamecnt_across_lexid );
 
 
 
@@ -98,11 +98,11 @@ dsdc_lname2 := Dedup(sdc_lname2, did, lname, Local );
 
 crosstab_lname := Record
     dsdc_lname2.lname;
-    count_per_lexid := Count(Group);
+    lnamecnt_across_lexid := Count(Group);
 End;
 
 out_crosstab_lname := Table(dsdc_lname2, crosstab_lname, lname );
-Export lnames_across_lexid := Sort(out_crosstab_lname, -count_per_lexid );
+Export lnames_across_lexid := Sort(out_crosstab_lname, -lnamecnt_across_lexid );
 
 
 
@@ -112,10 +112,10 @@ filteredssn := header( NOT ssn = ''); // non blank
 
 t_ssn := Record
     ssn := filteredssn.ssn;
-    Integer ssn_across_file := Count(Group);
+    Integer ssn_count := Count(Group);
 End;
 c_ssn := Table(filteredssn, t_ssn, ssn);
-Export ssn_across_file := Sort(c_ssn, -ssn_across_file);
+Export ssn_across_file := Sort(c_ssn, -ssn_count );
 
 
 
@@ -133,18 +133,18 @@ sdc_ssn2 := Sort(dc_ssn2, did, ssn, Local );
 Shared dsdc_ssn2 := Dedup(sdc_ssn2, did, ssn, Local );
 
 // Layouts for parent and child record 
-Shared lexidperssn := Record
+lexidperssn := Record
  Qstring ssn;
  Integer did;
 End;
 
-Shared parentRecordssn := Project(dsdc_ssn2, lexidperssn);
+Shared parentRecordssn := Project(dsdc_ssn2, lexidperssn );
 
-t1_ssn := Table(parentRecordssn, {ssn, did}, ssn, did);
+t1_ssn := Table(parentRecordssn, {ssn, did}, ssn, did );
 
-t2_ssn := Table(t1_ssn, {ssn, lexid_per_ssn := count(group)}, ssn);
+t2_ssn := Table(t1_ssn, {ssn, lexidcnt_per_ssn := Count(Group)}, ssn );
 
-Export lexids_per_ssn := Sort(t2_ssn, -lexid_per_ssn);
+Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt_per_ssn );
 
 
 
@@ -159,58 +159,53 @@ Rec_Address := Record
     header.did;
     header.prim_range;
     header.prim_name;
-    header.unit_desig;
     header.sec_range;
     header.st;
     header.zip;
 End;
 
-addressRec := Table(header, Rec_Address, did, prim_range, prim_name, unit_desig, 
-                               sec_range, st, zip);
-sdc_addressRec := Sort(addressRec, did, prim_range, prim_name, unit_desig, 
-                               sec_range, st, zip , Local);                                        
-Shared dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, unit_desig, 
-                               sec_range, st, zip , Local);
+addressRec := Table(header, Rec_Address, did, prim_range, prim_name, sec_range,
+                                st, zip );
+sdc_addressRec := Sort(addressRec, did, prim_range, prim_name, sec_range,
+                                st, zip , Local );                                        
+Shared dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, sec_range,
+                                st, zip , Local );
 
 
 
 Shared lexidperaddress := Record
+  Integer did;
   String  prim_range;
-  String  unit_desig;
+  String  prim_name;
   String  sec_range;
   String  st;
   String  zip;
-  Integer did;
 End;
 
-parentRecordAddress := Project(dsdc_addressRec, lexidperaddress);
+parentRecordAddress := Project(dsdc_addressRec, lexidperaddress );
 
-filteredAddress := parentRecordAddress( Not prim_range = '' and Not unit_desig = '' and Not sec_range = '' and 
-                                        Not st = '' and Not zip = '' );
+filteredAddress := parentRecordAddress( Not prim_range = '' And Not prim_name = ''  And 
+                                        Not st = '' And Not zip = '' );
 
-t1_address := Table(filteredAddress, {prim_range, unit_desig, sec_range, st, zip, did},
-                                         prim_range, unit_desig, sec_range, st, zip, did);
+t1_address := Table(filteredAddress, {prim_range, prim_name, sec_range, st, zip, did},
+                                         prim_range, prim_name, sec_range, st, zip, did );
 
-t2_address := Table(t1_address, {prim_range, unit_desig, sec_range, st, zip, lexid_per_address := count(group)}, 
-                                prim_range, unit_desig, sec_range, st, zip);
+t2_address := Table(t1_address, {prim_range, prim_name, sec_range, st, zip, lexidcnt_per_address := Count(Group)}, 
+                                prim_range, prim_name, sec_range, st, zip );
 
-Export lexids_per_address := Sort(t2_address, -lexid_per_address);
-
-
-
-// ========================================== Second Part of Report ======================================================
+Export lexids_per_address := Sort(t2_address, -lexidcnt_per_address );
 
 
 
 //  4. Date of Birth
 //  A. Most common DOB accross all records
-Sequencedob := Record
+sequencedob := Record
     header.dob;
-    dob_across_file := Count(Group);
+    dob_count := Count(Group);
 End;
 
-t_Crosstab_Dob := Table(header, Sequencedob, dob);
-Export dob_across_file := Sort(t_crosstab_Dob, -dob_across_file);
+t_crosstab_Dob := Table(header, sequencedob, dob);
+Export dob_across_file := Sort(t_crosstab_Dob, -dob_count );
 
 
 
@@ -220,7 +215,7 @@ LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
   String2 DD  := if(dob[7..8]='00','',dob[7..8]);
-  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
+  String2 MM  := if(dob[5..6]='00' And DD='','',dob[5..6]);
   Return (Unsigned8)(YY + MM + DD );
 End;
 
@@ -236,7 +231,7 @@ End;
 
 dob_file := Project(Header, SlimRec(Left));
 
-filteredDob := dob_file( Not dob = 0 AND Not did = 0 );
+filteredDob := dob_file( Not dob = 0 And Not did = 0 );
 
 input_dobs := Sort(filteredDob, did, dob );
 
@@ -267,9 +262,9 @@ Shared filterFullDob := parentRecordsDob( validDob = 1 );
 
 t1_dob := Table(filterFullDob, {dob, did}, dob, did);
 
-t2_dob := Table(t1_dob, {dob, lexid_count := Count(Group)}, dob);
+t2_dob := Table(t1_dob, {dob, lexidcnt_per_dob := Count(Group)}, dob);
 
-Export lexids_per_fulldob := Sort(t2_dob, -lexid_count);
+Export lexids_per_fulldob := Sort(t2_dob, -lexidcnt_per_dob);
 
 
 
@@ -297,9 +292,9 @@ valid_result_mmdd := result_mmdd_only( mm_dob = 1 and dd_dob = 1 and yy_dob = 0 
 
 result_mmdd := Table(valid_result_mmdd, {did, dob}, did, dob);
 
-t_result_mmdd := Table(result_mmdd, {dob, lexid_count := Count(Group)}, dob );
+t_result_mmdd := Table(result_mmdd, {dob, lexidcnt_per_dob := Count(Group)}, dob );
 
-Export lexids_per_mmdddob := Sort(t_result_mmdd, -lexid_count);
+Export lexids_per_mmdddob := Sort(t_result_mmdd, -lexidcnt_per_dob );
 
 
 
@@ -310,7 +305,6 @@ blankDobs := Header( dob = 0);
 
 NonBlankDob := Record
   blankDobs.src;
-  blankDobs.dob;
   blank_dob_count := Count(Group);
 End;
 
@@ -324,7 +318,7 @@ LoseTrailingZeroes(Unsigned4 indob) := Function
   String8 dob := (String8)indob;
   String4 YY  := dob[1..4];
   String2 DD  := if(dob[7..8]='00','',dob[7..8]);
-  String2 MM  := if(dob[5..6]='00' AND DD='','',dob[5..6]);
+  String2 MM  := if(dob[5..6]='00' And DD='','',dob[5..6]);
   Return (Unsigned8)( YY );
 End;
 
@@ -334,13 +328,13 @@ blankmmdd := Record
   String   src;
 End;
 
-blankmmdd FliterDobsYYYY( Header Le ) := Transform
+blankmmdd FliterDobsYYYY( header Le ) := Transform
   Self.dob_year := LoseTrailingZeroes(Le.dob);
   Self.did := Le.did;
   Self.src := Le.src;
 End;
 
-result_dob_year := Project(Header, FliterDobsYYYY(Left));
+result_dob_year := Project(header, FliterDobsYYYY(Left));
 
 Export nonblank_year := result_dob_year( Not dob_year = 0);
 
@@ -349,8 +343,8 @@ crosstab_dobyear := Record
   blank_mmdd_count := Count(Group);
 End;
 
-Out_Crosstab_dob := Table(nonblank_year, crosstab_dobyear, src );
-Export blank_mmdd_persource := Sort(Out_Crosstab_dob, -blank_mmdd_count);
+out_crosstab_dob := Table(nonblank_year, crosstab_dobyear, src );
+Export blank_mmdd_persource := Sort(Out_Crosstab_dob, -blank_mmdd_count );
 
 
 
@@ -361,13 +355,13 @@ blankdd := Record
   String   src;
 End;
 
-blankdd FilterDobsMMYYYY( Header Le ) := Transform
+blankdd FilterDobsMMYYYY( header Le ) := Transform
   Self.dob_yyyymm := (Unsigned)Le.dob[1..6];
   Self.did := Le.did;
   Self.src := Le.src;
 End;
 
-result_dob_mmyyyy := Project(Header, FilterDobsMMYYYY(Left));
+result_dob_mmyyyy := Project(header, FilterDobsMMYYYY(Left));
 
 Export nonblank_mmyyyy := result_dob_mmyyyy( Not dob_yyyymm = 0 );
 
@@ -376,13 +370,13 @@ crosstab_mmyyyy := Record
   blank_dd_count := Count(Group);
 End;
 
-out_crosstab_dob := Table(nonblank_mmyyyy, crosstab_mmyyyy, src);
-Export blank_dd_persource := Sort(out_crosstab_dob, -blank_dd_count);
+out_crosstab_dob := Table(nonblank_mmyyyy, crosstab_mmyyyy, src );
+Export blank_dd_persource := Sort(out_crosstab_dob, -blank_dd_count );
+
 
 
 // E. Dob normal distribution score ( measure of normality accross all non-zero per lexid Dob)
-
-filteredFullDobLexid := filterFullDob( NOT dob = 0 AND Not did = 0);
+filteredFullDobLexid := filterFullDob( Not dob = 0 And Not did = 0);
 
 normaldist := Record
     Integer   did;
@@ -398,8 +392,8 @@ result_normdist := Project(filteredFullDobLexid, distSlim(Left));
 
 t1_dob := Table(result_normdist, {dob_mmdd, did}, dob_mmdd, did);
 
-t2_dob := Table(t1_dob, {dob_mmdd, lexidcnt := Count(Group)}, dob_mmdd);
+t2_dob := Table(t1_dob, {dob_mmdd, lexid_count := Count(Group)}, dob_mmdd );
 
-Export normal_distribution := Sort(t2_dob, -lexidcnt);
+Export normal_distribution := Sort(t2_dob, -lexid_count );
 
 End; // Do not delete 
