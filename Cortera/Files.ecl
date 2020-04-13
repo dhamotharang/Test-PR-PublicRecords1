@@ -8,7 +8,7 @@ EXPORT Files := MODULE
 	// fAs_Business_Header - Needed for Business Header Build per Vern Bentley
 	export	Bus_hdr := dataset('~thor_data400::cortera::out::20170131::business',Business_Header.Layout_Business_Header_New, thor);
 
-  export File_Attributes_In := dataset(cortera.Constants.sfHeaderIn,
+  export File_Attributes_In := dataset(cortera.Constants.sfAttributesIn,
 																					cortera.Layout_Attributes, CSV(
 																								SEPARATOR('|')
 																							, TERMINATOR(['\n', '\r\n'])
@@ -17,9 +17,7 @@ EXPORT Files := MODULE
 																							)
 																				);
 																				
-																				root := '~thor::cortera::hdr_in';
-
-  export File_Header_In := dataset(cortera.Constants.sfAttributesIn, 
+  export File_Header_In := dataset(cortera.Constants.sfHeaderIn, 
 																		cortera.Layout_Header, CSV(
 																								SEPARATOR('|')
 																							, TERMINATOR(['\n', '\r\n'])

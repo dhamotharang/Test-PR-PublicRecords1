@@ -1881,6 +1881,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'FSA (Isle of Man) Not Fit and Proper Directors','1868'},
 {'FSA (Isle of Man) Public Warnings','1869'},
 {'Japanese Finance Ministry - Mali List','1870'},
-{'United Arab Emirates National List of Terrorist','1871'}
+{'United Arab Emirates National List of Terrorist','1871'},
+{'AFM (Netherlands) Enforcement Orders','1872'},
+{'United Arab Emirates National List of Terrorists','1873'}
 ],r);
 
