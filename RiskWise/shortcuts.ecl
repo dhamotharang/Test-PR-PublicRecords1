@@ -60,7 +60,7 @@ export shortcuts := module
   export gw_empty     := dataset( [], risk_indicators.layout_gateways_in );
   export gw_targus    := dataset( [{'targus','http://rw_data_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
   export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-  export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_bridger := dataset([{'bridgerwlc','http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'}], risk_indicators.Layout_Gateways_In);
   export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
   // use this version for anything that is customer paid test  
   export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
