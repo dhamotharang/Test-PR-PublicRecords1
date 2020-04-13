@@ -19,7 +19,12 @@ EXPORT mac_fetch_bydid(ds_in, did_field, death_params, restrictions = 0, recs_pe
   LOCAL skip_all_restrictions := restrictions = dx_death_master.Constants.DataRestrictions.skipAll;
   LOCAL local_glb_ok := skip_glb_restrictions OR death_params.isValidGlb();
 
+  #IF (use_distributed)
   LOCAL in_file := UNGROUP(ds_in);
+  #ELSE
+  LOCAL in_file := ds_in; // cannot ungroup or some queries will fail with "branches with different grouping" error.
+  #END
+
   LOCAL key_death := IF(_data_env = data_services.data_env.iFCRA, 
     doxie.key_death_masterV2_ssa_DID_fcra, doxie.key_death_masterV2_ssa_DID);
 
@@ -91,6 +96,8 @@ EXPORT mac_fetch_bydid(ds_in, did_field, death_params, restrictions = 0, recs_pe
       ));
   END;
 
+  // Note: join to opt-out key done in isOptOutRestricted() is not effective, but it avoids "branches with different grouping" 
+  // error when syntax checking some queries.
   LOCAL out_recs := JOIN(in_file, key_death, 
     (((UNSIGNED6)left.did_field)>0) AND keyed((UNSIGNED6) left.did_field = right.l_did)
     AND (skip_src_restrictions OR NOT deathv2_services.functions.Restricted(right.src, right.glb_flag, local_glb_ok, death_params))
