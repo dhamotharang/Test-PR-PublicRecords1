@@ -501,7 +501,7 @@ got_death_nonfcra_roxie_unsuppressed := join (got_SSNTableDL_nonfcra_roxie, deat
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(keyed(left.ssn=right.ssn),500));
 									
-got_death_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(got_death_nonfcra_roxie_unsuppressed, mod_access, data_env := iType);
+got_death_nonfcra_roxie_flagged := Suppress.CheckSuppression(got_death_nonfcra_roxie_unsuppressed, mod_access, data_env := iType);
 
 got_death_nonfcra_roxie := PROJECT(got_death_nonfcra_roxie_flagged, TRANSFORM(layout_output_DE_src, 
 	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	
@@ -522,7 +522,7 @@ got_death_nonfcra_thor_unsuppressed := join (distribute(got_SSNTableDL_nonfcra_t
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
 	
-got_death_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(got_death_nonfcra_thor_unsuppressed, mod_access, data_env := iType);
+got_death_nonfcra_thor_flagged := Suppress.CheckSuppression(got_death_nonfcra_thor_unsuppressed, mod_access, data_env := iType);
 
 got_death_nonfcra_thor := PROJECT(got_death_nonfcra_thor_flagged, TRANSFORM(layout_output_DE_src, 
 	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	

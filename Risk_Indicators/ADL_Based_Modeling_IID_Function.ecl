@@ -112,6 +112,7 @@ END;
 		SET OF STRING38 gong_correct_record_id {maxlength(3900)} := [];
 		// Address Append BSOption flags
 		UNSIGNED1 AddressMatchLevel := 0;
+		boolean skip_opt_out;
 	end;
 
 
@@ -336,7 +337,7 @@ with_gong_did1_roxie_unsuppressed := join(best_of_header, key_history_did,
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(riskwise.max_atmost), keep(100));
 
-with_gong_did1_roxie_flagged := Suppress.MAC_FlagSuppressedSource(with_gong_did1_roxie_unsuppressed, mod_access, data_env := data_environment);
+with_gong_did1_roxie_flagged := Suppress.CheckSuppression(with_gong_did1_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 with_gong_did1_roxie := PROJECT(with_gong_did1_roxie_flagged, TRANSFORM(temp,
 	self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);
@@ -359,7 +360,7 @@ with_gong_did1_thor_unsuppressed := join(distribute(best_of_header, hash64(did))
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), keep(100), LOCAL);
 
-with_gong_did1_thor_flagged := Suppress.MAC_FlagSuppressedSource(with_gong_did1_thor_unsuppressed, mod_access, data_env := data_environment);
+with_gong_did1_thor_flagged := Suppress.CheckSuppression(with_gong_did1_thor_unsuppressed, mod_access, data_env := data_environment);
 
 with_gong_did1_thor := PROJECT(with_gong_did1_thor_flagged, TRANSFORM(temp,
 	self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);

@@ -1,4 +1,4 @@
-﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress, data_services;
+﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress, data_services, STD;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_employment, 
@@ -31,7 +31,8 @@ patw := record
 end;
 
 patw_CCPA := record
-    unsigned4 global_sid; // CCPA changes
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
 	patw;
 end;
 
@@ -93,7 +94,7 @@ pawfile_full_nonfcra_roxie_unsuppressed := join(with_paw_did, paw.Key_contactid,
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000));
 						
-pawfile_full_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+pawfile_full_nonfcra_roxie_flagged := Suppress.CheckSuppression(pawfile_full_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 pawfile_full_nonfcra_roxie := PROJECT(pawfile_full_nonfcra_roxie_flagged, TRANSFORM(patw, 						
 	self.contact_id := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.contact_id);
@@ -121,7 +122,7 @@ pawfile_full_nonfcra_thor_unsuppressed := join(distribute(with_paw_did, hash64(c
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 																						
-pawfile_full_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+pawfile_full_nonfcra_thor_flagged := Suppress.CheckSuppression(pawfile_full_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
 pawfile_full_nonfcra_thor := PROJECT(pawfile_full_nonfcra_thor_flagged, TRANSFORM(patw, 						
 	self.contact_id := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.contact_id);
@@ -262,14 +263,14 @@ patw roll_paw(patw le, patw rt) := transform
 	self.first_seen_date := if(rt.first_seen_date<le.first_seen_date and rt.first_seen_date<>0, rt.first_seen_date, le.first_seen_date);
 	self.last_seen_date := if(rt.last_seen_date>le.last_seen_date, rt.last_seen_date, le.last_seen_date);
 	
-	source_seen := stringlib.stringfind(le.sources, le.source, 1)>0;
+	source_seen := STD.str.find(le.sources, le.source, 1)>0;
 	self.sources := if(source_seen, le.sources, trim(le.sources) + ',' + le.source); 
 	self.source_ct := if(source_seen or le.sources='', le.source_ct, le.source_ct + rt.source_ct);
 	
 	self.business_ct := if(le.bdid=rt.bdid, le.business_ct, le.business_ct + rt.business_ct);
 	// self.dead_business_ct := if(le.bdid=rt.bdid, le.dead_business_ct, le.dead_business_ct + rt.dead_business_ct);  // don't count these here because we need a seperate table for that
 	
-	new_phone := le.phone<>'' and stringlib.stringfind(le.active_phones, le.phone, 1)=0 ;
+	new_phone := le.phone<>'' and STD.str.find(le.active_phones, le.phone, 1)=0 ;
 	self.Business_active_phone_ct := if(new_phone, le.business_active_phone_ct + 1, le.Business_active_phone_ct);
 	self.active_phones := if(new_phone, trim(le.active_phones) + ',' + le.phone, le.active_phones);
 

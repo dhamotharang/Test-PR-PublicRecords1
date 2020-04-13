@@ -26,6 +26,7 @@ export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Ou
     email_tmp_CCPA := RECORD
       unsigned6 did;  //CCPA Changes
       unsigned4 global_sid; //CCPA Changes
+			boolean skip_opt_out := false;
       email_tmp;
     END;
     
@@ -49,7 +50,7 @@ export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Ou
 			email_details(left, right, EmailDetailsCount), 
 				atmost(riskwise.max_atmost), keep(1000), left outer);
                                                   
-    emails_orig_flagged := Suppress.MAC_FlagSuppressedSource(emails_orig_unsuppressed, mod_access);
+    emails_orig_flagged := Suppress.CheckSuppression(emails_orig_unsuppressed, mod_access);
 
 	emails_orig := PROJECT(emails_orig_flagged, TRANSFORM(email_tmp, 
 		self.domain_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.domain_type);

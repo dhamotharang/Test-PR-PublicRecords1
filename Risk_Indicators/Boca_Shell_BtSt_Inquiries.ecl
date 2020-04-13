@@ -152,6 +152,7 @@ export Boca_Shell_BtSt_Inquiries(
 
     inq_tmp_CCPA := RECORD
         unsigned4 global_sid;
+				boolean skip_opt_out := false;
         inq_tmp;
     END;
     
@@ -271,7 +272,7 @@ getBtStInquiryRaw(btStField, InquiryRawCount, KeyName, getDelta) := FUNCTIONMACR
 						add_inquiry_raw(left, right, InquiryRawCount),
 						left outer, atmost(5000));	
     #END             
-    inq_flagged := Suppress.MAC_FlagSuppressedSource(inq_unsuppressed, mod_access);
+    inq_flagged := Suppress.CheckSuppression(inq_unsuppressed, mod_access);
 
 inq := PROJECT(inq_flagged, TRANSFORM(inq_tmp, 
 		self.CBD_Hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.CBD_Hit);

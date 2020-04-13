@@ -11,7 +11,8 @@ end;
 
 temp_layout_CCPA := record
 	unsigned6 did; // CCPA changes
-    unsigned4 global_sid; // CCPA changes
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
 	temp_layout;
 end;
 
@@ -29,7 +30,7 @@ bureau_phonesearch_tmp_unsuppressed := join(ids_wide, PhoneMart.key_phonemart_di
 	self := left;
 		), left outer, atmost(riskwise.max_atmost), keep(100));
 		
-bureau_phonesearch_tmp_flagged := Suppress.MAC_FlagSuppressedSource(bureau_phonesearch_tmp_unsuppressed, mod_access);
+bureau_phonesearch_tmp_flagged := Suppress.CheckSuppression(bureau_phonesearch_tmp_unsuppressed, mod_access);
 
 bureau_phonesearch_tmp := PROJECT(bureau_phonesearch_tmp_flagged, TRANSFORM(temp_layout, 
 	self.phone_ver_bureau := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phone_ver_bureau);

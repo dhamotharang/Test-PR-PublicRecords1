@@ -1,4 +1,4 @@
-﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators, doxie, Suppress;
+﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators, doxie, Suppress, STD;
 
 export Boca_Shell_Impulse(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -12,6 +12,7 @@ END;
 Layout_Impulse_CCPA := RECORD
     integer8 did; // CCPA changes
     unsigned4 global_sid; // CCPA changes
+		boolean skip_opt_out := false; // CCPA changes
     Layout_Impulse;
 END;
 
@@ -19,8 +20,8 @@ Layout_Impulse_CCPA addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID ri) :=
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := ri.did<>0;
 	self.count := (integer)hit;
-	self.first_seen_date := (unsigned)stringlib.stringfilterout(ri.created[1..10],'-');
-	dt_last_seen := stringlib.stringfilterout(ri.lastmodified[1..10],'-');
+	self.first_seen_date := (unsigned)STD.str.filterout(ri.created[1..10],'-');
+	dt_last_seen := STD.str.filterout(ri.lastmodified[1..10],'-');
 	self.last_seen_date := (unsigned)dt_last_seen;	// seems to be the same as first seen date
 	self.siteidsrc := ri.siteid;	// internal use for rollup
 	self.siteid := ri.siteid+',';
@@ -38,11 +39,11 @@ Layout_Impulse_CCPA addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID ri) :=
     self.global_sid := ri.global_sid;
 	self := le;
 end;
-wImpulse_unsuppressed := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)stringlib.stringfilterout(right.created[1..7],'-')< left.historydate and	
+wImpulse_unsuppressed := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)STD.str.filterout(right.created[1..7],'-')< left.historydate and	
 																// left.did=right.did, addImpulse(left,right), left outer);
 																keyed(left.did=right.did), addImpulse(left,right), left outer, atmost(riskwise.max_atmost));
 
-wImpulse_flagged := Suppress.MAC_FlagSuppressedSource(wImpulse_unsuppressed, mod_access);
+wImpulse_flagged := Suppress.CheckSuppression(wImpulse_unsuppressed, mod_access);
 
 wImpulse := PROJECT(wImpulse_flagged, TRANSFORM(Layout_Impulse, 
 	self.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count);
@@ -106,7 +107,7 @@ wThrive_unsuppressed := join (ids_wide, key_main,
   );
 	
 	
-wThrive_flagged := Suppress.MAC_FlagSuppressedSource(wThrive_unsuppressed, mod_access);
+wThrive_flagged := Suppress.CheckSuppression(wThrive_unsuppressed, mod_access);
 
 wThrive := PROJECT(wThrive_flagged, TRANSFORM(Layout_Impulse, 
 	self.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count);
@@ -133,7 +134,7 @@ Layout_Impulse rollImpulse(Layout_Impulse le, Layout_Impulse ri) := transform
 	self.count := le.count + ri.count;
 	self.first_seen_date := ut.Min2(le.first_seen_date,ri.first_seen_date);
 	self.last_seen_date := if(max(le.last_seen_date,ri.last_seen_date) > (unsigned)myGetDate, (unsigned)myGetDate, max(le.last_seen_date,ri.last_seen_date));
-	siteSeen := Stringlib.StringFind(trim(le.siteid),trim(ri.siteidsrc)+',',1)>0;
+	siteSeen := STD.str.Find(trim(le.siteid),trim(ri.siteidsrc)+',',1)>0;
 	self.siteidsrc := ri.siteidsrc;	// so we go on to the next record for checking
 	self.siteid := IF(siteSeen, le.siteid, TRIM(le.siteid)+ri.siteidsrc+',');
 	self.count30 := le.count30 + ri.count30;

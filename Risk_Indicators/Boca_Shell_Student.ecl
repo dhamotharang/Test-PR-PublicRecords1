@@ -14,6 +14,7 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
   	Layout_AS_Plus_CCPA := RECORD
         unsigned4 global_sid; // CCPA changes
 		Layout_AS_Plus;
+		boolean skip_opt_out := false;
 	end;
 	 
 	Layout_AS_Plus_CCPA student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
@@ -25,7 +26,8 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		self.student := ri;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
 		self.src := ri.historical_flag; // ASL records will be indicated by a historical (H) or current (C) indicator
-        self.global_sid := ri.global_sid;
+    self.global_sid := ri.global_sid;
+		self.skip_opt_out := le.skip_opt_out;
 	end;
 	
 	student_file_unsuppressed := join(ids_only, american_student_list.key_DID, 
@@ -37,7 +39,7 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
 	
-student_file_flagged := Suppress.MAC_FlagSuppressedSource(student_file_unsuppressed, mod_access);
+student_file_flagged := Suppress.CheckSuppression(student_file_unsuppressed, mod_access);
 
 student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus, 
 		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
@@ -167,7 +169,7 @@ student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus,
 			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 
-	alloy_file_flagged := Suppress.MAC_FlagSuppressedSource(alloy_file_unsuppressed, mod_access);
+	alloy_file_flagged := Suppress.CheckSuppression(alloy_file_unsuppressed, mod_access);
 
 	alloy_file := PROJECT(alloy_file_flagged, TRANSFORM(Layout_AS_Plus, 
 		self.student.college_major := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_major);

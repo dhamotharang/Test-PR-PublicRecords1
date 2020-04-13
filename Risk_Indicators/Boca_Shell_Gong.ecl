@@ -22,6 +22,7 @@ END;
 
 Layout_Gong_CCPA := RECORD
     unsigned4 global_sid; // CCPA changes
+		boolean skip_opt_out := false;
     Layout_Gong;
 END;
 
@@ -61,7 +62,7 @@ gong_by_did_unsuppressed := join(ids_wide, key_history_did, left.did != 0 and ke
 										((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)),
 										addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
 
-gong_by_did_flagged := Suppress.MAC_FlagSuppressedSource(gong_by_did_unsuppressed, mod_access);
+gong_by_did_flagged := Suppress.CheckSuppression(gong_by_did_unsuppressed, mod_access);
 
 gong_by_did1 := PROJECT(gong_by_did_flagged, TRANSFORM(Layout_Gong,
 	self.gong_did.gong_ADL_dt_first_seen_full := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_did.gong_ADL_dt_first_seen_full );

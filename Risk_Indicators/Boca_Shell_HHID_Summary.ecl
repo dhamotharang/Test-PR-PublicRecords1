@@ -1,7 +1,7 @@
 ﻿
 import riskwise, dx_header, LN_PropertyV2, paw, Inquiry_AccLogs, liensv2, doxie_files, 
 BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr, risk_indicators, Doxie,
-Suppress;
+Suppress, STD;
 
 // this function gives a high level overview of different public records attributes at the household level
 EXPORT Boca_Shell_HHID_Summary(grouped DATASET(risk_indicators.iid_constants.layout_outx) all_header,
@@ -13,7 +13,7 @@ isFCRA := false;  // this function is only valid in nonfcra shell
 
 // dedup to make sure there is just 1 hhid per seq before slimming the layout to run this function
 hhid_input := table(dedup(sort(all_header, seq, -hhid_summary.hhid), seq), 
-										{seq, did, hhid := hhid_summary.hhid, historydate, fname, lname});
+										{seq, did, hhid := hhid_summary.hhid, historydate, fname, lname, skip_opt_out});
 
 layout_hhid_temp := record
 	unsigned seq;
@@ -26,6 +26,7 @@ layout_hhid_temp := record
 	string35 crim_case_num := ''; // criminal extras
 	STRING50 rmsid := ''; // liens extras
 	string50 tmsid := ''; // liens extras
+	boolean skip_opt_out := false;
 end;
 
 hhids := dedup(hhid_input(hhid<>0), hhid);
@@ -60,7 +61,7 @@ with_age_unsuppressed := join(with_hhid_dids, risk_indicators.Key_ADL_Risk_Table
 	self.age := age;
 	self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_age_flagged := Suppress.MAC_FlagSuppressedSource(with_age_unsuppressed, mod_access);
+with_age_flagged := Suppress.CheckSuppression(with_age_unsuppressed, mod_access);
 
 with_age := PROJECT(with_age_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_age_65_plus := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_age_65_plus);
@@ -93,7 +94,7 @@ pawfile_full_nonfcra_unsuppressed := join(with_paw_did, paw.Key_contactid,
 							self.hh_workers_paw := if(right.contact_id<>0, 1, 0),
 							self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 							
-pawfile_full_nonfcra_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_unsuppressed, mod_access);
+pawfile_full_nonfcra_flagged := Suppress.CheckSuppression(pawfile_full_nonfcra_unsuppressed, mod_access);
 
 pawfile_full_nonfcra := PROJECT(pawfile_full_nonfcra_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_workers_paw := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_workers_paw);
@@ -105,13 +106,13 @@ with_paw_rolled := dedup(sort(pawfile_full_nonfcra, seq, did, -hh_workers_paw, s
 collections_bucket := if(bsversion>=50, Inquiry_AccLogs.shell_constants.collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);	
 with_collection_inquiries_unsuppressed := join(with_paw_rolled, Inquiry_AccLogs.Key_Inquiry_DID, 
 						keyed(left.did=right.s_did) and
-						trim(StringLib.StringToUpperCase(right.search_info.function_description)) in Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions(bsVersion) and
+						trim(STD.str.ToUpperCase(right.search_info.function_description)) in Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions(bsVersion) and
 						trim(right.search_info.product_code) in Inquiry_AccLogs.shell_constants.valid_product_codes and
 						trim(right.bus_intel.use)='' and
 						(
-								trim(StringLib.StringToUpperCase(right.bus_intel.vertical)) IN collections_bucket or
-								trim(StringLib.StringToUpperCase(right.bus_intel.industry)) IN Inquiry_AccLogs.shell_constants.collection_industry or
-								StringLib.StringFind(trim(StringLib.StringToUpperCase(right.bus_intel.sub_market)),'FIRST PARTY', 1) > 0
+								trim(STD.str.ToUpperCase(right.bus_intel.vertical)) IN collections_bucket or
+								trim(STD.str.ToUpperCase(right.bus_intel.industry)) IN Inquiry_AccLogs.shell_constants.collection_industry or
+								STD.str.Find(trim(STD.str.ToUpperCase(right.bus_intel.sub_market)),'FIRST PARTY', 1) > 0
 						) and
 					  trim(right.search_info.datetime)<>'' and
 						(unsigned)right.search_info.datetime[1..6] < left.historydate,  
@@ -121,7 +122,7 @@ with_collection_inquiries_unsuppressed := join(with_paw_rolled, Inquiry_AccLogs.
 							self := left),
 						left outer, atmost(riskwise.max_atmost), keep(1)) ;	
 						
-with_collection_inquiries_flagged := Suppress.MAC_FlagSuppressedSource(with_collection_inquiries_unsuppressed, mod_access);
+with_collection_inquiries_flagged := Suppress.CheckSuppression(with_collection_inquiries_unsuppressed, mod_access);
 
 with_collection_inquiries := PROJECT(with_collection_inquiries_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_collections_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_collections_ct);
@@ -129,13 +130,13 @@ with_collection_inquiries := PROJECT(with_collection_inquiries_flagged, TRANSFOR
 )); 
 
 with_impulse_unsuppressed := join(with_collection_inquiries, Impulse_Email.Key_Impulse_DID, 
-									keyed(left.did=right.did) and (unsigned)stringlib.stringfilterout(right.created[1..7],'-')< left.historydate,	
+									keyed(left.did=right.did) and (unsigned)STD.str.filterout(right.created[1..7],'-')< left.historydate,	
 									transform({layout_hhid_temp, UNSIGNED4 global_sid},
 										self.global_sid := RIGHT.global_sid;
 										self.hh_payday_loan_users := if(right.did<>0, 1, 0);
 										self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 										
-with_impulse_flagged := Suppress.MAC_FlagSuppressedSource(with_impulse_unsuppressed, mod_access);
+with_impulse_flagged := Suppress.CheckSuppression(with_impulse_unsuppressed, mod_access);
 
 with_impulse := PROJECT(with_impulse_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_payday_loan_users := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_payday_loan_users);
@@ -151,7 +152,7 @@ with_thrive_unsuppressed := join(with_impulse, thrive.keys().did.qa,
 										self.hh_payday_loan_users := if(right.did<>0 or left.hh_payday_loan_users=1, 1, 0);
 										self := left), left outer, atmost(riskwise.max_atmost), keep(1));										
 										
-with_thrive_flagged := Suppress.MAC_FlagSuppressedSource(with_thrive_unsuppressed, mod_access);
+with_thrive_flagged := Suppress.CheckSuppression(with_thrive_unsuppressed, mod_access);
 
 with_thrive := PROJECT(with_thrive_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_payday_loan_users := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_payday_loan_users);
@@ -166,7 +167,7 @@ with_professional_license_unsuppressed := join(with_thrive, prof_licenseV2.Key_P
 											self.hh_prof_license_holders := if(right.did<>0, 1, 0);
 											self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 											
-with_professional_license_flagged := Suppress.MAC_FlagSuppressedSource(with_professional_license_unsuppressed, mod_access);
+with_professional_license_flagged := Suppress.CheckSuppression(with_professional_license_unsuppressed, mod_access);
 
 with_professional_license := PROJECT(with_professional_license_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_prof_license_holders := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_prof_license_holders);
@@ -183,7 +184,7 @@ with_alloy_unsuppressed := join(with_professional_license, AlloyMedia_student_li
 				self.hh_college_attendees := if(right.did<>0, 1, 0);
 				self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_alloy_flagged := Suppress.MAC_FlagSuppressedSource(with_alloy_unsuppressed, mod_access);
+with_alloy_flagged := Suppress.CheckSuppression(with_alloy_unsuppressed, mod_access);
 
 with_alloy := PROJECT(with_alloy_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_college_attendees := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_college_attendees);
@@ -201,7 +202,7 @@ with_american_student_unsuppressed := join(with_alloy, american_student_list.key
 				self.hh_college_attendees := if(right.did<>0 or left.hh_college_attendees=1, 1, 0);
 				self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_american_student_flagged := Suppress.MAC_FlagSuppressedSource(with_american_student_unsuppressed, mod_access);
+with_american_student_flagged := Suppress.CheckSuppression(with_american_student_unsuppressed, mod_access);
 
 with_american_student := PROJECT(with_american_student_flagged, TRANSFORM(layout_hhid_temp, 
 	self.hh_college_attendees := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_college_attendees);
@@ -256,7 +257,7 @@ with_liens_unsuppressed := join(with_lien_ids, liensv2.key_liens_party_id,
 				SELF := left),
 				LEFT OUTER, KEEP(1), ATMOST(Riskwise.max_atmost));
 
-with_liens_flagged := Suppress.MAC_FlagSuppressedSource(with_liens_unsuppressed, mod_access);
+with_liens_flagged := Suppress.CheckSuppression(with_liens_unsuppressed, mod_access);
 
 with_liens := PROJECT(with_liens_flagged, TRANSFORM(layout_hhid_temp, 
 				self.hh_lienholders := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_lienholders);

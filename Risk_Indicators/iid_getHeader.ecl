@@ -220,7 +220,7 @@ j_pre_roxie_unsuppressed := join (g_inrec, header_key,
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
 
-j_pre_roxie_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_roxie_unsuppressed, mod_access, data_env := iType);
+j_pre_roxie_flagged := Suppress.CheckSuppression(j_pre_roxie_unsuppressed, mod_access, data_env := iType);
 
 j_pre_roxie := PROJECT(j_pre_roxie_flagged, TRANSFORM(Layout_Header_Data, 
 	self.h := IF(~left.is_suppressed, left.h); 
@@ -260,7 +260,7 @@ j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)),
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
 
-j_pre_thor_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_thor_unsuppressed, mod_access, data_env := iType);
+j_pre_thor_flagged := Suppress.CheckSuppression(j_pre_thor_unsuppressed, mod_access, data_env := iType);
 
 j_pre_thor := PROJECT(j_pre_thor_flagged, TRANSFORM(Layout_Header_Data, 
 	self.h := IF(~left.is_suppressed, left.h); 
