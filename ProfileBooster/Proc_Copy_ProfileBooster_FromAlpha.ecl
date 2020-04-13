@@ -7,8 +7,8 @@ import std,_Control, ProfileBooster.Constants;
 //******************************************************************************************************************
 
 destGrp 		  := _Control.TargetGroup.Thor400_44;
-sourceDali 	:= if (dali = 'Dev',_Control.IPAddress.adataland_dali, _Control.IPAddress.aprod_thor_dali);
-
+sourceDali 	 := if (dali = 'Dev',_Control.IPAddress.adataland_dali, _Control.IPAddress.aprod_thor_dali);
+pbcpy_semail := Fileservices.Sendemail(ProfileBooster.Constants.QC_email_target , 'ProfileBooster Copies: ' + Version, 'ProfileBooster Copies have started for version: ' + Version,,,'ProfileBooster@lexisnexisrisk.com');
 pbsrce01_of_15 := ProfileBooster.Files.MMdain + Version + '_01_of_15';
 pbsrce02_of_15 := ProfileBooster.Files.MMdain + Version + '_02_of_15';
 pbsrce03_of_15 := ProfileBooster.Files.MMdain + Version + '_03_of_15';
@@ -45,76 +45,65 @@ local pbkeys         := ProfileBooster.Proc_Transfer_Needed_Keys();
 
 #IF (ProcToRun = 1)
 local mypbcopy := SEQUENTIAL(pbcopy01_of_15,pbcopy02_of_15,pbcopy03_of_15,pbcopy04_of_15,pbcopy05_of_15
-																							  		 ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																								  	 ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys
-																									  	);
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 2)			
 local mypbcopy := SEQUENTIAL(pbcopy02_of_15,pbcopy03_of_15,pbcopy04_of_15,pbcopy05_of_15
-																										  ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 3)			
 local mypbcopy := SEQUENTIAL(pbcopy03_of_15,pbcopy04_of_15,pbcopy05_of_15
-																										  ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 4)			
 local mypbcopy := SEQUENTIAL(pbcopy04_of_15,pbcopy05_of_15
-																										  ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 5)			
 local mypbcopy := SEQUENTIAL(pbcopy05_of_15
-																										  ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );			
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);			
 #ELSEIF (ProcToRun = 6)			
 local mypbcopy := SEQUENTIAL(pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 7)			
 local mypbcopy := SEQUENTIAL(pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									  );
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 8)			
 local mypbcopy := SEQUENTIAL(pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									  );
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 9)			
 local mypbcopy := SEQUENTIAL(pbcopy09_of_15,pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys																											
-																									   );
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 10)			
 local mypbcopy := SEQUENTIAL(pbcopy10_of_15
-																										  ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  ,pbkeys	
-																									   );
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
+							,pbcpy_semail,pbkeys);
 #ELSEIF (ProcToRun = 11)			
-local mypbcopy := SEQUENTIAL(pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbkeys);													
+local mypbcopy := SEQUENTIAL(pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbcpy_semail,pbkeys);													
 #ELSEIF (ProcToRun = 12)			
-local mypbcopy := SEQUENTIAL(pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbkeys);													
+local mypbcopy := SEQUENTIAL(pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbcpy_semail,pbkeys);													
 #ELSEIF (ProcToRun = 13)			
-local mypbcopy := SEQUENTIAL(pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbkeys);													
+local mypbcopy := SEQUENTIAL(pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15,pbcpy_semail,pbkeys);													
 #ELSEIF (ProcToRun = 14)			
-local mypbcopy := SEQUENTIAL(pbcopy14_of_15,pbcopy15_of_15,pbkeys);													
+local mypbcopy := SEQUENTIAL(pbcopy14_of_15,pbcopy15_of_15,pbcpy_semail,pbkeys);													
 #ELSEIF (ProcToRun = 15)			
-local mypbcopy := SEQUENTIAL(pbcopy15_of_15,pbkeys );	
+local mypbcopy := SEQUENTIAL(pbcopy15_of_15,pbcpy_semail,pbkeys );	
 #ELSEIF (ProcToRun = 16)			
-local mypbcopy := SEQUENTIAL(pbkeys);	
+local mypbcopy := SEQUENTIAL(pbcpy_semail,pbkeys);	
 #ELSEIF (ProcToRun = 99)			
 local mypbcopy := SEQUENTIAL(pbcopy01_of_15,pbcopy02_of_15,pbcopy03_of_15,pbcopy04_of_15,pbcopy05_of_15
-																							  		 ,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
-																								  	 ,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15
-																										  );
+							,pbcopy06_of_15,pbcopy07_of_15,pbcopy08_of_15,pbcopy09_of_15,pbcopy10_of_15
+							,pbcopy11_of_15,pbcopy12_of_15,pbcopy13_of_15,pbcopy14_of_15,pbcopy15_of_15);
 #ELSE 
 	  ERROR('LeadIntegrity.Proc_Copy_LeadIntegrity_MMInput_FromAlpha - Invalid Parm for ProcToRun');
 #END					 												
