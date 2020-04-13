@@ -8,5 +8,5 @@ EXPORT Functions := MODULE
       STD.Date.IsValidDate((INTEGER) flip_date) => flip_date,
       '');
   END;
-  
+
 END;

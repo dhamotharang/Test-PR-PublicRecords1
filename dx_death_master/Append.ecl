@@ -1,21 +1,50 @@
 ﻿import dx_death_master, data_services;
 
 /*
-  A set of macros to append deceased information to a dataset.
-  Note: If skip_GLB_check=true, caller must apply GLB on result dataset
+  ** A set of macros to append deceased information to a dataset.
 */
 EXPORT Append := MODULE
 
-  EXPORT byDid(ds_in, did_field, death_params, skip_GLB_check = FALSE, recs_per_did = 1, _data_env = Data_Services.data_env.iNonFCRA) 
+  /*
+    ** Append deceased by LexID.
+    **
+    ** @param ds_in                   Input dataset; REQUIRED. 
+    ** @param did_field               The LexID field as defined by the input dataset layout; REQUIRED.
+    ** @param death_params            Death master input mod as defined in DeathV2_Services.IParam.DeathRestrictions;
+    **                                REQUIRED.
+    ** @param skip_GLB_check          Controls whether or not GLB restrictions are enforced whithin this function; 
+    **                                OPTIONAL, defaults to FALSE, i.e. enforce GLB restrictions.
+    **                                IMPORTANT: If skip_GLB_check=true, caller **MUST** apply GLB restrictions on result 
+    **                                dataset prior to returning death information.
+    ** @param recs_per_did            Number of matching records to be returned; 
+    **                                OPTIONAL: defaults to 1.
+    ** @param use_distributed         For use when running THOR jobs; OPTINAL, defaults to FALSE.
+    ** @param data_env                Data environment, either FCRA or non-FCRA; 
+    **                                OPTIONAL, defaults to non-FCRA;
+    ** @returns                       Input dataset with deceased information as defined in dx_death_master.layout_death.
+    **
+  */
+  EXPORT byDid(ds_in, did_field, death_params, skip_GLB_check = FALSE, recs_per_did = 1, use_distributed = FALSE, _data_env = Data_Services.data_env.iNonFCRA) 
     := FUNCTIONMACRO
-  
-    LOCAL out_recs := dx_death_master.mac_fetch_bydid(ds_in, did_field, death_params, 
-      skip_GLB_check, recs_per_did, /*left_outer*/TRUE, _data_env);
+   
+    LOCAL restrictions := IF(skip_GLB_check, dx_death_master.Constants.DataRestrictions.skipGLB, dx_death_master.Constants.DataRestrictions.enforceAll);
+    LOCAL out_recs := dx_death_master.mac_fetch_bydid(ds_in, did_field, death_params,
+      restrictions, recs_per_did, /*left_outer*/TRUE, use_distributed, _data_env);
 
     RETURN out_recs;
 
   ENDMACRO;
 
+  /*
+    ** Append supplemental death data by state death id.
+    **
+    ** @param ds_in                   Input dataset; REQUIRED. 
+    ** @param death_id_field          The state death id field as defined by the input dataset layout; REQUIRED.
+    ** @param format_date             Format dates to YYYYMMDD. OPTIONAL, set to true by default.
+    **
+    ** @returns                       Input dataset with deceased information as defined in dx_death_master.layout_death.
+    **
+  */
   EXPORT supplementalByDeathId(ds_in, death_id_field, format_date = TRUE)
     := FUNCTIONMACRO
   
@@ -50,5 +79,45 @@ EXPORT Append := MODULE
     RETURN out_recs;
 
   ENDMACRO;
+  
+  /*
+    ** Append DOD by LexID with unrestricted access. Note: May return blank DOD if deceased subject is in opt-out (CCPA).
+    **
+    ** @param ds_in                   Input dataset; REQUIRED. 
+    ** @param did_field               The LexID field as defined by the input dataset layout; REQUIRED.
+    ** @param death_params            Death master input mod as defined in DeathV2_Services.IParam.DeathRestrictions;
+    **                                REQUIRED.
+    ** @param recs_per_did            Number of matching records to be returned; 
+    **                                OPTIONAL: defaults to 1.
+    ** @param use_distributed         For use when running THOR jobs; OPTINAL, defaults to FALSE.
+    ** @param data_env                Data environment, either FCRA or non-FCRA; 
+    **                                OPTIONAL, defaults to non-FCRA;
+    ** @returns                       Input dataset with 2 DOD fields (dod and dodSSA).
+    **
+  */
+  EXPORT byDidUnrestricted(ds_in, did_field, death_params, recs_per_did = 1, use_distributed = FALSE, _data_env = Data_Services.data_env.iNonFCRA) 
+    := FUNCTIONMACRO
+  
+    import MDR;
+    LOCAL layout_death_unrestricted := RECORD
+      unsigned dod;
+      unsigned dodSSA;
+    END;
+    LOCAL l_out := RECORDOF(ds_in) OR layout_death_unrestricted;
+
+    LOCAL death_appended := dx_death_master.mac_fetch_bydid(ds_in, did_field, death_params,
+      dx_death_master.Constants.DataRestrictions.skipGLBAndSource, recs_per_did, 
+      /*left_outer*/TRUE, use_distributed, _data_env);
+
+    LOCAL out_recs := PROJECT(death_appended, TRANSFORM(l_out,
+      SELF.dod := if(left.death.src <> MDR.sourceTools.src_Death_Restricted, (UNSIGNED) left.death.dod8, 0); //excludes SSA 
+      SELF.dodSSA := (UNSIGNED) LEFT.death.dod8; //unrestricted so includes SSA
+      SELF := LEFT;
+      ));
+
+    RETURN out_recs;
+
+  ENDMACRO;
+
 
 END;

@@ -1,16 +1,36 @@
 ﻿import dx_death_master, data_services;
 
 /*
-  A set of macros to get deceased information.
-  Note: If skip_GLB_check=true, caller must apply GLB on result dataset
+  ** A set of macros to "get" deceased information.
 */
 EXPORT Get := MODULE
 
-  EXPORT byDid(ds_in, did_field, death_params, skip_GLB_check = FALSE, recs_per_did = 1, _data_env = Data_Services.data_env.iNonFCRA) 
+
+  /*
+    ** Get deceased by LexID.
+    **
+    ** @param ds_in                   Input dataset; REQUIRED. 
+    ** @param did_field               The LexID field as defined by the input dataset layout; REQUIRED.
+    ** @param death_params            Death master input mod as defined in DeathV2_Services.IParam.DeathRestrictions;
+    **                                REQUIRED.
+    ** @param skip_GLB_check          Controls whether or not GLB restrictions are enforced whithin this function; 
+    **                                OPTIONAL, defaults to FALSE, i.e. enforce GLB restrictions.
+    **                                IMPORTANT: If skip_GLB_check=true, caller **MUST** apply GLB restrictions on result 
+    **                                dataset prior to returning death information.
+    ** @param recs_per_did            Number of matching records to be returned; 
+    **                                OPTIONAL: defaults to 1.
+    ** @param use_distributed         For use when running THOR jobs; OPTINAL, defaults to FALSE.
+    ** @param data_env                Data environment, either FCRA or non-FCRA; 
+    **                                OPTIONAL, defaults to non-FCRA;
+    ** @returns                       A dataset with deceased information as defined in dx_death_master.layout_death.
+    **
+  */
+  EXPORT byDid(ds_in, did_field, death_params, skip_GLB_check = FALSE, recs_per_did = 1, use_distributed = FALSE, _data_env = Data_Services.data_env.iNonFCRA) 
     := FUNCTIONMACRO
-  
+
+    LOCAL restrictions := IF(skip_GLB_check, dx_death_master.Constants.DataRestrictions.skipGLB, dx_death_master.Constants.DataRestrictions.enforceAll);
     LOCAL recs_death_appended := dx_death_master.mac_fetch_bydid(ds_in, did_field, death_params, 
-      skip_GLB_check, recs_per_did, /*left_outer*/FALSE, _data_env);
+      restrictions, recs_per_did, /*left_outer*/FALSE, use_distributed, _data_env);
 
     LOCAL layout_out_rec := RECORD
       ds_in.did_field;
@@ -22,6 +42,20 @@ EXPORT Get := MODULE
 
   ENDMACRO;
 
+  /*
+    ** Get deceased by state death id.
+    **
+    ** @param ds_in                   Input dataset; REQUIRED. 
+    ** @param death_id_field          The state death id field as defined by the input dataset layout; REQUIRED.
+    ** @param death_params            Death master input mod as defined in DeathV2_Services.IParam.DeathRestrictions;
+    **                                REQUIRED.
+    ** @param recs_per_did            Number of matching records to be returned; 
+    **                                OPTIONAL: defaults to 1.
+    ** @param data_env                Data environment, either FCRA or non-FCRA; 
+    **                                OPTIONAL, defaults to non-FCRA;
+    ** @returns                       A dataset with deceased information attached to input record. 
+    **
+  */
   EXPORT byDeathId(ds_in, death_id_field, death_params, recs_per_id = 1, _data_env = Data_Services.data_env.iNonFCRA) 
     := FUNCTIONMACRO
   
@@ -54,5 +88,6 @@ EXPORT Get := MODULE
     RETURN suppress.MAC_SuppressSource(out_recs, death_params, death.did, death.global_sid, data_env := _data_env); 
 
   ENDMACRO;
+
 
 END;
