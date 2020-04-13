@@ -1,4 +1,4 @@
-import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib;
+import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib,scrubs_diversity_certification,scrubs;
 
 export Build_All(string	pversion ,string fileDate) := module
 		export spray_files 		:= fSprayFiles(fileDate);
@@ -40,7 +40,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																					,InputSF_prebuild2
 																					,InputSF_prebuild3
 																				 );
-		dops_update 					:= Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com'); 															
+		dops_update 					:= if(scrubs.mac_ScrubsFailureTest('scrubs_diversity_certification',pversion),Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com'),OUTPUT('Scrubs Failed due to reject warnings',NAMED('Scrubs_Failure')); 															
 									
 		export full_build 	  := sequential( nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
 																				,nothor(apply(filenames().Input.dAll_superfilenames, versioncontrol.mUtilities.createsuper(name)))
@@ -58,6 +58,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																				,Out_Strata_Population_Stats(pversion)
 																				,output(choosen(Files().keybuildSF(bdid<>0) , 1000), named ('keybuild_SampleRecords'))
 																				,output(choosen(Files().Base.qa(bdid<>0) , 1000), named ('BaseFile_SampleRecords'))
+																				,scrubs_Diversity_Certification.fn_RunScrubs(pversion)
 																				,dops_update
 																				) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
    
