@@ -92,8 +92,9 @@ layout_temp := record
 end;
 
 layout_temp_ccpa := RECORD
-    unsigned4 global_sid; // CCPA changes
-    layout_temp;
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
+  layout_temp;
 END;
 
 //can have multiple gateways so account for them
@@ -114,7 +115,7 @@ clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
 layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
-    self.global_sid := rt.ccpa.global_sid;
+   self.global_sid := rt.ccpa.global_sid;
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105 
@@ -139,6 +140,7 @@ layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did
 								 product_code in Inquiry_AccLogs.shell_constants.valid_product_codes;
 
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number); //if no transaction_id, use sequence number
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.first_log_date := if(inquiry_hit, logdate, '');
@@ -671,7 +673,7 @@ j_raw_nonfcra_full_unsuppressed := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_
 						add_inquiry_raw(left, right),
 						left outer, atmost(5000));	
 
-j_raw_nonfcra_full_flagged := Suppress.MAC_FlagSuppressedSource(j_raw_nonfcra_full_unsuppressed, mod_access);
+j_raw_nonfcra_full_flagged := Suppress.CheckSuppression(j_raw_nonfcra_full_unsuppressed, mod_access);
 
 j_raw_nonfcra_full := PROJECT(j_raw_nonfcra_full_flagged, TRANSFORM(layout_temp, 
 	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
@@ -1844,6 +1846,7 @@ layout_temp_CCPA trans_name(layout_temp le, ssn_key rt) := transform
 	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perssn_count_day := if(good_inquiry and within1day, 1, 0);
@@ -1950,7 +1953,7 @@ ssn_raw_base_unsuppressed := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
-ssn_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(ssn_raw_base_unsuppressed, mod_access);
+ssn_raw_base_flagged := Suppress.CheckSuppression(ssn_raw_base_unsuppressed, mod_access);
 
 ssn_raw_base := PROJECT(ssn_raw_base_flagged, TRANSFORM(layout_temp, 
 	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
@@ -2276,6 +2279,7 @@ layout_temp_CCPA trans_name(layout_temp le, addr_key rt) := transform
 	self.virtual_fraud.AltLexID_addr_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_peraddr_count_day := if(good_inquiry and within1day, 1, 0);
@@ -2348,7 +2352,7 @@ Addr_raw_base_unsuppressed := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
-Addr_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Addr_raw_base_unsuppressed, mod_access);
+Addr_raw_base_flagged := Suppress.CheckSuppression(Addr_raw_base_unsuppressed, mod_access);
 
 Addr_raw_base := PROJECT(Addr_raw_base_flagged, TRANSFORM(layout_temp, 
 	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
@@ -2637,6 +2641,7 @@ layout_temp_CCPA trans_name(layout_temp le, phone_key rt) := transform
 	self.virtual_fraud.AltLexID_Phone_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);	
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perphone_count_day := if(good_inquiry and within1day, 1, 0);
@@ -2703,7 +2708,7 @@ Phone_raw_base_unsuppressed := join(with_all_per_addr, Inquiry_AccLogs.Key_Inqui
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw(left, right), left outer, atmost(riskwise.max_atmost));
 						
-Phone_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Phone_raw_base_unsuppressed, mod_access);
+Phone_raw_base_flagged := Suppress.CheckSuppression(Phone_raw_base_unsuppressed, mod_access);
 
 Phone_raw_base := PROJECT(Phone_raw_base_flagged, TRANSFORM(layout_temp, 								
 	self.inquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerPhone);												
@@ -2820,7 +2825,9 @@ layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
 															'', 
 															isFCRA, bsVersion,
 															rt.search_info.method, 
-															le.historyDateTimeStamp);  //for MS-160														
+															le.historyDateTimeStamp);  //for MS-160
+
+
 	self.inquiryPerEmail := if(good_inquiry, 1, 0);   // any search at all by email that meets the good_inquiry criteria														
 	self.inquiryADLsPerEmail := if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromEmail := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
@@ -2856,7 +2863,7 @@ Email_raw_base_unsuppressed := join(with_phone_velocities, Inquiry_AccLogs.Key_I
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Email_raw(left, right), left outer, atmost(riskwise.max_atmost));
 								
-Email_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Email_raw_base_unsuppressed, mod_access);
+Email_raw_base_flagged := Suppress.CheckSuppression(Email_raw_base_unsuppressed, mod_access);
 
 Email_raw_base := PROJECT(Email_raw_base_flagged, TRANSFORM(layout_temp, 													
 	self.inquiryPerEmail := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerEmail);											

@@ -179,7 +179,7 @@ with_certegy_roxie_unsuppressed := join(dl_did_rolled, certegy.key_certegy_did,
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100));
 					
-with_certegy_roxie_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_roxie_unsuppressed, mod_access, data_env := data_environment);
+with_certegy_roxie_flagged := Suppress.CheckSuppression(with_certegy_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 with_certegy_roxie := PROJECT(with_certegy_roxie_flagged, TRANSFORM(dl_temp, 
 	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);
@@ -196,7 +196,7 @@ with_certegy_thor_pre_unsuppressed := join(distribute(dl_did_rolled(did<>0 and d
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100), local);
 
-with_certegy_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_thor_pre_unsuppressed, mod_access, data_env := data_environment);
+with_certegy_thor_pre_flagged := Suppress.CheckSuppression(with_certegy_thor_pre_unsuppressed, mod_access, data_env := data_environment);
 
 with_certegy_thor_pre := PROJECT(with_certegy_thor_pre_flagged, TRANSFORM(dl_temp, 
 	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);

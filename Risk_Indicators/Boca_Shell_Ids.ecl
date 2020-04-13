@@ -18,7 +18,7 @@ TRANSFORM
                 SELF.isrelat := relat;
                 SELF.fname := f_name;
                 SELF.lname := l_name;
-
+								self.skip_opt_out := if(relat, true, le.skip_opt_out); // only do opt out on the consumer on input, don't need it on relatives
                 self := [];
 END;
 

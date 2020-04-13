@@ -1233,7 +1233,7 @@ withDIDdeceased_nonfcra_roxie_unsuppressed := JOIN(with_advo, did_deceased_key,
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
-withDIDdeceased_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+withDIDdeceased_nonfcra_roxie_flagged := Suppress.CheckSuppression(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 withDIDdeceased_nonfcra_roxie := PROJECT(withDIDdeceased_nonfcra_roxie_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
 	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
@@ -1252,7 +1252,7 @@ withDIDdeceased_nonfcra_thor_unsuppressed := JOIN(distribute(with_advo, hash64(d
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 										
-withDIDdeceased_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+withDIDdeceased_nonfcra_thor_flagged := Suppress.CheckSuppression(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
 withDIDdeceased_nonfcra_thor := PROJECT(withDIDdeceased_nonfcra_thor_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
 	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);

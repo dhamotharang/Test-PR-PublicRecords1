@@ -20,10 +20,12 @@ EXPORT CitDDShared := MODULE
   
   //we want to use the standard BS Options used in the Boca Shell.  
   EXPORT INTEGER DEFAULT_BS_VERSION := 52;
-	EXPORT UNSIGNED8 DEFAULT_BS_OPTIONS :=(Risk_Indicators.iid_constants.BSOptions.IncludeDoNotMail +
-                                         Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
-                                         Risk_Indicators.iid_constants.BSOptions.IncludeHHIDSummary);
-  
+	EXPORT UNSIGNED8 DEFAULT_BS_OPTIONS :=(Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
+                                         Risk_Indicators.iid_constants.BSOptions.IncludeHHIDSummary +
+                                         Risk_Indicators.iid_constants.BSOptions.TurnOffTumblings +
+                                         Risk_Indicators.iid_constants.BSOptions.TurnOffRelativeProperty
+																				 );
+			
   EXPORT PRODUCT_REQUESTED_ENUM := ENUM(UNSIGNED1, EMPTY=0, DUEDILIGENCE_ONLY=1, CITIZENSHIP_ONLY=2, BOTH=3);
   
   EXPORT DUEDILIGENCE_PRODUCTS := [PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY, PRODUCT_REQUESTED_ENUM.BOTH];

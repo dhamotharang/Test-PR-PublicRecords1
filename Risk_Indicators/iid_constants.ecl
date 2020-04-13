@@ -522,7 +522,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		enableEquifaxPhoneMart   =1 << 36,
 		TurnOffTumblings=1 << 37,  // option to speed up bocashell 5.3 and higher if it's not needed
 	 UseIngestDate=1 << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
-    	ReleasedCaseFltr = 1		<< 39
+    	ReleasedCaseFltr = 1		<< 39,
+			TurnOffRelativeProperty=1 << 40
   );
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
