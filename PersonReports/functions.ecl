@@ -628,9 +628,8 @@ HISTORICAL addresses (so far subject's only, no last name)
 
   export unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.Age(dob),0);
 
-//  export layouts.identity_slim GetDeadInfo (layouts.identity_slim L, doxie.key_death_masterV2_DID R):= transform
   export PersonReports.layouts.identity_slim GetDeadInfo (PersonReports.layouts.identity_slim L, doxie_crs.layout_deathfile_records R):= transform
-        // there can be different DOB in key_death_masterV2_DID and source dataset (for example: DID=002644313020),
+        // there can be different DOB in death_master index and source dataset (for example: DID=002644313020),
         // thus it is safer to take DOB from the left side
         left_dob := (string4) L.DOB.year + intformat (L.DOB.month, 2, 1) + intformat (L.DOB.day, 2, 1);
         u_doB := (unsigned) if (L.DOB.year != 0 and L.DOB.month != 0, left_dob, r.dob8);
