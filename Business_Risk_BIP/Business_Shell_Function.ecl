@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Cortera, Doxie, MDR, PublicRecords_KEL.ECL_Functions, 
+﻿IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Cortera, Doxie, MDR, PublicRecords_KEL, 
 		Risk_Indicators, UT, STD;
 
 EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig,

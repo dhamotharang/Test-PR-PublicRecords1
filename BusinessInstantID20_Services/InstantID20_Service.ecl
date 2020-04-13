@@ -5,13 +5,13 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="BIID20ProductType" type="xsd:integer"/> <!-- 1,2,3 -->
+	<part name="BIID20ProductType" type="xsd:integer"/> <!-- 1,2,3,4 -->
   <part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs, LNSmallBusiness;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs, LNSmallBusiness, BusinessInstantID20_Services;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -58,20 +58,20 @@ EXPORT InstantID20_Service() := MACRO
 			 **********************************************/
 			string32 _LoginID               := ''	: STORED('_LoginID');
 			outofbandCompanyID							:= '' : STORED('_CompanyID');
-			string20 CompanyID              := if(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
+			string20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
 			string20 FunctionName           := '' : STORED('_LogFunctionName');
 			string50 ESPMethod              := '' : STORED('_ESPMethodName');
 			string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
 			string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
 			string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
 			outofbandssnmask                := '' : STORED('SSNMask');
-			string10 SSN_Mask               := if(users.SSNMask != '', users.SSNMask, outofbandssnmask);
+			string10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
 			outofbanddobmask                := '' : STORED('DOBMask');
-			string10 DOB_Mask               := if(users.DOBMask != '', users.DOBMask, outofbanddobmask);
+			string10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);
 			BOOLEAN DL_Mask                 := users.DLMask;
 			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
-			BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
-			BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+			BOOLEAN DisableOutcomeTracking  := FALSE : STORED('OutcomeTrackingOptOut');
+			BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
 			unsigned1 LexIdSourceOptout 		:= 1 : STORED('LexIdSourceOptout');
 			string TransactionID 						:= '' : STORED('_TransactionId');
 			string BatchUID 								:= '' : STORED('_BatchUID');
@@ -82,7 +82,38 @@ EXPORT InstantID20_Service() := MACRO
 		/* ************* End Scout Fields **************/
 		
 		ds_Input := DATASET([xfm_LoadInput]); // see this transform in Macros.mac_LoadInput()
-		
+    
+    /* For IID-B Lite Project */
+    /* Placing input of authorized representatives 2 - 5 in its own definition */
+    myAuthReps := ds_Input.AuthReps[2..];
+    
+    /* Checking whether at least one field for representatives 2 though 5 has been filled out */
+    checkRepsFilled := EXISTS(myAuthReps(NOT(NameTitle = '' AND 
+                                             FullName = '' AND 
+                                             FirstName = '' AND 
+                                             MiddleName = '' AND 
+                                             LastName = '' AND 
+                                             NameSuffix = '' AND 
+                                             FormerLastName = '' AND 
+                                             StreetAddress1 = '' AND 
+                                             StreetAddress2 = '' AND 
+                                             City = '' AND 
+                                             Zip = '' AND 
+                                             SSN = '' AND 
+                                             DateOfBirth = '' AND 
+                                             Age = '' AND 
+                                             DLNumber = '' AND 
+                                             DLState = '' AND 
+                                             Phone10 = '' AND 
+                                             Email = '')));
+                                             
+    /* Checks if product type is the VALIDATE solution and creates a defination for it */                                     
+    isValidate := IF(_BIID20ProductType = 4, TRUE, FALSE);
+    
+    /* Checks whether product type is 4 and if at least one field has been filled out. If so, throw error based on acceptance criteria. Or else, continue on */
+    IF((isValidate AND checkRepsFilled), FAIL('Only Authorized Representative 1 is allowed on input with InstantID Business Validate Solution; please refer to your product manual for guidance.'));  
+    
+    
 		// 2.  Load the Options and LinkingOptions modules.		
 		Gateway.Layouts.Config Options_gateway_switch(iesp.businessinstantid20.t_BIID20Gateway le) := transform
 			self.servicename	:= if((le.servicename in BusinessInstantID20_Services.Constants.SET_TARGUS_SERVICENAMES AND NOT _DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.servicename);
@@ -116,16 +147,16 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BOOLEAN    DisableIntermediateShellLogging := _DisableIntermediateShellLogging;
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
-			EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
+			EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
 			EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested := 
 				PROJECT(option.IncludeModels.Names, 
 				TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
-					SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
+					SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
 			EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := 
 				PROJECT(option.IncludeModels.ModelOptions,
 				TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
-					SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
-					SELF.OptionValue := StringLib.StringToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
+					SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
+					SELF.OptionValue := STD.Str.ToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
 		END;
 
   IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
@@ -160,24 +191,25 @@ EXPORT InstantID20_Service() := MACRO
 			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
                                                             // Please refer to the ticket if needing further details.
 
-		
     
     // 4. Pass input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,LexIdSourceOptout := LexIdSourceOptout, 
-	  TransactionID := TransactionID, 
-	  BatchUID := BatchUID, 
-	  GlobalCompanyID := GlobalCompanyID);
-
-    #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+    ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);
+   
+   
+    #IF(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
 	
 		
     // 4.5 Call Testseeds Function
-		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options);
+		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options, isValidate);
 
 		// 5. Project into IESP output.
-		results_pre := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToIespLayout(LEFT) );
-	
-		//5.5 Choose the correct result
+		results_pre := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToIespLayout(LEFT, isValidate) );
+
+		// 5.5 Choose the correct result
 		results := IF(_TestData_Enabled, TestSeed_Results, results_pre);
 		// results := results_pre;
 		
@@ -220,105 +252,113 @@ EXPORT InstantID20_Service() := MACRO
 		
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
 		
-		//Log to Deltabase
-		Deltabase_Logging_prep := project(results_iesp, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																										 self.company_id := (Integer)CompanyID,
-																										 self.login_id := _LoginID,
-																										 self.product_id := Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service,
-																										 self.function_name := FunctionName,
-																										 self.esp_method := ESPMethod,
-																										 self.interface_version := InterfaceVersion,
-																										 self.delivery_method := DeliveryMethod,
-																										 self.date_added := (STRING8)Std.Date.Today(),
-																										 self.death_master_purpose := DeathMasterPurpose,
-																										 self.ssn_mask := SSN_Mask,
-																										 self.dob_mask := DOB_Mask,
-																										 self.dl_mask := (String)(Integer)DL_Mask,
-																										 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
-																										 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																										 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
-                                                     self.glb := _GLBA_Purpose,
-                                                     self.dppa := _DPPA_Purpose,
-																										 self.data_restriction_mask := _DataRestrictionMask,
-																										 self.data_permission_mask := __DataPermissionMask,
-																										 self.industry := Industry_Search[1].Industry,
+		// Log to Deltabase
+		Deltabase_Logging_prep := PROJECT(results_iesp, TRANSFORM(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+																										 SELF.company_id := (INTEGER)CompanyID,
+																										 SELF.login_id := _LoginID,
+																										 SELF.product_id := Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service,
+																										 SELF.function_name := FunctionName,
+																										 SELF.esp_method := ESPMethod,
+																										 SELF.interface_version := InterfaceVersion,
+																										 SELF.delivery_method := DeliveryMethod,
+																										 SELF.date_added := (STRING8)Std.Date.Today(),
+																										 SELF.death_master_purpose := DeathMasterPurpose,
+																										 SELF.ssn_mask := SSN_Mask,
+																										 SELF.dob_mask := DOB_Mask,
+																										 SELF.dl_mask := (STRING)(INTEGER)DL_Mask,
+																										 SELF.exclude_dmv_pii := (STRING)(INTEGER)ExcludeDMVPII,
+																										 SELF.scout_opt_out := (STRING)(INTEGER)DisableOutcomeTracking,
+																										 SELF.archive_opt_in := (STRING)(INTEGER)ArchiveOptIn,
+                                                     SELF.glb := _GLBA_Purpose,
+                                                     SELF.dppa := _DPPA_Purpose,
+																										 SELF.data_restriction_mask := _DataRestrictionMask,
+																										 SELF.data_permission_mask := __DataPermissionMask,
+																										 SELF.industry := Industry_Search[1].Industry,
 																										 //self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
-																										 self.i_ssn := search.AuthorizedRep1.SSN,
-                                                     self.i_dob := _Rep1_DateOfBirth;
-                                                     self.i_name_full := search.AuthorizedRep1.Name.Full,
-																										 self.i_name_first := search.AuthorizedRep1.Name.First,
-																										 self.i_name_last := search.AuthorizedRep1.Name.Last,
-																										 self.i_lexid := (Integer)search.AuthorizedRep1.UniqueId,
-																										 self.i_address := If(trim(search.AuthorizedRep1.address.streetaddress1)!='',
-                                                                          trim(search.AuthorizedRep1.address.streetaddress1 + ' ' + search.AuthorizedRep1.address.streetaddress2),
+																										 SELF.i_ssn := search.AuthorizedRep1.SSN,
+                                                     SELF.i_dob := _Rep1_DateOfBirth;
+                                                     SELF.i_name_full := search.AuthorizedRep1.Name.Full,
+																										 SELF.i_name_first := search.AuthorizedRep1.Name.First,
+																										 SELF.i_name_last := search.AuthorizedRep1.Name.Last,
+																										 SELF.i_lexid := (Integer)search.AuthorizedRep1.UniqueId,
+																										 SELF.i_address := IF(TRIM(search.AuthorizedRep1.address.streetaddress1)!='',
+                                                                          TRIM(search.AuthorizedRep1.address.streetaddress1 + ' ' + search.AuthorizedRep1.address.streetaddress2),
 																																				 Address.Addr1FromComponents(search.AuthorizedRep1.address.streetnumber,
 																																				 search.AuthorizedRep1.address.streetpredirection, search.AuthorizedRep1.address.streetname,
 																																				 search.AuthorizedRep1.address.streetsuffix, search.AuthorizedRep1.address.streetpostdirection,
 																																				 search.AuthorizedRep1.address.unitdesignation, search.AuthorizedRep1.address.unitnumber)),
-																										 self.i_city := search.AuthorizedRep1.address.City,
-																										 self.i_state := search.AuthorizedRep1.address.State,
-																										 self.i_zip := search.AuthorizedRep1.address.Zip5,
-																										 self.i_dl := search.AuthorizedRep1.DriverLicenseNumber,
-																										 self.i_dl_state := search.AuthorizedRep1.DriverLicenseState,
-                                                     self.i_home_phone := search.AuthorizedRep1.Phone,
-																										 self.i_tin := search.Company.FEIN,
-																										 self.i_name_first_2 := search.AuthorizedRep2.Name.First,
-																										 self.i_name_last_2 := search.AuthorizedRep2.Name.Last,
-																										 self.i_name_first_3 := search.AuthorizedRep3.Name.First,
-																										 self.i_name_last_3 := search.AuthorizedRep3.Name.Last,
-																										 self.i_name_first_4 := search.AuthorizedRep4.Name.First,
-																										 self.i_name_last_4 := search.AuthorizedRep4.Name.Last,
-																										 self.i_name_first_5 := search.AuthorizedRep5.Name.First,
-																										 self.i_name_last_5 := search.AuthorizedRep5.Name.Last,
-                                                     self.i_bus_name := search.Company.CompanyName,
-																										 self.i_alt_bus_name := search.Company.AlternateCompanyName,
-																										 self.i_bus_address := If(trim(search.Company.address.streetaddress1)!='', search.Company.address.streetaddress1,
+																										 SELF.i_city := search.AuthorizedRep1.address.City,
+																										 SELF.i_state := search.AuthorizedRep1.address.State,
+																										 SELF.i_zip := search.AuthorizedRep1.address.Zip5,
+																										 SELF.i_dl := search.AuthorizedRep1.DriverLicenseNumber,
+																										 SELF.i_dl_state := search.AuthorizedRep1.DriverLicenseState,
+                                                     SELF.i_home_phone := search.AuthorizedRep1.Phone,
+																										 SELF.i_tin := search.Company.FEIN,
+																										 SELF.i_name_first_2 := search.AuthorizedRep2.Name.First,
+																										 SELF.i_name_last_2 := search.AuthorizedRep2.Name.Last,
+																										 SELF.i_name_first_3 := search.AuthorizedRep3.Name.First,
+																										 SELF.i_name_last_3 := search.AuthorizedRep3.Name.Last,
+																										 SELF.i_name_first_4 := search.AuthorizedRep4.Name.First,
+																										 SELF.i_name_last_4 := search.AuthorizedRep4.Name.Last,
+																										 SELF.i_name_first_5 := search.AuthorizedRep5.Name.First,
+																										 SELF.i_name_last_5 := search.AuthorizedRep5.Name.Last,
+                                                     SELF.i_bus_name := search.Company.CompanyName,
+																										 SELF.i_alt_bus_name := search.Company.AlternateCompanyName,
+																										 SELF.i_bus_address := IF(TRIM(search.Company.address.streetaddress1)!='', search.Company.address.streetaddress1,
 																																									 Address.Addr1FromComponents(search.Company.address.streetnumber,
 																																									 search.Company.address.streetpredirection, search.Company.address.streetname,
 																																									 search.Company.address.streetsuffix, search.Company.address.streetpostdirection,
 																																									 search.Company.address.unitdesignation, search.Company.address.unitnumber)),
-																										 self.i_bus_city := search.Company.address.City,
-																										 self.i_bus_state := search.Company.address.State,
-																										 self.i_bus_zip := search.Company.address.Zip5,
-                                                     self.i_bus_phone := search.Company.Phone,
-																										 self.i_model_name_1 := 'BVI',
-																										 self.i_model_name_2 := 'CVI',
-																										 self.o_score_1    := (String)left.Result.CompanyResults.BusinessVerification.Index,
-																										 self.o_reason_1_1 := left.Result.CompanyResults.RiskIndicators[1].RiskCode,
-																										 self.o_reason_1_2 := left.Result.CompanyResults.RiskIndicators[2].RiskCode,
-																										 self.o_reason_1_3 := left.Result.CompanyResults.RiskIndicators[3].RiskCode,
-																										 self.o_reason_1_4 := left.Result.CompanyResults.RiskIndicators[4].RiskCode,
-																										 self.o_reason_1_5 := left.Result.CompanyResults.RiskIndicators[5].RiskCode,
-																										 self.o_reason_1_6 := left.Result.CompanyResults.RiskIndicators[6].RiskCode,
-																										 self.o_score_2    := (String)left.Result.AuthorizedRepresentativeResults[1].ComprehensiveVerificationIndex,
-																										 self.o_reason_2_1 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[1].RiskCode,
-																										 self.o_reason_2_2 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[2].RiskCode,
-																										 self.o_reason_2_3 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[3].RiskCode,
-																										 self.o_reason_2_4 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[4].RiskCode,
-																										 self.o_reason_2_5 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[5].RiskCode,
-																										 self.o_reason_2_6 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[6].RiskCode,
-																										 self.o_lexid := (Integer)left.Result.AuthorizedRepresentativeResults[1].UniqueID,
-                                                     self.o_seleid := left.Result.CompanyResults.BusinessIds.Seleid,
-																										 self := left,
-																										 self := [] ));
+																										 SELF.i_bus_city := search.Company.address.City,
+																										 SELF.i_bus_state := search.Company.address.State,
+																										 SELF.i_bus_zip := search.Company.address.Zip5,
+                                                     SELF.i_bus_phone := search.Company.Phone,
+																										 SELF.i_model_name_1 := 'BVI',
+																										 SELF.i_model_name_2 := 'CVI',
+																										 SELF.o_score_1    := (STRING)LEFT.Result.CompanyResults.BusinessVerification.Index,
+																										 SELF.o_reason_1_1 := LEFT.Result.CompanyResults.RiskIndicators[1].RiskCode,
+																										 SELF.o_reason_1_2 := LEFT.Result.CompanyResults.RiskIndicators[2].RiskCode,
+																										 SELF.o_reason_1_3 := LEFT.Result.CompanyResults.RiskIndicators[3].RiskCode,
+																										 SELF.o_reason_1_4 := LEFT.Result.CompanyResults.RiskIndicators[4].RiskCode,
+																										 SELF.o_reason_1_5 := LEFT.Result.CompanyResults.RiskIndicators[5].RiskCode,
+																										 SELF.o_reason_1_6 := LEFT.Result.CompanyResults.RiskIndicators[6].RiskCode,
+																										 SELF.o_score_2    := (String)LEFT.Result.AuthorizedRepresentativeResults[1].ComprehensiveVerificationIndex,
+																										 SELF.o_reason_2_1 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[1].RiskCode,
+																										 SELF.o_reason_2_2 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[2].RiskCode,
+																										 SELF.o_reason_2_3 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[3].RiskCode,
+																										 SELF.o_reason_2_4 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[4].RiskCode,
+																										 SELF.o_reason_2_5 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[5].RiskCode,
+																										 SELF.o_reason_2_6 := LEFT.Result.AuthorizedRepresentativeResults[1].RiskIndicators[6].RiskCode,
+																										 SELF.o_lexid := (INTEGER)LEFT.Result.AuthorizedRepresentativeResults[1].UniqueID,
+                                                     SELF.o_seleid := left.Result.CompanyResults.BusinessIds.Seleid,
+																										 SELF := LEFT,
+																										 SELF := [] ));
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 		// #stored('Deltabase_Log', Deltabase_Logging);
 
-		//Improved Scout Logging
-		IF(~DisableOutcomeTracking and NOT _TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		// Improved Scout Logging
+		IF(~DisableOutcomeTracking AND NOT _TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
-	// DEBUGs:
-	// OUTPUT( ds_Input, NAMED('Input') );
-	// OUTPUT( Options );
-	// OUTPUT( linkingOptions );
-	// OUTPUT( ds_BIID_results, NAMED('BIID_results') );
+    // DEBUGs:
+    // OUTPUT( ds_Input, NAMED('Input') );
+    // OUTPUT( Options );
+    // OUTPUT( linkingOptions );
+    // OUTPUT( ds_BIID_results, NAMED('BIID_results') );
+    // OUTPUT(myAuthReps, NAMED('myAuthRepsTwoThroughFive'));
+    // OUTPUT(ds_Input.AuthReps[1], NAMED('dsInputAuthorizedRep1'));
+    // OUTPUT(ds_Input.AuthReps[2], NAMED('dsInputAuthorizedRep2'));
+    // OUTPUT(ds_Input.AuthReps[3], NAMED('dsInputAuthorizedRep3'));
+    // OUTPUT(checkRepsFilled, NAMED('AreRepsTwoThroughFiveFilled'));    
+    // OUTPUT(ds_BIID_results, NAMED('ds_BIID_results'));    
+    // OUTPUT(isValidate, NAMED('isValidate'));
+    // OUTPUT(_BIID20ProductType, NAMED('_BIID20ProductType'));
 
 	// 7. Results!
 	OUTPUT( results_iesp, NAMED('Results') );
-#else // Else, output the model results directly
-//return ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+#ELSE //Else, output the model results directly
+// return ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
 OUTPUT (ds_BIID_results, NAMED('MODELRESULTS'));
 
-#end
+#END
 	
 ENDMACRO;

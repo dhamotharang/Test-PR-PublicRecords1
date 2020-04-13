@@ -1,10 +1,9 @@
-﻿
-IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, Seed_Files, STD;
+﻿IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, Seed_Files, STD;
 
 EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) inData = DATASET([],BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo),
 																STRING32 TestDataTableName_in = '',
 																DATA16 hashval = HASHMD5('DEFAULT'),
-																BusinessInstantID20_Services.iOptions Options) := FUNCTION
+																BusinessInstantID20_Services.iOptions Options, BOOLEAN isValidate = FALSE) := FUNCTION
 		
 	// There at least three versions of this product:
 	//   o  BASE
@@ -1226,7 +1225,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	testseed_intermediateLayout := DATASET( [xfm_toIntermediateLayout] );
 	// output(testseed_intermediateLayout);
 
-	FinalSeed := PROJECT( testseed_intermediateLayout, BusinessInstantID20_Services.xfm_ToIespLayout(LEFT) );
+	FinalSeed := PROJECT( testseed_intermediateLayout, BusinessInstantID20_Services.xfm_ToIespLayout(LEFT, isValidate) );
 	
 	return FinalSeed;
 END;
