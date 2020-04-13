@@ -154,9 +154,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
     self := [];
   end;
 
-  f_in_nbrs := project(f_in_nbrs_death, get_nbr_in_dod(left));
-
   f_in_nbrs_PB_in := TopN(f_in_nbrs_wo_death, PB_nbr_in_cnt, nbr_rank); // profile booster input restriction for nbrs_in
+
 
   /* Find Neighbors for the search subject based on the Best address information. Return
      the top 3 Neighbors, i.e. closest addresses by distance.
@@ -206,6 +205,13 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
   f_best_nbrs := project(f_best_nbrs_death, get_nbr_in_dod(left));
 
   f_best_nbrs_PB_in := TopN(f_best_nbrs_wo_death, PB_nbr_best_cnt, nbr_rank); // profile booster input restriction for nbrs_best
+
+  // Remove duplicate entries from input neighbors and best record neighbors
+  f_in_nbrs_w_dup := project(f_in_nbrs_death, get_nbr_in_dod(left));
+
+  f_in_nbrs := join(f_in_nbrs_w_dup,f_best_nbrs,
+                    left.seqTarget = right.seqTarget AND left.did = right.did,
+                    Transform(LEFT), LEFT ONLY);
 
   /* Get Relatives and Roommates (Associates). That is, get the identities of everyone who
      lives in the same dwelling as the search subject. A Roommate differs from a Relative
@@ -605,6 +611,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
                     denormalize(f_out_with_nbr_in, f_nbr_best_w_email_profile,
                                 left.seq = right.seqTarget,
                                 Didville.Transforms.get_out_nbr_best(left, right,counter)));
+
 
   RETURN f_out_final;
 
