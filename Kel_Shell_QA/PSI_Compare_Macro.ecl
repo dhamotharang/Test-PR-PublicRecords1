@@ -1,4 +1,4 @@
-﻿EXPORT PSI_Compare_Macro(unique_field, new_input_file_records, old_input_file_records, new_Tag, old_Tag) := FUNCTIONMACRO
+﻿EXPORT PSI_Compare_Macro(logical_file_name, unique_field, new_input_file_records, old_input_file_records, new_Tag, old_Tag) := FUNCTIONMACRO
 
 		aa1:=join(new_input_file_records, old_input_file_records,left.#expand(unique_field)=right.#expand(unique_field),inner);
 
@@ -156,7 +156,7 @@
 		
 		final_report:=output(final_PSI_output,,'~kel_shell::out::PSI_Compare_'+ new_Tag + '_VS_' + old_Tag,CSV(heading(single), quote('"')), overwrite);
 		
-		final_report_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::PSI_Compare_'+ new_Tag + '_VS_' + old_Tag, ' PSI Report ' , new_Tag + '_VS_' + old_Tag  );
+		final_report_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::PSI_Compare_'+ new_Tag + '_VS_' + old_Tag, ' PSI Report ' ,' PSI Report ' , new_Tag + '_VS_' + old_Tag  );
 		
 		seq:=sequential(final_report, final_report_excel);
 		
