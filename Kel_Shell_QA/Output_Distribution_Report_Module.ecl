@@ -1,4 +1,4 @@
-﻿EXPORT Output_Distribution_Report_Module(unique_field, inut_file_records, Tag) := FUNCTIONMACRO
+﻿EXPORT Output_Distribution_Report_Module(logical_file_name, unique_field, inut_file_records, Tag) := FUNCTIONMACRO
 
 test:=record
 	unsigned seq_num;
@@ -11,13 +11,13 @@ Kel_Shell_QA.Distribution_Module.Dis_Macro(unique_field, fileop, op, op2)
 
 final_report:=output(op,,'~kel_shell::out::Distribution_Report_'+ tag, CSV(heading(single), quote('"')), overwrite, EXPIRE(30));
 
-final_report_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Distribution_Report_'+ tag , ' Distribution Report ' , tag  );
+final_report_excel := Kel_Shell_QA.Email_Report(logical_file_name,'~kel_shell::out::Distribution_Report_'+ tag , ' Distribution Report ' ,'Dist_Report ', tag  );
 
 final_report_summary_pjt:=project(op2,transform({STRING Accountnumber; STRING Attribute;STRING Category;STRING Distribution_type;STRING Attribute_value; recordof(inut_file_records)},self:=left;));
 
 final_report_summary:=output(distribute(final_report_summary_pjt,random()),,'~kel_shell::out::Distribution_Report_Summary_'+ tag,CSV(heading(single), quote('"')), overwrite, EXPIRE(15));
 
-final_report_summary_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Distribution_Report_Summary_'+ tag , ' Distribution Report Summary' , tag  );
+final_report_summary_excel := Kel_Shell_QA.Email_Report(logical_file_name,'~kel_shell::out::Distribution_Report_Summary_'+ tag , ' Distribution Report Summary' , 'Dist_Summ_Report ',tag  );
 
 seq:=sequential(final_report, final_report_excel);
 
