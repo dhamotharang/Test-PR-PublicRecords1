@@ -54,17 +54,18 @@ end;
       
 lay makeFatRecord(rules_appended_file L) := TRANSFORM
 									self.sno:=(string)L.#expand(unique_id);
-									self.Result:=MAP(STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 =>
-																	 Kel_Shell_QA.Months_between_python_func2(
-																								ROW(L, Base_Lay),
-																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																								(string)L.def_vals,Lay_para),
+									self.Result:=MAP(STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
+																														 Kel_Shell_QA.Months_between_python_func2(
+																																					ROW(L, Base_Lay),
+																																					trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																																					(string)L.def_vals,Lay_para),
 																								
-									                 STD.Str.Find(L.Raw_Acceptance_Criteria,'of months between')>=1 =>
-																	 Kel_Shell_QA.Months_between_python_func(
-																								ROW(L, Base_Lay),
-																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																								(string)L.def_vals,Lay_para),
+									                 STD.Str.Find(L.Raw_Acceptance_Criteria,'of months between')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>Kel_Shell_QA.Months_between_python_func(
+																																								ROW(L, Base_Lay),
+																																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																																								(string)L.def_vals,Lay_para),
 																							
 																	 Kel_Shell_QA.test(
 																								ROW(L, Base_Lay),
@@ -80,7 +81,8 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 							self:=L;
 							self:=[];
 							END;
-      
+							
+							
 AC_result:=PROJECT(rules_appended_file, makeFatRecord(LEFT)):persist('kel_shell::persist::Acceptance_Criteria_results_AC_result'+'_'+Tag+'_'+Category_par);
 
 #uniquename(report_lay)
