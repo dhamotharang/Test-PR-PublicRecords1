@@ -98,7 +98,8 @@ daily_plus_full := Full_hogan_Main +  file_update;
 // Sort and rollup full file (local)
 
 // full_sort := sort(daily_plus_full,record,except process_date,orig_filing_time,local);
-full_sort := sort(daily_plus_full,
+//VC DF-25909
+full_sort := sort(daily_plus_full, 
                   tmsid ,rmsid,record_code,date_vendor_removed, filing_jurisdiction,filing_state,orig_filing_number,orig_filing_type, 
                   orig_filing_date,orig_filing_time , case_number,filing_number,filing_type_desc, filing_date , filing_time, vendor_entry_date,judge,case_title, 
 							    filing_book,filing_page,release_date,amount,eviction,satisifaction_type,judg_satisfied_date,judg_vacated_date,tax_code,irs_serial_number,effective_date,
