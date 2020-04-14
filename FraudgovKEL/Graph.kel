@@ -233,6 +233,13 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     INTEGER RecordId=record_id,
     DATE EventDate,
     STRING EventType, 
+		
+		STRING Title=NULL(),
+		STRING FirstName=NULL(),
+		STRING MiddleName=NULL(),
+		STRING LastName=NULL(),
+		STRING NameSuffix=NULL(),
+				
     INTEGER Confidence_that_activity_was_deceitful_id,
     INTEGER name_risk_code,
     INTEGER dob_risk_code,
@@ -397,7 +404,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     MODEL(
       UID,
       rCustomer,
-      SourceCustomers{rSourceCustomer},
+      rSourceCustomer,
       Subject,
       Location,
       RecordId,
@@ -405,6 +412,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
       EventTypes{EventType},
 
     rPhone,rEmail,rInternetProtocol,rBankAccount,rDriversLicense,rSsn,
+    Title,FirstName,MiddleName,LastName,NameSuffix,		
 		rin_source,
     LexId,
     OttoAddressId,
@@ -1241,7 +1249,7 @@ USE FraudgovKEL.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
 /* LOGIC STATEMENTS - Attributes */
      
 Event: => EntityContextUid := '_11' + RecordId;     
-Event: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+Event: => InCustomerPopulation := MAP(rSourceCustomer=rCustomer => 1, 0);
 Event: => CustomerId := rCustomer.CustomerId;
 Event: => IndustryType := rCustomer.IndustryType;
 Event: => DeceasedPriorToEvent := MAP(Subject.DeceasedMatch = 1 AND Subject.DeceasedDate < EventDate => 1, 0);
@@ -1269,7 +1277,6 @@ Event: => AddressOutOfState := MAP(Location.State != rCustomer.JurisdictionState
 
 Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
 Event: => EventAge := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
-
 
 Event: => Nas9Flag := MAP(COUNT(PersonEvent.Transaction(IdNas9Flag=1)) > 0 => 1, 0); // SSN and Last Name not associated with identity per public records
 Event: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
