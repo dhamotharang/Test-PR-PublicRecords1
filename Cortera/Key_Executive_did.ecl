@@ -44,5 +44,7 @@ matchset := ['A', 'Z'];
 did_add.MAC_Match_Flex(dExecutiveCleanName, matchset, '', '', fname, mname, lname, name_suffix, 
   prim_range, prim_name, sec_range, zip, st, '' , did, Cortera.Layout_Executive_did, TRUE, DID_Score,75, dExecutiveCleanNameWDID);
 
-EXPORT Key_Executive_did := INDEX(dExecutiveCleanNameWDID, {Link_ID, did}, {dExecutiveCleanNameWDID},
+addGlobalSID 	 := mdr.macGetGlobalSID(dExecutiveCleanNameWDID,'Cortera','','global_sid');
+
+EXPORT Key_Executive_did := INDEX(addGlobalSID, {Link_ID, did}, {addGlobalSID},
 						data_services.Data_Location.Prefix('DEFAULT')+'thor::cortera::key::executive_did_' + doxie.version_superkey);
