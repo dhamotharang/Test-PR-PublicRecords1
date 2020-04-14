@@ -1,0 +1,50 @@
+import STD,scrubs;
+
+EXPORT Functions := MODULE
+
+    //CHECK FOR VALID SIC CODE
+    EXPORT fn_Valid_Sic(string st) := FUNCTION
+
+        RETURN if
+        ( 
+            LENGTH(std.str.filter(st, '0123456789')) in [0,4,8],
+            1,
+            0
+        );
+    END;
+
+    //CHECK FOR VALID COMMODITY CODE
+    EXPORT fn_Valid_Commodity(string st) := FUNCTION
+
+        RETURN if
+        ( 
+            LENGTH(std.str.filter(st, '0123456789')) in [0,6,8,10],
+            1,
+            0
+        );
+    END;
+
+    //CHECK FOR VALID NAICS CODE
+    EXPORT fn_Valid_NAICS(string st) := FUNCTION
+
+        RETURN if
+        ( 
+            LENGTH(std.str.filter(st, '0123456789')) in [0,2,3,4,5,6],
+            1,
+            0
+        );
+    END;
+
+    //CHECK FOR VALID DATE DESPITE FORMAT
+    EXPORT fn_Valid_Date(STRING st = '', string future = '') := FUNCTION
+
+        return if(
+            Scrubs.fn_valid_date(st, future) > 0
+            OR Scrubs.fn_valid_date((string) STD.Date.FromStringToDate(st, '%m/%d/%Y'), future) > 0
+            ,1
+            ,0
+        );
+
+    END;
+
+END;
