@@ -104,9 +104,6 @@ module
 	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
 	//Identify RIN Source
-	Export NewBaseSources	:= Append_RinSource(NewBaseDelta):independent;
-
-
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseSources);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
 
 END;

@@ -56,6 +56,7 @@ EXPORT Layouts := MODULE
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
 			string11	geo_long;
+      		unsigned2   RIN_Source := 0;
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -171,6 +172,7 @@ EXPORT Layouts := MODULE
 			string20	external_referral_or_casenumber;
 			string3		cleared_fraud;
 			string		reason_cleared_code;
+      		unsigned2   RIN_Source := 0;
 		END;
 		EXPORT SafeList	:= RECORD
 			KnownFraud;
@@ -233,6 +235,7 @@ EXPORT Layouts := MODULE
 			string250	reason_description;
 			string30	event_type_1;
 			string30	event_entity_1;
+      		unsigned2   RIN_Source := 0;
 		END;
 
 		EXPORT RDP := record
