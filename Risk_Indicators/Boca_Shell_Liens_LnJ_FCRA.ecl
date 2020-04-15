@@ -69,6 +69,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
     self.State := ri.orig_state;
     self.Zip5 := ri.orig_zip5;
 		self.Party_PersistId := (string) ri.persistent_record_id;
+		SELF.HighRiskCheck := IF(STD.Date.DaysBetween((INTEGER)ri.date_vendor_last_reported, STD.Date.Today()) > 90, TRUE, FALSE);
 		SELF := le;
 		SELF := [];
 	END;
@@ -141,7 +142,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		liens_party_overrides := liens_party_overrides_roxie;
 	#END
 
-	MAC_liensMain_transform(trans_name, key_liens_main) := MACRO	
+	MAC_liensMain_transform(trans_name, key_liens_main, IsOverrideKey) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, key_liens_main ri) := transform
 		isEviction := ri.eviction='Y';
@@ -371,13 +372,17 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_jgmt_cnt := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, 1);							
 		//End Juli additions
 		self.PersistId := (string) ri.persistent_record_id;
-  self.Party_PersistId := (string) le.Party_PersistId;
+		self.Party_PersistId := (string) le.Party_PersistId;
+		self.HighRiskCheck := MAP(le.HighRiskCheck = FALSE => FALSE,
+														 IsOverrideKey = true AND ri.filing_type_desc <> '' AND ri.release_date <> '' => FALSE,
+													     ri.release_date = '' => TRUE,
+														 FALSE);
 		SELF := le;
 	end;
 	endmacro;
 
-	MAC_liensMain_transform(get_liens_main_raw, liensv2.key_liens_main_id_FCRA);
-	MAC_liensMain_transform(get_liens_main_corrections, fcra.key_Override_liensv2_main_ffid);
+	MAC_liensMain_transform(get_liens_main_raw, liensv2.key_liens_main_id_FCRA, FALSE);
+	MAC_liensMain_transform(get_liens_main_corrections, fcra.key_Override_liensv2_main_ffid, TRUE);
 
 	liens_main_raw_roxie_unfiltered := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
 					left.rmsid<>'' and left.tmsid<>'' and 
@@ -822,7 +827,10 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Filingnumber := le.Filingnumber;
 		SELF.Filingbook := le.Filingbook;
 		SELF.Filingpage := le.Filingpage;
-    SELF.orig_rmsid := le.orig_rmsid;
+		SELF.orig_rmsid := le.orig_rmsid;
+		SELF.rmsid := le.rmsid;
+		SELF.tmsid := le.tmsid;
+		SELF.HighRiskCheck := le.HighRiskCheck;
 		SELF.AgencyID := le.AgencyID;
 		SELF.Agency := le.Agency;
 		SELF.Agencycounty := le.Agencycounty;
@@ -934,7 +942,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 			SELF := RIGHT,
 			SELF := []),
 		LEFT OUTER);
-
+	
 	w_LiensNJudgmentsFinal := if(FilterLiens or //filters by DRM posLiensJudgRestriction
 			bsVersion < 50 or 
 			IncludeLnJ = false, //filters off by Juli if input was not choosen

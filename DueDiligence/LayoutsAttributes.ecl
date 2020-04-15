@@ -105,6 +105,11 @@
     //BusSales
     INTEGER sales;                                                  //populated in DueDiligence.getBusSales
     STRING4 salesYearReported;                                      //populated in DueDiligence.getBusSales
+    //BusCivilLegalEvent
+    UNSIGNED3 liensUnreleasedCntInThePastNYR;
+    UNSIGNED3 evictionsCntInThePastNYR;
+    UNSIGNED3 liensUnreleasedCntOVNYR;
+    UNSIGNED3 evictionsCntOVNYR;
   END;
   
   
@@ -208,6 +213,11 @@
     BOOLEAN relationFelonyPast3Years;                               //populated in DueDiligence.commonIndividual
     UNSIGNED2 relationHeaderLess1YearWithSSNRiskCount;              //populated in DueDiligence.getIndPerAssoc
     UNSIGNED2 relationHeaderGreater1YearWithSSNRiskCount;           //populated in DueDiligence.getIndPerAssoc
+    //PerCivilLegalEvent
+    UNSIGNED3 liensUnreleasedCntInThePastNYR;
+    UNSIGNED3 evictionsCntInThePastNYR;
+    UNSIGNED3 liensUnreleasedCntOVNYR;
+    UNSIGNED3 evictionsCntOVNYR;
   END;
 
 END;

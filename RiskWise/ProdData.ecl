@@ -540,9 +540,10 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	if(searchdid!=0 and (include_all_files=true or include_inquiries=true), output(inquiries_nonfcra, named('inquiries_nonfcra')) );
 	if(searchdid!=0 and (include_all_files=true or include_inquiries=true), output(inquiries_update_nonfcra, named('inquiries_update_nonfcra')) );
 	
-did_ds := project(ut.ds_oneRecord, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
-																														self.seq := 1;
-																														self.did := searchdid));
+    did_ds := DATASET([TRANSFORM(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
+                                                                    self.seq := 1;
+                                                                    self.did := searchdid;)]);
+                                                                    
 // <-- cert --><servicename>delta_inquiry</servicename>
 // <url>HTTP://delta_iid_api_dev:ap1d3lt%40$$@10.176.68.151:7909/WsDeltabase</url>
 
@@ -550,13 +551,12 @@ did_ds := project(ut.ds_oneRecord, transform(Inquiry_Deltabase.Layouts.Input_Del
 // <url>HTTP://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase</url>
 
 bsversion := 50;	
-																																																									
-DeltabaseGateway := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, 
-	SELF.ServiceName := 'delta_inquiry'; 
-	SELF.URL := 'HTTP://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase';
-	SELF.TransactionId := 'ProdData';
-	SELF.properties := dataset([], gateway.layouts.ConfigProperties);
-	));
+																																																									  
+  DeltabaseGateway := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+    SELF.ServiceName := 'delta_inquiry'; 
+    SELF.URL := 'HTTP://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase';
+    SELF.TransactionId := 'ProdData';
+    SELF.properties := DATASET([], gateway.layouts.ConfigProperties);)]);
 	
 deltaBase_did_results := Inquiry_Deltabase.Search_DID(did_ds, 
 	Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), 
@@ -820,11 +820,12 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 	riskwise.layout_IPAI t_f(indata le) := transform
 		self.seq := le.seq;
 		self.ipaddr := le.ip_address;
+		self.did := searchdid;
 	end;
 
 	ip_input := project(indata, t_f(left));
 
-	netacuity_results := risk_indicators.getNetAcuity(ip_input, gateways, dppa, glb);
+	netacuity_results := risk_indicators.getNetAcuity(ip_input, gateways, dppa, glb, applyOptOut := TRUE);
 	if(in_ip_value!='' and include_netacuitysearch, output(netacuity_results, named('netacuity_results')) );
 	
 	// For Score and Outcome Tracking we need to be able to determine if we are deployed to Cert or Prod - using this as a test.

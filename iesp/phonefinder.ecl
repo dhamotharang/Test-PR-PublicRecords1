@@ -160,10 +160,14 @@ export t_InquiryInfo := record
 	dataset(iesp.share.t_Date) InquiryDates {xpath('InquiryDates/InquiryDate'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxInquiries)};
 end;
 
-export t_PhoneFinderSourceIndicator := record
+export t_PhoneFinderSourceCategory := record
 	string Category {xpath('Category')};
-	string _Type {xpath('Type')};
 	unsigned2 Count {xpath('Count')};
+end;
+
+export t_PhoneFinderSourceIndicator := record
+	string _Type {xpath('Type')};
+	dataset(t_PhoneFinderSourceCategory) Categories {xpath('Categories/Category'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};
 end;
 
 export t_BasePhoneInfo := record
@@ -177,6 +181,8 @@ export t_BasePhoneInfo := record
 	string2 PhoneAddressState {xpath('PhoneAddressState')};
 	string Source {xpath('Source')};
 	dataset(t_PhoneFinderSourceIndicator) SourceDetails {xpath('SourceDetails/SourceDetail'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};//hidden[ecl_only]
+	boolean SelfReportedSourcesOnly {xpath('SelfReportedSourcesOnly')};
+	integer TotalSourceCount {xpath('TotalSourceCount')};
 end;
 
 export t_PhoneFinderInfo := record (t_BasePhoneInfo)
@@ -211,6 +217,8 @@ export t_PhoneIdentityInfo := record
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
 	string SSN {xpath('SSN')};//hidden[internal]
 	dataset(t_PhoneFinderSourceIndicator) SourceDetails {xpath('SourceDetails/SourceDetail'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};//hidden[ecl_only]
+	boolean SelfReportedSourcesOnly {xpath('SelfReportedSourcesOnly')};
+	integer TotalSourceCount {xpath('TotalSourceCount')};
 end;
 
 export t_PhoneFinderHistory := record

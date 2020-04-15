@@ -6,10 +6,14 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
   //Function to map categories and create a table with category, Type and count of sources within category.
   dGetCtgSources(DATASET($.Layouts.PhoneFinder.src_rec) dIn) := FUNCTION
 
-    iesp.phonefinder.t_PhoneFinderSourceIndicator src_it ($.Layouts.PhoneFinder.src_rec l) := TRANSFORM
+    tempLayout_Category := RECORD
+     STRING40 _Type;
+     STRING24 Category;
+    END;
+
+    tempLayout_Category src_it ($.Layouts.PhoneFinder.src_rec l) := TRANSFORM
      SELF.Category := $.Constants.MapCategoryDCT(l.Src);
      SELF._Type := $.Constants.MapSourceTypeDCT(l.Src);
-     SELF.Count := 0;
     end;
 
     dCtg := PROJECT(dIn, src_it(LEFT));
@@ -17,7 +21,7 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
     tCtgRec := RECORD
       dCtg.Category;
       dCtg._Type;
-      INTEGER count := COUNT(GROUP);
+      UNSIGNED count := COUNT(GROUP);
     END;
 
     tCtg := TABLE(dCtg, tCtgRec, Category, _Type, FEW);
@@ -28,8 +32,18 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
 
   //Assign SourceInfo back to the final layout with actual categories.
   $.Layouts.PhoneFinder.Final getCategory(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := TRANSFORM
-     SELF.SourceInfo := PROJECT(dGetCtgSources(DEDUP(SORT(l.phn_src_all, src), src)),
-                           TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF  := LEFT));
+
+    dDedupSrc := DEDUP(SORT(l.phn_src_all, src), src);
+    Src_Func := dGetCtgSources(dDedupSrc);
+
+    iesp.phonefinder.t_PhoneFinderSourceIndicator denormCats(RECORDOF(Src_Func) l, DATASET(RECORDOF(Src_Func)) r)  := TRANSFORM
+      SELF._Type := l._Type;
+      SELF.Categories := PROJECT(r, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceCategory, SELF := LEFT));
+    END;
+    dGrpSrc := DENORMALIZE(Src_Func, Src_Func, LEFT._Type = RIGHT._Type, GROUP, denormCats(LEFT, ROWS(RIGHT)));
+     SELF.SourceInfo           := DEDUP(dGrpSrc, ALL);
+     SELF.TotalSourceCount     := COUNT(dDedupSrc);
+     SELF.SelfReportedSourcesOnly := ~(EXISTS(Src_Func(_Type IN [$.Constants.PFSourceType.Account])));
      SELF := l;
   END;
 

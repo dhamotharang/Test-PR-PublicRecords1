@@ -131,7 +131,7 @@
 </pre>
 */
 
-import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
+import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5, Royalty;
 
 export FlexID_Batch_Service := MACRO
 
@@ -542,16 +542,8 @@ LayoutFlexIDBatchOutExt := RECORD
 	boolean insurance_dl_used;
 END;
 
-//  For ThreatMetrix reasoncodes
-TMX_model:=Models.IID1906_0_0(ret);
-DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
- retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
- transform(risk_indicators.layout_output,
- self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
- self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
- self:=LEFT),left outer),ungroup(ret));
  
-LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
+LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.seq := (string)ri.seq;
 	SELF.acctNo := ri.acctno;
 	
@@ -688,7 +680,7 @@ LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
  SELF.PhoneLineDescription:=le.PhoneLineDescription;
  SELF := [];
 END;
-formedbeforeAdvo := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formedbeforeAdvo := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 formedWithAdvo := join(formedbeforeAdvo, with_advo, (integer)left.seq = right.seq, 
 									TRANSFORM(LayoutFlexIDBatchOutExt,
 										self.ValidElementSummaryAddressCMRA := IF(LEFT.ValidElementSummaryAddressCMRA = '1' OR RIGHT.ADVODropIndicator = 'C', '1', '0');
@@ -729,10 +721,8 @@ clam :=  risk_indicators.Boca_Shell_Function(	ret,
                                                             BatchUID := BatchUID, 
                                                             GlobalCompanyID := GlobalCompanyID);
 															
-															
-
-ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
-ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose);
+ip_prep := JOIN(ret, fs, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := right.ip_addr, self.seq := right.seq, self.did := left.did ) );
+ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose, applyOptOut := TRUE);
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;

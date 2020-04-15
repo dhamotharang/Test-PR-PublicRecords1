@@ -84,13 +84,14 @@ FUNCTION
                  SELF := LEFT),
        LEFT ONLY);
 
-  dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch2(dsNoHitMktBest,,
+
+	dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch2(dsNoHitMktBest,,
                                             BIPV2.IDconstants.Fetch_Level_SELEID,,
 																						ExecAtHomeV2.Constants.MAX_CONTACTS);
 
   dsPawFiltered := dsPawLinkIdsAll(DID != 0 AND
                                    record_type = ExecAtHomeV2.Constants.CURRENT_REC AND
-                                   source IN MDR.sourceTools.set_Marketing_Sources);
+																	 Doxie.compliance.isMarketingAllowed(source));
 
   // saving a join by using dsSearchIDsBestWeight (to pick up acctno) instead of dsPawLinkIdsAll
   // because the later uses dsNoHitMktBest which will only return the desired result set

@@ -76,11 +76,12 @@ re_filter2:=SORT(re_filter1, -Difference_Percent);
 // ******** END: CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
 // ******** START: ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
-
-ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_54_historydate_201207_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+//updated 201207 to 201907
+ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_54_historydate_201901_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+// ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_54_historydate_201207_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 // ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_50_historydate_201207_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
-filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_201207_prod_*_1'));
+filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_201901_prod_*_1'));
 
 
 filelist_arch := sort(filenames_details_arch, -modified);
@@ -197,12 +198,13 @@ re_filter2_nonfcra := SORT(re_filter1_nonfcra, -Difference_Percent);
 // ******** END: NonFCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
 // ******** START: NonFCRA ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
-
-nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_54_historydate_201207_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+//updated 201207 to 201907
+nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_54_historydate_201901_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+// nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_54_historydate_201207_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 // nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_50_historydate_201207_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
 
-nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_54_historydate_201207_prod_*_1'));
+nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_54_historydate_201901_prod_*_1'));
 
 
 nonfcra_filelist_arch := sort(nonfcra_filenames_details_arch, -modified);
@@ -311,10 +313,10 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 													+ '---------------------------------------------------------------------------------------------------------------------'
 													}], MyRec); 
 													
-
+//updated 201607 to 201901
 	head_fcra_prod_archive := DATASET([{1,    
 														'Environment:  PROD - FCRA'	+ '\n'
-													+ 'Archive date:  201607' + '\n'
+													+ 'Archive date:  201901' + '\n'
 													+ 'Previous run date:  ' + cleaned_prev_arch_date + '\n'
 													+ 'Current run date:  ' + cleaned_curr_arch_date + '\n' 
 													+ 'Previous record count:  ' + COUNT(ds_prev_archive) + '\n'
@@ -340,10 +342,10 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 													+ '---------------------------------------------------------------------------------------------------------------------'
 													}], MyRec); 
 													
-
+//updated 201607 to 201901
 	head_nonfcra_prod_archive := DATASET([{1,    
 														'Environment:  PROD - NONFCRA'	+ '\n'
-													+ 'Archive date:  201607' + '\n'
+													+ 'Archive date:  201901' + '\n'
 													+ 'Previous run date:  ' + cleaned_nonfcra_prev_date_arch + '\n'
 													+ 'Current run date:  ' + cleaned_nonfcra_curr_date_arch + '\n' 
 													+ 'Previous record count:  ' + COUNT(nonfcra_ds_prev_arch) + '\n'
@@ -383,10 +385,10 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
   	// OUTPUT(XtabOut, NAMED('XtabOut'));
 
-		final := //FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
-						FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.boca_54_list, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
-												// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
-						FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Boca_54_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+		final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+						//FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.boca_54_list, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+												 FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+						//FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Boca_54_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
 		RETURN final;
 END;	

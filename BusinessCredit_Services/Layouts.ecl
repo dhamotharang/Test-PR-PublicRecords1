@@ -4401,12 +4401,42 @@ EXPORT InputEcho := RECORD
 			string25 AcctDet1_IndustrySegment;
 			string8 AcctDet1_AccountDateReported; 
 			string12 AcctDet1_AmountOutstanding; 
+      // Account Detail, AcctDet1, 24 Month Payment History - two accounts
+			string12 AcctDet1_1_TotalCurrentExposure;
+			string3  AcctDet1_1_WithinTermsTotal;
+			string3  AcctDet1_1_PastDueAgingAmount01to30Percent;
+			string3  AcctDet1_1_PastDueAgingAmount31to60Percent;
+			string3  AcctDet1_1_PastDueAgingAmount61to90Percent;
+			string3  AcctDet1_1_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet1_1_DateReported;
+			string12 AcctDet1_2_TotalCurrentExposure;
+			string3  AcctDet1_2_WithinTermsTotal;
+			string3  AcctDet1_2_PastDueAgingAmount01to30Percent;
+			string3  AcctDet1_2_PastDueAgingAmount31to60Percent;
+			string3  AcctDet1_2_PastDueAgingAmount61to90Percent;
+			string3  AcctDet1_2_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet1_2_DateReported;
+      // Account Detail, AcctDet2
 			string20 AcctDet2_AccountNo; 
 			string10 AcctDet2_Status; 
 			string25 AcctDet2_IndustrySegment;
 			string8 AcctDet2_AccountDateReported; 
 			string12 AcctDet2_AmountOutstanding;
-			
+      // Account Detail, AcctDet2, 24 Month Payment History - two accounts
+			string12 AcctDet2_1_TotalCurrentExposure;
+			string3  AcctDet2_1_WithinTermsTotal;
+			string3  AcctDet2_1_PastDueAgingAmount01to30Percent;
+			string3  AcctDet2_1_PastDueAgingAmount31to60Percent;
+			string3  AcctDet2_1_PastDueAgingAmount61to90Percent;
+			string3  AcctDet2_1_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet2_1_DateReported;
+			string12 AcctDet2_2_TotalCurrentExposure;
+			string3  AcctDet2_2_WithinTermsTotal;
+			string3  AcctDet2_2_PastDueAgingAmount01to30Percent;
+			string3  AcctDet2_2_PastDueAgingAmount31to60Percent;
+			string3  AcctDet2_2_PastDueAgingAmount61to90Percent;
+			string3  AcctDet2_2_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet2_2_DateReported;			
 			string5 StatusCode;
 			string40 StatusDescription;
 	END;

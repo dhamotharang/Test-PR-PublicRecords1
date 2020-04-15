@@ -11,6 +11,7 @@ string accountnumber;
 // layout_riskview5_batch_response;
 	string30 acctno;
 	riskview.layouts.layout_riskview5-Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
+	riskview.layouts.layout_checkingindicators;
 	STRING errorcode;
 	RiskProcessing.layout_internal_extras;
 END;

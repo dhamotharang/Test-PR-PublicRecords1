@@ -81,8 +81,7 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 											));
 	                                              
 	
-  BusInquiries 					:=  if (inmod.BusinessCreditReportType NOT IN BusinessCredit_Services.Constants.LNOnlyCreditSet,
-	                      BusinessCredit_Services.fn_getBusInquiries(inmod));
+  BusInquiries 					:=  BusinessCredit_Services.fn_getBusInquiries(inmod);
 		
   buzCreditTradeLineMod	:= BusinessCredit_Services.fn_getBuzCreditTrades(inmod, buzCreditHeader_recs,IndustryCode); 
   tradeSummary					:= IF(buzCreditAccess, buzCreditTradeLineMod.TradeSummary,ROW([],iesp.businesscreditreport.t_BusinessCreditTradeSummary));

@@ -55,7 +55,7 @@ EXPORT getIndIdentityRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                           
                                     SELF.redFlagLexIDContainsMultiSSNs := LEFT.cit_lexIDMultipleSSNs > 0;
                                     SELF.redFlagInputSSNAssocAtleast3LexIDs := LEFT.bs_adlsPerSSN >= 3;
-                                    SELF.redFlagInputSSNIsITIN := LEFT.cit_inputSSNITIN;
+                                    SELF.redFlagInputSSNIsITIN := LEFT.cit_inputSSNITIN = 1;
                                     SELF.bestDOBExists := LEFT.bestDOB > 0;
                                     SELF.bestAddressExists := LEFT.bestAddress.streetAddress1 <> DueDiligence.Constants.EMPTY AND
                                                               LEFT.bestAddress.city <> DueDiligence.Constants.EMPTY AND
@@ -65,7 +65,7 @@ EXPORT getIndIdentityRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                               
                                     //fields for identity report
                                     SELF.inputSSNDetails.enumerationAtEntry := Risk_Indicators.rcSet.isCode85(LEFT.inputSSNDetails.ssn, (STRING)LEFT.inputSSNDetails.issuedLowDate);
-                                    SELF.inputSSNDetails.isITIN := LEFT.cit_inputSSNITIN;
+                                    SELF.inputSSNDetails.isITIN := LEFT.cit_inputSSNITIN = 1;
                                     SELF.inputSSNDetails.invalid := LEFT.cit_inputSSNInvalid = 1;
                                     SELF.inputSSNDetails.issuedPriorToDOB := LEFT.cit_inputSSNIssuePriorToDOB = 1;
                                     SELF.inputSSNDetails.randomlyIssuedInvalid := LEFT.cit_inputSSNRandomIssuedInvalid = 1;

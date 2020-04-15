@@ -1,4 +1,4 @@
-IMPORT iesp, Gateway, FCRA, FCRAGateway_Services;
+﻿IMPORT iesp, Gateway, FCRA, FCRAGateway_Services, Address, STD;
 
 EXPORT EquifaxEmsAppendLexIDs(DATASET(iesp.equifax_ems.t_CreditReportRecord) ds_ems_reports,
   iesp.share.t_User user) := FUNCTION
@@ -16,6 +16,38 @@ EXPORT EquifaxEmsAppendLexIDs(DATASET(iesp.equifax_ems.t_CreditReportRecord) ds_
   report_w_lexID_request_layout append_lexID_request(iesp.equifax_ems.t_CreditReportRecord report) := TRANSFORM
       SELF.report := report;
       SELF.lexID_request.User := user;
+      unparsedAddress := report.BureauBorrower.UnparsedAddress;
+      
+      //replace comma with space and clean spaces
+      unparsedAddress_spcs := STD.Str.FindReplace(unparsedAddress, ',', ' ');
+      unparsedAddress_cs := Std.Str.CleanSpaces(unparsedAddress_spcs);
+      
+      //check if date appended at the end of the address and remove it
+      unparsedAddress_reverse := Std.Str.Reverse(unparsedAddress_cs);
+      pos_space1 := STD.Str.Find(unparsedAddress_reverse, ' ', 1);
+      date_val := unparsedAddress_cs[(LENGTH(unparsedAddress_cs) - pos_space1)+1..];
+      date_trim := trim(date_val, left, right);
+      
+      DateFinder := '^([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})$';
+      date_check := regexfind(DateFinder, date_trim) OR date_trim = 'UNK';
+      
+      unparsedAddress_final := IF(date_check, TRIM(unparsedAddress_cs[..(LENGTH(unparsedAddress_cs) - pos_space1)], left,right), TRIM(unparsedAddress_cs, left,right));
+      
+      //parse address
+      parsed_address := Address.CleanAddressOneLine(unparsedAddress_final);
+      
+      SELF.lexID_request.SearchBy.Address.StreetNumber := IF(report.BureauBorrower.Address.StreetNumber = '', parsed_address.prim_range, report.BureauBorrower.Address.StreetNumber);
+      SELF.lexID_request.SearchBy.Address.StreetName := IF(report.BureauBorrower.Address.StreetName = '', parsed_address.prim_name, report.BureauBorrower.Address.StreetName);
+      SELF.lexID_request.SearchBy.Address.UnitNumber := IF(report.BureauBorrower.Address.UnitNumber = '', parsed_address.sec_range, report.BureauBorrower.Address.UnitNumber);
+      SELF.lexID_request.SearchBy.Address.StreetSuffix := IF(report.BureauBorrower.Address.StreetSuffix = '', parsed_address.suffix, report.BureauBorrower.Address.StreetSuffix);
+      SELF.lexID_request.SearchBy.Address.StreetPreDirection := IF(report.BureauBorrower.Address.StreetPreDirection = '', parsed_address.predir, report.BureauBorrower.Address.StreetPreDirection);
+      SELF.lexID_request.SearchBy.Address.StreetPostDirection := IF(report.BureauBorrower.Address.StreetPostDirection = '', parsed_address.postdir, report.BureauBorrower.Address.StreetPostDirection);
+      SELF.lexID_request.SearchBy.Address.UnitDesignation := IF(report.BureauBorrower.Address.UnitDesignation = '', parsed_address.unit_desig, report.BureauBorrower.Address.UnitDesignation);
+      SELF.lexID_request.SearchBy.Address.city := IF(report.BureauBorrower.Address.City = '', parsed_address.p_city, report.BureauBorrower.Address.City);
+      SELF.lexID_request.SearchBy.Address.zip5 := IF(report.BureauBorrower.Address.Zip5 = '', parsed_address.zip, report.BureauBorrower.Address.Zip5);
+      SELF.lexID_request.SearchBy.Address.zip4 := IF(report.BureauBorrower.Address.Zip4 = '', parsed_address.zip4, report.BureauBorrower.Address.Zip4);
+      SELF.lexID_request.SearchBy.Address.state := IF(report.BureauBorrower.Address.State = '', parsed_address.state, report.BureauBorrower.Address.State);
+      
       SELF.lexID_request.SearchBy := report.BureauBorrower;
       SELF := [];
   END;
