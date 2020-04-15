@@ -1502,8 +1502,8 @@ Event: => AgencyUid := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
-// Event: => T_SrcAgencyUID := rSourceCustomer.CustomerId; //CHECKME - need to ask about source agency
-// Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; //CHECKME - same as above
+Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; //CHECKME - need to ask about source agency
+Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; //CHECKME - same as above
 
 Event: => T_ActUid := RecordId;
 Event: => T_ActDtEcho := EventDate; 
@@ -1515,71 +1515,57 @@ Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
 																T_SrcType IN [4,5] => 2,
 																T_SrcType IN [2,3] => 3,
 																4);
-																
-// Event: => T_InpClnTitleEcho := MAP(Title = '' => -99999, //Subject.FullName.Title:Null => -99999,
-																	 // Title);
-// Event: => T_InpClnFirstNmEcho := MAP(Subject.FullName.FirstName ='' OR Subject.FullName.FirstName:Null => -99999,
-																	 // Subject.FullName.FirstName);
-// Event: => T_InpClnLastNmEcho := MAP(Subject.FullName.LastName = '' OR Subject.FullName.LastName:Null => -99999,
-																	 // Subject.FullName.LastName);
-// Event: => T_InpClnNmSuffixEcho := MAP(Subject.FullName.NameSuffix = '' OR Subject.FullName.LastName:Null => -99999,
-																	 // Subject.FullName.NameSuffix);
-																	 
-Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' OR Location.PrimaryRange:Null => -99999,
-																					 Location.PrimaryRange);
-Event: => T_InpClnAddrPreDirEcho := MAP(Location.Predirectional = '' OR Location.Predirectional:Null => -99999,
-																					 Location.Predirectional);
-Event: => T_InpClnAddrPrimNmEcho := MAP(Location.PrimaryName = '' OR Location.PrimaryName:Null => -99999,
-																					 Location.PrimaryName);
-Event: => T_InpClnAddrSuffixEcho := MAP(Location.Suffix = '' OR Location.Suffix:Null => -99999,
-																					 Location.Suffix);
-Event: => T_InpClnAddrPostDirEcho := MAP(Location.Postdirectional = '' OR Location.Postdirectional:Null => -99999,
-																					 Location.Postdirectional);
 
-Event: => T_InpClnAddrUnitDesigEcho := MAP(Location.UnitDesignation = '' OR Location.UnitDesignation:Null => -99999,
-																					 Location.UnitDesignation);
-Event: => T_InpClnAddrSecRangeEcho := MAP(Location.SecondaryRange = '' OR Location.SecondaryRange:Null => -99999,
-																					 Location.SecondaryRange);
-Event: => T_InpClnAddrCityEcho := MAP(Location.PostalCity = '' OR Location.PostalCity:Null => -99999,
-																					 Location.PostalCity);
-Event: => T_InpClnAddrStEcho := MAP(Location.State = '' OR Location.State:Null => -99999,
-																					 Location.State);
-Event: => T_InpClnAddrZip5Echo := MAP(Location.Zip = '' OR Location.Zip:Null => -99999,
-																					 Location.Zip);
-Event: => T_InpClnAddrZip4Echo := MAP(Location.Zip4 = '' OR Location.Zip4:Null => -99999,
-																					 Location.Zip4);
-Event: => T_InpClnAddrLatEcho := MAP(Location.Latitude:Null => -99999,
-																					 Location.Latitude);
-Event: => T_InpClnAddrLongEcho := MAP(Location.Longitude:Null => -99999,
-																					 Location.Longitude);
-Event: => T_InpClnAddrCountyEcho := MAP(Location.County = '' OR Location.County:Null => -99999,
-																					 Location.County);
-Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' OR Location.GeoBlock:Null => -99999,
-																					 Location.GeoBlock);
-// Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, //is country listed anywhere?
-																					 // Location.Country);
+Event: => T_PersonUidEcho	:= MAP(LexId = '' OR LexId:Null => -99999, LexId);
+																	
+														
+Event: => T_InpClnTitleEcho := MAP(Title = '' OR Title:Null => -99999, Title);
+Event: => T_InpClnFirstNmEcho := MAP(FirstName ='' OR FirstName:Null => -99999, FirstName);
+Event: => T_InpClnLastNmEcho := MAP(LastName = '' OR LastName:Null => -99999, LastName);
+Event: => T_InpClnNmSuffixEcho := MAP(NameSuffix = '' OR NameSuffix:Null => -99999, NameSuffix);
+																	 
+Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' OR Location.PrimaryRange:Null => -99999, Location.PrimaryRange);
+Event: => T_InpClnAddrPreDirEcho := MAP(Location.Predirectional = '' OR Location.Predirectional:Null => -99999, Location.Predirectional);
+Event: => T_InpClnAddrPrimNmEcho := MAP(Location.PrimaryName = '' OR Location.PrimaryName:Null => -99999, Location.PrimaryName);
+Event: => T_InpClnAddrSuffixEcho := MAP(Location.Suffix = '' OR Location.Suffix:Null => -99999, Location.Suffix);
+Event: => T_InpClnAddrPostDirEcho := MAP(Location.Postdirectional = '' OR Location.Postdirectional:Null => -99999, Location.Postdirectional);
+Event: => T_InpClnAddrUnitDesigEcho := MAP(Location.UnitDesignation = '' OR Location.UnitDesignation:Null => -99999, Location.UnitDesignation);
+Event: => T_InpClnAddrSecRangeEcho := MAP(Location.SecondaryRange = '' OR Location.SecondaryRange:Null => -99999, Location.SecondaryRange);
+Event: => T_InpClnAddrCityEcho := MAP(Location.PostalCity = '' OR Location.PostalCity:Null => -99999, Location.PostalCity);
+Event: => T_InpClnAddrStEcho := MAP(Location.State = '' OR Location.State:Null => -99999, Location.State);
+Event: => T_InpClnAddrZip5Echo := MAP(Location.Zip = '' OR Location.Zip:Null => -99999, Location.Zip);
+Event: => T_InpClnAddrZip4Echo := MAP(Location.Zip4 = '' OR Location.Zip4:Null => -99999, Location.Zip4);
+Event: => T_InpClnAddrLatEcho := MAP(Location.Latitude:Null => -99999, Location.Latitude);
+Event: => T_InpClnAddrLongEcho := MAP(Location.Longitude:Null => -99999, Location.Longitude);
+Event: => T_InpClnAddrCountyEcho := MAP(Location.County = '' OR Location.County:Null => -99999, Location.County);
+Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' OR Location.GeoBlock:Null => -99999, Location.GeoBlock);
+// Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, Location.Country); // is country listed?
+
 // Event: => T_InpClnSSNEcho := MAP(Subject.ReportedSsn.Ssn = '' OR Subject.ReportedSsn.Ssn:Null => -99999, //are there multiple reported SSNs/Do I need to specify the latest?
 																 // Subject.ReportedSsn.Ssn);
-Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999,
-																	INTEGER(DateOfBirth));
-Event: => T_InpClnDlEcho := MAP(rDriversLicense.LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999,
-																rDriversLicense.LicenseNumber);
-Event: => T_InpClnDlStEcho := MAP(rDriversLicense.State = '' OR rDriversLicense.State:Null => -99999,
-																	rDriversLicense.State);
-Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' OR rEmail.EmailAddress:Null => -99999,
-																	 rEmail.EmailAddress);
-Event: => T_InpClnBnkAcctEcho := MAP(rBankAccount.AccountNumber = '' OR rBankAccount.AccountNumber:Null => -99999,
-																		 rBankAccount.AccountNumber);
-Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' OR rBankAccount.rBank.RoutingNumber:Null => -99999,
-																				rBankAccount.rBank.RoutingNumber);
+Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999, INTEGER(DateOfBirth));
 
+Event: => T_InpClnDlEcho := MAP(rDriversLicense.LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999, rDriversLicense.LicenseNumber);
+Event: => T_InpClnDlStEcho := MAP(rDriversLicense.State = '' OR rDriversLicense.State:Null => -99999, rDriversLicense.State);
 
-Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' OR IpAddress:Null => -99999, 
-																		IpAddress);
+Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' OR rEmail.EmailAddress:Null => -99999, rEmail.EmailAddress);
+
+Event: => T_InpClnBnkAcctEcho := MAP(rBankAccount.AccountNumber = '' OR rBankAccount.AccountNumber:Null => -99999, rBankAccount.AccountNumber);
+Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' OR rBankAccount.rBank.RoutingNumber:Null => -99999, rBankAccount.rBank.RoutingNumber);
+
+Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' OR IpAddress:Null => -99999, IpAddress);
+
+Event: => T_InpClnPhnEcho := MAP(PhoneNumber = '' OR PhoneNumber:Null => -99999, PhoneNumber);
+
+Event: => T1_LexIDPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
+																 //how do we tell the difference between Lex ID and Rin ID for 0?
+																 1);
+Event: => T1_RinIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999);
+																 //how do we tell the difference between Lex Id and Rin ID?
+
 Event: => T18_IsIpMetaHitFlag := MAP(T_InpClnIpAddrEcho = -99999 => -99999, 
                                      T_InpClnIpAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
-																		 1);
-																		 
+																		 1);										 
 Event: => T18_IpAddrCity := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																edgecity = '' OR edgecity:Null => -99997,
@@ -1690,7 +1676,18 @@ Event: => T9_AddrStatus := MAP(T9_AddrPopFlag < 1 => -99999,
 															 Location.ACECleanerErrorCode = '' OR Location.ACECleanerErrorCode:Null => -99997,
 															 Location.ACECleanerErrorCode);
 
+Event: => T16_PhnPopFlag := MAP(T_InpClnPhnEcho IN ['-99999','-99998','-99997'] OR LENGTH(T_InpClnPhnEcho) < 10 => 0, 1);
 
+// Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
+
+Event: => T20_DLPopFlag := MAP(T_InpClnDlEcho <= -99997 OR T_InpClnDlStEcho <= -99997 => 0, 1);
+
+Event: => T18_IpAddressPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+Event: => T_InAgencyFlag := MAP(AgencyUid != T_SrcAgencyUid => 0, 1);
+
+// Event: => T_KRcodeEcho := MAP(T_SrcClassType != 3 => -99998,
+															
 
 
 
