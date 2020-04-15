@@ -292,6 +292,14 @@ build_keys := fedex.proc_fedex_build_keys2(version_date);
 
 sample_recs	:=	fedex.fedex_qa_samples(version_date);
 
-return sequential(buildBase,build_keys,sample_recs, output1,output2,output3);
+return sequential
+(
+	buildBase,
+	build_keys,
+	sample_recs, 
+	output1,
+	output2,
+	output3
+);
 
 end; 
