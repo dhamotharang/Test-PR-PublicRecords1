@@ -8,7 +8,7 @@ export MyInfo
 	export	string	UserID				:=	'UserID';
 	export	string	Password			:=	'p@ssword';
 	export	string	Name				:=	'No Body';
-	export	string	EmailAddressNormal	:=	'terri.hardy-george@lexisnexisrisk.com';
-	export	string	EmailAddressNotify	:=	'terri.hardy-george@lexisnexisrisk.com';
+	export	string	EmailAddressNormal	:=	'nobody@seisint.com';
+	export	string	EmailAddressNotify	:=	'nobody@seisint.com';
   end
  ;
