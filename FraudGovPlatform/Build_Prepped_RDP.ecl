@@ -34,6 +34,7 @@ FUNCTION
 		SELF.Drivers_License := L.dl;		
 		SELF.Rawlinkid := L.response_lexid;
 		SELF.IP_Address	:= STD.Str.FindReplace(L.ipaddr,'"','');
+		SELF.Source_RIN := 9; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
 		SELF := L;
 		SELF := [];
 	END;

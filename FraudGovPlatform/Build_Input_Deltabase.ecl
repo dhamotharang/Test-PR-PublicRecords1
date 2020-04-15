@@ -24,6 +24,13 @@ module
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.rawlinkid	:= l.rawlinkid;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+		self.RIN_Source := map(	file_type = 3  => 4, //identity
+								file_type = 1 and deceitful_confidence != -3  => 5, //knownrisk
+								file_type = 1 and deceitful_confidence = -3  => 7,  //safelist
+								file_type = 5  => 6,  //status update
+								l.RIN_Source); 
+
 		self:=l;
 		self:=[];
 	end;
