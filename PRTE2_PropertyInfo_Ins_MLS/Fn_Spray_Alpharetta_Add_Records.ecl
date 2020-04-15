@@ -2,6 +2,8 @@
 **********************************************************************************************
 ***** MLS CONVERSION NOTES:
 TODO - We don't want to fill any SRC fields but might want to empty them if value is blank???
+WARNING --- WARNING --- WARNING --- WARNING --- WARNING --- WARNING --- WARNING --- WARNING --- 
+WARNING!!  We do not know if this "add" will be needed and IT MUST BE TESTED IF WE DO USE IT THE FIRST TIME WE TRY IT.
 **********************************************************************************************
 OLDER NOTES:
  PRTE2_PropertyInfo_Ins_MLS.Fn_Spray_Alpharetta_Add_Records
@@ -90,9 +92,9 @@ EXPORT Fn_Spray_Alpharetta_Add_Records(STRING CSVName, STRING fileVersion, BOOLE
 			dsAll := dsExisting + dsNewPreparedData;
 			//****************************************************************************************************	
 
-			speadsheetCleaned := PROJECT(dsAll, Transforms.spreadsheet_clean(LEFT));
+			speadsheetCleaned2 := PROJECT(dsAll, Transforms.spreadsheet_clean(LEFT));
 			
-			buildPIIBase := PRTE2_Common.Promote_Supers.mac_SFBuildProcess(speadsheetCleaned, Files.PII_ALPHA_BASE_SF);
+			buildPIIBase := PRTE2_Common.Promote_Supers.mac_SFBuildProcess(speadsheetCleaned2, Files.PII_ALPHA_BASE_SF);
 			// --------------------------------------------------
 			delSprayedFile  := FileServices.DeleteLogicalFile (Files.Alpha_Spray_Name);
 
