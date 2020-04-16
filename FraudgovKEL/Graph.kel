@@ -1680,9 +1680,9 @@ Event: => T16_PhnPopFlag := MAP(T_InpClnPhnEcho IN ['-99999','-99998','-99997'] 
 
 // Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
 
-Event: => T20_DLPopFlag := MAP(T_InpClnDlEcho <= -99997 OR T_InpClnDlStEcho <= -99997 => 0, 1);
+Event: => T20_DLPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR T_InpClnDlStEcho IN ['-99999','-99998','-99997'] => 0, 1);
 
-Event: => T18_IpAddressPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
+Event: => T18_IpAddrPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
 
 Event: => T_InAgencyFlag := MAP(AgencyUid != T_SrcAgencyUid => 0, 1);
 
