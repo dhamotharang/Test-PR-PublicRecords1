@@ -100,8 +100,8 @@ OUTACTION :=
 	update_dops := 	if
 					(
 						scrubs.mac_ScrubsFailureTest('scrubs_fedex',version_date),
-						RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N',
-						OUTPUT('Dops failure due to scrubs reject warning(s)',NAMED('Failure_warning'))
+						RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N'),
+						OUTPUT('Dops update failure due to scrubs reject warning(s)',NAMED('Failure_warning'))
 					);
 	build_keys	:= sequential(outaction, move_qa);
 
