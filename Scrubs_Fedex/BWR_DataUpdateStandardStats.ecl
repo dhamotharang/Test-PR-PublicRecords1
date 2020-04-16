@@ -11,5 +11,7 @@ dsNew := DATASET(mynewfile, Scrubs_Fedex.Layout_Fedex, THOR);
 dsPrev := DATASET(myprevfile, Scrubs_Fedex.Layout_Fedex, THOR);
  
 hygieneStats := Scrubs_Fedex.hygiene(dsNew).StandardStats();
-allStats := hygieneStats;
+scrubsStats := Scrubs_Fedex.Scrubs.StandardStats(dsNew);
+deltaStats := IF(TRIM(myprevfile) > '' AND EXISTS(dsPrev), Scrubs_Fedex.Delta(dsPrev, dsNew).StandardStats());
+allStats := hygieneStats & scrubsStats & deltaStats;
 OUTPUT(allStats,, mystatsfile);

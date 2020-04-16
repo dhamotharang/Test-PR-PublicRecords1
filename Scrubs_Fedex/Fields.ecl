@@ -1,203 +1,290 @@
 ﻿IMPORT SALT311;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
 EXPORT NumFields := 47;
  
+// Processing for each FieldType
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Float','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNum','Invalid_AlphaNumChar','Invalid_ID','Invalid_Dir','Invalid_Date','Invalid_Phone','Invalid_Zip','Invalid_State');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Float' => 2,'Invalid_Alpha' => 3,'Invalid_AlphaChar' => 4,'Invalid_AlphaNum' => 5,'Invalid_AlphaNumChar' => 6,'Invalid_ID' => 7,'Invalid_Dir' => 8,'Invalid_Date' => 9,'Invalid_Phone' => 10,'Invalid_Zip' => 11,'Invalid_State' => 12,0);
+ 
+EXPORT MakeFT_Invalid_No(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Float(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789 .-/'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .-/'))));
+EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .-/'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
+EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_AlphaChar(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ \'-.:'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ \'-.:'))));
+EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ \'-.:'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_AlphaNum(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
+EXPORT InValidMessageFT_Invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_AlphaNumChar(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,-/:#\''); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,-/:#\''))));
+EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,-/:#\''),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_ID(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_Invalid_ID(SALT311.StrType s) := WHICH(~fn_valid_id(s)>0);
+EXPORT InValidMessageFT_Invalid_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('fn_valid_id'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Dir(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'NSEW'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Dir(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'NSEW'))));
+EXPORT InValidMessageFT_Invalid_Dir(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('NSEW'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_date(s)>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Phone(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  RETURN  MakeFT_Invalid_No(s1);
+END;
+EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 10 OR LENGTH(TRIM(s)) = 11));
+EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,10,11'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Zip(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  RETURN  MakeFT_Invalid_No(s1);
+END;
+EXPORT InValidFT_Invalid_Zip(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5));
+EXPORT InValidMessageFT_Invalid_Zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,5'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_State(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  RETURN  MakeFT_Invalid_Alpha(s1);
+END;
+EXPORT InValidFT_Invalid_State(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
+EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
+ 
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'file_date','record_id','record_type','first_name','middle_initial','last_name','full_name','company_name','address_line1','address_line2','city','state','zip','country','phone','append_prepaddr1','append_prepaddr2','append_rawaid','nametype','business_indicator','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip5','zip6','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'file_date','record_id','record_type','first_name','middle_initial','last_name','full_name','company_name','address_line1','address_line2','city','state','zip','country','phone','append_prepaddr1','append_prepaddr2','append_rawaid','nametype','business_indicator','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip5','zip6','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'file_date' => 0,'record_id' => 1,'record_type' => 2,'first_name' => 3,'middle_initial' => 4,'last_name' => 5,'full_name' => 6,'company_name' => 7,'address_line1' => 8,'address_line2' => 9,'city' => 10,'state' => 11,'zip' => 12,'country' => 13,'phone' => 14,'append_prepaddr1' => 15,'append_prepaddr2' => 16,'append_rawaid' => 17,'nametype' => 18,'business_indicator' => 19,'prim_range' => 20,'predir' => 21,'prim_name' => 22,'addr_suffix' => 23,'postdir' => 24,'unit_desig' => 25,'sec_range' => 26,'p_city_name' => 27,'v_city_name' => 28,'st' => 29,'zip5' => 30,'zip6' => 31,'zip4' => 32,'cart' => 33,'cr_sort_sz' => 34,'lot' => 35,'lot_order' => 36,'dbpc' => 37,'chk_digit' => 38,'rec_type' => 39,'county' => 40,'geo_lat' => 41,'geo_long' => 42,'msa' => 43,'geo_blk' => 44,'geo_match' => 45,'err_stat' => 46,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_file_date(SALT311.StrType s0) := s0;
-EXPORT InValid_file_date(SALT311.StrType s) := 0;
-EXPORT InValidMessage_file_date(UNSIGNED1 wh) := '';
+EXPORT Make_file_date(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_file_date(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_file_date(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_record_id(SALT311.StrType s0) := s0;
-EXPORT InValid_record_id(SALT311.StrType s) := 0;
-EXPORT InValidMessage_record_id(UNSIGNED1 wh) := '';
+EXPORT Make_record_id(SALT311.StrType s0) := MakeFT_Invalid_ID(s0);
+EXPORT InValid_record_id(SALT311.StrType s) := InValidFT_Invalid_ID(s);
+EXPORT InValidMessage_record_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_ID(wh);
  
-EXPORT Make_record_type(SALT311.StrType s0) := s0;
-EXPORT InValid_record_type(SALT311.StrType s) := 0;
-EXPORT InValidMessage_record_type(UNSIGNED1 wh) := '';
+EXPORT Make_record_type(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_record_type(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_record_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_first_name(SALT311.StrType s0) := s0;
-EXPORT InValid_first_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_first_name(UNSIGNED1 wh) := '';
+EXPORT Make_first_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_first_name(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_first_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_middle_initial(SALT311.StrType s0) := s0;
-EXPORT InValid_middle_initial(SALT311.StrType s) := 0;
-EXPORT InValidMessage_middle_initial(UNSIGNED1 wh) := '';
+EXPORT Make_middle_initial(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_middle_initial(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_middle_initial(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_last_name(SALT311.StrType s0) := s0;
-EXPORT InValid_last_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_last_name(UNSIGNED1 wh) := '';
+EXPORT Make_last_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_last_name(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_last_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_full_name(SALT311.StrType s0) := s0;
-EXPORT InValid_full_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_full_name(UNSIGNED1 wh) := '';
+EXPORT Make_full_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_full_name(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_full_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_company_name(SALT311.StrType s0) := s0;
-EXPORT InValid_company_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_company_name(UNSIGNED1 wh) := '';
+EXPORT Make_company_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_company_name(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_company_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_address_line1(SALT311.StrType s0) := s0;
-EXPORT InValid_address_line1(SALT311.StrType s) := 0;
-EXPORT InValidMessage_address_line1(UNSIGNED1 wh) := '';
+EXPORT Make_address_line1(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_address_line1(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_address_line1(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_address_line2(SALT311.StrType s0) := s0;
-EXPORT InValid_address_line2(SALT311.StrType s) := 0;
-EXPORT InValidMessage_address_line2(UNSIGNED1 wh) := '';
+EXPORT Make_address_line2(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_address_line2(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_address_line2(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_city(SALT311.StrType s0) := s0;
-EXPORT InValid_city(SALT311.StrType s) := 0;
-EXPORT InValidMessage_city(UNSIGNED1 wh) := '';
+EXPORT Make_city(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_city(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_city(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_state(SALT311.StrType s0) := s0;
-EXPORT InValid_state(SALT311.StrType s) := 0;
-EXPORT InValidMessage_state(UNSIGNED1 wh) := '';
+EXPORT Make_state(SALT311.StrType s0) := MakeFT_Invalid_State(s0);
+EXPORT InValid_state(SALT311.StrType s) := InValidFT_Invalid_State(s);
+EXPORT InValidMessage_state(UNSIGNED1 wh) := InValidMessageFT_Invalid_State(wh);
  
-EXPORT Make_zip(SALT311.StrType s0) := s0;
-EXPORT InValid_zip(SALT311.StrType s) := 0;
-EXPORT InValidMessage_zip(UNSIGNED1 wh) := '';
+EXPORT Make_zip(SALT311.StrType s0) := MakeFT_Invalid_Zip(s0);
+EXPORT InValid_zip(SALT311.StrType s) := InValidFT_Invalid_Zip(s);
+EXPORT InValidMessage_zip(UNSIGNED1 wh) := InValidMessageFT_Invalid_Zip(wh);
  
-EXPORT Make_country(SALT311.StrType s0) := s0;
-EXPORT InValid_country(SALT311.StrType s) := 0;
-EXPORT InValidMessage_country(UNSIGNED1 wh) := '';
+EXPORT Make_country(SALT311.StrType s0) := MakeFT_Invalid_State(s0);
+EXPORT InValid_country(SALT311.StrType s) := InValidFT_Invalid_State(s);
+EXPORT InValidMessage_country(UNSIGNED1 wh) := InValidMessageFT_Invalid_State(wh);
  
-EXPORT Make_phone(SALT311.StrType s0) := s0;
-EXPORT InValid_phone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_phone(UNSIGNED1 wh) := '';
+EXPORT Make_phone(SALT311.StrType s0) := MakeFT_Invalid_Phone(s0);
+EXPORT InValid_phone(SALT311.StrType s) := InValidFT_Invalid_Phone(s);
+EXPORT InValidMessage_phone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Phone(wh);
  
-EXPORT Make_append_prepaddr1(SALT311.StrType s0) := s0;
-EXPORT InValid_append_prepaddr1(SALT311.StrType s) := 0;
-EXPORT InValidMessage_append_prepaddr1(UNSIGNED1 wh) := '';
+EXPORT Make_append_prepaddr1(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_append_prepaddr1(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_append_prepaddr1(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_append_prepaddr2(SALT311.StrType s0) := s0;
-EXPORT InValid_append_prepaddr2(SALT311.StrType s) := 0;
-EXPORT InValidMessage_append_prepaddr2(UNSIGNED1 wh) := '';
+EXPORT Make_append_prepaddr2(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_append_prepaddr2(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_append_prepaddr2(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_append_rawaid(SALT311.StrType s0) := s0;
-EXPORT InValid_append_rawaid(SALT311.StrType s) := 0;
-EXPORT InValidMessage_append_rawaid(UNSIGNED1 wh) := '';
+EXPORT Make_append_rawaid(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_append_rawaid(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_append_rawaid(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_nametype(SALT311.StrType s0) := s0;
-EXPORT InValid_nametype(SALT311.StrType s) := 0;
-EXPORT InValidMessage_nametype(UNSIGNED1 wh) := '';
+EXPORT Make_nametype(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_nametype(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_nametype(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_business_indicator(SALT311.StrType s0) := s0;
-EXPORT InValid_business_indicator(SALT311.StrType s) := 0;
-EXPORT InValidMessage_business_indicator(UNSIGNED1 wh) := '';
+EXPORT Make_business_indicator(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_business_indicator(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_business_indicator(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_prim_range(SALT311.StrType s0) := s0;
-EXPORT InValid_prim_range(SALT311.StrType s) := 0;
-EXPORT InValidMessage_prim_range(UNSIGNED1 wh) := '';
+EXPORT Make_prim_range(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_prim_range(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_prim_range(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_predir(SALT311.StrType s0) := s0;
-EXPORT InValid_predir(SALT311.StrType s) := 0;
-EXPORT InValidMessage_predir(UNSIGNED1 wh) := '';
+EXPORT Make_predir(SALT311.StrType s0) := MakeFT_Invalid_Dir(s0);
+EXPORT InValid_predir(SALT311.StrType s) := InValidFT_Invalid_Dir(s);
+EXPORT InValidMessage_predir(UNSIGNED1 wh) := InValidMessageFT_Invalid_Dir(wh);
  
-EXPORT Make_prim_name(SALT311.StrType s0) := s0;
-EXPORT InValid_prim_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := '';
+EXPORT Make_prim_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_prim_name(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_addr_suffix(SALT311.StrType s0) := s0;
-EXPORT InValid_addr_suffix(SALT311.StrType s) := 0;
-EXPORT InValidMessage_addr_suffix(UNSIGNED1 wh) := '';
+EXPORT Make_addr_suffix(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_addr_suffix(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_addr_suffix(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_postdir(SALT311.StrType s0) := s0;
-EXPORT InValid_postdir(SALT311.StrType s) := 0;
-EXPORT InValidMessage_postdir(UNSIGNED1 wh) := '';
+EXPORT Make_postdir(SALT311.StrType s0) := MakeFT_Invalid_Dir(s0);
+EXPORT InValid_postdir(SALT311.StrType s) := InValidFT_Invalid_Dir(s);
+EXPORT InValidMessage_postdir(UNSIGNED1 wh) := InValidMessageFT_Invalid_Dir(wh);
  
-EXPORT Make_unit_desig(SALT311.StrType s0) := s0;
-EXPORT InValid_unit_desig(SALT311.StrType s) := 0;
-EXPORT InValidMessage_unit_desig(UNSIGNED1 wh) := '';
+EXPORT Make_unit_desig(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_unit_desig(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_unit_desig(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_sec_range(SALT311.StrType s0) := s0;
-EXPORT InValid_sec_range(SALT311.StrType s) := 0;
-EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := '';
+EXPORT Make_sec_range(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_sec_range(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_p_city_name(SALT311.StrType s0) := s0;
-EXPORT InValid_p_city_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_p_city_name(UNSIGNED1 wh) := '';
+EXPORT Make_p_city_name(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_p_city_name(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_p_city_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_v_city_name(SALT311.StrType s0) := s0;
-EXPORT InValid_v_city_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_v_city_name(UNSIGNED1 wh) := '';
+EXPORT Make_v_city_name(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_v_city_name(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_v_city_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_st(SALT311.StrType s0) := s0;
-EXPORT InValid_st(SALT311.StrType s) := 0;
-EXPORT InValidMessage_st(UNSIGNED1 wh) := '';
+EXPORT Make_st(SALT311.StrType s0) := MakeFT_Invalid_State(s0);
+EXPORT InValid_st(SALT311.StrType s) := InValidFT_Invalid_State(s);
+EXPORT InValidMessage_st(UNSIGNED1 wh) := InValidMessageFT_Invalid_State(wh);
  
-EXPORT Make_zip5(SALT311.StrType s0) := s0;
-EXPORT InValid_zip5(SALT311.StrType s) := 0;
-EXPORT InValidMessage_zip5(UNSIGNED1 wh) := '';
+EXPORT Make_zip5(SALT311.StrType s0) := MakeFT_Invalid_Zip(s0);
+EXPORT InValid_zip5(SALT311.StrType s) := InValidFT_Invalid_Zip(s);
+EXPORT InValidMessage_zip5(UNSIGNED1 wh) := InValidMessageFT_Invalid_Zip(wh);
  
-EXPORT Make_zip6(SALT311.StrType s0) := s0;
-EXPORT InValid_zip6(SALT311.StrType s) := 0;
-EXPORT InValidMessage_zip6(UNSIGNED1 wh) := '';
+EXPORT Make_zip6(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_zip6(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_zip6(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_zip4(SALT311.StrType s0) := s0;
-EXPORT InValid_zip4(SALT311.StrType s) := 0;
-EXPORT InValidMessage_zip4(UNSIGNED1 wh) := '';
+EXPORT Make_zip4(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_zip4(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_zip4(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_cart(SALT311.StrType s0) := s0;
-EXPORT InValid_cart(SALT311.StrType s) := 0;
-EXPORT InValidMessage_cart(UNSIGNED1 wh) := '';
+EXPORT Make_cart(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_cart(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_cart(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_cr_sort_sz(SALT311.StrType s0) := s0;
-EXPORT InValid_cr_sort_sz(SALT311.StrType s) := 0;
-EXPORT InValidMessage_cr_sort_sz(UNSIGNED1 wh) := '';
+EXPORT Make_cr_sort_sz(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_cr_sort_sz(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_cr_sort_sz(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_lot(SALT311.StrType s0) := s0;
-EXPORT InValid_lot(SALT311.StrType s) := 0;
-EXPORT InValidMessage_lot(UNSIGNED1 wh) := '';
+EXPORT Make_lot(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_lot(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_lot(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_lot_order(SALT311.StrType s0) := s0;
-EXPORT InValid_lot_order(SALT311.StrType s) := 0;
-EXPORT InValidMessage_lot_order(UNSIGNED1 wh) := '';
+EXPORT Make_lot_order(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_lot_order(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_lot_order(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_dbpc(SALT311.StrType s0) := s0;
-EXPORT InValid_dbpc(SALT311.StrType s) := 0;
-EXPORT InValidMessage_dbpc(UNSIGNED1 wh) := '';
+EXPORT Make_dbpc(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_dbpc(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_dbpc(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_chk_digit(SALT311.StrType s0) := s0;
-EXPORT InValid_chk_digit(SALT311.StrType s) := 0;
-EXPORT InValidMessage_chk_digit(UNSIGNED1 wh) := '';
+EXPORT Make_chk_digit(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_chk_digit(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_chk_digit(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rec_type(SALT311.StrType s0) := s0;
-EXPORT InValid_rec_type(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rec_type(UNSIGNED1 wh) := '';
+EXPORT Make_rec_type(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rec_type(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rec_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_county(SALT311.StrType s0) := s0;
-EXPORT InValid_county(SALT311.StrType s) := 0;
-EXPORT InValidMessage_county(UNSIGNED1 wh) := '';
+EXPORT Make_county(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_county(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_county(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_geo_lat(SALT311.StrType s0) := s0;
-EXPORT InValid_geo_lat(SALT311.StrType s) := 0;
-EXPORT InValidMessage_geo_lat(UNSIGNED1 wh) := '';
+EXPORT Make_geo_lat(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_geo_lat(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_geo_lat(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_geo_long(SALT311.StrType s0) := s0;
-EXPORT InValid_geo_long(SALT311.StrType s) := 0;
-EXPORT InValidMessage_geo_long(UNSIGNED1 wh) := '';
+EXPORT Make_geo_long(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_geo_long(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_geo_long(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_msa(SALT311.StrType s0) := s0;
-EXPORT InValid_msa(SALT311.StrType s) := 0;
-EXPORT InValidMessage_msa(UNSIGNED1 wh) := '';
+EXPORT Make_msa(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_msa(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_msa(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_geo_blk(SALT311.StrType s0) := s0;
-EXPORT InValid_geo_blk(SALT311.StrType s) := 0;
-EXPORT InValidMessage_geo_blk(UNSIGNED1 wh) := '';
+EXPORT Make_geo_blk(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_geo_blk(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_geo_blk(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_geo_match(SALT311.StrType s0) := s0;
-EXPORT InValid_geo_match(SALT311.StrType s) := 0;
-EXPORT InValidMessage_geo_match(UNSIGNED1 wh) := '';
+EXPORT Make_geo_match(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_geo_match(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_geo_match(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_err_stat(SALT311.StrType s0) := s0;
-EXPORT InValid_err_stat(SALT311.StrType s) := 0;
-EXPORT InValidMessage_err_stat(UNSIGNED1 wh) := '';
+EXPORT Make_err_stat(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_err_stat(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_err_stat(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
