@@ -48,6 +48,8 @@ module
         
     slim_rec find_nac_data(slim_rec L) := TRANSFORM
         SELF.source := MAP(   L.Rin_Source = 8 => 'NAC'
+                            , L.Rin_Source = 10=> 'NAC'
+                            , L.Rin_Source = 11=> 'NAC'
                             , L.Rin_Source = 9 => 'RDP'
                             , L.Rin_Source = 4 => 'IDENTITY'
                             , L.Rin_Source = 5 => 'KNOWNRISK'
@@ -60,6 +62,8 @@ module
 
         SELF.source_group := MAP(   
                               L.Rin_Source = 8 => 'SUPPLEMENTAL'
+                            , L.Rin_Source = 10=> 'SUPPLEMENTAL'
+                            , L.Rin_Source = 11=> 'SUPPLEMENTAL'                              
                             , L.Rin_Source = 9 => 'SUPPLEMENTAL'
                             , L.Rin_Source = 4 => 'AGENCYACTIVITY'
                             , L.Rin_Source = 5 => 'AGENCYACTIVITY'
