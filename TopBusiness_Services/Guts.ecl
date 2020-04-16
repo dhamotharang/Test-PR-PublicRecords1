@@ -261,8 +261,8 @@ export Guts := MODULE
 						source_mod_access,ds_busHeaderRecs)
 				);              
                   
-            TmpBusinessInsightSection := if (section_BusinessInsight, 
-                           TopBusiness_Services.BusinessInsightSection.fn_FullView(
+            TmpBusinessInsightPreLayoutPopulation := if (section_BusinessInsight,                           
+                           TopBusiness_Services.BusinessInsightSection.FromBipReportBusinessEvidence(
                             project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
                             ,project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]
                             ,BestSection[1]
@@ -272,6 +272,8 @@ export Guts := MODULE
                            ,FinanceSection[1]
                            )
                            );
+              tmpBusinessInsightSection := if (section_BusinessInsight, TopBusiness_Services.BusinessInsightSection.fn_FullViewBusinessEvidence( 
+                                                                            TmpBusinessInsightPreLayoutPopulation[1] ));
              BusinessInsightSection := if (section_businessInsight,
                            TopBusiness_Services.BusinessInsightSection.fn_FullViewRisk(
                             project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
@@ -296,7 +298,7 @@ export Guts := MODULE
                     PropertySectionFinal := if (in_options.IncludeProperties, PropertySection);
                     AircraftSectionFinal := if (in_options.IncludeAircrafts, AircraftSection);
                     WatercraftSectionFinal := if (in_options.IncludeWatercrafts, WatercraftSection);
-			     FinanceSectionFinal := if (in_options.IncludeFinances, FinanceSection);
+			    FinanceSectionFinal := if (in_options.IncludeFinances, FinanceSection);
  				
 				
  TopBusiness_Services.BranchReport_Layouts.Final BIPREPORTXFORM() := TRANSFORM

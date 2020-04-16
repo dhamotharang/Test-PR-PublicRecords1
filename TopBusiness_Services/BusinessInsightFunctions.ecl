@@ -1,4 +1,4 @@
-﻿Import  BIPv2, MDR, TopBusiness_Services , doxie, iesp, Advo, STD, ut, UCCV2, SAM, property, Corp2,
+﻿Import  BIPv2, MDR, TopBusiness_Services , doxie, iesp, Advo, STD, ut, SAM, property, Corp2,
               Cortera_Tradeline, DueDiligence, Liensv2;
 //////////////////////////////////////////////////////////////////////
 //  start of smart linx story #70 risk indicator code (business Evidence)
@@ -9,28 +9,25 @@ EXPORT BusinessInsightFunctions := MODULE
        RETURN(isDefunct);
     END;
 
-    EXPORT  BusinessIsInactive(boolean IsActive) := FUNCTION
-       RETURN(Not(isActive));
+    EXPORT  BusinessIsInactive(boolean IsInActive) := FUNCTION
+       RETURN(isInActive);
     END;
 
-    EXPORT TooFewSourcesSeen(UNSIGNED3 srcCount
-                                                       ,STRING2 twoLetterIdentifier) := FUNCTION
-                                       res :=  srcCount = 1 AND (NOT(mdr.sourcetools.SourceIsCorpV2(twoLetterIdentifier)))
-                                                AND twoLetterIdentifier <> mdr.sourcetools.src_Business_Registration;
-                                    RETURN (res);
+    EXPORT TooFewSourcesSeen(UNSIGNED3 srcCount,STRING2 twoLetterIdentifier) := FUNCTION
+         res :=  srcCount = 1 AND (NOT(mdr.sourcetools.SourceIsCorpV2(twoLetterIdentifier)))
+                    AND twoLetterIdentifier <> mdr.sourcetools.src_Business_Registration;
+         RETURN (res);
     END;
     
-     EXPORT CorpBiplinkidsExists(DATASET (BIPV2.IDlayouts.l_xlink_ids) biplinkids
-                                                           ,STRING1 FETCH_LEVEL) := FUNCTION
-            res :=  NOT(exists(Topbusiness_services.incorporationSection.GetCorpBipLinkids( biplinkids, FETCH_LEVEL)));                                                                                                                  
-          RETURN (res);
+     EXPORT NoCorpBiplinkidsExists(BOOLEAN NoCorpRecsExist) := FUNCTION                                                                                                        
+          res := NoCorpRecsExist;
+          RETURN(res);
      END; // function
                              
-     EXPORT IsVacantAddress(STRING5 inZip5, STRING28 InStreetName, STRING10 InStreetNumber) := FUNCTION                  
-                                                                     
-                           res := PROJECT(Advo.Key_Addr1(zip = InZip5 and prim_range = InStreetNumber AND prim_name = InStreetName), 
-                                           TRANSFORM({STRING1 address_vacancy_indicator;}, SELF := LEFT));                                                                          
-                            RETURN (res[1].address_vacancy_indicator = 'Y');                            
+     EXPORT IsVacantAddress(STRING5 inZip5, STRING28 InStreetName, STRING10 InStreetNumber) := FUNCTION                                                                                       
+           res := PROJECT(Advo.Key_Addr1(zip = InZip5 and prim_range = InStreetNumber AND prim_name = InStreetName), 
+           TRANSFORM({STRING1 address_vacancy_indicator;}, SELF := LEFT));                                                                          
+          RETURN (res[1].address_vacancy_indicator = 'Y');                            
      END; // function
                         
                         // last activity on business > 12 months ago - could possibly use the addressToDate in the bestsection here.
@@ -41,30 +38,11 @@ EXPORT BusinessInsightFunctions := MODULE
                     RETURN(Indate < OneYearBack);
       END; // function
    
-   
-      EXPORT NoFirmagraphicsData ( dataset (BIPV2.IDlayouts.l_xlink_ids) biplinkids
-                                                           ,STRING1 FETCH_LEVEL
-                                                             ,UNSIGNED4 FETCH_KEEP_LIMIT,
-                                                             TopBusiness_Services.FinanceSection_Layouts.rec_final   FinanceSectionIn) := FUNCTION
-          ds_industry_keyrecs := Topbusiness_services.IndustrySection.GetIndustryBipLinkids(
-                                                                                       biplinkids
-                                                                                     , FETCH_LEVEL
-                                                                                     , FETCH_KEEP_LIMIT);
-          ds_industry_keyrecs_filtered := ds_industry_keyrecs((SicCode !='' or NAICS !='' OR
-                                                       industry_description !=''   OR
-                                                       business_description !='')
-										AND
-										((source=MDR.sourceTools.src_EBR AND
-										record_type='C') OR
-										         source !=MDR.sourceTools.src_EBR)
-											);
-           
-            NoRevenue :=  (NOT(EXISTS(FinanceSectionIn.Finances))) OR EXISTS(FinanceSectionIn.Finances(AnnualSales = '0'));
-           res :=  NOT(EXISTS(ds_industry_keyrecs_filtered)) AND NoRevenue;
+       EXPORT NoFirmagraphicsData (  BOOLEAN  AnnualSalesIsZeroOrNotExistSiccodes   ) := FUNCTION        
+           res := AnnualSalesIsZeroOrNotExistSiccodes;
            RETURN (res);
        END; // function
     
-
    // Business established less than one year ago
        EXPORT BusinessisLessThanOneYearBack(INTEGER2 YearStarted) := FUNCTION
           STRING8 CurDate := (STRING8) STD.Date.today();
@@ -77,7 +55,7 @@ EXPORT BusinessInsightFunctions := MODULE
               RETURN( res);
        END; // function
         
-       EXPORT NoPeopleConnectionsToBusiness(UNSIGNED4  countBusinessContacts) := function
+       EXPORT NoPeopleConnectionsToBusiness(UNSIGNED4  countBusinessContacts) :=  FUNCTION
              res :=  countBusinessContacts = 0;
              RETURN(res);
        END;
@@ -106,52 +84,12 @@ EXPORT BusinessInsightFunctions := MODULE
             res := lastActivityDateUnsigned >= ThreeMonthsBackDate;
              RETURN (res);       
         END; // function
-          
-        EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLinkids
-                                                                         ,STRING1 FETCH_LEVEL
-                                                                         ,UNSIGNED4 FETCH_KEEP_LIMIT
-                                                                         ,INTEGER NumYrs) :=  FUNCTION     
-             ds_linkids_keyrecs := Topbusiness_services.uccSection.GetUCCBipLinkids(InBiplinkids, FETCH_LEVEL, FETCH_KEEP_LIMIT); 
-                  
-             ds_linkids_keyrecs_slimmed := PROJECT (ds_linkids_keyrecs(party_type != 'A'),
-		           TRANSFORM(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_linkidsdata_slimmed, //TODO can slim this down probably to just TMSID			
-			       SELF := LEFT;
-                       SELF := [];
-			));
-                  
-                  ds_linkids_keyrecs_deduped := DEDUP(SORT(ds_linkids_keyrecs_slimmed,  
-                                                                                    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),tmsid),
-																#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), tmsid);
-                 set_terminated_types := ['LAPSED','L','RELEASE','EXPUNGED','DELETED',
-	                         'TERMINATED','TERMINATION','UCC3 TERMINATION', 'UCC-3 TERMINATION'];
-
-                 ds_uccmain_keyrecs := JOIN(ds_linkids_keyrecs_deduped,UCCV2.Key_Rmsid_Main(),
-                               KEYED(LEFT.tmsid = RIGHT.tmsid), //get all recs for the tmsids
-	                  TRANSFORM({TopBusiness_Services.UCCSection_Layouts.rec_ids_with_maindata_slimmed; UNSIGNED4 Filing_date_unsigned;},
-		                                       // Added this additional field here.
-			        temp_status_type           := std.str.ToUpperCase(RIGHT.status_type);
-			        temp_filing_type           :=  std.str.ToUpperCase(RIGHT.filing_type);						
-			        SELF.orig_filing_number    := IF(RIGHT.orig_filing_number != '', RIGHT.orig_filing_number,RIGHT.filing_number),
-			
-                        SELF.filing_date_unsigned := (UNSIGNED4) RIGHT.filing_date;
-	                   // Fill in derived UCC overall status(status_code), A=active or T=terminated
-			        SELF.status_code           := IF (temp_status_type IN set_terminated_types OR  temp_filing_type IN set_terminated_types,
-											topbusiness_services.Constants.TERMINATED,Constants.ACTIVE);                                                                
-			        SELF := RIGHT, // to pull off the ucc main key fields we want                       ???
-			               // (which have the same name on the temp layout as on the main key)
-			        SELF := LEFT, // to preserve ids & other(?) kept linkids key fields ???
-                        SELF := [];
-                   ),
-		           LEFT OUTER, 		
-		           LIMIT(10000,SKIP) 
-	            );                                      
-            //output(ds_uccmain_keyrecs, named('ds_uccmain_keyrecs'));               
-            STRING8 CurDate := (STRING8) STD.Date.today();
-           UNSIGNED4 XYearBack := ((UNSIGNED4) (curdate[1..4])) - NumYrs;   // +  curDate[5..6] + curDate[7..8]);
-           UNSIGNED4 XYearBackFinal := (UNSIGNED4)( (STRING4) (XYearBack) +  curDate[5..6] + curDate[7..8] );
-          res := EXISTS(ds_uccmain_keyrecs(filing_date_unsigned > XYearBackFinal));                                  
-       RETURN (res);
-    END; // function
+             
+           EXPORT UccActivity( BOOLEAN BooleanIn) :=  FUNCTION     
+                 Res := BooleanIn;
+                 RETURN(res);
+            END;                 
+                                                                                                 
  //   end of story #70 risk indicator code (business Evidence)
  
  // ****************************************************
@@ -435,15 +373,11 @@ EXPORT BusinessInsightFunctions := MODULE
                     RETURN(res);
              END;
              
-             EXPORT RecentUCCActivity(DATASET (BIPV2.IDlayouts.l_xlink_ids) biplinkids
-                                                              ,STRING1 FETCH_LEVEL
-                                                              ,UNSIGNED4 FETCH_LIMIT
-                                                              ,INTEGER NumYrsback) := FUNCTION
-                   res := UccActivityWithinXYears(biplinkids
-                                                                            ,FETCH_LEVEL
-                                                                            ,Topbusiness_services.constants.BusinessInsight.UCCBusinessInsightKfetchMaxLimit
-                                                                            ,NumYrsBack);                                                                                                                                                                                           
-                   RETURN(res);      
+             
+               EXPORT RecentUCCActivity(BOOLEAN  InBoolean
+                                                              ) := FUNCTION                                                              
+                   a := 0;                                                                                                                                                               
+                   RETURN(InBoolean);      
                 END;
                 
               EXPORT BusinessInHighCrimeLocation(TopBusiness_Services.BestSection_Layouts.final   BestSectionIn) := FUNCTION
