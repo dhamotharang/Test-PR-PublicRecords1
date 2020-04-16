@@ -40,6 +40,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																					,InputSF_prebuild2
 																					,InputSF_prebuild3
 																				 );
+		run_scrubs						:= scrubs_Diversity_Certification.fn_RunScrubs(pversion);
 		dops_update 					:= if(scrubs.mac_ScrubsFailureTest('scrubs_diversity_certification',pversion),Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com'),OUTPUT('Scrubs Failed due',NAMED('Scrubs_Failure'))); 															
 									
 		export full_build 	  := sequential( nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
@@ -58,7 +59,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																				,Out_Strata_Population_Stats(pversion)
 																				,output(choosen(Files().keybuildSF(bdid<>0) , 1000), named ('keybuild_SampleRecords'))
 																				,output(choosen(Files().Base.qa(bdid<>0) , 1000), named ('BaseFile_SampleRecords'))
-																				,scrubs_Diversity_Certification.fn_RunScrubs(pversion)
+																				,run_scrubs
 																				,dops_update
 																				) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
    
