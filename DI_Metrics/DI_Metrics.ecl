@@ -6,7 +6,7 @@
 
 export DI_Metrics(string pHostname, string pTarget, string pContact ='\' \'') := function
 
-SEQUENTIAL(
+build_all := SEQUENTIAL(
 
 DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
@@ -33,5 +33,7 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 ,DI_Metrics.FCRA_Watercraft(pHostname, pTarget, pContact)
 
 );
+
+return build_all;
 
 end;
