@@ -151,16 +151,22 @@ dincident_TF :=  	dedup(sort(distribute(
 													,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,right,local)
 											;	
 											
-dincidentCombined := dincident_EA + dincident_EA_Coplogic + dincident_EA_CRU	+ dincident_TF ;										
+dincidentCombined := dincident_EA + dincident_EA_Coplogic + dincident_EA_CRU	+ dincident_TF ;	
+
+fabAgency := project(agency, transform({agency},
+                                       self.agency_ori := map(left.agency_ori = '' and trim(left.agency_id,all) = '1520042' => 'GA0280000',
+                                                              left.agency_ori = '' and trim(left.agency_id,all) = '1521562' => 'GA0331200',
+											                                        left.agency_ori);
+																			 self := left;));
 //------------------------------------------------------------------------------------------------------------------							
-Layout_Infiles_Fixed.incident_ori trecs0(dincidentCombined L, agency R) := transform
+Layout_Infiles_Fixed.incident_ori trecs0(dincidentCombined L, fabAgency R) := transform
 self.agency_name := if(L.agency_id = R.agency_id,R.Agency_Name,'');// use this for QC ,if(work_type_id not in ['2','3'],l.agency_name,''));
 self.agency_ori := if(L.agency_id = R.agency_id,R.Agency_Ori,'');
 self := L;
 self := [];
 end;
 
-jrecs0 := distribute(join(dincidentCombined,agency,
+jrecs0 := distribute(join(dincidentCombined,fabAgency,
 							left.agency_id = right.agency_id,
 							trecs0(left,right),left outer,lookup),hash(incident_id)):independent;
 
