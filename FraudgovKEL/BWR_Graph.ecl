@@ -3,7 +3,6 @@
 IMPORT KEL011 AS KEL;
 IMPORT * FROM KEL011.Null;
 IMPORT * FROM FraudgovKEL;
-OUTPUT(Q_Temp.Res0,NAMED('Temp_0'));
 OUTPUT(Q__show_Customer_Person_Event.Res0,NAMED('showCustomerPersonEvent_0'));
 OUTPUT(Q__show_Customer_Person.Res0,NAMED('showCustomerPerson_0'));
 OUTPUT(Q__show_Customer.Res0,NAMED('showCustomer_0'));
