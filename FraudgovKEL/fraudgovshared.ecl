@@ -125,10 +125,11 @@ or ssn in ['595637941','589650781','770703763'])
                            : PERSIST('~temp::deleteme27');
                            
 // output this to setup ramps cert to be able to build without having all the appends.
+set_record_id := [86763133,86763531,86763916,86765020,86766105,86766831,86774545,86774685,86775406,86780434,86785164,86785586,86768257,86772043,86792404,86796205,86806947,86826833,86843196,86866824,86871454,86879333,86880951,86897697,86910269];
+
 tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR))
-               ((zip = '33136' and (UNSIGNED)event_date < 20130825) OR
-							   OttoIpAddressId % 100 = 0
+               (record_id in set_record_id
 							 );
 //output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
-EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; // tempbuild;
+EXPORT FraudGovShared := CustomerAddressPersonPrep1; // tempbuild;
