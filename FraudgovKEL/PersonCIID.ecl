@@ -182,9 +182,9 @@ newr := RECORD
   string errorcode;
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
-  STRING Hri;
   integer1 relativeaddressmatch;
-	unsigned6 did_orig;
+  unsigned6 did_orig;
+  STRING Hri;
  END;
 
 FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Ciid.built
