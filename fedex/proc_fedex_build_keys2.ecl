@@ -97,12 +97,7 @@ OUTACTION :=
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','SUCC', version_date, send_succ_msg, RoxieKeyBuild.Email_Notification_List);
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
 	Run_Scrubs 	:= scrubs_fedex.fn_RunScrubs(version_date);
-	update_dops := 	if
-					(
-						scrubs.mac_ScrubsFailureTest('scrubs_fedex',version_date),
-						RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N'),
-						OUTPUT('Dops update failure due to scrubs reject warning(s)',NAMED('Failure_warning'))
-					);
+	update_dops := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N');
 	build_keys	:= sequential(outaction, move_qa);
 
 	build_fedex_keys := sequential
