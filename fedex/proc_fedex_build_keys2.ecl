@@ -1,4 +1,4 @@
-﻿import AutokeyB2, autokey, roxiekeybuild, CanadianPhones, scrubs, scrubs_fedex;
+﻿import AutokeyB2, autokey, roxiekeybuild, CanadianPhones,scrubs_fedex;
 
 export proc_fedex_build_keys2(string version_date) := function
 	fedex_dataset := fedex.fedex_autokey_constants.autokey_dataset2;
