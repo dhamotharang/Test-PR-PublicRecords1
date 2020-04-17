@@ -23,13 +23,15 @@ FraudGovWithBank := AppendBankDetails.macAppendBankDetails(FraudGovWithBank1, ba
 FraudGovWithDeceased := JOIN(FraudGovWithBank, FraudgovKEL.PersonDeceased, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // CIID
-FraudGovWithCIID := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonCIID, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+//FraudGovWithCIID := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonCIID, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // FraudPoint
-FraudGovWithFraudpoint := JOIN(FraudGovWithCIID, FraudgovKEL.PersonFraudPoint, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+//FraudGovWithFraudpoint := JOIN(FraudGovWithCIID, FraudgovKEL.PersonFraudPoint, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+FraudGovWithBocashell := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonBocashell, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // IP Metadata
-FraudGovWithIPMetadata := JOIN(FraudGovWithFraudpoint, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+FraudGovWithIPMetadata := JOIN(FraudGovWithBocashell, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // Crim
 FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, FraudgovKEL.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
