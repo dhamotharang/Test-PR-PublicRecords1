@@ -8,7 +8,7 @@ fcra_all				:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit);
 //Remove FCRA related information from non-updating sources
 	hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory removeInfo(fcra_filtered l):= transform
 	  self.fcra_offense_key 							:= '';
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
