@@ -56,7 +56,7 @@ MODULE
 
 			SELF.Household_ID := l.SearchCaseId;
 			SELF.Customer_Person_ID := l.SearchClientId;
-			SELF.Source_RIN := if(l.ActivityType, '1', 8, 10); //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+			SELF.RIN_Source := if(l.ActivityType='1', 8, 10); //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
 			SELF := L;
 			SELF := [];
 	END;
@@ -112,7 +112,7 @@ MODULE
 
 			SELF.Household_id	:= L.CaseID;
 			SELF.Customer_Person_ID	:= L.ClientID;
-			SELF.Source_RIN := 11; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+			SELF.RIN_Source := 11; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
 			SELF := L;
 			SELF := [];
 	END;
@@ -161,7 +161,7 @@ MODULE
 
 			SELF.Household_id	:= R.Case_Identifier;
 			SELF.Customer_Person_ID	:= R.Client_Identifier;
-			SELF.Source_RIN := 11; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+			SELF.RIN_Source := 11; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
 			SELF := L;
 			SELF := [];
 	END;
