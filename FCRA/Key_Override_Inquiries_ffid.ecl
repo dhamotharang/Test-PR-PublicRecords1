@@ -1,6 +1,8 @@
 ﻿import fcra, ut;
 
-base_file := dataset('~thor_data400::base::override::fcra::qa::Inquiries',FCRA.Layout_Override_Inquiries,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+//CCPA-1048
+base_file0 := dataset('~thor_data400::base::override::fcra::qa::Inquiries',FCRA.Layout_Override_Inquiries_In,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+base_file  := PROJECT(base_file0,FCRA.Layout_Override_Inquiries);
 
 kf := dedup(sort(base_file,-flag_file_id),except flag_file_id,keep(1));
 

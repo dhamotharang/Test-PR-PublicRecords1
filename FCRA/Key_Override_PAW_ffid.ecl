@@ -1,6 +1,8 @@
 ﻿import fcra, ut, data_services, Overrides;
 
-base_file := dataset('~thor_data400::base::override::fcra::qa::PAW',FCRA.Layout_Override_PAW,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt)(flag_file_id<>'');
+//CCPA-1052 - Add CCPA fields to Override PAW key
+base_file0 := dataset('~thor_data400::base::override::fcra::qa::PAW',FCRA.Layout_Override_PAW_In,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt)(flag_file_id<>'');
+base_file  := PROJECT(base_file0, $.Layout_Override_PAW);
 
 kf := dedup(sort(base_file,-flag_file_id),except flag_file_id,keep(1));
 

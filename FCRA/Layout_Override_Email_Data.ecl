@@ -1,7 +1,7 @@
-﻿import Email_Data;
+﻿IMPORT Email_Data;
 
-export Layout_Override_Email_Data := record
-	//exclude new CCPA fields
-	Email_Data.Layout_Email.Keys - [global_sid, record_sid];
+EXPORT Layout_Override_Email_Data := record
+	//CCPA-1044 - include CCPA fields global_sid and record_sid
+	Email_Data.Layout_Email.Keys;
 	STRING20 flag_file_id;
-end;
+END;
