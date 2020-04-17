@@ -101,27 +101,16 @@ MODULE
     END;
 
     lRTPIn xtIQ411In(lBatchIn pInput) := TRANSFORM
-      SELF.acctno := pInput.acctno;
-      SELF.did := pInput.did;
-      SELF.name_first := '';
-      SELF.name_last := pInput.name_last;
       SELF.ssn := IF(pInput.ssn != '',INTFORMAT((INTEGER)pInput.ssn,9,1),'');
-      SELF.phoneno := IF(~inMod.IsPrimarySearchPII, pInput.homephone, '');
-      SELF.prim_range := pInput.prim_range;
-      SELF.predir := pInput.predir;
-      SELF.prim_name := pInput.prim_name;
+      SELF.phoneno := pInput.homephone;
       SELF.suffix := pInput.addr_suffix;
-      SELF.postdir := pInput.postdir;
-      SELF.sec_range := pInput.sec_range;
-      SELF.p_city_name := pInput.p_city_name;
-      SELF.st := pInput.st;
-      SELF.z5 := pInput.z5;
+      SELF := pInput; // acctno, did, name_first, name_last, prim_range, predir, prim_name, postdir, sec_range, p_city_name, st, z5
       SELF := [];
     END;
     dRtpIn := PROJECT(dIn, xtIQ411In(LEFT)); 
 
     // apply ccpa optout before calling the gateway
-    dRtpInClean := dx_gateway.parser_qsent_raw.CleanRawRequest(dRTPIn, mod_access);
+    dRtpInClean := dx_gateway.parser_qsent_raw.CleanRawRequest(dRtpIn, mod_access);
 
     // making single call to Qsent with full addr, last name and ssn to improve response time
     rQSent_Layout IQ411_Recs(lRTPIn pInput) :=
@@ -186,7 +175,7 @@ MODULE
         IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway,
         DATASET([$.Constants.PFSourceCodes.QsentIQ411], $.Layouts.PhoneFinder.src_rec)),
         SELF := LEFT)); 
-        
+
     // Debug
     #IF(PhoneFinder_Services.Constants.Debug.QSent)
       OUTPUT(dIn,NAMED('dQSentIQ411_In'));
