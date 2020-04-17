@@ -35,9 +35,10 @@ module
 		self.ind_type 	:= functions.ind_type_fn(fn[4]);
 		self.file_type := 1 ;
 		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification:
-		self.RIN_Source := map(	l.RIN_Source = 0 and l.confidence_that_activity_was_deceitful != 3 ) => 2, //Known Risk
-								l.RIN_Source = 0 and l.confidence_that_activity_was_deceitful = 3 ) => 3,  //Safelist 
-								l.RIN_Source);  // NAC
+		self.RIN_Source := map(
+														regexfind('KnownRisk',filename,nocase) => 2, //knownrisk
+														regexfind('Safelist',filename,nocase) => 3, //safelist
+														l.RIN_Source);  // NAC
 		self:=l;
 		self:=[];
 	end;
