@@ -1,4 +1,4 @@
-import doxie, tools,autokeyb2,dca;
+﻿import doxie, tools,autokeyb2,dca;
 export Keys(
 	 string													pversion									= ''
 	,boolean												pUseOtherEnvironment			= false
@@ -18,7 +18,9 @@ module
 	export EntNumNonFilter := pFileKeybuildNonFiltered;
 		
 	export FilterBdids	 := Basebdid	(bdid	!= 0);
-	export dFileContacts := pFileContacts;
+	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029 
+	export dFileContacts 		:= pFileContacts;
+	export FilterContBdids	:= dFileContacts(bdid	!= 0);
 	
 	shared layout_dca_hierarchy :=
 	record
@@ -96,6 +98,7 @@ module
 	export HierEntNum 	:= tools.macf_FilesIndex('dHierRootSubNew		,{Enterprise_num																							}	,{dHierRootSubNew	}'	,knames.HierEntNum		);
 	export EntNum				:= tools.macf_FilesIndex('EntNumFilt   		  ,{Enterprise_num																							}	,{EntNumFilt  		}'	,knames.EntNum				);
 	export EntNumNonFilt:= tools.macf_FilesIndex('EntNumNonFilter		,{Enterprise_num																				    	}	,{EntNumNonFilter }'	,knames.EntNumNonFilt	);
+	export ContactBdid 	:= tools.macf_FilesIndex('FilterContBdids		,{bdid																												}	,{FilterContBdids	}'	,knames.ContactBdid		);
 
 end;
 
