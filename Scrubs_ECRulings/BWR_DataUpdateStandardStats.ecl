@@ -11,5 +11,7 @@ dsNew := DATASET(mynewfile, Scrubs_ECRulings.Layout_ECRulings, THOR);
 dsPrev := DATASET(myprevfile, Scrubs_ECRulings.Layout_ECRulings, THOR);
  
 hygieneStats := Scrubs_ECRulings.hygiene(dsNew).StandardStats();
-allStats := hygieneStats;
+scrubsStats := Scrubs_ECRulings.Scrubs.StandardStats(dsNew);
+deltaStats := IF(TRIM(myprevfile) > '' AND EXISTS(dsPrev), Scrubs_ECRulings.Delta(dsPrev, dsNew).StandardStats());
+allStats := hygieneStats & scrubsStats & deltaStats;
 OUTPUT(allStats,, mystatsfile);
