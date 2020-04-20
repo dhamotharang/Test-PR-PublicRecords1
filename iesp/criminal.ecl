@@ -1,4 +1,4 @@
-﻿// Note to ECL Developers:
+// Note to ECL Developers:
 // 
 // On 07/09/2019 for the 2019 Criminal Records Report Enhancement (add offense town) Project; 
 // when 1 new OffenseTown field was to be added to the t_CrimReportOffense record of the ESDL 
@@ -75,6 +75,8 @@ export t_CrimSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IncludeCannotClassify {xpath('IncludeCannotClassify')};
 	boolean IncludeWarrantFugitive {xpath('IncludeWarrantFugitive')};
 	boolean IncludeObstructResist {xpath('IncludeObstructResist')};
+	string OffenseType {xpath('OffenseType')}; //values['','all','felonies','']
+	boolean ConvictionsOnly {xpath('ConvictionsOnly')};
 end;
 		
 export t_CrimSearchBy := record
