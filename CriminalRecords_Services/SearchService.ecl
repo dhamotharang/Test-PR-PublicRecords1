@@ -89,6 +89,8 @@ export SearchService := MACRO
     export string8    CaseFilingStartDate  := iesp.ECL2ESP.t_DateToString8(search_by.CaseFilingDateRange.StartDate);
     export string8    CaseFilingEndDate    := iesp.ECL2ESP.t_DateToString8(search_by.CaseFilingDateRange.EndDate);
     export unsigned   OffenseCategories := CriminalRecords_Services.IParam.getOffenseCategories(first_row.options);
+    export string     OffenseType := first_row.options.OffenseType;
+    export boolean    ConvictionsOnly := first_row.options.ConvictionsOnly;
   end;
 
   is_valid_dateinput := (tempmod.CaseFilingStartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.CaseFilingStartDate)) 
