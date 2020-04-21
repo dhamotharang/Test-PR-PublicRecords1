@@ -100,6 +100,7 @@ export rWCOCategories := Record
 	string			SubCategoryLabel {maxlength(100)};
 	string			SubCategoryDesc {maxlength(100)};
 	string			LastUpdated;
+	string			IsActivePEP;
 	END;
 export rRelationship := RECORD
 	unsigned8		RID;
