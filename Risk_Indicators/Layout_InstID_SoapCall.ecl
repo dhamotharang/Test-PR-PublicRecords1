@@ -45,4 +45,5 @@ export Layout_InstID_SoapCall := RECORD
 	boolean PreScreen := false;
 	unsigned3 LastSeenThreshold := 0;
 	boolean UseIngestDate := false;
+  boolean TurnOffTumblings := false;
 END;
