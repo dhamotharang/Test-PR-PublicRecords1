@@ -171,6 +171,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING ACECleanerErrorCode=NULL(),
 		BOOLEAN isAdditional,
 
+    STRING PhoneFormatted,
+
     STRING LicenseNumber,
     STRING LicenseState, 
 
@@ -398,6 +400,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		LicenseNumber,
     LicenseState,
 
+    PhoneFormatted,
+		
     EmailAddress, Type, CreatedOn, Host , EmailLastDomain, isdisposableemail,
 
     Ssn, SsnFormatted,
@@ -856,31 +860,29 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     drlcvalflag = iid.drlcvalflag,
     hphonevalflag = iid.hphonevalflag,
     truedid	= truedid,
-    best_fname	= best_flags.fname,
-    best_lname	= best_flags.lname,
-    best_ssn	= best_flags.ssn,
+    best_fname = best_fname,
+    best_lname = best_lname,
+    best_ssn = best_ssn,
     input_fname_isbestmatch	= best_pii_flags.input_fname_isbestmatch,
     input_lname_isbestmatch	= best_pii_flags.input_lname_isbestmatch,
     input_ssn_isbestmatch	= best_pii_flags.input_ssn_isbestmatch,
+		
+    add_curr_prim_range = add_curr_prim_range,
+    add_curr_predir = add_curr_predir,
+    add_curr_prim_name = add_curr_prim_name,
+    add_curr_addr_suffix = add_curr_addr_suffix,
+    add_curr_postdir = add_curr_postdir,
+    add_curr_unit_desig = add_curr_unit_desig,
+    add_curr_sec_range = add_curr_sec_range,
+    add_curr_city_name = add_curr_city_name,
+    add_curr_st = add_curr_st,
+    add_curr_zip5 = add_curr_zip5,
+    add_curr_county = add_curr_county,
+    add_curr_geo_blk = add_curr_geo_blk,
+    add_curr_lat = add_curr_lat,
+    add_curr_long = add_curr_long,
+    
     add_curr_pop	= address_verification.address_history_1.addrpop,
-		/*
-    add_curr_prim_range	= address_verification.address_history_1.prim_range,
-    add_curr_predir	= address_verification.address_history_1.predir,
-    add_curr_prim_name	= address_verification.address_history_1.prim_name,
-    add_curr_addr_suffix	= address_verification.address_history_1.addr_suffix,
-    add_curr_postdir	= address_verification.address_history_1.postdir,
-    add_curr_unit_desig	= address_verification.address_history_1.unit_desig,
-    add_curr_sec_range	= address_verification.address_history_1.sec_range,
-    add_curr_city_name	= address_verification.address_history_1.city_name,
-    */
-    add_curr_st	= address_verification.address_history_1.st,
-    add_curr_zip5	= address_verification.address_history_1.zip5,
-    add_curr_county	= address_verification.address_history_1.county,
-    add_curr_geo_blk	= address_verification.address_history_1.geo_blk,
-		/*
-    add_curr_lat	= address_verification.address_history_1.lat,
-    add_curr_long	= address_verification.address_history_1.long,
-    */
     add_input_isbestmatch	= address_verification.input_address_information.isbestmatch
 
 		
@@ -1709,14 +1711,14 @@ Event: => IpIsLastEventId := MAP(rInternetProtocol.LastRecordId = RecordId => 1,
 Event: => BnkIsLastEventId := MAP(rBankAccount.LastRecordId = RecordId => 1, 0);
 Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0);
 
-Event: => PersonLabel := Subject.Label;
-Event: => EmailLabel := rEmail.Label;
-Event: => AddressLabel := Location.FullAddress;
-Event: => IpLabel := rInternetProtocol.Label;
-Event: => SsnLabel := rSsn.Label;
-Event: => PhoneLabel := rPhone.Label;
-Event: => BankAccountLabel := rBankAccount.Label;
-Event: => DriversLicenseLabel := rDriversLicense.Label;
+Event: => PersonLabel := TRIM(FirstName) + ' ' + TRIM(LastName);
+Event: => EmailLabel := EmailAddress;
+Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
+Event: => IpLabel := IpAddress;
+Event: => SsnLabel := SsnFormatted;
+Event: => PhoneLabel := PhoneFormatted;
+Event: => BankAccountLabel := AccountNumber;
+Event: => DriversLicenseLabel := LicenseNumber;
 
 Event: => AddressEntityContextUid := Location.EntityContextUid;
 Event: => SsnEntityContextUid := rSsn.EntityContextUid;
