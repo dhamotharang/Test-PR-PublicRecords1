@@ -4,8 +4,8 @@ IMPORT E_Bank,E_Customer FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Bank_2 := MODULE
   SHARED VIRTUAL TYPEOF(E_Bank.__Result) __E_Bank := E_Bank.__Result;
-  SHARED __EE222169 := __E_Bank;
-  EXPORT __ST34820_Layout := RECORD
+  SHARED __EE222869 := __E_Bank;
+  EXPORT __ST34944_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Bank.Source_Customers_Layout) Source_Customers_;
@@ -21,9 +21,9 @@ EXPORT B_Bank_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST34820_Layout __ND222204__Project(E_Bank.Layout __PP222091) := TRANSFORM
-    SELF.High_Risk_Routing_ := MAP(__T(__OP2(__PP222091.Routing_Number_,IN,__CN(['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'])))=>1,0);
-    SELF := __PP222091;
+  SHARED __ST34944_Layout __ND222904__Project(E_Bank.Layout __PP222791) := TRANSFORM
+    SELF.High_Risk_Routing_ := MAP(__T(__OP2(__PP222791.Routing_Number_,IN,__CN(['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'])))=>1,0);
+    SELF := __PP222791;
   END;
-  EXPORT __ENH_Bank_2 := PROJECT(__EE222169,__ND222204__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Bank_2 := PROJECT(__EE222869,__ND222904__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank::Annotated_2',EXPIRE(7));
 END;

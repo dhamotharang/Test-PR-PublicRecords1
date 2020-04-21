@@ -3,9 +3,9 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Customer,B_Customer_4,B_Internet_Protocol,E_Customer,E_Internet_Protocol FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer_Ip_Address_Entities := MODULE
-  SHARED __EE1337545 := B_Internet_Protocol.IDX_Internet_Protocol_UID_Wrapped;
-  SHARED __EE1337788 := PROJECT(B_Customer.IDX_Customer_UID_Wrapped,E_Customer.Layout);
-  SHARED __ST1269600_Layout := RECORD
+  SHARED __EE1338598 := B_Internet_Protocol.IDX_Internet_Protocol_UID_Wrapped;
+  SHARED __EE1338841 := PROJECT(B_Customer.IDX_Customer_UID_Wrapped,E_Customer.Layout);
+  SHARED __ST1270652_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
@@ -142,16 +142,16 @@ EXPORT RQ__show_Customer_Ip_Address_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1337802(B_Internet_Protocol.__ST26986_Layout __EE1337545, E_Customer.Layout __EE1337788) := __EEQP(__EE1337545._r_Customer_,__EE1337788.UID);
-  __ST1269600_Layout __JT1337802(B_Internet_Protocol.__ST26986_Layout __l, E_Customer.Layout __r) := TRANSFORM
+  __JC1338855(B_Internet_Protocol.__ST27182_Layout __EE1338598, E_Customer.Layout __EE1338841) := __EEQP(__EE1338598._r_Customer_,__EE1338841.UID);
+  __ST1270652_Layout __JT1338855(B_Internet_Protocol.__ST27182_Layout __l, E_Customer.Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Customer_Id__1_ := __r.Customer_Id_;
     SELF.Industry_Type__1_ := __r.Industry_Type_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1337990 := JOIN(__EE1337545,__EE1337788,__JC1337802(LEFT,RIGHT),__JT1337802(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST1269460_Layout := RECORD
+  SHARED __EE1339043 := JOIN(__EE1338598,__EE1338841,__JC1338855(LEFT,RIGHT),__JT1338855(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __ST1270512_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
@@ -171,12 +171,12 @@ EXPORT RQ__show_Customer_Ip_Address_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST1269460_Layout __ND1338139__Project(__ST1269600_Layout __PP1337991) := TRANSFORM
-    SELF.Source_Customer_ := __PP1337991._r_Customer_;
-    SELF.Customer_Id_ := __PP1337991.Customer_Id__1_;
-    SELF.Industry_Type_ := __PP1337991.Industry_Type__1_;
-    SELF.Person_Count_ := __PP1337991.Identity_Count_;
-    SELF := __PP1337991;
+  SHARED __ST1270512_Layout __ND1339192__Project(__ST1270652_Layout __PP1339044) := TRANSFORM
+    SELF.Source_Customer_ := __PP1339044._r_Customer_;
+    SELF.Customer_Id_ := __PP1339044.Customer_Id__1_;
+    SELF.Industry_Type_ := __PP1339044.Industry_Type__1_;
+    SELF.Person_Count_ := __PP1339044.Identity_Count_;
+    SELF := __PP1339044;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE1337990,__ND1338139__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_Customer_,Customer_Id_,Industry_Type_,Entity_Context_Uid_,Label_,Entity_Type_,Person_Count_,In_Customer_Population_,Contributor_Safe_Flag_,Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Kr_High_Risk_Flag_,Kr_Medium_Risk_Flag_,Kr_Low_Risk_Flag_},Source_Customer_,Customer_Id_,Industry_Type_,Entity_Context_Uid_,Label_,Entity_Type_,Person_Count_,In_Customer_Population_,Contributor_Safe_Flag_,Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Kr_High_Risk_Flag_,Kr_Medium_Risk_Flag_,Kr_Low_Risk_Flag_,MERGE),__ST1269460_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE1339043,__ND1339192__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_Customer_,Customer_Id_,Industry_Type_,Entity_Context_Uid_,Label_,Entity_Type_,Person_Count_,In_Customer_Population_,Contributor_Safe_Flag_,Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Kr_High_Risk_Flag_,Kr_Medium_Risk_Flag_,Kr_Low_Risk_Flag_},Source_Customer_,Customer_Id_,Industry_Type_,Entity_Context_Uid_,Label_,Entity_Type_,Person_Count_,In_Customer_Population_,Contributor_Safe_Flag_,Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Kr_High_Risk_Flag_,Kr_Medium_Risk_Flag_,Kr_Low_Risk_Flag_,MERGE),__ST1270512_Layout));
 END;
