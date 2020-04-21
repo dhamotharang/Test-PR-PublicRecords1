@@ -1,4 +1,4 @@
-import Address,NID;
+﻿import Address,NID;
 export layouts := module
 
 // Airmen Raw Layouts
@@ -39,7 +39,7 @@ export nonpilotraw := record
    string33 street2;
    string17 city;
    string2 state;
-   string10 zip;
+   string10 zip_code;
    string18 country;
    string2 region;
    string1 med_class;
@@ -60,7 +60,7 @@ export nonpilotrawfill := record
    string33 street2;
    string17 city;
    string2 state;
-   string10 zip;
+   string10 zip_code;
    string18 country;
    string2 region;
    string1 med_class;
