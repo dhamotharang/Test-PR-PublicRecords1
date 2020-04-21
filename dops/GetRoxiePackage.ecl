@@ -322,12 +322,24 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	end;
 	
 	
-	export fDatasetAsXMLPackage(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)) := function
+	export fDatasetAsXMLPackage(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)
+																	,boolean pBuildWithoutPart = true) := function
 		
-		dGetPackageAsDataset := if (count(pGetPackageAsDataset) = 0
+		dGetPackageAsDatasetWithPart := if (count(pGetPackageAsDataset) = 0
 															,sort(fXMLPackageAsDataset(),packagename,partid,packageid,environmentid,baseid,superfile)
 															,sort(pGetPackageAsDataset,packagename,partid,packageid,environmentid,baseid,superfile)
 															): independent;
+															
+		typeof(dGetPackageAsDatasetWithPart) xNoParts(dGetPackageAsDatasetWithPart l) := transform
+			self.partid := '';
+			self := l;
+		end;
+		
+		dGetPackageAsDatasetWithoutPart := project(dGetPackageAsDatasetWithPart,xNoParts(left));
+		
+		dGetPackageAsDataset := if (pBuildWithoutPart
+																	,dGetPackageAsDatasetWithoutPart
+																	,dGetPackageAsDatasetWithPart);
 		
 		dGetPackageEnvironment := dGetPackageAsDataset(environmentid <> '');
 		
