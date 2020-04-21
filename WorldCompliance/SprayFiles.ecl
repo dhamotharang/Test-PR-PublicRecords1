@@ -6,7 +6,7 @@ sprayFile(string version, string filename, string outname) :=
 		std.File.SprayVariable(_control.IPAddress.bctlpedata10,
 							srcdir + version + '/' + filename,
 							8192,'|',,'\t',						// pipe delimited, no quote character
-							'thor400_44',
+							'thor400_dev01',
 							root + outname,
 							,,,true,true,false
 						);
