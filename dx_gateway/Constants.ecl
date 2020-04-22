@@ -1,4 +1,4 @@
-EXPORT Constants := MODULE
+﻿EXPORT Constants := MODULE
 
   EXPORT BOOLEAN DID_APPEND_LOCAL := TRUE;
   EXPORT UNSIGNED DID_SCORE_THRESHOLD := 80;
@@ -16,6 +16,18 @@ EXPORT Constants := MODULE
 
   EXPORT SocialMediaLocator := MODULE
     EXPORT GLOBAL_SID := 28431; // hard-coded here, but coming from Orbit.
+  END;
+
+  EXPORT QSent := MODULE
+    EXPORT GLOBAL_SID := 28421;
+  END;
+
+  EXPORT NetAcuity := MODULE
+    EXPORT GLOBAL_SID := 28481;
+  END;
+
+  EXPORT CaAvmReport := MODULE
+    EXPORT GLOBAL_SID := 28471; // hard-coded here, but coming from Orbit.
   END;
 
 END;

@@ -218,8 +218,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
                                             GlobalCompanyID := GlobalCompanyID)
 			);
 	
-		ip_prep := project( batchinseq( ip_addr!='' ), transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
-		ipdata_gw := risk_indicators.getNetAcuity( ip_prep, gateways, args.dppa, args.glb);
+	ip_prep := JOIN( batchinseq( ip_addr!='' ), iid, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq, self.did := right.did) );
+	ipdata_gw := risk_indicators.getNetAcuity( ip_prep, gateways, args.dppa, args.glb, applyOptOut := TRUE);
     ipdata := IF(exists(inIPdata), inIPdata_seq, ipdata_gw);
     
     //Added for Paro 9-2018

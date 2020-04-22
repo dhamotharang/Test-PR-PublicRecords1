@@ -486,6 +486,7 @@ export ChargebackDefender_Service := MACRO
 		riskwise.Layout_IPAI prep_ips(iid_results le) := transform
 			self.seq := le.bill_to_output.seq;
 			self.ipaddr := le.Bill_to_output.ip_address;
+			self.did := le.Bill_to_output.did;
 		end;
 		
 		ip_prep := ungroup(project(iid_results, prep_ips(left)));
@@ -497,7 +498,7 @@ export ChargebackDefender_Service := MACRO
 
 		gateways_in_tempNetAcuity := project(gateways_input, gwIPIDCheck(left));
 	
-		ips := risk_indicators.getNetAcuity(ip_prep, gateways_in_tempNetAcuity, dppa_purpose, glb_purpose);
+		ips := risk_indicators.getNetAcuity(ip_prep, gateways_in_tempNetAcuity, dppa_purpose, glb_purpose, applyOptOut := true);
 
 		Models.Layout_Chargeback_Out addIP(mapped_results le, ips ri) := TRANSFORM
 			self.ipdata.ipcontinent := ri.continent;

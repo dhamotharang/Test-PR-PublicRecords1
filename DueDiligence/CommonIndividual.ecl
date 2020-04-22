@@ -121,6 +121,10 @@ EXPORT CommonIndividual := MODULE
                                                                                   SELF.currentlyParoleOrProbation := IF(dataOptions.includeLegalData, RIGHT.currProbation OR RIGHT.currParole, LEFT.currentlyParoleOrProbation);
                                                                                   SELF.felonyPast3Yrs := IF(dataOptions.includeLegalData, RIGHT.felonyPast3Years, LEFT.felonyPast3Yrs);
                                                                                   
+                                                                                  SELF.offenseTrafficRelated := IF(dataOptions.includeLegalData, RIGHT.party.trafficOffenseFound, LEFT.offenseTrafficRelated);
+                                                                                  SELF.otherCriminalOffense := IF(dataOptions.includeLegalData, RIGHT.party.otherCriminalOffenseFound OR RIGHT.potentialSO, LEFT.otherCriminalOffense);
+
+                                                                                  
                                                                                   SELF.headerFirstSeenDate := IF(dataOptions.includeHeaderData, RIGHT.headerFirstSeen, LEFT.headerFirstSeenDate);
                                                                                   
                                                                                   SELF.validSSN := IF(dataOptions.includeSSNData, RIGHT.validSSN, LEFT.validSSN);

@@ -67,7 +67,6 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_provider_npi         := EntitiesIds_.GetNPI();
 	ds_provider_lnpid       := EntitiesIds_.GetLNPID();
 	ds_bankaccountnumber		:= EntitiesIds_.GetBankAccountNumber();
-	ds_DriverLicensesIds		:= EntitiesIds_.GetDriverLicenses();
 
 	//Hitting the Advance Search spcific only keys.. which are based on BatchInExtended_rec record structure.
 	Search_EntitiesIDs_ := FraudGovPlatform_Services.Search_EntitiesIDs(ds_batch_in, fraud_platform, filterBy_entity_type, IsOnline);
@@ -83,6 +82,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_CityStateIds			:= Search_EntitiesIDs_.GetCityStateIds();
 	ds_CountyIds				:= Search_EntitiesIDs_.GetCountyIds();
 	ds_ZipIds						:= Search_EntitiesIDs_.GetZipIds();
+	ds_DriverLicensesIds:= Search_EntitiesIDs_.GetDriverLicenses();
 	
 	//Find which email key to hit.
 	email_user_name :=  STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',in_rec.email_address,1));

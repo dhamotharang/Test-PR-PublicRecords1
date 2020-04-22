@@ -8,6 +8,15 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
                         BOOLEAN apply_opt_out = FALSE // CCPA opt out use
                        ) := FUNCTION
 
+  //Project in_mod onto Doxie.IDataAccess to strip off 'gateways' dataset and special AppID param
+  // so it can be used on both dx_gateway.parser_netwise_email function calls below.
+  mod_access := PROJECT(in_mod, Doxie.IDataAccess); 
+
+  // Check query input LexId in the gateway request for CCPA opt out
+  ds_recs_in_clean := dx_gateway.parser_netwise_email.fn_CleanRequest(ds_recs_in, mod_access);
+
+  ds_recs_in_ready := IF(apply_opt_out, ds_recs_in_clean, ds_recs_in);
+
   gateway_cfg := in_mod.gateways(Gateway.Configuration.IsNetWise(servicename))[1];
 
   // Use a transform to set certain fields.
@@ -38,7 +47,7 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF := L;
   END;
 
-	ds_soap_request := PROJECT(ds_recs_in, tf_IntoRequest(LEFT));
+  ds_soap_request := PROJECT(ds_recs_in_ready, tf_IntoRequest(LEFT));
 
   // Used for a gateway soapcall error,  
   // an intermediate layout to accommodate for longer soap messages 
@@ -54,7 +63,7 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
   END; 
 
   // Make the actual soapcall
-	ds_soapcall_out := IF (makeGatewayCall, 
+  ds_soapcall_out := IF (makeGatewayCall, 
                          SOAPCALL(ds_soap_request, 
                                   gateway_cfg.url,
                                   'NetWiseQuery', 
@@ -86,17 +95,17 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF := L;
   END;
 
-	ds_final_out_pre := PROJECT(ds_soapcall_out,tf_format_sc_out(LEFT));
+  ds_final_out_pre := PROJECT(ds_soapcall_out,tf_format_sc_out(LEFT));
 
-  //Project in_mod onto Doxie.IDataAccess to strip off 'gateways' dataset and special AppID param
-  mod_access := PROJECT(in_mod, Doxie.IDataAccess); 
-
+  // Check gateway response data for CCPA opt out
   ds_final_out_clean := dx_gateway.parser_netwise_email.fn_CleanResponse(ds_final_out_pre, mod_access);
 
 
   // Outputs for debugging.  Un-comment them as needed!
   //OUTPUT(ds_recs_in,        named('ds_recs_in'));
   //OUTPUT(in_mod.gateways,   named('in_mod_gateways'));
+  //OUTPUT(ds_recs_in_clean,  named('ds_recs_in_clean'));
+  //OUTPUT(ds_recs_in_ready,  named('ds_recs_in_ready'));
   //OUTPUT(gateway_cfg,       named('gateway_cfg'));
   //OUTPUT(ds_soap_request,   named('ds_soap_request'));
   //OUTPUT(ds_soapcall_out,   named('ds_soapcall_out'));

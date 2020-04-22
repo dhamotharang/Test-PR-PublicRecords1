@@ -514,34 +514,6 @@ rva.InquiryCollections12Month;
 
 rva.AlertRegulatoryCondition;
 
-rva.LnJEvictionTimeNewest;
-rva.LnJEvictionTotalCount;
-rva.LnJEvictionTotalCount12Month;
-rva.LnJJudgmentCount;
-rva.LnJJudgmentCourtCount;
-rva.LnJJudgmentDollarTotal;
-rva.LnJJudgmentForeclosureCount;
-rva.LnJJudgmentSmallClaimsCount;
-rva.LnjJudgmentTimeNewest;
-rva.LnJLienCount;
-rva.LnJLienDollarTotal;
-rva.LnJLienJudgmentCount;
-rva.LnJLienJudgmentCount12Month;
-rva.LnJLienJudgmentDollarTotal;
-rva.LnJLienJudgmentOtherCount;
-rva.LnJLienJudgmentSeverityIndex;
-rva.LnJLienJudgmentTimeNewest;
-rva.LnJLienTaxCount;
-rva.LnJLienTaxDollarTotal;
-rva.LnJLienTaxFederalCount;
-rva.LnJLienTaxFederalDollarTotal;
-rva.LnJLienTaxFederalTimeNewest;
-rva.LnJLienTaxStateCount;
-rva.LnJLienTaxStateDollarTotal;
-rva.LnJLienTaxStateTimeNewest;
-rva.LnJLienTimeNewest;
-rva.LnJLienTaxTimeNewest;
-
 unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing in soapcall script.  this will be 0 in the Vault thor script
 string errorcode := '';
 

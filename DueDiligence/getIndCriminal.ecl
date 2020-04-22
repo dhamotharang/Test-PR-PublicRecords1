@@ -31,59 +31,64 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
     //calc offense type based on top level data
     updateWithStateLegal := PROJECT(updateWithOffenseType, TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFinal,
     
-                                                              trafficRelated := LEFT.offenseTrafficRelated = DueDiligence.Constants.YES;
-                                                              offenseTypeTraffic := LEFT.offenseCategoryID = DueDiligence.translateExpression.OffenseID.TRAFFIC;
-                                                              
-                                                              SELF.offenseTrafficRelated := IF(trafficRelated OR offenseTypeTraffic, DueDiligence.Constants.YES, LEFT.offenseTrafficRelated);
-                                                                                        
+                                                                      trafficRelated := LEFT.offenseTrafficRelated = DueDiligence.Constants.YES;
+                                                                      offenseTypeTraffic := LEFT.offenseCategoryID = DueDiligence.translateExpression.OffenseID.TRAFFIC;
+                                                                      
+                                                                      SELF.offenseTrafficRelated := IF(trafficRelated OR offenseTypeTraffic, DueDiligence.Constants.YES, LEFT.offenseTrafficRelated);
                                                                                                 
-                                                              criminalActivityDate := DueDiligence.CommonDate.DaysApartAccountingForZero((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
-                                                              past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
-                                                              
-                                                              reportedLast3Yrs := LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate <= past3Years;
-                                                              reportedOver3YrsOrCannotCalcDate := ((LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate > past3Years) OR LEFT.offenseDDFirstReportedActivity = 0);
-                                                               
-                                                               
-                                                               
-                                                              nonFelonies := [DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.INFRACTION, 
-                                                                              DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.UNKNOWN, DueDiligence.Constants.EMPTY];
-                                                              
-                                                              convictedFelony := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction = DueDiligence.Constants.YES;
-                                                              convictedNonFelony := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction = DueDiligence.Constants.YES;
-                                                                                          
-                                                                                           
-                                                              SELF.attr_stateLegalEvent8 := convictedFelony AND reportedLast3Yrs;
-                                                              SELF.attr_stateLegalEvent7 := convictedFelony AND reportedOver3YrsOrCannotCalcDate;
-                                                              
-                                                              SELF.attr_stateLegalEvent5 := convictedNonFelony AND reportedLast3Yrs;
-                                                              SELF.attr_stateLegalEvent4 := convictedNonFelony AND reportedOver3YrsOrCannotCalcDate;
-                                                              
-                                                              SELF.attr_stateLegalEvent3 := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
-                                                              SELF.attr_stateLegalEvent2 := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
-                                                              
-                                                              
-                                                              offenseIDLevel := DueDiligence.translateExpression.expressionDCT[LEFT.offenseCategoryID];
-                                                              
-                                                              SELF.attr_offenseType9 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_9;
-                                                              SELF.attr_offenseType8 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_8;
-                                                              SELF.attr_offenseType7 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_7;
-                                                              SELF.attr_offenseType6 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_6;
-                                                              SELF.attr_offenseType5 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_5;
-                                                              SELF.attr_offenseType4 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_4;
-                                                              SELF.attr_offenseType3 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_3;
-                                                              SELF.attr_offenseType2 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_2;  
-                                                              SELF.attr_offenseType0 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_0;
-                                                              
-                                                              //set the text to uncagegorized if we did not find the charge
-                                                              SELF.offenseCategoryDescription := IF(LEFT.offenseCategoryID = 0 AND LEFT.offenseCategoryDescription = DueDiligence.Constants.EMPTY, DueDiligence.translateExpression.DEFAULT_UNCATEGORIZED_TEXT, LEFT.offenseCategoryDescription);
-                                                               
-                                                                                               
-                                                              SELF := LEFT;));
+                                                                                                        
+                                                                      criminalActivityDate := DueDiligence.CommonDate.DaysApartAccountingForZero((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
+                                                                      past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
+                                                                      
+                                                                      reportedLast3Yrs := LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate <= past3Years;
+                                                                      reportedOver3YrsOrCannotCalcDate := ((LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate > past3Years) OR LEFT.offenseDDFirstReportedActivity = 0);
+                                                                       
+                                                                       
+                                                                       
+                                                                      nonFelonies := [DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.INFRACTION, 
+                                                                                      DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.UNKNOWN, DueDiligence.Constants.EMPTY];
+                                                                      
+                                                                      convictedFelony := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction = DueDiligence.Constants.YES;
+                                                                      convictedNonFelony := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction = DueDiligence.Constants.YES;
+                                                                                                  
+                                                                                                   
+                                                                      SELF.attr_stateLegalEvent8 := convictedFelony AND reportedLast3Yrs;
+                                                                      SELF.attr_stateLegalEvent7 := convictedFelony AND reportedOver3YrsOrCannotCalcDate;
+                                                                      
+                                                                      SELF.attr_stateLegalEvent5 := convictedNonFelony AND reportedLast3Yrs;
+                                                                      SELF.attr_stateLegalEvent4 := convictedNonFelony AND reportedOver3YrsOrCannotCalcDate;
+                                                                      
+                                                                      SELF.attr_stateLegalEvent3 := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
+                                                                      SELF.attr_stateLegalEvent2 := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
+                                                                      
+                                                                      
+                                                                      offenseIDLevel := DueDiligence.translateExpression.expressionDCT[LEFT.offenseCategoryID];
+                                                                      
+                                                                      SELF.attr_offenseType9 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_9;
+                                                                      SELF.attr_offenseType8 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_8;
+                                                                      SELF.attr_offenseType7 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_7;
+                                                                      SELF.attr_offenseType6 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_6;
+                                                                      SELF.attr_offenseType5 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_5;
+                                                                      SELF.attr_offenseType4 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_4;
+                                                                      SELF.attr_offenseType3 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_3;
+                                                                      SELF.attr_offenseType2 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_2;  
+                                                                      SELF.attr_offenseType0 := offenseIDLevel.level = DueDiligence.translateExpression.LEVEL_0;
+                                                                      
+                                                                      //set the text to uncagegorized if we did not find the charge
+                                                                      SELF.offenseCategoryDescription := IF(LEFT.offenseCategoryID = 0 AND LEFT.offenseCategoryDescription = DueDiligence.Constants.EMPTY, DueDiligence.translateExpression.DEFAULT_UNCATEGORIZED_TEXT, LEFT.offenseCategoryDescription);
+                                                                      
+                                                                      
+                                                                      isTrafficOffense := offenseTypeTraffic OR LEFT.offenseCategoryID = DueDiligence.translateExpression.OffenseID.DUI;                                                                      
+                                                                      
+                                                                      SELF.trafficOffenseFound := isTrafficOffense;
+                                                                      SELF.otherOffenseFound := isTrafficOffense = FALSE;
+                                                                       
+                                                                                                       
+                                                                      SELF := LEFT;));
 
 
     //roll up all offenses now by person
-    formatCrimData := PROJECT(updateWithStateLegal, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.LayoutsInternal.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
-                                                                
+    formatCrimData := PROJECT(updateWithStateLegal, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, BOOLEAN trafficOffenseFound, BOOLEAN otherOffenseFound, DueDiligence.LayoutsInternal.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
                                                               SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
                                                               SELF := LEFT;
                                                               SELF := [];));
@@ -92,7 +97,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
     sortformatCrimData := SORT(formatCrimData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);  
    
     rollCrimToDID := ROLLUP(sortformatCrimData,
-                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                             LEFT.did = RIGHT.did,
                             TRANSFORM(RECORDOF(LEFT),
                                       SELF.attr_stateLegalEvent9 := LEFT.attr_stateLegalEvent9 OR RIGHT.attr_stateLegalEvent9;
@@ -113,6 +118,9 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                       SELF.attr_offenseType3 := LEFT.attr_offenseType3 OR RIGHT.attr_offenseType3;
                                       SELF.attr_offenseType2 := LEFT.attr_offenseType2 OR RIGHT.attr_offenseType2;
                                       SELF.attr_offenseType0 := LEFT.attr_offenseType0 OR RIGHT.attr_offenseType0;
+                                      
+                                      SELF.trafficOffenseFound := LEFT.trafficOffenseFound OR RIGHT.trafficOffenseFound;
+                                      SELF.otherOffenseFound := LEFT.otherOffenseFound OR RIGHT.otherOffenseFound;
                                       
                                       SELF.indCrimOffenses := LEFT.indCrimOffenses + RIGHT.indCrimOffenses;
                                       SELF := LEFT;));
@@ -165,6 +173,9 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                   SELF.party.legalEventTypeFlags := legalEventType.value;
 
                                   SELF.party.indOffenses := RIGHT.crimOffenses.indCrimOffenses;
+                                  
+                                  SELF.party.trafficOffenseFound := RIGHT.crimOffenses.trafficOffenseFound;
+                                  SELF.party.otherCriminalOffenseFound := RIGHT.crimOffenses.otherOffenseFound;
                                   
                                   SELF := LEFT;),
                         LEFT OUTER,

@@ -39,7 +39,8 @@ export Constants := module
     export String40 Attus := 'attus'; // active, as of 07/24/2012
     export String40 EquifaxSts := 'equifaxsts'; // active, as of 03/22/2016
     export String40 ThreatMetrix := 'threatmetrix'; // added for threatmetrix
-    export String40 ThreatMetrix_test := 'threatmetrix_test'; // added for threatmetrix_test transactions for modeling tea
+    export String40 ThreatMetrix_test := 'threatmetrix_test'; // added for threatmetrix_test transactions for modeling team
+    export String40 FirstData := 'first_data';           // added for firstdata/fiserv
     export String40 EmailRisk := 'emailrisk'; // added for EmailRisk
     export String40 News := 'news'; // WSK news gateway (currently for AML Attributes)
     export String40 ERI := 'erisalary';
@@ -72,6 +73,7 @@ export Constants := module
     export String40 BriteVerifyEmail := 'BriteVerifyEmail'; //Brite Verify Email validation
     export String40 NetWise := 'netwise'; //NetWise (Social Media Email Search) for use by the Virtual Identity Report V2 Accurint product
     export String40 SocialMediaLocator := 'socialmedialocator'; //Standalone Social Media Locator gateway.
+    export String40 CaAvmReport := 'caavmreport'; //Standalone CaAvmReport property valuation gateway.
   end;
 
   export ConfigProperties := module

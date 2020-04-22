@@ -259,10 +259,10 @@ EXPORT functions := MODULE
     progressive_phone.mac_get_type_e(f_with_did, f_in_batch, f_out_type_e, mod_access, inMod.IncludeRelativeCellPhones);
     progressive_phone.mac_get_type_f(f_with_did, f_in_batch, f_out_type_f, mod_access, sx_match_restriction_limit);
     progressive_phone.mac_get_type_g(f_with_did, f_in_batch, f_out_type_g, mod_access);
-		progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, mod_access);
+    progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, mod_access);
     progressive_phone.mac_get_type_r(f_with_did, f_in_batch, f_out_type_r);
     progressive_phone.mac_get_type_v(f_with_did, f_in_batch, f_out_type_v,, mod_access);  // unrated
-    progressive_phone.mac_get_type_w(f_with_did, f_in_batch, f_out_type_w);
+    progressive_phone.mac_get_type_w(f_with_did, f_in_batch, f_out_type_w, mod_access);
     progressive_phone.mac_get_type_t(f_with_did, f_in_batch, f_out_type_t, mod_access);
 
     batch_out_with_did := progressive_phone.layout_progressive_batch_out_with_did;
@@ -651,7 +651,12 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
     // in order to pass the correct Phone Shell Version parameter to the Phone_Shell_Function
     boolean isProgressiveBatch := modelName[1..5] = 'PSV1_'; // see if this is coming from progressive_phone_batch_service
     unsigned2 PhoneShellVersion := if(isProgressiveBatch, 10, 21); // if yes, use phone shell 1.0, else use phone shell 2.1 (current default)
-
+	
+	mod_access := MODULE(Doxie.IDataAccess)
+		EXPORT glb := GLB_Purpose;
+		EXPORT dppa := DPPA_Purpose;
+	END;
+	
     // Returns the Phone data without the score.
     phones_with_attrs := Phone_Shell.Phone_Shell_Function(
                               phone_shell_withphones_in,
@@ -670,12 +675,13 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                               , // relocation max days before
                               , // relocation max days after
                               , // relocations target radius
-																														inMod.IncludeLastResort,
-                              IncludePhonesFeedback,
-																														Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
-																														BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
-																														UsePremiumSource_A := UsePremiumSource_A,
-																														RunRelocation := RunRelocation);
+							 inMod.IncludeLastResort,
+							 IncludePhonesFeedback,
+							 Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
+							 BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
+							 UsePremiumSource_A := UsePremiumSource_A,
+							 RunRelocation := RunRelocation,
+							 mod_access := mod_access);
 
     // SCORE THE PHONES
 

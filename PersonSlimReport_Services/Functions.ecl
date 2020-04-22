@@ -1,4 +1,4 @@
-﻿IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, Gateway, iesp,
+IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, iesp,
        PersonReports, PersonSlimReport_Services, SmartRollup, STD, ut;
 
 EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
@@ -115,8 +115,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
     EXPORT phoneRecsByDid(doxie.phone_noreconn_param.searchParams phone_mod):= FUNCTION
        //get all free phone (no GW hits) recs (phone plus and gong) and apply restrictions
-       emptyGateway := dataset([], Gateway.Layouts.Config);
-       phones_raw   := doxie.phone_noreconn_records(phone_mod).val(in_did, emptyGateway);
+       phones_raw   := doxie.phone_noreconn_records(phone_mod, in_did);
        phones_raw_sorted:= sort(phones_raw, phone,-(unsigned4)dt_last_seen,-(unsigned4)dt_first_seen);
        phones_duped := dedup(phones_raw_sorted,phone);
        phones_duped_sorted := sort(phones_duped, -(unsigned4)dt_last_seen,-(unsigned4)dt_first_seen);
@@ -136,9 +135,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT profLicRecsByDid(Ioptions in_mod):= FUNCTION
-      pl_mod  := module (PersonReports.IParam.proflic)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+      pl_mod  := PROJECT(in_mod, PersonReports.IParam.proflic, OPT);
       pl_raw  := PersonReports.proflic_records(in_did,pl_mod).proflicenses_v2;
       pl_clean := project(pl_raw,
                     TRANSFORM(iesp.proflicense.t_ProfessionalLicenseRecord,
@@ -152,10 +149,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
  //this function also adds did's to the RTV records to be used in alerting platform
   SHARED getRealTimeVehicles(Ioptions in_mod, DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)) := FUNCTION
-      mod_access:= MODULE (doxie.IDataAccess)
-        //this brings some extras (like, include_BlankDOD), but there's no harm in it
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      END;
+      mod_access:= PROJECT(in_mod, doxie.IDataAccess);
 
       rec_reg_seq := record(iesp.motorvehicle.t_MotorVehicleReportRegistrant)
         unsigned4 seq := 0;
@@ -233,9 +227,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
   EXPORT vehicleRecsByDid(Ioptions in_mod,
                           DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)):= FUNCTION
-      vehicles_mod  := module (PersonReports.IParam.vehicles)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+      vehicles_mod  := PROJECT (in_mod, PersonReports.IParam.vehicles, OPT);
       vehicles_v2  := PersonReports.vehicle_records(in_did,vehicles_mod).vehicles_v2;
       //hit RTV GW - experian
       rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));
@@ -255,9 +247,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT acRecsByDid(Ioptions in_mod):= FUNCTION
-      ac_mod  := module (PersonReports.IParam.aircrafts)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+
+      ac_mod := PROJECT(in_mod, PersonReports.IParam.aircrafts, OPT);
 
       ac_raw  := PersonReports.aircraft_records(in_did,ac_mod);
       ac_sorted := sort(ac_raw, aircraftnumber, -d2i(datelastseen));
@@ -268,9 +259,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT wcRecsByDid(Ioptions in_mod):= FUNCTION
-      wc_mod  := module (PersonReports.IParam.watercrafts)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+      wc_mod := PROJECT(in_mod, PersonReports.IParam.watercrafts, OPT);
       wc_raw  := PersonReports.watercraft_records(in_did,wc_mod).wtr_recs;
       wc_sorted := sort(wc_raw, hullnumber, stateoforigin, -d2i(datelastseen));
       wc_duped  := dedup(wc_sorted, hullnumber, stateoforigin);
@@ -281,8 +270,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
 
   EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
-      ucc_mod  := module (PersonReports.IParam.ucc)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
+      ucc_mod := module (PROJECT(in_mod, PersonReports.IParam.ucc, OPT))
         EXPORT string1 ucc_party_type := in_mod.ucc_party_type;
       end;
       ucc_raw  := PersonReports.ucc_records(in_did,ucc_mod).ucc_v2;
@@ -294,9 +282,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT sexOffRecsByDid(Ioptions in_mod):= FUNCTION
-      sexOff_mod  := module (PersonReports.IParam.sexoffenses)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+      sexOff_mod := PROJECT(in_mod, PersonReports.IParam.sexoffenses);
       sexOff_raw := PersonReports.sexoffenses_records(in_did,sexOff_mod);
       sexOff_sorted := sort(sexOff_raw, primarykey, -d2i(datelastseen));
       sexOff_duped  := dedup(sexOff_sorted, primarykey);
@@ -305,9 +291,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT crimRecsByDid(Ioptions in_mod):= FUNCTION
-      crim_mod  := module (PersonReports.IParam.criminal)
-        $.IParams.MAC_copy_old_report_fields(in_mod);
-      end;
+      crim_mod := PROJECT(in_mod, PersonReports.IParam.criminal, OPT);
       crim_raw := PersonReports.criminal_records(in_did,crim_mod);
       crim_sorted := sort(crim_raw, offenderid, -d2i(casefilingdate));
       crim_duped  := dedup(crim_sorted, offenderid);
@@ -316,9 +300,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT cWeaponsRecsByDid(Ioptions in_mod):= FUNCTION
-       ccw_mod  := module (PersonReports.IParam.ccw)
-         $.IParams.MAC_copy_old_report_fields(in_mod);
-       end;
+       ccw_mod := PROJECT (in_mod, PersonReports.IParam.ccw);
 
        ccw_raw := PersonReports.ccw_records(in_did,ccw_mod);
        //SmartRollup.fn_smart_rollup_cweapons
@@ -330,8 +312,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT liensRecsByDid(Ioptions in_mod):= FUNCTION
-      liens_mod := module (PersonReports.IParam.liens)
-         $.IParams.MAC_copy_old_report_fields(in_mod);
+      liens_mod := module (PROJECT(in_mod, PersonReports.IParam.liens, OPT))
          export string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
       end;
       liens_raw := project(PersonReports.lienjudgment_records(in_did, liens_mod).liensjudgment_v2,
@@ -375,9 +356,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     END;
 
     EXPORT marDivRecsByDid(Ioptions in_mod):= FUNCTION
-      mardiv_mod := Module(PersonReports.IParam.mardiv)
-          $.IParams.MAC_copy_old_report_fields(in_mod);
-      End;
+      mardiv_mod := PROJECT(in_mod, PersonReports.IParam.mardiv);
       marDiv_raw := PersonReports.marriagedivorce_records(in_did, mardiv_mod);
       marDiv_raw_sorted:= sort(marDiv_raw, -FilingTypeCode,StateOrigin,FilingNumber,-d2i(marriagedate));
       marDiv_duped := dedup(marDiv_raw_sorted, FilingNumber, StateOrigin, FilingTypeCode);
@@ -420,7 +399,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                 SELF.investigation.investigationagent.agentreportnumber :=
                     pickLongestStr(LEFT.investigation.investigationagent.agentreportnumber,
                                    RIGHT.investigation.investigationagent.agentreportnumber),
-                SELF := LEFT)	);
+                SELF := LEFT)  );
 
     shared accVehiclesDuped(DATASET(iesp.accident.t_AccidentReportVehicle) vehicles) :=
          dedup(sort(vehicles,TagNumber,Make,Model,-(unsigned6)Owner.UniqueId),
@@ -450,9 +429,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     END;
 
     EXPORT pilotCertRecsByDid(Ioptions in_mod):= FUNCTION
-      pil_mod  := module (PersonReports.IParam.faacerts)
-        $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
-      end;
+      pil_mod := PROJECT (in_mod, PersonReports.IParam.faacerts, OPT);
       pil_raw  := PersonReports.faacert_records(in_did,pil_mod).bps_view;
       //one certification for each STATE/COUNTY
       //similar logic to - SmartRollup.fn_smart_rollup_faa_cert
@@ -464,9 +441,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT propertyRecsByDid(Ioptions in_mod, doxie.IDataAccess mod_access):= FUNCTION
-      prop_mod  := module (PersonReports.IParam.property)
-        $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
-      end;
+      prop_mod := PROJECT (in_mod, PersonReports.IParam.property, OPT);
       prop_raw   := PersonReports.Property_Records(in_did,mod_access,prop_mod).property_v2;
       prop_clean := project(prop_raw,
                      TRANSFORM(iesp.property.t_PropertyReport2Record,
@@ -482,9 +457,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
      END;
 
   EXPORT deaConSubRecsByDid(Ioptions in_mod):= FUNCTION
-       dea_mod  := module (PersonReports.IParam.dea)
-         $.IParams.MAC_copy_old_report_fields(in_mod);
-       end;
+       dea_mod := PROJECT(in_mod, PersonReports.IParam.dea);
        dea_raw  := PersonReports.dea_records(in_did,dea_mod);
        //SmartRollup.fn_smart_rollup_dea
        dea_sorted := sort(dea_raw, RegistrationNumber, -d2i(controlledSubstancesInfo[1].expirationDate));
@@ -499,9 +472,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT voterRecsByDid(Ioptions in_mod):= FUNCTION
-      vote_mod := module (PersonReports.IParam.voters)
-         $.IParams.MAC_copy_old_report_fields(in_mod);
-       end;
+      vote_mod := PROJECT(in_mod, PersonReports.IParam.voters);
       voter_raw    := PersonReports.voter_records(in_did,vote_mod).voters_v2;
       voter_sorted := sort(voter_raw, RegistrateState, ResidentAddress.county, -d2i(LastVoteDate));
       voter_rolled := rollup(voter_sorted, //SmartRollup.fn_smart_rollup_voter
@@ -516,10 +487,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN voter_rolled_sorted;
   END;
 
-	EXPORT pawRecsByDid(Ioptions in_mod):= FUNCTION
-       paw_mod := Module(PersonReports.IParam.peopleatwork)
-           $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
-       End;
+  EXPORT pawRecsByDid(Ioptions in_mod):= FUNCTION
+       paw_mod := PROJECT(in_mod, PersonReports.IParam.peopleatwork, OPT);
        paw_raw := PersonReports.peopleatwork_records(in_did, paw_mod);
 
        paw_raw_sorted:= sort(paw_raw,-businessids.ultid,-businessids.orgid,-businessids.seleid,
@@ -542,7 +511,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
   END;
 
   EXPORT utilityRecsByDid(Ioptions in_mod):= FUNCTION
-       utils := doxie.Util_records(in_did, in_mod.ssn_mask, in_mod.mask_dl, in_mod.GLBPurpose, in_mod.industry_class);
+       utils := doxie.Util_records(in_did, in_mod.ssn_mask, in_mod.dl_mask > 0, in_mod.glb, in_mod.industry_class);
        iesp.personslimreport.t_PersonSlimReportUtility transUtil(doxie_crs.layout_utility.record_layout_slim L)  := TRANSFORM
        self.utiltype                := L.util_type;
        self.utilcategory            := L.util_category;

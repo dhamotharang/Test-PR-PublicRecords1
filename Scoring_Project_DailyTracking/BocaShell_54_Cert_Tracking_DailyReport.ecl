@@ -2,14 +2,15 @@
 
 import std, ut, Scoring_Project, Scoring_Project_DailyTracking, ashirey,Scoring_Project_Macros;
 
-//dt := ut.getdate;
-dt := (STRING8)Std.Date.Today();
+
+dt := ut.getdate;
+//dt := (STRING8)Std.Date.Today();
 
 decimal19_2 thresh := 1.25;
 
 
- ds_curr := dataset('~scoringqa::out::fcra::bocashell_54_historydate_999999_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
+ds_curr := dataset('~scoringqa::out::fcra::bocashell_54_historydate_999999_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 // bs_cert_curr_choosen := choosen(bs_cert_curr, 10);
 // bs_cert_curr_choosen;
 
@@ -78,9 +79,12 @@ re_filter2:=SORT(re_filter1, -Difference_Percent);
 
 // ******** START: ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
 
-ds_curr_archive := dataset('~scoringqa::out::fcra::bocashell_54_historydate_201207_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+//updated 201207 to 201901
+// ds_curr_archive := dataset('~scoringqa::out::fcra::bocashell_54_historydate_201207_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_curr_archive := dataset('~scoringqa::out::fcra::bocashell_54_historydate_201901_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
-filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_201207_cert_*_1'));
+// filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_201207_cert_*_1'));
+filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_201901_cert_*_1'));
 
 
 filelist_arch := sort(filenames_details_arch, -modified);
@@ -93,6 +97,7 @@ cleaned_prev_arch_date := prev_arch_date;
 
 ds_prev_archive := dataset('~'+ p_arch_file_name, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
+		
 		join1_arch := JOIN(ds_curr_archive, ds_prev_archive, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
 		clean_file_archive := join1_arch(accountnumber <> '');
 		ds_curr_arch_join := JOIN(ds_curr_archive, clean_file_archive, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
@@ -134,8 +139,9 @@ re_filter2_archive := SORT(re_filter1_archive, -Difference_Percent);
 
 // ******** START: NON FCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
- 
 nonfcra_ds_curr := dataset('~scoringqa::out::nonfcra::bocashell_54_historydate_999999_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+
+
 
 nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_54_historydate_999999_cert_*_1'));
 
@@ -194,10 +200,13 @@ re_filter2_nonfcra := SORT(re_filter1_nonfcra, -Difference_Percent);
 
 // ******** START: NonFCRA ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
 
+//updated 201207 to 201901
+// nonfcra_ds_curr_arch := dataset('~scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_curr_arch := dataset('~scoringqa::out::nonfcra::bocashell_54_historydate_201901_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
-nonfcra_ds_curr_arch := dataset('~scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
-nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_*_1'));
+
+nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_54_historydate_201901_cert_*_1'));
 
 
 nonfcra_filelist_arch := sort(nonfcra_filenames_details_arch, -modified);
@@ -209,6 +218,7 @@ cleaned_nonfcra_curr_date_arch := dt;
 cleaned_nonfcra_prev_date_arch := nonfcra_prev_date_arch;
 
 nonfcra_ds_prev_arch := dataset('~'+ nonfcra_p_file_name_arch, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ 
  
 		nonfcra_join1_arch := JOIN(nonfcra_ds_curr_arch, nonfcra_ds_prev_arch, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
 		nonfcra_clean_file_arch := nonfcra_join1_arch(accountnumber <> '');
@@ -303,10 +313,11 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 													+ '-----------------------------------------------------------------------------------------------------------------'
 													}], MyRec); 
 													
-
+//updated 201607 to 201901
 		head_cert_archive := DATASET([{1,    
 														'Environment:  CERT - FCRA'	+ '\n'
-													+ 'Archive date:  201607' + '\n'
+													//+ 'Archive date:  201607' + '\n'
+													+ 'Archive date:  201901' + '\n'
 													+ 'Previous run date:  ' + cleaned_prev_arch_date + '\n'
 													+ 'Current run date:  ' + cleaned_curr_arch_date + '\n' 
 													+ 'Previous record count:  ' + COUNT(ds_prev_archive) + '\n'
@@ -332,10 +343,11 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 													+ '------------------------------------------------------------------------------------------------------------------'
 													}], MyRec); 
 													
-
+//update 201607 to 201901
 		head_prod_archive := DATASET([{1,    
 														'Environment:  CERT - NONFCRA'	+ '\n'
-													+ 'Archive date:  201607' + '\n'
+                          // + 'Archive date:  201607' + '\n'													
+													+ 'Archive date:  201901' + '\n'
 													+ 'Previous run date:  ' + cleaned_nonfcra_prev_date_arch + '\n'
 													+ 'Current run date:  ' + cleaned_nonfcra_curr_date_arch + '\n' 
 													+ 'Previous record count:  ' + COUNT(nonfcra_ds_prev_arch) + '\n'
@@ -376,8 +388,10 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
   	// OUTPUT(XtabOut, NAMED('XtabOut'));
 
 		final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'BocaShell 5.4 Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
-									FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
-
+							// FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.boca_54_list, 'BocaShell 5.4 Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+					                       FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+		                               // FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.boca_54_list,'BocaShell 5.4 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+		
 		RETURN final;
 END;	
 // final;

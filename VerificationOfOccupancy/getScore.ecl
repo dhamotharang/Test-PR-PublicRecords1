@@ -196,7 +196,7 @@ RelativeMax := 500;
 voshell_dids := PROJECT(voshell_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-rellyids := Relationship.proc_GetRelationship(voshell_dids,TopNCount:=RelativeMax,
+rellyids := Relationship.proc_GetRelationshipNeutral(voshell_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax).result; 
 		
 //use the new relatives key to get all DIDs that are related to our input subject
