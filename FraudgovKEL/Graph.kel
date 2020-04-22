@@ -108,6 +108,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     Offenses {off_cat_list},
     Address {EventDate, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, Zip, Zip4}				
     ));	
+		
 
 Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
     Customer rCustomer=AssociatedCustomerFileInfo,
@@ -130,6 +131,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING OttoIpAddressId,
     STRING OttoDriversLicenseId,
 		STRING OttoSSNId,
+		STRING OttoBankAccountId,
     STRING CaseId,
     INTEGER RecordId=record_id,
     DATE EventDate,
@@ -141,6 +143,12 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING LastName=NULL(),
 		STRING NameSuffix=NULL(),
 
+    STRING unique_number,
+    STRING mac_address,
+    STRING serial_number,
+    STRING device_type,
+    STRING device_identification_provider,
+	
     BOOLEAN addresspobox,
     BOOLEAN addresscmra,
 		STRING PrimaryRange=NULL(),
@@ -378,7 +386,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		OttoSSNId,
     CaseId,
     OttoDriversLicenseId,
+		OttoBankAccountId,
 
+    unique_number, mac_address, serial_number, device_type, device_identification_provider,
+		
     DeceasedMatchCode,
     isdeepdive,
 
@@ -1781,14 +1792,14 @@ Event: => PhoneLabel := PhoneFormatted;
 Event: => BankAccountLabel := AccountNumber;
 Event: => DriversLicenseLabel := LicenseNumber;
 
-Event: => AddressEntityContextUid := Location.EntityContextUid;
-Event: => SsnEntityContextUid := rSsn.EntityContextUid;
-Event: => PersonEntityContextUid := Subject.EntityContextUid;
-Event: => PhoneEntityContextUid := rPhone.EntityContextUid;
-Event: => EmailEntityContextUid := rEmail.EntityContextUid;
-Event: => IpEntityContextUid := rInternetProtocol.EntityContextUid;
-Event: => BankAccountEntityContextUid := rBankAccount.EntityContextUid;
-Event: => DriversLicenseEntityContextUid := rDriversLicense.EntityContextUid;
+Event: => AddressEntityContextUid := '_09' + OttoAddressId;
+Event: => SsnEntityContextUid := '_15' + OttoSSNId;
+Event: => PersonEntityContextUid := '_01' + LexId;
+Event: => PhoneEntityContextUid := '_16' + PhoneNumber;
+Event: => EmailEntityContextUid := '_17' + OttoEmailId;
+Event: => IpEntityContextUid := '_18' + OttoIpAddressId;
+Event: => BankAccountEntityContextUid := '_19' + OttoBankAccountId;
+Event: => DriversLicenseEntityContextUid := '_20' + OttoDriversLicenseId;
 
 Event: => AddrEventCount := Location.EventCount;
 Event: => SsnEventCount := rSsn.EventCount;
@@ -1835,9 +1846,10 @@ Event: => IpEventAfterKrCount := rInternetProtocol.KrEventAfterLastKnownRiskCoun
 Event: => BankAccountEventAfterKrCount := rBankAccount.KrEventAfterLastKnownRiskCount;
 Event: => DriversLicenseEventAfterKrCount := rDriversLicense.KrEventAfterLastKnownRiskCount;
 
+// this is the example for counting number of identitities at the associated address BEFORE the date of this transaction
 Event: => AddrIdentityCount := COUNT(Location.PersonAddress(EventDates.EventDate < Event.EventDate){Subject});
+// this is the example for counting number of identitities at the associated address EVER (including the future)
 Event: => AddrIdentityFullCount := COUNT(Location.PersonAddress{Subject});
-
 
 
 /*
@@ -1848,6 +1860,8 @@ Event: => KrEventAfterKnownRisk := MAP(Location.KrLastEventDate < EventDate OR
                                        rBankAccount.KrLastEventDate < EventDate OR 
                                        rDriversLicense.KrLastEventDate < EventDate => 1, 0);
 */
+
+
 /* ASSOCIATION LOGIC STATEMENTS */
 
 //PersonPerson: => DtFirstSeen := MIN(EventDates, EventDate);
