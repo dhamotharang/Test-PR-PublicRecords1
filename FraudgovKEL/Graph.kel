@@ -1524,44 +1524,38 @@ Event: => T_InpClnFirstNmEcho := MAP(FirstName ='' OR FirstName:Null => -99999, 
 Event: => T_InpClnLastNmEcho := MAP(LastName = '' OR LastName:Null => -99999, LastName);
 Event: => T_InpClnNmSuffixEcho := MAP(NameSuffix = '' OR NameSuffix:Null => -99999, NameSuffix);
 																	 
-Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' OR Location.PrimaryRange:Null => -99999, Location.PrimaryRange);
-Event: => T_InpClnAddrPreDirEcho := MAP(Location.Predirectional = '' OR Location.Predirectional:Null => -99999, Location.Predirectional);
-Event: => T_InpClnAddrPrimNmEcho := MAP(Location.PrimaryName = '' OR Location.PrimaryName:Null => -99999, Location.PrimaryName);
-Event: => T_InpClnAddrSuffixEcho := MAP(Location.Suffix = '' OR Location.Suffix:Null => -99999, Location.Suffix);
-Event: => T_InpClnAddrPostDirEcho := MAP(Location.Postdirectional = '' OR Location.Postdirectional:Null => -99999, Location.Postdirectional);
-Event: => T_InpClnAddrUnitDesigEcho := MAP(Location.UnitDesignation = '' OR Location.UnitDesignation:Null => -99999, Location.UnitDesignation);
-Event: => T_InpClnAddrSecRangeEcho := MAP(Location.SecondaryRange = '' OR Location.SecondaryRange:Null => -99999, Location.SecondaryRange);
-Event: => T_InpClnAddrCityEcho := MAP(Location.PostalCity = '' OR Location.PostalCity:Null => -99999, Location.PostalCity);
-Event: => T_InpClnAddrStEcho := MAP(Location.State = '' OR Location.State:Null => -99999, Location.State);
-Event: => T_InpClnAddrZip5Echo := MAP(Location.Zip = '' OR Location.Zip:Null => -99999, Location.Zip);
-Event: => T_InpClnAddrZip4Echo := MAP(Location.Zip4 = '' OR Location.Zip4:Null => -99999, Location.Zip4);
-Event: => T_InpClnAddrLatEcho := MAP(Location.Latitude:Null => -99999, Location.Latitude);
-Event: => T_InpClnAddrLongEcho := MAP(Location.Longitude:Null => -99999, Location.Longitude);
-Event: => T_InpClnAddrCountyEcho := MAP(Location.County = '' OR Location.County:Null => -99999, Location.County);
-Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' OR Location.GeoBlock:Null => -99999, Location.GeoBlock);
-// Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, Location.Country); // is country listed?
+Event: => T_InpClnAddrPrimRangeEcho := MAP(PrimaryRange = '' OR PrimaryRange:Null => -99999, PrimaryRange);
+Event: => T_InpClnAddrPreDirEcho := MAP(Predirectional = '' OR Predirectional:Null => -99999, Predirectional);
+Event: => T_InpClnAddrPrimNmEcho := MAP(PrimaryName = '' OR PrimaryName:Null => -99999, PrimaryName);
+Event: => T_InpClnAddrSuffixEcho := MAP(Suffix = '' OR Suffix:Null => -99999, Suffix);
+Event: => T_InpClnAddrPostDirEcho := MAP(Postdirectional = '' OR Postdirectional:Null => -99999, Postdirectional);
+Event: => T_InpClnAddrUnitDesigEcho := MAP(UnitDesignation = '' OR UnitDesignation:Null => -99999, UnitDesignation);
+Event: => T_InpClnAddrSecRangeEcho := MAP(SecondaryRange = '' OR SecondaryRange:Null => -99999, SecondaryRange);
+Event: => T_InpClnAddrCityEcho := MAP(PostalCity = '' OR PostalCity:Null => -99999, PostalCity);
+Event: => T_InpClnAddrStEcho := MAP(State = '' OR State:Null => -99999, State);
+Event: => T_InpClnAddrZip5Echo := MAP(Zip = '' OR Zip:Null => -99999, Zip);
+Event: => T_InpClnAddrZip4Echo := MAP(Zip4 = '' OR Zip4:Null => -99999, Zip4);
+Event: => T_InpClnAddrLatEcho := MAP(Latitude:Null => -99999, Latitude);
+Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null => -99999, Longitude);
+Event: => T_InpClnAddrCountyEcho := MAP(County = '' OR County:Null => -99999, County);
+Event: => T_InpClnAddrGeoBlkEcho := MAP(GeoBlock = '' OR GeoBlock:Null => -99999, GeoBlock);
+// Event: => T_InpClnAddrCountryEcho := MAP(Country = '' => -99999, Country); // is country listed?
 
-// Event: => T_InpClnSSNEcho := MAP(Subject.ReportedSsn.Ssn = '' OR Subject.ReportedSsn.Ssn:Null => -99999, //are there multiple reported SSNs/Do I need to specify the latest?
-																 // Subject.ReportedSsn.Ssn);
+Event: => T_InpClnSsnEcho := MAP(Ssn = '' OR Ssn:Null => -99999, Ssn);
 Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999, INTEGER(DateOfBirth));
-
-Event: => T_InpClnDlEcho := MAP(rDriversLicense.LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999, rDriversLicense.LicenseNumber);
-Event: => T_InpClnDlStEcho := MAP(rDriversLicense.State = '' OR rDriversLicense.State:Null => -99999, rDriversLicense.State);
-
-Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' OR rEmail.EmailAddress:Null => -99999, rEmail.EmailAddress);
-
-Event: => T_InpClnBnkAcctEcho := MAP(rBankAccount.AccountNumber = '' OR rBankAccount.AccountNumber:Null => -99999, rBankAccount.AccountNumber);
-Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' OR rBankAccount.rBank.RoutingNumber:Null => -99999, rBankAccount.rBank.RoutingNumber);
-
+Event: => T_InpClnDlEcho := MAP(LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999, rDriversLicense.LicenseNumber);
+Event: => T_InpClnDlStEcho := MAP(LicenseState = '' OR LicenseState:Null => -99999, LicenseState);
+Event: => T_InpClnEmailEcho := MAP(EmailAddress = '' OR EmailAddress:Null => -99999, EmailAddress);
+Event: => T_InpClnBnkAcctEcho := MAP(AccountNumber = '' OR AccountNumber:Null => -99999, AccountNumber);
+Event: => T_InpClnBnkAcctRtgEcho := MAP(RoutingNumber = '' OR RoutingNumber:Null => -99999, RoutingNumber);
 Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' OR IpAddress:Null => -99999, IpAddress);
-
 Event: => T_InpClnPhnEcho := MAP(PhoneNumber = '' OR PhoneNumber:Null => -99999, PhoneNumber);
 
 Event: => T1_LexIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
-																 //how do we tell the difference between Lex ID and Rin ID for 0?
-																 1);
-Event: => T1_RinIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999);
-																 //how do we tell the difference between Lex Id and Rin ID?
+																 NoLexId = 1 => 0, 1);
+Event: => T1_RinIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
+																 NoLexId = 1 => 1, 0);
+																 
 
 Event: => T18_IsIpMetaHitFlag := MAP(T_InpClnIpAddrEcho = -99999 => -99999, 
                                      T_InpClnIpAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
@@ -1648,11 +1642,11 @@ Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																
 Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho IN ['-99999','-99998'] OR T_InpClnBnkAcctRtgEcho IN ['-99999','-99998'] => 0,
 																    1);
-Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //where is this? bank has a hit field
-																		 0); 
+Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //is bankhit what I should be using for this?
+																		 BankHit); 
 Event: => T19_BnkAcctBnkNm := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																	T19_IsBnkAppHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	rBankAccount.rBank.FullBankname); //could also use AbbreviatedBankname
+																	FullBankname); 
 Event: => T19_BnkAcctHRPrePdRtgFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
 																					 T_SrcClassType < 4 => -99998,
 																					 T_InpClnBnkAcctRtgEcho IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'] => 1,
@@ -1667,8 +1661,7 @@ Event: => T17_EmailDomainDispFlag := MAP(T17_EmailPopFlag = 0 => -99999,
 																				 T_SrcClassType < 4 => -99998,
 																				 rEmail.isdisposableemail);
 //FIXME 
-Event: => T9_AddrPopFlag := 1;//MAP((street != '' AND T_InpClnAddrCityEcho=-99999 AND T_InpClnAddrStEcho=-99999) OR (street != '' AND T_InpClnAddrZip5Echo=-99999),
-//																0);
+Event: => T9_AddrPopFlag := MAP((T_InpClnAddrPrimNmEcho != -99999 AND T_InpClnAddrCityEcho != -99999 AND T_InpClnAddrStEcho != -99999) OR (T_InpClnAddrPrimNmEcho != -99999 AND T_InpClnAddrZip5Echo != -99999) => 1,0);
 Event: => T9_AddrType := MAP(T9_AddrPopFlag < 1 => -99999,
 														 Location.TypeCode = '' OR Location.TypeCode:Null => -99997,
 														 Location.TypeCode);
@@ -1678,7 +1671,7 @@ Event: => T9_AddrStatus := MAP(T9_AddrPopFlag < 1 => -99999,
 
 Event: => T16_PhnPopFlag := MAP(T_InpClnPhnEcho IN ['-99999','-99998','-99997'] OR LENGTH(T_InpClnPhnEcho) < 10 => 0, 1);
 
-// Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
+Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
 
 Event: => T20_DlPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR T_InpClnDlStEcho IN ['-99999','-99998','-99997'] => 0, 1);
 
@@ -1705,10 +1698,10 @@ Event: => T_KrCodeEcho := MAP(T_SrcClassType != 3 => -99998, 1);
 // Event: => T_KrCodeDesc := MAP(T_SrcClassType != 3 => -99998, //FIXME - are the kr codes actually listed somewhere or do I need to put them in?
 															// T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
 															// 'tbd');
-// Event: => T15_SsnIsKrFlag := MAP(T15_SsnPopFlag = 0 => -99999,
-																 // T_SrcClassType != 3 => -99998,
-																 // T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 // T_KrCodeEcho IN ['100','101','190','191','192','193'] => 1, 0);
+Event: => T15_SsnIsKrFlag := MAP(T15_SsnPopFlag = 0 => -99999,
+																 T_SrcClassType != 3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['100','101','190','191','192','193'])) > 0 => 1, 0);
 																 
 Event: => T20_DlIsKRFlag := MAP(T20_DlPopFlag = 0 => -99999,
 																 T_SrcClassType !=3 => -99998,
