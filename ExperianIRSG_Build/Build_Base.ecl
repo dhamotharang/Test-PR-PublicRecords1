@@ -1,5 +1,5 @@
-import  address, ut, header_slimsort, did_add, didville,watchdog, experianirsg_build;
-norm_addr	:=ExperianIRSG_Build.Clean_Addresses; 
+import  ut, did_add, experianirsg_build;
+norm_addr	:=ExperianIRSG_Build.Clean_Addresses;
 
 //-----------------------------------------------------------------
 //join Clean Names to normalized data
@@ -16,13 +16,13 @@ Layouts.Layout_Out t_parse_get_name (norm_addr le) := TRANSFORM
 	SELF				:= [];
 END;
 
-proj_norm_addr := project(norm_addr,t_parse_get_name(left));					
-					
+proj_norm_addr := project(norm_addr,t_parse_get_name(left));
+
 invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
 
 Layouts.Layout_Out t_validate (proj_norm_addr  le) := TRANSFORM
 	valid_dob   			:=if((unsigned)le.Orig_Date_of_Birth between 18000101 and (unsigned) ut.GetDate, le.Orig_Date_of_Birth, '');
-		
+
 	SELF.Date_of_Birth		:=valid_dob;
 	SELF.prim_name   		:=if(trim(le.prim_name) in invalid_prim_name,'',le.prim_name);
 	SELF.zip         		:=if(le.zip='00000','',le.zip);
@@ -31,22 +31,22 @@ Layouts.Layout_Out t_validate (proj_norm_addr  le) := TRANSFORM
 //----------------------------------------------------------------
 //---VERY IMPORTANT: Setting first/last date seen and current record flag
 //----------------------------------------------------------------
-	
+
 	valid_Address_Create_Date		:=if((unsigned)le.date_first_seen between 18000101 and (unsigned) ut.GetDate, (unsigned) le.date_first_seen, 0);
 	valid_Address_Date				:=if((unsigned)le.Orig_Address_date between 18000101 and (unsigned) ut.GetDate, (unsigned) le.Orig_Address_date, 0);
 
 	SELF.date_first_seen			:=(unsigned)valid_Address_Create_Date;
-	SELF.date_last_seen				:=(unsigned)valid_Address_Date;	
+	SELF.date_last_seen				:=(unsigned)valid_Address_Date;
 	SELF.date_vendor_first_reported	:=(unsigned)version;
-	SELF.date_vendor_last_reported	:=(unsigned)version;	
+	SELF.date_vendor_last_reported	:=(unsigned)version;
 	SELF.current_rec_flag			:=1;//only one address per record, all addresses are expected to be current
 	SELF							:=le;
 END;
 
-field_validation := project(distribute(proj_norm_addr, hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)), 
+field_validation := project(distribute(proj_norm_addr, hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)),
 										t_validate(left)): persist('~thor_data400::persist::experianirsg_build::build_base::clean_normalized');
-										
-//-----------------------------------------------------------------										
+
+//-----------------------------------------------------------------
 //Delete records with Name score <= 50 or invalid state
 //-----------------------------------------------------------------
 valid_st := ['AA','AE','AK','AL','AP','AR','AS','AZ','CA','CO','CT','DC','DE','FL','FM','GA',
@@ -77,12 +77,12 @@ delete_bad_names :=join(experian_d, Bad_Names50_CurrentNmAddr_d,
 							left.Orig_State = right.Orig_State and
 							left.Orig_ZipCode = right.Orig_ZipCode and
 							left.Orig_ZipCode4 = right.Orig_ZipCode4 and
-							left.Orig_Phone_Num = right.Orig_Phone_Num,						 
+							left.Orig_Phone_Num = right.Orig_Phone_Num,
 						 t_delete_bad_names(left, right),
 						 left only,
 						 local);
 experian_clean_update :=delete_bad_names ((unsigned)name_score > 50 and st in valid_st);
-							
+
 //-----------------------------------------------------------------
 //Apply update to current base file
 //-----------------------------------------------------------------
@@ -98,7 +98,7 @@ cur_update_d	:=dedup(exp_cln_upd_srt,Orig_PID,Orig_fname,Orig_mname,Orig_lname,O
 										Orig_ZipCode,Orig_ZipCode4,Orig_Phone_Num, local);
 
 Layouts.Layout_Out t_apply_updates (cur_base_d le, cur_update_d ri) := transform
-					
+
 	SELF.current_rec_flag	:= if(
 									le.Orig_fname=ri.Orig_fname and
 									le.Orig_mname=ri.Orig_mname and
@@ -122,7 +122,7 @@ Layouts.Layout_Out t_apply_updates (cur_base_d le, cur_update_d ri) := transform
 									le.Orig_State = ri.Orig_State and
 									le.Orig_ZipCode = ri.Orig_ZipCode and
 									le.Orig_ZipCode4 = ri.Orig_ZipCode4 and
-									le.Orig_Phone_Num = ri.Orig_Phone_Num and 
+									le.Orig_Phone_Num = ri.Orig_Phone_Num and
 									le.current_rec_flag = 1, 0, le.current_rec_flag);
 	SELF.Orig_PID			:= MAX(le.orig_PID,ri.orig_PID);
 	SELF 					:= le;
@@ -157,41 +157,41 @@ apply_updates := join(cur_base_d,
 					  left outer,
 					  local);
 
-base_and_update := if(FileServices.GetSuperFileSubCount(Superfile_List.IRSG_Base_File) = 0, 
-					  experian_clean_update,  
+base_and_update := if(FileServices.GetSuperFileSubCount(Superfile_List.IRSG_Base_File) = 0,
+					  experian_clean_update,
 					  experian_clean_update + apply_updates);
 
 matchset := ['A','Z','D','P'];
 
 did_add.MAC_Match_Flex
-	(base_and_update , 
-	 matchset,					
-	 SSN, 
-	 Date_of_Birth, 
-	 fname, mname, 
-	 lname, 
-	 name_suffix, 
-	 prim_range, 
-	 prim_name, 
-	 sec_range, 
-	 zip, 
+	(base_and_update ,
+	 matchset,
+	 SSN,
+	 Date_of_Birth,
+	 fname, mname,
+	 lname,
+	 name_suffix,
+	 prim_range,
+	 prim_name,
+	 sec_range,
+	 zip,
 	 st,
 	 Orig_phone_Num,
-	 DID, 
-	 Layouts.Layout_Out, 
-	 true, 
+	 DID,
+	 Layouts.Layout_Out,
+	 true,
 	 DID_Score_field,
-	 75, 
+	 75,
 	 d_did)
 
 //-----------------------------------------------------------------
 //Rollup to eliminate duplications
 //-----------------------------------------------------------------
 
-build_experian_base_d := distribute(d_did, hash(did, Orig_PID, Orig_fname, Orig_lname, Orig_mname )); 
+build_experian_base_d := distribute(d_did, hash(did, Orig_PID, Orig_fname, Orig_lname, Orig_mname ));
 
-build_experian_base_s := sort(build_experian_base_d, 
-					did, 
+build_experian_base_s := sort(build_experian_base_d,
+					did,
 					Orig_PID,
 					Orig_fname,
 					Orig_mname,
@@ -235,9 +235,9 @@ Layouts.Layout_Out t_rollup (build_experian_base_s  le, build_experian_base_s ri
  self := le;
 end;
 
-experianirsg_build_base := rollup(build_experian_base_s, 
-					t_rollup(left, right), 
-					did, 
+experianirsg_build_base := rollup(build_experian_base_s,
+					t_rollup(left, right),
+					did,
 					Orig_PID,
 					Orig_fname,
 					Orig_mname,
@@ -265,7 +265,7 @@ experianirsg_build_base := rollup(build_experian_base_s,
 
 //-----------------------------------------------------------------
 //Append Delete File
-//-----------------------------------------------------------------					
+//-----------------------------------------------------------------
 Experian_base_d     := distribute(experianirsg_build_base,  hash(orig_fname,orig_lname,orig_mname,orig_suffix));
-				   
+
 export Build_Base := Experian_base_d;

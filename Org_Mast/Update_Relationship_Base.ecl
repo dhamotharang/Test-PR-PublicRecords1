@@ -1,8 +1,5 @@
 
-import Address, Ut, std, lib_STRINGlib, _Control, business_header,_Validate, mdr,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, watchdog,
-VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
-BIPV2_Company_Names, HealthCareFacility;
+import std, ut;
 
 Today := Std.Date.SecondsToString(std.date.CurrentSeconds(true), '%Y%m%d%H%M%S');
 EXPORT Update_Relationship_Base (STRING filedate, STRING Affldate, STRING ORG_Mst_Date,boolean pUseProd = false) := module
@@ -11,7 +8,7 @@ EXPORT Update_Relationship_Base (STRING filedate, STRING Affldate, STRING ORG_Ms
 	EXPORT Relationship_base := FUNCTION
 		Aff_Table := dataset ('~thor400_data::Base::org_master::org_master_affiliations::'+Affldate,org_mast.layouts.affiliations_base, THOR);
 		Org_Table := dataset ('~thor400_data::Base::org_master::org_master_organization::'+ORG_Mst_Date,org_mast.layouts.organization_base, THOR);
-		//Indiv_Table := dataset ('~thor400_data::Base::HMS_PM::HMS_individuals::'+pversion,HMS.layouts.individual_base, THOR);		
+		//Indiv_Table := dataset ('~thor400_data::Base::HMS_PM::HMS_individuals::'+pversion,HMS.layouts.individual_base, THOR);
 		s_Aff_Table := SORT(Aff_Table,LNFID);
 		s_Org_Table	:= SORT (Org_Table,LNFID);
 
@@ -30,9 +27,9 @@ EXPORT Update_Relationship_Base (STRING filedate, STRING Affldate, STRING ORG_Ms
 		//Relationship := Relationship1:PERSIST('~thor400_data::PERSIST::org_master::Org_Base11::'+filedate);
 		ut.MAC_Sequence_Records(Relationship,RID,outfile1);
 		outfile := outfile1:PERSIST('~thor400_data::PERSIST::org_master::Org_Base12::'+filedate);
-/*		
+/*
    		outf1 := outfile + Relationship;
-   		outf := outf1:PERSIST('~thor400_data::PERSIST::org_master::Org_Base10::'+filedate);		
+   		outf := outf1:PERSIST('~thor400_data::PERSIST::org_master::Org_Base10::'+filedate);
    		output(count(outf), named ('Count_OutF'));
    		mxr:=max(outf,RID);
    		Org_Mast.Layouts.Relationship_base to_form(outf l) := transform
@@ -41,7 +38,7 @@ EXPORT Update_Relationship_Base (STRING filedate, STRING Affldate, STRING ORG_Ms
       			// self.pflag1 := MAP(l.did=0=>'A',l.rid=0=>'P','+');
       			self := l;
       		end;
-      
+
       		new_Relationship := project(outf,to_form(left));
 
 		// Note that this file is regenerated everytime the input files are processed and Affiliations & Organization base files are created

@@ -1,4 +1,4 @@
-import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header_SS, Business_Header;
+import bankrupt, did_add, ut, Business_Header_SS, Business_Header;
 
 #stored('did_add_force','thor');
 
@@ -58,20 +58,20 @@ bdid_nomatch := bdid_init(bdid_new = 0);
 
 Business_Header_SS.MAC_Add_BDID_FLEX(
             bdid_nomatch, business_matchset,
-            debtor_company, 
-            prim_range, prim_name, z5, 
+            debtor_company,
+            prim_range, prim_name, z5,
             sec_range, st,
             phone_field, fein_field,
-            bdid_new,          
+            bdid_new,
             temprec,
             false, BDID_Score_field,  //these should default to zero in definition
 			bdid_rematch)
-          
+
 out3 := to_bdid_no_company + bdid_match + bdid_rematch;
-                                               
+
 
 typeof(df) into(out3 L) := transform
-	boolean ssn_flag := If ((length(trim(L.orig_ssn)) = 4 AND length(trim(L.a_ssn)) = 9 AND l.orig_ssn[1..4] <> L.a_ssn[6..9]) OR 
+	boolean ssn_flag := If ((length(trim(L.orig_ssn)) = 4 AND length(trim(L.a_ssn)) = 9 AND l.orig_ssn[1..4] <> L.a_ssn[6..9]) OR
 							(length(trim(L.orig_ssn)) = 9 AND length(trim(L.a_ssn)) = 9 AND L.orig_ssn <> L.a_ssn) OR
                             (length(trim(L.orig_ssn)) = 4 AND length(trim(L.a_ssn)) = 4 AND L.orig_ssn[1..4] <> L.a_ssn[1..4]) OR
                             (length(trim(L.orig_ssn)) = 9 AND length(trim(L.a_ssn)) = 4),
@@ -87,4 +87,3 @@ end;
 out4 := project(out3,into(LEFT));
 
 output(out4,,'~thor_data400::out::bankrupt_search_v8_20050419',overwrite)
- 

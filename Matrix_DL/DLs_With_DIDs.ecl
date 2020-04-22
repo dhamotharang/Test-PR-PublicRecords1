@@ -1,14 +1,14 @@
-import did_add,ut,header_slimsort,lib_stringlib, watchdog, didville, fair_isaac;;
+import did_add;
 //dl_file := DL_Joined;
 
 lMatchSet := ['A','D','S'];
 
 DID_Add.MAC_Match_Flex
 	(DL_Joined, lMatchSet,						//see above
-	 ssn, dob, fname, mname, lname, name_suffix, 
+	 ssn, dob, fname, mname, lname, name_suffix,
 	 prim_range, prim_name, sec_range, zip5, st, JUNK,
 	 DID,   			//if bool = false, then put junk in corresponding _field
-	 Layout_Common, 
+	 Layout_Common,
 	 false, DID_Score_field, //these should default to zero in definition
 	 75,
 	 res)

@@ -1,6 +1,6 @@
 
 
-import doxie_files, doxie,ut,Address,did_Add,header_slimsort,watchdog,RoxieKeyBuild;
+import ut, Address, did_Add;
 
 export clean_opt_out_data(string filedate) := function
 
@@ -22,8 +22,8 @@ newfile:= appndAddr;
 
 fcra_opt_out.layout_infile_appended trecs2(newfile input) := transform
 
-self.prim_range 			:= input.clean[1..10]; 
-self.predir 				:= input.clean[11..12];					   
+self.prim_range 			:= input.clean[1..10];
+self.predir 				:= input.clean[11..12];
 self.prim_name 				:= input.clean[13..40];
 self.name_suffix 		    := input.clean[41..44];
 self.postdir 				:= input.clean[45..46];
@@ -72,18 +72,18 @@ pnames := project(precs2(inname_last<>'' and inname_first <>''),tnames(left));
 
 lMatchSet := ['S','A'];
 did_Add.MAC_Match_Flex
-	(pnames , lMatchSet,						
-	 ssn, blank2, fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, z5, st, blank3, 
+	(pnames , lMatchSet,
+	 ssn, blank2, fname, mname,lname, name_suffix,
+	 prim_range, prim_name, sec_range, z5, st, blank3,
 	 DID,
 	 pnames,
 	 true, DID_Score,
-	 75,						
+	 75,
 	 outfile
 	)
-	
-	
-did_add.MAC_Add_SSN_By_DID(outfile,did,ssn_append,outssn, true);	
+
+
+did_add.MAC_Add_SSN_By_DID(outfile,did,ssn_append,outssn, true);
 
 //export clean_opt_out_data := output (outssn,,'~thor_data400::base::fcra::optout',overwrite);
 // retval := output (outssn,,'~thor_data400::base::fcra::optout',overwrite);
@@ -91,5 +91,3 @@ did_add.MAC_Add_SSN_By_DID(outfile,did,ssn_append,outssn, true);
 return outssn;
 
 end;
-
-

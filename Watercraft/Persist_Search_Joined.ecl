@@ -1,4 +1,4 @@
-import did_add, ut, header_slimsort, header, WatchDog, didville, fair_isaac, Business_Header_SS, Business_Header;
+import did_add, Business_Header_SS, Business_Header;
 
 dJoined
  :=	Watercraft.Mapping_AK_as_Search
@@ -149,10 +149,10 @@ sDIDMatchSet 	:= ['A','D','S'];
 
 did_Add.MAC_Match_Flex
 	(dCleanedPersonOnly, sDIDMatchSet,
-	 orig_ssn, temp_DOB, fname, mname, lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip5, st, phone_1, 
+	 orig_ssn, temp_DOB, fname, mname, lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip5, st, phone_1,
 	 temp_DID,
-	 rPreDIDRecord, 
+	 rPreDIDRecord,
 	 true, temp_DID_Score,		//these should default to zero in definition
 	 75,
 	 dPostDID);		//try the dedup DIDing
@@ -189,7 +189,7 @@ business_header_ss.MAC_Match_Flex(dWithNoBusHdrSourceMatch,sBDIDMatchSet,
 								  dPostBDID
 								 );
 
-dPostDIDandBDIDPersist	:=	dPostDIDandSSN 
+dPostDIDandBDIDPersist	:=	dPostDIDandSSN
 						+	dPostBDID
 						+	dWithBusHdrSourceMatch
 						:	persist('~thor_data400::persist::watercraft_PostDIDandBDID','thor_dell400_2')

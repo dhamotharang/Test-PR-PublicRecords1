@@ -1,4 +1,4 @@
-import ut,corrections,header_slimsort,watchdog,didville,fair_isaac,did_add,doxie_build,census_data,codes;
+import ut,corrections,didville,did_add,doxie_build,census_data,codes;
 
 export proc_build_Life_EIR_offenders(dataset(corrections_layout_offender) infile):= function
 
@@ -51,7 +51,7 @@ did_add.mac_match_fast_roxie(did_in,outf_rox,'','BEST_SSN','ALL',true,true)
 
 didoutrec into_didout(outf_rox L) := transform
 	self.ssn_added := L.best_ssn;
-	self := l;	
+	self := l;
 end;
 
 outf := project(outf_rox,into_didout(LEFT));
@@ -113,7 +113,7 @@ layout_offender get_state_mapping1(o1wd L, codes.File_Codes_V3_In R) := transfor
 end;
 
 o1a := join(o1wd,codes.File_Codes_V3_In(file_name = 'GENERAL', field_name= 'STATE_LONG'),
-	left.place_of_birth != '' and 
+	left.place_of_birth != '' and
 	right.code = left.place_of_birth,
 	get_state_mapping1(LEFT,RIGHT),lookup, left outer);
 
@@ -124,7 +124,7 @@ end;
 
 o1a2 := join(o1a,codes.File_Codes_V3_In(file_name = 'GENERAL', field_name= 'STATE_LONG'),right.code = left.orig_state,
 		get_state_mapping2(LEFT,RIGHT),left outer, lookup);
-		
+
 
 layout_offender get_county_name(o1a2 L, Census_data.File_Fips2County r) := transform
 	self.county_name := R.county_name;
@@ -226,8 +226,8 @@ end;
 dpostfinal := join(dpost2,codes.File_Codes_V3_In(file_name = 'CRIM_OFFENDER2'),
 				right.field_name = 'DATA_TYPE' and left.data_type = right.code,
 				get_datasource(LEFT,RIGHT),left outer, lookup);
-				
+
 //ut.MAC_SF_BuildProcess(dpostfinal,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate,a,2)
-	
+
 return dpostfinal;
 end;

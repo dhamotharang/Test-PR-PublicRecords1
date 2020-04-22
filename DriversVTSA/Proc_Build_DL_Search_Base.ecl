@@ -1,4 +1,3 @@
-//import doxie_build, Matrix_DL, fieldstats, doxie_files, drivers, ut, didville, did_add, fair_isaac, header_slimsort, watchdog;
 import DriversV2, ut, doxie_build, lib_fileservices;
 
 st := CompDL;
@@ -30,12 +29,12 @@ p := PROJECT(st, addM(LEFT));
 */
 //export Proc_Build_DL_Search_Base := sequential(dofirst);
 
-basename := '~thor400_92::base::scankdl::' + filedate + '::DLSearch';	
+basename := '~thor400_92::base::scankdl::' + filedate + '::DLSearch';
 sfname := '~thor400_92::base::scankdl::qa::DLSearch';
 
 
 export Proc_Build_DL_Search_Base := sequential(
-				IF(FileServices.SuperFileExists(sfname), 
+				IF(FileServices.SuperFileExists(sfname),
 					FileServices.ClearSuperFile(sfname),
 					FileServices.CreateSuperFile(sfname)),
 				OUTPUT(p,,basename, overwrite),
@@ -43,4 +42,3 @@ export Proc_Build_DL_Search_Base := sequential(
 					FileServices.AddSuperfile(sfname, basename),
 				FileServices.FinishSuperFileTransaction()
 			);
-

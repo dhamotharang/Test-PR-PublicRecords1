@@ -1,6 +1,6 @@
-import doxie,ut,header_slimsort,doxie_files,watchdog;
+import doxie;
 
-export fun_DIDAppendBatchMaster(dataset(doxie.layout_inBatchMaster) inputs) := 
+export fun_DIDAppendBatchMaster(dataset(doxie.layout_inBatchMaster) inputs) :=
 FUNCTION
 
 //prep for did macro
@@ -8,7 +8,7 @@ didville.Layout_Did_OutBatch transform_BatchInputForDID(inputs l) := transform
   self.did := 0;
 	self.ssn := l.ssn;
 	self.dob := l.dob;
-	self.phone10 := l.homephone;   
+	self.phone10 := l.homephone;
 	self.title := '';
 	self.fname := l.name_first;
 	self.mname := l.name_middle;
@@ -32,7 +32,7 @@ end;
 fordid := project(inputs, transform_BatchInputForDID(left));
 
 //get dids
-didville.MAC_DidAppend(fordid,resu,false,'',true)  
+didville.MAC_DidAppend(fordid,resu,false,'',true)
 
 return resu;
 

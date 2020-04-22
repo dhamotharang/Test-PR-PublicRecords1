@@ -1,4 +1,4 @@
-import ut, Address, Business_Header, Business_Header_SS, did_add, DidVille, header_slimsort, Watchdog;
+import ut, Address, Business_Header, Business_Header_SS;
 
 layout_bbb_seq := record
 unsigned4 seq;
@@ -124,11 +124,11 @@ bbb_bdid_nomatch := bbb_bdid_init(bdid = 0);
 Business_Header_SS.MAC_Match_Flex
 (
 	bbb_bdid_nomatch, BDID_Matchset,
-	company_name, 
+	company_name,
 	prim_range, prim_name, z5,
 	sec_range, st,
 	phone10, fein,
-	BDID,	
+	BDID,
 	Business_Header_SS.Layout_BDID_OutBatch,
 	true, score,  //these should default to zero in definition
 	bbb_bdid_rematch,
@@ -149,5 +149,5 @@ bbb_bdid_append := join(bbb_clean,
 				    left.seq = right.seq,
 				    AppendBDID(left, right),
 				    lookup);
-						  
+
 export bbb_non_member_clean_bdid := bbb_bdid_append : persist('TEMP::BBB_Non_Member_Clean_BDID');
