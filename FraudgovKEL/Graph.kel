@@ -10,7 +10,6 @@ C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\Fraudgo
 #OPTION(codegen, 'nolookupjoins')
 */
 
-
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
