@@ -1,10 +1,10 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Diversity_Certification; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs_Diversity_Certification,scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 211;
-  EXPORT NumRulesFromFieldType := 211;
+  EXPORT NumRules := 202;
+  EXPORT NumRulesFromFieldType := 202;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 202;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -227,7 +227,7 @@ EXPORT Input_Scrubs := MODULE
           ,'dateadded:Invalid_Date:CUSTOM'
           ,'dateupdated:Invalid_Date:CUSTOM'
           ,'website:Invalid_AlphaNumChar:ALLOW'
-          ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
+          ,'state:Invalid_State:CUSTOM'
           ,'profilelastupdated:Invalid_Date:CUSTOM'
           ,'county:Invalid_AlphaNumChar:ALLOW'
           ,'servicearea:Invalid_Alpha:ALLOW'
@@ -246,15 +246,15 @@ EXPORT Input_Scrubs := MODULE
           ,'address1:Invalid_AlphaNumChar:ALLOW'
           ,'address2:Invalid_AlphaNum:ALLOW'
           ,'addresscity:Invalid_Alpha:ALLOW'
-          ,'addressstate:Invalid_State:ALLOW','addressstate:Invalid_State:LENGTHS'
+          ,'addressstate:Invalid_State:CUSTOM'
           ,'addresszip4:Invalid_No:ALLOW'
           ,'building:Invalid_Alpha:ALLOW'
           ,'contact:Invalid_Alpha:ALLOW'
-          ,'phone1:Invalid_Phone:ALLOW','phone1:Invalid_Phone:LENGTHS'
-          ,'phone2:Invalid_Phone:ALLOW','phone2:Invalid_Phone:LENGTHS'
-          ,'phone3:Invalid_Phone:ALLOW','phone3:Invalid_Phone:LENGTHS'
-          ,'cell:Invalid_Phone:ALLOW','cell:Invalid_Phone:LENGTHS'
-          ,'fax:Invalid_Phone:ALLOW','fax:Invalid_Phone:LENGTHS'
+          ,'phone1:Invalid_Phone:CUSTOM'
+          ,'phone2:Invalid_Phone:CUSTOM'
+          ,'phone3:Invalid_Phone:CUSTOM'
+          ,'cell:Invalid_Phone:CUSTOM'
+          ,'fax:Invalid_Phone:CUSTOM'
           ,'email1:Invalid_AlphaNumChar:ALLOW'
           ,'email2:Invalid_AlphaNumChar:ALLOW'
           ,'email3:Invalid_AlphaNumChar:ALLOW'
@@ -287,9 +287,9 @@ EXPORT Input_Scrubs := MODULE
           ,'firmlocationaddresscity:Invalid_Alpha:ALLOW'
           ,'firmlocationaddresszip4:Invalid_No:ALLOW'
           ,'firmlocationcounty:Invalid_Alpha:ALLOW'
-          ,'firmlocationstate:Invalid_State:ALLOW','firmlocationstate:Invalid_State:LENGTHS'
+          ,'firmlocationstate:Invalid_State:CUSTOM'
           ,'certfed:Invalid_Alpha:ALLOW'
-          ,'certstate:Invalid_State:ALLOW','certstate:Invalid_State:LENGTHS'
+          ,'certstate:Invalid_State:CUSTOM'
           ,'contractsfederal:Invalid_Alpha:ALLOW'
           ,'contractsva:Invalid_Alpha:ALLOW'
           ,'contractscommercial:Invalid_Alpha:ALLOW'
@@ -437,7 +437,7 @@ EXPORT Input_Scrubs := MODULE
           ,Input_Fields.InvalidMessage_dateadded(1)
           ,Input_Fields.InvalidMessage_dateupdated(1)
           ,Input_Fields.InvalidMessage_website(1)
-          ,Input_Fields.InvalidMessage_state(1),Input_Fields.InvalidMessage_state(2)
+          ,Input_Fields.InvalidMessage_state(1)
           ,Input_Fields.InvalidMessage_profilelastupdated(1)
           ,Input_Fields.InvalidMessage_county(1)
           ,Input_Fields.InvalidMessage_servicearea(1)
@@ -456,15 +456,15 @@ EXPORT Input_Scrubs := MODULE
           ,Input_Fields.InvalidMessage_address1(1)
           ,Input_Fields.InvalidMessage_address2(1)
           ,Input_Fields.InvalidMessage_addresscity(1)
-          ,Input_Fields.InvalidMessage_addressstate(1),Input_Fields.InvalidMessage_addressstate(2)
+          ,Input_Fields.InvalidMessage_addressstate(1)
           ,Input_Fields.InvalidMessage_addresszip4(1)
           ,Input_Fields.InvalidMessage_building(1)
           ,Input_Fields.InvalidMessage_contact(1)
-          ,Input_Fields.InvalidMessage_phone1(1),Input_Fields.InvalidMessage_phone1(2)
-          ,Input_Fields.InvalidMessage_phone2(1),Input_Fields.InvalidMessage_phone2(2)
-          ,Input_Fields.InvalidMessage_phone3(1),Input_Fields.InvalidMessage_phone3(2)
-          ,Input_Fields.InvalidMessage_cell(1),Input_Fields.InvalidMessage_cell(2)
-          ,Input_Fields.InvalidMessage_fax(1),Input_Fields.InvalidMessage_fax(2)
+          ,Input_Fields.InvalidMessage_phone1(1)
+          ,Input_Fields.InvalidMessage_phone2(1)
+          ,Input_Fields.InvalidMessage_phone3(1)
+          ,Input_Fields.InvalidMessage_cell(1)
+          ,Input_Fields.InvalidMessage_fax(1)
           ,Input_Fields.InvalidMessage_email1(1)
           ,Input_Fields.InvalidMessage_email2(1)
           ,Input_Fields.InvalidMessage_email3(1)
@@ -497,9 +497,9 @@ EXPORT Input_Scrubs := MODULE
           ,Input_Fields.InvalidMessage_firmlocationaddresscity(1)
           ,Input_Fields.InvalidMessage_firmlocationaddresszip4(1)
           ,Input_Fields.InvalidMessage_firmlocationcounty(1)
-          ,Input_Fields.InvalidMessage_firmlocationstate(1),Input_Fields.InvalidMessage_firmlocationstate(2)
+          ,Input_Fields.InvalidMessage_firmlocationstate(1)
           ,Input_Fields.InvalidMessage_certfed(1)
-          ,Input_Fields.InvalidMessage_certstate(1),Input_Fields.InvalidMessage_certstate(2)
+          ,Input_Fields.InvalidMessage_certstate(1)
           ,Input_Fields.InvalidMessage_contractsfederal(1)
           ,Input_Fields.InvalidMessage_contractsva(1)
           ,Input_Fields.InvalidMessage_contractscommercial(1)
@@ -851,10 +851,10 @@ EXPORT FromNone(DATASET(Input_Layout_Diversity_Certification) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_Layout_Diversity_Certification);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dartid_Invalid << 0 ) + ( le.dateadded_Invalid << 1 ) + ( le.dateupdated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.profilelastupdated_Invalid << 6 ) + ( le.county_Invalid << 7 ) + ( le.servicearea_Invalid << 8 ) + ( le.region1_Invalid << 9 ) + ( le.region2_Invalid << 10 ) + ( le.region3_Invalid << 11 ) + ( le.region4_Invalid << 12 ) + ( le.region5_Invalid << 13 ) + ( le.fname_Invalid << 14 ) + ( le.lname_Invalid << 15 ) + ( le.mname_Invalid << 16 ) + ( le.suffix_Invalid << 17 ) + ( le.title_Invalid << 18 ) + ( le.ethnicity_Invalid << 19 ) + ( le.gender_Invalid << 20 ) + ( le.address1_Invalid << 21 ) + ( le.address2_Invalid << 22 ) + ( le.addresscity_Invalid << 23 ) + ( le.addressstate_Invalid << 24 ) + ( le.addresszip4_Invalid << 26 ) + ( le.building_Invalid << 27 ) + ( le.contact_Invalid << 28 ) + ( le.phone1_Invalid << 29 ) + ( le.phone2_Invalid << 31 ) + ( le.phone3_Invalid << 33 ) + ( le.cell_Invalid << 35 ) + ( le.fax_Invalid << 37 ) + ( le.email1_Invalid << 39 ) + ( le.email2_Invalid << 40 ) + ( le.email3_Invalid << 41 ) + ( le.webpage1_Invalid << 42 ) + ( le.webpage2_Invalid << 43 ) + ( le.webpage3_Invalid << 44 ) + ( le.businessname_Invalid << 45 ) + ( le.dba_Invalid << 46 ) + ( le.businessid_Invalid << 47 ) + ( le.businesstype1_Invalid << 48 ) + ( le.businesslocation1_Invalid << 49 ) + ( le.businesstype2_Invalid << 50 ) + ( le.businesslocation2_Invalid << 51 ) + ( le.businesstype3_Invalid << 52 ) + ( le.businesslocation3_Invalid << 53 ) + ( le.businesstype4_Invalid << 54 ) + ( le.businesslocation4_Invalid << 55 ) + ( le.businesstype5_Invalid << 56 ) + ( le.businesslocation5_Invalid << 57 ) + ( le.industry_Invalid << 58 ) + ( le.trade_Invalid << 59 ) + ( le.resourcedescription_Invalid << 60 ) + ( le.natureofbusiness_Invalid << 61 ) + ( le.businessdescription_Invalid << 62 ) + ( le.businessstructure_Invalid << 63 );
-    SELF.ScrubsBits2 := ( le.totalemployees_Invalid << 0 ) + ( le.avgcontractsize_Invalid << 1 ) + ( le.firmid_Invalid << 2 ) + ( le.firmlocationaddress_Invalid << 3 ) + ( le.firmlocationaddresscity_Invalid << 4 ) + ( le.firmlocationaddresszip4_Invalid << 5 ) + ( le.firmlocationcounty_Invalid << 6 ) + ( le.firmlocationstate_Invalid << 7 ) + ( le.certfed_Invalid << 9 ) + ( le.certstate_Invalid << 10 ) + ( le.contractsfederal_Invalid << 12 ) + ( le.contractsva_Invalid << 13 ) + ( le.contractscommercial_Invalid << 14 ) + ( le.contractorgovernmentprime_Invalid << 15 ) + ( le.contractorgovernmentsub_Invalid << 16 ) + ( le.contractornongovernment_Invalid << 17 ) + ( le.registeredgovernmentbus_Invalid << 18 ) + ( le.registerednongovernmentbus_Invalid << 19 ) + ( le.clearancelevelpersonnel_Invalid << 20 ) + ( le.clearancelevelfacility_Invalid << 21 ) + ( le.certificatedatefrom1_Invalid << 22 ) + ( le.certificatedateto1_Invalid << 23 ) + ( le.certificatestatus1_Invalid << 24 ) + ( le.certificationnumber1_Invalid << 25 ) + ( le.certificationtype1_Invalid << 26 ) + ( le.certificatedatefrom2_Invalid << 27 ) + ( le.certificatedateto2_Invalid << 28 ) + ( le.certificatestatus2_Invalid << 29 ) + ( le.certificationnumber2_Invalid << 30 ) + ( le.certificationtype2_Invalid << 31 ) + ( le.certificatedatefrom3_Invalid << 32 ) + ( le.certificatedateto3_Invalid << 33 ) + ( le.certificatestatus3_Invalid << 34 ) + ( le.certificationnumber3_Invalid << 35 ) + ( le.certificationtype3_Invalid << 36 ) + ( le.certificatedatefrom4_Invalid << 37 ) + ( le.certificatedateto4_Invalid << 38 ) + ( le.certificatestatus4_Invalid << 39 ) + ( le.certificationnumber4_Invalid << 40 ) + ( le.certificationtype4_Invalid << 41 ) + ( le.certificatedatefrom5_Invalid << 42 ) + ( le.certificatedateto5_Invalid << 43 ) + ( le.certificatestatus5_Invalid << 44 ) + ( le.certificationnumber5_Invalid << 45 ) + ( le.certificationtype5_Invalid << 46 ) + ( le.certificatedatefrom6_Invalid << 47 ) + ( le.certificatedateto6_Invalid << 48 ) + ( le.certificatestatus6_Invalid << 49 ) + ( le.certificationnumber6_Invalid << 50 ) + ( le.certificationtype6_Invalid << 51 ) + ( le.starrating_Invalid << 52 ) + ( le.assets_Invalid << 53 ) + ( le.biddescription_Invalid << 54 ) + ( le.competitiveadvantage_Invalid << 55 ) + ( le.cagecode_Invalid << 56 ) + ( le.capabilitiesnarrative_Invalid << 57 ) + ( le.category_Invalid << 58 ) + ( le.chtrclass_Invalid << 59 ) + ( le.productdescription1_Invalid << 60 ) + ( le.productdescription2_Invalid << 61 ) + ( le.productdescription3_Invalid << 62 ) + ( le.productdescription4_Invalid << 63 );
-    SELF.ScrubsBits3 := ( le.productdescription5_Invalid << 0 ) + ( le.classdescription1_Invalid << 1 ) + ( le.subclassdescription1_Invalid << 2 ) + ( le.classdescription2_Invalid << 3 ) + ( le.subclassdescription2_Invalid << 4 ) + ( le.classdescription3_Invalid << 5 ) + ( le.subclassdescription3_Invalid << 6 ) + ( le.classdescription4_Invalid << 7 ) + ( le.subclassdescription4_Invalid << 8 ) + ( le.classdescription5_Invalid << 9 ) + ( le.subclassdescription5_Invalid << 10 ) + ( le.classifications_Invalid << 11 ) + ( le.commodity1_Invalid << 12 ) + ( le.commodity2_Invalid << 13 ) + ( le.commodity3_Invalid << 14 ) + ( le.commodity4_Invalid << 15 ) + ( le.commodity5_Invalid << 16 ) + ( le.commodity6_Invalid << 17 ) + ( le.commodity7_Invalid << 18 ) + ( le.commodity8_Invalid << 19 ) + ( le.completedate_Invalid << 20 ) + ( le.crossreference_Invalid << 21 ) + ( le.dateestablished_Invalid << 22 ) + ( le.businessage_Invalid << 23 ) + ( le.deposits_Invalid << 24 ) + ( le.dunsnumber_Invalid << 25 ) + ( le.enttype_Invalid << 26 ) + ( le.expirationdate_Invalid << 27 ) + ( le.extendeddate_Invalid << 28 ) + ( le.issuingauthority_Invalid << 29 ) + ( le.keywords_Invalid << 30 ) + ( le.licensenumber_Invalid << 31 ) + ( le.licensetype_Invalid << 32 ) + ( le.mincd_Invalid << 33 ) + ( le.minorityaffiliation_Invalid << 34 ) + ( le.minorityownershipdate_Invalid << 35 ) + ( le.siccode1_Invalid << 36 ) + ( le.siccode2_Invalid << 37 ) + ( le.siccode3_Invalid << 38 ) + ( le.siccode4_Invalid << 39 ) + ( le.siccode5_Invalid << 40 ) + ( le.siccode6_Invalid << 41 ) + ( le.siccode7_Invalid << 42 ) + ( le.siccode8_Invalid << 43 ) + ( le.naicscode1_Invalid << 44 ) + ( le.naicscode2_Invalid << 45 ) + ( le.naicscode3_Invalid << 46 ) + ( le.naicscode4_Invalid << 47 ) + ( le.naicscode5_Invalid << 48 ) + ( le.naicscode6_Invalid << 49 ) + ( le.naicscode7_Invalid << 50 ) + ( le.naicscode8_Invalid << 51 ) + ( le.prequalify_Invalid << 52 ) + ( le.procurementcategory1_Invalid << 53 ) + ( le.subprocurementcategory1_Invalid << 54 ) + ( le.procurementcategory2_Invalid << 55 ) + ( le.subprocurementcategory2_Invalid << 56 ) + ( le.procurementcategory3_Invalid << 57 ) + ( le.subprocurementcategory3_Invalid << 58 ) + ( le.procurementcategory4_Invalid << 59 ) + ( le.subprocurementcategory4_Invalid << 60 ) + ( le.procurementcategory5_Invalid << 61 ) + ( le.subprocurementcategory5_Invalid << 62 ) + ( le.renewal_Invalid << 63 );
-    SELF.ScrubsBits4 := ( le.renewaldate_Invalid << 0 ) + ( le.unitedcertprogrampartner_Invalid << 1 ) + ( le.vendorkey_Invalid << 2 ) + ( le.vendornumber_Invalid << 3 ) + ( le.workcode1_Invalid << 4 ) + ( le.workcode2_Invalid << 5 ) + ( le.workcode3_Invalid << 6 ) + ( le.workcode4_Invalid << 7 ) + ( le.workcode5_Invalid << 8 ) + ( le.workcode6_Invalid << 9 ) + ( le.workcode7_Invalid << 10 ) + ( le.workcode8_Invalid << 11 ) + ( le.exporter_Invalid << 12 ) + ( le.exportbusinessactivities_Invalid << 13 ) + ( le.exportto_Invalid << 14 ) + ( le.exportbusinessrelationships_Invalid << 15 ) + ( le.exportobjectives_Invalid << 16 ) + ( le.reference1_Invalid << 17 ) + ( le.reference2_Invalid << 18 );
+    SELF.ScrubsBits1 := ( le.dartid_Invalid << 0 ) + ( le.dateadded_Invalid << 1 ) + ( le.dateupdated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.profilelastupdated_Invalid << 5 ) + ( le.county_Invalid << 6 ) + ( le.servicearea_Invalid << 7 ) + ( le.region1_Invalid << 8 ) + ( le.region2_Invalid << 9 ) + ( le.region3_Invalid << 10 ) + ( le.region4_Invalid << 11 ) + ( le.region5_Invalid << 12 ) + ( le.fname_Invalid << 13 ) + ( le.lname_Invalid << 14 ) + ( le.mname_Invalid << 15 ) + ( le.suffix_Invalid << 16 ) + ( le.title_Invalid << 17 ) + ( le.ethnicity_Invalid << 18 ) + ( le.gender_Invalid << 19 ) + ( le.address1_Invalid << 20 ) + ( le.address2_Invalid << 21 ) + ( le.addresscity_Invalid << 22 ) + ( le.addressstate_Invalid << 23 ) + ( le.addresszip4_Invalid << 24 ) + ( le.building_Invalid << 25 ) + ( le.contact_Invalid << 26 ) + ( le.phone1_Invalid << 27 ) + ( le.phone2_Invalid << 28 ) + ( le.phone3_Invalid << 29 ) + ( le.cell_Invalid << 30 ) + ( le.fax_Invalid << 31 ) + ( le.email1_Invalid << 32 ) + ( le.email2_Invalid << 33 ) + ( le.email3_Invalid << 34 ) + ( le.webpage1_Invalid << 35 ) + ( le.webpage2_Invalid << 36 ) + ( le.webpage3_Invalid << 37 ) + ( le.businessname_Invalid << 38 ) + ( le.dba_Invalid << 39 ) + ( le.businessid_Invalid << 40 ) + ( le.businesstype1_Invalid << 41 ) + ( le.businesslocation1_Invalid << 42 ) + ( le.businesstype2_Invalid << 43 ) + ( le.businesslocation2_Invalid << 44 ) + ( le.businesstype3_Invalid << 45 ) + ( le.businesslocation3_Invalid << 46 ) + ( le.businesstype4_Invalid << 47 ) + ( le.businesslocation4_Invalid << 48 ) + ( le.businesstype5_Invalid << 49 ) + ( le.businesslocation5_Invalid << 50 ) + ( le.industry_Invalid << 51 ) + ( le.trade_Invalid << 52 ) + ( le.resourcedescription_Invalid << 53 ) + ( le.natureofbusiness_Invalid << 54 ) + ( le.businessdescription_Invalid << 55 ) + ( le.businessstructure_Invalid << 56 ) + ( le.totalemployees_Invalid << 57 ) + ( le.avgcontractsize_Invalid << 58 ) + ( le.firmid_Invalid << 59 ) + ( le.firmlocationaddress_Invalid << 60 ) + ( le.firmlocationaddresscity_Invalid << 61 ) + ( le.firmlocationaddresszip4_Invalid << 62 ) + ( le.firmlocationcounty_Invalid << 63 );
+    SELF.ScrubsBits2 := ( le.firmlocationstate_Invalid << 0 ) + ( le.certfed_Invalid << 1 ) + ( le.certstate_Invalid << 2 ) + ( le.contractsfederal_Invalid << 3 ) + ( le.contractsva_Invalid << 4 ) + ( le.contractscommercial_Invalid << 5 ) + ( le.contractorgovernmentprime_Invalid << 6 ) + ( le.contractorgovernmentsub_Invalid << 7 ) + ( le.contractornongovernment_Invalid << 8 ) + ( le.registeredgovernmentbus_Invalid << 9 ) + ( le.registerednongovernmentbus_Invalid << 10 ) + ( le.clearancelevelpersonnel_Invalid << 11 ) + ( le.clearancelevelfacility_Invalid << 12 ) + ( le.certificatedatefrom1_Invalid << 13 ) + ( le.certificatedateto1_Invalid << 14 ) + ( le.certificatestatus1_Invalid << 15 ) + ( le.certificationnumber1_Invalid << 16 ) + ( le.certificationtype1_Invalid << 17 ) + ( le.certificatedatefrom2_Invalid << 18 ) + ( le.certificatedateto2_Invalid << 19 ) + ( le.certificatestatus2_Invalid << 20 ) + ( le.certificationnumber2_Invalid << 21 ) + ( le.certificationtype2_Invalid << 22 ) + ( le.certificatedatefrom3_Invalid << 23 ) + ( le.certificatedateto3_Invalid << 24 ) + ( le.certificatestatus3_Invalid << 25 ) + ( le.certificationnumber3_Invalid << 26 ) + ( le.certificationtype3_Invalid << 27 ) + ( le.certificatedatefrom4_Invalid << 28 ) + ( le.certificatedateto4_Invalid << 29 ) + ( le.certificatestatus4_Invalid << 30 ) + ( le.certificationnumber4_Invalid << 31 ) + ( le.certificationtype4_Invalid << 32 ) + ( le.certificatedatefrom5_Invalid << 33 ) + ( le.certificatedateto5_Invalid << 34 ) + ( le.certificatestatus5_Invalid << 35 ) + ( le.certificationnumber5_Invalid << 36 ) + ( le.certificationtype5_Invalid << 37 ) + ( le.certificatedatefrom6_Invalid << 38 ) + ( le.certificatedateto6_Invalid << 39 ) + ( le.certificatestatus6_Invalid << 40 ) + ( le.certificationnumber6_Invalid << 41 ) + ( le.certificationtype6_Invalid << 42 ) + ( le.starrating_Invalid << 43 ) + ( le.assets_Invalid << 44 ) + ( le.biddescription_Invalid << 45 ) + ( le.competitiveadvantage_Invalid << 46 ) + ( le.cagecode_Invalid << 47 ) + ( le.capabilitiesnarrative_Invalid << 48 ) + ( le.category_Invalid << 49 ) + ( le.chtrclass_Invalid << 50 ) + ( le.productdescription1_Invalid << 51 ) + ( le.productdescription2_Invalid << 52 ) + ( le.productdescription3_Invalid << 53 ) + ( le.productdescription4_Invalid << 54 ) + ( le.productdescription5_Invalid << 55 ) + ( le.classdescription1_Invalid << 56 ) + ( le.subclassdescription1_Invalid << 57 ) + ( le.classdescription2_Invalid << 58 ) + ( le.subclassdescription2_Invalid << 59 ) + ( le.classdescription3_Invalid << 60 ) + ( le.subclassdescription3_Invalid << 61 ) + ( le.classdescription4_Invalid << 62 ) + ( le.subclassdescription4_Invalid << 63 );
+    SELF.ScrubsBits3 := ( le.classdescription5_Invalid << 0 ) + ( le.subclassdescription5_Invalid << 1 ) + ( le.classifications_Invalid << 2 ) + ( le.commodity1_Invalid << 3 ) + ( le.commodity2_Invalid << 4 ) + ( le.commodity3_Invalid << 5 ) + ( le.commodity4_Invalid << 6 ) + ( le.commodity5_Invalid << 7 ) + ( le.commodity6_Invalid << 8 ) + ( le.commodity7_Invalid << 9 ) + ( le.commodity8_Invalid << 10 ) + ( le.completedate_Invalid << 11 ) + ( le.crossreference_Invalid << 12 ) + ( le.dateestablished_Invalid << 13 ) + ( le.businessage_Invalid << 14 ) + ( le.deposits_Invalid << 15 ) + ( le.dunsnumber_Invalid << 16 ) + ( le.enttype_Invalid << 17 ) + ( le.expirationdate_Invalid << 18 ) + ( le.extendeddate_Invalid << 19 ) + ( le.issuingauthority_Invalid << 20 ) + ( le.keywords_Invalid << 21 ) + ( le.licensenumber_Invalid << 22 ) + ( le.licensetype_Invalid << 23 ) + ( le.mincd_Invalid << 24 ) + ( le.minorityaffiliation_Invalid << 25 ) + ( le.minorityownershipdate_Invalid << 26 ) + ( le.siccode1_Invalid << 27 ) + ( le.siccode2_Invalid << 28 ) + ( le.siccode3_Invalid << 29 ) + ( le.siccode4_Invalid << 30 ) + ( le.siccode5_Invalid << 31 ) + ( le.siccode6_Invalid << 32 ) + ( le.siccode7_Invalid << 33 ) + ( le.siccode8_Invalid << 34 ) + ( le.naicscode1_Invalid << 35 ) + ( le.naicscode2_Invalid << 36 ) + ( le.naicscode3_Invalid << 37 ) + ( le.naicscode4_Invalid << 38 ) + ( le.naicscode5_Invalid << 39 ) + ( le.naicscode6_Invalid << 40 ) + ( le.naicscode7_Invalid << 41 ) + ( le.naicscode8_Invalid << 42 ) + ( le.prequalify_Invalid << 43 ) + ( le.procurementcategory1_Invalid << 44 ) + ( le.subprocurementcategory1_Invalid << 45 ) + ( le.procurementcategory2_Invalid << 46 ) + ( le.subprocurementcategory2_Invalid << 47 ) + ( le.procurementcategory3_Invalid << 48 ) + ( le.subprocurementcategory3_Invalid << 49 ) + ( le.procurementcategory4_Invalid << 50 ) + ( le.subprocurementcategory4_Invalid << 51 ) + ( le.procurementcategory5_Invalid << 52 ) + ( le.subprocurementcategory5_Invalid << 53 ) + ( le.renewal_Invalid << 54 ) + ( le.renewaldate_Invalid << 55 ) + ( le.unitedcertprogrampartner_Invalid << 56 ) + ( le.vendorkey_Invalid << 57 ) + ( le.vendornumber_Invalid << 58 ) + ( le.workcode1_Invalid << 59 ) + ( le.workcode2_Invalid << 60 ) + ( le.workcode3_Invalid << 61 ) + ( le.workcode4_Invalid << 62 ) + ( le.workcode5_Invalid << 63 );
+    SELF.ScrubsBits4 := ( le.workcode6_Invalid << 0 ) + ( le.workcode7_Invalid << 1 ) + ( le.workcode8_Invalid << 2 ) + ( le.exporter_Invalid << 3 ) + ( le.exportbusinessactivities_Invalid << 4 ) + ( le.exportto_Invalid << 5 ) + ( le.exportbusinessrelationships_Invalid << 6 ) + ( le.exportobjectives_Invalid << 7 ) + ( le.reference1_Invalid << 8 ) + ( le.reference2_Invalid << 9 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -880,204 +880,204 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.dateadded_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.dateupdated_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.website_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 3;
-    SELF.profilelastupdated_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.county_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.servicearea_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.region1_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.region2_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.region3_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.region4_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.region5_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.fname_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.lname_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.mname_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.suffix_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.title_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.ethnicity_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.gender_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.address1_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.address2_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.addresscity_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.addressstate_Invalid := (le.ScrubsBits1 >> 24) & 3;
-    SELF.addresszip4_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.building_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.contact_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.phone1_Invalid := (le.ScrubsBits1 >> 29) & 3;
-    SELF.phone2_Invalid := (le.ScrubsBits1 >> 31) & 3;
-    SELF.phone3_Invalid := (le.ScrubsBits1 >> 33) & 3;
-    SELF.cell_Invalid := (le.ScrubsBits1 >> 35) & 3;
-    SELF.fax_Invalid := (le.ScrubsBits1 >> 37) & 3;
-    SELF.email1_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.email2_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.email3_Invalid := (le.ScrubsBits1 >> 41) & 1;
-    SELF.webpage1_Invalid := (le.ScrubsBits1 >> 42) & 1;
-    SELF.webpage2_Invalid := (le.ScrubsBits1 >> 43) & 1;
-    SELF.webpage3_Invalid := (le.ScrubsBits1 >> 44) & 1;
-    SELF.businessname_Invalid := (le.ScrubsBits1 >> 45) & 1;
-    SELF.dba_Invalid := (le.ScrubsBits1 >> 46) & 1;
-    SELF.businessid_Invalid := (le.ScrubsBits1 >> 47) & 1;
-    SELF.businesstype1_Invalid := (le.ScrubsBits1 >> 48) & 1;
-    SELF.businesslocation1_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.businesstype2_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.businesslocation2_Invalid := (le.ScrubsBits1 >> 51) & 1;
-    SELF.businesstype3_Invalid := (le.ScrubsBits1 >> 52) & 1;
-    SELF.businesslocation3_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.businesstype4_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.businesslocation4_Invalid := (le.ScrubsBits1 >> 55) & 1;
-    SELF.businesstype5_Invalid := (le.ScrubsBits1 >> 56) & 1;
-    SELF.businesslocation5_Invalid := (le.ScrubsBits1 >> 57) & 1;
-    SELF.industry_Invalid := (le.ScrubsBits1 >> 58) & 1;
-    SELF.trade_Invalid := (le.ScrubsBits1 >> 59) & 1;
-    SELF.resourcedescription_Invalid := (le.ScrubsBits1 >> 60) & 1;
-    SELF.natureofbusiness_Invalid := (le.ScrubsBits1 >> 61) & 1;
-    SELF.businessdescription_Invalid := (le.ScrubsBits1 >> 62) & 1;
-    SELF.businessstructure_Invalid := (le.ScrubsBits1 >> 63) & 1;
-    SELF.totalemployees_Invalid := (le.ScrubsBits2 >> 0) & 1;
-    SELF.avgcontractsize_Invalid := (le.ScrubsBits2 >> 1) & 1;
-    SELF.firmid_Invalid := (le.ScrubsBits2 >> 2) & 1;
-    SELF.firmlocationaddress_Invalid := (le.ScrubsBits2 >> 3) & 1;
-    SELF.firmlocationaddresscity_Invalid := (le.ScrubsBits2 >> 4) & 1;
-    SELF.firmlocationaddresszip4_Invalid := (le.ScrubsBits2 >> 5) & 1;
-    SELF.firmlocationcounty_Invalid := (le.ScrubsBits2 >> 6) & 1;
-    SELF.firmlocationstate_Invalid := (le.ScrubsBits2 >> 7) & 3;
-    SELF.certfed_Invalid := (le.ScrubsBits2 >> 9) & 1;
-    SELF.certstate_Invalid := (le.ScrubsBits2 >> 10) & 3;
-    SELF.contractsfederal_Invalid := (le.ScrubsBits2 >> 12) & 1;
-    SELF.contractsva_Invalid := (le.ScrubsBits2 >> 13) & 1;
-    SELF.contractscommercial_Invalid := (le.ScrubsBits2 >> 14) & 1;
-    SELF.contractorgovernmentprime_Invalid := (le.ScrubsBits2 >> 15) & 1;
-    SELF.contractorgovernmentsub_Invalid := (le.ScrubsBits2 >> 16) & 1;
-    SELF.contractornongovernment_Invalid := (le.ScrubsBits2 >> 17) & 1;
-    SELF.registeredgovernmentbus_Invalid := (le.ScrubsBits2 >> 18) & 1;
-    SELF.registerednongovernmentbus_Invalid := (le.ScrubsBits2 >> 19) & 1;
-    SELF.clearancelevelpersonnel_Invalid := (le.ScrubsBits2 >> 20) & 1;
-    SELF.clearancelevelfacility_Invalid := (le.ScrubsBits2 >> 21) & 1;
-    SELF.certificatedatefrom1_Invalid := (le.ScrubsBits2 >> 22) & 1;
-    SELF.certificatedateto1_Invalid := (le.ScrubsBits2 >> 23) & 1;
-    SELF.certificatestatus1_Invalid := (le.ScrubsBits2 >> 24) & 1;
-    SELF.certificationnumber1_Invalid := (le.ScrubsBits2 >> 25) & 1;
-    SELF.certificationtype1_Invalid := (le.ScrubsBits2 >> 26) & 1;
-    SELF.certificatedatefrom2_Invalid := (le.ScrubsBits2 >> 27) & 1;
-    SELF.certificatedateto2_Invalid := (le.ScrubsBits2 >> 28) & 1;
-    SELF.certificatestatus2_Invalid := (le.ScrubsBits2 >> 29) & 1;
-    SELF.certificationnumber2_Invalid := (le.ScrubsBits2 >> 30) & 1;
-    SELF.certificationtype2_Invalid := (le.ScrubsBits2 >> 31) & 1;
-    SELF.certificatedatefrom3_Invalid := (le.ScrubsBits2 >> 32) & 1;
-    SELF.certificatedateto3_Invalid := (le.ScrubsBits2 >> 33) & 1;
-    SELF.certificatestatus3_Invalid := (le.ScrubsBits2 >> 34) & 1;
-    SELF.certificationnumber3_Invalid := (le.ScrubsBits2 >> 35) & 1;
-    SELF.certificationtype3_Invalid := (le.ScrubsBits2 >> 36) & 1;
-    SELF.certificatedatefrom4_Invalid := (le.ScrubsBits2 >> 37) & 1;
-    SELF.certificatedateto4_Invalid := (le.ScrubsBits2 >> 38) & 1;
-    SELF.certificatestatus4_Invalid := (le.ScrubsBits2 >> 39) & 1;
-    SELF.certificationnumber4_Invalid := (le.ScrubsBits2 >> 40) & 1;
-    SELF.certificationtype4_Invalid := (le.ScrubsBits2 >> 41) & 1;
-    SELF.certificatedatefrom5_Invalid := (le.ScrubsBits2 >> 42) & 1;
-    SELF.certificatedateto5_Invalid := (le.ScrubsBits2 >> 43) & 1;
-    SELF.certificatestatus5_Invalid := (le.ScrubsBits2 >> 44) & 1;
-    SELF.certificationnumber5_Invalid := (le.ScrubsBits2 >> 45) & 1;
-    SELF.certificationtype5_Invalid := (le.ScrubsBits2 >> 46) & 1;
-    SELF.certificatedatefrom6_Invalid := (le.ScrubsBits2 >> 47) & 1;
-    SELF.certificatedateto6_Invalid := (le.ScrubsBits2 >> 48) & 1;
-    SELF.certificatestatus6_Invalid := (le.ScrubsBits2 >> 49) & 1;
-    SELF.certificationnumber6_Invalid := (le.ScrubsBits2 >> 50) & 1;
-    SELF.certificationtype6_Invalid := (le.ScrubsBits2 >> 51) & 1;
-    SELF.starrating_Invalid := (le.ScrubsBits2 >> 52) & 1;
-    SELF.assets_Invalid := (le.ScrubsBits2 >> 53) & 1;
-    SELF.biddescription_Invalid := (le.ScrubsBits2 >> 54) & 1;
-    SELF.competitiveadvantage_Invalid := (le.ScrubsBits2 >> 55) & 1;
-    SELF.cagecode_Invalid := (le.ScrubsBits2 >> 56) & 1;
-    SELF.capabilitiesnarrative_Invalid := (le.ScrubsBits2 >> 57) & 1;
-    SELF.category_Invalid := (le.ScrubsBits2 >> 58) & 1;
-    SELF.chtrclass_Invalid := (le.ScrubsBits2 >> 59) & 1;
-    SELF.productdescription1_Invalid := (le.ScrubsBits2 >> 60) & 1;
-    SELF.productdescription2_Invalid := (le.ScrubsBits2 >> 61) & 1;
-    SELF.productdescription3_Invalid := (le.ScrubsBits2 >> 62) & 1;
-    SELF.productdescription4_Invalid := (le.ScrubsBits2 >> 63) & 1;
-    SELF.productdescription5_Invalid := (le.ScrubsBits3 >> 0) & 1;
-    SELF.classdescription1_Invalid := (le.ScrubsBits3 >> 1) & 1;
-    SELF.subclassdescription1_Invalid := (le.ScrubsBits3 >> 2) & 1;
-    SELF.classdescription2_Invalid := (le.ScrubsBits3 >> 3) & 1;
-    SELF.subclassdescription2_Invalid := (le.ScrubsBits3 >> 4) & 1;
-    SELF.classdescription3_Invalid := (le.ScrubsBits3 >> 5) & 1;
-    SELF.subclassdescription3_Invalid := (le.ScrubsBits3 >> 6) & 1;
-    SELF.classdescription4_Invalid := (le.ScrubsBits3 >> 7) & 1;
-    SELF.subclassdescription4_Invalid := (le.ScrubsBits3 >> 8) & 1;
-    SELF.classdescription5_Invalid := (le.ScrubsBits3 >> 9) & 1;
-    SELF.subclassdescription5_Invalid := (le.ScrubsBits3 >> 10) & 1;
-    SELF.classifications_Invalid := (le.ScrubsBits3 >> 11) & 1;
-    SELF.commodity1_Invalid := (le.ScrubsBits3 >> 12) & 1;
-    SELF.commodity2_Invalid := (le.ScrubsBits3 >> 13) & 1;
-    SELF.commodity3_Invalid := (le.ScrubsBits3 >> 14) & 1;
-    SELF.commodity4_Invalid := (le.ScrubsBits3 >> 15) & 1;
-    SELF.commodity5_Invalid := (le.ScrubsBits3 >> 16) & 1;
-    SELF.commodity6_Invalid := (le.ScrubsBits3 >> 17) & 1;
-    SELF.commodity7_Invalid := (le.ScrubsBits3 >> 18) & 1;
-    SELF.commodity8_Invalid := (le.ScrubsBits3 >> 19) & 1;
-    SELF.completedate_Invalid := (le.ScrubsBits3 >> 20) & 1;
-    SELF.crossreference_Invalid := (le.ScrubsBits3 >> 21) & 1;
-    SELF.dateestablished_Invalid := (le.ScrubsBits3 >> 22) & 1;
-    SELF.businessage_Invalid := (le.ScrubsBits3 >> 23) & 1;
-    SELF.deposits_Invalid := (le.ScrubsBits3 >> 24) & 1;
-    SELF.dunsnumber_Invalid := (le.ScrubsBits3 >> 25) & 1;
-    SELF.enttype_Invalid := (le.ScrubsBits3 >> 26) & 1;
-    SELF.expirationdate_Invalid := (le.ScrubsBits3 >> 27) & 1;
-    SELF.extendeddate_Invalid := (le.ScrubsBits3 >> 28) & 1;
-    SELF.issuingauthority_Invalid := (le.ScrubsBits3 >> 29) & 1;
-    SELF.keywords_Invalid := (le.ScrubsBits3 >> 30) & 1;
-    SELF.licensenumber_Invalid := (le.ScrubsBits3 >> 31) & 1;
-    SELF.licensetype_Invalid := (le.ScrubsBits3 >> 32) & 1;
-    SELF.mincd_Invalid := (le.ScrubsBits3 >> 33) & 1;
-    SELF.minorityaffiliation_Invalid := (le.ScrubsBits3 >> 34) & 1;
-    SELF.minorityownershipdate_Invalid := (le.ScrubsBits3 >> 35) & 1;
-    SELF.siccode1_Invalid := (le.ScrubsBits3 >> 36) & 1;
-    SELF.siccode2_Invalid := (le.ScrubsBits3 >> 37) & 1;
-    SELF.siccode3_Invalid := (le.ScrubsBits3 >> 38) & 1;
-    SELF.siccode4_Invalid := (le.ScrubsBits3 >> 39) & 1;
-    SELF.siccode5_Invalid := (le.ScrubsBits3 >> 40) & 1;
-    SELF.siccode6_Invalid := (le.ScrubsBits3 >> 41) & 1;
-    SELF.siccode7_Invalid := (le.ScrubsBits3 >> 42) & 1;
-    SELF.siccode8_Invalid := (le.ScrubsBits3 >> 43) & 1;
-    SELF.naicscode1_Invalid := (le.ScrubsBits3 >> 44) & 1;
-    SELF.naicscode2_Invalid := (le.ScrubsBits3 >> 45) & 1;
-    SELF.naicscode3_Invalid := (le.ScrubsBits3 >> 46) & 1;
-    SELF.naicscode4_Invalid := (le.ScrubsBits3 >> 47) & 1;
-    SELF.naicscode5_Invalid := (le.ScrubsBits3 >> 48) & 1;
-    SELF.naicscode6_Invalid := (le.ScrubsBits3 >> 49) & 1;
-    SELF.naicscode7_Invalid := (le.ScrubsBits3 >> 50) & 1;
-    SELF.naicscode8_Invalid := (le.ScrubsBits3 >> 51) & 1;
-    SELF.prequalify_Invalid := (le.ScrubsBits3 >> 52) & 1;
-    SELF.procurementcategory1_Invalid := (le.ScrubsBits3 >> 53) & 1;
-    SELF.subprocurementcategory1_Invalid := (le.ScrubsBits3 >> 54) & 1;
-    SELF.procurementcategory2_Invalid := (le.ScrubsBits3 >> 55) & 1;
-    SELF.subprocurementcategory2_Invalid := (le.ScrubsBits3 >> 56) & 1;
-    SELF.procurementcategory3_Invalid := (le.ScrubsBits3 >> 57) & 1;
-    SELF.subprocurementcategory3_Invalid := (le.ScrubsBits3 >> 58) & 1;
-    SELF.procurementcategory4_Invalid := (le.ScrubsBits3 >> 59) & 1;
-    SELF.subprocurementcategory4_Invalid := (le.ScrubsBits3 >> 60) & 1;
-    SELF.procurementcategory5_Invalid := (le.ScrubsBits3 >> 61) & 1;
-    SELF.subprocurementcategory5_Invalid := (le.ScrubsBits3 >> 62) & 1;
-    SELF.renewal_Invalid := (le.ScrubsBits3 >> 63) & 1;
-    SELF.renewaldate_Invalid := (le.ScrubsBits4 >> 0) & 1;
-    SELF.unitedcertprogrampartner_Invalid := (le.ScrubsBits4 >> 1) & 1;
-    SELF.vendorkey_Invalid := (le.ScrubsBits4 >> 2) & 1;
-    SELF.vendornumber_Invalid := (le.ScrubsBits4 >> 3) & 1;
-    SELF.workcode1_Invalid := (le.ScrubsBits4 >> 4) & 1;
-    SELF.workcode2_Invalid := (le.ScrubsBits4 >> 5) & 1;
-    SELF.workcode3_Invalid := (le.ScrubsBits4 >> 6) & 1;
-    SELF.workcode4_Invalid := (le.ScrubsBits4 >> 7) & 1;
-    SELF.workcode5_Invalid := (le.ScrubsBits4 >> 8) & 1;
-    SELF.workcode6_Invalid := (le.ScrubsBits4 >> 9) & 1;
-    SELF.workcode7_Invalid := (le.ScrubsBits4 >> 10) & 1;
-    SELF.workcode8_Invalid := (le.ScrubsBits4 >> 11) & 1;
-    SELF.exporter_Invalid := (le.ScrubsBits4 >> 12) & 1;
-    SELF.exportbusinessactivities_Invalid := (le.ScrubsBits4 >> 13) & 1;
-    SELF.exportto_Invalid := (le.ScrubsBits4 >> 14) & 1;
-    SELF.exportbusinessrelationships_Invalid := (le.ScrubsBits4 >> 15) & 1;
-    SELF.exportobjectives_Invalid := (le.ScrubsBits4 >> 16) & 1;
-    SELF.reference1_Invalid := (le.ScrubsBits4 >> 17) & 1;
-    SELF.reference2_Invalid := (le.ScrubsBits4 >> 18) & 1;
+    SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.profilelastupdated_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.county_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.servicearea_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.region1_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.region2_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.region3_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.region4_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.region5_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.fname_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.lname_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.mname_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.suffix_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.title_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.ethnicity_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.gender_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.address1_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.address2_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.addresscity_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.addressstate_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.addresszip4_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.building_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.contact_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.phone1_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.phone2_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.phone3_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.cell_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.fax_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.email1_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.email2_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.email3_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.webpage1_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.webpage2_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.webpage3_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.businessname_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.dba_Invalid := (le.ScrubsBits1 >> 39) & 1;
+    SELF.businessid_Invalid := (le.ScrubsBits1 >> 40) & 1;
+    SELF.businesstype1_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.businesslocation1_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.businesstype2_Invalid := (le.ScrubsBits1 >> 43) & 1;
+    SELF.businesslocation2_Invalid := (le.ScrubsBits1 >> 44) & 1;
+    SELF.businesstype3_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.businesslocation3_Invalid := (le.ScrubsBits1 >> 46) & 1;
+    SELF.businesstype4_Invalid := (le.ScrubsBits1 >> 47) & 1;
+    SELF.businesslocation4_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.businesstype5_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.businesslocation5_Invalid := (le.ScrubsBits1 >> 50) & 1;
+    SELF.industry_Invalid := (le.ScrubsBits1 >> 51) & 1;
+    SELF.trade_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.resourcedescription_Invalid := (le.ScrubsBits1 >> 53) & 1;
+    SELF.natureofbusiness_Invalid := (le.ScrubsBits1 >> 54) & 1;
+    SELF.businessdescription_Invalid := (le.ScrubsBits1 >> 55) & 1;
+    SELF.businessstructure_Invalid := (le.ScrubsBits1 >> 56) & 1;
+    SELF.totalemployees_Invalid := (le.ScrubsBits1 >> 57) & 1;
+    SELF.avgcontractsize_Invalid := (le.ScrubsBits1 >> 58) & 1;
+    SELF.firmid_Invalid := (le.ScrubsBits1 >> 59) & 1;
+    SELF.firmlocationaddress_Invalid := (le.ScrubsBits1 >> 60) & 1;
+    SELF.firmlocationaddresscity_Invalid := (le.ScrubsBits1 >> 61) & 1;
+    SELF.firmlocationaddresszip4_Invalid := (le.ScrubsBits1 >> 62) & 1;
+    SELF.firmlocationcounty_Invalid := (le.ScrubsBits1 >> 63) & 1;
+    SELF.firmlocationstate_Invalid := (le.ScrubsBits2 >> 0) & 1;
+    SELF.certfed_Invalid := (le.ScrubsBits2 >> 1) & 1;
+    SELF.certstate_Invalid := (le.ScrubsBits2 >> 2) & 1;
+    SELF.contractsfederal_Invalid := (le.ScrubsBits2 >> 3) & 1;
+    SELF.contractsva_Invalid := (le.ScrubsBits2 >> 4) & 1;
+    SELF.contractscommercial_Invalid := (le.ScrubsBits2 >> 5) & 1;
+    SELF.contractorgovernmentprime_Invalid := (le.ScrubsBits2 >> 6) & 1;
+    SELF.contractorgovernmentsub_Invalid := (le.ScrubsBits2 >> 7) & 1;
+    SELF.contractornongovernment_Invalid := (le.ScrubsBits2 >> 8) & 1;
+    SELF.registeredgovernmentbus_Invalid := (le.ScrubsBits2 >> 9) & 1;
+    SELF.registerednongovernmentbus_Invalid := (le.ScrubsBits2 >> 10) & 1;
+    SELF.clearancelevelpersonnel_Invalid := (le.ScrubsBits2 >> 11) & 1;
+    SELF.clearancelevelfacility_Invalid := (le.ScrubsBits2 >> 12) & 1;
+    SELF.certificatedatefrom1_Invalid := (le.ScrubsBits2 >> 13) & 1;
+    SELF.certificatedateto1_Invalid := (le.ScrubsBits2 >> 14) & 1;
+    SELF.certificatestatus1_Invalid := (le.ScrubsBits2 >> 15) & 1;
+    SELF.certificationnumber1_Invalid := (le.ScrubsBits2 >> 16) & 1;
+    SELF.certificationtype1_Invalid := (le.ScrubsBits2 >> 17) & 1;
+    SELF.certificatedatefrom2_Invalid := (le.ScrubsBits2 >> 18) & 1;
+    SELF.certificatedateto2_Invalid := (le.ScrubsBits2 >> 19) & 1;
+    SELF.certificatestatus2_Invalid := (le.ScrubsBits2 >> 20) & 1;
+    SELF.certificationnumber2_Invalid := (le.ScrubsBits2 >> 21) & 1;
+    SELF.certificationtype2_Invalid := (le.ScrubsBits2 >> 22) & 1;
+    SELF.certificatedatefrom3_Invalid := (le.ScrubsBits2 >> 23) & 1;
+    SELF.certificatedateto3_Invalid := (le.ScrubsBits2 >> 24) & 1;
+    SELF.certificatestatus3_Invalid := (le.ScrubsBits2 >> 25) & 1;
+    SELF.certificationnumber3_Invalid := (le.ScrubsBits2 >> 26) & 1;
+    SELF.certificationtype3_Invalid := (le.ScrubsBits2 >> 27) & 1;
+    SELF.certificatedatefrom4_Invalid := (le.ScrubsBits2 >> 28) & 1;
+    SELF.certificatedateto4_Invalid := (le.ScrubsBits2 >> 29) & 1;
+    SELF.certificatestatus4_Invalid := (le.ScrubsBits2 >> 30) & 1;
+    SELF.certificationnumber4_Invalid := (le.ScrubsBits2 >> 31) & 1;
+    SELF.certificationtype4_Invalid := (le.ScrubsBits2 >> 32) & 1;
+    SELF.certificatedatefrom5_Invalid := (le.ScrubsBits2 >> 33) & 1;
+    SELF.certificatedateto5_Invalid := (le.ScrubsBits2 >> 34) & 1;
+    SELF.certificatestatus5_Invalid := (le.ScrubsBits2 >> 35) & 1;
+    SELF.certificationnumber5_Invalid := (le.ScrubsBits2 >> 36) & 1;
+    SELF.certificationtype5_Invalid := (le.ScrubsBits2 >> 37) & 1;
+    SELF.certificatedatefrom6_Invalid := (le.ScrubsBits2 >> 38) & 1;
+    SELF.certificatedateto6_Invalid := (le.ScrubsBits2 >> 39) & 1;
+    SELF.certificatestatus6_Invalid := (le.ScrubsBits2 >> 40) & 1;
+    SELF.certificationnumber6_Invalid := (le.ScrubsBits2 >> 41) & 1;
+    SELF.certificationtype6_Invalid := (le.ScrubsBits2 >> 42) & 1;
+    SELF.starrating_Invalid := (le.ScrubsBits2 >> 43) & 1;
+    SELF.assets_Invalid := (le.ScrubsBits2 >> 44) & 1;
+    SELF.biddescription_Invalid := (le.ScrubsBits2 >> 45) & 1;
+    SELF.competitiveadvantage_Invalid := (le.ScrubsBits2 >> 46) & 1;
+    SELF.cagecode_Invalid := (le.ScrubsBits2 >> 47) & 1;
+    SELF.capabilitiesnarrative_Invalid := (le.ScrubsBits2 >> 48) & 1;
+    SELF.category_Invalid := (le.ScrubsBits2 >> 49) & 1;
+    SELF.chtrclass_Invalid := (le.ScrubsBits2 >> 50) & 1;
+    SELF.productdescription1_Invalid := (le.ScrubsBits2 >> 51) & 1;
+    SELF.productdescription2_Invalid := (le.ScrubsBits2 >> 52) & 1;
+    SELF.productdescription3_Invalid := (le.ScrubsBits2 >> 53) & 1;
+    SELF.productdescription4_Invalid := (le.ScrubsBits2 >> 54) & 1;
+    SELF.productdescription5_Invalid := (le.ScrubsBits2 >> 55) & 1;
+    SELF.classdescription1_Invalid := (le.ScrubsBits2 >> 56) & 1;
+    SELF.subclassdescription1_Invalid := (le.ScrubsBits2 >> 57) & 1;
+    SELF.classdescription2_Invalid := (le.ScrubsBits2 >> 58) & 1;
+    SELF.subclassdescription2_Invalid := (le.ScrubsBits2 >> 59) & 1;
+    SELF.classdescription3_Invalid := (le.ScrubsBits2 >> 60) & 1;
+    SELF.subclassdescription3_Invalid := (le.ScrubsBits2 >> 61) & 1;
+    SELF.classdescription4_Invalid := (le.ScrubsBits2 >> 62) & 1;
+    SELF.subclassdescription4_Invalid := (le.ScrubsBits2 >> 63) & 1;
+    SELF.classdescription5_Invalid := (le.ScrubsBits3 >> 0) & 1;
+    SELF.subclassdescription5_Invalid := (le.ScrubsBits3 >> 1) & 1;
+    SELF.classifications_Invalid := (le.ScrubsBits3 >> 2) & 1;
+    SELF.commodity1_Invalid := (le.ScrubsBits3 >> 3) & 1;
+    SELF.commodity2_Invalid := (le.ScrubsBits3 >> 4) & 1;
+    SELF.commodity3_Invalid := (le.ScrubsBits3 >> 5) & 1;
+    SELF.commodity4_Invalid := (le.ScrubsBits3 >> 6) & 1;
+    SELF.commodity5_Invalid := (le.ScrubsBits3 >> 7) & 1;
+    SELF.commodity6_Invalid := (le.ScrubsBits3 >> 8) & 1;
+    SELF.commodity7_Invalid := (le.ScrubsBits3 >> 9) & 1;
+    SELF.commodity8_Invalid := (le.ScrubsBits3 >> 10) & 1;
+    SELF.completedate_Invalid := (le.ScrubsBits3 >> 11) & 1;
+    SELF.crossreference_Invalid := (le.ScrubsBits3 >> 12) & 1;
+    SELF.dateestablished_Invalid := (le.ScrubsBits3 >> 13) & 1;
+    SELF.businessage_Invalid := (le.ScrubsBits3 >> 14) & 1;
+    SELF.deposits_Invalid := (le.ScrubsBits3 >> 15) & 1;
+    SELF.dunsnumber_Invalid := (le.ScrubsBits3 >> 16) & 1;
+    SELF.enttype_Invalid := (le.ScrubsBits3 >> 17) & 1;
+    SELF.expirationdate_Invalid := (le.ScrubsBits3 >> 18) & 1;
+    SELF.extendeddate_Invalid := (le.ScrubsBits3 >> 19) & 1;
+    SELF.issuingauthority_Invalid := (le.ScrubsBits3 >> 20) & 1;
+    SELF.keywords_Invalid := (le.ScrubsBits3 >> 21) & 1;
+    SELF.licensenumber_Invalid := (le.ScrubsBits3 >> 22) & 1;
+    SELF.licensetype_Invalid := (le.ScrubsBits3 >> 23) & 1;
+    SELF.mincd_Invalid := (le.ScrubsBits3 >> 24) & 1;
+    SELF.minorityaffiliation_Invalid := (le.ScrubsBits3 >> 25) & 1;
+    SELF.minorityownershipdate_Invalid := (le.ScrubsBits3 >> 26) & 1;
+    SELF.siccode1_Invalid := (le.ScrubsBits3 >> 27) & 1;
+    SELF.siccode2_Invalid := (le.ScrubsBits3 >> 28) & 1;
+    SELF.siccode3_Invalid := (le.ScrubsBits3 >> 29) & 1;
+    SELF.siccode4_Invalid := (le.ScrubsBits3 >> 30) & 1;
+    SELF.siccode5_Invalid := (le.ScrubsBits3 >> 31) & 1;
+    SELF.siccode6_Invalid := (le.ScrubsBits3 >> 32) & 1;
+    SELF.siccode7_Invalid := (le.ScrubsBits3 >> 33) & 1;
+    SELF.siccode8_Invalid := (le.ScrubsBits3 >> 34) & 1;
+    SELF.naicscode1_Invalid := (le.ScrubsBits3 >> 35) & 1;
+    SELF.naicscode2_Invalid := (le.ScrubsBits3 >> 36) & 1;
+    SELF.naicscode3_Invalid := (le.ScrubsBits3 >> 37) & 1;
+    SELF.naicscode4_Invalid := (le.ScrubsBits3 >> 38) & 1;
+    SELF.naicscode5_Invalid := (le.ScrubsBits3 >> 39) & 1;
+    SELF.naicscode6_Invalid := (le.ScrubsBits3 >> 40) & 1;
+    SELF.naicscode7_Invalid := (le.ScrubsBits3 >> 41) & 1;
+    SELF.naicscode8_Invalid := (le.ScrubsBits3 >> 42) & 1;
+    SELF.prequalify_Invalid := (le.ScrubsBits3 >> 43) & 1;
+    SELF.procurementcategory1_Invalid := (le.ScrubsBits3 >> 44) & 1;
+    SELF.subprocurementcategory1_Invalid := (le.ScrubsBits3 >> 45) & 1;
+    SELF.procurementcategory2_Invalid := (le.ScrubsBits3 >> 46) & 1;
+    SELF.subprocurementcategory2_Invalid := (le.ScrubsBits3 >> 47) & 1;
+    SELF.procurementcategory3_Invalid := (le.ScrubsBits3 >> 48) & 1;
+    SELF.subprocurementcategory3_Invalid := (le.ScrubsBits3 >> 49) & 1;
+    SELF.procurementcategory4_Invalid := (le.ScrubsBits3 >> 50) & 1;
+    SELF.subprocurementcategory4_Invalid := (le.ScrubsBits3 >> 51) & 1;
+    SELF.procurementcategory5_Invalid := (le.ScrubsBits3 >> 52) & 1;
+    SELF.subprocurementcategory5_Invalid := (le.ScrubsBits3 >> 53) & 1;
+    SELF.renewal_Invalid := (le.ScrubsBits3 >> 54) & 1;
+    SELF.renewaldate_Invalid := (le.ScrubsBits3 >> 55) & 1;
+    SELF.unitedcertprogrampartner_Invalid := (le.ScrubsBits3 >> 56) & 1;
+    SELF.vendorkey_Invalid := (le.ScrubsBits3 >> 57) & 1;
+    SELF.vendornumber_Invalid := (le.ScrubsBits3 >> 58) & 1;
+    SELF.workcode1_Invalid := (le.ScrubsBits3 >> 59) & 1;
+    SELF.workcode2_Invalid := (le.ScrubsBits3 >> 60) & 1;
+    SELF.workcode3_Invalid := (le.ScrubsBits3 >> 61) & 1;
+    SELF.workcode4_Invalid := (le.ScrubsBits3 >> 62) & 1;
+    SELF.workcode5_Invalid := (le.ScrubsBits3 >> 63) & 1;
+    SELF.workcode6_Invalid := (le.ScrubsBits4 >> 0) & 1;
+    SELF.workcode7_Invalid := (le.ScrubsBits4 >> 1) & 1;
+    SELF.workcode8_Invalid := (le.ScrubsBits4 >> 2) & 1;
+    SELF.exporter_Invalid := (le.ScrubsBits4 >> 3) & 1;
+    SELF.exportbusinessactivities_Invalid := (le.ScrubsBits4 >> 4) & 1;
+    SELF.exportto_Invalid := (le.ScrubsBits4 >> 5) & 1;
+    SELF.exportbusinessrelationships_Invalid := (le.ScrubsBits4 >> 6) & 1;
+    SELF.exportobjectives_Invalid := (le.ScrubsBits4 >> 7) & 1;
+    SELF.reference1_Invalid := (le.ScrubsBits4 >> 8) & 1;
+    SELF.reference2_Invalid := (le.ScrubsBits4 >> 9) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -1090,9 +1090,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     dateadded_CUSTOM_ErrorCount := COUNT(GROUP,h.dateadded_Invalid=1);
     dateupdated_CUSTOM_ErrorCount := COUNT(GROUP,h.dateupdated_Invalid=1);
     website_ALLOW_ErrorCount := COUNT(GROUP,h.website_Invalid=1);
-    state_ALLOW_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
-    state_LENGTHS_ErrorCount := COUNT(GROUP,h.state_Invalid=2);
-    state_Total_ErrorCount := COUNT(GROUP,h.state_Invalid>0);
+    state_CUSTOM_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
     profilelastupdated_CUSTOM_ErrorCount := COUNT(GROUP,h.profilelastupdated_Invalid=1);
     county_ALLOW_ErrorCount := COUNT(GROUP,h.county_Invalid=1);
     servicearea_ALLOW_ErrorCount := COUNT(GROUP,h.servicearea_Invalid=1);
@@ -1111,27 +1109,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     address1_ALLOW_ErrorCount := COUNT(GROUP,h.address1_Invalid=1);
     address2_ALLOW_ErrorCount := COUNT(GROUP,h.address2_Invalid=1);
     addresscity_ALLOW_ErrorCount := COUNT(GROUP,h.addresscity_Invalid=1);
-    addressstate_ALLOW_ErrorCount := COUNT(GROUP,h.addressstate_Invalid=1);
-    addressstate_LENGTHS_ErrorCount := COUNT(GROUP,h.addressstate_Invalid=2);
-    addressstate_Total_ErrorCount := COUNT(GROUP,h.addressstate_Invalid>0);
+    addressstate_CUSTOM_ErrorCount := COUNT(GROUP,h.addressstate_Invalid=1);
     addresszip4_ALLOW_ErrorCount := COUNT(GROUP,h.addresszip4_Invalid=1);
     building_ALLOW_ErrorCount := COUNT(GROUP,h.building_Invalid=1);
     contact_ALLOW_ErrorCount := COUNT(GROUP,h.contact_Invalid=1);
-    phone1_ALLOW_ErrorCount := COUNT(GROUP,h.phone1_Invalid=1);
-    phone1_LENGTHS_ErrorCount := COUNT(GROUP,h.phone1_Invalid=2);
-    phone1_Total_ErrorCount := COUNT(GROUP,h.phone1_Invalid>0);
-    phone2_ALLOW_ErrorCount := COUNT(GROUP,h.phone2_Invalid=1);
-    phone2_LENGTHS_ErrorCount := COUNT(GROUP,h.phone2_Invalid=2);
-    phone2_Total_ErrorCount := COUNT(GROUP,h.phone2_Invalid>0);
-    phone3_ALLOW_ErrorCount := COUNT(GROUP,h.phone3_Invalid=1);
-    phone3_LENGTHS_ErrorCount := COUNT(GROUP,h.phone3_Invalid=2);
-    phone3_Total_ErrorCount := COUNT(GROUP,h.phone3_Invalid>0);
-    cell_ALLOW_ErrorCount := COUNT(GROUP,h.cell_Invalid=1);
-    cell_LENGTHS_ErrorCount := COUNT(GROUP,h.cell_Invalid=2);
-    cell_Total_ErrorCount := COUNT(GROUP,h.cell_Invalid>0);
-    fax_ALLOW_ErrorCount := COUNT(GROUP,h.fax_Invalid=1);
-    fax_LENGTHS_ErrorCount := COUNT(GROUP,h.fax_Invalid=2);
-    fax_Total_ErrorCount := COUNT(GROUP,h.fax_Invalid>0);
+    phone1_CUSTOM_ErrorCount := COUNT(GROUP,h.phone1_Invalid=1);
+    phone2_CUSTOM_ErrorCount := COUNT(GROUP,h.phone2_Invalid=1);
+    phone3_CUSTOM_ErrorCount := COUNT(GROUP,h.phone3_Invalid=1);
+    cell_CUSTOM_ErrorCount := COUNT(GROUP,h.cell_Invalid=1);
+    fax_CUSTOM_ErrorCount := COUNT(GROUP,h.fax_Invalid=1);
     email1_ALLOW_ErrorCount := COUNT(GROUP,h.email1_Invalid=1);
     email2_ALLOW_ErrorCount := COUNT(GROUP,h.email2_Invalid=1);
     email3_ALLOW_ErrorCount := COUNT(GROUP,h.email3_Invalid=1);
@@ -1164,13 +1150,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     firmlocationaddresscity_ALLOW_ErrorCount := COUNT(GROUP,h.firmlocationaddresscity_Invalid=1);
     firmlocationaddresszip4_ALLOW_ErrorCount := COUNT(GROUP,h.firmlocationaddresszip4_Invalid=1);
     firmlocationcounty_ALLOW_ErrorCount := COUNT(GROUP,h.firmlocationcounty_Invalid=1);
-    firmlocationstate_ALLOW_ErrorCount := COUNT(GROUP,h.firmlocationstate_Invalid=1);
-    firmlocationstate_LENGTHS_ErrorCount := COUNT(GROUP,h.firmlocationstate_Invalid=2);
-    firmlocationstate_Total_ErrorCount := COUNT(GROUP,h.firmlocationstate_Invalid>0);
+    firmlocationstate_CUSTOM_ErrorCount := COUNT(GROUP,h.firmlocationstate_Invalid=1);
     certfed_ALLOW_ErrorCount := COUNT(GROUP,h.certfed_Invalid=1);
-    certstate_ALLOW_ErrorCount := COUNT(GROUP,h.certstate_Invalid=1);
-    certstate_LENGTHS_ErrorCount := COUNT(GROUP,h.certstate_Invalid=2);
-    certstate_Total_ErrorCount := COUNT(GROUP,h.certstate_Invalid>0);
+    certstate_CUSTOM_ErrorCount := COUNT(GROUP,h.certstate_Invalid=1);
     contractsfederal_ALLOW_ErrorCount := COUNT(GROUP,h.contractsfederal_Invalid=1);
     contractsva_ALLOW_ErrorCount := COUNT(GROUP,h.contractsva_Invalid=1);
     contractscommercial_ALLOW_ErrorCount := COUNT(GROUP,h.contractscommercial_Invalid=1);
@@ -1314,9 +1296,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.servicearea_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ethnicity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.gender_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_Total_ErrorCount > 0, 1, 0) + IF(le.addresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_Total_ErrorCount > 0, 1, 0) + IF(le.phone2_Total_ErrorCount > 0, 1, 0) + IF(le.phone3_Total_ErrorCount > 0, 1, 0) + IF(le.cell_Total_ErrorCount > 0, 1, 0) + IF(le.fax_Total_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.industry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.trade_ALLOW_ErrorCount > 0, 1, 0) + IF(le.resourcedescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.natureofbusiness_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessstructure_ALLOW_ErrorCount > 0, 1, 0) + IF(le.totalemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.avgcontractsize_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationcounty_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationstate_Total_ErrorCount > 0, 1, 0) + IF(le.certfed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certstate_Total_ErrorCount > 0, 1, 0) + IF(le.contractsfederal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractsva_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractscommercial_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentprime_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentsub_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractornongovernment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registeredgovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registerednongovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelpersonnel_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelfacility_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.starrating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assets_ALLOW_ErrorCount > 0, 1, 0) + IF(le.biddescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.competitiveadvantage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cagecode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.capabilitiesnarrative_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chtrclass_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classifications_ALLOW_ErrorCount > 0, 1, 0) + IF(le.commodity1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.completedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.crossreference_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateestablished_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.businessage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deposits_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dunsnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enttype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expirationdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.extendeddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.issuingauthority_ALLOW_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mincd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityaffiliation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityownershipdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prequalify_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.unitedcertprogrampartner_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendorkey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendornumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exporter_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessactivities_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportto_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessrelationships_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportobjectives_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference2_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.servicearea_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ethnicity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.gender_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.addresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fax_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.industry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.trade_ALLOW_ErrorCount > 0, 1, 0) + IF(le.resourcedescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.natureofbusiness_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessstructure_ALLOW_ErrorCount > 0, 1, 0) + IF(le.totalemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.avgcontractsize_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationcounty_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certfed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contractsfederal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractsva_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractscommercial_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentprime_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentsub_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractornongovernment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registeredgovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registerednongovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelpersonnel_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelfacility_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.starrating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assets_ALLOW_ErrorCount > 0, 1, 0) + IF(le.biddescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.competitiveadvantage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cagecode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.capabilitiesnarrative_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chtrclass_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classifications_ALLOW_ErrorCount > 0, 1, 0) + IF(le.commodity1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.completedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.crossreference_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateestablished_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.businessage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deposits_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dunsnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enttype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expirationdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.extendeddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.issuingauthority_ALLOW_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mincd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityaffiliation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityownershipdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prequalify_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.unitedcertprogrampartner_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendorkey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendornumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exporter_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessactivities_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportto_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessrelationships_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportobjectives_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference2_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.servicearea_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ethnicity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.gender_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.addresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.phone2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.phone3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone3_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cell_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cell_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.industry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.trade_ALLOW_ErrorCount > 0, 1, 0) + IF(le.resourcedescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.natureofbusiness_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessstructure_ALLOW_ErrorCount > 0, 1, 0) + IF(le.totalemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.avgcontractsize_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationcounty_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationstate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.certfed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certstate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.contractsfederal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractsva_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractscommercial_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentprime_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentsub_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractornongovernment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registeredgovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registerednongovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelpersonnel_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelfacility_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.starrating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assets_ALLOW_ErrorCount > 0, 1, 0) + IF(le.biddescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.competitiveadvantage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cagecode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.capabilitiesnarrative_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chtrclass_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classifications_ALLOW_ErrorCount > 0, 1, 0) + IF(le.commodity1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.completedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.crossreference_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateestablished_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.businessage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deposits_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dunsnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enttype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expirationdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.extendeddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.issuingauthority_ALLOW_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mincd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityaffiliation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityownershipdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prequalify_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.unitedcertprogrampartner_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendorkey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendornumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exporter_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessactivities_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportto_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessrelationships_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportobjectives_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference2_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.servicearea_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.region5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ethnicity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.gender_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.addresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.building_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fax_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.webpage3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesslocation5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.industry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.trade_ALLOW_ErrorCount > 0, 1, 0) + IF(le.resourcedescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.natureofbusiness_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessstructure_ALLOW_ErrorCount > 0, 1, 0) + IF(le.totalemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.avgcontractsize_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationcounty_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firmlocationstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certfed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contractsfederal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractsva_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractscommercial_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentprime_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractorgovernmentsub_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contractornongovernment_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registeredgovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.registerednongovernmentbus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelpersonnel_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clearancelevelfacility_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificatedatefrom6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatedateto6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.certificatestatus6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationnumber6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.certificationtype6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.starrating_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assets_ALLOW_ErrorCount > 0, 1, 0) + IF(le.biddescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.competitiveadvantage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cagecode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.capabilitiesnarrative_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.chtrclass_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.productdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subclassdescription5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classifications_ALLOW_ErrorCount > 0, 1, 0) + IF(le.commodity1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.commodity8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.completedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.crossreference_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateestablished_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.businessage_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deposits_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dunsnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enttype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expirationdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.extendeddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.issuingauthority_ALLOW_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mincd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityaffiliation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.minorityownershipdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siccode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode6_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode7_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naicscode8_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prequalify_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.procurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subprocurementcategory5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewal_ALLOW_ErrorCount > 0, 1, 0) + IF(le.renewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.unitedcertprogrampartner_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendorkey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendornumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.workcode8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exporter_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessactivities_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportto_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportbusinessrelationships_ALLOW_ErrorCount > 0, 1, 0) + IF(le.exportobjectives_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reference2_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -1338,7 +1320,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dateadded_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dateupdated_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.website_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.state_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.profilelastupdated_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.county_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.servicearea_Invalid,'ALLOW','UNKNOWN')
@@ -1357,15 +1339,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.address1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.address2_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.addresscity_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.addressstate_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.addressstate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.addresszip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.building_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.contact_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.phone1_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.phone2_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.phone3_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.cell_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.fax_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.phone1_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.phone2_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.phone3_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.cell_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.fax_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.email1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.email2_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.email3_Invalid,'ALLOW','UNKNOWN')
@@ -1398,9 +1380,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.firmlocationaddresscity_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.firmlocationaddresszip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.firmlocationcounty_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.firmlocationstate_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.firmlocationstate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.certfed_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.certstate_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.certstate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.contractsfederal_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.contractsva_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.contractscommercial_Invalid,'ALLOW','UNKNOWN')
@@ -1557,7 +1539,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dateadded_CUSTOM_ErrorCount
           ,le.dateupdated_CUSTOM_ErrorCount
           ,le.website_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
+          ,le.state_CUSTOM_ErrorCount
           ,le.profilelastupdated_CUSTOM_ErrorCount
           ,le.county_ALLOW_ErrorCount
           ,le.servicearea_ALLOW_ErrorCount
@@ -1576,15 +1558,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.address1_ALLOW_ErrorCount
           ,le.address2_ALLOW_ErrorCount
           ,le.addresscity_ALLOW_ErrorCount
-          ,le.addressstate_ALLOW_ErrorCount,le.addressstate_LENGTHS_ErrorCount
+          ,le.addressstate_CUSTOM_ErrorCount
           ,le.addresszip4_ALLOW_ErrorCount
           ,le.building_ALLOW_ErrorCount
           ,le.contact_ALLOW_ErrorCount
-          ,le.phone1_ALLOW_ErrorCount,le.phone1_LENGTHS_ErrorCount
-          ,le.phone2_ALLOW_ErrorCount,le.phone2_LENGTHS_ErrorCount
-          ,le.phone3_ALLOW_ErrorCount,le.phone3_LENGTHS_ErrorCount
-          ,le.cell_ALLOW_ErrorCount,le.cell_LENGTHS_ErrorCount
-          ,le.fax_ALLOW_ErrorCount,le.fax_LENGTHS_ErrorCount
+          ,le.phone1_CUSTOM_ErrorCount
+          ,le.phone2_CUSTOM_ErrorCount
+          ,le.phone3_CUSTOM_ErrorCount
+          ,le.cell_CUSTOM_ErrorCount
+          ,le.fax_CUSTOM_ErrorCount
           ,le.email1_ALLOW_ErrorCount
           ,le.email2_ALLOW_ErrorCount
           ,le.email3_ALLOW_ErrorCount
@@ -1617,9 +1599,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.firmlocationaddresscity_ALLOW_ErrorCount
           ,le.firmlocationaddresszip4_ALLOW_ErrorCount
           ,le.firmlocationcounty_ALLOW_ErrorCount
-          ,le.firmlocationstate_ALLOW_ErrorCount,le.firmlocationstate_LENGTHS_ErrorCount
+          ,le.firmlocationstate_CUSTOM_ErrorCount
           ,le.certfed_ALLOW_ErrorCount
-          ,le.certstate_ALLOW_ErrorCount,le.certstate_LENGTHS_ErrorCount
+          ,le.certstate_CUSTOM_ErrorCount
           ,le.contractsfederal_ALLOW_ErrorCount
           ,le.contractsva_ALLOW_ErrorCount
           ,le.contractscommercial_ALLOW_ErrorCount
@@ -1767,7 +1749,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dateadded_CUSTOM_ErrorCount
           ,le.dateupdated_CUSTOM_ErrorCount
           ,le.website_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
+          ,le.state_CUSTOM_ErrorCount
           ,le.profilelastupdated_CUSTOM_ErrorCount
           ,le.county_ALLOW_ErrorCount
           ,le.servicearea_ALLOW_ErrorCount
@@ -1786,15 +1768,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.address1_ALLOW_ErrorCount
           ,le.address2_ALLOW_ErrorCount
           ,le.addresscity_ALLOW_ErrorCount
-          ,le.addressstate_ALLOW_ErrorCount,le.addressstate_LENGTHS_ErrorCount
+          ,le.addressstate_CUSTOM_ErrorCount
           ,le.addresszip4_ALLOW_ErrorCount
           ,le.building_ALLOW_ErrorCount
           ,le.contact_ALLOW_ErrorCount
-          ,le.phone1_ALLOW_ErrorCount,le.phone1_LENGTHS_ErrorCount
-          ,le.phone2_ALLOW_ErrorCount,le.phone2_LENGTHS_ErrorCount
-          ,le.phone3_ALLOW_ErrorCount,le.phone3_LENGTHS_ErrorCount
-          ,le.cell_ALLOW_ErrorCount,le.cell_LENGTHS_ErrorCount
-          ,le.fax_ALLOW_ErrorCount,le.fax_LENGTHS_ErrorCount
+          ,le.phone1_CUSTOM_ErrorCount
+          ,le.phone2_CUSTOM_ErrorCount
+          ,le.phone3_CUSTOM_ErrorCount
+          ,le.cell_CUSTOM_ErrorCount
+          ,le.fax_CUSTOM_ErrorCount
           ,le.email1_ALLOW_ErrorCount
           ,le.email2_ALLOW_ErrorCount
           ,le.email3_ALLOW_ErrorCount
@@ -1827,9 +1809,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.firmlocationaddresscity_ALLOW_ErrorCount
           ,le.firmlocationaddresszip4_ALLOW_ErrorCount
           ,le.firmlocationcounty_ALLOW_ErrorCount
-          ,le.firmlocationstate_ALLOW_ErrorCount,le.firmlocationstate_LENGTHS_ErrorCount
+          ,le.firmlocationstate_CUSTOM_ErrorCount
           ,le.certfed_ALLOW_ErrorCount
-          ,le.certstate_ALLOW_ErrorCount,le.certstate_LENGTHS_ErrorCount
+          ,le.certstate_CUSTOM_ErrorCount
           ,le.contractsfederal_ALLOW_ErrorCount
           ,le.contractsva_ALLOW_ErrorCount
           ,le.contractscommercial_ALLOW_ErrorCount

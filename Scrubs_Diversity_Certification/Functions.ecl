@@ -35,7 +35,7 @@ EXPORT Functions := MODULE
 
         RETURN if
         ( 
-            LENGTH(naics) in [0,2,3,4,5,6]
+            LENGTH(naics) in [0,6]
             AND scrubs.functions.fn_validate_NAICSCode(naics) > 0
             ,
             1,
