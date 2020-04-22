@@ -1501,14 +1501,14 @@ Event: => AgencyUid := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
-Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; //CHECKME - need to ask about source agency
-Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; //CHECKME - same as above
+Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; 
+Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; 
 
 Event: => T_ActUid := RecordId;
 Event: => T_ActDtEcho := EventDate; 
 
 Event: => T_SrcType := MAP(rin_source <= 0 OR rin_source > 12 => -99997,
-                           rin_source); //FIXME - need to update once rin_source is actually showing up
+                           rin_source); 
 Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
 																T_SrcType IN [6,11] => 1,
 																T_SrcType IN [4,5] => 2,
@@ -1641,7 +1641,7 @@ Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																
 Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho IN ['-99999','-99998'] OR T_InpClnBnkAcctRtgEcho IN ['-99999','-99998'] => 0,
 																    1);
-Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //is bankhit what I should be using for this?
+Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, 
 																		 BankHit); 
 Event: => T19_BnkAcctBnkNm := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																	T19_IsBnkAppHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -1655,7 +1655,7 @@ Event: => T17_EmailPopFlag := MAP(T_InpClnEmailEcho = '-99999' => 0,
 																	1);
 Event: => T17_EmailDomain := MAP(T17_EmailPopFlag = 0 => -99999,
 																 T_SrcClassType < 4 => -99998,
-																 WORD(EmailAddress,2,'@')); //FIXME - need to figure out some string manipulation to pull domain out of full email
+																 WORD(EmailAddress,2,'@')); 
 Event: => T17_EmailDomainDispFlag := MAP(T17_EmailPopFlag = 0 => -99999,
 																				 T_SrcClassType < 4 => -99998,
 																				 rEmail.isdisposableemail);
