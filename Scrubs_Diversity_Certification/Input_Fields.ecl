@@ -16,11 +16,11 @@ EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(
 EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Float(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789 .,-/+E$\\r'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789 .,-/+E$'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/+E$\\r'))));
-EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .,-/+E$\\r'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/+E$'))));
+EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .,-/+E$'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ '); // Only allow valid symbols

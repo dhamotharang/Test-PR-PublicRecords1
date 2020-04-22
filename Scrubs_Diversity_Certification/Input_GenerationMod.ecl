@@ -44,7 +44,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'NAMESCOPE:Input\n'
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789)\n'
-    + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$\\r)\n'
+    + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ )\n'
     + 'FIELDTYPE:Invalid_AlphaNum:ALLOW(0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ )\n'
     + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ _,.\'-:;/&#@\\(\\))\n'
