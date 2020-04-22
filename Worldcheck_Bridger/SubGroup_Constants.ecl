@@ -1204,6 +1204,8 @@
 		export string KEYWORD_CNPPSD_MW							:= '890';
 		export string KEYWORD_USCBP									:= '891';
 		export string KEYWORD_USCBP_WRO							:= '892';
+		export string KEYWORD_UKEMBARGO							:= '893';
+		export string KEYWORD_LVVID									:= '894';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
