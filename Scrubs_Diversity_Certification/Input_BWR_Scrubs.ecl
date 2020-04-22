@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Diversity_Certification.BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
+#workunit('name','Scrubs_Diversity_Certification.Input_BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
 IMPORT Scrubs_Diversity_Certification,SALT311;
-infile := Scrubs_Diversity_Certification.In_Diversity_Certification;
-mod_scrubs := Scrubs_Diversity_Certification.Scrubs;
+infile := Scrubs_Diversity_Certification.Input_In_Diversity_Certification;
+mod_scrubs := Scrubs_Diversity_Certification.Input_Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources

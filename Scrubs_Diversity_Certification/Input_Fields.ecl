@@ -1,6 +1,6 @@
 ﻿IMPORT SALT311;
 IMPORT Scrubs_Diversity_Certification; // Import modules for FieldTypes attribute definitions
-EXPORT Fields := MODULE
+EXPORT Input_Fields := MODULE
  
 EXPORT NumFields := 205;
  
@@ -132,9 +132,9 @@ EXPORT Make_profilelastupdated(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
 EXPORT InValid_profilelastupdated(SALT311.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_profilelastupdated(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_county(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
-EXPORT InValid_county(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
-EXPORT InValidMessage_county(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
+EXPORT Make_county(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_county(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_county(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
 EXPORT Make_servicearea(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
 EXPORT InValid_servicearea(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
@@ -160,13 +160,13 @@ EXPORT Make_region5(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
 EXPORT InValid_region5(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
 EXPORT InValidMessage_region5(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_fname(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
-EXPORT InValid_fname(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
-EXPORT InValidMessage_fname(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
+EXPORT Make_fname(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_fname(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_fname(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_lname(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
-EXPORT InValid_lname(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
-EXPORT InValidMessage_lname(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
+EXPORT Make_lname(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_lname(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_lname(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
 EXPORT Make_mname(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
 EXPORT InValid_mname(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);

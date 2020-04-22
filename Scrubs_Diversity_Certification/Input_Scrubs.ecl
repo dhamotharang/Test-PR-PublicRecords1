@@ -1,6 +1,6 @@
 ﻿IMPORT SALT311,STD;
 IMPORT Scrubs_Diversity_Certification; // Import modules for FieldTypes attribute definitions
-EXPORT Scrubs := MODULE
+EXPORT Input_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 211;
@@ -9,7 +9,7 @@ EXPORT Scrubs := MODULE
   EXPORT NumFieldsWithRules := 202;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
-  EXPORT Expanded_Layout := RECORD(Layout_Diversity_Certification)
+  EXPORT Expanded_Layout := RECORD(Input_Layout_Diversity_Certification)
     UNSIGNED1 dartid_Invalid;
     UNSIGNED1 dateadded_Invalid;
     UNSIGNED1 dateupdated_Invalid;
@@ -213,13 +213,13 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 reference1_Invalid;
     UNSIGNED1 reference2_Invalid;
   END;
-  EXPORT  Bitmap_Layout := RECORD(Layout_Diversity_Certification)
+  EXPORT  Bitmap_Layout := RECORD(Input_Layout_Diversity_Certification)
     UNSIGNED8 ScrubsBits1;
     UNSIGNED8 ScrubsBits2;
     UNSIGNED8 ScrubsBits3;
     UNSIGNED8 ScrubsBits4;
   END;
-  EXPORT Rule_Layout := RECORD(Layout_Diversity_Certification)
+  EXPORT Rule_Layout := RECORD(Input_Layout_Diversity_Certification)
     STRING Rules {MAXLENGTH(1000)};
   END;
   SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
@@ -229,15 +229,15 @@ EXPORT Scrubs := MODULE
           ,'website:Invalid_AlphaNumChar:ALLOW'
           ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
           ,'profilelastupdated:Invalid_Date:CUSTOM'
-          ,'county:Invalid_AlphaNum:ALLOW'
+          ,'county:Invalid_AlphaNumChar:ALLOW'
           ,'servicearea:Invalid_Alpha:ALLOW'
           ,'region1:Invalid_AlphaNumChar:ALLOW'
           ,'region2:Invalid_AlphaNumChar:ALLOW'
           ,'region3:Invalid_AlphaNumChar:ALLOW'
           ,'region4:Invalid_AlphaNumChar:ALLOW'
           ,'region5:Invalid_AlphaNumChar:ALLOW'
-          ,'fname:Invalid_Alpha:ALLOW'
-          ,'lname:Invalid_Alpha:ALLOW'
+          ,'fname:Invalid_AlphaChar:ALLOW'
+          ,'lname:Invalid_AlphaChar:ALLOW'
           ,'mname:Invalid_AlphaChar:ALLOW'
           ,'suffix:Invalid_Alpha:ALLOW'
           ,'title:Invalid_AlphaChar:ALLOW'
@@ -433,208 +433,208 @@ EXPORT Scrubs := MODULE
           ,'record:Number_Errored_Records:SUMMARY'
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
   SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
-          ,Fields.InvalidMessage_dartid(1)
-          ,Fields.InvalidMessage_dateadded(1)
-          ,Fields.InvalidMessage_dateupdated(1)
-          ,Fields.InvalidMessage_website(1)
-          ,Fields.InvalidMessage_state(1),Fields.InvalidMessage_state(2)
-          ,Fields.InvalidMessage_profilelastupdated(1)
-          ,Fields.InvalidMessage_county(1)
-          ,Fields.InvalidMessage_servicearea(1)
-          ,Fields.InvalidMessage_region1(1)
-          ,Fields.InvalidMessage_region2(1)
-          ,Fields.InvalidMessage_region3(1)
-          ,Fields.InvalidMessage_region4(1)
-          ,Fields.InvalidMessage_region5(1)
-          ,Fields.InvalidMessage_fname(1)
-          ,Fields.InvalidMessage_lname(1)
-          ,Fields.InvalidMessage_mname(1)
-          ,Fields.InvalidMessage_suffix(1)
-          ,Fields.InvalidMessage_title(1)
-          ,Fields.InvalidMessage_ethnicity(1)
-          ,Fields.InvalidMessage_gender(1)
-          ,Fields.InvalidMessage_address1(1)
-          ,Fields.InvalidMessage_address2(1)
-          ,Fields.InvalidMessage_addresscity(1)
-          ,Fields.InvalidMessage_addressstate(1),Fields.InvalidMessage_addressstate(2)
-          ,Fields.InvalidMessage_addresszip4(1)
-          ,Fields.InvalidMessage_building(1)
-          ,Fields.InvalidMessage_contact(1)
-          ,Fields.InvalidMessage_phone1(1),Fields.InvalidMessage_phone1(2)
-          ,Fields.InvalidMessage_phone2(1),Fields.InvalidMessage_phone2(2)
-          ,Fields.InvalidMessage_phone3(1),Fields.InvalidMessage_phone3(2)
-          ,Fields.InvalidMessage_cell(1),Fields.InvalidMessage_cell(2)
-          ,Fields.InvalidMessage_fax(1),Fields.InvalidMessage_fax(2)
-          ,Fields.InvalidMessage_email1(1)
-          ,Fields.InvalidMessage_email2(1)
-          ,Fields.InvalidMessage_email3(1)
-          ,Fields.InvalidMessage_webpage1(1)
-          ,Fields.InvalidMessage_webpage2(1)
-          ,Fields.InvalidMessage_webpage3(1)
-          ,Fields.InvalidMessage_businessname(1)
-          ,Fields.InvalidMessage_dba(1)
-          ,Fields.InvalidMessage_businessid(1)
-          ,Fields.InvalidMessage_businesstype1(1)
-          ,Fields.InvalidMessage_businesslocation1(1)
-          ,Fields.InvalidMessage_businesstype2(1)
-          ,Fields.InvalidMessage_businesslocation2(1)
-          ,Fields.InvalidMessage_businesstype3(1)
-          ,Fields.InvalidMessage_businesslocation3(1)
-          ,Fields.InvalidMessage_businesstype4(1)
-          ,Fields.InvalidMessage_businesslocation4(1)
-          ,Fields.InvalidMessage_businesstype5(1)
-          ,Fields.InvalidMessage_businesslocation5(1)
-          ,Fields.InvalidMessage_industry(1)
-          ,Fields.InvalidMessage_trade(1)
-          ,Fields.InvalidMessage_resourcedescription(1)
-          ,Fields.InvalidMessage_natureofbusiness(1)
-          ,Fields.InvalidMessage_businessdescription(1)
-          ,Fields.InvalidMessage_businessstructure(1)
-          ,Fields.InvalidMessage_totalemployees(1)
-          ,Fields.InvalidMessage_avgcontractsize(1)
-          ,Fields.InvalidMessage_firmid(1)
-          ,Fields.InvalidMessage_firmlocationaddress(1)
-          ,Fields.InvalidMessage_firmlocationaddresscity(1)
-          ,Fields.InvalidMessage_firmlocationaddresszip4(1)
-          ,Fields.InvalidMessage_firmlocationcounty(1)
-          ,Fields.InvalidMessage_firmlocationstate(1),Fields.InvalidMessage_firmlocationstate(2)
-          ,Fields.InvalidMessage_certfed(1)
-          ,Fields.InvalidMessage_certstate(1),Fields.InvalidMessage_certstate(2)
-          ,Fields.InvalidMessage_contractsfederal(1)
-          ,Fields.InvalidMessage_contractsva(1)
-          ,Fields.InvalidMessage_contractscommercial(1)
-          ,Fields.InvalidMessage_contractorgovernmentprime(1)
-          ,Fields.InvalidMessage_contractorgovernmentsub(1)
-          ,Fields.InvalidMessage_contractornongovernment(1)
-          ,Fields.InvalidMessage_registeredgovernmentbus(1)
-          ,Fields.InvalidMessage_registerednongovernmentbus(1)
-          ,Fields.InvalidMessage_clearancelevelpersonnel(1)
-          ,Fields.InvalidMessage_clearancelevelfacility(1)
-          ,Fields.InvalidMessage_certificatedatefrom1(1)
-          ,Fields.InvalidMessage_certificatedateto1(1)
-          ,Fields.InvalidMessage_certificatestatus1(1)
-          ,Fields.InvalidMessage_certificationnumber1(1)
-          ,Fields.InvalidMessage_certificationtype1(1)
-          ,Fields.InvalidMessage_certificatedatefrom2(1)
-          ,Fields.InvalidMessage_certificatedateto2(1)
-          ,Fields.InvalidMessage_certificatestatus2(1)
-          ,Fields.InvalidMessage_certificationnumber2(1)
-          ,Fields.InvalidMessage_certificationtype2(1)
-          ,Fields.InvalidMessage_certificatedatefrom3(1)
-          ,Fields.InvalidMessage_certificatedateto3(1)
-          ,Fields.InvalidMessage_certificatestatus3(1)
-          ,Fields.InvalidMessage_certificationnumber3(1)
-          ,Fields.InvalidMessage_certificationtype3(1)
-          ,Fields.InvalidMessage_certificatedatefrom4(1)
-          ,Fields.InvalidMessage_certificatedateto4(1)
-          ,Fields.InvalidMessage_certificatestatus4(1)
-          ,Fields.InvalidMessage_certificationnumber4(1)
-          ,Fields.InvalidMessage_certificationtype4(1)
-          ,Fields.InvalidMessage_certificatedatefrom5(1)
-          ,Fields.InvalidMessage_certificatedateto5(1)
-          ,Fields.InvalidMessage_certificatestatus5(1)
-          ,Fields.InvalidMessage_certificationnumber5(1)
-          ,Fields.InvalidMessage_certificationtype5(1)
-          ,Fields.InvalidMessage_certificatedatefrom6(1)
-          ,Fields.InvalidMessage_certificatedateto6(1)
-          ,Fields.InvalidMessage_certificatestatus6(1)
-          ,Fields.InvalidMessage_certificationnumber6(1)
-          ,Fields.InvalidMessage_certificationtype6(1)
-          ,Fields.InvalidMessage_starrating(1)
-          ,Fields.InvalidMessage_assets(1)
-          ,Fields.InvalidMessage_biddescription(1)
-          ,Fields.InvalidMessage_competitiveadvantage(1)
-          ,Fields.InvalidMessage_cagecode(1)
-          ,Fields.InvalidMessage_capabilitiesnarrative(1)
-          ,Fields.InvalidMessage_category(1)
-          ,Fields.InvalidMessage_chtrclass(1)
-          ,Fields.InvalidMessage_productdescription1(1)
-          ,Fields.InvalidMessage_productdescription2(1)
-          ,Fields.InvalidMessage_productdescription3(1)
-          ,Fields.InvalidMessage_productdescription4(1)
-          ,Fields.InvalidMessage_productdescription5(1)
-          ,Fields.InvalidMessage_classdescription1(1)
-          ,Fields.InvalidMessage_subclassdescription1(1)
-          ,Fields.InvalidMessage_classdescription2(1)
-          ,Fields.InvalidMessage_subclassdescription2(1)
-          ,Fields.InvalidMessage_classdescription3(1)
-          ,Fields.InvalidMessage_subclassdescription3(1)
-          ,Fields.InvalidMessage_classdescription4(1)
-          ,Fields.InvalidMessage_subclassdescription4(1)
-          ,Fields.InvalidMessage_classdescription5(1)
-          ,Fields.InvalidMessage_subclassdescription5(1)
-          ,Fields.InvalidMessage_classifications(1)
-          ,Fields.InvalidMessage_commodity1(1)
-          ,Fields.InvalidMessage_commodity2(1)
-          ,Fields.InvalidMessage_commodity3(1)
-          ,Fields.InvalidMessage_commodity4(1)
-          ,Fields.InvalidMessage_commodity5(1)
-          ,Fields.InvalidMessage_commodity6(1)
-          ,Fields.InvalidMessage_commodity7(1)
-          ,Fields.InvalidMessage_commodity8(1)
-          ,Fields.InvalidMessage_completedate(1)
-          ,Fields.InvalidMessage_crossreference(1)
-          ,Fields.InvalidMessage_dateestablished(1)
-          ,Fields.InvalidMessage_businessage(1)
-          ,Fields.InvalidMessage_deposits(1)
-          ,Fields.InvalidMessage_dunsnumber(1)
-          ,Fields.InvalidMessage_enttype(1)
-          ,Fields.InvalidMessage_expirationdate(1)
-          ,Fields.InvalidMessage_extendeddate(1)
-          ,Fields.InvalidMessage_issuingauthority(1)
-          ,Fields.InvalidMessage_keywords(1)
-          ,Fields.InvalidMessage_licensenumber(1)
-          ,Fields.InvalidMessage_licensetype(1)
-          ,Fields.InvalidMessage_mincd(1)
-          ,Fields.InvalidMessage_minorityaffiliation(1)
-          ,Fields.InvalidMessage_minorityownershipdate(1)
-          ,Fields.InvalidMessage_siccode1(1)
-          ,Fields.InvalidMessage_siccode2(1)
-          ,Fields.InvalidMessage_siccode3(1)
-          ,Fields.InvalidMessage_siccode4(1)
-          ,Fields.InvalidMessage_siccode5(1)
-          ,Fields.InvalidMessage_siccode6(1)
-          ,Fields.InvalidMessage_siccode7(1)
-          ,Fields.InvalidMessage_siccode8(1)
-          ,Fields.InvalidMessage_naicscode1(1)
-          ,Fields.InvalidMessage_naicscode2(1)
-          ,Fields.InvalidMessage_naicscode3(1)
-          ,Fields.InvalidMessage_naicscode4(1)
-          ,Fields.InvalidMessage_naicscode5(1)
-          ,Fields.InvalidMessage_naicscode6(1)
-          ,Fields.InvalidMessage_naicscode7(1)
-          ,Fields.InvalidMessage_naicscode8(1)
-          ,Fields.InvalidMessage_prequalify(1)
-          ,Fields.InvalidMessage_procurementcategory1(1)
-          ,Fields.InvalidMessage_subprocurementcategory1(1)
-          ,Fields.InvalidMessage_procurementcategory2(1)
-          ,Fields.InvalidMessage_subprocurementcategory2(1)
-          ,Fields.InvalidMessage_procurementcategory3(1)
-          ,Fields.InvalidMessage_subprocurementcategory3(1)
-          ,Fields.InvalidMessage_procurementcategory4(1)
-          ,Fields.InvalidMessage_subprocurementcategory4(1)
-          ,Fields.InvalidMessage_procurementcategory5(1)
-          ,Fields.InvalidMessage_subprocurementcategory5(1)
-          ,Fields.InvalidMessage_renewal(1)
-          ,Fields.InvalidMessage_renewaldate(1)
-          ,Fields.InvalidMessage_unitedcertprogrampartner(1)
-          ,Fields.InvalidMessage_vendorkey(1)
-          ,Fields.InvalidMessage_vendornumber(1)
-          ,Fields.InvalidMessage_workcode1(1)
-          ,Fields.InvalidMessage_workcode2(1)
-          ,Fields.InvalidMessage_workcode3(1)
-          ,Fields.InvalidMessage_workcode4(1)
-          ,Fields.InvalidMessage_workcode5(1)
-          ,Fields.InvalidMessage_workcode6(1)
-          ,Fields.InvalidMessage_workcode7(1)
-          ,Fields.InvalidMessage_workcode8(1)
-          ,Fields.InvalidMessage_exporter(1)
-          ,Fields.InvalidMessage_exportbusinessactivities(1)
-          ,Fields.InvalidMessage_exportto(1)
-          ,Fields.InvalidMessage_exportbusinessrelationships(1)
-          ,Fields.InvalidMessage_exportobjectives(1)
-          ,Fields.InvalidMessage_reference1(1)
-          ,Fields.InvalidMessage_reference2(1)
+          ,Input_Fields.InvalidMessage_dartid(1)
+          ,Input_Fields.InvalidMessage_dateadded(1)
+          ,Input_Fields.InvalidMessage_dateupdated(1)
+          ,Input_Fields.InvalidMessage_website(1)
+          ,Input_Fields.InvalidMessage_state(1),Input_Fields.InvalidMessage_state(2)
+          ,Input_Fields.InvalidMessage_profilelastupdated(1)
+          ,Input_Fields.InvalidMessage_county(1)
+          ,Input_Fields.InvalidMessage_servicearea(1)
+          ,Input_Fields.InvalidMessage_region1(1)
+          ,Input_Fields.InvalidMessage_region2(1)
+          ,Input_Fields.InvalidMessage_region3(1)
+          ,Input_Fields.InvalidMessage_region4(1)
+          ,Input_Fields.InvalidMessage_region5(1)
+          ,Input_Fields.InvalidMessage_fname(1)
+          ,Input_Fields.InvalidMessage_lname(1)
+          ,Input_Fields.InvalidMessage_mname(1)
+          ,Input_Fields.InvalidMessage_suffix(1)
+          ,Input_Fields.InvalidMessage_title(1)
+          ,Input_Fields.InvalidMessage_ethnicity(1)
+          ,Input_Fields.InvalidMessage_gender(1)
+          ,Input_Fields.InvalidMessage_address1(1)
+          ,Input_Fields.InvalidMessage_address2(1)
+          ,Input_Fields.InvalidMessage_addresscity(1)
+          ,Input_Fields.InvalidMessage_addressstate(1),Input_Fields.InvalidMessage_addressstate(2)
+          ,Input_Fields.InvalidMessage_addresszip4(1)
+          ,Input_Fields.InvalidMessage_building(1)
+          ,Input_Fields.InvalidMessage_contact(1)
+          ,Input_Fields.InvalidMessage_phone1(1),Input_Fields.InvalidMessage_phone1(2)
+          ,Input_Fields.InvalidMessage_phone2(1),Input_Fields.InvalidMessage_phone2(2)
+          ,Input_Fields.InvalidMessage_phone3(1),Input_Fields.InvalidMessage_phone3(2)
+          ,Input_Fields.InvalidMessage_cell(1),Input_Fields.InvalidMessage_cell(2)
+          ,Input_Fields.InvalidMessage_fax(1),Input_Fields.InvalidMessage_fax(2)
+          ,Input_Fields.InvalidMessage_email1(1)
+          ,Input_Fields.InvalidMessage_email2(1)
+          ,Input_Fields.InvalidMessage_email3(1)
+          ,Input_Fields.InvalidMessage_webpage1(1)
+          ,Input_Fields.InvalidMessage_webpage2(1)
+          ,Input_Fields.InvalidMessage_webpage3(1)
+          ,Input_Fields.InvalidMessage_businessname(1)
+          ,Input_Fields.InvalidMessage_dba(1)
+          ,Input_Fields.InvalidMessage_businessid(1)
+          ,Input_Fields.InvalidMessage_businesstype1(1)
+          ,Input_Fields.InvalidMessage_businesslocation1(1)
+          ,Input_Fields.InvalidMessage_businesstype2(1)
+          ,Input_Fields.InvalidMessage_businesslocation2(1)
+          ,Input_Fields.InvalidMessage_businesstype3(1)
+          ,Input_Fields.InvalidMessage_businesslocation3(1)
+          ,Input_Fields.InvalidMessage_businesstype4(1)
+          ,Input_Fields.InvalidMessage_businesslocation4(1)
+          ,Input_Fields.InvalidMessage_businesstype5(1)
+          ,Input_Fields.InvalidMessage_businesslocation5(1)
+          ,Input_Fields.InvalidMessage_industry(1)
+          ,Input_Fields.InvalidMessage_trade(1)
+          ,Input_Fields.InvalidMessage_resourcedescription(1)
+          ,Input_Fields.InvalidMessage_natureofbusiness(1)
+          ,Input_Fields.InvalidMessage_businessdescription(1)
+          ,Input_Fields.InvalidMessage_businessstructure(1)
+          ,Input_Fields.InvalidMessage_totalemployees(1)
+          ,Input_Fields.InvalidMessage_avgcontractsize(1)
+          ,Input_Fields.InvalidMessage_firmid(1)
+          ,Input_Fields.InvalidMessage_firmlocationaddress(1)
+          ,Input_Fields.InvalidMessage_firmlocationaddresscity(1)
+          ,Input_Fields.InvalidMessage_firmlocationaddresszip4(1)
+          ,Input_Fields.InvalidMessage_firmlocationcounty(1)
+          ,Input_Fields.InvalidMessage_firmlocationstate(1),Input_Fields.InvalidMessage_firmlocationstate(2)
+          ,Input_Fields.InvalidMessage_certfed(1)
+          ,Input_Fields.InvalidMessage_certstate(1),Input_Fields.InvalidMessage_certstate(2)
+          ,Input_Fields.InvalidMessage_contractsfederal(1)
+          ,Input_Fields.InvalidMessage_contractsva(1)
+          ,Input_Fields.InvalidMessage_contractscommercial(1)
+          ,Input_Fields.InvalidMessage_contractorgovernmentprime(1)
+          ,Input_Fields.InvalidMessage_contractorgovernmentsub(1)
+          ,Input_Fields.InvalidMessage_contractornongovernment(1)
+          ,Input_Fields.InvalidMessage_registeredgovernmentbus(1)
+          ,Input_Fields.InvalidMessage_registerednongovernmentbus(1)
+          ,Input_Fields.InvalidMessage_clearancelevelpersonnel(1)
+          ,Input_Fields.InvalidMessage_clearancelevelfacility(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom1(1)
+          ,Input_Fields.InvalidMessage_certificatedateto1(1)
+          ,Input_Fields.InvalidMessage_certificatestatus1(1)
+          ,Input_Fields.InvalidMessage_certificationnumber1(1)
+          ,Input_Fields.InvalidMessage_certificationtype1(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom2(1)
+          ,Input_Fields.InvalidMessage_certificatedateto2(1)
+          ,Input_Fields.InvalidMessage_certificatestatus2(1)
+          ,Input_Fields.InvalidMessage_certificationnumber2(1)
+          ,Input_Fields.InvalidMessage_certificationtype2(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom3(1)
+          ,Input_Fields.InvalidMessage_certificatedateto3(1)
+          ,Input_Fields.InvalidMessage_certificatestatus3(1)
+          ,Input_Fields.InvalidMessage_certificationnumber3(1)
+          ,Input_Fields.InvalidMessage_certificationtype3(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom4(1)
+          ,Input_Fields.InvalidMessage_certificatedateto4(1)
+          ,Input_Fields.InvalidMessage_certificatestatus4(1)
+          ,Input_Fields.InvalidMessage_certificationnumber4(1)
+          ,Input_Fields.InvalidMessage_certificationtype4(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom5(1)
+          ,Input_Fields.InvalidMessage_certificatedateto5(1)
+          ,Input_Fields.InvalidMessage_certificatestatus5(1)
+          ,Input_Fields.InvalidMessage_certificationnumber5(1)
+          ,Input_Fields.InvalidMessage_certificationtype5(1)
+          ,Input_Fields.InvalidMessage_certificatedatefrom6(1)
+          ,Input_Fields.InvalidMessage_certificatedateto6(1)
+          ,Input_Fields.InvalidMessage_certificatestatus6(1)
+          ,Input_Fields.InvalidMessage_certificationnumber6(1)
+          ,Input_Fields.InvalidMessage_certificationtype6(1)
+          ,Input_Fields.InvalidMessage_starrating(1)
+          ,Input_Fields.InvalidMessage_assets(1)
+          ,Input_Fields.InvalidMessage_biddescription(1)
+          ,Input_Fields.InvalidMessage_competitiveadvantage(1)
+          ,Input_Fields.InvalidMessage_cagecode(1)
+          ,Input_Fields.InvalidMessage_capabilitiesnarrative(1)
+          ,Input_Fields.InvalidMessage_category(1)
+          ,Input_Fields.InvalidMessage_chtrclass(1)
+          ,Input_Fields.InvalidMessage_productdescription1(1)
+          ,Input_Fields.InvalidMessage_productdescription2(1)
+          ,Input_Fields.InvalidMessage_productdescription3(1)
+          ,Input_Fields.InvalidMessage_productdescription4(1)
+          ,Input_Fields.InvalidMessage_productdescription5(1)
+          ,Input_Fields.InvalidMessage_classdescription1(1)
+          ,Input_Fields.InvalidMessage_subclassdescription1(1)
+          ,Input_Fields.InvalidMessage_classdescription2(1)
+          ,Input_Fields.InvalidMessage_subclassdescription2(1)
+          ,Input_Fields.InvalidMessage_classdescription3(1)
+          ,Input_Fields.InvalidMessage_subclassdescription3(1)
+          ,Input_Fields.InvalidMessage_classdescription4(1)
+          ,Input_Fields.InvalidMessage_subclassdescription4(1)
+          ,Input_Fields.InvalidMessage_classdescription5(1)
+          ,Input_Fields.InvalidMessage_subclassdescription5(1)
+          ,Input_Fields.InvalidMessage_classifications(1)
+          ,Input_Fields.InvalidMessage_commodity1(1)
+          ,Input_Fields.InvalidMessage_commodity2(1)
+          ,Input_Fields.InvalidMessage_commodity3(1)
+          ,Input_Fields.InvalidMessage_commodity4(1)
+          ,Input_Fields.InvalidMessage_commodity5(1)
+          ,Input_Fields.InvalidMessage_commodity6(1)
+          ,Input_Fields.InvalidMessage_commodity7(1)
+          ,Input_Fields.InvalidMessage_commodity8(1)
+          ,Input_Fields.InvalidMessage_completedate(1)
+          ,Input_Fields.InvalidMessage_crossreference(1)
+          ,Input_Fields.InvalidMessage_dateestablished(1)
+          ,Input_Fields.InvalidMessage_businessage(1)
+          ,Input_Fields.InvalidMessage_deposits(1)
+          ,Input_Fields.InvalidMessage_dunsnumber(1)
+          ,Input_Fields.InvalidMessage_enttype(1)
+          ,Input_Fields.InvalidMessage_expirationdate(1)
+          ,Input_Fields.InvalidMessage_extendeddate(1)
+          ,Input_Fields.InvalidMessage_issuingauthority(1)
+          ,Input_Fields.InvalidMessage_keywords(1)
+          ,Input_Fields.InvalidMessage_licensenumber(1)
+          ,Input_Fields.InvalidMessage_licensetype(1)
+          ,Input_Fields.InvalidMessage_mincd(1)
+          ,Input_Fields.InvalidMessage_minorityaffiliation(1)
+          ,Input_Fields.InvalidMessage_minorityownershipdate(1)
+          ,Input_Fields.InvalidMessage_siccode1(1)
+          ,Input_Fields.InvalidMessage_siccode2(1)
+          ,Input_Fields.InvalidMessage_siccode3(1)
+          ,Input_Fields.InvalidMessage_siccode4(1)
+          ,Input_Fields.InvalidMessage_siccode5(1)
+          ,Input_Fields.InvalidMessage_siccode6(1)
+          ,Input_Fields.InvalidMessage_siccode7(1)
+          ,Input_Fields.InvalidMessage_siccode8(1)
+          ,Input_Fields.InvalidMessage_naicscode1(1)
+          ,Input_Fields.InvalidMessage_naicscode2(1)
+          ,Input_Fields.InvalidMessage_naicscode3(1)
+          ,Input_Fields.InvalidMessage_naicscode4(1)
+          ,Input_Fields.InvalidMessage_naicscode5(1)
+          ,Input_Fields.InvalidMessage_naicscode6(1)
+          ,Input_Fields.InvalidMessage_naicscode7(1)
+          ,Input_Fields.InvalidMessage_naicscode8(1)
+          ,Input_Fields.InvalidMessage_prequalify(1)
+          ,Input_Fields.InvalidMessage_procurementcategory1(1)
+          ,Input_Fields.InvalidMessage_subprocurementcategory1(1)
+          ,Input_Fields.InvalidMessage_procurementcategory2(1)
+          ,Input_Fields.InvalidMessage_subprocurementcategory2(1)
+          ,Input_Fields.InvalidMessage_procurementcategory3(1)
+          ,Input_Fields.InvalidMessage_subprocurementcategory3(1)
+          ,Input_Fields.InvalidMessage_procurementcategory4(1)
+          ,Input_Fields.InvalidMessage_subprocurementcategory4(1)
+          ,Input_Fields.InvalidMessage_procurementcategory5(1)
+          ,Input_Fields.InvalidMessage_subprocurementcategory5(1)
+          ,Input_Fields.InvalidMessage_renewal(1)
+          ,Input_Fields.InvalidMessage_renewaldate(1)
+          ,Input_Fields.InvalidMessage_unitedcertprogrampartner(1)
+          ,Input_Fields.InvalidMessage_vendorkey(1)
+          ,Input_Fields.InvalidMessage_vendornumber(1)
+          ,Input_Fields.InvalidMessage_workcode1(1)
+          ,Input_Fields.InvalidMessage_workcode2(1)
+          ,Input_Fields.InvalidMessage_workcode3(1)
+          ,Input_Fields.InvalidMessage_workcode4(1)
+          ,Input_Fields.InvalidMessage_workcode5(1)
+          ,Input_Fields.InvalidMessage_workcode6(1)
+          ,Input_Fields.InvalidMessage_workcode7(1)
+          ,Input_Fields.InvalidMessage_workcode8(1)
+          ,Input_Fields.InvalidMessage_exporter(1)
+          ,Input_Fields.InvalidMessage_exportbusinessactivities(1)
+          ,Input_Fields.InvalidMessage_exportto(1)
+          ,Input_Fields.InvalidMessage_exportbusinessrelationships(1)
+          ,Input_Fields.InvalidMessage_exportobjectives(1)
+          ,Input_Fields.InvalidMessage_reference1(1)
+          ,Input_Fields.InvalidMessage_reference2(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -642,214 +642,214 @@ EXPORT Scrubs := MODULE
           ,'Rules with possible edits'
           ,'Records with at least one error'
           ,'Records without errors','UNKNOWN');
-EXPORT FromNone(DATASET(Layout_Diversity_Certification) h) := MODULE
+EXPORT FromNone(DATASET(Input_Layout_Diversity_Certification) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.dartid_Invalid := Fields.InValid_dartid((SALT311.StrType)le.dartid);
-    SELF.dateadded_Invalid := Fields.InValid_dateadded((SALT311.StrType)le.dateadded);
-    SELF.dateupdated_Invalid := Fields.InValid_dateupdated((SALT311.StrType)le.dateupdated);
-    SELF.website_Invalid := Fields.InValid_website((SALT311.StrType)le.website);
-    SELF.state_Invalid := Fields.InValid_state((SALT311.StrType)le.state);
-    SELF.profilelastupdated_Invalid := Fields.InValid_profilelastupdated((SALT311.StrType)le.profilelastupdated);
-    SELF.county_Invalid := Fields.InValid_county((SALT311.StrType)le.county);
-    SELF.servicearea_Invalid := Fields.InValid_servicearea((SALT311.StrType)le.servicearea);
-    SELF.region1_Invalid := Fields.InValid_region1((SALT311.StrType)le.region1);
-    SELF.region2_Invalid := Fields.InValid_region2((SALT311.StrType)le.region2);
-    SELF.region3_Invalid := Fields.InValid_region3((SALT311.StrType)le.region3);
-    SELF.region4_Invalid := Fields.InValid_region4((SALT311.StrType)le.region4);
-    SELF.region5_Invalid := Fields.InValid_region5((SALT311.StrType)le.region5);
-    SELF.fname_Invalid := Fields.InValid_fname((SALT311.StrType)le.fname);
-    SELF.lname_Invalid := Fields.InValid_lname((SALT311.StrType)le.lname);
-    SELF.mname_Invalid := Fields.InValid_mname((SALT311.StrType)le.mname);
-    SELF.suffix_Invalid := Fields.InValid_suffix((SALT311.StrType)le.suffix);
-    SELF.title_Invalid := Fields.InValid_title((SALT311.StrType)le.title);
-    SELF.ethnicity_Invalid := Fields.InValid_ethnicity((SALT311.StrType)le.ethnicity);
-    SELF.gender_Invalid := Fields.InValid_gender((SALT311.StrType)le.gender);
-    SELF.address1_Invalid := Fields.InValid_address1((SALT311.StrType)le.address1);
-    SELF.address2_Invalid := Fields.InValid_address2((SALT311.StrType)le.address2);
-    SELF.addresscity_Invalid := Fields.InValid_addresscity((SALT311.StrType)le.addresscity);
-    SELF.addressstate_Invalid := Fields.InValid_addressstate((SALT311.StrType)le.addressstate);
-    SELF.addresszip4_Invalid := Fields.InValid_addresszip4((SALT311.StrType)le.addresszip4);
-    SELF.building_Invalid := Fields.InValid_building((SALT311.StrType)le.building);
-    SELF.contact_Invalid := Fields.InValid_contact((SALT311.StrType)le.contact);
-    SELF.phone1_Invalid := Fields.InValid_phone1((SALT311.StrType)le.phone1);
-    SELF.phone2_Invalid := Fields.InValid_phone2((SALT311.StrType)le.phone2);
-    SELF.phone3_Invalid := Fields.InValid_phone3((SALT311.StrType)le.phone3);
-    SELF.cell_Invalid := Fields.InValid_cell((SALT311.StrType)le.cell);
-    SELF.fax_Invalid := Fields.InValid_fax((SALT311.StrType)le.fax);
-    SELF.email1_Invalid := Fields.InValid_email1((SALT311.StrType)le.email1);
-    SELF.email2_Invalid := Fields.InValid_email2((SALT311.StrType)le.email2);
-    SELF.email3_Invalid := Fields.InValid_email3((SALT311.StrType)le.email3);
-    SELF.webpage1_Invalid := Fields.InValid_webpage1((SALT311.StrType)le.webpage1);
-    SELF.webpage2_Invalid := Fields.InValid_webpage2((SALT311.StrType)le.webpage2);
-    SELF.webpage3_Invalid := Fields.InValid_webpage3((SALT311.StrType)le.webpage3);
-    SELF.businessname_Invalid := Fields.InValid_businessname((SALT311.StrType)le.businessname);
-    SELF.dba_Invalid := Fields.InValid_dba((SALT311.StrType)le.dba);
-    SELF.businessid_Invalid := Fields.InValid_businessid((SALT311.StrType)le.businessid);
-    SELF.businesstype1_Invalid := Fields.InValid_businesstype1((SALT311.StrType)le.businesstype1);
-    SELF.businesslocation1_Invalid := Fields.InValid_businesslocation1((SALT311.StrType)le.businesslocation1);
-    SELF.businesstype2_Invalid := Fields.InValid_businesstype2((SALT311.StrType)le.businesstype2);
-    SELF.businesslocation2_Invalid := Fields.InValid_businesslocation2((SALT311.StrType)le.businesslocation2);
-    SELF.businesstype3_Invalid := Fields.InValid_businesstype3((SALT311.StrType)le.businesstype3);
-    SELF.businesslocation3_Invalid := Fields.InValid_businesslocation3((SALT311.StrType)le.businesslocation3);
-    SELF.businesstype4_Invalid := Fields.InValid_businesstype4((SALT311.StrType)le.businesstype4);
-    SELF.businesslocation4_Invalid := Fields.InValid_businesslocation4((SALT311.StrType)le.businesslocation4);
-    SELF.businesstype5_Invalid := Fields.InValid_businesstype5((SALT311.StrType)le.businesstype5);
-    SELF.businesslocation5_Invalid := Fields.InValid_businesslocation5((SALT311.StrType)le.businesslocation5);
-    SELF.industry_Invalid := Fields.InValid_industry((SALT311.StrType)le.industry);
-    SELF.trade_Invalid := Fields.InValid_trade((SALT311.StrType)le.trade);
-    SELF.resourcedescription_Invalid := Fields.InValid_resourcedescription((SALT311.StrType)le.resourcedescription);
-    SELF.natureofbusiness_Invalid := Fields.InValid_natureofbusiness((SALT311.StrType)le.natureofbusiness);
-    SELF.businessdescription_Invalid := Fields.InValid_businessdescription((SALT311.StrType)le.businessdescription);
-    SELF.businessstructure_Invalid := Fields.InValid_businessstructure((SALT311.StrType)le.businessstructure);
-    SELF.totalemployees_Invalid := Fields.InValid_totalemployees((SALT311.StrType)le.totalemployees);
-    SELF.avgcontractsize_Invalid := Fields.InValid_avgcontractsize((SALT311.StrType)le.avgcontractsize);
-    SELF.firmid_Invalid := Fields.InValid_firmid((SALT311.StrType)le.firmid);
-    SELF.firmlocationaddress_Invalid := Fields.InValid_firmlocationaddress((SALT311.StrType)le.firmlocationaddress);
-    SELF.firmlocationaddresscity_Invalid := Fields.InValid_firmlocationaddresscity((SALT311.StrType)le.firmlocationaddresscity);
-    SELF.firmlocationaddresszip4_Invalid := Fields.InValid_firmlocationaddresszip4((SALT311.StrType)le.firmlocationaddresszip4);
-    SELF.firmlocationcounty_Invalid := Fields.InValid_firmlocationcounty((SALT311.StrType)le.firmlocationcounty);
-    SELF.firmlocationstate_Invalid := Fields.InValid_firmlocationstate((SALT311.StrType)le.firmlocationstate);
-    SELF.certfed_Invalid := Fields.InValid_certfed((SALT311.StrType)le.certfed);
-    SELF.certstate_Invalid := Fields.InValid_certstate((SALT311.StrType)le.certstate);
-    SELF.contractsfederal_Invalid := Fields.InValid_contractsfederal((SALT311.StrType)le.contractsfederal);
-    SELF.contractsva_Invalid := Fields.InValid_contractsva((SALT311.StrType)le.contractsva);
-    SELF.contractscommercial_Invalid := Fields.InValid_contractscommercial((SALT311.StrType)le.contractscommercial);
-    SELF.contractorgovernmentprime_Invalid := Fields.InValid_contractorgovernmentprime((SALT311.StrType)le.contractorgovernmentprime);
-    SELF.contractorgovernmentsub_Invalid := Fields.InValid_contractorgovernmentsub((SALT311.StrType)le.contractorgovernmentsub);
-    SELF.contractornongovernment_Invalid := Fields.InValid_contractornongovernment((SALT311.StrType)le.contractornongovernment);
-    SELF.registeredgovernmentbus_Invalid := Fields.InValid_registeredgovernmentbus((SALT311.StrType)le.registeredgovernmentbus);
-    SELF.registerednongovernmentbus_Invalid := Fields.InValid_registerednongovernmentbus((SALT311.StrType)le.registerednongovernmentbus);
-    SELF.clearancelevelpersonnel_Invalid := Fields.InValid_clearancelevelpersonnel((SALT311.StrType)le.clearancelevelpersonnel);
-    SELF.clearancelevelfacility_Invalid := Fields.InValid_clearancelevelfacility((SALT311.StrType)le.clearancelevelfacility);
-    SELF.certificatedatefrom1_Invalid := Fields.InValid_certificatedatefrom1((SALT311.StrType)le.certificatedatefrom1);
-    SELF.certificatedateto1_Invalid := Fields.InValid_certificatedateto1((SALT311.StrType)le.certificatedateto1);
-    SELF.certificatestatus1_Invalid := Fields.InValid_certificatestatus1((SALT311.StrType)le.certificatestatus1);
-    SELF.certificationnumber1_Invalid := Fields.InValid_certificationnumber1((SALT311.StrType)le.certificationnumber1);
-    SELF.certificationtype1_Invalid := Fields.InValid_certificationtype1((SALT311.StrType)le.certificationtype1);
-    SELF.certificatedatefrom2_Invalid := Fields.InValid_certificatedatefrom2((SALT311.StrType)le.certificatedatefrom2);
-    SELF.certificatedateto2_Invalid := Fields.InValid_certificatedateto2((SALT311.StrType)le.certificatedateto2);
-    SELF.certificatestatus2_Invalid := Fields.InValid_certificatestatus2((SALT311.StrType)le.certificatestatus2);
-    SELF.certificationnumber2_Invalid := Fields.InValid_certificationnumber2((SALT311.StrType)le.certificationnumber2);
-    SELF.certificationtype2_Invalid := Fields.InValid_certificationtype2((SALT311.StrType)le.certificationtype2);
-    SELF.certificatedatefrom3_Invalid := Fields.InValid_certificatedatefrom3((SALT311.StrType)le.certificatedatefrom3);
-    SELF.certificatedateto3_Invalid := Fields.InValid_certificatedateto3((SALT311.StrType)le.certificatedateto3);
-    SELF.certificatestatus3_Invalid := Fields.InValid_certificatestatus3((SALT311.StrType)le.certificatestatus3);
-    SELF.certificationnumber3_Invalid := Fields.InValid_certificationnumber3((SALT311.StrType)le.certificationnumber3);
-    SELF.certificationtype3_Invalid := Fields.InValid_certificationtype3((SALT311.StrType)le.certificationtype3);
-    SELF.certificatedatefrom4_Invalid := Fields.InValid_certificatedatefrom4((SALT311.StrType)le.certificatedatefrom4);
-    SELF.certificatedateto4_Invalid := Fields.InValid_certificatedateto4((SALT311.StrType)le.certificatedateto4);
-    SELF.certificatestatus4_Invalid := Fields.InValid_certificatestatus4((SALT311.StrType)le.certificatestatus4);
-    SELF.certificationnumber4_Invalid := Fields.InValid_certificationnumber4((SALT311.StrType)le.certificationnumber4);
-    SELF.certificationtype4_Invalid := Fields.InValid_certificationtype4((SALT311.StrType)le.certificationtype4);
-    SELF.certificatedatefrom5_Invalid := Fields.InValid_certificatedatefrom5((SALT311.StrType)le.certificatedatefrom5);
-    SELF.certificatedateto5_Invalid := Fields.InValid_certificatedateto5((SALT311.StrType)le.certificatedateto5);
-    SELF.certificatestatus5_Invalid := Fields.InValid_certificatestatus5((SALT311.StrType)le.certificatestatus5);
-    SELF.certificationnumber5_Invalid := Fields.InValid_certificationnumber5((SALT311.StrType)le.certificationnumber5);
-    SELF.certificationtype5_Invalid := Fields.InValid_certificationtype5((SALT311.StrType)le.certificationtype5);
-    SELF.certificatedatefrom6_Invalid := Fields.InValid_certificatedatefrom6((SALT311.StrType)le.certificatedatefrom6);
-    SELF.certificatedateto6_Invalid := Fields.InValid_certificatedateto6((SALT311.StrType)le.certificatedateto6);
-    SELF.certificatestatus6_Invalid := Fields.InValid_certificatestatus6((SALT311.StrType)le.certificatestatus6);
-    SELF.certificationnumber6_Invalid := Fields.InValid_certificationnumber6((SALT311.StrType)le.certificationnumber6);
-    SELF.certificationtype6_Invalid := Fields.InValid_certificationtype6((SALT311.StrType)le.certificationtype6);
-    SELF.starrating_Invalid := Fields.InValid_starrating((SALT311.StrType)le.starrating);
-    SELF.assets_Invalid := Fields.InValid_assets((SALT311.StrType)le.assets);
-    SELF.biddescription_Invalid := Fields.InValid_biddescription((SALT311.StrType)le.biddescription);
-    SELF.competitiveadvantage_Invalid := Fields.InValid_competitiveadvantage((SALT311.StrType)le.competitiveadvantage);
-    SELF.cagecode_Invalid := Fields.InValid_cagecode((SALT311.StrType)le.cagecode);
-    SELF.capabilitiesnarrative_Invalid := Fields.InValid_capabilitiesnarrative((SALT311.StrType)le.capabilitiesnarrative);
-    SELF.category_Invalid := Fields.InValid_category((SALT311.StrType)le.category);
-    SELF.chtrclass_Invalid := Fields.InValid_chtrclass((SALT311.StrType)le.chtrclass);
-    SELF.productdescription1_Invalid := Fields.InValid_productdescription1((SALT311.StrType)le.productdescription1);
-    SELF.productdescription2_Invalid := Fields.InValid_productdescription2((SALT311.StrType)le.productdescription2);
-    SELF.productdescription3_Invalid := Fields.InValid_productdescription3((SALT311.StrType)le.productdescription3);
-    SELF.productdescription4_Invalid := Fields.InValid_productdescription4((SALT311.StrType)le.productdescription4);
-    SELF.productdescription5_Invalid := Fields.InValid_productdescription5((SALT311.StrType)le.productdescription5);
-    SELF.classdescription1_Invalid := Fields.InValid_classdescription1((SALT311.StrType)le.classdescription1);
-    SELF.subclassdescription1_Invalid := Fields.InValid_subclassdescription1((SALT311.StrType)le.subclassdescription1);
-    SELF.classdescription2_Invalid := Fields.InValid_classdescription2((SALT311.StrType)le.classdescription2);
-    SELF.subclassdescription2_Invalid := Fields.InValid_subclassdescription2((SALT311.StrType)le.subclassdescription2);
-    SELF.classdescription3_Invalid := Fields.InValid_classdescription3((SALT311.StrType)le.classdescription3);
-    SELF.subclassdescription3_Invalid := Fields.InValid_subclassdescription3((SALT311.StrType)le.subclassdescription3);
-    SELF.classdescription4_Invalid := Fields.InValid_classdescription4((SALT311.StrType)le.classdescription4);
-    SELF.subclassdescription4_Invalid := Fields.InValid_subclassdescription4((SALT311.StrType)le.subclassdescription4);
-    SELF.classdescription5_Invalid := Fields.InValid_classdescription5((SALT311.StrType)le.classdescription5);
-    SELF.subclassdescription5_Invalid := Fields.InValid_subclassdescription5((SALT311.StrType)le.subclassdescription5);
-    SELF.classifications_Invalid := Fields.InValid_classifications((SALT311.StrType)le.classifications);
-    SELF.commodity1_Invalid := Fields.InValid_commodity1((SALT311.StrType)le.commodity1);
-    SELF.commodity2_Invalid := Fields.InValid_commodity2((SALT311.StrType)le.commodity2);
-    SELF.commodity3_Invalid := Fields.InValid_commodity3((SALT311.StrType)le.commodity3);
-    SELF.commodity4_Invalid := Fields.InValid_commodity4((SALT311.StrType)le.commodity4);
-    SELF.commodity5_Invalid := Fields.InValid_commodity5((SALT311.StrType)le.commodity5);
-    SELF.commodity6_Invalid := Fields.InValid_commodity6((SALT311.StrType)le.commodity6);
-    SELF.commodity7_Invalid := Fields.InValid_commodity7((SALT311.StrType)le.commodity7);
-    SELF.commodity8_Invalid := Fields.InValid_commodity8((SALT311.StrType)le.commodity8);
-    SELF.completedate_Invalid := Fields.InValid_completedate((SALT311.StrType)le.completedate);
-    SELF.crossreference_Invalid := Fields.InValid_crossreference((SALT311.StrType)le.crossreference);
-    SELF.dateestablished_Invalid := Fields.InValid_dateestablished((SALT311.StrType)le.dateestablished);
-    SELF.businessage_Invalid := Fields.InValid_businessage((SALT311.StrType)le.businessage);
-    SELF.deposits_Invalid := Fields.InValid_deposits((SALT311.StrType)le.deposits);
-    SELF.dunsnumber_Invalid := Fields.InValid_dunsnumber((SALT311.StrType)le.dunsnumber);
-    SELF.enttype_Invalid := Fields.InValid_enttype((SALT311.StrType)le.enttype);
-    SELF.expirationdate_Invalid := Fields.InValid_expirationdate((SALT311.StrType)le.expirationdate);
-    SELF.extendeddate_Invalid := Fields.InValid_extendeddate((SALT311.StrType)le.extendeddate);
-    SELF.issuingauthority_Invalid := Fields.InValid_issuingauthority((SALT311.StrType)le.issuingauthority);
-    SELF.keywords_Invalid := Fields.InValid_keywords((SALT311.StrType)le.keywords);
-    SELF.licensenumber_Invalid := Fields.InValid_licensenumber((SALT311.StrType)le.licensenumber);
-    SELF.licensetype_Invalid := Fields.InValid_licensetype((SALT311.StrType)le.licensetype);
-    SELF.mincd_Invalid := Fields.InValid_mincd((SALT311.StrType)le.mincd);
-    SELF.minorityaffiliation_Invalid := Fields.InValid_minorityaffiliation((SALT311.StrType)le.minorityaffiliation);
-    SELF.minorityownershipdate_Invalid := Fields.InValid_minorityownershipdate((SALT311.StrType)le.minorityownershipdate);
-    SELF.siccode1_Invalid := Fields.InValid_siccode1((SALT311.StrType)le.siccode1);
-    SELF.siccode2_Invalid := Fields.InValid_siccode2((SALT311.StrType)le.siccode2);
-    SELF.siccode3_Invalid := Fields.InValid_siccode3((SALT311.StrType)le.siccode3);
-    SELF.siccode4_Invalid := Fields.InValid_siccode4((SALT311.StrType)le.siccode4);
-    SELF.siccode5_Invalid := Fields.InValid_siccode5((SALT311.StrType)le.siccode5);
-    SELF.siccode6_Invalid := Fields.InValid_siccode6((SALT311.StrType)le.siccode6);
-    SELF.siccode7_Invalid := Fields.InValid_siccode7((SALT311.StrType)le.siccode7);
-    SELF.siccode8_Invalid := Fields.InValid_siccode8((SALT311.StrType)le.siccode8);
-    SELF.naicscode1_Invalid := Fields.InValid_naicscode1((SALT311.StrType)le.naicscode1);
-    SELF.naicscode2_Invalid := Fields.InValid_naicscode2((SALT311.StrType)le.naicscode2);
-    SELF.naicscode3_Invalid := Fields.InValid_naicscode3((SALT311.StrType)le.naicscode3);
-    SELF.naicscode4_Invalid := Fields.InValid_naicscode4((SALT311.StrType)le.naicscode4);
-    SELF.naicscode5_Invalid := Fields.InValid_naicscode5((SALT311.StrType)le.naicscode5);
-    SELF.naicscode6_Invalid := Fields.InValid_naicscode6((SALT311.StrType)le.naicscode6);
-    SELF.naicscode7_Invalid := Fields.InValid_naicscode7((SALT311.StrType)le.naicscode7);
-    SELF.naicscode8_Invalid := Fields.InValid_naicscode8((SALT311.StrType)le.naicscode8);
-    SELF.prequalify_Invalid := Fields.InValid_prequalify((SALT311.StrType)le.prequalify);
-    SELF.procurementcategory1_Invalid := Fields.InValid_procurementcategory1((SALT311.StrType)le.procurementcategory1);
-    SELF.subprocurementcategory1_Invalid := Fields.InValid_subprocurementcategory1((SALT311.StrType)le.subprocurementcategory1);
-    SELF.procurementcategory2_Invalid := Fields.InValid_procurementcategory2((SALT311.StrType)le.procurementcategory2);
-    SELF.subprocurementcategory2_Invalid := Fields.InValid_subprocurementcategory2((SALT311.StrType)le.subprocurementcategory2);
-    SELF.procurementcategory3_Invalid := Fields.InValid_procurementcategory3((SALT311.StrType)le.procurementcategory3);
-    SELF.subprocurementcategory3_Invalid := Fields.InValid_subprocurementcategory3((SALT311.StrType)le.subprocurementcategory3);
-    SELF.procurementcategory4_Invalid := Fields.InValid_procurementcategory4((SALT311.StrType)le.procurementcategory4);
-    SELF.subprocurementcategory4_Invalid := Fields.InValid_subprocurementcategory4((SALT311.StrType)le.subprocurementcategory4);
-    SELF.procurementcategory5_Invalid := Fields.InValid_procurementcategory5((SALT311.StrType)le.procurementcategory5);
-    SELF.subprocurementcategory5_Invalid := Fields.InValid_subprocurementcategory5((SALT311.StrType)le.subprocurementcategory5);
-    SELF.renewal_Invalid := Fields.InValid_renewal((SALT311.StrType)le.renewal);
-    SELF.renewaldate_Invalid := Fields.InValid_renewaldate((SALT311.StrType)le.renewaldate);
-    SELF.unitedcertprogrampartner_Invalid := Fields.InValid_unitedcertprogrampartner((SALT311.StrType)le.unitedcertprogrampartner);
-    SELF.vendorkey_Invalid := Fields.InValid_vendorkey((SALT311.StrType)le.vendorkey);
-    SELF.vendornumber_Invalid := Fields.InValid_vendornumber((SALT311.StrType)le.vendornumber);
-    SELF.workcode1_Invalid := Fields.InValid_workcode1((SALT311.StrType)le.workcode1);
-    SELF.workcode2_Invalid := Fields.InValid_workcode2((SALT311.StrType)le.workcode2);
-    SELF.workcode3_Invalid := Fields.InValid_workcode3((SALT311.StrType)le.workcode3);
-    SELF.workcode4_Invalid := Fields.InValid_workcode4((SALT311.StrType)le.workcode4);
-    SELF.workcode5_Invalid := Fields.InValid_workcode5((SALT311.StrType)le.workcode5);
-    SELF.workcode6_Invalid := Fields.InValid_workcode6((SALT311.StrType)le.workcode6);
-    SELF.workcode7_Invalid := Fields.InValid_workcode7((SALT311.StrType)le.workcode7);
-    SELF.workcode8_Invalid := Fields.InValid_workcode8((SALT311.StrType)le.workcode8);
-    SELF.exporter_Invalid := Fields.InValid_exporter((SALT311.StrType)le.exporter);
-    SELF.exportbusinessactivities_Invalid := Fields.InValid_exportbusinessactivities((SALT311.StrType)le.exportbusinessactivities);
-    SELF.exportto_Invalid := Fields.InValid_exportto((SALT311.StrType)le.exportto);
-    SELF.exportbusinessrelationships_Invalid := Fields.InValid_exportbusinessrelationships((SALT311.StrType)le.exportbusinessrelationships);
-    SELF.exportobjectives_Invalid := Fields.InValid_exportobjectives((SALT311.StrType)le.exportobjectives);
-    SELF.reference1_Invalid := Fields.InValid_reference1((SALT311.StrType)le.reference1);
-    SELF.reference2_Invalid := Fields.InValid_reference2((SALT311.StrType)le.reference2);
+    SELF.dartid_Invalid := Input_Fields.InValid_dartid((SALT311.StrType)le.dartid);
+    SELF.dateadded_Invalid := Input_Fields.InValid_dateadded((SALT311.StrType)le.dateadded);
+    SELF.dateupdated_Invalid := Input_Fields.InValid_dateupdated((SALT311.StrType)le.dateupdated);
+    SELF.website_Invalid := Input_Fields.InValid_website((SALT311.StrType)le.website);
+    SELF.state_Invalid := Input_Fields.InValid_state((SALT311.StrType)le.state);
+    SELF.profilelastupdated_Invalid := Input_Fields.InValid_profilelastupdated((SALT311.StrType)le.profilelastupdated);
+    SELF.county_Invalid := Input_Fields.InValid_county((SALT311.StrType)le.county);
+    SELF.servicearea_Invalid := Input_Fields.InValid_servicearea((SALT311.StrType)le.servicearea);
+    SELF.region1_Invalid := Input_Fields.InValid_region1((SALT311.StrType)le.region1);
+    SELF.region2_Invalid := Input_Fields.InValid_region2((SALT311.StrType)le.region2);
+    SELF.region3_Invalid := Input_Fields.InValid_region3((SALT311.StrType)le.region3);
+    SELF.region4_Invalid := Input_Fields.InValid_region4((SALT311.StrType)le.region4);
+    SELF.region5_Invalid := Input_Fields.InValid_region5((SALT311.StrType)le.region5);
+    SELF.fname_Invalid := Input_Fields.InValid_fname((SALT311.StrType)le.fname);
+    SELF.lname_Invalid := Input_Fields.InValid_lname((SALT311.StrType)le.lname);
+    SELF.mname_Invalid := Input_Fields.InValid_mname((SALT311.StrType)le.mname);
+    SELF.suffix_Invalid := Input_Fields.InValid_suffix((SALT311.StrType)le.suffix);
+    SELF.title_Invalid := Input_Fields.InValid_title((SALT311.StrType)le.title);
+    SELF.ethnicity_Invalid := Input_Fields.InValid_ethnicity((SALT311.StrType)le.ethnicity);
+    SELF.gender_Invalid := Input_Fields.InValid_gender((SALT311.StrType)le.gender);
+    SELF.address1_Invalid := Input_Fields.InValid_address1((SALT311.StrType)le.address1);
+    SELF.address2_Invalid := Input_Fields.InValid_address2((SALT311.StrType)le.address2);
+    SELF.addresscity_Invalid := Input_Fields.InValid_addresscity((SALT311.StrType)le.addresscity);
+    SELF.addressstate_Invalid := Input_Fields.InValid_addressstate((SALT311.StrType)le.addressstate);
+    SELF.addresszip4_Invalid := Input_Fields.InValid_addresszip4((SALT311.StrType)le.addresszip4);
+    SELF.building_Invalid := Input_Fields.InValid_building((SALT311.StrType)le.building);
+    SELF.contact_Invalid := Input_Fields.InValid_contact((SALT311.StrType)le.contact);
+    SELF.phone1_Invalid := Input_Fields.InValid_phone1((SALT311.StrType)le.phone1);
+    SELF.phone2_Invalid := Input_Fields.InValid_phone2((SALT311.StrType)le.phone2);
+    SELF.phone3_Invalid := Input_Fields.InValid_phone3((SALT311.StrType)le.phone3);
+    SELF.cell_Invalid := Input_Fields.InValid_cell((SALT311.StrType)le.cell);
+    SELF.fax_Invalid := Input_Fields.InValid_fax((SALT311.StrType)le.fax);
+    SELF.email1_Invalid := Input_Fields.InValid_email1((SALT311.StrType)le.email1);
+    SELF.email2_Invalid := Input_Fields.InValid_email2((SALT311.StrType)le.email2);
+    SELF.email3_Invalid := Input_Fields.InValid_email3((SALT311.StrType)le.email3);
+    SELF.webpage1_Invalid := Input_Fields.InValid_webpage1((SALT311.StrType)le.webpage1);
+    SELF.webpage2_Invalid := Input_Fields.InValid_webpage2((SALT311.StrType)le.webpage2);
+    SELF.webpage3_Invalid := Input_Fields.InValid_webpage3((SALT311.StrType)le.webpage3);
+    SELF.businessname_Invalid := Input_Fields.InValid_businessname((SALT311.StrType)le.businessname);
+    SELF.dba_Invalid := Input_Fields.InValid_dba((SALT311.StrType)le.dba);
+    SELF.businessid_Invalid := Input_Fields.InValid_businessid((SALT311.StrType)le.businessid);
+    SELF.businesstype1_Invalid := Input_Fields.InValid_businesstype1((SALT311.StrType)le.businesstype1);
+    SELF.businesslocation1_Invalid := Input_Fields.InValid_businesslocation1((SALT311.StrType)le.businesslocation1);
+    SELF.businesstype2_Invalid := Input_Fields.InValid_businesstype2((SALT311.StrType)le.businesstype2);
+    SELF.businesslocation2_Invalid := Input_Fields.InValid_businesslocation2((SALT311.StrType)le.businesslocation2);
+    SELF.businesstype3_Invalid := Input_Fields.InValid_businesstype3((SALT311.StrType)le.businesstype3);
+    SELF.businesslocation3_Invalid := Input_Fields.InValid_businesslocation3((SALT311.StrType)le.businesslocation3);
+    SELF.businesstype4_Invalid := Input_Fields.InValid_businesstype4((SALT311.StrType)le.businesstype4);
+    SELF.businesslocation4_Invalid := Input_Fields.InValid_businesslocation4((SALT311.StrType)le.businesslocation4);
+    SELF.businesstype5_Invalid := Input_Fields.InValid_businesstype5((SALT311.StrType)le.businesstype5);
+    SELF.businesslocation5_Invalid := Input_Fields.InValid_businesslocation5((SALT311.StrType)le.businesslocation5);
+    SELF.industry_Invalid := Input_Fields.InValid_industry((SALT311.StrType)le.industry);
+    SELF.trade_Invalid := Input_Fields.InValid_trade((SALT311.StrType)le.trade);
+    SELF.resourcedescription_Invalid := Input_Fields.InValid_resourcedescription((SALT311.StrType)le.resourcedescription);
+    SELF.natureofbusiness_Invalid := Input_Fields.InValid_natureofbusiness((SALT311.StrType)le.natureofbusiness);
+    SELF.businessdescription_Invalid := Input_Fields.InValid_businessdescription((SALT311.StrType)le.businessdescription);
+    SELF.businessstructure_Invalid := Input_Fields.InValid_businessstructure((SALT311.StrType)le.businessstructure);
+    SELF.totalemployees_Invalid := Input_Fields.InValid_totalemployees((SALT311.StrType)le.totalemployees);
+    SELF.avgcontractsize_Invalid := Input_Fields.InValid_avgcontractsize((SALT311.StrType)le.avgcontractsize);
+    SELF.firmid_Invalid := Input_Fields.InValid_firmid((SALT311.StrType)le.firmid);
+    SELF.firmlocationaddress_Invalid := Input_Fields.InValid_firmlocationaddress((SALT311.StrType)le.firmlocationaddress);
+    SELF.firmlocationaddresscity_Invalid := Input_Fields.InValid_firmlocationaddresscity((SALT311.StrType)le.firmlocationaddresscity);
+    SELF.firmlocationaddresszip4_Invalid := Input_Fields.InValid_firmlocationaddresszip4((SALT311.StrType)le.firmlocationaddresszip4);
+    SELF.firmlocationcounty_Invalid := Input_Fields.InValid_firmlocationcounty((SALT311.StrType)le.firmlocationcounty);
+    SELF.firmlocationstate_Invalid := Input_Fields.InValid_firmlocationstate((SALT311.StrType)le.firmlocationstate);
+    SELF.certfed_Invalid := Input_Fields.InValid_certfed((SALT311.StrType)le.certfed);
+    SELF.certstate_Invalid := Input_Fields.InValid_certstate((SALT311.StrType)le.certstate);
+    SELF.contractsfederal_Invalid := Input_Fields.InValid_contractsfederal((SALT311.StrType)le.contractsfederal);
+    SELF.contractsva_Invalid := Input_Fields.InValid_contractsva((SALT311.StrType)le.contractsva);
+    SELF.contractscommercial_Invalid := Input_Fields.InValid_contractscommercial((SALT311.StrType)le.contractscommercial);
+    SELF.contractorgovernmentprime_Invalid := Input_Fields.InValid_contractorgovernmentprime((SALT311.StrType)le.contractorgovernmentprime);
+    SELF.contractorgovernmentsub_Invalid := Input_Fields.InValid_contractorgovernmentsub((SALT311.StrType)le.contractorgovernmentsub);
+    SELF.contractornongovernment_Invalid := Input_Fields.InValid_contractornongovernment((SALT311.StrType)le.contractornongovernment);
+    SELF.registeredgovernmentbus_Invalid := Input_Fields.InValid_registeredgovernmentbus((SALT311.StrType)le.registeredgovernmentbus);
+    SELF.registerednongovernmentbus_Invalid := Input_Fields.InValid_registerednongovernmentbus((SALT311.StrType)le.registerednongovernmentbus);
+    SELF.clearancelevelpersonnel_Invalid := Input_Fields.InValid_clearancelevelpersonnel((SALT311.StrType)le.clearancelevelpersonnel);
+    SELF.clearancelevelfacility_Invalid := Input_Fields.InValid_clearancelevelfacility((SALT311.StrType)le.clearancelevelfacility);
+    SELF.certificatedatefrom1_Invalid := Input_Fields.InValid_certificatedatefrom1((SALT311.StrType)le.certificatedatefrom1);
+    SELF.certificatedateto1_Invalid := Input_Fields.InValid_certificatedateto1((SALT311.StrType)le.certificatedateto1);
+    SELF.certificatestatus1_Invalid := Input_Fields.InValid_certificatestatus1((SALT311.StrType)le.certificatestatus1);
+    SELF.certificationnumber1_Invalid := Input_Fields.InValid_certificationnumber1((SALT311.StrType)le.certificationnumber1);
+    SELF.certificationtype1_Invalid := Input_Fields.InValid_certificationtype1((SALT311.StrType)le.certificationtype1);
+    SELF.certificatedatefrom2_Invalid := Input_Fields.InValid_certificatedatefrom2((SALT311.StrType)le.certificatedatefrom2);
+    SELF.certificatedateto2_Invalid := Input_Fields.InValid_certificatedateto2((SALT311.StrType)le.certificatedateto2);
+    SELF.certificatestatus2_Invalid := Input_Fields.InValid_certificatestatus2((SALT311.StrType)le.certificatestatus2);
+    SELF.certificationnumber2_Invalid := Input_Fields.InValid_certificationnumber2((SALT311.StrType)le.certificationnumber2);
+    SELF.certificationtype2_Invalid := Input_Fields.InValid_certificationtype2((SALT311.StrType)le.certificationtype2);
+    SELF.certificatedatefrom3_Invalid := Input_Fields.InValid_certificatedatefrom3((SALT311.StrType)le.certificatedatefrom3);
+    SELF.certificatedateto3_Invalid := Input_Fields.InValid_certificatedateto3((SALT311.StrType)le.certificatedateto3);
+    SELF.certificatestatus3_Invalid := Input_Fields.InValid_certificatestatus3((SALT311.StrType)le.certificatestatus3);
+    SELF.certificationnumber3_Invalid := Input_Fields.InValid_certificationnumber3((SALT311.StrType)le.certificationnumber3);
+    SELF.certificationtype3_Invalid := Input_Fields.InValid_certificationtype3((SALT311.StrType)le.certificationtype3);
+    SELF.certificatedatefrom4_Invalid := Input_Fields.InValid_certificatedatefrom4((SALT311.StrType)le.certificatedatefrom4);
+    SELF.certificatedateto4_Invalid := Input_Fields.InValid_certificatedateto4((SALT311.StrType)le.certificatedateto4);
+    SELF.certificatestatus4_Invalid := Input_Fields.InValid_certificatestatus4((SALT311.StrType)le.certificatestatus4);
+    SELF.certificationnumber4_Invalid := Input_Fields.InValid_certificationnumber4((SALT311.StrType)le.certificationnumber4);
+    SELF.certificationtype4_Invalid := Input_Fields.InValid_certificationtype4((SALT311.StrType)le.certificationtype4);
+    SELF.certificatedatefrom5_Invalid := Input_Fields.InValid_certificatedatefrom5((SALT311.StrType)le.certificatedatefrom5);
+    SELF.certificatedateto5_Invalid := Input_Fields.InValid_certificatedateto5((SALT311.StrType)le.certificatedateto5);
+    SELF.certificatestatus5_Invalid := Input_Fields.InValid_certificatestatus5((SALT311.StrType)le.certificatestatus5);
+    SELF.certificationnumber5_Invalid := Input_Fields.InValid_certificationnumber5((SALT311.StrType)le.certificationnumber5);
+    SELF.certificationtype5_Invalid := Input_Fields.InValid_certificationtype5((SALT311.StrType)le.certificationtype5);
+    SELF.certificatedatefrom6_Invalid := Input_Fields.InValid_certificatedatefrom6((SALT311.StrType)le.certificatedatefrom6);
+    SELF.certificatedateto6_Invalid := Input_Fields.InValid_certificatedateto6((SALT311.StrType)le.certificatedateto6);
+    SELF.certificatestatus6_Invalid := Input_Fields.InValid_certificatestatus6((SALT311.StrType)le.certificatestatus6);
+    SELF.certificationnumber6_Invalid := Input_Fields.InValid_certificationnumber6((SALT311.StrType)le.certificationnumber6);
+    SELF.certificationtype6_Invalid := Input_Fields.InValid_certificationtype6((SALT311.StrType)le.certificationtype6);
+    SELF.starrating_Invalid := Input_Fields.InValid_starrating((SALT311.StrType)le.starrating);
+    SELF.assets_Invalid := Input_Fields.InValid_assets((SALT311.StrType)le.assets);
+    SELF.biddescription_Invalid := Input_Fields.InValid_biddescription((SALT311.StrType)le.biddescription);
+    SELF.competitiveadvantage_Invalid := Input_Fields.InValid_competitiveadvantage((SALT311.StrType)le.competitiveadvantage);
+    SELF.cagecode_Invalid := Input_Fields.InValid_cagecode((SALT311.StrType)le.cagecode);
+    SELF.capabilitiesnarrative_Invalid := Input_Fields.InValid_capabilitiesnarrative((SALT311.StrType)le.capabilitiesnarrative);
+    SELF.category_Invalid := Input_Fields.InValid_category((SALT311.StrType)le.category);
+    SELF.chtrclass_Invalid := Input_Fields.InValid_chtrclass((SALT311.StrType)le.chtrclass);
+    SELF.productdescription1_Invalid := Input_Fields.InValid_productdescription1((SALT311.StrType)le.productdescription1);
+    SELF.productdescription2_Invalid := Input_Fields.InValid_productdescription2((SALT311.StrType)le.productdescription2);
+    SELF.productdescription3_Invalid := Input_Fields.InValid_productdescription3((SALT311.StrType)le.productdescription3);
+    SELF.productdescription4_Invalid := Input_Fields.InValid_productdescription4((SALT311.StrType)le.productdescription4);
+    SELF.productdescription5_Invalid := Input_Fields.InValid_productdescription5((SALT311.StrType)le.productdescription5);
+    SELF.classdescription1_Invalid := Input_Fields.InValid_classdescription1((SALT311.StrType)le.classdescription1);
+    SELF.subclassdescription1_Invalid := Input_Fields.InValid_subclassdescription1((SALT311.StrType)le.subclassdescription1);
+    SELF.classdescription2_Invalid := Input_Fields.InValid_classdescription2((SALT311.StrType)le.classdescription2);
+    SELF.subclassdescription2_Invalid := Input_Fields.InValid_subclassdescription2((SALT311.StrType)le.subclassdescription2);
+    SELF.classdescription3_Invalid := Input_Fields.InValid_classdescription3((SALT311.StrType)le.classdescription3);
+    SELF.subclassdescription3_Invalid := Input_Fields.InValid_subclassdescription3((SALT311.StrType)le.subclassdescription3);
+    SELF.classdescription4_Invalid := Input_Fields.InValid_classdescription4((SALT311.StrType)le.classdescription4);
+    SELF.subclassdescription4_Invalid := Input_Fields.InValid_subclassdescription4((SALT311.StrType)le.subclassdescription4);
+    SELF.classdescription5_Invalid := Input_Fields.InValid_classdescription5((SALT311.StrType)le.classdescription5);
+    SELF.subclassdescription5_Invalid := Input_Fields.InValid_subclassdescription5((SALT311.StrType)le.subclassdescription5);
+    SELF.classifications_Invalid := Input_Fields.InValid_classifications((SALT311.StrType)le.classifications);
+    SELF.commodity1_Invalid := Input_Fields.InValid_commodity1((SALT311.StrType)le.commodity1);
+    SELF.commodity2_Invalid := Input_Fields.InValid_commodity2((SALT311.StrType)le.commodity2);
+    SELF.commodity3_Invalid := Input_Fields.InValid_commodity3((SALT311.StrType)le.commodity3);
+    SELF.commodity4_Invalid := Input_Fields.InValid_commodity4((SALT311.StrType)le.commodity4);
+    SELF.commodity5_Invalid := Input_Fields.InValid_commodity5((SALT311.StrType)le.commodity5);
+    SELF.commodity6_Invalid := Input_Fields.InValid_commodity6((SALT311.StrType)le.commodity6);
+    SELF.commodity7_Invalid := Input_Fields.InValid_commodity7((SALT311.StrType)le.commodity7);
+    SELF.commodity8_Invalid := Input_Fields.InValid_commodity8((SALT311.StrType)le.commodity8);
+    SELF.completedate_Invalid := Input_Fields.InValid_completedate((SALT311.StrType)le.completedate);
+    SELF.crossreference_Invalid := Input_Fields.InValid_crossreference((SALT311.StrType)le.crossreference);
+    SELF.dateestablished_Invalid := Input_Fields.InValid_dateestablished((SALT311.StrType)le.dateestablished);
+    SELF.businessage_Invalid := Input_Fields.InValid_businessage((SALT311.StrType)le.businessage);
+    SELF.deposits_Invalid := Input_Fields.InValid_deposits((SALT311.StrType)le.deposits);
+    SELF.dunsnumber_Invalid := Input_Fields.InValid_dunsnumber((SALT311.StrType)le.dunsnumber);
+    SELF.enttype_Invalid := Input_Fields.InValid_enttype((SALT311.StrType)le.enttype);
+    SELF.expirationdate_Invalid := Input_Fields.InValid_expirationdate((SALT311.StrType)le.expirationdate);
+    SELF.extendeddate_Invalid := Input_Fields.InValid_extendeddate((SALT311.StrType)le.extendeddate);
+    SELF.issuingauthority_Invalid := Input_Fields.InValid_issuingauthority((SALT311.StrType)le.issuingauthority);
+    SELF.keywords_Invalid := Input_Fields.InValid_keywords((SALT311.StrType)le.keywords);
+    SELF.licensenumber_Invalid := Input_Fields.InValid_licensenumber((SALT311.StrType)le.licensenumber);
+    SELF.licensetype_Invalid := Input_Fields.InValid_licensetype((SALT311.StrType)le.licensetype);
+    SELF.mincd_Invalid := Input_Fields.InValid_mincd((SALT311.StrType)le.mincd);
+    SELF.minorityaffiliation_Invalid := Input_Fields.InValid_minorityaffiliation((SALT311.StrType)le.minorityaffiliation);
+    SELF.minorityownershipdate_Invalid := Input_Fields.InValid_minorityownershipdate((SALT311.StrType)le.minorityownershipdate);
+    SELF.siccode1_Invalid := Input_Fields.InValid_siccode1((SALT311.StrType)le.siccode1);
+    SELF.siccode2_Invalid := Input_Fields.InValid_siccode2((SALT311.StrType)le.siccode2);
+    SELF.siccode3_Invalid := Input_Fields.InValid_siccode3((SALT311.StrType)le.siccode3);
+    SELF.siccode4_Invalid := Input_Fields.InValid_siccode4((SALT311.StrType)le.siccode4);
+    SELF.siccode5_Invalid := Input_Fields.InValid_siccode5((SALT311.StrType)le.siccode5);
+    SELF.siccode6_Invalid := Input_Fields.InValid_siccode6((SALT311.StrType)le.siccode6);
+    SELF.siccode7_Invalid := Input_Fields.InValid_siccode7((SALT311.StrType)le.siccode7);
+    SELF.siccode8_Invalid := Input_Fields.InValid_siccode8((SALT311.StrType)le.siccode8);
+    SELF.naicscode1_Invalid := Input_Fields.InValid_naicscode1((SALT311.StrType)le.naicscode1);
+    SELF.naicscode2_Invalid := Input_Fields.InValid_naicscode2((SALT311.StrType)le.naicscode2);
+    SELF.naicscode3_Invalid := Input_Fields.InValid_naicscode3((SALT311.StrType)le.naicscode3);
+    SELF.naicscode4_Invalid := Input_Fields.InValid_naicscode4((SALT311.StrType)le.naicscode4);
+    SELF.naicscode5_Invalid := Input_Fields.InValid_naicscode5((SALT311.StrType)le.naicscode5);
+    SELF.naicscode6_Invalid := Input_Fields.InValid_naicscode6((SALT311.StrType)le.naicscode6);
+    SELF.naicscode7_Invalid := Input_Fields.InValid_naicscode7((SALT311.StrType)le.naicscode7);
+    SELF.naicscode8_Invalid := Input_Fields.InValid_naicscode8((SALT311.StrType)le.naicscode8);
+    SELF.prequalify_Invalid := Input_Fields.InValid_prequalify((SALT311.StrType)le.prequalify);
+    SELF.procurementcategory1_Invalid := Input_Fields.InValid_procurementcategory1((SALT311.StrType)le.procurementcategory1);
+    SELF.subprocurementcategory1_Invalid := Input_Fields.InValid_subprocurementcategory1((SALT311.StrType)le.subprocurementcategory1);
+    SELF.procurementcategory2_Invalid := Input_Fields.InValid_procurementcategory2((SALT311.StrType)le.procurementcategory2);
+    SELF.subprocurementcategory2_Invalid := Input_Fields.InValid_subprocurementcategory2((SALT311.StrType)le.subprocurementcategory2);
+    SELF.procurementcategory3_Invalid := Input_Fields.InValid_procurementcategory3((SALT311.StrType)le.procurementcategory3);
+    SELF.subprocurementcategory3_Invalid := Input_Fields.InValid_subprocurementcategory3((SALT311.StrType)le.subprocurementcategory3);
+    SELF.procurementcategory4_Invalid := Input_Fields.InValid_procurementcategory4((SALT311.StrType)le.procurementcategory4);
+    SELF.subprocurementcategory4_Invalid := Input_Fields.InValid_subprocurementcategory4((SALT311.StrType)le.subprocurementcategory4);
+    SELF.procurementcategory5_Invalid := Input_Fields.InValid_procurementcategory5((SALT311.StrType)le.procurementcategory5);
+    SELF.subprocurementcategory5_Invalid := Input_Fields.InValid_subprocurementcategory5((SALT311.StrType)le.subprocurementcategory5);
+    SELF.renewal_Invalid := Input_Fields.InValid_renewal((SALT311.StrType)le.renewal);
+    SELF.renewaldate_Invalid := Input_Fields.InValid_renewaldate((SALT311.StrType)le.renewaldate);
+    SELF.unitedcertprogrampartner_Invalid := Input_Fields.InValid_unitedcertprogrampartner((SALT311.StrType)le.unitedcertprogrampartner);
+    SELF.vendorkey_Invalid := Input_Fields.InValid_vendorkey((SALT311.StrType)le.vendorkey);
+    SELF.vendornumber_Invalid := Input_Fields.InValid_vendornumber((SALT311.StrType)le.vendornumber);
+    SELF.workcode1_Invalid := Input_Fields.InValid_workcode1((SALT311.StrType)le.workcode1);
+    SELF.workcode2_Invalid := Input_Fields.InValid_workcode2((SALT311.StrType)le.workcode2);
+    SELF.workcode3_Invalid := Input_Fields.InValid_workcode3((SALT311.StrType)le.workcode3);
+    SELF.workcode4_Invalid := Input_Fields.InValid_workcode4((SALT311.StrType)le.workcode4);
+    SELF.workcode5_Invalid := Input_Fields.InValid_workcode5((SALT311.StrType)le.workcode5);
+    SELF.workcode6_Invalid := Input_Fields.InValid_workcode6((SALT311.StrType)le.workcode6);
+    SELF.workcode7_Invalid := Input_Fields.InValid_workcode7((SALT311.StrType)le.workcode7);
+    SELF.workcode8_Invalid := Input_Fields.InValid_workcode8((SALT311.StrType)le.workcode8);
+    SELF.exporter_Invalid := Input_Fields.InValid_exporter((SALT311.StrType)le.exporter);
+    SELF.exportbusinessactivities_Invalid := Input_Fields.InValid_exportbusinessactivities((SALT311.StrType)le.exportbusinessactivities);
+    SELF.exportto_Invalid := Input_Fields.InValid_exportto((SALT311.StrType)le.exportto);
+    SELF.exportbusinessrelationships_Invalid := Input_Fields.InValid_exportbusinessrelationships((SALT311.StrType)le.exportbusinessrelationships);
+    SELF.exportobjectives_Invalid := Input_Fields.InValid_exportobjectives((SALT311.StrType)le.exportobjectives);
+    SELF.reference1_Invalid := Input_Fields.InValid_reference1((SALT311.StrType)le.reference1);
+    SELF.reference2_Invalid := Input_Fields.InValid_reference2((SALT311.StrType)le.reference2);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
-  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_Diversity_Certification);
+  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_Layout_Diversity_Certification);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.dartid_Invalid << 0 ) + ( le.dateadded_Invalid << 1 ) + ( le.dateupdated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.profilelastupdated_Invalid << 6 ) + ( le.county_Invalid << 7 ) + ( le.servicearea_Invalid << 8 ) + ( le.region1_Invalid << 9 ) + ( le.region2_Invalid << 10 ) + ( le.region3_Invalid << 11 ) + ( le.region4_Invalid << 12 ) + ( le.region5_Invalid << 13 ) + ( le.fname_Invalid << 14 ) + ( le.lname_Invalid << 15 ) + ( le.mname_Invalid << 16 ) + ( le.suffix_Invalid << 17 ) + ( le.title_Invalid << 18 ) + ( le.ethnicity_Invalid << 19 ) + ( le.gender_Invalid << 20 ) + ( le.address1_Invalid << 21 ) + ( le.address2_Invalid << 22 ) + ( le.addresscity_Invalid << 23 ) + ( le.addressstate_Invalid << 24 ) + ( le.addresszip4_Invalid << 26 ) + ( le.building_Invalid << 27 ) + ( le.contact_Invalid << 28 ) + ( le.phone1_Invalid << 29 ) + ( le.phone2_Invalid << 31 ) + ( le.phone3_Invalid << 33 ) + ( le.cell_Invalid << 35 ) + ( le.fax_Invalid << 37 ) + ( le.email1_Invalid << 39 ) + ( le.email2_Invalid << 40 ) + ( le.email3_Invalid << 41 ) + ( le.webpage1_Invalid << 42 ) + ( le.webpage2_Invalid << 43 ) + ( le.webpage3_Invalid << 44 ) + ( le.businessname_Invalid << 45 ) + ( le.dba_Invalid << 46 ) + ( le.businessid_Invalid << 47 ) + ( le.businesstype1_Invalid << 48 ) + ( le.businesslocation1_Invalid << 49 ) + ( le.businesstype2_Invalid << 50 ) + ( le.businesslocation2_Invalid << 51 ) + ( le.businesstype3_Invalid << 52 ) + ( le.businesslocation3_Invalid << 53 ) + ( le.businesstype4_Invalid << 54 ) + ( le.businesslocation4_Invalid << 55 ) + ( le.businesstype5_Invalid << 56 ) + ( le.businesslocation5_Invalid << 57 ) + ( le.industry_Invalid << 58 ) + ( le.trade_Invalid << 59 ) + ( le.resourcedescription_Invalid << 60 ) + ( le.natureofbusiness_Invalid << 61 ) + ( le.businessdescription_Invalid << 62 ) + ( le.businessstructure_Invalid << 63 );
     SELF.ScrubsBits2 := ( le.totalemployees_Invalid << 0 ) + ( le.avgcontractsize_Invalid << 1 ) + ( le.firmid_Invalid << 2 ) + ( le.firmlocationaddress_Invalid << 3 ) + ( le.firmlocationaddresscity_Invalid << 4 ) + ( le.firmlocationaddresszip4_Invalid << 5 ) + ( le.firmlocationcounty_Invalid << 6 ) + ( le.firmlocationstate_Invalid << 7 ) + ( le.certfed_Invalid << 9 ) + ( le.certstate_Invalid << 10 ) + ( le.contractsfederal_Invalid << 12 ) + ( le.contractsva_Invalid << 13 ) + ( le.contractscommercial_Invalid << 14 ) + ( le.contractorgovernmentprime_Invalid << 15 ) + ( le.contractorgovernmentsub_Invalid << 16 ) + ( le.contractornongovernment_Invalid << 17 ) + ( le.registeredgovernmentbus_Invalid << 18 ) + ( le.registerednongovernmentbus_Invalid << 19 ) + ( le.clearancelevelpersonnel_Invalid << 20 ) + ( le.clearancelevelfacility_Invalid << 21 ) + ( le.certificatedatefrom1_Invalid << 22 ) + ( le.certificatedateto1_Invalid << 23 ) + ( le.certificatestatus1_Invalid << 24 ) + ( le.certificationnumber1_Invalid << 25 ) + ( le.certificationtype1_Invalid << 26 ) + ( le.certificatedatefrom2_Invalid << 27 ) + ( le.certificatedateto2_Invalid << 28 ) + ( le.certificatestatus2_Invalid << 29 ) + ( le.certificationnumber2_Invalid << 30 ) + ( le.certificationtype2_Invalid << 31 ) + ( le.certificatedatefrom3_Invalid << 32 ) + ( le.certificatedateto3_Invalid << 33 ) + ( le.certificatestatus3_Invalid << 34 ) + ( le.certificationnumber3_Invalid << 35 ) + ( le.certificationtype3_Invalid << 36 ) + ( le.certificatedatefrom4_Invalid << 37 ) + ( le.certificatedateto4_Invalid << 38 ) + ( le.certificatestatus4_Invalid << 39 ) + ( le.certificationnumber4_Invalid << 40 ) + ( le.certificationtype4_Invalid << 41 ) + ( le.certificatedatefrom5_Invalid << 42 ) + ( le.certificatedateto5_Invalid << 43 ) + ( le.certificatestatus5_Invalid << 44 ) + ( le.certificationnumber5_Invalid << 45 ) + ( le.certificationtype5_Invalid << 46 ) + ( le.certificatedatefrom6_Invalid << 47 ) + ( le.certificatedateto6_Invalid << 48 ) + ( le.certificatestatus6_Invalid << 49 ) + ( le.certificationnumber6_Invalid << 50 ) + ( le.certificationtype6_Invalid << 51 ) + ( le.starrating_Invalid << 52 ) + ( le.assets_Invalid << 53 ) + ( le.biddescription_Invalid << 54 ) + ( le.competitiveadvantage_Invalid << 55 ) + ( le.cagecode_Invalid << 56 ) + ( le.capabilitiesnarrative_Invalid << 57 ) + ( le.category_Invalid << 58 ) + ( le.chtrclass_Invalid << 59 ) + ( le.productdescription1_Invalid << 60 ) + ( le.productdescription2_Invalid << 61 ) + ( le.productdescription3_Invalid << 62 ) + ( le.productdescription4_Invalid << 63 );
@@ -874,7 +874,7 @@ EXPORT FromNone(DATASET(Layout_Diversity_Certification) h) := MODULE
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
-  EXPORT Infile := PROJECT(h,Layout_Diversity_Certification);
+  EXPORT Infile := PROJECT(h,Input_Layout_Diversity_Certification);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.dartid_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.dateadded_Invalid := (le.ScrubsBits1 >> 1) & 1;
@@ -1332,7 +1332,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
     UNSIGNED1 ErrNum := CHOOSE(c,le.dartid_Invalid,le.dateadded_Invalid,le.dateupdated_Invalid,le.website_Invalid,le.state_Invalid,le.profilelastupdated_Invalid,le.county_Invalid,le.servicearea_Invalid,le.region1_Invalid,le.region2_Invalid,le.region3_Invalid,le.region4_Invalid,le.region5_Invalid,le.fname_Invalid,le.lname_Invalid,le.mname_Invalid,le.suffix_Invalid,le.title_Invalid,le.ethnicity_Invalid,le.gender_Invalid,le.address1_Invalid,le.address2_Invalid,le.addresscity_Invalid,le.addressstate_Invalid,le.addresszip4_Invalid,le.building_Invalid,le.contact_Invalid,le.phone1_Invalid,le.phone2_Invalid,le.phone3_Invalid,le.cell_Invalid,le.fax_Invalid,le.email1_Invalid,le.email2_Invalid,le.email3_Invalid,le.webpage1_Invalid,le.webpage2_Invalid,le.webpage3_Invalid,le.businessname_Invalid,le.dba_Invalid,le.businessid_Invalid,le.businesstype1_Invalid,le.businesslocation1_Invalid,le.businesstype2_Invalid,le.businesslocation2_Invalid,le.businesstype3_Invalid,le.businesslocation3_Invalid,le.businesstype4_Invalid,le.businesslocation4_Invalid,le.businesstype5_Invalid,le.businesslocation5_Invalid,le.industry_Invalid,le.trade_Invalid,le.resourcedescription_Invalid,le.natureofbusiness_Invalid,le.businessdescription_Invalid,le.businessstructure_Invalid,le.totalemployees_Invalid,le.avgcontractsize_Invalid,le.firmid_Invalid,le.firmlocationaddress_Invalid,le.firmlocationaddresscity_Invalid,le.firmlocationaddresszip4_Invalid,le.firmlocationcounty_Invalid,le.firmlocationstate_Invalid,le.certfed_Invalid,le.certstate_Invalid,le.contractsfederal_Invalid,le.contractsva_Invalid,le.contractscommercial_Invalid,le.contractorgovernmentprime_Invalid,le.contractorgovernmentsub_Invalid,le.contractornongovernment_Invalid,le.registeredgovernmentbus_Invalid,le.registerednongovernmentbus_Invalid,le.clearancelevelpersonnel_Invalid,le.clearancelevelfacility_Invalid,le.certificatedatefrom1_Invalid,le.certificatedateto1_Invalid,le.certificatestatus1_Invalid,le.certificationnumber1_Invalid,le.certificationtype1_Invalid,le.certificatedatefrom2_Invalid,le.certificatedateto2_Invalid,le.certificatestatus2_Invalid,le.certificationnumber2_Invalid,le.certificationtype2_Invalid,le.certificatedatefrom3_Invalid,le.certificatedateto3_Invalid,le.certificatestatus3_Invalid,le.certificationnumber3_Invalid,le.certificationtype3_Invalid,le.certificatedatefrom4_Invalid,le.certificatedateto4_Invalid,le.certificatestatus4_Invalid,le.certificationnumber4_Invalid,le.certificationtype4_Invalid,le.certificatedatefrom5_Invalid,le.certificatedateto5_Invalid,le.certificatestatus5_Invalid,le.certificationnumber5_Invalid,le.certificationtype5_Invalid,le.certificatedatefrom6_Invalid,le.certificatedateto6_Invalid,le.certificatestatus6_Invalid,le.certificationnumber6_Invalid,le.certificationtype6_Invalid,le.starrating_Invalid,le.assets_Invalid,le.biddescription_Invalid,le.competitiveadvantage_Invalid,le.cagecode_Invalid,le.capabilitiesnarrative_Invalid,le.category_Invalid,le.chtrclass_Invalid,le.productdescription1_Invalid,le.productdescription2_Invalid,le.productdescription3_Invalid,le.productdescription4_Invalid,le.productdescription5_Invalid,le.classdescription1_Invalid,le.subclassdescription1_Invalid,le.classdescription2_Invalid,le.subclassdescription2_Invalid,le.classdescription3_Invalid,le.subclassdescription3_Invalid,le.classdescription4_Invalid,le.subclassdescription4_Invalid,le.classdescription5_Invalid,le.subclassdescription5_Invalid,le.classifications_Invalid,le.commodity1_Invalid,le.commodity2_Invalid,le.commodity3_Invalid,le.commodity4_Invalid,le.commodity5_Invalid,le.commodity6_Invalid,le.commodity7_Invalid,le.commodity8_Invalid,le.completedate_Invalid,le.crossreference_Invalid,le.dateestablished_Invalid,le.businessage_Invalid,le.deposits_Invalid,le.dunsnumber_Invalid,le.enttype_Invalid,le.expirationdate_Invalid,le.extendeddate_Invalid,le.issuingauthority_Invalid,le.keywords_Invalid,le.licensenumber_Invalid,le.licensetype_Invalid,le.mincd_Invalid,le.minorityaffiliation_Invalid,le.minorityownershipdate_Invalid,le.siccode1_Invalid,le.siccode2_Invalid,le.siccode3_Invalid,le.siccode4_Invalid,le.siccode5_Invalid,le.siccode6_Invalid,le.siccode7_Invalid,le.siccode8_Invalid,le.naicscode1_Invalid,le.naicscode2_Invalid,le.naicscode3_Invalid,le.naicscode4_Invalid,le.naicscode5_Invalid,le.naicscode6_Invalid,le.naicscode7_Invalid,le.naicscode8_Invalid,le.prequalify_Invalid,le.procurementcategory1_Invalid,le.subprocurementcategory1_Invalid,le.procurementcategory2_Invalid,le.subprocurementcategory2_Invalid,le.procurementcategory3_Invalid,le.subprocurementcategory3_Invalid,le.procurementcategory4_Invalid,le.subprocurementcategory4_Invalid,le.procurementcategory5_Invalid,le.subprocurementcategory5_Invalid,le.renewal_Invalid,le.renewaldate_Invalid,le.unitedcertprogrampartner_Invalid,le.vendorkey_Invalid,le.vendornumber_Invalid,le.workcode1_Invalid,le.workcode2_Invalid,le.workcode3_Invalid,le.workcode4_Invalid,le.workcode5_Invalid,le.workcode6_Invalid,le.workcode7_Invalid,le.workcode8_Invalid,le.exporter_Invalid,le.exportbusinessactivities_Invalid,le.exportto_Invalid,le.exportbusinessrelationships_Invalid,le.exportobjectives_Invalid,le.reference1_Invalid,le.reference2_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dartid(le.dartid_Invalid),Fields.InvalidMessage_dateadded(le.dateadded_Invalid),Fields.InvalidMessage_dateupdated(le.dateupdated_Invalid),Fields.InvalidMessage_website(le.website_Invalid),Fields.InvalidMessage_state(le.state_Invalid),Fields.InvalidMessage_profilelastupdated(le.profilelastupdated_Invalid),Fields.InvalidMessage_county(le.county_Invalid),Fields.InvalidMessage_servicearea(le.servicearea_Invalid),Fields.InvalidMessage_region1(le.region1_Invalid),Fields.InvalidMessage_region2(le.region2_Invalid),Fields.InvalidMessage_region3(le.region3_Invalid),Fields.InvalidMessage_region4(le.region4_Invalid),Fields.InvalidMessage_region5(le.region5_Invalid),Fields.InvalidMessage_fname(le.fname_Invalid),Fields.InvalidMessage_lname(le.lname_Invalid),Fields.InvalidMessage_mname(le.mname_Invalid),Fields.InvalidMessage_suffix(le.suffix_Invalid),Fields.InvalidMessage_title(le.title_Invalid),Fields.InvalidMessage_ethnicity(le.ethnicity_Invalid),Fields.InvalidMessage_gender(le.gender_Invalid),Fields.InvalidMessage_address1(le.address1_Invalid),Fields.InvalidMessage_address2(le.address2_Invalid),Fields.InvalidMessage_addresscity(le.addresscity_Invalid),Fields.InvalidMessage_addressstate(le.addressstate_Invalid),Fields.InvalidMessage_addresszip4(le.addresszip4_Invalid),Fields.InvalidMessage_building(le.building_Invalid),Fields.InvalidMessage_contact(le.contact_Invalid),Fields.InvalidMessage_phone1(le.phone1_Invalid),Fields.InvalidMessage_phone2(le.phone2_Invalid),Fields.InvalidMessage_phone3(le.phone3_Invalid),Fields.InvalidMessage_cell(le.cell_Invalid),Fields.InvalidMessage_fax(le.fax_Invalid),Fields.InvalidMessage_email1(le.email1_Invalid),Fields.InvalidMessage_email2(le.email2_Invalid),Fields.InvalidMessage_email3(le.email3_Invalid),Fields.InvalidMessage_webpage1(le.webpage1_Invalid),Fields.InvalidMessage_webpage2(le.webpage2_Invalid),Fields.InvalidMessage_webpage3(le.webpage3_Invalid),Fields.InvalidMessage_businessname(le.businessname_Invalid),Fields.InvalidMessage_dba(le.dba_Invalid),Fields.InvalidMessage_businessid(le.businessid_Invalid),Fields.InvalidMessage_businesstype1(le.businesstype1_Invalid),Fields.InvalidMessage_businesslocation1(le.businesslocation1_Invalid),Fields.InvalidMessage_businesstype2(le.businesstype2_Invalid),Fields.InvalidMessage_businesslocation2(le.businesslocation2_Invalid),Fields.InvalidMessage_businesstype3(le.businesstype3_Invalid),Fields.InvalidMessage_businesslocation3(le.businesslocation3_Invalid),Fields.InvalidMessage_businesstype4(le.businesstype4_Invalid),Fields.InvalidMessage_businesslocation4(le.businesslocation4_Invalid),Fields.InvalidMessage_businesstype5(le.businesstype5_Invalid),Fields.InvalidMessage_businesslocation5(le.businesslocation5_Invalid),Fields.InvalidMessage_industry(le.industry_Invalid),Fields.InvalidMessage_trade(le.trade_Invalid),Fields.InvalidMessage_resourcedescription(le.resourcedescription_Invalid),Fields.InvalidMessage_natureofbusiness(le.natureofbusiness_Invalid),Fields.InvalidMessage_businessdescription(le.businessdescription_Invalid),Fields.InvalidMessage_businessstructure(le.businessstructure_Invalid),Fields.InvalidMessage_totalemployees(le.totalemployees_Invalid),Fields.InvalidMessage_avgcontractsize(le.avgcontractsize_Invalid),Fields.InvalidMessage_firmid(le.firmid_Invalid),Fields.InvalidMessage_firmlocationaddress(le.firmlocationaddress_Invalid),Fields.InvalidMessage_firmlocationaddresscity(le.firmlocationaddresscity_Invalid),Fields.InvalidMessage_firmlocationaddresszip4(le.firmlocationaddresszip4_Invalid),Fields.InvalidMessage_firmlocationcounty(le.firmlocationcounty_Invalid),Fields.InvalidMessage_firmlocationstate(le.firmlocationstate_Invalid),Fields.InvalidMessage_certfed(le.certfed_Invalid),Fields.InvalidMessage_certstate(le.certstate_Invalid),Fields.InvalidMessage_contractsfederal(le.contractsfederal_Invalid),Fields.InvalidMessage_contractsva(le.contractsva_Invalid),Fields.InvalidMessage_contractscommercial(le.contractscommercial_Invalid),Fields.InvalidMessage_contractorgovernmentprime(le.contractorgovernmentprime_Invalid),Fields.InvalidMessage_contractorgovernmentsub(le.contractorgovernmentsub_Invalid),Fields.InvalidMessage_contractornongovernment(le.contractornongovernment_Invalid),Fields.InvalidMessage_registeredgovernmentbus(le.registeredgovernmentbus_Invalid),Fields.InvalidMessage_registerednongovernmentbus(le.registerednongovernmentbus_Invalid),Fields.InvalidMessage_clearancelevelpersonnel(le.clearancelevelpersonnel_Invalid),Fields.InvalidMessage_clearancelevelfacility(le.clearancelevelfacility_Invalid),Fields.InvalidMessage_certificatedatefrom1(le.certificatedatefrom1_Invalid),Fields.InvalidMessage_certificatedateto1(le.certificatedateto1_Invalid),Fields.InvalidMessage_certificatestatus1(le.certificatestatus1_Invalid),Fields.InvalidMessage_certificationnumber1(le.certificationnumber1_Invalid),Fields.InvalidMessage_certificationtype1(le.certificationtype1_Invalid),Fields.InvalidMessage_certificatedatefrom2(le.certificatedatefrom2_Invalid),Fields.InvalidMessage_certificatedateto2(le.certificatedateto2_Invalid),Fields.InvalidMessage_certificatestatus2(le.certificatestatus2_Invalid),Fields.InvalidMessage_certificationnumber2(le.certificationnumber2_Invalid),Fields.InvalidMessage_certificationtype2(le.certificationtype2_Invalid),Fields.InvalidMessage_certificatedatefrom3(le.certificatedatefrom3_Invalid),Fields.InvalidMessage_certificatedateto3(le.certificatedateto3_Invalid),Fields.InvalidMessage_certificatestatus3(le.certificatestatus3_Invalid),Fields.InvalidMessage_certificationnumber3(le.certificationnumber3_Invalid),Fields.InvalidMessage_certificationtype3(le.certificationtype3_Invalid),Fields.InvalidMessage_certificatedatefrom4(le.certificatedatefrom4_Invalid),Fields.InvalidMessage_certificatedateto4(le.certificatedateto4_Invalid),Fields.InvalidMessage_certificatestatus4(le.certificatestatus4_Invalid),Fields.InvalidMessage_certificationnumber4(le.certificationnumber4_Invalid),Fields.InvalidMessage_certificationtype4(le.certificationtype4_Invalid),Fields.InvalidMessage_certificatedatefrom5(le.certificatedatefrom5_Invalid),Fields.InvalidMessage_certificatedateto5(le.certificatedateto5_Invalid),Fields.InvalidMessage_certificatestatus5(le.certificatestatus5_Invalid),Fields.InvalidMessage_certificationnumber5(le.certificationnumber5_Invalid),Fields.InvalidMessage_certificationtype5(le.certificationtype5_Invalid),Fields.InvalidMessage_certificatedatefrom6(le.certificatedatefrom6_Invalid),Fields.InvalidMessage_certificatedateto6(le.certificatedateto6_Invalid),Fields.InvalidMessage_certificatestatus6(le.certificatestatus6_Invalid),Fields.InvalidMessage_certificationnumber6(le.certificationnumber6_Invalid),Fields.InvalidMessage_certificationtype6(le.certificationtype6_Invalid),Fields.InvalidMessage_starrating(le.starrating_Invalid),Fields.InvalidMessage_assets(le.assets_Invalid),Fields.InvalidMessage_biddescription(le.biddescription_Invalid),Fields.InvalidMessage_competitiveadvantage(le.competitiveadvantage_Invalid),Fields.InvalidMessage_cagecode(le.cagecode_Invalid),Fields.InvalidMessage_capabilitiesnarrative(le.capabilitiesnarrative_Invalid),Fields.InvalidMessage_category(le.category_Invalid),Fields.InvalidMessage_chtrclass(le.chtrclass_Invalid),Fields.InvalidMessage_productdescription1(le.productdescription1_Invalid),Fields.InvalidMessage_productdescription2(le.productdescription2_Invalid),Fields.InvalidMessage_productdescription3(le.productdescription3_Invalid),Fields.InvalidMessage_productdescription4(le.productdescription4_Invalid),Fields.InvalidMessage_productdescription5(le.productdescription5_Invalid),Fields.InvalidMessage_classdescription1(le.classdescription1_Invalid),Fields.InvalidMessage_subclassdescription1(le.subclassdescription1_Invalid),Fields.InvalidMessage_classdescription2(le.classdescription2_Invalid),Fields.InvalidMessage_subclassdescription2(le.subclassdescription2_Invalid),Fields.InvalidMessage_classdescription3(le.classdescription3_Invalid),Fields.InvalidMessage_subclassdescription3(le.subclassdescription3_Invalid),Fields.InvalidMessage_classdescription4(le.classdescription4_Invalid),Fields.InvalidMessage_subclassdescription4(le.subclassdescription4_Invalid),Fields.InvalidMessage_classdescription5(le.classdescription5_Invalid),Fields.InvalidMessage_subclassdescription5(le.subclassdescription5_Invalid),Fields.InvalidMessage_classifications(le.classifications_Invalid),Fields.InvalidMessage_commodity1(le.commodity1_Invalid),Fields.InvalidMessage_commodity2(le.commodity2_Invalid),Fields.InvalidMessage_commodity3(le.commodity3_Invalid),Fields.InvalidMessage_commodity4(le.commodity4_Invalid),Fields.InvalidMessage_commodity5(le.commodity5_Invalid),Fields.InvalidMessage_commodity6(le.commodity6_Invalid),Fields.InvalidMessage_commodity7(le.commodity7_Invalid),Fields.InvalidMessage_commodity8(le.commodity8_Invalid),Fields.InvalidMessage_completedate(le.completedate_Invalid),Fields.InvalidMessage_crossreference(le.crossreference_Invalid),Fields.InvalidMessage_dateestablished(le.dateestablished_Invalid),Fields.InvalidMessage_businessage(le.businessage_Invalid),Fields.InvalidMessage_deposits(le.deposits_Invalid),Fields.InvalidMessage_dunsnumber(le.dunsnumber_Invalid),Fields.InvalidMessage_enttype(le.enttype_Invalid),Fields.InvalidMessage_expirationdate(le.expirationdate_Invalid),Fields.InvalidMessage_extendeddate(le.extendeddate_Invalid),Fields.InvalidMessage_issuingauthority(le.issuingauthority_Invalid),Fields.InvalidMessage_keywords(le.keywords_Invalid),Fields.InvalidMessage_licensenumber(le.licensenumber_Invalid),Fields.InvalidMessage_licensetype(le.licensetype_Invalid),Fields.InvalidMessage_mincd(le.mincd_Invalid),Fields.InvalidMessage_minorityaffiliation(le.minorityaffiliation_Invalid),Fields.InvalidMessage_minorityownershipdate(le.minorityownershipdate_Invalid),Fields.InvalidMessage_siccode1(le.siccode1_Invalid),Fields.InvalidMessage_siccode2(le.siccode2_Invalid),Fields.InvalidMessage_siccode3(le.siccode3_Invalid),Fields.InvalidMessage_siccode4(le.siccode4_Invalid),Fields.InvalidMessage_siccode5(le.siccode5_Invalid),Fields.InvalidMessage_siccode6(le.siccode6_Invalid),Fields.InvalidMessage_siccode7(le.siccode7_Invalid),Fields.InvalidMessage_siccode8(le.siccode8_Invalid),Fields.InvalidMessage_naicscode1(le.naicscode1_Invalid),Fields.InvalidMessage_naicscode2(le.naicscode2_Invalid),Fields.InvalidMessage_naicscode3(le.naicscode3_Invalid),Fields.InvalidMessage_naicscode4(le.naicscode4_Invalid),Fields.InvalidMessage_naicscode5(le.naicscode5_Invalid),Fields.InvalidMessage_naicscode6(le.naicscode6_Invalid),Fields.InvalidMessage_naicscode7(le.naicscode7_Invalid),Fields.InvalidMessage_naicscode8(le.naicscode8_Invalid),Fields.InvalidMessage_prequalify(le.prequalify_Invalid),Fields.InvalidMessage_procurementcategory1(le.procurementcategory1_Invalid),Fields.InvalidMessage_subprocurementcategory1(le.subprocurementcategory1_Invalid),Fields.InvalidMessage_procurementcategory2(le.procurementcategory2_Invalid),Fields.InvalidMessage_subprocurementcategory2(le.subprocurementcategory2_Invalid),Fields.InvalidMessage_procurementcategory3(le.procurementcategory3_Invalid),Fields.InvalidMessage_subprocurementcategory3(le.subprocurementcategory3_Invalid),Fields.InvalidMessage_procurementcategory4(le.procurementcategory4_Invalid),Fields.InvalidMessage_subprocurementcategory4(le.subprocurementcategory4_Invalid),Fields.InvalidMessage_procurementcategory5(le.procurementcategory5_Invalid),Fields.InvalidMessage_subprocurementcategory5(le.subprocurementcategory5_Invalid),Fields.InvalidMessage_renewal(le.renewal_Invalid),Fields.InvalidMessage_renewaldate(le.renewaldate_Invalid),Fields.InvalidMessage_unitedcertprogrampartner(le.unitedcertprogrampartner_Invalid),Fields.InvalidMessage_vendorkey(le.vendorkey_Invalid),Fields.InvalidMessage_vendornumber(le.vendornumber_Invalid),Fields.InvalidMessage_workcode1(le.workcode1_Invalid),Fields.InvalidMessage_workcode2(le.workcode2_Invalid),Fields.InvalidMessage_workcode3(le.workcode3_Invalid),Fields.InvalidMessage_workcode4(le.workcode4_Invalid),Fields.InvalidMessage_workcode5(le.workcode5_Invalid),Fields.InvalidMessage_workcode6(le.workcode6_Invalid),Fields.InvalidMessage_workcode7(le.workcode7_Invalid),Fields.InvalidMessage_workcode8(le.workcode8_Invalid),Fields.InvalidMessage_exporter(le.exporter_Invalid),Fields.InvalidMessage_exportbusinessactivities(le.exportbusinessactivities_Invalid),Fields.InvalidMessage_exportto(le.exportto_Invalid),Fields.InvalidMessage_exportbusinessrelationships(le.exportbusinessrelationships_Invalid),Fields.InvalidMessage_exportobjectives(le.exportobjectives_Invalid),Fields.InvalidMessage_reference1(le.reference1_Invalid),Fields.InvalidMessage_reference2(le.reference2_Invalid),'UNKNOWN'));
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_Fields.InvalidMessage_dartid(le.dartid_Invalid),Input_Fields.InvalidMessage_dateadded(le.dateadded_Invalid),Input_Fields.InvalidMessage_dateupdated(le.dateupdated_Invalid),Input_Fields.InvalidMessage_website(le.website_Invalid),Input_Fields.InvalidMessage_state(le.state_Invalid),Input_Fields.InvalidMessage_profilelastupdated(le.profilelastupdated_Invalid),Input_Fields.InvalidMessage_county(le.county_Invalid),Input_Fields.InvalidMessage_servicearea(le.servicearea_Invalid),Input_Fields.InvalidMessage_region1(le.region1_Invalid),Input_Fields.InvalidMessage_region2(le.region2_Invalid),Input_Fields.InvalidMessage_region3(le.region3_Invalid),Input_Fields.InvalidMessage_region4(le.region4_Invalid),Input_Fields.InvalidMessage_region5(le.region5_Invalid),Input_Fields.InvalidMessage_fname(le.fname_Invalid),Input_Fields.InvalidMessage_lname(le.lname_Invalid),Input_Fields.InvalidMessage_mname(le.mname_Invalid),Input_Fields.InvalidMessage_suffix(le.suffix_Invalid),Input_Fields.InvalidMessage_title(le.title_Invalid),Input_Fields.InvalidMessage_ethnicity(le.ethnicity_Invalid),Input_Fields.InvalidMessage_gender(le.gender_Invalid),Input_Fields.InvalidMessage_address1(le.address1_Invalid),Input_Fields.InvalidMessage_address2(le.address2_Invalid),Input_Fields.InvalidMessage_addresscity(le.addresscity_Invalid),Input_Fields.InvalidMessage_addressstate(le.addressstate_Invalid),Input_Fields.InvalidMessage_addresszip4(le.addresszip4_Invalid),Input_Fields.InvalidMessage_building(le.building_Invalid),Input_Fields.InvalidMessage_contact(le.contact_Invalid),Input_Fields.InvalidMessage_phone1(le.phone1_Invalid),Input_Fields.InvalidMessage_phone2(le.phone2_Invalid),Input_Fields.InvalidMessage_phone3(le.phone3_Invalid),Input_Fields.InvalidMessage_cell(le.cell_Invalid),Input_Fields.InvalidMessage_fax(le.fax_Invalid),Input_Fields.InvalidMessage_email1(le.email1_Invalid),Input_Fields.InvalidMessage_email2(le.email2_Invalid),Input_Fields.InvalidMessage_email3(le.email3_Invalid),Input_Fields.InvalidMessage_webpage1(le.webpage1_Invalid),Input_Fields.InvalidMessage_webpage2(le.webpage2_Invalid),Input_Fields.InvalidMessage_webpage3(le.webpage3_Invalid),Input_Fields.InvalidMessage_businessname(le.businessname_Invalid),Input_Fields.InvalidMessage_dba(le.dba_Invalid),Input_Fields.InvalidMessage_businessid(le.businessid_Invalid),Input_Fields.InvalidMessage_businesstype1(le.businesstype1_Invalid),Input_Fields.InvalidMessage_businesslocation1(le.businesslocation1_Invalid),Input_Fields.InvalidMessage_businesstype2(le.businesstype2_Invalid),Input_Fields.InvalidMessage_businesslocation2(le.businesslocation2_Invalid),Input_Fields.InvalidMessage_businesstype3(le.businesstype3_Invalid),Input_Fields.InvalidMessage_businesslocation3(le.businesslocation3_Invalid),Input_Fields.InvalidMessage_businesstype4(le.businesstype4_Invalid),Input_Fields.InvalidMessage_businesslocation4(le.businesslocation4_Invalid),Input_Fields.InvalidMessage_businesstype5(le.businesstype5_Invalid),Input_Fields.InvalidMessage_businesslocation5(le.businesslocation5_Invalid),Input_Fields.InvalidMessage_industry(le.industry_Invalid),Input_Fields.InvalidMessage_trade(le.trade_Invalid),Input_Fields.InvalidMessage_resourcedescription(le.resourcedescription_Invalid),Input_Fields.InvalidMessage_natureofbusiness(le.natureofbusiness_Invalid),Input_Fields.InvalidMessage_businessdescription(le.businessdescription_Invalid),Input_Fields.InvalidMessage_businessstructure(le.businessstructure_Invalid),Input_Fields.InvalidMessage_totalemployees(le.totalemployees_Invalid),Input_Fields.InvalidMessage_avgcontractsize(le.avgcontractsize_Invalid),Input_Fields.InvalidMessage_firmid(le.firmid_Invalid),Input_Fields.InvalidMessage_firmlocationaddress(le.firmlocationaddress_Invalid),Input_Fields.InvalidMessage_firmlocationaddresscity(le.firmlocationaddresscity_Invalid),Input_Fields.InvalidMessage_firmlocationaddresszip4(le.firmlocationaddresszip4_Invalid),Input_Fields.InvalidMessage_firmlocationcounty(le.firmlocationcounty_Invalid),Input_Fields.InvalidMessage_firmlocationstate(le.firmlocationstate_Invalid),Input_Fields.InvalidMessage_certfed(le.certfed_Invalid),Input_Fields.InvalidMessage_certstate(le.certstate_Invalid),Input_Fields.InvalidMessage_contractsfederal(le.contractsfederal_Invalid),Input_Fields.InvalidMessage_contractsva(le.contractsva_Invalid),Input_Fields.InvalidMessage_contractscommercial(le.contractscommercial_Invalid),Input_Fields.InvalidMessage_contractorgovernmentprime(le.contractorgovernmentprime_Invalid),Input_Fields.InvalidMessage_contractorgovernmentsub(le.contractorgovernmentsub_Invalid),Input_Fields.InvalidMessage_contractornongovernment(le.contractornongovernment_Invalid),Input_Fields.InvalidMessage_registeredgovernmentbus(le.registeredgovernmentbus_Invalid),Input_Fields.InvalidMessage_registerednongovernmentbus(le.registerednongovernmentbus_Invalid),Input_Fields.InvalidMessage_clearancelevelpersonnel(le.clearancelevelpersonnel_Invalid),Input_Fields.InvalidMessage_clearancelevelfacility(le.clearancelevelfacility_Invalid),Input_Fields.InvalidMessage_certificatedatefrom1(le.certificatedatefrom1_Invalid),Input_Fields.InvalidMessage_certificatedateto1(le.certificatedateto1_Invalid),Input_Fields.InvalidMessage_certificatestatus1(le.certificatestatus1_Invalid),Input_Fields.InvalidMessage_certificationnumber1(le.certificationnumber1_Invalid),Input_Fields.InvalidMessage_certificationtype1(le.certificationtype1_Invalid),Input_Fields.InvalidMessage_certificatedatefrom2(le.certificatedatefrom2_Invalid),Input_Fields.InvalidMessage_certificatedateto2(le.certificatedateto2_Invalid),Input_Fields.InvalidMessage_certificatestatus2(le.certificatestatus2_Invalid),Input_Fields.InvalidMessage_certificationnumber2(le.certificationnumber2_Invalid),Input_Fields.InvalidMessage_certificationtype2(le.certificationtype2_Invalid),Input_Fields.InvalidMessage_certificatedatefrom3(le.certificatedatefrom3_Invalid),Input_Fields.InvalidMessage_certificatedateto3(le.certificatedateto3_Invalid),Input_Fields.InvalidMessage_certificatestatus3(le.certificatestatus3_Invalid),Input_Fields.InvalidMessage_certificationnumber3(le.certificationnumber3_Invalid),Input_Fields.InvalidMessage_certificationtype3(le.certificationtype3_Invalid),Input_Fields.InvalidMessage_certificatedatefrom4(le.certificatedatefrom4_Invalid),Input_Fields.InvalidMessage_certificatedateto4(le.certificatedateto4_Invalid),Input_Fields.InvalidMessage_certificatestatus4(le.certificatestatus4_Invalid),Input_Fields.InvalidMessage_certificationnumber4(le.certificationnumber4_Invalid),Input_Fields.InvalidMessage_certificationtype4(le.certificationtype4_Invalid),Input_Fields.InvalidMessage_certificatedatefrom5(le.certificatedatefrom5_Invalid),Input_Fields.InvalidMessage_certificatedateto5(le.certificatedateto5_Invalid),Input_Fields.InvalidMessage_certificatestatus5(le.certificatestatus5_Invalid),Input_Fields.InvalidMessage_certificationnumber5(le.certificationnumber5_Invalid),Input_Fields.InvalidMessage_certificationtype5(le.certificationtype5_Invalid),Input_Fields.InvalidMessage_certificatedatefrom6(le.certificatedatefrom6_Invalid),Input_Fields.InvalidMessage_certificatedateto6(le.certificatedateto6_Invalid),Input_Fields.InvalidMessage_certificatestatus6(le.certificatestatus6_Invalid),Input_Fields.InvalidMessage_certificationnumber6(le.certificationnumber6_Invalid),Input_Fields.InvalidMessage_certificationtype6(le.certificationtype6_Invalid),Input_Fields.InvalidMessage_starrating(le.starrating_Invalid),Input_Fields.InvalidMessage_assets(le.assets_Invalid),Input_Fields.InvalidMessage_biddescription(le.biddescription_Invalid),Input_Fields.InvalidMessage_competitiveadvantage(le.competitiveadvantage_Invalid),Input_Fields.InvalidMessage_cagecode(le.cagecode_Invalid),Input_Fields.InvalidMessage_capabilitiesnarrative(le.capabilitiesnarrative_Invalid),Input_Fields.InvalidMessage_category(le.category_Invalid),Input_Fields.InvalidMessage_chtrclass(le.chtrclass_Invalid),Input_Fields.InvalidMessage_productdescription1(le.productdescription1_Invalid),Input_Fields.InvalidMessage_productdescription2(le.productdescription2_Invalid),Input_Fields.InvalidMessage_productdescription3(le.productdescription3_Invalid),Input_Fields.InvalidMessage_productdescription4(le.productdescription4_Invalid),Input_Fields.InvalidMessage_productdescription5(le.productdescription5_Invalid),Input_Fields.InvalidMessage_classdescription1(le.classdescription1_Invalid),Input_Fields.InvalidMessage_subclassdescription1(le.subclassdescription1_Invalid),Input_Fields.InvalidMessage_classdescription2(le.classdescription2_Invalid),Input_Fields.InvalidMessage_subclassdescription2(le.subclassdescription2_Invalid),Input_Fields.InvalidMessage_classdescription3(le.classdescription3_Invalid),Input_Fields.InvalidMessage_subclassdescription3(le.subclassdescription3_Invalid),Input_Fields.InvalidMessage_classdescription4(le.classdescription4_Invalid),Input_Fields.InvalidMessage_subclassdescription4(le.subclassdescription4_Invalid),Input_Fields.InvalidMessage_classdescription5(le.classdescription5_Invalid),Input_Fields.InvalidMessage_subclassdescription5(le.subclassdescription5_Invalid),Input_Fields.InvalidMessage_classifications(le.classifications_Invalid),Input_Fields.InvalidMessage_commodity1(le.commodity1_Invalid),Input_Fields.InvalidMessage_commodity2(le.commodity2_Invalid),Input_Fields.InvalidMessage_commodity3(le.commodity3_Invalid),Input_Fields.InvalidMessage_commodity4(le.commodity4_Invalid),Input_Fields.InvalidMessage_commodity5(le.commodity5_Invalid),Input_Fields.InvalidMessage_commodity6(le.commodity6_Invalid),Input_Fields.InvalidMessage_commodity7(le.commodity7_Invalid),Input_Fields.InvalidMessage_commodity8(le.commodity8_Invalid),Input_Fields.InvalidMessage_completedate(le.completedate_Invalid),Input_Fields.InvalidMessage_crossreference(le.crossreference_Invalid),Input_Fields.InvalidMessage_dateestablished(le.dateestablished_Invalid),Input_Fields.InvalidMessage_businessage(le.businessage_Invalid),Input_Fields.InvalidMessage_deposits(le.deposits_Invalid),Input_Fields.InvalidMessage_dunsnumber(le.dunsnumber_Invalid),Input_Fields.InvalidMessage_enttype(le.enttype_Invalid),Input_Fields.InvalidMessage_expirationdate(le.expirationdate_Invalid),Input_Fields.InvalidMessage_extendeddate(le.extendeddate_Invalid),Input_Fields.InvalidMessage_issuingauthority(le.issuingauthority_Invalid),Input_Fields.InvalidMessage_keywords(le.keywords_Invalid),Input_Fields.InvalidMessage_licensenumber(le.licensenumber_Invalid),Input_Fields.InvalidMessage_licensetype(le.licensetype_Invalid),Input_Fields.InvalidMessage_mincd(le.mincd_Invalid),Input_Fields.InvalidMessage_minorityaffiliation(le.minorityaffiliation_Invalid),Input_Fields.InvalidMessage_minorityownershipdate(le.minorityownershipdate_Invalid),Input_Fields.InvalidMessage_siccode1(le.siccode1_Invalid),Input_Fields.InvalidMessage_siccode2(le.siccode2_Invalid),Input_Fields.InvalidMessage_siccode3(le.siccode3_Invalid),Input_Fields.InvalidMessage_siccode4(le.siccode4_Invalid),Input_Fields.InvalidMessage_siccode5(le.siccode5_Invalid),Input_Fields.InvalidMessage_siccode6(le.siccode6_Invalid),Input_Fields.InvalidMessage_siccode7(le.siccode7_Invalid),Input_Fields.InvalidMessage_siccode8(le.siccode8_Invalid),Input_Fields.InvalidMessage_naicscode1(le.naicscode1_Invalid),Input_Fields.InvalidMessage_naicscode2(le.naicscode2_Invalid),Input_Fields.InvalidMessage_naicscode3(le.naicscode3_Invalid),Input_Fields.InvalidMessage_naicscode4(le.naicscode4_Invalid),Input_Fields.InvalidMessage_naicscode5(le.naicscode5_Invalid),Input_Fields.InvalidMessage_naicscode6(le.naicscode6_Invalid),Input_Fields.InvalidMessage_naicscode7(le.naicscode7_Invalid),Input_Fields.InvalidMessage_naicscode8(le.naicscode8_Invalid),Input_Fields.InvalidMessage_prequalify(le.prequalify_Invalid),Input_Fields.InvalidMessage_procurementcategory1(le.procurementcategory1_Invalid),Input_Fields.InvalidMessage_subprocurementcategory1(le.subprocurementcategory1_Invalid),Input_Fields.InvalidMessage_procurementcategory2(le.procurementcategory2_Invalid),Input_Fields.InvalidMessage_subprocurementcategory2(le.subprocurementcategory2_Invalid),Input_Fields.InvalidMessage_procurementcategory3(le.procurementcategory3_Invalid),Input_Fields.InvalidMessage_subprocurementcategory3(le.subprocurementcategory3_Invalid),Input_Fields.InvalidMessage_procurementcategory4(le.procurementcategory4_Invalid),Input_Fields.InvalidMessage_subprocurementcategory4(le.subprocurementcategory4_Invalid),Input_Fields.InvalidMessage_procurementcategory5(le.procurementcategory5_Invalid),Input_Fields.InvalidMessage_subprocurementcategory5(le.subprocurementcategory5_Invalid),Input_Fields.InvalidMessage_renewal(le.renewal_Invalid),Input_Fields.InvalidMessage_renewaldate(le.renewaldate_Invalid),Input_Fields.InvalidMessage_unitedcertprogrampartner(le.unitedcertprogrampartner_Invalid),Input_Fields.InvalidMessage_vendorkey(le.vendorkey_Invalid),Input_Fields.InvalidMessage_vendornumber(le.vendornumber_Invalid),Input_Fields.InvalidMessage_workcode1(le.workcode1_Invalid),Input_Fields.InvalidMessage_workcode2(le.workcode2_Invalid),Input_Fields.InvalidMessage_workcode3(le.workcode3_Invalid),Input_Fields.InvalidMessage_workcode4(le.workcode4_Invalid),Input_Fields.InvalidMessage_workcode5(le.workcode5_Invalid),Input_Fields.InvalidMessage_workcode6(le.workcode6_Invalid),Input_Fields.InvalidMessage_workcode7(le.workcode7_Invalid),Input_Fields.InvalidMessage_workcode8(le.workcode8_Invalid),Input_Fields.InvalidMessage_exporter(le.exporter_Invalid),Input_Fields.InvalidMessage_exportbusinessactivities(le.exportbusinessactivities_Invalid),Input_Fields.InvalidMessage_exportto(le.exportto_Invalid),Input_Fields.InvalidMessage_exportbusinessrelationships(le.exportbusinessrelationships_Invalid),Input_Fields.InvalidMessage_exportobjectives(le.exportobjectives_Invalid),Input_Fields.InvalidMessage_reference1(le.reference1_Invalid),Input_Fields.InvalidMessage_reference2(le.reference2_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dartid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.dateadded_Invalid,'CUSTOM','UNKNOWN')
@@ -1537,14 +1537,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.reference1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.reference2_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dartid','dateadded','dateupdated','website','state','profilelastupdated','county','servicearea','region1','region2','region3','region4','region5','fname','lname','mname','suffix','title','ethnicity','gender','address1','address2','addresscity','addressstate','addresszip4','building','contact','phone1','phone2','phone3','cell','fax','email1','email2','email3','webpage1','webpage2','webpage3','businessname','dba','businessid','businesstype1','businesslocation1','businesstype2','businesslocation2','businesstype3','businesslocation3','businesstype4','businesslocation4','businesstype5','businesslocation5','industry','trade','resourcedescription','natureofbusiness','businessdescription','businessstructure','totalemployees','avgcontractsize','firmid','firmlocationaddress','firmlocationaddresscity','firmlocationaddresszip4','firmlocationcounty','firmlocationstate','certfed','certstate','contractsfederal','contractsva','contractscommercial','contractorgovernmentprime','contractorgovernmentsub','contractornongovernment','registeredgovernmentbus','registerednongovernmentbus','clearancelevelpersonnel','clearancelevelfacility','certificatedatefrom1','certificatedateto1','certificatestatus1','certificationnumber1','certificationtype1','certificatedatefrom2','certificatedateto2','certificatestatus2','certificationnumber2','certificationtype2','certificatedatefrom3','certificatedateto3','certificatestatus3','certificationnumber3','certificationtype3','certificatedatefrom4','certificatedateto4','certificatestatus4','certificationnumber4','certificationtype4','certificatedatefrom5','certificatedateto5','certificatestatus5','certificationnumber5','certificationtype5','certificatedatefrom6','certificatedateto6','certificatestatus6','certificationnumber6','certificationtype6','starrating','assets','biddescription','competitiveadvantage','cagecode','capabilitiesnarrative','category','chtrclass','productdescription1','productdescription2','productdescription3','productdescription4','productdescription5','classdescription1','subclassdescription1','classdescription2','subclassdescription2','classdescription3','subclassdescription3','classdescription4','subclassdescription4','classdescription5','subclassdescription5','classifications','commodity1','commodity2','commodity3','commodity4','commodity5','commodity6','commodity7','commodity8','completedate','crossreference','dateestablished','businessage','deposits','dunsnumber','enttype','expirationdate','extendeddate','issuingauthority','keywords','licensenumber','licensetype','mincd','minorityaffiliation','minorityownershipdate','siccode1','siccode2','siccode3','siccode4','siccode5','siccode6','siccode7','siccode8','naicscode1','naicscode2','naicscode3','naicscode4','naicscode5','naicscode6','naicscode7','naicscode8','prequalify','procurementcategory1','subprocurementcategory1','procurementcategory2','subprocurementcategory2','procurementcategory3','subprocurementcategory3','procurementcategory4','subprocurementcategory4','procurementcategory5','subprocurementcategory5','renewal','renewaldate','unitedcertprogrampartner','vendorkey','vendornumber','workcode1','workcode2','workcode3','workcode4','workcode5','workcode6','workcode7','workcode8','exporter','exportbusinessactivities','exportto','exportbusinessrelationships','exportobjectives','reference1','reference2','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_Date','Invalid_Date','Invalid_AlphaNumChar','Invalid_State','Invalid_Date','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNum','Invalid_Alpha','Invalid_State','Invalid_No','Invalid_Alpha','Invalid_Alpha','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_Float','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_No','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_No','Invalid_Float','Invalid_AlphaChar','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Date','Invalid_Alpha','Invalid_Date','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_Future','Invalid_Future','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaNum','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_Date','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Future','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNum','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_Date','Invalid_Date','Invalid_AlphaNumChar','Invalid_State','Invalid_Date','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNum','Invalid_Alpha','Invalid_State','Invalid_No','Invalid_Alpha','Invalid_Alpha','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_Phone','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_Float','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_No','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Future','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_No','Invalid_Float','Invalid_AlphaChar','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Commodity','Invalid_Date','Invalid_Alpha','Invalid_Date','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_Future','Invalid_Future','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaNum','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_Date','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_Sic','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_NAICS','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Future','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNum','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dartid,(SALT311.StrType)le.dateadded,(SALT311.StrType)le.dateupdated,(SALT311.StrType)le.website,(SALT311.StrType)le.state,(SALT311.StrType)le.profilelastupdated,(SALT311.StrType)le.county,(SALT311.StrType)le.servicearea,(SALT311.StrType)le.region1,(SALT311.StrType)le.region2,(SALT311.StrType)le.region3,(SALT311.StrType)le.region4,(SALT311.StrType)le.region5,(SALT311.StrType)le.fname,(SALT311.StrType)le.lname,(SALT311.StrType)le.mname,(SALT311.StrType)le.suffix,(SALT311.StrType)le.title,(SALT311.StrType)le.ethnicity,(SALT311.StrType)le.gender,(SALT311.StrType)le.address1,(SALT311.StrType)le.address2,(SALT311.StrType)le.addresscity,(SALT311.StrType)le.addressstate,(SALT311.StrType)le.addresszip4,(SALT311.StrType)le.building,(SALT311.StrType)le.contact,(SALT311.StrType)le.phone1,(SALT311.StrType)le.phone2,(SALT311.StrType)le.phone3,(SALT311.StrType)le.cell,(SALT311.StrType)le.fax,(SALT311.StrType)le.email1,(SALT311.StrType)le.email2,(SALT311.StrType)le.email3,(SALT311.StrType)le.webpage1,(SALT311.StrType)le.webpage2,(SALT311.StrType)le.webpage3,(SALT311.StrType)le.businessname,(SALT311.StrType)le.dba,(SALT311.StrType)le.businessid,(SALT311.StrType)le.businesstype1,(SALT311.StrType)le.businesslocation1,(SALT311.StrType)le.businesstype2,(SALT311.StrType)le.businesslocation2,(SALT311.StrType)le.businesstype3,(SALT311.StrType)le.businesslocation3,(SALT311.StrType)le.businesstype4,(SALT311.StrType)le.businesslocation4,(SALT311.StrType)le.businesstype5,(SALT311.StrType)le.businesslocation5,(SALT311.StrType)le.industry,(SALT311.StrType)le.trade,(SALT311.StrType)le.resourcedescription,(SALT311.StrType)le.natureofbusiness,(SALT311.StrType)le.businessdescription,(SALT311.StrType)le.businessstructure,(SALT311.StrType)le.totalemployees,(SALT311.StrType)le.avgcontractsize,(SALT311.StrType)le.firmid,(SALT311.StrType)le.firmlocationaddress,(SALT311.StrType)le.firmlocationaddresscity,(SALT311.StrType)le.firmlocationaddresszip4,(SALT311.StrType)le.firmlocationcounty,(SALT311.StrType)le.firmlocationstate,(SALT311.StrType)le.certfed,(SALT311.StrType)le.certstate,(SALT311.StrType)le.contractsfederal,(SALT311.StrType)le.contractsva,(SALT311.StrType)le.contractscommercial,(SALT311.StrType)le.contractorgovernmentprime,(SALT311.StrType)le.contractorgovernmentsub,(SALT311.StrType)le.contractornongovernment,(SALT311.StrType)le.registeredgovernmentbus,(SALT311.StrType)le.registerednongovernmentbus,(SALT311.StrType)le.clearancelevelpersonnel,(SALT311.StrType)le.clearancelevelfacility,(SALT311.StrType)le.certificatedatefrom1,(SALT311.StrType)le.certificatedateto1,(SALT311.StrType)le.certificatestatus1,(SALT311.StrType)le.certificationnumber1,(SALT311.StrType)le.certificationtype1,(SALT311.StrType)le.certificatedatefrom2,(SALT311.StrType)le.certificatedateto2,(SALT311.StrType)le.certificatestatus2,(SALT311.StrType)le.certificationnumber2,(SALT311.StrType)le.certificationtype2,(SALT311.StrType)le.certificatedatefrom3,(SALT311.StrType)le.certificatedateto3,(SALT311.StrType)le.certificatestatus3,(SALT311.StrType)le.certificationnumber3,(SALT311.StrType)le.certificationtype3,(SALT311.StrType)le.certificatedatefrom4,(SALT311.StrType)le.certificatedateto4,(SALT311.StrType)le.certificatestatus4,(SALT311.StrType)le.certificationnumber4,(SALT311.StrType)le.certificationtype4,(SALT311.StrType)le.certificatedatefrom5,(SALT311.StrType)le.certificatedateto5,(SALT311.StrType)le.certificatestatus5,(SALT311.StrType)le.certificationnumber5,(SALT311.StrType)le.certificationtype5,(SALT311.StrType)le.certificatedatefrom6,(SALT311.StrType)le.certificatedateto6,(SALT311.StrType)le.certificatestatus6,(SALT311.StrType)le.certificationnumber6,(SALT311.StrType)le.certificationtype6,(SALT311.StrType)le.starrating,(SALT311.StrType)le.assets,(SALT311.StrType)le.biddescription,(SALT311.StrType)le.competitiveadvantage,(SALT311.StrType)le.cagecode,(SALT311.StrType)le.capabilitiesnarrative,(SALT311.StrType)le.category,(SALT311.StrType)le.chtrclass,(SALT311.StrType)le.productdescription1,(SALT311.StrType)le.productdescription2,(SALT311.StrType)le.productdescription3,(SALT311.StrType)le.productdescription4,(SALT311.StrType)le.productdescription5,(SALT311.StrType)le.classdescription1,(SALT311.StrType)le.subclassdescription1,(SALT311.StrType)le.classdescription2,(SALT311.StrType)le.subclassdescription2,(SALT311.StrType)le.classdescription3,(SALT311.StrType)le.subclassdescription3,(SALT311.StrType)le.classdescription4,(SALT311.StrType)le.subclassdescription4,(SALT311.StrType)le.classdescription5,(SALT311.StrType)le.subclassdescription5,(SALT311.StrType)le.classifications,(SALT311.StrType)le.commodity1,(SALT311.StrType)le.commodity2,(SALT311.StrType)le.commodity3,(SALT311.StrType)le.commodity4,(SALT311.StrType)le.commodity5,(SALT311.StrType)le.commodity6,(SALT311.StrType)le.commodity7,(SALT311.StrType)le.commodity8,(SALT311.StrType)le.completedate,(SALT311.StrType)le.crossreference,(SALT311.StrType)le.dateestablished,(SALT311.StrType)le.businessage,(SALT311.StrType)le.deposits,(SALT311.StrType)le.dunsnumber,(SALT311.StrType)le.enttype,(SALT311.StrType)le.expirationdate,(SALT311.StrType)le.extendeddate,(SALT311.StrType)le.issuingauthority,(SALT311.StrType)le.keywords,(SALT311.StrType)le.licensenumber,(SALT311.StrType)le.licensetype,(SALT311.StrType)le.mincd,(SALT311.StrType)le.minorityaffiliation,(SALT311.StrType)le.minorityownershipdate,(SALT311.StrType)le.siccode1,(SALT311.StrType)le.siccode2,(SALT311.StrType)le.siccode3,(SALT311.StrType)le.siccode4,(SALT311.StrType)le.siccode5,(SALT311.StrType)le.siccode6,(SALT311.StrType)le.siccode7,(SALT311.StrType)le.siccode8,(SALT311.StrType)le.naicscode1,(SALT311.StrType)le.naicscode2,(SALT311.StrType)le.naicscode3,(SALT311.StrType)le.naicscode4,(SALT311.StrType)le.naicscode5,(SALT311.StrType)le.naicscode6,(SALT311.StrType)le.naicscode7,(SALT311.StrType)le.naicscode8,(SALT311.StrType)le.prequalify,(SALT311.StrType)le.procurementcategory1,(SALT311.StrType)le.subprocurementcategory1,(SALT311.StrType)le.procurementcategory2,(SALT311.StrType)le.subprocurementcategory2,(SALT311.StrType)le.procurementcategory3,(SALT311.StrType)le.subprocurementcategory3,(SALT311.StrType)le.procurementcategory4,(SALT311.StrType)le.subprocurementcategory4,(SALT311.StrType)le.procurementcategory5,(SALT311.StrType)le.subprocurementcategory5,(SALT311.StrType)le.renewal,(SALT311.StrType)le.renewaldate,(SALT311.StrType)le.unitedcertprogrampartner,(SALT311.StrType)le.vendorkey,(SALT311.StrType)le.vendornumber,(SALT311.StrType)le.workcode1,(SALT311.StrType)le.workcode2,(SALT311.StrType)le.workcode3,(SALT311.StrType)le.workcode4,(SALT311.StrType)le.workcode5,(SALT311.StrType)le.workcode6,(SALT311.StrType)le.workcode7,(SALT311.StrType)le.workcode8,(SALT311.StrType)le.exporter,(SALT311.StrType)le.exportbusinessactivities,(SALT311.StrType)le.exportto,(SALT311.StrType)le.exportbusinessrelationships,(SALT311.StrType)le.exportobjectives,(SALT311.StrType)le.reference1,(SALT311.StrType)le.reference2,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,202,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_Diversity_Certification) prevDS = DATASET([], Layout_Diversity_Certification), STRING10 Src='UNK'):= FUNCTION
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Input_Layout_Diversity_Certification) prevDS = DATASET([], Input_Layout_Diversity_Certification), STRING10 Src='UNK'):= FUNCTION
   // field error stats
     SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
@@ -1992,7 +1992,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
  
     // field population stats
-    mod_hygiene := hygiene(PROJECT(h, Layout_Diversity_Certification));
+    mod_hygiene := Input_hygiene(PROJECT(h, Input_Layout_Diversity_Certification));
     hygiene_summaryStats := mod_hygiene.Summary('');
     getFieldTypeText(infield) := FUNCTIONMACRO
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
@@ -2636,7 +2636,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
  
-    mod_Delta := Delta(prevDS, PROJECT(h, Layout_Diversity_Certification));
+    mod_Delta := Input_Delta(prevDS, PROJECT(h, Input_Layout_Diversity_Certification));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),205,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
@@ -2649,13 +2649,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
 END;
  
-EXPORT StandardStats(DATASET(Layout_Diversity_Certification) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+EXPORT StandardStats(DATASET(Input_Layout_Diversity_Certification) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Diversity_Certification, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Diversity_Certification, Input_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;

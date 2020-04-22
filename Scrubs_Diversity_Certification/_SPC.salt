@@ -1,6 +1,7 @@
 ﻿OPTIONS:-gh
 MODULE:Scrubs_Diversity_Certification
 FILENAME:Diversity_Certification
+NAMESCOPE:Input
 
 FIELDTYPE:Invalid_No:ALLOW(0123456789)
 FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$)
@@ -11,7 +12,7 @@ FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPq
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0)
 FIELDTYPE:Invalid_Future:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0, 'Future')
 FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)
-FIELDTYPE:Invalid_Zip:TRIM:LIKE(Invalid_No):LENGTHS(0,5)
+FIELDTYPE:Invalid_Zip:TRIM:LIKE(Invalid_Float):LENGTHS(0,5,10)
 FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,9,10)
 FIELDTYPE:Invalid_NAICS:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_naics > 0)
 FIELDTYPE:Invalid_Commodity:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Commodity > 0)
@@ -23,15 +24,15 @@ FIELD:dateupdated:TYPE(STRING):LIKE(Invalid_Date):0,0
 FIELD:website:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:state:TYPE(STRING):LIKE(Invalid_State):0,0
 FIELD:profilelastupdated:TYPE(STRING):LIKE(Invalid_Date):0,0
-FIELD:county:TYPE(STRING):LIKE(Invalid_AlphaNum):0,0
+FIELD:county:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:servicearea:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:region1:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:region2:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:region3:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:region4:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
 FIELD:region5:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
-FIELD:fname:TYPE(STRING):LIKE(Invalid_Alpha):0,0
-FIELD:lname:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:fname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+FIELD:lname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
 FIELD:mname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
 FIELD:suffix:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:title:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0

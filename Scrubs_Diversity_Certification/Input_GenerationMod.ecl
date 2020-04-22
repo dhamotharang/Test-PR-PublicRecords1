@@ -1,6 +1,6 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
-EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
+EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
   EXPORT salt_VERSION := 'V3.11.9';
@@ -9,7 +9,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_Diversity_Certification';
-  EXPORT spc_NAMESCOPE := '';
+  EXPORT spc_NAMESCOPE := 'Input';
   EXPORT spc_PROCESS := '';
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
@@ -41,6 +41,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_Diversity_Certification\n'
     + 'FILENAME:Diversity_Certification\n'
+    + 'NAMESCOPE:Input\n'
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789)\n'
     + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$)\n'
@@ -51,7 +52,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0)\n'
     + 'FIELDTYPE:Invalid_Future:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0, \'Future\')\n'
     + 'FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)\n'
-    + 'FIELDTYPE:Invalid_Zip:TRIM:LIKE(Invalid_No):LENGTHS(0,5)\n'
+    + 'FIELDTYPE:Invalid_Zip:TRIM:LIKE(Invalid_Float):LENGTHS(0,5,10)\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,9,10)\n'
     + 'FIELDTYPE:Invalid_NAICS:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_naics > 0)\n'
     + 'FIELDTYPE:Invalid_Commodity:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Commodity > 0)\n'
@@ -63,15 +64,15 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:website:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:state:TYPE(STRING):LIKE(Invalid_State):0,0\n'
     + 'FIELD:profilelastupdated:TYPE(STRING):LIKE(Invalid_Date):0,0\n'
-    + 'FIELD:county:TYPE(STRING):LIKE(Invalid_AlphaNum):0,0\n'
+    + 'FIELD:county:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:servicearea:TYPE(STRING):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:region1:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:region2:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:region3:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:region4:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:region5:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0\n'
-    + 'FIELD:fname:TYPE(STRING):LIKE(Invalid_Alpha):0,0\n'
-    + 'FIELD:lname:TYPE(STRING):LIKE(Invalid_Alpha):0,0\n'
+    + 'FIELD:fname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
+    + 'FIELD:lname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:mname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:suffix:TYPE(STRING):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:title:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'

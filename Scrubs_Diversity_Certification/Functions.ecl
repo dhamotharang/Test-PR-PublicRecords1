@@ -5,9 +5,13 @@ EXPORT Functions := MODULE
     //CHECK FOR VALID SIC CODE
     EXPORT fn_Valid_Sic(string st) := FUNCTION
 
+        sic := std.str.filter(st, '0123456789');
+
         RETURN if
         ( 
-            LENGTH(std.str.filter(st, '0123456789')) in [0,4,8],
+            LENGTH(sic) in [0,4,8]
+            AND scrubs.functions.fn_valid_SicCode(sic) > 0
+            ,
             1,
             0
         );
@@ -27,9 +31,13 @@ EXPORT Functions := MODULE
     //CHECK FOR VALID NAICS CODE
     EXPORT fn_Valid_NAICS(string st) := FUNCTION
 
+        naics := std.str.filter(st, '0123456789');
+
         RETURN if
         ( 
-            LENGTH(std.str.filter(st, '0123456789')) in [0,2,3,4,5,6],
+            LENGTH(naics) in [0,2,3,4,5,6]
+            AND scrubs.functions.fn_validate_NAICSCode(naics) > 0
+            ,
             1,
             0
         );
