@@ -47,8 +47,8 @@ export Build_All(string	pversion ,string fileDate) := module
 																				,nothor(apply(filenames().Input.dAll_superfilenames, versioncontrol.mUtilities.createsuper(name)))
 																				,CreateTempKeyBuildIfNotExist
 																				,spray_files
-																				,run_scrubs
 																				,PreBuild
+																				,run_scrubs
 																				,Build_KeyBuild_File
 																				,KeyBuild_main
 																				,Build_Base_File
