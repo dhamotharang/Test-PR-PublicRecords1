@@ -1502,141 +1502,122 @@ Event: => AgencyUid := CustomerId;
 Event: => AgencyProgType := IndustryType;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
-// Event: => T_SrcAgencyUID := SourceCustomers{rSourceCustomer.CustomerId}; //CHECKME - need to ask about source agency
-// Event: => T_SrcAgencyProgType := SourceCustomers{rSourceCustomer.IndustryType}; //CHECKME - same as above
+Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; //CHECKME - need to ask about source agency
+Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; //CHECKME - same as above
 
 Event: => T_ActUid := RecordId;
 Event: => T_ActDtEcho := EventDate; 
 
-Event: => T_SrcType := // MAP(rin_source = 0 => -99997,
-                       rin_source; //FIXME - need to update once rin_source is actually showing up
+Event: => T_SrcType := MAP(rin_source <= 0 OR rin_source > 12 => -99997,
+                           rin_source); //FIXME - need to update once rin_source is actually showing up
 Event: => T_SrcClassType := MAP(T_SrcType = -99997 => -99997,
 																T_SrcType IN [6,11] => 1,
 																T_SrcType IN [4,5] => 2,
 																T_SrcType IN [2,3] => 3,
 																4);
-																
-// Event: => T_InpClnTitleEcho := MAP(Subject.FullName.Title = '' => -99999,
-																	 // Subject.FullName.Title);
-// Event: => T_InpClnFirstNmEcho := MAP(Subject.FullName.FirstName ='' => -99999,
-																	 // Subject.FullName.FirstName);
-// Event: => T_InpClnLastNmEcho := MAP(Subject.FullName.LastName = '' => -99999,
-																	 // Subject.FullName.LastName);
-// Event: => T_InpClnNmSuffixEcho := MAP(Subject.FullName.NameSuffix = '' => -99999,
-																	 // Subject.FullName.NameSuffix);
+
+Event: => T_PersonUidEcho	:= MAP(LexId = '' OR LexId:Null => -99999, LexId);
+																	
+														
+Event: => T_InpClnTitleEcho := MAP(Title = '' OR Title:Null => -99999, Title);
+Event: => T_InpClnFirstNmEcho := MAP(FirstName ='' OR FirstName:Null => -99999, FirstName);
+Event: => T_InpClnLastNmEcho := MAP(LastName = '' OR LastName:Null => -99999, LastName);
+Event: => T_InpClnNmSuffixEcho := MAP(NameSuffix = '' OR NameSuffix:Null => -99999, NameSuffix);
 																	 
-Event: => T_InpClnAddrPrimRangeEcho := MAP(Location.PrimaryRange = '' => -99999,
-																					 Location.PrimaryRange);
-Event: => T_InpClnAddrPreDirEcho := MAP(Location.Predirectional = '' => -99999,
-																					 Location.Predirectional);
-Event: => T_InpClnAddrPrimNmEcho := MAP(Location.PrimaryName = '' => -99999,
-																					 Location.PrimaryName);
-Event: => T_InpClnAddrSuffixEcho := MAP(Location.Suffix = '' => -99999,
-																					 Location.Suffix);
-Event: => T_InpClnAddrPostDirEcho := MAP(Location.Postdirectional = '' => -99999,
-																					 Location.Postdirectional);
+Event: => T_InpClnAddrPrimRangeEcho := MAP(PrimaryRange = '' OR PrimaryRange:Null => -99999, PrimaryRange);
+Event: => T_InpClnAddrPreDirEcho := MAP(Predirectional = '' OR Predirectional:Null => -99999, Predirectional);
+Event: => T_InpClnAddrPrimNmEcho := MAP(PrimaryName = '' OR PrimaryName:Null => -99999, PrimaryName);
+Event: => T_InpClnAddrSuffixEcho := MAP(Suffix = '' OR Suffix:Null => -99999, Suffix);
+Event: => T_InpClnAddrPostDirEcho := MAP(Postdirectional = '' OR Postdirectional:Null => -99999, Postdirectional);
+Event: => T_InpClnAddrUnitDesigEcho := MAP(UnitDesignation = '' OR UnitDesignation:Null => -99999, UnitDesignation);
+Event: => T_InpClnAddrSecRangeEcho := MAP(SecondaryRange = '' OR SecondaryRange:Null => -99999, SecondaryRange);
+Event: => T_InpClnAddrCityEcho := MAP(PostalCity = '' OR PostalCity:Null => -99999, PostalCity);
+Event: => T_InpClnAddrStEcho := MAP(State = '' OR State:Null => -99999, State);
+Event: => T_InpClnAddrZip5Echo := MAP(Zip = '' OR Zip:Null => -99999, Zip);
+Event: => T_InpClnAddrZip4Echo := MAP(Zip4 = '' OR Zip4:Null => -99999, Zip4);
+Event: => T_InpClnAddrLatEcho := MAP(Latitude:Null => -99999, Latitude);
+Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null => -99999, Longitude);
+Event: => T_InpClnAddrCountyEcho := MAP(County = '' OR County:Null => -99999, County);
+Event: => T_InpClnAddrGeoBlkEcho := MAP(GeoBlock = '' OR GeoBlock:Null => -99999, GeoBlock);
+// Event: => T_InpClnAddrCountryEcho := MAP(Country = '' => -99999, Country); // is country listed?
 
-Event: => T_InpClnAddrUnitDesigEcho := MAP(Location.UnitDesignation = '' => -99999,
-																					 Location.UnitDesignation);
-Event: => T_InpClnAddrSecRangeEcho := MAP(Location.SecondaryRange = '' => -99999,
-																					 Location.SecondaryRange);
-Event: => T_InpClnAddrCityEcho := MAP(Location.PostalCity = '' => -99999,
-																					 Location.PostalCity);
-Event: => T_InpClnAddrStEcho := MAP(Location.State = '' => -99999,
-																					 Location.State);
-Event: => T_InpClnAddrAddrZip5Echo := MAP(Location.Zip = '' => -99999, //CHECKME - make sure this is the 5 digit zip code
-																					 Location.Zip);
-Event: => T_InpClnAddrZip4Echo := MAP(Location.Zip4 = '' => -99999,
-																					 Location.Zip4);
-Event: => T_InpClnAddrLatEcho := MAP(Location.Latitude:Null => -99999,
-																					 Location.Latitude);
-Event: => T_InpClnAddrLongEcho := MAP(Location.Longitude:Null => -99999,
-																					 Location.Longitude);
-Event: => T_InpClnAddrCountyEcho := MAP(Location.County = '' => -99999,
-																					 Location.County);
-Event: => T_InpClnAddrGeoBlkEcho := MAP(Location.GeoBlock = '' => -99999,
-																					 Location.GeoBlock);
-// Event: => T_InpClnAddrCountryEcho := MAP(Location.Country = '' => -99999, //is country listed anywhere?
-																					 // Location.Country);
-// Event: => T_InpClnSSNEcho := MAP(Subject.ReportedSsn.Ssn = '' => -99999, //are there multiple reported SSNs/Do I need to specify the latest?
-																 // Subject.ReportedSsn.Ssn);
-Event: => T_InpClnDobEcho := MAP(Subject.DateOfBirth:Null => -99999,
-																	INTEGER(Subject.DateOfBirth));
-Event: => T_InpClnDlEcho := MAP(rDriversLicense.LicenseNumber = '' => -99999,
-																rDriversLicense.LicenseNumber);
-Event: => T_InpClnDlStEcho := MAP(rDriversLicense.State = '' => -99999,
-																	rDriversLicense.State);
-Event: => T_InpClnEmailEcho := MAP(rEmail.EmailAddress = '' => -99999,
-																	 rEmail.EmailAddress);
-Event: => T_InpClnBnkAcctEcho := MAP(rBankAccount.AccountNumber = '' => -99999,
-																		 rBankAccount.AccountNumber);
-Event: => T_InpClnBnkAcctRtgEcho := MAP(rBankAccount.rBank.RoutingNumber = '' => -99999,
-																				rBankAccount.rBank.RoutingNumber);
+Event: => T_InpClnSsnEcho := MAP(Ssn = '' OR Ssn:Null => -99999, Ssn);
+Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999, INTEGER(DateOfBirth));
+Event: => T_InpClnDlEcho := MAP(LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999, rDriversLicense.LicenseNumber);
+Event: => T_InpClnDlStEcho := MAP(LicenseState = '' OR LicenseState:Null => -99999, LicenseState);
+Event: => T_InpClnEmailEcho := MAP(EmailAddress = '' OR EmailAddress:Null => -99999, EmailAddress);
+Event: => T_InpClnBnkAcctEcho := MAP(AccountNumber = '' OR AccountNumber:Null => -99999, AccountNumber);
+Event: => T_InpClnBnkAcctRtgEcho := MAP(RoutingNumber = '' OR RoutingNumber:Null => -99999, RoutingNumber);
+Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' OR IpAddress:Null => -99999, IpAddress);
+Event: => T_InpClnPhnEcho := MAP(PhoneNumber = '' OR PhoneNumber:Null => -99999, PhoneNumber);
 
+Event: => T1_LexIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
+																 NoLexId = 1 => 0, 1);
+Event: => T1_RinIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
+																 NoLexId = 1 => 1, 0);
+																 
 
-Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' => -99999, 
-																		IpAddress);
 Event: => T18_IsIpMetaHitFlag := MAP(T_InpClnIpAddrEcho = -99999 => -99999, 
                                      T_InpClnIpAddrEcho != -99999 AND iprngbeg = '' AND iprngend = '' => 0,
-																		 1);
-																		 
+																		 1);										 
 Event: => T18_IpAddrCity := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																edgecity = '' => -99997,
+																edgecity = '' OR edgecity:Null => -99997,
 																edgecity);
 Event: => T18_IpAddrCountry := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																edgecountry = '' => -99997,
+																edgecountry = '' OR edgecountry:Null => -99997,
 																edgecountry);
 Event: => T18_IpAddrRegion := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																edgeregion = '' => -99997,
+																edgeregion = '' OR edgeregion:Null => -99997,
 																edgeregion);
 Event: => T18_IpAddrDomain := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																domainname = '' => -99997,
+																domainname = '' OR domainname:Null => -99997,
 																domainname);
 Event: => T18_IpAddrIspNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																ispname = '' => -99997,
+																ispname = '' OR ispname:Null => -99997,
 															  ispname);
 Event: => T18_IpAddrLocType := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																homebiztype = '' => -99997,
+																homebiztype = '' OR homebiztype:Null => -99997,
 															  homebiztype);
 Event: => T18_IpAddrProxyType := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																proxytype = '' => -99997,
+																proxytype = '' OR proxytype:Null => -99997,
 															  proxytype);
 Event: => T18_IpAddrProxyDesc := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																proxydescription = '' => -99997,
+																proxydescription = '' OR proxydescription:Null => -99997,
 															  proxydescription);
 Event: => T18_IpAddrIsIspFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																isanisp:Null => -99997,
-															  isanisp);
-Event: => T18_IpAddrAsn:= MAP(T_InpClnIpAddrEcho=-99999 => -99999,
-																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																asnname = '' => -99997,
-															  asnname);
-Event: => T18_IpAddrIsAsnFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+															  isanisp='YES' => 1,
+																isanisp='NO' => 0);
+Event: => T18_IpAddrAsnCompNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
+															T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+															asnname = '' OR asnname:Null => -99997,
+															asnname);
+Event: => T18_IpAddrAsn := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																asn:Null => -99997,
 															  asn);
 Event: => T18_IpAddrCompNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																companyname = '' => -99997,
+																companyname = '' OR companyname:Null => -99997,
 															  companyname);
 Event: => T18_IpAddrOrgNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																organizationname = '' => -99997,
+																organizationname = '' OR organizationname:Null => -99997,
 															  organizationname);
 																
 Event: => T18_IpAddrHostedFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																T18_IpAddrProxyType<1 OR T18_IpAddrProxyDesc<1 => -99997,
-															  T18_IpAddrProxyType='HOSTING' AND (T18_IpAddrProxyDesc != 'CLOUD-SECURITY' OR T18_IpAddrProxyDesc != 'CLOUD') => 1, //CHECKME - double check this logic make sure it matches reqs
+															  T18_IpAddrProxyType='HOSTING' AND (T18_IpAddrProxyDesc != 'CLOUD-SECURITY' AND T18_IpAddrProxyDesc != 'CLOUD') => 1, //CHECKME - double check this logic make sure it matches reqs
 																0);
 Event: => T18_IpAddrVpnFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -1659,38 +1640,118 @@ Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																AgencyProgJurSt != 'FL' AND T18_IpAddrCity = 'MIAMI' => 1,
 																0);
 																
-Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho < -99997 OR T_InpClnBnkAcctRtgEcho < -99997  => 0,
-																    T_InpClnBnkAcctEcho > -99997 AND T_InpClnBnkAcctRtgEcho > -99997 => 1);
-Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //where is this? bank has a hit field
-																		 0); 
+Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho IN ['-99999','-99998'] OR T_InpClnBnkAcctRtgEcho IN ['-99999','-99998'] => 0,
+																    1);
+Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, //is bankhit what I should be using for this?
+																		 BankHit); 
 Event: => T19_BnkAcctBnkNm := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																	T19_IsBnkAppHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	rBankAccount.rBank.FullBankname); //could also use AbbreviatedBankname
+																	FullBankname); 
 Event: => T19_BnkAcctHRPrePdRtgFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
 																					 T_SrcClassType < 4 => -99998,
 																					 T_InpClnBnkAcctRtgEcho IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'] => 1,
 																					 0);
 																					 
-Event: => T17_EmailPopFlag := MAP(T_InpClnEmailEcho < -99997 OR rEmail.EmailLastDomain = '' => 0, //DOUBLECHECK this - not exactly sure emaillastdomain is what I think it is
+Event: => T17_EmailPopFlag := MAP(T_InpClnEmailEcho = '-99999' => 0, 
 																	1);
 Event: => T17_EmailDomain := MAP(T17_EmailPopFlag = 0 => -99999,
 																 T_SrcClassType < 4 => -99998,
-																 rEmail.EmailLastDomain); //CHECKME - check that this is actually just the domain name
+																 -99997); //FIXME - need to figure out some string manipulation to pull domain out of full email
 Event: => T17_EmailDomainDispFlag := MAP(T17_EmailPopFlag = 0 => -99999,
 																				 T_SrcClassType < 4 => -99998,
 																				 rEmail.isdisposableemail);
 //FIXME 
-Event: => T9_AddrPopFlag := 1;//MAP((street != '' AND T_InpClnAddrCityEcho=-99999 AND T_InpClnAddrStEcho=-99999) OR (street != '' AND T_InpClnAddrZip5Echo=-99999),
-//																0);
+Event: => T9_AddrPopFlag := MAP((T_InpClnAddrPrimNmEcho != -99999 AND T_InpClnAddrCityEcho != -99999 AND T_InpClnAddrStEcho != -99999) OR (T_InpClnAddrPrimNmEcho != -99999 AND T_InpClnAddrZip5Echo != -99999) => 1,0);
 Event: => T9_AddrType := MAP(T9_AddrPopFlag < 1 => -99999,
-														 Location.TypeCode = '' => -99997,
+														 Location.TypeCode = '' OR Location.TypeCode:Null => -99997,
 														 Location.TypeCode);
 Event: => T9_AddrStatus := MAP(T9_AddrPopFlag < 1 => -99999,
-															 Location.ACECleanerErrorCode = '' => -99997,
+															 Location.ACECleanerErrorCode = '' OR Location.ACECleanerErrorCode:Null => -99997,
 															 Location.ACECleanerErrorCode);
 
+Event: => T16_PhnPopFlag := MAP(T_InpClnPhnEcho IN ['-99999','-99998','-99997'] OR LENGTH(T_InpClnPhnEcho) < 10 => 0, 1);
 
+Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
 
+Event: => T20_DlPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR T_InpClnDlStEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+Event: => T18_IpAddrPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+Event: => T_InAgencyFlag := MAP(AgencyUid != T_SrcAgencyUid => 0, 1);
+
+Event: => T_KrCodeEcho := MAP(T_SrcClassType != 3 => -99998, 1);
+															// EventTypes.EventType IN ['100','101','190','191','192','193',
+																											 // '200','201','202','203','204','290','291','292','293',
+																											 // '300','301','302','303','390','391','392','393',
+																											 // '400','401','402','490','491','492','493',
+																											 // '500','501','502','590','591','592','593',
+																											 // '600','601','602','603','604','605',
+																											 // '1000','1001','1090','1091','1092','1093',
+																											 // '800','801','802','890','891','892','893',
+																											 // '10000','10001','10002','10003','10004','10005','10006','10007',
+																											 // '11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
+																											 // '12000','12001','12002','12003','12004','12006','12007',
+																											 // '13000','13001','13002','13003','13005','13006','13007',
+																											 // '14900','14901','14902','14903'] => EventTypes.EventType,
+															// -99997);
+
+// Event: => T_KrCodeDesc := MAP(T_SrcClassType != 3 => -99998, //FIXME - are the kr codes actually listed somewhere or do I need to put them in?
+															// T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+															// 'tbd');
+Event: => T15_SsnIsKrFlag := MAP(T15_SsnPopFlag = 0 => -99999,
+																 T_SrcClassType != 3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['100','101','190','191','192','193'])) > 0 => 1, 0);
+																 
+Event: => T20_DlIsKRFlag := MAP(T20_DlPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['200','201','202','203','204','290','291','292','293'])) > 0 => 1, 0);
+
+Event: => T9_AddrIsKrFlag := MAP(T9_AddrPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['300','301','302','303','390','391','392','393']))>0 => 1, 0);
+																
+Event: => T16_PhnIsKrFlag := MAP(T16_PhnPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['400','401','402','490','491','492','493']))>0 => 1, 0);
+Event: => T17_EmailIsKrFlag := MAP(T17_EmailPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['500','501','502','590','591','592','593']))>0 => 1, 0);
+Event: => T18_IpAddrIsKrFlag := MAP(T18_IpAddrPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['600','601','602','603','604','605','1000','1001','1090','1091','1092','1093']))>0 => 1, 0);
+Event: => T19_BnkAcctIsKrFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['800','801','802','890','891','892','893']))>0 => 1, 0);
+Event: => T1_IdIsKrGenFrdFlag := MAP(T1_LexIdPopFlag = 0 AND T1_RinIdPopFlag = 0 => -99999,
+																 T_SrcClassType !=3 => -99998,
+																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																 COUNT(EventTypes(EventType IN ['10000','10001','10002','10003','10004','10005','10006','10007',
+																									'11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
+																									'12000','12001','12002','12003','12004','12006','12007',
+																									'13000','13001','13002','13003','13005','13006','13007']))>0 => 1, 0);
+Event: => T1_IdIsKrStolIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																     T_SrcClassType != 3 => -99998,
+																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																     COUNT(EventTypes(EventType IN ['10000','10001','10002','10004']))>0 => 1, 0);
+Event: => T1_IdIsKrAppFrdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																     T_SrcClassType != 3 => -99998,
+																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																     COUNT(EventTypes(EventType IN ['10002','10003','11003','11005','11017','11018','11019']))>0 => 1, 0);
+Event: => T1_IdIsKrOthFrdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																     T_SrcClassType != 3 => -99998,
+																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																     COUNT(EventTypes(EventType IN ['14900','14901','14902','14903']))>0 => 1, 0);
+Event: => T1_IdIsKrFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																     T_SrcClassType != 3 => -99998,
+																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																     T1_IdIsKrGenFrdFlag=1 OR T1_IdIsKrStolIdFlag=1 OR T1_IdIsKrAppFrdFlag=1 OR T1_IdIsKrOthFrdFlag=1 => 1, 0);
 
 
 
