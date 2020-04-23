@@ -1,4 +1,4 @@
-import std, ut;
+﻿import std, ut;
 
 	GetNameSources(dataset(Layouts.rEntity) src) := JOIN(DISTRIBUTE(src,Ent_id), 
 								DISTRIBUTE(WorldCompliance.GetSanctions(src),Ent_id),
@@ -6,8 +6,9 @@ import std, ut;
 			TRANSFORM(rComments,
 				self.Ent_Id := LEFT.Ent_Id;
 				self.sorter := 1;
+				self.subcmts := '';
 				self.cmts := 'Source: ' + TRIM(Right.Country) + ',' + TRIM(Right.SourceName);), INNER, LOCAL);
-
+				
 
 
 Layout_XG.rgeo xForm(Layouts.rEntity infile) := TRANSFORM, SKIP(infile.EntryType <> 'Country')
