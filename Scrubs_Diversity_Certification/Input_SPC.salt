@@ -12,7 +12,7 @@ FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPq
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0)
 FIELDTYPE:Invalid_Future:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0, 'Future')
 FIELDTYPE:Invalid_State:CUSTOM(scrubs.functions.fn_Valid_StateAbbrev > 0)
-FIELDTYPE:Invalid_Zip:LEFTTRIM:LIKE(Invalid_Float):LENGTHS(0,5,9,10)
+FIELDTYPE:Invalid_Zip:LIKE(Invalid_Float):LENGTHS(0,5,9,10)
 FIELDTYPE:Invalid_Phone:CUSTOM(Scrubs.Functions.fn_verify_optional_phone > 0)
 FIELDTYPE:Invalid_NAICS:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_naics > 0)
 FIELDTYPE:Invalid_Commodity:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Commodity > 0)
