@@ -52,7 +52,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0)\n'
     + 'FIELDTYPE:Invalid_Future:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Date > 0, \'Future\')\n'
     + 'FIELDTYPE:Invalid_State:CUSTOM(scrubs.functions.fn_Valid_StateAbbrev > 0)\n'
-    + 'FIELDTYPE:Invalid_Zip:TRIM:LIKE(Invalid_Float):LENGTHS(0,5,9,10)\n'
+    + 'FIELDTYPE:Invalid_Zip:LEFTTRIM:LIKE(Invalid_Float):LENGTHS(0,5,9,10)\n'
     + 'FIELDTYPE:Invalid_Phone:CUSTOM(Scrubs.Functions.fn_verify_optional_phone > 0)\n'
     + 'FIELDTYPE:Invalid_NAICS:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_naics > 0)\n'
     + 'FIELDTYPE:Invalid_Commodity:CUSTOM(Scrubs_Diversity_Certification.Functions.fn_valid_Commodity > 0)\n'
