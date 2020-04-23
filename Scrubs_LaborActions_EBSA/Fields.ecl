@@ -16,12 +16,11 @@ EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(
 EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Float(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789 .,-/$"'); // Only allow valid symbols
-  s2 := TRIM(s1,LEFT); // Left trim
-  RETURN  s2;
+  s1 := SALT311.stringfilter(s0,'0123456789 .,-/'); // Only allow valid symbols
+  RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/$"'))));
-EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLeft,SALT311.HygieneErrors.NotInChars('0123456789 .,-/$"'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/'))));
+EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .,-/'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
@@ -53,7 +52,7 @@ EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygiene
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','penalty_amount');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','penalty_amount');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dart_id' => 0,'date_added' => 1,'date_updated' => 2,'website' => 3,'state' => 4,'casetype' => 5,'plan_ein' => 6,'plan_no' => 7,'plan_year' => 8,'plan_name' => 9,'plan_administrator' => 10,'admin_state' => 11,'admin_zip_code' => 12,'admin_zip_code4' => 13,'closing_reason' => 14,'closing_date' => 15,'penalty_amount' => 16,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['LEFTTRIM','ALLOW'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -122,9 +121,9 @@ EXPORT Make_closing_date(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
 EXPORT InValid_closing_date(SALT311.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_closing_date(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_penalty_amount(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
-EXPORT InValid_penalty_amount(SALT311.StrType s) := InValidFT_Invalid_Float(s);
-EXPORT InValidMessage_penalty_amount(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
+EXPORT Make_penalty_amount(SALT311.StrType s0) := s0;
+EXPORT InValid_penalty_amount(SALT311.StrType s) := 0;
+EXPORT InValidMessage_penalty_amount(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO

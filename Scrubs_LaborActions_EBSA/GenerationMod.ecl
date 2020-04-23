@@ -43,7 +43,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:LaborActions_EBSA\n'
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789)\n'
-    + 'FIELDTYPE:Invalid_Float:LEFTTRIM:ALLOW(0123456789 .,-/$")\n'
+    + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ )\n'
     + 'FIELDTYPE:Invalid_AlphaNumChar:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/&\\(\\))\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.Fn_Valid_Date > 0)\n'
@@ -65,7 +65,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:admin_zip_code4:TYPE(STRING):LIKE(Invalid_No):0,0\n'
     + 'FIELD:closing_reason:TYPE(STRING):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:closing_date:TYPE(STRING):LIKE(Invalid_Date):0,0\n'
-    + 'FIELD:penalty_amount:TYPE(STRING):LIKE(Invalid_Float):0,0'
+    + 'FIELD:penalty_amount:TYPE(STRING):0,0'
     ;
  
   // Structured values

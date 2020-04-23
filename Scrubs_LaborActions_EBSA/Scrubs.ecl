@@ -3,10 +3,10 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 21;
-  EXPORT NumRulesFromFieldType := 21;
+  EXPORT NumRules := 17;
+  EXPORT NumRulesFromFieldType := 17;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 17;
+  EXPORT NumFieldsWithRules := 16;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_LaborActions_EBSA)
@@ -26,7 +26,6 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 admin_zip_code4_Invalid;
     UNSIGNED1 closing_reason_Invalid;
     UNSIGNED1 closing_date_Invalid;
-    UNSIGNED1 penalty_amount_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_LaborActions_EBSA)
     UNSIGNED8 ScrubsBits1;
@@ -41,9 +40,9 @@ EXPORT Scrubs := MODULE
           ,'website:Invalid_Alpha:ALLOW'
           ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
           ,'casetype:Invalid_Alpha:ALLOW'
-          ,'plan_ein:Invalid_Float:LEFTTRIM','plan_ein:Invalid_Float:ALLOW'
+          ,'plan_ein:Invalid_Float:ALLOW'
           ,'plan_no:Invalid_No:ALLOW'
-          ,'plan_year:Invalid_Float:LEFTTRIM','plan_year:Invalid_Float:ALLOW'
+          ,'plan_year:Invalid_Float:ALLOW'
           ,'plan_name:Invalid_AlphaNumChar:ALLOW'
           ,'plan_administrator:Invalid_AlphaNumChar:ALLOW'
           ,'admin_state:Invalid_Alpha:ALLOW'
@@ -51,7 +50,6 @@ EXPORT Scrubs := MODULE
           ,'admin_zip_code4:Invalid_No:ALLOW'
           ,'closing_reason:Invalid_Alpha:ALLOW'
           ,'closing_date:Invalid_Date:CUSTOM'
-          ,'penalty_amount:Invalid_Float:LEFTTRIM','penalty_amount:Invalid_Float:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -66,9 +64,9 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_website(1)
           ,Fields.InvalidMessage_state(1),Fields.InvalidMessage_state(2)
           ,Fields.InvalidMessage_casetype(1)
-          ,Fields.InvalidMessage_plan_ein(1),Fields.InvalidMessage_plan_ein(2)
+          ,Fields.InvalidMessage_plan_ein(1)
           ,Fields.InvalidMessage_plan_no(1)
-          ,Fields.InvalidMessage_plan_year(1),Fields.InvalidMessage_plan_year(2)
+          ,Fields.InvalidMessage_plan_year(1)
           ,Fields.InvalidMessage_plan_name(1)
           ,Fields.InvalidMessage_plan_administrator(1)
           ,Fields.InvalidMessage_admin_state(1)
@@ -76,7 +74,6 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_admin_zip_code4(1)
           ,Fields.InvalidMessage_closing_reason(1)
           ,Fields.InvalidMessage_closing_date(1)
-          ,Fields.InvalidMessage_penalty_amount(1),Fields.InvalidMessage_penalty_amount(2)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -102,13 +99,12 @@ EXPORT FromNone(DATASET(Layout_LaborActions_EBSA) h) := MODULE
     SELF.admin_zip_code4_Invalid := Fields.InValid_admin_zip_code4((SALT311.StrType)le.admin_zip_code4);
     SELF.closing_reason_Invalid := Fields.InValid_closing_reason((SALT311.StrType)le.closing_reason);
     SELF.closing_date_Invalid := Fields.InValid_closing_date((SALT311.StrType)le.closing_date);
-    SELF.penalty_amount_Invalid := Fields.InValid_penalty_amount((SALT311.StrType)le.penalty_amount);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_LaborActions_EBSA);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dart_id_Invalid << 0 ) + ( le.date_added_Invalid << 1 ) + ( le.date_updated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.casetype_Invalid << 6 ) + ( le.plan_ein_Invalid << 7 ) + ( le.plan_no_Invalid << 9 ) + ( le.plan_year_Invalid << 10 ) + ( le.plan_name_Invalid << 12 ) + ( le.plan_administrator_Invalid << 13 ) + ( le.admin_state_Invalid << 14 ) + ( le.admin_zip_code_Invalid << 15 ) + ( le.admin_zip_code4_Invalid << 16 ) + ( le.closing_reason_Invalid << 17 ) + ( le.closing_date_Invalid << 18 ) + ( le.penalty_amount_Invalid << 19 );
+    SELF.ScrubsBits1 := ( le.dart_id_Invalid << 0 ) + ( le.date_added_Invalid << 1 ) + ( le.date_updated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.casetype_Invalid << 6 ) + ( le.plan_ein_Invalid << 7 ) + ( le.plan_no_Invalid << 8 ) + ( le.plan_year_Invalid << 9 ) + ( le.plan_name_Invalid << 10 ) + ( le.plan_administrator_Invalid << 11 ) + ( le.admin_state_Invalid << 12 ) + ( le.admin_zip_code_Invalid << 13 ) + ( le.admin_zip_code4_Invalid << 14 ) + ( le.closing_reason_Invalid << 15 ) + ( le.closing_date_Invalid << 16 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -136,17 +132,16 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.website_Invalid := (le.ScrubsBits1 >> 3) & 1;
     SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 3;
     SELF.casetype_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.plan_ein_Invalid := (le.ScrubsBits1 >> 7) & 3;
-    SELF.plan_no_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.plan_year_Invalid := (le.ScrubsBits1 >> 10) & 3;
-    SELF.plan_name_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.plan_administrator_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.admin_state_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.admin_zip_code_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.admin_zip_code4_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.closing_reason_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.closing_date_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.penalty_amount_Invalid := (le.ScrubsBits1 >> 19) & 3;
+    SELF.plan_ein_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.plan_no_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.plan_year_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.plan_name_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.plan_administrator_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.admin_state_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.admin_zip_code_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.admin_zip_code4_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.closing_reason_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.closing_date_Invalid := (le.ScrubsBits1 >> 16) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -163,13 +158,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     state_LENGTHS_ErrorCount := COUNT(GROUP,h.state_Invalid=2);
     state_Total_ErrorCount := COUNT(GROUP,h.state_Invalid>0);
     casetype_ALLOW_ErrorCount := COUNT(GROUP,h.casetype_Invalid=1);
-    plan_ein_LEFTTRIM_ErrorCount := COUNT(GROUP,h.plan_ein_Invalid=1);
-    plan_ein_ALLOW_ErrorCount := COUNT(GROUP,h.plan_ein_Invalid=2);
-    plan_ein_Total_ErrorCount := COUNT(GROUP,h.plan_ein_Invalid>0);
+    plan_ein_ALLOW_ErrorCount := COUNT(GROUP,h.plan_ein_Invalid=1);
     plan_no_ALLOW_ErrorCount := COUNT(GROUP,h.plan_no_Invalid=1);
-    plan_year_LEFTTRIM_ErrorCount := COUNT(GROUP,h.plan_year_Invalid=1);
-    plan_year_ALLOW_ErrorCount := COUNT(GROUP,h.plan_year_Invalid=2);
-    plan_year_Total_ErrorCount := COUNT(GROUP,h.plan_year_Invalid>0);
+    plan_year_ALLOW_ErrorCount := COUNT(GROUP,h.plan_year_Invalid=1);
     plan_name_ALLOW_ErrorCount := COUNT(GROUP,h.plan_name_Invalid=1);
     plan_administrator_ALLOW_ErrorCount := COUNT(GROUP,h.plan_administrator_Invalid=1);
     admin_state_ALLOW_ErrorCount := COUNT(GROUP,h.admin_state_Invalid=1);
@@ -177,10 +168,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     admin_zip_code4_ALLOW_ErrorCount := COUNT(GROUP,h.admin_zip_code4_Invalid=1);
     closing_reason_ALLOW_ErrorCount := COUNT(GROUP,h.closing_reason_Invalid=1);
     closing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.closing_date_Invalid=1);
-    penalty_amount_LEFTTRIM_ErrorCount := COUNT(GROUP,h.penalty_amount_Invalid=1);
-    penalty_amount_ALLOW_ErrorCount := COUNT(GROUP,h.penalty_amount_Invalid=2);
-    penalty_amount_Total_ErrorCount := COUNT(GROUP,h.penalty_amount_Invalid>0);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.dart_id_Invalid > 0 OR h.date_added_Invalid > 0 OR h.date_updated_Invalid > 0 OR h.website_Invalid > 0 OR h.state_Invalid > 0 OR h.casetype_Invalid > 0 OR h.plan_ein_Invalid > 0 OR h.plan_no_Invalid > 0 OR h.plan_year_Invalid > 0 OR h.plan_name_Invalid > 0 OR h.plan_administrator_Invalid > 0 OR h.admin_state_Invalid > 0 OR h.admin_zip_code_Invalid > 0 OR h.admin_zip_code4_Invalid > 0 OR h.closing_reason_Invalid > 0 OR h.closing_date_Invalid > 0 OR h.penalty_amount_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.dart_id_Invalid > 0 OR h.date_added_Invalid > 0 OR h.date_updated_Invalid > 0 OR h.website_Invalid > 0 OR h.state_Invalid > 0 OR h.casetype_Invalid > 0 OR h.plan_ein_Invalid > 0 OR h.plan_no_Invalid > 0 OR h.plan_year_Invalid > 0 OR h.plan_name_Invalid > 0 OR h.plan_administrator_Invalid > 0 OR h.admin_state_Invalid > 0 OR h.admin_zip_code_Invalid > 0 OR h.admin_zip_code4_Invalid > 0 OR h.closing_reason_Invalid > 0 OR h.closing_date_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -188,9 +176,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dart_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.casetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_ein_Total_ErrorCount > 0, 1, 0) + IF(le.plan_no_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_year_Total_ErrorCount > 0, 1, 0) + IF(le.plan_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_administrator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_reason_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.penalty_amount_Total_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dart_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.casetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_ein_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_no_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_administrator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_reason_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_date_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dart_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.casetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_ein_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.plan_ein_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_no_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_year_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.plan_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_administrator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_reason_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.penalty_amount_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.penalty_amount_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dart_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.casetype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_ein_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_no_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.plan_administrator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.admin_zip_code4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_reason_ALLOW_ErrorCount > 0, 1, 0) + IF(le.closing_date_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -205,8 +193,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dart_id_Invalid,le.date_added_Invalid,le.date_updated_Invalid,le.website_Invalid,le.state_Invalid,le.casetype_Invalid,le.plan_ein_Invalid,le.plan_no_Invalid,le.plan_year_Invalid,le.plan_name_Invalid,le.plan_administrator_Invalid,le.admin_state_Invalid,le.admin_zip_code_Invalid,le.admin_zip_code4_Invalid,le.closing_reason_Invalid,le.closing_date_Invalid,le.penalty_amount_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dart_id(le.dart_id_Invalid),Fields.InvalidMessage_date_added(le.date_added_Invalid),Fields.InvalidMessage_date_updated(le.date_updated_Invalid),Fields.InvalidMessage_website(le.website_Invalid),Fields.InvalidMessage_state(le.state_Invalid),Fields.InvalidMessage_casetype(le.casetype_Invalid),Fields.InvalidMessage_plan_ein(le.plan_ein_Invalid),Fields.InvalidMessage_plan_no(le.plan_no_Invalid),Fields.InvalidMessage_plan_year(le.plan_year_Invalid),Fields.InvalidMessage_plan_name(le.plan_name_Invalid),Fields.InvalidMessage_plan_administrator(le.plan_administrator_Invalid),Fields.InvalidMessage_admin_state(le.admin_state_Invalid),Fields.InvalidMessage_admin_zip_code(le.admin_zip_code_Invalid),Fields.InvalidMessage_admin_zip_code4(le.admin_zip_code4_Invalid),Fields.InvalidMessage_closing_reason(le.closing_reason_Invalid),Fields.InvalidMessage_closing_date(le.closing_date_Invalid),Fields.InvalidMessage_penalty_amount(le.penalty_amount_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dart_id_Invalid,le.date_added_Invalid,le.date_updated_Invalid,le.website_Invalid,le.state_Invalid,le.casetype_Invalid,le.plan_ein_Invalid,le.plan_no_Invalid,le.plan_year_Invalid,le.plan_name_Invalid,le.plan_administrator_Invalid,le.admin_state_Invalid,le.admin_zip_code_Invalid,le.admin_zip_code4_Invalid,le.closing_reason_Invalid,le.closing_date_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dart_id(le.dart_id_Invalid),Fields.InvalidMessage_date_added(le.date_added_Invalid),Fields.InvalidMessage_date_updated(le.date_updated_Invalid),Fields.InvalidMessage_website(le.website_Invalid),Fields.InvalidMessage_state(le.state_Invalid),Fields.InvalidMessage_casetype(le.casetype_Invalid),Fields.InvalidMessage_plan_ein(le.plan_ein_Invalid),Fields.InvalidMessage_plan_no(le.plan_no_Invalid),Fields.InvalidMessage_plan_year(le.plan_year_Invalid),Fields.InvalidMessage_plan_name(le.plan_name_Invalid),Fields.InvalidMessage_plan_administrator(le.plan_administrator_Invalid),Fields.InvalidMessage_admin_state(le.admin_state_Invalid),Fields.InvalidMessage_admin_zip_code(le.admin_zip_code_Invalid),Fields.InvalidMessage_admin_zip_code4(le.admin_zip_code4_Invalid),Fields.InvalidMessage_closing_reason(le.closing_reason_Invalid),Fields.InvalidMessage_closing_date(le.closing_date_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dart_id_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.date_added_Invalid,'CUSTOM','UNKNOWN')
@@ -214,22 +202,21 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.website_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.casetype_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.plan_ein_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.plan_ein_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.plan_no_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.plan_year_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.plan_year_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.plan_name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.plan_administrator_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.admin_state_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.admin_zip_code_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.admin_zip_code4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.closing_reason_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.closing_date_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.penalty_amount_Invalid,'LEFTTRIM','ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','penalty_amount','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_Date','Invalid_Date','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_Float','Invalid_No','Invalid_Float','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_Date','Invalid_Float','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dart_id,(SALT311.StrType)le.date_added,(SALT311.StrType)le.date_updated,(SALT311.StrType)le.website,(SALT311.StrType)le.state,(SALT311.StrType)le.casetype,(SALT311.StrType)le.plan_ein,(SALT311.StrType)le.plan_no,(SALT311.StrType)le.plan_year,(SALT311.StrType)le.plan_name,(SALT311.StrType)le.plan_administrator,(SALT311.StrType)le.admin_state,(SALT311.StrType)le.admin_zip_code,(SALT311.StrType)le.admin_zip_code4,(SALT311.StrType)le.closing_reason,(SALT311.StrType)le.closing_date,(SALT311.StrType)le.penalty_amount,'***SALTBUG***');
+          ,CHOOSE(le.closing_date_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_Date','Invalid_Date','Invalid_Alpha','Invalid_State','Invalid_Alpha','Invalid_Float','Invalid_No','Invalid_Float','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_Date','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dart_id,(SALT311.StrType)le.date_added,(SALT311.StrType)le.date_updated,(SALT311.StrType)le.website,(SALT311.StrType)le.state,(SALT311.StrType)le.casetype,(SALT311.StrType)le.plan_ein,(SALT311.StrType)le.plan_no,(SALT311.StrType)le.plan_year,(SALT311.StrType)le.plan_name,(SALT311.StrType)le.plan_administrator,(SALT311.StrType)le.admin_state,(SALT311.StrType)le.admin_zip_code,(SALT311.StrType)le.admin_zip_code4,(SALT311.StrType)le.closing_reason,(SALT311.StrType)le.closing_date,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,16,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -248,9 +235,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.website_ALLOW_ErrorCount
           ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.casetype_ALLOW_ErrorCount
-          ,le.plan_ein_LEFTTRIM_ErrorCount,le.plan_ein_ALLOW_ErrorCount
+          ,le.plan_ein_ALLOW_ErrorCount
           ,le.plan_no_ALLOW_ErrorCount
-          ,le.plan_year_LEFTTRIM_ErrorCount,le.plan_year_ALLOW_ErrorCount
+          ,le.plan_year_ALLOW_ErrorCount
           ,le.plan_name_ALLOW_ErrorCount
           ,le.plan_administrator_ALLOW_ErrorCount
           ,le.admin_state_ALLOW_ErrorCount
@@ -258,7 +245,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.admin_zip_code4_ALLOW_ErrorCount
           ,le.closing_reason_ALLOW_ErrorCount
           ,le.closing_date_CUSTOM_ErrorCount
-          ,le.penalty_amount_LEFTTRIM_ErrorCount,le.penalty_amount_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -273,17 +259,16 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.website_ALLOW_ErrorCount
           ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.casetype_ALLOW_ErrorCount
-          ,le.plan_ein_LEFTTRIM_ErrorCount,le.plan_ein_ALLOW_ErrorCount
+          ,le.plan_ein_ALLOW_ErrorCount
           ,le.plan_no_ALLOW_ErrorCount
-          ,le.plan_year_LEFTTRIM_ErrorCount,le.plan_year_ALLOW_ErrorCount
+          ,le.plan_year_ALLOW_ErrorCount
           ,le.plan_name_ALLOW_ErrorCount
           ,le.plan_administrator_ALLOW_ErrorCount
           ,le.admin_state_ALLOW_ErrorCount
           ,le.admin_zip_code_ALLOW_ErrorCount
           ,le.admin_zip_code4_ALLOW_ErrorCount
           ,le.closing_reason_ALLOW_ErrorCount
-          ,le.closing_date_CUSTOM_ErrorCount
-          ,le.penalty_amount_LEFTTRIM_ErrorCount,le.penalty_amount_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.closing_date_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)

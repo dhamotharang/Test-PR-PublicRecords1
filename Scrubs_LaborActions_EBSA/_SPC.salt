@@ -3,7 +3,7 @@ MODULE:Scrubs_LaborActions_EBSA
 FILENAME:LaborActions_EBSA
 
 FIELDTYPE:Invalid_No:ALLOW(0123456789)
-FIELDTYPE:Invalid_Float:LEFTTRIM:ALLOW(0123456789 .,-/$")
+FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/)
 FIELDTYPE:Invalid_Alpha:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ )
 FIELDTYPE:Invalid_AlphaNumChar:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/&\(\))
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.Fn_Valid_Date > 0)
@@ -25,4 +25,4 @@ FIELD:admin_zip_code:TYPE(STRING):LIKE(Invalid_No):0,0
 FIELD:admin_zip_code4:TYPE(STRING):LIKE(Invalid_No):0,0
 FIELD:closing_reason:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:closing_date:TYPE(STRING):LIKE(Invalid_Date):0,0
-FIELD:penalty_amount:TYPE(STRING):LIKE(Invalid_Float):0,0
+FIELD:penalty_amount:TYPE(STRING):0,0
