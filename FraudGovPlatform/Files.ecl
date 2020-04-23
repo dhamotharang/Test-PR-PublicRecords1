@@ -29,10 +29,8 @@ module
 											{string75 fn { virtual(logicalfilename)},Inquiry_AccLogs.Layout.Common_ThorAdditions},
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
-											{string75 fn { virtual(logicalfilename)},Inquiry_AccLogs.Layout_SBA_logs.input_raw},
-											FLAT, OPT);
-											//CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																					
-
+											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																																
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
