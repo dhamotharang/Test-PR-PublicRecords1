@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 17;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Float','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_Date','Invalid_State','Invalid_Zip');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Float' => 2,'Invalid_Alpha' => 3,'Invalid_AlphaNumChar' => 4,'Invalid_Date' => 5,'Invalid_State' => 6,'Invalid_Zip' => 7,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Float','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_Date','Invalid_State');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Float' => 2,'Invalid_Alpha' => 3,'Invalid_AlphaNumChar' => 4,'Invalid_Date' => 5,'Invalid_State' => 6,0);
  
 EXPORT MakeFT_Invalid_No(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -16,11 +16,12 @@ EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(
 EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Float(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789 .,-/$"\\r'); // Only allow valid symbols
-  RETURN  s1;
+  s1 := SALT311.stringfilter(s0,'0123456789 .,-/$"'); // Only allow valid symbols
+  s2 := TRIM(s1,LEFT); // Left trim
+  RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/$"\\r'))));
-EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .,-/$"\\r'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .,-/$"'))));
+EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLeft,SALT311.HygieneErrors.NotInChars('0123456789 .,-/$"'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
@@ -30,11 +31,11 @@ EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaNumChar(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/&()'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/'))));
-EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/&()'))));
+EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_.,-/&()'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -49,17 +50,10 @@ END;
 EXPORT InValidFT_Invalid_State(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
 EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_Zip(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  MakeFT_Invalid_No(s1);
-END;
-EXPORT InValidFT_Invalid_Zip(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5));
-EXPORT InValidMessageFT_Invalid_Zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,5'),SALT311.HygieneErrors.Good);
- 
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','penalty_amount');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dart_id','date_added','date_updated','website','state','casetype','plan_ein','plan_no','plan_year','plan_name','plan_administrator','admin_state','admin_zip_code','admin_zip_code4','closing_reason','closing_date','penalty_amount');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dart_id' => 0,'date_added' => 1,'date_updated' => 2,'website' => 3,'state' => 4,'casetype' => 5,'plan_ein' => 6,'plan_no' => 7,'plan_year' => 8,'plan_name' => 9,'plan_administrator' => 10,'admin_state' => 11,'admin_zip_code' => 12,'admin_zip_code4' => 13,'closing_reason' => 14,'closing_date' => 15,'penalty_amount' => 16,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['LEFTTRIM','ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -112,9 +106,9 @@ EXPORT Make_admin_state(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
 EXPORT InValid_admin_state(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
 EXPORT InValidMessage_admin_state(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_admin_zip_code(SALT311.StrType s0) := MakeFT_Invalid_Zip(s0);
-EXPORT InValid_admin_zip_code(SALT311.StrType s) := InValidFT_Invalid_Zip(s);
-EXPORT InValidMessage_admin_zip_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Zip(wh);
+EXPORT Make_admin_zip_code(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_admin_zip_code(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_admin_zip_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
 EXPORT Make_admin_zip_code4(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_admin_zip_code4(SALT311.StrType s) := InValidFT_Invalid_No(s);
