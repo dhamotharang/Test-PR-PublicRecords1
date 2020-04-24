@@ -79,4 +79,6 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isHeaderSourceRestricted (string2 src) := 
            $.compliance.isHeaderSourceRestricted (src, DataRestrictionMask);
 
+  EXPORT BOOLEAN use_DnB()                  := $.compliance.use_DnB(DataPermissionMask);
+   
 END;
