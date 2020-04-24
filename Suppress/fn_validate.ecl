@@ -8,7 +8,10 @@ a:=Suppress.Layout_New_Suppression;
 QA:=dataset('~thor_data400::base::new_suppression_file',a,thor);
 father:=dataset('~thor_data400::base::new_suppression_file_father',a,thor);
 
-boolean suppressions_chk:= count(QA) = count(father);
+b:=count(QA(product <> 'ALL'));
+c:=count(father(product <> 'ALL'));
+
+boolean suppressions_chk:= count(b) = count(c);
 
 output(count(QA(product <> 'ALL')),NAMED('QA_RECORDS_NOT_EQUAL_TO_ALL'));
 output(count(father(product <> 'ALL')),NAMED('FATHER_RECORDS_NOT_EQUAL_TO_ALL'));
