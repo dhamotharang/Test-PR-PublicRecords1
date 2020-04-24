@@ -47,6 +47,7 @@ new_digital_id := 'new_digital_id';
 no_data_check(string my_attribute) := if(trim(my_attribute)='', PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND, my_attribute);
  
 risk_indicators.layouts.layout_threatmetrix_shell_internal_results map_tmx_fields(threatmetrix_in inrec, tm_results le) := transform
+  
   set_reason_codes := set(le.response.Summary.ReasonCodes, trim(stringlib.stringtolowercase(value)));
   digital_id_result := trim(le.response._Data.DigitalIdResult);
   account_telephone_result := trim(le.response._Data.AccountTelephoneResult);
@@ -67,12 +68,22 @@ invalid_account_telephone := rc_invalid_account_telephone in set_reason_codes;
 // these 7 fields are for UAT, not to be returned in final version of Risk_Indicators.Layout_Boca_Shell_Edina_v55
 self.invalid_account_email := if(invalid_account_email, '1', '0');
 self.invalid_account_telephone := if(invalid_account_telephone, '1', '0');
-self.digital_id_result := trim(le.response._Data.DigitalIdResult);
+//self.digital_id_result := trim(le.response._Data.DigitalIdResult);
 self.account_telephone_result := trim(le.response._Data.AccountTelephoneResult);
 self.account_email_result := trim(le.response._Data.Accountemailresult);
 self.account_name_result := trim(le.response._Data.AccountNameResult);
 self.account_address_result := trim(le.response._Data.AccountAddressResult);
-// 
+//
+
+/*///////////////////////////////////////////////////////////////////////////////////*
+//  Hijacking digital_id_result, setting to error code from TM gateway failure
+//  Need to pass back to FraudAdvisor Service
+*////////////////////////////////////////////////////////////////////////////////////*
+tmFailMessage := tm_results[1].response._header.message;
+tmFailCode := tm_results[1].response._header.status;
+self.digital_id_result := if(tmFailMessage <> '' or tmFailCode <> 0, 
+                             'gateway-error:' + tmFailCode,
+                             trim(le.response._Data.DigitalIdResult));
  
 self.seq := (unsigned)inrec.User.QueryId;
 self.TxinqWAddrFirst := map(
@@ -1144,7 +1155,7 @@ self.RuleSmartidBlistInTxinqWPFlag1M	:= no_data_check( left.RuleSmartidBlistInTx
 self.RuleSmartidBlistInTxinqWPFlag1Y	:= no_data_check( left.RuleSmartidBlistInTxinqWPFlag1Y	);
 self.RuleEmailHighRiskDomainFlag	:= no_data_check( left.RuleEmailHighRiskDomainFlag	);
 self.RuleEmailAliasFlag	:= no_data_check( left.RuleEmailAliasFlag	);
-self.RuleEmailMachineGeneratedFlag	:= no_data_check( left.RuleEmailMachineGeneratedFlag	); 
+self.RuleEmailMachineGeneratedFlag	:= no_data_check( left.RuleEmailMachineGeneratedFlag	);
 
 self := left;   // set the debug fields to what they were above 
  ));
