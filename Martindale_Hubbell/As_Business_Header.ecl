@@ -1,4 +1,3 @@
-import Business_HeaderV2;
 export As_Business_Header(
 
 	 boolean pUsingInBusinessHeader	= true
@@ -7,7 +6,7 @@ export As_Business_Header(
 ) :=
 module
 
-	dfile := if(pUsingInBusinessHeader	
+	dfile := if(pUsingInBusinessHeader
 		,files(,pUseOtherEnvironment).base.Organizations.BusinessHeader
 		,files(,pUseOtherEnvironment).base.Organizations.qa
 	);
@@ -18,7 +17,7 @@ module
 	sequential(
 
 		 output(enth(Organizations	,1000),named('As_Business_Header'	),all)
-	                                                            
+
 	);
 
 end;

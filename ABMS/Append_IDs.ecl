@@ -1,4 +1,4 @@
-IMPORT Business_Header, Business_Header_SS, Business_HeaderV2, DID_Add, ut;
+IMPORT Business_Header_SS, DID_Add;
 
 EXPORT Append_IDs := MODULE
 
@@ -45,8 +45,8 @@ EXPORT Append_IDs := MODULE
 													 ,FALSE          	// Does output record have the score
 													 ,did_score      	// did score field
 													 ,75             	// score threshold
-													 ,dDidOut_orig		// output dataset			
-		);                          
+													 ,dDidOut_orig		// output dataset
+		);
 
 		RETURN PROJECT(dDidOut_orig, BasePlus);
 
@@ -96,7 +96,7 @@ EXPORT Append_IDs := MODULE
 			SELF.sec_range	 := L.clean_company_address.sec_range;
 			SELF.st       	 := L.clean_company_address.st;
 			SELF.phone    	 := L.clean_phone.phone;
-			
+
 			SELF := L;
 		END;
 
