@@ -85,44 +85,51 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
         RETURN STD.Date.AdjustCalendar(dateToUpdate, year, month, day);
     END;
     
-    getCurrentlyIncarParoleProb(UNSIGNED historyDate, UNSIGNED sentBegin, UNSIGNED sentEnd, UNSIGNED releaseDate, UNSIGNED paroleEndDate, 
-                                STRING maxTerm, STRING maxParoleTerm, STRING maxProbationTerm, STRING inmateStatus, STRING paroleStatus, 
-                                BOOLEAN curIncarFlag, BOOLEAN curParoleFlag, BOOLEAN curProbFlag) := FUNCTION
+    getCurrentlyIncarParoleProb(UNSIGNED historyDate, UNSIGNED sentBegin, UNSIGNED sentEnd, UNSIGNED paroleEndDate, UNSIGNED probationEndDate, 
+                                STRING inmateStatus, STRING paroleStatus, BOOLEAN curIncarFlag, BOOLEAN curParoleFlag, BOOLEAN curProbFlag) := FUNCTION
     
-      maxDate := updateDate(maxTerm, sentBegin);
-      maxParoleDate := updateDate(maxParoleTerm, sentBegin);
-      maxProbationDate := updateDate(maxProbationTerm, sentBegin);
+
       
-      released := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_DISCHARGED;
+      released := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_DISCHARGED OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_DISCHARGED;
+      paroled := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PAROLE OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PAROLE;
+      probation := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PROBATION OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PROBATION;
+      prevIncar := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED;
+
       
-      RETURN MAP(sentEnd <> 0 AND sentEND >= historyDate AND NOT released AND paroleEndDate = 0 => TYPE_INCARCERATION,
-                    releaseDate <> 0 AND releaseDate >= historyDate AND NOT released AND paroleEndDate = 0 => TYPE_INCARCERATION,
-                    sentBegin <> 0 AND maxDate >= historyDate AND NOT released AND paroleEndDate = 0 => TYPE_INCARCERATION,
-                    inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_INCARCERATION AND paroleEndDate = 0 => TYPE_INCARCERATION,
-                    paroleStatus = 'INMATE' AND paroleEndDate = 0 AND NOT released => TYPE_INCARCERATION,
-                    
-                    paroleEndDate <> 0 AND paroleEndDate >= historyDate AND NOT released => TYPE_PAROLE,
-                    maxParoleTerm <> '' AND maxParoleDate >= historyDate AND NOT released  => TYPE_PAROLE,   
-                    inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PAROLE => TYPE_PAROLE,
-                    
-                    maxProbationTerm <> '' AND maxProbationDate >= historyDate AND NOT released => TYPE_PROBATION,
-                    inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PROBATION => TYPE_PROBATION,
-                    
-                    inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED OR released => TYPE_PREV_INCARCERATION,
-                    sentEnd <> 0 AND sentEND < historyDate AND released AND paroleEndDate <> 0 => TYPE_PREV_INCARCERATION,
-                    releaseDate <> 0 AND releaseDate < historyDate => TYPE_PREV_INCARCERATION,
-                    paroleEndDate <> 0 AND paroleEndDate < historyDate => TYPE_PREV_INCARCERATION,
-                    paroleStatus = 'DISCHARGE' => TYPE_PREV_INCARCERATION,
-                    released => TYPE_PREV_INCARCERATION,
-                    
-                    
-                    curIncarFlag => TYPE_INCARCERATION,
-                    curParoleFlag => TYPE_PAROLE,
-                    curProbFlag => TYPE_PROBATION,
-                    
-                    released => TYPE_RELEASED,
-                    inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_UNKNOWN => TYPE_UNKNOWN,
-                    DueDiligence.Constants.EMPTY); 
+      RETURN MAP(curIncarFlag AND curParoleFlag = FALSE AND curProbFlag = FALSE => TYPE_INCARCERATION,
+                 curIncarFlag = FALSE AND curParoleFlag AND curProbFlag = FALSE => TYPE_PAROLE,
+                 curIncarFlag = FALSE AND curParoleFlag = FALSE AND curProbFlag => TYPE_PROBATION,
+                   
+                 sentBegin > 0 AND sentEnd = 0 AND paroleEndDate = 0 AND probationEndDate > 0 AND sentBegin > probationEndDate => TYPE_UNKNOWN,
+                 sentBegin > 0 AND sentEnd = 0 AND paroleEndDate > 0 AND probationEndDate = 0 AND sentBegin > paroleEndDate => TYPE_UNKNOWN,
+                 sentBegin > 0 AND sentEnd > 0 AND sentBegin > sentEnd => TYPE_UNKNOWN,
+                 
+                 sentBegin > 0 AND sentEnd >= historyDate AND paroleEndDate = 0 AND probationEndDate = 0 AND NOT (released OR paroled OR probation) => TYPE_INCARCERATION,
+                 sentBegin > 0 AND sentEnd = 0 AND paroleEndDate = 0 AND probationEndDate = 0 AND NOT (released OR paroled OR probation) => TYPE_INCARCERATION,
+
+                 sentBegin > 0 AND sentEnd >= historyDate AND paroleEndDate > 0 AND probationEndDate = 0 AND NOT (released OR probation) => TYPE_PAROLE,
+                 sentBegin > 0 AND sentEnd = 0 AND paroleEndDate >= historyDate AND probationEndDate = 0 AND NOT (released OR probation) => TYPE_PAROLE,
+                 sentBegin = 0 AND sentEnd = 0 AND paroleEndDate >= historyDate AND probationEndDate = 0 AND NOT (released OR probation) => TYPE_PAROLE,
+                                  
+                 sentBegin > 0 AND sentEnd = 0 AND paroleEndDate = 0 AND probationEndDate >= historyDate AND NOT (released OR paroled) => TYPE_PROBATION,
+                 sentBegin = 0 AND sentEnd = 0 AND paroleEndDate = 0 AND probationEndDate >= historyDate AND NOT (released OR paroled) => TYPE_PROBATION,
+                 sentBegin > 0 AND sentEnd >= historyDate AND paroleEndDate = 0 AND probationEndDate > 0 AND NOT (released OR paroled) => TYPE_PROBATION,
+                 
+                 sentBegin > 0 AND sentEnd > 0 AND sentEnd < historyDate => TYPE_PREV_INCARCERATION,
+                 sentBegin = 0 AND sentEnd > 0 AND sentEnd < historyDate => TYPE_PREV_INCARCERATION,
+                 
+                 paroled => TYPE_PAROLE,
+                 probation => TYPE_PROBATION,
+                 prevIncar => TYPE_PREV_INCARCERATION,
+                 released => TYPE_RELEASED,
+
+                 paroleEndDate > 0 AND paroleEndDate >= historyDate => TYPE_PAROLE,
+                 probationEndDate > 0 AND probationEndDate >= historyDate => TYPE_PROBATION,
+                 sentEnd > 0 AND sentEnd >= historyDate => TYPE_INCARCERATION,
+                 
+                 inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_UNKNOWN => TYPE_UNKNOWN,
+                 TYPE_PREV_INCARCERATION);
+                             
     END;
     
     
@@ -301,7 +308,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                               
                                         SELF.parole := RIGHT.parole;
                                         SELF.probation := RIGHT.probation;
-										SELF.incarAdmitDate := (UNSIGNED)RIGHT.inc_adm_dt;
+                                        SELF.incarAdmitDate := (UNSIGNED)RIGHT.inc_adm_dt;
                               
                                         
                                         //grouping data
@@ -373,19 +380,25 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                   RIGHT.latest_adm_dt <> DueDiligence.Constants.EMPTY => (UNSIGNED)RIGHT.latest_adm_dt,
                                                                   LEFT.sentenceDate <> 0 => LEFT.sentenceDate,
                                                                   LEFT.arrestDate <> 0 => LEFT.arrestDate,
-                                                                  LEFT.temp_offenseDate <> DueDiligence.Constants.EMPTY => (UNSIGNED)LEFT.temp_offenseDate,
                                                                   0);
-                       
+                                                                  
+                                            calcIncarEndDate := MAP(LEFT.sentenceEndDate <> 0 => LEFT.sentenceEndDate,
+                                                                    releaseDate <> 0 => releaseDate,
+                                                                    LEFT.maxTerm <> DueDiligence.Constants.EMPTY AND incarBeginDate <> 0 => updateDate(LEFT.maxTerm, incarBeginDate),
+                                                                    0);
                                             
+                                            calcParoleEndDate := MAP(paroleReleaseDate <> 0 => paroleReleaseDate,
+                                                                      LEFT.parole <> DueDiligence.Constants.EMPTY AND incarBeginDate <> 0 => updateDate(LEFT.parole, incarBeginDate),
+                                                                      0);
                                             
-                                              
+                                            calcProbationEndDate := IF(LEFT.probation <> DueDiligence.Constants.EMPTY AND incarBeginDate <> 0, updateDate(LEFT.probation, incarBeginDate), 0);
                        
-                       
-                                            incarParoleProbIndicator := getCurrentlyIncarParoleProb(LEFT.historyDate, incarBeginDate, LEFT.sentenceEndDate, releaseDate, paroleReleaseDate, 
-                                                                                                    LEFT.maxTerm, LEFT.parole, LEFT.probation, inmateStatusDesc, parCurStatDesc, 
-                                                                                                    LEFT.currentlyIncarcerated, LEFT.currentlyParoled, LEFT.currentlyProbation);
+                                            incarParoleProbIndicator := getCurrentlyIncarParoleProb(LEFT.historyDate, incarBeginDate, calcIncarEndDate, calcParoleEndDate, calcProbationEndDate,
+                                                                                                    inmateStatusDesc, parCurStatDesc, LEFT.currentlyIncarcerated, LEFT.currentlyParoled, 
+                                                                                                    LEFT.currentlyProbation);
          
           	
+            
                                             //additional data
                                             SELF.docScheduledReleaseDate := (UNSIGNED)RIGHT.sch_rel_dt;
                                             SELF.docActualReleaseDate := (UNSIGNED)RIGHT.act_rel_dt;
@@ -397,12 +410,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                             SELF.docParoleCurrentStatus := RIGHT.par_cur_stat_desc;
                                             SELF.docCurrentKnownInmateStatus := inmateStatusDesc;
                                             SELF.docCurrentLocationSecurity := RIGHT.cur_loc_sec;
-                                            
-                      
-                                            paroleCurrentStatusDescription := MAP(parCurStatDesc = 'INMATE' => DueDiligence.Constants.INCARCERATION_TEXT,
-																																									parCurStatDesc = 'DISCHARGE' => DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT, 
-																																									DueDiligence.Constants.EMPTY);
-                                            
+                                                                                        
                                             SELF.offenseIncarcerationProbationParole := STD.Str.ToUpperCase(MAP(incarParoleProbIndicator = TYPE_INCARCERATION => DueDiligence.Constants.INCARCERATION_TEXT,
                                                                                                                 incarParoleProbIndicator = TYPE_PAROLE => DueDiligence.Constants.PAROLE_TEXT,
                                                                                                                 incarParoleProbIndicator = TYPE_PROBATION => DueDiligence.Constants.PROBATION_TEXT,
@@ -411,6 +419,10 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                                                                 incarParoleProbIndicator = TYPE_UNKNOWN => UNKNOWN,
                                                                                                                 DueDiligence.Constants.EMPTY));
                                             
+                                            paroleCurrentStatusDescription := MAP(parCurStatDesc = 'INMATE' => DueDiligence.Constants.INCARCERATION_TEXT,
+																																									parCurStatDesc = 'DISCHARGE' => DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT, 
+																																									DueDiligence.Constants.EMPTY);
+                                                                                  
                                             SELF.docParoleStatus := paroleCurrentStatusDescription;
                                             
                                             SELF.currentlyIncarcerated := incarParoleProbIndicator = TYPE_INCARCERATION;
@@ -529,6 +541,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                                                     SELF.DOCParoleCurrentStatus := LEFT.DOCParoleCurrentStatus;
                                                                                                     SELF.DOCCurrentLocationSecurity := LEFT.DOCCurrentLocationSecurity;
                                                                                                     SELF.partyNames := LEFT.uniquePartyNames;
+                                                                                                    SELF := LEFT;
                                                                                                     SELF := [];)]);
                                                                                                     
                                                                       
@@ -608,13 +621,16 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                     probation := LEFT.currProbation OR RIGHT.currProbation;
                                     prevIncarceration := LEFT.prevIncar OR RIGHT.prevIncar;
 
-                                    SELF.currIncar := incarcerated AND NOT (paroled OR probation);
+                                    // SELF.currIncar := incarcerated AND NOT (paroled OR probation); //removed v6
+                                    SELF.currIncar := incarcerated; //v6
                                     SELF.currParole := paroled;
                                     SELF.currProbation := probation;
                                     SELF.prevIncar := prevIncarceration OR (incarcerated AND (paroled OR probation));
 
-                                    SELF.attr_stateLegalEvent9 := incarcerated AND NOT (paroled OR probation OR prevIncarceration);
-                                    SELF.attr_stateLegalEvent6 := prevIncarceration OR (incarcerated AND (paroled OR probation)) OR paroled OR probation;
+                                    // SELF.attr_stateLegalEvent9 := incarcerated AND NOT (paroled OR probation OR prevIncarceration); //removed 6
+                                    // SELF.attr_stateLegalEvent6 := prevIncarceration OR (incarcerated AND (paroled OR probation)) OR paroled OR probation; //removed v6
+                                    SELF.attr_stateLegalEvent9 := incarcerated;  //v6
+                                    SELF.attr_stateLegalEvent6 := prevIncarceration OR paroled OR probation;  //v6
 
                                     SELF.offenseIncarcerationProbationParole := MAP(incarcerated AND NOT (paroled OR probation OR prevIncarceration) => DueDiligence.Constants.INCARCERATION_TEXT,
                                                                                     paroled AND NOT probation => DueDiligence.Constants.PAROLE_TEXT,
