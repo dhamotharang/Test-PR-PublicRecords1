@@ -1,4 +1,4 @@
-import Address,NID;
+﻿import Address,NID;
 export layouts := module
 
 // Airmen Raw Layouts
@@ -8,7 +8,7 @@ export airmen := module
  export pilotraw := record
   
    
-    string1 letter_code;
+   string1 letter_code;
    string7 unique_id;
    string2 orig_rec_type;
    string30 orig_fname;
@@ -23,7 +23,9 @@ export airmen := module
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
-	 string922 Filler; 
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;   
+   string906 Filler; 
    string2 lfcr;
 end;
 
@@ -37,12 +39,14 @@ export nonpilotraw := record
    string33 street2;
    string17 city;
    string2 state;
-   string10 zip;
+   string10 zip_code;
    string18 country;
    string2 region;
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;    
    string2 lfcr;
 end;
 
@@ -56,13 +60,15 @@ export nonpilotrawfill := record
    string33 street2;
    string17 city;
    string2 state;
-   string10 zip;
+   string10 zip_code;
    string18 country;
    string2 region;
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
-	 string922 Filler; 
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;   
+   string906 Filler;
    string2 lfcr;
 end;
 
@@ -85,7 +91,9 @@ export input := record
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
-   string31 filler; 
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;     
+   string15 filler; 
    string2 lfcr;
 end;
 
@@ -110,9 +118,11 @@ export temp := record
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
-	 string2 oer;
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;  	
+   string2 oer;
    UNSIGNED8 raw_aid;
-	 UNSIGNED8 ace_aid;
+	UNSIGNED8 ace_aid;
   Address.Layout_Clean182_fips clean_address;
   Address.Layout_Clean_Name    clean_name;
 end;
@@ -136,9 +146,11 @@ export clean := record
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
-	 string2 oer;
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;     
+	string2 oer;
    UNSIGNED8 raw_aid;
-	 UNSIGNED8 ace_aid;
+	UNSIGNED8 ace_aid;
   Address.Layout_Clean182_fips clean_address;
   Address.Layout_Clean_Name    clean_name;
 end;

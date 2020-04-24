@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT RDP_MAC_PopulationStatistics(infile,Ref='',Input_Transaction_ID = '',Input_TransactionDate = '',Input_FirstName = '',Input_LastName = '',Input_MiddleName = '',Input_Suffix = '',Input_BirthDate = '',Input_SSN = '',Input_Lexid_Input = '',Input_Street1 = '',Input_Street2 = '',Input_Suite = '',Input_City = '',Input_State = '',Input_Zip5 = '',Input_Phone = '',Input_Lexid_Discovered = '',Input_RemoteIPAddress = '',Input_ConsumerIPAddress = '',OutFile) := MACRO
+EXPORT RDP_MAC_PopulationStatistics(infile,Ref='',Input_Transaction_ID = '',Input_TransactionDate = '',Input_FirstName = '',Input_LastName = '',Input_MiddleName = '',Input_Suffix = '',Input_BirthDate = '',Input_SSN = '',Input_Lexid_Input = '',Input_Street1 = '',Input_Street2 = '',Input_Suite = '',Input_City = '',Input_State = '',Input_Zip5 = '',Input_Phone = '',Input_Lexid_Discovered = '',Input_RemoteIPAddress = '',Input_ConsumerIPAddress = '',Input_Email_Address = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_FraudGov;
   #uniquename(of)
   %of% := RECORD
@@ -120,6 +120,12 @@ EXPORT RDP_MAC_PopulationStatistics(infile,Ref='',Input_Transaction_ID = '',Inpu
       '' 
     #ELSE
         IF( le.Input_ConsumerIPAddress = (TYPEOF(le.Input_ConsumerIPAddress))'','',':ConsumerIPAddress')
+    #END
+ 
++    #IF( #TEXT(Input_Email_Address)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Email_Address = (TYPEOF(le.Input_Email_Address))'','',':Email_Address')
     #END
 ;
   END;

@@ -81,7 +81,8 @@ end;
 //////////////////////////////////////////////////////////////////
 //reFormat Entity Parent Records
 export Parent := module
-	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+//	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02']),normalizd.gwl.Supplemental);
 	export MSB:= 	Accuity.Functions.mapEntity(Inputs.msb,normalizd.msb.Supplemental);
 	export OFAC:= 	Accuity.Functions.mapEntity(Inputs.ofac,normalizd.ofac.Supplemental); 
 	export GEO:= 	Accuity.Functions.mapEntity(Inputs.gwl(type IN ['01', '02']),normalizd.gwl.Supplemental);

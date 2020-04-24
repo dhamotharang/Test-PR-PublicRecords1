@@ -1,4 +1,4 @@
-import  Address, aid, NID, ut;
+﻿import  Address, aid, NID, ut;
 
 
 export Standardize_NameAddr :=
@@ -60,8 +60,7 @@ module
 		dBase := project(
 			dwithAID
 			,transform(
-				Layouts.base
-				,
+				Layouts.base,
 				self.ace_aid				:= left.aidwork_acecache.aid					;
 				self.raw_aid				:= left.aidwork_rawaid								;
 				self.prim_range			:= left.aidwork_acecache.prim_range		;
@@ -91,7 +90,7 @@ module
 				self.geo_blk				:= left.aidwork_acecache.geo_blk			;
 				self.geo_match			:= left.aidwork_acecache.geo_match		;
 				self.err_stat				:= left.aidwork_acecache.err_stat			;
-								
+        self.sic_code				:= if(ut.fn_SIC_functions.fn_validate_SicCode(left.sic_code) = 1,ut.CleanSpacesAndUpper(left.sic_code),''); 
 				self								:= left																;
 			)
 		)
@@ -113,7 +112,7 @@ module
 	
 		dStandardizeName	:= fStandardizeName			(pBaseFile				);
 				
-		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName			) : persist(pPersistname);		
+		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName			) : persist(pPersistname);
 		
 		return dStandardizeAddr;
 	

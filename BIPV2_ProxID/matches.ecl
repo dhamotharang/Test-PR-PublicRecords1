@@ -305,7 +305,7 @@ SHARED ih_thin := TABLE(ih_init,{rcid,dotid,Proxid,lgid3,orgid,ultid});
   SALT311.MAC_Split_Parents(ih2,split_patch,Proxid,ultid,ih3); // Perform parent splits
   SALT311.utMAC_Patch_Id(ih3,Proxid,BasicMatch(ih).patch_file,Proxid1,Proxid2,ihbp); // Perform basic matches
   SALT311.MAC_Reassign_UID(ihbp,Cleave(ih).patch_file,Proxid,rcid,ihbp01/*HACKMatches07a*/); // Perform cleaves
-  SALT311.utMAC_Patch_Id(ih1,Proxid,Matches,Proxid1,Proxid2,o); // Join Clusters
+  SALT311.utMAC_Patch_Id(ihbp01/*HACKMatches07b*/,Proxid,Matches,Proxid1,Proxid2,o); // Join Clusters
   Patchlgid3 := BIPV2_Tools.MAC_ParentId_Patch(o,lgid3,Proxid);  // Collapse any lgid3 now joined by Proxid/*HACKMatches06*/
   Patchorgid := BIPV2_Tools.MAC_ParentId_Patch(Patchlgid3,orgid,lgid3);  // Collapse any orgid now joined by lgid3/*HACKMatches06*/
   Patchultid := BIPV2_Tools.MAC_ParentId_Patch(Patchorgid,ultid,orgid);  // Collapse any ultid now joined by orgid/*HACKMatches06*/

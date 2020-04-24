@@ -8,5 +8,7 @@ Export Files := module
     Export Orbit_buildinstance_report  := Dataset('~thor_data400::in::orbit_buildinstance::20200220::dops_extract03', history_analysis.layouts.Layout_Orbit_Buildinstance, CSV(Heading(1)));
     
     Export History_Analysis_SF := Dataset('~thor_data400::history_analysis::base::counted_deltas', History_Analysis.Layouts.BaseRec, Thor, __Compressed__);
+    
+    Export Delta_Statistics := Dataset('~thor_data400::history_analysis::base::Delta_Statistics', History_Analysis.Layouts.StatisticsRec, Thor, __Compressed__);
 
 End;

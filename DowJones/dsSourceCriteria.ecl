@@ -1875,6 +1875,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/417 Democratic Republic of the Congo List','1862'},
 {'EC (CFSP) 2020/418 Egypt List','1863'},
 {'EC 2020/415 Democratic Republic of the Congo List','1864'},
-{'EC 2020/416 Egypt List','1865'}
+{'EC 2020/416 Egypt List','1865'},
+{'FSA (Isle of Man) Discretionary Civil Penalties','1866'},
+{'FSA (Isle of Man) Disqualified Directors','1867'},
+{'FSA (Isle of Man) Not Fit and Proper Directors','1868'},
+{'FSA (Isle of Man) Public Warnings','1869'},
+{'Japanese Finance Ministry - Mali List','1870'},
+{'United Arab Emirates National List of Terrorist','1871'},
+{'AFM (Netherlands) Enforcement Orders','1872'},
+{'United Arab Emirates National List of Terrorists','1873'},
+{'EC (CFSP) 2020/512 Iran List','1874'},
+{'EC 2020/510 Iran List','1875'},
+{'Kingdom of Bahrain Terrorists List','1876'}
 ],r);
 

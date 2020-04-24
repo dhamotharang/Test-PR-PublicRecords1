@@ -19,7 +19,9 @@ EXPORT Email := MODULE
 		// use as follows:   #CONSTANT('SubstituteEmail','Bruce.Petro@lexisnexisrisk.com');
 		SHARED substituteEmail 		:= '':STORED('SubstituteEmail');
 		
-		// e-mail notifications							
+		// e-mail notifications
+		EXPORT CT_AlphaECL 			:= 'InsuranceCustomerTestECLDev@lexisnexisrisk.com';				//There may be cases to send only to ECL team
+		EXPORT CT_Data 					:= 'InsuranceCustomerTestDataRequests@lexisnexisrisk.com';	// There may be cases to send only to Data team
 		EXPORT CT_AlphaAll			:= 'RiskInsuranceCustomerTest@lexisnexisrisk.com';
 		SHARED CT_BocaAll				:= 'RiskBusinessServicesCustomerTest@lexisnexisrisk.com';
 		EXPORT AlpharettaTeamPRCT	:= IF(substituteEmail<>'',substituteEmail,CT_AlphaAll);
