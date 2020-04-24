@@ -937,7 +937,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.VerifiedInput.DriverLicenseNumber         := IF(isValidate, '', le.verDL);
 
 		// Some scalar values.
-		SELF.SSNFoundForLexID               					 := IF(isValidate, FALSE, le.SSNFoundForLexID);
+		SELF.SSNFoundForLexID               					 := le.SSNFoundForLexID;
 		SELF.DOBMatchLevel                             := IF(isValidate, '', le.DOBMatchLevel);
 		SELF.NameAddressSSNSummary          					 := IF(isValidate, 0, le.NAS_Summary);
 		SELF.NameAddressPhoneSummary        					 := IF(isValidate, 0, le.NAP_Summary);
@@ -1090,7 +1090,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.DateLastSeen.Year						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[1..4]);
 					SELF.DateLastSeen.Month						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[5..6]);
 					SELF.DateLastSeen.Day							:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[7..8]);
-					SELF.IsBestAddress								:= IF(isValidate, FALSE, chron_le.isBestMatch);
+					SELF.IsBestAddress								:= chron_le.isBestMatch;
 				END;
 	
 		SELF.ChronologyHistories := PROJECT( le.Chronology, xfm_ChronologyHistory(LEFT, isValidate) );
@@ -1148,8 +1148,8 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.Watchlists := SORT( ds_WatchlistRecords, Sequence );
 
 		// Address Risk 
-		SELF.AddressRisk.AddressIsPOBox := IF(isValidate, FALSE, le.addressPOBox);
-		SELF.AddressRisk.AddressIsCMRA  := IF(isValidate, FALSE, le.addressCMRA);
+		SELF.AddressRisk.AddressIsPOBox := le.addressPOBox;
+		SELF.AddressRisk.AddressIsCMRA  := le.addressCMRA;
 
 		// Decedent Info
 		SELF.DecedentInfo.Name.Full		  := '';
