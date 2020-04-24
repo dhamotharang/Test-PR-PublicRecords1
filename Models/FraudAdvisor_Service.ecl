@@ -337,8 +337,8 @@ Models_to_use := IF(Model != '', single_model, Model_requests);
 Valid_requested_models := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
                                        self := Models.FP_models.Valid_request(left, attributesIn, ip_value, includeriskindices, RedFlag_version, glb_ok)));
 
-//Check minimum input for Digital Insights score and attributes
-IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or EXISTS(attributesIn(STD.STR.ToLowerCase(name) in [Models.FraudAdvisor_Constants.attrvTMX])))
+//Check minimum input for Digital Insights model
+IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']))
     and (email_value = '' or hphone_value = ''),
     FAIL('Invalid request for Digital Insights, must supply a phone number and email.'));
 
@@ -365,6 +365,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                                                                                                                                          le.url); 
   self := le;																																								
 end;
+
 gateways := project(gateways_in, gw_switch(left));
 
 if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
@@ -557,7 +558,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=== BS Version        ===
 //=========================
 bsVersion := map(
-  Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) => 55,
+  Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
   Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1']) => 54,
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
@@ -591,6 +592,13 @@ iid := //Group(Dataset([],risk_indicators.layout_output), seq);
                                                                                     BatchUID := BatchUID, 
                                                                                     GlobalCompanyID := GlobalCompanyID);
 
+//Check for ThreatMetrix Gateway error
+IF(EXISTS(gateways(servicename IN ['threatmetrix', 'threatmetrix_test'])),
+          IF(iid[1].threatmetrix.digital_id_result[1..14] = 'gateway-error:', 
+             FAIL('An error occured within the ThreatMetrix Gateway (Error Code ' + iid[1].threatmetrix.digital_id_result[15..] + ')')));
+
+                                                                                    
+
 clam := //Group(Dataset([], risk_indicators.Layout_Boca_Shell), seq);
         risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,  
 																						doRelatives, doDL, doVehicle, doDerogs, bsVersion, doScore, nugen,
@@ -614,7 +622,7 @@ clam_BtSt := //Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bil
                                                                                     BatchUID := BatchUID, 
                                                                                     GlobalCompanyID := GlobalCompanyID)
 	);
-	
+  
   //Added for Paro 9-2018
   skiptrace_Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
   skiptrace_call := riskwise.skip_trace(skiptrace_Prep, DPPA_Purpose, GLB_Purpose, DataRestriction, '', DataPermission);
