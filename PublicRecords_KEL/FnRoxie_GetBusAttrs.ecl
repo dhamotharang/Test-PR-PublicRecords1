@@ -29,14 +29,15 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// 'mini' fdc fetching is to gather address hist data from rank key on person then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
 	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
-	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini);		
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini, CheckTDSPhone);		
 
 	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini); 
 
 	// At this time, only need to collect data for rep1 and not other reps. 
 	// If/when this changes all records from withRepLexIDs will need to be passed to Fn_MAS_FDC.
 	// Just passing in Rep1 Inputs for now to avoid fetching too much data.
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, CheckTDSPhone );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, CheckTDSPhone, FDCDatasetMini );
+
 
 	// Get Business attributes
 	// When we get the cleaned attributes, then B_InpArchDt will change to B_InpClnArchDt
@@ -90,6 +91,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	MasterResults := SORT(FinalResult, G_ProcBusUID);
 	
 	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
+
 
 	RETURN MasterResults;
 END;

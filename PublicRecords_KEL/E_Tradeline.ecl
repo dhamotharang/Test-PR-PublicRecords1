@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -156,10 +156,10 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ult_I_D_);
-  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Org_I_D_);
-  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sele_I_D_);
-  EXPORT Account_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Account_Key_);
+  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ult_I_D_);
+  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_I_D_);
+  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sele_I_D_);
+  EXPORT Account_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Account_Key_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Account_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Account_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(__d0)},

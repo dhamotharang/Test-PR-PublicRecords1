@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_T_I_N FROM PublicRecords_KEL;
@@ -13,6 +13,7 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nint Best_T_I_N_;
     KEL.typ.nint Best_T_I_N_Rank_;
+    KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -23,8 +24,12 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),taxid(DEFAULT:Tax_I_D_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),besttin(DEFAULT:Best_T_I_N_:0),besttinrank(DEFAULT:Best_T_I_N_Rank_:0),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
+  SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),taxid(DEFAULT:Tax_I_D_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),besttin(DEFAULT:Best_T_I_N_:0),besttinrank(DEFAULT:Best_T_I_N_Rank_:0),headerhitflag(DEFAULT:Header_Hit_Flag_),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
   SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),company_fein(OVERRIDE:Tax_I_D_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),besttin(DEFAULT:Best_T_I_N_:0),besttinrank(DEFAULT:Best_T_I_N_Rank_:0),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.Header_Hit_Flag_ := __CN(TRUE);
+    SELF := __r;
+  END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_BIPV2__Key_BH_Linking_kfetch2,TRANSFORM(RECORDOF(__in.Dataset_BIPV2__Key_BH_Linking_kfetch2),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)ultid<>0 AND (UNSIGNED)orgid<>0 AND (UNSIGNED)seleid<>0 AND (UNSIGNED)company_fein	!= 0);
   SHARED __d0_Legal__Layout := RECORD
@@ -34,8 +39,8 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __d0_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid','__in');
   SHARED __d0_Legal__Mapped := IF(__d0_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Legal__UIDComponents),E_Business_Sele(__in,__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Legal__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED __Mapping1 := 'Legal_(DEFAULT:Legal_:0),company_fein(OVERRIDE:Tax_I_D_:0|OVERRIDE:Best_T_I_N_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'Legal_(DEFAULT:Legal_:0),company_fein(OVERRIDE:Tax_I_D_:0|OVERRIDE:Best_T_I_N_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),headerhitflag(DEFAULT:Header_Hit_Flag_),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
     SELF.Best_T_I_N_Rank_ := __CN(1);
     SELF := __r;
@@ -52,6 +57,7 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping1_Transform(LEFT)));
   EXPORT InData := __d0 + __d1;
   EXPORT Data_Sources_Layout := RECORD
+    KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -79,7 +85,7 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Legal_,Tax_I_D_,Ult_I_D_,Org_I_D_,Sele_I_D_,Best_T_I_N_,Best_T_I_N_Rank_,ALL));
   Sele_T_I_N_Group := __PostFilter;
   Layout Sele_T_I_N__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Header_Hit_Flag_,Source_},Header_Hit_Flag_,Source_),Data_Sources_Layout)(__NN(Header_Hit_Flag_) OR __NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Archive___Date_ := KEL.era.SimpleRoll(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -89,7 +95,7 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     SELF := __r;
   END;
   Layout Sele_T_I_N__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Header_Hit_Flag_) OR __NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Archive___Date_ := KEL.era.SimpleRollSingleRow(__r,Archive___Date_,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
@@ -124,6 +130,7 @@ EXPORT E_Sele_T_I_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d1(__NL(Org_I_D_))),COUNT(__d1(__NN(Org_I_D_)))},
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d1(__NL(Sele_I_D_))),COUNT(__d1(__NN(Sele_I_D_)))},
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','company_fein',COUNT(__d1(__NL(Best_T_I_N_))),COUNT(__d1(__NN(Best_T_I_N_)))},
+    {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderHitFlag',COUNT(__d1(__NL(Header_Hit_Flag_))),COUNT(__d1(__NN(Header_Hit_Flag_)))},
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
     {'SeleTIN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},

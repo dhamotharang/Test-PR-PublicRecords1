@@ -1,4 +1,5 @@
 ﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
+#workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 threads := 1;
 
@@ -149,6 +150,7 @@ OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 	
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';

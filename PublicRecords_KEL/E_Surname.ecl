@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -114,18 +114,18 @@ EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Surname__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Surname_);
-  EXPORT Is_Latest__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Is_Latest_);
-  EXPORT Name_Rank__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Name_Rank_);
-  EXPORT Name_Count__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Name_Count_);
-  EXPORT Prop100_K__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Prop100_K_);
-  EXPORT Cumulative_Prop100_K__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Cumulative_Prop100_K_);
-  EXPORT Percent_White__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_White_);
-  EXPORT Percent_Black__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_Black_);
-  EXPORT Percent_Asian_Pacific_Islander__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_Asian_Pacific_Islander_);
-  EXPORT Percent_American_Indian_Alaska_Native__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_American_Indian_Alaska_Native_);
-  EXPORT Percent_Multiracial__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_Multiracial_);
-  EXPORT Percent_Hispanic__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Percent_Hispanic_);
+  EXPORT Surname__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Surname_);
+  EXPORT Is_Latest__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Is_Latest_);
+  EXPORT Name_Rank__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Name_Rank_);
+  EXPORT Name_Count__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Name_Count_);
+  EXPORT Prop100_K__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Prop100_K_);
+  EXPORT Cumulative_Prop100_K__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Cumulative_Prop100_K_);
+  EXPORT Percent_White__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_White_);
+  EXPORT Percent_Black__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Black_);
+  EXPORT Percent_Asian_Pacific_Islander__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Asian_Pacific_Islander_);
+  EXPORT Percent_American_Indian_Alaska_Native__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_American_Indian_Alaska_Native_);
+  EXPORT Percent_Multiracial__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Multiracial_);
+  EXPORT Percent_Hispanic__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Hispanic_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid),COUNT(Surname__SingleValue_Invalid),COUNT(Is_Latest__SingleValue_Invalid),COUNT(Name_Rank__SingleValue_Invalid),COUNT(Name_Count__SingleValue_Invalid),COUNT(Prop100_K__SingleValue_Invalid),COUNT(Cumulative_Prop100_K__SingleValue_Invalid),COUNT(Percent_White__SingleValue_Invalid),COUNT(Percent_Black__SingleValue_Invalid),COUNT(Percent_Asian_Pacific_Islander__SingleValue_Invalid),COUNT(Percent_American_Indian_Alaska_Native__SingleValue_Invalid),COUNT(Percent_Multiracial__SingleValue_Invalid),COUNT(Percent_Hispanic__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid,KEL.typ.int Surname__SingleValue_Invalid,KEL.typ.int Is_Latest__SingleValue_Invalid,KEL.typ.int Name_Rank__SingleValue_Invalid,KEL.typ.int Name_Count__SingleValue_Invalid,KEL.typ.int Prop100_K__SingleValue_Invalid,KEL.typ.int Cumulative_Prop100_K__SingleValue_Invalid,KEL.typ.int Percent_White__SingleValue_Invalid,KEL.typ.int Percent_Black__SingleValue_Invalid,KEL.typ.int Percent_Asian_Pacific_Islander__SingleValue_Invalid,KEL.typ.int Percent_American_Indian_Alaska_Native__SingleValue_Invalid,KEL.typ.int Percent_Multiracial__SingleValue_Invalid,KEL.typ.int Percent_Hispanic__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid),COUNT(__d0)},

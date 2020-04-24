@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult FROM PublicRecords_KEL;
@@ -798,23 +798,23 @@ EXPORT E_Business_Prox(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ult_I_D_);
-  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Org_I_D_);
-  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sele_I_D_);
-  EXPORT Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Prox_I_D_);
-  EXPORT Prox_Sele__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Prox_Sele_);
-  EXPORT Parent_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Parent_Prox_I_D_);
-  EXPORT Sele_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sele_Prox_I_D_);
-  EXPORT Org_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Org_Prox_I_D_);
-  EXPORT Ult_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ult_Prox_I_D_);
-  EXPORT Levels_From_Top__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Levels_From_Top_);
-  EXPORT Nodes_Below__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Nodes_Below_);
-  EXPORT Prox_Segment__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Prox_Segment_);
-  EXPORT Store_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Store_Number_);
-  EXPORT Active_Duns_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Active_Duns_Number_);
-  EXPORT Hist_Duns_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Hist_Duns_Number_);
-  EXPORT D_U_N_S_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,D_U_N_S_Number_);
-  EXPORT Equifax_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Equifax_I_D_);
+  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ult_I_D_);
+  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_I_D_);
+  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sele_I_D_);
+  EXPORT Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Prox_I_D_);
+  EXPORT Prox_Sele__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Prox_Sele_);
+  EXPORT Parent_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Parent_Prox_I_D_);
+  EXPORT Sele_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sele_Prox_I_D_);
+  EXPORT Org_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_Prox_I_D_);
+  EXPORT Ult_Prox_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ult_Prox_I_D_);
+  EXPORT Levels_From_Top__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Levels_From_Top_);
+  EXPORT Nodes_Below__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Nodes_Below_);
+  EXPORT Prox_Segment__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Prox_Segment_);
+  EXPORT Store_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Store_Number_);
+  EXPORT Active_Duns_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Active_Duns_Number_);
+  EXPORT Hist_Duns_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Hist_Duns_Number_);
+  EXPORT D_U_N_S_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,D_U_N_S_Number_);
+  EXPORT Equifax_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Equifax_I_D_);
   EXPORT Prox_Sele__Orphan := JOIN(InData(__NN(Prox_Sele_)),E_Business_Sele(__in,__cfg).__Result,__EEQP(LEFT.Prox_Sele_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Prox_Sele__Orphan),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Corp2__Kfetch_LinkIDs_Corp_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BusReg__kfetch_busreg_company_linkids_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera__kfetch_LinkID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_EBR_kfetch_5600_Demographic_Data_linkids_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_OSHAIR__kfetch_OSHAIR_LinkIds_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Equifax_Business__Data_kfetch_LinkIDs_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_2_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_slim_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_2_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_3_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Prox_I_D__SingleValue_Invalid),COUNT(Prox_Sele__SingleValue_Invalid),COUNT(Parent_Prox_I_D__SingleValue_Invalid),COUNT(Sele_Prox_I_D__SingleValue_Invalid),COUNT(Org_Prox_I_D__SingleValue_Invalid),COUNT(Ult_Prox_I_D__SingleValue_Invalid),COUNT(Levels_From_Top__SingleValue_Invalid),COUNT(Nodes_Below__SingleValue_Invalid),COUNT(Prox_Segment__SingleValue_Invalid),COUNT(Store_Number__SingleValue_Invalid),COUNT(Active_Duns_Number__SingleValue_Invalid),COUNT(Hist_Duns_Number__SingleValue_Invalid),COUNT(D_U_N_S_Number__SingleValue_Invalid),COUNT(Equifax_I_D__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Prox_Sele__Orphan,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Corp2__Kfetch_LinkIDs_Corp_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BusReg__kfetch_busreg_company_linkids_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera__kfetch_LinkID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_EBR_kfetch_5600_Demographic_Data_linkids_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_OSHAIR__kfetch_OSHAIR_LinkIds_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Equifax_Business__Data_kfetch_LinkIDs_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_2_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Build__kfetch_contact_linkids_slim_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_2_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_3_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Prox_I_D__SingleValue_Invalid,KEL.typ.int Prox_Sele__SingleValue_Invalid,KEL.typ.int Parent_Prox_I_D__SingleValue_Invalid,KEL.typ.int Sele_Prox_I_D__SingleValue_Invalid,KEL.typ.int Org_Prox_I_D__SingleValue_Invalid,KEL.typ.int Ult_Prox_I_D__SingleValue_Invalid,KEL.typ.int Levels_From_Top__SingleValue_Invalid,KEL.typ.int Nodes_Below__SingleValue_Invalid,KEL.typ.int Prox_Segment__SingleValue_Invalid,KEL.typ.int Store_Number__SingleValue_Invalid,KEL.typ.int Active_Duns_Number__SingleValue_Invalid,KEL.typ.int Hist_Duns_Number__SingleValue_Invalid,KEL.typ.int D_U_N_S_Number__SingleValue_Invalid,KEL.typ.int Equifax_I_D__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([

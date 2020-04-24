@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -120,11 +120,11 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT S_S_N__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,S_S_N_);
-  EXPORT Official_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Official_First_Seen_);
-  EXPORT Official_Last_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Official_Last_Seen_);
-  EXPORT Issue_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issue_State_);
-  EXPORT Header_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Header_First_Seen_);
+  EXPORT S_S_N__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,S_S_N_);
+  EXPORT Official_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Official_First_Seen_);
+  EXPORT Official_Last_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Official_Last_Seen_);
+  EXPORT Issue_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Issue_State_);
+  EXPORT Header_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Header_First_Seen_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Death_MasterV2__key_ssn_ssa_Invalid),COUNT(S_S_N__SingleValue_Invalid),COUNT(Official_First_Seen__SingleValue_Invalid),COUNT(Official_Last_Seen__SingleValue_Invalid),COUNT(Issue_State__SingleValue_Invalid),COUNT(Header_First_Seen__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Death_MasterV2__key_ssn_ssa_Invalid,KEL.typ.int S_S_N__SingleValue_Invalid,KEL.typ.int Official_First_Seen__SingleValue_Invalid,KEL.typ.int Official_Last_Seen__SingleValue_Invalid,KEL.typ.int Issue_State__SingleValue_Invalid,KEL.typ.int Header_First_Seen__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(__d0)},

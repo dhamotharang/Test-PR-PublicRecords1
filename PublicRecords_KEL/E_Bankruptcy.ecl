@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -179,10 +179,10 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,T_M_S_I_D_);
-  EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Court_Code_);
-  EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Case_Number_);
-  EXPORT Original_Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Original_Case_Number_);
+  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,T_M_S_I_D_);
+  EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Court_Code_);
+  EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Number_);
+  EXPORT Original_Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Original_Case_Number_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(__d0)},

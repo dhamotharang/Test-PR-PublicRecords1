@@ -22,7 +22,8 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpAddrZip := le.P_InpAddrZip;
 		SELF.P_InpPhoneHome := le.P_InpPhoneHome;
 		SELF.P_InpPhoneWork := le.P_InpPhoneWork;
-		SELF.P_InpEmail := le.P_InpEmail; 
+		SELF.P_InpEmail := le.P_InpEmail;
+		SELF.P_InpIPAddr := le.P_InpIPAddr; 
 		SELF.P_InpArchDt := le.P_InpArchDt;
 		SELF.P_InpSSN := le.P_InpSSN;
 		SELF.P_InpDOB := le.P_InpDOB;
@@ -70,6 +71,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnAddrUnitDesig := cleaned_Addr.unit_desig;
 		SELF.P_InpClnAddrSecRng :=cleaned_Addr.sec_range;
 		SELF.P_InpClnAddrCity := cleaned_Addr.v_city_name;
+		SELF.P_InpClnAddrCityPost := cleaned_Addr.p_city_name;
 		SELF.P_InpClnAddrState := cleaned_Addr.st;
 		SELF.P_InpClnAddrZip5 := cleaned_Addr.zip;
 		SELF.P_InpClnAddrZip4 := cleaned_Addr.zip4;

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT * FROM KEL12.Null;

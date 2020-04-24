@@ -1,4 +1,5 @@
-﻿﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
+﻿﻿﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
+#workunit('name','MAS Busienss dev156 1 thread 100k');
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
 
@@ -67,7 +68,7 @@ eyeball := 120;
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~lweiner::out::Business_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::Business_Roxie_100k_Archive_KS-5842_test_errors_'+ ThorLib.wuid();
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -254,6 +255,7 @@ END;
 // ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 layout_MAS_Business_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';

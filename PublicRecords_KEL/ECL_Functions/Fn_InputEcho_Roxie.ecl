@@ -19,6 +19,7 @@ EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_
 		SELF.P_InpPhoneHome := le.HomePhone;
 		SELF.P_InpPhoneWork := le.WorkPhone;
 		SELF.P_InpEmail := le.Email; 
+		SELF.P_InpIPAddr := le.IPAddress; 
 		SELF.P_InpArchDt := le.historydate;
 		SELF.P_InpSSN := le.SSN;
 		SELF.P_InpDOB := le.DateOfBirth;

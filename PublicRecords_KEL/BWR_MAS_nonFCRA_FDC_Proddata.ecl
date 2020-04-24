@@ -1,5 +1,5 @@
 ﻿// EXPORT BWR_MAS_nonFCRA_FDC_Proddata := 'todo';
-
+#workunit('name','MAS FDC Proddata - dev156 - T1 - C1');
 IMPORT KEL011 AS KEL;
 import ut, PublicRecords_KEL, STD,RiskWise;
 
@@ -34,14 +34,17 @@ BOOLEAN DriversLicense := TRUE;
 BOOLEAN Education := TRUE;
 BOOLEAN Email := TRUE;
 BOOLEAN Employment := TRUE;
+BOOLEAN Geolink := TRUE;
 BOOLEAN Household := TRUE;
 BOOLEAN Inquiry := TRUE;
+BOOLEAN LienJudgment := TRUE;
 BOOLEAN Person := TRUE;
 BOOLEAN Phone := TRUE;
 BOOLEAN ProfessionalLicense := TRUE;
 BOOLEAN Property := TRUE;
 BOOLEAN PropertyEvent := TRUE;
 BOOLEAN SocialSecurityNumber := TRUE;
+BOOLEAN Surname := TRUE;
 BOOLEAN TIN := TRUE;
 BOOLEAN Tradeline := TRUE;
 BOOLEAN Utility := TRUE;
@@ -49,6 +52,7 @@ BOOLEAN Vehicle := TRUE;
 BOOLEAN Watercraft := TRUE;
 BOOLEAN ZipCode := TRUE;
 BOOLEAN UCC := TRUE;
+BOOLEAN Mini := TRUE;
 
 
 mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
@@ -256,14 +260,17 @@ soapLayout := RECORD
 		BOOLEAN IncludeEducation;
 		BOOLEAN IncludeEmail;
 		BOOLEAN IncludeEmployment ;
+		BOOLEAN IncludeGeolink ;
 		BOOLEAN IncludeHousehold;
 		BOOLEAN IncludeInquiry;
+		BOOLEAN IncludeLienJudgment ;
 		BOOLEAN IncludePerson;
 		BOOLEAN IncludePhone;
 		BOOLEAN IncludeProfessionalLicense;
 		BOOLEAN IncludeProperty ;
 		BOOLEAN IncludePropertyEvent;
 		BOOLEAN IncludeSocialSecurityNumber;
+		BOOLEAN IncludeSurname ;
 		BOOLEAN IncludeTIN;
 		BOOLEAN IncludeTradeline ;
 		BOOLEAN IncludeUtility ;
@@ -271,6 +278,7 @@ soapLayout := RECORD
 		BOOLEAN IncludeWatercraft;
 		BOOLEAN IncludeZipCode;
 		BOOLEAN IncludeUCC ;
+		BOOLEAN IncludeMini;
 end;
 
 soapLayout trans_pre (pp le, Integer c):= TRANSFORM 
@@ -297,14 +305,17 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		self.IncludeEducation := Education;
 		self.IncludeEmail := Email;
 		self.IncludeEmployment := Employment;
+		self.IncludeGeolink := Geolink;
 		self.IncludeHousehold := Household;
 		self.IncludeInquiry := Inquiry;
+		self.IncludeLienJudgment := LienJudgment;
 		self.IncludePerson := Person;
 		self.IncludePhone := Phone;
 		self.IncludeProfessionalLicense := ProfessionalLicense;
 		self.IncludeProperty := Property;
 		self.IncludePropertyEvent := PropertyEvent;
 		self.IncludeSocialSecurityNumber := SocialSecurityNumber;
+		self.IncludeSurname := Surname;
 		self.IncludeTIN := TIN;
 		self.IncludeTradeline := Tradeline;
 		self.IncludeUtility := Utility;
@@ -312,6 +323,7 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		self.IncludeWatercraft := Watercraft;
 		self.IncludeZipCode := ZipCode;
 		self.IncludeUCC := UCC;
+		self.IncludeMini := Mini;
 		SELF := [];
 END;
 
@@ -323,25 +335,23 @@ OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 OutputFDC := {recordof(PublicRecords_KEL.ECL_Functions.Layouts_FDC(m.Options).Layout_FDC)};
 
 layout_FDC_Service := RECORD
-
-	OutputFDC LayoutFDC {XPATH('Results/Result/Dataset[@name=\'FDCDataset\']/Row')};
-
+		OutputFDC;
 		STRING ErrorCode;
 END;
 	
 layout_FDC_Service myFail(soap_in le) := TRANSFORM
 
-	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.ErrorCode := (FAILCODE + ' ' + FAILMESSAGE);
 		SELF := [];
 END;
 
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service.3', //prox assoc
+				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service', //prox assoc
 				{soap_in}, 
 				DATASET(layout_FDC_Service),
-				XPATH('*'),
+				// XPATH('*'),
         RETRY(2), TIMEOUT(300),
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
@@ -351,6 +361,7 @@ output(bwr_results, named('soap_out'));
 Passed := bwr_results(TRIM(ErrorCode) = ''); // Use as input to KEL query.
 Failed := bwr_results(TRIM(ErrorCode) <> '');
 
-output(Failed, named('Failed_Resutls'));
+output(choosen(Failed, 25), named('Failed_Results'));
+output(count(failed), named('Failed_Count'));
 
 OUTPUT(Passed,,OutputFile, Thor, overwrite);

@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -251,19 +251,19 @@ EXPORT E_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Punishment_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Punishment_Type_);
-  EXPORT Source_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Source_State_);
-  EXPORT Current_Known_Inmate_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Current_Known_Inmate_Status_);
-  EXPORT Sentence_County__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sentence_County_);
-  EXPORT Current_Location_Of_Inmate__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Current_Location_Of_Inmate_);
-  EXPORT Current_Location_Security__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Current_Location_Security_);
-  EXPORT Offender_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Offender_Key_);
-  EXPORT Current_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Current_Status_);
-  EXPORT Probation_Time_Period__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Probation_Time_Period_);
-  EXPORT Consecutive_And_Concurrent_Information__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Consecutive_And_Concurrent_Information_);
-  EXPORT Instituiton_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Instituiton_Name_);
-  EXPORT Restitution__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Restitution_);
-  EXPORT Community_Service__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Community_Service_);
+  EXPORT Punishment_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Punishment_Type_);
+  EXPORT Source_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Source_State_);
+  EXPORT Current_Known_Inmate_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Current_Known_Inmate_Status_);
+  EXPORT Sentence_County__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sentence_County_);
+  EXPORT Current_Location_Of_Inmate__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Current_Location_Of_Inmate_);
+  EXPORT Current_Location_Security__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Current_Location_Security_);
+  EXPORT Offender_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Offender_Key_);
+  EXPORT Current_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Current_Status_);
+  EXPORT Probation_Time_Period__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Probation_Time_Period_);
+  EXPORT Consecutive_And_Concurrent_Information__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Consecutive_And_Concurrent_Information_);
+  EXPORT Instituiton_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Instituiton_Name_);
+  EXPORT Restitution__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Restitution_);
+  EXPORT Community_Service__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Community_Service_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Punishment_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid),COUNT(Punishment_Type__SingleValue_Invalid),COUNT(Source_State__SingleValue_Invalid),COUNT(Current_Known_Inmate_Status__SingleValue_Invalid),COUNT(Sentence_County__SingleValue_Invalid),COUNT(Current_Location_Of_Inmate__SingleValue_Invalid),COUNT(Current_Location_Security__SingleValue_Invalid),COUNT(Offender_Key__SingleValue_Invalid),COUNT(Current_Status__SingleValue_Invalid),COUNT(Probation_Time_Period__SingleValue_Invalid),COUNT(Consecutive_And_Concurrent_Information__SingleValue_Invalid),COUNT(Instituiton_Name__SingleValue_Invalid),COUNT(Restitution__SingleValue_Invalid),COUNT(Community_Service__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Punishment_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid,KEL.typ.int Punishment_Type__SingleValue_Invalid,KEL.typ.int Source_State__SingleValue_Invalid,KEL.typ.int Current_Known_Inmate_Status__SingleValue_Invalid,KEL.typ.int Sentence_County__SingleValue_Invalid,KEL.typ.int Current_Location_Of_Inmate__SingleValue_Invalid,KEL.typ.int Current_Location_Security__SingleValue_Invalid,KEL.typ.int Offender_Key__SingleValue_Invalid,KEL.typ.int Current_Status__SingleValue_Invalid,KEL.typ.int Probation_Time_Period__SingleValue_Invalid,KEL.typ.int Consecutive_And_Concurrent_Information__SingleValue_Invalid,KEL.typ.int Instituiton_Name__SingleValue_Invalid,KEL.typ.int Restitution__SingleValue_Invalid,KEL.typ.int Community_Service__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'CriminalPunishment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Punishment_Invalid),COUNT(__d0)},

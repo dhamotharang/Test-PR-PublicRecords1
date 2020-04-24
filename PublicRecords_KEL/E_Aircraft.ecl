@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -163,16 +163,16 @@ EXPORT E_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT N_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,N_Number_);
-  EXPORT Serial_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Serial_Number_);
-  EXPORT Manufacturer_Model_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Manufacturer_Model_Code_);
-  EXPORT Engine_Manufacturer_Model_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Engine_Manufacturer_Model_Code_);
-  EXPORT Year_Manufactured__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Year_Manufactured_);
-  EXPORT Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Type_);
-  EXPORT Type_Engine__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Type_Engine_);
-  EXPORT Manufacturer_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Manufacturer_Name_);
-  EXPORT Model_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Model_Name_);
-  EXPORT Transponder_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Transponder_Code_);
+  EXPORT N_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,N_Number_);
+  EXPORT Serial_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Serial_Number_);
+  EXPORT Manufacturer_Model_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Manufacturer_Model_Code_);
+  EXPORT Engine_Manufacturer_Model_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Engine_Manufacturer_Model_Code_);
+  EXPORT Year_Manufactured__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Year_Manufactured_);
+  EXPORT Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Type_);
+  EXPORT Type_Engine__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Type_Engine_);
+  EXPORT Manufacturer_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Manufacturer_Name_);
+  EXPORT Model_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Model_Name_);
+  EXPORT Transponder_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Transponder_Code_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid),COUNT(N_Number__SingleValue_Invalid),COUNT(Serial_Number__SingleValue_Invalid),COUNT(Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Engine_Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Year_Manufactured__SingleValue_Invalid),COUNT(Type__SingleValue_Invalid),COUNT(Type_Engine__SingleValue_Invalid),COUNT(Manufacturer_Name__SingleValue_Invalid),COUNT(Model_Name__SingleValue_Invalid),COUNT(Transponder_Code__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid,KEL.typ.int N_Number__SingleValue_Invalid,KEL.typ.int Serial_Number__SingleValue_Invalid,KEL.typ.int Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Engine_Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Year_Manufactured__SingleValue_Invalid,KEL.typ.int Type__SingleValue_Invalid,KEL.typ.int Type_Engine__SingleValue_Invalid,KEL.typ.int Manufacturer_Name__SingleValue_Invalid,KEL.typ.int Model_Name__SingleValue_Invalid,KEL.typ.int Transponder_Code__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid),COUNT(__d0)},
