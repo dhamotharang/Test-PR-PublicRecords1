@@ -202,6 +202,7 @@ module
 			Death.dAll_filenames +
 			FraudPoint.dAll_filenames +
 			BestInfo.dAll_filenames +
+			CoverageDates.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
