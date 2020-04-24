@@ -216,7 +216,7 @@ MODULE
       EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
       EXPORT BOOLEAN IsGetPortedData         := ReturnPortingInfo OR IncludePhoneMetadata;
       EXPORT BOOLEAN IsGetMetaData           := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
-              BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase;
+      BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase OR IncludeRiskIndicators; // To get same day OTPs and Inquiries
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
@@ -376,10 +376,11 @@ MODULE
       AllRules  := IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.defaultRiskIndicatorRules + UserRules);
       EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := DEDUP(SORT(IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules), riskid), riskid);
 
-		  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
-		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
-			       BOOLEAN   RealtimeData 			                := FALSE : STORED('UseDeltabase');
-			EXPORT BOOLEAN   UseDeltabase 					            := IF(IsGetMetaData,RealTimedata,FALSE);
+	  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
+	  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
+      BOOLEAN   UseDeltabase_internal                     := FALSE : STORED('UseDeltabase');
+      BOOLEAN   RealtimeData 		                      := UseDeltabase_internal OR IncludeRiskIndicators; // To get same day OTPs and Inquiries
+	  EXPORT BOOLEAN   UseDeltabase 		              := IF(IsGetMetaData,RealTimedata,FALSE);
       EXPORT BOOLEAN   UseTransUnionIQ411                 :=   UseQSent;
       EXPORT BOOLEAN   UseTransUnionPVS                   :=   UseQSent;
       EXPORT BOOLEAN   UseInhousePhones                   :=   displayAll OR TransactionType = $.Constants.TransType.BASIC;
