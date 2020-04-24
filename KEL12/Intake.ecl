@@ -1,4 +1,5 @@
-﻿IMPORT KEL12 AS KEL;
+//IMPORT:KEL12.Intake
+IMPORT KEL12 AS KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT Intake := MODULE
 
@@ -13,6 +14,10 @@ EXPORT Intake := MODULE
 
   EXPORT DetectMultipleValues(__in, __field) := FUNCTIONMACRO
     RETURN __UNWRAP(__in(KEL.Typ.TestFlag(__field, KEL.Typ.MultipleValuesDetected)));
+  ENDMACRO;
+
+  EXPORT DetectMultipleValuesOnResult(__in, __field) := FUNCTIONMACRO
+    RETURN __in((#EXPAND('__' + #TEXT(__field) + '_flags') & KEL.Typ.MultipleValuesDetected) != 0);
   ENDMACRO;
 
   EXPORT NullFromDataType(__value) := FUNCTIONMACRO
@@ -108,4 +113,3 @@ EXPORT Intake := MODULE
   ENDMACRO;
 
 END;
-

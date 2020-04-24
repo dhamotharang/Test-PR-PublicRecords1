@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -136,21 +136,21 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Transaction_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Transaction_I_D_);
-  EXPORT Sequence_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sequence_Number_);
-  EXPORT Date_Of_Inquiry__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Date_Of_Inquiry_);
-  EXPORT Time_Of_Inquiry__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Time_Of_Inquiry_);
-  EXPORT Inquiry_Source__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Inquiry_Source_);
-  EXPORT Method__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Method_);
-  EXPORT Product_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Product_Code_);
-  EXPORT Function_Description__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Function_Description_);
-  EXPORT G_L_B_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,G_L_B_Purpose_);
-  EXPORT D_P_P_A_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,D_P_P_A_Purpose_);
-  EXPORT F_C_R_A_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,F_C_R_A_Purpose_);
-  EXPORT Sub_Market__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sub_Market_);
-  EXPORT Vertical__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Vertical_);
-  EXPORT Use__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Use_);
-  EXPORT Industry__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Industry_);
+  EXPORT Transaction_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Transaction_I_D_);
+  EXPORT Sequence_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sequence_Number_);
+  EXPORT Date_Of_Inquiry__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Date_Of_Inquiry_);
+  EXPORT Time_Of_Inquiry__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Time_Of_Inquiry_);
+  EXPORT Inquiry_Source__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Inquiry_Source_);
+  EXPORT Method__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Method_);
+  EXPORT Product_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Product_Code_);
+  EXPORT Function_Description__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Function_Description_);
+  EXPORT G_L_B_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,G_L_B_Purpose_);
+  EXPORT D_P_P_A_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,D_P_P_A_Purpose_);
+  EXPORT F_C_R_A_Purpose__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,F_C_R_A_Purpose_);
+  EXPORT Sub_Market__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sub_Market_);
+  EXPORT Vertical__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Vertical_);
+  EXPORT Use__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Use_);
+  EXPORT Industry__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Industry_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(Transaction_I_D__SingleValue_Invalid),COUNT(Sequence_Number__SingleValue_Invalid),COUNT(Date_Of_Inquiry__SingleValue_Invalid),COUNT(Time_Of_Inquiry__SingleValue_Invalid),COUNT(Inquiry_Source__SingleValue_Invalid),COUNT(Method__SingleValue_Invalid),COUNT(Product_Code__SingleValue_Invalid),COUNT(Function_Description__SingleValue_Invalid),COUNT(G_L_B_Purpose__SingleValue_Invalid),COUNT(D_P_P_A_Purpose__SingleValue_Invalid),COUNT(F_C_R_A_Purpose__SingleValue_Invalid),COUNT(Sub_Market__SingleValue_Invalid),COUNT(Vertical__SingleValue_Invalid),COUNT(Use__SingleValue_Invalid),COUNT(Industry__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid,KEL.typ.int Transaction_I_D__SingleValue_Invalid,KEL.typ.int Sequence_Number__SingleValue_Invalid,KEL.typ.int Date_Of_Inquiry__SingleValue_Invalid,KEL.typ.int Time_Of_Inquiry__SingleValue_Invalid,KEL.typ.int Inquiry_Source__SingleValue_Invalid,KEL.typ.int Method__SingleValue_Invalid,KEL.typ.int Product_Code__SingleValue_Invalid,KEL.typ.int Function_Description__SingleValue_Invalid,KEL.typ.int G_L_B_Purpose__SingleValue_Invalid,KEL.typ.int D_P_P_A_Purpose__SingleValue_Invalid,KEL.typ.int F_C_R_A_Purpose__SingleValue_Invalid,KEL.typ.int Sub_Market__SingleValue_Invalid,KEL.typ.int Vertical__SingleValue_Invalid,KEL.typ.int Use__SingleValue_Invalid,KEL.typ.int Industry__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(__d0)},

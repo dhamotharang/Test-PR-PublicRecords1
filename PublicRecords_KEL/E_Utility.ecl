@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -96,11 +96,11 @@ EXPORT E_Utility(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Utility_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Utility_I_D_);
-  EXPORT Date_Added_To_Exchange__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Date_Added_To_Exchange_);
-  EXPORT Connect_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Connect_Date_);
-  EXPORT Utility_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Utility_Type_);
-  EXPORT Record_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Record_Date_);
+  EXPORT Utility_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Utility_I_D_);
+  EXPORT Date_Added_To_Exchange__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Date_Added_To_Exchange_);
+  EXPORT Connect_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Connect_Date_);
+  EXPORT Utility_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Utility_Type_);
+  EXPORT Record_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Record_Date_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Key_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Key_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Kfetch2_LinkIds_Invalid),COUNT(Utility_I_D__SingleValue_Invalid),COUNT(Date_Added_To_Exchange__SingleValue_Invalid),COUNT(Connect_Date__SingleValue_Invalid),COUNT(Utility_Type__SingleValue_Invalid),COUNT(Record_Date__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Key_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Key_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Kfetch2_LinkIds_Invalid,KEL.typ.int Utility_I_D__SingleValue_Invalid,KEL.typ.int Date_Added_To_Exchange__SingleValue_Invalid,KEL.typ.int Connect_Date__SingleValue_Invalid,KEL.typ.int Utility_Type__SingleValue_Invalid,KEL.typ.int Record_Date__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Utility','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UtilFile__Key_Address_Invalid),COUNT(__d0)},

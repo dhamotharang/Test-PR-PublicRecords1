@@ -1,4 +1,5 @@
-﻿EXPORT FromFlat := MODULE
+//IMPORT:KEL12.FromFlat
+EXPORT FromFlat := MODULE
 
     EXPORT BuildMapping(from, to, source, dest, nullval, frule) := FUNCTIONMACRO
         LOADXML('<xml/>');

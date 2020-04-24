@@ -50,6 +50,7 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				SELF.B_InpClnAddrUnitDesig   := cleaned_Addr.unit_desig;
 				SELF.B_InpClnAddrSecRng    := cleaned_Addr.sec_range;
 				SELF.B_InpClnAddrCity        := cleaned_Addr.v_city_name;
+				SELF.B_InpClnAddrCityPost       := cleaned_Addr.p_city_name;
 				SELF.B_InpClnAddrState       := cleaned_Addr.st;
 				SELF.B_InpClnAddrZip5        := cleaned_Addr.zip;
 				SELF.B_InpClnAddrZip4        := cleaned_Addr.zip4;

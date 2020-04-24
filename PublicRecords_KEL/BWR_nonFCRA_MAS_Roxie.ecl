@@ -1,4 +1,5 @@
 ﻿﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
+#workunit('name','MAS NonFCRA Consumer dev156 1 Thread-Testfile');
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 
 threads := 1;
@@ -52,7 +53,7 @@ Output_SALT_Profile := TRUE;
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~lweiner::out::PersonNonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Archive_KS-5842_test_marketing_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -133,6 +134,7 @@ END;
   // OUTPUT( ResultSet, NAMED('Results') );
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';

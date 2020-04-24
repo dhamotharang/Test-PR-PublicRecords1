@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -58,7 +58,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
   SHARED __SortedTable := SORT(__Table,KeyVal);
   EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE|OVERRIDE:Date_First_Seen_:EPOCH),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_LiensV2_key_liens_main_ID_Records,TRANSFORM(RECORDOF(__in.Dataset_LiensV2_key_liens_main_ID_Records),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_LiensV2_key_liens_main_ID_Records);
@@ -177,17 +177,17 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,T_M_S_I_D_);
-  EXPORT R_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,R_M_S_I_D_);
-  EXPORT Agency_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Agency_I_D_);
-  EXPORT Agency__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Agency_);
-  EXPORT Agency_County__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Agency_County_);
-  EXPORT Agency_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Agency_State_);
-  EXPORT Sent_To_Credit_Bureau_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sent_To_Credit_Bureau_Flag_);
-  EXPORT I_R_S_Serial_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,I_R_S_Serial_Number_);
-  EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Case_Number_);
-  EXPORT Case_Link_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Case_Link_I_D_);
-  EXPORT Certificate_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Certificate_Number_);
+  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,T_M_S_I_D_);
+  EXPORT R_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,R_M_S_I_D_);
+  EXPORT Agency_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Agency_I_D_);
+  EXPORT Agency__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Agency_);
+  EXPORT Agency_County__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Agency_County_);
+  EXPORT Agency_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Agency_State_);
+  EXPORT Sent_To_Credit_Bureau_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sent_To_Credit_Bureau_Flag_);
+  EXPORT I_R_S_Serial_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,I_R_S_Serial_Number_);
+  EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Number_);
+  EXPORT Case_Link_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Link_I_D_);
+  EXPORT Certificate_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Certificate_Number_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(R_M_S_I_D__SingleValue_Invalid),COUNT(Agency_I_D__SingleValue_Invalid),COUNT(Agency__SingleValue_Invalid),COUNT(Agency_County__SingleValue_Invalid),COUNT(Agency_State__SingleValue_Invalid),COUNT(Sent_To_Credit_Bureau_Flag__SingleValue_Invalid),COUNT(I_R_S_Serial_Number__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Case_Link_I_D__SingleValue_Invalid),COUNT(Certificate_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int R_M_S_I_D__SingleValue_Invalid,KEL.typ.int Agency_I_D__SingleValue_Invalid,KEL.typ.int Agency__SingleValue_Invalid,KEL.typ.int Agency_County__SingleValue_Invalid,KEL.typ.int Agency_State__SingleValue_Invalid,KEL.typ.int Sent_To_Credit_Bureau_Flag__SingleValue_Invalid,KEL.typ.int I_R_S_Serial_Number__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Case_Link_I_D__SingleValue_Invalid,KEL.typ.int Certificate_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid),COUNT(__d0)},

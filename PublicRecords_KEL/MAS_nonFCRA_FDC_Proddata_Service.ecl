@@ -27,13 +27,16 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludeEducation',
 		'IncludeEmail',
 		'IncludeEmployment',
+		'IncludeGeolink',
 		'IncludeHousehold',
 		'IncludeInquiry',
+		'IncludeLienJudgment',
 		'IncludePerson',
 		'IncludePhone',
 		'IncludeProfessionalLicense',
 		'IncludeProperty',
 		'IncludePropertyEvent',
+		'IncludeSurname',
 		'IncludeSocialSecurityNumber',
 		'IncludeTIN',
 		'IncludeTradeline',
@@ -41,7 +44,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludeVehicle',
 		'IncludeWatercraft',
 		'IncludeZipCode',
-		'IncludeUCC'
+		'IncludeUCC',
+		'IncludeMini'
   ));
 		STRING100 Default_data_permission_mask := '11111111111111111111111111111111111111111111111111';	
 		#stored('DataPermissionMask',Default_data_permission_mask);
@@ -105,14 +109,17 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeEducation := TRUE: STORED('IncludeEducation');
 		EXPORT BOOLEAN IncludeEmail := TRUE: STORED('IncludeEmail');
 		EXPORT BOOLEAN IncludeEmployment := TRUE: STORED('IncludeEmployment');
+		EXPORT BOOLEAN IncludeGeolink := TRUE: STORED('IncludeGeolink');
 		EXPORT BOOLEAN IncludeHousehold := TRUE: STORED('IncludeHousehold');
 		EXPORT BOOLEAN IncludeInquiry := TRUE: STORED('IncludeInquiry');
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE: STORED('IncludeLienJudgment');
 		EXPORT BOOLEAN IncludePerson := TRUE: STORED('IncludePerson');
 		EXPORT BOOLEAN IncludePhone := TRUE: STORED('IncludePhone');
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE: STORED('IncludeProfessionalLicense');
 		EXPORT BOOLEAN IncludeProperty := TRUE: STORED('IncludeProperty');
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE: STORED('IncludePropertyEvent');
 		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE: STORED('IncludeSocialSecurityNumber');
+		EXPORT BOOLEAN IncludeSurname := TRUE: STORED('IncludeSurname');
 		EXPORT BOOLEAN IncludeTIN := TRUE: STORED('IncludeTIN');
 		EXPORT BOOLEAN IncludeTradeline := TRUE: STORED('IncludeTradeline');
 		EXPORT BOOLEAN IncludeUtility := TRUE: STORED('IncludeUtility');
@@ -120,6 +127,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeWatercraft := TRUE: STORED('IncludeWatercraft');
 		EXPORT BOOLEAN IncludeZipCode := TRUE: STORED('IncludeZipCode');
 		EXPORT BOOLEAN IncludeUCC := TRUE: STORED('IncludeUCC');
+		EXPORT BOOLEAN IncludeMini := TRUE: STORED('IncludeMini');
 	END;	
 	
 	BOOLEAN IsInsuranceProduct := FALSE : STORED('IsInsuranceProduct');
@@ -161,7 +169,13 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 
 	withBIPIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendBIPIDs_Roxie( cleanBusiness, Rep1Input, Options );
 
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options,withBIPIDs );
+	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
+	
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini, withBIPIDs);		
+
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini); 
+
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options,withBIPIDs,FDCDatasetMini );
 
 	ds_slim := project(FDCDataset, transform(PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options).Layout_FDC, self.UIDAppend := left.UIDAppend, self :=[]));
 

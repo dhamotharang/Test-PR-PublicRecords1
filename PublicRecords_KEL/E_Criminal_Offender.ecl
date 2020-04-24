@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -189,13 +189,13 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Offender_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Offender_Key_);
-  EXPORT Citizenship__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Citizenship_);
-  EXPORT Hair_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Hair_Color_);
-  EXPORT Eye_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Eye_Color_);
-  EXPORT Skin_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Skin_Color_);
-  EXPORT Height__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Height_);
-  EXPORT Weight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Weight_);
+  EXPORT Offender_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Offender_Key_);
+  EXPORT Citizenship__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Citizenship_);
+  EXPORT Hair_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Hair_Color_);
+  EXPORT Eye_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Eye_Color_);
+  EXPORT Skin_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Skin_Color_);
+  EXPORT Height__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Height_);
+  EXPORT Weight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Weight_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid),COUNT(Offender_Key__SingleValue_Invalid),COUNT(Citizenship__SingleValue_Invalid),COUNT(Hair_Color__SingleValue_Invalid),COUNT(Eye_Color__SingleValue_Invalid),COUNT(Skin_Color__SingleValue_Invalid),COUNT(Height__SingleValue_Invalid),COUNT(Weight__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid,KEL.typ.int Offender_Key__SingleValue_Invalid,KEL.typ.int Citizenship__SingleValue_Invalid,KEL.typ.int Hair_Color__SingleValue_Invalid,KEL.typ.int Eye_Color__SingleValue_Invalid,KEL.typ.int Skin_Color__SingleValue_Invalid,KEL.typ.int Height__SingleValue_Invalid,KEL.typ.int Weight__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(__d0)},

@@ -21,6 +21,7 @@ EXPORT Input_Layout := record
 	STRING CHARGEOFFD; 
 	STRING FormerName;
 	STRING EMAIL; 
+	STRING IPAddress;
 	STRING employername;
 	STRING historydate; //(adding historydate timestamp) 
 	STRING LexID;

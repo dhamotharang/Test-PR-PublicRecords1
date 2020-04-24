@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -268,33 +268,33 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Drivers_License_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Drivers_License_Number_);
-  EXPORT Issuing_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issuing_State_);
-  EXPORT State_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,State_Name_);
-  EXPORT Drivers_License_Sequence__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Drivers_License_Sequence_);
-  EXPORT License_Class__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,License_Class_);
-  EXPORT License_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,License_Type_);
-  EXPORT Moxie_License_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Moxie_License_Type_);
-  EXPORT Attention__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Attention_);
-  EXPORT Attention_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Attention_Code_);
-  EXPORT Restrictions__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Restrictions_);
-  EXPORT Restrictions_Delimited__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Restrictions_Delimited_);
-  EXPORT Original_Expiration_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Original_Expiration_Date_);
-  EXPORT Original_Issue_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Original_Issue_Date_);
-  EXPORT Issue_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issue_Date_);
-  EXPORT Expiration_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Expiration_Date_);
-  EXPORT Active_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Active_Date_);
-  EXPORT Inactive_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Inactive_Date_);
-  EXPORT Endorsement__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Endorsement_);
-  EXPORT Motorcycle_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Motorcycle_Code_);
-  EXPORT Driver_Education_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Driver_Education_Code_);
-  EXPORT Duplicate_Count__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Duplicate_Count_);
-  EXPORT R_C_D_Stat__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,R_C_D_Stat_);
-  EXPORT Issuance__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issuance_);
-  EXPORT C_D_L_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,C_D_L_Status_);
-  EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,County_);
-  EXPORT History_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,History_Name_);
-  EXPORT History__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,History_);
+  EXPORT Drivers_License_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Drivers_License_Number_);
+  EXPORT Issuing_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Issuing_State_);
+  EXPORT State_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,State_Name_);
+  EXPORT Drivers_License_Sequence__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Drivers_License_Sequence_);
+  EXPORT License_Class__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,License_Class_);
+  EXPORT License_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,License_Type_);
+  EXPORT Moxie_License_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Moxie_License_Type_);
+  EXPORT Attention__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Attention_);
+  EXPORT Attention_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Attention_Code_);
+  EXPORT Restrictions__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Restrictions_);
+  EXPORT Restrictions_Delimited__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Restrictions_Delimited_);
+  EXPORT Original_Expiration_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Original_Expiration_Date_);
+  EXPORT Original_Issue_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Original_Issue_Date_);
+  EXPORT Issue_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Issue_Date_);
+  EXPORT Expiration_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Expiration_Date_);
+  EXPORT Active_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Active_Date_);
+  EXPORT Inactive_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Inactive_Date_);
+  EXPORT Endorsement__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Endorsement_);
+  EXPORT Motorcycle_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Motorcycle_Code_);
+  EXPORT Driver_Education_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Driver_Education_Code_);
+  EXPORT Duplicate_Count__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Duplicate_Count_);
+  EXPORT R_C_D_Stat__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,R_C_D_Stat_);
+  EXPORT Issuance__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Issuance_);
+  EXPORT C_D_L_Status__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,C_D_L_Status_);
+  EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,County_);
+  EXPORT History_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,History_Name_);
+  EXPORT History__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,History_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid),COUNT(Drivers_License_Number__SingleValue_Invalid),COUNT(Issuing_State__SingleValue_Invalid),COUNT(State_Name__SingleValue_Invalid),COUNT(Drivers_License_Sequence__SingleValue_Invalid),COUNT(License_Class__SingleValue_Invalid),COUNT(License_Type__SingleValue_Invalid),COUNT(Moxie_License_Type__SingleValue_Invalid),COUNT(Attention__SingleValue_Invalid),COUNT(Attention_Code__SingleValue_Invalid),COUNT(Restrictions__SingleValue_Invalid),COUNT(Restrictions_Delimited__SingleValue_Invalid),COUNT(Original_Expiration_Date__SingleValue_Invalid),COUNT(Original_Issue_Date__SingleValue_Invalid),COUNT(Issue_Date__SingleValue_Invalid),COUNT(Expiration_Date__SingleValue_Invalid),COUNT(Active_Date__SingleValue_Invalid),COUNT(Inactive_Date__SingleValue_Invalid),COUNT(Endorsement__SingleValue_Invalid),COUNT(Motorcycle_Code__SingleValue_Invalid),COUNT(Driver_Education_Code__SingleValue_Invalid),COUNT(Duplicate_Count__SingleValue_Invalid),COUNT(R_C_D_Stat__SingleValue_Invalid),COUNT(Issuance__SingleValue_Invalid),COUNT(C_D_L_Status__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(History_Name__SingleValue_Invalid),COUNT(History__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid,KEL.typ.int Drivers_License_Number__SingleValue_Invalid,KEL.typ.int Issuing_State__SingleValue_Invalid,KEL.typ.int State_Name__SingleValue_Invalid,KEL.typ.int Drivers_License_Sequence__SingleValue_Invalid,KEL.typ.int License_Class__SingleValue_Invalid,KEL.typ.int License_Type__SingleValue_Invalid,KEL.typ.int Moxie_License_Type__SingleValue_Invalid,KEL.typ.int Attention__SingleValue_Invalid,KEL.typ.int Attention_Code__SingleValue_Invalid,KEL.typ.int Restrictions__SingleValue_Invalid,KEL.typ.int Restrictions_Delimited__SingleValue_Invalid,KEL.typ.int Original_Expiration_Date__SingleValue_Invalid,KEL.typ.int Original_Issue_Date__SingleValue_Invalid,KEL.typ.int Issue_Date__SingleValue_Invalid,KEL.typ.int Expiration_Date__SingleValue_Invalid,KEL.typ.int Active_Date__SingleValue_Invalid,KEL.typ.int Inactive_Date__SingleValue_Invalid,KEL.typ.int Endorsement__SingleValue_Invalid,KEL.typ.int Motorcycle_Code__SingleValue_Invalid,KEL.typ.int Driver_Education_Code__SingleValue_Invalid,KEL.typ.int Duplicate_Count__SingleValue_Invalid,KEL.typ.int R_C_D_Stat__SingleValue_Invalid,KEL.typ.int Issuance__SingleValue_Invalid,KEL.typ.int C_D_L_Status__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int History_Name__SingleValue_Invalid,KEL.typ.int History__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid),COUNT(__d0)},
