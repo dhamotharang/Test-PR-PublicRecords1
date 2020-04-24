@@ -217,7 +217,7 @@ EXPORT fn_getSearchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec)
     // LEXID
     SELF.LexId:=(STRING)L.did;
     SELF.LexIdScore:=(STRING)L.score;
-    SELF.Exception:=IF(L.error_code!=0,'Y','');
+    SELF.ExceptionOccured:=IF(L.error_code!=0,'Y','');
     SELF.ExceptionCode:=L.exception_code;
 
     // BEST RECORD
