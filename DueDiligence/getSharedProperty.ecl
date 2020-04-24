@@ -65,7 +65,7 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                                 SELF.recordingDate := RIGHT.recording_date; //recorded date is the date the property officially transferred
                                                 SELF.purchasePrice := (INTEGER)RIGHT.sales_price; //sale date is the date the paperwork was created, another name for it is a "contract" date
                                                 SELF.purchaseDate := RIGHT.sale_date;
-                                                SELF.lengthOfOwnership := DueDiligence.Common.DaysApartWithZeroEmptyDate(RIGHT.sale_date, (STRING)LEFT.historydate)/30;        //store the value in months. 
+                                                SELF.lengthOfOwnership := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate(RIGHT.sale_date, (STRING)LEFT.historydate)/30;        //store the value in months. 
                                                 SELF.addressType := RIGHT.county_land_use_description;
 
                                                 SELF := LEFT;

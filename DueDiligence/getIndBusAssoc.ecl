@@ -44,7 +44,7 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
     pawCleanDates := DueDiligence.Common.CleanDatasetDateFields(pawBusiness, 'dateFirstSeen, dateLastSeen');
     
     //filter out records after our history date
-    filterPAW := DueDiligence.Common.FilterRecordsSingleDate(pawCleanDates, dateFirstSeen);
+    filterPAW := DueDiligence.CommonDate.FilterRecordsSingleDate(pawCleanDates, dateFirstSeen);
     
     filterBusinessOnly := filterPAW(seleID > 0);
     filterBusAssocOnly := filterPAW(assocID > 0);

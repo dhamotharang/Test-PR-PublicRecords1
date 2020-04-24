@@ -30,7 +30,7 @@ EXPORT getIndGeographicRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData) 
                                                     SELF := [];));  //all other fields can be empty
 
     //Determine the Geographic Risk for the Inquired Individual
-    AddressPersonGeoRisk := DueDiligence.Common.getGeographicRisk(ListOfAddresses);  
+    AddressPersonGeoRisk := DueDiligence.CommonAddress.getAddressRisk(ListOfAddresses);  
 
 
     //add the Geographic Risk to Indv_Internal layout

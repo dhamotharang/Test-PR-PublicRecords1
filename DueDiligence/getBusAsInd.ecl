@@ -46,7 +46,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
     advoCleanRecs := DueDiligence.Common.CleanDatasetDateFields(withAdvoRaw, 'advoDtfirstseen, date_first_seen, date_vendor_first_reported');
 
     // Filter out records after our history date.
-    advoFilt := DueDiligence.Common.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
+    advoFilt := DueDiligence.CommonDate.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
                                     
     advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
     advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
@@ -207,7 +207,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
     consumerHeaderCleanRecs := DueDiligence.Common.CleanDatasetDateFields(consumerHeaderDidRaw, 'dt_first_seen, dt_last_seen');
 
     //Filter out records after our history date.
-    consumerHeaderDidFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(consumerHeaderCleanRecs, dt_first_seen);
+    consumerHeaderDidFiltRecs := DueDiligence.CommonDate.FilterRecordsSingleDate(consumerHeaderCleanRecs, dt_first_seen);
 
 
     //Determine max name match level and address overlap for the inquired business where

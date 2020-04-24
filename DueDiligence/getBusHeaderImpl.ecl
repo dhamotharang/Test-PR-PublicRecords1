@@ -12,7 +12,7 @@ EXPORT getBusHeaderImpl := MODULE
                                                   
                                                   
                                                   
-        busHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(inData),
+        busHeaderRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(inData),
                                                           Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                                                           0, /*ScoreThreshold --> 0 = Give me everything*/
                                                           linkingOptions,
@@ -23,19 +23,68 @@ EXPORT getBusHeaderImpl := MODULE
                                                           mod_access := mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																	
 				
-				//clean up the business header before doing anything else
-				Business_Risk_BIP.Common.mac_slim_header(busHeaderRaw1, busHeaderRaw);	
-					
-				//Add back our Seq numbers.
-				busHeaderSeq := DueDiligence.CommonBusiness.AppendSeq(busHeaderRaw, indata, TRUE);
-				
-				//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
-				busHeaderCleanDate := DueDiligence.Common.CleanDatasetDateFields(busHeaderSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
-				
-				//Filter out records after our history date.
-				busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
-        
-        RETURN busHeaderFilt;
+        //grab only the fields we need
+        slimBusHeaderData := PROJECT(busHeaderRaw, TRANSFORM({DueDiligence.LayoutsInternal.BusSlimHeader -seq -historyDate},
+                                                              SELF.ultID := LEFT.ultID;
+                                                              SELF.orgID := LEFT.orgID;
+                                                              SELF.seleID := LEFT.seleID;
+                                                              SELF.proxID := LEFT.proxID;
+                                                              SELF.powID := LEFT.powID;
+                                                              
+                                                              SELF.source := LEFT.source;
+                                                              SELF.dt_first_seen := IF(LEFT.dt_first_seen = 0, LEFT.dt_vendor_first_reported, LEFT.dt_first_seen);
+                                                              SELF.dt_last_seen := LEFT.dt_last_seen;
+                                                              SELF.dt_vendor_first_reported := LEFT.dt_vendor_first_reported;
+                                                              
+                                                              SELF.dba_name := LEFT.dba_name;
+                                                              
+                                                              SELF.prim_range := LEFT.prim_range;
+                                                              SELF.predir := LEFT.predir;
+                                                              SELF.prim_name := LEFT.prim_name;
+                                                              SELF.addr_suffix := LEFT.addr_suffix; 
+                                                              SELF.postdir := LEFT.postdir;
+                                                              SELF.unit_desig := LEFT.unit_desig;
+                                                              SELF.sec_range := LEFT.sec_range;
+                                                              SELF.city := LEFT.v_city_name;
+                                                              SELF.state := LEFT.st;
+                                                              SELF.zip5 := LEFT.zip;
+                                                              SELF.zip4 := LEFT.zip4;
+                                                              SELF.county := LEFT.fips_county;                               
+                                                              SELF.geo_blk := LEFT.geo_blk;
+
+                                                              SELF.company_inc_state := LEFT.company_inc_state;
+                                                              SELF.company_fein := LEFT.company_fein;
+                                                              SELF.company_org_structure_derived := LEFT.company_org_structure_derived;
+                                                              
+                                                              SELF.company_sic_code1 := LEFT.company_sic_code1;
+                                                              SELF.company_sic_code2 := LEFT.company_sic_code2;
+                                                              SELF.company_sic_code3 := LEFT.company_sic_code3;
+                                                              SELF.company_sic_code4 := LEFT.company_sic_code4;
+                                                              SELF.company_sic_code5 := LEFT.company_sic_code5;
+                                                              
+                                                              SELF.company_naics_code1 := LEFT.company_naics_code1;
+                                                              SELF.company_naics_code2 := LEFT.company_naics_code2;
+                                                              SELF.company_naics_code3 := LEFT.company_naics_code3;
+                                                              SELF.company_naics_code4 := LEFT.company_naics_code4;
+                                                              SELF.company_naics_code5 := LEFT.company_naics_code5;
+                                                          
+                                                              SELF := [];));
+
+          
+        //Add back our Seq numbers.
+        busHeaderSeq := DueDiligence.CommonBusiness.AppendSeq(slimBusHeaderData, indata, FALSE);
+
+        //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+        busHeaderCleanDate := DueDiligence.Common.CleanDatasetDateFields(busHeaderSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
+
+        //Filter out records after our history date.
+        busHeaderFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(busHeaderCleanDate, dt_first_seen);
+
+        //convert to the slim layout now that we have history date, clean dates, and the seq ids
+        slimBusHeader := PROJECT(busHeaderFilt, TRANSFORM(DueDiligence.LayoutsInternal.BusSlimHeader, SELF := LEFT;));
+
+
+        RETURN slimBusHeader;
     END;
     
     
@@ -54,7 +103,7 @@ EXPORT getBusHeaderImpl := MODULE
                                 #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                                 TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                           SELF.BusnHdrDtFirstSeen := RIGHT.dt_first_seen;
-                                          SELF.BusnHdrDtLastSeen := right.dt_last_seen,
+                                          SELF.BusnHdrDtLastSeen := RIGHT.dt_last_seen,
                                           SELF := LEFT;),
                                 LEFT OUTER,
                                 ATMOST(1));
@@ -147,10 +196,10 @@ EXPORT getBusHeaderImpl := MODULE
         hdrAddrProject := PROJECT(dedupSortBusHdrAddr, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
                                                                   SELF.addrCount := 1;
                                                                   SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.CommonGeographicLayout,
-                                                                                                            SELF.county:= LEFT.fips_county;
-                                                                                                            SELF.city := LEFT.v_city_name;
-                                                                                                            SELF.state := LEFT.st;
-                                                                                                            SELF.zip5 := LEFT.zip;
+                                                                                                            SELF.county:= LEFT.county;
+                                                                                                            SELF.city := LEFT.city;
+                                                                                                            SELF.state := LEFT.state;
+                                                                                                            SELF.zip5 := LEFT.zip5;
                                                                                                             SELF.dateLastSeen := LEFT.dt_last_seen;
                                                                                                             SELF := LEFT;
                                                                                                             SELF := [];));
@@ -202,7 +251,7 @@ EXPORT getBusHeaderImpl := MODULE
         outNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen);
         
         allSicNaic := outSic1 + outSic2 + outSic3 + outSic4 + outSic5 + outNaic1 + outNaic2 + outNaic3 + outNaic4 + outNaic5;
-        sortRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addStructure, allSicNaic);
+        sortRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(inBusiness, allSicNaic);
           
         addSicNaic := JOIN(inBusiness, sortRollSicNaic,
                                   #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
@@ -218,20 +267,20 @@ EXPORT getBusHeaderImpl := MODULE
     
     
     EXPORT getFirstSeenCleanedInputAddress(inBusiness, filteredData) := FUNCTIONMACRO
-        sortFirstSeenAddr := SORT(filteredData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-                                  prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, v_city_name, st, zip, zip4, dt_first_seen, dt_vendor_first_reported);
+        sortFirstSeenAddr := SORT(filteredData(dt_first_seen > 0), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
+                                  prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, city, state, zip5, zip4, dt_first_seen, dt_vendor_first_reported);
         dedupFirstSeenAddr := DEDUP(sortFirstSeenAddr, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-                                    prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, v_city_name, st, zip, zip4);
+                                    prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, city, state, zip5, zip4);
         
         findMatchAddr := JOIN(inBusiness, dedupFirstSeenAddr,
                               #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                               TRANSFORM({BOOLEAN inputAddrMatch, UNSIGNED addressScore, UNSIGNED dateFirstSeen, RECORDOF(LEFT)},
-                                        addrScore := DueDiligence.Common.getAddressScore(LEFT.busn_info.address.prim_range,
-                                                                                          LEFT.busn_info.address.prim_name,
-                                                                                          LEFT.busn_info.address.sec_range,
-                                                                                          RIGHT.prim_range,
-                                                                                          RIGHT.prim_name,
-                                                                                          RIGHT.sec_range);
+                                        addrScore := DueDiligence.CommonAddress.getAddressScore(LEFT.busn_info.address.prim_range,
+                                                                                                LEFT.busn_info.address.prim_name,
+                                                                                                LEFT.busn_info.address.sec_range,
+                                                                                                RIGHT.prim_range,
+                                                                                                RIGHT.prim_name,
+                                                                                                RIGHT.sec_range);
                                         SELF.addressScore := addrScore;
                                         SELF.inputAddrMatch := addrScore BETWEEN DueDiligence.Constants.MIN_ADDRESS_SCORE AND DueDiligence.Constants.MAX_ADDRESS_SCORE;
                                         SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);

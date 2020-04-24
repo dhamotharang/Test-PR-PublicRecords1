@@ -26,7 +26,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
     execCleanDates := DueDiligence.Common.CleanDatasetDateFields(execsRawSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen, dt_vendor_last_reported');
     
     // Filter out records after our history date.
-    execFilt := DueDiligence.Common.FilterRecords(execCleanDates, dt_first_seen, dt_vendor_first_reported);
+    execFilt := DueDiligence.CommonDate.FilterRecords(execCleanDates, dt_first_seen, dt_vendor_first_reported);
     
     //pull out the contact info and needed info
     pulledExecs :=  PROJECT(execFilt, TRANSFORM(DueDiligence.LayoutsInternal.BEOLayout,
@@ -52,7 +52,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                 derived := STD.Str.ToUpperCase(TRIM(LEFT.contact_job_title_derived, LEFT, RIGHT));
                                                 execTitle := IF(derived IN DueDiligence.Constants.EXECUTIVE_TITLES, derived, DueDiligence.Constants.EMPTY);
                                                 
-                                                lastSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)lastSeen, (STRING)LEFT.historyDate);
+                                                lastSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)lastSeen, (STRING)LEFT.historyDate);
                                                 past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
                                                 seenLast3Years := lastSeenDays <= past3Years;
                                                 

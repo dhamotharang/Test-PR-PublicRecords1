@@ -37,7 +37,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                       SELF.offenseTrafficRelated := IF(trafficRelated OR offenseTypeTraffic, DueDiligence.Constants.YES, LEFT.offenseTrafficRelated);
                                                                                                 
                                                                                                         
-                                                                      criminalActivityDate := DueDiligence.CommonDate.DaysApartAccountingForZero((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
+                                                                      criminalActivityDate := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
                                                                       past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
                                                                       
                                                                       reportedLast3Yrs := LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate <= past3Years;
