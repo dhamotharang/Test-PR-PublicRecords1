@@ -453,6 +453,21 @@ EXPORT Functions := MODULE
 			END;
 		ds_exceptions:=PROJECT(ds_children,exceptions(LEFT));
 
+		// Return standard FAIL message ESP is expecting if ALL of the names submitted cause exceptions
+		BOOLEAN allFailed:=COUNT(srch_recs)=COUNT(srch_recs(ExceptionCode!=''));
+
+		BOOLEAN notFound:=EXISTS(ds_exceptions(Code=CNST.NO_LEXID_FOUND_CODE));
+		IF(allFailed AND notFound,FAIL(CNST.NO_LEXID_FOUND_CODE,CNST.NO_LEXID_FOUND_MSG));
+
+		BOOLEAN lowScore:=EXISTS(ds_exceptions(Code=CNST.LOW_LEXID_SCORE_CODE));
+		IF(allFailed AND lowScore,FAIL(CNST.LOW_LEXID_SCORE_CODE,CNST.LOW_LEXID_SCORE_MSG));
+
+		BOOLEAN tooMany:=EXISTS(ds_exceptions(Code=CNST.TOO_MANY_SUBJECTS_CODE));
+		IF(allFailed AND tooMany,FAIL(CNST.TOO_MANY_SUBJECTS_CODE,CNST.TOO_MANY_SUBJECTS_MSG));
+
+		BOOLEAN insufficient:=EXISTS(ds_exceptions(Code=CNST.INSUFFICIENT_INPUT_CODE));
+		IF(allFailed AND insufficient,FAIL(CNST.INSUFFICIENT_INPUT_CODE,CNST.INSUFFICIENT_INPUT_MSG));
+
 		RETURN ds_exceptions(code>0);
 	END;
 
