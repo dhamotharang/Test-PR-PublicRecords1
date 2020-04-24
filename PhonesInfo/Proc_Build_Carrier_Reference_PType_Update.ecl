@@ -1,6 +1,6 @@
 ﻿IMPORT _control, DeltabaseGateway, PromoteSupers, RoxieKeyBuild, Std;
 
-EXPORT Proc_Build_Carrier_Reference_PType_Update(string version):= FUNCTION
+EXPORT Proc_Build_Carrier_Reference_PType_Update(string version, string emailTarget):= FUNCTION
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Create LIDB PType CR Append Base File//////////////////////////////////////////////////////////////////////
@@ -31,10 +31,7 @@ EXPORT Proc_Build_Carrier_Reference_PType_Update(string version):= FUNCTION
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Generate CR PMT Update Status Email///////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
-	emailDev					:= ';judy.tao@lexisnexisrisk.com';
-	
-	emailTarget				:= _control.MyInfo.EmailAddressNotify + emailDev;
+
 	emailBuildNotice 	:= if(count(DeltabaseGateway.File_Deltabase_Gateway.Historic_LIDB_Results_CR_Append_PType(phone<>'')) > 0
 																,fileservices.SendEmail(emailTarget, 'Phones Info: Carrier Reference Phone Type Update', 'Phones Info: Carrier Reference Phone Type Update Files Are Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																,fileservices.SendEmail(emailTarget, 'Phones Info: Carrier Reference Phone Type Update', 'There Were No Updated Records In This Build')

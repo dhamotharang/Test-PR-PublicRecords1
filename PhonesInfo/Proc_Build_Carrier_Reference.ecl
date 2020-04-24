@@ -1,13 +1,10 @@
 ﻿IMPORT _control, PromoteSupers, RoxieKeyBuild, Scrubs_PhonesInfo, Std;
 
-EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function																																										
+EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string emailTarget):= function																																										
 																																																																																							
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Check Category Change - Send Notification Email////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		
-		//To-From Email Addresses	
-		emailTarget				:= _control.MyInfo.EmailAddressNotify + /*PhonesInfo.emailNotification.DOps +*/ PhonesInfo.emailNotification.Dev;
 		
 		//////////////////////////////////////////////////////////////////////////
 		//Send Alert Email If Current Lerg1 Category Changed From Existing Build//
@@ -23,7 +20,7 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function
 																													,'Lerg1_Category_'+version+'.csv'
 																													,
 																													,
-																													,_control.MyInfo.EmailAddressNotify);
+																													,emailTarget);
 
 		pullCheck					:= if(checkFile='no lerg1 category changes',
 														output('no lerg1 category changes'),
@@ -32,17 +29,29 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Create Carrier Reference Base File/////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-																																													
-		buildBase					:= PhonesInfo.Map_Carrier_Reference(version);	
-												 		
-		clearDelete 			:= nothor(fileservices.clearsuperfile('~thor_data400::base::phones::source_reference_main_delete', true));														
 		
-		moveBase					:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::source_reference_main',
+		//Process Input Files
+		cleanLergAddr			:= output(PhonesInfo.Clean_Lerg_Addresses);
+		
+		updExceptList			:= PhonesInfo.Map_Exception_List(version);
+		
+		moveExceptList		:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::source_reference_main_exception',
+																												'~thor_data400::base::phones::source_reference_main_exception_father',
+																												'~thor_data400::base::phones::source_reference_main_exception_delete'], '~thor_data400::base::phones::source_reference_main_exception_'+ version, true);
+		
+		//Build Carrier Reference Base
+		buildCRBase				:= PhonesInfo.Map_Carrier_Reference(version);	
+												 		
+		clearCRDelete 		:= nothor(fileservices.clearsuperfile('~thor_data400::base::phones::source_reference_main_delete', true));														
+		
+		moveCRBase				:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::source_reference_main',
 																												'~thor_data400::base::phones::source_reference_main_father',
 																												'~thor_data400::base::phones::source_reference_main_grandfather',
 																												'~thor_data400::base::phones::source_reference_main_delete'], '~thor_data400::base::phones::source_reference_main_'+ version, true);
 		
-		runBuild					:= sequential(buildBase, clearDelete, moveBase);			
+		runBuild					:= sequential(cleanLergAddr,
+																		updExceptList, moveExceptList,
+																		buildCRBase, clearCRDelete, moveCRBase);			
 		
 	//////////////////////////////////////////////////////////////////////////////////////////////	
 	//Generate Incomplete Records For Review Email////////////////////////////////////////////////
@@ -58,7 +67,7 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function
 																													,'Lerg_Incomplete_Review_'+version+'.csv'
 																													,
 																													,
-																													,_control.MyInfo.EmailAddressNotify);
+																													,emailTarget);
 													
 		clrRevIncomp			:= nothor(fileservices.clearsuperfile('~thor_data400::base::phones::source_reference_main_review_delete', true));		
 		
@@ -84,7 +93,7 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function
 																													,'Lerg_Review_Diff_Rec_Types_'+version+'.csv'
 																													,
 																													,
-																													,_control.MyInfo.EmailAddressNotify);
+																													,emailTarget);
 														
 		pullRevDiff				:= if(revDiffFile='no carrier reference records ocn/carrier_name/serv/line/spid differences available',
 														output('no carrier reference records ocn/carrier_name/serv/line/spid differences available'),
@@ -94,8 +103,8 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck):= function
 	//Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
-		scrubsRuns				:= sequential(Scrubs_PhonesInfo.RawLergFileScrubs(version, _control.MyInfo.EmailAddressNotify),
-																		Scrubs_PhonesInfo.MainCarrierRefScrubs(version, _control.MyInfo.EmailAddressNotify)
+		scrubsRuns				:= sequential(Scrubs_PhonesInfo.RawLergFileScrubs(version, emailTarget),
+																		Scrubs_PhonesInfo.MainCarrierRefScrubs(version, emailTarget)
 																		);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////

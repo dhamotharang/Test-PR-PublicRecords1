@@ -1,6 +1,6 @@
 ﻿IMPORT _control, PromoteSupers, RoxieKeyBuild, Std;
 
-EXPORT Proc_Build_Carrier_Reference_PMT_Update(string version):= FUNCTION
+EXPORT Proc_Build_Carrier_Reference_PMT_Update(string version, string emailTarget):= FUNCTION
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Create LIDB PMT CR Append Base File////////////////////////////////////////////////////////////////////////
@@ -45,10 +45,7 @@ EXPORT Proc_Build_Carrier_Reference_PMT_Update(string version):= FUNCTION
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Generate CR PMT Update Status Email///////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
-	emailDev					:= ';judy.tao@lexisnexisrisk.com';
-	
-	emailTarget				:= _control.MyInfo.EmailAddressNotify + emailDev;
+
 	emailBuildNotice 	:= if(count(PhonesInfo.File_Lerg.Lerg6UpdPhone(phone<>'')) > 0
 																,fileservices.SendEmail(emailTarget, 'Phones Info: Carrier Reference PMT Update', 'Phones Info: Carrier Reference PMT Update Files Are Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																,fileservices.SendEmail(emailTarget, 'Phones Info: Carrier Reference PMT Update', 'There Were No Updated Records In This Build')

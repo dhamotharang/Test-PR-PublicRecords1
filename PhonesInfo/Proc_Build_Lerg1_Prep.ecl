@@ -1,6 +1,6 @@
 ﻿import _control, std, ut;
 
-EXPORT Proc_Build_Lerg1_Prep(string version, const varstring eclsourceip, string thor_name) := function
+EXPORT Proc_Build_Lerg1_Prep(string version, const varstring eclsourceip, string emailTarget, string thor_name) := function
 
 	sprayLerg 				:= PhonesInfo.Spray_Lerg(version, eclsourceip, thor_name);
 		
@@ -34,8 +34,8 @@ EXPORT Proc_Build_Lerg1_Prep(string version, const varstring eclsourceip, string
 																											'~thor_data400::in::phones::lerg1_prep_delete'], '~thor_data400::in::phones::lerg1_prep_'+version, true);																						
 				
 	emailNotice 			:= if(count(PhonesInfo.File_Lerg.Lerg1Prep(dt_last_reported=version[1..8])) > 0
-													,fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'Phones Metadata: Lerg1 Prep File', 'An updated Lerg1 prep file is now available.')
-													,fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'Phones Metadata: No Lerg1 Prep File Update', 'There was no Lerg1 prep file update in this build.')
+													,fileservices.SendEmail(emailTarget, 'Phones Metadata: Lerg1 Prep File', 'An updated Lerg1 prep file is now available.')
+													,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Lerg1 Prep File Update', 'There was no Lerg1 prep file update in this build.')
 													);	
 																	
 	return sequential(sprayLerg,

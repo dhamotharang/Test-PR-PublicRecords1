@@ -5,19 +5,18 @@ IMPORT aid, aid_support, dx_phonesinfo, std, ut;
 /*
 	REGULAR BUILD PROCESS:
 	======================
-	STEP 1: Concat all inputs.
-	STEP 2: Run the input records through the standard address cleaner.
-	STEP 3: Join the cleaned results to the latest comp_code base file (is_current = TRUE and filter countries) by ocn and operator full name.  
+	STEP 1: Join the cleaned results to the latest comp_code base file (is_current = TRUE and filter countries) by ocn and operator full name.  
 					Matched records will have the spid, operator_fullname, and code (data_type) dervived from the comp_code file.
-	STEP 4: Join the carrier records (override_type='A') to the contact records (override_type='B') by ocn.  
+	STEP 2: Join the carrier records (override_type='A') to the contact records (override_type='B') by ocn.  
 					Matched current (is_current=TRUE) records will use the city/state values from the carrier file.
-	STEP 5: Concat the carrier, contact, and other record results together.
-	STEP 6: Join these records to the latest carrier reference file by ocn, carrier name (name), and spid.
+	STEP 3: Concat the carrier, contact, and other record results together.
+	STEP 4: Join these records to the latest carrier reference file by ocn, carrier name (name), and spid.
 					Matched records will use the serv, line, prepaid, high_risk_indicator, activation_dt, and number_in_service values from the carrier reference file.
 					Unmatched records will have their is_current status changed to FALSE, and the dt_end field will be populated with the latest filedate. 
-	STEP 7: Split the current/non-current records by complete (serv<>'' and line<>'' and spid<>'') and incomplete (serv='' or line='' or spid='').
-	STEP 8: The complete records will be used to update the carrier reference file.
-					The incomplete records will be used to generate the record review file.  Unmatched comp_code records will also be included in this file.
+	STEP 5: Split the current/non-current records by complete (serv<>'' and line<>'' and spid<>'') and incomplete (serv='' or line='' or spid='').
+	STEP 6: The complete records will be used to update the carrier reference file.
+					The incomplete records will be used to generate the record review file.
+					The dropped records will be added to a review file.
 */
 
 EXPORT Map_Carrier_Reference(string version) := FUNCTION
@@ -25,64 +24,11 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 	//Run Build Update Whenever There Is A Change Made to the Lerg1 and Lerg1Con Files
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 1: CONCAT LERG PREP FILES///////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-		//Lerg Input Files	
-		lergComb					:= PhonesInfo.File_Lerg.Lerg1Prep;									//Prepped Lerg1 & Lerg1Con Files (Use for Monthly Update)
-		
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 2: CLEAN COMBINED LERG ADDRESSES////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		
-		//Standard AID Address Cleaner
-		unsigned4 lAIDAppendFlags			:= AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;		
-		AID.MacAppendFromRaw_2Line(lergComb, address1, address2, append_Rawaid, addrComb, lAIDAppendFlags);
-		
-		Layout_Lerg.lergPrep clnTr(addrComb l):= transform	
-			self.ocn										:= PhonesInfo._functions.fn_standardName(l.ocn);
-			self.prim_range 						:= if(l.AIDWork_ACECache.prim_range ='0','',l.AIDWork_ACECache.prim_range);
-			self.predir 								:= l.AIDWork_ACECache.predir;
-			self.prim_name 							:= l.AIDWork_ACECache.prim_name;
-			self.addr_suffix 						:= l.AIDWork_ACECache.addr_suffix;
-			self.postdir 								:= l.AIDWork_ACECache.postdir;
-			self.unit_desig 						:= l.AIDWork_ACECache.unit_desig;
-			self.sec_range 							:= l.AIDWork_ACECache.sec_range;
-			self.p_city_name 						:= l.AIDWork_ACECache.p_city_name;
-			self.v_city_name 						:= l.AIDWork_ACECache.v_city_name;
-			self.st 										:= l.AIDWork_ACECache.st;
-			self.z5 										:= l.AIDWork_ACECache.zip5;
-			self.zip4 									:= l.AIDWork_ACECache.zip4;
-			self.cart 									:= l.AIDWork_ACECache.cart;
-			self.cr_sort_sz 						:= l.AIDWork_ACECache.cr_sort_sz;
-			self.lot 										:= l.AIDWork_ACECache.lot;
-			self.lot_order 							:= l.AIDWork_ACECache.lot_order;
-			self.dpbc 									:= l.AIDWork_ACECache.dbpc;
-			self.chk_digit 							:= l.AIDWork_ACECache.chk_digit;
-			self.rec_type 							:= l.AIDWork_ACECache.rec_type;
-			self.ace_fips_st   					:= l.AIDWork_ACECache.county[1..2];
-			self.fips_county 						:= l.AIDWork_ACECache.county[3..];
-			self.geo_lat 								:= l.AIDWork_ACECache.geo_lat;
-			self.geo_long 							:= l.AIDWork_ACECache.geo_long;
-			self.msa 										:= l.AIDWork_ACECache.msa;
-			self.geo_blk 								:= l.AIDWork_ACECache.geo_blk;
-			self.geo_match 							:= l.AIDWork_ACECache.geo_match;
-			self.err_stat 							:= l.AIDWork_ACECache.err_stat;	
-			self.address_type						:= '';
-			self.privacy_indicator 			:= '';
-			self.opname									:= '';
-			self.is_new									:= '';
-			self.rec_update							:= '';
-			self 												:= l;
-		end;	
-			
-		cleanAdd  				:= project(addrComb, clnTr(left)):persist('~thor400_data::persist::lerg_address_aid');		
-		cleanAddr					:= cleanAdd : independent;
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 3: PULL COMP_CODE SPIDS INFO////////////////////////////////////////////////////////////////////////
+	//STEP 1: PULL COMP_CODE SPIDS INFO////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
+		//Pull Lerg1Prep Clean Address Results
+		cleanAddr					:= PhonesInfo.File_Lerg.Lerg1PrepClean;
 		srtCleanAddr			:= sort(distribute(cleanAddr, hash(ocn, name)), ocn, name, local);	
 		
 		//Pull Records Only From Canada & US States/Territories in the Comp_Code File
@@ -121,7 +67,7 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		ddAddSPID					:= dedup(sort(distributed(joinComb, hash(ocn)), record, local), record, local);
 		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 4: POPULATE SPECIFIC CARRIER INFO FIELDS TO THE CONTACT FILE////////////////////////////////////////
+	//STEP 2: POPULATE SPECIFIC CARRIER INFO FIELDS TO THE CONTACT FILE////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//Populate Carrier City/State Info in the Contact File (Not Needed for Original Carrier Ref Records)
@@ -149,7 +95,7 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		ddUpdContact			:= dedup(sort(distribute(updContact, hash(ocn)), record, local), record, local); 		
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEPS 5-7: APPEND EXISTING CARRIER REFERENCE INFO - Serv/Line Types//////////////////////////////////////
+	//STEPS 3-4: APPEND EXISTING CARRIER REFERENCE INFO - Serv/Line Types//////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//Combine Lerg Files + Existing Carrier Reference Tables
@@ -278,7 +224,7 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		currRec						:= dedup(sort(distribute(concatCurr, hash(ocn, spid, opname)), ocn, spid, opname, serv, line, local), record, local);			
 		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 7: SPLIT RECORDS BY CURRENT/NONCURRENT & COMPLETE/INCOMPLETE////////////////////////////////////////
+	//STEP 5: SPLIT RECORDS BY CURRENT/NONCURRENT & COMPLETE/INCOMPLETE////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//Find CURRENT + Exception Records 
@@ -326,7 +272,7 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		nonCurrIncompRec	:= nonCurrRec(serv='' or line='' or spid='');			//INCOMPLETE NonCurrent Records
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//STEP 8: OUTPUT RESULTS///////////////////////////////////////////////////////////////////////////////////
+	//STEP 6: OUTPUT RESULTS///////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//Pull COMPLETE CURRENT/NONCURRENT Records for Base 

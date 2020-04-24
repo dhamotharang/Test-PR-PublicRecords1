@@ -36,8 +36,8 @@ EXPORT Reform_Common_Lerg(string version) := MODULE
 					self.target_ocn											:= l.target_ocn;
 					self.overall_target_ocn							:= l.overall_target_ocn;
 					self.ocn_abbr_name									:= l.ocn_abbr_name;
-					self.rural_lec_indicator 						:= stringlib.stringfilter(l.rural_lec_indicator, ' X');
-					self.small_ilec_indicator 					:= stringlib.stringfilter(l.small_ilec_indicator, ' X');
+					self.rural_lec_indicator 						:= stringlib.stringfilter(l.rural_lec_indicator, 'X');
+					self.small_ilec_indicator 					:= stringlib.stringfilter(l.small_ilec_indicator, 'X');
 					self.category												:= l.category;
 					self.carrier_address1								:= l.address1;
 					self.carrier_address2								:= l.address2;
@@ -210,10 +210,10 @@ EXPORT Reform_Common_Lerg(string version) := MODULE
 																										    std.str.Find(l.contact_information, ' FAX ', 1)<>0 or std.str.Find(l.contact_information, ' FAX: ', 1)<>0 																																																															=> stringlib.stringfilter(l.contact_information[std.str.Find(l.contact_information, ' FAX ', 1)+5..], '0123456789'),
 																												''));
 					self.contact_email									:= map(std.str.Find(l.contact_information, ' EMAIL: ', 1)<>0 																																							=> l.contact_information[std.str.Find(l.contact_information, ' EMAIL: ', 1)+8..],
-																										 std.str.Find(l.contact_information, ' EMAIL ', 1)<>0 																																							=> l.contact_information[std.str.Find(l.contact_information, ' EMAIL ', 1)+7..],
-																										 std.str.Find(l.contact_information, ' ADDRESS: ', 1)<>0 																																						=> l.contact_information[std.str.Find(l.contact_information, ' ADDRESS: ', 1)+11..],
+																										 std.str.Find(l.contact_information, ' EMAIL ADDRESS: ', 1)<>0 																																			=> l.contact_information[std.str.Find(l.contact_information, ' EMAIL ADDRESS: ', 1)+17..],
+																										 std.str.Find(l.contact_information, ' EMAIL ', 1)<>0 																																							=> l.contact_information[std.str.Find(l.contact_information, ' EMAIL ', 1)+7..], 
 																										 std.str.Find(trim(l.contact_information, left, right),' ',1)=0 and std.str.Find(trim(l.contact_information, left, right),'@',1)<>0 => trim(l.contact_information, left, right), 
-																											'');
+																										 '');
 					self.contact_information						:= l.contact_information;
 					self.prim_range											:= '';
 					self.predir													:= '';

@@ -54,7 +54,7 @@
 	joinLidbDeltFields				:= join(srtLidbDelt, srtCRef,
 																		left.name = right.name and
 																		left.carrier_ocn = right.ocn,
-																		appDeltaSL(left, right), left outer, local);
+																		appDeltaSL(left, right), left outer, local, keep(1));
 	
 	ddLidbDelt								:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
 
@@ -77,7 +77,7 @@
 
 	joinLidbDeltFields2				:= join(srtLidbDelt2, srtCRef2,
 																		left.account_owner = right.ocn,
-																		appDeltaSL2(left, right), left outer, local);
+																		appDeltaSL2(left, right), left outer, local, keep(1));
 	
 	srcLidbDelt2							:= dedup(sort(distribute(joinLidbDeltFields2, hash(account_owner, serv)), record, local), record, local);	
 	

@@ -18,7 +18,8 @@ EXPORT File_Lerg := MODULE
 	
 	//Lerg Prep Files In Common Layout (Lerg1 + Lerg1Con)
 	EXPORT Lerg1Prep							:= dataset('~thor_data400::in::phones::lerg1_prep',									PhonesInfo.Layout_Lerg.lergPrep, 					flat);				
-
+	EXPORT Lerg1PrepClean					:= dataset('~thor400_data::persist::lerg_address_aid', 							PhonesInfo.Layout_Lerg.lergPrep, 					flat);	
+	
 	//Lerg6
 	EXPORT Lerg6									:= dataset('~thor_data400::in::phones::lerg6', 	 										PhonesInfo.Layout_Lerg.lerg6, 									csv(terminator('\n'), 	separator(','), quote('"')));
 	EXPORT Lerg6Hist							:= dataset('~thor_data400::in::phones::lerg6_history', 							PhonesInfo.Layout_Lerg.lerg6Hist, 							flat);

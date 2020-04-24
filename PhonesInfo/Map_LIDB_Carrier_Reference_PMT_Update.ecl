@@ -48,7 +48,7 @@
 	joinFields 								:= join(srt_carrier, srt_name,
 																		left.tempName = right.tempName and
 																		left.account_owner = right.ocn,
-																		appF(left, right), left outer, nosort, local);
+																		appF(left, right), left outer, nosort, local, keep(1));
 	
 	dedupFields								:= dedup(sort(distribute(joinFields, hash(carrier_name)), record, local), record, local);
 	
@@ -71,7 +71,7 @@
 	
 	joinFields2 							:= join(srtIncompRec, srtCarrRef,
 																		left.account_owner = right.ocn,
-																		appF2(left, right), left outer, nosort, local);
+																		appF2(left, right), left outer, nosort, local, keep(1));
 	
 	dedupFields2							:= dedup(sort(distribute(joinFields2, hash(account_owner)), record, local), record, local);
 	
