@@ -45,7 +45,7 @@ EXPORT getInd(DATASET(DueDiligence.LayoutsInternal.SharedInput) sharedInput) := 
                                                   SELF.bestAddress := LEFT.dataToUse.bestAddress;
                                                   
                                                   
-                                                  validDOB := DueDiligence.Common.IsValidDOB((UNSIGNED4)LEFT.dataToUse.dob);
+                                                  validDOB := DueDiligence.CommonDate.IsValidDate((UNSIGNED4)LEFT.dataToUse.dob);
                                                   validHistDate := STD.Date.IsValidDate(historyDate);
                                                   
                                                   SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age((UNSIGNED4)LEFT.dataToUse.dob, historyDate), 0);

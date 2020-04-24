@@ -32,7 +32,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	oshaCleanDate := DueDiligence.Common.CleanDatasetDateFields(oshaRawSeq, 'inspection_opening_date, inspection_close_date');
 	
 	// Filter out records after our history date.
-	oshaFilt := DueDiligence.Common.FilterRecordsSingleDate(oshaCleanDate, inspection_opening_date);
+	oshaFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(oshaCleanDate, inspection_opening_date);
 	
 	//retrieve SIC and NAIC codes with dates
 	outOshaSic := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_OSHA, sic_code, TRUE, TRUE, inspection_opening_date, inspection_close_date);
@@ -69,7 +69,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	dcaDateClean := DueDiligence.Common.CleanDatasetDateFields(dcaRawSeq, 'date_first_seen, date_vendor_first_reported, date_last_seen');
 	
 	// Filter out records after our history date.
-	dcaFilt := DueDiligence.Common.FilterRecords(dcaDateClean, date_first_seen, date_vendor_first_reported);
+	dcaFilt := DueDiligence.CommonDate.FilterRecords(dcaDateClean, date_first_seen, date_vendor_first_reported);
 
 	
 	//retrieve SIC and NAIC codes with dates
@@ -130,7 +130,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	fbnDateClean := DueDiligence.Common.CleanDatasetDateFields(fbnRawSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
 			
 	// Filter out records after our history date.
-	fbnFilt := DueDiligence.Common.FilterRecords(fbnDateClean, dt_first_seen, dt_vendor_first_reported);
+	fbnFilt := DueDiligence.CommonDate.FilterRecords(fbnDateClean, dt_first_seen, dt_vendor_first_reported);
 	
 	//retrieve SIC and NAIC codes with dates
 	outFbnSic := DueDiligence.CommonBusiness.getSicNaicCodes(fbnFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_FICTICIOUS_BUSINESS, sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
@@ -164,7 +164,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	ypCleanDate := DueDiligence.Common.CleanDatasetDateFields(ypRawSeq, 'pub_date');
 			
 	// Filter out records after our history date.
-	ypFiltRec := DueDiligence.Common.FilterRecordsSingleDate(ypCleanDate, pub_date);
+	ypFiltRec := DueDiligence.CommonDate.FilterRecordsSingleDate(ypCleanDate, pub_date);
 	
 	//yellow pages does not have an end date - create one
 	tempLayout := RECORD
@@ -210,7 +210,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	calBusCleanDate := DueDiligence.Common.CleanDatasetDateFields(calBusRawSeq, 'dt_first_seen, dt_last_seen');
 	
 	// Filter out records after our history date.
-	calBusFilt := DueDiligence.Common.FilterRecordsSingleDate(calBusCleanDate, dt_first_seen);
+	calBusFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(calBusCleanDate, dt_first_seen);
 	
 	//retrieve SIC and NAIC codes with dates
 	outCalBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(calBusFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_CAL_BUSINESS, naics_code, FALSE, TRUE, dt_first_seen, dt_last_seen);

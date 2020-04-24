@@ -181,7 +181,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
                                     
     //BUSINESS SOS AGE RANGE
-    SOSAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.SOSIncorporationDate, (STRING)le.historyDate);   
+    SOSAge := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.SOSIncorporationDate, (STRING)le.historyDate);   
 
     sosFlag9 := IF(le.NoSOSFilingEver AND (UNSIGNED)le.SOSIncorporationDate = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                            		 
     sosFlag8 := IF(sosFlag9 = DueDiligence.Constants.F_INDICATOR AND SOSAge < ut.DaysInNYears(1), 'T', 'F');                                		 
@@ -208,7 +208,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
     //BUSINESS PUBLIC RECORD AGE RANGE
-    HDRAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.BusnHdrDtFirstSeen, (STRING)le.historyDate); 
+    HDRAge := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.BusnHdrDtFirstSeen, (STRING)le.historyDate); 
 
     hdrAgeFlag9 := IF(le.srcCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                                	 			
     hdrAgeFlag8 := IF(hdrAgeFlag9 = DueDiligence.Constants.F_INDICATOR AND HDRAge < ut.DaysInNYears(1), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                			
@@ -287,7 +287,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
     //BUSINESS STABILITY RISK
-    stabFirstSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.firstReportedAtInputAddress, (STRING)le.historyDate);
+    stabFirstSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.firstReportedAtInputAddress, (STRING)le.historyDate);
 
     stabFlag9 := IF(le.sosAllDissolveInactiveSuspend, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
     stabFlag8 := IF(le.sosHasAtleastOneOtherStatusFiling AND le.sosHasAtleastOneDissolvedFiling = FALSE AND 
@@ -316,8 +316,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
     //BUSINESS SHELL SHELF RISK
-    nonCreditFirstSeen := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.historyDate);
-    differSOSAndNoCredit := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.SOSIncorporationDate);
+    nonCreditFirstSeen := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.historyDate);
+    differSOSAndNoCredit := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.SOSIncorporationDate);
 
     shellShelfFlag9 := IF(le.numOfBusFoundAtAddr > 50 AND ((le.numOfBusIncInStateLooseLaws/le.numOfBusFoundAtAddr) * 100) > 25, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
     shellShelfFlag8 := IF(le.numOfBusFoundAtAddr > 50 AND ((le.numOfBusNoReportedFein/le.numOfBusFoundAtAddr) * 100) > 75, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);

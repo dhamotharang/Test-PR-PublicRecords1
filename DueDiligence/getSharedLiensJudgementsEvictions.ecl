@@ -101,7 +101,7 @@ EXPORT getSharedLiensJudgementsEvictions(DATASET(DueDiligence.LayoutsInternal.Sh
                                     
     cleanDates := DueDiligence.Common.CleanDatasetDateFields(mainLiens, 'dateFirstSeen, dateLastSeen, releaseDate, filingDate');  
     
-    filterData := DueDiligence.Common.FilterRecordsSingleDate(cleanDates, dateFirstSeen);
+    filterData := DueDiligence.CommonDate.FilterRecordsSingleDate(cleanDates, dateFirstSeen);
     
     calcReleaseDate := PROJECT(filterData, TRANSFORM(DueDiligence.LayoutsInternal.SharedSlimLiens,
                                                       SELF.dateFirstSeen := LEFT.dateFirstSeen;
@@ -217,7 +217,7 @@ EXPORT getSharedLiensJudgementsEvictions(DATASET(DueDiligence.LayoutsInternal.Sh
      
     mainLiensCategorized := PROJECT(liensRolled, TRANSFORM({DueDiligence.LayoutsInternal.SharedSlimLiens, DATASET(DueDiligence.Layouts.LiensJudgementsEvictionDetails) lje}, 
                                                            
-                                                           numOfDaysAgo := DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)LEFT.dateFirstSeen, (STRING)LEFT.historyDate);
+                                                           numOfDaysAgo := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)LEFT.dateFirstSeen, (STRING)LEFT.historyDate);
                                                            
                                                            SELF.totalEvictionsOver3Yrs := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES AND numOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.releaseDate = 0);
                                                            SELF.totalEvictionsPast3Yrs := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES AND numOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.releaseDate = 0);

@@ -20,7 +20,7 @@ EXPORT getBusSOSDetailImpl := MODULE
         corpFilingsCleanDate := DueDiligence.Common.CleanDatasetDateFields(corpFilingsSeq, 'dt_first_seen, dt_vendor_first_reported, corp_inc_date, corp_filing_date, dt_last_seen');
         
         //filter out records after our history date.
-        corpFilingsFilt := DueDiligence.Common.FilterRecords(corpFilingsCleanDate, dt_first_seen, dt_vendor_first_reported);
+        corpFilingsFilt := DueDiligence.CommonDate.FilterRecords(corpFilingsCleanDate, dt_first_seen, dt_vendor_first_reported);
         
         RETURN corpFilingsFilt;	
     END;
@@ -139,12 +139,12 @@ EXPORT getBusSOSDetailImpl := MODULE
                                                         corpStatusCd := DueDiligence.CommonBusiness.GetSOSStatuses(LEFT);
                       
                                                         SELF.lastReinstateDate := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_REINSTATE, LEFT.dt_last_seen, DueDiligence.Constants.NUMERIC_ZERO);
-                                                        SELF.activeExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_ACTIVE, TRUE, FALSE);
-                                                        SELF.dissolvedExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_DISSOLVED, TRUE, FALSE);
-                                                        SELF.inactiveExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_INACTIVE, TRUE, FALSE);
-                                                        SELF.suspendedExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_SUSPEND, TRUE, FALSE);
-                                                        SELF.allDissolveInactiveSuspended := IF(corpStatusCd IN [DueDiligence.Constants.CORP_STATUS_DISSOLVED, DueDiligence.Constants.CORP_STATUS_INACTIVE, DueDiligence.Constants.CORP_STATUS_SUSPEND], TRUE, FALSE);
-                                                        SELF.otherStatusExists := IF(corpStatusCd = DueDiligence.Constants.COPR_STATUS_OTHER, TRUE, FALSE);
+                                                        SELF.activeExists := corpStatusCd = DueDiligence.Constants.CORP_STATUS_ACTIVE;
+                                                        SELF.dissolvedExists := corpStatusCd = DueDiligence.Constants.CORP_STATUS_DISSOLVED;
+                                                        SELF.inactiveExists := corpStatusCd = DueDiligence.Constants.CORP_STATUS_INACTIVE;
+                                                        SELF.suspendedExists := corpStatusCd = DueDiligence.Constants.CORP_STATUS_SUSPEND;
+                                                        SELF.allDissolveInactiveSuspended := corpStatusCd IN [DueDiligence.Constants.CORP_STATUS_DISSOLVED, DueDiligence.Constants.CORP_STATUS_INACTIVE, DueDiligence.Constants.CORP_STATUS_SUSPEND];
+                                                        SELF.otherStatusExists := corpStatusCd = DueDiligence.Constants.COPR_STATUS_OTHER;
                                                         SELF.sosFilingExists := TRUE;
                                                         SELF := LEFT;));
                                                                       
@@ -205,6 +205,7 @@ EXPORT getBusSOSDetailImpl := MODULE
                                 LEFT.corp_ra_postdir = RIGHT.corp_ra_postdir AND
                                 LEFT.corp_ra_zip5 = RIGHT.corp_ra_zip5,
                                 TRANSFORM({RECORDOF(LEFT)},
+                                           SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
                                            SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
                                            SELF := LEFT;));
         

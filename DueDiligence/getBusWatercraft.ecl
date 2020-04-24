@@ -35,7 +35,7 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(tempSlimWatercraft, 'dateFirstSeen');
 	
   //Filter records based on when we first seen the data
-	filteredWatercraft := DueDiligence.Common.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);
+	filteredWatercraft := DueDiligence.CommonDate.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);
   
   slimWatercraft := PROJECT(filteredWatercraft, TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout, SELF := LEFT;));
   

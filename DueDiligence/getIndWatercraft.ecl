@@ -56,7 +56,7 @@ EXPORT getIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(watercraftDateDetails, 'dateFirstSeen');
     
     //Filter records based on when we first seen the data
-    filteredWatercraftRecords := DueDiligence.Common.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);  
+    filteredWatercraftRecords := DueDiligence.CommonDate.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);  
     
     slimWatercraft := PROJECT(filteredWatercraftRecords, TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout, SELF := LEFT;));
     

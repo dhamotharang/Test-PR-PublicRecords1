@@ -39,7 +39,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	cleanDateFields := DueDiligence.Common.CleanDatasetDateFields(addrCountRaw, 'dt_first_seen');											
 	
 	// Filter out records after our history date.
-	addrCountDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(cleanDateFields, dt_first_seen);
+	addrCountDataFiltRecs := DueDiligence.CommonDate.FilterRecordsSingleDate(cleanDateFields, dt_first_seen);
 	
 	//determine businesses counts (at addr, incorporated in loose state, have no fein)
 	addCounts := JOIN(inData, addrCountDataFiltRecs(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
@@ -107,7 +107,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	addrDateFilt := DueDiligence.Common.CleanDatasetDateFields(addrRaw, 'dt_first_seen, dt_last_seen');
 	
 	// Filter out records after our history date.
-	addrDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrDateFilt, dt_first_seen);
+	addrDataFiltRecs := DueDiligence.CommonDate.FilterRecordsSingleDate(addrDateFilt, dt_first_seen);
 	
 	
 	filteredInquiredBus := addrDataFiltRecs(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE);
@@ -229,7 +229,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	addrSicDateFilt := DueDiligence.Common.CleanDatasetDateFields(hraSicRaw, 'dt_first_seen');
 	
 	// Filter out records after our history date.
-	addrSicDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrSicDateFilt, dt_first_seen);
+	addrSicDataFiltRecs := DueDiligence.CommonDate.FilterRecordsSingleDate(addrSicDateFilt, dt_first_seen);
 	
 	addrSicDataTrans := PROJECT(addrSicDataFiltRecs, TRANSFORM({BOOLEAN cmraSicCode, RECORDOF(LEFT)},
 																															SELF.cmraSicCode := LEFT.sic_code IN DueDiligence.Constants.CMRA_SIC_CODES;

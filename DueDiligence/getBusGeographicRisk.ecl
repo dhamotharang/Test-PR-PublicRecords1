@@ -35,7 +35,7 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 
                                                                                   
     //Determine the Geographic Risk for the Inquired Business
-    AddressBusnGeoRisk := DueDiligence.Common.getGeographicRisk(ListOfAddresses, TRUE);  
+    AddressBusnGeoRisk := DueDiligence.CommonAddress.getAddressRisk(ListOfAddresses, TRUE);  
 
 
     //add the Geographic Risk to Busn_Internal layout.

@@ -34,7 +34,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData,
 	// ------ If the History date is all 9's essentially no records will be dropped - also known ------
 	// ------ as CURRENT MODE.                                                                   ------
 	// ------                                                                                    ------
-	Property_Filtered := DueDiligence.Common.FilterRecords(propertyCleanDates, dt_first_seen, dt_vendor_first_reported); 
+	Property_Filtered := DueDiligence.CommonDate.FilterRecords(propertyCleanDates, dt_first_seen, dt_vendor_first_reported); 
 
   //we need to project the first and last seen dates with vendor if they are not populated so we do not lose records....
   formatProperty := PROJECT(Property_Filtered, TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,

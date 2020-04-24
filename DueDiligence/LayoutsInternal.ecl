@@ -339,7 +339,36 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED4 dateFirstSeen;
     STRING50 src;
   END;
-
+  
+  EXPORT BusSlimHeader := RECORD
+    UNSIGNED4 seq;
+    InternalSeqAndIdentifiersLayout -did -seq;
+    
+    UNSIGNED4 historyDate;
+    
+    STRING2 source;
+    UNSIGNED4 dt_first_seen;
+    UNSIGNED4 dt_last_seen;
+    UNSIGNED4 dt_vendor_first_reported;
+    DueDiligence.Layouts.AddressSlimDetail;
+    
+    STRING9 company_fein;
+    STRING company_org_structure_derived;
+    STRING2 company_inc_state;
+    STRING dba_name;
+    
+    STRING company_sic_code1;
+    STRING company_sic_code2;
+    STRING company_sic_code3;
+    STRING company_sic_code4;
+    STRING company_sic_code5;
+    
+    STRING company_naics_code1;
+    STRING company_naics_code2;
+    STRING company_naics_code3;
+    STRING company_naics_code4;
+    STRING company_naics_code5;
+  END;
 
   EXPORT FeinSources := RECORD
     InternalSeqAndIdentifiersLayout;
