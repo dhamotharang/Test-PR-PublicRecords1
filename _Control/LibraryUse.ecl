@@ -76,6 +76,8 @@ export ForceOffOne_Address__LIB_Cleaning := _Control.ThisEnvironment.IsPlatformT
 export ForceOff_Bocashell_Models := false;
 // export ForceOff_Bocashell_Models := true;
 
+export ForceOff_B2B_attributes := FALSE;
+
 /*
 END ECL YOU ARE ENCOURAGED TO SANDBOX!!!!!!!!!!!!!!!
 */
