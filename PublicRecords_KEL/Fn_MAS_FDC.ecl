@@ -1,6 +1,6 @@
 IMPORT ADVO, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, Business_Risk_BIP, BusReg, CalBus, CellPhone, Corp2,
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, DMA, Doxie, Doxie_Files, DriversV2, dx_BestRecords, DX_Email,
-		dx_Equifax_Business_Data, dx_Header, dx_Infutor_NARB, EBR, FAA, FBNv2, Fraudpoint3, Gong, dx_Gong,
+		dx_Equifax_Business_Data, dx_Header, dx_Infutor_NARB, EBR, FAA, FBNv2, Fraudpoint3, dx_Gong,
 		GovData, Header, Header_Quick, IRS5500, InfutorCID, Inquiry_AccLogs, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari,
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, SAM, STD, Suppress, Targus, USPIS_HotList, Utilfile,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_header, LiensV2, American_student_list, AlloyMedia_student_list, RiskWise, Death_Master,
@@ -2600,7 +2600,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInput(Layouts_FDC.Layout_FDC le) := TRA
 
 	Key_Gong_History_LinkID_Records :=
 			IF(Common.DoFDCJoin_Gong__Key_History_LinkIds = TRUE,
-				PublicRecords_KEL.ecl_functions.DateSelector(Gong.Key_History_LinkIds.kfetch2(
+				PublicRecords_KEL.ecl_functions.DateSelector(dx_Gong.key_history_LinkIds.kfetch2(
 						PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
 						mod_access, // CCPA suppression
 						PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),

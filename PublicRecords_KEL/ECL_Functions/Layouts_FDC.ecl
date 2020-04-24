@@ -1,6 +1,6 @@
 ﻿
 IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2, Cortera, Cortera_Tradeline,
-	DMA, DCAV2, Doxie_Files, dx_BestRecords, dx_Email, dx_Header, EBR, FAA, FBNv2, Fraudpoint3, Gong, dx_Gong, GovData,
+	DMA, DCAV2, Doxie_Files, dx_BestRecords, dx_Email, dx_Header, EBR, FAA, FBNv2, Fraudpoint3, dx_Gong, GovData,
 	Header_Quick, InfutorCID, Inquiry_AccLogs, IRS5500, LN_PropertyV2, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
 	PublicRecords_KEL, OSHAIR, Targus, USPIS_HotList, UtilFile, SAM, VehicleV2, Watercraft, Watchdog, YellowPages,
 	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Relationship, data_services, Doxie,
@@ -817,7 +817,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		UNSIGNED8 DPMBitmap;
 	END;
 
-	SHARED Gong__Key_History_LinkIds := Gong.Key_History_LinkIds.kFetch2;
+	SHARED Gong__Key_History_LinkIds := dx_Gong.Key_History_LinkIds.kFetch2;
 	EXPORT Layout_Gong__Key_History_LinkIds := RECORD
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_LinkIds);

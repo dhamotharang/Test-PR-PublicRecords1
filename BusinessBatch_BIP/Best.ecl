@@ -176,16 +176,6 @@ EXPORT Best := MODULE
 
                               //self.best_sic_code ...fill in later.
                           SELF.best_address_status := LEFT.err_stat;
-                            // tmpDs := project(ut.ds_oneRecord, transform(BIPV2.IDlayouts.l_xlink_ids,
-                                              // SELF.ultid := tmpULTID;
-                                              // SELF.ORGID := tmpORGID;
-                                              // SELF.SELEID := tmpSELEID;
-                                              // SELF := []));
-                          // gongLinkidsHasCurrentPhone := exists(Gong.key_History_LinkIDs.kfetch(TMPDS)
-                                                              // (Current_record_flag = 'Y'));
-                          // gongHistoryPhone := exists(project(dx_gong.key_history_phone()(p7 = LEFT.company_phone[4..10] AND
-                                                                                    // p3 = LEFT.company_phone[1..3]),
-                                                                                    // TRANSFORM(LEFT))(current_flag));
                         // Could do like we did in BIP search and override the Bip BH isActive flag if its false
                         // if we have a matching Phone # in the Gong key history that is current.
                         // possibly in future use going linkids key to do same
