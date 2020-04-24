@@ -1,6 +1,6 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
-EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
+EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
   EXPORT salt_VERSION := 'V3.11.9';
@@ -9,7 +9,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_FCC';
-  EXPORT spc_NAMESCOPE := '';
+  EXPORT spc_NAMESCOPE := 'Input';
   EXPORT spc_PROCESS := '';
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
@@ -41,13 +41,14 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_FCC\n'
     + 'FILENAME:FCC\n'
+    + 'NAMESCOPE:Input\n'
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789 )\n'
     + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .-/)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz )\n'
     + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz .,-\'&)\n'
     + 'FIELDTYPE:Invalid_AlphaNum:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz )\n'
-    + 'FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz .,:;\'#/-&\\(\\))\n'
+    + 'FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz _.,:;\'#/-&\\(\\))\n'
     + 'FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)\n'
     + 'FIELDTYPE:Invalid_Zip:LIKE(Invalid_Float):LENGTHS(0,5,9,10)\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_Float):LENGTHS(0,9,10)\n'
@@ -55,7 +56,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Future:CUSTOM(fn_valid_Date > 0, \'Future\')\n'
     + '\n'
     + 'FIELD:license_type:TYPE(STRING3):LIKE(Invalid_AlphaNum):0,0\n'
-    + 'FIELD:file_number:TYPE(STRING15):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:file_number:TYPE(STRING15):LIKE(Invalid_AlphaNum):0,0\n'
     + 'FIELD:callsign_of_license:TYPE(STRING10):LIKE(Invalid_AlphaNum):0,0\n'
     + 'FIELD:radio_service_code:TYPE(STRING2):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:licensees_name:TYPE(STRING50):LIKE(Invalid_AlphaNumChar):0,0\n'
@@ -86,7 +87,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:number_of_units_authorized_on_freq:TYPE(STRING9):LIKE(Invalid_No):0,0\n'
     + 'FIELD:effective_radiated_power:TYPE(STRING9):LIKE(Invalid_Float):0,0\n'
     + 'FIELD:emissions_codes:TYPE(STRING45):LIKE(Invalid_AlphaNum):0,0\n'
-    + 'FIELD:frequency_coordination_number:TYPE(STRING30):LIKE(Invalid_AlphaNum):0,0\n'
+    + 'FIELD:frequency_coordination_number:TYPE(STRING30):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:paging_license_status:TYPE(STRING2):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:control_point_for_the_system:TYPE(STRING50):LIKE(Invalid_AlphaNumChar):0,0\n'
     + 'FIELD:pending_or_granted:TYPE(STRING1):LIKE(Invalid_Alpha):0,0\n'

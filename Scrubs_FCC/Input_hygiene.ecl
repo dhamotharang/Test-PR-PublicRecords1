@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-EXPORT hygiene(dataset(layout_FCC) h) := MODULE
+EXPORT Input_hygiene(dataset(Input_layout_FCC) h) := MODULE
  
 //A simple summary record
 EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
@@ -285,51 +285,51 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    Fields.InValid_license_type((SALT311.StrType)le.license_type),
-    Fields.InValid_file_number((SALT311.StrType)le.file_number),
-    Fields.InValid_callsign_of_license((SALT311.StrType)le.callsign_of_license),
-    Fields.InValid_radio_service_code((SALT311.StrType)le.radio_service_code),
-    Fields.InValid_licensees_name((SALT311.StrType)le.licensees_name),
-    Fields.InValid_licensees_attention_line((SALT311.StrType)le.licensees_attention_line),
-    Fields.InValid_dba_name((SALT311.StrType)le.dba_name),
-    Fields.InValid_licensees_street((SALT311.StrType)le.licensees_street),
-    Fields.InValid_licensees_city((SALT311.StrType)le.licensees_city),
-    Fields.InValid_licensees_state((SALT311.StrType)le.licensees_state),
-    Fields.InValid_licensees_zip((SALT311.StrType)le.licensees_zip),
-    Fields.InValid_licensees_phone((SALT311.StrType)le.licensees_phone),
-    Fields.InValid_date_application_received_at_fcc((SALT311.StrType)le.date_application_received_at_fcc),
-    Fields.InValid_date_license_issued((SALT311.StrType)le.date_license_issued),
-    Fields.InValid_date_license_expires((SALT311.StrType)le.date_license_expires),
-    Fields.InValid_date_of_last_change((SALT311.StrType)le.date_of_last_change),
-    Fields.InValid_type_of_last_change((SALT311.StrType)le.type_of_last_change),
-    Fields.InValid_latitude((SALT311.StrType)le.latitude),
-    Fields.InValid_longitude((SALT311.StrType)le.longitude),
-    Fields.InValid_transmitters_street((SALT311.StrType)le.transmitters_street),
-    Fields.InValid_transmitters_city((SALT311.StrType)le.transmitters_city),
-    Fields.InValid_transmitters_county((SALT311.StrType)le.transmitters_county),
-    Fields.InValid_transmitters_state((SALT311.StrType)le.transmitters_state),
-    Fields.InValid_transmitters_antenna_height((SALT311.StrType)le.transmitters_antenna_height),
-    Fields.InValid_transmitters_height_above_avg_terra((SALT311.StrType)le.transmitters_height_above_avg_terra),
-    Fields.InValid_transmitters_height_above_ground_le((SALT311.StrType)le.transmitters_height_above_ground_le),
-    Fields.InValid_power_of_this_frequency((SALT311.StrType)le.power_of_this_frequency),
-    Fields.InValid_frequency_mhz((SALT311.StrType)le.frequency_mhz),
-    Fields.InValid_class_of_station((SALT311.StrType)le.class_of_station),
-    Fields.InValid_number_of_units_authorized_on_freq((SALT311.StrType)le.number_of_units_authorized_on_freq),
-    Fields.InValid_effective_radiated_power((SALT311.StrType)le.effective_radiated_power),
-    Fields.InValid_emissions_codes((SALT311.StrType)le.emissions_codes),
-    Fields.InValid_frequency_coordination_number((SALT311.StrType)le.frequency_coordination_number),
-    Fields.InValid_paging_license_status((SALT311.StrType)le.paging_license_status),
-    Fields.InValid_control_point_for_the_system((SALT311.StrType)le.control_point_for_the_system),
-    Fields.InValid_pending_or_granted((SALT311.StrType)le.pending_or_granted),
-    Fields.InValid_firm_preparing_application((SALT311.StrType)le.firm_preparing_application),
-    Fields.InValid_contact_firms_street_address((SALT311.StrType)le.contact_firms_street_address),
-    Fields.InValid_contact_firms_city((SALT311.StrType)le.contact_firms_city),
-    Fields.InValid_contact_firms_state((SALT311.StrType)le.contact_firms_state),
-    Fields.InValid_contact_firms_zipcode((SALT311.StrType)le.contact_firms_zipcode),
-    Fields.InValid_contact_firms_phone_number((SALT311.StrType)le.contact_firms_phone_number),
-    Fields.InValid_contact_firms_fax_number((SALT311.StrType)le.contact_firms_fax_number),
-    Fields.InValid_unique_key((SALT311.StrType)le.unique_key),
-    Fields.InValid_crlf((SALT311.StrType)le.crlf),
+    Input_Fields.InValid_license_type((SALT311.StrType)le.license_type),
+    Input_Fields.InValid_file_number((SALT311.StrType)le.file_number),
+    Input_Fields.InValid_callsign_of_license((SALT311.StrType)le.callsign_of_license),
+    Input_Fields.InValid_radio_service_code((SALT311.StrType)le.radio_service_code),
+    Input_Fields.InValid_licensees_name((SALT311.StrType)le.licensees_name),
+    Input_Fields.InValid_licensees_attention_line((SALT311.StrType)le.licensees_attention_line),
+    Input_Fields.InValid_dba_name((SALT311.StrType)le.dba_name),
+    Input_Fields.InValid_licensees_street((SALT311.StrType)le.licensees_street),
+    Input_Fields.InValid_licensees_city((SALT311.StrType)le.licensees_city),
+    Input_Fields.InValid_licensees_state((SALT311.StrType)le.licensees_state),
+    Input_Fields.InValid_licensees_zip((SALT311.StrType)le.licensees_zip),
+    Input_Fields.InValid_licensees_phone((SALT311.StrType)le.licensees_phone),
+    Input_Fields.InValid_date_application_received_at_fcc((SALT311.StrType)le.date_application_received_at_fcc),
+    Input_Fields.InValid_date_license_issued((SALT311.StrType)le.date_license_issued),
+    Input_Fields.InValid_date_license_expires((SALT311.StrType)le.date_license_expires),
+    Input_Fields.InValid_date_of_last_change((SALT311.StrType)le.date_of_last_change),
+    Input_Fields.InValid_type_of_last_change((SALT311.StrType)le.type_of_last_change),
+    Input_Fields.InValid_latitude((SALT311.StrType)le.latitude),
+    Input_Fields.InValid_longitude((SALT311.StrType)le.longitude),
+    Input_Fields.InValid_transmitters_street((SALT311.StrType)le.transmitters_street),
+    Input_Fields.InValid_transmitters_city((SALT311.StrType)le.transmitters_city),
+    Input_Fields.InValid_transmitters_county((SALT311.StrType)le.transmitters_county),
+    Input_Fields.InValid_transmitters_state((SALT311.StrType)le.transmitters_state),
+    Input_Fields.InValid_transmitters_antenna_height((SALT311.StrType)le.transmitters_antenna_height),
+    Input_Fields.InValid_transmitters_height_above_avg_terra((SALT311.StrType)le.transmitters_height_above_avg_terra),
+    Input_Fields.InValid_transmitters_height_above_ground_le((SALT311.StrType)le.transmitters_height_above_ground_le),
+    Input_Fields.InValid_power_of_this_frequency((SALT311.StrType)le.power_of_this_frequency),
+    Input_Fields.InValid_frequency_mhz((SALT311.StrType)le.frequency_mhz),
+    Input_Fields.InValid_class_of_station((SALT311.StrType)le.class_of_station),
+    Input_Fields.InValid_number_of_units_authorized_on_freq((SALT311.StrType)le.number_of_units_authorized_on_freq),
+    Input_Fields.InValid_effective_radiated_power((SALT311.StrType)le.effective_radiated_power),
+    Input_Fields.InValid_emissions_codes((SALT311.StrType)le.emissions_codes),
+    Input_Fields.InValid_frequency_coordination_number((SALT311.StrType)le.frequency_coordination_number),
+    Input_Fields.InValid_paging_license_status((SALT311.StrType)le.paging_license_status),
+    Input_Fields.InValid_control_point_for_the_system((SALT311.StrType)le.control_point_for_the_system),
+    Input_Fields.InValid_pending_or_granted((SALT311.StrType)le.pending_or_granted),
+    Input_Fields.InValid_firm_preparing_application((SALT311.StrType)le.firm_preparing_application),
+    Input_Fields.InValid_contact_firms_street_address((SALT311.StrType)le.contact_firms_street_address),
+    Input_Fields.InValid_contact_firms_city((SALT311.StrType)le.contact_firms_city),
+    Input_Fields.InValid_contact_firms_state((SALT311.StrType)le.contact_firms_state),
+    Input_Fields.InValid_contact_firms_zipcode((SALT311.StrType)le.contact_firms_zipcode),
+    Input_Fields.InValid_contact_firms_phone_number((SALT311.StrType)le.contact_firms_phone_number),
+    Input_Fields.InValid_contact_firms_fax_number((SALT311.StrType)le.contact_firms_fax_number),
+    Input_Fields.InValid_unique_key((SALT311.StrType)le.unique_key),
+    Input_Fields.InValid_crlf((SALT311.StrType)le.crlf),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -341,9 +341,9 @@ ErrorRecordsTotals := RECORD
 END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
-  FieldNme := Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_AlphaNum','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Date','Invalid_Date','Invalid_Future','Invalid_Date','Invalid_Alpha','Invalid_Float','Invalid_Float','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_State','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_AlphaNum','Invalid_No','Invalid_Float','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Phone','Invalid_AlphaNumChar','Unknown');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_license_type(TotalErrors.ErrorNum),Fields.InValidMessage_file_number(TotalErrors.ErrorNum),Fields.InValidMessage_callsign_of_license(TotalErrors.ErrorNum),Fields.InValidMessage_radio_service_code(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_name(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_attention_line(TotalErrors.ErrorNum),Fields.InValidMessage_dba_name(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_street(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_city(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_state(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_zip(TotalErrors.ErrorNum),Fields.InValidMessage_licensees_phone(TotalErrors.ErrorNum),Fields.InValidMessage_date_application_received_at_fcc(TotalErrors.ErrorNum),Fields.InValidMessage_date_license_issued(TotalErrors.ErrorNum),Fields.InValidMessage_date_license_expires(TotalErrors.ErrorNum),Fields.InValidMessage_date_of_last_change(TotalErrors.ErrorNum),Fields.InValidMessage_type_of_last_change(TotalErrors.ErrorNum),Fields.InValidMessage_latitude(TotalErrors.ErrorNum),Fields.InValidMessage_longitude(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_street(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_city(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_county(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_state(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_antenna_height(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_height_above_avg_terra(TotalErrors.ErrorNum),Fields.InValidMessage_transmitters_height_above_ground_le(TotalErrors.ErrorNum),Fields.InValidMessage_power_of_this_frequency(TotalErrors.ErrorNum),Fields.InValidMessage_frequency_mhz(TotalErrors.ErrorNum),Fields.InValidMessage_class_of_station(TotalErrors.ErrorNum),Fields.InValidMessage_number_of_units_authorized_on_freq(TotalErrors.ErrorNum),Fields.InValidMessage_effective_radiated_power(TotalErrors.ErrorNum),Fields.InValidMessage_emissions_codes(TotalErrors.ErrorNum),Fields.InValidMessage_frequency_coordination_number(TotalErrors.ErrorNum),Fields.InValidMessage_paging_license_status(TotalErrors.ErrorNum),Fields.InValidMessage_control_point_for_the_system(TotalErrors.ErrorNum),Fields.InValidMessage_pending_or_granted(TotalErrors.ErrorNum),Fields.InValidMessage_firm_preparing_application(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_street_address(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_city(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_state(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_zipcode(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_phone_number(TotalErrors.ErrorNum),Fields.InValidMessage_contact_firms_fax_number(TotalErrors.ErrorNum),Fields.InValidMessage_unique_key(TotalErrors.ErrorNum),Fields.InValidMessage_crlf(TotalErrors.ErrorNum));
+  FieldNme := Input_Fields.FieldName(TotalErrors.FieldNum);
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Date','Invalid_Date','Invalid_Future','Invalid_Date','Invalid_Alpha','Invalid_Float','Invalid_Float','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_State','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_Float','Invalid_AlphaNum','Invalid_No','Invalid_Float','Invalid_AlphaNum','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Phone','Invalid_AlphaNumChar','Unknown');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,Input_Fields.InValidMessage_license_type(TotalErrors.ErrorNum),Input_Fields.InValidMessage_file_number(TotalErrors.ErrorNum),Input_Fields.InValidMessage_callsign_of_license(TotalErrors.ErrorNum),Input_Fields.InValidMessage_radio_service_code(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_name(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_attention_line(TotalErrors.ErrorNum),Input_Fields.InValidMessage_dba_name(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_street(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_city(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_state(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_zip(TotalErrors.ErrorNum),Input_Fields.InValidMessage_licensees_phone(TotalErrors.ErrorNum),Input_Fields.InValidMessage_date_application_received_at_fcc(TotalErrors.ErrorNum),Input_Fields.InValidMessage_date_license_issued(TotalErrors.ErrorNum),Input_Fields.InValidMessage_date_license_expires(TotalErrors.ErrorNum),Input_Fields.InValidMessage_date_of_last_change(TotalErrors.ErrorNum),Input_Fields.InValidMessage_type_of_last_change(TotalErrors.ErrorNum),Input_Fields.InValidMessage_latitude(TotalErrors.ErrorNum),Input_Fields.InValidMessage_longitude(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_street(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_city(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_county(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_state(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_antenna_height(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_height_above_avg_terra(TotalErrors.ErrorNum),Input_Fields.InValidMessage_transmitters_height_above_ground_le(TotalErrors.ErrorNum),Input_Fields.InValidMessage_power_of_this_frequency(TotalErrors.ErrorNum),Input_Fields.InValidMessage_frequency_mhz(TotalErrors.ErrorNum),Input_Fields.InValidMessage_class_of_station(TotalErrors.ErrorNum),Input_Fields.InValidMessage_number_of_units_authorized_on_freq(TotalErrors.ErrorNum),Input_Fields.InValidMessage_effective_radiated_power(TotalErrors.ErrorNum),Input_Fields.InValidMessage_emissions_codes(TotalErrors.ErrorNum),Input_Fields.InValidMessage_frequency_coordination_number(TotalErrors.ErrorNum),Input_Fields.InValidMessage_paging_license_status(TotalErrors.ErrorNum),Input_Fields.InValidMessage_control_point_for_the_system(TotalErrors.ErrorNum),Input_Fields.InValidMessage_pending_or_granted(TotalErrors.ErrorNum),Input_Fields.InValidMessage_firm_preparing_application(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_street_address(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_city(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_state(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_zipcode(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_phone_number(TotalErrors.ErrorNum),Input_Fields.InValidMessage_contact_firms_fax_number(TotalErrors.ErrorNum),Input_Fields.InValidMessage_unique_key(TotalErrors.ErrorNum),Input_Fields.InValidMessage_crlf(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
@@ -352,7 +352,7 @@ EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRU
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
  
-  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FCC, Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FCC, Input_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
  
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));

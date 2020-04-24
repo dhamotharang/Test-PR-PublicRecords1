@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-EXPORT Fields := MODULE
+EXPORT Input_Fields := MODULE
  
 EXPORT NumFields := 45;
  
@@ -43,11 +43,11 @@ EXPORT InValidFT_Invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>L
 EXPORT InValidMessageFT_Invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaNumChar(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz .,:;\'#/-&()'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz _.,:;\'#/-&()'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz .,:;\'#/-&()'))));
-EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz .,:;\'#/-&()'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz _.,:;\'#/-&()'))));
+EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz _.,:;\'#/-&()'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_State(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '); // Only allow valid symbols
@@ -94,9 +94,9 @@ EXPORT Make_license_type(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
 EXPORT InValid_license_type(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
 EXPORT InValidMessage_license_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_file_number(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
-EXPORT InValid_file_number(SALT311.StrType s) := InValidFT_Invalid_No(s);
-EXPORT InValidMessage_file_number(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
+EXPORT Make_file_number(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_file_number(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_file_number(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
 EXPORT Make_callsign_of_license(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
 EXPORT InValid_callsign_of_license(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
@@ -218,9 +218,9 @@ EXPORT Make_emissions_codes(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
 EXPORT InValid_emissions_codes(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
 EXPORT InValidMessage_emissions_codes(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_frequency_coordination_number(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
-EXPORT InValid_frequency_coordination_number(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
-EXPORT InValidMessage_frequency_coordination_number(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
+EXPORT Make_frequency_coordination_number(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_frequency_coordination_number(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_frequency_coordination_number(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
 EXPORT Make_paging_license_status(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
 EXPORT InValid_paging_license_status(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);

@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_FCC.BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
+#workunit('name','Scrubs_FCC.Input_BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
 IMPORT Scrubs_FCC,SALT311;
-infile := Scrubs_FCC.In_FCC;
-mod_scrubs := Scrubs_FCC.Scrubs;
+infile := Scrubs_FCC.Input_In_FCC;
+mod_scrubs := Scrubs_FCC.Input_Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources
