@@ -10,7 +10,6 @@ export t_HEOwner := record
 	iesp.share.t_Name Name {xpath('Name')};
 	string11 SSN {xpath('SSN')};
 	iesp.share.t_Date DOB {xpath('DOB')};
-	iesp.share.t_Address Address {xpath('Address')};
 end;
 
 export t_HomesteadExemptionSearchOption := record (iesp.share.t_BaseSearchOption)
@@ -25,6 +24,7 @@ end;
 export t_HomesteadExemptionSearchBy := record
 	string4 TaxYear {xpath('TaxYear')};
 	string2 TaxState {xpath('TaxState')};
+	iesp.share.t_Address Address {xpath('Address')};
 	dataset(t_HEOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.constants.hmstdExmptn.MAX_OWNERS)};
 end;
 
@@ -144,7 +144,7 @@ end;
 export t_HomesteadExemptionRecord := record
 	string12 LexId {xpath('LexId')};
 	string4 LexIdScore {xpath('LexIdScore')};
-	string1 Exception {xpath('Exception')};
+	string1 ExceptionOccured {xpath('ExceptionOccured')};
 	string12 ExceptionCode {xpath('ExceptionCode')};
 	t_HEBestRecord BestRecord {xpath('BestRecord')};
 	t_HEDeceasedRecord DeceasedRecord {xpath('DeceasedRecord')};
