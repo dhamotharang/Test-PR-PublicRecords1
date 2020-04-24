@@ -4,10 +4,10 @@ import AutoStandardI, doxie, DeathV2_Services, dx_death_master;
 #STORED('GLBPurpose', '0');
 
 dids := dataset([
-  {0, 'no did'},  
-	{150, 'subject is alive'}, 
-	{376475600, 'subject is dead but opted out'}, 
-	{383779201, 'subject is dead but opted out'}, 
+  {0, 'no did'},
+	{150, 'subject is alive'},
+	{376475600, 'subject is dead but opted out'},
+	{383779201, 'subject is dead but opted out'},
 	{1431, 'subject is dead'}, // dead
 	{4010, 'subject is dead'}, // dead, 3 records, 1 glb - in dataland
 	{239885, 'dead with supplemental'}, // dead with supplemental - 2 death records, only one with supplemental
@@ -15,7 +15,8 @@ dids := dataset([
 	], {unsigned6 did; string ref;});
 
 infile := dids;
-// infile := pull(gong.Key_address_current); // for testing with large files on thor (set _use_distributed=true)
+// infile := pull(dx_gong.key_address_current()); // for testing with large files on thor (set _use_distributed=true)
+
 
 _use_distributed := FALSE;
 g_mod := AutoStandardI.GlobalModule();

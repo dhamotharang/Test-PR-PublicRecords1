@@ -1,1 +1,0 @@
-EXPORT File_TPM_StZ3Exc := DATASET('GONG::TPM_StZ3Exc', Layout_TPM, THOR);

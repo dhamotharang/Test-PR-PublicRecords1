@@ -1151,7 +1151,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 					 self := []),
 		     left outer);
 
-    // gongLinkidsHasCurrentPhone := exists(Gong.key_History_LinkIDs.kfetch(project(add_metadata_1, transform(BIPV2.IDlayouts.l_xlink_ids,
+    // gongLinkidsHasCurrentPhone := exists(dx_Gong.key_history_LinkIDs.kfetch(project(add_metadata_1, transform(BIPV2.IDlayouts.l_xlink_ids,
 		                                                 // self.ultid := left.businessIDs.ultid,
 																										 // self.orgid := left.BusinessIDs.orgid,
 																										 // self.seleid := left.businessIDs.seleid,

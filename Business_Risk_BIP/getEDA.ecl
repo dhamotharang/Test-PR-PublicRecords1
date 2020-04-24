@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gong, dx_Gong, MDR, Risk_Indicators, UT, Doxie, Suppress;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, dx_Gong, MDR, Risk_Indicators, UT, Doxie, Suppress;
 
 EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -155,7 +155,7 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 
 		// ---------------- Gong - EDA Phone Data ------------------
-	GongLinkIdRaw := Gong.key_History_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
+	GongLinkIdRaw := dx_Gong.key_history_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

@@ -70,7 +70,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 														SELF.Contact_did:=LEFT.did,
 														SELF.hsort:=TRUE, // bip requirement - always make true
 														SELF:=LEFT,SELF:=[]));
-	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.
+	//get bip data		 - dx_Gong.key_history_LinkIDs	may be added later - exploring the value.
 	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).data2_;
 	dsBips := DEDUP(dsBipData2(source<>MDR.SourceTools.src_Dunn_Bradstreet),all); //filter out Dunn's records, should only be used for linking
 
