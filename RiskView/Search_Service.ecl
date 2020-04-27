@@ -151,9 +151,14 @@ export Search_Service := MACRO
 	unsigned6 MinimumAmount := MIN(option.LiensJudgmentsReportOptions.MinimumAmount, 999999999);
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates := option.LiensJudgmentsReportOptions.ExcludeStates;
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources := option.LiensJudgmentsReportOptions.ExcludeReportingSources;
+	boolean AttributesOnly := option.LiensJudgmentsReportOptions.AttributesOnly;
+    boolean ExcludeStatusRefresh := option.LiensJudgmentsReportOptions.ExcludeStatusRefresh;
+    string32 DeferredTransactionID := option.LiensJudgmentsReportOptions.DeferredTransactionID;
+    string5 StatusRefreshWaitPeriod := option.LiensJudgmentsReportOptions.StatusRefreshWaitPeriod;
+	
 	// if the boolean flag is true, use the boolean flags
-	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType
-		
+	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType	
+	
 	tmpCityFltr := if(ExcludeCityTaxLiens, '0', tmpFilterLienTypes[1..1]);
 	tmpCountyFltr := if(ExcludeCountyTaxLiens, '0', tmpFilterLienTypes[2..2]);
 	tmpStateWarrantFltr := if(ExcludeStateTaxWarrants, '0', tmpFilterLienTypes[3..3]);
@@ -163,6 +168,9 @@ export Search_Service := MACRO
 	tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 	tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
 	tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
+	tmpAttributesOnlyFltr := if(AttributesOnly, '0', tmpFilterLienTypes[10..10]);
+    tmpExcludeStatusRefresh := if(ExcludeStatusRefresh, '0', tmpFilterLienTypes[11..11]);
+	
 		//We now have boolean options for each of these filters. We built the code to use a bit (string)
 		//saying which ones they want and which ones they want to filter. I take the boolean flags and 
 		//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
@@ -175,7 +183,9 @@ export Search_Service := MACRO
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
 		tmpEvictionsFltr +
-		tmpReleasedCasesFltr;
+		tmpReleasedCasesFltr +
+		tmpAttributesOnlyFltr +
+        tmpExcludeStatusRefresh;
 		
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
   
@@ -270,8 +280,10 @@ MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND ban
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
 
 rpt_period_error_message := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
+
+attr_only_error_message := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
             
-input_ok := map((( 
+check_valid_input := IF((( 
 							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
 							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
 								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
@@ -280,26 +292,15 @@ input_ok := map(((
 								) or
 							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
 							  ) or
-							(unsigned)packagedInput[1].LexID <> 0) 
-           and
-        (ReportingPeriod > 0 and ReportingPeriod <= 84)
-         => true,
-       (( 
-							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
-							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
-								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
-								(trim(packagedInput[1].z5)<>'' OR (trim(packagedInput[1].p_city_name)<>'' AND trim(packagedInput[1].St)<>'')))												// zip or city/state check
-							)
-								) or
-							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
-							  ) or
-							(unsigned)packagedInput[1].LexID <> 0) 
-           and
-        (ReportingPeriod <= 0 or ReportingPeriod > 84) // same as above, everything is good EXCEPT reportingperiod
-         => ERROR(301,rpt_period_error_message),
+							(unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
+
+input_ok := map(AttributesOnly AND ExcludeReleasedCases => ERROR(301,attr_only_error_message),
+							check_valid_input and (ReportingPeriod > 0 and ReportingPeriod <= 84) => true,
+							check_valid_input and (ReportingPeriod <= 0 or ReportingPeriod > 84) => ERROR(301,rpt_period_error_message), // Reporting period must be within 0 - 84.
 							ERROR(301,error_message) // else if anything else is wrong, give the other error message first priority.
-						);
-		//output(input_ok);				
+							);
+		
+		// output(input_ok);						
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
@@ -341,7 +342,9 @@ search_results_temp := ungroup(
       		MinimumAmount := MinimumAmount,
       		ExcludeStates := ExcludeStates,
       		ExcludeReportingSources := ExcludeReportingSources,
-			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks
+			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+            DeferredTransactionID := DeferredTransactionID,
+            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod
       		) 
       	);
   
@@ -369,7 +372,7 @@ search_results_temp := ungroup(
 				includeLnj),	// TestSeed Values
 		  search_results_temp
 	 )
-   );			
+   );						
 	 
 /* ***************************************
 	 *    Convert Search Results to name/value pairs for ESDL:   *
@@ -1037,6 +1040,7 @@ search_results_temp := ungroup(
 	LnJ_liens := project(search_results[1].LnJliens, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForLien,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -1051,6 +1055,7 @@ search_results_temp := ungroup(
 	LnJ_jdgmts := project(search_results[1].LnJJudgments, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForJudgement,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -1072,14 +1077,13 @@ search_results_temp := ungroup(
 			  self.Result.AttributesGroup.attributes := nameValuePairsVersion5;
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ, left.report.summary);
+				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly, left.report.summary);
 				self.Result.Report := IF(run_riskview_report, left.report);
 				
 				self.Result.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
-				self.Result.LiensJudgmentsReports.Liens := LnJ_liens;
-				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
+				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly, LnJ_liens);
+				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly, LnJ_jdgmts);
 				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport;
-        
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore
         self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);

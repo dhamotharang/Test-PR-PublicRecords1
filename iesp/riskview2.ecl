@@ -215,6 +215,7 @@ export t_RiskView2Models := record
 end;
 		
 export t_RiskView2LiensJudgmentsReportOptions := record
+    string32 DeferredTransactionID {xpath('DeferredTransactionID')};
 	boolean IncludeRecordsWithSSN {xpath('IncludeRecordsWithSSN')};
 	boolean ExcludeCityTaxLiens {xpath('ExcludeCityTaxLiens')};
 	boolean ExcludeCountyTaxLiens {xpath('ExcludeCountyTaxLiens')};
@@ -231,6 +232,9 @@ export t_RiskView2LiensJudgmentsReportOptions := record
 	unsigned6 MinimumAmount {xpath('MinimumAmount')}; // Xsd type: int64
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates {xpath('ExcludeStates/ExcludeState'), MAXCOUNT(iesp.constants.RiskView_2.MaxStateExclusions)};
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources {xpath('ExcludeReportingSources/ExcludeReportingSource'), MAXCOUNT(iesp.constants.RiskView_2.MaxReportingSourceExclusions)};
+	boolean AttributesOnly {xpath('AttributesOnly')};
+    boolean ExcludeStatusRefresh {xpath('ExcludeStatusRefresh')};
+    string5 StatusRefreshWaitPeriod {xpath('StatusRefreshWaitPeriod')};
 end;
 		
 export t_RiskView2Options := record (iesp.share.t_BaseOption)
@@ -292,14 +296,15 @@ end;
 		
 export t_RiskView2LiensJudgmentsReportForLien := record
 	string30 Seq {xpath('Seq')};
+	string17 RecordID {xpath('RecordID')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+	string2 LienTypeID {xpath('LienTypeID')};
 	string50 LienType {xpath('LienType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};
 	iesp.share.t_Address DefendantAddress {xpath('DefendantAddress')};
-	string2 LienTypeID {xpath('LienTypeID')};
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
@@ -312,11 +317,12 @@ end;
 		
 export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string30 Seq {xpath('Seq')};
+	string17 RecordID {xpath('RecordID')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+	string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string50 JudgmentType {xpath('JudgmentType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
-	string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string16 FilingDescription {xpath('FilingDescription')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};

@@ -246,9 +246,11 @@ EXPORT Layouts_Derog_Info := MODULE
 		string2 AgencyState         ;  
 		unsigned ConsumerStatementId;
 		string10 orig_rmsid         ;
+        /* The below parameters are internal only */
 		boolean HighRiskCheck;
 		string RMSID;
 		string TMSID;
+        boolean SuppressRecord := FALSE;
 	END;
 	
 	EXPORT Liens_seq := RECORD
@@ -295,9 +297,11 @@ EXPORT Layouts_Derog_Info := MODULE
 		string2 AgencyState    ;
 		unsigned ConsumerStatementId;
 		string10 orig_rmsid   ;
+        /* The below parameters are internal only */
 		boolean HighRiskCheck;
 		string RMSID;
 		string TMSID;
+        boolean SuppressRecord := FALSE;
 	END;	
 	
 	EXPORT Judgments_seq := RECORD
