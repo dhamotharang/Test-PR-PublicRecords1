@@ -5,9 +5,9 @@ IMPORT * FROM KEL011.Null;
 EXPORT B_Event_6 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_7.__ENH_Event_7) __ENH_Event_7 := B_Event_7.__ENH_Event_7;
   SHARED VIRTUAL TYPEOF(B_Person_7.__ENH_Person_7) __ENH_Person_7 := B_Person_7.__ENH_Person_7;
-  SHARED __EE48569 := __ENH_Event_7;
-  SHARED __EE48309 := __ENH_Person_7;
-  SHARED __ST49024_Layout := RECORD
+  SHARED __EE48765 := __ENH_Event_7;
+  SHARED __EE48499 := __ENH_Person_7;
+  SHARED __ST49232_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -42,6 +42,12 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Case_Id_;
     KEL.typ.nstr Otto_Drivers_License_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
+    KEL.typ.nstr _unique__number_;
+    KEL.typ.nstr _mac__address_;
+    KEL.typ.nstr _serial__number_;
+    KEL.typ.nstr _device__type_;
+    KEL.typ.nstr _device__identification__provider_;
     KEL.typ.nstr Deceased_Match_Code_;
     KEL.typ.nbool _isdeepdive_;
     KEL.typ.nint _nap__summary_;
@@ -257,8 +263,8 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC49021(B_Event_7.__ST42096_Layout __EE48569, B_Person_7.__ST42389_Layout __EE48309) := __EEQP(__EE48569.Subject_,__EE48309.UID);
-  __ST49024_Layout __JT49021(B_Event_7.__ST42096_Layout __l, B_Person_7.__ST42389_Layout __r) := TRANSFORM
+  __JC49229(B_Event_7.__ST42190_Layout __EE48765, B_Person_7.__ST42489_Layout __EE48499) := __EEQP(__EE48765.Subject_,__EE48499.UID);
+  __ST49232_Layout __JT49229(B_Event_7.__ST42190_Layout __l, B_Person_7.__ST42489_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF._r_Customer__1_ := __r._r_Customer_;
     SELF.Lex_Id__1_ := __r.Lex_Id_;
@@ -283,8 +289,8 @@ EXPORT B_Event_6 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE49022 := JOIN(__EE48569,__EE48309,__JC49021(LEFT,RIGHT),__JT49021(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST41492_Layout := RECORD
+  SHARED __EE49230 := JOIN(__EE48765,__EE48499,__JC49229(LEFT,RIGHT),__JT49229(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST41574_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -319,6 +325,12 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Case_Id_;
     KEL.typ.nstr Otto_Drivers_License_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
+    KEL.typ.nstr _unique__number_;
+    KEL.typ.nstr _mac__address_;
+    KEL.typ.nstr _serial__number_;
+    KEL.typ.nstr _device__type_;
+    KEL.typ.nstr _device__identification__provider_;
     KEL.typ.nstr Deceased_Match_Code_;
     KEL.typ.nbool _isdeepdive_;
     KEL.typ.nint _nap__summary_;
@@ -509,12 +521,12 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST41492_Layout __ND50741__Project(__ST49024_Layout __PP50287) := TRANSFORM
-    SELF.Deceased_Match_ := MAP(__PP50287.Deceased_ = 1 AND __PP50287.Deceased_Name_Match_ = 1 AND __PP50287.Deceased_Dob_Match_ = 1=>1,0);
-    SELF.Deceased_Prior_To_Event_ := MAP(__T(__AND(__CN(__PP50287.Deceased_Match_ = 1),__OP2(__PP50287.Deceased_Date__1_,<,__PP50287.Event_Date_)))=>1,0);
-    SELF.In_Customer_Population_ := MAP(__T(__OP2(__PP50287._r_Source_Customer_,=,__PP50287._r_Customer_))=>1,0);
-    SELF.Kr_Identity_Risk_ := MAP(__T(__OR(__OR(__OP2(__PP50287._name__risk__code_,<>,__CN(0)),__OP2(__PP50287._dob__risk__code_,<>,__CN(0))),__OP2(__PP50287._identity__risk__code_,<>,__CN(0))))=>1,0);
-    SELF := __PP50287;
+  SHARED __ST41574_Layout __ND50991__Project(__ST49232_Layout __PP50525) := TRANSFORM
+    SELF.Deceased_Match_ := MAP(__PP50525.Deceased_ = 1 AND __PP50525.Deceased_Name_Match_ = 1 AND __PP50525.Deceased_Dob_Match_ = 1=>1,0);
+    SELF.Deceased_Prior_To_Event_ := MAP(__T(__AND(__CN(__PP50525.Deceased_Match_ = 1),__OP2(__PP50525.Deceased_Date__1_,<,__PP50525.Event_Date_)))=>1,0);
+    SELF.In_Customer_Population_ := MAP(__T(__OP2(__PP50525._r_Source_Customer_,=,__PP50525._r_Customer_))=>1,0);
+    SELF.Kr_Identity_Risk_ := MAP(__T(__OR(__OR(__OP2(__PP50525._name__risk__code_,<>,__CN(0)),__OP2(__PP50525._dob__risk__code_,<>,__CN(0))),__OP2(__PP50525._identity__risk__code_,<>,__CN(0))))=>1,0);
+    SELF := __PP50525;
   END;
-  EXPORT __ENH_Event_6 := PROJECT(__EE49022,__ND50741__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_6',EXPIRE(7));
+  EXPORT __ENH_Event_6 := PROJECT(__EE49230,__ND50991__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_6',EXPIRE(7));
 END;

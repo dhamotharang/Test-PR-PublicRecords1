@@ -10,7 +10,6 @@ C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\Fraudgo
 #OPTION(codegen, 'nolookupjoins')
 */
 
-
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
@@ -108,6 +107,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     Offenses {off_cat_list},
     Address {EventDate, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, Zip, Zip4}				
     ));	
+		
 
 Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
     Customer rCustomer=AssociatedCustomerFileInfo,
@@ -130,6 +130,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING OttoIpAddressId,
     STRING OttoDriversLicenseId,
 		STRING OttoSSNId,
+		STRING OttoBankAccountId,
     STRING CaseId,
     INTEGER RecordId=record_id,
     DATE EventDate,
@@ -141,6 +142,12 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING LastName=NULL(),
 		STRING NameSuffix=NULL(),
 
+    STRING unique_number,
+    STRING mac_address,
+    STRING serial_number,
+    STRING device_type,
+    STRING device_identification_provider,
+	
     BOOLEAN addresspobox,
     BOOLEAN addresscmra,
 		STRING PrimaryRange=NULL(),
@@ -213,7 +220,11 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     INTEGER device_risk_code,
     INTEGER identity_risk_code,
 
-		DATE DateOfBirth,
+    INTEGER event_type_1,
+		INTEGER event_type_2,
+		INTEGER event_type_3,
+		
+    DATE DateOfBirth,
 
     // BocaShell Columns
 
@@ -378,7 +389,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		OttoSSNId,
     CaseId,
     OttoDriversLicenseId,
+		OttoBankAccountId,
 
+    unique_number, mac_address, serial_number, device_type, device_identification_provider,
+		
     DeceasedMatchCode,
     isdeepdive,
 
@@ -413,7 +427,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     name_ssn_dob_match,
 
     IpAddress,iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname,
-    Confidence_that_activity_was_deceitful_id, name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
+    Confidence_that_activity_was_deceitful_id,event_type_1,event_type_2,event_type_3,name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
 		advo_hitflag, advo_vacancyindicator, advo_addressstyle, advo_dropindicator, advo_residentialorbusinessindicator, advo_addresstype, advo_addressusagetype
           ));
 
@@ -1272,6 +1286,7 @@ Event: => DeceasedToEventYearDiff := MAP(DeceasedMatch = 1 => YEARSBETWEEN(Event
 //Event: => FullAddress := Location.FullAddress;//jp
 Event: => FullAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => StreetAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange)))))))));
+Event: => City := PostalCity;
 
 Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
 Event: => EventTypeCount := COUNT(EventTypes);
@@ -1781,14 +1796,14 @@ Event: => PhoneLabel := PhoneFormatted;
 Event: => BankAccountLabel := AccountNumber;
 Event: => DriversLicenseLabel := LicenseNumber;
 
-Event: => AddressEntityContextUid := Location.EntityContextUid;
-Event: => SsnEntityContextUid := rSsn.EntityContextUid;
-Event: => PersonEntityContextUid := Subject.EntityContextUid;
-Event: => PhoneEntityContextUid := rPhone.EntityContextUid;
-Event: => EmailEntityContextUid := rEmail.EntityContextUid;
-Event: => IpEntityContextUid := rInternetProtocol.EntityContextUid;
-Event: => BankAccountEntityContextUid := rBankAccount.EntityContextUid;
-Event: => DriversLicenseEntityContextUid := rDriversLicense.EntityContextUid;
+Event: => AddressEntityContextUid := '_09' + OttoAddressId;
+Event: => SsnEntityContextUid := '_15' + OttoSSNId;
+Event: => PersonEntityContextUid := '_01' + LexId;
+Event: => PhoneEntityContextUid := '_16' + PhoneNumber;
+Event: => EmailEntityContextUid := '_17' + OttoEmailId;
+Event: => IpEntityContextUid := '_18' + OttoIpAddressId;
+Event: => BankAccountEntityContextUid := '_19' + OttoBankAccountId;
+Event: => DriversLicenseEntityContextUid := '_20' + OttoDriversLicenseId;
 
 Event: => AddrEventCount := Location.EventCount;
 Event: => SsnEventCount := rSsn.EventCount;
@@ -1835,9 +1850,10 @@ Event: => IpEventAfterKrCount := rInternetProtocol.KrEventAfterLastKnownRiskCoun
 Event: => BankAccountEventAfterKrCount := rBankAccount.KrEventAfterLastKnownRiskCount;
 Event: => DriversLicenseEventAfterKrCount := rDriversLicense.KrEventAfterLastKnownRiskCount;
 
+// this is the example for counting number of identitities at the associated address BEFORE the date of this transaction
 Event: => AddrIdentityCount := COUNT(Location.PersonAddress(EventDates.EventDate < Event.EventDate){Subject});
+// this is the example for counting number of identitities at the associated address EVER (including the future)
 Event: => AddrIdentityFullCount := COUNT(Location.PersonAddress{Subject});
-
 
 
 /*
@@ -1848,6 +1864,8 @@ Event: => KrEventAfterKnownRisk := MAP(Location.KrLastEventDate < EventDate OR
                                        rBankAccount.KrLastEventDate < EventDate OR 
                                        rDriversLicense.KrLastEventDate < EventDate => 1, 0);
 */
+
+
 /* ASSOCIATION LOGIC STATEMENTS */
 
 //PersonPerson: => DtFirstSeen := MIN(EventDates, EventDate);
