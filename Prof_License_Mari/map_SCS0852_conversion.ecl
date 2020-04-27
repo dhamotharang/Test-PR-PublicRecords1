@@ -176,6 +176,7 @@ EXPORT map_SCS0852_conversion(STRING pVersion) := FUNCTION
 				
 		SELF.NAME_OFFICE	  	:= MAP(CleanNAME_OFFICE<>'' AND REGEXFIND(DBApattern,CleanNAME_OFFICE)=>StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.GetCorpName(CleanNAME_OFFICE)),
                                  CleanNAME_OFFICE!='' AND TRIM(CleanNAME_OFFICE,ALL)= TRIM(SELF.name_first,ALL) + TRIM(SELF.name_last,ALL)=>'', 															     
+																 CleanNAME_OFFICE!='' AND TRIM(CleanNAME_OFFICE,ALL)= TRIM(SELF.name_last,ALL) + TRIM(SELF.name_first,ALL)=>'', 
 																 CleanNAME_OFFICE!='' AND TRIM(CleanNAME_OFFICE,ALL)= TRIM(SELF.name_first,ALL) + TRIM(SELF.name_mid,ALL) + TRIM(SELF.name_last,ALL)=>'',
 																 CleanNAME_OFFICE);		
 																 
