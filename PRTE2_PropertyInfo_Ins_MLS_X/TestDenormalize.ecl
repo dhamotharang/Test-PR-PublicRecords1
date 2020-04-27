@@ -1,18 +1,10 @@
-﻿/* ************************************************************************************************************************
-PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.fn_add_Type_F
-
-**********************************************************************************************
-***** MLS CONVERSION NOTES:
-Pass in "E" Records
-Pass in recordset with all other types as well.
-Receive recordset with "F" records.
-**********************************************************************************************
-************************************************************************************************************************ */
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PRTE2_Common_DevOnly;
+IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PRTE2_Common_DevOnly,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
 
 BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec_MLS;
 
-EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Prop) := FUNCTION
+DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS,property_rid);
+// CloneableDS := CHOOSEN(DS_Prop(vendor_source = 'E'),100);
+CloneableDS := DS_Prop(vendor_source = 'E');
 
     // DS_Prop := PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS;
     EnhanceableDS1A := DS_Prop(vendor_source='A');
@@ -32,27 +24,25 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
     CloneableDS_D := DISTRIBUTE(CloneableDS,HASH(fares_unformatted_apn));
     // FYI: Reviewed results and appears to work properly if no rows had a non-empty value.
     rowPickU (rowsInDS, fieldName) := FUNCTIONMACRO
-        RETURN rowsInDS(fieldName<>0) [1];
-    ENDMACRO;	
+        RETURN rowsInDS(fieldName<>0)[1];
+    ENDMACRO;
 
     rowPick (rowsInDS, fieldName) := FUNCTIONMACRO
-        RETURN rowsInDS(fieldName<>'') [1];
-    ENDMACRO;	
+        RETURN rowsInDS(fieldName<>'')[1];
+    ENDMACRO;
 
     rowPick2 (rowsInDS, fieldName) := FUNCTIONMACRO
-        RETURN rowsInDS(fieldName<>'') [2];
+        RETURN rowsInDS(fieldName<>'')[2];
     ENDMACRO;
 
-    rowPick3 (rowsInDS, fieldName) := FUNCTIONMACRO
-        INTEGER recCnt1 := IF(COUNT(rowsInDS(fieldName<>''))<3, 2, 3);
-        INTEGER recCnt := IF(COUNT(rowsInDS(fieldName<>''))<recCnt1, 1, recCnt1);
-        RETURN rowsInDS(fieldName<>'') [recCnt];
-    ENDMACRO;
-
+    OUTPUT(CloneableDS_D(fares_unformatted_apn='1009467701'));
+    OUTPUT(EnhanceableDS(fares_unformatted_apn='1009467701'));
+    rightLayout := RECORDOF(EnhanceableDS);
+    TestingLayout := {RECORDOF(CloneableDS_D), Dataset(rightLayout) rightRecs := Dataset([],rightLayout)};
     finalSetF := DENORMALIZE(CloneableDS_D,EnhanceableDS,
                     LEFT.fares_unformatted_apn = RIGHT.fares_unformatted_apn,
                     GROUP,
-                    TRANSFORM({CloneableDS_D},
+                    TRANSFORM(TestingLayout,
                             SELF.vendor_source := 'F';
                             rowsIn := SORT(ROWS(RIGHT),RND_NUM);
                             // rowsIn2 := SORT(ROWS(RIGHT),-RND_NUM);      // trying to get some randomness within the record.
@@ -66,9 +56,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_air_conditioning_type := rowPick2(rowsIn,air_conditioning_type).src_air_conditioning_type;
                             SELF.tax_dt_air_conditioning_type := rowPick2(rowsIn,air_conditioning_type).tax_dt_air_conditioning_type;
 
-                            SELF.basement_finish := rowPick3(rowsIn,basement_finish).basement_finish;
-                            SELF.src_basement_finish := rowPick3(rowsIn,basement_finish).src_basement_finish;
-                            SELF.tax_dt_basement_finish := rowPick3(rowsIn,basement_finish).tax_dt_basement_finish;
+                            SELF.basement_finish := rowPick(rowsIn,basement_finish).basement_finish;
+                            SELF.src_basement_finish := rowPick(rowsIn,basement_finish).src_basement_finish;
+                            SELF.tax_dt_basement_finish := rowPick(rowsIn,basement_finish).tax_dt_basement_finish;
 
                             SELF.construction_type := rowPick2(rowsIn,construction_type).construction_type;
                             SELF.src_construction_type := rowPick2(rowsIn,construction_type).src_construction_type;
@@ -78,9 +68,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_exterior_wall := rowPick(rowsIn,exterior_wall).src_exterior_wall;
                             SELF.tax_dt_exterior_wall := rowPick(rowsIn,exterior_wall).tax_dt_exterior_wall;
 
-                            SELF.fireplace_ind := rowPick3(rowsIn,fireplace_ind).fireplace_ind;
-                            SELF.src_fireplace_ind := rowPick3(rowsIn,fireplace_ind).src_fireplace_ind;
-                            SELF.tax_dt_fireplace_ind := rowPick3(rowsIn,fireplace_ind).tax_dt_fireplace_ind;
+                            SELF.fireplace_ind := rowPick2(rowsIn,fireplace_ind).fireplace_ind;
+                            SELF.src_fireplace_ind := rowPick2(rowsIn,fireplace_ind).src_fireplace_ind;
+                            SELF.tax_dt_fireplace_ind := rowPick2(rowsIn,fireplace_ind).tax_dt_fireplace_ind;
 
                             SELF.fireplace_type := rowPick(rowsIn,fireplace_type).fireplace_type;
                             SELF.src_fireplace_type := rowPick(rowsIn,fireplace_type).src_fireplace_type;
@@ -102,9 +92,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_heating := rowPick(rowsIn,heating).src_heating;
                             SELF.tax_dt_heating := rowPick(rowsIn,heating).tax_dt_heating;
 
-                            SELF.living_area_square_footage := rowPick3(rowsIn,living_area_square_footage).living_area_square_footage;
-                            SELF.src_living_area_square_footage := rowPick3(rowsIn,living_area_square_footage).src_living_area_square_footage;
-                            SELF.tax_dt_living_area_square_footage := rowPick3(rowsIn,living_area_square_footage).tax_dt_living_area_square_footage;
+                            SELF.living_area_square_footage := rowPick(rowsIn,living_area_square_footage).living_area_square_footage;
+                            SELF.src_living_area_square_footage := rowPick(rowsIn,living_area_square_footage).src_living_area_square_footage;
+                            SELF.tax_dt_living_area_square_footage := rowPick(rowsIn,living_area_square_footage).tax_dt_living_area_square_footage;
 
                             SELF.no_of_baths := rowPick(rowsIn,no_of_baths).no_of_baths;
                             SELF.src_no_of_baths := rowPick(rowsIn,no_of_baths).src_no_of_baths;
@@ -118,9 +108,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_no_of_fireplaces := rowPick(rowsIn,no_of_fireplaces).src_no_of_fireplaces;
                             SELF.tax_dt_no_of_fireplaces := rowPick(rowsIn,no_of_fireplaces).tax_dt_no_of_fireplaces;
 
-                            SELF.no_of_full_baths := rowPick3(rowsIn,no_of_full_baths).no_of_full_baths;
-                            SELF.src_no_of_full_baths := rowPick3(rowsIn,no_of_full_baths).src_no_of_full_baths;
-                            SELF.tax_dt_no_of_full_baths := rowPick3(rowsIn,no_of_full_baths).tax_dt_no_of_full_baths;
+                            SELF.no_of_full_baths := rowPick(rowsIn,no_of_full_baths).no_of_full_baths;
+                            SELF.src_no_of_full_baths := rowPick(rowsIn,no_of_full_baths).src_no_of_full_baths;
+                            SELF.tax_dt_no_of_full_baths := rowPick(rowsIn,no_of_full_baths).tax_dt_no_of_full_baths;
 
                             SELF.no_of_half_baths := rowPick(rowsIn,no_of_half_baths).no_of_half_baths;
                             SELF.src_no_of_half_baths := rowPick(rowsIn,no_of_half_baths).src_no_of_half_baths;
@@ -134,13 +124,13 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_parking_type := rowPick(rowsIn,parking_type).src_parking_type;
                             SELF.tax_dt_parking_type := rowPick(rowsIn,parking_type).tax_dt_parking_type;
 
-                            SELF.pool_indicator := rowPick3(rowsIn,pool_indicator).pool_indicator;
-                            SELF.src_pool_indicator := rowPick3(rowsIn,pool_indicator).src_pool_indicator;
-                            SELF.tax_dt_pool_indicator := rowPick3(rowsIn,pool_indicator).tax_dt_pool_indicator;
+                            SELF.pool_indicator := rowPick(rowsIn,pool_indicator).pool_indicator;
+                            SELF.src_pool_indicator := rowPick(rowsIn,pool_indicator).src_pool_indicator;
+                            SELF.tax_dt_pool_indicator := rowPick(rowsIn,pool_indicator).tax_dt_pool_indicator;
 
-                            SELF.pool_type := rowPick3(rowsIn,pool_type).pool_type;
-                            SELF.src_pool_type := rowPick3(rowsIn,pool_type).src_pool_type;
-                            SELF.tax_dt_pool_type := rowPick3(rowsIn,pool_type).tax_dt_pool_type;
+                            SELF.pool_type := rowPick(rowsIn,pool_type).pool_type;
+                            SELF.src_pool_type := rowPick(rowsIn,pool_type).src_pool_type;
+                            SELF.tax_dt_pool_type := rowPick(rowsIn,pool_type).tax_dt_pool_type;
 
                             SELF.roof_cover := rowPick2(rowsIn,roof_cover).roof_cover;
                             SELF.src_roof_cover := rowPick2(rowsIn,roof_cover).src_roof_cover;
@@ -158,13 +148,13 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_foundation := rowPick(rowsIn,foundation).src_foundation;
                             SELF.tax_dt_foundation := rowPick(rowsIn,foundation).tax_dt_foundation;
 
-                            SELF.basement_square_footage := rowPick3(rowsIn,basement_square_footage).basement_square_footage;
-                            SELF.src_basement_square_footage := rowPick3(rowsIn,basement_square_footage).src_basement_square_footage;
-                            SELF.tax_dt_basement_square_footage := rowPick3(rowsIn,basement_square_footage).tax_dt_basement_square_footage;
+                            SELF.basement_square_footage := rowPick(rowsIn,basement_square_footage).basement_square_footage;
+                            SELF.src_basement_square_footage := rowPick(rowsIn,basement_square_footage).src_basement_square_footage;
+                            SELF.tax_dt_basement_square_footage := rowPick(rowsIn,basement_square_footage).tax_dt_basement_square_footage;
 
-                            SELF.effective_year_built := rowPick(rowsIn,effective_year_built).effective_year_built;
-                            SELF.src_effective_year_built := rowPick(rowsIn,effective_year_built).src_effective_year_built;
-                            SELF.tax_dt_effective_year_built := rowPick(rowsIn,effective_year_built).tax_dt_effective_year_built;
+                            SELF.effective_year_built := rowPick2(rowsIn,effective_year_built).effective_year_built;
+                            SELF.src_effective_year_built := rowPick2(rowsIn,effective_year_built).src_effective_year_built;
+                            SELF.tax_dt_effective_year_built := rowPick2(rowsIn,effective_year_built).tax_dt_effective_year_built;
 
                             SELF.garage_square_footage := rowPick(rowsIn,garage_square_footage).garage_square_footage;
                             SELF.src_garage_square_footage := rowPick(rowsIn,garage_square_footage).src_garage_square_footage;
@@ -174,9 +164,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_stories_type := rowPick(rowsIn,stories_type).src_stories_type;
                             SELF.tax_dt_stories_type := rowPick(rowsIn,stories_type).tax_dt_stories_type;
 
-                            SELF.apn_number := rowPick(rowsIn,apn_number).apn_number;
-                            SELF.src_apn_number := rowPick(rowsIn,apn_number).src_apn_number;
-                            SELF.tax_dt_apn_number := rowPick(rowsIn,apn_number).tax_dt_apn_number;
+                            SELF.apn_number := rowPick2(rowsIn,apn_number).apn_number;
+                            SELF.src_apn_number := rowPick2(rowsIn,apn_number).src_apn_number;
+                            SELF.tax_dt_apn_number := rowPick2(rowsIn,apn_number).tax_dt_apn_number;
 
                             SELF.census_tract := rowPick2(rowsIn,census_tract).census_tract;
                             SELF.src_census_tract := rowPick2(rowsIn,census_tract).src_census_tract;
@@ -214,9 +204,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_fips_code := rowPick(rowsIn,fips_code).src_fips_code;
                             SELF.tax_dt_fips_code := rowPick(rowsIn,fips_code).tax_dt_fips_code;
 
-                            SELF.subdivision := rowPick3(rowsIn,subdivision).subdivision;
-                            SELF.src_subdivision := rowPick3(rowsIn,subdivision).src_subdivision;
-                            SELF.tax_dt_subdivision := rowPick3(rowsIn,subdivision).tax_dt_subdivision;
+                            SELF.subdivision := rowPick(rowsIn,subdivision).subdivision;
+                            SELF.src_subdivision := rowPick(rowsIn,subdivision).src_subdivision;
+                            SELF.tax_dt_subdivision := rowPick(rowsIn,subdivision).tax_dt_subdivision;
 
                             SELF.municipality := rowPick(rowsIn,municipality).municipality;
                             SELF.src_municipality := rowPick(rowsIn,municipality).src_municipality;
@@ -230,9 +220,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_homestead_exemption_ind := rowPick(rowsIn,homestead_exemption_ind).src_homestead_exemption_ind;
                             SELF.tax_dt_homestead_exemption_ind := rowPick(rowsIn,homestead_exemption_ind).tax_dt_homestead_exemption_ind;
 
-                            SELF.land_use_code := rowPick3(rowsIn,land_use_code).land_use_code;
-                            SELF.src_land_use_code := rowPick3(rowsIn,land_use_code).src_land_use_code;
-                            SELF.tax_dt_land_use_code := rowPick3(rowsIn,land_use_code).tax_dt_land_use_code;
+                            SELF.land_use_code := rowPick(rowsIn,land_use_code).land_use_code;
+                            SELF.src_land_use_code := rowPick(rowsIn,land_use_code).src_land_use_code;
+                            SELF.tax_dt_land_use_code := rowPick(rowsIn,land_use_code).tax_dt_land_use_code;
 
                             SELF.latitude := rowPick(rowsIn,latitude).latitude;
                             SELF.src_latitude := rowPick(rowsIn,latitude).src_latitude;
@@ -242,9 +232,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_longitude := rowPick(rowsIn,longitude).src_longitude;
                             SELF.tax_dt_longitude := rowPick(rowsIn,longitude).tax_dt_longitude;
 
-                            SELF.location_influence_code := rowPick3(rowsIn,location_influence_code).location_influence_code;
-                            SELF.src_location_influence_code := rowPick3(rowsIn,location_influence_code).src_location_influence_code;
-                            SELF.tax_dt_location_influence_code := rowPick3(rowsIn,location_influence_code).tax_dt_location_influence_code;
+                            SELF.location_influence_code := rowPick(rowsIn,location_influence_code).location_influence_code;
+                            SELF.src_location_influence_code := rowPick(rowsIn,location_influence_code).src_location_influence_code;
+                            SELF.tax_dt_location_influence_code := rowPick(rowsIn,location_influence_code).tax_dt_location_influence_code;
 
                             SELF.acres := rowPick2(rowsIn,acres).acres;
                             SELF.src_acres := rowPick2(rowsIn,acres).src_acres;
@@ -258,9 +248,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_lot_front_footage := rowPick(rowsIn,lot_front_footage).src_lot_front_footage;
                             SELF.tax_dt_lot_front_footage := rowPick(rowsIn,lot_front_footage).tax_dt_lot_front_footage;
 
-                            SELF.lot_number := rowPick3(rowsIn,lot_number).lot_number;
-                            SELF.src_lot_number := rowPick3(rowsIn,lot_number).src_lot_number;
-                            SELF.tax_dt_lot_number := rowPick3(rowsIn,lot_number).tax_dt_lot_number;
+                            SELF.lot_number := rowPick(rowsIn,lot_number).lot_number;
+                            SELF.src_lot_number := rowPick(rowsIn,lot_number).src_lot_number;
+                            SELF.tax_dt_lot_number := rowPick(rowsIn,lot_number).tax_dt_lot_number;
 
                             SELF.lot_size := rowPick2(rowsIn,lot_size).lot_size;
                             SELF.src_lot_size := rowPick2(rowsIn,lot_size).src_lot_size;
@@ -282,9 +272,9 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.src_sewer := rowPick(rowsIn,sewer).src_sewer;
                             SELF.tax_dt_sewer := rowPick(rowsIn,sewer).tax_dt_sewer;
 
-                            SELF.assessed_land_value := rowPick3(rowsIn,assessed_land_value).assessed_land_value;
-                            SELF.src_assessed_land_value := rowPick3(rowsIn,assessed_land_value).src_assessed_land_value;
-                            SELF.tax_dt_assessed_land_value := rowPick3(rowsIn,assessed_land_value).tax_dt_assessed_land_value;
+                            SELF.assessed_land_value := rowPick(rowsIn,assessed_land_value).assessed_land_value;
+                            SELF.src_assessed_land_value := rowPick(rowsIn,assessed_land_value).src_assessed_land_value;
+                            SELF.tax_dt_assessed_land_value := rowPick(rowsIn,assessed_land_value).tax_dt_assessed_land_value;
 
                             SELF.assessed_year := rowPick(rowsIn,assessed_year).assessed_year;
                             SELF.src_assessed_year := rowPick(rowsIn,assessed_year).src_assessed_year;
@@ -403,7 +393,17 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                             SELF.interest_rate_type_code := rowPick(rowsIn,interest_rate_type_code).interest_rate_type_code;
                             SELF.src_interest_rate_type_code := rowPick(rowsIn,interest_rate_type_code).src_interest_rate_type_code;
                             SELF.rec_dt_interest_rate_type_code := rowPick(rowsIn,interest_rate_type_code).rec_dt_interest_rate_type_code;
+                    SELF.rightRecs := rowsIn;
                     SELF := left), local);
+// OUTPUT(finalSetF);
+finalSetF2 := PROJECT(finalSetF,RECORDOF(CloneableDS_D));
+// -------------------------------------------------------------------------------------
+EXPORT_DS := SORT(finalSetF2,fares_unformatted_apn,vendor_source);
+// -------------------------------------------------------------------------------------
+dateString 		:= PRTE2_Common.Constants.TodayString;
+desprayName 	:= 'PropertyInfo_3_Refill_BestOnly_'+dateString+'.csv';
+lzFilePathFile	:= PRTE2_PropertyInfo_Ins_PreMLS.Constants.SourcePathForPIICSV + desprayName;
+LandingZoneIP 	:= PRTE2_PropertyInfo_Ins_PreMLS.Constants.LandingZoneIP;
+TempCSV			:= PRTE2_PropertyInfo_Ins_PreMLS.Files.Alpha_Spray_Name;
 
-	RETURN finalSetF;
-END;
+PRTE2_Common.DesprayCSV(EXPORT_DS, TempCSV, LandingZoneIP, lzFilePathFile);
