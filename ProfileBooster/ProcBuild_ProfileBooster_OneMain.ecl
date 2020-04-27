@@ -3,9 +3,9 @@
 EXPORT ProcBuild_ProfileBooster_OneMain (string IPaddr, string AbsolutePath, string NotifyList) := FUNCTION;
 
  // NotifyList := '';
- // IPaddr := 'bctlpedata12';  //dev
+ // IPaddr := 'bctlpedata12';  //dev use this one
 //  IPaddr := 'bctlpedata10';  //prod
- // AbsolutePath := '/data/Builds/builds/OneMain/data/fulfillment/20191008';  // change the date to the date it's run on
+ // AbsolutePath := '/data/Builds/builds/OneMain/data';  
 
 sequential(
 			ProfileBooster.bwr_ProfileBooster_OneMain_Step1(NotifyList ),

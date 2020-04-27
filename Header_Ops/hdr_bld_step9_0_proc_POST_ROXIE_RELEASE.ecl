@@ -5,11 +5,11 @@ emailList   :=  ''
               +';Debendra.Kumar@lexisnexisrisk.com'
             ;
 
-build_version:= '20191023';// we would like to use header._info.version_base_qa; but #WORKUNIT must be constant at compile time
+build_version:= '20191226';// we would like to use header._info.version_base_qa; but #WORKUNIT must be constant at compile time
 
 #WORKUNIT('name',build_version+' Header - Post Roxie Release');
 
-sf_name := '~thor_data400::out::header_post_roxie_release';
+sf_name := Header_ops._Constant.postroxie_build_sf;
 status  := Header.LogBuildStatus(sf_name, build_version).GetLatestVersionCompletedStatus:INDEPENDENT;
 update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,build_version,new_status).Write;
            
@@ -17,18 +17,11 @@ step1 := $.fn_report_segmentation(emailList);
 step2 := $.fn_report_build_timing_stats(emailList);
 step3 := $.suppressions.promote_pre_building_reference_file;
 
-prev_st_sf_name := '~thor_data400::out::header_post_move_status';
+prev_st_sf_name := Header_Ops._Constant.postmove_build_sf;
 latest_move    := Header.LogBuildStatus(prev_st_sf_name, '').GetLatest;
 
 version_base_qa   := header._info.version_base_qa;
 prod_roxie_version:= header._info.current_prod_roxie_version;
-
-step4 := sequential(
-    fileservices.StartSuperFileTransaction(),
-    fileservices.clearsuperfile('~thor_data400::base::header_prod'),
-    fileservices.addsuperfile('~thor_data400::base::header_prod','thor_data400::base::header_' + prod_roxie_version),
-    fileservices.FinishSuperFileTransaction()
-    );
 
 sequential(
     header._config.setup_build,
@@ -43,10 +36,10 @@ sequential(
     if(status<1,sequential(step1,update_status(1))),
     if(status<2,sequential(step2,update_status(2))),
     if(status<3,sequential(step3,update_status(3))),
-    if(status<4,sequential(step4,update_status(4))),
 //In order to keep consistency across all builds and 
 //reserving status to add future steps, the end status is set as 9
     if(status<9,update_status(9))
 ):failure(STD.System.Email.SendEmail(emailList,build_version+ ' Post Roxie Release failed','see: '+header._info.wuidLink +'\n\n'+FAILMESSAGE));
 
+//20191226 W20200204-092432
 //20191023 W20191213-113636

@@ -10,7 +10,7 @@ EXPORT fragHunter(
 
 	//Input data
 	dInfileDedup := DEDUP(SORT(DISTRIBUTE(pInfile,nomatch_id),nomatch_id,LOCAL),nomatch_id,LOCAL);
-	dNoMatchIDIn := PROJECT(dInfileDedup,{unsigned8 nomatch_id});
+	dNoMatchIDIn := PROJECT(dInfileDedup,{unsigned8 nomatch_id,unsigned8 LexID});
 
 	//Fraghunter thor function
 	SHARED dNoMatchIDOut := HealthcareNoMatchHeader_ExternalLinking.XNOMATCH_FragHunter_v1(pSrc,pVersion,pInfile,dNoMatchIDIn) :
@@ -20,7 +20,9 @@ EXPORT fragHunter(
 	SHARED Layout_Scoring := RECORD
 		UNSIGNED6 uniqueid;
 		UNSIGNED8 NoMatchIDSource;
+		UNSIGNED8 LexIDSource;
 		UNSIGNED8 nomatch_id;
+		UNSIGNED8 LexID;
 		INTEGER2 	weight;
 	END;
 	
@@ -29,6 +31,7 @@ EXPORT fragHunter(
 	Layout_Scoring normFrags(dNoMatchIDOut L, ChildRec R) := TRANSFORM
     SELF.uniqueid   :=  L.reference;
     SELF.nomatch_id :=  R.nomatch_id;
+    SELF.LexID      :=  R.LexID;
     SELF.weight     :=  R.weight;
     SELF            :=  L;
 	END;
@@ -36,7 +39,7 @@ EXPORT fragHunter(
 	EXPORT pFrags := NORMALIZE(dNoMatchIDOut, LEFT.results,normFrags(LEFT,RIGHT)) : PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate + 'underlinks::fragHunter::pFrags',EXPIRE(10));
 	
 	//Filter any fragments that are below the weight threshold
-	EXPORT vFrags     :=  pFrags(nomatch_id <> NoMatchIDSource AND weight > fragThreshold);
+	EXPORT vFrags     :=  pFrags(nomatch_id <> NoMatchIDSource AND LexID <> LexIDSource AND weight > fragThreshold);
 	SHARED vFragsDist :=  DISTRIBUTE(vFrags,nomatch_id) : PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate + 'underlinks::fragHunter::onlyFrags',EXPIRE(10));
    
 	EXPORT onlyFrags:= vFragsDist;

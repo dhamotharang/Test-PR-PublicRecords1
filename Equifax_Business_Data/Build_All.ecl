@@ -19,14 +19,15 @@ function
 		Equifax_Business_Data.Spray       (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite),
 		Equifax_Business_Data.Build_Base(pversion,pIsTesting,pSprayedFile,pBaseFile)
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Input', 'Input', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
-	  ,Equifax_Business_Data.Build_Keys	(pversion).all
+	  ,Equifax_Business_Data.Build_Keys(pversion).all
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Base', 'Base', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
 		,Equifax_Business_Data.Promote().Inputfiles.using2used
 		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
 		,Equifax_Business_Data.QA_Records()
 		,dops.updateversion('EquifaxBusDataKeys',pversion,Equifax_Business_Data.Email_Notification_Lists().BuildSuccess,,'N')
-		,Orbit3.proc_Orbit3_CreateBuild('Equifax Marketing Data Solutions (MDS)',pversion,'N');
+		,Orbit3.proc_Orbit3_CreateBuild('Equifax Marketing Data Solutions (MDS)',pversion,'N')
+		;
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	

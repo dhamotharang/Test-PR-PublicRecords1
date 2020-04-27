@@ -57,6 +57,7 @@ MODULE
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
 	export src_Best_Business             := 'BB';
+	export src_Best_Person               := 'BP';  // Best Person
 	export src_BrightVerify_email				 :=	'BV';		//BrightVerify email deltabase
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
@@ -465,6 +466,7 @@ MODULE
 	export src_Infutor_Motorcycle_Veh    := '2V';
 	export src_Vickers                   := 'V ';  // stock market insider trading info from Vickers   
 	export src_Voters_v2                 := 'VO';  // Voter Registrations
+    export src_MA_Census                 := 'UM';
 	export src_AK_Watercraft             := '#W';  // Watercrafts (boats, etc.) registrations ----v
 	export src_AL_Watercraft             := 'LW';
 	export src_AR_Watercraft             := 'RW';
@@ -613,7 +615,7 @@ MODULE
 		,src_TX_Experian_Veh           ,src_UT_Experian_Veh           ,src_VT_Experian_Veh           ,src_WA_Experian_Veh
 		,src_WI_Experian_Veh			  	 ,src_WY_Experian_Veh   
 		/*,src_Infutor_Veh           		 ,src_Infutor_Motorcycle_Veh*/
-		,src_Vickers                   ,src_Voters_v2                 ,src_AK_Watercraft             ,src_AL_Watercraft             
+		,src_Vickers                   ,src_MA_Census                 ,src_Voters_v2                 ,src_AK_Watercraft             ,src_AL_Watercraft             
 		,src_AR_Watercraft             ,src_AZ_Watercraft             ,src_CO_Watercraft             ,src_CT_Watercraft             
 		,src_FL_Watercraft             ,src_GA_Watercraft             ,src_IA_Watercraft             ,src_IL_Watercraft             
 		,src_KS_Watercraft             ,src_KY_Watercraft             ,src_MA_Watercraft             ,src_MD_Watercraft             
@@ -945,7 +947,7 @@ MODULE
 		,src_OK_Experian_Veh           ,src_RI_Experian_Veh           ,src_SC_Experian_Veh           ,src_SD_Experian_Veh
 		,src_TN_Experian_Veh           ,src_TX_Experian_Veh           ,src_UT_Experian_Veh           ,src_VT_Experian_Veh
 		,src_WA_Experian_Veh           ,src_WI_Experian_Veh					  ,src_WY_Experian_Veh
-		/*,src_Infutor_Veh 						 ,src_Infutor_Motorcycle_Veh*/ ,src_Voters_v2   
+		/*,src_Infutor_Veh 						 ,src_Infutor_Motorcycle_Veh*/ ,src_Voters_v2        ,src_MA_Census  
 		,src_AK_Watercraft             ,src_AL_Watercraft             
 		,src_AR_Watercraft             ,src_AZ_Watercraft             ,src_CO_Watercraft             ,src_CT_Watercraft             
 		,src_FL_Watercraft             ,src_GA_Watercraft             ,src_IA_Watercraft             ,src_IL_Watercraft             
@@ -1177,7 +1179,7 @@ export set_Marketing_Restricted := [
 		src_EMerge_Hunt                 ,src_EMerge_Master            ,src_Equifax                   ,src_Equifax_Quick									,
 		src_Equifax_Weekly							,src_FCRA_Corrections_record	,src_Federal_Explosives        ,src_Federal_Firearms         			,
 		src_Gong_History,src_Gong_Neustar							,src_LnPropV2_Lexis_Asrs      ,src_LnPropV2_Lexis_Deeds_Mtgs ,
-		src_MS_Worker_Comp              ,src_Professional_License     ,src_Targus_White_pages        ,src_TUCS_Ptrack                  	,	// white pages and Tucs are included here, but will be removed from fcra header key
+		src_MS_Worker_Comp              ,src_Professional_License     ,src_Targus_White_pages        ,src_TUCS_Ptrack                  	,src_MA_Census              	   ,// white pages and Tucs are included here, but will be removed from fcra header key
 		src_US_Coastguard               ,src_Voters_v2                ,src_AK_Watercraft             ,src_AL_Watercraft                 ,src_AR_Watercraft                 ,
 		src_AZ_Watercraft               ,src_CO_Watercraft            ,src_CT_Watercraft             ,src_FL_Watercraft                 ,src_GA_Watercraft                 ,
 		src_IA_Watercraft               ,src_IL_Watercraft            ,src_KS_Watercraft             ,src_KY_Watercraft                 ,src_MA_Watercraft                 ,
@@ -1201,7 +1203,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		src_EMerge_Hunt                 ,src_Equifax                   ,src_Equifax_Quick									,
 		src_Equifax_Weekly							,src_Federal_Explosives        ,src_Federal_Firearms         			,
 		src_Gong_History,src_Gong_Neustar								,src_LnPropV2_Lexis_Asrs      ,src_LnPropV2_Lexis_Deeds_Mtgs ,
-    src_Professional_License     ,
+    src_Professional_License            ,src_MA_Census                ,
 		src_US_Coastguard               ,src_Voters_v2                ,src_AK_Watercraft             ,src_AL_Watercraft                 ,src_AR_Watercraft                 ,
 		src_AZ_Watercraft               ,src_CO_Watercraft            ,src_CT_Watercraft             ,src_FL_Watercraft                 ,src_GA_Watercraft                 ,
 		src_IA_Watercraft               ,src_IL_Watercraft            ,src_KS_Watercraft             ,src_KY_Watercraft                 ,src_MA_Watercraft                 ,
@@ -1236,7 +1238,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Death_MT									 ,src_Death_NC									,src_Death_NV									 ,src_Death_OH
 		,src_Death_VA									 ,src_OKC_Probate 							,src_Dummy_Records2						 ,src_Infutor_Watercraft				 
 		,src_InfutorNarc               ,src_Infutor_Veh							  ,src_Infutor_Motorcycle_Veh		 ,src_Death_Obituary						 
-		,src_Death_Restricted
+		,src_Death_Restricted          ,src_MA_Census
 	];
 
 	export set_NonUpdatingSrc             := [
@@ -1338,7 +1340,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Death_ME									 ,src_Death_MI									,src_Death_MN									 ,src_Death_MT
 		,src_Death_NC									 ,src_Death_NV									,src_Death_OH									 ,src_Death_VA
 		,src_Death_Restricted					 ,src_NM_Watercraft							,src_OKC_Probate
-		/*,src_Death_Obituary					 ,src_Infutor_Watercraft*/
+		/*,src_Death_Obituary					 ,src_Infutor_Watercraft*/, src_MA_Census
 	];
 
   // POE = Place of Employment, now known as WorkPlace Locator
@@ -1369,7 +1371,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_VA_Watercraft						,src_NC_Watercraft							,src_EMerge_Cens							,src_Federal_Firearms
 		,src_EMerge_Fish							,src_Federal_Explosives					,src_MD_Watercraft						,src_Miscellaneous
 		,src_MO_Veh										,src_MO_DL											,src_MO_Experian_Veh					,src_Experian_Credit_Header
-		,src_MO_Watercraft						,src_LnPropV2_Lexis_Deeds_Mtgs 
+		,src_MO_Watercraft						,src_LnPropV2_Lexis_Deeds_Mtgs          ,src_MA_Census
 	];
 	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
@@ -1391,7 +1393,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_scoring_FCRA_gov := [
 		src_Aircrafts, src_MS_Worker_Comp, src_AK_Perm_Fund, src_LnPropV2_Lexis_Asrs, src_Bankruptcy, src_Death_Master, src_Death_Restricted,
 		src_Death_State, /*src_Death_Tributes,*/ src_LnPropV2_Lexis_Deeds_Mtgs, src_DEA, src_Federal_Explosives, src_Federal_Firearms,
-		src_Airmen,	src_Liens_v2, src_Professional_License, src_US_Coastguard, src_Voters_v2 /*src_Death_CA, src_Death_CT, src_Death_FL,
+		src_Airmen,	src_Liens_v2, src_Professional_License, src_US_Coastguard, src_Voters_v2, src_MA_Census /*src_Death_CA, src_Death_CT, src_Death_FL,
 		src_Death_GA, src_Death_KY, src_Death_MA, src_Death_ME, src_Death_MI, src_Death_MN, src_Death_MT, src_Death_NC, src_Death_NV,
 		src_Death_OH, src_Death_VA, src_Death_Obituary*/ //Not cleared by modeling for use in FCRA
 	];
@@ -1418,7 +1420,7 @@ export set_NonDerog_FCRA_sources_v50 := [
       src_TN_Watercraft,						src_TX_Watercraft,            	src_US_Coastguard,       src_US_Coastguard,
       src_UT_Watercraft,						src_VA_Watercraft,            	src_Voters_v2,           src_WI_Watercraft,
       src_WV_Watercraft,            src_WY_Watercraft,              src_OR_Watercraft,			 src_Death_Restricted,
-			src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header		/*,
+			src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census		/*,
 			src_Death_CA, 								src_Death_CT, 									src_Death_FL,							src_Death_GA,
 			src_Death_KY, 								src_Death_MA, 									src_Death_ME, 						src_Death_MI,
 			src_Death_MN, 								src_Death_MT, 									src_Death_NC, 						src_Death_NV,
@@ -3096,6 +3098,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Infutor_Motorcycle_Veh    ,'Infutor Motorcycle Veh'   	                               }
 		,{src_Vickers                   ,'Vickers'                                                   }
 		,{src_Voters_v2                 ,'Voters v2'                                                 }
+        ,{src_MA_Census                 ,'NA Census'                                                 }
 		,{src_AK_Watercraft             ,'AK Watercraft'                                             }
 		,{src_AL_Watercraft             ,'AL Watercraft'                                             }
 		,{src_AR_Watercraft             ,'AR Watercraft'                                             }
@@ -3618,7 +3621,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Infutor_Veh           		 => 'Infutor Veh'                                      
 		,src_Infutor_Motorcycle_Veh    => 'Infutor Motorcycle Veh'                                      
 		,src_Vickers                   => 'Vickers'                                              
-		,src_Voters_v2                 => 'Voters v2'                                            
+		,src_Voters_v2                 => 'Voters v2'
+        ,src_MA_Census                 => 'MA Census'                                            
 		,src_AK_Watercraft             => 'AK Watercraft'                                        
 		,src_AL_Watercraft             => 'AL Watercraft'                                        
 		,src_AR_Watercraft             => 'AR Watercraft'                                        

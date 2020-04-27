@@ -20,7 +20,10 @@ END;
 
 EXPORT DO := FUNCTION
 
+MakeSuperFiles ('~prte::base::crim_offense_cat::charge@version@');
+
 MakeSuperKeys ('~prte::key::crim_offense_cat::@version@::charge');
+
                  
 RETURN 'SUCCESS';
 

@@ -1,4 +1,4 @@
-﻿import _control, AutoKeyB, AutoKeyB2, RoxieKeyBuild, PRTE, STD, prte2, tools,doxie, AutoStandardI,doxie_build, PRTE,PRTE2_Common, strata;
+﻿import _control, AutoKeyB, AutoKeyB2, RoxieKeyBuild, PRTE, STD, prte2, tools,doxie, AutoStandardI,doxie_build, PRTE,PRTE2_Common, strata,dops, orbit3;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 
@@ -52,6 +52,14 @@ DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
 updatedops					:= PRTE.UpdateVersion('AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
 updatedops_fcra			:= PRTE.UpdateVersion('FCRA_AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 
+key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                   output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
+
+create_orbit_build := parallel(
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - American_Student_List', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - FCRA_American_Student_List', filedate, 'F', true, true, false,  _control.MyInfo.EmailAddressNormal),
+															);
+
 
 // -- Actions
 buildKey	:=	sequential(build_roxie_keys
@@ -59,6 +67,8 @@ buildKey	:=	sequential(build_roxie_keys
 												 ,to_qa
 												 ,build_autokeys
                          ,cnt_asl_did2_fcra
+												 ,key_validations
+												 ,create_orbit_build
 												 ,if(not doDOPS, DOPS_Comment, parallel(updatedops, updatedops_fcra))												 
 											);
 									

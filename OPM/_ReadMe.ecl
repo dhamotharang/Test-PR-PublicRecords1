@@ -4,7 +4,7 @@
 	Overview: Office of Personnel Management Build ,A file that contains the names of government employees
 						This data is being built in support of the Workplace Locator Enhancements Project
 						Workplace Locator is just the batch name for Place of Employment (POE). 
-						This source is non-FCRA and will be updated monthly. 
+						This source is non-FCRA and will be updated sporadically. 
 
 						We receive Load(4 text files from OPM), which contains a pipe (|) delimited text 
 						file with one header record . We use that to update our base file on thor .
@@ -15,11 +15,12 @@
 			
 	Quick Documentation to run the thor build:
 
-		Tapeload02b Dir	:(\\tapeload02b.br.seisint.com)\eval\federal_goverment_public_employees(pi)
+		Tapeload02b Dir	:(\\tapeload02b.br.seisint.com)\people\fed_gov_pub_employees
 		Unix Directory	: bctlpedata11:/data/Builds/builds/OPM/data/<folder date>
 		Thor Module			: OPM
 		Orbit Build			: OPM
-		Frequency				: Monthly - Updates 
+		Frequency				: Sporadically - Updates 
+    FileType        : Txt file, CSV & pipe (|) delimited
 		
 		1.	The folder on tapeload02b and the text file contents are to be copied into the data directory under
 				the OPM folder on bctlpedata11. *NonDOD*.txt files will be picked up 

@@ -19,7 +19,8 @@ function
 		 Create_Supers
 		,Spray					(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)
 		,Build_Base			(pversion,pIsTesting,pSprayedFile,pBaseFile	)
-		,Scrubs.ScrubsPlus('Frandx','Scrubs_Frandx','Scrubs_Frandx_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,Scrubs.ScrubsPlus('Frandx','Scrubs_Frandx','Scrubs_Frandx_Input', 'Input', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,Scrubs.ScrubsPlus('Frandx','Scrubs_Frandx','Scrubs_Frandx_BaseV2', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Keys			(pversion																		).all
 		,Build_Strata		(pversion	,pOverwrite,,,	pIsTesting				)
 		,Promote().Inputfiles.using2used
@@ -30,11 +31,8 @@ function
 	
 	return
 		if(tools.fun_IsValidVersion(pversion),
-				if(count(pSprayedFile(stringlib.stringfind(frn_start_date,'/',1) = 0 and frn_start_date<>'')) = 0,
-						full_build,
-						output('Invalid frn_start_Date field. Please contact data development. Skipping the Frandx Build.')
-					),
-				output('No Valid version parameter passed, skipping Frandx.Build_All')
-			 );
+			 full_build,
+			 output('No Valid version parameter passed, skipping Frandx.Build_All')
+			);
 
 end;

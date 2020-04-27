@@ -178,5 +178,5 @@ on_addr_diff := join(newd,oldd,
 output(choosen(on_addr_diff,100),named('Address_changed'));
 
 
-export BWR_Run_Watchdog_Marketing_stats := fileservices.SendEmail('michael.gould@lexisnexisrisk.com,skasavajjala@seisint.com,rperez@seisint.com','Watchdog-marketing Stats FINISHED wu:'+thorlib.wuid(),'');
+export BWR_Run_Watchdog_Marketing_stats := fileservices.SendEmail('Sudhir.Kasavajjala@lexisnexisrisk.com','Watchdog-marketing Stats FINISHED wu:'+thorlib.wuid(),'');
 

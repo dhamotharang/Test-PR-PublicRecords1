@@ -1,4 +1,4 @@
-import doxie_build, header, header_services,ut, yellowpages, AID;
+﻿import doxie_build, header, header_services,ut, yellowpages, AID, suppress, DriversV2;
 
 export fn_file_header_building(dataset(recordof(header.Layout_Header)) in_hdr0) := 
 function
@@ -23,15 +23,15 @@ in_hdr  := in_hdr3(rid not in header.fraud_records);
 in_base_ := in_hdr;
 
 layout_hashed := {
-							data16 hval_id_1;
+							// data16 hval_id_1;
 							data16 hval_id_2 ;
 							data16 hval_address ;
 							header.Layout_Header ;							
 						} ;
 					
 layout_hashed xTohash(header.Layout_Header L) := transform
-       self.hval_id_1 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));     
-       self.hval_id_2 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));      
+     // self.hval_id_1 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));     
+     self.hval_id_2 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));      
 		 self.hval_address := hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
 		 self := L ;
@@ -39,14 +39,10 @@ end ;
 
 in_base := project (in_base_, xTohash(left)) ;
 
-Suppression_Layout 	:= header_services.Supplemental_Data.layout_in; 
-header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
-DL_Suppression_In 	:= dl_supp_ds_func();
-DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
-
-full_ShortSuppress := join(in_Base,DLSuppressedIn,left.hval_id_1=right.hval, left only,lookup);
+full_ShortSuppress := DriversV2.regulatory.applyDriversLicenseSup_DIDVend(in_base);
 
 // Start of code to suppress data based on an MD5 Hash of DID+Address
+Suppression_Layout 	:= suppress.Applyregulatory.layout_in; 
 
 header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
  

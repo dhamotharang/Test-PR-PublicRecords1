@@ -55,8 +55,14 @@ noOldUtil:=noComp(~header.IsOldUtil(versionBuild,,,,7));
 // within or across clusters - if there are, we have a problem
 Header.Mac_dedup_header(noOldUtil, deletesDone, '_hj');
 
+explicitRecordRemoved:=JOIN(deletesDone,header.Explicit_record_removal.file_rec_remover,
+                            LEFT.rid=RIGHT.rid AND
+                            LEFT.did=RIGHT.did AND
+                            LEFT.src=RIGHT.src      ,LEFT ONLY,HASH);
+
+
 // blank out PII while preserving did/rid/flags for records purged thus far
-AllClear:=join(in_head,deletesDone
+AllClear:=join(in_head,explicitRecordRemoved
 							,left.rid=right.rid
 							,transform({in_head}
 								,self.did:=left.did

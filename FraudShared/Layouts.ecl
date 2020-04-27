@@ -511,7 +511,8 @@ export Main         :=
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
 	unsigned4					global_sid := 0;
-	unsigned8					record_sid := 0; 	
+	unsigned8					record_sid := 0;
+	unsigned2					RIN_Source := 0;
 end; 
 
 end; 
@@ -711,13 +712,14 @@ export keybuild
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';
-	string10  				amount_paid := '';
+	string10  					amount_paid := '';
 	string10					region_code := '';
 	string10					investigator_id := '';
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
 	unsigned4					global_sid := 0;
-	unsigned8 				record_sid := 0; 	
+	unsigned8 					record_sid := 0; 	
+	unsigned2					RIN_Source := 0;
 
 end; 
 

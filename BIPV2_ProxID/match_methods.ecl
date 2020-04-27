@@ -12,7 +12,12 @@ EXPORT match_active_enterprise_number(TYPEOF(h.active_enterprise_number) L, TYPE
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
-EXPORT match_active_domestic_corp_key(TYPEOF(h.active_domestic_corp_key) L, TYPEOF(h.active_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_company_inc_state(TYPEOF(h.company_inc_state) L, TYPEOF(h.company_inc_state) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
+EXPORT match_company_charter_number(TYPEOF(h.company_charter_number) L, TYPEOF(h.company_charter_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
@@ -32,17 +37,7 @@ EXPORT match_hist_duns_number(TYPEOF(h.hist_duns_number) L, TYPEOF(h.hist_duns_n
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
-EXPORT match_hist_domestic_corp_key(TYPEOF(h.hist_domestic_corp_key) L, TYPEOF(h.hist_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-   MAP(L = R => SALT311.MatchCode.ExactMatch,
-    SALT311.MatchCode.NoMatch),
-     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
-);
-EXPORT match_foreign_corp_key(TYPEOF(h.foreign_corp_key) L, TYPEOF(h.foreign_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-   MAP(L = R => SALT311.MatchCode.ExactMatch,
-    SALT311.MatchCode.NoMatch),
-     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
-);
-EXPORT match_unk_corp_key(TYPEOF(h.unk_corp_key) L, TYPEOF(h.unk_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_hist_corp_key(TYPEOF(h.hist_corp_key) L, TYPEOF(h.hist_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)

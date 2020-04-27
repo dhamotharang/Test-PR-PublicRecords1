@@ -10,26 +10,25 @@ SHARED TotalClusters := Specificities(h).TotalClusters;
   st_tokens := PROJECT(Specificities(h).st_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.st; SELF.TokenType := 2; SELF.Spc := LEFT.field_Specificity ));
   prim_range_derived_tokens := PROJECT(Specificities(h).prim_range_derived_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.prim_range_derived; SELF.TokenType := 3; SELF.Spc := LEFT.field_Specificity ));
   sbfe_id_tokens := PROJECT(Specificities(h).sbfe_id_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.sbfe_id; SELF.TokenType := 4; SELF.Spc := LEFT.field_Specificity ));
-  hist_enterprise_number_tokens := PROJECT(Specificities(h).hist_enterprise_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_enterprise_number; SELF.TokenType := 5; SELF.Spc := LEFT.field_Specificity ));
-  ebr_file_number_tokens := PROJECT(Specificities(h).ebr_file_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.ebr_file_number; SELF.TokenType := 6; SELF.Spc := LEFT.field_Specificity ));
-  active_enterprise_number_tokens := PROJECT(Specificities(h).active_enterprise_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.active_enterprise_number; SELF.TokenType := 7; SELF.Spc := LEFT.field_Specificity ));
-  hist_domestic_corp_key_tokens := PROJECT(Specificities(h).hist_domestic_corp_key_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_domestic_corp_key; SELF.TokenType := 8; SELF.Spc := LEFT.field_Specificity ));
-  foreign_corp_key_tokens := PROJECT(Specificities(h).foreign_corp_key_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.foreign_corp_key; SELF.TokenType := 9; SELF.Spc := LEFT.field_Specificity ));
-  unk_corp_key_tokens := PROJECT(Specificities(h).unk_corp_key_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.unk_corp_key; SELF.TokenType := 10; SELF.Spc := LEFT.field_Specificity ));
-  active_domestic_corp_key_tokens := PROJECT(Specificities(h).active_domestic_corp_key_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.active_domestic_corp_key; SELF.TokenType := 11; SELF.Spc := LEFT.field_Specificity ));
-  hist_duns_number_tokens := PROJECT(Specificities(h).hist_duns_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_duns_number; SELF.TokenType := 12; SELF.Spc := LEFT.field_Specificity ));
-  active_duns_number_tokens := PROJECT(Specificities(h).active_duns_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.active_duns_number; SELF.TokenType := 13; SELF.Spc := LEFT.field_Specificity ));
-  company_phone_tokens := PROJECT(Specificities(h).company_phone_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_phone; SELF.TokenType := 14; SELF.Spc := LEFT.field_Specificity ));
-  company_fein_tokens := PROJECT(Specificities(h).company_fein_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_fein; SELF.TokenType := 15; SELF.Spc := LEFT.field_Specificity ));
-  zip_tokens := PROJECT(Specificities(h).zip_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.zip; SELF.TokenType := 17; SELF.Spc := LEFT.field_Specificity ));
-  cnp_name_phonetic_tokens := PROJECT(Specificities(h).cnp_name_phonetic_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_name_phonetic; SELF.TokenType := 19; SELF.Spc := LEFT.field_Specificity ));
-  cnp_name_tokens := PROJECT(Specificities(h).cnp_name_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_name; SELF.TokenType := 20; SELF.Spc := LEFT.field_Specificity ));
-  prim_name_derived_tokens := PROJECT(Specificities(h).prim_name_derived_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.prim_name_derived; SELF.TokenType := 21; SELF.Spc := LEFT.field_Specificity ));
-  sec_range_tokens := PROJECT(Specificities(h).sec_range_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.sec_range; SELF.TokenType := 22; SELF.Spc := LEFT.field_Specificity ));
-  v_city_name_tokens := PROJECT(Specificities(h).v_city_name_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.v_city_name; SELF.TokenType := 23; SELF.Spc := LEFT.field_Specificity ));
-  cnp_btype_tokens := PROJECT(Specificities(h).cnp_btype_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_btype; SELF.TokenType := 24; SELF.Spc := LEFT.field_Specificity ));
-  company_name_type_derived_tokens := PROJECT(Specificities(h).company_name_type_derived_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_name_type_derived; SELF.TokenType := 25; SELF.Spc := LEFT.field_Specificity ));
-SHARED all_tokens0 := cnp_number_tokens + st_tokens + prim_range_derived_tokens + sbfe_id_tokens + hist_enterprise_number_tokens + ebr_file_number_tokens + active_enterprise_number_tokens + hist_domestic_corp_key_tokens + foreign_corp_key_tokens + unk_corp_key_tokens + active_domestic_corp_key_tokens + hist_duns_number_tokens + active_duns_number_tokens + company_phone_tokens + company_fein_tokens + zip_tokens + cnp_name_phonetic_tokens + cnp_name_tokens + prim_name_derived_tokens + sec_range_tokens + v_city_name_tokens + cnp_btype_tokens + company_name_type_derived_tokens;
+  company_charter_number_tokens := PROJECT(Specificities(h).company_charter_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_charter_number; SELF.TokenType := 5; SELF.Spc := LEFT.field_Specificity ));
+  hist_enterprise_number_tokens := PROJECT(Specificities(h).hist_enterprise_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_enterprise_number; SELF.TokenType := 6; SELF.Spc := LEFT.field_Specificity ));
+  ebr_file_number_tokens := PROJECT(Specificities(h).ebr_file_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.ebr_file_number; SELF.TokenType := 7; SELF.Spc := LEFT.field_Specificity ));
+  active_enterprise_number_tokens := PROJECT(Specificities(h).active_enterprise_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.active_enterprise_number; SELF.TokenType := 8; SELF.Spc := LEFT.field_Specificity ));
+  hist_corp_key_tokens := PROJECT(Specificities(h).hist_corp_key_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_corp_key; SELF.TokenType := 9; SELF.Spc := LEFT.field_Specificity ));
+  hist_duns_number_tokens := PROJECT(Specificities(h).hist_duns_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.hist_duns_number; SELF.TokenType := 10; SELF.Spc := LEFT.field_Specificity ));
+  active_duns_number_tokens := PROJECT(Specificities(h).active_duns_number_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.active_duns_number; SELF.TokenType := 11; SELF.Spc := LEFT.field_Specificity ));
+  company_phone_tokens := PROJECT(Specificities(h).company_phone_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_phone; SELF.TokenType := 12; SELF.Spc := LEFT.field_Specificity ));
+  company_fein_tokens := PROJECT(Specificities(h).company_fein_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_fein; SELF.TokenType := 13; SELF.Spc := LEFT.field_Specificity ));
+  zip_tokens := PROJECT(Specificities(h).zip_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.zip; SELF.TokenType := 15; SELF.Spc := LEFT.field_Specificity ));
+  cnp_name_phonetic_tokens := PROJECT(Specificities(h).cnp_name_phonetic_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_name_phonetic; SELF.TokenType := 17; SELF.Spc := LEFT.field_Specificity ));
+  cnp_name_tokens := PROJECT(Specificities(h).cnp_name_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_name; SELF.TokenType := 18; SELF.Spc := LEFT.field_Specificity ));
+  prim_name_derived_tokens := PROJECT(Specificities(h).prim_name_derived_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.prim_name_derived; SELF.TokenType := 19; SELF.Spc := LEFT.field_Specificity ));
+  sec_range_tokens := PROJECT(Specificities(h).sec_range_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.sec_range; SELF.TokenType := 20; SELF.Spc := LEFT.field_Specificity ));
+  v_city_name_tokens := PROJECT(Specificities(h).v_city_name_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.v_city_name; SELF.TokenType := 21; SELF.Spc := LEFT.field_Specificity ));
+  company_inc_state_tokens := PROJECT(Specificities(h).company_inc_state_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_inc_state; SELF.TokenType := 22; SELF.Spc := LEFT.field_Specificity ));
+  cnp_btype_tokens := PROJECT(Specificities(h).cnp_btype_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.cnp_btype; SELF.TokenType := 23; SELF.Spc := LEFT.field_Specificity ));
+  company_name_type_derived_tokens := PROJECT(Specificities(h).company_name_type_derived_values_persisted,TRANSFORM(SALT311.Layout_Classify_Token,SELF.TokenValue := (SALT311.StrType)LEFT.company_name_type_derived; SELF.TokenType := 24; SELF.Spc := LEFT.field_Specificity ));
+SHARED all_tokens0 := cnp_number_tokens + st_tokens + prim_range_derived_tokens + sbfe_id_tokens + company_charter_number_tokens + hist_enterprise_number_tokens + ebr_file_number_tokens + active_enterprise_number_tokens + hist_corp_key_tokens + hist_duns_number_tokens + active_duns_number_tokens + company_phone_tokens + company_fein_tokens + zip_tokens + cnp_name_phonetic_tokens + cnp_name_tokens + prim_name_derived_tokens + sec_range_tokens + v_city_name_tokens + company_inc_state_tokens + cnp_btype_tokens + company_name_type_derived_tokens;
 SHARED all_tokens := SALT311.fn_process_multitokens(all_tokens0);
  
 EXPORT TokenKeyName := '~'+'key::BIPV2_ProxID::Proxid::Token::TokenKey';
@@ -39,8 +38,8 @@ EXPORT TokenKey := INDEX(all_tokens,{UNSIGNED4 TokenHash := HASH32(TokenValue),T
 EXPORT MultiTokenKeyName := '~'+'key::BIPV2_ProxID::Proxid::Token::MultiTokenKey';
  
 EXPORT MultiTokenKey := INDEX(all_tokens0(SALT311.WordCount(TokenValue)>1),{UNSIGNED4 TokenHash := HASH32(TokenValue),TokenType},{all_tokens0},MultiTokenKeyName);
-  company_addr1_tokens := PROJECT(Specificities(h).company_addr1_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_addr1; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
-  company_csz_tokens := PROJECT(Specificities(h).company_csz_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_csz; SELF.TokenType := 18; SELF.Spc := LEFT.field_Specificity ));
+  company_addr1_tokens := PROJECT(Specificities(h).company_addr1_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_addr1; SELF.TokenType := 14; SELF.Spc := LEFT.field_Specificity ));
+  company_csz_tokens := PROJECT(Specificities(h).company_csz_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_csz; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
   company_address_tokens := PROJECT(Specificities(h).company_address_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_address; SELF.TokenType := 36; SELF.Spc := LEFT.field_Specificity ));
 SHARED all_tokens1 := company_addr1_tokens + company_csz_tokens + company_address_tokens;
  
@@ -65,7 +64,7 @@ SHARED Layout_ConceptTemplate := RECORD
   END;
   t := table(ih,company_addr1_filled_rec);
   company_addr1_filled_rec_totals := RECORD
-    UNSIGNED2 TokenType := 16;
+    UNSIGNED2 TokenType := 14;
     t.prim_range_derived_filled;
     t.prim_name_derived_filled;
     t.sec_range_filled;
@@ -75,9 +74,9 @@ SHARED Layout_ConceptTemplate := RECORD
   SALT311.MAC_Field_Specificities(t_tot,o_tot);
 shared company_addr1_combinations := o_tot;
   Layout_ConceptTemplate Into(company_addr1_combinations le) := TRANSFORM
-    SELF.FieldNumber1 := MAP ( le.prim_range_derived_filled => 3, le.prim_name_derived_filled => 21, le.sec_range_filled => 22,0);
-    SELF.FieldNumber2 := MAP ( le.prim_name_derived_filled AND SELF.FieldNumber1 != 21 => 21, le.sec_range_filled AND SELF.FieldNumber1 != 22 => 22,0);
-    SELF.FieldNumber3 := MAP ( le.sec_range_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 => 22,0);
+    SELF.FieldNumber1 := MAP ( le.prim_range_derived_filled => 3, le.prim_name_derived_filled => 19, le.sec_range_filled => 20,0);
+    SELF.FieldNumber2 := MAP ( le.prim_name_derived_filled AND SELF.FieldNumber1 != 19 => 19, le.sec_range_filled AND SELF.FieldNumber1 != 20 => 20,0);
+    SELF.FieldNumber3 := MAP ( le.sec_range_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 => 20,0);
     SELF := le;
   END;
 shared company_addr1_templates := project(company_addr1_combinations,Into(LEFT));
@@ -88,7 +87,7 @@ shared company_addr1_templates := project(company_addr1_combinations,Into(LEFT))
   END;
   t := table(ih,company_csz_filled_rec);
   company_csz_filled_rec_totals := RECORD
-    UNSIGNED2 TokenType := 18;
+    UNSIGNED2 TokenType := 16;
     t.v_city_name_filled;
     t.st_filled;
     t.zip_filled;
@@ -98,9 +97,9 @@ shared company_addr1_templates := project(company_addr1_combinations,Into(LEFT))
   SALT311.MAC_Field_Specificities(t_tot,o_tot);
 shared company_csz_combinations := o_tot;
   Layout_ConceptTemplate Into(company_csz_combinations le) := TRANSFORM
-    SELF.FieldNumber1 := MAP ( le.v_city_name_filled => 23, le.st_filled => 2, le.zip_filled => 17,0);
-    SELF.FieldNumber2 := MAP ( le.st_filled AND SELF.FieldNumber1 != 2 => 2, le.zip_filled AND SELF.FieldNumber1 != 17 => 17,0);
-    SELF.FieldNumber3 := MAP ( le.zip_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 => 17,0);
+    SELF.FieldNumber1 := MAP ( le.v_city_name_filled => 21, le.st_filled => 2, le.zip_filled => 15,0);
+    SELF.FieldNumber2 := MAP ( le.st_filled AND SELF.FieldNumber1 != 2 => 2, le.zip_filled AND SELF.FieldNumber1 != 15 => 15,0);
+    SELF.FieldNumber3 := MAP ( le.zip_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 => 15,0);
     SELF := le;
   END;
 shared company_csz_templates := project(company_csz_combinations,Into(LEFT));
@@ -119,8 +118,8 @@ shared company_csz_templates := project(company_csz_combinations,Into(LEFT));
   SALT311.MAC_Field_Specificities(t_tot,o_tot);
 shared company_address_combinations := o_tot;
   Layout_ConceptTemplate Into(company_address_combinations le) := TRANSFORM
-    SELF.FieldNumber1 := MAP ( le.company_addr1_filled => 16, le.company_csz_filled => 18,0);
-    SELF.FieldNumber2 := MAP ( le.company_csz_filled AND SELF.FieldNumber1 != 18 => 18,0);
+    SELF.FieldNumber1 := MAP ( le.company_addr1_filled => 14, le.company_csz_filled => 16,0);
+    SELF.FieldNumber2 := MAP ( le.company_csz_filled AND SELF.FieldNumber1 != 16 => 16,0);
     SELF := le;
   END;
 shared company_address_templates := project(company_address_combinations,Into(LEFT));

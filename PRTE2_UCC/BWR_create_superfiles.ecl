@@ -1,4 +1,4 @@
-IMPORT PromoteSupers, roxiekeybuild, PRTE2_UCC;
+﻿IMPORT PromoteSupers, roxiekeybuild, PRTE2_UCC;
 
 //Input files
 FileServices.CreateSuperFile(PRTE2_UCC.Constants.IN_PREFIX + 'main');
@@ -18,7 +18,6 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc', 'bdid_w_t
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc', 'main_rmsid');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc', 'party_rmsid');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc', 'linkids');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc', 'party_rmsid_linkids');
 
 //FCRA Key
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::ucc::fcra', 'did_w_type');

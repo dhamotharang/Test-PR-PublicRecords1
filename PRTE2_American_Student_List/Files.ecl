@@ -1,8 +1,12 @@
 ﻿import data_services;
 EXPORT Files := module
 
-  export incoming := dataset('~prte::in::american_student_list', layouts.incoming, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) )(ssn <> '');
-  export base     := dataset('~prte::base::american_student_list', layouts.base, thor);
+  export incoming_1:= dataset('~prte::in::american_student_list::student_list', layouts.incoming, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) )(ssn <> '');
+	export incoming_2 := dataset('~prte::in::american_student_list::student_list_Ins', layouts.incoming, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) )(ssn <> '');
+  
+  export incoming := incoming_1 + incoming_2;
+	
+	export base     := dataset('~prte::base::american_student_list', layouts.base, thor);
 
   export DID_base	      :=	PROJECT(base((unsigned8)did<>0 AND HISTORICAL_FLAG = 'C'), layouts.ASL_Key_Layout);
   export DID_base_fcra  := 	PROJECT(base((unsigned8)did<>0 AND HISTORICAL_FLAG = 'C'), 

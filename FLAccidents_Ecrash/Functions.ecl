@@ -1,4 +1,4 @@
-IMPORT FLAccidents_Ecrash, lib_stringlib, STD, ut;
+﻿IMPORT FLAccidents_Ecrash, lib_stringlib, STD, ut;
 EXPORT Functions := MODULE
 
 	EXPORT INTEGER GetTour(STRING CrashTime):= FUNCTION
@@ -126,4 +126,93 @@ EXPORT Functions := MODULE
 	    RETURN Cnt;
 	END; // UnknownFHE
 
+
+	EXPORT CleanDate(string pDate) := function
+   STRING yy := pDate[LENGTH(pDate)-1..];
+	 STRING mm := pDate[4..6];
+   INTEGER current_yy := (INTEGER)(stringlib.GetDateYYYYMMDD()[3..4]);
+   STRING4 AdjustYear(STRING year) := MAP(LENGTH(year) <> 2 => year,
+																				 (INTEGER)year <= (current_yy + 30) => (string4)(2000 + (integer)year),
+											                   (STRING4)(1900 + (INTEGER)year));
+   STRING Stdyear := AdjustYear(yy);
+   STRING2 ConvertMonth(STRING3 mname) := MAP(mname = 'JAN' => '01',
+																							mname = 'FEB' => '02',
+																							mname = 'MAR' => '03',
+																							mname = 'APR' => '04',
+																							mname = 'MAY' => '05',
+																							mname = 'JUN' => '06',
+																							mname = 'JUL' => '07',
+																							mname = 'AUG' => '08',
+																							mname = 'SEP' => '09',
+																							mname = 'OCT' => '10',
+																							mname = 'NOV' => '11',
+																							mname = 'DEC' => '12',
+																							'00');
+	STRING Stdmmonth := ConvertMonth(stringlib.stringtouppercase( mm ));
+	STRING day := pDate[1..2];
+
+	RETURN Stdyear+Stdmmonth+day;
+ END;
+
+ EXPORT dateconv(STRING10 date) := FUNCTION
+    trim_date      := TRIM(date, ALL);
+    hasSpecialChar := REGEXFIND('[-,/]', trim_date);
+    numDate_1_2    := (UNSIGNED1) trim_date[1..2];
+    numDate_3_4    := (UNSIGNED1) trim_date[3..4];
+    numDate_4_5    := (UNSIGNED1) trim_date[4..5];
+    numDate_5_6    := (UNSIGNED1) trim_date[5..6];
+    numDate_6_7    := (UNSIGNED1) trim_date[6..7];
+    numDate_7_8    := (UNSIGNED1) trim_date[7..8];
+    numDate_8_9    := (UNSIGNED1) trim_date[8..9];
+    
+    RETURN IF(trim_date <> '',
+      CASE(LENGTH(trim_date),
+        10 => MAP(numDate_1_2 <= 12 AND trim_date[3] IN ['/'] AND numDate_4_5 >= 1 AND trim_date[6] IN ['/'] AND trim_date[7..8] IN ['19','20'] => (STRING) STD.Date.FromStringToDate(trim_date, '%m/%d/%Y'),
+                  numDate_1_2 <= 12 AND trim_date[3] IN ['-'] AND numDate_4_5 >= 1 AND trim_date[6] IN ['-'] AND trim_date[7..8] IN ['19','20'] => (STRING) STD.Date.FromStringToDate(trim_date, '%m-%d-%Y'),
+                  trim_date[1..2] IN ['19','20'] AND trim_date[5] IN ['-', '/'] AND numDate_6_7 <= 12 => trim_date[1..4] + trim_date[6..7] + trim_date[9..10],
+                  trim_date[1..2] IN ['19','20'] AND trim_date[5] IN ['-', '/'] AND numDate_6_7 > 12 => trim_date[1..4] + trim_date[9..10] + trim_date[6..7],
+                  numDate_1_2 >= 1 AND trim_date[3] IN ['/'] AND numDate_4_5 <= 12 AND trim_date[6] IN ['/'] => (STRING) STD.Date.FromStringToDate(trim_date, '%d/%m/%Y'),
+                  numDate_1_2 >= 1 AND trim_date[3] IN ['-'] AND numDate_4_5 <= 12 AND trim_date[6] IN ['-'] => (STRING) STD.Date.FromStringToDate(trim_date, '%d-%m-%Y'),
+                  ''),
+        9 => MAP(REGEXFIND('[aA-zZ]', trim_date) = TRUE => CleanDate(trim_date),
+                 hasSpecialChar AND trim_date[1..2] IN ['19','20'] AND trim_date[3..4] NOT IN ['-', '/'] AND trim_date[5] IN ['-', '/'] AND trim_date[7] NOT IN ['-', '/'] AND numDate_6_7 > 12 => trim_date[1..4] + '0' + trim_date[9] + trim_date[6..7],
+                 hasSpecialChar AND trim_date[2] IN ['-', '/'] => trim_date[6..9] + '0' + trim_date[1] + trim_date[3..4],
+                 hasSpecialChar AND trim_date[1..2] IN ['19','20'] AND trim_date[3..4] NOT IN ['-', '/'] AND trim_date[5] IN ['-', '/'] AND trim_date[7] IN ['-', '/'] AND numDate_8_9 > 12 => trim_date[1..4] + '0' + trim_date[6] + trim_date[8..9],
+                 hasSpecialChar AND trim_date[1..2] IN ['19','20'] AND trim_date[3..4] NOT IN ['-', '/'] AND trim_date[5] IN ['-', '/'] AND trim_date[7] IN ['-', '/'] => trim_date[1..4] + '0' + trim_date[6] + trim_date[8..9],
+                 hasSpecialChar AND numDate_1_2 > 12 AND trim_date[3] IN ['-', '/'] AND trim_date[5] IN ['-', '/'] => trim_date[6..9] + '0' + trim_date[4] + trim_date[1..2],
+                 hasSpecialChar AND trim_date[3] IN ['-', '/'] AND trim_date[5] IN ['-', '/'] => trim_date[6..9] + '0' + trim_date[4] + trim_date[1..2],
+                 ''),
+        8 => MAP(hasSpecialChar AND trim_date[3] IN ['-','/'] AND trim_date[7] IN ['1','0'] AND numDate_1_2 <= 12 => '20' + trim_date[7..8] + trim_date[1..2] + trim_date[4..5],
+                 hasSpecialChar AND trim_date[3] IN ['-','/'] AND trim_date[7] IN ['1','0'] AND numDate_1_2 > 12 => '20' + trim_date[7..8] + trim_date[4..5] + trim_date[1..2],
+                 hasSpecialChar AND trim_date[3] IN ['-','/'] AND numDate_7_8 > 30 AND numDate_1_2 <= 12 => '19' + trim_date[7..8] + trim_date[1..2] + trim_date[4..5],
+                 hasSpecialChar AND trim_date[3] IN ['-','/'] AND numDate_7_8 > 30 AND numDate_1_2 > 12 => '19' + trim_date[7..8] + trim_date[4..5] + trim_date[1..2],
+                 hasSpecialChar = FALSE AND trim_date[1..2] IN ['19','20'] AND numDate_5_6 <= 12 => trim_date,
+                 hasSpecialChar = FALSE AND trim_date[1..2] IN ['19','20'] AND numDate_5_6 > 12 AND trim_date[5..6] NOT IN ['19','20'] => trim_date[1..4] + trim_date[7..8] + trim_date[5..6],
+                 hasSpecialChar = FALSE AND trim_date[1..2] IN ['19','20'] AND numDate_3_4 <= 12 AND trim_date[5..6] IN ['19','20'] => trim_date[5..8] + trim_date[3..4] + trim_date[1..2],
+                 hasSpecialChar = FALSE AND trim_date[5..6] IN ['19','20'] AND numDate_1_2 <= 12 => trim_date[5..8] + trim_date[1..2] + trim_date[3..4],
+                 hasSpecialChar = FALSE AND trim_date[5..6] IN ['19','20'] AND numDate_1_2 > 12 => trim_date[5..8] + trim_date[3..4] + trim_date[1..2],
+                 ''),
+        7 => MAP(hasSpecialChar = FALSE AND trim_date[4..5] IN ['19','20'] => trim_date[4..7] + '0' + trim_date[1..3],
+                 hasSpecialChar AND numDate_6_7 > 30 AND trim_date[3] IN ['-','/'] AND numDate_1_2 > 12 => '19' + trim_date[6..7] + '0' + trim_date[4] + trim_date[1..2],
+                 hasSpecialChar AND numDate_6_7 > 30 AND trim_date[3] IN ['-','/'] AND numDate_1_2 <= 12 => '19' + trim_date[6..7] + trim_date[1..2] + '0' + trim_date[4],
+                 hasSpecialChar AND numDate_6_7 < 30 AND trim_date[3] IN ['-','/'] AND numDate_1_2 > 12 => '20' + trim_date[6..7] + '0' + trim_date[4] + trim_date[1..2],
+                 hasSpecialChar AND numDate_6_7 < 30 AND trim_date[3] IN ['-','/'] AND numDate_1_2 <= 12 => '20' + trim_date[6..7] + trim_date[1..2] + '0' + trim_date[4],
+                 hasSpecialChar AND numDate_6_7 > 30 AND trim_date[2] IN ['-','/'] AND numDate_3_4 > 12 => '19' + trim_date[6..7] + '0' + trim_date[1] + trim_date[3..4],
+                 hasSpecialChar AND numDate_6_7 > 30 AND trim_date[2] IN ['-','/'] AND numDate_3_4 <= 12 => '19' + trim_date[6..7] + trim_date[3..4] + '0' + trim_date[1],
+                 hasSpecialChar AND numDate_6_7 < 30 AND trim_date[2] IN ['-','/'] AND numDate_3_4 > 12 => '20' + trim_date[6..7] + '0' + trim_date[1] + trim_date[3..4],
+                 hasSpecialChar AND numDate_6_7 < 30 AND trim_date[2] IN ['-','/'] AND numDate_3_4 <= 12 => '20' + trim_date[6..7] + trim_date[3..4] + '0' + trim_date[1],
+                 ''),
+        6 => MAP(trim_date[3..4] IN ['19','20'] AND trim_date[1..2] NOT IN ['19','20'] => trim_date[3..6] + '0' + trim_date[1] + '0' + trim_date[2],
+                 trim_date[1..2] IN ['19','20'] AND trim_date[3..4] NOT IN ['19','20'] => trim_date[1..4] + '0' + trim_date[5] + '0' + trim_date[6],
+                 numDate_1_2 > 50 AND trim_date[3] = '0' AND trim_date[5] = '0' => '19' + trim_date[1..6],
+                 trim_date[5] IN ['1','0','2'] AND numDate_1_2 <= 12 => '20' + trim_date[5..6] + trim_date[1..4],
+                 trim_date[5] IN ['1','0','2'] AND numDate_1_2 > 12 => '20' + trim_date[5..6] + trim_date[3..4] + trim_date[1..2],
+                 trim_date[5] NOT IN ['1','0','2'] AND numDate_1_2 <= 12 => '19' + trim_date[5..6] + trim_date[1..4],
+                 trim_date[5] NOT IN ['1','0','2'] AND numDate_1_2 > 12 => '19' + trim_date[5..6] + trim_date[3..4] + trim_date[1..2],
+                 '') ,
+
+        ''),
+    '');
+  END;
+	
 END;
