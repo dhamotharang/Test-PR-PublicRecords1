@@ -258,6 +258,7 @@ EXPORT Layouts := MODULE
 			unsigned6 Lexid_Discovered;
 			string25 RemoteIPAddress;
 			string25 ConsumerIPAddress;
+      		string256 Email_Address;
 		END;
 	
 		EXPORT validate_record := record
