@@ -10,7 +10,6 @@ C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\Fraudgo
 #OPTION(codegen, 'nolookupjoins')
 */
 
-
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
@@ -221,7 +220,11 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     INTEGER device_risk_code,
     INTEGER identity_risk_code,
 
-		DATE DateOfBirth,
+    INTEGER event_type_1,
+		INTEGER event_type_2,
+		INTEGER event_type_3,
+		
+    DATE DateOfBirth,
 
     // BocaShell Columns
 
@@ -424,7 +427,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     name_ssn_dob_match,
 
     IpAddress,iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname,
-    Confidence_that_activity_was_deceitful_id, name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
+    Confidence_that_activity_was_deceitful_id,event_type_1,event_type_2,event_type_3,name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
 		advo_hitflag, advo_vacancyindicator, advo_addressstyle, advo_dropindicator, advo_residentialorbusinessindicator, advo_addresstype, advo_addressusagetype
           ));
 
@@ -1283,6 +1286,7 @@ Event: => DeceasedToEventYearDiff := MAP(DeceasedMatch = 1 => YEARSBETWEEN(Event
 //Event: => FullAddress := Location.FullAddress;//jp
 Event: => FullAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => StreetAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange)))))))));
+Event: => City := PostalCity;
 
 Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
 Event: => EventTypeCount := COUNT(EventTypes);
