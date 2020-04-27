@@ -4,20 +4,19 @@ Each export should populate one of these tables, and additional exports to provi
 Please ignor 1.c (business names). The deliverable here is a code module that we will add to the header folder which we can call to generate these tables and drill down
 */ 
 
-Import Anomalies_Header;
-Import STD;
-Import AID;
+
+Import STD, AID;
 
 
 
 layout_header := Anomalies_Header.Layouts.Layout_Header;
 // Slimmed files from the original header file
-input := Anomalies_Header.Files.Header; 
+infile := Anomalies_Header.Files.Header; 
 
 
 
 // dedup here
-t := Table(input, layouts.layout_header, did, fname, lname,
+t := Table(infile, layouts.layout_header, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
                   city_name, st, zip, zip4, county, cbsa, src );
@@ -44,33 +43,33 @@ Export Header_Counts := Module
 // A. Most common names accross all records
 
 // Most common first names
-t_fname := Record
+layout_fname := Record
     fname := header.fname;
     Integer fname_count := Count(Group);
 End;
-c_fname := Table(header, t_fname, fname );
-Export fnames_across_file := Sort(c_fname, -fname_count );
+table_fname := Table(header, layout_fname, fname );
+Export fnames_across_file := Sort(table_fname, -fname_count );
 
 
 
 // Most common last names
-t_lname := Record
+layout_lname := Record
     lname := header.lname;
     Integer lname_count := Count(Group);
 End;
-c_lname := Table(header, t_lname, lname );
-Export lanmes_across_file := Sort(c_lname, -lname_count );
+table_lname := Table(header, layout_lname, lname );
+Export lanmes_across_file := Sort(table_lname, -lname_count );
 
 
 
 // B. Most common names across diffeent lexids 
 // Most common first names accross lexids 
-t_fname2 := Record
+layout_fnamelexid := Record
     header.did;
     header.fname;
 End;
 
-c_fname2 := Table(header, t_fname2, did, fname );
+c_fname2 := Table(header, layout_fnamelexid, did, fname );
 dc_fname2 := Distribute(c_fname2, Hash(did, fname ));
 sdc_fname2 := Sort(dc_fname2, did, fname, Local );
 dsdc_fname2 := Dedup(sdc_fname2, did, fname, Local );
@@ -86,12 +85,12 @@ Export fnames_across_lexid := Sort(out_crosstab_fname, -fnamecnt_across_lexid );
 
 
 // Most common last names accross lexids
-t_lname2 := Record
+layout_lnamelexid := Record
     header.lname;
     header.did;
 End;
 
-c_lname2 := Table(header, t_lname2, did, lname );
+c_lname2 := Table(header, layout_lnamelexid, did, lname );
 dc_lname2 := Distribute(c_lname2, Hash(did, lname ));
 sdc_lname2 := Sort(dc_lname2, did, lname, Local );
 dsdc_lname2 := Dedup(sdc_lname2, did, lname, Local );
@@ -133,14 +132,14 @@ sdc_ssn2 := Sort(dc_ssn2, did, ssn, Local );
 Shared dsdc_ssn2 := Dedup(sdc_ssn2, did, ssn, Local );
 
 // Layouts for parent and child record 
-lexidperssn := Record
+layout_lexidperssn := Record
  Qstring ssn;
  Integer did;
 End;
 
-Shared parentRecordssn := Project(dsdc_ssn2, lexidperssn );
+Shared parent_recordssn := Project(dsdc_ssn2, layout_lexidperssn );
 
-t1_ssn := Table(parentRecordssn, {ssn, did}, ssn, did );
+t1_ssn := Table(parent_recordssn, {ssn, did}, ssn, did );
 
 t2_ssn := Table(t1_ssn, {ssn, lexidcnt_per_ssn := Count(Group)}, ssn );
 
@@ -155,7 +154,7 @@ Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt_per_ssn );
 // 
 
 // Get the multiples of addresses per lexids
-Rec_Address := Record
+layout_address := Record
     header.did;
     header.prim_range;
     header.prim_name;
@@ -164,7 +163,7 @@ Rec_Address := Record
     header.zip;
 End;
 
-addressRec := Table(header, Rec_Address, did, prim_range, prim_name, sec_range,
+addressRec := Table(header, layout_address, did, prim_range, prim_name, sec_range,
                                 st, zip );
 sdc_addressRec := Sort(addressRec, did, prim_range, prim_name, sec_range,
                                 st, zip , Local );                                        
@@ -173,7 +172,7 @@ Shared dsdc_addressRec := Dedup(sdc_addressRec, did, prim_range, prim_name, sec_
 
 
 
-Shared lexidperaddress := Record
+Shared layout_lexidperaddress := Record
   Integer did;
   String  prim_range;
   String  prim_name;
@@ -182,7 +181,7 @@ Shared lexidperaddress := Record
   String  zip;
 End;
 
-parentRecordAddress := Project(dsdc_addressRec, lexidperaddress );
+parentRecordAddress := Project(dsdc_addressRec, layout_lexidperaddress );
 
 filteredAddress := parentRecordAddress( Not prim_range = '' And Not prim_name = ''  And 
                                         Not st = '' And Not zip = '' );
@@ -199,12 +198,12 @@ Export lexids_per_address := Sort(t2_address, -lexidcnt_per_address );
 
 //  4. Date of Birth
 //  A. Most common DOB accross all records
-sequencedob := Record
+layout_dob := Record
     header.dob;
     dob_count := Count(Group);
 End;
 
-t_crosstab_Dob := Table(header, sequencedob, dob);
+t_crosstab_Dob := Table(header, layout_dob, dob);
 Export dob_across_file := Sort(t_crosstab_Dob, -dob_count );
 
 
@@ -219,21 +218,21 @@ LoseTrailingZeroes(Unsigned4 indob) := Function
   Return (Unsigned8)(YY + MM + DD );
 End;
 
-dobFile := Record
+layout_dob_file := Record
   Integer  did;
   Unsigned dob;
 End;
 
-dobFile SlimRec( header Le ) := Transform
+layout_dob_file SlimRec( header Le ) := Transform
   Self.did := Le.did;
   Self.dob := LoseTrailingZeroes(Le.dob);
 End;
 
 dob_file := Project(Header, SlimRec(Left));
 
-filteredDob := dob_file( Not dob = 0 And Not did = 0 );
+filtered_dob := dob_file( Not dob = 0 And Not did = 0 );
 
-input_dobs := Sort(filteredDob, did, dob );
+input_dobs := Sort(filtered_dob, did, dob );
 
 Export input_dob_perlexid := Dedup(input_dobs, did, dob);
 
@@ -241,26 +240,26 @@ Export input_dob_perlexid := Dedup(input_dobs, did, dob);
 
 // B. Full Dob with the highest counts of (different Lexids) ( no 00/Blank)
 // // Filter to only output full dobs without any blanks 
-lexidDob := Record
+layout_lexiddob := Record
   Unsigned validDob;
   Unsigned dob;
   Integer  did;
 End;
 
 // Validate full dobs 
-lexidDob FilterDates( input_dob_perlexid  Le ) := Transform
+layout_lexiddob FilterDates( input_dob_perlexid  Le ) := Transform
   Self.validDob :=(Unsigned)STD.Date.IsValidDate(Le.dob);
   Self.dob := Le.dob;
   Self.did := Le.did;
 End;
 
 // Validated full dobs with 0s and 1s
-Shared parentRecordsDob := Project(input_dob_perlexid, FilterDates(Left));
+Shared parent_records_dob := Project(input_dob_perlexid, FilterDates(Left));
 
 // Filtering valids dobs only (flagged with 1s)
-Shared filterFullDob := parentRecordsDob( validDob = 1 );
+Shared filter_fulldob := parent_records_dob( validDob = 1 );
 
-t1_dob := Table(filterFullDob, {dob, did}, dob, did);
+t1_dob := Table(filter_fulldob, {dob, did}, dob, did);
 
 t2_dob := Table(t1_dob, {dob, lexidcnt_per_dob := Count(Group)}, dob);
 
@@ -269,28 +268,28 @@ Export lexids_per_fulldob := Sort(t2_dob, -lexidcnt_per_dob);
 
 
 // C. Partial Dob (MMDD : month and day) with the highest count of (different lexids) (no 00 / blank)
+Export input_file := input_dob_perlexid( Not dob = 0 And Not did = 0);
+
 mmdd_dob_only := Record
   Integer    did;
+  Unsigned   dob_mmdd;
+  Unsigned   dob_yyyy;
   Unsigned   dob;
-  Unsigned   yy_dob;
-  Unsigned   mm_dob;
-  Unsigned   dd_dob;
 End;
 
 
-mmdd_dob_only FilterMMDD( input_dob_perlexid Le ) := Transform
+mmdd_dob_only FilterMMDD( input_file Le ) := Transform
   Self.did := Le.did;
+  Self.dob_yyyy := (Unsigned)Le.dob[1..4]; 
+  Self.dob_mmdd := (Unsigned)Le.dob[5..8]; 
   Self.dob := Le.dob;
-  Self.yy_dob := (Unsigned)STD.Date.Year(Le.dob);
-  Self.mm_dob := (Unsigned)STD.Date.Month(Le.dob); 
-  Self.dd_dob := (Unsigned)STD.Date.Day(Le.dob);
 End;
 
-result_mmdd_only := Project(input_dob_perlexid, FilterMMDD(Left));
+result_input := Project(input_file, FilterMMDD(Left));
 
-valid_result_mmdd := result_mmdd_only( mm_dob = 1 and dd_dob = 1 and yy_dob = 0 );
+result_mmdd_only := result_input( Not dob_mmdd = 0 and dob_mmdd = (Unsigned)dob_mmdd[5..8] );
 
-result_mmdd := Table(valid_result_mmdd, {did, dob}, did, dob);
+result_mmdd := Table(result_mmdd_only, {did, dob}, did, dob);
 
 t_result_mmdd := Table(result_mmdd, {dob, lexidcnt_per_dob := Count(Group)}, dob );
 
@@ -376,7 +375,7 @@ Export blank_dd_persource := Sort(out_crosstab_dob, -blank_dd_count );
 
 
 // E. Dob normal distribution score ( measure of normality accross all non-zero per lexid Dob)
-filteredFullDobLexid := filterFullDob( Not dob = 0 And Not did = 0);
+filteredFullDobLexid := filter_fulldob( Not dob = 0 And Not did = 0);
 
 normaldist := Record
     Integer   did;

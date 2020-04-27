@@ -1,25 +1,25 @@
-Import Anomalies_Header;
+
 
 t := Table(Anomalies_Header.Files.Header, Layouts.Layout_Header, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+                  city_name, st, zip, zip4, county, cbsa, src );
 
 dt := Distribute(t, hash(did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src));
+                  city_name, st, zip, zip4, county, cbsa, src ));
 
 sdt := Sort(dt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src, Local);
+                  city_name, st, zip, zip4, county, cbsa, src, Local );
 
 // Header infile 
 LeftFile := Dedup(sdt, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
-                  city_name, st, zip, zip4, county, cbsa, src);
+                  city_name, st, zip, zip4, county, cbsa, src );
 
 RightFile_input := Anomalies_Header.Files.Watchdog; 
 RightFile := Distribute(RightFile_input, hash(did));
@@ -31,8 +31,8 @@ Watchdog_Layout := Anomalies_Header.Layouts.MyRecright;
 
 Export Watchdog_Match_Report := Module
 
-LeftRec := Project(Leftfile, Header_Layout);
-RightRec := Project(RightFile, Watchdog_Layout);
+LeftRec := Project(Leftfile, Header_Layout );
+RightRec := Project(RightFile, Watchdog_Layout );
 
 
 MyOutRec := Record
@@ -89,7 +89,7 @@ MyOutRec MatchThem( LeftRec Le, RightRec Ri ) := Transform
     Self.source_name  := Le.src;
 End;
 
-J_Watchdog_Match := Join(LeftRec, RightRec, Left.did = Right.did, MatchThem(Left, Right), Local);
+J_Watchdog_Match := Join(LeftRec, RightRec, Left.did = Right.did, MatchThem(Left, Right), Local );
 
 
 //exports comparingson of header file agaisnt watchdog
@@ -97,7 +97,7 @@ D_Watchdog_Match := Dedup(J_Watchdog_Match, did, fname_match, lname_match, dob_m
                                                 ssn_match, address_match, address_match_all, 
                                                 source_name, All ); // take a look
 
-Export Watchdog_Match  := Sort(D_Watchdog_Match, did);
+Export Watchdog_Match  := Sort(D_Watchdog_Match, did );
 
 
 // rollup by lexid
@@ -112,8 +112,8 @@ FlaggedRec := Record
     Watchdog_Match.source_name;
 End;
 
-t_flagged_rec := Table(Watchdog_Match, FLaggedRec);
-st_flagged_rec := Sort(t_flagged_rec, did);
+t_flagged_rec := Table(Watchdog_Match, FLaggedRec );
+st_flagged_rec := Sort(t_flagged_rec, did );
 
 FlaggedRec FormFlagged( st_flagged_rec Le, st_flagged_rec Ri ) := Transform
     Self := Le;
