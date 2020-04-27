@@ -2,10 +2,27 @@
 
 
 EXPORT Files := MODULE
-  EXPORT IN_0010_Header							:= dataset(Constants.in_prefix_name + '0010_header', Layouts.In_0010_Header, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-	EXPORT IN_5600_Demographic_Data		:= dataset(Constants.in_prefix_name + '5600_demographic_data', Layouts.In_5600_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-	EXPORT IN_5610_Demographic_Data		:= dataset(Constants.in_prefix_name + '5610_demographic_data', Layouts.In_5610_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-
+  EXPORT IN_0010_Header_Boca						:= dataset(Constants.in_prefix_name + '0010_header', Layouts.In_0010_Header, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+	EXPORT IN_0010_Header_Ins							:= dataset(Constants.in_prefix_name + '0010_header_ins', Layouts.In_0010_Header, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  Export IN_0010_Header:= IN_0010_Header_Boca + IN_0010_Header_Ins;
+	
+	EXPORT IN_5600_Demographic_Data_Boca		:= dataset(Constants.in_prefix_name + '5600_demographic_data', Layouts.In_5600_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  EXPORT IN_5600_Demographic_Data_Ins		:= dataset(Constants.in_prefix_name + '5600_demographic_data_ins', Layouts.In_5600_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+  Export IN_5600_Demographic_Data:= IN_5600_Demographic_Data_Boca + IN_5600_Demographic_Data_Ins;
+	 
+	 
+	EXPORT IN_5610_Demographic_Data_Boca		:= dataset(Constants.in_prefix_name + '5610_demographic_data', Layouts.In_5610_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+	EXPORT IN_5610_Demographic_Data_Ins		:= dataset(Constants.in_prefix_name + '5610_demographic_data_ins', Layouts.In_5610_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  Export IN_5610_Demographic_Data:=IN_5610_Demographic_Data_Boca+IN_5610_Demographic_Data_Ins;	
+  
+	EXPORT IN_1000_Executive_Summary_Boca		:= dataset(Constants.in_prefix_name + 'execsummary', Layouts.Executive_In, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  EXPORT IN_1000_Executive_Summary_Ins		:= dataset(Constants.in_prefix_name + 'execsummaryins', Layouts.Executive_In, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  Export IN_1000_Executive_Summary:=	IN_1000_Executive_Summary_Boca	+ IN_1000_Executive_Summary_Ins;
+	
+  EXPORT IN_Trade_Pay_Tot_Boca		:= dataset(Constants.in_prefix_name + 'tradepmttot', Layouts.Trade_Pay_Tot_In, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+	EXPORT IN_Trade_Pay_Tot_Ins		:= dataset(Constants.in_prefix_name + 'tradepmttotins', Layouts.Trade_Pay_Tot_In, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+  EXPORT IN_Trade_Pay_Tot:=	IN_Trade_Pay_Tot_Boca+IN_Trade_Pay_Tot_Ins;
+	
 	EXPORT BASE_0010_Header						:= dataset(Constants.base_prefix_name + '0010_header', Layouts.File_0010_Header, thor); 
 	EXPORT BASE_0010_Header_linkids:=project(BASE_0010_Header,EBR.Layout_0010_Header_Base_AID); 
 	
@@ -15,9 +32,12 @@ EXPORT Files := MODULE
 	EXPORT BASE_5610_Demographic			:= dataset(Constants.base_prefix_name + '5610_demographic_data', Layouts.File_5610_Demographic, thor);
 	Export BASE_5610_Demographic_linkIds:=project(BASE_5610_Demographic,EBR.Layout_5610_demographic_data_Base);
 	
-	EXPORT BASE_1000_Executive_Summary				:= dataset([], Layouts.File_1000_Executive_Summary);
+	EXPORT BASE_1000_Executive_Summary				:= dataset(Constants.base_prefix_name + 'executive_summary_data', Layouts.File_1000_Executive_Summary, thor);
+				
 	EXPORT BASE_2000_Trade										:= dataset([], Layouts.File_2000_Trade);
-	EXPORT BASE_2015_Trade_Payment_Totals			:= dataset([], Layouts.File_2015_Trade_Payment_Totals);
+	
+  EXPORT BASE_2015_Trade_Payment_Totals			:= dataset(Constants.base_prefix_name + 'trade_payment_tot_data', Layouts.File_2015_Trade_Payment_Totals, thor);
+		
 	EXPORT BASE_2020_Trade_Payment_Trends			:= dataset([], Layouts.File_2020_Trade_Payment_Trends);
 	EXPORT BASE_2025_Trade_Quarterly_Averages	:= dataset([], Layouts.File_2025_Trade_Quarterly_Averages);
 	EXPORT BASE_4010_Bankruptcy								:= dataset([], Layouts.File_4010_Bankruptcy);

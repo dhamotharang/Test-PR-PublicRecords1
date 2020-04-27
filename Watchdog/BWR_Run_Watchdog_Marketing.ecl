@@ -23,9 +23,9 @@ string8 filedate := fd[1].fdate : stored('filedate');
 
 set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
-send_bad_email := fileservices.SendEmail('michael.gould@lexisnexisrisk.com,skasavajjala@seisint.com','Watchdog-marketing Build FAILED','');
-send_email := fileservices.SendEmail('michael.gould@lexisnexisrisk.com,skasavajjala@seisint.com','Watchdog-marketing Build FINISHED','');
-updatedops          := RoxieKeyBuild.updateversion('MarketingHeaderKeys',filedate,'michael.gould@lexisnexis.com,skasavajjala@seisint.com',,'N');
+send_bad_email := fileservices.SendEmail('Sudhir.Kasavajjala@lexisnexisrisk.com','Watchdog-marketing Build FAILED','');
+send_email := fileservices.SendEmail('Sudhir.Kasavajjala@lexisnexisrisk.com','Watchdog-marketing Build FINISHED','');
+updatedops          := RoxieKeyBuild.updateversion('MarketingHeaderKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N');
 
 
 sequential(wchk,set_inputs,watchdog.BWR_Best(isnewheader),watchdog.BWR_BestMarketingEnhanced,watchdog.BWR_Delta,watchdog.input_clear,watchdog.BWR_Watchdog_Roxie_Marketing,watchdog.BWR_Run_Watchdog_Marketing_stats,send_email,updatedops) : FAILURE(send_bad_email);

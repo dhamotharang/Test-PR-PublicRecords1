@@ -5,7 +5,7 @@ EXPORT proc_Copy_Xlink_To_AlphaProd(
   ,pcluster         = '\'hthor_prod_eclcc\''
   ,pEmailList       = 'BIPV2_Build.mod_email.emailList'     // -- for testing, make sure to put in your email address to receive the emails
   ,pCompileTest     = 'false'
-  ,pdoParallel      = 'false'
+  ,pdoParallel      = 'true'
   ,pLESP            = '\'alpha_prod_thor_esp.risk.regn.net\''
 ) :=
 functionmacro
@@ -15,7 +15,7 @@ functionmacro
   
   ecl_text :=   '#workunit(\'name\',\'BIPV2_Build.Copy_Xlink_to_Alpha_Prod @version@\');\n\n'
               + '#workunit(\'priority\',\'high\');\n'
-              + 'BIPV2_Build.Copy_Xlink_to_Alpha_Prod(\'@version@\');'
+              + 'BIPV2_Build.Copy_Xlink_to_Alpha_Prod(\'@version@\',false,true,false,\'(bizlinkfull|segmentation_linkids|seleprox|bipv2_best|contact_title_linkids)\');'
               ;
                      
   import Workman,tools,BIPV2,BIPV2_Build;

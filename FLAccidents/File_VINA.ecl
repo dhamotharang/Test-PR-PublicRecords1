@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 import VehLic;
 
 lVINAFileBaseName := '~thor_Data400::in::VehReg_VINA_Info_';

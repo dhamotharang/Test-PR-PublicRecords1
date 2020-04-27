@@ -56,6 +56,7 @@ EXPORT Layouts := MODULE
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
 			string11	geo_long;
+      		unsigned2   RIN_Source := 0;
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -171,6 +172,7 @@ EXPORT Layouts := MODULE
 			string20	external_referral_or_casenumber;
 			string3		cleared_fraud;
 			string		reason_cleared_code;
+      		unsigned2   RIN_Source := 0;
 		END;
 		EXPORT SafeList	:= RECORD
 			KnownFraud;
@@ -233,6 +235,7 @@ EXPORT Layouts := MODULE
 			string250	reason_description;
 			string30	event_type_1;
 			string30	event_entity_1;
+      		unsigned2   RIN_Source := 0;
 		END;
 
 		EXPORT RDP := record
@@ -255,6 +258,7 @@ EXPORT Layouts := MODULE
 			unsigned6 Lexid_Discovered;
 			string25 RemoteIPAddress;
 			string25 ConsumerIPAddress;
+      		string256 Email_Address;
 		END;
 	
 		EXPORT validate_record := record
@@ -766,6 +770,53 @@ Export CIID := RECORD
   string55 mdtitle;
   string100 organizationname;
  END;
+ 
+ EXPORT BestInfo := RECORD
+		unsigned8 Record_ID;
+		unsigned6 did;
+		unsigned6 fdn_file_info_id;
+		string10 	best_phone;
+		string9  	best_ssn;
+		string9  	max_ssn;
+		string5		best_title;
+		string20	best_fname;
+		string20	best_mname;
+		string20	best_lname;
+		string5		best_name_suffix;
+		string120 best_addr1;
+		string30	best_city;
+		string2		best_state;
+		string5		best_zip;
+		string4		best_zip4;
+		STRING6		best_addr_date;
+		string8  	best_dob;
+		string8  	best_dod;
+		STRING3 	verify_best_phone;
+		STRING3 	verify_best_ssn;
+		STRING3 	verify_best_address;
+		STRING3 	verify_best_name;
+		STRING3 	verify_best_dob;
+		STRING3 	score_any_ssn;
+		STRING3 	score_any_addr;
+		STRING3 	any_addr_date;
+		STRING3 	score_any_dob;
+		STRING3 	score_any_phn;
+		STRING3		score_any_fzzy;
+		STRING		errorcode;
+ END;
+
+ EXPORT CoverageDates := RECORD
+    unsigned6 customer_id;
+    string2		customer_state;
+    string1   customer_program;
+    string100 contribution_code;
+    string100	source := '';
+    string100	source_group := '';
+    unsigned4	max_reported_date := 0;
+    unsigned4	max_process_date := 0;
+    unsigned4	record_count := 1;				
+  END;
+ 
  
  //KEL Layouts
  shared flagsrec := RECORD

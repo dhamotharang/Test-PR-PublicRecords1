@@ -68,7 +68,7 @@ export proc_build_all(
   ,pSkipXlink             = 'false'
   ,pSkipCopyXlinkKeys     = 'false'
   ,pSkipXlinkValidation   = 'false'
-  ,pSkipXlinkSample       = 'false'
+  ,pSkipXlinkSample       = 'true'
   ,pSkipWeeklyKeys        = 'false'
   ,pSkipBest              = 'false'
   ,pSkipIndustry          = 'false'
@@ -121,7 +121,7 @@ functionmacro
     bestCondition   := pSkipBest      = false or pSkipIndustry      = false or pSkipMisckeys        = false                                                         ;
     statsCondition  := pSkipMisckeys  = false or pSkipSegStats      = false or pSkipStrata          = false or pSkipDataCard    = false or pSkipOverlinking = false ;
     
-    XlinkStuffWuid  := if(xlinkCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true                 ,true           ,true              ,'XlinkStuff'                      ,,pCompileTest),'');
+    XlinkStuffWuid  := if(xlinkCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,true            ,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true                 ,true           ,true              ,'XlinkStuff'                      ,,pCompileTest),'');
     BestWuid        := if(bestCondition                 ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,true          ,pSkipQASamples ,true           ,true         ,true             ,true                 ,true                 ,pSkipCrosswalk ,pSkipHighRiskKeys ,'BestAndMiscKeys'                 ,,pCompileTest),'');
     StatsWuid       := if(statsCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,pSkipMisckeys ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipDataCard    ,pSkipOverlinking     ,true                 ,true           ,true              ,'Stats'                           ,,pCompileTest),'');
     RelativesWuid   := if(pSkipSeleidRelative = false   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,pSkipSeleidRelative  ,true           ,true              ,'SeleidRelative'                  ,,pCompileTest),'');
@@ -184,7 +184,7 @@ functionmacro
       ,if(pSkipEntityReport  = false ,BIPV2_Build.proc_EntityReport           (pversion                                                                                                     )) // do entity report
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
       ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
-      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',true                                                                   )) // Copy the rest of the BIPV2FullKeys package to dataland
+      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',false,true                                                              )) // Copy the rest of the BIPV2FullKeys package to dataland, turn off alpha copy
       ,if(pPromote2QA        = true  ,BIPV2_Build.proc_Promote2QA             (pversion)                                                                                                     )
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2FullKeys_Package       (keyversion).outputpackage                                                                                     ) //double check that keys match layout
       ,UpdateBIPV2FullKeysDops  

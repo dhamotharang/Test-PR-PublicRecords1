@@ -22,6 +22,10 @@ EXPORT Functions := MODULE
 
   //****************************************************************************
   //fn_numeric_optional: 	returns true if only populated with numbers or empty
+	//                      If the string contains all numbers the size provided must 
+	//                      equal the length of the string.  Use ALLOW in spc file 
+	//                      if your optional numeric string has varying lengths.
+	//                      EXAMPLE: FIELDTYPE:Numeric_Optional:ALLOW(0123456789)
   //****************************************************************************
   EXPORT fn_numeric_optional(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(LENGTH(TRIM(nmbr, ALL)) IN [0,size] AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
@@ -424,8 +428,19 @@ EXPORT Functions := MODULE
     RETURN IF((company_populated OR person_populated) AND NOT (company_populated AND person_populated),1,0);
   END;
 
+  //****************************************************************************
+  //fn_validate_NAICSCode: 	returns true if NAICS code is found in lookup table or is zero/null
+  //****************************************************************************
+EXPORT integer fn_validate_NAICSCode(string code) := function
+  return ut.fn_NAICS_functions.fn_validate_NAICSCode(code);
+END;
 
-
+  //****************************************************************************
+  //fn_validate_SICCode: 	returns true if SIC code is found in lookup table or is zero/null
+  //****************************************************************************
+EXPORT integer fn_valid_SicCode(string code) := function
+	return ut.fn_SIC_functions.fn_validate_SicCode(code);
+END;
 
 //*********************************************************//
 //***************END BUSINESS SECTION**********************//

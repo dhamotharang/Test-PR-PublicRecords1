@@ -34,7 +34,8 @@ doDOPS 	:= is_running_in_prod AND NOT skipDOPS;
 			move_qa_key_charge,
 			PerformUpdateOrNot,
 			key_validation,
-			updateorbit); 
+		  updateorbit
+		); 
 	End;
 	
 	

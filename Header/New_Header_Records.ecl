@@ -93,6 +93,8 @@ osl_in := okc_student_list.OKC_Student_List_as_header(,true)(use_osl);
 
 voters_in := votersv2.voters_as_header(,true)(use_voters);
 
+Census_in := VotersV2.MA_Census_As_Header(true);
+
 certegy_in := Certegy.As_header(,true)(use_certegy);
 
 nod_in := property.NOD_as_Header(,true)(use_nod);
@@ -136,6 +138,7 @@ concat0 := if(~pFastHeader,
 		 + asl_in 
          + osl_in
 		 + voters_in
+         + Census_in
 		 + certegy_in
 		 + nod_in
 		 + Experian_in

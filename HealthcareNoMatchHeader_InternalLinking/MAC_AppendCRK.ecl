@@ -27,6 +27,7 @@ EXPORT  MAC_AppendCRK(
   pMaxNumIter     :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.maxNumIters;
   pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
   pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
+  pWuIterations   :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUIterations;
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
   pEmailTo        :=  pWorkmanEmailTo;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
@@ -73,7 +74,7 @@ EXPORT  MAC_AppendCRK(
                         , //  pStartIteration       = '1'
                         , //  pNumMaxIterations     = '1'
                         , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIngest_Text) //  pOutputFilename
+                        ,pWuPrefix + pWuIterations + trim(runIngest_Text) //  pOutputFilename
                         ,pWuSuperfile       //  pOutputSuperfile
                         ,pIngestSetResults  //  pSetResults
                         , //  pStopCondition        = '\'\''
@@ -118,7 +119,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           ,pMaxNumIter                    //  pNumMaxIterations
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
+                          ,pWuPrefix + pWuIterations + trim(runIteration_Text) //  pOutputFilename  :=  
                           ,pWuSuperfile                   //  pOutputSuperfile
                           ,pIterationSetResults           //  pSetResults
                           ,pIterationStopCondition        //  pStopCondition
@@ -141,19 +142,21 @@ EXPORT  MAC_AppendCRK(
   //  One Append Customer Record Key Iteration
   pAppendCRKSetResults  :=  [ 'Source Stats[3].val1'
                               ,'SourceName Stats[4].val1'
-                              ,'TotalRecordCount Stats[5].val1'
-                              ,'TotalSingletons Stats[7].val1'
-                              ,'TotalSingletonsWithNoLexID Stats[8].val1'
-                              ,'TotalSingletonsWithLexID Stats[9].val1'
-                              ,'TotalRecordsWithNoLexIDInALexIDCluster Stats[10].val1'
-                              ,'TotalNonSingletonClusters Stats[12].val1'
-                              ,'ClustersWithNoLexID Stats[14].val1'
-                              ,'ClustersWithUniqueLexID Stats[15].val1'
-                              ,'ClustersWithMultipleNoMatchIDs Stats[16].val1'
-                              ,'ClustersWithMultipleLexIDs Stats[20].val1'
-                              ,'ClustersWithMultipleNames Stats[21].val1'
-                              ,'ClustersWithMultipleDOBs Stats[22].val1'
-                              ,'ClustersWithMultipleAddresses Stats[23].val1'
+                              ,'TotalRecordCount Stats[6].val1'
+                              ,'TotalLexIDsAppended Stats[7].val1'
+                              ,'TotalMinors Stats[8].val1'
+                              ,'TotalSingletons Stats[9].val1'
+                              ,'TotalSingletonsWithNoLexID Stats[10].val1'
+                              ,'TotalSingletonsWithLexID Stats[11].val1'
+                              ,'TotalRecordsWithNoLexIDInALexIDCluster Stats[12].val1'
+                              ,'TotalNonSingletonClusters Stats[14].val1'
+                              ,'ClustersWithNoLexID Stats[16].val1'
+                              ,'ClustersWithUniqueLexID Stats[17].val1'
+                              ,'ClustersWithMultipleNoMatchIDs Stats[18].val1'
+                              ,'ClustersWithMultipleLexIDs Stats[22].val1'
+                              ,'ClustersWithMultipleNames Stats[23].val1'
+                              ,'ClustersWithMultipleDOBs Stats[24].val1'
+                              ,'ClustersWithMultipleAddresses Stats[25].val1'
                             ];
   runAppendCRK_Text  := 'AppendCustomerRecordKey';
   runAppendCRK_ECL   := workmanPreamble(runAppendCRK_Text)+
@@ -171,7 +174,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           , //  pNumMaxIterations     = '1'
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runAppendCRK_Text) //  pOutputFilename
+                          ,pWuPrefix + pWuIterations + trim(runAppendCRK_Text) //  pOutputFilename
                           ,pWuSuperfile   //  pOutputSuperfile
                           ,pAppendCRKSetResults //  pSetResults
                           , //  pStopCondition        = '\'\''

@@ -180,7 +180,7 @@ ld := dataset ( [
      
 reltv_n_othr:=base_relative + additional_keys;
 ikb_ver:=header._info.get_version_link_qa_inc:INDEPENDENT;
-EXPORT MoveToQA :=sequential(nothor(sequential(
+EXPORT MoveToQA :=nothor(sequential(
      output(ikb_ver,named('current_ikb_version')) // get the ikb version ahead of the update, so that we can ensure it is re-instated after the move of the full lab keys
     ,apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )))
     ,apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) )
@@ -191,8 +191,7 @@ EXPORT MoveToQA :=sequential(nothor(sequential(
     ,apply(ld,           update_supers(  ver(nm,'qa'    ,'thor400_44'  ), ver(nm,filedate,'thor_data400')))
     ,apply(ld,           update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor_data400')))
     ,Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver) // Restore the incremental keys into the qa superfiles
-)),_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
-);
+    ));
 
 END;
 

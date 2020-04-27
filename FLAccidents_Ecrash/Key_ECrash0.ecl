@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie, FLAccidents, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -138,7 +138,7 @@ pInq := project(inqFile,slimrecinq(left));
 
 // ecrash 
 
-ecrashFile := FLAccidents_Ecrash.BaseFile;
+ecrashFile := eCrashBaseAgencyExclusion;
 
 pflc0 slimrececrash(ecrashFile L) := transform
 

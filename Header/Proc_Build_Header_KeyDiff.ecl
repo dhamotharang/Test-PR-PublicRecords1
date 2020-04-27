@@ -26,7 +26,7 @@ EXPORT Proc_Build_Header_KeyDiff(string pVersion, string cVersion) := FUNCTION
     ,{'dx_header.key_name_alt()','~thor_data400::key::header.lname.fname_alt_qa',pX_Header + cVersion + '::lname.fname_alt',pX_Header + pVersion + '::lname.fname_alt'}
     ,{'dx_header.key_name()','~thor_data400::key::header.lname.fname_qa',pX_Header + cVersion + '::lname.fname',pX_Header + pVersion + '::lname.fname'}
     ,{'dx_header.key_minors_hash()','~thor_data400::key::header.minors_hash_qa',pX_Header + cVersion + '::minors_hash',pX_Header + pVersion + '::minors_hash'}
-    ,{'dx_header.key_ParentLnames()','~thor_data400::key::header.parentlnames_qa',pX_Header + cVersion + '::parentlnames',pX_Header + pVersion + '::parentlnames'}
+    // ,{'dx_header.key_ParentLnames()','~thor_data400::key::header.parentlnames_qa',pX_Header + cVersion + '::parentlnames',pX_Header + pVersion + '::parentlnames'}
     ,{'dx_header.key_phone()','~thor_data400::key::header.phone_qa',pX_Header + cVersion + '::phone',pX_Header + pVersion + '::phone'}
     ,{'dx_header.key_piz()','~thor_data400::key::header.piz_lname_fname_qa',pX_Header + cVersion + '::piz_lname_fname',pX_Header + pVersion + '::piz_lname_fname'}
     ,{'dx_header.key_address()','~thor_data400::key::header.pname.prange.st.city.sec_range.lname_qa',pX_Header + cVersion + '::pname.prange.st.city.sec_range.lname',pX_Header + pVersion + '::pname.prange.st.city.sec_range.lname'}
@@ -63,7 +63,7 @@ EXPORT Proc_Build_Header_KeyDiff(string pVersion, string cVersion) := FUNCTION
     ,{'dx_Header.Key_SSN_Address()','~thor_data400::key::header_ssn_address_qa',pX_Header + cVersion + '::ssn_address',pX_Header + pVersion + '::ssn_address'}
     ,{'dx_header.key_hhid_did()','~thor_data400::key::hhid_did_qa','~thor_data400::key::header::hhid::' + cVersion + '::hhid.ver','~thor_data400::key::header::hhid::' + pVersion + '::hhid.ver'}
     ,{'dx_header.key_did_rid()','~thor_data400::key::lab.did_rid_qa','~thor_data400::key::lab::' + cVersion + '::did_rid','~thor_data400::key::lab::' + pVersion + '::did_rid'}
-    ,{'lssi.Key_Prep_Determiner','~thor_data400::key::lssi.determiner_qa','~thor_data400::key::lssi::' + cVersion + '::determiner','~thor_data400::key::lssi::' + pVersion + '::determiner'}
+    // ,{'lssi.Key_Prep_Determiner','~thor_data400::key::lssi.determiner_qa','~thor_data400::key::lssi::' + cVersion + '::determiner','~thor_data400::key::lssi::' + pVersion + '::determiner'}
     ,{'dx_header.key_max_dt_last_seen()','~thor_data400::key::max_dt_last_seen_qa',pX_Header + cVersion + '::max_dt_last_seen',pX_Header + pVersion + '::max_dt_last_seen'}
     ,{'dx_header.key_nbr_address()','~thor_data400::key::nbr_address_qa',pX_Header + cVersion + '::nbr_address',pX_Header + pVersion + '::nbr_address'}
     ,{'dx_header.key_did_rid2()','~thor_data400::key::rid_did2_qa',pX_Header + cVersion + '::rid_did2',pX_Header + pVersion + '::rid_did2'}

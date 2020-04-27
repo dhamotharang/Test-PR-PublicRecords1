@@ -55,7 +55,7 @@ export Proc_Build_All(
 				orbit_update,
 				orbiti_update,
 				new_records_sample_for_qa,
-				CopyKey2Alpha('thor_data400::key::vina::vin_qa'), 
+				//CopyKey2Alpha('thor_data400::key::vina::vin_qa'), 
 				FileServices.clearsuperfile(processedSuperFile),
 				FileServices.addsuperfile(processedSuperFile,'~thor_data400::in::vintelligence::vin',,true),
 				FileServices.clearsuperfile('~thor_data400::in::vintelligence::vin'),

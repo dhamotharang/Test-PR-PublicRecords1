@@ -1,10 +1,10 @@
 IMPORT header;
 
 bver := header.version_build;
-#workunit('name','PersonHeader - verifysuperfiles');
+#workunit('name',bver + 'PersonHeader - verifysuperfiles');
 
 PHKeys   := header.verify_keys('PersonHeaderKeys');
-F_PHKeys := header.verify_keys('PersonHeaderKeys',true);
+// F_PHKeys := header.verify_keys('PersonHeaderKeys',true);
 RelKeys  := header.verify_keys('RelativeV3Keys');
 PSlimKeys:= header.verify_keys('PersonSlimsortKeys');
 PLabKeys := header.verify_keys('PersonLabKeys');
@@ -14,7 +14,7 @@ PAncKeys := header.verify_keys('PersonAncillaryKeys');
 BoolKeys := header.verify_keys('PowerSearchKeys',,true);
 
 output(PHKeys   ,named('PersonHeaderKeys')     ,all);
-output(F_PHKeys ,named('FCRA_PersonHeaderKeys'),all);
+// output(F_PHKeys ,named('FCRA_PersonHeaderKeys'),all);
 output(RelKeys  ,named('RelativeKeys_v3')      ,all);
 output(PSlimKeys,named('PersonSlimsortKeys')   ,all);
 output(PLabKeys ,named('PersonLabKeys')        ,all);
@@ -25,8 +25,8 @@ output(BoolKeys ,named('PowerSearchKeys')      ,all);
 
 PHWrongKeys := PHKeys(~regexfind(bver, lfn));
 if(count(PHWrongKeys) > 0, output(PHWrongKeys, named('PHWrongKeys'), all), output('ALL QA PersonHeaderKeys contains ' + bver + ' keys'));
-F_PHWrongKeys := F_PHKeys(~regexfind(bver, lfn));
-if(count(F_PHWrongKeys) > 0, output(F_PHWrongKeys, named('F_PHWrongKeys'), all), output('ALL QA FCRA_PersonHeaderKeys contains ' + bver + ' keys'));
+// F_PHWrongKeys := F_PHKeys(~regexfind(bver, lfn));
+// if(count(F_PHWrongKeys) > 0, output(F_PHWrongKeys, named('F_PHWrongKeys'), all), output('ALL QA FCRA_PersonHeaderKeys contains ' + bver + ' keys'));
 RelWrongKeys := RelKeys(~regexfind(bver, lfn));
 if(count(RelWrongKeys) > 0, output(RelWrongKeys, named('RelWrongKeys'), all), output('ALL QA RelativeKeys_v3 contains ' + bver + ' keys'));
 SlimWrongKeys := PSlimKeys(~regexfind(bver, lfn));
