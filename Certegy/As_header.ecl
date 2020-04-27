@@ -6,14 +6,14 @@ export	As_header(dataset(layouts.base) pCertegy = dataset([],layouts.base), bool
 	dCertegyAsSource	:=	As_source(pCertegy,pForHeaderBuild);
 
 	Header.Layout_New_Records Translate_certegy_to_Header(dCertegyAsSource l) := transform
-	
+
 	    string8 v_dob      := l.clean_dob;
-		
+
 		string4 v_dob_yyyy := v_dob[1..4];
 		string2 v_dob_mm   := if(v_dob[5..6]='00','01',v_dob[5..6]);
 		string2 v_dob_dd   := if(v_dob[7..8]='00','01',v_dob[7..8]);
-		
-		//don't even populate vendor dates because they can eventually get used in watchdog.bestaddress
+
+		//don't even populate vendor dates because they can eventually get used in watchdog bestaddress
 		self.did                      := 0;
 		self.rid                      := 0;
 		self.dt_first_seen            := (unsigned3)l.date_first_seen[1..6];
