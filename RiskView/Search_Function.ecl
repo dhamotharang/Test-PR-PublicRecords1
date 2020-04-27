@@ -223,16 +223,23 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
 
 CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
-NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;								
+NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;															
+
+
+//good chance these come through with varied case, so we will build out the set and capitalize them all
+//start change to upper case
+
+custom_models := DATASET([Custom_model_name,Custom2_model_name,Custom3_model_name,Custom4_model_name,Custom5_model_name],{string model});
+ucase_custom_models := PROJECT(custom_models, TRANSFORM(recordof(custom_models),SELF.model := STD.Str.ToUpperCase(LEFT.model)));
+Custom_model_name_array := SET(ucase_custom_models, model);
+
+
+ 
+// end change to upper case
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
-bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
-                Custom_model_name in  ['RVP1702_1'] or 
-                Custom2_model_name in ['RVP1702_1'] or 
-                Custom3_model_name in ['RVP1702_1'] or
-                Custom4_model_name in ['RVP1702_1'] or 
-                Custom5_model_name in ['RVP1702_1'] or
-                CheckingIndicatorsRequest,52,50);  // hard code this for now
+ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 'RVP1702_1' in Custom_model_name_array or  CheckingIndicatorsRequest,52,50); 
+
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
