@@ -43,8 +43,27 @@
 									// ,left.superfile = right.superfile
 									// ,xGetNewKeyVersions(left,right)
 									// ,left outer),record);
+									
+//////////// IF PACKAGE IS DEPLOYED BY OPS USE THE EXAMPLE BELOW /////////////////////
+// 1. create the XML file from above dataset
+// 2. despray the XML file to a package server that ops can access, by default it desprays to PR DOPS Package server location
+// 3. if using default package server then after despray, provide the following url to OPS to use it for deploy
+// 4. URL for OPS, if using default package server: http://uspr-dopsroxiepkg.risk.regn.net/~rpt_srv_acct/pkgfiles/<yourpackagename.txt>
+// destip := 'databuilddev01.risk.regn.net';
+// destlocation := '/home/rpt_srv_acct/public_html/pkgfiles/<yourpackagename.txt>'
+// dPackageDatasetasXML := dops.GetRoxiePackage('','','').fDatasetAsXMLPackage(dUpdateKeys);
 
+// sequential
+// (
+	// output(dPackageDatasetasXML,,'~<yourfilename>',xml('',heading('<RoxiePackages>\n','</RoxiePackages>\n'),OPT),overwrite)
+	// ,STD.File.Despray('~<yourfilename>',destip,destlocation,,,,TRUE)
+// );
+
+/////////////// END OPS DEPLOYE //////////////////////
+
+//////////// IF PACKAGE IS DEPLOYED FROM ECL USE THE EXAMPLE BELOW ////////////////////
 // pkgxmlstring := dops.GetRoxiePackage('','','').fGetXMLPackageAsString(dUpdateKeys);
+
 
 // dops.PackageFile(l_esp,l_port).AddPackage('test.pkg'
 											// ,l_roxietarget
@@ -76,4 +95,5 @@
 
 // dops.PackageFile has more functionalities related to package file deploy
 // dops.GetRoxiePackage has more functionalities related to reading content from a package file on roxie
+///////
 	
