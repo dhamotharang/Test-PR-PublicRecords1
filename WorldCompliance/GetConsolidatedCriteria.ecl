@@ -2,8 +2,9 @@
 
 		dSources := DICTIONARY($.GetSanctionsCriteria, {sourceabbrev => sourceid});
 		//usefileA := Distribute(($.Files.dsEntities),Ent_ID);
-		usefile := DEDUP(SORT($.Files.dsEntities, ent_id, EntryCategory, EntrySubcategory, local),
-								Ent_ID, EntryCategory, EntrySubcategory, local);
+		usefile := DEDUP(SORT($.Files.dsMasters_base, ent_id, EntryCategory, EntrySubcategory, local),
+								Ent_ID, EntryCategory, EntrySubcategory,All);
+								
 		srcs := DISTRIBUTE(
 							JOIN(usefile, $.dsConsolidatedSanctions, left.ent_id=right.masterid,
 												TRANSFORM($.rCriteriaRollup,
