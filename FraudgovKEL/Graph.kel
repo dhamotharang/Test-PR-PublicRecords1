@@ -1550,11 +1550,10 @@ Event: => T_InpClnAddrCityEcho := MAP(PostalCity = '' OR PostalCity:Null => -999
 Event: => T_InpClnAddrStEcho := MAP(State = '' OR State:Null => -99999, State);
 Event: => T_InpClnAddrZip5Echo := MAP(Zip = '' OR Zip:Null => -99999, Zip);
 Event: => T_InpClnAddrZip4Echo := MAP(Zip4 = '' OR Zip4:Null => -99999, Zip4);
-Event: => T_InpClnAddrLatEcho := MAP(Latitude:Null => -99999, Latitude);
-Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null => -99999, Longitude);
+Event: => T_InpClnAddrLatEcho := MAP(Latitude:Null OR Latitude=0 => -99999, Latitude);
+Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null OR Longitude=0 => -99999, Longitude);
 Event: => T_InpClnAddrCountyEcho := MAP(County = '' OR County:Null => -99999, County);
 Event: => T_InpClnAddrGeoBlkEcho := MAP(GeoBlock = '' OR GeoBlock:Null => -99999, GeoBlock);
-// Event: => T_InpClnAddrCountryEcho := MAP(Country = '' => -99999, Country); // is country listed?
 
 Event: => T_InpClnSsnEcho := MAP(Ssn = '' OR Ssn:Null => -99999, Ssn);
 Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999, INTEGER(DateOfBirth));
@@ -1564,7 +1563,7 @@ Event: => T_InpClnEmailEcho := MAP(EmailAddress = '' OR EmailAddress:Null => -99
 Event: => T_InpClnBnkAcctEcho := MAP(AccountNumber = '' OR AccountNumber:Null => -99999, AccountNumber);
 Event: => T_InpClnBnkAcctRtgEcho := MAP(RoutingNumber = '' OR RoutingNumber:Null => -99999, RoutingNumber);
 Event: => T_InpClnIpAddrEcho := MAP(IpAddress = '' OR IpAddress:Null => -99999, IpAddress);
-Event: => T_InpClnPhnEcho := MAP(PhoneNumber = '' OR PhoneNumber:Null => -99999, PhoneNumber);
+Event: => T_InpClnPhnEcho := MAP(PhoneNumber = '' OR PhoneNumber:Null OR PhoneNumber='0000000000' => -99999, PhoneNumber);
 
 Event: => T1_LexIdPopFlag := MAP(T_PersonUidEcho = -99999 => -99999,
 																 NoLexId = 1 => 0, 1);
@@ -1581,7 +1580,7 @@ Event: => T18_IpAddrCity := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																edgecity);
 Event: => T18_IpAddrCountry := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																edgecountry = '' OR edgecountry:Null => -99997,
+																edgecountry = '' OR edgecountry:Null OR edgecountry='0' => -99997,
 																edgecountry);
 Event: => T18_IpAddrRegion := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -1618,7 +1617,7 @@ Event: => T18_IpAddrAsnCompNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 															asnname);
 Event: => T18_IpAddrAsn := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																asn:Null => -99997,
+																asn:Null OR asn=0 => -99997,
 															  asn);
 Event: => T18_IpAddrCompNm := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IsIpMetaHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -1658,7 +1657,7 @@ Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho IN ['-99999','-99998'] OR T_InpClnBnkAcctRtgEcho IN ['-99999','-99998'] => 0,
 																    1);
 Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, 
-																		 BankHit); 
+																		 BankHit = 1 => 1, 0); 
 Event: => T19_BnkAcctBnkNm := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																	T19_IsBnkAppHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																	FullBankname); 
@@ -1667,7 +1666,7 @@ Event: => T19_BnkAcctHrPrePdRtgFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
 																					 T_InpClnBnkAcctRtgEcho IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'] => 1,
 																					 0);
 																					 
-Event: => T17_EmailPopFlag := MAP(T_InpClnEmailEcho = '-99999' => 0, 
+Event: => T17_EmailPopFlag := MAP(WORD(EmailAddress,1,'@') = '' OR WORD(EmailAddress,2,'@') = '' => 0, 
 																	1);
 Event: => T17_EmailDomain := MAP(T17_EmailPopFlag = 0 => -99999,
 																 T_SrcClassType < 4 => -99998,
@@ -1694,79 +1693,129 @@ Event: => T18_IpAddrPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99
 
 Event: => T_InAgencyFlag := MAP(AgencyUid != T_SrcAgencyUid => 0, 1);
 
-Event: => T_KrCodeEcho := MAP(T_SrcClassType != 3 => -99998, 1);
-															// EventTypes.EventType IN ['100','101','190','191','192','193',
-																											 // '200','201','202','203','204','290','291','292','293',
-																											 // '300','301','302','303','390','391','392','393',
-																											 // '400','401','402','490','491','492','493',
-																											 // '500','501','502','590','591','592','593',
-																											 // '600','601','602','603','604','605',
-																											 // '1000','1001','1090','1091','1092','1093',
-																											 // '800','801','802','890','891','892','893',
-																											 // '10000','10001','10002','10003','10004','10005','10006','10007',
-																											 // '11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
-																											 // '12000','12001','12002','12003','12004','12006','12007',
-																											 // '13000','13001','13002','13003','13005','13006','13007',
-																											 // '14900','14901','14902','14903'] => EventTypes.EventType,
-															// -99997);
 
-// Event: => T_KrCodeDesc := MAP(T_SrcClassType != 3 => -99998, //FIXME - are the kr codes actually listed somewhere or do I need to put them in?
-															// T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-															// 'tbd');
+Event: => T_EvtType1KrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																			event_type_1 = '' OR event_type_1:Null => -99997,
+																			event_type_1);
+Event: => T_EvtType2KrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																			event_type_2 = '' OR event_type_2:Null => -99997,
+																			event_type_2);
+Event: => T_EvtType3KrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																			event_type_3 = '' OR event_type_3:Null => -99997,
+																			event_type_3);
+																			
+Event: => T_IdKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																name_risk_code = '' OR name_risk_code:Null => -99997,
+																name_risk_code);
+Event: => T_SsnKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																ssn_risk_code = '' OR ssn_risk_code:Null => -99997,
+																ssn_risk_code);																
+Event: => T_DlKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																drivers_license_risk_code = '' OR drivers_license_risk_code:Null => -99997,
+																drivers_license_risk_code);
+Event: => T_AddrKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																physical_address_risk_code = '' OR physical_address_risk_code:Null => -99997,
+																physical_address_risk_code);
+Event: => T_PhnKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																phone_risk_code = '' OR phone_risk_code:Null => -99997,
+																phone_risk_code);
+Event: => T_EmailKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																email_address_risk_code = '' OR email_address_risk_code:Null => -99997,
+																email_address_risk_code);
+Event: => T_IpAddrKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																ip_address_fraud_code = '' OR ip_address_fraud_code:Null => -99997,
+																ip_address_fraud_code);
+Event: => T_BnkAcctKrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
+																bank_account_1_risk_code = '' OR bank_account_1_risk_code:Null => -99997,
+																bank_account_1_risk_code);
+
+
+
 Event: => T15_SsnIsKrFlag := MAP(T15_SsnPopFlag = 0 => -99999,
 																 T_SrcClassType != 3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['100','101','190','191','192','193'])) > 0 => 1, 0);
+																 T_SsnKrCodeEcho = -99997 => 0,
+																 T_SsnKrCodeEcho IN ['100','101','190','191','192','193'] => 1, -99997);
 																 
 Event: => T20_DlIsKrFlag := MAP(T20_DlPopFlag = 0 => -99999,
-																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['200','201','202','203','204','290','291','292','293'])) > 0 => 1, 0);
+																T_SrcClassType != 3 => -99998,
+																T_DlKrCodeEcho = -99997 => 0,
+																T_DlKrCodeEcho IN ['200','201','202','203','204','290','291','292','293'] => 1, -99997);
 
 Event: => T9_AddrIsKrFlag := MAP(T9_AddrPopFlag = 0 => -99999,
 																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['300','301','302','303','390','391','392','393']))>0 => 1, 0);
+																 T_AddrKrCodeEcho = -99997 => 0,
+																 T_AddrKrCodeEcho IN ['300','301','302','303','390','391','392','393'] => 1, -99997);
 																
 Event: => T16_PhnIsKrFlag := MAP(T16_PhnPopFlag = 0 => -99999,
 																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['400','401','402','490','491','492','493']))>0 => 1, 0);
+																 T_PhnKrCodeEcho = -99997 => 0,
+																 T_PhnKrCodeEcho IN ['400','401','402','490','491','492','493'] => 1, -99997);
+																 
 Event: => T17_EmailIsKrFlag := MAP(T17_EmailPopFlag = 0 => -99999,
-																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['500','501','502','590','591','592','593']))>0 => 1, 0);
+																 T_SrcClassType != 3 => -99998,
+																 T_EmailKrCodeEcho = -99997 => 0,
+																 T_EmailKrCodeEcho IN ['500','501','502','590','591','592','593'] => 1, -99997);
+																 
 Event: => T18_IpAddrIsKrFlag := MAP(T18_IpAddrPopFlag = 0 => -99999,
-																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['600','601','602','603','604','605','1000','1001','1090','1091','1092','1093']))>0 => 1, 0);
+																 T_SrcClassType != 3 => -99998,
+																 T_IpAddrKrCodeEcho = -99997 => 0,
+																 T_IpAddrKrCodeEcho IN ['600','601','602','603','604','605','1000','1001','1090','1091','1092','1093'] => 1, -99997);
+
 Event: => T19_BnkAcctIsKrFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
 																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['800','801','802','890','891','892','893']))>0 => 1, 0);
+																 T_BnkAcctKrCodeEcho = -99997 => 0,
+																 T_BnkAcctKrCodeEcho IN ['800','801','802','890','891','892','893'] => 1, -99997);
+
 Event: => T1_IdIsKrGenFrdFlag := MAP(T1_LexIdPopFlag = 0 AND T1_RinIdPopFlag = 0 => -99999,
-																 T_SrcClassType !=3 => -99998,
-																 T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																 COUNT(EventTypes(EventType IN ['10000','10001','10002','10003','10004','10005','10006','10007',
+																 T_SrcClassType != 3 => -99998,
+																 T_EvtType1KrCodeEcho = -99997 AND T_EvtType2KrCodeEcho = -99997 AND T_EvtType3KrCodeEcho = -99997 => 0,
+																 T_EvtType1KrCodeEcho IN ['10000','10001','10002','10003','10004','10005','10006','10007',
 																									'11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
 																									'12000','12001','12002','12003','12004','12006','12007',
-																									'13000','13001','13002','13003','13005','13006','13007']))>0 => 1, 0);
+																									'13000','13001','13002','13003','13005','13006','13007']
+																 OR T_EvtType2KrCodeEcho IN ['10000','10001','10002','10003','10004','10005','10006','10007',
+																									'11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
+																									'12000','12001','12002','12003','12004','12006','12007',
+																									'13000','13001','13002','13003','13005','13006','13007']
+																 OR T_EvtType3KrCodeEcho IN ['10000','10001','10002','10003','10004','10005','10006','10007',
+																									'11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019',
+																									'12000','12001','12002','12003','12004','12006','12007',
+																									'13000','13001','13002','13003','13005','13006','13007']=> 1, -99997);
 Event: => T1_IdIsKrStolIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																     T_SrcClassType != 3 => -99998,
-																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																     COUNT(EventTypes(EventType IN ['10000','10001','10002','10004']))>0 => 1, 0);
+																     T1_IdIsKrGenFrdFlag = -99997 => 0,
+																     T_EvtType1KrCodeEcho IN ['10000','10001','10002','10004']
+																		 OR T_EvtType2KrCodeEcho IN ['10000','10001','10002','10004']
+																		 OR T_EvtType3KrCodeEcho IN ['10000','10001','10002','10004'] => 1, -99997);
 Event: => T1_IdIsKrAppFrdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																     T_SrcClassType != 3 => -99998,
-																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																     COUNT(EventTypes(EventType IN ['10002','10003','11003','11005','11017','11018','11019']))>0 => 1, 0);
+																     T1_IdIsKrGenFrdFlag = -99997 => 0,
+																     T_EvtType1KrCodeEcho IN ['10002','10003','11003','11005','11017','11018','11019']
+																		 OR T_EvtType2KrCodeEcho IN ['10002','10003','11003','11005','11017','11018','11019']
+																		 OR T_EvtType3KrCodeEcho IN ['10002','10003','11003','11005','11017','11018','11019'] => 1, -99997);
 Event: => T1_IdIsKrOthFrdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																     T_SrcClassType != 3 => -99998,
-																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
-																     COUNT(EventTypes(EventType IN ['14900','14901','14902','14903']))>0 => 1, 0);
+																     T1_IdIsKrGenFrdFlag = -99997 => 0,
+																     T_EvtType1KrCodeEcho IN ['14900','14901','14902','14903']
+																		 OR T_EvtType2KrCodeEcho IN ['14900','14901','14902','14903']
+																		 OR T_EvtType3KrCodeEcho IN ['14900','14901','14902','14903'] => 1, -99997);
 Event: => T1_IdIsKrFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																     T_SrcClassType != 3 => -99998,
-																     T_KrCodeEcho IN ['-99999','-99998','-99997'] => -99997,
+																     T1_IdIsKrGenFrdFlag = -99997 => 0,
 																     T1_IdIsKrGenFrdFlag=1 OR T1_IdIsKrStolIdFlag=1 OR T1_IdIsKrAppFrdFlag=1 OR T1_IdIsKrOthFrdFlag=1 => 1, 0);
+
+Event: => T_FirstNmPopFlag := MAP(T_InpClnFirstNmEcho IN ['-99999','-99998','-99997'] => 0, 1);
+Event: => T_LastNmPopFlag := MAP(T_InpClnLastNmEcho IN ['-99999','-99998','-99997'] => 0, 1);
+Event: => T_DOBPopFlag := MAP(T_InpClnDobEcho < -99997 => 0, 1);
+
+// Event: => NewestIdEventDate := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PersonEvent.Transaction(T_SrcClassType IN [2,3]){EventDate}),
+																	 // MAX(PersonEvent.Transaction(T_SrcClassType = 4){EventDate}));
+
+// Event: => P1_AoTIDCurrProfFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																			// ALL(PersonEvent.Transaction,T_SrcClassType<2) => -99998,
+																			// T_SrcClassType < 2 => -99997,
+																			// T_ActDtEcho = NewestIdEventDate => 1, 0);
+
 
 
 
