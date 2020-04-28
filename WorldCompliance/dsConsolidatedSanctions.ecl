@@ -1,8 +1,11 @@
 ﻿EXPORT dsConsolidatedSanctions := FUNCTION
-		ent := $.Files.dsEntities;
+//		ent := $.Files.dsEntities;
+				//usefileA := Distribute(($.Files.dsEntities),Ent_ID);
+				ent := DEDUP(SORT($.Files.dsEntities, ent_id, EntryCategory, EntrySubcategory, local),
+								Ent_ID, EntryCategory, EntrySubcategory, local);
 
 		dsConsolidatedRec := ent(EntryCategory='Sanction List' and NameSource='Sanctions' and MasterID=0);
-		dsOtherRec 				:= $.Files.dsEntities - dsConsolidatedRec;	
+		dsOtherRec 				:= ent - dsConsolidatedRec;	
 		dsLinkedToConsolidatedRec := dsOtherRec(MasterID in SET(dsConsolidatedRec, Ent_ID));
 		dsConsolidated := PROJECT(dsLinkedToConsolidatedRec, TRANSFORM($.rConsolidatedAsscoiations,
    																						self.MasterId := left.MasterId;
