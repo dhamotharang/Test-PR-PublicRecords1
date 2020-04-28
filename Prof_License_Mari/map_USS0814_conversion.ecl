@@ -40,7 +40,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 	// Remove Company name from address
 	RemovePattern	      := '(^.* LLC$|^.* LLC\\.$|^.*LLC.*$|^.* INC$|^.*INC|^.* ,INC|^.* INC\\.$|^.* LLP|^.* COMPANY|^.* CORP$|^.*CORP.*$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
-					 '^.* APPRAISAL SV[C|S]$|^.* APPRAISAL SERVICE|^.*APPRAISALS|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
+					 '^.* APPRAISAL SV[C|S]$|^.* APPRAISAL SERVICE|^.*APPRAISALS|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN: .*$|^ATTN.*$|^ATT: .*$| C/O .*$|^.* ATTN; EY.*$|' +
 					 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 					 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|^.* ASSOC$|^.* CONSULTING$|' +
 					 'RV PARK|SEE DCRA MANAGER FOR ANY REQUEST 7506|RECEIVED NONSUFFICIENT FUN|^.* OFFICE$|^N/I|^N/A|^N/L|' +
@@ -54,6 +54,8 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 					 'VICTORIA XING|' +
 					 '^INACTIVE - NONRENEW .*$|HOME STREET BANK|DR A H MCCOY|^ASSESSMENT DEPT' +
 					 ')';
+					 
+									 
 	CoPattern	   := '(^.* LLC$|^.* LLC\\.$|^.* LLP|^.* LLP$|^.* INC$|^.* INC\\.$|^.*INC|^.*NET$|^%.*$|^.* COMPANY|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 									'^.* APPR\\.$|^.*APPRAISALS$|^.* APPRAISAL SERVICE|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.*APRPAISAL NETWORK|^.*APPRAISALS|^.* FINANCIAL$|' +
 									'^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.*REALTY SEVICES|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O .*$|^ATTN.*$|^ATTN:.*$' +
