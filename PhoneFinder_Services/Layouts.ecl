@@ -770,7 +770,7 @@
   END;
 
   EXPORT DeltabaseResponse := RECORD
-    DATASET (DeltaPortedDataRECORD) RECORDs	 {XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};
+    DATASET (DeltaPortedDataRECORD) RECORDs	 {XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};
     STRING  RecsReturned                     {XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 {XPATH('Latency')};
     STRING  ExceptionMessage								 {XPATH('Exceptions/Exception/Message')};
@@ -788,25 +788,25 @@
   END;
 
   EXPORT SpoofDeltabaseResponse := RECORD
-    DATASET (DeltaSpoofedRec) 			RECORDs	{XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxSpoofedMatches)};
+    DATASET (DeltaSpoofedRec) 			RECORDs	{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxSpoofedMatches)};
     STRING  RecsReturned                    {XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													{XPATH('Latency')};
     STRING  ExceptionMessage								{XPATH('Exceptions/Exception/Message')};
   END;
 
   EXPORT DeltaOTPRec := RECORD
-    STRING20  	transaction_id				{XPATH('transaction_id')};
-    STRING     date_added				  	{XPATH('date_added')};
-    STRING 		event_time						{XPATH('event_time')};
-    STRING 		function_name					{XPATH('function_name')};
-    STRING10   otp_phone							{XPATH('otp_phone')};
-    BOOLEAN    verify_passed					{XPATH('verify_passed')};
-    STRING20   otp_id								{XPATH('otp_id')};
-    STRING1    otp_delivery_method		{XPATH('otp_delivery_method')};
+    STRING20  transaction_id                 {XPATH('transaction_id')};
+    STRING  date_added                       {XPATH('date_added')};
+    STRING  event_time                       {XPATH('event_time')};
+    STRING10  otp_phone                      {XPATH('otp_phone')};
+    STRING  function_name                    {XPATH('function_name')};
+    STRING20  otp_id                         {XPATH('otp_id')};   
+    BOOLEAN  verify_passed                   {XPATH('verify_passed')};
+    STRING1  otp_delivery_method             {XPATH('otp_delivery_method')};
   END;
 
   EXPORT OTPDeltabaseResponse := RECORD
-    DATASET (DeltaOTPRec) 					RECORDs		{XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxOTPMatches)};
+    DATASET (DeltaOTPRec) 					RECORDs		{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxOTPMatches)};
     STRING  RecsReturned                     	{XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 	{XPATH('Latency')};
     STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
@@ -826,7 +826,7 @@
   END;
 
   EXPORT DeltaInquiryDeltabaseResponse := RECORD
-    DATASET (DeltaInquiryDataRECORD) Response {XPATH('RECORDs/Rec')};
+    DATASET (DeltaInquiryDataRECORD) Response {XPATH('Records/Rec')};
     STRING  RECORDsReturned                  	{XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 	{XPATH('Latency')};
     STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
