@@ -17,7 +17,7 @@ IMPORT BIPV2_Segmentation,BIPV2_xlink_segmentation;
                       LEFT.res.seleid=RIGHT.seleid,
                        TRANSFORM(RECORDOF(LEFT),
 														 SELF.res.ind := IF(TRIM(RIGHT.category) in BIPV2_xlink_segmentation.Constants.CATEGORY_WITH_NO_SUBCATEGORY, TRIM(RIGHT.category), TRIM(RIGHT.category)+'_'+TRIM(RIGHT.subCategory));                            
-														 SELF := LEFT;), LEFT outer, keep(1), skew(1)); //populate indicator field
+														 SELF := LEFT;), LEFT outer, keep(1), hash); //populate indicator field
 														 
 	#UNIQUENAME(trimResSeg)
 	%trimResSeg% := IF(isKeyedJoin, %trimReswSegKeyed%, %trimReswSegReg%);
