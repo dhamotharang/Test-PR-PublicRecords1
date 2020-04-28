@@ -50,7 +50,7 @@ EXPORT propertyCharacteristicsSoapCallFunction (DATASET(Address_Shell.layoutInpu
 		SELF.Products.PROPINFO.CustomerName := '';
 		SELF.Products.PROPINFO.CustomerNumber := '';
 		SELF.Products.PROPINFO.Status := 'A';
-		SELF.Products.PROPINFO.IsReseller := FALSE;
+		//SELF.Products.PROPINFO.IsReseller := FALSE;
 		SELF.Products.PROPINFO.IncludeConfidenceFactors := TRUE;
 		SELF := [];
 	END;
