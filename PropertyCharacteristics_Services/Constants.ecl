@@ -1,4 +1,4 @@
-
+﻿
 export	Constants	:=
 module
 
@@ -84,4 +84,11 @@ module
 	export Underwriter     := 'U';
 	export Agent           := 'A';
 	
+	EXPORT Default_Option  													:= 'DO';
+	EXPORT Default_Plus_Option  								:= 'DPO';
+	EXPORT Selected_Source_Option  					:= 'SS';
+	EXPORT Selected_Source_Plus_Option  := 'SSP';
+	
+	EXPORT MSL_Src  							:= 'MLS';
+
 end;

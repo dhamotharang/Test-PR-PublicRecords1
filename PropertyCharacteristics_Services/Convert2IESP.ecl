@@ -1,4 +1,4 @@
-import	Address,Codes,iesp,InsuranceContext_iesp,ut,std;  
+﻿import	Address,Codes,iesp,InsuranceContext_iesp,ut,std;  
 
 export	Convert2IESP(	PropertyCharacteristics_Services.IParam.Report	pInMod,
 											iesp.property_info.t_PropertyInformationRequest	pRequest
@@ -50,7 +50,7 @@ module
 	
 	// Function to populate the ReportID header section
 	// TODO: remove defaults?
-	export	iesp.property_info.t_ReportIdSection	SetReportID(	InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
+	export	iesp.property_info.t_PropertyReportIdSection	SetReportID(	InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
 																															// iesp.property_value_report.t_PropertyValueReportResponseEx								pGatewayResponse,
 																															unsigned																																	combined_errors,
 																															boolean																																		pLNPropResultsExists	= false,
@@ -68,7 +68,7 @@ module
 		
 		boolean		insufficient_address	:=	combined_errors	&	Constants.InternalCodes.INSUFFICIENT_ADDRESS	=	Constants.InternalCodes.INSUFFICIENT_ADDRESS;
 		
-		iesp.property_info.t_ReportIdSection	tReportID()	:=
+		iesp.property_info.t_PropertyReportIdSection	tReportID()	:=
 		transform
 			self.ServiceType								:=	pInMod.ReportType;
 			self.AccountNumber							:=	pInsContext.Account.Legacy.Base;
@@ -242,9 +242,9 @@ module
 	
 	// PROPERTY DATA ITEM SECTION	
 	// Risk address transform function
-	iesp.property_info.t_AddressInfo	SetPropDataRiskAddress(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
+	iesp.property_info.t_PropertyAddressInfo	SetPropDataRiskAddress(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
 	function
-		iesp.property_info.t_AddressInfo	tRiskAddress(PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
+		iesp.property_info.t_PropertyAddressInfo	tRiskAddress(PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
 		transform
 			self.StreetNumber					:=	pInput.prim_range;
 			self.StreetPreDirection		:=	pInput.predir;
@@ -397,11 +397,11 @@ module
 	end;
 	
 	// Property mortgage info transform function
-	iesp.property_info.t_MortgageRecordReport	SetPropDataMortgageInfo(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
+	iesp.property_info.t_PropertyMortgageRecordReport	SetPropDataMortgageInfo(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
 	function
 		dSlimmed	:=	project(pRow,transform(PropertyCharacteristics_Services.Layouts.SlimmedMortgage,self	:=	left));
 		
-		iesp.property_info.t_MortgageRecordReport	tMortgageInfo(PropertyCharacteristics_Services.Layouts.SlimmedMortgage	pInput,integer	cnt)	:=
+		iesp.property_info.t_PropertyMortgageRecordReport	tMortgageInfo(PropertyCharacteristics_Services.Layouts.SlimmedMortgage	pInput,integer	cnt)	:=
 		transform
 			self.MortgageCompanyName	:=	choose(cnt,pInput.mortgage_company_name,'');
 			self.MortgageType					:=	choose(cnt,1,2);
@@ -417,9 +417,9 @@ module
 	end;
 	
 	// Property sales info transform function
-	iesp.property_info.t_PropertySalesInfoRecordReport	SetPropDataSalesInfo(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
+	iesp.property_info.t_PropertyInfoSalesInfoRecordReport	SetPropDataSalesInfo(PropertyCharacteristics_Services.Layouts.Payload	pRow)	:=
 	function
-		iesp.property_info.t_PropertySalesInfoRecordReport	tPropSalesInfo(PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
+		iesp.property_info.t_PropertyInfoSalesInfoRecordReport	tPropSalesInfo(PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
 		transform
 			self.Classification			:=	'';
 			self.DeedRecordingDate	:=	iesp.ECL2ESP.toDate((unsigned)pInput.deed_recording_date);
@@ -629,9 +629,16 @@ module
 	// Format the results to the ESP layout
 	export iesp.property_info.t_PropertyDataItem	Convert2PropDataItem (PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
 		transform
-			self.DataSource								:=	map(	pInput.vendor_source	=	'D'	=>	'A',	//FARES
+			self.DataSource								:=	map(	pInput.vendor_source = 'D' AND pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]	=>	'A',	//FARES
+																							pInMod.ResultOption = Constants.Default_Plus_Option => 'B DEFAULT PLUS',
+																							pInMod.ResultOption = Constants.Selected_Source_Option => 'F SELECTED SOURCE',
+																							pInput.vendor_source =	'F' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'F SELECTED SOURCE PLUS',
+																							pInput.vendor_source =	'E' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'E HOME LISTING DATA',
+																							pInput.vendor_source =	'D' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'D PUBLIC RECORD SOURCE A',
+																							pInput.vendor_source =	'C' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'C PUBLIC RECORD SOURCE B',
 																							pInput.vendor_source
 																						);
+		
 			self.Messages									:=	[];
 			self.RiskAddress							:=	SetPropDataRiskAddress(pInput);
 			self.PropertyAttributes				:=	SetPropDataAttr(pInput);
