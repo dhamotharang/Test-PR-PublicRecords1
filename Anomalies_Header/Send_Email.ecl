@@ -1,32 +1,32 @@
 Import STD, _Control, VersionControl;
 
-Export Send_Email( String pversion, Boolean pUseProd = False ) := Module
+Export Send_Email := Module
+
+    Shared server      := 'http://dataland_esp.br.seisint.com:8010';
 
 
-    Shared Anomalies_Support := 'Maurice.Vigueras@lexisnexisrisk.com';
+	Shared subject          := 'Header Anomalies Report Version: 20200427';
 
-	Shared SuccessSubject := if(VersionControl.IsValidVersion(pversion), 
-							    _Dataset(pUseProd).name + 'Build' + pversion + ' Completed on ' + _Control.ThisEnvironment.Name, 
-								_Dataset(pUseprod).name + ' Build Skipped, No version paramter passed to build upon ' + 
-								_Control.ThisEnvironment.Name 
-								 );
 
-	Shared SuccessBody    := if(VersionControl.IsValidVersion(pversion),
-								workunit,
-								workunit + '\nPlease pass in a version date parameter to ' + 
-								_Dataset().Name + '.Build_All and then resubmit through querybuilder.' + 
-								'\nSee ' + _Dataset().name + '._BWR_Build_Test attribute for more details.');
+	Shared report          := 'All results can found here: ' + server +  '/?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Results-DL/Grid';
 
-	Export BuildSuccess    := STD.System.Email.SendEmail(Email_Notification_list.BuildSuccess,
-	                                                     SuccessSubject, 
-														 SuccessBody,,, Anomalies_Support);
+
+	Shared body_success     := 'This is the report you submitted:' + '\n\n'
+							+   report +  '\n\n' 
+							+ ' For your notes, the workunit is: ' +  workunit + '\n\n' 
+							+ ' Have a wonderful day!' + '\n\n' 
+							+ ' The End.';
+
+	Shared body_failure     := 'This is the report you submitted:' + '\n\n'
+							+   report +  '\n\n' 
+							+ ' For your notes, the workunit is: ' +  workunit + '\n\n' 
+							+ ' Have a wonderful day!' + '\n\n' 
+							+ ' The End.';
+          
+
+	Export Build_Success    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_success );
 													
 
-	Export BuildFailure    := STD.System.Email.SendEmail(Email_Notification_list.BuildFailure,
-	                                                     SuccessSubject, 
-														 SuccessBody,,, Anomalies_Support);
-	
+	Export Build_Failure    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_failure );
 
-
-
-End;
+	End;

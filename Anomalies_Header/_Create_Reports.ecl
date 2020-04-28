@@ -1,6 +1,5 @@
 
 Export _Create_Reports := Module
-
 // ========================================= Count Reports ===================================================
 
 // Partial Count Reports 
@@ -19,7 +18,7 @@ Export blank_mmyyyy_persource := Output(Header_Counts.blank_mmdd_persource,  Nam
 Export blank_dd_persource     := Output(Header_Counts.blank_dd_persource,    Named('counted_blank_dd'));  
 Export normal_distribution    := Output(Header_Counts.normal_distribution,   Named('normal_distribution_mmdd')); // DOB normal distribution score (measure for normality across all non-zero 1 per lexid DOB) 
 
-//Full Counts Reports
+//Full Count Reports
 Export full_count_reports := Sequential(Parallel( fname_across_file, lname_across_file, fname_across_lexids,
                                     lname_across_lexids, ssn_across_file, lexids_per_ssn, lexids_per_address,
                                     dob_across_file, lexids_per_fulldob, lexids_per_mmdddob, blank_dobs_persource, 
@@ -28,7 +27,7 @@ Export full_count_reports := Sequential(Parallel( fname_across_file, lname_acros
 
 // ======================================== Percentage Reports ============================================
 
-// Partial Percentages Reports 
+// Partial Percentage Reports 
 Export fname_percentages := Output(Header_Percentages.fname_percentage, Named('fname_percentages'));
 Export lname_percentages := Output(Header_Percentages.lname_percentage, Named('lname_percentages'));
 Export dob_percenatges   := Output(Header_Percentages.dob_percentage,   Named('dob_percenateges'));
@@ -36,11 +35,12 @@ Export ssn_percenatges   := Output(Header_Percentages.ssn_percentage,   Named('s
 Export addressmatch_percentages    := Output(Header_Percentages.addressMatch_percentage,    Named('address_percentages'));
 Export addressmatchall_percentages := Output(Header_Percentages.addressAllMatch_percentage, Named('addressAll_percentages'));
 
-// Full Percentages Report 
+// Full Percentage Report 
 Export full_percentage_reports := Sequential(Parallel( fname_percentages, lname_percentages, dob_percenatges,
-                                                 ssn_percenatges, addressmatch_percentages , addressmatchall_percentages ));
+                                             ssn_percenatges, addressmatch_percentages , addressmatchall_percentages ));
 
 
-Export complete_header_reports := Sequential(Parallel(full_percentage_reports, full_count_reports));
-
+Export complete_header_reports := Sequential(Parallel(full_percentage_reports, full_count_reports ))
+                                            : Success(Send_Email.Build_Success), Failure(Send_Email.Build_Failure);
+                              
 End;
