@@ -43,6 +43,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:Diversity_Certification\n'
     + 'NAMESCOPE:Input\n'
     + '\n'
+    + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789)\n'
     + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ )\n'

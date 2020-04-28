@@ -3,6 +3,7 @@ MODULE:Scrubs_Diversity_Certification
 FILENAME:Diversity_Certification
 NAMESCOPE:Input
 
+
 FIELDTYPE:Invalid_No:ALLOW(0123456789)
 FIELDTYPE:Invalid_Float:ALLOW(0123456789 .,-/+E$)
 FIELDTYPE:Invalid_Alpha:ALLOW(aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ )
