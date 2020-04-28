@@ -2,7 +2,7 @@
 //W20200326-094059 Prod
 //For the following events, I would like the number of new events by type by month by state all the way back to 2010. This data should be created using only data on the FCRA Roxies
 
-IMPORT _Control, census_data, LN_PropertyV2, LN_PropertyV2_Fast, data_services, from_zz_CDKelly, STD, ut;
+IMPORT _Control, census_data, LN_PropertyV2, LN_PropertyV2_Fast, data_services, STD, ut;
 
 export FCRA_Property_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'') := function
 
@@ -87,7 +87,7 @@ Key_Tax_FCRA_2010_props := DEDUP(sort(distribute(Key_Tax_FCRA_monthly_plus_2010(
 																 fares_unformatted_apn, new_recording_date, state_code, standardized_land_use_code, all);
 
 //proc_date is YYYYMM from the value for Recording Date, which is when the transaction was filed at the county
-tbl_Key_Tax_FCRA_2010_props := TABLE(Key_Tax_FCRA_2010_props, {new_recording_date, state_code, standardized_land_use_code, standardized_land_use := from_zz_CDKelly.zz_CDKelly_fnSourceBStandardizedLandUse(standardized_land_use_code), property_count := count(group)}, proc_date, state_code, standardized_land_use_code, few);
+tbl_Key_Tax_FCRA_2010_props := TABLE(Key_Tax_FCRA_2010_props, {new_recording_date, state_code, standardized_land_use_code, standardized_land_use := DI_Metrics.fnSourceBStandardizedLandUse(standardized_land_use_code), property_count := count(group)}, proc_date, state_code, standardized_land_use_code, few);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_fcra_tax_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_FCRA_Key_Tax_2010_properties_by_StandLandUse_'+ filedate +'.csv',
