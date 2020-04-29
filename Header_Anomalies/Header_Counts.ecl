@@ -9,7 +9,7 @@ Import STD, AID;
 
 
 
-layout_header := Anomalies_Header.Layouts.Layout_Header;
+layout_header := Header_Anomalies.Layouts.Layout_Header;
 // Slimmed files from the original header file
 infile := Anomalies_Header.Files.Header; 
 

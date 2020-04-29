@@ -24,9 +24,9 @@ Export Send_Email := Module
 							+ ' The End.';
           
 
-	Export Build_Success    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_success );
+	Export build_success    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_success );
 													
 
-	Export Build_Failure    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_failure );
+	Export build_failure    := STD.System.Email.SendEmail(Mailing_List.Developer, Subject, body_failure );
 
 	End;

@@ -1,6 +1,6 @@
 
 
-t := Table(Anomalies_Header.Files.Header, Layouts.Layout_Header, did, fname, lname,
+t := Table(Header_Anomalies.Files.Header, Layouts.Layout_Header, did, fname, lname,
                   dob, ssn, prim_range, predir, prim_name, 
                   suffix, postdir, unit_desig, sec_range, 
                   city_name, st, zip, zip4, county, cbsa, src );
@@ -21,13 +21,13 @@ LeftFile := Dedup(sdt, did, fname, lname,
                   suffix, postdir, unit_desig, sec_range, 
                   city_name, st, zip, zip4, county, cbsa, src );
 
-RightFile_input := Anomalies_Header.Files.Watchdog; 
+RightFile_input := Header_Anomalies.Files.Watchdog; 
 RightFile := Distribute(RightFile_input, hash(did));
 // Watchdog infile
 
 // Layouts
-Header_Layout := Anomalies_Header.Layouts.MyRecLeft;
-Watchdog_Layout := Anomalies_Header.Layouts.MyRecright;
+Header_Layout := Header_Anomalies.Layouts.MyRecLeft;
+Watchdog_Layout := Header_Anomalies.Layouts.MyRecright;
 
 Export Watchdog_Match_Report := Module
 
