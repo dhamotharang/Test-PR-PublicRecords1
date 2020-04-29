@@ -32,5 +32,5 @@ Clean_file := project(Clean_In_file, FixDates(left));
 
 emerges.MAC_eMerge_Date_Patch(clean_file,regdate,lastdatevote,regdate,regdate,date_fix);//Extra regdate's don't matter because Voters doesn't use them								
 							
-export Updated_Voters := date_fix : persist(VotersV2.Cluster + 'persist::Updated_Voters');
+export Updated_Voters := date_fix : persist(VotersV2.Cluster + 'persist::Updated_Voters', SINGLE);
 

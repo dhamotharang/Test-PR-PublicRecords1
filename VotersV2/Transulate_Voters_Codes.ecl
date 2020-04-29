@@ -128,7 +128,7 @@ Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs
 
 Sort_Cleaned_Patched_file := sort(Clean_patched_vtid_dob_file,RECORD,
 								  EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								  file_acquired_date,local);
+								  file_acquired_date,local) : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Sort', SINGLE);
 
 Layout_outfile  rollupXform(Layout_outfile l, Layout_outfile r) := transform
 	self.Process_Date    := if(l.Process_Date > r.Process_Date, l.Process_Date, r.Process_Date);
@@ -139,6 +139,6 @@ end;
 
 Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD,
 								EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								file_acquired_date, local);					  
+								file_acquired_date, local): persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Rollup', SINGLE);					  
 
-export Transulate_Voters_Codes := Rollup_Voters : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', REFRESH(TRUE), SINGLE);
+export Transulate_Voters_Codes := Rollup_Voters : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE);

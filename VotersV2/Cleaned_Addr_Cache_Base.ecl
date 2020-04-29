@@ -3,6 +3,7 @@
 //DF-27577 Moved DID after DID
 in_file := VotersV2.Updated_Voters;
 
+//Gives Updated_Voters equal number of fields as the Base File
 VotersV2.Layouts_Voters.Layout_Voters_base_new trfInFile(in_file l) := transform
 	self := l;			
 	self := [];
@@ -15,11 +16,6 @@ baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base : persist('
 
 bothFiles := InFileTransformed + baseFile;
 
-out_layout := record
-	VotersV2.Layouts_Voters.Layout_Voters_base_new;	
-	string70 addr1_for_clean := '';
-	string40 addr2_for_clean := '';	
-end;
 															
 // Transform to Normalize the Mailing Addresses.
 // Skip's the normalized mailing records that only contain the mailing city, st and zip populate 
@@ -30,12 +26,20 @@ end;
 
 //DF-27577 Added prep address fields
 
+out_layout := record
+	VotersV2.Layouts_Voters.Layout_Voters_base_new;
+	string100 addr_line1 := '';
+	string50 addr_line_last := '';
+end;
+
 out_layout trfNormMailAddr(bothFiles l, unsigned c) := transform
 	 ,skip(c = 2 and
-	       trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
-		   trim(l.st,left,right)          = trim(l.mail_st,left,right) and
-		   trim(l.zip,left,right)         = trim(l.mail_ace_zip,left,right) and
-		   trim(l.p_city_name,left,right) + trim(l.zip,left,right) <> '' and
+	       // trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
+		   // trim(l.st,left,right)          = trim(l.mail_st,left,right) and
+		   // trim(l.zip,left,right)         = trim(l.mail_ace_zip,left,right) and
+		   // trim(l.p_city_name,left,right) + trim(l.zip,left,right) <> '' and
+			 trim(l.prep_res_addr_line_last,left,right) = trim(l.prep_mail_addr_line_last,left,right) and
+		   trim(l.prep_res_addr_line_last,left,right) <> '' and
 		   trim(l.mail_prim_range, left, right) = '' and
 		   trim(l.mail_predir,left,right)  = '' and
 		   trim(l.mail_prim_name,left,right)  = '' and
@@ -80,16 +84,20 @@ out_layout trfNormMailAddr(bothFiles l, unsigned c) := transform
 												        l.mail_addr_suffix, l.mail_postdir, l.mail_unit_desig,
 												        l.mail_sec_range)); 
 	self.prep_mail_addr_line_last := choose(c, '', Address.Addr2FromComponents(l.mail_p_city_name, l.mail_st, l.mail_zip));	
-	self.addr1_for_clean := if(self.prep_res_addr_line1 != '' and self.prep_mail_addr_line1 = '', self.prep_res_addr_line1, self.prep_mail_addr_line1);
-	self.addr2_for_clean := if(self.prep_res_addr_line_last != '' and self.prep_mail_addr_line_last = '', self.prep_res_addr_line_last, self.prep_mail_addr_line_last);
+	self.addr_line1 := if(self.prep_res_addr_line1 != '' and self.prep_mail_addr_line1 = '', self.prep_res_addr_line1, self.prep_mail_addr_line1);
+	self.addr_line_last := if(self.prep_res_addr_line_last != '' and self.prep_mail_addr_line_last = '', self.prep_res_addr_line_last, self.prep_mail_addr_line_last);
+  self.did := 0;
+	self.did_score := 0;
 	self := l;	
 	self := [];
 end;
 
 // Normalize the Mailing Addresses 
-Clean_Addr_Norn_file  := NORMALIZE(bothFiles,
-								   if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
-								       (integer)left.mail_ace_zip = 0)  or 
+Clean_Addr_Norm_file  := NORMALIZE(bothFiles,
+								   // if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
+								       // (integer)left.mail_ace_zip = 0)  
+									if((trim(left.prep_mail_addr_line_last,left,right) = '') 
+											 or 
 								      (trim(left.prim_range,left,right)  = trim(left.mail_prim_range,left,right) and
 									   trim(left.predir,left,right)      = trim(left.mail_predir,left,right) and
 								       trim(left.prim_name,left,right)   = trim(left.mail_prim_name,left,right) and									   
@@ -103,21 +111,23 @@ Clean_Addr_Norn_file  := NORMALIZE(bothFiles,
 								       trim(left.zip4,left,right)        = trim(left.mail_zip4,left,right)),1,2)								      
 								   ,trfNormMailAddr(left,counter));
 
-Clean_File_filt := Clean_Addr_Norn_file(trim(p_city_name,left,right) <> '' and
-										trim(st,left,right)  <> '' and
-										trim(zip,left,right) <> '');
+Clean_File_filt := Clean_Addr_Norm_file(prep_mail_addr_line_last <> '');
+                   // Clean_Addr_Norm_file(trim(p_city_name,left,right) <> '' and
+										// trim(st,left,right)  <> '' and
+										// trim(zip,left,right) <> '');
 
-Clean_file_emty := Clean_Addr_Norn_file(trim(p_city_name,left,right) = '' or
-										trim(st,left,right)  = '' or
-										trim(zip,left,right) = '');	
+Clean_file_emty := Clean_Addr_Norm_file(prep_mail_addr_line_last = '');
+                   // Clean_Addr_Norm_file(trim(p_city_name,left,right) = '' or
+										// trim(st,left,right)  = '' or
+										// trim(zip,left,right) = '');	
 									
 unsigned4	lFlags 	:= AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 
 //Added AID
 AID.MacAppendFromRaw_2Line(
                            Clean_File_filt,
-				                   addr1_for_clean,       //addr1
-				                   addr2_for_clean,       //addr2													 
+				                   addr_line1,       //addr1
+				                   addr_line_last,       //addr2													 
 													 raw_aid, dwithAID, lFlags);
 
 clean_cache_addr_file := project(dwithAID
@@ -151,8 +161,11 @@ clean_cache_addr_file := project(dwithAID
 				self.geo_blk				:= left.aidwork_acecache.geo_blk			;
 				self.geo_match			:= left.aidwork_acecache.geo_match		;
 				self.err_stat				:= left.aidwork_acecache.err_stat			;
-				self.prep_mail_addr_line1 := left.prep_mail_addr_line1;
-				self.prep_mail_addr_line_last := left.prep_mail_addr_line_last;
+				// self.prep_res_addr_line1 := left.prep_res_addr_line1;
+				// self.prep_res_addr_line_last := left.prep_res_addr_line_last;
+				// self.prep_mail_addr_line1 := left.prep_mail_addr_line1;
+				// self.prep_mail_addr_line_last := left.prep_mail_addr_line_last;
+				self := left;
 				self := [];
 			)
 		)
@@ -160,9 +173,10 @@ clean_cache_addr_file := project(dwithAID
 		self := left
 		,self := []));
 
-clean_cache_file      := clean_cache_addr_file;
+// clean_cache_file      := clean_cache_addr_file;
 
-clean_cache_file_dist := distribute(clean_cache_file, vtid);
+// clean_cache_file_dist := distribute(clean_cache_file, vtid);
+clean_cache_file_dist := distribute(clean_cache_addr_file, vtid);
 
 full_norm_file := sort(clean_cache_file_dist, vtid, -process_date, -date_first_seen, addr_type, local);
 

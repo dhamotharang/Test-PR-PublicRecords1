@@ -60,4 +60,4 @@ deduped_clean_file  := dedup(sort(dis_clean_norm_file, lname, name_suffix, fname
 							 lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
 							 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, local);
 															
-export Norm_Voters_Cleaned_Base := deduped_clean_file : persist(VotersV2.Cluster+'persist::Norm_Voters_Cleaned_Base', REFRESH(TRUE), SINGLE);
+export Norm_Voters_Cleaned_Base := deduped_clean_file : persist(VotersV2.Cluster+'persist::Norm_Voters_Cleaned_Base', SINGLE);
