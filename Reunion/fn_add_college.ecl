@@ -1,4 +1,4 @@
-import American_student_list;
+import American_student_list, D2C_Customers;
 
 /*
 FR=Freshman
@@ -78,7 +78,7 @@ dictMajor := DICTIONARY(dsMajor, {abbreviation => major});
 
 EXPORT fn_add_college(DATASET(reunion.layouts.lMain) src) := FUNCTION
 
-		students := DISTRIBUTE(American_student_list.File_american_student_DID(did<>0), did);
+		students := DISTRIBUTE(American_student_list.File_american_student_DID(did<>0, D2C_Customers.SRC_Allowed.Check(22, source)), did);
 
 		main := DISTRIBUTE(src((unsigned6)adl<>0), (unsigned6)adl);
 
