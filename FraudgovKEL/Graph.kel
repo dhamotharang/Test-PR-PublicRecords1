@@ -806,6 +806,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     LexId = did,
 		CaseId = household_id,
     EventDate = event_date,
+		DateOfBirth = dob,		
 		Title = cleaned_name.title,
 		FirstName = cleaned_name.fname,
 		MiddleName =cleaned_name.mname,
@@ -1653,7 +1654,7 @@ Event: => T18_IpAddrLocMiamiFlag := MAP(T_InpClnIpAddrEcho=-99999 => -99999,
 																T18_IpAddrCity < 1 => -99997,
 																AgencyProgJurSt != 'FL' AND T18_IpAddrCity = 'MIAMI' => 1,
 																0);
-																
+	
 Event: => T19_BnkAcctPopFlag := MAP(T_InpClnBnkAcctEcho IN ['-99999','-99998'] OR T_InpClnBnkAcctRtgEcho IN ['-99999','-99998'] => 0,
 																    1);
 Event: => T19_IsBnkAppHitFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999, 
