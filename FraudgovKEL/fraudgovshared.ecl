@@ -131,4 +131,4 @@ tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', R
                (did % 90 = 0);
 //output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
-EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; //tempbuild
+EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; 
