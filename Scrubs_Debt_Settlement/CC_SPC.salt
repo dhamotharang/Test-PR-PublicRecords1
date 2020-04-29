@@ -11,13 +11,13 @@ NAMESCOPE:CC
 //Uncomment Process if doing external adl
 //PROCESS:<ProcessName>
 
-FIELDTYPE:Invalid_id:ALLOW(0123456789):LENGTHS(5)
+FIELDTYPE:Invalid_id:CUSTOM(Scrubs.functions.fn_numeric>0,5)
 FIELDTYPE:Invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:Invalid_mandatory_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)
 FIELDTYPE:Invalid_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0) 
 FIELDTYPE:Invalid_St:CUSTOM(Scrubs.functions.fn_valid_StateAbbrev>0)
-FIELDTYPE:Invalid_zip:ALLOW(0123456789):LENGTHS(0,5)
-FIELDTYPE:Invalid_zip4:ALLOW(0123456789):LENGTHS(0,4)
+FIELDTYPE:Invalid_zip:CUSTOM(Scrubs.functions.fn_numeric_optional>0,5)
+FIELDTYPE:Invalid_zip4:CUSTOM(Scrubs.functions.fn_numeric_optional>0,4)
 FIELDTYPE:Invalid_Phone:CUSTOM(Scrubs.functions.fn_verify_optional_phone>0)
 FIELDTYPE:Invalid_Status:CUSTOM(Scrubs_Debt_Settlement.functions.fn_valid_status>0)
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.functions.fn_valid_date>0)

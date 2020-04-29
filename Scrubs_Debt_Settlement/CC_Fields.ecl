@@ -9,11 +9,10 @@ EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_id','Inva
 EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_id' => 1,'Invalid_mandatory' => 2,'Invalid_mandatory_alpha' => 3,'Invalid_alpha' => 4,'Invalid_St' => 5,'Invalid_zip' => 6,'Invalid_zip4' => 7,'Invalid_Phone' => 8,'Invalid_Status' => 9,'Invalid_Date' => 10,'Invalid_Future_Date' => 11,'Invalid_OrgType' => 12,0);
  
 EXPORT MakeFT_Invalid_id(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_id(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 5));
-EXPORT InValidMessageFT_Invalid_id(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('5'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_id(SALT311.StrType s) := WHICH(~Scrubs.functions.fn_numeric(s,5)>0);
+EXPORT InValidMessageFT_Invalid_id(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -40,18 +39,16 @@ EXPORT InValidFT_Invalid_St(SALT311.StrType s) := WHICH(~Scrubs.functions.fn_val
 EXPORT InValidMessageFT_Invalid_St(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.functions.fn_valid_StateAbbrev'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_zip(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_zip(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5));
-EXPORT InValidMessageFT_Invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,5'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_zip(SALT311.StrType s) := WHICH(~Scrubs.functions.fn_numeric_optional(s,5)>0);
+EXPORT InValidMessageFT_Invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.functions.fn_numeric_optional'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_zip4(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_zip4(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 4));
-EXPORT InValidMessageFT_Invalid_zip4(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,4'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_zip4(SALT311.StrType s) := WHICH(~Scrubs.functions.fn_numeric_optional(s,4)>0);
+EXPORT InValidMessageFT_Invalid_zip4(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.functions.fn_numeric_optional'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Phone(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -86,7 +83,7 @@ EXPORT InValidMessageFT_Invalid_OrgType(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygie
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'idnum','businessname','dba','orgid','address1','address2','city','state','zip','zip4','phone','fax','email','url','status','licensedatefrom','licensedateto','orgtype','source');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'idnum','businessname','dba','orgid','address1','address2','city','state','zip','zip4','phone','fax','email','url','status','licensedatefrom','licensedateto','orgtype','source');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'idnum' => 0,'businessname' => 1,'dba' => 2,'orgid' => 3,'address1' => 4,'address2' => 5,'city' => 6,'state' => 7,'zip' => 8,'zip4' => 9,'phone' => 10,'fax' => 11,'email' => 12,'url' => 13,'status' => 14,'licensedatefrom' => 15,'licensedateto' => 16,'orgtype' => 17,'source' => 18,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['LENGTHS'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['LENGTHS'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

@@ -26,7 +26,7 @@ module
 					,if(not pWriteFileOnly	,Promote(pversion).buildfiles.New2Built)
 					,output(Filenames(pversion).dAll_filenames,named('buildNames'))
 									)					
-				,OUTPUT('Scrubs failed. Base not built.',NAMED('Scrubs_Failure'))
+				,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
 		   );
 	
 	/*export All :=
