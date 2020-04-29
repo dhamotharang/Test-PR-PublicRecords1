@@ -39,22 +39,22 @@ add_comp_rpt_attrs() := FUNCTION
 END;
 
 seq_pb := sequential(
-	// Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(1),122), //1 seg = 10M records
-	// if(input_cnt > 1*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(2),123)),
-	// if(input_cnt > 2*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(3),124)),
-	// if(input_cnt > 3*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(4),125)),
-	// if(input_cnt > 4*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(5),126)),
-	// if(input_cnt > 5*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(6),127)),
-	// if(input_cnt > 6*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(7),128)),
-	// if(input_cnt > 7*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(8),129)),
-	// if(input_cnt > 8*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(9),130)),
-	// if(input_cnt > 9*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(10),131)),
-	// if(input_cnt > 10*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(11),132)), 
-	// if(input_cnt > 11*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(12),133)),
-	// if(input_cnt > 12*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(13),134)),
-	// if(input_cnt > 13*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(14),135)),
-	// if(input_cnt > 14*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(15),136)),
-	// if(input_cnt > 15*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(16),137)),
+	Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(1),122), //1 seg = 10M records
+	if(input_cnt > 1*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(2),123)),
+	if(input_cnt > 2*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(3),124)),
+	if(input_cnt > 3*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(4),125)),
+	if(input_cnt > 4*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(5),126)),
+	if(input_cnt > 5*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(6),127)),
+	if(input_cnt > 6*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(7),128)),
+	if(input_cnt > 7*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(8),129)),
+	if(input_cnt > 8*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(9),130)),
+	if(input_cnt > 9*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(10),131)),
+	if(input_cnt > 10*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(11),132)), 
+	if(input_cnt > 11*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(12),133)),
+	if(input_cnt > 12*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(13),134)),
+	if(input_cnt > 13*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(14),135)),
+	if(input_cnt > 14*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(15),136)),
+	if(input_cnt > 15*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(16),137)),
 	if(input_cnt > 16*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(17),138)),
 	if(input_cnt > 17*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(18),139)),
 	if(input_cnt > 18*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_pb_attrs(19),140)),
@@ -82,8 +82,8 @@ seq_pb := sequential(
 );
 
 seq_li := sequential(
-	// Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(1),162), 
-	// if(input_cnt > 1*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(2),163)),
+	Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(1),162), 
+	if(input_cnt > 1*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(2),163)),
 	if(input_cnt > 2*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(3),164)),
 	if(input_cnt > 3*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(4),165)),
 	if(input_cnt > 4*reunion.constants.Seg_size, Reunion.mac_runIfNotCompleted ('Reunion',sVersion, add_li_attrs(5),166)),
