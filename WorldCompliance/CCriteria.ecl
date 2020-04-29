@@ -25,7 +25,8 @@ END;
 WCOCategories(dataset(Layouts.rWCOCategories) restored) := FUNCTION
 								
 		dsCategory := PROJECT(AllCategories,rCriteria);
-		Mcats := PROJECT(restored, TRANSFORM(rCriteriaRollup,
+		Mcats := PROJECT(restored, TRANSFORM (rCriteriaRollup,
+											SKIP(left.IsActivePEP in ['N']),
 											self.id := LEFT.EntityID;
 											self.criteria := if(left.SegmentType='AdditionalSegments' or left.SegmentType='Sanction',
 										if(left.SubCategoryLabel = 'Associated Entity' or left.SubCategoryLabel ='Ownership Or Control' or left.SubCategoryLabel = 'SWIFT BIC Entity',
@@ -88,7 +89,7 @@ GetMultCategories(dataset(Layouts.rWCOCategories) restored) := FUNCTION
 END;
 EXPORT CCriteria := FUNCTION
 
-		oldcat0 := Distribute((Files.dsMasters), Ent_ID);
+		oldcat0 := (Files.dsMasters);
 		oldcat := DEDUP(SORT(oldcat0, ent_id, EntryCategory, EntrySubcategory, local),
 			Ent_ID, EntryCategory, EntrySubcategory, local);
 		oldpeps := oldcat(EntryCategory='PEP');
@@ -99,25 +100,19 @@ EXPORT CCriteria := FUNCTION
 									self := left), left only, local);
 		oldrestored := oldcat(EntryCategory<>'PEP') + oldjustformer + oldnoformer;
 	
-	newcat0 := Distribute((Files.dsWCOCategories),entityid);
-	newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel, subcategorydesc, -lastupdated, local),
-		entityid, segmenttype, subcategorylabel, subcategorydesc, local);
+	newcat0 := (Files.dsWCOCategories);
+	newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel, subcategorydesc, -isactivepep, local),
+		entityid, segmenttype, subcategorylabel, subcategorydesc, isactivepep, local);
 	peps := newcat(segmenttype='PEP');
 	former := newcat(subcategorydesc='Former PEP');
-/*	
-	justformer := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
-									self := left), inner, keep(1), local);
-	noformer := JOIN(peps, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
-									self := left), left only, local);
-	restored := newcat(segmenttype<>'PEP') + justformer + noformer;
-*/
+
 	justformer0 := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 									self := left), inner, keep(1), local);
-	justformer := DEDUP(SORT(justformer0, entityid, segmenttype, subcategorydesc, -lastupdated, local),
+	justformer := DEDUP(SORT(justformer0, entityid, segmenttype, subcategorydesc, -isactivepep, local),
 									entityid, segmenttype, subcategorydesc, local);								
 	noformer0 := JOIN(peps, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 									self := left), left only, local);
-	noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -lastupdated, local),
+	noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 								entityid, segmenttype, subcategorydesc, local);
 	restored := newcat(segmenttype<>'PEP') + justformer + noformer;
 

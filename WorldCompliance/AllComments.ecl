@@ -123,7 +123,7 @@ END;
 															left.SubCategoryLabel))),															
 												if ((left.SubCategoryLabel = 'Sanction List'),
 													'',
-													left.SubCategoryLabel))));));
+													left.SubCategoryLabel)))) + ' ' + Left.isactivepep;));
 													//left.SubCategoryLabel)));));
 				
 
@@ -161,28 +161,22 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 		oldrestored := oldcat(EntryCategory<>'PEP') + oldjustformer + oldnoformer;
 
 			newcat0 := Distribute((Files.dsWCOCategories),entityid);
-			newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel,subcategorydesc, -lastupdated, local),
-														entityid, segmenttype, subcategorylabel,subcategorydesc, local);
+			newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel,subcategorydesc, -isactivepep, local),
+														entityid, segmenttype, subcategorylabel,subcategorydesc, isactivepep,local);
 			peps := newcat(segmenttype='PEP');
 			former := newcat(subcategorydesc='Former PEP');
 
-/*			justformer := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
-											self := left), inner, keep(1), local);
-			noformer := JOIN(peps, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
-											self := left), left only, local);
-			restored := newcat(segmenttype<>'PEP') + justformer + noformer;
-*/
 			justformer0 := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 											self := left), inner, keep(1), local);
-			justformer := DEDUP(SORT(justformer0, entityid, segmenttype, subcategorydesc, -lastupdated, local),
+			justformer := DEDUP(SORT(justformer0, entityid, segmenttype, subcategorydesc, -isactivepep, local),
 											entityid, segmenttype, subcategorydesc, local);								
 			noformer0 := JOIN(peps, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 											self := left), left only, local);
-			noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -lastupdated, local),
+			noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 										entityid, segmenttype, subcategorydesc, local);
 			restored := newcat(segmenttype<>'PEP') + justformer + noformer;
 			
-			Allreasons := sort((GetReasons(oldrestored) & GetMultReasons(restored)), Ent_ID, cmts, local); //Original
+			Allreasons := sort(GetMultReasons(restored), Ent_ID, cmts, local); //Original
 					
 		items := SORT(Distribute(
 								//GetConsolidatedRec(infile) &

@@ -104,6 +104,7 @@ export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Le
 																									if(left.Entrycategory = 'Sanction List',left.Entrycategory,left.EntrySubcategory));
 											self.SubCategoryDesc := if (left.Entrycategory='PEP',left.EntrySubcategory,
 																									if (left.Entrycategory = 'Sanction List' and left.EntrySubcategory <> 'N/A',left.EntrySubcategory,''));
+											self.isActivePEP := if(left.Entrycategory = 'PEP','Y','');
 											self := right;
 										),Left Outer, local);
 				
@@ -125,7 +126,7 @@ export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, L
 															'Govt Linked Corp',
 															if ((left.SubCategoryLabel = 'Majority' or left.SubCategoryLabel = 'Multiple Majority'),'Govt Owned Corp', left.SubCategoryLabel)),
 													left.SubCategoryLabel)));
-
+	
 											self := right;
 									),Inner,local);
 
@@ -144,6 +145,7 @@ export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCa
 																									if(left.SubCategoryDesc = 'Legislature' or left.SubCategoryDesc = 'Intelligence' or left.SubCategoryDesc = 'Law Enforce Auth' or left.SubCategoryDesc = 'Traditional Leadership',
 																										'Govt Branch Member',if(left.SubCategoryDesc = 'MSOE','Mgmt Govt Corp',left.SubCategoryDesc))),left.SubCategoryDesc); 
 																									
+											self.IsActivePEP := left.IsActivePEP;
 											self := right;
 										), Inner, local);
 
