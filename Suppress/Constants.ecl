@@ -110,6 +110,11 @@ export Constants := module
 		EXPORT STRING20 Domain_Id_Ins		:= 'INS';	
 		EXPORT STRING20 Domain_Id_HC		:= 'HC-HPCC';	
 	END;	
+<<<<<<< HEAD
 	
 	
 END;
+=======
+
+END;
+>>>>>>> 7817ea0e20f6e69551477fdabedab887db3a58e2
