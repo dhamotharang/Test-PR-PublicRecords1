@@ -54,6 +54,7 @@ EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
 	 
 	 EXPORT stliclookup_input := dataset(Filenames(pversion,pUseProd).stliclookup_lInputTemplate, layouts.stliclookup_layout, csv( separator('\t'),heading(single), terminator(['\n', '\r\n']), quote(['\'','"'])));
 	 EXPORT stliclookup_input_new := dataset(Filenames(pversion,pUseProd).stliclookup_new_lInputTemplate, layouts.stliclookup_layout_new, csv( separator('\t'),heading(single), terminator(['\n', '\r\n']), quote(['\'','"'])));
+	 EXPORT stliclookup_input_alpha := dataset(Filenames(pversion,pUseProd).stliclookup_alpha_lInputTemplate, layouts.stliclookup_layout_from_alpha, csv( separator('|'),heading(single), terminator(['\n', '\r\n']), quote(['\'','"'])));
 	 
 	 /* Base File Versions */
    tools.mac_FilesBase(Filenames(pversion,pUseProd).address_Base, HMS_STLIC.layouts.address_base, address_Base);
