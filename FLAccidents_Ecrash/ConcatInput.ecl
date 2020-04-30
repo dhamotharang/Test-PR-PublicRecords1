@@ -1,7 +1,4 @@
-﻿
-import ut; 
-
-export ConcatInput := function
+﻿export ConcatInput := function
 ECrash_incident := FLAccidents_Ecrash.Infiles.incident; 
 ECrash_citation := FLAccidents_Ecrash.Infiles.citation;
 ECrash_commercl := FLAccidents_Ecrash.Infiles.commercl;
@@ -9,11 +6,11 @@ ECrash_persn := FLAccidents_Ecrash.Infiles.persn;
 ECrash_vehicl := FLAccidents_Ecrash.Infiles.vehicl;
 ECrash_Property_damage := FLAccidents_Ecrash.Infiles.Property_damage;
 photo := DATASET('~thor_data400::in::ecrash::document_raw'
-																	,FLAccidents_Ecrash.Layouts.PhotoLayout
-																	,CSV(TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT);
+                 ,FLAccidents_Ecrash.Layouts.PhotoLayout
+                 ,CSV(TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT);
 
-time := ut.gettime() : independent; 
-date := ut.GetDate : independent; 
+time := mod_Utilities.StrSysSeconds : independent; 
+date := mod_Utilities.StrSysDate : independent; 
 
 
 outrec := record 
