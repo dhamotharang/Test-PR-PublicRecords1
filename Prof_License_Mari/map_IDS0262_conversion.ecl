@@ -32,7 +32,7 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 	Datepattern := '^(.*)/(.*)/(.*)$';
 
   MD_Ind := ['AT','CGA','CRA','LRA','TCGA','TCRA'];
-  GR_Ind := ['AMC'];	
+  GR_Ind := ['AMC', 'AMCF'];	
 	
 	//Remove bad records before processing
 	ValidAppraiser	:= ds_ID_appraiser(TRIM(SORT_NAME) != ' ' AND LIC_NO!= ' '
@@ -61,6 +61,7 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 														     StringLib.StringFind(TRIM(L.LIC_DESC),'TEMPORARY CERTIFIED GENERAL APPRAISER',1)= 1 => 'TCGA',
 														     StringLib.StringFind(TRIM(L.LIC_DESC),'TEMPORARY CERTIFIED RESIDENTIAL APPRAISER',1)= 1 => 'TCRA',
 														     StringLib.StringFind(TRIM(L.LIC_DESC),'APPRAISAL MANAGEMENT COMPANY',1)= 1 => 'AMC',
+																 StringLib.StringFind(TRIM(L.LIC_DESC),'FEDERALLY REGULATED APPRAISAL MANAGEMENT COMPANY',1)= 1 => 'AMCF',
 														     ' '); 	
 		SELF.TYPE_CD					:= IF(SELF.STD_LICENSE_TYPE in GR_Ind, 'GR',
 		                           IF(SELF.STD_LICENSE_TYPE in MD_Ind, 'MD',
@@ -123,7 +124,15 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != ' ',clnDBA_name,' ');
 		clnPhone							:= StringLib.StringCleanSpaces(L.PHONE);
 		SELF.PHN_MARI_1				:= L.PHONE;
-		
+
+		RemovePattern         := '(^C/O | INC$| LLC$)';
+		TrimAddress1          := ut.CleanSpacesAndUpper(L.ADDRESS1);
+		TrimAddress2          := ut.CleanSpacesAndUpper(L.ADDRESS2); 
+		TrimCity              := ut.CleanSpacesAndUpper(L.CITY); 
+		TrimState             := ut.CleanSpacesAndUpper(L.STATE); 
+		tmpZip	              := MAP(LENGTH(TRIM(L.POSTALCODE))=3 => '00'+TRIM(L.POSTALCODE),
+		                             LENGTH(TRIM(L.POSTALCODE))=4 => '0'+TRIM(L.POSTALCODE),
+						                     TRIM(L.POSTALCODE));
 		//	Indicates whether address_1 is an address or business name	
 		IsAddr								:= IF(REGEXFIND('^[0-9]+',L.ADDRESS1)
 														    OR REGEXFIND('P[\\.]?[ ]?O[\\.]? BOX', L.ADDRESS1)
@@ -134,15 +143,34 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 														    FALSE);
 		tmpOfficeName					:= MAP(TRIM(L.ADDRESS2) != ' ' AND IsAddr != true => L.ADDRESS1,
 														     REGEXFIND('(^C/O | INC$| LLC$)',TRIM(L.ADDRESS1)) => L.ADDRESS1,
+																 REGEXFIND('(^C/O | INC$| LLC$)',TRIM(L.ADDRESS2)) => L.ADDRESS2,
 		                             ''); //Get contact name from address
-		SELF.ADDR_ADDR1_1			:= IF(tmpOfficeName = ' ',StringLib.StringToUpperCase(TRIM(L.ADDRESS1,LEFT,RIGHT)),
-																StringLib.StringToUpperCase(TRIM(L.ADDRESS2,LEFT,RIGHT)));
-		SELF.ADDR_ADDR2_1			:= IF(tmpOfficeName != ' ',' ',StringLib.StringToUpperCase(TRIM(L.ADDRESS2,LEFT,RIGHT)));
+
+		prepAddr_Line_1				:= TrimAddress1 + ' ' + TrimAddress2;
+		prepAddr_Line_1_1			:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(prepAddr_Line_1, RemovePattern);
+		prepAddr_Line_2				:= TrimCity + ' ' + TrimState + ' ' + TmpZip;
+		clnAddress						:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(prepAddr_Line_1_1,prepAddr_Line_2);
+		tmpADDR_ADDR1_1				:= TRIM(clnAddress[1..10],LEFT,RIGHT)+' '+TRIM(clnAddress[11..12],LEFT,RIGHT)+' '+TRIM(clnAddress[13..40],LEFT,RIGHT)+' '+TRIM(clnAddress[41..44],LEFT,RIGHT)+' '+TRIM(clnAddress[45..46],LEFT,RIGHT);																	
+		tmpADDR_ADDR2_1 			:= TRIM(clnAddress[47..56],LEFT,RIGHT)+' '+TRIM(clnAddress[57..64],LEFT,RIGHT);
+		AddrWithContact				:= Prof_License_Mari.mod_clean_name_addr.GetDBAName(tmpADDR_ADDR1_1); //Looks for any stray ATTN AND C/O in address
+
+		SELF.ADDR_ADDR1_1			:= MAP(AddrWithContact != '' AND tmpADDR_ADDR2_1 != '' => StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),
+																 tmpADDR_ADDR1_1=''  => StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),
+																 StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));
+		SELF.ADDR_ADDR2_1			:= MAP(AddrWithContact!='' => '',
+																 tmpADDR_ADDR2_1='' => '',
+																 TRIM(tmpADDR_ADDR2_1)=TRIM(tmpADDR_ADDR1_1) => '',
+																 StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
+
+															 
+																 
+		// SELF.ADDR_ADDR1_1			:= IF(tmpOfficeName = ' ',StringLib.StringToUpperCase(TRIM(L.ADDRESS1,LEFT,RIGHT)),
+																// StringLib.StringToUpperCase(TRIM(L.ADDRESS2,LEFT,RIGHT)));
+		// SELF.ADDR_ADDR2_1			:= IF(tmpOfficeName != ' ',' ',StringLib.StringToUpperCase(TRIM(L.ADDRESS2,LEFT,RIGHT)));
+		
 		SELF.ADDR_CITY_1		  := StringLib.StringToUpperCase(TRIM(L.CITY));
 		SELF.ADDR_STATE_1			:= StringLib.StringToUpperCase(TRIM(L.STATE));
-		tmpZip	              := MAP(LENGTH(TRIM(L.POSTALCODE))=3 => '00'+TRIM(L.POSTALCODE),
-		                             LENGTH(TRIM(L.POSTALCODE))=4 => '0'+TRIM(L.POSTALCODE),
-						                     TRIM(L.POSTALCODE));
+
 		SELF.ADDR_ZIP5_1		  := tmpZip[1..5];
 		SELF.ADDR_ZIP4_1		  := IF(StringLib.StringFind(tmpZip,'-',1)>0,tmpZip[7..11],
 				                       tmpZip[6..10]);
