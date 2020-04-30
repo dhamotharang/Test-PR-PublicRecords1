@@ -1,4 +1,5 @@
-import header, mdr;
+﻿import header, mdr;
+// export	as_headers(dataset(Layouts.layout_offender) pDOC = prte2_doc.Files.file_offenders_keybuilding) :=  function
 export	as_headers(dataset(Layouts.layout_offender) pDOC = dataset([],Layouts.layout_offender)) :=  function
 	infile := pDOC;
 
