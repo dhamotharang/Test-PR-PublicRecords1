@@ -1,8 +1,11 @@
-﻿IMPORT header,mdr;
+﻿IMPORT header,mdr,infutor;
 
-EXPORT files:=MODULE
+EXPORT files(unsigned1 mode):=MODULE
 
-  EXPORT file_header_nonglb_dppa := header.file_headers_NonGLB(~mdr.Source_is_on_Probation(src) and ~mdr.Source_is_DPPA(src) and ((prim_range<>'' or prim_name<>'') and zip<>'')):persist('~thor::persist::reunion::headernonglb');
+  // EXPORT file_header_nonglb_dppa := header.file_headers_NonGLB(~mdr.Source_is_on_Probation(src) and ~mdr.Source_is_DPPA(src) and ((prim_range<>'' or prim_name<>'') and zip<>'')):persist('~thor::persist::reunion::headernonglb');
+
+  inf_hdr := infutor.infutor_header(~mdr.Source_is_on_Probation(src) and ~mdr.Source_is_DPPA(src) and ((prim_range<>'' or prim_name<>'') and zip<>'')):persist('~thor::persist::reunion::headerinfutor', refresh(false));
+  EXPORT infutor_header := header.fn_suppress_ccpa(inf_hdr, true);
 
   SHARED lRawIn01:=RECORD
    STRING user_num;
@@ -12,7 +15,7 @@ EXPORT files:=MODULE
    STRING zip;
    STRING gender;
   END;
-  EXPORT dRawIn01(STRING sVersion=constants.sVersion):=DATASET(constants.sLocationIn+sVersion+'::mylife1.dat',lRawIn01,CSV(QUOTE(''),TERMINATOR(['\r\n','\n\r','\n']),SEPARATOR(','),HEADING(9)));
+  EXPORT dRawIn01(STRING sVersion=reunion.constants.sVersion):=DATASET(constants.sLocationIn+sVersion+'::mylife1.dat',lRawIn01,CSV(QUOTE(''),TERMINATOR(['\r\n','\n\r','\n']),SEPARATOR(','),HEADING(9)));
 
   SHARED lRawIn02:=RECORD
    STRING user_num;
@@ -34,16 +37,21 @@ EXPORT files:=MODULE
   //EXPORT dRawIn06(STRING sVersion=constants.sVersion):=DATASET(constants.sLocationIn+sVersion+'::mylife6.dat',lRawIn02,CSV(QUOTE(''),TERMINATOR(['\r\n','\n']),SEPARATOR(','),HEADING(1)));
   EXPORT dRawIn06(STRING sVersion=constants.sVersion):=DATASET(constants.sLocationIn+sVersion+'::mylife6.dat',lRawIn01,CSV(QUOTE(''),TERMINATOR(['\r\n','\n']),SEPARATOR(','),HEADING(1)),OPT);
 
-  EXPORT dCustomerDB:=DATASET('~thor::base::mylife::customer_database',reunion.layouts.lCustomerDB,FLAT);
-	EXPORT dThirdPartyDB:=DATASET('~thor::base::mylife::third_party_database',reunion.layouts.lThirdPartyDB,FLAT);
-  EXPORT dMain:=DATASET('~thor::base::mylife::main',reunion.layouts.lMain,FLAT);
-  EXPORT dOldAddresses:=DATASET('~thor::base::mylife::old_addresses',reunion.layouts.lOldAddresses,FLAT);
-  EXPORT dRelatives:=DATASET('~thor::base::mylife::relatives',reunion.layouts.lRelatives,FLAT);
-  EXPORT dAliases:=DATASET('~thor::base::mylife::alias',reunion.layouts.lAlias,FLAT);
-  EXPORT dAdlScore:=DATASET('~thor::base::mylife::adl_score',reunion.layouts.lAdlScore,FLAT);
-  EXPORT dCollege:=DATASET('~thor::base::mylife::college',reunion.layouts.lCollege,FLAT);
-  EXPORT dEmail:=DATASET('~thor::base::mylife::email',reunion.layouts.lEmail,FLAT);
-  EXPORT dTax:=DATASET('~thor::base::mylife::tax',reunion.layouts.l_tax,FLAT);
-  EXPORT dDeed:=DATASET('~thor::base::mylife::deeds',reunion.layouts.l_deed,FLAT);
-  EXPORT dFlags:=DATASET('~thor::base::mylife::flags',reunion.layouts.l_flags,FLAT);
+  sPrefix := '~thor::base::mylife::' + reunion.Constants.sMode(mode) + '::';
+  shared sFile(record_type) := sPrefix + reunion.Constants.sFile(record_type);
+
+  EXPORT dCustomerDB:=DATASET(sFile(1),reunion.layouts.lCustomerDB,FLAT);
+	EXPORT dThirdPartyDB:=DATASET(sFile(2),reunion.layouts.lThirdPartyDB,FLAT);
+  EXPORT dMain:=DATASET(sFile(3),reunion.layouts.lMain,FLAT);
+  EXPORT dOldAddresses:=DATASET(sFile(4),reunion.layouts.lOldAddresses,FLAT);
+  EXPORT dRelatives:=DATASET(sFile(5),reunion.layouts.lRelatives,FLAT);
+  EXPORT dAliases:=DATASET(sFile(6),reunion.layouts.lAlias,FLAT);
+  EXPORT dAdlScore:=DATASET(sFile(7),reunion.layouts.lAdlScore,FLAT);
+  EXPORT dEmail:=DATASET(sFile(8),reunion.layouts.lEmail,FLAT);
+  EXPORT dCollege:=DATASET(sFile(9),reunion.layouts.lCollege,FLAT);  
+  EXPORT dDeed:=DATASET(sFile(10),reunion.layouts.l_deed,FLAT);
+  EXPORT dTax:=DATASET(sFile(11),reunion.layouts.l_tax,FLAT);  
+  EXPORT dFlags:=DATASET(sFile(12),reunion.layouts.l_flags,FLAT);
+  EXPORT dAttributes:=DATASET(sFile(13),reunion.layouts.lAttributes,FLAT);
+  
 END;
