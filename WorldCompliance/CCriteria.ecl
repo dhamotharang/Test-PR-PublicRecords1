@@ -26,7 +26,7 @@ WCOCategories(dataset(Layouts.rWCOCategories) restored) := FUNCTION
 								
 		dsCategory := PROJECT(AllCategories,rCriteria);
 		Mcats := PROJECT(restored, TRANSFORM (rCriteriaRollup,
-											SKIP(left.IsActivePEP in ['N']),
+											SKIP(left.IsActivePEP = 'N'),
 											self.id := LEFT.EntityID;
 											self.criteria := if(left.SegmentType='AdditionalSegments' or left.SegmentType='Sanction',
 										if(left.SubCategoryLabel = 'Associated Entity' or left.SubCategoryLabel ='Ownership Or Control' or left.SubCategoryLabel = 'SWIFT BIC Entity',
@@ -123,9 +123,9 @@ EXPORT CCriteria := FUNCTION
 
 //Allreasons := sort((GetReasons(infile) & GetMultReasons(restored)), Ent_ID, cmts, local);
 //finalcat := DEDUP(SORT(DISTRIBUTE(SORT(GetCategories(oldcat) + GetMultCategories(restored),id,criteria,Local),id), id, criteria, LOCAL),id, criteria, LOCAL);
-finalcat := DEDUP(SORT(GetCategories(oldrestored) + GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // This is last run
+//finalcat := DEDUP(SORT(GetCategories(oldrestored) + GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // Pre IsActivePEP
 //finalcat := DEDUP(SORT(GetCategories(oldrestored),id,criteria,Local),id, criteria, LOCAL); // This is last run
-
+finalcat := DEDUP(SORT(GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // This is last run
 
 Group_3 := ROLLUP(finalcat, mergeValue(LEFT, RIGHT), id, LOCAL);
 return Group_3;

@@ -93,6 +93,7 @@ END;
 			 //'Last Updated: ' + ut.ConvertDate(TRIM(Left.Touchdate),'%Y-%m-%d', '%Y-%m-%d');));
 //Multi Cat/Subcat section
 	 GetMultReasons(dataset(Layouts.rWCOCategories) src) := PROJECT(src, TRANSFORM(rComments,
+			SKIP(Left.IsActivePEP = 'N'),
 			self.Ent_Id := LEFT.EntityID;
 			self.sorter := 5;
 			self.subcmts := '';
