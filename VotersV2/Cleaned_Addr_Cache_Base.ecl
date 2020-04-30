@@ -34,12 +34,13 @@ end;
 
 out_layout trfNormMailAddr(bothFiles l, unsigned c) := transform
 	 ,skip(c = 2 and
-	       // trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
-		   // trim(l.st,left,right)          = trim(l.mail_st,left,right) and
-		   // trim(l.zip,left,right)         = trim(l.mail_ace_zip,left,right) and
-		   // trim(l.p_city_name,left,right) + trim(l.zip,left,right) <> '' and
-			 trim(l.prep_res_addr_line_last,left,right) = trim(l.prep_mail_addr_line_last,left,right) and
-		   trim(l.prep_res_addr_line_last,left,right) <> '' and
+	       trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
+		   trim(l.st,left,right)          = trim(l.mail_st,left,right) and
+		   trim(l.zip,left,right)         = trim(l.mail_ace_zip,left,right) and
+		   trim(l.p_city_name,left,right) + trim(l.zip,left,right) <> '' and
+			 //Can't use new fields yet as there values are not set yet
+			 // trim(l.prep_res_addr_line_last,left,right) = trim(l.prep_mail_addr_line_last,left,right) and
+		   // trim(l.prep_res_addr_line_last,left,right) <> '' and
 		   trim(l.mail_prim_range, left, right) = '' and
 		   trim(l.mail_predir,left,right)  = '' and
 		   trim(l.mail_prim_name,left,right)  = '' and
@@ -94,9 +95,11 @@ end;
 
 // Normalize the Mailing Addresses 
 Clean_Addr_Norm_file  := NORMALIZE(bothFiles,
-								   // if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
-								       // (integer)left.mail_ace_zip = 0)  
-									if((trim(left.prep_mail_addr_line_last,left,right) = '') 
+								   if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
+								       (integer)left.mail_ace_zip = 0)  											 
+			            //Again Can't use new fields yet as there values are not set yet
+									// if((trim(left.prep_mail_addr_line_last,left,right) = '') and
+                   // (integer)left.mail_ace_zip = 0)
 											 or 
 								      (trim(left.prim_range,left,right)  = trim(left.mail_prim_range,left,right) and
 									   trim(left.predir,left,right)      = trim(left.mail_predir,left,right) and
@@ -111,12 +114,12 @@ Clean_Addr_Norm_file  := NORMALIZE(bothFiles,
 								       trim(left.zip4,left,right)        = trim(left.mail_zip4,left,right)),1,2)								      
 								   ,trfNormMailAddr(left,counter));
 
-Clean_File_filt := Clean_Addr_Norm_file(prep_mail_addr_line_last <> '');
+Clean_File_filt := Clean_Addr_Norm_file(addr_line_last <> '');
                    // Clean_Addr_Norm_file(trim(p_city_name,left,right) <> '' and
 										// trim(st,left,right)  <> '' and
 										// trim(zip,left,right) <> '');
 
-Clean_file_emty := Clean_Addr_Norm_file(prep_mail_addr_line_last = '');
+Clean_file_emty := Clean_Addr_Norm_file(addr_line_last = '');
                    // Clean_Addr_Norm_file(trim(p_city_name,left,right) = '' or
 										// trim(st,left,right)  = '' or
 										// trim(zip,left,right) = '');	
@@ -173,9 +176,6 @@ clean_cache_addr_file := project(dwithAID
 		self := left
 		,self := []));
 
-// clean_cache_file      := clean_cache_addr_file;
-
-// clean_cache_file_dist := distribute(clean_cache_file, vtid);
 clean_cache_file_dist := distribute(clean_cache_addr_file, vtid);
 
 full_norm_file := sort(clean_cache_file_dist, vtid, -process_date, -date_first_seen, addr_type, local);
