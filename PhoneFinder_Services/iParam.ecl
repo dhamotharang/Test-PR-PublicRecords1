@@ -216,7 +216,8 @@ MODULE
       EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
       EXPORT BOOLEAN IsGetPortedData         := ReturnPortingInfo OR IncludePhoneMetadata;
       EXPORT BOOLEAN IsGetMetaData           := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
-      BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase OR IncludeRiskIndicators; // To get same day OTPs and Inquiries
+      BOOLEAN IncludeDeltabaseForRI          := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId IN [6, 7, 8, 9, 15, 26, 27, 30]));
+      BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase OR IncludeDeltabaseForRI; // To get same day OTPs and Inquiries
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
@@ -379,7 +380,8 @@ MODULE
 	  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
 	  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
       BOOLEAN   UseDeltabase_internal                     := FALSE : STORED('UseDeltabase');
-      BOOLEAN   RealtimeData 		                      := UseDeltabase_internal OR IncludeRiskIndicators; // To get same day OTPs and Inquiries
+      BOOLEAN IncludeDeltabaseForRI          := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId IN [6, 7, 8, 9, 15, 26, 27, 30]));
+      BOOLEAN   RealtimeData 		                      := UseDeltabase_internal OR IncludeDeltabaseForRI; // To get same day OTPs and Inquiries
 	  EXPORT BOOLEAN   UseDeltabase 		              := IF(IsGetMetaData,RealTimedata,FALSE);
       EXPORT BOOLEAN   UseTransUnionIQ411                 :=   UseQSent;
       EXPORT BOOLEAN   UseTransUnionPVS                   :=   UseQSent;
