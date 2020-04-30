@@ -12,6 +12,7 @@ end;
 		
 export t_NetWiseEmailSearchResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	integer RecordCount {xpath('RecordCount')};
 	dataset(iesp.net_wise_share.t_NetWiseResult) Results {xpath('Results/Result'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_RESULTS_RECORDS)};
 end;
 		
