@@ -1,7 +1,7 @@
-IMPORT gong,phonesplus;
+IMPORT gong,phonesplus, D2C;
 
 dGong:=gong.file_history(current_record_flag='Y' AND did<>0);
-dPhonesPlus:=phonesplus.file_phonesplus_base(activeflag='Y' AND confidencescore>=11 AND did<>0);
+dPhonesPlus:=phonesplus.file_phonesplus_base(activeflag='Y' AND confidencescore>=11 AND did<>0, vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
 
 lPhones:=RECORD
  UNSIGNED6 did;
