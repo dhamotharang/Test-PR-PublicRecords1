@@ -1,4 +1,4 @@
-﻿IMPORT IESP, DeferredTask, Risk_Indicators, Riskview, Gateway, Risk_Reporting, STD;
+﻿IMPORT IESP, Risk_Indicators, Riskview, Gateway, Risk_Reporting, STD;
 
 EXPORT Functions := MODULE
 
@@ -8,7 +8,9 @@ RecsToDTE := DATASET([TRANSFORM(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoReque
 
 GetRequestInfoGW := gateways(STD.Str.ToLowerCase(ServiceName)=Gateway.Constants.ServiceName.GetRequestInfo)[1];
 
-GetRequestInfo := Gateway.Soapcall_GetRequestInfo(RecsToDTE, GetRequestInfoGW);
+makeDTEGatewayCall := GetRequestInfoGW.URL <> '';
+
+GetRequestInfo := Gateway.Soapcall_DTEGetRequestInfo(RecsToDTE, GetRequestInfoGW, pMakeGatewayCall := makeDTEGatewayCall);
 
 rec := RECORD
 STRING50 RMSID{xpath('RMSID')};
