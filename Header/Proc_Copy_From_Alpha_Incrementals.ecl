@@ -129,7 +129,7 @@ EXPORT copy_from_alpha(string filedt) := function
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
      bldSegmentation // creates blank segmentation did_ind key  
-    ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,aPrefLoc + filedt + '::locid')  
+    ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
     ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedt, '::did::refs::dob'))
