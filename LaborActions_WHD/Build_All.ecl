@@ -1,4 +1,4 @@
-﻿IMPORT versioncontrol, _control, ut, Orbit3, Roxiekeybuild;
+﻿IMPORT versioncontrol, _control, ut, Orbit3, Roxiekeybuild, Scrubs_LaborActions_WHD,scrubs;
 
 EXPORT Build_All(STRING	pversion) := MODULE
 
@@ -16,7 +16,10 @@ EXPORT Build_All(STRING	pversion) := MODULE
 																						,NewBase
 																						,Build_Base_File );
 																						
-		dops_update := Roxiekeybuild.updateversion('LaborActionsWHDKeys',pversion,'Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com',,'N'); 
+		dops_update := if(
+						scrubs.mac_ScrubsFailureTest('Scrubs_LaborActions_WHD',pversion)
+						,Roxiekeybuild.updateversion('LaborActionsWHDKeys',pversion,'Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com',,'N')
+						,OUTPUT('Scrubs failed due to reject warnings',NAMED('Scrubs_Status'))); 
 		orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Labor Actions WHD', pversion);
 				
 		full_build 	:= SEQUENTIAL( 
@@ -24,6 +27,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 					    		,nothor(APPLY(filenames().Input.dAll_superfilenames, versioncontrol.mUtilities.createsuper(name)))
 									,spray_files
 									,Promote().Input.sprayed2using
+									,Scrubs_LaborActions_WHD.Fn_RunScrubs(pversion)
 									,Build_KeyBuild_File
 									,Build_Base_File
 									,FileServices.ClearSuperFile(filenames(pversion).keybuild.built,true)
