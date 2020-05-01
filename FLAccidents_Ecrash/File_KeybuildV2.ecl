@@ -96,7 +96,7 @@ pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash(accident_nbr))
 /////////////////////////////////////////////////////////////////
 Layout_keybuild_SSv2_NewAgencyORI xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
 
-	self.vehicle_incident_city			:= stringlib.stringtouppercase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
+	self.vehicle_incident_city			:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
 	//Appriss Integration
 	self.Releasable                     := '1'; 	
 	self 														:= L;
@@ -124,10 +124,10 @@ Layout_keybuild_SSv2_NewAgencyORI slimrec(ntlFile L) := transform
 		self.accident_nbr 						:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 		self.accident_date						:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
 		self.b_did										:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-		self.cname										:= stringlib.stringtouppercase(L.business_name);
+		self.cname										:= STD.Str.ToUpperCase(L.business_name);
 		self.addr_suffix 							:= L.suffix;
 		self.zip											:= L.zip5;
-		self.record_type							:= CASE(stringlib.stringtouppercase(trim(L.party_type,left,right))
+		self.record_type							:= CASE(STD.Str.ToUpperCase(trim(L.party_type,left,right))
 																							,'OWNER'=>'Property Owner'
 																							,'DRIVER'=>'Vehicle Driver'
 																							,'VEHICLE OWNER'=>'Property Owner' 
@@ -157,8 +157,8 @@ Layout_keybuild_SSv2_NewAgencyORI slimrec(ntlFile L) := transform
 		self.vehicle_make							:=L.vehMake;
 		self.make_description					:= if(L.make_description != '',L.make_description,L.vehMake);
 		self.model_description				:= if(L.model_description != '',L.model_description,L.vehModel);
-		self.vehicle_incident_city	  := stringlib.stringtouppercase(L.inc_city);
-		self.vehicle_incident_st			:= stringlib.stringtouppercase(L.state_abbr);
+		self.vehicle_incident_city	  := STD.Str.ToUpperCase(L.inc_city);
+		self.vehicle_incident_st			:= STD.Str.ToUpperCase(L.state_abbr);
 		self.point_of_impact					:= L.impact_location;
 		self.towed				      			:= L.Car_Towed;
 		self.Impact_Location    			:= L.Impact_Location ;
@@ -212,14 +212,14 @@ Layout_keybuild_SSv2_NewAgencyORI slimrec2(inqFile L ,unsigned1 cnt) := transfor
 		self.accident_location			:= map(L.cross_street!='' and L.cross_street!= 'N/A' => L.street+' & '+L.cross_street,L.street);
 		self.accident_street				:= L.street;
 		self.accident_cross_street	:= map(L.cross_street!= 'N/A' => L.cross_street,'');
-		self.jurisdiction						:= stringlib.stringtouppercase(trim(L.EDIT_AGENCY_NAME,left,right));
-		self.jurisdiction_state			:= stringlib.stringtouppercase(L.State);
+		self.jurisdiction						:= STD.Str.ToUpperCase(trim(L.EDIT_AGENCY_NAME,left,right));
+		self.jurisdiction_state			:= STD.Str.ToUpperCase(L.State);
 		self.st											:= if(l.st = '',self.jurisdiction_state,l.st);
 		self.jurisdiction_nbr				:= L.AGENCY_ID;
-		self.cru_jurisdiction       := stringlib.stringtouppercase(trim(L.EDIT_AGENCY_NAME,left,right));
+		self.cru_jurisdiction       := STD.Str.ToUpperCase(trim(L.EDIT_AGENCY_NAME,left,right));
 		self.cru_jurisdiction_nbr   := L.AGENCY_ID + '_'+L.STATE_NBR ; 
-		self.vehicle_incident_city	:= stringlib.stringtouppercase(L.city);
-		self.vehicle_incident_st		:= stringlib.stringtouppercase(L.state);
+		self.vehicle_incident_city	:= STD.Str.ToUpperCase(L.city);
+		self.vehicle_incident_st		:= STD.Str.ToUpperCase(L.state);
 		self.did										:= 	choose(cnt ,if(L.did = 0,'000000000000',intformat(L.did,12,1)),'000000000000','000000000000');	
 		self.prim_range   					:=  choose(cnt ,L.prim_range,'',''); 
 		self.predir       					:=  choose(cnt ,l.predir,'','');
@@ -367,8 +367,8 @@ Layout_keybuild_SSv2_NewAgencyORI slimrec3(eFile L, unsigned1 cnt) := transform
 		self.model_description							:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_description != '',L.model_description,L.model),
 																														if(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
 																														if(L.model_description != '',L.model_description,L.model));
-		self.vehicle_incident_city					:= stringlib.stringtouppercase(L.Crash_City);
-		self.vehicle_incident_st						:= stringlib.stringtouppercase(L.Loss_State_Abbr);
+		self.vehicle_incident_city					:= STD.Str.ToUpperCase(L.Crash_City);
+		self.vehicle_incident_st						:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
 		self.towed				   								:= L.Vehicle_Towed_Derived;
 		
 		self.impact_location 								:= if (l.report_code ='TM' ,
@@ -447,11 +447,11 @@ ddrecs := dedup(sort(distribute(total,hash(accident_nbr))
 
 Layout_keybuild_SSv2_NewAgencyORI slimrecs(ddrecs L) := transform
 
-     t_scrub := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+     t_scrub := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
      self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
      self.orig_accnbr := l.accident_nbr; 
-		 self.addl_report_number :=  if(stringlib.stringfilterout(trim(l.addl_report_number ,left,right),'0') <>'',l.addl_report_number,'') ;
-		 self.scrub_addl_report_number := stringlib.StringFilter(self.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+		 self.addl_report_number :=  if(STD.Str.FilterOut(trim(l.addl_report_number ,left,right),'0') <>'',l.addl_report_number,'') ;
+		 self.scrub_addl_report_number := STD.Str.Filter(self.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 		 self.policy_effective_date := map ( trim(l.policy_effective_date)[1] = '0' =>  '',
 		                                     trim(l.policy_effective_date)[8] = '-' =>  trim(l.policy_effective_date)[1..7],
 																					                                            trim(l.policy_effective_date)
