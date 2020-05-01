@@ -170,7 +170,7 @@ EXPORT Records := Module
 	//Records with 'M' entity type
 	byOrgs (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt,cfg);
 		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
 																																							self.acctno := left.acctno; 
 																																							self:=right; self:=left;), left outer);

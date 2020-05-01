@@ -1,9 +1,10 @@
-import BatchServices,Business_Header,ut,BIPV2,std;
+﻿import BatchServices,Business_Header,ut,BIPV2,std,AutoStandardI;
 EXPORT Datasource_Boca_Bus_Header := Module
 	// Recode to hit BIP Header...
 	Shared CurrentYYMM := ((STRING8)Std.Date.Today())[1..6];
-	Export get_BIP_Records (dataset(Layouts.autokeyInput) input) := function
+	Export get_BIP_Records (dataset(Layouts.autokeyInput) input, dataset(Layouts.common_runtime_config) cfg = dataset([],Layouts.common_runtime_config)) := function
 		//Project input into Bip format
+		mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
 		recFmt := BIPV2.IDfunctions.rec_SearchInput;
 		dsExact := project(input,transform(recFmt, 
 										self.acctno:=left.acctno;
@@ -30,8 +31,8 @@ EXPORT Datasource_Boca_Bus_Header := Module
 										self.fein:=left.FEIN;
 										self.results_limit:=Constants.BUS_NAME_BIP_MAX_RECS_THRESHOLD;
 										self := [];));
-		rawRecsExact := BIPV2.IdFunctions.fn_IndexedSearchForXLinkIDs(dsExact).data2_;
-		rawRecsAddress := BIPV2.IdFunctions.fn_IndexedSearchForXLinkIDs(dsAddress).data2_;
+		rawRecsExact := BIPV2.IdFunctions.fn_IndexedSearchForXLinkIDs(dsExact).SearchKeyData(mod_access);
+		rawRecsAddress := BIPV2.IdFunctions.fn_IndexedSearchForXLinkIDs(dsAddress).SearchKeyData(mod_access);
 		// Ok, so find those records at the same address that are likely the same company
 		BipAddressInput := join(input,dedup(rawRecsExact(company_name<>''),acctno,all), left.acctno=right.acctno, transform(Layouts.autokeyInput, self.bipExactFound:=true, self:=left), left outer,keep(Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0));
 		BipRawAddressLimit := join(input,rawRecsAddress(company_name<>''), left.acctno=right.acctno, transform(recordof(rawRecsAddress), self := right),keep(Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0));
@@ -146,9 +147,9 @@ EXPORT Datasource_Boca_Bus_Header := Module
 		//output(bocaBusHeader_final_sorted,named('bocaBusHeader_final_sorted'),extend);
 		return bocaBusHeader_final_sorted;
 	End;
-	Export get_boca_bus_header_entity (dataset(Layouts.autokeyInput) input):= function
+	Export get_boca_bus_header_entity (dataset(Layouts.autokeyInput) input, dataset(Layouts.common_runtime_config) cfg = dataset([],Layouts.common_runtime_config)):= function
 		// output(input,named('bocaBusHeader_input'));
-		bocaBusHeader_final_sorted := get_BIP_Records(input);
+		bocaBusHeader_final_sorted := get_BIP_Records(input,cfg);
 		bocaBusHeader_final_grouped := group(bocaBusHeader_final_sorted, acctno, LNPID);
 		bocaBusHeader_rolled := rollup(bocaBusHeader_final_grouped, group, Transforms.doBocaBusHeaderBaseRecordSrcIdRollup(left,rows(left)));			
 		return bocaBusHeader_rolled;
