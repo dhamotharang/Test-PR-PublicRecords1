@@ -4,18 +4,20 @@
     address
     fips_state   
     fips_county  
+    county_name
     business_phone
     seleid_status
 
 
 */
-import ut,BIPV2;
+import ut,BIPV2,Address;
 EXPORT Best_From_BIP_Best_Seleid(
 
-  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best = Marketing_List.Source_Files().bip_best
- ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base = Marketing_List.Source_Files().bip_base
+  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best   = Marketing_List.Source_Files().bip_best
+ ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base   = Marketing_List.Source_Files().bip_base
  ,boolean                                                   pDebug          = false
  ,set of unsigned6                                          pSampleProxids  = []
+ ,dataset(recordof(Address.County_Names                  )) pCounty_Names   = Address.County_Names
 
 ) :=
 function
@@ -70,6 +72,7 @@ function
     self.err_stat            := ''                                      ;//need to get this from the base file
     self.fips_state          := best_address.state_fips                 ;
     self.fips_county         := best_address.county_fips                ;
+    self.county_name         := ''                                      ;//get this below
     self.age_of_company      := ''                                      ;
     self.business_phone      := best_phone.company_phone                ;
     self.business_email      := ''                                      ;//need to get this from the base file
@@ -93,6 +96,12 @@ function
   // -- filter final dataset to make sure we didn't lose any records because of the marketing filter on company_name and address
   ds_best_seleid := ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
   
+  ds_result := join(ds_best_seleid  ,pCounty_Names  ,left.fips_state = right.state_code and left.fips_county = right.county_code ,transform(
+    recordof(left)
+    ,self.county_name := right.county_name  ;
+    ,self             := left               ;
+  ) ,left outer  ,hash  ,keep(1));
+
   output_debug := parallel(
    
     output('---------------------Marketing_List.Best_From_BIP_Best_Seleid---------------------'                      ,named('Marketing_List_Best_From_BIP_Best_Seleid' ),all)
@@ -103,9 +112,10 @@ function
    ,output(choosen(ds_best_get_active_seleids       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_get_active_seleids'               ),all)
    ,output(choosen(ds_best_prep                     (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_prep'                             ),all)
    ,output(choosen(ds_best_seleid                   (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_seleid'                           ),all)
+   ,output(choosen(ds_result                        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_result'                                ),all)
   
   );
 
-  return when(ds_best_seleid  ,if(pDebug = true ,output_debug));
+  return when(ds_result  ,if(pDebug = true ,output_debug));
   
 end;
