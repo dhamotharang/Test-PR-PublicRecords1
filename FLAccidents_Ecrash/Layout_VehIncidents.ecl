@@ -20,18 +20,6 @@
 		STRING100 	Loss_Street;
 		STRING100 	Loss_Cross_Street;
 	END;
-
-	EXPORT CmbndLayout := record
-		SlimIncidents;
-		STRING30 		vin;
-		STRING12 		tag_nbr;
-		STRING20 		fname;
-	 STRING20 		mname;
-	 STRING20 		lname;
-		STRING100 	Person_Type;
-		STRING10 		Date_of_Birth;
-		STRING3 		Unit_Number;
-	END;
 	
 	enum_code_desc := RECORD
    STRING50 code;
