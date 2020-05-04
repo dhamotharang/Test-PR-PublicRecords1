@@ -18,17 +18,14 @@ module
 	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.new		,create_base			,Build_Base_File		);
 	
 	export full_build :=
-	   if(scrubs.mac_ScrubsFailureTest('Scrubs_Debt_Settlement_CC',pversion) and 
-		    scrubs.mac_ScrubsFailureTest('Scrubs_Debt_Settlement_RSIH',pversion)
-			 ,sequential(
-					 if(not pWriteFileOnly	,Promote().Inputfiles.Sprayed2Using)
-					,Build_Base_File
-					,if(not pWriteFileOnly	,Promote(pversion).buildfiles.New2Built)
-					,output(Filenames(pversion).dAll_filenames,named('buildNames'))
-									)					
-				,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
-		   );
-	
+		 sequential(
+			 if(not pWriteFileOnly	,Promote().Inputfiles.Sprayed2Using)
+			,Build_Base_File
+			,if(not pWriteFileOnly	,Promote(pversion).buildfiles.New2Built)
+			,output(Filenames(pversion).dAll_filenames,named('buildNames'))
+
+		);
+		
 	/*export All :=
 		if(VersionControl.IsValidVersion(pversion)
 			,sequential(

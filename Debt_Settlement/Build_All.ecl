@@ -43,7 +43,11 @@ module
 		,spray_files
 		,Scrubs.ScrubsPlus('Debt_Settlement','Scrubs_Debt_Settlement','Scrubs_Debt_Settlement_CC', 'CC', pversion,Debt_Settlement.Email_Notification_Lists(pIsTesting).BuildFailure,false)
 	  ,Scrubs.ScrubsPlus('Debt_Settlement','Scrubs_Debt_Settlement','Scrubs_Debt_Settlement_RSIH', 'RSIH', pversion,Debt_Settlement.Email_Notification_Lists(pIsTesting).BuildFailure,false)
-	 	,Build_Base(pversion,pUpdateRSIHFile,pUpdateCCFile,pBaseFile,pUseBusHeader,,pBusHeaderBestFile,pBusSICRecs).full_build
+	 	,if(scrubs.mac_ScrubsFailureTest('Scrubs_Debt_Settlement_CC,Scrubs_Debt_Settlement_RSIH',pversion)
+		 	 ,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+			 ,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+		   )		
+		,Build_Base(pversion,pUpdateRSIHFile,pUpdateCCFile,pBaseFile,pUseBusHeader,,pBusHeaderBestFile,pBusSICRecs).full_build
  	  ,Build_Keys(pversion).all
 		,Build_Autokeys(pversion)
 		,Promote().Buildfiles.Built2QA
