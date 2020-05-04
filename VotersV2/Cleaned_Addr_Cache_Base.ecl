@@ -1,6 +1,5 @@
 ﻿import Address, ut, AID;
-//Added AID to the build
-//DF-27577 Moved DID after DID
+//DF-27577 Moved DID after AID
 in_file := VotersV2.Updated_Voters;
 
 //Gives Updated_Voters equal number of fields as the Base File
@@ -15,6 +14,9 @@ InFileTransformed := project(in_file, trfInFile(left));
 baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base : persist('~thor_data400::persist::voters::BaseFile',SINGLE) ;
 
 bothFiles := InFileTransformed + baseFile;
+
+// generating a sequence number for "vtid"
+ut.MAC_Sequence_Records(bothFiles,vtid,vtidBothFiles);
 
 															
 // Transform to Normalize the Mailing Addresses.
@@ -32,7 +34,7 @@ out_layout := record
 	string50 addr_line_last := '';
 end;
 
-out_layout trfNormMailAddr(bothFiles l, unsigned c) := transform
+out_layout trfNormMailAddr(vtidBothFiles l, unsigned c) := transform
 	 ,skip(c = 2 and
 	       trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
 		   trim(l.st,left,right)          = trim(l.mail_st,left,right) and
@@ -94,7 +96,7 @@ out_layout trfNormMailAddr(bothFiles l, unsigned c) := transform
 end;
 
 // Normalize the Mailing Addresses 
-Clean_Addr_Norm_file  := NORMALIZE(bothFiles,
+Clean_Addr_Norm_file  := NORMALIZE(vtidBothFiles,
 								   if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
 								       (integer)left.mail_ace_zip = 0)  											 
 			            //Again Can't use new fields yet as there values are not set yet
@@ -115,14 +117,8 @@ Clean_Addr_Norm_file  := NORMALIZE(bothFiles,
 								   ,trfNormMailAddr(left,counter));
 
 Clean_File_filt := Clean_Addr_Norm_file(addr_line_last <> '');
-                   // Clean_Addr_Norm_file(trim(p_city_name,left,right) <> '' and
-										// trim(st,left,right)  <> '' and
-										// trim(zip,left,right) <> '');
 
 Clean_file_emty := Clean_Addr_Norm_file(addr_line_last = '');
-                   // Clean_Addr_Norm_file(trim(p_city_name,left,right) = '' or
-										// trim(st,left,right)  = '' or
-										// trim(zip,left,right) = '');	
 									
 unsigned4	lFlags 	:= AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 
@@ -164,10 +160,6 @@ clean_cache_addr_file := project(dwithAID
 				self.geo_blk				:= left.aidwork_acecache.geo_blk			;
 				self.geo_match			:= left.aidwork_acecache.geo_match		;
 				self.err_stat				:= left.aidwork_acecache.err_stat			;
-				// self.prep_res_addr_line1 := left.prep_res_addr_line1;
-				// self.prep_res_addr_line_last := left.prep_res_addr_line_last;
-				// self.prep_mail_addr_line1 := left.prep_mail_addr_line1;
-				// self.prep_mail_addr_line_last := left.prep_mail_addr_line_last;
 				self := left;
 				self := [];
 			)

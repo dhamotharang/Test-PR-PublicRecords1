@@ -27,17 +27,17 @@ dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name
 																
 // deduping the records based on vtid key, political party, mailing address fields.																
 ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
-                                // lname, name_suffix, fname, mname, dob, 
-																// prim_range, prim_name, predir, addr_suffix, postdir, unit_desig, sec_range,
-																// p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
-                                // mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir,
-													  		// mail_unit_desig, mail_sec_range, mail_p_city_name, mail_st,	mail_ace_zip, 
+                                lname, name_suffix, fname, mname, dob, 
+																prim_range, prim_name, predir, addr_suffix, postdir, unit_desig, sec_range,
+																p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
+                                mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir,
+													  		mail_unit_desig, mail_sec_range, mail_p_city_name, mail_st,	mail_ace_zip, 
 																local), 
 													 vtid, 
-													 // lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
-													 // unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
-													 // mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir, mail_unit_desig, 
-													 // mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
+													 lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
+													 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
+													 mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir, mail_unit_desig, 
+													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
 													 local):persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE);
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor

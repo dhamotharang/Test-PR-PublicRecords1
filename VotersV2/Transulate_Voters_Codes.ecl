@@ -67,11 +67,8 @@ Clean_file_Voter_Status_exp := join(Clean_file_PoliticalParty_exp,
 
 //Moved Base File to earlier in process to Add AID/NID and to refresh DIDs
 ds_Clean_file_Voter_Status_exp := VotersV2.Filters.Base(Clean_file_Voter_Status_exp);
-
-// generating a sequence number for "vtid"
-ut.MAC_Sequence_Records(ds_Clean_file_Voter_Status_exp,vtid,vtidCleanedVotersBase);
 					 
-dist_vtidCleanedVotersBase := distribute(vtidCleanedVotersBase, hash64(source_state, lname, name_suffix, fname, mname, 
+dist_vtidCleanedVotersBase := distribute(ds_Clean_file_Voter_Status_exp, hash64(source_state, lname, name_suffix, fname, mname, 
 														 prim_range, prim_name, predir, addr_suffix, postdir,
 														 unit_desig, sec_range, p_city_name, st, zip,
 														 mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix,
