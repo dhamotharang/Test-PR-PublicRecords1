@@ -1,4 +1,4 @@
-﻿IMPORT Address, BatchShare, FFD, FCRA, iesp, Risk_Indicators, RiskView, Standard, Suppress, STD;
+﻿IMPORT Address, BatchShare, FFD, FCRA, iesp, Risk_Indicators, RiskView, Standard, Suppress, STD, ConsumerCreditReport_Services;
 
 EXPORT Functions := MODULE
 
@@ -295,6 +295,7 @@ EXPORT Functions := MODULE
 			self.Defendantaddress.county := L.county;
 			self.Defendantaddress.postalcode := L.postalcode;
 			self.Defendantaddress.statecityzip := L.statecityzip;
+      SELF.recordID := '';
       SELF:=L;
     END;
 
@@ -318,6 +319,7 @@ EXPORT Functions := MODULE
 			self.Defendantaddress.county := L.county;
 			self.Defendantaddress.postalcode := L.postalcode;
 			self.Defendantaddress.statecityzip := L.statecityzip;
+      SELF.recordID := '';
       SELF:=L;
     END;
 

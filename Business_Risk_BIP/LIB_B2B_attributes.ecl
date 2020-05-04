@@ -84,6 +84,12 @@ EXPORT LIB_B2B_attributes (
     EXPORT BOOLEAN IncludeUCC := FALSE;
     EXPORT isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
 
+    // these options allows to turn off business contacts searching in KEL B2B attributes:
+    EXPORT BOOLEAN IncludeMini := FALSE;
+    EXPORT BOOLEAN IncludeHouseholdMember := FALSE;
+    EXPORT BOOLEAN IncludeGeolink := FALSE;
+    EXPORT BOOLEAN IncludeLienJudgment := FALSE;
+    EXPORT BOOLEAN IncludeSurname := FALSE;
   END;
 
    // BusinessInput := PROJECT(Input,Transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BS Input to ECL_Functions.Layouts.LayoutInputBII - pop seq# and bip IDs.

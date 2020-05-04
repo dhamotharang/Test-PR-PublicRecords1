@@ -1,4 +1,4 @@
-import	iesp,PropertyCharacteristics, doxie, address;  
+﻿import	iesp,PropertyCharacteristics, doxie, address;  
 
 export	Layouts	:=
 module
@@ -7,7 +7,6 @@ module
 	export	Input	:=
 	record
 		string1		ReportType;
-		boolean		ResellerInd;
 		string20	FirstName;
 		string20	MiddleName;
 		string20	LastName;
@@ -185,7 +184,7 @@ module
 
   export errors_rec := record
     unsigned8 internal_code := 0;
-    iesp.property_info.t_NarrativeARecordReport;
+    iesp.property_info.t_PropertyNarrativeARecordReport;
   end;
 
 
@@ -358,15 +357,15 @@ LOADXML('<xml/>');
 #END
 
 export flat_inhouse_rec := record
-	string1 DataSource {xpath('DataSource')};
-	iesp.property_info.t_AddressInfo;
+	string25 DataSource {xpath('DataSource')};
+	iesp.property_info.t_PropertyAddressInfo;
 	iesp.property_info.t_PropertyAttributesReport;
 	//[dataset(t_PropertyCharacteristicRecordReport) PropertyCharacteristics {xpath('PropertyCharacteristics/PropertyCharacteristic'), MAXCOUNT(85)};]
   %output_characteristics%
 	//[dataset(t_MortgageRecordReport) Mortgages {xpath('Mortgages/Mortgage'), MAXCOUNT(3)};]
   %output_mortgages%
 
-	iesp.property_info.t_PropertySalesInfoRecordReport and not [DeedRecordingDate, SalesDate];
+	iesp.property_info.t_PropertyInfoSalesInfoRecordReport and not [DeedRecordingDate, SalesDate];
 	string8 DeedRecordingDate;
 	string8 SalesDate;
 	iesp.property_info.t_PropertyTaxInfoRecordReport and not [County, AssessmentRecordingDate];

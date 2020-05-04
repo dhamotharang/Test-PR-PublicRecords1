@@ -1,11 +1,11 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
   <part name="DPPAPurpose" type="xsd:byte"/>
   <part name="GLBPurpose" type="xsd:byte"/> 
   <part name="DataRestrictionMask" type="xsd:string" default="0000000000000000"/>
   <separator />
   <part name="Product" type="xsd:string" description=" [I]nspection) or [P]roperty)"/> 
-  <part name="IsReseller" type="xsd:boolean" decsription=" for product I: if true, return only Oklahoma data (C)"/> 
+  <part name="IndResultOption" type="xsd:string" description="DO Deafult" /> 
   <part name="ReportType" type="xsd:string" description=" P Only" /> 
   <part name="IncludeConfidenceFactors" type="xsd:boolean" description=" confidence scores for in-house properties"/> 
   // <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
@@ -119,7 +119,7 @@ export BatchService := MACRO
     // ERC data can be produced only for report type in [K,L];
     // Product=Inspection isn't aware of a report type, so I need to fake it
     export string1 ReportType	:= if (_product = ptypes.INSPECTION, 'K', reporttype_in);
-    export boolean Reseller	  := false : stored ('IsReseller');
+		export	string3		ResultOption	:=	'DO': stored('ResultOption');
     export boolean IncludeConfidenceFactors	:= false : stored ('IncludeConfidenceFactors');
 		// export dataset(Gateway.Layouts.Config) GatewayConfig := gateway_cfg;
 

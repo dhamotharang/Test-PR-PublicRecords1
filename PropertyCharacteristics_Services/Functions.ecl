@@ -1,4 +1,4 @@
-import	iesp,PropertyCharacteristics,Codes, PropertyCharacteristics_Services;  
+﻿import	iesp,PropertyCharacteristics,Codes, PropertyCharacteristics_Services;  
 
 export	Functions	:=
 module
@@ -76,7 +76,6 @@ module
 		transform
 			pInput												:=	pReportBy;			
 			self.ReportType								:=	pInMod.ReportType;
-			self.ResellerInd							:=	pInMod.Reseller;
 			self.FirstName								:=	pInput.Name.First;
 			self.MiddleName								:=	pInput.Name.Middle;
 			self.LastName									:=	pInput.Name.Last;
@@ -1299,5 +1298,351 @@ LOADXML('<xml/>');
 				
 		self := L;
 	END;	
+	
+	EXPORT PropertyCharacteristics_Services.Layouts.inhouse_layout DPOJOin(PropertyCharacteristics_Services.Layouts.inhouse_layout L, PropertyCharacteristics_Services.Layouts.inhouse_layout R) := TRANSFORM
+		self.src_building_square_footage 			:= IF(L.src_building_square_footage = Constants.MSL_Src, L.src_building_square_footage, R.src_building_square_footage);
+		self.building_square_footage					:= IF(L.src_building_square_footage = Constants.MSL_Src, L.building_square_footage, R.building_square_footage);
+		self.tax_dt_building_square_footage		:= IF(L.src_building_square_footage = Constants.MSL_Src, L.tax_dt_building_square_footage, R.tax_dt_building_square_footage);
+		
+		self.src_air_conditioning_type 				:= IF(L.src_air_conditioning_type = Constants.MSL_Src, L.src_air_conditioning_type, R.src_air_conditioning_type);
+		self.air_conditioning_type						:= IF(L.src_air_conditioning_type = Constants.MSL_Src, L.air_conditioning_type, R.air_conditioning_type);
+		self.tax_dt_air_conditioning_type			:= IF(L.src_air_conditioning_type = Constants.MSL_Src, L.tax_dt_air_conditioning_type, R.tax_dt_air_conditioning_type);
+		
+		self.src_basement_finish 							:= IF(L.src_basement_finish = Constants.MSL_Src, L.src_basement_finish, R.src_basement_finish);
+		self.basement_finish									:= IF(L.src_basement_finish = Constants.MSL_Src, L.basement_finish, R.basement_finish);
+		self.tax_dt_basement_finish						:= IF(L.src_basement_finish = Constants.MSL_Src, L.tax_dt_basement_finish, R.tax_dt_basement_finish);
+		
+		self.src_construction_type 						:= IF(L.src_construction_type = Constants.MSL_Src, L.src_construction_type, R.src_construction_type);
+		self.construction_type								:= IF(L.src_construction_type = Constants.MSL_Src, L.construction_type, R.construction_type);
+		self.tax_dt_construction_type					:= IF(L.src_construction_type = Constants.MSL_Src, L.tax_dt_construction_type, R.tax_dt_construction_type);
+		
+		self.src_exterior_wall 								:= IF(L.src_exterior_wall = Constants.MSL_Src, L.src_exterior_wall, R.src_exterior_wall);
+		self.exterior_wall										:= IF(L.src_exterior_wall = Constants.MSL_Src, L.exterior_wall, R.exterior_wall);
+		self.tax_dt_exterior_wall							:= IF(L.src_exterior_wall = Constants.MSL_Src, L.tax_dt_exterior_wall, R.tax_dt_exterior_wall);
+		
+		self.src_fireplace_ind 								:= IF(L.src_fireplace_ind = Constants.MSL_Src, L.src_fireplace_ind, R.src_fireplace_ind);
+		self.fireplace_ind										:= IF(L.src_fireplace_ind = Constants.MSL_Src, L.fireplace_ind, R.fireplace_ind);
+		self.tax_dt_fireplace_ind							:= IF(L.src_fireplace_ind = Constants.MSL_Src, L.tax_dt_fireplace_ind, L.tax_dt_fireplace_ind);
+		
+		self.src_fireplace_type 							:= IF(L.src_fireplace_type = Constants.MSL_Src, L.src_fireplace_type, R.src_fireplace_type);
+		self.fireplace_type										:= IF(L.src_fireplace_type = Constants.MSL_Src, L.fireplace_type, R.fireplace_type);
+		self.tax_dt_fireplace_type						:= IF(L.src_fireplace_type = Constants.MSL_Src, L.tax_dt_fireplace_type, R.tax_dt_fireplace_type);
+		
+		self.src_flood_zone_panel 						:= IF(L.src_flood_zone_panel = Constants.MSL_Src, L.src_flood_zone_panel, R.src_flood_zone_panel);
+		self.flood_zone_panel									:= IF(L.src_flood_zone_panel = Constants.MSL_Src, L.flood_zone_panel, R.flood_zone_panel);
+		self.tax_dt_flood_zone_panel					:= IF(L.src_flood_zone_panel = Constants.MSL_Src, L.tax_dt_flood_zone_panel, R.tax_dt_flood_zone_panel);
+		
+		self.src_garage 											:= IF(L.src_garage = Constants.MSL_Src, L.src_garage, R.src_garage);
+		self.garage														:= IF(L.src_garage = Constants.MSL_Src, L.garage, R.garage);
+		self.tax_dt_garage										:= IF(L.src_garage = Constants.MSL_Src, L.tax_dt_garage, R.tax_dt_garage);
 
+		self.src_first_floor_square_footage 		:= IF(L.src_first_floor_square_footage = Constants.MSL_Src, L.src_first_floor_square_footage, R.src_first_floor_square_footage);
+		self.first_floor_square_footage					:= IF(L.src_first_floor_square_footage = Constants.MSL_Src, L.first_floor_square_footage, R.first_floor_square_footage);
+		self.tax_dt_first_floor_square_footage	:= IF(L.src_first_floor_square_footage = Constants.MSL_Src, L.tax_dt_first_floor_square_footage, R.tax_dt_first_floor_square_footage);
+		
+		self.src_heating 											:= IF(L.src_heating = Constants.MSL_Src, L.src_heating, R.src_heating);
+		self.heating													:= IF(L.src_heating = Constants.MSL_Src, L.heating, R.heating);
+		self.tax_dt_heating										:= IF(L.src_heating = Constants.MSL_Src, L.tax_dt_heating, R.tax_dt_heating);
+		
+		self.src_living_area_square_footage 		:= IF(L.src_living_area_square_footage = Constants.MSL_Src, L.src_living_area_square_footage, R.src_living_area_square_footage);
+		self.living_area_square_footage					:= IF(L.src_living_area_square_footage = Constants.MSL_Src, L.living_area_square_footage, R.living_area_square_footage);
+		self.tax_dt_living_area_square_footage	:= IF(L.src_living_area_square_footage = Constants.MSL_Src, L.tax_dt_living_area_square_footage, R.tax_dt_living_area_square_footage);
+		
+		self.src_no_of_baths 									:= IF(L.src_no_of_baths = Constants.MSL_Src, L.src_no_of_baths, R.src_no_of_baths);
+		self.no_of_baths											:= IF(L.src_no_of_baths = Constants.MSL_Src, L.no_of_baths, R.no_of_baths);
+		self.tax_dt_no_of_baths								:= IF(L.src_no_of_baths = Constants.MSL_Src, L.tax_dt_no_of_baths, R.tax_dt_no_of_baths);
+		
+		self.src_no_of_bedrooms 							:= IF(L.src_no_of_bedrooms = Constants.MSL_Src, L.src_no_of_bedrooms, R.src_no_of_bedrooms);
+		self.no_of_bedrooms										:= IF(L.src_no_of_bedrooms = Constants.MSL_Src, L.no_of_bedrooms, R.no_of_bedrooms);
+		self.tax_dt_no_of_bedrooms						:= IF(L.src_no_of_bedrooms = Constants.MSL_Src, L.tax_dt_no_of_bedrooms, R.tax_dt_no_of_bedrooms);
+		
+		self.src_no_of_fireplaces 						:= IF(L.src_no_of_fireplaces = Constants.MSL_Src, L.src_no_of_fireplaces, R.src_no_of_fireplaces);
+		self.no_of_fireplaces									:= IF(L.src_no_of_fireplaces = Constants.MSL_Src, L.no_of_fireplaces, R.no_of_fireplaces);
+		self.tax_dt_no_of_fireplaces					:= IF(L.src_no_of_fireplaces = Constants.MSL_Src, L.tax_dt_no_of_fireplaces, R.tax_dt_no_of_fireplaces);
+		
+		self.src_no_of_full_baths 						:= IF(L.src_no_of_full_baths = Constants.MSL_Src, L.src_no_of_full_baths, R.src_no_of_full_baths);
+		self.no_of_full_baths									:= IF(L.src_no_of_full_baths = Constants.MSL_Src, L.no_of_full_baths, R.no_of_full_baths);
+		self.tax_dt_no_of_full_baths					:= IF(L.src_no_of_full_baths = Constants.MSL_Src, L.tax_dt_no_of_full_baths, R.tax_dt_no_of_full_baths);
+		
+		self.src_no_of_half_baths 						:= IF(L.src_no_of_half_baths = Constants.MSL_Src, L.src_no_of_half_baths, R.src_no_of_half_baths);
+		self.no_of_half_baths									:= IF(L.src_no_of_half_baths = Constants.MSL_Src, L.no_of_half_baths, R.no_of_half_baths);
+		self.tax_dt_no_of_half_baths					:= IF(L.src_no_of_half_baths = Constants.MSL_Src, L.tax_dt_no_of_half_baths, R.tax_dt_no_of_half_baths);
+		
+		self.src_no_of_stories 								:= IF(L.src_no_of_stories = Constants.MSL_Src, L.src_no_of_stories, R.src_no_of_stories);
+		self.no_of_stories										:= IF(L.src_no_of_stories = Constants.MSL_Src, L.no_of_stories, R.no_of_stories);
+		self.tax_dt_no_of_stories							:= IF(L.src_no_of_stories = Constants.MSL_Src, L.tax_dt_no_of_stories, R.tax_dt_no_of_stories);
+		
+		self.src_parking_type 								:= IF(L.src_parking_type = Constants.MSL_Src, L.src_parking_type, R.src_parking_type);
+		self.parking_type											:= IF(L.src_parking_type = Constants.MSL_Src, L.parking_type, R.parking_type);
+		self.tax_dt_parking_type							:= IF(L.src_parking_type = Constants.MSL_Src, L.tax_dt_parking_type, R.tax_dt_parking_type);
+		
+		self.src_pool_indicator 							:= IF(L.src_pool_indicator = Constants.MSL_Src, L.src_pool_indicator, R.src_pool_indicator);
+		self.pool_indicator										:= IF(L.src_pool_indicator = Constants.MSL_Src, L.pool_indicator, R.pool_indicator);
+		self.tax_dt_pool_indicator						:= IF(L.src_pool_indicator = Constants.MSL_Src, L.tax_dt_pool_indicator, R.tax_dt_pool_indicator);
+		
+		self.src_pool_type 										:= IF(L.src_pool_type = Constants.MSL_Src, L.src_pool_type, R.src_pool_type);
+		self.pool_type												:= IF(L.src_pool_type = Constants.MSL_Src, L.pool_type, R.pool_type);
+		self.tax_dt_pool_type									:= IF(L.src_pool_type = Constants.MSL_Src, L.tax_dt_pool_type, R.tax_dt_pool_type);
+		
+		self.src_roof_cover 									:= IF(L.src_roof_cover = Constants.MSL_Src, L.src_roof_cover, R.src_roof_cover);
+		self.roof_cover												:= IF(L.src_roof_cover = Constants.MSL_Src, L.roof_cover, R.roof_cover);
+		self.tax_dt_roof_cover								:= IF(L.src_roof_cover = Constants.MSL_Src, L.tax_dt_roof_cover, R.tax_dt_roof_cover);
+		
+		self.src_year_built 									:= IF(L.src_year_built = Constants.MSL_Src, L.src_year_built, R.src_year_built);
+		self.year_built												:= IF(L.src_year_built = Constants.MSL_Src, L.year_built, R.year_built);
+		self.tax_dt_year_built								:= IF(L.src_year_built = Constants.MSL_Src, L.tax_dt_year_built, R.tax_dt_year_built);
+		
+		self.src_foundation 									:= IF(L.src_foundation = Constants.MSL_Src, L.src_foundation, R.src_foundation);
+		self.foundation												:= IF(L.src_foundation = Constants.MSL_Src, L.foundation, R.foundation);
+		self.tax_dt_foundation								:= IF(L.src_foundation = Constants.MSL_Src, L.tax_dt_foundation, R.tax_dt_foundation);
+		
+		self.src_basement_square_footage 			:= IF(L.src_basement_square_footage = Constants.MSL_Src, L.src_basement_square_footage, R.src_basement_square_footage);
+		self.basement_square_footage					:= IF(L.src_basement_square_footage = Constants.MSL_Src, L.basement_square_footage, R.basement_square_footage);
+		self.tax_dt_basement_square_footage		:= IF(L.src_basement_square_footage = Constants.MSL_Src, L.tax_dt_basement_square_footage, R.tax_dt_basement_square_footage);
+		
+		self.src_effective_year_built 				:= IF(L.src_effective_year_built = Constants.MSL_Src, L.src_effective_year_built, R.src_effective_year_built);
+		self.effective_year_built							:= IF(L.src_effective_year_built = Constants.MSL_Src, L.effective_year_built, R.effective_year_built);
+		self.tax_dt_effective_year_built			:= IF(L.src_effective_year_built = Constants.MSL_Src, L.tax_dt_effective_year_built, R.tax_dt_effective_year_built);
+		
+		self.src_garage_square_footage 				:= IF(L.src_garage_square_footage = Constants.MSL_Src, L.src_garage_square_footage, R.src_garage_square_footage);
+		self.garage_square_footage						:= IF(L.src_garage_square_footage = Constants.MSL_Src, L.garage_square_footage, R.garage_square_footage);
+		self.tax_dt_garage_square_footage			:= IF(L.src_garage_square_footage = Constants.MSL_Src, L.tax_dt_garage_square_footage, R.tax_dt_garage_square_footage);
+		
+		self.src_stories_type 								:= IF(L.src_stories_type = Constants.MSL_Src, L.src_stories_type, R.src_stories_type);
+		self.stories_type											:= IF(L.src_stories_type = Constants.MSL_Src, L.stories_type, R.stories_type);
+		self.tax_dt_stories_type							:= IF(L.src_stories_type = Constants.MSL_Src, L.tax_dt_stories_type, R.tax_dt_stories_type);
+		
+		self.src_apn_number 									:= IF(L.src_apn_number = Constants.MSL_Src, L.src_apn_number, R.src_apn_number);
+		self.apn_number												:= IF(L.src_apn_number = Constants.MSL_Src, L.apn_number, R.apn_number);
+		self.tax_dt_apn_number								:= IF(L.src_apn_number = Constants.MSL_Src, L.tax_dt_apn_number, R.tax_dt_apn_number);
+		
+		self.src_census_tract 								:= IF(L.src_census_tract = Constants.MSL_Src, L.src_census_tract, R.src_census_tract);
+		self.census_tract											:= IF(L.src_census_tract = Constants.MSL_Src, L.census_tract, R.census_tract);
+		self.tax_dt_census_tract							:= IF(L.src_census_tract = Constants.MSL_Src, L.tax_dt_census_tract, R.tax_dt_census_tract);
+		
+		self.src_range 												:= IF(L.src_range = Constants.MSL_Src, L.src_range, R.src_range);
+		self.range														:= IF(L.src_range = Constants.MSL_Src, L.range, R.range);
+		self.tax_dt_range											:= IF(L.src_range = Constants.MSL_Src, L.tax_dt_range, R.tax_dt_range);
+		
+		self.src_zoning 											:= IF(L.src_zoning = Constants.MSL_Src, L.src_zoning, R.src_zoning);
+		self.zoning														:= IF(L.src_zoning = Constants.MSL_Src, L.zoning, R.zoning);
+		self.tax_dt_zoning										:= IF(L.src_zoning = Constants.MSL_Src, L.tax_dt_zoning, R.tax_dt_zoning);
+		
+		self.src_block_number 								:= IF(L.src_block_number = Constants.MSL_Src, L.src_block_number, R.src_block_number);
+		self.block_number											:= IF(L.src_block_number = Constants.MSL_Src, L.block_number, R.block_number);
+		self.tax_dt_block_number							:= IF(L.src_block_number = Constants.MSL_Src, L.tax_dt_block_number, R.tax_dt_block_number);
+		
+		self.src_county_name 									:= IF(L.src_county_name = Constants.MSL_Src, L.src_county_name, R.src_county_name);
+		self.county_name											:= IF(L.src_county_name = Constants.MSL_Src, L.county_name, R.county_name);
+		self.tax_dt_county_name								:= IF(L.src_county_name = Constants.MSL_Src, L.tax_dt_county_name, R.tax_dt_county_name);
+		
+		self.src_fips_code 										:= IF(L.src_fips_code = Constants.MSL_Src, L.src_fips_code, R.src_fips_code);
+		self.fips_code												:= IF(L.src_fips_code = Constants.MSL_Src, L.fips_code, R.fips_code);
+		self.tax_dt_fips_code									:= IF(L.src_fips_code = Constants.MSL_Src, L.tax_dt_fips_code, R.tax_dt_fips_code);
+		
+		self.src_subdivision 									:= IF(L.src_subdivision = Constants.MSL_Src, L.src_subdivision, R.src_subdivision);
+		self.subdivision											:= IF(L.src_subdivision = Constants.MSL_Src, L.subdivision, R.subdivision);
+		self.tax_dt_subdivision								:= IF(L.src_subdivision = Constants.MSL_Src, L.tax_dt_subdivision, R.tax_dt_subdivision);
+		
+		self.src_municipality 								:= IF(L.src_municipality = Constants.MSL_Src, L.src_municipality, R.src_municipality);
+		self.municipality											:= IF(L.src_municipality = Constants.MSL_Src, L.municipality, R.municipality);
+		self.tax_dt_municipality							:= IF(L.src_municipality = Constants.MSL_Src, L.tax_dt_municipality, R.tax_dt_municipality);
+		
+		self.src_township 										:= IF(L.src_township = Constants.MSL_Src, L.src_township, R.src_township);
+		self.township													:= IF(L.src_township = Constants.MSL_Src, L.township, R.township);
+		self.tax_dt_township									:= IF(L.src_township = Constants.MSL_Src, L.tax_dt_township, R.tax_dt_township);
+		
+		self.src_homestead_exemption_ind 			:= IF(L.src_homestead_exemption_ind = Constants.MSL_Src, L.src_homestead_exemption_ind, R.src_homestead_exemption_ind);
+		self.homestead_exemption_ind					:= IF(L.src_homestead_exemption_ind = Constants.MSL_Src, L.homestead_exemption_ind, R.homestead_exemption_ind);
+		self.tax_dt_homestead_exemption_ind		:= IF(L.src_homestead_exemption_ind = Constants.MSL_Src, L.tax_dt_homestead_exemption_ind, R.tax_dt_homestead_exemption_ind);
+		
+		self.src_land_use_code 								:= IF(L.src_land_use_code = Constants.MSL_Src, L.src_land_use_code, R.src_land_use_code);
+		self.land_use_code										:= IF(L.src_land_use_code = Constants.MSL_Src, L.land_use_code, R.land_use_code);
+		self.tax_dt_land_use_code							:= IF(L.src_land_use_code = Constants.MSL_Src, L.tax_dt_land_use_code, R.tax_dt_land_use_code);
+		
+		self.src_latitude 										:= IF(L.src_latitude = Constants.MSL_Src, L.src_latitude, R.src_latitude);
+		self.latitude													:= IF(L.src_latitude = Constants.MSL_Src, L.latitude, R.latitude);
+		self.tax_dt_latitude									:= IF(L.src_latitude = Constants.MSL_Src, L.tax_dt_latitude, R.tax_dt_latitude);
+		
+		self.src_longitude 										:= IF(L.src_longitude = Constants.MSL_Src, L.src_longitude, R.src_longitude);
+		self.longitude												:= IF(L.src_longitude = Constants.MSL_Src, L.longitude, R.longitude);
+		self.tax_dt_longitude									:= IF(L.src_longitude = Constants.MSL_Src, L.tax_dt_longitude, R.tax_dt_longitude);
+		
+		self.src_location_influence_code 			:= IF(L.src_location_influence_code = Constants.MSL_Src, L.src_location_influence_code, R.src_location_influence_code);
+		self.location_influence_code					:= IF(L.src_location_influence_code = Constants.MSL_Src, L.location_influence_code, R.location_influence_code);
+		self.tax_dt_location_influence_code		:= IF(L.src_location_influence_code = Constants.MSL_Src, L.tax_dt_location_influence_code, R.tax_dt_location_influence_code);
+		
+		self.src_acres 												:= IF(L.src_acres = Constants.MSL_Src, L.src_acres, R.src_acres);
+		self.acres														:= IF(L.src_acres = Constants.MSL_Src, L.acres, R.acres);
+		self.tax_dt_acres											:= IF(L.src_acres = Constants.MSL_Src, L.tax_dt_acres, R.tax_dt_acres);
+		
+		self.src_lot_depth_footage 						:= IF(L.src_lot_depth_footage = Constants.MSL_Src, L.src_lot_depth_footage, R.src_lot_depth_footage);
+		self.lot_depth_footage								:= IF(L.src_lot_depth_footage = Constants.MSL_Src, L.lot_depth_footage, R.lot_depth_footage);
+		self.tax_dt_lot_depth_footage					:= IF(L.src_lot_depth_footage = Constants.MSL_Src, L.tax_dt_lot_depth_footage, R.tax_dt_lot_depth_footage);
+		
+		self.src_lot_front_footage 						:= IF(L.src_lot_front_footage = Constants.MSL_Src, L.src_lot_front_footage, R.src_lot_front_footage);
+		self.lot_front_footage								:= IF(L.src_lot_front_footage = Constants.MSL_Src, L.lot_front_footage, R.lot_front_footage);
+		self.tax_dt_lot_front_footage					:= IF(L.src_lot_front_footage = Constants.MSL_Src, L.tax_dt_lot_front_footage, R.tax_dt_lot_front_footage);
+		
+		self.src_lot_number 									:= IF(L.src_lot_number = Constants.MSL_Src, L.src_lot_number, R.src_lot_number);
+		self.lot_number												:= IF(L.src_lot_number = Constants.MSL_Src, L.lot_number, R.lot_number);
+		self.tax_dt_lot_number								:= IF(L.src_lot_number = Constants.MSL_Src, L.tax_dt_lot_number, R.tax_dt_lot_number);
+		
+		self.src_lot_size 										:= IF(L.src_lot_size = Constants.MSL_Src, L.src_lot_size, R.src_lot_size);
+		self.lot_size													:= IF(L.src_lot_size = Constants.MSL_Src, L.lot_size, R.lot_size);
+		self.tax_dt_lot_size									:= IF(L.src_lot_size = Constants.MSL_Src, L.tax_dt_lot_size, R.tax_dt_lot_size);
+		
+		self.src_property_type_code 					:= IF(L.src_property_type_code = Constants.MSL_Src, L.src_property_type_code, R.src_property_type_code);
+		self.property_type_code								:= IF(L.src_property_type_code = Constants.MSL_Src, L.property_type_code, R.property_type_code);
+		self.tax_dt_property_type_code				:= IF(L.src_property_type_code = Constants.MSL_Src, L.tax_dt_property_type_code, R.tax_dt_property_type_code);
+		
+		self.src_structure_quality 						:= IF(L.src_structure_quality = Constants.MSL_Src, L.src_structure_quality, R.src_structure_quality);
+		self.structure_quality								:= IF(L.src_structure_quality = Constants.MSL_Src, L.structure_quality, R.structure_quality);
+		self.tax_dt_structure_quality					:= IF(L.src_structure_quality = Constants.MSL_Src, L.tax_dt_structure_quality, R.tax_dt_structure_quality);
+		
+		self.src_water 												:= IF(L.src_water = Constants.MSL_Src, L.src_water, R.src_water);
+		self.water														:= IF(L.src_water = Constants.MSL_Src, L.water, R.water);
+		self.tax_dt_water											:= IF(L.src_water = Constants.MSL_Src, L.tax_dt_water, R.tax_dt_water);
+		
+    self.src_sewer 	                    	:= IF(L.src_sewer = Constants.MSL_Src, L.src_sewer, R.src_sewer);		
+		self.sewer					                  := IF(L.src_sewer = Constants.MSL_Src, L.sewer, R.sewer);
+		self.tax_dt_sewer											:= IF(L.src_sewer = Constants.MSL_Src, L.tax_dt_sewer, R.tax_dt_sewer);
+		
+		self.src_assessed_land_value 		      := IF(L.src_assessed_land_value = Constants.MSL_Src, L.src_assessed_land_value, R.src_assessed_land_value);
+		self.assessed_land_value					    := IF(L.src_assessed_land_value = Constants.MSL_Src, L.assessed_land_value, R.assessed_land_value);
+		self.tax_dt_assessed_land_value       := IF(L.src_assessed_land_value = Constants.MSL_Src, L.tax_dt_assessed_land_value, R.tax_dt_assessed_land_value);
+		
+		self.src_assessed_year 					      := IF(L.src_assessed_year = Constants.MSL_Src, L.src_assessed_year, R.src_assessed_year);
+		self.assessed_year                    := IF(L.src_assessed_year = Constants.MSL_Src, L.assessed_year, R.assessed_year);
+		self.tax_dt_assessed_year             := IF(L.src_assessed_year = Constants.MSL_Src, L.tax_dt_assessed_year, R.tax_dt_assessed_year);
+		
+		self.src_tax_amount 		              := IF(L.src_tax_amount = Constants.MSL_Src, L.src_tax_amount, R.src_tax_amount);
+		self.tax_amount					              := IF(L.src_tax_amount = Constants.MSL_Src, L.tax_amount, R.tax_amount);
+		self.tax_dt_tax_amount                := IF(L.src_tax_amount = Constants.MSL_Src, L.tax_dt_tax_amount, R.tax_dt_tax_amount); 
+		
+		self.src_tax_year 		                := IF(L.src_tax_year = Constants.MSL_Src, L.src_tax_year, R.src_tax_year);
+		self.tax_year				                	:= IF(L.src_tax_year = Constants.MSL_Src, L.tax_year, R.tax_year);
+				
+    self.src_market_land_value 		        := IF(L.src_market_land_value = Constants.MSL_Src, L.src_market_land_value, R.src_market_land_value);		
+		self.market_land_value					      := IF(L.src_market_land_value = Constants.MSL_Src, L.market_land_value, R.market_land_value);
+		self.tax_dt_market_land_value         := IF(L.src_market_land_value = Constants.MSL_Src, L.tax_dt_market_land_value, R.tax_dt_market_land_value); 
+		
+    self.src_improvement_value 		        := IF(L.src_improvement_value = Constants.MSL_Src, L.src_improvement_value, R.src_improvement_value);		
+		self.improvement_value					      := IF(L.src_improvement_value = Constants.MSL_Src, L.improvement_value, R.improvement_value);
+		self.tax_dt_improvement_value         := IF(L.src_improvement_value = Constants.MSL_Src, L.tax_dt_improvement_value, R.tax_dt_improvement_value);
+		
+    self.src_percent_improved 		        := IF(L.src_percent_improved  = Constants.MSL_Src, L.src_percent_improved, R.src_percent_improved);		
+		self.percent_improved					        := IF(L.src_percent_improved  = Constants.MSL_Src, L.percent_improved, R.percent_improved);
+		self.tax_dt_percent_improved          := IF(L.src_percent_improved  = Constants.MSL_Src, L.tax_dt_improvement_value, R.tax_dt_improvement_value);
+		
+    self.src_total_assessed_value 		    := IF(L.src_total_assessed_value = Constants.MSL_Src, L.src_total_assessed_value, R.src_total_assessed_value);		
+		self.total_assessed_value					    := IF(L.src_total_assessed_value = Constants.MSL_Src, L.total_assessed_value, R.total_assessed_value);
+		self.tax_dt_total_assessed_value      := IF(L.src_total_assessed_value = Constants.MSL_Src, L.tax_dt_total_assessed_value, R.tax_dt_total_assessed_value);
+		
+    self.src_total_calculated_value 		  := IF(L.src_total_calculated_value = Constants.MSL_Src, L.src_total_calculated_value, R.src_total_calculated_value);		
+		self.total_calculated_value					  := IF(L.src_total_calculated_value = Constants.MSL_Src, L.total_calculated_value, R.total_calculated_value);
+		self.tax_dt_total_calculated_value    := IF(L.src_total_calculated_value = Constants.MSL_Src, L.tax_dt_total_calculated_value, R.tax_dt_total_calculated_value);
+		
+		self.src_total_land_value 		        := IF(L.src_total_land_value = Constants.MSL_Src, L.src_total_land_value, R.src_total_land_value);
+		self.total_land_value					        := IF(L.src_total_land_value = Constants.MSL_Src, L.total_land_value, R.total_land_value);
+		self.tax_dt_total_land_value          := IF(L.src_total_land_value = Constants.MSL_Src, L.tax_dt_total_land_value, R.tax_dt_total_land_value);
+		
+		self.src_total_market_value 		      := IF(L.src_total_market_value = Constants.MSL_Src, L.src_total_market_value, R.src_total_market_value);
+		self.total_market_value					      := IF(L.src_total_market_value = Constants.MSL_Src, L.total_market_value, R.total_market_value);
+		self.tax_dt_total_market_value        := IF(L.src_total_market_value = Constants.MSL_Src, L.tax_dt_total_market_value, R.tax_dt_total_market_value);
+		
+    self.src_floor_type 		              := IF(L.src_floor_type = Constants.MSL_Src, L.src_floor_type, R.src_floor_type);		
+		self.floor_type					              := IF(L.src_floor_type = Constants.MSL_Src, L.floor_type, R.floor_type);
+		self.tax_dt_floor_type                := IF(L.src_floor_type = Constants.MSL_Src, L.tax_dt_floor_type, R.tax_dt_floor_type);
+		
+    self.src_frame_type 		              := IF(L.src_frame_type = Constants.MSL_Src, L.src_frame_type, R.src_frame_type);		
+		self.frame_type					              := IF(L.src_frame_type = Constants.MSL_Src, L.frame_type, R.frame_type);
+		self.tax_dt_frame_type                := IF(L.src_frame_type = Constants.MSL_Src, L.tax_dt_frame_type, R.tax_dt_frame_type);
+		
+    self.src_fuel_type 	                	:= IF(L.src_fuel_type = Constants.MSL_Src, L.src_fuel_type, R.src_fuel_type);		
+		self.fuel_type					              := IF(L.src_fuel_type = Constants.MSL_Src, L.fuel_type, R.fuel_type);
+		self.tax_dt_fuel_type                 := IF(L.src_fuel_type = Constants.MSL_Src, L.tax_dt_fuel_type, R.tax_dt_fuel_type);
+		
+    self.src_no_of_bath_fixtures 		      := IF(L.src_no_of_bath_fixtures = Constants.MSL_Src, L.src_no_of_bath_fixtures, R.src_no_of_bath_fixtures);		
+		self.no_of_bath_fixtures				    	:= IF(L.src_no_of_bath_fixtures = Constants.MSL_Src, L.no_of_bath_fixtures, R.no_of_bath_fixtures);
+		self.tax_dt_no_of_bath_fixtures       := IF(L.src_no_of_bath_fixtures = Constants.MSL_Src, L.tax_dt_no_of_bath_fixtures, R.tax_dt_no_of_bath_fixtures);
+		
+		self.src_no_of_rooms 		              := IF(L.src_no_of_rooms = Constants.MSL_Src, L.src_no_of_rooms, R.src_no_of_rooms);
+		self.no_of_rooms				            	:= IF(L.src_no_of_rooms = Constants.MSL_Src, L.no_of_rooms, R.no_of_rooms);
+		self.tax_dt_no_of_rooms               := IF(L.src_no_of_rooms = Constants.MSL_Src, L.tax_dt_no_of_rooms, R.tax_dt_no_of_rooms);
+		
+		self.src_no_of_units 		              := IF(L.src_no_of_units = Constants.MSL_Src, L.src_no_of_units, R.src_no_of_units);
+		self.no_of_units					            := IF(L.src_no_of_units = Constants.MSL_Src, L.no_of_units, R.no_of_units);
+		self.tax_dt_no_of_units               := IF(L.src_no_of_units = Constants.MSL_Src, L.tax_dt_no_of_units, R.tax_dt_no_of_units);
+		
+    self.src_style_type 		              := IF(L.src_style_type = Constants.MSL_Src, L.src_style_type, R.src_style_type);		
+		self.style_type					              := IF(L.src_style_type = Constants.MSL_Src, L.style_type, R.style_type);
+		self.tax_dt_style_type                := IF(L.src_style_type = Constants.MSL_Src, L.tax_dt_style_type, R.tax_dt_style_type);
+		
+    self.src_assessment_document_number 	  := IF(L.src_assessment_document_number = Constants.MSL_Src, L.src_assessment_document_number, R.src_assessment_document_number);		
+		self.assessment_document_number					:= IF(L.src_assessment_document_number = Constants.MSL_Src, L.assessment_document_number, R.assessment_document_number);
+		self.tax_dt_assessment_document_number  := IF(L.src_assessment_document_number = Constants.MSL_Src, L.tax_dt_assessment_document_number, R.tax_dt_assessment_document_number);
+		
+    self.src_assessment_recording_date 		  := IF(L.src_assessment_recording_date = Constants.MSL_Src, L.src_assessment_recording_date, R.src_assessment_recording_date);		
+		self.assessment_recording_date					:= IF(L.src_assessment_recording_date = Constants.MSL_Src, L.assessment_recording_date, R.assessment_recording_date);
+		self.tax_dt_assessment_recording_date   := IF(L.src_assessment_recording_date = Constants.MSL_Src, L.tax_dt_assessment_recording_date, R.tax_dt_assessment_recording_date);
+		
+    self.src_deed_document_number 	      	:= IF(L.src_deed_document_number = Constants.MSL_Src, L.src_deed_document_number, R.src_deed_document_number);		
+		self.deed_document_number				      	:= IF(L.src_deed_document_number = Constants.MSL_Src, L.deed_document_number, R.deed_document_number);
+		self.rec_dt_deed_document_number        := IF(L.src_deed_document_number = Constants.MSL_Src, L.rec_dt_deed_document_number, R.rec_dt_deed_document_number);
+		
+		self.src_deed_recording_date 		        := IF(L.src_deed_recording_date = Constants.MSL_Src, L.src_deed_recording_date, R.src_deed_recording_date);
+		self.deed_recording_date				        := IF(L.src_deed_recording_date = Constants.MSL_Src, L.deed_recording_date, R.deed_recording_date);
+		
+		self.src_full_part_sale 		            := IF(L.src_full_part_sale = Constants.MSL_Src, L.src_full_part_sale, R.src_full_part_sale);
+		self.full_part_sale					            := IF(L.src_full_part_sale = Constants.MSL_Src, L.full_part_sale, R.full_part_sale);
+		self.rec_dt_full_part_sale              := IF(L.src_full_part_sale = Constants.MSL_Src, L.rec_dt_full_part_sale, R.rec_dt_full_part_sale);
+		
+    self.src_sale_amount 		                := IF(L.src_sale_amount = Constants.MSL_Src, L.src_sale_amount, R.src_sale_amount);		
+		self.sale_amount					              := IF(L.src_sale_amount = Constants.MSL_Src, L.sale_amount, R.sale_amount);
+		self.rec_dt_sale_amount                 := IF(L.src_sale_amount = Constants.MSL_Src, L.rec_dt_sale_amount, R.rec_dt_sale_amount);
+		
+		self.src_sale_date 		                  := IF(L.src_sale_date = Constants.MSL_Src, L.src_sale_date, R.src_sale_date);
+		self.sale_date					                := IF(L.src_sale_date = Constants.MSL_Src, L.sale_date, R.sale_date);
+		self.rec_dt_sale_date                   := IF(L.src_sale_date = Constants.MSL_Src, L.rec_dt_sale_date, R.rec_dt_sale_date);
+		
+		self.src_sale_type_code 		            := IF(L.src_sale_type_code = Constants.MSL_Src, L.src_sale_type_code, R.src_sale_type_code);
+		self.sale_type_code					            := IF(L.src_sale_type_code = Constants.MSL_Src, L.sale_type_code, R.sale_type_code);
+		self.rec_dt_sale_type_code              := IF(L.src_sale_type_code = Constants.MSL_Src, L.rec_dt_sale_type_code, R.rec_dt_sale_type_code);
+		
+    self.src_mortgage_company_name 		      := IF(L.src_mortgage_company_name = Constants.MSL_Src, L.src_mortgage_company_name, R.src_mortgage_company_name);		
+		self.mortgage_company_name					    := IF(L.src_mortgage_company_name = Constants.MSL_Src, L.mortgage_company_name, R.mortgage_company_name);
+		self.rec_dt_mortgage_company_name       := IF(L.src_mortgage_company_name = Constants.MSL_Src, L.rec_dt_mortgage_company_name, R.rec_dt_mortgage_company_name);
+		
+    self.src_loan_amount 		                := IF(L.src_loan_amount = Constants.MSL_Src, L.src_loan_amount, R.src_loan_amount);		
+		self.loan_amount					              := IF(L.src_loan_amount = Constants.MSL_Src, L.loan_amount, R.loan_amount);
+		self.rec_dt_loan_amount                 := IF(L.src_loan_amount = Constants.MSL_Src, L.rec_dt_loan_amount, R.rec_dt_loan_amount);
+		
+		self.src_second_loan_amount 		        := IF(L.src_second_loan_amount = Constants.MSL_Src, L.src_second_loan_amount, R.src_second_loan_amount);
+		self.second_loan_amount					        := IF(L.src_second_loan_amount = Constants.MSL_Src, L.second_loan_amount, R.second_loan_amount);
+		self.rec_dt_second_loan_amount          := IF(L.src_second_loan_amount = Constants.MSL_Src, L.rec_dt_second_loan_amount, R.rec_dt_second_loan_amount);
+		
+		self.src_loan_type_code 		            := IF(L.src_loan_type_code = Constants.MSL_Src, L.src_loan_type_code, R.src_loan_type_code);
+		self.loan_type_code					            := IF(L.src_loan_type_code = Constants.MSL_Src, L.loan_type_code, R.loan_type_code);
+		self.rec_dt_loan_type_code              := IF(L.src_loan_type_code = Constants.MSL_Src, L.rec_dt_loan_type_code, R.rec_dt_loan_type_code);
+		
+		self.src_interest_rate_type_code 		    := IF(L.src_interest_rate_type_code = Constants.MSL_Src, L.src_interest_rate_type_code, R.src_interest_rate_type_code);
+		self.interest_rate_type_code					  := IF(L.src_interest_rate_type_code = Constants.MSL_Src, L.interest_rate_type_code, R.interest_rate_type_code);
+		self.rec_dt_interest_rate_type_code     := IF(L.src_interest_rate_type_code = Constants.MSL_Src, L.rec_dt_interest_rate_type_code, R.rec_dt_interest_rate_type_code);
+
+		SELF := L;
+	END;
+	
+	EXPORT	UNSIGNED1	DataSource_SortOrder(STRING25	DataSource)	:=
+			CASE(DataSource, 
+										'A' => 1,
+										'B' => 2,
+										'B DEFAULT PLUS' => 3,
+										'F SELECTED SOURCE' => 4,
+										'F SELECTED SOURCE PLUS' => 5,
+										'D PUBLIC RECORD SOURCE A' => 6,
+										'C PUBLIC RECORD SOURCE B' => 7,
+										'E HOME LISTING DATA' => 8,
+										9);
+										
 end;
