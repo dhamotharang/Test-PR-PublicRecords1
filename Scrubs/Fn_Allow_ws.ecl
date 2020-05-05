@@ -25,8 +25,8 @@ EXPORT Fn_Allow_ws(string st, string inp) := FUNCTION
         inp,
         //PRESETS MODS
         'Num'           => STD.str.FilterOut(Up_st,Num) = '',                        
-        'Alpha'         => STD.str.FilterOut(Up_st,Alpha) = '',                                 //Ex in SALT:
-        'AlphaNum'      => STD.str.FilterOut(Up_st,Alpha+Num) = '',                             //FIELDTYPE:Invalid_AlphaNum:CUSTOM(Scrubs.Fn_Allow_ws > 0, 'AlphaNum')
+        'Alpha'         => STD.str.FilterOut(Up_st,Alpha) = '',  
+        'AlphaNum'      => STD.str.FilterOut(Up_st,Alpha+Num) = '',
         'AlphaChar'     => STD.str.FilterOut(Up_st,Alpha+Char) = '',
         'AlphaNumChar'  => STD.str.FilterOut(Up_st,Alpha+Num+Char) = '',
         //CUSTOM CHARACTERS
