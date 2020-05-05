@@ -635,7 +635,8 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
     best_address := Chronology_best[1].Address;
     best_city := Chronology_best[1].City;
     best_state := Chronology_best[1].St;
-    best_zip := Chronology_best[1].Zip;
+    best_zip5 := Chronology_best[1].Zip;
+    best_zip4 := Chronology_best[1].Zip4;
      
 	Additional_Lname := if(le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match, DATASET([{le.altfirst,le.altlast,le.altlast_date},
 							    {le.altfirst2,le.altlast2,le.altlast_date2},
@@ -682,7 +683,7 @@ END;
      // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
      SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
                                                             CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
-                                                            CustomCVIModelName = 'CCVI2004_1' => Models.CVI2004_1_0(le.prim_range, le.prim_name, le.st, le.p_city_name, le.z5, (REAL)le.lat, (REAL)le.long, best_address, best_city, best_state, best_zip),
+                                                            CustomCVIModelName = 'CCVI2004_1' => Models.CVI2004_1_0(le.prim_range, le.prim_name, le.st, le.p_city_name, le.z5, le.zip4,(REAL)le.lat, (REAL)le.long, best_address, best_city, best_state, best_zip5, best_zip4),
                                                             CustomCVIModelName <> '' => SELF.CVI,
                                                             '');
 
