@@ -27,7 +27,7 @@ EXPORT Fn_Allow_ws(string st, string inp, boolean caseMatters = false) := FUNCTI
     isValidString := CASE
     (
         inp,
-        //PRESETS MODS
+        //PRESET MODS
         'Num'           => STD.str.FilterOut(useString,Num) = '',
         'NumChar'       => STD.str.FilterOut(useString,Num+Char) = '',
         'Alpha'         => STD.str.FilterOut(useString,Alpha) = '',  
