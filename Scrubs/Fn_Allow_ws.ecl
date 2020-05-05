@@ -21,7 +21,7 @@ EXPORT Fn_Allow_ws(string st, string inp, boolean caseMatters = false) := FUNCTI
 
     useString   :=  if(caseMatters,clean_st,Up_st);
     Num         := '0123456789';
-    Alpha       := if(caseMatters,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy');
+    Alpha       := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     Char        := '_<>{}[]()-~^*=#@!?%$+&,./:;\'';
 
     isValidString := CASE
@@ -47,4 +47,3 @@ EXPORT Fn_Allow_ws(string st, string inp, boolean caseMatters = false) := FUNCTI
     );
 END;
 
-//EXAMPLE IN SALT:
