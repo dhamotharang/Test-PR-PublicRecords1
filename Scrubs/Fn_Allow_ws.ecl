@@ -8,7 +8,7 @@
 //          or build your own by filling in any other character(s).     //
 
 //          The third parameter is optional if it's important           //
-//          for the letters to be uppercase.               //
+//          for the letters to be uppercase.                            //
 //                                                                      //           
 //////////////////////////////////////////////////////////////////////////
 
