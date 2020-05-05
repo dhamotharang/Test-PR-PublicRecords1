@@ -8,7 +8,7 @@
 //          or build your own by filling in any other character(s).     //
 
 //          The third parameter is optional if it's important           //
-//          for the letters to be uppercase or lowercase.               //
+//          for the letters to be uppercase.               //
 //                                                                      //           
 //////////////////////////////////////////////////////////////////////////
 
@@ -36,8 +36,6 @@ EXPORT Fn_Allow_ws(string st, string inp, boolean caseMatters = false) := FUNCTI
         'AlphaNumChar'  => STD.str.FilterOut(useString,Alpha+Num+Char) = '',
         //CUSTOM CHARACTERS
         STD.STR.FilterOut(useString,inp) = ''
-        
-
     );
 
 
