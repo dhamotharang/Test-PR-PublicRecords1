@@ -2,7 +2,7 @@
 
 	EXPORT SlimIncidents := record
 		STRING40		accident_nbr;
-	 STRING11 		vehicle_incident_id;
+	 STRING14 		vehicle_incident_id;
 	 STRING8 		Sent_to_HPCC_DateTime;
 	 STRING11 		agency_id;
 	 STRING4 		report_code;
@@ -13,7 +13,7 @@
 	 STRING4 		report_type_id;
 	 STRING4 		Work_Type_ID;
 	 STRING9 		CRU_Order_ID;
-		STRING11 		vehicle_incident_id_latest;
+		STRING14 		vehicle_incident_id_latest;
 		STRING11 		jurisdiction_nbr;
 		STRING9 		ORI_Number;
 		STRING50 		Crash_City;

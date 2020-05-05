@@ -10,7 +10,7 @@ EXPORT Layout_eCrash := MODULE
 		STRING2 report_code;
 		STRING25 report_category;
 		STRING65 report_code_desc;
-		STRING11 vehicle_incident_id;
+		STRING14 vehicle_incident_id;
 		STRING1	vehicle_status;
 		STRING100 accident_location;
 		STRING100 accident_street;
