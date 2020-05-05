@@ -132,6 +132,14 @@ END;
 //										+ if(LEFT.SubCategoryLabel = 'Primary PEP' or LEFT.SubCategoryLabel = 'Secondary PEP', ' ' + LEFT.SubCategoryDesc, ' ' + LEFT.SubCategoryLabel) 
 //										+ ' | Last Updated: ' + Left.LastUpdated;));
 
+// Only Inactive PEP set:
+	GetForcedFormer(dataset(Layouts.rWCOCategories) onlyno) := PROJECT(onlyno, TRANSFORM(Layouts.rWCOCategories,
+				self.SegmentType := 'PEP';
+				self.SubCategoryLabel := 'Primary PEP';
+				self.SubCategoryDesc := 'Former PEP';
+				self.IsActivePEP := 'Y';
+				self :=[];));
+
 	GetModifiedDates(dataset(Layouts.rEntity) src) := PROJECT(src, 
 			TRANSFORM(WorldCompliance.rComments,
 				self.Ent_Id := LEFT.Ent_Id;
@@ -164,8 +172,11 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 			newcat0 := Distribute((Files.dsWCOCategories),entityid);
 			newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel,subcategorydesc, -isactivepep, local),
 														entityid, segmenttype, subcategorylabel,subcategorydesc, isactivepep,local);
+
 			peps := newcat(segmenttype='PEP');
 			former := newcat(subcategorydesc='Former PEP');
+			NotAct := newcat(isactivepep='N' and segmenttype = 'PEP');
+			Act := newcat(isactivepep IN ['Y',''] and segmenttype='PEP');
 
 			justformer0 := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 											self := left), inner, keep(1), local);
@@ -175,7 +186,23 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 											self := left), left only, local);
 			noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 										entityid, segmenttype, subcategorydesc, local);
-			restored := newcat(segmenttype<>'PEP') + justformer + noformer;
+			NotActive0 := JOIN(NotAct, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);
+			notActive := DEDUP(SORT(NotActive0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+			Active0 := JOIN(Act, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+			Active := DEDUP(SORT(Active0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+
+			onlyNo0 := JOIN(NotActive, Active, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+			onlyNo := DEDUP(SORT(onlyno0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+       
+			ForceFormer := GetForcedFormer(onlyNo);
+			
+			restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
 			
 			Allreasons := sort(GetMultReasons(restored), Ent_ID, cmts, local); //Original
 					
