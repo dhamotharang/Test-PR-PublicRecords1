@@ -26,6 +26,7 @@ EXPORT Records(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchRequest) ds_requ
   ds_search_resp_out := PROJECT(ds_gw_scnw_out,
                                 TRANSFORM(iesp.net_wise_search.t_NetWiseEmailSearchResponse,
                                   SELF._Header := LEFT.response._Header;
+                                  SELF.RecordCount := Gateway.NetwiseSearch.Functions.fn_CountResultsRecs(LEFT.response.Results);
                                   SELF.Results := LEFT.response.Results));
 
 
