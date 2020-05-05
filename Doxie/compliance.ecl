@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, codes, data_services, mdr;
+﻿IMPORT AutoStandardI, codes, data_services, mdr, STD;
 
 EXPORT compliance := MODULE
 
@@ -82,7 +82,7 @@ EXPORT compliance := MODULE
 
   //Temporary: a macro copying new-style compliance parameters to the old one;
   //can be convenient for creating a module of AutoStandardI.PermissionI_Tools.params type from mod_access
-  EXPORT MAC_CopyComplianceValuesToLegacy (mod) := MACRO 
+  EXPORT MAC_CopyComplianceValuesToLegacy (mod) := MACRO
     EXPORT boolean AllowAll  := mod.unrestricted = doxie.compliance.ALLOW.ALL;
     EXPORT boolean AllowGLB  := mod.unrestricted & doxie.compliance.ALLOW.GLB > 0;
     EXPORT boolean AllowDPPA := mod.unrestricted & doxie.compliance.ALLOW.DPPA > 0;
@@ -128,7 +128,7 @@ EXPORT compliance := MODULE
       EXPORT unsigned1 intended_use := mod.intended_use;
       EXPORT string transaction_id := mod.transaction_id;
       EXPORT unsigned6 global_company_id :=mod.global_company_id;
-  ENDMACRO;    
+  ENDMACRO;
 
   shared restrictedSet := ['0',''];
   // ==============================================================================================
@@ -136,7 +136,7 @@ EXPORT compliance := MODULE
   //          Most of these restrictions can be by-passed if "allow all" is requested.
   // ==============================================================================================
   // EXPORT FARES := (~allow and fixed_DRM[1]<>'0') OR in_mod.ignoreFares; // Fares=property data
-  // EXPORT QSENT := ~allow and fixed_DRM[2]<>'0'; // QSent = realtime phones gateway
+  EXPORT boolean isQsentRestricted       (string drm) := drm[2]<>'0'; // QSent = realtime phones gateway
   // EXPORT EBR   := ~allow and fixed_DRM[3]<>'0'; // EBR=Experian Business Reports
   // EXPORT WH     := ~allow and fixed_DRM[4]<>'0'; // WH=Weekly header
   // EXPORT Fidelity := (~allow and (fixed_DRM[5] not in ['0',''])) OR in_mod.ignoreFidelity;
@@ -150,26 +150,25 @@ EXPORT compliance := MODULE
   // cases or database entries might be counting on the existing behavior to
   // remain _exactly_ as it is.
 
-  // ECH = Experian Credit Header data
-  EXPORT boolean isECHRestricted        (string drm) := drm[6] <> '0';
-  //EXPORT boolean ECH := isECHRestricted(drm);
+  EXPORT boolean isECHRestricted        (string drm) := drm[6] <> '0'; // ECH = Experian Credit Header data
   // CY = Certegy data
   // EXPORT CY := ~allowAll and (drm[7] NOT IN ['0','']);
-  // EQ = Equifax Credit Header data
-  EXPORT boolean isEQCHRestricted       (string drm) := drm[8] NOT IN restrictedSet;
-  //EXPORT boolean EQ := isEQCHRestricted(drm);
+  EXPORT boolean isEQCHRestricted       (string drm) := drm[8] NOT IN restrictedSet; //Equifax Credit Header data
   //Restricting CreditHeader data from being returned in the qsent gateway
   //EXPORT string1 RequestCredential := if(fixed_DRM[9] = '','0', fixed_DRM[9]);
   // TCH = Transunion Credit Header data
   EXPORT boolean isTCHRestricted        (string drm) := drm[10] NOT IN restrictedSet;
   EXPORT boolean isTTRestricted         (string drm) := drm[11] NOT IN restrictedSet; //TeleTrack, a.k.a. TT
+  EXPORT boolean isAdvoRestricted       (string drm) := drm[12] NOT IN restrictedSet;
   EXPORT boolean isInfutorMVRestricted  (string drm) := drm[17] NOT IN restrictedSet;
+  EXPORT boolean isPhoneFinderTargusRestricted  (string drm) := drm[20] NOT IN restrictedSet;  //Targus gateway for phone finder
   EXPORT boolean isPreGLBRestricted     (string drm) := drm[23] NOT IN restrictedSet; //customer can see GLB protected data prior to June 2001
+  EXPORT boolean isPhoneMartRestricted  (string drm) := drm[24] NOT IN restrictedSet; //Equifax (PhoneMart) phones
   EXPORT boolean isFdnInquiry           (string drm) := drm[25] not in restrictedSet;
   EXPORT boolean isJuliRestricted       (string drm) := drm[41] NOT IN restrictedSet;
+  EXPORT boolean isAccuDataRestricted   (string drm) := drm[44] not in restrictedSet;
   EXPORT BOOLEAN isBriteVerifyRestricted(string drm) := drm[46] NOT IN restrictedSet; // BriteVerify gateway for Email verification
   // ----------------------------------------------------------------------------------------------
-
 
   // TODO: functions for checking access; they should be defined in a separate attribute
   //       (I probably want to replace existing permission Tools)
@@ -268,11 +267,18 @@ EXPORT compliance := MODULE
   // ==============================================================================================
   //          Restrictions based on DPM.
   // ==============================================================================================
+  EXPORT boolean use_qsent(string dpm)               := dpm [1] NOT IN restrictedSet; // use in-house(not gateway) qsent data
+  EXPORT boolean use_targus(string dpm)              := dpm [2] NOT IN restrictedSet; // use targus gateway
+  EXPORT boolean use_confirm(string dpm)             := dpm [3] NOT IN restrictedSet; // confirm if phone is active (typically, thorugh gateway call)
+  EXPORT boolean use_LastResort(string dpm)          := dpm [6] NOT IN restrictedSet;
   EXPORT boolean use_Polk(string dpm)                := dpm [7] NOT IN restrictedSet;
   EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;
   EXPORT boolean use_FdnContributoryData(string dpm) := dpm[11] NOT IN restrictedSet;	//Contributory Fraud and Test Fraud
   EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
+  EXPORT boolean use_ZumigoIdentity(string dpm)      := dpm[21] NOT IN restrictedSet;
   EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
+  EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
+
   // ----------------------------------------------------------------------------------------------
 
     // to exclude utility sources:
@@ -290,5 +296,19 @@ EXPORT compliance := MODULE
   EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
     RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
   ENDMACRO;
+
+  // Marketing Restrictions
+  EXPORT isMarketingAllowed(string src, string st = '') := FUNCTION
+    Boolean  isAllowed := NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs       AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          EXISTS(Codes.Key_Codes_V3(KEYED(file_name = 'VENDOR_SOURCES') AND
+                                                  KEYED(field_name= 'DIRECTMARKETING') AND
+                                                  KEYED(field_name2 = 'SCODE') AND
+                                                  KEYED(code = src)));
+    RETURN isAllowed;
+
+    END;
+
+  EXPORT Boolean isDirectMarketing(String _industry_class) := STD.Str.ToUpperCase(_industry_class) = 'DRMKT';
 
 END;

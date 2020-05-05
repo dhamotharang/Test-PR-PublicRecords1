@@ -28,8 +28,8 @@ EXPORT map_IDS0827_conversion(STRING pVersion) := FUNCTION
 	invalid_addr := '(N/A|NONE |NO VALID|SAME |UNKNOWN)';
 	C_O_Ind := '(C/O |ATTN: |ATTN )';
 	DBA_Ind := '( DBA |D/B/A |/DBA | A/K/A | AKA )';
-	GR_Ind	:= ['BO','CO','LC','LP','PA','PR','PT'];
-	MD_Ind	:= ['AABL ','AB','BK','ABL','ASL','DB','ISL','LB ','SP','IBL','MA','MB','MS','BR','TS'];
+	GR_Ind	:= ['BO','CO','CL','LC','LP','NO','PA','PR','PT'];
+	MD_Ind	:= ['AABL ','AB','BK','ABL','ASL','CB','DB','ISL','LB ','SP','IBL','MA','MB','MS','BR','TS'];
 	
 	
 date_ind := '^([A-Z][^\\,]+)\\,\\s([0-9]+){0,2}\\s([0-9]+){1,4}';

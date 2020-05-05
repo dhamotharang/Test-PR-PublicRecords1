@@ -76,7 +76,7 @@ end;
 
 parse_report := project(in_accnbr, transform(slim, 
 
-  part_num := if(trim(stringlib.StringFilterout(left.l_accnbr,'0-'),left,right) ='' , '', trim(left.l_accnbr,left,right));
+  part_num := if(trim(STD.Str.FilterOut(left.l_accnbr,'0-'),left,right) ='' , '', trim(left.l_accnbr,left,right));
   
   SELF.f1 := part_num[1..4];
   SELF.f2 := if(length(trim(part_num[2..5],left,right)) < 4 , '',part_num[2..5]) ;
@@ -181,7 +181,7 @@ end;
 	norm_report := normalize(parse_report, 37, tslim(left, counter))(partial_report_nbr <>''); 
 	 
  clean_partnbr := dedup(distribute(project(norm_report , transform(slim_rec , 
-          self.partial_report_nbr := if(trim(stringlib.StringFilterout(left.partial_report_nbr,'0-'),left,right) ='' , '', trim(left.partial_report_nbr,left,right)),
+          self.partial_report_nbr := if(trim(STD.Str.FilterOut(left.partial_report_nbr,'0-'),left,right) ='' , '', trim(left.partial_report_nbr,left,right)),
 					self := left))(partial_report_nbr <>''),hash(l_accnbr)), all,local);
 	 
 export Key_EcrashV2_Partial_Report_Nbr := index(clean_partnbr,{partial_report_nbr,report_code, jurisdiction_state,jurisdiction,accident_date} ,{l_accnbr,orig_Accnbr,addl_report_number, report_type_id,work_type_id,vendor_code,vendor_report_id,Idfield,ReportLinkID }
