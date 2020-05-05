@@ -11,5 +11,7 @@ dsNew := DATASET(mynewfile, Scrubs_Sheila_Greco.Companies_Layout_Sheila_Greco, T
 dsPrev := DATASET(myprevfile, Scrubs_Sheila_Greco.Companies_Layout_Sheila_Greco, THOR);
  
 hygieneStats := Scrubs_Sheila_Greco.Companies_hygiene(dsNew).StandardStats();
-allStats := hygieneStats;
+scrubsStats := Scrubs_Sheila_Greco.Companies_Scrubs.StandardStats(dsNew);
+deltaStats := IF(TRIM(myprevfile) > '' AND EXISTS(dsPrev), Scrubs_Sheila_Greco.Companies_Delta(dsPrev, dsNew).StandardStats());
+allStats := hygieneStats & scrubsStats & deltaStats;
 OUTPUT(allStats,, mystatsfile);

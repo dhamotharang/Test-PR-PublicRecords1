@@ -1,12 +1,11 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Contacts_Fields := MODULE
  
 EXPORT NumFields := 95;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Date','Invalid_AlphaCaps','Invalid_Alpha');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Date' => 2,'Invalid_AlphaCaps' => 3,'Invalid_Alpha' => 4,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Float','Invalid_Date','Invalid_AlphaCaps','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_State','Invalid_Zip');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Float' => 2,'Invalid_Date' => 3,'Invalid_AlphaCaps' => 4,'Invalid_AlphaNum' => 5,'Invalid_Alpha' => 6,'Invalid_AlphaChar' => 7,'Invalid_AlphaNumChar' => 8,'Invalid_State' => 9,'Invalid_Zip' => 10,0);
  
 EXPORT MakeFT_Invalid_No(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -15,11 +14,18 @@ END;
 EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
 EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
  
+EXPORT MakeFT_Invalid_Float(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789 .-/()'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Float(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 .-/()'))));
+EXPORT InValidMessageFT_Invalid_Float(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 .-/()'),SALT311.HygieneErrors.Good);
+ 
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs.Fn_Valid_Date(s)>0);
-EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Fn_Valid_Date'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Fn_Valid_Date(s)>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Fn_Valid_Date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaCaps(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
@@ -28,17 +34,52 @@ END;
 EXPORT InValidFT_Invalid_AlphaCaps(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
 EXPORT InValidMessageFT_Invalid_AlphaCaps(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '); // Only allow valid symbols
+EXPORT MakeFT_Invalid_AlphaNum(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '))));
-EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789'))));
+EXPORT InValidMessageFT_Invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'`.'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'`.'))));
+EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'`.'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_AlphaChar(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@&/`\'()'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@&/`\'()'))));
+EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@&/`\'()'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_AlphaNumChar(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@#&/`\'()'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_AlphaNumChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@#&/`\'()'))));
+EXPORT InValidMessageFT_Invalid_AlphaNumChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _.,-@#&/`\'()'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_State(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  RETURN  MakeFT_Invalid_AlphaCaps(s1);
+END;
+EXPORT InValidFT_Invalid_State(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
+EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Zip(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  RETURN  MakeFT_Invalid_No(s1);
+END;
+EXPORT InValidFT_Invalid_Zip(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5 OR LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 10));
+EXPORT InValidMessageFT_Invalid_Zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,5,9,10'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'did','did_score','bdid','bdid_score','raw_aid','ace_aid','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','record_type','rawfields_maincontactid','rawfields_maincompanyid','rawfields_active','rawfields_firstname','rawfields_midinital','rawfields_lastname','rawfields_age','rawfields_gender','rawfields_primarytitle','rawfields_titlelevel1','rawfields_primarydept','rawfields_secondtitle','rawfields_titlelevel2','rawfields_seconddept','rawfields_thirdtitle','rawfields_titlelevel3','rawfields_thirddept','rawfields_skillcategory','rawfields_skillsubcategory','rawfields_reportto','rawfields_officephone','rawfields_officeext','rawfields_officefax','rawfields_officeemail','rawfields_directdial','rawfields_mobilephone','rawfields_officeaddress1','rawfields_officeaddress2','rawfields_officecity','rawfields_officestate','rawfields_officezip','rawfields_officecountry','rawfields_school','rawfields_degree','rawfields_graduationyear','rawfields_country','rawfields_salary','rawfields_bonus','rawfields_compensation','rawfields_citizenship','rawfields_diversitycandidate','rawfields_entrydate','rawfields_lastupdate','rawfields_biography','clean_contact_name_title','clean_contact_name_fname','clean_contact_name_mname','clean_contact_name_lname','clean_contact_name_name_suffix','clean_contact_name_name_score','clean_contact_address_prim_range','clean_contact_address_predir','clean_contact_address_prim_name','clean_contact_address_addr_suffix','clean_contact_address_postdir','clean_contact_address_unit_desig','clean_contact_address_sec_range','clean_contact_address_p_city_name','clean_contact_address_v_city_name','clean_contact_address_st','clean_contact_address_zip','clean_contact_address_zip4','clean_contact_address_cart','clean_contact_address_cr_sort_sz','clean_contact_address_lot','clean_contact_address_lot_order','clean_contact_address_dbpc','clean_contact_address_chk_digit','clean_contact_address_rec_type','clean_contact_address_fips_state','clean_contact_address_fips_county','clean_contact_address_geo_lat','clean_contact_address_geo_long','clean_contact_address_msa','clean_contact_address_geo_blk','clean_contact_address_geo_match','clean_contact_address_err_stat','clean_dates_entrydate','clean_dates_lastupdate','clean_phones_officephone','clean_phones_directdial','clean_phones_mobilephone','global_sid','record_sid');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'did','did_score','bdid','bdid_score','raw_aid','ace_aid','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','record_type','rawfields_maincontactid','rawfields_maincompanyid','rawfields_active','rawfields_firstname','rawfields_midinital','rawfields_lastname','rawfields_age','rawfields_gender','rawfields_primarytitle','rawfields_titlelevel1','rawfields_primarydept','rawfields_secondtitle','rawfields_titlelevel2','rawfields_seconddept','rawfields_thirdtitle','rawfields_titlelevel3','rawfields_thirddept','rawfields_skillcategory','rawfields_skillsubcategory','rawfields_reportto','rawfields_officephone','rawfields_officeext','rawfields_officefax','rawfields_officeemail','rawfields_directdial','rawfields_mobilephone','rawfields_officeaddress1','rawfields_officeaddress2','rawfields_officecity','rawfields_officestate','rawfields_officezip','rawfields_officecountry','rawfields_school','rawfields_degree','rawfields_graduationyear','rawfields_country','rawfields_salary','rawfields_bonus','rawfields_compensation','rawfields_citizenship','rawfields_diversitycandidate','rawfields_entrydate','rawfields_lastupdate','rawfields_biography','clean_contact_name_title','clean_contact_name_fname','clean_contact_name_mname','clean_contact_name_lname','clean_contact_name_name_suffix','clean_contact_name_name_score','clean_contact_address_prim_range','clean_contact_address_predir','clean_contact_address_prim_name','clean_contact_address_addr_suffix','clean_contact_address_postdir','clean_contact_address_unit_desig','clean_contact_address_sec_range','clean_contact_address_p_city_name','clean_contact_address_v_city_name','clean_contact_address_st','clean_contact_address_zip','clean_contact_address_zip4','clean_contact_address_cart','clean_contact_address_cr_sort_sz','clean_contact_address_lot','clean_contact_address_lot_order','clean_contact_address_dbpc','clean_contact_address_chk_digit','clean_contact_address_rec_type','clean_contact_address_fips_state','clean_contact_address_fips_county','clean_contact_address_geo_lat','clean_contact_address_geo_long','clean_contact_address_msa','clean_contact_address_geo_blk','clean_contact_address_geo_match','clean_contact_address_err_stat','clean_dates_entrydate','clean_dates_lastupdate','clean_phones_officephone','clean_phones_directdial','clean_phones_mobilephone','global_sid','record_sid');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'did' => 0,'did_score' => 1,'bdid' => 2,'bdid_score' => 3,'raw_aid' => 4,'ace_aid' => 5,'dt_first_seen' => 6,'dt_last_seen' => 7,'dt_vendor_first_reported' => 8,'dt_vendor_last_reported' => 9,'record_type' => 10,'rawfields_maincontactid' => 11,'rawfields_maincompanyid' => 12,'rawfields_active' => 13,'rawfields_firstname' => 14,'rawfields_midinital' => 15,'rawfields_lastname' => 16,'rawfields_age' => 17,'rawfields_gender' => 18,'rawfields_primarytitle' => 19,'rawfields_titlelevel1' => 20,'rawfields_primarydept' => 21,'rawfields_secondtitle' => 22,'rawfields_titlelevel2' => 23,'rawfields_seconddept' => 24,'rawfields_thirdtitle' => 25,'rawfields_titlelevel3' => 26,'rawfields_thirddept' => 27,'rawfields_skillcategory' => 28,'rawfields_skillsubcategory' => 29,'rawfields_reportto' => 30,'rawfields_officephone' => 31,'rawfields_officeext' => 32,'rawfields_officefax' => 33,'rawfields_officeemail' => 34,'rawfields_directdial' => 35,'rawfields_mobilephone' => 36,'rawfields_officeaddress1' => 37,'rawfields_officeaddress2' => 38,'rawfields_officecity' => 39,'rawfields_officestate' => 40,'rawfields_officezip' => 41,'rawfields_officecountry' => 42,'rawfields_school' => 43,'rawfields_degree' => 44,'rawfields_graduationyear' => 45,'rawfields_country' => 46,'rawfields_salary' => 47,'rawfields_bonus' => 48,'rawfields_compensation' => 49,'rawfields_citizenship' => 50,'rawfields_diversitycandidate' => 51,'rawfields_entrydate' => 52,'rawfields_lastupdate' => 53,'rawfields_biography' => 54,'clean_contact_name_title' => 55,'clean_contact_name_fname' => 56,'clean_contact_name_mname' => 57,'clean_contact_name_lname' => 58,'clean_contact_name_name_suffix' => 59,'clean_contact_name_name_score' => 60,'clean_contact_address_prim_range' => 61,'clean_contact_address_predir' => 62,'clean_contact_address_prim_name' => 63,'clean_contact_address_addr_suffix' => 64,'clean_contact_address_postdir' => 65,'clean_contact_address_unit_desig' => 66,'clean_contact_address_sec_range' => 67,'clean_contact_address_p_city_name' => 68,'clean_contact_address_v_city_name' => 69,'clean_contact_address_st' => 70,'clean_contact_address_zip' => 71,'clean_contact_address_zip4' => 72,'clean_contact_address_cart' => 73,'clean_contact_address_cr_sort_sz' => 74,'clean_contact_address_lot' => 75,'clean_contact_address_lot_order' => 76,'clean_contact_address_dbpc' => 77,'clean_contact_address_chk_digit' => 78,'clean_contact_address_rec_type' => 79,'clean_contact_address_fips_state' => 80,'clean_contact_address_fips_county' => 81,'clean_contact_address_geo_lat' => 82,'clean_contact_address_geo_long' => 83,'clean_contact_address_msa' => 84,'clean_contact_address_geo_blk' => 85,'clean_contact_address_geo_match' => 86,'clean_contact_address_err_stat' => 87,'clean_dates_entrydate' => 88,'clean_dates_lastupdate' => 89,'clean_phones_officephone' => 90,'clean_phones_directdial' => 91,'clean_phones_mobilephone' => 92,'global_sid' => 93,'record_sid' => 94,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -99,321 +140,321 @@ EXPORT Make_rawfields_active(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_rawfields_active(SALT311.StrType s) := InValidFT_Invalid_No(s);
 EXPORT InValidMessage_rawfields_active(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_firstname(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_firstname(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_firstname(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_firstname(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_firstname(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_firstname(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_midinital(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_midinital(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_midinital(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_midinital(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_midinital(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_midinital(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_lastname(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_lastname(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_lastname(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_lastname(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_lastname(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_lastname(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_age(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_age(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_age(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_age(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_rawfields_age(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_rawfields_age(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_gender(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_gender(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_gender(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_gender(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_rawfields_gender(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_rawfields_gender(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_rawfields_primarytitle(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_primarytitle(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_primarytitle(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_primarytitle(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_primarytitle(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_primarytitle(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_titlelevel1(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_titlelevel1(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_titlelevel1(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_titlelevel1(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_rawfields_titlelevel1(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_rawfields_titlelevel1(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_primarydept(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_primarydept(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_primarydept(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_primarydept(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_primarydept(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_primarydept(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_secondtitle(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_secondtitle(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_secondtitle(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_secondtitle(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_secondtitle(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_secondtitle(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_titlelevel2(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_titlelevel2(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_titlelevel2(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_titlelevel2(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_rawfields_titlelevel2(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_rawfields_titlelevel2(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_seconddept(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_seconddept(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_seconddept(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_seconddept(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_seconddept(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_seconddept(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_thirdtitle(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_thirdtitle(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_thirdtitle(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_thirdtitle(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_thirdtitle(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_thirdtitle(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_titlelevel3(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_titlelevel3(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_titlelevel3(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_titlelevel3(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_rawfields_titlelevel3(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_rawfields_titlelevel3(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_thirddept(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_thirddept(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_thirddept(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_thirddept(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_thirddept(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_thirddept(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_skillcategory(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_skillcategory(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_skillcategory(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_skillcategory(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_skillcategory(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_skillcategory(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_skillsubcategory(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_skillsubcategory(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_skillsubcategory(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_skillsubcategory(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_skillsubcategory(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_skillsubcategory(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_reportto(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_reportto(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_reportto(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_reportto(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_reportto(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_reportto(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_officephone(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officephone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officephone(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officephone(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_officephone(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_officephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_officeext(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officeext(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officeext(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officeext(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_officeext(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_officeext(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_officefax(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officefax(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officefax(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officefax(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_officefax(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_officefax(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_officeemail(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officeemail(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officeemail(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officeemail(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_rawfields_officeemail(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_rawfields_officeemail(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_rawfields_directdial(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_directdial(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_directdial(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_directdial(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_directdial(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_directdial(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_mobilephone(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_mobilephone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_mobilephone(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_mobilephone(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_mobilephone(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_mobilephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_officeaddress1(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officeaddress1(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officeaddress1(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officeaddress1(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_rawfields_officeaddress1(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_rawfields_officeaddress1(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_rawfields_officeaddress2(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officeaddress2(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officeaddress2(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officeaddress2(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_rawfields_officeaddress2(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_rawfields_officeaddress2(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_rawfields_officecity(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officecity(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officecity(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officecity(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_officecity(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_officecity(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_officestate(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officestate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officestate(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officestate(SALT311.StrType s0) := MakeFT_Invalid_State(s0);
+EXPORT InValid_rawfields_officestate(SALT311.StrType s) := InValidFT_Invalid_State(s);
+EXPORT InValidMessage_rawfields_officestate(UNSIGNED1 wh) := InValidMessageFT_Invalid_State(wh);
  
-EXPORT Make_rawfields_officezip(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officezip(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officezip(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officezip(SALT311.StrType s0) := MakeFT_Invalid_Zip(s0);
+EXPORT InValid_rawfields_officezip(SALT311.StrType s) := InValidFT_Invalid_Zip(s);
+EXPORT InValidMessage_rawfields_officezip(UNSIGNED1 wh) := InValidMessageFT_Invalid_Zip(wh);
  
-EXPORT Make_rawfields_officecountry(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_officecountry(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_officecountry(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_officecountry(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_rawfields_officecountry(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_rawfields_officecountry(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_rawfields_school(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_school(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_school(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_school(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_school(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_school(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_degree(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_degree(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_degree(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_degree(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_degree(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_degree(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_graduationyear(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_graduationyear(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_graduationyear(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_graduationyear(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_rawfields_graduationyear(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_rawfields_graduationyear(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_rawfields_country(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_country(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_country(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_country(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_rawfields_country(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_rawfields_country(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_rawfields_salary(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_salary(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_salary(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_salary(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_salary(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_salary(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_bonus(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_bonus(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_bonus(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_bonus(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_bonus(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_bonus(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_compensation(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_compensation(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_compensation(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_compensation(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_rawfields_compensation(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_rawfields_compensation(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_rawfields_citizenship(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_citizenship(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_citizenship(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_citizenship(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_rawfields_citizenship(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_rawfields_citizenship(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_rawfields_diversitycandidate(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_diversitycandidate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_diversitycandidate(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_diversitycandidate(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
+EXPORT InValid_rawfields_diversitycandidate(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);
+EXPORT InValidMessage_rawfields_diversitycandidate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Alpha(wh);
  
-EXPORT Make_rawfields_entrydate(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_entrydate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_entrydate(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_entrydate(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_rawfields_entrydate(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_rawfields_entrydate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_rawfields_lastupdate(SALT311.StrType s0) := s0;
-EXPORT InValid_rawfields_lastupdate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_rawfields_lastupdate(UNSIGNED1 wh) := '';
+EXPORT Make_rawfields_lastupdate(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_rawfields_lastupdate(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_rawfields_lastupdate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
 EXPORT Make_rawfields_biography(SALT311.StrType s0) := s0;
 EXPORT InValid_rawfields_biography(SALT311.StrType s) := 0;
 EXPORT InValidMessage_rawfields_biography(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_contact_name_title(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_title(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_title(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_title(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_name_title(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_name_title(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_name_fname(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_fname(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_fname(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_fname(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_name_fname(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_name_fname(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_name_mname(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_mname(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_mname(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_mname(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_name_mname(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_name_mname(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_name_lname(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_lname(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_lname(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_lname(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_name_lname(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_name_lname(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_name_name_suffix(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_name_suffix(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_name_suffix(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_name_suffix(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_name_name_suffix(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_name_name_suffix(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_name_name_score(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_name_name_score(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_name_name_score(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_name_name_score(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_name_name_score(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_name_name_score(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_prim_range(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_prim_range(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_prim_range(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_prim_range(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_prim_range(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_prim_range(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_predir(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_predir(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_predir(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_predir(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_predir(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_predir(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_prim_name(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_prim_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_prim_name(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_prim_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_clean_contact_address_prim_name(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_clean_contact_address_prim_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_clean_contact_address_addr_suffix(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_addr_suffix(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_addr_suffix(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_addr_suffix(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_addr_suffix(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_addr_suffix(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_postdir(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_postdir(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_postdir(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_postdir(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_postdir(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_postdir(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_unit_desig(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_unit_desig(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_unit_desig(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_unit_desig(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_unit_desig(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_unit_desig(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_sec_range(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_sec_range(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_sec_range(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_sec_range(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_sec_range(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_sec_range(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_p_city_name(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_p_city_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_p_city_name(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_p_city_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_p_city_name(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_p_city_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_v_city_name(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_v_city_name(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_v_city_name(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_v_city_name(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_v_city_name(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_v_city_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_st(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_st(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_st(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_st(SALT311.StrType s0) := MakeFT_Invalid_State(s0);
+EXPORT InValid_clean_contact_address_st(SALT311.StrType s) := InValidFT_Invalid_State(s);
+EXPORT InValidMessage_clean_contact_address_st(UNSIGNED1 wh) := InValidMessageFT_Invalid_State(wh);
  
-EXPORT Make_clean_contact_address_zip(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_zip(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_zip(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_zip(SALT311.StrType s0) := MakeFT_Invalid_Zip(s0);
+EXPORT InValid_clean_contact_address_zip(SALT311.StrType s) := InValidFT_Invalid_Zip(s);
+EXPORT InValidMessage_clean_contact_address_zip(UNSIGNED1 wh) := InValidMessageFT_Invalid_Zip(wh);
  
-EXPORT Make_clean_contact_address_zip4(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_zip4(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_zip4(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_zip4(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_zip4(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_zip4(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_cart(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_cart(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_cart(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_cart(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_clean_contact_address_cart(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_clean_contact_address_cart(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_clean_contact_address_cr_sort_sz(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_cr_sort_sz(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_cr_sort_sz(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_cr_sort_sz(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_cr_sort_sz(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_cr_sort_sz(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_lot(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_lot(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_lot(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_lot(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_lot(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_lot(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_lot_order(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_lot_order(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_lot_order(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_lot_order(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_lot_order(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_lot_order(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_dbpc(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_dbpc(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_dbpc(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_dbpc(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_dbpc(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_dbpc(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_chk_digit(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_chk_digit(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_chk_digit(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_chk_digit(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_chk_digit(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_chk_digit(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_rec_type(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_rec_type(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_rec_type(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_rec_type(SALT311.StrType s0) := MakeFT_Invalid_AlphaCaps(s0);
+EXPORT InValid_clean_contact_address_rec_type(SALT311.StrType s) := InValidFT_Invalid_AlphaCaps(s);
+EXPORT InValidMessage_clean_contact_address_rec_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaCaps(wh);
  
-EXPORT Make_clean_contact_address_fips_state(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_fips_state(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_fips_state(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_fips_state(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_fips_state(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_fips_state(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_fips_county(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_fips_county(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_fips_county(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_fips_county(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_fips_county(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_fips_county(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_geo_lat(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_geo_lat(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_geo_lat(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_geo_lat(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_clean_contact_address_geo_lat(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_clean_contact_address_geo_lat(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_clean_contact_address_geo_long(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_geo_long(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_geo_long(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_geo_long(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_clean_contact_address_geo_long(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_clean_contact_address_geo_long(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_clean_contact_address_msa(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_msa(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_msa(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_msa(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_msa(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_msa(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_geo_blk(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_geo_blk(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_geo_blk(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_geo_blk(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_geo_blk(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_geo_blk(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_geo_match(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_geo_match(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_geo_match(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_geo_match(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_clean_contact_address_geo_match(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_clean_contact_address_geo_match(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_clean_contact_address_err_stat(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_contact_address_err_stat(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_contact_address_err_stat(UNSIGNED1 wh) := '';
+EXPORT Make_clean_contact_address_err_stat(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
+EXPORT InValid_clean_contact_address_err_stat(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
+EXPORT InValidMessage_clean_contact_address_err_stat(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
  
-EXPORT Make_clean_dates_entrydate(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_dates_entrydate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_dates_entrydate(UNSIGNED1 wh) := '';
+EXPORT Make_clean_dates_entrydate(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_clean_dates_entrydate(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_clean_dates_entrydate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_clean_dates_lastupdate(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_dates_lastupdate(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_dates_lastupdate(UNSIGNED1 wh) := '';
+EXPORT Make_clean_dates_lastupdate(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_clean_dates_lastupdate(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_clean_dates_lastupdate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_clean_phones_officephone(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_phones_officephone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_phones_officephone(UNSIGNED1 wh) := '';
+EXPORT Make_clean_phones_officephone(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_clean_phones_officephone(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_clean_phones_officephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_clean_phones_directdial(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_phones_directdial(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_phones_directdial(UNSIGNED1 wh) := '';
+EXPORT Make_clean_phones_directdial(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_clean_phones_directdial(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_clean_phones_directdial(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
-EXPORT Make_clean_phones_mobilephone(SALT311.StrType s0) := s0;
-EXPORT InValid_clean_phones_mobilephone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_clean_phones_mobilephone(UNSIGNED1 wh) := '';
+EXPORT Make_clean_phones_mobilephone(SALT311.StrType s0) := MakeFT_Invalid_Float(s0);
+EXPORT InValid_clean_phones_mobilephone(SALT311.StrType s) := InValidFT_Invalid_Float(s);
+EXPORT InValidMessage_clean_phones_mobilephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Float(wh);
  
 EXPORT Make_global_sid(SALT311.StrType s0) := s0;
 EXPORT InValid_global_sid(SALT311.StrType s) := 0;
