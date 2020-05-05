@@ -11,7 +11,7 @@
 
 IMPORT STD;
 
-EXPORT Fn_Allow_ws(string st, string inp) := FUNCTION 
+EXPORT Fn_Allow_ws(string st, string inp, boolean caseMatters = false) := FUNCTION 
 
     clean_st := TRIM(st,WHITESPACE);
     Up_st := Std.STR.ToUpperCase(clean_st);
@@ -24,13 +24,19 @@ EXPORT Fn_Allow_ws(string st, string inp) := FUNCTION
     (
         inp,
         //PRESETS MODS
-        'Num'           => STD.str.FilterOut(Up_st,Num) = '',                        
+        'Num'           => STD.str.FilterOut(Up_st,Num) = '',
+        'Float'         => STD.str.FilterOut(Up_st,Num+Char) = '',
         'Alpha'         => STD.str.FilterOut(Up_st,Alpha) = '',  
         'AlphaNum'      => STD.str.FilterOut(Up_st,Alpha+Num) = '',
         'AlphaChar'     => STD.str.FilterOut(Up_st,Alpha+Char) = '',
         'AlphaNumChar'  => STD.str.FilterOut(Up_st,Alpha+Num+Char) = '',
         //CUSTOM CHARACTERS
-        STD.STR.FilterOut(clean_st,inp) = ''
+        if
+        (
+            caseMatters
+            ,STD.STR.FilterOut(clean_st,inp) = ''
+            ,STD.STR.FilterOut(Up_st,inp) = ''
+        )
     );
 
 
