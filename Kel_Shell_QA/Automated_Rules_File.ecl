@@ -201,5 +201,19 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																Rules_Generation('Business','Business Derog - Bankruptcy History') +
 																
 																Rules_Generation('Business','Secretary of State') +
-																// Rules_Generation('Business','Best BII') +
-																Rules_Generation('Business','Business Uniform Commercial Code') ;
+																Rules_Generation('Business','Best BII') +
+																Rules_Generation('Business','Business Uniform Commercial Code') +
+																Rules_Generation('Business','Business Assets')+
+																Rules_Generation('Business','Business Best')+
+																Rules_Generation('Person', 'Address History')+
+																Rules_Generation('Business','Business Judgments')+
+																Rules_Generation('Business','Business Derogs - Landlord Tenant Disputes')+
+																Rules_Generation('Business','Business Derogs - Overall History')+
+																Rules_Generation('Business','Business Derogs - Lien and Judgment History')+
+																Rules_Generation('Business','Business Input - Business Header Velocity')+
+																Rules_Generation('Business','Business Firmographics')+
+																Rules_Generation('Business','Business Best - Best Sources')+
+																Rules_Generation('Business','Business Best - Best Characteristics')+
+																Rules_Generation('Business','Business Associate')+
+																Rules_Generation('Business','Business Source Verification')+
+																Rules_Generation('Person','Education');
