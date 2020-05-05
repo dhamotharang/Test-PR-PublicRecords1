@@ -132,13 +132,6 @@ END;
 //										+ if(LEFT.SubCategoryLabel = 'Primary PEP' or LEFT.SubCategoryLabel = 'Secondary PEP', ' ' + LEFT.SubCategoryDesc, ' ' + LEFT.SubCategoryLabel) 
 //										+ ' | Last Updated: ' + Left.LastUpdated;));
 
-// Only Inactive PEP set:
-	GetForcedFormer(dataset(Layouts.rWCOCategories) onlyno) := PROJECT(onlyno, TRANSFORM(Layouts.rWCOCategories,
-				self.SegmentType := 'PEP';
-				self.SubCategoryLabel := 'Primary PEP';
-				self.SubCategoryDesc := 'Former PEP';
-				self.IsActivePEP := 'Y';
-				self :=[];));
 
 	GetModifiedDates(dataset(Layouts.rEntity) src) := PROJECT(src, 
 			TRANSFORM(WorldCompliance.rComments,
@@ -186,6 +179,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 											self := left), left only, local);
 			noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 										entityid, segmenttype, subcategorydesc, local);
+
 			NotActive0 := JOIN(NotAct, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 										self := left), left only, local);
 			notActive := DEDUP(SORT(NotActive0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
@@ -200,7 +194,15 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 			onlyNo := DEDUP(SORT(onlyno0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 										entityid, segmenttype, subcategorydesc, local);
        
-			ForceFormer := GetForcedFormer(onlyNo);
+// Only Inactive PEP set:
+	export ForceFormer := Join(distribute(onlyno, EntityID),onlyno,Left.EntityID=Right.EntityID,
+		TRANSFORM(Layouts.rWCOCategories,
+				self.SegmentType := 'PEP';
+				self.SubCategoryLabel := 'Primary PEP';
+				self.SubCategoryDesc := 'Former PEP';
+				self.IsActivePEP := 'Y';
+				self := left;));
+			
 			
 			restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
 			
