@@ -206,7 +206,7 @@ Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := tran
 		self.report_category				:= L.report_category;
 		self.report_code_desc				:= L.report_code_desc;
 		self.accident_nbr 					:= if(L.vehicle_incident_id[1..3] = 'OID',
-																			(string40)((unsigned6)L.vehicle_incident_id[4..11]+100000000000),
+																			(string40)((unsigned6)L.vehicle_incident_id[4..]+100000000000),
 																			(string40)((unsigned6)L.vehicle_incident_id+10000000000));
 		self.accident_date					:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
 		self.accident_location			:= map(L.cross_street!='' and L.cross_street!= 'N/A' => L.street+' & '+L.cross_street,L.street);
