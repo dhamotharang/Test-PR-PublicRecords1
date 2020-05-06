@@ -23,10 +23,18 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
      
   // expand the layout to allow for the new calculations for Open accounts and account status
   TradeRecs_expandedLayout := PROJECT(TradeRecs_sorted,
-                                      TRANSFORM(BusinessCredit_Services.Layouts.rec_tradelineExpandedLayout,
-                                                SELF.isRemain_Bal_Changed  := (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
-                                                SELF.isRecent_Pmt_Not_Zero := (UNSIGNED)LEFT.recent_payment_amount != 0 AND (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
-                                                SELF                       := LEFT));
+    TRANSFORM(BusinessCredit_Services.Layouts.rec_tradelineExpandedLayout,
+      nonblank_status := TRIM(LEFT.Account_Status_1) <> '' OR TRIM(LEFT.Account_Status_2) <> '';
+      is_suspend := LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Suspend_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Suspend_Status;
+
+      SELF.isRemain_Bal_Changed  := (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
+      SELF.isRecent_Pmt_Not_Zero := (UNSIGNED)LEFT.recent_payment_amount != 0 AND (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
+      SELF.Disaster_Impact := LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Impact_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Impact_Status;
+      SELF.most_recent_status_dt := IF(nonblank_status, (UNSIGNED)LEFT.Cycle_End_Date, 0);
+      SELF.most_recent_suspend_dt := IF(is_suspend, (UNSIGNED)LEFT.Cycle_End_Date, 0);
+      SELF := LEFT));
   
   // The rollup needs to end up with only one record for each account as if deduped, 
   // with the two new calculated fields based on the last 12 months.
@@ -36,23 +44,31 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 				   LEFT.Contract_Account_Number  = RIGHT.Contract_Account_Number AND
 				   LEFT.Account_Type_Reported 	 = RIGHT.Account_Type_Reported,
            TRANSFORM(BusinessCredit_Services.Layouts.rec_tradelineExpandedLayout,
-                     leftRecordWithinLastYear   := (UNSIGNED)LEFT.Cycle_End_Date  > unsigned_DateOneYearAgo;
-                     rightRecordWithinLastYear  := (UNSIGNED)RIGHT.Cycle_End_Date > unsigned_DateOneYearAgo;
-                     SELF.isRemain_Bal_Changed  := leftRecordWithinLastYear AND 
-                                                  (LEFT.isRemain_Bal_Changed  OR (rightRecordWithinLastYear AND LEFT.remaining_balance != RIGHT.remaining_balance)),
-                     SELF.isRecent_Pmt_Not_Zero := leftRecordWithinLastYear AND 
-                                                   (LEFT.isRecent_Pmt_Not_Zero OR (rightRecordWithinLastYear AND ((UNSIGNED)LEFT.recent_payment_amount != 0 OR (UNSIGNED)RIGHT.recent_payment_amount != 0))),
-                     SELF.Account_Status_1      := MAP( LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_1,
-                                                        RIGHT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_1,
-                                                        LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_1,
-                                                        RIGHT.Account_Status_1),
-                     SELF.Account_Status_2      := MAP( LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_2,
-                                                        RIGHT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_2,
-                                                        LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_2,
-                                                        RIGHT.Account_Status_2),
-                     SELF.Account_Closure_Basis := IF(LEFT.Account_Closure_Basis != '', LEFT.Account_Closure_Basis, RIGHT.Account_Closure_Basis),
-                     SELF                       := LEFT // always keep the most recent record
-                    ));
+              leftRecordWithinLastYear   := (UNSIGNED)LEFT.Cycle_End_Date  > unsigned_DateOneYearAgo;
+              rightRecordWithinLastYear  := (UNSIGNED)RIGHT.Cycle_End_Date > unsigned_DateOneYearAgo;
+
+              SELF.Cycle_End_Date        := LEFT.Cycle_End_Date;    // keep the most recent end date
+              SELF.isRemain_Bal_Changed  := leftRecordWithinLastYear AND 
+                                          (LEFT.isRemain_Bal_Changed  OR (rightRecordWithinLastYear AND LEFT.remaining_balance != RIGHT.remaining_balance)),
+              SELF.isRecent_Pmt_Not_Zero := leftRecordWithinLastYear AND 
+                                            (LEFT.isRecent_Pmt_Not_Zero OR (rightRecordWithinLastYear AND ((UNSIGNED)LEFT.recent_payment_amount != 0 OR (UNSIGNED)RIGHT.recent_payment_amount != 0))),
+              SELF.Account_Status_1      := MAP( LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_1,
+                                                RIGHT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_1,
+                                                LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_1,
+                                                RIGHT.Account_Status_1),
+              SELF.Account_Status_2      := MAP( LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_2,
+                                                RIGHT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_2,
+                                                LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_2,
+                                                RIGHT.Account_Status_2),
+
+              // a disaster impact is only reported if it exists on the most recent record in the account
+              SELF.Disaster_Impact       := LEFT.Disaster_Impact;
+
+              SELF.most_recent_status_dt := MAX(LEFT.most_recent_status_dt, RIGHT.most_recent_status_dt);
+              SELF.most_recent_suspend_dt   := MAX(LEFT.most_recent_suspend_dt, RIGHT.most_recent_suspend_dt);
+              SELF.Account_Closure_Basis := IF(LEFT.Account_Closure_Basis != '', LEFT.Account_Closure_Basis, RIGHT.Account_Closure_Basis),
+              SELF                       := LEFT // always keep the most recent record
+            ));
      // SBCREDIT ADD											
 	EXPORT TradeRecs_dedup_Count := COUNT(TradeRecs_dedup);
  	SHARED TradeRecs_Active := TradeRecs_dedup(recent_activity_indicator = 'Y');
@@ -74,16 +90,21 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		string worst_status;
 	END;
 
-	SHARED TradeRecs_Raw_with_Status :=	PROJECT(TradeRecs_Raw, 
-																				TRANSFORM(worst_status_rec,
-																					SELF := LEFT,
-                                          // RQ-13023
-																					SELF.worst_status := BusinessCredit_Services.Functions.fn_WorstStatus(LEFT.Date_Account_Closed, LEFT.Account_Closure_Basis, LEFT.Account_Status_1, LEFT.Account_Status_2, LEFT.Payment_Status_Category)));
+  TradeRecs_Raw_with_Status :=	PROJECT(TradeRecs_Raw, 
+    TRANSFORM(worst_status_rec,
+      // RQ-13023
+      SELF.worst_status := BusinessCredit_Services.Functions.fn_WorstStatus(LEFT.Date_Account_Closed, LEFT.Account_Closure_Basis, LEFT.Account_Status_1, LEFT.Account_Status_2, LEFT.Payment_Status_Category), 
+      SELF := LEFT));
 
-	SHARED TradeRecs_Raw_with_Status_Sort := SORT(TradeRecs_Raw_with_Status, 	BusinessCredit_Services.Functions.fn_WorstStatus_sort_order(worst_status));
-	SHARED most_severe_status 						:= TradeRecs_Raw_with_Status_Sort[1].worst_status;
+	TradeRecs_Raw_with_Status_Sort := SORT(TradeRecs_Raw_with_Status, 	BusinessCredit_Services.Functions.fn_WorstStatus_sort_order(worst_status));
+  
+  // [RQ-20112] most_severe_status will indicate an impact by a natural disaster if the flag is present
+  // in the most recent record for any of the accounts
+  most_severe_status := BusinessCredit_Services.Functions.fn_appendDisasterStatus(
+    TradeRecs_Raw_with_Status_Sort[1].worst_status, 
+    EXISTS(TradeRecs_dedup(disaster_impact)), false);
 	
-	SHARED AvgOpenBalance 		:= ROUND(Total_Current_Exposure / open_accounts, 2);
+	AvgOpenBalance 		:= ROUND(Total_Current_Exposure / open_accounts, 2);
   
   // RQ-13023
 	BusinessCredit_Services.Macros.Mac_Median(TradeRecs_Active_AC_Open, Median_Balance, remaining_balance);
@@ -288,11 +309,21 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		CollateralIndicator			:= CollateralRec.Collateral_Indicator = 'Y';
 		TypeOfCollateralSecured := BusinessCredit_Services.Functions.fn_CollateralType(CollateralRec.Type_Of_Collateral_Secured_For_This_Account);
 		
+    // in order to consider the account suspended due to a natural disaster, the most recent non-blank 
+    // account status must contain '021' (disaster suspended) and that flag must be present less than 
+    // 180 days from the most recent account date
+    IsDisasterSuspend := L.most_recent_suspend_dt > 0 AND 
+      L.most_recent_suspend_dt >= L.most_recent_status_dt AND 
+      STD.Date.DaysBetween(L.most_recent_suspend_dt, (UNSIGNED)L.Cycle_End_Date) < 180;
+
 		SELF.BusinessContributorNumber 		:= 	L.Sbfe_Contributor_Number;
 		SELF.BusinessAccountNumber 				:= 	L.Contract_Account_Number;
 		SELF.AccountTypeReportedCode 			:= 	L.Account_Type_Reported;
 		SELF.AccountTypeReportedDesc 			:=	BusinessCredit_Services.Functions.fn_AccountTypeDescription(L.Account_Type_Reported);
-		SELF.AccountStatus					 			:=	BusinessCredit_Services.Functions.fn_CurrentBizAccountStatus(L.Date_Account_Closed, L.Account_Closure_Basis, L.Payment_Status_Category, L.Cycle_End_Date, L.isRemain_Bal_Changed, L.isRecent_Pmt_Not_Zero, unsigned_DateOneYearAgo, L.Account_Status_1, L.Account_Status_2);
+		SELF.AccountStatus					 			:=	BusinessCredit_Services.Functions.fn_CurrentBizAccountStatus(L.Date_Account_Closed, 
+      L.Account_Closure_Basis, L.Payment_Status_Category, L.Cycle_End_Date, 
+      L.isRemain_Bal_Changed, L.isRecent_Pmt_Not_Zero, unsigned_DateOneYearAgo, 
+      L.Account_Status_1, L.Account_Status_2, L.Disaster_Impact, IsDisasterSuspend);
 		SELF.AccountOpenDate							:= 	iesp.ECL2ESP.toDatestring8(L.Date_Account_Opened);
 		SELF.AccountReportedDate					:=	iesp.ECL2ESP.toDatestring8(L.Cycle_End_Date);
 		SELF.AccountClosureDate						:=	iesp.ECL2ESP.toDatestring8(L.Date_Account_Closed);
@@ -487,6 +518,8 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
                                                           CHOOSEN(SORT(ChargeOffsRecsToPutOnEnd, -AccountReportedDate),		NumChargeOffsToPutOnEnd)																												
 														);
 																												
+
+
              // c_AccDetail_recsChargedOff := count(AccDetail_recsChargedOff);
 		   // c_AccDetail_recsNoChargedOff := count(AccDetail_recsNoChargedOff);
             // output(MoreThanTenChargeOffs, named('MoreThanTenChargeOffs'));											
@@ -509,5 +542,12 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
    // output(tempAcctDetail_RecsYearlyCreditUtils, named('tempAcctDetail_RecsYearlyCreditUtils'));
    // output(TEMP2AccDetail_Recs, named('TEMP2AccDetail_Recs'));
    // output(AccDetail_Recs, named('AccDetail_Recs'));
+
+  // output(TradeRecs_Raw, named('fn_getBuzCreditTrades__TradeRecs_Raw'));
+  // output(TradeRecs_dedup, named('fn_getBuzCreditTrades__TradeRecs_dedup'));
+  // output(TradeRecs_Raw_with_Status_Sort, named('fn_getBuzCreditTrades__TradeRecs_Raw_with_Status_Sort'));
+  // output(TradeRecs_with_Status_Rolled, named('fn_getBuzCreditTrades__TradeRecs_with_Status_Rolled'));
+  // output(most_severe_status, named('fn_getBuzCreditTrades__most_severe_status'));
+
 	EXPORT   AccDetail_Recs_Combined :=   CHOOSEN( FinalAccDetail_recs,  iesp.Constants.BusinessCredit.MaxTradelines);							            
 END;
