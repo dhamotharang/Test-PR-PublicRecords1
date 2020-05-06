@@ -49,7 +49,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED1	SBFESrc									        := 1;
     EXPORT UNSIGNED1	HeaderSrc								        := 2;
 
-    EXPORT SET OF STRING	SET_ALLOWED_ACCOUNT						 := ['002' , '003' , '006']; 
+    EXPORT SET OF STRING	SET_ALLOWED_ACCOUNT := ['002' , '003' , '006']; 
     EXPORT SET OF STRING	SET_CHARGEOFF_STATUS := ['009','011'];
 
     EXPORT SCORE_TYPE := 
@@ -85,8 +85,11 @@ EXPORT Constants := MODULE
 		  END;
     EXPORT SET OF STRING EXCLUDED_EXPERIAN_SRC  := [MDR.sourceTools.src_EBR, MDR.sourceTools.src_Experian_CRDB];  //experian source removal
      
+    EXPORT STRING3 Disaster_Impact_Status := '020';
+    EXPORT STRING3 Disaster_Suspend_Status := '021';
     EXPORT SET OF STRING Closed_Account_Status_Codes := ['002','003','004','005','008','009','011','016','017','018','022'];	
-			
+		EXPORT SET OF STRING Disaster_Status_Codes := [Disaster_Impact_Status, Disaster_Suspend_Status];
+
 		EXPORT STRING3 NO_HIT_SCORE := '222';
 		
 		EXPORT UNSIGNED2 BIPID_WEIGHT_THRESHOLD := 44;
@@ -94,4 +97,49 @@ EXPORT Constants := MODULE
 		EXPORT  STRING30 PrincipalAndInterest := 'Principal and Interest';
 		EXPORT STRING35 AmountEqualToBadDebtReserve  := 'Amount Equal to Bad Debt Reserve';
 		EXPORT STRING1 Delimiter := '|';
+
+    EXPORT ACCT_STATUS := MODULE
+      EXPORT Current := 'CURRENT';
+      EXPORT Overdue := 'OVERDUE';
+      EXPORT Closed := 'CLOSED';
+
+      EXPORT WithinTerms := 'Within Terms';
+      EXPORT Overdue30 := 'Overdue 30';
+      EXPORT Overdue60 := 'Overdue 60';
+      EXPORT Overdue90 := 'Overdue 90';
+      EXPORT Overdue90Plus := 'Overdue 90+';
+
+      EXPORT Bankruptcy := 'Bankruptcy';
+      EXPORT ChargeOff := 'Charge off';
+      EXPORT Foreclosure := 'Foreclosure/Repossession';
+      EXPORT NonAccrual := 'Non-Accrual account';
+      EXPORT Collection := 'Collection';
+
+      EXPORT None := '';
+
+      EXPORT Disaster := MODULE
+        EXPORT Current := 'Disaster Impact: CURRENT';
+        EXPORT Overdue := 'Disaster Impact: OVERDUE';
+        EXPORT Closed := 'Disaster Impact: CLOSED';
+
+        EXPORT WithinTerms := 'Disaster Impact: Within Terms';
+        EXPORT Overdue30 := 'Disaster Impact: Overdue 30';
+        EXPORT Overdue60 := 'Disaster Impact: Overdue 60';
+        EXPORT Overdue90 := 'Disaster Impact: Overdue 90';
+        EXPORT Overdue90Plus := 'Disaster Impact: Overdue 90+';
+
+        EXPORT Bankruptcy := 'Disaster Impact: Bankruptcy';
+        EXPORT ChargeOff := 'Disaster Impact: Charge off';
+        EXPORT Foreclosure := 'Disaster Impact: Forcl/Repo';
+        EXPORT NonAccrual := 'Disaster Impact: Non-Accrual';
+        EXPORT Collection := 'Disaster Impact: Collection';
+
+        EXPORT Suspended := 'Disaster Impact: Suspended';
+        EXPORT None := 'Disaster Impact';
+
+        EXPORT AllSet := [Current, Overdue, Closed, WithinTerms, Overdue30, Overdue60, 
+          Overdue90, Overdue90Plus, Bankruptcy, ChargeOff, Foreclosure, NonAccrual, 
+          Collection, Suspended, None];
+      END;
+    END;
 END;
