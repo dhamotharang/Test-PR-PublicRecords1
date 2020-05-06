@@ -271,7 +271,7 @@ d := dataset([{(unsigned)account_value}],rec);
 //Check to see if new custom CVI field is populated with a valid value
 Custom_Model_Name := trim(STD.STR.ToUpperCase(In_CustomCVIModelName));
 
-Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1', 'CCVI1909_1'];
+Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1', 'CCVI1909_1', 'CCVI2004_1'];
 CustomCVIModelName := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.')):INDEPENDENT;
 ischase := if(CustomCVIModelName = 'CCVI1810_1', TRUE,FALSE);
 
@@ -625,8 +625,16 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 									{3, addr3, le.chronoprim_range3, le.chronopredir3, le.chronoprim_name3, le.chronosuffix3, le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3, 
 											le.chronocity3, le.chronostate3, le.chronozip3, le.chronozip4_3, le.chronophone3, le.chronodate_first3, le.chronodate_last3, le.chronoaddr_isbest3, if(IncludeDPBC,chrono3_dpbc,'')}], 
 									Risk_Indicators.Layout_AddressHistory);
-	self.chronology := chronology(Address<>'');
-	
+                  
+    self.chronology := chronology(Address<>'');
+      
+    Chronology_best := Chronology(isbestmatch = true);
+    best_address := Chronology_best[1].Address;
+    best_city := Chronology_best[1].City;
+    best_state := Chronology_best[1].St;
+    best_zip5 := Chronology_best[1].Zip;
+    best_zip4 := Chronology_best[1].Zip4;
+     
 	Additional_Lname := if(le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match, DATASET([{le.altfirst,le.altlast,le.altlast_date},
 							    {le.altfirst2,le.altlast2,le.altlast_date2},
 							    {le.altfirst3,le.altlast3,le.altlast_date3}], Risk_Indicators.Layout_LastNames), 
@@ -672,9 +680,10 @@ END;
      // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
      SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
                                                             CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            CustomCVIModelName = 'CCVI2004_1' => Models.CVI2004_1_0(le.prim_range, le.prim_name, le.st, le.p_city_name, le.z5, le.zip4,(REAL)le.lat, (REAL)le.long, best_address, best_city, best_state, best_zip5, best_zip4),
                                                             CustomCVIModelName <> '' => SELF.CVI,
                                                             '');
-  
+
 	self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 	self.age := if (le.age = '***','',le.age);
   
@@ -721,7 +730,7 @@ END;
   
 	self.cviCustomScore_name := if(Valid_CCVI, CustomCVIModelName, '');
 	
-    noCustomRIorFUA := CustomCVIModelName IN ['', 'CCVI1909_1'];
+    noCustomRIorFUA := CustomCVIModelName IN ['', 'CCVI1909_1', 'CCVI2004_1'];
     
 	self.cviCustomScore_ri  := MAP(ischase and chase_expressions => reason_with_seq_chase(hri<>''),
                                                                     noCustomRIorFUA => empty_reasons_with_seq,
