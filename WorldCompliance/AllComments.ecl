@@ -124,7 +124,7 @@ END;
 															left.SubCategoryLabel))),															
 												if ((left.SubCategoryLabel = 'Sanction List'),
 													'',
-													left.SubCategoryLabel)))) + ' ' + Left.isactivepep;));
+													left.SubCategoryLabel))));));
 													//left.SubCategoryLabel)));));
 				
 

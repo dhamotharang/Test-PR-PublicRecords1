@@ -105,6 +105,8 @@ EXPORT CCriteria := FUNCTION
 		entityid, segmenttype, subcategorylabel, subcategorydesc, isactivepep, local);
 	peps := newcat(segmenttype='PEP');
 	former := newcat(subcategorydesc='Former PEP');
+	NotAct := newcat(isactivepep='N' and segmenttype = 'PEP');
+	Act := newcat(isactivepep IN ['Y',''] and segmenttype='PEP');
 
 	justformer0 := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
 									self := left), inner, keep(1), local);
@@ -114,7 +116,31 @@ EXPORT CCriteria := FUNCTION
 									self := left), left only, local);
 	noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
 								entityid, segmenttype, subcategorydesc, local);
-	restored := newcat(segmenttype<>'PEP') + justformer + noformer;
+
+	NotActive0 := JOIN(NotAct, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);
+	notActive := DEDUP(SORT(NotActive0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+	Active0 := JOIN(Act, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+	Active := DEDUP(SORT(Active0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+
+	onlyNo0 := JOIN(NotActive, Active, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+	onlyNo := DEDUP(SORT(onlyno0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+       
+// Only Inactive PEP set:
+	export ForceFormer := Join(distribute(onlyno, EntityID),onlyno,Left.EntityID=Right.EntityID,
+		TRANSFORM(Layouts.rWCOCategories,
+				self.SegmentType := 'PEP';
+				self.SubCategoryLabel := 'Primary PEP';
+				self.SubCategoryDesc := 'Former PEP';
+				self.IsActivePEP := 'Y';
+				self := left;));
+			
+	restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
 
 //GetCategories(oldcat) + 
 
