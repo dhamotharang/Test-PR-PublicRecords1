@@ -1,9 +1,10 @@
 ﻿IMPORT SALT311,STD;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Companies_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 61;
-  EXPORT NumRulesFromFieldType := 61;
+  EXPORT NumRules := 59;
+  EXPORT NumRulesFromFieldType := 59;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 58;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -81,32 +82,32 @@ EXPORT Companies_Scrubs := MODULE
           ,'dt_vendor_last_reported:Invalid_Date:CUSTOM'
           ,'record_type:Invalid_AlphaCaps:ALLOW'
           ,'rawfields_maincompanyid:Invalid_No:ALLOW'
-          ,'rawfields_companyname:Invalid_AlphaChar:ALLOW'
+          ,'rawfields_companyname:Invalid_AlphaChar:CUSTOM'
           ,'rawfields_ticker:Invalid_AlphaCaps:ALLOW'
           ,'rawfields_fortunerank:Invalid_No:ALLOW'
-          ,'rawfields_primaryindustry:Invalid_AlphaChar:ALLOW'
-          ,'rawfields_address1:Invalid_AlphaNumChar:ALLOW'
-          ,'rawfields_address2:Invalid_AlphaNumChar:ALLOW'
-          ,'rawfields_city:Invalid_AlphaChar:ALLOW'
+          ,'rawfields_primaryindustry:Invalid_AlphaChar:CUSTOM'
+          ,'rawfields_address1:Invalid_AlphaNumChar:CUSTOM'
+          ,'rawfields_address2:Invalid_AlphaNumChar:CUSTOM'
+          ,'rawfields_city:Invalid_AlphaChar:CUSTOM'
           ,'rawfields_state:Invalid_State:ALLOW','rawfields_state:Invalid_State:LENGTHS'
-          ,'rawfields_zip:Invalid_Zip:ALLOW','rawfields_zip:Invalid_Zip:LENGTHS'
+          ,'rawfields_zip:Invalid_Zip:LENGTHS'
           ,'rawfields_country:Invalid_Alpha:ALLOW'
           ,'rawfields_region:Invalid_AlphaCaps:ALLOW'
-          ,'rawfields_phone:Invalid_Float:ALLOW'
-          ,'rawfields_extension:Invalid_Float:ALLOW'
-          ,'rawfields_weburl:Invalid_AlphaChar:ALLOW'
-          ,'rawfields_sales:Invalid_Float:ALLOW'
+          ,'rawfields_phone:Invalid_Float:CUSTOM'
+          ,'rawfields_extension:Invalid_Float:CUSTOM'
+          ,'rawfields_weburl:Invalid_AlphaChar:CUSTOM'
+          ,'rawfields_sales:Invalid_Float:CUSTOM'
           ,'rawfields_employees:Invalid_No:ALLOW'
-          ,'rawfields_competitors:Invalid_AlphaChar:ALLOW'
+          ,'rawfields_competitors:Invalid_AlphaChar:CUSTOM'
           ,'rawfields_divisionname:Invalid_Alpha:ALLOW'
-          ,'rawfields_siccode:Invalid_Float:ALLOW'
-          ,'rawfields_auditor:Invalid_Alpha:ALLOW'
+          ,'rawfields_siccode:Invalid_Float:CUSTOM'
+          ,'rawfields_auditor:Invalid_AlphaChar:CUSTOM'
           ,'rawfields_entrydate:Invalid_Date:CUSTOM'
           ,'rawfields_lastupdate:Invalid_Date:CUSTOM'
           ,'rawfields_entrystaffid:Invalid_No:ALLOW'
           ,'clean_address_prim_range:Invalid_No:ALLOW'
           ,'clean_address_predir:Invalid_AlphaCaps:ALLOW'
-          ,'clean_address_prim_name:Invalid_AlphaCaps:ALLOW'
+          ,'clean_address_prim_name:Invalid_AlphaNumChar:CUSTOM'
           ,'clean_address_addr_suffix:Invalid_AlphaCaps:ALLOW'
           ,'clean_address_postdir:Invalid_AlphaCaps:ALLOW'
           ,'clean_address_unit_desig:Invalid_AlphaCaps:ALLOW'
@@ -114,7 +115,7 @@ EXPORT Companies_Scrubs := MODULE
           ,'clean_address_p_city_name:Invalid_AlphaCaps:ALLOW'
           ,'clean_address_v_city_name:Invalid_AlphaCaps:ALLOW'
           ,'clean_address_st:Invalid_AlphaCaps:ALLOW'
-          ,'clean_address_zip:Invalid_Zip:ALLOW','clean_address_zip:Invalid_Zip:LENGTHS'
+          ,'clean_address_zip:Invalid_Zip:LENGTHS'
           ,'clean_address_zip4:Invalid_No:ALLOW'
           ,'clean_address_cart:Invalid_AlphaNum:ALLOW'
           ,'clean_address_cr_sort_sz:Invalid_AlphaCaps:ALLOW'
@@ -125,8 +126,8 @@ EXPORT Companies_Scrubs := MODULE
           ,'clean_address_rec_type:Invalid_AlphaCaps:ALLOW'
           ,'clean_address_fips_state:Invalid_No:ALLOW'
           ,'clean_address_fips_county:Invalid_No:ALLOW'
-          ,'clean_address_geo_lat:Invalid_Float:ALLOW'
-          ,'clean_address_geo_long:Invalid_Float:ALLOW'
+          ,'clean_address_geo_lat:Invalid_Float:CUSTOM'
+          ,'clean_address_geo_long:Invalid_Float:CUSTOM'
           ,'clean_address_msa:Invalid_No:ALLOW'
           ,'clean_address_geo_blk:Invalid_No:ALLOW'
           ,'clean_address_geo_match:Invalid_No:ALLOW'
@@ -155,7 +156,7 @@ EXPORT Companies_Scrubs := MODULE
           ,Companies_Fields.InvalidMessage_rawfields_address2(1)
           ,Companies_Fields.InvalidMessage_rawfields_city(1)
           ,Companies_Fields.InvalidMessage_rawfields_state(1),Companies_Fields.InvalidMessage_rawfields_state(2)
-          ,Companies_Fields.InvalidMessage_rawfields_zip(1),Companies_Fields.InvalidMessage_rawfields_zip(2)
+          ,Companies_Fields.InvalidMessage_rawfields_zip(1)
           ,Companies_Fields.InvalidMessage_rawfields_country(1)
           ,Companies_Fields.InvalidMessage_rawfields_region(1)
           ,Companies_Fields.InvalidMessage_rawfields_phone(1)
@@ -180,7 +181,7 @@ EXPORT Companies_Scrubs := MODULE
           ,Companies_Fields.InvalidMessage_clean_address_p_city_name(1)
           ,Companies_Fields.InvalidMessage_clean_address_v_city_name(1)
           ,Companies_Fields.InvalidMessage_clean_address_st(1)
-          ,Companies_Fields.InvalidMessage_clean_address_zip(1),Companies_Fields.InvalidMessage_clean_address_zip(2)
+          ,Companies_Fields.InvalidMessage_clean_address_zip(1)
           ,Companies_Fields.InvalidMessage_clean_address_zip4(1)
           ,Companies_Fields.InvalidMessage_clean_address_cart(1)
           ,Companies_Fields.InvalidMessage_clean_address_cr_sort_sz(1)
@@ -271,7 +272,7 @@ EXPORT FromNone(DATASET(Companies_Layout_Sheila_Greco) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Companies_Layout_Sheila_Greco);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_first_seen_Invalid << 0 ) + ( le.dt_last_seen_Invalid << 1 ) + ( le.dt_vendor_first_reported_Invalid << 2 ) + ( le.dt_vendor_last_reported_Invalid << 3 ) + ( le.record_type_Invalid << 4 ) + ( le.rawfields_maincompanyid_Invalid << 5 ) + ( le.rawfields_companyname_Invalid << 6 ) + ( le.rawfields_ticker_Invalid << 7 ) + ( le.rawfields_fortunerank_Invalid << 8 ) + ( le.rawfields_primaryindustry_Invalid << 9 ) + ( le.rawfields_address1_Invalid << 10 ) + ( le.rawfields_address2_Invalid << 11 ) + ( le.rawfields_city_Invalid << 12 ) + ( le.rawfields_state_Invalid << 13 ) + ( le.rawfields_zip_Invalid << 15 ) + ( le.rawfields_country_Invalid << 17 ) + ( le.rawfields_region_Invalid << 18 ) + ( le.rawfields_phone_Invalid << 19 ) + ( le.rawfields_extension_Invalid << 20 ) + ( le.rawfields_weburl_Invalid << 21 ) + ( le.rawfields_sales_Invalid << 22 ) + ( le.rawfields_employees_Invalid << 23 ) + ( le.rawfields_competitors_Invalid << 24 ) + ( le.rawfields_divisionname_Invalid << 25 ) + ( le.rawfields_siccode_Invalid << 26 ) + ( le.rawfields_auditor_Invalid << 27 ) + ( le.rawfields_entrydate_Invalid << 28 ) + ( le.rawfields_lastupdate_Invalid << 29 ) + ( le.rawfields_entrystaffid_Invalid << 30 ) + ( le.clean_address_prim_range_Invalid << 31 ) + ( le.clean_address_predir_Invalid << 32 ) + ( le.clean_address_prim_name_Invalid << 33 ) + ( le.clean_address_addr_suffix_Invalid << 34 ) + ( le.clean_address_postdir_Invalid << 35 ) + ( le.clean_address_unit_desig_Invalid << 36 ) + ( le.clean_address_sec_range_Invalid << 37 ) + ( le.clean_address_p_city_name_Invalid << 38 ) + ( le.clean_address_v_city_name_Invalid << 39 ) + ( le.clean_address_st_Invalid << 40 ) + ( le.clean_address_zip_Invalid << 41 ) + ( le.clean_address_zip4_Invalid << 43 ) + ( le.clean_address_cart_Invalid << 44 ) + ( le.clean_address_cr_sort_sz_Invalid << 45 ) + ( le.clean_address_lot_Invalid << 46 ) + ( le.clean_address_lot_order_Invalid << 47 ) + ( le.clean_address_dbpc_Invalid << 48 ) + ( le.clean_address_chk_digit_Invalid << 49 ) + ( le.clean_address_rec_type_Invalid << 50 ) + ( le.clean_address_fips_state_Invalid << 51 ) + ( le.clean_address_fips_county_Invalid << 52 ) + ( le.clean_address_geo_lat_Invalid << 53 ) + ( le.clean_address_geo_long_Invalid << 54 ) + ( le.clean_address_msa_Invalid << 55 ) + ( le.clean_address_geo_blk_Invalid << 56 ) + ( le.clean_address_geo_match_Invalid << 57 ) + ( le.clean_address_err_stat_Invalid << 58 ) + ( le.clean_dates_entrydate_Invalid << 59 ) + ( le.clean_dates_lastupdate_Invalid << 60 );
+    SELF.ScrubsBits1 := ( le.dt_first_seen_Invalid << 0 ) + ( le.dt_last_seen_Invalid << 1 ) + ( le.dt_vendor_first_reported_Invalid << 2 ) + ( le.dt_vendor_last_reported_Invalid << 3 ) + ( le.record_type_Invalid << 4 ) + ( le.rawfields_maincompanyid_Invalid << 5 ) + ( le.rawfields_companyname_Invalid << 6 ) + ( le.rawfields_ticker_Invalid << 7 ) + ( le.rawfields_fortunerank_Invalid << 8 ) + ( le.rawfields_primaryindustry_Invalid << 9 ) + ( le.rawfields_address1_Invalid << 10 ) + ( le.rawfields_address2_Invalid << 11 ) + ( le.rawfields_city_Invalid << 12 ) + ( le.rawfields_state_Invalid << 13 ) + ( le.rawfields_zip_Invalid << 15 ) + ( le.rawfields_country_Invalid << 16 ) + ( le.rawfields_region_Invalid << 17 ) + ( le.rawfields_phone_Invalid << 18 ) + ( le.rawfields_extension_Invalid << 19 ) + ( le.rawfields_weburl_Invalid << 20 ) + ( le.rawfields_sales_Invalid << 21 ) + ( le.rawfields_employees_Invalid << 22 ) + ( le.rawfields_competitors_Invalid << 23 ) + ( le.rawfields_divisionname_Invalid << 24 ) + ( le.rawfields_siccode_Invalid << 25 ) + ( le.rawfields_auditor_Invalid << 26 ) + ( le.rawfields_entrydate_Invalid << 27 ) + ( le.rawfields_lastupdate_Invalid << 28 ) + ( le.rawfields_entrystaffid_Invalid << 29 ) + ( le.clean_address_prim_range_Invalid << 30 ) + ( le.clean_address_predir_Invalid << 31 ) + ( le.clean_address_prim_name_Invalid << 32 ) + ( le.clean_address_addr_suffix_Invalid << 33 ) + ( le.clean_address_postdir_Invalid << 34 ) + ( le.clean_address_unit_desig_Invalid << 35 ) + ( le.clean_address_sec_range_Invalid << 36 ) + ( le.clean_address_p_city_name_Invalid << 37 ) + ( le.clean_address_v_city_name_Invalid << 38 ) + ( le.clean_address_st_Invalid << 39 ) + ( le.clean_address_zip_Invalid << 40 ) + ( le.clean_address_zip4_Invalid << 41 ) + ( le.clean_address_cart_Invalid << 42 ) + ( le.clean_address_cr_sort_sz_Invalid << 43 ) + ( le.clean_address_lot_Invalid << 44 ) + ( le.clean_address_lot_order_Invalid << 45 ) + ( le.clean_address_dbpc_Invalid << 46 ) + ( le.clean_address_chk_digit_Invalid << 47 ) + ( le.clean_address_rec_type_Invalid << 48 ) + ( le.clean_address_fips_state_Invalid << 49 ) + ( le.clean_address_fips_county_Invalid << 50 ) + ( le.clean_address_geo_lat_Invalid << 51 ) + ( le.clean_address_geo_long_Invalid << 52 ) + ( le.clean_address_msa_Invalid << 53 ) + ( le.clean_address_geo_blk_Invalid << 54 ) + ( le.clean_address_geo_match_Invalid << 55 ) + ( le.clean_address_err_stat_Invalid << 56 ) + ( le.clean_dates_entrydate_Invalid << 57 ) + ( le.clean_dates_lastupdate_Invalid << 58 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -307,50 +308,50 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.rawfields_address2_Invalid := (le.ScrubsBits1 >> 11) & 1;
     SELF.rawfields_city_Invalid := (le.ScrubsBits1 >> 12) & 1;
     SELF.rawfields_state_Invalid := (le.ScrubsBits1 >> 13) & 3;
-    SELF.rawfields_zip_Invalid := (le.ScrubsBits1 >> 15) & 3;
-    SELF.rawfields_country_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.rawfields_region_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.rawfields_phone_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.rawfields_extension_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.rawfields_weburl_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.rawfields_sales_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.rawfields_employees_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.rawfields_competitors_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.rawfields_divisionname_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.rawfields_siccode_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.rawfields_auditor_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.rawfields_entrydate_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.rawfields_lastupdate_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.rawfields_entrystaffid_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.clean_address_prim_range_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.clean_address_predir_Invalid := (le.ScrubsBits1 >> 32) & 1;
-    SELF.clean_address_prim_name_Invalid := (le.ScrubsBits1 >> 33) & 1;
-    SELF.clean_address_addr_suffix_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.clean_address_postdir_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.clean_address_unit_desig_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.clean_address_sec_range_Invalid := (le.ScrubsBits1 >> 37) & 1;
-    SELF.clean_address_p_city_name_Invalid := (le.ScrubsBits1 >> 38) & 1;
-    SELF.clean_address_v_city_name_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.clean_address_st_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.clean_address_zip_Invalid := (le.ScrubsBits1 >> 41) & 3;
-    SELF.clean_address_zip4_Invalid := (le.ScrubsBits1 >> 43) & 1;
-    SELF.clean_address_cart_Invalid := (le.ScrubsBits1 >> 44) & 1;
-    SELF.clean_address_cr_sort_sz_Invalid := (le.ScrubsBits1 >> 45) & 1;
-    SELF.clean_address_lot_Invalid := (le.ScrubsBits1 >> 46) & 1;
-    SELF.clean_address_lot_order_Invalid := (le.ScrubsBits1 >> 47) & 1;
-    SELF.clean_address_dbpc_Invalid := (le.ScrubsBits1 >> 48) & 1;
-    SELF.clean_address_chk_digit_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.clean_address_rec_type_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.clean_address_fips_state_Invalid := (le.ScrubsBits1 >> 51) & 1;
-    SELF.clean_address_fips_county_Invalid := (le.ScrubsBits1 >> 52) & 1;
-    SELF.clean_address_geo_lat_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.clean_address_geo_long_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.clean_address_msa_Invalid := (le.ScrubsBits1 >> 55) & 1;
-    SELF.clean_address_geo_blk_Invalid := (le.ScrubsBits1 >> 56) & 1;
-    SELF.clean_address_geo_match_Invalid := (le.ScrubsBits1 >> 57) & 1;
-    SELF.clean_address_err_stat_Invalid := (le.ScrubsBits1 >> 58) & 1;
-    SELF.clean_dates_entrydate_Invalid := (le.ScrubsBits1 >> 59) & 1;
-    SELF.clean_dates_lastupdate_Invalid := (le.ScrubsBits1 >> 60) & 1;
+    SELF.rawfields_zip_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.rawfields_country_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.rawfields_region_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.rawfields_phone_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.rawfields_extension_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.rawfields_weburl_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.rawfields_sales_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.rawfields_employees_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.rawfields_competitors_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.rawfields_divisionname_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.rawfields_siccode_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.rawfields_auditor_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.rawfields_entrydate_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.rawfields_lastupdate_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.rawfields_entrystaffid_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.clean_address_prim_range_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.clean_address_predir_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.clean_address_prim_name_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.clean_address_addr_suffix_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.clean_address_postdir_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.clean_address_unit_desig_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.clean_address_sec_range_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.clean_address_p_city_name_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.clean_address_v_city_name_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.clean_address_st_Invalid := (le.ScrubsBits1 >> 39) & 1;
+    SELF.clean_address_zip_Invalid := (le.ScrubsBits1 >> 40) & 1;
+    SELF.clean_address_zip4_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.clean_address_cart_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.clean_address_cr_sort_sz_Invalid := (le.ScrubsBits1 >> 43) & 1;
+    SELF.clean_address_lot_Invalid := (le.ScrubsBits1 >> 44) & 1;
+    SELF.clean_address_lot_order_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.clean_address_dbpc_Invalid := (le.ScrubsBits1 >> 46) & 1;
+    SELF.clean_address_chk_digit_Invalid := (le.ScrubsBits1 >> 47) & 1;
+    SELF.clean_address_rec_type_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.clean_address_fips_state_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.clean_address_fips_county_Invalid := (le.ScrubsBits1 >> 50) & 1;
+    SELF.clean_address_geo_lat_Invalid := (le.ScrubsBits1 >> 51) & 1;
+    SELF.clean_address_geo_long_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.clean_address_msa_Invalid := (le.ScrubsBits1 >> 53) & 1;
+    SELF.clean_address_geo_blk_Invalid := (le.ScrubsBits1 >> 54) & 1;
+    SELF.clean_address_geo_match_Invalid := (le.ScrubsBits1 >> 55) & 1;
+    SELF.clean_address_err_stat_Invalid := (le.ScrubsBits1 >> 56) & 1;
+    SELF.clean_dates_entrydate_Invalid := (le.ScrubsBits1 >> 57) & 1;
+    SELF.clean_dates_lastupdate_Invalid := (le.ScrubsBits1 >> 58) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -365,36 +366,34 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     dt_vendor_last_reported_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid=1);
     record_type_ALLOW_ErrorCount := COUNT(GROUP,h.record_type_Invalid=1);
     rawfields_maincompanyid_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_maincompanyid_Invalid=1);
-    rawfields_companyname_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_companyname_Invalid=1);
+    rawfields_companyname_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_companyname_Invalid=1);
     rawfields_ticker_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_ticker_Invalid=1);
     rawfields_fortunerank_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_fortunerank_Invalid=1);
-    rawfields_primaryindustry_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_primaryindustry_Invalid=1);
-    rawfields_address1_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_address1_Invalid=1);
-    rawfields_address2_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_address2_Invalid=1);
-    rawfields_city_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_city_Invalid=1);
+    rawfields_primaryindustry_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_primaryindustry_Invalid=1);
+    rawfields_address1_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_address1_Invalid=1);
+    rawfields_address2_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_address2_Invalid=1);
+    rawfields_city_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_city_Invalid=1);
     rawfields_state_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_state_Invalid=1);
     rawfields_state_LENGTHS_ErrorCount := COUNT(GROUP,h.rawfields_state_Invalid=2);
     rawfields_state_Total_ErrorCount := COUNT(GROUP,h.rawfields_state_Invalid>0);
-    rawfields_zip_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_zip_Invalid=1);
-    rawfields_zip_LENGTHS_ErrorCount := COUNT(GROUP,h.rawfields_zip_Invalid=2);
-    rawfields_zip_Total_ErrorCount := COUNT(GROUP,h.rawfields_zip_Invalid>0);
+    rawfields_zip_LENGTHS_ErrorCount := COUNT(GROUP,h.rawfields_zip_Invalid=1);
     rawfields_country_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_country_Invalid=1);
     rawfields_region_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_region_Invalid=1);
-    rawfields_phone_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_phone_Invalid=1);
-    rawfields_extension_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_extension_Invalid=1);
-    rawfields_weburl_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_weburl_Invalid=1);
-    rawfields_sales_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_sales_Invalid=1);
+    rawfields_phone_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_phone_Invalid=1);
+    rawfields_extension_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_extension_Invalid=1);
+    rawfields_weburl_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_weburl_Invalid=1);
+    rawfields_sales_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_sales_Invalid=1);
     rawfields_employees_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_employees_Invalid=1);
-    rawfields_competitors_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_competitors_Invalid=1);
+    rawfields_competitors_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_competitors_Invalid=1);
     rawfields_divisionname_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_divisionname_Invalid=1);
-    rawfields_siccode_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_siccode_Invalid=1);
-    rawfields_auditor_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_auditor_Invalid=1);
+    rawfields_siccode_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_siccode_Invalid=1);
+    rawfields_auditor_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_auditor_Invalid=1);
     rawfields_entrydate_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_entrydate_Invalid=1);
     rawfields_lastupdate_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_lastupdate_Invalid=1);
     rawfields_entrystaffid_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_entrystaffid_Invalid=1);
     clean_address_prim_range_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_prim_range_Invalid=1);
     clean_address_predir_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_predir_Invalid=1);
-    clean_address_prim_name_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_prim_name_Invalid=1);
+    clean_address_prim_name_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_address_prim_name_Invalid=1);
     clean_address_addr_suffix_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_addr_suffix_Invalid=1);
     clean_address_postdir_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_postdir_Invalid=1);
     clean_address_unit_desig_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_unit_desig_Invalid=1);
@@ -402,9 +401,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     clean_address_p_city_name_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_p_city_name_Invalid=1);
     clean_address_v_city_name_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_v_city_name_Invalid=1);
     clean_address_st_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_st_Invalid=1);
-    clean_address_zip_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_zip_Invalid=1);
-    clean_address_zip_LENGTHS_ErrorCount := COUNT(GROUP,h.clean_address_zip_Invalid=2);
-    clean_address_zip_Total_ErrorCount := COUNT(GROUP,h.clean_address_zip_Invalid>0);
+    clean_address_zip_LENGTHS_ErrorCount := COUNT(GROUP,h.clean_address_zip_Invalid=1);
     clean_address_zip4_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_zip4_Invalid=1);
     clean_address_cart_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_cart_Invalid=1);
     clean_address_cr_sort_sz_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_cr_sort_sz_Invalid=1);
@@ -415,8 +412,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     clean_address_rec_type_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_rec_type_Invalid=1);
     clean_address_fips_state_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_fips_state_Invalid=1);
     clean_address_fips_county_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_fips_county_Invalid=1);
-    clean_address_geo_lat_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_geo_lat_Invalid=1);
-    clean_address_geo_long_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_geo_long_Invalid=1);
+    clean_address_geo_lat_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_address_geo_lat_Invalid=1);
+    clean_address_geo_long_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_address_geo_long_Invalid=1);
     clean_address_msa_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_msa_Invalid=1);
     clean_address_geo_blk_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_geo_blk_Invalid=1);
     clean_address_geo_match_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_geo_match_Invalid=1);
@@ -431,9 +428,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_maincompanyid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_companyname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_ticker_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_fortunerank_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_primaryindustry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_region_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_extension_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_weburl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_sales_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_competitors_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_divisionname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_siccode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_auditor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_lastupdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrystaffid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_Total_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_dates_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_dates_lastupdate_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_maincompanyid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_companyname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_ticker_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_fortunerank_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_primaryindustry_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_region_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_extension_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_weburl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_sales_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_competitors_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_divisionname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_siccode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_auditor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_lastupdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrystaffid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_dates_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_dates_lastupdate_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_maincompanyid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_companyname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_ticker_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_fortunerank_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_primaryindustry_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_region_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_extension_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_weburl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_sales_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_competitors_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_divisionname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_siccode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_auditor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_lastupdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrystaffid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_dates_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_dates_lastupdate_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_maincompanyid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_companyname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_ticker_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_fortunerank_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_primaryindustry_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_region_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_extension_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_weburl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_sales_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_employees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_competitors_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_divisionname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_siccode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_auditor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_lastupdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_entrystaffid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_dates_entrydate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_dates_lastupdate_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -457,32 +454,32 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dt_vendor_last_reported_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.record_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_maincompanyid_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_companyname_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_companyname_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_ticker_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_fortunerank_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_primaryindustry_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_address1_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_address2_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_city_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_primaryindustry_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_address1_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_address2_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_city_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.rawfields_zip_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.rawfields_zip_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.rawfields_country_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_region_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_phone_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_extension_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_weburl_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_sales_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_phone_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_extension_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_weburl_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_sales_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_employees_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_competitors_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_competitors_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_divisionname_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_siccode_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_auditor_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_siccode_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_auditor_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_entrydate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_lastupdate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_entrystaffid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_prim_range_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_predir_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_prim_name_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.clean_address_prim_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_address_addr_suffix_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_postdir_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_unit_desig_Invalid,'ALLOW','UNKNOWN')
@@ -490,7 +487,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.clean_address_p_city_name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_v_city_name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_st_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_zip_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.clean_address_zip_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.clean_address_zip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_cart_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_cr_sort_sz_Invalid,'ALLOW','UNKNOWN')
@@ -501,8 +498,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.clean_address_rec_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_fips_state_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_fips_county_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_geo_lat_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_geo_long_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.clean_address_geo_lat_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.clean_address_geo_long_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_address_msa_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_geo_blk_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_geo_match_Invalid,'ALLOW','UNKNOWN')
@@ -510,7 +507,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.clean_dates_entrydate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_dates_lastupdate_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','record_type','rawfields_maincompanyid','rawfields_companyname','rawfields_ticker','rawfields_fortunerank','rawfields_primaryindustry','rawfields_address1','rawfields_address2','rawfields_city','rawfields_state','rawfields_zip','rawfields_country','rawfields_region','rawfields_phone','rawfields_extension','rawfields_weburl','rawfields_sales','rawfields_employees','rawfields_competitors','rawfields_divisionname','rawfields_siccode','rawfields_auditor','rawfields_entrydate','rawfields_lastupdate','rawfields_entrystaffid','clean_address_prim_range','clean_address_predir','clean_address_prim_name','clean_address_addr_suffix','clean_address_postdir','clean_address_unit_desig','clean_address_sec_range','clean_address_p_city_name','clean_address_v_city_name','clean_address_st','clean_address_zip','clean_address_zip4','clean_address_cart','clean_address_cr_sort_sz','clean_address_lot','clean_address_lot_order','clean_address_dbpc','clean_address_chk_digit','clean_address_rec_type','clean_address_fips_state','clean_address_fips_county','clean_address_geo_lat','clean_address_geo_long','clean_address_msa','clean_address_geo_blk','clean_address_geo_match','clean_address_err_stat','clean_dates_entrydate','clean_dates_lastupdate','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaChar','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_Alpha','Invalid_AlphaCaps','Invalid_Float','Invalid_Float','Invalid_AlphaChar','Invalid_Float','Invalid_No','Invalid_AlphaChar','Invalid_Alpha','Invalid_Float','Invalid_Alpha','Invalid_Date','Invalid_Date','Invalid_No','Invalid_No','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_Zip','Invalid_No','Invalid_AlphaNum','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaCaps','Invalid_No','Invalid_No','Invalid_AlphaCaps','Invalid_No','Invalid_No','Invalid_Float','Invalid_Float','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_Date','Invalid_Date','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaChar','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_Alpha','Invalid_AlphaCaps','Invalid_Float','Invalid_Float','Invalid_AlphaChar','Invalid_Float','Invalid_No','Invalid_AlphaChar','Invalid_Alpha','Invalid_Float','Invalid_AlphaChar','Invalid_Date','Invalid_Date','Invalid_No','Invalid_No','Invalid_AlphaCaps','Invalid_AlphaNumChar','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_AlphaCaps','Invalid_Zip','Invalid_No','Invalid_AlphaNum','Invalid_AlphaCaps','Invalid_No','Invalid_AlphaCaps','Invalid_No','Invalid_No','Invalid_AlphaCaps','Invalid_No','Invalid_No','Invalid_Float','Invalid_Float','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_Date','Invalid_Date','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.record_type,(SALT311.StrType)le.rawfields_maincompanyid,(SALT311.StrType)le.rawfields_companyname,(SALT311.StrType)le.rawfields_ticker,(SALT311.StrType)le.rawfields_fortunerank,(SALT311.StrType)le.rawfields_primaryindustry,(SALT311.StrType)le.rawfields_address1,(SALT311.StrType)le.rawfields_address2,(SALT311.StrType)le.rawfields_city,(SALT311.StrType)le.rawfields_state,(SALT311.StrType)le.rawfields_zip,(SALT311.StrType)le.rawfields_country,(SALT311.StrType)le.rawfields_region,(SALT311.StrType)le.rawfields_phone,(SALT311.StrType)le.rawfields_extension,(SALT311.StrType)le.rawfields_weburl,(SALT311.StrType)le.rawfields_sales,(SALT311.StrType)le.rawfields_employees,(SALT311.StrType)le.rawfields_competitors,(SALT311.StrType)le.rawfields_divisionname,(SALT311.StrType)le.rawfields_siccode,(SALT311.StrType)le.rawfields_auditor,(SALT311.StrType)le.rawfields_entrydate,(SALT311.StrType)le.rawfields_lastupdate,(SALT311.StrType)le.rawfields_entrystaffid,(SALT311.StrType)le.clean_address_prim_range,(SALT311.StrType)le.clean_address_predir,(SALT311.StrType)le.clean_address_prim_name,(SALT311.StrType)le.clean_address_addr_suffix,(SALT311.StrType)le.clean_address_postdir,(SALT311.StrType)le.clean_address_unit_desig,(SALT311.StrType)le.clean_address_sec_range,(SALT311.StrType)le.clean_address_p_city_name,(SALT311.StrType)le.clean_address_v_city_name,(SALT311.StrType)le.clean_address_st,(SALT311.StrType)le.clean_address_zip,(SALT311.StrType)le.clean_address_zip4,(SALT311.StrType)le.clean_address_cart,(SALT311.StrType)le.clean_address_cr_sort_sz,(SALT311.StrType)le.clean_address_lot,(SALT311.StrType)le.clean_address_lot_order,(SALT311.StrType)le.clean_address_dbpc,(SALT311.StrType)le.clean_address_chk_digit,(SALT311.StrType)le.clean_address_rec_type,(SALT311.StrType)le.clean_address_fips_state,(SALT311.StrType)le.clean_address_fips_county,(SALT311.StrType)le.clean_address_geo_lat,(SALT311.StrType)le.clean_address_geo_long,(SALT311.StrType)le.clean_address_msa,(SALT311.StrType)le.clean_address_geo_blk,(SALT311.StrType)le.clean_address_geo_match,(SALT311.StrType)le.clean_address_err_stat,(SALT311.StrType)le.clean_dates_entrydate,(SALT311.StrType)le.clean_dates_lastupdate,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,58,Into(LEFT,COUNTER));
@@ -532,32 +529,32 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_vendor_last_reported_CUSTOM_ErrorCount
           ,le.record_type_ALLOW_ErrorCount
           ,le.rawfields_maincompanyid_ALLOW_ErrorCount
-          ,le.rawfields_companyname_ALLOW_ErrorCount
+          ,le.rawfields_companyname_CUSTOM_ErrorCount
           ,le.rawfields_ticker_ALLOW_ErrorCount
           ,le.rawfields_fortunerank_ALLOW_ErrorCount
-          ,le.rawfields_primaryindustry_ALLOW_ErrorCount
-          ,le.rawfields_address1_ALLOW_ErrorCount
-          ,le.rawfields_address2_ALLOW_ErrorCount
-          ,le.rawfields_city_ALLOW_ErrorCount
+          ,le.rawfields_primaryindustry_CUSTOM_ErrorCount
+          ,le.rawfields_address1_CUSTOM_ErrorCount
+          ,le.rawfields_address2_CUSTOM_ErrorCount
+          ,le.rawfields_city_CUSTOM_ErrorCount
           ,le.rawfields_state_ALLOW_ErrorCount,le.rawfields_state_LENGTHS_ErrorCount
-          ,le.rawfields_zip_ALLOW_ErrorCount,le.rawfields_zip_LENGTHS_ErrorCount
+          ,le.rawfields_zip_LENGTHS_ErrorCount
           ,le.rawfields_country_ALLOW_ErrorCount
           ,le.rawfields_region_ALLOW_ErrorCount
-          ,le.rawfields_phone_ALLOW_ErrorCount
-          ,le.rawfields_extension_ALLOW_ErrorCount
-          ,le.rawfields_weburl_ALLOW_ErrorCount
-          ,le.rawfields_sales_ALLOW_ErrorCount
+          ,le.rawfields_phone_CUSTOM_ErrorCount
+          ,le.rawfields_extension_CUSTOM_ErrorCount
+          ,le.rawfields_weburl_CUSTOM_ErrorCount
+          ,le.rawfields_sales_CUSTOM_ErrorCount
           ,le.rawfields_employees_ALLOW_ErrorCount
-          ,le.rawfields_competitors_ALLOW_ErrorCount
+          ,le.rawfields_competitors_CUSTOM_ErrorCount
           ,le.rawfields_divisionname_ALLOW_ErrorCount
-          ,le.rawfields_siccode_ALLOW_ErrorCount
-          ,le.rawfields_auditor_ALLOW_ErrorCount
+          ,le.rawfields_siccode_CUSTOM_ErrorCount
+          ,le.rawfields_auditor_CUSTOM_ErrorCount
           ,le.rawfields_entrydate_CUSTOM_ErrorCount
           ,le.rawfields_lastupdate_CUSTOM_ErrorCount
           ,le.rawfields_entrystaffid_ALLOW_ErrorCount
           ,le.clean_address_prim_range_ALLOW_ErrorCount
           ,le.clean_address_predir_ALLOW_ErrorCount
-          ,le.clean_address_prim_name_ALLOW_ErrorCount
+          ,le.clean_address_prim_name_CUSTOM_ErrorCount
           ,le.clean_address_addr_suffix_ALLOW_ErrorCount
           ,le.clean_address_postdir_ALLOW_ErrorCount
           ,le.clean_address_unit_desig_ALLOW_ErrorCount
@@ -565,7 +562,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.clean_address_p_city_name_ALLOW_ErrorCount
           ,le.clean_address_v_city_name_ALLOW_ErrorCount
           ,le.clean_address_st_ALLOW_ErrorCount
-          ,le.clean_address_zip_ALLOW_ErrorCount,le.clean_address_zip_LENGTHS_ErrorCount
+          ,le.clean_address_zip_LENGTHS_ErrorCount
           ,le.clean_address_zip4_ALLOW_ErrorCount
           ,le.clean_address_cart_ALLOW_ErrorCount
           ,le.clean_address_cr_sort_sz_ALLOW_ErrorCount
@@ -576,8 +573,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.clean_address_rec_type_ALLOW_ErrorCount
           ,le.clean_address_fips_state_ALLOW_ErrorCount
           ,le.clean_address_fips_county_ALLOW_ErrorCount
-          ,le.clean_address_geo_lat_ALLOW_ErrorCount
-          ,le.clean_address_geo_long_ALLOW_ErrorCount
+          ,le.clean_address_geo_lat_CUSTOM_ErrorCount
+          ,le.clean_address_geo_long_CUSTOM_ErrorCount
           ,le.clean_address_msa_ALLOW_ErrorCount
           ,le.clean_address_geo_blk_ALLOW_ErrorCount
           ,le.clean_address_geo_match_ALLOW_ErrorCount
@@ -598,32 +595,32 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_vendor_last_reported_CUSTOM_ErrorCount
           ,le.record_type_ALLOW_ErrorCount
           ,le.rawfields_maincompanyid_ALLOW_ErrorCount
-          ,le.rawfields_companyname_ALLOW_ErrorCount
+          ,le.rawfields_companyname_CUSTOM_ErrorCount
           ,le.rawfields_ticker_ALLOW_ErrorCount
           ,le.rawfields_fortunerank_ALLOW_ErrorCount
-          ,le.rawfields_primaryindustry_ALLOW_ErrorCount
-          ,le.rawfields_address1_ALLOW_ErrorCount
-          ,le.rawfields_address2_ALLOW_ErrorCount
-          ,le.rawfields_city_ALLOW_ErrorCount
+          ,le.rawfields_primaryindustry_CUSTOM_ErrorCount
+          ,le.rawfields_address1_CUSTOM_ErrorCount
+          ,le.rawfields_address2_CUSTOM_ErrorCount
+          ,le.rawfields_city_CUSTOM_ErrorCount
           ,le.rawfields_state_ALLOW_ErrorCount,le.rawfields_state_LENGTHS_ErrorCount
-          ,le.rawfields_zip_ALLOW_ErrorCount,le.rawfields_zip_LENGTHS_ErrorCount
+          ,le.rawfields_zip_LENGTHS_ErrorCount
           ,le.rawfields_country_ALLOW_ErrorCount
           ,le.rawfields_region_ALLOW_ErrorCount
-          ,le.rawfields_phone_ALLOW_ErrorCount
-          ,le.rawfields_extension_ALLOW_ErrorCount
-          ,le.rawfields_weburl_ALLOW_ErrorCount
-          ,le.rawfields_sales_ALLOW_ErrorCount
+          ,le.rawfields_phone_CUSTOM_ErrorCount
+          ,le.rawfields_extension_CUSTOM_ErrorCount
+          ,le.rawfields_weburl_CUSTOM_ErrorCount
+          ,le.rawfields_sales_CUSTOM_ErrorCount
           ,le.rawfields_employees_ALLOW_ErrorCount
-          ,le.rawfields_competitors_ALLOW_ErrorCount
+          ,le.rawfields_competitors_CUSTOM_ErrorCount
           ,le.rawfields_divisionname_ALLOW_ErrorCount
-          ,le.rawfields_siccode_ALLOW_ErrorCount
-          ,le.rawfields_auditor_ALLOW_ErrorCount
+          ,le.rawfields_siccode_CUSTOM_ErrorCount
+          ,le.rawfields_auditor_CUSTOM_ErrorCount
           ,le.rawfields_entrydate_CUSTOM_ErrorCount
           ,le.rawfields_lastupdate_CUSTOM_ErrorCount
           ,le.rawfields_entrystaffid_ALLOW_ErrorCount
           ,le.clean_address_prim_range_ALLOW_ErrorCount
           ,le.clean_address_predir_ALLOW_ErrorCount
-          ,le.clean_address_prim_name_ALLOW_ErrorCount
+          ,le.clean_address_prim_name_CUSTOM_ErrorCount
           ,le.clean_address_addr_suffix_ALLOW_ErrorCount
           ,le.clean_address_postdir_ALLOW_ErrorCount
           ,le.clean_address_unit_desig_ALLOW_ErrorCount
@@ -631,7 +628,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.clean_address_p_city_name_ALLOW_ErrorCount
           ,le.clean_address_v_city_name_ALLOW_ErrorCount
           ,le.clean_address_st_ALLOW_ErrorCount
-          ,le.clean_address_zip_ALLOW_ErrorCount,le.clean_address_zip_LENGTHS_ErrorCount
+          ,le.clean_address_zip_LENGTHS_ErrorCount
           ,le.clean_address_zip4_ALLOW_ErrorCount
           ,le.clean_address_cart_ALLOW_ErrorCount
           ,le.clean_address_cr_sort_sz_ALLOW_ErrorCount
@@ -642,8 +639,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.clean_address_rec_type_ALLOW_ErrorCount
           ,le.clean_address_fips_state_ALLOW_ErrorCount
           ,le.clean_address_fips_county_ALLOW_ErrorCount
-          ,le.clean_address_geo_lat_ALLOW_ErrorCount
-          ,le.clean_address_geo_long_ALLOW_ErrorCount
+          ,le.clean_address_geo_lat_CUSTOM_ErrorCount
+          ,le.clean_address_geo_long_CUSTOM_ErrorCount
           ,le.clean_address_msa_ALLOW_ErrorCount
           ,le.clean_address_geo_blk_ALLOW_ErrorCount
           ,le.clean_address_geo_match_ALLOW_ErrorCount
