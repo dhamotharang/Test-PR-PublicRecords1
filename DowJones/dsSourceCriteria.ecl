@@ -1888,6 +1888,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/510 Iran List','1875'},
 {'Kingdom of Bahrain Terrorists List','1876'},
 {'EC (CFSP) 2020/563 Myanmar/Burma List','1877'},
-{'EC 2020/562 Myanmar/Burma List','1878'}
+{'EC 2020/562 Myanmar/Burma List','1878'},
+{'EC (CFSP) 2020/584 Central African Republic List','1879'},
+{'EC (CFSP) 2020/607 Nicaragua List','1880'},
+{'EC 2020/582 Central African Republic List','1881'},
+{'EC 2020/606 Nicaragua List','1882'}
 ],r);
 
