@@ -76,12 +76,15 @@ Patriot.Out_Patriot_File_Stats_Population(filedate,strata_output)
 //Create Orbit Entry
 %do10% := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Patriot Act',filedate);
 
+#uniquename(scrubs)
+%scrubs%	:= Scrubs_Patriot.BaseBuildScrubs(filedate);
+
 #if(doscore)
-	sequential(%pre%, /*%stats%,*/ %do1%, %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output) : 
+	sequential(%pre%, /*%stats%,*/ %do1%, %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output,%scrubs%) : 
 	success(%e_mail_success%),
 	failure(%e_mail_fail%);
 #else
-	sequential(%pre%, /*%stats%,*/ %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output) :
+	sequential(%pre%, /*%stats%,*/ %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output,%scrubs%) :
 	success(%e_mail_success%),
 	failure(%e_mail_fail%);
 #end
