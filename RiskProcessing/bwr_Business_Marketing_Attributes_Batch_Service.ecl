@@ -13,12 +13,11 @@ IMPORT PublicRecords_KEL,BRM_Marketing_attributes,ut;
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-recordsToRun := 2;
-// recordsToRun := ALL;
+recordsToRun := ALL;
 eyeball      := 10;
-threads      := 2;
-RoxieIP := RiskWise.shortcuts.Dev156; //Development Roxie 156
-// RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
+threads      := 3;
+// RoxieIP := RiskWise.shortcuts.Dev156; //Development Roxie 156
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 //RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
 // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
