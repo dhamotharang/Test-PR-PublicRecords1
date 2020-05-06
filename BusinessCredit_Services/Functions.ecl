@@ -36,6 +36,37 @@ EXPORT Functions := MODULE
                                                                             ,FETCHLEVEL);
 	END;
 
+  // RQ-20112 - indicate if status is impacted by natural disaster
+  EXPORT fn_appendDisasterStatus(string status, boolean disaster_impact,
+    boolean disaster_suspend) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    status_app := CASE(status, 
+      stat.Current => stat.Disaster.Current, 
+      stat.Overdue => stat.Disaster.Overdue, 
+      stat.Closed => stat.Disaster.Closed, 
+      stat.WithinTerms => stat.Disaster.WithinTerms, 
+      stat.Overdue30 => stat.Disaster.Overdue30, 
+      stat.Overdue60 => stat.Disaster.Overdue60, 
+      stat.Overdue90 => stat.Disaster.Overdue90, 
+      stat.Overdue90Plus => stat.Disaster.Overdue90Plus, 
+      stat.Bankruptcy => stat.Disaster.Bankruptcy, 
+      stat.ChargeOff => stat.Disaster.ChargeOff, 
+      stat.Foreclosure => stat.Disaster.Foreclosure, 
+      stat.NonAccrual => stat.Disaster.NonAccrual, 
+      stat.Collection => stat.Disaster.Collection, 
+      stat.Disaster.None
+    );
+
+    acct_stat :=  MAP(
+      disaster_suspend => stat.Disaster.Suspended, 
+      disaster_impact => status_app, 
+      status
+    );
+
+    return acct_stat;
+    
+  END;
+
 	EXPORT fn_useBusinessCredit (STRING in_dataPermissionMask, BOOLEAN IncludeBusinessCredit ) := FUNCTION
 
 		dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
@@ -226,14 +257,21 @@ EXPORT Functions := MODULE
 		RETURN AccountTypeDescription;
 	END; // END of function AccountTypeDescription
 
-	EXPORT fn_CurrentAccountStatus (STRING DateAccountClosed , STRING PaymentStatusCategory) := FUNCTION
-		AccountStatus := MAP (
-													DateAccountClosed = 	'' AND  (integer) PaymentStatusCategory = 0 => 'CURRENT',
-													DateAccountClosed = 	'' AND  (integer) PaymentStatusCategory > 0 => 'OVERDUE',
-													DateAccountClosed <> 	'' 																					=> 'CLOSED',
-													''
-													);
-		RETURN AccountStatus;
+	EXPORT fn_CurrentAccountStatus (STRING DateAccountClosed , 
+    STRING PaymentStatusCategory, 
+    BOOLEAN Disaster_Impact, 
+    BOOLEAN Disaster_Suspend) := FUNCTION
+    
+		stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    AccountStatus := MAP (
+      DateAccountClosed = '' AND (integer) PaymentStatusCategory = 0 => stat.Current,
+      DateAccountClosed = '' AND (integer) PaymentStatusCategory > 0 => stat.Overdue,
+      DateAccountClosed <> '' => stat.Closed,
+      stat.None
+    );
+
+		// RQ-20112 - indicate if status is impacted by natural disaster
+		RETURN fn_appendDisasterStatus(AccountStatus, Disaster_Impact, Disaster_Suspend);
 	END; // END of function CurrentAccountStatus
 
   EXPORT fn_CurrentBizAccountStatus (STRING   DateAccountClosed,
@@ -244,7 +282,11 @@ EXPORT Functions := MODULE
                                      BOOLEAN  isRecent_Pmt_Not_Zero,
                                      UNSIGNED dateOneYearAgo,
                                      STRING   Account_Status_1,
-                                     STRING   Account_Status_2) := FUNCTION
+                                     STRING   Account_Status_2, 
+                                     BOOLEAN  Disaster_Impact, 
+                                     BOOLEAN  Disaster_Suspend) := FUNCTION
+
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 
     RequiredValidations := DateAccountClosed = '' AND
                            AccountClosureReason = '' AND
@@ -255,15 +297,17 @@ EXPORT Functions := MODULE
 
 
     AccountStatus := MAP (
-													RequiredValidations AND (INTEGER) PaymentStatusCategory = 0
-                            => 'CURRENT',
-													RequiredValidations AND (INTEGER) PaymentStatusCategory > 0
-                            => 'OVERDUE',
-													~RequiredValidations
-                            => 'CLOSED',
-													''
-													);
-		RETURN AccountStatus;
+      RequiredValidations AND (INTEGER) PaymentStatusCategory = 0
+        => stat.Current,
+      RequiredValidations AND (INTEGER) PaymentStatusCategory > 0
+        => stat.Overdue,
+      ~RequiredValidations
+        => stat.Closed,
+      stat.None
+    );
+
+    // RQ-20112 - indicate if status is impacted by natural disaster
+		RETURN fn_appendDisasterStatus(AccountStatus, Disaster_Impact, Disaster_Suspend);
 	END; // END of function CurrentBizAccountStatus
 
 	EXPORT fn_OwnerGuarnIndicator (STRING OwnerGuarnIndicatorCode) := FUNCTION
@@ -288,14 +332,20 @@ EXPORT Functions := MODULE
 	END; // END of function AccountClosureReason
 
 	EXPORT fn_PaymentStatusCategory (STRING PaymentStatusCategoryCode) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 		PaymentStatusCategoryDesc:= MAP (
-																			PaymentStatusCategoryCode = '007' OR PaymentStatusCategoryCode = '006' OR PaymentStatusCategoryCode = '005' OR PaymentStatusCategoryCode = '004' => 'Overdue 90+',
-																			PaymentStatusCategoryCode = '003' => 'Overdue 90',
-																			PaymentStatusCategoryCode = '002' => 'Overdue 60',
-																			PaymentStatusCategoryCode = '001' => 'Overdue 30',
-																			PaymentStatusCategoryCode = '000' => 'Within Terms',
-																			''
-																		);
+      PaymentStatusCategoryCode = '007' OR PaymentStatusCategoryCode = '006' OR PaymentStatusCategoryCode = '005' OR PaymentStatusCategoryCode = '004' 
+        => stat.Overdue90Plus,
+      PaymentStatusCategoryCode = '003' 
+        => stat.Overdue90,
+      PaymentStatusCategoryCode = '002' 
+        => stat.Overdue60,
+      PaymentStatusCategoryCode = '001' 
+        => stat.Overdue30,
+      PaymentStatusCategoryCode = '000' 
+        => stat.WithinTerms,
+      stat.None
+    );
 		RETURN PaymentStatusCategoryDesc;
 	END; // END of function PaymentStatusCategory
 
@@ -376,50 +426,70 @@ EXPORT Functions := MODULE
                               Account_Closed_Reason <> '' OR
                               Account_Status_1 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes OR
                               Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes;
-		status_whenAccClosed := MAP(isAccountClosed AND  Account_Status_1 = '008' => 'Bankruptcy',
-																isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011') => 'Charge off',
-																isAccountClosed AND  (Account_Status_1 = '006' OR Account_Status_1 = '015' OR Account_Status_1 = '018') => 'Foreclosure/Repossession',
-																isAccountClosed AND  Account_Status_1 = '010' => 'Non-Accrual account',
-																isAccountClosed AND  Account_Status_1 = '017' => 'Collection',
-																'');
+		stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    status_whenAccClosed := MAP(
+      isAccountClosed AND  Account_Status_1 = '008' 
+        => stat.Bankruptcy,
+      isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011') 
+        => stat.ChargeOff,
+      isAccountClosed AND  (Account_Status_1 = '006' OR Account_Status_1 = '015' OR Account_Status_1 = '018') 
+        => stat.Foreclosure,
+      isAccountClosed AND  Account_Status_1 = '010' 
+        => stat.NonAccrual,
+      isAccountClosed AND  Account_Status_1 = '017' 
+        => stat.Collection,
+      stat.None
+    );
 
-		paymentStatus	:= IF(status_whenAccClosed = '', fn_PaymentStatusCategory(Payment_Status_Category), status_whenAccClosed);
-		RETURN paymentStatus;
+		paymentStatus	:= IF(status_whenAccClosed = stat.None, fn_PaymentStatusCategory(Payment_Status_Category), status_whenAccClosed);
+		
+    RETURN paymentStatus;
 	END; // END of function WorstStatus
 
 	EXPORT fn_WorstStatus_sort_order(STRING status) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 		worst_status_sort_order := 	CASE(status,
-																		'Bankruptcy' 							  => 1,
-																		'Charge off' 							  => 2,
-																		'Foreclosure/Repossession'  => 3,
-																		'Non-Accrual account' 		  => 4,
-																		'Collection' 							  => 5,
-																		'Overdue 90+' 		  				=> 6,
-																		'Overdue 90' 		  					=> 7,
-																		'Overdue 60' 		 						=> 8,
-																		'Overdue 30' 		  					=> 9,
-																		'Within Terms' 							=> 10,
-																		999);
+      stat.Bankruptcy => 1,
+      stat.ChargeOff => 2,
+      stat.Foreclosure => 3,
+      stat.NonAccrual => 4,
+      stat.Collection => 5,
+      stat.Overdue90Plus => 6,
+      stat.Overdue90 => 7,
+      stat.Overdue60 => 8,
+      stat.Overdue30 => 9,
+      stat.WithinTerms => 10,
+      999);
 		RETURN worst_status_sort_order;
 	END;
 
 	EXPORT fn_AccountStatus_sort_orderCreditTrades(STRING status) := FUNCTION
 
-           res := 	CASE(status,
-																				'OVERDUE'	=> 1,
-																				'CURRENT'	=> 2,
-																				'CLOSED'  => 3,
-																				999);
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    res := CASE(status,
+      stat.Disaster.Overdue => 1,
+      stat.Overdue => 2,
+      stat.Disaster.Current => 3,
+      stat.Current => 4,
+      stat.Disaster.Closed => 5,
+      stat.Closed => 6,
+      999
+    );
 
 		RETURN res;
 	END;
 	EXPORT fn_AccountStatus_sort_order(STRING status) := FUNCTION
 
-           fn_AccountStatus_sort_order := 	CASE(status,
-																				'CURRENT'	=> 1,
-																				'OVERDUE'	=> 2,
-																				'CLOSED'  => 3,
-																				999);
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    fn_AccountStatus_sort_order := CASE(status,
+      stat.Disaster.Current => 1,
+      stat.Current => 2,
+      stat.Disaster.Overdue => 3,
+      stat.Overdue => 4,
+      stat.Disaster.Closed => 5,
+      stat.Closed => 6,
+      999
+    );
 
 		RETURN fn_AccountStatus_sort_order;
 	END;

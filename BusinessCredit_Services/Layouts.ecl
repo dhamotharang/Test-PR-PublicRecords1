@@ -4471,6 +4471,9 @@ END;
       Business_Credit.key_tradeline();
       BOOLEAN isRemain_Bal_Changed := FALSE; 
       BOOLEAN isRecent_Pmt_Not_Zero := FALSE;
+      BOOLEAN Disaster_Impact := FALSE;
+      UNSIGNED most_recent_suspend_dt := 0;
+      UNSIGNED most_recent_status_dt := 0;
     END;
 
 	
