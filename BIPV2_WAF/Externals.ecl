@@ -1,4 +1,4 @@
-EXPORT Externals := MODULE
+﻿EXPORT Externals := MODULE
   IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - provides 'we also found' capability
 SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2().EFR+Mod_BizContacts().EFR;
 // Need to compute the 'rolled up' counts for parents in hierarchy
@@ -42,7 +42,10 @@ EXPORT FetchEFR(DATASET(process_Biz_layouts.id_stream_layout) idstream,UNSIGNED 
     UNSIGNED4 Cnt;
     UNSIGNED2 Permits;
   END;
-  N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&1022 = 1022) and permits <> 0);
+	//*** Jira DF-27682, Modified code as suggested in the ticket.
+	//*** Since Bob Pressel is making the change to remove the line in bipv2.mod_sources to remove the MARKETING_UNRESTRICTED (which is value 512 in number)
+	//*** as a result in salt (BIPV2_WAF.Externals) you have to subtract away 512 from 1022 so therefore its 510 the value that we need to use in this line.
+  N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&510 = 510) and permits <> 0);
   RETURN TABLE(N,{ UniqueID, Child_Id, UNSIGNED Cnt := SUM(GROUP,Cnt)},UniqueId,Child_Id,FEW);
 END;
 EXPORT BuildEFR := BUILDINDEX(EFR,OVERWRITE);
