@@ -26,13 +26,6 @@ export SicLookup := record
 
 end;
 
-export NaicLookup := record
-
-	string6		naics_code				;
-	string80	naics_description	;					
-
-end;
-
 export layout_watchlists := record
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
