@@ -19,8 +19,9 @@ module
 		
 	export FilterBdids	 := Basebdid	(bdid	!= 0);
 	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029
-	// applying the same record_type filter that is used to create the File_Keybuild file for the creation of companies BDID key.
-	// See the code lines 21-28 in DCAV2.file_keybuild
+	// applying the same record_type filter applied on contact base file that is used to create the DCAV2.File_Keybuild file for the creation of companies BDID key.
+	// So, only keeping the contact records that matched this record_type filter code for ContactBDID key.
+	// filter applied is - record_type in [DCAV2.Utilities.RecordType.Updated,DCAV2.Utilities.RecordType.New]
 	export FilterContBdids			:= pFileContacts(bdid	!= 0 and record_type in [DCAV2.Utilities.RecordType.Updated,DCAV2.Utilities.RecordType.New]);
 	export FilterContBdids_ded  := dedup(sort(distribute(FilterContBdids, hash(BDID, rawfields.enterprise_num)), record, local), record, except rid, lncagid, lncaghid, local);
 	
