@@ -12,19 +12,26 @@
 RightNow := Std.Date.Today();
 
 GetFileName(string ilfn) := FUNCTION
-		s1 := Std.Str.FindReplace(ilfn, '::', ' ');
-		n := Std.Str.WordCount(s1);
-		return Std.Str.GetNthWord(s1, n);
+		s1 := Std.Str.SplitWords(ilfn, '::');
+		n := COUNT(s1);
+		return s1[n];
 END;
 																	
 EXPORT PreprocessNCF2(string ilfn) := function
 
 	r1 := RECORD
 		string	text;
+		string	filename{ VIRTUAL( logicalfilename ) };
 	END;
 	ds := dataset(ilfn, r1, CSV)(LENGTH(TRIM(text,left,right)) > 4);
+	
+	rNac := RECORD
+		string	  filename;
+		unsigned4	seqnum;
+		Nac_V2.Layouts2.rNac2;
+	END;	
 
-	nacin := PROJECT(ds, TRANSFORM(Nac_V2.Layouts2.rNac2,
+	nacin := PROJECT(ds, TRANSFORM(rNac,			//Nac_V2.Layouts2.rNac2,
 				string4 rc := left.text[1..4];
 				len := MIN(LENGTH(left.text), 484);
 				string484 text := left.text[5..len] + IF(len < 484, Std.Str.Repeat(' ', 484-len), '');
@@ -35,20 +42,24 @@ EXPORT PreprocessNCF2(string ilfn) := function
 				self.ExceptionRec := IF(rc='EX01', TRANSFER(text, Nac_V2.Layouts2.rException - RecordCode));
 				self.BadRec := IF(rc NOT IN Nac_V2.Layouts2.validRecordCodes, TRANSFER(text, Nac_V2.Layouts2.rBadRecord - RecordCode));
 				self.RecordCode := rc;
+				self.filename := GetFileName(left.filename);
+				self.seqnum := COUNTER;
 				));
 				
-	fname := GetFileName(ilfn);
-	gid := Std.Str.ToUpperCase(fname[6..9]);
+	//fname := GetFileName(ilfn);
+	//gid := Std.Str.ToUpperCase(fname[6..9]);
 
 	cases := 	Nac_V2.mod_Validation.CaseFile(
 							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
-										self.GroupId := gid;
-										self.OrigGroupId := gid;
-										self.filename := fname;
+										self.GroupId := left.filename[6..9];
+										self.OrigGroupId := left.filename[6..9];
+										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
+										self.filename := left.filename;
+										self.seqnum := left.seqnum;
 										self := [];
 										)),
 							);
@@ -58,11 +69,13 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
-											self.GroupId := gid;
-											self.OrigGroupId := gid;
-											self.filename := fname;
+											self.GroupId := left.filename[6..9];
+											self.OrigGroupId := left.filename[6..9];
+											//self.filename := fname;
 											self.Created := RightNow;
 											self.Updated := RightNow;
+											self.filename := left.filename;
+											self.seqnum := left.seqnum;
 											self := [];
 											)
 										),
@@ -75,11 +88,13 @@ EXPORT PreprocessNCF2(string ilfn) := function
 											PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
-												self.GroupId := gid;
-												self.OrigGroupId := gid;
-												self.filename := fname;
+												self.GroupId := left.filename[6..9];
+												self.OrigGroupId := left.filename[6..9];
+												//self.filename := fname;
 												self.Created := RightNow;
 												self.Updated := RightNow;
+												self.filename := left.filename;
+												self.seqnum := left.seqnum;
 												self := []))
 										)
 								);
@@ -88,11 +103,13 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
 										self := LEFT.StateContactRec;
 										self.RecordCode := left.RecordCode;
-										self.GroupId := gid;
-										self.OrigGroupId := gid;
-										self.filename := fname;
+										self.GroupId := left.filename[6..9];
+										self.OrigGroupId := left.filename[6..9];
+										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
+										self.filename := left.filename;
+										self.seqnum := left.seqnum;
 										self := [];
 										)));
 									
@@ -100,10 +117,11 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rExceptionEx,
 										self := LEFT.ExceptionRec;
 										self.RecordCode := left.RecordCode;
-										self.SourceGroupId := gid;
-										self.filename := fname;
+										self.SourceGroupId := left.filename[6..9];
+										self.filename := left.filename;
 										self.Created := RightNow;
 										self.Updated := RightNow;
+										self.seqnum := left.seqnum;
 										self := [];
 										)));
 										

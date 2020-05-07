@@ -102,7 +102,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 										self.RecordCode := left.RecordCode;
 										)), hash32(CaseId));
 										
-	cases := DEDUP(SORT(ca1(errors=0), CaseId,ProgramState,ProgramCode,GroupId, local),
+	cases := DEDUP(SORT(ca1(errors=0), CaseId,ProgramState,ProgramCode,GroupId, -seqnum, local),
 									CaseId,ProgramState,ProgramCode,GroupId, local);
 
 	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
@@ -111,7 +111,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 											)
 										), HASH32(ClientId));
 
-	clients := DEDUP(SORT(cl1(errors=0), ClientId,CaseId,ProgramState,ProgramCode,GroupId, local),
+	clients := DEDUP(SORT(cl1(errors=0), ClientId,CaseId,ProgramState,ProgramCode,GroupId,-seqnum, local),
 									ClientId,CaseId,ProgramState,ProgramCode,GroupId, local);
 
 	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
@@ -119,7 +119,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));
 
-	addresses := DEDUP(SORT(ad1(errors=0), CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local),
+	addresses := DEDUP(SORT(ad1(errors=0), CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType,-seqnum, local),
 									CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local);
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
@@ -192,12 +192,11 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.EndDate := IF(right.PeriodType='M',fn_LastDayOfMonth(right.EndDate), (integer)right.EndDate);
 					
 					// create unique id. For backward compatibility, this is limited to 6 bytes
-					day := ((unsigned)(right.filename[15..16]))*31 + ((unsigned)(right.filename[17..18]));
-					year := ((unsigned)(right.filename[11..14])) - 2020; // nothing before 2020
-					id := (day * 40) + year;		// good for 40 years
+					year2020 := Std.Date.FromJulianYMD(2020,1,1); 	// nothing before 2020
+					year := Std.Date.FromJulianYMD((unsigned)(right.filename[11..14]),(unsigned)(right.filename[15..16]),(unsigned)(right.filename[17..18]));
+					id := year - year2020;		// good for 50 years
 					self.PrepRecSeq := if(right.filename='',0,
-						HASH32(right.GroupId,right.ProgramCode,right.Caseid,right.ClientId,right.filename[11..18]) | 
-										(id << 32) );
+						HASHCRC(right.GroupId,right.ProgramCode) | (id << 32) );
 
 					self := right;
 					self := left;

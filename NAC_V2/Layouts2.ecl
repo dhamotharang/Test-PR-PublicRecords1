@@ -139,6 +139,7 @@ export rCommonEx := RECORD
 		DATASET($.ValidationCodes.rError)	dsErrs;
 		string4						OrigGroupId := '';
 		string32					filename := '';
+		unsigned4					seqnum := 0;
 END;
 
 // extended records
