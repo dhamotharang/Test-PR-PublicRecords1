@@ -37,7 +37,7 @@ function
 															,'clean_Name.lname'   );
 	dAppendBdid_proj := project(dAppendBdid	,layouts.base.contacts);
 	
-	// Jira# CCPA-1029: CCPA-1Add Global_SID - Populate Global_SID
+	// Jira# CCPA-1029 - Populate Global_SID's
 	addGlobalSID		:= MDR.macGetGlobalSid(dAppendBdid_proj, 'DCA', 'file_type', 'global_sid') : persist(persistnames().UpdateContacts); 
 	
  	return addGlobalSID;	
