@@ -1,4 +1,4 @@
-﻿import ut, _control, Orbit3;
+﻿import ut, _control, Orbit3,Scrubs,Scrubs_IRS_Nonprofit;
 
 export Proc_Build_IRS_NonProfit_BDID_All(string filedate) := function
 
@@ -17,6 +17,8 @@ sprayfile := FileServices.SprayVariable('uspr-edata11.risk.regn.net'
 							,true
 							,true
 							);							
+							
+scrub_input := Scrubs.ScrubsPlus('IRS_Nonprofit','Scrubs_IRS_Nonprofit','Scrubs_IRS_Nonprofit', 'Input', filedate,Email_Notification_Lists(false).BuildFailure,false);
 									
 //Superfile Transactions
 superfile_transac := sequential(fileservices.addsuperfile('~thor_data400::in::irs::sprayed::delete::non_profit','~thor_data400::in::irs::sprayed::grandfather::non_profit',,true),
@@ -38,9 +40,14 @@ strata_counts := govdata.Strata_Population_Stats.IRS_Non_profit_pop;
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_npf('IRS Non-profit Charitable Organizations',filedate);
 
 retval := sequential(sprayfile
-					  ,superfile_transac
-						,make_bdid
-					  ,strata_counts
-						,orbit_update);
+            ,scrub_input
+						,if(Scrubs.Mac_ScrubsFailureTest('Scrubs_IRS_NonProfit',filedate),
+					      sequential(superfile_transac
+						               ,make_bdid
+					                 ,strata_counts
+						               ,orbit_update),
+								OUTPUT('Scrubs failed. Keys not built.',NAMED('Scrubs_Failure'))
+								)
+						);
 return retval;
 end;
