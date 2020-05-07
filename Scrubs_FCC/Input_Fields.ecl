@@ -1,4 +1,5 @@
 ﻿IMPORT SALT311;
+IMPORT Scrubs_FCC; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Fields := MODULE
  
 EXPORT NumFields := 45;
@@ -73,14 +74,14 @@ EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygiene
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~fn_valid_Date(s)>0);
-EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('fn_valid_Date'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs_FCC.Functions.fn_valid_Date(s)>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_FCC.Functions.fn_valid_Date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Future(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Future(SALT311.StrType s) := WHICH(~fn_valid_Date(s,'Future')>0);
-EXPORT InValidMessageFT_Invalid_Future(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('fn_valid_Date'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Future(SALT311.StrType s) := WHICH(~Scrubs_FCC.Functions.fn_valid_Date(s,'Future')>0);
+EXPORT InValidMessageFT_Invalid_Future(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_FCC.Functions.fn_valid_Date'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'license_type','file_number','callsign_of_license','radio_service_code','licensees_name','licensees_attention_line','dba_name','licensees_street','licensees_city','licensees_state','licensees_zip','licensees_phone','date_application_received_at_fcc','date_license_issued','date_license_expires','date_of_last_change','type_of_last_change','latitude','longitude','transmitters_street','transmitters_city','transmitters_county','transmitters_state','transmitters_antenna_height','transmitters_height_above_avg_terra','transmitters_height_above_ground_le','power_of_this_frequency','frequency_mhz','class_of_station','number_of_units_authorized_on_freq','effective_radiated_power','emissions_codes','frequency_coordination_number','paging_license_status','control_point_for_the_system','pending_or_granted','firm_preparing_application','contact_firms_street_address','contact_firms_city','contact_firms_state','contact_firms_zipcode','contact_firms_phone_number','contact_firms_fax_number','unique_key','crlf');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'license_type','file_number','callsign_of_license','radio_service_code','licensees_name','licensees_attention_line','dba_name','licensees_street','licensees_city','licensees_state','licensees_zip','licensees_phone','date_application_received_at_fcc','date_license_issued','date_license_expires','date_of_last_change','type_of_last_change','latitude','longitude','transmitters_street','transmitters_city','transmitters_county','transmitters_state','transmitters_antenna_height','transmitters_height_above_avg_terra','transmitters_height_above_ground_le','power_of_this_frequency','frequency_mhz','class_of_station','number_of_units_authorized_on_freq','effective_radiated_power','emissions_codes','frequency_coordination_number','paging_license_status','control_point_for_the_system','pending_or_granted','firm_preparing_application','contact_firms_street_address','contact_firms_city','contact_firms_state','contact_firms_zipcode','contact_firms_phone_number','contact_firms_fax_number','unique_key','crlf');

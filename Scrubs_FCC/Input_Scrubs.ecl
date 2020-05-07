@@ -1,4 +1,5 @@
 ﻿IMPORT SALT311,STD;
+IMPORT Scrubs_FCC; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist

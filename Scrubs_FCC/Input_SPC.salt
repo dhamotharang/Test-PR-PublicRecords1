@@ -12,8 +12,8 @@ FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQ
 FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)
 FIELDTYPE:Invalid_Zip:LIKE(Invalid_Float):LENGTHS(0,5,9,10)
 FIELDTYPE:Invalid_Phone:LIKE(Invalid_Float):LENGTHS(0,9,10)
-FIELDTYPE:Invalid_Date:CUSTOM(fn_valid_Date > 0)
-FIELDTYPE:Invalid_Future:CUSTOM(fn_valid_Date > 0, 'Future')
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_FCC.Functions.fn_valid_Date > 0)
+FIELDTYPE:Invalid_Future:CUSTOM(Scrubs_FCC.Functions.fn_valid_Date > 0, 'Future')
 
 FIELD:license_type:TYPE(STRING3):LIKE(Invalid_AlphaNum):0,0
 FIELD:file_number:TYPE(STRING15):LIKE(Invalid_AlphaNum):0,0
