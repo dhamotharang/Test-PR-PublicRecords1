@@ -82,10 +82,14 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
     populated_ConsumerIPAddress_pcnt := AVE(GROUP,IF(h.ConsumerIPAddress = (TYPEOF(h.ConsumerIPAddress))'',0,100));
     maxlength_ConsumerIPAddress := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ConsumerIPAddress)));
     avelength_ConsumerIPAddress := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ConsumerIPAddress)),h.ConsumerIPAddress<>(typeof(h.ConsumerIPAddress))'');
+    populated_Email_Address_cnt := COUNT(GROUP,h.Email_Address <> (TYPEOF(h.Email_Address))'');
+    populated_Email_Address_pcnt := AVE(GROUP,IF(h.Email_Address = (TYPEOF(h.Email_Address))'',0,100));
+    maxlength_Email_Address := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.Email_Address)));
+    avelength_Email_Address := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.Email_Address)),h.Email_Address<>(typeof(h.Email_Address))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
-    UNSIGNED LinkingPotential :=  + T.Populated_Transaction_ID_pcnt *   0.00 / 100 + T.Populated_TransactionDate_pcnt *   0.00 / 100 + T.Populated_FirstName_pcnt *   0.00 / 100 + T.Populated_LastName_pcnt *   0.00 / 100 + T.Populated_MiddleName_pcnt *   0.00 / 100 + T.Populated_Suffix_pcnt *   0.00 / 100 + T.Populated_BirthDate_pcnt *   0.00 / 100 + T.Populated_SSN_pcnt *   0.00 / 100 + T.Populated_Lexid_Input_pcnt *   0.00 / 100 + T.Populated_Street1_pcnt *   0.00 / 100 + T.Populated_Street2_pcnt *   0.00 / 100 + T.Populated_Suite_pcnt *   0.00 / 100 + T.Populated_City_pcnt *   0.00 / 100 + T.Populated_State_pcnt *   0.00 / 100 + T.Populated_Zip5_pcnt *   0.00 / 100 + T.Populated_Phone_pcnt *   0.00 / 100 + T.Populated_Lexid_Discovered_pcnt *   0.00 / 100 + T.Populated_RemoteIPAddress_pcnt *   0.00 / 100 + T.Populated_ConsumerIPAddress_pcnt *   0.00 / 100;
+    UNSIGNED LinkingPotential :=  + T.Populated_Transaction_ID_pcnt *   0.00 / 100 + T.Populated_TransactionDate_pcnt *   0.00 / 100 + T.Populated_FirstName_pcnt *   0.00 / 100 + T.Populated_LastName_pcnt *   0.00 / 100 + T.Populated_MiddleName_pcnt *   0.00 / 100 + T.Populated_Suffix_pcnt *   0.00 / 100 + T.Populated_BirthDate_pcnt *   0.00 / 100 + T.Populated_SSN_pcnt *   0.00 / 100 + T.Populated_Lexid_Input_pcnt *   0.00 / 100 + T.Populated_Street1_pcnt *   0.00 / 100 + T.Populated_Street2_pcnt *   0.00 / 100 + T.Populated_Suite_pcnt *   0.00 / 100 + T.Populated_City_pcnt *   0.00 / 100 + T.Populated_State_pcnt *   0.00 / 100 + T.Populated_Zip5_pcnt *   0.00 / 100 + T.Populated_Phone_pcnt *   0.00 / 100 + T.Populated_Lexid_Discovered_pcnt *   0.00 / 100 + T.Populated_RemoteIPAddress_pcnt *   0.00 / 100 + T.Populated_ConsumerIPAddress_pcnt *   0.00 / 100 + T.Populated_Email_Address_pcnt *   0.00 / 100;
     T;
   END;
   RETURN TABLE(T,R1);
@@ -103,27 +107,27 @@ END;
 invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.FldNo := C;
   SELF.NumberOfRecords := le.NumberOfRecords;
-  SELF.FieldName := CHOOSE(C,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress');
-  SELF.populated_pcnt := CHOOSE(C,le.populated_Transaction_ID_pcnt,le.populated_TransactionDate_pcnt,le.populated_FirstName_pcnt,le.populated_LastName_pcnt,le.populated_MiddleName_pcnt,le.populated_Suffix_pcnt,le.populated_BirthDate_pcnt,le.populated_SSN_pcnt,le.populated_Lexid_Input_pcnt,le.populated_Street1_pcnt,le.populated_Street2_pcnt,le.populated_Suite_pcnt,le.populated_City_pcnt,le.populated_State_pcnt,le.populated_Zip5_pcnt,le.populated_Phone_pcnt,le.populated_Lexid_Discovered_pcnt,le.populated_RemoteIPAddress_pcnt,le.populated_ConsumerIPAddress_pcnt);
-  SELF.maxlength := CHOOSE(C,le.maxlength_Transaction_ID,le.maxlength_TransactionDate,le.maxlength_FirstName,le.maxlength_LastName,le.maxlength_MiddleName,le.maxlength_Suffix,le.maxlength_BirthDate,le.maxlength_SSN,le.maxlength_Lexid_Input,le.maxlength_Street1,le.maxlength_Street2,le.maxlength_Suite,le.maxlength_City,le.maxlength_State,le.maxlength_Zip5,le.maxlength_Phone,le.maxlength_Lexid_Discovered,le.maxlength_RemoteIPAddress,le.maxlength_ConsumerIPAddress);
-  SELF.avelength := CHOOSE(C,le.avelength_Transaction_ID,le.avelength_TransactionDate,le.avelength_FirstName,le.avelength_LastName,le.avelength_MiddleName,le.avelength_Suffix,le.avelength_BirthDate,le.avelength_SSN,le.avelength_Lexid_Input,le.avelength_Street1,le.avelength_Street2,le.avelength_Suite,le.avelength_City,le.avelength_State,le.avelength_Zip5,le.avelength_Phone,le.avelength_Lexid_Discovered,le.avelength_RemoteIPAddress,le.avelength_ConsumerIPAddress);
+  SELF.FieldName := CHOOSE(C,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress','Email_Address');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_Transaction_ID_pcnt,le.populated_TransactionDate_pcnt,le.populated_FirstName_pcnt,le.populated_LastName_pcnt,le.populated_MiddleName_pcnt,le.populated_Suffix_pcnt,le.populated_BirthDate_pcnt,le.populated_SSN_pcnt,le.populated_Lexid_Input_pcnt,le.populated_Street1_pcnt,le.populated_Street2_pcnt,le.populated_Suite_pcnt,le.populated_City_pcnt,le.populated_State_pcnt,le.populated_Zip5_pcnt,le.populated_Phone_pcnt,le.populated_Lexid_Discovered_pcnt,le.populated_RemoteIPAddress_pcnt,le.populated_ConsumerIPAddress_pcnt,le.populated_Email_Address_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_Transaction_ID,le.maxlength_TransactionDate,le.maxlength_FirstName,le.maxlength_LastName,le.maxlength_MiddleName,le.maxlength_Suffix,le.maxlength_BirthDate,le.maxlength_SSN,le.maxlength_Lexid_Input,le.maxlength_Street1,le.maxlength_Street2,le.maxlength_Suite,le.maxlength_City,le.maxlength_State,le.maxlength_Zip5,le.maxlength_Phone,le.maxlength_Lexid_Discovered,le.maxlength_RemoteIPAddress,le.maxlength_ConsumerIPAddress,le.maxlength_Email_Address);
+  SELF.avelength := CHOOSE(C,le.avelength_Transaction_ID,le.avelength_TransactionDate,le.avelength_FirstName,le.avelength_LastName,le.avelength_MiddleName,le.avelength_Suffix,le.avelength_BirthDate,le.avelength_SSN,le.avelength_Lexid_Input,le.avelength_Street1,le.avelength_Street2,le.avelength_Suite,le.avelength_City,le.avelength_State,le.avelength_Zip5,le.avelength_Phone,le.avelength_Lexid_Discovered,le.avelength_RemoteIPAddress,le.avelength_ConsumerIPAddress,le.avelength_Email_Address);
 END;
-EXPORT invSummary := NORMALIZE(summary0, 19, invert(LEFT,COUNTER));
+EXPORT invSummary := NORMALIZE(summary0, 20, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
 SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress),TRIM((SALT311.StrType)le.Email_Address)));
   SELF.FldNo := C;
 END;
-SHARED FldInv0 := NORMALIZE(h,19,Into(LEFT,COUNTER));
+SHARED FldInv0 := NORMALIZE(h,20,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
 SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
-  SELF.FldNo1 := 1 + (C / 19);
-  SELF.FldNo2 := 1 + (C % 19);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress)));
+  SELF.FldNo1 := 1 + (C / 20);
+  SELF.FldNo2 := 1 + (C % 20);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress),TRIM((SALT311.StrType)le.Email_Address)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.Transaction_ID),TRIM((SALT311.StrType)le.TransactionDate),TRIM((SALT311.StrType)le.FirstName),TRIM((SALT311.StrType)le.LastName),TRIM((SALT311.StrType)le.MiddleName),TRIM((SALT311.StrType)le.Suffix),TRIM((SALT311.StrType)le.BirthDate),TRIM((SALT311.StrType)le.SSN),IF (le.Lexid_Input <> 0,TRIM((SALT311.StrType)le.Lexid_Input), ''),TRIM((SALT311.StrType)le.Street1),TRIM((SALT311.StrType)le.Street2),TRIM((SALT311.StrType)le.Suite),TRIM((SALT311.StrType)le.City),TRIM((SALT311.StrType)le.State),TRIM((SALT311.StrType)le.Zip5),TRIM((SALT311.StrType)le.Phone),IF (le.Lexid_Discovered <> 0,TRIM((SALT311.StrType)le.Lexid_Discovered), ''),TRIM((SALT311.StrType)le.RemoteIPAddress),TRIM((SALT311.StrType)le.ConsumerIPAddress),TRIM((SALT311.StrType)le.Email_Address)));
   END;
-SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),19*19,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),20*20,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'Transaction_ID'}
       ,{2,'TransactionDate'}
       ,{3,'FirstName'}
@@ -142,7 +146,8 @@ SHARED FldIds := DATASET([{1,'Transaction_ID'}
       ,{16,'Phone'}
       ,{17,'Lexid_Discovered'}
       ,{18,'RemoteIPAddress'}
-      ,{19,'ConsumerIPAddress'}],SALT311.MAC_Character_Counts.Field_Identification);
+      ,{19,'ConsumerIPAddress'}
+      ,{20,'Email_Address'}],SALT311.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
 EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
@@ -174,10 +179,11 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     RDP_Fields.InValid_Lexid_Discovered((SALT311.StrType)le.Lexid_Discovered),
     RDP_Fields.InValid_RemoteIPAddress((SALT311.StrType)le.RemoteIPAddress),
     RDP_Fields.InValid_ConsumerIPAddress((SALT311.StrType)le.ConsumerIPAddress),
+    RDP_Fields.InValid_Email_Address((SALT311.StrType)le.Email_Address),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
-Errors := NORMALIZE(h,19,NoteErrors(LEFT,COUNTER));
+Errors := NORMALIZE(h,20,NoteErrors(LEFT,COUNTER));
 ErrorRecordsTotals := RECORD
   Errors.FieldNum;
   Errors.ErrorNum;
@@ -186,8 +192,8 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := RDP_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_date','invalid_ssn','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_phone','invalid_numeric','invalid_ip','invalid_ip');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,RDP_Fields.InValidMessage_Transaction_ID(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_TransactionDate(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_FirstName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_LastName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_MiddleName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Suffix(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_BirthDate(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_SSN(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Lexid_Input(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Street1(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Street2(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Suite(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_City(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_State(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Zip5(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Phone(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Lexid_Discovered(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_RemoteIPAddress(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_ConsumerIPAddress(TotalErrors.ErrorNum));
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_date','invalid_ssn','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_phone','invalid_numeric','invalid_ip','invalid_ip','invalid_email');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,RDP_Fields.InValidMessage_Transaction_ID(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_TransactionDate(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_FirstName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_LastName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_MiddleName(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Suffix(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_BirthDate(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_SSN(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Lexid_Input(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Street1(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Street2(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Suite(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_City(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_State(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Zip5(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Phone(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Lexid_Discovered(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_RemoteIPAddress(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_ConsumerIPAddress(TotalErrors.ErrorNum),RDP_Fields.InValidMessage_Email_Address(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);

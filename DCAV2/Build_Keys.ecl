@@ -1,4 +1,4 @@
-import doxie, Tools, VersionControl;
+﻿import doxie, Tools, VersionControl;
 export Build_Keys(
 	 string													pversion
 	,string													pKeyDatasetName	= 'DCA'
@@ -18,6 +18,7 @@ module
 	export BuildHierEntNum 		:= tools.macf_WriteIndex('lkeys.HierEntNum.New' );
 	export BuildEntNum				:= tools.macf_WriteIndex('lkeys.EntNum.New'		  );
 	export BuildEntNumNonFilt	:= tools.macf_WriteIndex('lkeys.EntNumNonFilt.New');
+	export BuildContactBdid		:= tools.macf_WriteIndex('lkeys.ContactBdid.New');	// Added for CCPA phase 2 requirement as per Jira# CCPA-1029 
 
   VersionControl.macBuildNewLogicalKeyWithName(DCAV2.Key_LinkIds.Key,	DCAV2.keynames(pversion,false,pKeyDatasetName).LinkIds.New, BuildLinkIdsKey);	
 		
@@ -34,6 +35,7 @@ module
 			 ,BuildHierEntNum 									
 			 ,BuildEntNum
 			 ,BuildEntNumNonFilt
+			 ,BuildContactBdid
 			 ,BuildLinkIdsKey
 		 ))
 		 ,Promote(pversion).buildfiles.New2Built

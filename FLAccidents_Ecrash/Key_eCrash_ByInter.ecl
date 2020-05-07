@@ -1,4 +1,4 @@
-// Ecrash Reports key, by Intersection
+﻿// Ecrash Reports key, by Intersection
 
 IMPORT FLAccidents_Ecrash, STD, UT, doxie,Data_Services;
 
@@ -97,8 +97,8 @@ accidents_by_slim2 := RECORD
 END;
 
 accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
-	    NewBTString := stringlib.StringToUpperCase(TRIM(L.Report_vehicle_body_type,LEFT,RIGHT));
-			NewFHEString := stringlib.StringToUpperCase(TRIM(L.Report_first_harmful_event,LEFT,RIGHT));
+	    NewBTString := STD.Str.ToUpperCase(TRIM(L.Report_vehicle_body_type,LEFT,RIGHT));
+			NewFHEString := STD.Str.ToUpperCase(TRIM(L.Report_first_harmful_event,LEFT,RIGHT));
 	SELF.ATVehicle 						:= FLAccidents_Ecrash.Functions.KnownVT(NewBTString);
 	SELF.ATPedestrian         := IF(STD.Str.FindCount(NewFHEString, FLAccidents_Ecrash.Constants.PEDESTRIAN) > 0,1,0);
 	SELF.ATBicycle            := IF(STD.Str.FindCount(NewFHEString, FLAccidents_Ecrash.Constants.BICYCLE) > 0,1,0);
@@ -108,7 +108,7 @@ accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
 	SELF.ATUnknown            := IF((NewBTString = '') OR
 	                                FLAccidents_Ecrash.Functions.UnknownVT(NewBTString) > 0 OR
 																	FLAccidents_Ecrash.Functions.UnknownFHE(NewFHEString) > 0,1,0);
-			NewCTString := stringlib.StringToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
+			NewCTString := STD.Str.ToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
 	SELF.CTFrontRear					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTREAR) > 0,1,0); 
 	SELF.CTFrontFront					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTFRONT) > 0,1,0);
 	SELF.CTAngle							:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.ANGLE) > 0,1,0);

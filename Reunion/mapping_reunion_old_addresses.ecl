@@ -1,17 +1,20 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Dataset containing any old addresses for the DIDs in the main.
 //-----------------------------------------------------------------------------
 IMPORT header,mdr,ut;
+
+EXPORT mapping_reunion_old_addresses(unsigned1 mode, STRING sVersion) := MODULE
 
 // Number of months to look back for old addresses
 iThreshold:=48;
 
 // Get non-dead DIDs from the main
-dMain:=DEDUP(DISTRIBUTE(reunion.mapping_reunion_main(get_other_elements=TRUE AND TRIM(date_of_death)=''),HASH(did)),did,ALL,LOCAL);
+dMain:=DEDUP(DISTRIBUTE(reunion.mapping_reunion_main(mode, sVersion).all(get_other_elements=TRUE AND TRIM(date_of_death)=''),HASH(did)),did,ALL,LOCAL);
 dMainDeduped:=DEDUP(DISTRIBUTE(dMain,HASH(did,prim_range,prim_name,sec_range,zip)),did,prim_range,prim_name,sec_range,zip,ALL,LOCAL);
 
-dHeader:=DISTRIBUTE(reunion.files.file_header_nonglb_dppa(~(mdr.sourcetools.sourceisdeath(src))),HASH(prim_range,prim_name,sec_range,zip));
-dAddressRecency:=DISTRIBUTE(header.address_recency(dHeader,iThreshold).recent_addresses,HASH(prim_range,prim_name,sec_range,zip));
+dHeader:=DISTRIBUTE(reunion.files(mode).infutor_header(~(mdr.sourcetools.sourceisdeath(src))),HASH(prim_range,prim_name,sec_range,zip));
+// dAddressRecency:=DISTRIBUTE(header.address_recency(dHeader,iThreshold).recent_addresses,HASH(prim_range,prim_name,sec_range,zip));
+dAddressRecency:=DISTRIBUTE(reunion.address_recency(dHeader,iThreshold).recent_addresses,HASH(prim_range,prim_name,sec_range,zip));
 dHeaderRecency:=DISTRIBUTE(JOIN(dHeader,dAddressRecency,LEFT.prim_range=RIGHT.prim_range AND LEFT.prim_name=RIGHT.prim_name AND LEFT.sec_range=RIGHT.sec_range AND LEFT.zip=RIGHT.zip,TRANSFORM(header.Layout_Header,SELF:=LEFT;),LOCAL),HASH(did));
 													
 lRecency:=RECORD
@@ -76,4 +79,6 @@ reunion.layouts.lOldAddresses tGetOld(dOldAddresses L):=TRANSFORM
   SELF:=L; 
 END;
 
-EXPORT mapping_reunion_old_addresses:=PROJECT(dOldAddresses,tGetOld(LEFT)):PERSIST('~thor::persist::mylife::mapping_old_addresses');
+EXPORT all := PROJECT(dOldAddresses,tGetOld(LEFT)):PERSIST('~thor::persist::mylife::mapping_old_addresses::' + reunion.Constants.sMode(mode));
+
+END;
