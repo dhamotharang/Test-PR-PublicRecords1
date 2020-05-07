@@ -22,7 +22,10 @@ in_value in
 'GEN DEL',
 'GENERAL DELIVERY',
 'TO BE DETERMINED',
-'TBD'
+'TBD',
+'THANK YOU',
+'NO THANK YOU',
+'NO ADDRESS'
 ] or
 (
     prim_name_length > 2 
