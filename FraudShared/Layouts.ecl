@@ -520,6 +520,8 @@ export Main         :=
 	unsigned8					record_sid := 0;
 	unsigned2					RIN_Source := 0;
 	clean_Drivers_License 		clean_Drivers_License;
+	string10					geo_lat := '';
+	string11					geo_long := '';	
 end; 
 
 end; 
@@ -730,7 +732,8 @@ export keybuild
 	unsigned8 					record_sid := 0; 	
 	unsigned2					RIN_Source := 0;
 	clean_Drivers_License 		clean_Drivers_License;
-
+	string10					geo_lat := '';
+	string11					geo_long := '';	
 end; 
 
 export temp := module 
