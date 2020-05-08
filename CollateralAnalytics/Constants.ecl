@@ -12,8 +12,8 @@ MODULE
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',
-														'/data/data_build_1/american_student',
-														'/data/data_build_1/american_student');
+														'/data/hds_180/property/Collateral_Analytic/data',
+														'/data/hds_180/property/Collateral_Analytic/data');
 
 	//	Scrubs email notification
 	EXPORT 	email_notification_scrubs := 'david.dittman@lexisnexisrisk.com';
