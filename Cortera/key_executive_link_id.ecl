@@ -1,4 +1,4 @@
-IMPORT _control, doxie, data_services, Cortera, Cortera_Tradeline, Suppress;
+IMPORT $, _control, doxie, data_services, Cortera, Cortera_Tradeline, Suppress;
 
 
 #IF(_control.environment.onThor and ~_control.Environment.onVault)
@@ -8,7 +8,7 @@ dExecLinkIDwoDID := dExecLinkID(did=0);
 mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
 suppress_global_sid := Suppress.MAC_SuppressSource(dExecLinkIDwDID, mod_access, , , TRUE);
 #ELSE
-suppress_global_sid := dataset([], $.Layout_Executive_Link_Id);
+suppress_global_sid := dataset([], $.Layout_ExecLinkID);
 #END
 
 after_suppress_all := suppress_global_sid + dExecLinkIDwoDID;
