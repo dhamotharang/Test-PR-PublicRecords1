@@ -162,7 +162,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 									self := left), left only, local);
 		oldrestored := oldcat(EntryCategory<>'PEP') + oldjustformer + oldnoformer;
 
-			newcat0 := Distribute((Files.dsWCOCategories),entityid);
+			newcat0 := Files.dsWCOCategories;
 			newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel,subcategorydesc, -isactivepep, local),
 														entityid, segmenttype, subcategorylabel,subcategorydesc, isactivepep,local);
 
