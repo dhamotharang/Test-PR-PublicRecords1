@@ -1,5 +1,4 @@
-// This is a static layout for us to use RiskWise.shortcuts.validation_phone_shell95k_41
-
+﻿// This is a static layout for us to use RiskWise.shortcuts.validation_phone_shell95k_41
 IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
 
 EXPORT Layout_Phone_Shell_Temp := MODULE
@@ -7,12 +6,17 @@ EXPORT Layout_Phone_Shell_Temp := MODULE
 EXPORT Layout_Boca_Shell_Plus := RECORD
 	Risk_Indicators.Layout_Boca_Shell;
 END;
+EXPORT Layout_Dedup_Hist_Phone := RECORD
+		STRING20 acctno := '';
+		STRING10 phone10 := '';
+END;
 
 EXPORT Input := RECORD
 	UNSIGNED4 seq := 0;
 	STRING50 AcctNo := '';
 	UNSIGNED6 DID := 0;
 	STRING120 FullName := '';
+	STRING20 NamePrefix := '';
 	STRING20 FirstName := '';
 	STRING20 MiddleName := '';
 	STRING20 LastName := '';
@@ -51,6 +55,7 @@ EXPORT Input := RECORD
 	BOOLEAN TargusGatewayEnabled := FALSE;
 	BOOLEAN TransUnionGatewayEnabled := FALSE;
 	BOOLEAN InsuranceGatewayEnabled := FALSE;
+	DATASET(Layout_Dedup_Hist_Phone) InputPhoneList := DATASET([],Layout_Dedup_Hist_Phone);
 END;
 
 EXPORT Layout_Phone_Shell_Input_Echo := RECORD
@@ -74,6 +79,7 @@ EXPORT Layout_Phone_Shell_Input_Echo := RECORD
 	BOOLEAN		in_TUGW_Enabled					:= FALSE;
 	BOOLEAN		in_INSGW_Enabled				:= FALSE;
 	STRING8		in_Processing_Date			:= '';
+	BOOLEAN  in_Burea_Enabled				 := FALSE;
 END;
 
 EXPORT Layout_Subject_Level := RECORD
@@ -83,9 +89,15 @@ EXPORT Layout_Subject_Level := RECORD
 END;
 
 EXPORT Layout_Sources := RECORD
-	STRING200 Source_List							:= '';
-	STRING200 Source_List_Last_Seen		:= '';
-	STRING200 Source_List_First_Seen	:= '';
+	STRING200 Source_List								:= '';
+	STRING200 Source_Owner_DID        	:= '';
+	STRING200 Source_Owner_Name_Prefix	:= '';
+	STRING200 Source_Owner_Name_First   := '';
+	STRING200 Source_Owner_Name_Middle	:= '';
+	STRING200 Source_Owner_Name_Last		:= '';
+	STRING200 Source_Owner_Name_Suffix	:= '';
+	STRING200 Source_List_Last_Seen			:= '';
+	STRING200 Source_List_First_Seen		:= '';
 END;
 
 EXPORT Layout_Raw_Phone_Characteristics := RECORD
@@ -311,6 +323,12 @@ EXPORT Layout_Royalties := RECORD
 	UNSIGNED1 TargusComprehensive_Royalty := 0; // Targus Gateway Called
 	UNSIGNED1 QSentCIS_Royalty := 0; // Trans Union Gateway Called
 	UNSIGNED1 LastResortPhones_Royalty := 0; // Phones Plus Phones Of Last Resort Used
+	UNSIGNED1 EFXDataMart_Royalty := 0; //Equifax 
+END;
+
+EXPORT Layout_Bureau := RECORD
+	BOOLEAN Bureau_Verified := FALSE;
+	STRING8 Bureau_Last_Update := '';
 END;
 
 EXPORT Layout_Phone_Shell_Plus := RECORD
@@ -321,6 +339,7 @@ EXPORT Layout_Phone_Shell_Plus := RECORD
 	Layout_Phone_Shell_Input_Echo 				Input_Echo;
 	Layout_Subject_Level 									Subject_Level;
 	STRING10 Gathered_Phone								:= '';
+	STRING3 Phone_Model_Score							:= '';
 	Layout_Sources												Sources;
 	Layout_Raw_Phone_Characteristics			Raw_Phone_Characteristics;
 	Layout_PhonesPlus_Characteristics			PhonesPlus_Characteristics;
@@ -330,12 +349,13 @@ EXPORT Layout_Phone_Shell_Plus := RECORD
 	Layout_Experian_File_One_Verification	Experian_File_One_Verification;
 	Layout_EDA_Characteristics						EDA_Characteristics;
 	Layout_Royalties											Royalties;
+	Layout_Bureau												Bureau;	
 	Layout_Boca_Shell_Plus								Clam;					// This field is removed from the final layout below
 END;
 
 EXPORT Phone_Shell_Layout := RECORD
 	Layout_Phone_Shell_Plus - Raw_Input - Clean_Input - Clam Phone_Shell;
-	Risk_Indicators.Layout_Boca_Shell - LnJ_datasets Boca_Shell;
+	Risk_Indicators.Layout_Boca_Shell - LnJ_datasets - consumerstatements - bk_chapters Boca_Shell;
 END;
 
 END;
