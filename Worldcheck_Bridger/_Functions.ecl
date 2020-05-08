@@ -1309,6 +1309,11 @@
 				trim(kword, left, right) = 'UKEMBARGO' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKEMBARGO,
 				trim(kword, left, right) = 'LVVID' =>SubGroup_Constants.numKeywordsID.KEYWORD_LVVID,
 				trim(kword, left, right) = 'ITOCF' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITOCF,
+				trim(kword, left, right) = 'MYKPDNHEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYKPDNHEP,
+				trim(kword, left, right) = 'BRTCU' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRTCU,
+				trim(kword, left, right) = 'BGRE-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_BGRE_WC,
+				trim(kword, left, right) = 'EU-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_NIC,
+				trim(kword, left, right) = 'IDBAPPEBTI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDBAPPEBTI,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

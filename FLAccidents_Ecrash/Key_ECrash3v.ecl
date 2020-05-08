@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -104,7 +104,7 @@ xpnd_layout xpndrecs(flc3v L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr; 
 self 								:= L;
 end;

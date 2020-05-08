@@ -1,4 +1,4 @@
-/*2017-03-22T17:19:15Z (Srilatha Katukuri)
+﻿/*2017-03-22T17:19:15Z (Srilatha Katukuri)
 ECH-4531 Analytics Keys Injury and Accident count correction
 */
 /*2017-01-31T00:22:35Z (Srilatha Katukuri)
@@ -11,14 +11,14 @@ import ut, STD;
 Infile := FLAccidents_Ecrash.File_KeybuildV2.out((report_code in ['EA','TF'] or (report_code = 'TM' and STD.Str.ToUpperCase(report_status) in ['COMPLETED'] )) AND report_type_id = 'A' AND work_type_id NOT IN['2','3']) ;
 
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 transInFile(FLAccidents_Ecrash.Layout_keybuild_SSv2 L) := transform
+Layout_eCrash.Consolidation transInFile(Layout_eCrash.Consolidation L) := transform
 	self.did := (STRING12) If(L.did = '000000000000', '0', L.did);
 	self := L;
 end;
 
 ModInfile:= project(InFile,transInFile(left));
 
-tlayout := record FLAccidents_Ecrash.Layout_keybuild_SSv2, string orig_case_identifier , string orig_state_report_number, end; 
+tlayout := record Layout_eCrash.Consolidation, string orig_case_identifier , string orig_state_report_number, end; 
 
 // dedup across sources 
 tInfile := project (ModInfile, transform( tlayout, 

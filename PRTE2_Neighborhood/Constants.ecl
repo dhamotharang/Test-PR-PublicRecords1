@@ -1,11 +1,7 @@
-﻿IMPORT PRTE2_Neighborhood;
+﻿IMPORT PRTE2_Neighborhood, data_services;
 
 EXPORT Constants := MODULE
-
-			//Base/Input/Key Prefix - Currently no input or base files as data is metadata
-		// EXPORT IN_PREFIX 		:= '~prte::in::neighborhood::';
-		// EXPORT BASE_PREFIX	:= '~prte::base::neighborhood::';
-		EXPORT KEY_PREFIX		:= '~prte::key::neighborhood::';
-		Export dops_name:=('NeighborhoodKeys');
-		
+    EXPORT KEY_PREFIX   := '~prte::key::neighborhood::';
+    EXPORT dops_name    := 'NeighborhoodKeys';
+    EXPORT Bip_filename := (data_services.foreign_Prod + 'prte::key::bipv2::business_header::qa::linkids');
 END;

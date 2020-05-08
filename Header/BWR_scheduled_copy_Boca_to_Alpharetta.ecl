@@ -15,6 +15,11 @@ emailList          :=   'gabriel.marcan@lexisnexisrisk.com'
 
 updateSuperInNewFileFound(STRING super,STRING file_pattern):= FUNCTION
 
+  		// Setup time stamp
+        dt:=Std.Date.Today();
+        tm:=STD.Date.CurrentTime();
+        datetime := dt[1..4]+'-'+dt[5..6]+'-'+dt[7..8]+' '+tm[1..2]+':'+tm[3..4]+':'+tm[5..6];
+  
         // get current file in super
         qa_logical_file:=STD.File.SuperFileContents(super)[1].name;
 
@@ -39,12 +44,15 @@ updateSuperInNewFileFound(STRING super,STRING file_pattern):= FUNCTION
                                               STD.File.RemoveOwnedSubFiles(super,TRUE),
                                               STD.File.ClearSuperFile     (super     ),
                                               STD.File.AddSuperFile       (super,'~'+latest_available_filename  ),
-                                              STD.File.FinishSuperFileTransaction()
+                                              STD.File.FinishSuperFileTransaction(),
+                  							  OUTPUT(dataset([{super,qa_logical_file,latest_version_available,datetime}],
+                                                    {string super, string in_qa, STRING best_available, string datetime}),
+                                                    NAMED('update_log'),extend)
                 						    )
                 ),
                 OUTPUT(dataset([{super,qa_logical_file,latest_version_available,supers_updated}],
                                 {string super, string in_qa, STRING best_available, boolean superUpdated}),
-                                NAMED('update_report'),extend)
+                                NAMED('update_report'),overwrite)
          ));
 
 END;

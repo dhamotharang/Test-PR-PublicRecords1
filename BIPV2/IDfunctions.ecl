@@ -1,5 +1,6 @@
 ﻿import BizLinkFull, BIPV2_Company_Names, ut, SALT311, BIPV2_Best, BIPV2_Suppression;
 import std.Str AS Str;
+import Doxie;
 import dx_Header;
 
 EXPORT IDfunctions := 
@@ -116,7 +117,6 @@ EXPORT SALTOutput2 := PROJECT(SALTOutput2_before_is_truncated,
 	SELF.is_truncated:= LEFT.istruncated; // JA 20190505 - SALT field named isTruncated, but some queries reference older hacked field is_truncated
 	SELF:=LEFT;
 ));
-
 EXPORT raw_data := THISMODULE.MEOW_Biz(SALTInput2).raw_data;  //For now, this just supports SeleBest work below
 
 SHARED outrec2:=RECORD
@@ -140,7 +140,23 @@ EXPORT RecordOut2 := outrec2;
 // output(uid_results, named('uid_results'));
 // output(Raw_Results2, named('Raw_Results2'));
 // output(raw_data, named('raw_data'));
-EXPORT Data2_ := Outfile2;
+shared Data2_internal := Outfile2;
+EXPORT Data2_ := Data2_internal : deprecated('use SearchKeyData() to apply source restrictions');
+
+EXPORT SearchKeyData(Doxie.iDataAccess mod_access) := function
+
+	legacy_mod := module
+		Doxie.compliance.MAC_CopyComplianceValuesToLegacy(mod_access);
+	end;
+
+	bip_access := project(legacy_mod, BIPV2.mod_sources.iParams, opt);
+
+	// removed restricted data
+	nonRestricted := Data2_internal(BIPV2.mod_sources.isPermitted(bip_access, true).bySource(source, vl_id, dt_first_seen));
+	// mask D&B
+	return BIPV2.mod_sources.applyMasking(nonRestricted, bip_access);
+
+end;
 
 EXPORT UnsuppressedData2_ := output_unsuppressed;
 // EXPORT Data2_:=Raw_Results2;
@@ -250,6 +266,146 @@ wpas_status := join(wpas  ,sb ,left.seleid = right.seleid,transform({recordof(wp
 wsta := JOIN(wpas_status,SALTInput2_,LEFT.uniqueid=RIGHT.uniqueid,TRANSFORM({RECORDOF(LEFT) AND NOT uniqueid;STRING30 acctno;},SELF:=LEFT;SELF:=RIGHT;));
 // wsta := JOIN(BIPV2.mac_AddStatus(wpas),SALTInput2_,LEFT.uniqueid=RIGHT.uniqueid,TRANSFORM({STRING30 acctno;RECORDOF(LEFT) AND NOT uniqueid;},SELF:=LEFT;SELF:=RIGHT;));
 // output(sb, named('sb'));
-EXPORT SeleBest := BIPV2_Suppression.macSuppress(wsta);
+EXPORT SeleBest := BIPV2_Suppression.macSuppress(wsta) : deprecated('use SeleBest2 to properly apply source restrictions');
+
+
+
+// Had to copy the code for calculating SeleBest so that access module will be properly passed into the Best kFetch.
+// This is a sub-optimal implementation. The above Selebest should call this function with default access module, 
+// but there wasn't time to fully test a full refactoring of the code so just having new SeleBest2 use the new function.
+shared SeleBest_restricted(
+		BIPV2.mod_sources.iParams bipAccess 
+			= PROJECT(AutoStandardI.GlobalModule(), BIPV2.mod_sources.iParams, opt)
+	) := function
+
+renewed_uid_results := dedup(project(raw_data, {raw_data.UniqueId, BIPV2.IDlayouts.l_xlink_ids}), all);
+
+sb := BIPV2_Best.Key_LinkIds.kfetch(
+  inputs := dedup(project(renewed_uid_results, BIPV2.IDlayouts.l_xlink_ids), all),
+  Level := BIPV2.IDconstants.Fetch_Level_SELEID,
+  in_mod := bipAccess
+)(proxid = 0);//when proxid > 0, that is the proxid best.  when 0, its sele.
+// append back the UniqueId
+wu := 
+  join(
+    dedup(renewed_uid_results, UniqueId, seleid, all),
+    sb,   
+    left.seleid = right.seleid,
+    transform(
+      {sb, unsigned8 UniqueId},
+      self.UniqueId := left.UniqueId,
+      self := right
+    )
+  ,  keep(1)
+);
+// now project/transform to the layout needed for scoring
+lfs :=
+project(
+  wu,
+  transform(
+    {raw_data},
+    
+    cp := left.company_phone[1].company_phone;    //If restrictions already applied, then I think taking the first row is good.  if not, we can add a normalize here.
+    self.company_phone := cp;
+    self.company_phone_3 := cp[1..3];
+    self.company_phone_7 := cp[4..10];
+    self.company_name   :=  left.company_name[1].company_name;
+    self.dt_first_seen  := left.company_name[1].dt_first_seen;
+    self.dt_last_seen   := left.company_name[1].dt_last_seen;
+    self.company_fein   :=  left.company_fein[1].company_fein;
+    self.company_url    :=  left.company_url[1].company_url;
+    
+    ca := left.company_address[1];
+    self.prim_range := ca.company_prim_range; 
+    self.prim_name := ca.company_prim_name;
+    self.sec_range := ca.company_sec_range; 
+    self.city := ca.address_v_city_name;  
+    self.st := ca.company_st;
+    self.zip := ca.company_zip5;    
+    self.zip4 := ca.company_zip4;
+    self := left;
+    self := []    //  fill in lots of fields we dont care to score, like rcid2
+  )
+);
+//add cnp_name, etc
+forcnp :=
+project(
+  lfs,
+  transform(
+    {lfs, unsigned6 rid_forcnp},
+    self := left,
+    self.rid_forcnp := counter
+  )
+);
+BIPV2_Company_Names.functions.mac_go(forcnp, wcnp, rid_forcnp,company_name,,FALSE)
+wcnp2 := project(wcnp, {raw_data});
+best_out:=THISMODULE.MEOW_Biz(SALTInput2).ScoreData(wcnp2,SALTInput2);
+// output(Wu, named('wu'));
+wcounty :=
+join(
+  best_out,
+  Wu,
+  left.uniqueid = right.uniqueid and left.seleid = right.seleid,
+  transform(
+    {best_out, sb.company_address.county_name, dataset({sb.company_fein.sources}) company_fein_sources, dataset({sb.company_name.sources}) company_name_sources, sb.company_address.company_address_data_permits},
+    self.county_name := right.company_address[1].county_name,
+    self.addr_suffix := right.company_address[1].company_addr_suffix,
+    self.predir := right.company_address[1].company_predir,
+    self.postdir := right.company_address[1].company_postdir,
+    self.unit_desig := right.company_address[1].company_unit_desig,
+    self.p_city_name := right.company_address[1].company_p_city_name,
+    self.v_city_name := right.company_address[1].address_v_city_name,
+    self.company_fein_sources := right.company_fein.sources,
+    self.company_name_sources := right.company_name.sources,
+    self.company_address_data_permits := right.company_address[1].company_address_data_permits,
+    self := left
+  ),
+  keep(1)
+);
+
+wparentinfo := //ultimate_proxid and sele_proxid needed for mac_AddParentAbovSeleField
+join(
+  wcounty,
+  Data2_internal,
+  left.uniqueid = right.uniqueid and left.seleid = right.seleid,
+  transform(
+    {wcounty},
+    self.ultimate_proxid := right.ultimate_proxid,
+    self.sele_proxid := right.sele_proxid,
+    self := left
+  ),
+  keep(1)
+);
+wpas := BIPV2.IDmacros.mac_AddParentAbovSeleField(wparentinfo);
+wpas_status := join(wpas  ,sb ,left.seleid = right.seleid,transform({recordof(wpas), boolean isActive, boolean isDefunct},self.isactive := right.isactive,self.isdefunct := right.isdefunct,self.company_status_derived := '',self := left),left outer);
+wsta := JOIN(wpas_status,SALTInput2_,LEFT.uniqueid=RIGHT.uniqueid,TRANSFORM({RECORDOF(LEFT) AND NOT uniqueid;STRING30 acctno;},SELF:=LEFT;SELF:=RIGHT;));
+
+return BIPV2_Suppression.macSuppress(wsta);
+
+END; // selebest_restricted
+
+
+EXPORT SeleBest2(Doxie.iDataAccess mod_access) := function
+
+	legacy_mod := module
+		Doxie.compliance.MAC_CopyComplianceValuesToLegacy(mod_access);
+	end;
+
+	// Need to handle ignoreFares and ignoreFidelity until iDataAccess handles it.
+	// Just using defaults from globalModule instead of passing in value because
+	// it will match existing behavior of SeleBest.
+
+	defaultAccess := project(AutoStandardI.GlobalModule(), BIPV2.mod_sources.iParams, opt);
+
+	bip_access := module(project(legacy_mod, BIPV2.mod_sources.iParams, opt))
+		export boolean ignoreFares    := defaultAccess.ignoreFares;
+    	export boolean ignoreFidelity := defaultAccess.ignoreFidelity;
+	end;
+
+	return SeleBest_restricted(bip_access);
+
+END;
+
+
 END;
 END;
