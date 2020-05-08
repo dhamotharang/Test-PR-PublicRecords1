@@ -6,7 +6,7 @@ EXPORT Layout_eCrash := MODULE
 		BIPV2.IDlayouts.l_xlink_ids;	//Added for BIP project   
 		STRING8 dt_first_seen;
 		STRING8 dt_last_seen;
-		STRING3 report_code;
+		STRING4 report_code;
 		STRING25 report_category;
 		STRING65 report_code_desc;
 		STRING14 vehicle_incident_id;
