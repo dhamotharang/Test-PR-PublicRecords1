@@ -998,7 +998,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'rawfields_diversitycandidate:' + getFieldTypeText(h.rawfields_diversitycandidate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'rawfields_entrydate:' + getFieldTypeText(h.rawfields_entrydate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'rawfields_lastupdate:' + getFieldTypeText(h.rawfields_lastupdate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'rawfields_biography:' + getFieldTypeText(h.rawfields_biography) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_contact_name_title:' + getFieldTypeText(h.clean_contact_name_title) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_contact_name_fname:' + getFieldTypeText(h.clean_contact_name_fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_contact_name_mname:' + getFieldTypeText(h.clean_contact_name_mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -1094,7 +1093,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_rawfields_diversitycandidate_cnt
           ,le.populated_rawfields_entrydate_cnt
           ,le.populated_rawfields_lastupdate_cnt
-          ,le.populated_rawfields_biography_cnt
           ,le.populated_clean_contact_name_title_cnt
           ,le.populated_clean_contact_name_fname_cnt
           ,le.populated_clean_contact_name_mname_cnt
@@ -1190,7 +1188,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_rawfields_diversitycandidate_pcnt
           ,le.populated_rawfields_entrydate_pcnt
           ,le.populated_rawfields_lastupdate_pcnt
-          ,le.populated_rawfields_biography_pcnt
           ,le.populated_clean_contact_name_title_pcnt
           ,le.populated_clean_contact_name_fname_pcnt
           ,le.populated_clean_contact_name_mname_pcnt
@@ -1233,7 +1230,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_record_sid_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,95,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,94,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -1249,7 +1246,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Contacts_Delta(prevDS, PROJECT(h, Contacts_Layout_Sheila_Greco));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),95,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),94,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

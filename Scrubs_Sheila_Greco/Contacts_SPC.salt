@@ -68,7 +68,6 @@ FIELD:rawfields_citizenship:TYPE(STRING):LIKE(Invalid_AlphaCaps):0,0
 FIELD:rawfields_diversitycandidate:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:rawfields_entrydate:TYPE(STRING):LIKE(Invalid_Date):0,0
 FIELD:rawfields_lastupdate:TYPE(STRING):LIKE(Invalid_Date):0,0
-FIELD:rawfields_biography:TYPE(STRING):0,0
 FIELD:clean_contact_name_title:TYPE(STRING5):LIKE(Invalid_AlphaCaps):0,0
 FIELD:clean_contact_name_fname:TYPE(STRING20):LIKE(Invalid_AlphaCaps):0,0
 FIELD:clean_contact_name_mname:TYPE(STRING20):LIKE(Invalid_AlphaCaps):0,0

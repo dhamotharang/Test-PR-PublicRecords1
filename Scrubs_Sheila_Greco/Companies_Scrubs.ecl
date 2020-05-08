@@ -740,7 +740,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'rawfields_entrydate:' + getFieldTypeText(h.rawfields_entrydate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'rawfields_lastupdate:' + getFieldTypeText(h.rawfields_lastupdate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'rawfields_entrystaffid:' + getFieldTypeText(h.rawfields_entrystaffid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'rawfields_description:' + getFieldTypeText(h.rawfields_description) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_address_prim_range:' + getFieldTypeText(h.clean_address_prim_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_address_predir:' + getFieldTypeText(h.clean_address_predir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_address_prim_name:' + getFieldTypeText(h.clean_address_prim_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -829,7 +828,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_rawfields_entrydate_cnt
           ,le.populated_rawfields_lastupdate_cnt
           ,le.populated_rawfields_entrystaffid_cnt
-          ,le.populated_rawfields_description_cnt
           ,le.populated_clean_address_prim_range_cnt
           ,le.populated_clean_address_predir_cnt
           ,le.populated_clean_address_prim_name_cnt
@@ -918,7 +916,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_rawfields_entrydate_pcnt
           ,le.populated_rawfields_lastupdate_pcnt
           ,le.populated_rawfields_entrystaffid_pcnt
-          ,le.populated_rawfields_description_pcnt
           ,le.populated_clean_address_prim_range_pcnt
           ,le.populated_clean_address_predir_pcnt
           ,le.populated_clean_address_prim_name_pcnt
@@ -953,7 +950,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_record_sid_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,88,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,87,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -969,7 +966,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Companies_Delta(prevDS, PROJECT(h, Companies_Layout_Sheila_Greco));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),88,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),87,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
