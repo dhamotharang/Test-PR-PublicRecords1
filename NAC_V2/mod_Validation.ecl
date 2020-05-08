@@ -77,8 +77,8 @@ EXPORT mod_Validation := MODULE
 	shared ValidStartDate(string date, string2 state, string4 RecordCode) := IF(NOT IsValidDate(date), 
 										DATASET([{errcodes.E117, 'E', 'F', FieldCode('E',errcodes.E117), date, state, RecordCode}], rErr));
 	shared ValidEndDate(string startdate, string enddate, string2 state, string4 RecordCode) := 
-							IF(NOT IsValidDate(enddate) OR 
-								(IsValidDate(startdate) AND IsValidDate(enddate) AND (unsigned)enddate < (unsigned)startdate),
+							IF(NOT IsValidDate(enddate),	// OR 
+								//(IsValidDate(startdate) AND IsValidDate(enddate) AND (unsigned)enddate < (unsigned)startdate),
 										DATASET([{errcodes.E118, 'E', 'F', FieldCode('E',errcodes.E118), enddate, state, RecordCode}], rErr));
 	// ** Address Validation
 	rgxValidStreet := '[A-Z0-9.,#/&_"\' -]+$';

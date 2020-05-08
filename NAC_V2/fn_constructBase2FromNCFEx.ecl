@@ -194,9 +194,10 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					// create unique id. For backward compatibility, this is limited to 6 bytes
 					year2020 := Std.Date.FromJulianYMD(2020,1,1); 	// nothing before 2020
 					year := Std.Date.FromJulianYMD((unsigned)(right.filename[11..14]),(unsigned)(right.filename[15..16]),(unsigned)(right.filename[17..18]));
-					id := year - year2020;		// good for 50 years
+					days := year - year2020;		// good for 50 years
 					self.PrepRecSeq := if(right.filename='',0,
-						HASHCRC(right.GroupId,right.ProgramCode) | (id << 32) );
+						HASH32(right.GroupId,right.ProgramCode,TRIM(right.ClientId,right,left),TRIM(right.CaseId,right,left))
+										| (days << 32) );
 
 					self := right;
 					self := left;
