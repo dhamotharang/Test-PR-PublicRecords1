@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, dx_header, Suppress;
+﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, Risk_Indicators, dx_header, DeathV2_Services, dx_death_master;
 
 
 EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
@@ -193,26 +193,27 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                           ATMOST(1));
   //The Associated With Other Business is now populated in this results set and should get passed along and eventually land in the NetworkDetails of the Business Report                  
   
-  
+  death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    
+  deceasedDIDs_unformatted := DX_Death_Master.Get.ByDID(uniqueDIDs, did, death_params);
+                     
   //check to see if the individual is deceased
-  deceasedDIDs_unsuppressed := JOIN(uniqueDIDs, Doxie.key_Death_masterV2_ssa_DID,
-                      (UNSIGNED)(RIGHT.dod8) < LEFT.historydate AND									
-                      KEYED(LEFT.DID = RIGHT.l_did) AND
-                      NOT((Risk_Indicators.iid_constants.deathSSA_ok(options.DataRestrictionMask) = FALSE AND RIGHT.src = MDR.sourceTools.src_Death_Restricted) 
-                          OR (linkingOptions.AllowGLB = FALSE AND RIGHT.glb_flag = DueDiligence.Constants.YES)),
+  deceasedDIDs := JOIN(uniqueDIDs, deceasedDIDs_unformatted,
+                      (UNSIGNED)(RIGHT.death.dod8) < LEFT.historydate AND									
+                      LEFT.did = RIGHT.did AND
+                      NOT((Risk_Indicators.iid_constants.deathSSA_ok(options.DataRestrictionMask) = FALSE) 
+                          OR (linkingOptions.AllowGLB = FALSE)),
                       TRANSFORM({RECORDOF(RIGHT)},
                                 SELF := RIGHT;), 
-                      KEEP(1), ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+                      KEEP(1));
                       
-  deceasedDIDs := Suppress.MAC_SuppressSource(deceasedDIDs_unsuppressed, mod_access);
-  
-  uniqueDeceasedDIDs := DEDUP(SORT(deceasedDIDs, l_did), l_did);
+  uniqueDeceasedDIDs := DEDUP(SORT(deceasedDIDs, did), did);
   
   //add the deceased flag to the result set that contains reporting information for the business executive  
   addDeceased := JOIN(addAssociation, uniqueDeceasedDIDs,
-                      LEFT.did = RIGHT.l_did,
+                      LEFT.did = RIGHT.did,
                       TRANSFORM(RECORDOF(LEFT),
-                                SELF.Deceased := RIGHT.l_did <> 0; 
+                                SELF.Deceased := RIGHT.did <> 0; 
                                 SELF := LEFT;),
                       LEFT OUTER,
                       ATMOST(1));
