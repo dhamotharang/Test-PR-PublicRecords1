@@ -1,6 +1,6 @@
 import AutoStandardI;
 import address, doxie, dx_header, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
-       header, suppress, STD;
+       suppress, STD;
 
 export InterfaceTranslator := module
 	// provided only for backward compatibility
@@ -915,7 +915,7 @@ export InterfaceTranslator := module
 		end;
 		export set of string val(params in_mod) := FUNCTION
       ph_lname := metaphonelib.DMetaPhone1 (lname_value.val(in_mod))[1..6];
-      ds_dist := header.key_phonetic_lname (
+      ds_dist := dx_header.key_phonetic_lname() (
                    keyed (dph_lname = ph_lname),
                    STD.Str.EditDistance (lname_value.val(in_mod), lname) < in_mod.distancethreshold);
       orig_set := SET (IF(UsePhoneticDistance.val(in_mod), CHOOSEN (ds_dist, 500)), lname);
