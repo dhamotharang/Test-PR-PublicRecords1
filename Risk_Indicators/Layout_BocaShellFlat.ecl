@@ -1,10 +1,10 @@
 ﻿EXPORT Layout_BocaShellFlat := MODULE 
   EXPORT V_53 := RECORD 
+    string30 acctno; //batch needs this field for linking instead of 'accountnumber'
     integer8 bsversion;
     string1 isfcra;
     string3 cb_allowed;
     string1 intendedpurpose;
-    string30 accountnumber;
     unsigned4 seq;
     unsigned6 did;
     boolean truedid;
@@ -1450,11 +1450,11 @@
   
   
   EXPORT V_55 := RECORD
+    string30 acctno; //batch needs this field for linking instead of 'accountnumber'
     integer8 bsversion;
     string1 isfcra;
     string3 cb_allowed;
     string1 intendedpurpose;
-    string30 accountnumber;
     unsigned4 seq;
     unsigned6 did;
     boolean truedid;
