@@ -97,19 +97,17 @@ boolean ExcludeEvictions := false : stored('ExcludeEvictions');
 boolean ExcludeReleasedCases := false : stored('ExcludeReleasedCases');
 unsigned6 MinAmount := 0 : stored('MinimumAmount');
 MinimumAmount := MIN(MinAmount, 999999999);
-
-ExcludeStatesTemp := record
-		dataset(iesp.share.t_StringArrayItem) ExcludeStates {xpath('ExcludeStates/ExcludeState'), MAXCOUNT(50)};
-end;
-ExcludeStates := dataset([], ExcludeStatesTemp) : stored('ExcludeStates', few);
-ExcludedStates := ExcludeStates[1].ExcludeStates;
-
-ExcludeReportingSourcesTemp := record
-		dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources {xpath('ExcludeReportingSources/ExcludeReportingSource'), MAXCOUNT(12292)};
-end;
-ExcludeReportingSources := dataset([], ExcludeReportingSourcesTemp) : stored('ExcludeReportingSources', few);
-ExcludedReportingSources := ExcludeReportingSources[1].ExcludeReportingSources;
-
+string ExcludeStates := '' : stored('ExcludeStates');
+ExcludeStatesArray := STD.STr.SplitWords(TRIM(ExcludeStates,ALL),',');
+ExcludedStates := DATASET(ExcludeStatesArray,iesp.share.t_StringArrayItem);
+string ExcludeReportingSources := '' : stored('ExcludeReportingSources');
+ExcludeReportingSourcesArray := STD.STr.SplitWords(TRIM(ExcludeReportingSources,ALL),',');
+ExcludedReportingSources := DATASET(ExcludeReportingSourcesArray,iesp.share.t_StringArrayItem);
+boolean IncludeStatusRefreshChecks := false : stored('IncludeStatusRefreshChecks');
+boolean AttributesOnly := false : stored('AttributesOnly');
+boolean ExcludeStatusRefresh := false : stored('ExcludeStatusRefresh');
+string5 StatusRefreshWaitPeriod := '' : stored('StatusRefreshWaitPeriod');
+		
 //Default to being ON, which is 1. If Excluded, we change to 0.
 string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
@@ -122,6 +120,8 @@ tmpLiensFltr := if(ExcludeOtherLiens,'0', tmpFilterLienTypes[6..6]);
 tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
 tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
+tmpAttributesOnlyFltr := if(AttributesOnly, '0', tmpFilterLienTypes[10..10]);
+tmpExcludeStatusRefresh := if(ExcludeStatusRefresh, '0', tmpFilterLienTypes[11..11]);
 	//We now have boolean options for each of these filters. We built the code to use a bit (string)
 	//saying which ones they want and which ones they want to filter. I take the boolean flags and 
 	//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
@@ -134,7 +134,9 @@ FilterLienTypes := tmpCityFltr +
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
 		tmpEvictionsFltr +
-		tmpReleasedCasesFltr;
+		tmpReleasedCasesFltr +
+		tmpAttributesOnlyFltr +
+        tmpExcludeStatusRefresh;
 
 boolean RetainInputDID := false				: stored('RetainInputDID');  // to be used by modelers in R&D mode
 
@@ -267,7 +269,9 @@ search_Results := riskview.Search_Function(valid_inputs,
 	RetainInputDID,
 	MinimumAmount := MinimumAmount,
 	ExcludeStates := ExcludedStates,
-	ExcludeReportingSources := ExcludedReportingSources
+	ExcludeReportingSources := ExcludedReportingSources,
+	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod
 	);
 
 
