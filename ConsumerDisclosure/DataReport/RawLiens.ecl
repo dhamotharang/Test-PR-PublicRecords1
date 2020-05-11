@@ -12,8 +12,11 @@ layout_liens_main_raw := RECORD(LiensV2.Layout_liens_main_module.layout_liens_ma
 END; 
 	
 layout_liens_party_raw := RECORD // RECORDOF(liensv2.key_liens_party_id_FCRA)
-		liensv2.layout_liens_party;
-		BIPV2.IDlayouts.l_xlink_ids;
+    liensv2.layout_liens_party;
+    BIPV2.IDlayouts.l_xlink_ids;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
+    string10 orig_rmsid;
 END; 
 	
 layout_liens_party_rawrec := RECORD(layout_liens_party_raw)
@@ -208,6 +211,9 @@ EXPORT RawLiens := MODULE
 			
       SELF.tmsid := L.tmsid;
       SELF.rmsid := L.rmsid;
+      SELF.orig_rmsid := L.orig_rmsid;
+      SELF.global_sid := L.global_sid;
+      SELF.record_sid := L.record_sid;
       SELF.persistent_record_id := L.persistent_record_id;
       
       SELF.lname := IF (isRestricted, FCRA.Constants.FCRA_Restricted, L.lname);    

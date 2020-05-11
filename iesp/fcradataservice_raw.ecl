@@ -2096,6 +2096,7 @@ end;
 export t_FcraDataServiceRawLiensPartyTmsid := record
 	string tmsid {xpath('tmsid')};
 	string rmsid {xpath('rmsid')};
+	string orig_rmsid {xpath('orig_rmsid')};
 	string orig_full_debtorname {xpath('orig_full_debtorname')};
 	string orig_name {xpath('orig_name')};
 	string orig_lname {xpath('orig_lname')};
