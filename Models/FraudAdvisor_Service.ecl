@@ -559,7 +559,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1']) => 54,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1909_2']) => 54,
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
@@ -672,14 +672,9 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
 	left outer
 );
 
-#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
-    // This is for ROUND 2 Validation ONLY //
- 	  ModelValidationResults := Models.DI31906_0_0(iid);
- 	  OUTPUT(ModelValidationResults, named('Results'));
+#if( NOT Models.FraudAdvisor_Constants.VALIDATION_MODE)
     
-#ELSE
-
 //* *************************************
 //*   Boca Shell Logging Functionality  *
 //***************************************
@@ -688,7 +683,7 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
      intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(clam, productID, bsVersion);
 // ************ End Logging ************
 
-
+#END
 risk_indicators.layout_input into_test_prep(r1 l) := transform
 	self.seq := l.seq;	
 	self.ssn := socs_value;
@@ -709,7 +704,13 @@ attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_ind
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);
+#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 
+    // This is for ROUND 2 Validation ONLY //
+ 	  ModelValidationResults := Models.FP1909_2_0(clam, 6, attributes);
+ 	  OUTPUT(ModelValidationResults, named('Results'));
+    
+#ELSE
 // search for test seeds																					
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);	
 																																									
@@ -857,6 +858,7 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                                 EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
                                                 EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
                                                 EXPORT Dataset(easi.layout_census) _easicensus := easi_census;
+                                                EXPORT Dataset(Models.Layout_FraudAttributes) _FDatributes := attributes;
                                               END;
                                               
                                               custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');

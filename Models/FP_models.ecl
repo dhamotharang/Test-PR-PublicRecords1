@@ -264,7 +264,8 @@ EXPORT FP_models := MODULE
     model_fp1806_1 := Models.FP1806_1_0( ungroup(FP_mod._clam), 6);
     model_fp1710_1 := Models.FP1710_1_0( ungroup(FP_mod._clam), 6);
     model_fp1803_1 := Models.FP1803_1_0( ungroup(FP_mod._clam), 6);
-    model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6); 
+    model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6);
+		model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDatributes);
     model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
     
     //These models use the RiskIndicies from fp1109 so they are assigned to temp variables for the joins below
@@ -393,7 +394,10 @@ EXPORT FP_models := MODULE
                            self.ri := right.ri;
                           self.score := right.score;
                           self := right));
-
+#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
+		model_info := model_fp1909_2; 
+		
+#ELSE
     model_info := CASE(model_name,
                         'fp3710_0' => model_fp3710_0,
                         'fp3710_9' => model_fp3710_9,
@@ -448,12 +452,13 @@ EXPORT FP_models := MODULE
                         'fp1803_1' => model_fp1803_1,
                         'fp1806_1' => model_fp1806_1,
                         'fp1902_1' => model_fp1902_1,
+                        'fp1909_2' => model_fp1909_2,
                         'di31906_0' => model_di31906_0,
                         'msn1803_1' => model_msn1803_1,
                         'rsn804_1'  => model_rsn804_1,
                                        DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
-                     
+   #END                  
     return model_info[1];
 
   END;
