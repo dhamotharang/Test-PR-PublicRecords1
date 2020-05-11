@@ -26,8 +26,8 @@ EXPORT RoyaltyCaAvmReport := MODULE
 
   //Returns a dataset of royalties for the CaAvmReport gateway
   EXPORT GetRoyalties(
-    iesp.ca_Avm_request.t_CaAvmReportRequest gw_request,
-    iesp.ca_avm_response.t_CaAvmResponse gw_response
+    iesp.gw_ca_Avm_request.t_CaAvmReportRequest gw_request,
+    iesp.gw_ca_avm_response.t_CaAvmResponse gw_response
   ) := FUNCTION
 
     product_code := gw_request.options.CaProductCode;
