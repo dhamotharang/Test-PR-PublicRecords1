@@ -16,7 +16,7 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
                                    self.hsort := true,
 	                                 self := left )) ;
 	
-	ds_InfoProxIdNonRestrictedWithD := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput_Hsort).data2_;
+	ds_InfoProxIdNonRestrictedWithD := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput_Hsort).SearchKeyData(mod_access);
 	ds_InfoProxIdNonRestricted := ds_InfoProxIdNonRestrictedWithD(source <> MDR.SourceTools.src_Dunn_Bradstreet);
    	
 	TopBusiness_Services.functions.MAC_IsRestricted(ds_InfoProxIdNonRestricted,

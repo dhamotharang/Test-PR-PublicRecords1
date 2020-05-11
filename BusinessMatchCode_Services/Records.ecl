@@ -1,5 +1,5 @@
 ﻿import AutoStandardI,BusinessMatchCode_Services,MDR,STD, BIPV2, TopBusiness_Services,
-       Suppress;
+       Suppress, Doxie;
 
 EXPORT Records( DATASET(BusinessMatchCode_Services.Layouts.Input_Processed) ds_BatchIn,
                 BusinessMatchCode_services.iParam.BatchParams               inMod
@@ -14,6 +14,8 @@ FUNCTION
 // 2.	Obtain the the bip salt search results based on input 
 // 3.	Apply the postfilter on the match_codes results
 // 4.	Output results.
+
+mod_access := Project(inMod, Doxie.IDataAccess);
 
 in_mod2 := module(AutoStandardI.DataRestrictionI.params)  
 	  export boolean AllowAll := false;
@@ -56,7 +58,7 @@ in_mod2 := module(AutoStandardI.DataRestrictionI.params)
 			self := [];
 		));  
 
-	proxidLevelResults := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).data2_;
+	proxidLevelResults := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).SearchKeyData(mod_access);
 	
 	//
 	// takes care of GLB restrictions
