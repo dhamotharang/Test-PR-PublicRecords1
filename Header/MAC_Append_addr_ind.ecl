@@ -1,12 +1,12 @@
-﻿EXPORT MAC_Append_addr_ind(ds_in, addr_ind, src = '', did, prim_range, prim_name, sec_range = '', 
+﻿EXPORT MAC_Append_addr_ind(ds_in, addr_ind, src = '', did, prim_range, prim_name, sec_range = '',
 														city = '', st = '', zip, predir = '', postdir = '', addr_suffix = '',
-														dt_first_seen = '', dt_last_seen = '', 
+														dt_first_seen = '', dt_last_seen = '',
 														dt_vendor_first_reported = '', dt_vendor_last_reported = '',
 														isTrusted = '', isFCRA = FALSE, hitQH = FALSE, debug = FALSE) := FUNCTIONMACRO
 
 //default if no isTrusted, treat TU as untrusted
 
-IMPORT Header,header_quick,MDR,IDL_Header, ut;
+IMPORT dx_Header, header_quick, MDR, IDL_Header, ut, data_services;
 
 #DECLARE(sourceName)
 #DECLARE(sec_rangeName)
@@ -98,9 +98,9 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 #UNIQUENAME(qh);
 #SET(finalOutput,%'qh'% + ' := ');
 
-#IF(isFCRA = TRUE) 
+#IF(isFCRA = TRUE)
 	#APPEND(finalOutput,'header_quick.Key_Did_FCRA;\n');
-#ELSE 
+#ELSE
 	#APPEND(finalOutput,'header_quick.key_did;\n');
 #END
 
@@ -169,16 +169,16 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 #UNIQUENAME(outrec);
 #APPEND(finalOutput,%'outrec'% + ' := record\n\t' + %'newrec'% + ' - [isQH];\nend;\n');
 
-#UNIQUENAME(mindate); 
+#UNIQUENAME(mindate);
 #APPEND(finalOutput,%'mindate'% + ' (unsigned3 dt1, unsigned3 dt2) := MAP(dt1 = 0 => dt2, dt2 = 0 => dt1, min(dt1,dt2));\n');
 
 #UNIQUENAME(ua_Key);
-#APPEND(finalOutput,%'ua_Key'% + ' := Header.Key_Addr_Unique_Expanded(');
+#APPEND(finalOutput,%'ua_Key'% + ' := dx_Header.key_addr_unique_expanded(');
 
 #IF(isFCRA = TRUE)
-	#APPEND(finalOutput,'TRUE);\n');
+	#APPEND(finalOutput,'data_services.data_env.iFCRA);\n');
 #ELSE
-	#APPEND(finalOutput,'FALSE);\n');
+	#APPEND(finalOutput,');\n');
 #END
 
 #UNIQUENAME(ded_in_did);
@@ -238,14 +238,14 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 	#APPEND(finalOutput,'OUTPUT(SORT(' + %'datesRolled'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'datesRolled\'));\n');
 #END
 
-#UNIQUENAME(bhdr);   									
+#UNIQUENAME(bhdr);
 #APPEND(finalOutput,%'bhdr'% + ' := join(' + %'qhdr_joined'% + ',' + %'get_ua_indexed'% + ',\n\tleft.' + #TEXT(did) + '=right.did and\n\tleft.' + #TEXT(prim_range) + '=right.prim_range and\n\tleft.' + %'predirName'% + '=right.predir and\n\tleft.' + #TEXT(prim_name) + ' = right.prim_name and\n\tleft.' + %'postdirName'% + ' = right.postdir and\n\tleft.' + %'addr_suffixName'% + ' = right.addr_suffix and\n\tleft.' + %'sec_rangeName'% + ' = right.sec_range and\n\tleft.' + %'cityName'% + ' = right.city and\n\tleft.' + %'stName'% + ' = right.st and\n\tleft.' + #TEXT(zip) + ' = right.zip,\n\ttransform(' + %'newrec'% + ',\n\t\tself.isQH := \'Y\',\n\t\tself.best_addr_ind := \'B\',\n\t\tself.best_addr_rank := \'1\',\n\t\tself.addr_ind := \'1\',\n\t\tself.src_cnt := 1,\n\t\tself.insurance_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'ins_srcs'% + ',1,0),\n\t\tself.bureau_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'bureau_srcs'% + ',1,0),\n\t\tself.property_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'prop_srcs'% + ',1,0),\n\t\tself.utility_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'utility_srcs'% + ',1,0),\n\t\tself.vehicle_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'veh_srcs'% + ',1,0),\n\t\tself.dl_src_cnt := IF(left.' + %'sourceName'% + ' IN ' + %'dl_srcs'% + ',1,0),\n\t\tself.voter_src_cnt := IF(left.' + %'sourceName'% + ' = ' + %'voter_srcs'% + ',1,0),\n\t\tself.dt_first_seen_addr := IF(left.' + %'isTrustedName'% + ',(unsigned)left.' + %'dt_first_seenName'% + ',0),\n\t\tself.dt_last_seen_addr := IF(left.' + %'isTrustedName'% + ',(unsigned)left.' + %'dt_last_seenName'% + ',0),\n\t\tself.dt_vendor_first_reported_addr := IF(left.' + %'isTrustedName'% + ',(unsigned)left.' + %'dt_vendor_first_reportedName'% + ',0),\n\t\tself.dt_vendor_last_reported_addr := IF(left.' + %'isTrustedName'% + ',(unsigned)left.' + %'dt_vendor_last_reportedName'% + ',0),\n\t\tself:=left,self:=[]),\n\t\tleft only);\n');
 
 #IF(Debug = TRUE)
 	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bhdr'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bhdr\'));\n');
 #END
 
-#UNIQUENAME(roll_bh);   
+#UNIQUENAME(roll_bh);
 #APPEND(finalOutput,%'roll_bh'% + ' := rollup(sort(' + %'bhdr'% + ',' + #TEXT(did) + ',' + #TEXT(prim_range) + ',' + %'predirName'% + ',' + #TEXT(prim_name) + ',' + %'addr_suffixName'% + ',' + %'postdirName'% + ',' + %'sec_rangeName'% + ',' + %'cityName'% + ',' + %'stName'% + ',' + #TEXT(zip) + ',' + %'sourceName'% + '),\n\tleft.' + #TEXT(did) + ' = right.' + #TEXT(did) + ' AND\n\tleft.' + #TEXT(prim_range) + ' = right.' + #TEXT(prim_range) + ' AND\n\tleft.' + %'predirName'% + ' = right.' + %'predirName'% + ' AND\n\tleft.' + #TEXT(prim_name) + ' = right.' + #TEXT(prim_name) + ' AND\n\tleft.' + %'addr_suffixName'% + ' = right.' + %'addr_suffixName'% + ' AND\n\tleft.' + %'postdirName'% + ' = right.' + %'postdirName'% + ' AND\n\tleft.' + %'sec_rangeName'% + ' = right.' + %'sec_rangeName'% + ' AND\n\tleft.' + %'cityName'% + ' = right.' + %'cityName'% + ' AND\n\tleft.' + %'stName'% + ' = right.' + %'stName'% + ' AND\n\tleft.' + #TEXT(zip) + ' = right.' + #TEXT(zip) + ',\n\ttransform(' + %'newrec'% + ',\n\t\tself.dt_first_seen_addr := ' + %'mindate'% + '(left.dt_first_seen_addr,right.dt_first_seen_addr),\n\t\tself.dt_last_seen_addr := max(left.dt_last_seen_addr,right.dt_last_seen_addr),\n\t\tself.dt_vendor_first_reported_addr := ' + %'mindate'% + '(left.dt_vendor_first_reported_addr,right.dt_vendor_first_reported_addr),\n\t\tself.dt_vendor_last_reported_addr := max(left.dt_vendor_last_reported_addr,right.dt_vendor_last_reported_addr),\n\t\tself.src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ',left.src_cnt + right.src_cnt,left.src_cnt),\n\t\tself.insurance_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'ins_srcs'% + ',left.insurance_src_cnt + right.insurance_src_cnt,left.insurance_src_cnt),\n\t\tself.bureau_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'bureau_srcs'% + ',left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),\n\t\tself.property_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'prop_srcs'% + ',left.property_src_cnt + right.property_src_cnt,left.property_src_cnt),\n\t\tself.utility_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'utility_srcs'% + ',left.utility_src_cnt + right.utility_src_cnt,left.utility_src_cnt),\n\t\tself.vehicle_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'veh_srcs'% + ',left.vehicle_src_cnt + right.vehicle_src_cnt,left.vehicle_src_cnt),\n\t\tself.dl_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' IN ' + %'dl_srcs'% + ',left.dl_src_cnt + right.dl_src_cnt,left.dl_src_cnt),\n\t\tself.voter_src_cnt := if(left.' + %'sourceName'% + '<>right.' + %'sourceName'% + ' AND right.' + %'sourceName'% + ' = ' + %'voter_srcs'% + ',left.voter_src_cnt + right.voter_src_cnt,left.voter_src_cnt),\n\t\tself.' + %'isTrustedName'% + ':= IF(left.' + %'isTrustedName'% + ',TRUE,right.' + %'isTrustedName'% + '),\n\t\tself := right,self := left));\n');
 
 #IF(Debug = TRUE)
@@ -254,15 +254,15 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 
 #UNIQUENAME(cleanApt);
 #APPEND(finalOutput,%'cleanApt'% + '(string apt) := trim(ut.rmv_ld_zeros(StringLib.StringFindReplace(apt,\'-\',\'\')),all);\n');
-												 
-//Exact match between core address components 
+
+//Exact match between core address components
 #UNIQUENAME(bh_matches);
 #APPEND(finalOutput,%'bh_matches'% + ' := join(' + %'roll_bh'% + ',' + %'get_ua_indexed'% + ',\n\tleft.' + #TEXT(did) + ' = right.did AND\n\tleft.' + #TEXT(prim_range) + ' = right.prim_range AND\n\tleft.' + #TEXT(prim_name) + ' = right.prim_name AND\n\t' + %'cleanApt'% + '(left.' + %'sec_rangeName'% + ') = ' + %'cleanApt'% + '(right.sec_range) AND\n\tleft.' + #TEXT(zip) + ' = right.zip,\n\ttransform(' + %'newrec'% + ',\n\t\tself.' + #TEXT(addr_ind) + ' := right.addr_ind,\n\t\tself.apt_cnt := right.apt_cnt,\n\t\tself.best_addr_ind := [],\n\t\tself := left));\n');
 
 #IF(Debug = TRUE)
 	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_matches'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_matches\'));\n');
 #END
-												
+
 //QH has a blank sec range while unique Address Key does not
 #UNIQUENAME(bh_blanksec);
 #APPEND(finalOutput,%'bh_blanksec'% + ' := join(' + %'roll_bh'% + ',' + %'get_ua_indexed'% + ',\n\tleft.' + #TEXT(did) + ' = right.did AND\n\tleft.' + #TEXT(prim_range) + ' = right.prim_range AND\n\tleft.' + #TEXT(prim_name) + ' = right.prim_name AND\n\tright.sec_range <> \'\' AND\n\tleft.' + %'sec_rangeName'% + ' = \'\' AND\n\tleft.' + #TEXT(zip) + ' = right.zip,\n\ttransform(' + %'newrec'% + ',\n\t\tself.' + #TEXT(addr_ind) + ' := right.addr_ind,\n\t\tself.apt_cnt := right.apt_cnt,\n\t\tself.best_addr_ind := [],\n\t\tself := left));\n');
@@ -304,7 +304,7 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 #APPEND(finalOutput,%'bh_join_rec'% + ' := RECORD\n\tstring2 addr_ind_new;\n\tunsigned3 dt_first_seen_ua;\n\tunsigned3 dt_last_seen_ua;\n\t' + %'newrec'% + ';\nEND;\n');
 
 #IF(Debug = TRUE)
-	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_matches_full'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_matches_full\'));\n'); 
+	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_matches_full'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_matches_full\'));\n');
 #END
 
 //New addresses, may need to be linked to each other
@@ -375,22 +375,22 @@ IMPORT Header,header_quick,MDR,IDL_Header, ut;
 #APPEND(finalOutput,%'bh_mismatches_full'% + ' := join(' + %'bhdr'% + ',' + %'bh_mismatches_updated'% + ',\n\tleft.' + #TEXT(did) + ' = right.' + #TEXT(did) + '  AND\n\tleft.' + #TEXT(prim_range) + ' = right.' +#TEXT(prim_range) + ' AND\n\tleft.' + #TEXT(prim_name) + ' = right.' + #TEXT(prim_name) + ' AND\n\tleft.' + %'sec_rangeName'% + ' = right.' + %'sec_rangeName'% + ' AND\n\tleft.' + %'cityName'% + ' = right.' + %'cityName'% + ' AND\n\tleft.' + %'stName'% + ' = right.' + %'stName'% + ' AND\n\tleft.' + #TEXT(zip) + ' = right.' + #TEXT(zip) + ' AND\n\tleft.' + %'predirName'% + ' = right.' + %'predirName'% + ' AND\n\tleft.' + %'postdirName'% + ' = right.' + %'postdirName'% + ' AND\n\tleft.' + %'addr_suffixName'% + ' = right.' + %'addr_suffixName'% + ',\n\ttransform(' + %'newrec'% + ',\n\t\tself.' + #TEXT(addr_ind) + ' := right.' + #TEXT(addr_ind) + ',\n\t\tself.best_addr_ind := right.best_addr_ind,\n\t\tself.best_addr_rank := right.best_addr_rank,\n\t\tself.dt_first_seen_addr := right.dt_first_seen_addr,\n\t\tself.dt_last_seen_addr := right.dt_last_seen_addr,\n\t\tself.dt_vendor_first_reported_addr := right.dt_vendor_first_reported_addr,\n\t\tself.dt_vendor_last_reported_addr := right.dt_vendor_last_reported_addr,\n\t\tself.apt_cnt := right.apt_cnt,\n\t\tself.src_cnt := right.src_cnt,\n\t\tself.insurance_src_cnt := right.insurance_src_cnt,\n\t\tself.bureau_src_cnt := right.bureau_src_cnt,\n\t\tself.property_src_cnt := right.property_src_cnt,\n\t\tself.utility_src_cnt := right.utility_src_cnt,\n\t\tself.vehicle_src_cnt := right.vehicle_src_cnt,\n\t\tself.dl_src_cnt := right.dl_src_cnt,\n\t\tself.voter_src_cnt := right.voter_src_cnt,\n\t\tself.addressstatus := right.addressstatus,\n\t\tself.addresstype := right.addresstype,\n\t\tself:=left));\n');
 
 #IF(Debug = TRUE)
-	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_mismatches_full'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_mismatches_full\'));\n'); 
+	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_mismatches_full'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_mismatches_full\'));\n');
 #END
 
 #UNIQUENAME(bh_matches_updated)
 #APPEND(finalOutput,%'bh_matches_updated'% + ' := join(' + %'bh_reordered'% + '(isQH = \'\'),' + %'get_ua'% + '((unsigned)' + #TEXT(addr_ind) + ' < 91) + ' + %'bh_matches_full'% + ',\n\tleft.' + #TEXT(did) + ' = right.' + #TEXT(did) + ' and left.' + #TEXT(addr_ind) + ' = right.' + #TEXT(addr_ind) + ',\n\ttransform(' + %'newrec'% + ',\n\t\tself.' + #TEXT(addr_ind) + ' := left.addr_ind_new,self.best_addr_ind := IF((unsigned)left.addr_ind_new < 91 AND right.best_addr_rank = \'1\',\'B\',\'\'),\n\t\tself:=right)) + ' + %'bh_matches_full'% + '((unsigned)' + #TEXT(addr_ind) + ' > 90);\n');
 
 #IF(Debug = TRUE)
-	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_matches_updated'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_matches_updated\'));\n');   
+	#APPEND(finalOutput,'OUTPUT(SORT(' + %'bh_matches_updated'% + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank),ALL,named(\'bh_matches_updated\'));\n');
 #END
 
 #UNIQUENAME(bh_all)
-#APPEND(finalOutput,%'bh_all'% + ' := ' + %'bh_mismatches_full'% + ' + ' + %'bh_matches_updated'% + ' + ' + %'get_ua'% + '(' + #TEXT(addr_ind) + ' BETWEEN \'91\' AND \'99\');\n'); 
+#APPEND(finalOutput,%'bh_all'% + ' := ' + %'bh_mismatches_full'% + ' + ' + %'bh_matches_updated'% + ' + ' + %'get_ua'% + '(' + #TEXT(addr_ind) + ' BETWEEN \'91\' AND \'99\');\n');
 
 #APPEND(finalOutput,'return SORT(' + %'bh_all'% + ',' + #TEXT(did) + ',(unsigned)' + #TEXT(addr_ind) + ',(unsigned)best_addr_rank);');
 
-// return %'finalOutput'%; 
+// return %'finalOutput'%;
 
 %finalOutput%
 
