@@ -1,8 +1,8 @@
 ﻿/*2016-02-25T21:35:40Z (Rhodes, Mark (RIS-BCT))
 RR 200433  fixed ayntax error
 */
-import iesp, AutoStandardI,Ingenix_NatlProf, doxie,doxie_files,DeaV2_Services,Business_Risk,prof_licensev2_services,DeathV2_Services,doxie_crs,ut,clia,
-			BankruptcyV3_Services,bankruptcyv2_services,LiensV2_Services,Identifier2,Business_Header,address, NPPES, ams, dea, watchdog, suppress, Healthcare_Services,Healthcare_Header_Services;
+import iesp, AutoStandardI, Ingenix_NatlProf, doxie, doxie_files, ut, clia,
+			Business_Header, address, NPPES, dea, suppress, Healthcare_Services, Healthcare_Header_Services;
 export Functions := Module
 
 	shared myLayouts := Healthcare_Provider_Services.layouts;
@@ -28,7 +28,7 @@ export Functions := Module
 			string wordVal;
 			boolean isInitial;
 		END;
-			
+
 		HealthCareFilterWords := dataset([{'MEDICAL'},{'CORPORATION'},{'COUNTY'},{'HEALTHCARE'},{'HEALTH'},{'CLINIC'},{'HOSPITAL'},{'UNIVERSITY'},{'OF'},
 																			{'AND'},{'THE'},{'SCHOOL'},{'COMMUNITY'},{'CENTER'},{'CENTERS'},{'GROUP'},{'GRP'},{'INC'},{'ASSOCIATES'},{'ASSOC'},
 																			{'CORP'},{'LLC'},{'LTD'},{'LLP'},{'INCORPORATION'},{'INCORPORATED'},{'MED'},{'LABORATORY'},{'AUTHORITY'}],wordpart);
@@ -47,125 +47,125 @@ export Functions := Module
 		returnVal := trim(mergeWords[maxRow].wordVal,left,right);
 		return returnVal;
 	END;
-	
+
 	EXPORT BOOLEAN allowGLB() := FUNCTION
 		RETURN AutoStandardI.InterfaceTranslator.glb_ok.val(PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_ok.params));
 	END;
 
 	EXPORT BOOLEAN allowDPPA() := FUNCTION
-		RETURN AutoStandardI.InterfaceTranslator.dppa_ok.val(PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.dppa_ok.params)); 
+		RETURN AutoStandardI.InterfaceTranslator.dppa_ok.val(PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.dppa_ok.params));
 	END;
 
 	EXPORT getPayloadByIDS(Dataset(layouts.id) ids) := FUNCTION
-		
+
 		search_key := Ingenix_NatlProf.Key_Sanctions_Payload;
-			
+
 		ds_recs := join(ids,search_key,
 										keyed(left.id=right.fakeid),
 										transform(myLayouts.layout_sancid, self.sanc_id :=(integer)right.sanc_id),
-										keep(myConst.MAX_RECS_ON_JOIN));			
+										keep(myConst.MAX_RECS_ON_JOIN));
 		RETURN ds_recs;
-		
+
 	END;
 
 	EXPORT getPayloadByPIDS(Dataset(myLayouts.id) ids) := FUNCTION
-		
+
 		prov_key := Ingenix_NatlProf.Key_Provider_Payload;
-		
+
 		ds_recs := join(ids,prov_key,
 										keyed(left.id=right.fakeid),
 										transform(myLayouts.layout_provid,self.prov_id:=(unsigned6)right.ProviderID),
-										keep(myConst.MAX_RECS_ON_JOIN));		
+										keep(myConst.MAX_RECS_ON_JOIN));
 		RETURN ds_recs;
-		
+
 	END;
-	
+
 	EXPORT getPayloadByNPPESIDS(Dataset(myLayouts.id) ids) := FUNCTION
-		
+
 		nppes_key := NPPES.Key_NPPES_Payload;
-		
+
 		ds_recs := join(ids,nppes_key,
 										keyed(left.id=right.fakeid),
 										transform(recordof(nppes_key), self := right),
-										keep(myConst.MAX_RECS_ON_JOIN));		
+										keep(myConst.MAX_RECS_ON_JOIN));
 		RETURN ds_recs;
-		
+
 	END;
-	
+
 	EXPORT getNPPESByAutokeys(IParams.searchParams aInputData) := FUNCTION
-		
-		validCriteria:=(trim(aInputData.LastName,all) <> '' or trim(aInputData.CompanyName,all) <> '') and 
+
+		validCriteria:=(trim(aInputData.LastName,all) <> '' or trim(aInputData.CompanyName,all) <> '') and
 										trim(aInputData.City,all) <> '' and trim(aInputData.Zip,all) <> '';
-		nppes_ids_byak := if(validCriteria,AutoKey_Ids(aInputData).nppes);		
+		nppes_ids_byak := if(validCriteria,AutoKey_Ids(aInputData).nppes);
 		nppes_payload := getPayloadByNPPESIDS(nppes_ids_byak);
 		nppes_res := project(nppes_payload, recordof(myLayouts.NPPES_Layouts.temp_layout));
 
 		RETURN nppes_res;
 	END;
-	
+
 	EXPORT getNPPESByNPI(dataset(myLayouts.NPPES_Layouts.layout_npiid) NPIRec) := FUNCTION
 		npi_key := NPPES.Key_NPPES_npi;
 		nppes_ids_bynpi := join(NPIRec, npi_key, Keyed(left.npi_id = right.npi),
 														transform(recordof(myLayouts.NPPES_Layouts.temp_layout), self := right));
 		RETURN nppes_ids_bynpi;
 	END;
-	
+
 	EXPORT getSIDSByDIDS(Dataset(myLayouts.deepDids) dids) := FUNCTION
 		search_key_sid := doxie_files.key_sanctions_did;
 		ds_recs_sids := join(dids,search_key_sid,
 										keyed(left.did=right.l_did),
 										transform(myLayouts.layout_sancid, self.sanc_id := (integer)right.sanc_id),
-										keep(myConst.MAX_RECS_ON_JOIN));	
+										keep(myConst.MAX_RECS_ON_JOIN));
 		RETURN ds_recs_sids;
 	END;
-	
+
 	EXPORT getSIDSByBDIDS(Dataset(myLayouts.deepBDids) bdids) := FUNCTION
 		search_key_sid := Ingenix_NatlProf.Key_sanctions_bdid;
 		ds_recs_sids := join(bdids,search_key_sid,
 										keyed(left.bdid=right.bdid),
 										transform(myLayouts.layout_sancid, self.sanc_id := (integer)right.sanc_id),
-										keep(myConst.MAX_RECS_ON_JOIN));	
+										keep(myConst.MAX_RECS_ON_JOIN));
 		RETURN ds_recs_sids;
 	END;
-	
+
 	EXPORT getPIDSByDIDS(Dataset(myLayouts.deepDids) dids) := FUNCTION
 		search_key_pid := doxie_files.key_provider_did;
 		ds_recs_pids := join(dids,search_key_pid,
 										keyed(left.did=right.l_did),
 										transform(myLayouts.layout_provid, self.prov_id := right.providerid),
 										keep(myConst.MAX_RECS_ON_JOIN));
-										
-		RETURN ds_recs_pids;	
+
+		RETURN ds_recs_pids;
 	END;
-	
+
 	SHARED pid_npi_rec := record
      unsigned6 providerid;
 		doxie.ingenix_provider_module.ingenix_npi_rec;
 	end;
-	
-/*	EXPORT getNPIthruNPPES_Prov(dataset(pid_npi_rec) pid_npi_in, 
-															dataset(recordof(doxie_files.key_provider_id)) prov_id_in) := FUNCTION 
-			
+
+/*	EXPORT getNPIthruNPPES_Prov(dataset(pid_npi_rec) pid_npi_in,
+															dataset(recordof(doxie_files.key_provider_id)) prov_id_in) := FUNCTION
+
 		int_rec := record
 			unsigned seq;
 			doxie_files.key_provider_id;
 			pid_npi_rec - [providerid];
 		end;
-		
-		pid_npi_seq := project(pid_npi_in, transform(int_rec, self.seq := counter, 
-																													self.providerid := (string)left.providerid, 
-																													self := left, 
+
+		pid_npi_seq := project(pid_npi_in, transform(int_rec, self.seq := counter,
+																													self.providerid := (string)left.providerid,
+																													self := left,
 																													self := []));
-		
+
 		int_rec xform_wnpi(prov_id_in L, int_rec R) := transform
 			self := L;
 			self := R;
 		end;
-		
-		prov_npi := join(prov_id_in, pid_npi_seq, 
-										left.providerid = (string)right.providerid, 
+
+		prov_npi := join(prov_id_in, pid_npi_seq,
+										left.providerid = (string)right.providerid,
 										xform_wnpi(left, right));
-										
+
 		Healthcare_Provider_Services.MAC_VerifyNPIthruNPPES(prov_npi, verified_prov_npi,
 															prov_clean_lname,
 															prov_clean_fname,
@@ -181,20 +181,20 @@ export Functions := Module
 															prov_clean_zip,
 															providerid,
 															LastName);
-															
+
 		return verified_prov_npi;
 	END;
-	
-	EXPORT getNPIthruNPPES_SearchProv(dataset(doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt) prov_searchid_in) := FUNCTION 
-		
+
+	EXPORT getNPIthruNPPES_SearchProv(dataset(doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt) prov_searchid_in) := FUNCTION
+
 		seq_rec := record
 			unsigned seq;
 			// string did := '';
 			doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt;
 		end;
-		
+
 		seq_final := project(prov_searchid_in, transform(seq_rec, self.seq := counter, self := left, self := []));
-		
+
 		Healthcare_Provider_Services.MAC_VerifyNPIthruNPPES(seq_final,
 																												verified_npi,
 																												name[1].prov_clean_lname,
@@ -208,32 +208,32 @@ export Functions := Module
 																												address[1].prov_clean_sec_range,
 																												address[1].prov_clean_p_city_name,
 																												address[1].prov_clean_st,
-																												address[1].prov_clean_zip,	
+																												address[1].prov_clean_zip,
 																												providerid,
 																												Provider_Organization_Name);
-		
+
 		out_res := join(seq_final, verified_npi, left.seq = right.seq,
 										transform(doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt,
 															self.npi := right.npi,
 															self.NPPESVerified := right.NPPESVerified,
 															self := left));
-		
+
 		return out_res;
 	END;
 */
 	SHARED sid_npi_rec := doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report;
-	
+
 	EXPORT getNPIthruNPPES_Sanc(dataset(sid_npi_rec) sid_npi_in) := FUNCTION
 		int_rec := record
 			unsigned seq;
 			sid_npi_rec;
 		end;
-		
-		sanc_id_seq := project(sid_npi_in, transform(int_rec, 
+
+		sanc_id_seq := project(sid_npi_in, transform(int_rec,
 																								self.seq := counter,
 																								self := left));
 		sanc_id_seq_filtered := sanc_id_seq;
-		
+
 		Healthcare_Provider_Services.MAC_VerifyNPIthruNPPES(sanc_id_seq_filtered, verified_sanc_npi,
 																												Prov_Clean_lname,
 																												Prov_Clean_fname,
@@ -249,22 +249,22 @@ export Functions := Module
 																												ProvCo_Address_Clean_zip,
 																												sanc_id,
 																												SANC_BUSNME);
-		
-		sanc_final := join(sanc_id_seq, verified_sanc_npi, 
+
+		sanc_final := join(sanc_id_seq, verified_sanc_npi,
 											left.seq = right.seq,
-											transform(sid_npi_rec, 
+											transform(sid_npi_rec,
 																self.npi := right.npi,
 																self.nppesVerified := right.nppesVerified,
 																self := left),
 											left outer);
-																
+
 		RETURN sanc_final;
 	end;
 
-	EXPORT apply_penalty(dataset(myLayouts.sanc_penalty_recs) SanctionRec, 
-												IParams.searchParams aInputData) := FUNCTION												
-		
-		myLayouts.sanc_penalty_recs setPenalty(myLayouts.sanc_penalty_recs SanctionRecs) := TRANSFORM		
+	EXPORT apply_penalty(dataset(myLayouts.sanc_penalty_recs) SanctionRec,
+												IParams.searchParams aInputData) := FUNCTION
+
+		myLayouts.sanc_penalty_recs setPenalty(myLayouts.sanc_penalty_recs SanctionRecs) := TRANSFORM
 			tempIndvMod := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export city_field := SanctionRecs.provco_address_clean_p_city_name;
@@ -275,7 +275,7 @@ export Functions := Module
 				export postdir_field := SanctionRecs.provco_address_clean_postdir;
 				export prange_field := SanctionRecs.provco_address_clean_prim_range;
 				export predir_field := SanctionRecs.provco_address_clean_predir;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export state_field := SanctionRecs.provco_address_clean_st;
 				export suffix_field := SanctionRecs.provco_address_clean_addr_suffix;
 				export sec_range_field := SanctionRecs.provco_address_clean_sec_range;
@@ -293,19 +293,19 @@ export Functions := Module
 				export agehigh := 0;
 				export agelow := 0;
 			END;
-						
+
 			SELF.record_penalty:= AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod);
 			SELF := SanctionRecs;
 		END;
-	
-			penaltyRecs := project(SanctionRec, setPenalty(LEFT));					
+
+			penaltyRecs := project(SanctionRec, setPenalty(LEFT));
 		RETURN penaltyRecs;
 	END;
-	
-	EXPORT apply_penalty_prov(dataset(myLayouts.prov_penalty_recs) ProviderRec, 
-												IParams.searchParams aInputData) := FUNCTION												
-		
-		myLayouts.prov_penalty_recs setPenalty(myLayouts.prov_penalty_recs ProviderRecs) := TRANSFORM		
+
+	EXPORT apply_penalty_prov(dataset(myLayouts.prov_penalty_recs) ProviderRec,
+												IParams.searchParams aInputData) := FUNCTION
+
+		myLayouts.prov_penalty_recs setPenalty(myLayouts.prov_penalty_recs ProviderRecs) := TRANSFORM
 			tempIndvMod := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export city_field := ProviderRecs.prov_clean_p_city_name;
@@ -316,7 +316,7 @@ export Functions := Module
 				export postdir_field := ProviderRecs.prov_clean_postdir;
 				export prange_field := ProviderRecs.prov_clean_prim_range;
 				export predir_field := ProviderRecs.prov_clean_predir;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export state_field := ProviderRecs.prov_clean_st;
 				export suffix_field := ProviderRecs.prov_clean_addr_suffix;
 				export sec_range_field := ProviderRecs.prov_clean_sec_range;
@@ -334,25 +334,25 @@ export Functions := Module
 				export agehigh := 0;
 				export agelow := 0;
 			END;
-						
+
 			SELF.record_penalty:= AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod);
 			SELF := ProviderRecs;
 		END;
-	
-			penaltyRecs := project(ProviderRec, setPenalty(LEFT));					
+
+			penaltyRecs := project(ProviderRec, setPenalty(LEFT));
 		RETURN penaltyRecs;
 	END;
-	
-	EXPORT apply_penalty_nppes(dataset(myLayouts.NPPES_Layouts.temp_layout) NPPESRec, 
-												IParams.searchParams aInputData) := FUNCTION												
-		
-		myLayouts.NPPES_Layouts.nppes_penalty_recs setPenalty(myLayouts.NPPES_Layouts.temp_layout NPPESRecs) := TRANSFORM		
+
+	EXPORT apply_penalty_nppes(dataset(myLayouts.NPPES_Layouts.temp_layout) NPPESRec,
+												IParams.searchParams aInputData) := FUNCTION
+
+		myLayouts.NPPES_Layouts.nppes_penalty_recs setPenalty(myLayouts.NPPES_Layouts.temp_layout NPPESRecs) := TRANSFORM
 			tempIndvMod := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export fname_field := NPPESRecs.clean_name_provider.fname;
 				export lname_field := NPPESRecs.clean_name_provider.lname;
 				export mname_field := NPPESRecs.clean_name_provider.mname;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export pname_field := NPPESRecs.clean_norm_address.prim_name;
 				export postdir_field := NPPESRecs.clean_norm_address.postdir;
 				export prange_field := NPPESRecs.clean_norm_address.prim_range;
@@ -376,9 +376,9 @@ export Functions := Module
 				export agelow := 0;
 				// Input fields
 				export companyname := aInputData.companyname;
-				export lastname   := aInputData.lastname;       
-				export middlename := aInputData.middlename;     
-				export firstname  := aInputData.firstname;            				
+				export lastname   := aInputData.lastname;
+				export middlename := aInputData.middlename;
+				export firstname  := aInputData.firstname;
 				export prim_range := aInputData.prim_range;
 				export predir := aInputData.predir;
 				export prim_name := aInputData.prim_name;
@@ -388,25 +388,25 @@ export Functions := Module
 				export state := aInputData.state;
 				export zip := aInputData.zip;
 			END;
-						
+
 			SELF.record_penalty:= AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod);
 			SELF := NPPESRecs;
 		END;
-	
-			penaltyRecs := sort(project(NPPESRec, setPenalty(LEFT)), record_penalty);	
-			
+
+			penaltyRecs := sort(project(NPPESRec, setPenalty(LEFT)), record_penalty);
+
 		RETURN penaltyRecs;
 	END;
 
-	EXPORT apply_penalty_nppes_batch (dataset(Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty) NPPESRec) := function 
-		
-		Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty setPenalty(Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty rawNPPESRecs) := TRANSFORM		
+	EXPORT apply_penalty_nppes_batch (dataset(Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty) NPPESRec) := function
+
+		Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty setPenalty(Healthcare_Provider_Services.NPI_Layouts.batch_out_penalty rawNPPESRecs) := TRANSFORM
 			tempIndvMod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export fname_field := rawNPPESRecs.clean_name_provider.fname;
 				export lname_field := rawNPPESRecs.clean_name_provider.lname;
 				export mname_field := rawNPPESRecs.clean_name_provider.mname;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export pname_field := rawNPPESRecs.clean_location_address.prim_name;
 				export postdir_field := rawNPPESRecs.clean_location_address.postdir;
 				export prange_field := rawNPPESRecs.clean_location_address.prim_range;
@@ -430,9 +430,9 @@ export Functions := Module
 				export agelow := 0;
 				// Input fields
 				export companyname := rawNPPESRecs.comp_name;
-				export lastname   := rawNPPESRecs.Name_last;       
-				export middlename := rawNPPESRecs.Name_middle;     
-				export firstname  := rawNPPESRecs.Name_first;            				
+				export lastname   := rawNPPESRecs.Name_last;
+				export middlename := rawNPPESRecs.Name_middle;
+				export firstname  := rawNPPESRecs.Name_first;
 				export prim_range := rawNPPESRecs.prim_range;
 				export predir := rawNPPESRecs.predir;
 				export prim_name := rawNPPESRecs.prim_name;
@@ -450,7 +450,7 @@ export Functions := Module
 				export fname_field := rawNPPESRecs.clean_name_provider.fname;
 				export lname_field := rawNPPESRecs.clean_name_provider.lname;
 				export mname_field := rawNPPESRecs.clean_name_provider.mname;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export pname_field := rawNPPESRecs.clean_mailing_address.prim_name;
 				export postdir_field := rawNPPESRecs.clean_mailing_address.postdir;
 				export prange_field := rawNPPESRecs.clean_mailing_address.prim_range;
@@ -474,9 +474,9 @@ export Functions := Module
 				export agelow := 0;
 				// Input fields
 				export companyname := rawNPPESRecs.comp_name;
-				export lastname   := rawNPPESRecs.Name_last;       
-				export middlename := rawNPPESRecs.Name_middle;     
-				export firstname  := rawNPPESRecs.Name_first;            				
+				export lastname   := rawNPPESRecs.Name_last;
+				export middlename := rawNPPESRecs.Name_middle;
+				export firstname  := rawNPPESRecs.Name_first;
 				export prim_range := rawNPPESRecs.prim_range;
 				export predir := rawNPPESRecs.predir;
 				export prim_name := rawNPPESRecs.prim_name;
@@ -489,21 +489,21 @@ export Functions := Module
 				export zip := rawNPPESRecs.z5;
 				export bdid := '';//(string14)rawNPPESRecs.bdid;
 			END;
-						
+
 			pen_addr1 := AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod);
 			pen_addr2 := AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod2);
 			SELF.record_penalty:= pen_addr2;//if(pen_addr1>pen_addr2,pen_addr2,pen_addr1);
 			SELF := rawNPPESRecs;
 		END;
-	
-		penaltyRecs := sort(project(NPPESRec, setPenalty(LEFT)), record_penalty);	
-		// penaltyRecs := project(NPPESRec, setPenalty(LEFT));				
+
+		penaltyRecs := sort(project(NPPESRec, setPenalty(LEFT)), record_penalty);
+		// penaltyRecs := project(NPPESRec, setPenalty(LEFT));
 		RETURN penaltyRecs;
 	END;
 
-	
-	EXPORT apply_penalty_bdids(Dataset(myLayouts.deepBDids) bdids, 
-												IParams.reportParams aInputData) := FUNCTION												
+
+	EXPORT apply_penalty_bdids(Dataset(myLayouts.deepBDids) bdids,
+												IParams.reportParams aInputData) := FUNCTION
 
 		busData := RECORD
 		  unsigned2 penalt:=0;
@@ -512,7 +512,7 @@ export Functions := Module
 
 		rawdata:=join(bdids,Business_Header.Key_BH_Best,keyed(left.bdid=right.bdid),transform(busData, self:=right),keep(100));
 
-		busData setPenalty(busData RawRecs) := TRANSFORM		
+		busData setPenalty(busData RawRecs) := TRANSFORM
 			tempBusMod := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export city_field := RawRecs.city;
@@ -523,7 +523,7 @@ export Functions := Module
 				export postdir_field := RawRecs.postdir;
 				export prange_field := RawRecs.prim_range;
 				export predir_field := RawRecs.predir;
-				export ssn_field := '';  
+				export ssn_field := '';
 				export state_field := RawRecs.state;
 				export suffix_field := RawRecs.addr_suffix;
 				export sec_range_field := RawRecs.sec_range;
@@ -540,11 +540,11 @@ export Functions := Module
 				export agehigh := 0;
 				export agelow := 0;
 			END;
-						
+
 			SELF.penalt:= AutoStandardI.LIBCALL_PenaltyI.val(tempBusMod);
 			SELF := RawRecs;
 		END;
-	
+
 		//Penalize records and get lowest penalty record first
 		penaltyRecs := sort(project(rawdata, setPenalty(LEFT)),penalt);
 		//Filter results so that only records with the lowest penalty return
@@ -552,9 +552,9 @@ export Functions := Module
 		RETURN resultsbdids;
 	END;
 
-	EXPORT apply_penalty_clia(dataset(Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty) CLIARec) := FUNCTION												
-		
-		Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty setPenalty(Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty CLIARecs) := TRANSFORM		
+	EXPORT apply_penalty_clia(dataset(Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty) CLIARec) := FUNCTION
+
+		Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty setPenalty(Healthcare_Provider_Services.CLIA_Layouts.batch_out_penalty CLIARecs) := TRANSFORM
 			tempIndvMod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI.full,opt))
 				export allow_wildcard := false;
 				export pname_field := CLIARecs.clean_company_address_prim_name;
@@ -572,7 +572,7 @@ export Functions := Module
 				export fname_field := '';
 				export lname_field := '';
 				export mname_field := '';
-				export ssn_field := '';  
+				export ssn_field := '';
 				export did_field := '';
 				export city2_field := '';
 				export county_field := '';
@@ -599,27 +599,27 @@ export Functions := Module
 			SELF.record_penalty:= AutoStandardI.LIBCALL_PenaltyI.val_biz(tempIndvMod);
 			SELF := CLIARecs;
 		END;
-	
-			penaltyRecs := sort(project(CLIARec, setPenalty(LEFT)), record_penalty);	
-			
+
+			penaltyRecs := sort(project(CLIARec, setPenalty(LEFT)), record_penalty);
+
 		RETURN penaltyRecs;
 	END;
 
-	EXPORT cleanValue(STRING inputValue) := 
+	EXPORT cleanValue(STRING inputValue) :=
 	FUNCTION
 		RETURN stringlib.StringFilter(stringlib.StringToUpperCase(inputValue),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 	END;
-	EXPORT cleanValueNumbers(STRING inputValue) := 
+	EXPORT cleanValueNumbers(STRING inputValue) :=
 	FUNCTION
 		RETURN stringlib.StringFilter(stringlib.StringToUpperCase(inputValue),'0123456789');
 	END;
-	EXPORT checkCurrentLicense(iesp.share.t_Date inputValue) := 
+	EXPORT checkCurrentLicense(iesp.share.t_Date inputValue) :=
 	FUNCTION
 		licDate:= iesp.ECL2ESP.t_DateToString8(inputValue);
 		currentDate:=(string)ut.GetDate;
 		RETURN licDate>=currentDate;
 	END;
-	
+
 		shared verification := record
 				boolean MedicalSchoolNameVerified := false;
 				boolean gradYearVerified := false;
@@ -665,45 +665,45 @@ export Functions := Module
 				boolean License10Valid := false;
 			end;
 
-		export medicalSchoolNameVerified(dataset(iesp.healthcare.t_MedicalSchool) mschools, IParams.searchParams aInputData) := Function 
+		export medicalSchoolNameVerified(dataset(iesp.healthcare.t_MedicalSchool) mschools, IParams.searchParams aInputData) := Function
 			recs := project(mschools, transform(verification, self.MedicalSchoolNameVerified := if(BridgerScoreLib.companyScore(left.Name,aInputData.MedicalSchoolName)>.80,true,skip)));
 			return exists(recs);
 		end;
 
-		export gradYearVerified(dataset(iesp.healthcare.t_MedicalSchool) mschools, IParams.searchParams aInputData) := Function 
+		export gradYearVerified(dataset(iesp.healthcare.t_MedicalSchool) mschools, IParams.searchParams aInputData) := Function
 			recs := project(mschools, transform(verification, self.gradYearVerified := if(aInputData.GraduationYear=(integer)left.graduationyear and (integer)left.graduationyear <> 0,true,skip)));
 			return exists(recs);
 		end;
-		
-		export upinVerified(dataset(iesp.share.t_StringArrayItem) upins, IParams.searchParams aInputData) := Function 
+
+		export upinVerified(dataset(iesp.share.t_StringArrayItem) upins, IParams.searchParams aInputData) := Function
 			hasUPIN := aInputData.UPIN <> '';
 			recs := project(upins, transform(verification,self.upinVerified := if(cleanValue(left.value) = cleanValue(aInputData.UPIN) and cleanValue(left.value) <> '',true,skip)));
 			return hasUPIN and exists(recs);
 		end;
-		
-		export NpiExists(IParams.searchParams aInputData) := Function 
+
+		export NpiExists(IParams.searchParams aInputData) := Function
 			hasNPI := aInputData.NPI <> '';
-			tmp := dataset([{aInputData.NPI}],myLayouts.NPPES_Layouts.layout_npiid); 
+			tmp := dataset([{aInputData.NPI}],myLayouts.NPPES_Layouts.layout_npiid);
 			recs := getNPPESByNPI(tmp);
 			return hasNPI and exists(recs);
 		end;
 
-		export NpiVerified(dataset(iesp.share.t_StringArrayItem) npis, IParams.searchParams aInputData) := Function 
+		export NpiVerified(dataset(iesp.share.t_StringArrayItem) npis, IParams.searchParams aInputData) := Function
 			hasNPI := aInputData.NPI <> '';
 			recs := project(npis, transform(verification, self.npiVerified := if(cleanValue(left.value) = cleanValue(aInputData.NPI) and cleanValue(left.value) <> '',true,skip)));
 			return hasNPI and exists(recs);
 		end;
 
-		export NPIValid(dataset(iesp.npireport.t_NPIReport) npiRec, IParams.searchParams aInputData) := Function 
+		export NPIValid(dataset(iesp.npireport.t_NPIReport) npiRec, IParams.searchParams aInputData) := Function
 			hasNPI := aInputData.NPI <> '';
-			recs := project(npiRec, transform(verification, self.NPIValid := if(cleanValue(left.NPIInformation.NPINumber) = cleanValue(aInputData.NPI) and 
-																																					cleanValue(left.NPIInformation.NPINumber) <> '' and 
+			recs := project(npiRec, transform(verification, self.NPIValid := if(cleanValue(left.NPIInformation.NPINumber) = cleanValue(aInputData.NPI) and
+																																					cleanValue(left.NPIInformation.NPINumber) <> '' and
 																																					(length(trim(iesp.ECL2ESP.t_DateToString8(left.NPIInformation.DeactivationDate),all))=0 or length(trim(iesp.ECL2ESP.t_DateToString8(left.NPIInformation.ReactivationDate),all))>0),
 																																					true,skip)));
 			return hasNPI and exists(recs);
 		end;
-		
-		export NameVerified(dataset(iesp.share.t_Name) names, IParams.searchParams aInputData) := Function 
+
+		export NameVerified(dataset(iesp.share.t_Name) names, IParams.searchParams aInputData) := Function
 			hasFull := cleanValue(aInputData.unparsedfullname) <> '';
 			hasLast := cleanValue(aInputData.lastname) <> '';
 			hasInputtoVerify := hasFull or hasLast;
@@ -711,14 +711,14 @@ export Functions := Module
 			return hasInputtoVerify and exists(recs);
 		end;
 
-		export CompanyNamesVerified(dataset(iesp.share.t_Name) names, IParams.searchParams aInputData) := Function 
+		export CompanyNamesVerified(dataset(iesp.share.t_Name) names, IParams.searchParams aInputData) := Function
 			hasFull := cleanValue(aInputData.companyname) <> '';
 			hasInputtoVerify := hasFull;
 			recs := project(names, transform(verification, self.CompanyNameVerified := IF (ut.CompanySimilar100 (cleanValue(left.full), cleanValue(aInputData.companyname),true) < 60,true,skip)));
 			return hasInputtoVerify and exists(recs);
 		end;
-		
-		export AddressVerified(dataset(iesp.healthcare.t_HealthCareBusinessAddress) addr, IParams.searchParams aInputData) := Function 
+
+		export AddressVerified(dataset(iesp.healthcare.t_HealthCareBusinessAddress) addr, IParams.searchParams aInputData) := Function
 			hasPrimRange := cleanValue(aInputData.prim_range) <>'';
 			hasPrimName := cleanValue(aInputData.prim_name) <>'';
 			hasCity := cleanValue(aInputData.city) <>'';
@@ -729,35 +729,35 @@ export Functions := Module
 			hasInputAddrtoVerify := (hasPrimRange and hasPrimName) or hasFullAddr or (hasPrimName and hasCity);
 			input_range := if(hasFullAddr,cleanValue(cln_PrimRange),cleanValue(aInputData.prim_range));
 			input_name := if(hasFullAddr,cleanValue(cln_PrimName),cleanValue(aInputData.prim_name));
-			recs := project(addr, transform(verification, self.AddressVerified := if((cleanValue(left.Address.StreetNumber) = input_range and 
-																																									cleanValue(left.Address.StreetName) = input_name) or 														
-																																									cleanValue(left.Address.StreetAddress1) = cleanValue(aInputData.addr) or  
-																																									(cleanValue(left.Address.StreetName) = input_name and 
+			recs := project(addr, transform(verification, self.AddressVerified := if((cleanValue(left.Address.StreetNumber) = input_range and
+																																									cleanValue(left.Address.StreetName) = input_name) or
+																																									cleanValue(left.Address.StreetAddress1) = cleanValue(aInputData.addr) or
+																																									(cleanValue(left.Address.StreetName) = input_name and
 																																									cleanValue(left.Address.city) = cleanValue(aInputData.city)),true,skip)));
 			return hasInputAddrtoVerify and exists(recs);
 		end;
-		
-		export PhoneVerified(dataset(iesp.healthcare.t_HealthCareBusinessAddress) addressPhones, IParams.searchParams aInputData) := Function 
+
+		export PhoneVerified(dataset(iesp.healthcare.t_HealthCareBusinessAddress) addressPhones, IParams.searchParams aInputData) := Function
 			hasPhone := aInputData.Phone <> '';
 			recs := project(addressPhones.Phones, transform(verification, self.PhoneVerified := if(cleanValue(left.Phone10) = cleanValue(aInputData.Phone) and cleanValue(left.Phone10) <> '',true,skip)));
 			return hasPhone and exists(recs);
 		end;
-		
-		export FEINVerified(dataset(iesp.share.t_StringArrayItem) feins, dataset(iesp.share.t_StringArrayItem) taxids, IParams.searchParams aInputData) := Function 
+
+		export FEINVerified(dataset(iesp.share.t_StringArrayItem) feins, dataset(iesp.share.t_StringArrayItem) taxids, IParams.searchParams aInputData) := Function
 			hasTIN := aInputData.taxid <> '';
 			hasFEIN := aInputData.FEIN <> '';
 			hasInputValuetoVerify := hasTIN or hasFEIN;
 			recs := project(feins+taxids, transform(verification, self.FEINVerified := if((cleanValue(left.value) = cleanValue(aInputData.FEIN) or cleanValue(left.value) = cleanValue(aInputData.taxid)) and cleanValue(left.value) <> '',true,skip)));
 			return hasInputValuetoVerify and exists(recs);
 		end;
-		
-		export SSNVerified(dataset(iesp.share.t_StringArrayItem) ssns, IParams.searchParams aInputData) := Function 
+
+		export SSNVerified(dataset(iesp.share.t_StringArrayItem) ssns, IParams.searchParams aInputData) := Function
 			hasSSN := aInputData.SSN <> '';
 			recs := project(ssns, transform(verification, self.SSNVerified := if(cleanValue(left.value) = cleanValue(aInputData.SSN) and cleanValue(left.value) <> '',true,skip)));
 			return hasSSN and exists(recs);
 		end;
-		
-		export LicenseVerified(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData) := Function 
+
+		export LicenseVerified(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData) := Function
 			hasLicense := aInputData.LicenseNumber <> '' or aInputData.StateLicenses[1].LicenseNumber <> '';
 			hasLicenseState := aInputData.LicenseState <> '' or aInputData.StateLicenses[1].LicenseState <> '';
 			hasLicensetoVerify := hasLicense and hasLicenseState;
@@ -765,7 +765,7 @@ export Functions := Module
 			return hasLicensetoVerify and exists(recs);
 		end;
 
-		export LicenseValid(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData) := Function 
+		export LicenseValid(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData) := Function
 			hasLicense := aInputData.LicenseNumber <> '';
 			hasLicenseState := aInputData.LicenseState <> '';
 			hasLicensetoVerify := hasLicense and hasLicenseState;
@@ -773,58 +773,58 @@ export Functions := Module
 			return hasLicensetoVerify and exists(recs);
 		end;
 
-		export LicenseDSVerified(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData, integer rownum, dataset(iesp.healthcare.t_StateLicenseRecord) customerLicense = dataset([],iesp.healthcare.t_StateLicenseRecord)) := Function 
+		export LicenseDSVerified(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData, integer rownum, dataset(iesp.healthcare.t_StateLicenseRecord) customerLicense = dataset([],iesp.healthcare.t_StateLicenseRecord)) := Function
 			hasLicense := aInputData.StateLicenses[rownum].LicenseNumber <> '';
 			hasLicenseState := aInputData.StateLicenses[rownum].LicenseState <> '';
 			hasLicensetoVerify := hasLicense and hasLicenseState;
 			validCustomer := hasLicense and exists(customerLicense(LicenseNumber=aInputData.StateLicenses[rownum].LicenseNumber));
 			recs := project(licenses, transform(verification, self.LicenseVerified := if(validCustomer or
-																																										((cleanValue(left.LicenseNumber) = cleanValue(aInputData.StateLicenses[rownum].LicenseNumber) or 
-																																										cleanValueNumbers(left.LicenseNumber) = cleanValueNumbers(aInputData.StateLicenses[rownum].LicenseNumber)) and 
-																																										(cleanValue(left.LicenseState) = cleanValue(aInputData.StateLicenses[rownum].LicenseState) or aInputData.StateLicenses[rownum].LicenseState = '') and 
+																																										((cleanValue(left.LicenseNumber) = cleanValue(aInputData.StateLicenses[rownum].LicenseNumber) or
+																																										cleanValueNumbers(left.LicenseNumber) = cleanValueNumbers(aInputData.StateLicenses[rownum].LicenseNumber)) and
+																																										(cleanValue(left.LicenseState) = cleanValue(aInputData.StateLicenses[rownum].LicenseState) or aInputData.StateLicenses[rownum].LicenseState = '') and
 																																										cleanValue(left.LicenseNumber) <> ''),true,skip)));
 			return validCustomer or (hasLicensetoVerify and exists(recs));
 		end;
-		
-		export LicenseDSValid(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData, integer rownum, dataset(iesp.healthcare.t_StateLicenseRecord) customerLicense = dataset([],iesp.healthcare.t_StateLicenseRecord)) := Function 
+
+		export LicenseDSValid(dataset(iesp.healthcare.t_ProviderLicenseInfo) licenses, IParams.searchParams aInputData, integer rownum, dataset(iesp.healthcare.t_StateLicenseRecord) customerLicense = dataset([],iesp.healthcare.t_StateLicenseRecord)) := Function
 			hasLicense := aInputData.StateLicenses[rownum].LicenseNumber <> '';
 			hasLicenseState := aInputData.StateLicenses[rownum].LicenseState <> '';
 			hasLicensetoVerify := hasLicense and hasLicenseState;
 			validCustomer := hasLicense and exists(customerLicense(LicenseNumber=aInputData.StateLicenses[rownum].LicenseNumber)) and checkCurrentLicense(customerLicense(LicenseNumber=aInputData.StateLicenses[rownum].LicenseNumber)[1].ExpirationDate);
 			recs := project(licenses, transform(verification, self.LicenseVerified := if(validCustomer or
-																																									  ((cleanValue(left.LicenseNumber) = cleanValue(aInputData.StateLicenses[rownum].LicenseNumber) or 
-																																										cleanValueNumbers(left.LicenseNumber) = cleanValueNumbers(aInputData.StateLicenses[rownum].LicenseNumber)) and 
-																																										(cleanValue(left.LicenseState) = cleanValue(aInputData.StateLicenses[rownum].LicenseState) or aInputData.StateLicenses[rownum].LicenseState = '')  and 
-																																										cleanValue(left.LicenseNumber) <> '' and 
+																																									  ((cleanValue(left.LicenseNumber) = cleanValue(aInputData.StateLicenses[rownum].LicenseNumber) or
+																																										cleanValueNumbers(left.LicenseNumber) = cleanValueNumbers(aInputData.StateLicenses[rownum].LicenseNumber)) and
+																																										(cleanValue(left.LicenseState) = cleanValue(aInputData.StateLicenses[rownum].LicenseState) or aInputData.StateLicenses[rownum].LicenseState = '')  and
+																																										cleanValue(left.LicenseNumber) <> '' and
 																																										checkCurrentLicense(left.ExpirationDate)),true,skip)));
 			return validCustomer or (hasLicensetoVerify and exists(recs));
 		end;
-		
-		export CLIAVerified(dataset(iesp.cliasearch.t_CLIARecord) CliaRec, IParams.searchParams aInputData) := Function 
+
+		export CLIAVerified(dataset(iesp.cliasearch.t_CLIARecord) CliaRec, IParams.searchParams aInputData) := Function
 			hasClia := aInputData.CLIANumber <> '';
 			recs := project(CliaRec, transform(verification, self.CLIAVerified := if(cleanValue(left.CLIANumber) = cleanValue(aInputData.CLIANumber) and cleanValue(left.CLIANumber) <> '',true,skip)));
 			return hasClia and exists(recs);
 		end;
 
-		export CLIAValid(dataset(iesp.cliasearch.t_CLIARecord) CliaRec, IParams.searchParams aInputData) := Function 
+		export CLIAValid(dataset(iesp.cliasearch.t_CLIARecord) CliaRec, IParams.searchParams aInputData) := Function
 			hasClia := aInputData.CLIANumber <> '';
 			recs := project(CliaRec, transform(verification, self.CLIAVerified := if(cleanValue(left.CLIANumber) = cleanValue(aInputData.CLIANumber) and cleanValue(left.CLIANumber) <> '' and checkCurrentLicense(left.ExpirationDate),true,skip)));
 			return hasClia and exists(recs);
 		end;
-		
-		export DEAVerified(dataset(iesp.healthcare.t_DEAControlledSubstanceRecordEx) DEARec, IParams.searchParams aInputData) := Function 
+
+		export DEAVerified(dataset(iesp.healthcare.t_DEAControlledSubstanceRecordEx) DEARec, IParams.searchParams aInputData) := Function
 			hasDea := aInputData.DEA <> '';
 			recs := project(DEARec, transform(verification, self.DEAVerified := if((cleanValue(left.RegistrationNumber) = cleanValue(aInputData.DEA) or cleanValueNumbers(left.RegistrationNumber) = cleanValueNumbers(aInputData.DEA)) and cleanValue(left.RegistrationNumber) <> '',true,skip)));
 			return hasDea and exists(recs);
 		end;
 
-		export DEAValid(dataset(iesp.healthcare.t_DEAControlledSubstanceRecordEx) DEARec, IParams.searchParams aInputData) := Function 
+		export DEAValid(dataset(iesp.healthcare.t_DEAControlledSubstanceRecordEx) DEARec, IParams.searchParams aInputData) := Function
 			hasDea := aInputData.DEA <> '';
 			recs := project(DEARec, transform(verification, self.DEAVerified := if((cleanValue(left.RegistrationNumber) = cleanValue(aInputData.DEA) or cleanValueNumbers(left.RegistrationNumber) = cleanValueNumbers(aInputData.DEA)) and cleanValue(left.RegistrationNumber) <> '' and checkCurrentLicense(left.ExpirationDate),true,skip)));
 			return hasDea and exists(recs);
 		end;
 
-		export TaxonomyVerified(dataset(iesp.proflicense.t_Taxonomy) TaxonomyRec, IParams.searchParams aInputData) := Function 
+		export TaxonomyVerified(dataset(iesp.proflicense.t_Taxonomy) TaxonomyRec, IParams.searchParams aInputData) := Function
 			hasTaxonomy := aInputData.Taxonomy <> '';
 			recs := project(TaxonomyRec, transform(verification, self.TaxonomyVerified := if(cleanValue(left.TaxonomyCode) = cleanValue(aInputData.Taxonomy) and cleanValue(left.TaxonomyCode) <> '',true,skip)));
 			return hasTaxonomy and exists(recs);
@@ -833,7 +833,7 @@ export Functions := Module
 			 String15 taxonomy:='';
 			 unsigned1 inputrow:=0;
 		end;
-		export TaxonomyVerifiedMultiple(dataset(iesp.proflicense.t_Taxonomy) TaxonomyRec, IParams.searchParams aInputData, dataset(iesp.npireport.t_NPIReport) NPIData = dataset([],iesp.npireport.t_NPIReport)) := Function 
+		export TaxonomyVerifiedMultiple(dataset(iesp.proflicense.t_Taxonomy) TaxonomyRec, IParams.searchParams aInputData, dataset(iesp.npireport.t_NPIReport) NPIData = dataset([],iesp.npireport.t_NPIReport)) := Function
 			//Build hashtable of input Taxonomies
 			dsInput := dataset([{cleanValue(aInputData.Taxonomy),1},
 													{cleanValue(aInputData.Taxonomy2),2},
@@ -846,46 +846,46 @@ export Functions := Module
 			hasTaxonomy := aInputData.Taxonomy <> '' or aInputData.Taxonomy2 <> '' or aInputData.Taxonomy3 <> ''or aInputData.Taxonomy4 <> '' or aInputData.Taxonomy5 <> '';
 			return dsJoin(hasTaxonomy);
 		end;
-		
-		export CompanyNameVerified(string company_name, IParams.searchParams aInputData) := Function 
+
+		export CompanyNameVerified(string company_name, IParams.searchParams aInputData) := Function
 			hasCompanyNameToVerify := cleanValue(aInputData.companyName) <> '';
 			isSameCompanyName := cleanValue(company_name) = cleanValue(aInputData.companyName);
 			return hasCompanyNametoVerify and isSameCompanyName;
 		end;
-		
+
 		export MatchingInputVerified(dataset(myLayouts.NPPES_Layouts.temp_layout) in_data, IParams.searchParams aInputData) := FUNCTION
 			boolean hasNPI := aInputData.NPI <> '';
 			npi_verif_rec := project(in_data, transform(iesp.share.t_StringArrayItem, self.value := left.npi));
 			boolean hasMatchingNPI := NPIVerified(npi_verif_rec, aInputData);
-			
+
 			boolean hasName := aInputData.FirstName <> '' and aInputData.LastName <> '' or aInputData.CompanyName <> '';
-			name_verif_rec := project(in_data, transform(iesp.share.t_Name, self.first := left.provider_first_name, 
+			name_verif_rec := project(in_data, transform(iesp.share.t_Name, self.first := left.provider_first_name,
 																																			self.last := left.provider_last_name,
 																																			self.full := '',
 																																			self := []));
 			boolean hasMatchingPersonName := NameVerified(name_verif_rec, aInputData);
 			boolean hasMatchingCompanyName := CompanyNameVerified(in_data[1].provider_organization_name, aInputData);
 			boolean hasMatchingName := hasMatchingPersonName or hasMatchingCompanyName;
-			
+
 			boolean hasAddress := aInputData.addr <> '' and (aInputData.Zip <> '' or (aInputData.City <> '' and aInputData.State <> ''));
-			addr_verif_rec := project(in_data, transform(iesp.healthcare.t_HealthCareBusinessAddress, 
+			addr_verif_rec := project(in_data, transform(iesp.healthcare.t_HealthCareBusinessAddress,
 																				 self.Address.StreetNumber := left.clean_norm_address.prim_range,
 																				 self.Address.StreetName := left.clean_norm_address.prim_name,
 																				 self.Address.StreetAddress1 := address.Addr1FromComponents(left.clean_norm_address.prim_range,left.clean_norm_address.predir,
-																																																		 left.clean_norm_address.prim_name, left.clean_norm_address.addr_suffix, 
-																																																		 left.clean_norm_address.postdir, left.clean_norm_address.unit_desig, 
+																																																		 left.clean_norm_address.prim_name, left.clean_norm_address.addr_suffix,
+																																																		 left.clean_norm_address.postdir, left.clean_norm_address.unit_desig,
 																																																		 left.clean_norm_address.sec_range),
 																				 self.Address.City := left.clean_norm_address.p_city_name,
 																				 self := []));
-			boolean hasMatchingAddress := AddressVerified(addr_verif_rec, aInputData);																																																						
-			
-			boolean InputMatches := (hasMatchingNPI or ~hasNPI) and 
-														 (hasMatchingName or ~hasName)  and 
+			boolean hasMatchingAddress := AddressVerified(addr_verif_rec, aInputData);
+
+			boolean InputMatches := (hasMatchingNPI or ~hasNPI) and
+														 (hasMatchingName or ~hasName)  and
 														 (hasMatchingAddress or ~hasAddress);
 			return InputMatches;
 		end;
 
-		export SanctionMatchesProvider(dataset(doxie.ingenix_provider_module.layout_ingenix_provider_report) providers, dataset(doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report) sanctions) := Function 
+		export SanctionMatchesProvider(dataset(doxie.ingenix_provider_module.layout_ingenix_provider_report) providers, dataset(doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report) sanctions) := Function
 			sancRecIDs := project(sanctions,transform(myLayouts.layout_providerVerify,self.SANC_ID:=(integer)left.SANC_ID;self := left,self:=[]));
 			normIDs := NORMALIZE(providers,left.sanction_id,transform(myLayouts.layout_providerVerify,self.ProviderID:=(unsigned6)left.ProviderID,self.SANC_ID:=(integer)right.SANC_ID,self:=[]));
 			normdids := NORMALIZE(providers,left.providerdid,transform(myLayouts.layout_providerVerify,self.ProviderID:=(unsigned6)left.ProviderID,self.did:=right.did,self:=[]))(did<>'0');
@@ -914,25 +914,25 @@ export Functions := Module
 			end;
 			recsNpi := project(Npis, transform(tmpNpiRec,SELF.npi := left.npi;SELF.providerid := 0;self.NPITierTypeID :=0;self.NPPESVerified := 'No';));
 
-			nppes_ids_bynpi := join(recsNpi(npi<>''),NPPES.Key_NPPES_npi, keyed(left.npi=right.npi), 
+			nppes_ids_bynpi := join(recsNpi(npi<>''),NPPES.Key_NPPES_npi, keyed(left.npi=right.npi),
 															transform(tmpNpiRec, self.CompanyName:=right.provider_organization_name;
 																				self.FirstName := right.provider_first_name;
 																				self.LastName := right.provider_last_name;
 																				self.npi := left.npi;
 																				self:=[]), left outer, keep(100));
 			verifiedNpiLast := join(nppes_ids_bynpi, inputNames, left.LastName = right.LastName,
-																transform(tmpNpiRec, 
+																transform(tmpNpiRec,
 																self.NPI:=left.npi;
 																self.NPPESVerified:='YES';
 																self.ranking:=1;
 																self := left; self :=[]),
 																left outer, keep(100));
 			NpiFinal:=project(dedup(sort(verifiedNpiLast,npi,ranking),npi,ranking),transform(pid_npi_rec, self:= left;));
-			
-			tmpMod:= MODULE(PROJECT(gm, Healthcare_Provider_Services.IParams.searchParams,opt))		
-				EXPORT LastName := inputCriteria[1].name_last;      			
-				EXPORT FirstName := inputCriteria[1].name_first;      			
-				EXPORT MiddleName := inputCriteria[1].name_middle;      			
+
+			tmpMod:= MODULE(PROJECT(gm, Healthcare_Provider_Services.IParams.searchParams,opt))
+				EXPORT LastName := inputCriteria[1].name_last;
+				EXPORT FirstName := inputCriteria[1].name_first;
+				EXPORT MiddleName := inputCriteria[1].name_middle;
 				EXPORT CompanyName := inputCriteria[1].comp_name;
 				export predir := inputCriteria[1].predir;
 				export prim_range := inputCriteria[1].prim_range;
@@ -960,7 +960,7 @@ export Functions := Module
 /*		Export getCLIA(dataset(myLayouts.layout_slim_sanction) input) := Function
 			byClia := normalize(input,left.clianumbers,transform(Layouts.layout_slim_clia,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.clianumber:=right.clianumber;self:=[]));
 			cliaRaw := join(byClia,clia.keys().CLIA_Number.qa,keyed(left.clianumber=right.clia_number),
-													Healthcare_Provider_Services.CLIA_Transforms.acctPlusESDLRecords(left,right), 
+													Healthcare_Provider_Services.CLIA_Transforms.acctPlusESDLRecords(left,right),
 													keep(myConst.MAX_RECS_ON_JOIN), limit(0));
 			//Does this CLIA record really belong to what the user supplied as input?
 			//Join results back to input and compare business name found with business name user supplied
@@ -982,7 +982,7 @@ export Functions := Module
 			// output(cliaRaw,named('GetCLIA_cliaRaw'));
 			// output(cliaRawVerified,named('GetCLIA_cliaRawVerified'));
 			// output(results_rolled,named('GetCLIA_results_rolled'));
-			return results_rolled; 
+			return results_rolled;
 		end;*/
 		Export getCustomerLicenseData(dataset(myLayouts.autokeyInput) input) := function
 			myCustomerRecords := Healthcare_Services.Customer_License_Search_Records;
@@ -1026,7 +1026,7 @@ export Functions := Module
 			results_rolled := rollup(group(CustomerLicenseData,acctno),group,doRollup(left,rows(left)));
 			return results_rolled;
 		end;
-		Export appendCustomerLicenseData (dataset(myLayouts.autokeyInput) input, 
+		Export appendCustomerLicenseData (dataset(myLayouts.autokeyInput) input,
 														dataset(myLayouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
 			fmtRec_CustomerLicenseData := getCustomerLicenseData(input);
 			results := join(inputRecs,fmtRec_CustomerLicenseData, left.acctno=right.acctno,
@@ -1063,7 +1063,7 @@ export Functions := Module
 			results_rolled := rollup(group(CustomerDeathData,acctno),group,doRollup(left,rows(left)));
 			return results_rolled;
 		end;
-		Export appendCustomerDeathData (dataset(myLayouts.autokeyInput) input, 
+		Export appendCustomerDeathData (dataset(myLayouts.autokeyInput) input,
 																		dataset(myLayouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
 			fmtRec_CustomerDeathData := getCustomerDeathData(input);
 			results := join(inputRecs,fmtRec_CustomerDeathData, left.acctno=right.acctno,
@@ -1089,11 +1089,11 @@ export Functions := Module
 			convertedInputRecordsDerivedDid := join(input,getDerivedDids,left.acctno = (string)right.seq, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput, self.acctno := right.acctno; self.seq := right.seq; self.did:=right.did;self := left));
 			convertedInputRecordsDerivedNPI := join(input,getDerivedNPIs,left.acctno = (string)right.seq, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput, self.acctno := right.acctno; self.seq := right.seq; self.npi:=right.npi;self := left));
 			convertedInputRecords := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;
-			 mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
-			supressabms:=Suppress.MAC_FlagSuppressedSource(convertedInputRecords, mod_access); 
-      OptOutabms := project(supressabms, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]))   ;              
-			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(OptOutabms,cfg);	
-			abmsRecs := project(abmsRecsRaw,iesp.abms.t_ABMSResults);	
+			 mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
+			supressabms:=Suppress.MAC_FlagSuppressedSource(convertedInputRecords, mod_access);
+      OptOutabms := project(supressabms, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]))   ;
+			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(OptOutabms,cfg);
+			abmsRecs := project(abmsRecsRaw,iesp.abms.t_ABMSResults);
 			//Now that we have records back we need to rejoin them back to the correct acctno
 			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(mylayouts.layout_abms, self.acctno := right.AccountNumber; self := right));
 			relink2DerivedData := join(convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI,abmsRecs, left.acctno = right.AccountNumber, transform(mylayouts.layout_abms, self.acctno := (string)left.seq; self.AccountNumber:=(string)left.seq;self := right));
@@ -1101,14 +1101,14 @@ export Functions := Module
 			finalABMSData := sort(relink2InputAcctno+relink2DerivedData,acctno,if(isInputNPIMatched or isDerivedNPIMatched,1,2),_Penalty);
 			finalABMSDataDedup := dedup(finalABMSData,acctno,abmsbiogid);
 			reformatDedup := project(finalABMSDataDedup,iesp.abms.t_ABMSResults);
-			
+
 			myLayouts.layout_fullchild_abms doRollup(iesp.abms.t_ABMSResults l, dataset(iesp.abms.t_ABMSResults) r) := TRANSFORM
 				SELF.acctno := l.AccountNumber;
 				self.ProviderID := (unsigned6)l.ABMSBiogID;
 				self.childinfo := project(r,iesp.abms.t_ABMSResults);
 			END;
 			results_rolled := rollup(group(sort(reformatDedup,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID),group,doRollup(left,rows(left)));
-		
+
 			return results_rolled;
 		end;
 		Export appendABMSData (dataset(myLayouts.autokeyInput) input,

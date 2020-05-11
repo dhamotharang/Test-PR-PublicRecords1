@@ -1,4 +1,4 @@
-IMPORT  did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,standard;
+IMPORT  did_add, ut, business_header, business_header_ss;
 
 Layout.Taxpro_standard_base Trans(Layout.Taxpro_base Pinput)
    :=Transform
@@ -13,13 +13,13 @@ Layout.Taxpro_standard_base Trans(Layout.Taxpro_base Pinput)
 	 self.addr:=[];
 	 self:=pinput;
 	 end;
-	 
-dIn:=Mapping_IRS_Enrolled_Agent+Mapping_Practitioner; 
 
-	 
+dIn:=Mapping_IRS_Enrolled_Agent+Mapping_Practitioner;
+
+
 matchset := ['A','Z'];
 
-did_add.MAC_Match_Flex(dIn 
+did_add.MAC_Match_Flex(dIn
                        ,matchset
 					   ,foo
 					   ,foo
@@ -47,10 +47,10 @@ sBDIDMatchSet		   := ['A'];
 Business_Header_SS.MAC_Add_BDID_FLEX(dInC ,
 									 sBDIDMatchSet,
 									 company,
-									 prim_range, 
-									 prim_name, 
+									 prim_range,
+									 prim_name,
 									 zip5,
-									 sec_range, 
+									 sec_range,
 									 st,
 									 foo,
 									 foo,
@@ -59,16 +59,16 @@ Business_Header_SS.MAC_Add_BDID_FLEX(dInC ,
 									 false,
 									 BDID_Score,
 								     dPostBusHdrSourceMatch);
-									 
+
 dWithBusHdrSourceMatch          := dPostBusHdrSourceMatch(BDID != 0);
 dWithNoBusHdrSourceMatch        := dPostBusHdrSourceMatch(BDID = 0);
 
-business_header.MAC_Source_Match(dWithNoBusHdrSourceMatch  
+business_header.MAC_Source_Match(dWithNoBusHdrSourceMatch
                                  ,dPostBDID
                                  ,false
                                  ,BDID
                                  ,false
-                                 ,'Ta'     
+                                 ,'Ta'
                                  ,FALSE, corp_key
                                  ,company
                                  ,prim_range

@@ -1,6 +1,6 @@
 // proc_build_keys
 
-import doxie_files, doxie,ut,Address,did_Add,header_slimsort,watchdog,RoxieKeyBuild;
+import ut, RoxieKeyBuild;
 
 export proc_build_keys(string filedate) := function
 
@@ -9,11 +9,11 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(VINA.key_vin
 										  ,'~thor_data400::key::vina::'+filedate+'::vin'
 										  ,build_key_vin);
 
-//////////////////////////////////////////////////////////////////											
-											
+//////////////////////////////////////////////////////////////////
+
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::vina::vin'
 								     ,'~thor_data400::key::vina::'+filedate+'::vin'
-									 ,mv2blt_vin);		
+									 ,mv2blt_vin);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to QA
@@ -29,8 +29,7 @@ build_keys := sequential(
 		parallel(mv2blt_vin),
 		parallel(mv2qa_vin)
 	);
-	
-return build_keys;	
-	
-end;			  
-							
+
+return build_keys;
+
+end;

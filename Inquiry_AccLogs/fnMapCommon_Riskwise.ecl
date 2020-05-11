@@ -1,5 +1,4 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS;
-import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut;
 
 export fnMapCommon_Riskwise := module
 
@@ -11,14 +10,14 @@ NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
 inputfile := distribute(choosen(inquiry_acclogs.File_Riskwise_Logs.input
 																	,IF(n > 0, n, choosen:ALL)), random()) // choosen for testing purposes
-																		; 		
+																		;
 
 inquiry_acclogs.fncleanfunctions.cleanfields(inputfile, cleaned_fields);
 
 /* !!!!!!!!!!!!!!!!! NORMALIZE INPUT FILE !!!!!!!!!!!!!!!!!!!!! */
 normInputFile := normalize(cleaned_fields, 2, transform({inquiry_acclogs.Layout_Riskwise_Logs.denorm,
 																										string orig_transaction_type := '',
-																										string orig_global_company_id := ''}, 
+																										string orig_global_company_id := ''},
 								self.orig_fname 			:= choose(counter, left.orig_fname, left.orig_fname_2);
 								self.orig_mname 			:= choose(counter, left.orig_mname, left.orig_mname_2);
 								self.orig_lname 			:= choose(counter, left.orig_lname, left.orig_lname_2);
@@ -31,7 +30,7 @@ normInputFile := normalize(cleaned_fields, 2, transform({inquiry_acclogs.Layout_
 								self.orig_homephone 	:= choose(counter, left.orig_homephone, left.orig_homephone_2);
 								self.orig_workphone 	:= choose(counter, left.orig_workphone, left.orig_workphone_2);
 								self.orig_ssn 				:= choose(counter, left.orig_ssn, left.orig_ssn_2);
-								self.orig_business_name := choose(counter, if(left.orig_business_name = '', left.orig_business_name_2, left.orig_business_name), 
+								self.orig_business_name := choose(counter, if(left.orig_business_name = '', left.orig_business_name_2, left.orig_business_name),
 																													 if(left.orig_business_name_2 = '', left.orig_business_name, left.orig_business_name_2));
 								self.orig_dob 				:= choose(counter, left.orig_dob, left.orig_dob_2);
 								self.orig_email 			:= choose(counter, left.orig_email, left.orig_email_2);
@@ -43,7 +42,7 @@ normInputFile := normalize(cleaned_fields, 2, transform({inquiry_acclogs.Layout_
 
 inquiry_acclogs.File_MBSApp(normInputFile, 'RISKWISE', '', mbs_outfile)
 
-/* !!!!!!!!!!!!!!!!! REMOVE NULLS and MAKE ALL CAPS FOR EASY JOINING !!!!!!!!!!!!!!!!!!!!! */					
+/* !!!!!!!!!!!!!!!!! REMOVE NULLS and MAKE ALL CAPS FOR EASY JOINING !!!!!!!!!!!!!!!!!!!!! */
 removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 
 								self.orig_company_name1 := left.orig_business_name;
@@ -57,20 +56,20 @@ removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 								self.ssn := 		Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 								self.personal_phone := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_homephone);
 								self.work_phone := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_workphone);
-								
+
 								self.dob := 		Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
-							
+
 									fixDate := Inquiry_AccLogs.fncleanfunctions.tDateAdded(left.orig_date_added);
 									fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(fixDate);
-								self.DateTime := fixTime;	
+								self.DateTime := fixTime;
 
-								self.DL := left.orig_dl_number; 
+								self.DL := left.orig_dl_number;
 								self.Email_Address := left.orig_email;
 								self.LinkID := left.orig_unique_id;
 
 								self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 								self.COMPANY_ID := left.orig_company_id;
-						
+
 								self.Industry_1_Code 		:= left.Industry_Code_1;
 								self.Industry_2_Code 		:= left.Industry_Code_2;
 
@@ -81,13 +80,13 @@ removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 								self.Transaction_ID 		:= stringlib.stringtouppercase(left.orig_transaction_id);
 								self.Product_Code 			:= left.product_id;
 								self.Function_Description := map(left.description <> '' => left.description, left.orig_function_name);
-								self.PERSON_ORIG_IP_ADDRESS1 := Inquiry_Acclogs.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);				
+								self.PERSON_ORIG_IP_ADDRESS1 := Inquiry_Acclogs.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);
 								self.ORIG_IP_ADDRESS2 := map(self.PERSON_ORIG_IP_ADDRESS1 = '' => left.ORIG_IP_ADDRESS, '');
 								self.Sub_Market 				:= left.sub_market;
 								self.Vertical 					:= left.vertical;
-								
+
 								self.method := '';
-								
+
 								self.source_file := 'RISKWISE';
 								self := left;
 								self := []))(orig_lname + orig_company_name1 + orig_full_name1 <> '');// : persist('~persist::riskwise::clean');
@@ -98,13 +97,13 @@ end;
 
 export ready_File(dataset(inquiry_acclogs.Layout_In_Common) AppendForward, string select_source = 'RISKWISE') := function
 
-///////////////// PROJECT INTO PERSON QUERY LAYOUT 
-							
-person_project := project(AppendForward(repflag = '' and source_file = select_source), 
+///////////////// PROJECT INTO PERSON QUERY LAYOUT
+
+person_project := project(AppendForward(repflag = '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -114,11 +113,11 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -177,12 +176,12 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.person_q.Appended_ADL := left.appendadl;
 			self := []));
 
-bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), 
+bususer_project := project(AppendForward(repflag <> '' and source_file = select_source),
 			transform(inquiry_acclogs.Layout.Common,
-			
+
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -192,11 +191,11 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -206,7 +205,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.search_info.Transaction_Type := left.transaction_type;
 			self.search_info.Function_Description := left.function_description;
 			self.search_info.IPAddr := left.ORIG_IP_ADDRESS2;
-	
+
 			self.bus_q.CName := left.clean_cname1;
 							self.bus_q.domain_name := left.domain_name;
 							self.bus_q.ein := left.ein;
@@ -256,8 +255,8 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 
 update_records := bususer_project + person_project;
 
-return dedup(sort(distribute(update_records, hash(search_info.Transaction_ID))(mbs.company_id + mbs.global_company_id <> ''), 
+return dedup(sort(distribute(update_records, hash(search_info.Transaction_ID))(mbs.company_id + mbs.global_company_id <> ''),
 												record, local), record, local);
-end;		
+end;
 
 end;

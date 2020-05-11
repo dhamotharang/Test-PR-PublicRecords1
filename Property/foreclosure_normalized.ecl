@@ -2,7 +2,7 @@
 Normalizing by Name, Company name and address. The normalized file is used for did, bdid and ssn append.
 This file is used for building autokeys
 */
-import property, ut, header_slimsort, DID_Add, Business_Header_SS, MDR, Business_header, Address, Header, Watchdog;
+import property, ut, header_slimsort, DID_Add, Business_Header_SS, Business_header;
 
 foreclosureIn := property.File_Foreclosure_In;
 
@@ -35,13 +35,13 @@ normalizeDIDLayout := record
 	recordof(foreclosureIn);
 end;
 
-// by name (autokeys also will use normalization by company name) 
+// by name (autokeys also will use normalization by company name)
 normalizeDIDLayout normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := transform
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first);
 	self.name_middle := choose(nameCounter,l.name1_middle,l.name2_middle,l.name3_middle,l.name4_middle);
 	self.name_last := choose(nameCounter,l.name1_last,l.name2_last,l.name3_last,l.name4_last);
 	self.name_suffix := choose(nameCounter,l.name1_suffix,l.name2_suffix,l.name3_suffix,l.name4_suffix);
-	self.name_Company := choose(nameCounter,l.name1_company,l.name2_company,l.name3_company,l.name4_company);	
+	self.name_Company := choose(nameCounter,l.name1_company,l.name2_company,l.name3_company,l.name4_company);
 	self.site_prim_range :=l.situs1_prim_range;
 	self.site_predir :=l.situs1_predir;
 	self.site_prim_name :=l.situs1_prim_name;
@@ -54,7 +54,7 @@ normalizeDIDLayout normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := 
 	self.site_st:=l.situs1_st;
 	self.site_zip:=l.situs1_zip;
 	self.site_zip4:=l.situs1_zip4;
-	
+
 	self.name_indicator := nameCounter;
 	self := l;
 end;
@@ -93,7 +93,7 @@ did_add.MAC_Match_Flex(foreclosureBaseNormalized_src,matchset,
 											 site_prim_range,site_prim_name,site_sec_range,site_zip,site_st,foo,
 											 did,src_rec,
 											 true,did_score,75,foreclosureDID_src,true,src);
-//remove src 
+//remove src
 foreclosureDID := project(foreclosureDID_src, transform(normalizeDIDLayout, self := left));
 
 matchset_bdid := ['A'];
@@ -104,7 +104,7 @@ Business_Header_SS.MAC_Match_Flex(foreclosureDID,matchset_bdid,
 								 foo,foo,
 								 bdid,normalizeDIDLayout,
 								 true,bdid_score,foreclosureDID_BDID);
-											 
+
 DID_Add.MAC_Add_SSN_By_DID(foreclosureDID_BDID,did,ssn,appendSSN);
 
 appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, LOCAL);

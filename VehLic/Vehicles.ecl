@@ -1,4 +1,4 @@
-import VehLic, business_header, business_header_ss, did_add, ut, header_slimsort, header, VehicleCodes, WatchDog, didville, fair_isaac;
+import VehLic, business_header, business_header_ss, did_add, VehicleCodes;
 
 veh_zero := Vehicles_Contacts_Undid;
 veh_slim_rec := layout_slim_vehreg_v3;
@@ -8,10 +8,10 @@ matchset := ['A','D','S'];
 
 did_Add.MAC_Match_Flex
 	(veh_zero, matchset,						//see above
-	 feid_ssn, dob, fname, mname, lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip5, st, junk, 
+	 feid_ssn, dob, fname, mname, lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip5, st, junk,
 	 DID,
-	 veh_slim_rec, 
+	 veh_slim_rec,
 	 false, DID_Score_field,	//these should default to zero in definition
 	 75,
 	 outf1)		//try the dedup DIDing
@@ -27,7 +27,7 @@ business_header.MAC_Source_Match(outf1_psist,outf2,
 							prim_range,prim_name,sec_range,zip5,
 							false,foo,
 							false,foo);
-							
+
 o2_hasBDID := outf2(bdid != 0);
 o2_noBDID := outf2(bdid = 0);
 bmatch := ['A'];
@@ -83,7 +83,7 @@ veh_slim_rec tPutItBack(veh_slim_rec pOrig, rVerySlimRecord pSlim)
  ;
 
 veh_did_out := join(veh_did,dVerySlimOut,
-					 left.seq_no     = right.seq_no 
+					 left.seq_no     = right.seq_no
 				 and left.rec_source = right.rec_source,
 					 tPutItBack(left,right)
 					);

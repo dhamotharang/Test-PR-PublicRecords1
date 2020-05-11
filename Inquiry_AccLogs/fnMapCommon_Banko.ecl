@@ -1,20 +1,19 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS;
-import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut, lib_stringlib;
 
 export fnMapCommon_Banko := module
 
 export clean := function
 
 n := test_count; /* n - to test a sample set, 0 to run all */
-										
+
 NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
-inputfile := 
+inputfile :=
 					choosen(
 							inquiry_acclogs.File_Banko_logs.input(orig_company_id <> ''),IF(n > 0, n, choosen:ALL)); // choosen for testing purposes
 
 tinputfile := project(distribute(inputfile, random()), transform({string orig_global_company_id := '', recordof(inputfile)},
-																								self := left)); 
+																								self := left));
 
 inquiry_acclogs.fncleanfunctions.cleanfields(tinputfile, cleaned_fields);
 inquiry_acclogs.File_MBSApp(cleaned_fields, 'BANKO', '', mbs_outfile)
@@ -32,7 +31,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 														self.ORIG_MNAME := '';
 														self.ORIG_LNAME := left.orig_name_last;
 														self.ORIG_NAMESUFFIX := '';
-														
+
 														self.ORIG_ADDR1 := left.orig_address;
 														self.ORIG_LASTLINE1 := stringlib.stringcleanspaces(left.orig_CITY + ' ' + left.orig_state + ' ' + left.orig_zip);
 														self.ORIG_CITY1 := left.orig_city;
@@ -46,7 +45,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 														self.PERSONAL_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_phone);
 														self.COMPANY_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_phone);
 														self.DOB := Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
-				
+
 														self.ORIG_COMPANY_NAME1 := stringlib.stringcleanspaces(stringlib.stringfindreplace(left.ORIG_BUSINESS_NAME, ',', ', '));
 
 														self.BILLING_ID := left.billing_id;
@@ -63,7 +62,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 														self.TRANSACTION_ID := left.orig_transaction_id;
 														self.SEQUENCE_NUMBER := '';
 														self.METHOD := 'ONLINE';
-								
+
 														self.FCRA_purpose := left.orig_fcra_purpose;
 														self.GLB_purpose  := left.orig_glb_purpose;
 														self.DPPA_purpose := left.orig_dppa_purpose;
@@ -76,7 +75,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 														SELF.USE := LEFT.USE;
 
 														SELF.SOURCE_FILE := 'BANKO';
-							
+
 							self := []));// : persist('~persist::banko::clean');
 
 return cleanInput;
@@ -86,13 +85,13 @@ end;
 
 export ready_File(dataset(Inquiry_Acclogs.Layout_In_Common) AppendForward, string select_source = 'BANKO') := function
 
-///////////////// PROJECT INTO PERSON QUERY LAYOUT 
-							
-person_project := project(AppendForward(repflag = '' and source_file = select_source), 
+///////////////// PROJECT INTO PERSON QUERY LAYOUT
+
+person_project := project(AppendForward(repflag = '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -102,11 +101,11 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -163,13 +162,13 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
-			
+
 			self := []));
 
 bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -179,11 +178,11 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -238,7 +237,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.Appended_ADL := left.appendadl;
 
 			self := left;
-			self := []));							
+			self := []));
 
 // prev_base := inquiry_acclogs.file_MBSApp_Base.file(version);
 
@@ -246,9 +245,9 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 									// transform(inquiry_acclogs.Layout.Common,
 														// self := left));
 
-// OUTPUT UPDATES ONLY - 														
+// OUTPUT UPDATES ONLY -
 return dedup(sort(distribute(person_project + bususer_project, hash(search_info.Transaction_ID))
 																(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local);
 end;
-															
+
 end;
