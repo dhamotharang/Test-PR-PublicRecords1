@@ -27,6 +27,7 @@ EXPORT BatchService := MACRO
 	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 	 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
 	 self.DRM := gm.DataRestrictionMask;
+	 self.DPM := gm.DataPermissionMask;
 		self.IncludeSpecialties  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeLicenses  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeResidencies  := Healthcare_Shared.Constants.CFG_False;
