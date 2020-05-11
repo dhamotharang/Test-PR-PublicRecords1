@@ -8,7 +8,7 @@ IMPORT $, AutoStandardI, Doxie, iesp, Gateway;
 
 EXPORT CaAvmReportService := MACRO
 
-  ds_in := DATASET([], iesp.ca_avm_request.t_CaAvmReportRequest) : STORED('CaAvmReportRequest', FEW);
+  ds_in := DATASET([], iesp.gw_ca_avm_request.t_CaAvmReportRequest) : STORED('CaAvmReportRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
   iesp.ECL2ESP.SetInputBaseRequest(first_row);
   gws := Gateway.Configuration.Get();

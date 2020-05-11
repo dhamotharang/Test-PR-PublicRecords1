@@ -1,7 +1,7 @@
 IMPORT Gateway, iesp, Royalty, STD;
 
-req_layout := iesp.ca_avm_request.t_CaAvmReportRequest;
-resp_layout := iesp.ca_avm_response.t_CaAvmReportResponseEx;
+req_layout := iesp.gw_ca_avm_request.t_CaAvmReportRequest;
+resp_layout := iesp.gw_ca_avm_response.t_CaAvmReportResponseEx;
 
 EXPORT SoapCall_CaAvmReport(
   req_layout request,

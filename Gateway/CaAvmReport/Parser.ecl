@@ -1,6 +1,6 @@
 IMPORT Address, dx_gateway, Doxie, iesp, Suppress;
 
-gesp_resp_layout := iesp.ca_avm_response.t_CaAvmResponse;
+gesp_resp_layout := iesp.gw_ca_avm_response.t_CaAvmResponse;
 
 EXPORT parser := MODULE
 
@@ -10,7 +10,7 @@ EXPORT parser := MODULE
   // In total there will be 3 calls to the macro, one for each property dataset.
   getSuppressedNames(
     DATASET(iesp.share.t_StringArrayItem) names,
-    iesp.ca_avm_response.t_AddressType addr,
+    iesp.gw_ca_avm_response.t_GW_AddressType addr,
     doxie.IDataAccess mod_access)
   := FUNCTION
 
@@ -87,16 +87,16 @@ EXPORT parser := MODULE
 
   // Internal function. Will break names out of property layout and removes any that should be suppressed.
   // Returns the original properties layout.
-  cleanProperties(DATASET(iesp.ca_avm_response.t_PropertyType) properties, Doxie.IDataAccess mod_access) := FUNCTION
+  cleanProperties(DATASET(iesp.gw_ca_avm_response.t_gw_PropertyType) properties, Doxie.IDataAccess mod_access) := FUNCTION
 
     prop_seq_rec := RECORD
-      iesp.ca_avm_response.t_PropertyType;
+      iesp.gw_ca_avm_response.t_gw_PropertyType;
       unsigned2 seq;
     END;
 
     // Extract all names for each property. Check for suppression, and suppress as required.
     // Only the names themselves will be suppressed. https://jira.rsi.lexisnexis.com/browse/CCPA-941
-    iesp.ca_avm_response.t_PropertyType scrubNames(iesp.ca_avm_response.t_PropertyType L) := TRANSFORM
+    iesp.gw_ca_avm_response.t_gw_PropertyType scrubNames(iesp.gw_ca_avm_response.t_gw_PropertyType L) := TRANSFORM
 
       // Aggregate all names from child datasets.
       OwnerName := DATASET([{L.Info.OwnerName}], iesp.share.t_StringArrayItem);
@@ -116,14 +116,14 @@ EXPORT parser := MODULE
       SELF.Info.OwnerInfo.SellerArray := L.Info.OwnerInfo.SellerArray(value not in namesToSuppress);
 
       SELF.TransferInfoArray := PROJECT(L.TransferInfoArray,
-        TRANSFORM(iesp.ca_avm_response.t_PropertyTransferInfoType,
+        TRANSFORM(iesp.gw_ca_avm_response.t_gw_PropertyTransferInfoType,
           SELF.OwnerInfo.BuyerArray := LEFT.OwnerInfo.BuyerArray(value not in namesToSuppress),
           SELF.OwnerInfo.SellerArray := LEFT.OwnerInfo.SellerArray(value not in namesToSuppress),
           SELF := LEFT
       ));
 
       SELF.HistoricalTransactions.TransactionArray := PROJECT(L.HistoricalTransactions.TransactionArray,
-        TRANSFORM(iesp.ca_avm_response.t_HistoricalTransactionType,
+        TRANSFORM(iesp.gw_ca_avm_response.t_gw_HistoricalTransactionType,
           SELF.OwnerInfo.BuyerArray := LEFT.OwnerInfo.BuyerArray(value not in namesToSuppress),
           SELF.OwnerInfo.SellerArray := LEFT.OwnerInfo.SellerArray(value not in namesToSuppress),
           SELF := LEFT
@@ -137,10 +137,10 @@ EXPORT parser := MODULE
   END;
 
   // This function applies opt-out suppression to the CaAVMReport gateway response.
-  EXPORT CleanResponse(iesp.ca_avm_response.t_CaAvmResponse response, Doxie.IDataAccess mod_access) := FUNCTION
+  EXPORT CleanResponse(iesp.gw_ca_avm_response.t_CaAvmResponse response, Doxie.IDataAccess mod_access) := FUNCTION
 
-    iesp.ca_avm_response.t_CaAvmResponse clean_xform(iesp.ca_avm_response.t_CaAvmResponse L) := TRANSFORM
-      ds_property := DATASET([L.CaAvmResponse.ReportData.Property], iesp.ca_avm_response.t_PropertyType);
+    iesp.gw_ca_avm_response.t_CaAvmResponse clean_xform(iesp.gw_ca_avm_response.t_CaAvmResponse L) := TRANSFORM
+      ds_property := DATASET([L.CaAvmResponse.ReportData.Property], iesp.gw_ca_avm_response.t_gw_PropertyType);
       SELF.CaAvmResponse.ReportData.Property := cleanProperties(ds_property, mod_access)[1];
       SELF.CaAvmResponse.ReportData.PropertyList.PropertyArray :=
         cleanProperties(L.CaAvmResponse.ReportData.PropertyList.PropertyArray, mod_access);
@@ -153,8 +153,8 @@ EXPORT parser := MODULE
 
     cleanedResponse := PROJECT(response, clean_xform(LEFT));
 
-    // OUTPUT(DATASET([response], iesp.ca_avm_response.t_CaAvmResponse), NAMED('response'), EXTEND);
-    // OUTPUT(DATASET([cleanedResponse], iesp.ca_avm_response.t_CaAvmResponse), NAMED('cleaned_response'), EXTEND);
+    // OUTPUT(DATASET([response], iesp.gw_ca_avm_response.t_CaAvmResponse), NAMED('response'), EXTEND);
+    // OUTPUT(DATASET([cleanedResponse], iesp.gw_ca_avm_response.t_CaAvmResponse), NAMED('cleaned_response'), EXTEND);
 
     RETURN cleanedResponse;
 
