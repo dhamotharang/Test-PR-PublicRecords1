@@ -6,7 +6,7 @@ export	alloy_as_header(dataset(AlloyMedia_student_list.layouts.Layout_base) pAll
 	dAlloyAsSource	:=	AlloyMedia_student_list.alloy_as_source(pAlloy,pForHeaderBuild);
 
 	Header.Layout_New_Records Translate_Alloy_to_Header(dAlloyAsSource l) := transform
-		//don't even populate vendor dates because they can eventually get used in watchdog.bestaddress
+		//don't even populate vendor dates because they can eventually get used in watchdog/bestaddress
 		self.did                      :=	0;
 		self.rid                      :=	0;
 		self.src											:=	'AL';	//Is this ok as an identifier?

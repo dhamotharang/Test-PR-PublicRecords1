@@ -1,5 +1,4 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS;
-import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut;
 
 export fnMapCommon_BatchR3 := module
 
@@ -17,7 +16,7 @@ InputFile := choosen(Inquiry_acclogs.File_BatchR3_Logs.Input
 
 inquiry_acclogs.fncleanfunctions.cleanfields(InputFile, cleaned_fields);
 
-Inquiry_AccLogs.File_MBSApp(cleaned_fields, 'BATCHR3', '', outfileBatchR3); 
+Inquiry_AccLogs.File_MBSApp(cleaned_fields, 'BATCHR3', '', outfileBatchR3);
 
 filter_out_fcra := join(outfileBatchR3, inquiry_acclogs.Proc_Prod_R3Monitoring.File_PIDs(~isFcra), left.orig_global_company_id = right.gcid, lookup);
 
@@ -38,7 +37,7 @@ NormFiles := normalize(filter_out_fcra, 2,
 																				self.orig_city_1 := choose(counter, left.orig_city_1, '');
 																				self.orig_st_1 := choose(counter, left.orig_st_1, '');
 																				self.orig_zip_1 := choose(counter, left.orig_zip_1, '');
-																				
+
 																				self.orig_cname := choose(counter, '', left.orig_cname);
 																				self.orig_company_phone := choose(counter, '', left.orig_company_phone);
 																				self.orig_ein := choose(counter, '', left.orig_ein);
@@ -50,11 +49,11 @@ NormFiles := normalize(filter_out_fcra, 2,
 																				self.orig_city_2 := choose(counter, '', left.orig_city_1);
 																				self.orig_st_2 := choose(counter, '', left.orig_st_1);
 																				self.orig_zip_2 := choose(counter, '', left.orig_zip_1);
-																				self := left))(orig_cname <> '' or orig_full_name <> ''); 
+																				self := left))(orig_cname <> '' or orig_full_name <> '');
 
 clean_out :=  PROJECT(NormFiles,
-								TRANSFORM(Inquiry_AccLogs.layout_in_common, 
-										
+								TRANSFORM(Inquiry_AccLogs.layout_in_common,
+
 			self.orig_company_name1 := left.orig_cname;
 			self.orig_full_name1 := left.orig_full_name;
 														self.ORIG_FULL_NAME2 :='';
@@ -66,7 +65,7 @@ clean_out :=  PROJECT(NormFiles,
 			self.ORIG_LASTLINE1						:= stringlib.stringcleanspaces(self.orig_addr1 + ' ' + self.orig_city1 + ' ' + self.orig_state1 + ' ' + self.orig_zip1);
 			self.PERSON_ORIG_IP_ADDRESS1		:= Inquiry_Acclogs.fnCleanFunctions.fraudback(left.description, left.orig_IPADDR);
 			self.ORIG_IP_ADDRESS2		:= map(self.PERSON_ORIG_IP_ADDRESS1 = '' => left.orig_IPADDR, '');
-			
+
 			self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 			self.COMPANY_ID := left.orig_company_id;
 
@@ -75,7 +74,7 @@ clean_out :=  PROJECT(NormFiles,
 			self.Industry := left.industry;
 
 			self.allowflags := left.allowflags;
-			
+
 			self.Sequence_Number := left.orig_sequence_number;
 			self.Method := 'MONITORING';
 			self.Product_Code := left.product_id;
@@ -83,13 +82,13 @@ clean_out :=  PROJECT(NormFiles,
 																			 left.product_id = '2' => 'RISKWISE MONITORING',
 																			 left.product_id = '5' => 'BANKRUPTCY MONITORING', left.orig_method);
 			self.repflag	:= '';
-				
+
 			self.PERSONAL_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_personal_phone);
 			self.WORK_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_work_phone);
 			self.COMPANY_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_company_phone);
 			fixDate := Inquiry_AccLogs.fncleanfunctions.tDateAdded(left.orig_datetime);
 			fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(fixDate);
-			self.DateTime := fixTime;														
+			self.DateTime := fixTime;
 			self.SSN := Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 			self.DOB := Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
 
@@ -99,7 +98,7 @@ clean_out :=  PROJECT(NormFiles,
 			self.charter_number := left.orig_charter_number;
 			self.ucc_number 		:= left.orig_ucc_number;
 			self.linkid 				:= left.orig_linkid;
-			
+
 			self.source_file := 'BATCHR3';
 
 			self := LEFT;
@@ -111,11 +110,11 @@ end;
 
 export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCHR3') := function
 
-person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source), 
+person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -125,11 +124,11 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -145,7 +144,7 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 							self.bus_q.ein := left.ein;
 							self.bus_q.charter_number := left.Charter_Number;
 							self.bus_q.ucc_number := left.ucc_number;
-							
+
 			self.person_q.Full_Name :=  left.orig_full_name1;
 			self.person_q.Title := '';
 			self.person_q.First_Name :=  left.orig_fname;
@@ -195,11 +194,11 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 
 ///////////////// PROJECT INTO BUSINESS QUERY LAYOUT ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source), 
+bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -209,11 +208,11 @@ bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + e
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -258,7 +257,7 @@ bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + e
 			self.bus_q.appended_ein := left.appendtaxid;
 			self := []));
 
-return dedup(sort(distribute(person_project + bus_project, 
+return dedup(sort(distribute(person_project + bus_project,
 															hash(search_info.Sequence_Number + person_q.lname + bususer_q.lname + bus_q.cname))
 															(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local);
 

@@ -1,4 +1,4 @@
-import did_add, fair_isaac, didville, ut, header_slimsort, watchdog, 
+import did_add, ut,
        Business_Header, Business_Header_SS;
 
 
@@ -33,7 +33,7 @@ did_add.MAC_Match_Flex(df2, myset, ssn, foo, def_fname, def_mname, def_lname,
 	                     did_temp, temprec, true, did_score_temp, 70, outf)
 
 
-//did_add.MAC_Add_SSN_By_DID(outf, did_temp, ssn_appended_temp, out2, true)	
+//did_add.MAC_Add_SSN_By_DID(outf, did_temp, ssn_appended_temp, out2, true)
 out2 := outf;
 
 
@@ -53,7 +53,7 @@ Business_Header.MAC_Source_Match(to_bdid_company, bdid_init,
                         FALSE, phone_field,
                         FALSE, fein_field,
 				    TRUE, vendor_id)
- 
+
 bdid_match := bdid_init(bdid_new <> 0);
 
 bdid_nomatch := bdid_init(bdid_new = 0);
@@ -61,17 +61,17 @@ bdid_nomatch := bdid_init(bdid_new = 0);
 
 Business_Header_SS.MAC_Add_BDID_FLEX(
 	bdid_nomatch, business_matchset,
-	company_name, 
-	prim_range, prim_name, zip, 
+	company_name,
+	prim_range, prim_name, zip,
 	sec_range, state,
 	phone_field, fein_field,
-	bdid_new,	
+	bdid_new,
 	temprec,
 	false, BDID_Score_field,  //these should default to zero in definition
 	bdid_rematch)
-	
+
 out3 := to_bdid_no_company + bdid_match + bdid_rematch;
-	
+
 typeof(df) into(out3 L) := transform
 	boolean ssn_flag := If ((length(trim(L.ssn)) = 4 AND length(trim(L.ssn_appended_temp)) = 9 AND l.ssn[1..4] <> L.ssn_appended_temp[6..9]) OR
 					 (length(trim(L.ssn)) = 9 AND length(trim(L.ssn_appended_temp)) = 9 AND L.ssn <> L.ssn_appended_temp) OR
@@ -89,12 +89,8 @@ out4 := project(out3, into(LEFT));
 
 ut.MAC_SF_BuildProcess(out4, '~thor_data400::base::superior_liens_did', do_did);
 
-export did_superior_liens := 
+export did_superior_liens :=
 sequential(do_did);
  // : success(FileServices.sendemail(liens_superior.Spray_Notification_Email_Address,'Superior Liens Spray Succeeded', 'Superior Liens Spray Succeeded')),
    // failure(FileServices.sendemail(liens_superior.Spray_Notification_Email_Address,'Superior Liens Spray Failure','Superior Liens Spray Failure'))
- // ;   
-
-
-
-
+ // ;

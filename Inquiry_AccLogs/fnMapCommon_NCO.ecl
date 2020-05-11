@@ -1,4 +1,4 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut;
 
 export fnMapCommon_NCO := module
 
@@ -12,14 +12,14 @@ pinputfile := choosen(inquiry_acclogs.File_NCO_Logs.input(
 													stringlib.stringtouppercase(orig_company_id[1..3]) = 'NCO' and stringlib.stringtouppercase(orig_company_id[1..3]) not in ['','COMPANY_ID'] and
 																				(orig_full_name not in nullset or 						// remove records with null names and company names
 																				 orig_last_name not in nullset))
-																					,IF(n > 0, n, choosen:ALL)); 		
+																					,IF(n > 0, n, choosen:ALL));
 
 inputfile := distribute(project(pinputfile, transform({string orig_cid, inquiry_acclogs.Layout_NCO_Logs,
 															string fullname1 := '';
 															string fullname2 := '';
 															string line1 := '';
 															string line2 := ''},
-															
+
 														self.fullname1 := stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name);
 														self.fullname2 :=left.orig_full_name;
 														self.line1 := left.orig_addr1_street;
@@ -49,19 +49,19 @@ reconname := project(outfile, transform(Inquiry_AccLogs.layout_in_common,
 
 								fixDate := Inquiry_AccLogs.fncleanfunctions.tDateAdded(stringlib.stringfilterout(left.orig_datetime_stamp, '/'));
 								fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(fixDate);
-							self.DateTime := fixTime;	
-							
+							self.DateTime := fixTime;
+
 							self.orig_company_name1 := left.orig_company_name;
 							self.orig_fname := left.orig_first_name;
 							self.orig_mname := left.orig_middle_name;
 							self.orig_lname := left.orig_last_name;
-											
+
 							self.ORIG_ADDR1 		:= left.line1;
 							self.ORIG_LASTLINE1 := left.line2;
 							self.ORIG_CITY1 		:= left.orig_addr1_city;
 							self.ORIG_STATE1 		:= left.orig_addr1_state;
 							self.ORIG_ZIP1 			:= left.orig_addr1_zip;
-							
+
 							self.glb_purpose 		:= left.orig_glb_purpose;
 							self.dppa_purpose 	:= left.orig_dppa_purpose;
 							self.fcra_purpose 	:= left.orig_fcra_purpose;
@@ -78,18 +78,18 @@ reconname := project(outfile, transform(Inquiry_AccLogs.layout_in_common,
 							self.INDUSTRY_1_CODE 	:= left.industry_code_1;
 							self.INDUSTRY_2_CODE 	:= left.industry_code_2;
 							self.PERSON_ORIG_IP_ADDRESS1 := left.orig_ip_address_executed;
-							self.ORIG_IP_ADDRESS2 := left.orig_ip_address_initiated;														
-														
+							self.ORIG_IP_ADDRESS2 := left.orig_ip_address_initiated;
+
 							self.source_file 			:= 'NCO';
-							
+
 							self.email_address 		:= left.orig_email_address;
 							self.linkid 					:= left.orig_link_id;
-							
+
 							self.stop_monitor 		:= left.orig_stop_monitor;
-							
+
 							self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 							self.COMPANY_ID 			 := left.orig_company_id;
-							
+
 							self := left
 							,self := []
 							))(orig_full_name1 <> 'NO NAME');// : persist('~persist::nco::clean');
@@ -104,7 +104,7 @@ export ready_File(dataset(inquiry_acclogs.layout_in_common) SSNFile, string sele
 AppendForward := project(SSNFile(source_file = select_source), transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -114,11 +114,11 @@ AppendForward := project(SSNFile(source_file = select_source), transform(inquiry
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -147,7 +147,7 @@ AppendForward := project(SSNFile(source_file = select_source), transform(inquiry
 			self.person_q.Personal_Phone :=   left.personal_phone;
 			self.person_q.Work_Phone := left.work_phone;
 			self.person_q.DOB :=  left.dob;
-			self.person_q.DL :=  left.dl; 
+			self.person_q.DL :=  left.dl;
 			self.person_q.DL_St := left.dl_state; // unique id
 			self.person_q.Email_Address := left.email_address;
 			self.person_q.SSN :=  left.ssn;
@@ -179,11 +179,11 @@ AppendForward := project(SSNFile(source_file = select_source), transform(inquiry
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.appended_adl := left.appendadl;
 			self.person_q.appended_ssn := left.appendssn;
-			
+
 			self.search_info.Start_Monitor := left.datetime[..8];
 			self.search_info.Stop_Monitor := left.Stop_Monitor;
 
-						
+
 			self := left;
 			self := []));
 
@@ -203,7 +203,7 @@ jnToMBS := 	join(prev_base, dedup(Inquiry_AccLogs.File_MBS.File(id = '8135331' a
 																			self.bus_intel.Industry_2_Code 				:= map(right.mbs_Industry_Code_2 <> '' => right.mbs_Industry_Code_2, left.bus_intel.Industry_2_Code);
 																			self.bus_intel.Sub_market							:= if(right.sub_market <> '', right.sub_market, left.bus_intel.sub_market);
 																			self.bus_intel.Vertical 							:= if(right.vertical <> '', right.vertical, left.bus_intel.vertical);
-																			self.bus_intel.Use 										:= if(right.use <> '', right.use, left.bus_intel.use); 
+																			self.bus_intel.Use 										:= if(right.use <> '', right.use, left.bus_intel.use);
 																			self.bus_intel.Industry 							:= if(right.industry <> '', right.industry, left.bus_intel.industry);
 																			self := left),
 													left outer, lookup);
@@ -216,8 +216,8 @@ distrNewBase := distribute(baseMBS + AppendForward, hash(search_info.Sequence_Nu
 
 dedNewBase := dedup(sort(distrNewBase, search_info.Sequence_Number, search_info.Login_History_ID, -search_info.Stop_Monitor, local),
 														 search_info.Sequence_Number, search_info.Login_History_ID, local);
-														 
-			
+
+
 return dedNewBase;
 end;
 
