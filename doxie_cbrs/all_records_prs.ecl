@@ -1,11 +1,12 @@
 ﻿import doxie_crs,doxie,LN_PropertyV2_Services;
 
 export all_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1,
-                                                             boolean include_ofac = false, real global_watchlist_threshold = 0.8
+                                                             boolean include_ofac = false, real global_watchlist_threshold = 0.8,
+                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 ) := FUNCTION
 
 //***** MY RECORDSETS
-cntr := doxie_cbrs.count_records_prs(bdids, ofac_version, include_ofac, global_watchlist_threshold);
+cntr := doxie_cbrs.count_records_prs(bdids, ofac_version, include_ofac, global_watchlist_threshold, mod_access);
 tarr := doxie_cbrs.best_records_prs_target(bdids);
 hirr := doxie_cbrs.hierarchy_records;
 idnr := doxie_cbrs.ID_Number_records(bdids);
@@ -26,7 +27,7 @@ conr := doxie_cbrs.contact_records_prs_max(bdids);
 pror := doxie_cbrs.property_records_prs_byAddress_max(bdids);
 // pro2r:= doxie_cbrs.property_records_v2; //removing at least for now as it is unused
 idor := doxie_cbrs.Internet_Domains_records_max(bdids);
-dnbr := doxie_cbrs.DNB_records_max(bdids);
+dnbr := doxie_cbrs.DNB_records_max(bdids, mod_access);
 rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids);
 ypar := doxie_cbrs.YellowPages_records_prs_max(bdids);
 patr := doxie_cbrs.Patriot_records_max(ofac_version, include_ofac, global_watchlist_threshold);

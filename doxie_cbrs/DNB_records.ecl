@@ -1,7 +1,7 @@
 ﻿import dnb, codes, business_header, doxie, ut;;
 doxie_cbrs.mac_Selection_Declare()
 
-export DNB_records(dataset(doxie_cbrs.layout_references) in_bdids) := FUNCTION
+export DNB_records(dataset(doxie_cbrs.layout_references) in_bdids, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 //**** keep the group bdids but the target info for comparison
 outrec := record
@@ -43,7 +43,7 @@ dnk keepr(bdids l, dnb.key_DNB_BDID r) := transform
 	self := r;
 	self := l;
 end;
-dnos := join(bdids, dnb.key_DNB_BDID, keyed(left.bdid = right.bd), keepr(left,right));
+dnos := join(bdids, dnb.key_DNB_BDID, keyed(left.bdid = right.bd) and mod_access.use_DNB(), keepr(left,right));
 
 k := dnb.key_DNB_DunsNum;
 
@@ -64,7 +64,7 @@ end;
 
 //**** pick the best ONE
 
-alldnb := join(dedup(dnos, all), k, keyed(left.duns_number = right.duns), keepk(left, right));
+alldnb := join(dedup(dnos, all), k, keyed(left.duns_number = right.duns) and mod_access.use_DNB(), keepk(left, right));
 srtdnb := sort(alldnb, if(bdid in set(in_bdids,bdid),0,1),
 											 // coMatch,
 											 // -zipMatch,

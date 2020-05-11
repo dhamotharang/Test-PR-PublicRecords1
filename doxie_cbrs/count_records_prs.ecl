@@ -6,7 +6,8 @@ unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, 
 		 count_simple,
 		 count_shown);
 
-export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8) := dataset([{
+export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8,
+                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := dataset([{
 	get_Count(
 		Include_CorporationFilings_val,
 		Max_CorporationFilings_val,
@@ -50,7 +51,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		max_AssociatedBusinesses_val,
 		count(doxie_cbrs.Associated_Business_byContact_records_max(bdids)),
 		doxie_cbrs_raw.Associated_Business_byContact(bdids).record_count(true)),
-	(unsigned3)count(doxie_cbrs.DNB_records(bdids)),
+	(unsigned3)count(doxie_cbrs.DNB_records(bdids, mod_access)),
 	get_Count(
 		Include_InternetDomains_val,
 		max_InternetDomains_val,

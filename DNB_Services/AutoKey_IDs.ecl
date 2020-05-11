@@ -1,4 +1,4 @@
-import AutoKeyB2,AutoKeyI,doxie,doxie_cbrs,ut,dnb,dnb_Services;
+﻿import AutoKeyB2,AutoKeyI,doxie,doxie_cbrs,ut,dnb,dnb_Services;
 
 export AutoKey_IDs := module
 	export params := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface)
@@ -14,6 +14,8 @@ export AutoKey_IDs := module
 		ak_skipSet		:= c.ak_skipSet;
 		ak_typeStr		:= c.ak_typeStr;
 		str_autokeyname	:= c.str_autokeyname;
+    
+  mod_access := project(in_mod, Doxie.IDataAccess, opt);
 		
 		tempmod := module(project(in_mod,AutoKeyI.AutoKeyStandardFetchArgumentInterface,opt))
 			export string autokey_keyname_root := str_autokeyname;
@@ -22,27 +24,29 @@ export AutoKey_IDs := module
 			export boolean useAllLookups := true;
 		end;
 		ids := AutoKeyI.AutoKeyStandardFetch(tempmod).ids;
+  ids_suppressed := IF(mod_access.use_DNB(), ids);
 		// hitting company keys and person keys.
 		
 			
-		AutokeyB2.mac_get_payload(ids, str_autokeyname, ak_dataset, outpl, 0, bdid, ak_typeStr)
-		by_auto := dedup(sort(project(outpl,
+		AutokeyB2.mac_get_payload(ids_suppressed, str_autokeyname, ak_dataset, outpl, 0, bdid, ak_typeStr)
+  outpl_suppressed := IF(mod_access.use_DNB(), outpl);
+		by_auto := dedup(sort(project(outpl_suppressed,
 	      	transform (dnb_Services.Layouts.dnbNumberPlus, 
 								 self.duns_number := left.duns_number,
 								 self.bdid :=left.bdid;
 								 self := [] )),record),record);
 
 	
-		hasbdid	:= outpl((unsigned6) bdid > 0 and ~AutokeyB2.ISFakeID((unsigned6) bdid, ak_typeStr));										
+		hasbdid	:= outpl_suppressed((unsigned6) bdid > 0 and ~AutokeyB2.ISFakeID((unsigned6) bdid, ak_typeStr));										
 		newbdids	:= join(
-					hasbdid, ids(isbdid),
+					hasbdid, ids_suppressed(isbdid),
 					left.id = right.id,
 					transform(doxie_cbrs.layout_references, 
 							self.bdid := left.bdid),
 							limit(dnb_services.constants.MAX_RECS_ON_JOIN,skip));
 
 
-		temp_dnb_ids := dnb_Services.Raw.byBDIDs(newbdids);		
+		temp_dnb_ids := dnb_Services.Raw.byBDIDs(newbdids, mod_access);		
 		
     // project here into layout search setting deep dive to true
 		dnbID_ids := project(temp_dnb_ids, 

@@ -1,10 +1,11 @@
-import doxie,doxie_cbrs,dnb_services, dnb, iesp, Census_Data, Codes;
+﻿import doxie,doxie_cbrs,dnb_services, dnb, iesp, Census_Data, Codes;
 
 export Raw := module
 				
-		export Layouts.dnbNumberPlus byBDIDs(dataset(doxie_cbrs.layout_references) in_bdids) := function
+		export Layouts.dnbNumberPlus byBDIDs(dataset(doxie_cbrs.layout_references) in_bdids,
+                                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 			deduped := dedup(sort(in_bdids,bdid),bdid);
-			joinup := join(deduped,dnb.Key_dnb_BDID,keyed(left.bdid = right.bd),transform(Layouts.dnbNumberPlus,
+			joinup := join(deduped,dnb.Key_dnb_BDID,keyed(left.bdid = right.bd) and mod_access.use_DNB(),transform(Layouts.dnbNumberPlus,
 				self.duns_number := right.duns_number,
 				self.bdid := right.bd,
 				self := right),limit(dnb_services.constants.max_recs_on_bdid_join, skip));
@@ -13,10 +14,11 @@ export Raw := module
 			// output(dedup_joinup);
 			return dedup_joinup;
 		end;		
-		export Layouts.dnbNumberPlus bydunsnumber(dataset(Layouts.dnbNumberPlus) in_dunsnumber) := function
+		export Layouts.dnbNumberPlus bydunsnumber(dataset(Layouts.dnbNumberPlus) in_dunsnumber,
+                                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 			deduped := dedup(sort(in_dunsnumber,duns_number),duns_number);
 			joinup := join(deduped,dnb.Key_dnb_dunsNum,
-											keyed(left.duns_number =  right.duns),
+											keyed(left.duns_number =  right.duns) and mod_access.use_DNB(),
 												 transform(Layouts.dnbNumberPlus,														 
 															 self.duns_number  := right.duns,
 															 self.bdid := right.bdid,
