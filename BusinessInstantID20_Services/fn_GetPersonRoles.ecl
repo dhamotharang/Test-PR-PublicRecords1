@@ -1,4 +1,4 @@
-﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD;
+﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD, Doxie, BusinessInstantID20_Services ;
 
 // The following function finds the title for each Auth Rep at the time of the HistoryDate.
 EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInputWithLexIDs,
@@ -7,6 +7,13 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 													BIPV2.mod_sources.iParams linkingOptions,
 													SET OF STRING2 AllowedSourcesSet) := 
 	FUNCTION
+
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := options.GLBA_Purpose;
+      EXPORT dppa := options.DPPA_Purpose;
+      EXPORT DataPermissionMask := options.DataPermissionMask;
+      EXPORT DataRestrictionMask := options.DataRestrictionMask;
+    END;
 	
 		commonTitleChars := '- ,';
 		alphabeticChars := _Validate.Strings.Alpha_Upper + _Validate.Strings.Alpha_Lower + commonTitleChars;
@@ -17,7 +24,8 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 																						 0, // ScoreThreshold --> 0 = Give me everything
 																						 linkingOptions,
 																						 Business_Risk_BIP.Constants.Limit_Default,
-																						 Options.KeepLargeBusinesses
+																						 Options.KeepLargeBusinesses,
+																						 mod_access
 																		 );
 		// 1. Add back our Seq numbers.
 		ds_contactLinkids_seq_pre := 

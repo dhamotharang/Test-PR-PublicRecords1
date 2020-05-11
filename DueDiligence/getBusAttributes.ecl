@@ -15,6 +15,8 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
      mod_access := MODULE(Doxie.IDataAccess)
       EXPORT glb := options.GLBA_Purpose;
       EXPORT dppa := options.DPPA_Purpose;
+      EXPORT DataPermissionMask := options.DataPermissionMask;
+      EXPORT DataRestrictionMask := options.DataRestrictionMask;
       EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
       EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
