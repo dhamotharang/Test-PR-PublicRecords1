@@ -1,4 +1,4 @@
-﻿import RiskWise, dx_Gong, ut, business_header_ss, mdr, std, Doxie, Suppress;
+﻿import RiskWise, dx_gong, ut, business_header_ss, mdr, std, Doxie, Suppress, Business_Risk;
 
 export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
                                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
@@ -19,7 +19,7 @@ layout_out := record
 end;
 
 
-bqi_stat := business_risk.get_BH_BQI_Stats_hist(biid);
+bqi_stat := business_risk.get_BH_BQI_Stats_hist(biid, mod_access);
 
 layout_out append_bqi(biid le, bqi_stat rt) := transform
 	self.seq := le.seq,
@@ -56,7 +56,7 @@ bdid_tbl_init := join(biid, bqi_stat,
 						  left.bdid=right.bdid,
 						  append_bqi(left, right), keep(1));
 
-kgh := dx_Gong.Key_History_BDID();
+kgh := dx_gong.Key_History_BDID();
 layout_gong_slim := record
 	kgh.bdid;
 	kgh.phone10;

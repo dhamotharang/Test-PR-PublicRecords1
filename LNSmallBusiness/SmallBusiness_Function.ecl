@@ -266,7 +266,8 @@ EXPORT SmallBusiness_Function(
                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
                                                                                            TransactionID := TransactionID, 
                                                                                            BatchUID := BatchUID, 
-                                                                                           GlobalCompanyID := GlobalCompanyID);
+                                                                                           GlobalCompanyID := GlobalCompanyID,
+                                                                                           DataPermission := DataPermission);
 
 	model := case( model_name,
 		'rvs811_0' => Models.RVS811_0_0( clam, bshell ),
