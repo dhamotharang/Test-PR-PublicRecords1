@@ -200,5 +200,6 @@ export BillingIndex := MODULE
     export FP1704_1     := '181'; //FP1704_1 - Fraudpoint 3.0 Custom Model for Ford (181 % 100 + 30 = 111)          
     export FP1902_1     := '182'; //FP1902_1 - Fraudpoint 3.0 Custom Model for elevate(182 % 100 + 30 = 112)    
     export DI31906_0    := '183'; //DI31906_0 - ThreatMetrix Flagship Model(183 - 70 = 113)    
+    export FP1909_2    	:= '185'; //FP1909_2 - Fraudpoint 3.0 Custom Model for Fifth Third (185 - 70 = 115)    
   
 END;
