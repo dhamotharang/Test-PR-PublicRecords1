@@ -1,4 +1,4 @@
-  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
+﻿  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
 
   pfLayouts     := PhoneFinder_Services.Layouts;
   lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -550,6 +550,7 @@
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
+      SELF.Prepaid                 := pInput.Prepaid, 
       SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
                                                               pInput.predir, pInput.postdir, pInput.suffix,
                                                               pInput.unit_desig, pInput.sec_range,
