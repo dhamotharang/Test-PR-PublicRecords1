@@ -2,6 +2,11 @@
 
 EXPORT Layouts2 := MODULE
 
+export rRawFile := RECORD				// raw incoming file prior to processing
+		string	text;
+		string	filename{ VIRTUAL( logicalfilename ) };
+END;
+
 // Address Record – AD01
 export rAddress := RECORD
 	string4			RecordCode;
