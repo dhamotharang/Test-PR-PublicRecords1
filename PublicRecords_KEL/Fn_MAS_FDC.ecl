@@ -1,4 +1,4 @@
-IMPORT ADVO, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Corp2, 
+﻿IMPORT ADVO, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Corp2, 
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, DMA, Doxie, Doxie_Files, DriversV2, dx_BestRecords, DX_Email, 
 		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, EBR, Email_Data, FAA, FBNv2, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
@@ -733,8 +733,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	// --------------------[ Aircraft records ]--------------------
 
 	// FAA.key_aircraft_did has a parameter to say if FCRA or nonFCRA - same file layout
-	Key_Aircraft_did_Records := 
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, FAA.key_aircraft_did(Options.isFCRA),
+	Key_Aircraft_did_Records := //	Not in Uses, no dates being mapped does not need DateSelector
+			JOIN(Input_FDC, FAA.key_aircraft_did(Options.isFCRA),
 				Common.DoFDCJoin_Aircraft_Files__FAA__Aircraft_did = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
@@ -745,7 +745,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	// FAA.key_aircraft_id has a parameter to say if FCRA or nonFCRA - same file layout		
 	Key_Aircraft_ID_Records := 
@@ -775,8 +775,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	// --------------------[ Watercraft records ]--------------------
 
 	// Watercraft.key_watercraft_did has a parameter to say if FCRA or nonFCRA - same file layout
-	Key_Watercraft_did_Records := 
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, Watercraft.key_watercraft_did(Options.isFCRA),
+	Key_Watercraft_did_Records := //	Not in Uses, no dates being mapped does not need DateSelector
+			JOIN(Input_FDC, Watercraft.key_watercraft_did(Options.isFCRA),
 				Common.DoFDCJoin_Watercraft_Files__Watercraft_DID = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.l_did),
@@ -787,7 +787,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	// Watercraft.key_watercraft_sid has a parameter to say if FCRA or nonFCRA - same file layout		
 	//
@@ -1109,8 +1109,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := []));	
 	
 	// DNM: consumer address only; use consumer address data
-	Key_DNM_Name_Address_Records := 
-		PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_Address_All, DMA.Key_DNM_Name_Address,
+	Key_DNM_Name_Address_Records := //	Key has no dates does not need DateSelector
+		JOIN(Input_Address_All, DMA.Key_DNM_Name_Address,
 				Common.DoFDCJoin_DMA__Key_DNM_Name_Address = TRUE AND
 				LEFT.PrimaryName != '' AND LEFT.ZIP5 != '' AND 
 				KEYED(LEFT.PrimaryName = RIGHT.l_prim_name AND
@@ -1125,7 +1125,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	With_DNM_Name_Address_Records := DENORMALIZE(With_ADVO_History_Records, Key_DNM_Name_Address_Records,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
@@ -1135,8 +1135,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := []));	
 
 	// FP: consumer address only; use consumer address data	
-	Key_Fraudpoint3_Address_Records :=
-		PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_Address_All, Fraudpoint3.Key_Address,
+	Key_Fraudpoint3_Address_Records := //	Key has no dates does not need DateSelector
+		JOIN(Input_Address_All, Fraudpoint3.Key_Address,
 				Common.DoFDCJoin_Fraudpoint3__Key_Address = TRUE AND
 				LEFT.PrimaryName != '' AND LEFT.ZIP5 != '' AND 
 				KEYED(LEFT.ZIP5 = RIGHT.zip AND
@@ -1149,7 +1149,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	With_Fraudpoint3_Address_Records := DENORMALIZE(With_DNM_Name_Address_Records, Key_Fraudpoint3_Address_Records,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
@@ -1159,7 +1159,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := []));	
 	
 	Key_Fraudpoint3_SSN_Records :=
-		PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, Fraudpoint3.Key_SSN,
+	JOIN(Input_FDC, Fraudpoint3.Key_SSN, //Key has no dates does not need DateSelector
 				Common.DoFDCJoin_Fraudpoint3__Key_SSN = TRUE AND
 				(INTEGER)LEFT.P_InpClnSSN > 0 AND
 				KEYED(LEFT.P_InpClnSSN = RIGHT.ssn),
@@ -1169,7 +1169,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	With_Fraudpoint3_SSN_Records := DENORMALIZE(With_Fraudpoint3_Address_Records, Key_Fraudpoint3_SSN_Records,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
@@ -1870,8 +1870,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	
 	/* Cellphone - Neustar Phone Records */			
 
-	Key_CellPhone__Key_Neustar_Phone := 
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_Phone_All, CellPhone.key_neustar_phone, 
+	Key_CellPhone__Key_Neustar_Phone := 	//Key has no dates does not need DateSelector
+			JOIN(Input_Phone_All, CellPhone.key_neustar_phone, 
 				Common.DoFDCJoin_CellPhone__Key_Nustar_Phone = TRUE AND
 				LEFT.Phone <> '' AND
 				KEYED(LEFT.Phone = RIGHT.cellphone),
@@ -1882,7 +1882,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Phones_Plus, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT, 
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	With_Key_CellPhone__Key_Neustar_Phone_Records := 
 		DENORMALIZE(With_Key_Iverfication_Did_Phone_Records, Key_CellPhone__Key_Neustar_Phone,
@@ -2142,8 +2142,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	************************************************************************** */
 	// --------------------[ Vehicle records ]--------------------
 
-	Key_Vehicle_did_Records :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, VehicleV2.Key_Vehicle_DID,
+	Key_Vehicle_did_Records :=	//	Key not in uses, no dates used does not need dateselector
+			JOIN(Input_FDC, VehicleV2.Key_Vehicle_DID,
 				Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_DID = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.append_did),
@@ -2154,7 +2154,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.VEHICLE_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.VEHICLE_JOIN_LIMIT));
 	
 	Temp_Vehicle_linkids := project(Key_Vehicle_linkids_Records, transform(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_DID,
 					SELF := LEFT,
@@ -2813,38 +2813,46 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 
 /* Lookup by did (both FCRA and NonFCRA)*/
 
-	PropertyV2__Key_Property_Did_Records :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Clean_Input_Plus_Contacts, LN_PropertyV2.key_Property_did(Options.isFCRA),
+	PropertyV2__Key_Property_Did_Records :=	// dates not kept, does not need DateSelector
+			JOIN(Clean_Input_Plus_Contacts, LN_PropertyV2.key_Property_did(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Property_Did = TRUE AND 
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did),
-				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Property_Did_Records,
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_DID_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_DID_JOIN_LIMIT));
 
 /* Lookup by seleid NonFCRA)*/
 	
-	PropertyV2__Key_Property_Linkids_kFetch2_Records := IF(Common.DoFDCJoin_PropertyV2__Key_Linkids_Key = TRUE, 
+	PropertyV2__Key_Property_Linkids_kFetch2_Records := IF(Common.DoFDCJoin_PropertyV2__Key_Linkids_Key = TRUE, // dates not kept, does not need DateSelector
 																											LN_PropertyV2.Key_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
 																											PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																											0, /*ScoreThreshold --> 0 = Give me everything*/
 																											linkingOptions,
 																											PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
 																											BIPV2.IDconstants.JoinTypes.LimitTransformJoin));
+																											
+	getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp, 
+													self.b_lexidult := left.ultid,
+													self.b_lexidorg := left.orgid,
+													self.b_lexidlegal := left.seleid,
+													self.UIDAppend := left.uniqueid,
+													SELF := LEFT,
+													SELF := [];));																											
 /* Lookup by address (both FCRA and NonFCRA)*/
 
-	PropertyV2__Key_Addr_Fid_Records :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_and_Best_Address, LN_PropertyV2.key_addr_fid(Options.isFCRA),
+	PropertyV2__Key_Addr_Fid_Records :=	// dates not kept, does not need DateSelector
+			JOIN(Input_and_Best_Address, LN_PropertyV2.key_addr_fid(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Addr_Fid = TRUE AND 
 				KEYED(LEFT.PrimaryName = RIGHT.prim_name AND
 					LEFT.PrimaryRange = RIGHT.prim_range AND
 					LEFT.ZIP5 = RIGHT.zip),
-				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Addr_Fid_Records,
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.Predirectional := LEFT.Predirectional, 
@@ -2858,23 +2866,9 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_ADDRESS_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_ADDRESS_JOIN_LIMIT));
 
-/* transform property lookup records to a common temp layout */	
-  
-	Get_Property_Common_Lookup_Records(inDataset) := FUNCTIONMACRO
-			RETURN PROJECT(inDataset, TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp, SELF := LEFT;SELF := [];));
-	ENDMACRO;
-getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp, 
-													self.b_lexidult := left.ultid,
-													self.b_lexidorg := left.orgid,
-													self.b_lexidlegal := left.seleid,
-													SELF := LEFT,
-													SELF := [];));
-
-	Property_lookup_search_records_pre  := Get_Property_Common_Lookup_Records(PropertyV2__Key_Property_Did_Records) + 
-																		getbiprecords + 
-																		Get_Property_Common_Lookup_Records(PropertyV2__Key_Addr_Fid_Records);
+Property_lookup_search_records_pre  := PropertyV2__Key_Property_Did_Records + getbiprecords + PropertyV2__Key_Addr_Fid_Records;
 
 	Property_lookup_search_records := DEDUP(SORT(Property_lookup_search_records_pre, ln_fares_id, UIDAppend),ln_fares_id, UIDAppend);
 
@@ -2957,18 +2951,10 @@ getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANS
 					SELF := LEFT,
 					SELF := []));		
 	
-	PropertyV2__Key_Search_Fid_Records :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Property_lookup_search_records, LN_PropertyV2.key_search_fid(Options.isFCRA),
+PropertyV2__Key_Search_Fid_Records :=	// dates not kept, does not need DateSelector
+			JOIN(Property_lookup_search_records, LN_PropertyV2.key_search_fid(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Search_Fid = TRUE AND
-				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) and 
-					((INTEGER)LEFT.p_lexid > 0 and (left.p_lexid = right.did) OR //this change will prevent us from seeing if records are sold to a relative of the family.  we will be passing relatives into this in a later ticket, however not all people you are related to are in the relaivtes key
-						((INTEGER)left.b_lexidult > 0 and (left.b_lexidult = right.ultid AND
-						left.b_lexidorg = right.orgid and
-						left.b_lexidlegal = right.seleid)) OR
-						((INTEGER)left.zip5 > 0 and (left.primaryname = right.prim_name and
-						left.primaryrange = right.prim_range and
-						left.zip5 = right.zip )
-						)),
+				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
 				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Search_Fid_Records,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -2997,7 +2983,7 @@ getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANS
 					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(RIGHT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Marketing_State := Right.ST),
 					SELF := RIGHT,
 					SELF := []), 
-					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_SEARCH_FID_JOIN_LIMIT)),FALSE,FALSE);				
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_SEARCH_FID_JOIN_LIMIT));				
 			
 	With_PropertyV2__Key_Search_Fid_Records := DENORMALIZE(With_PropertyV2__Key_Deed_Fid_Records, PropertyV2__Key_Search_Fid_Records,	
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
@@ -3006,38 +2992,6 @@ getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANS
 					SELF := LEFT,
 					SELF := []));	
 	
-	PropertyV2__Key_Addl_Fares_Deed_Fid_Records :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Property_lookup_search_records, LN_PropertyV2.key_addl_fares_deed_fid,
-				Common.DoFDCJoin_PropertyV2__Key_Addl_Fares_Deed_Fid = TRUE AND
-				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
-				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.G_ProcUID := LEFT.G_ProcUID,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF.Predirectional := LEFT.Predirectional, 
-					SELF.PrimaryName  := LEFT.PrimaryName,
-					SELF.AddrSuffix  := LEFT.AddrSuffix,
-					SELF.Postdirectional  := LEFT.Postdirectional,
-					SELF.City  := LEFT.City,
-					SELF.State  := LEFT.State,
-					SELF.ZIP5  := LEFT.ZIP5,
-					SELF.SecondaryRange := LEFT.SecondaryRange,
-					SELF.Src := LN_PropertyV2_Src(RIGHT.ln_fares_id),
-					SELF.fares_corporate_indicator := RIGHT.fares_corporate_indicator = 'Y',
-					SELF.fares_residential_model_ind := RIGHT.fares_residential_model_ind = 'Y',
-					SELF.fares_partial_interest_ind := RIGHT.fares_partial_interest_ind = 'Y',
-					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(RIGHT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File), //no state in this file
-					SELF := RIGHT,
-					SELF := []), 
-					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_JOIN_LIMIT)),FALSE,FALSE);				
-				
-	With_PropertyV2__Key_Addl_Fares_Deed_Fid_Records := DENORMALIZE(With_PropertyV2__Key_Search_Fid_Records, PropertyV2__Key_Addl_Fares_Deed_Fid_Records,	
-			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_PropertyV2__Key_Addl_Fares_Deed_Fid := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
 	AVM_V2__Key_AVM_Address_Records :=	
 			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_Address_All, IF( Options.isFCRA, AVM_V2.Key_AVM_Address_FCRA, AVM_V2.Key_AVM_Address) ,
 				Common.DoFDCJoin_AVM_V2__Key_AVM_Address = TRUE AND 
@@ -3063,10 +3017,17 @@ getbiprecords := project(PropertyV2__Key_Property_Linkids_kFetch2_Records, TRANS
 					SELF := []), 
 					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
 
- AVM_V2__Key_AVM_Address_Norm_Records := PROJECT(AVM_V2__Key_AVM_Address_Records, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records, SELF.IsCurrent := TRUE, SELF := LEFT, SELF := [])) +
-			NORMALIZE(AVM_V2__Key_AVM_Address_Records, left.history, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records, SELF.IsCurrent := FALSE, SELF := RIGHT, SELF := LEFT, SELF := []));
+ AVM_V2__Key_AVM_Address_Norm_Records := PROJECT(AVM_V2__Key_AVM_Address_Records, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records, 
+				SELF.IsCurrent := TRUE, 
+				SELF := LEFT, 
+				SELF := [])) +
+			NORMALIZE(AVM_V2__Key_AVM_Address_Records, left.history, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records, 
+				SELF.IsCurrent := FALSE, 
+				SELF := RIGHT, 
+				SELF := LEFT, 
+				SELF := []));
 
-	With_AVM_V2_Key_AVM_Records := DENORMALIZE(With_PropertyV2__Key_Addl_Fares_Deed_Fid_Records, AVM_V2__Key_AVM_Address_Norm_Records,
+	With_AVM_V2_Key_AVM_Records := DENORMALIZE(With_PropertyV2__Key_Search_Fid_Records, AVM_V2__Key_AVM_Address_Norm_Records,
 			LEFT.G_ProcUID = RIGHT.G_ProcUID, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_AVM_V2__Key_AVM_Address := ROWS(RIGHT),
@@ -3241,8 +3202,8 @@ LienJudgement_DID_Key := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.
 
 
 	//gather lexids from input ssn
-		Key_wild_SSN :=	
-			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, dx_Header.key_wild_SSN(),//non FCRA only
+		Key_wild_SSN :=	//	No dates does not need DateSelector
+			JOIN(Input_FDC, dx_Header.key_wild_SSN(),//non FCRA only
 				Common.DoFDCJoin_Dx_Header__key_wild_SSN = TRUE AND
 				(INTEGER)LEFT.P_InpClnSSN > 0 AND
 				KEYED(LEFT.P_InpClnSSN[1] = RIGHT.s1 AND
@@ -3262,7 +3223,7 @@ LienJudgement_DID_Key := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 	
 	//transform ssn lookup key results into input layout
 	temp_wild_SSN := project(Key_wild_SSN, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.did,  self := left, self := []));			
@@ -3470,7 +3431,7 @@ dx_CFPB__key_Census_Surnames := IF( Options.isFCRA, dx_ConsumerFinancialProtecti
 						SELF.Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18 := ROWS(RIGHT),
 						SELF := LEFT,
 						SELF := []));			
-								
-	RETURN With_key_BLKGRP_attr_over18;
+
+RETURN With_key_BLKGRP_attr_over18;
 	
 	END;

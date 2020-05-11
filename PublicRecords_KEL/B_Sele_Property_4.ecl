@@ -6,14 +6,14 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   SHARED VIRTUAL TYPEOF(B_Property_Event_5().__ENH_Property_Event_5) __ENH_Property_Event_5 := B_Property_Event_5(__in,__cfg).__ENH_Property_Event_5;
   SHARED VIRTUAL TYPEOF(E_Sele_Property().__Result) __E_Sele_Property := E_Sele_Property(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Sele_Property_Event().__Result) __E_Sele_Property_Event := E_Sele_Property_Event(__in,__cfg).__Result;
-  SHARED __EE678991 := __E_Sele_Property;
-  SHARED __EE679553 := __E_Sele_Property_Event;
-  SHARED __EE682949 := __EE679553(__NN(__EE679553.Legal_) AND __NN(__EE679553.Event_));
-  SHARED __EE679452 := __EE678991;
-  SHARED __EE683002 := __EE679452(__NN(__EE679452.Prop_) AND __NN(__EE679452.Legal_));
-  SHARED __EE679551 := __ENH_Property_Event_5;
-  SHARED __EE680237 := __EE679551(__NN(__EE679551.Prop_));
-  SHARED __ST680461_Layout := RECORD
+  SHARED __EE714358 := __E_Sele_Property;
+  SHARED __EE714920 := __E_Sele_Property_Event;
+  SHARED __EE718196 := __EE714920(__NN(__EE714920.Legal_) AND __NN(__EE714920.Event_));
+  SHARED __EE714819 := __EE714358;
+  SHARED __EE718249 := __EE714819(__NN(__EE714819.Prop_) AND __NN(__EE714819.Legal_));
+  SHARED __EE714918 := __ENH_Property_Event_5;
+  SHARED __EE715604 := __EE714918(__NN(__EE714918.Prop_));
+  SHARED __ST715828_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -41,7 +41,6 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ntyp(E_Property().Typ) Prop__1_;
     KEL.typ.nbool Is_Deed_;
     KEL.typ.nbool Is_Assessment_;
-    KEL.typ.nbool Is_Additional_Fares_Deed_;
     KEL.typ.nkdate Process_Date_;
     KEL.typ.nstr Vendor_Source_Code_;
     KEL.typ.nbool Current_Record_;
@@ -323,35 +322,6 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.nbool Additional_Name_Flag_;
     KEL.typ.nstr L_N_Buyer_Mailing_Country_Code_;
     KEL.typ.nstr L_N_Seller_Mailing_Country_Code_;
-    KEL.typ.nstr Fares_Owner_Et_Al_Indicator_;
-    KEL.typ.nstr Fares_Owner_Relationship_Code_;
-    KEL.typ.nstr Fares_Owner_Relationship_Type_;
-    KEL.typ.nstr Fares_Match_Code_;
-    KEL.typ.nkdate Fares_Document_Year_;
-    KEL.typ.nbool Fares_Corporate_Indicator_;
-    KEL.typ.nstr Fares_Transaction_Type_;
-    KEL.typ.nstr Fares_Lender_Address_;
-    KEL.typ.nstr Fares_Sales_Transaction_Code_;
-    KEL.typ.nbool Fares_Residential_Model_Ind_;
-    KEL.typ.nstr Fares_Mortgage_Deed_Type_;
-    KEL.typ.nstr Fares_Mortgage_Term_Code_;
-    KEL.typ.nint Fares_Mortgage_Term_;
-    KEL.typ.nint Fares_Mortgage_Assumption_Amount_;
-    KEL.typ.nstr Fares_Second_Mortgage_Loan_Type_Code_;
-    KEL.typ.nstr Fares_Second_Deed_Type_;
-    KEL.typ.nstr Fares_Absentee_Indicator_;
-    KEL.typ.nbool Fares_Partial_Interest_Indicator_;
-    KEL.typ.nstr Fares_Primary_Category_Code_;
-    KEL.typ.nstr Fares_Private_Party_Lender_;
-    KEL.typ.nstr Fares_Construction_Loan_;
-    KEL.typ.nstr Fares_Resale_New_Construction_;
-    KEL.typ.nstr Fares_Inter_Family_;
-    KEL.typ.nstr Fares_Cash_Mortgage_Purchase_;
-    KEL.typ.nint Fares_Building_Square_Feet_;
-    KEL.typ.nstr Fares_Foreclosure_;
-    KEL.typ.nstr Fares_Refincance_Flag_;
-    KEL.typ.nstr Fares_Equity_Flag_;
-    KEL.typ.nstr Fares_Iris_A_P_N_;
     KEL.typ.ndataset(E_Property_Event(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -361,8 +331,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC683014(E_Sele_Property(__in,__cfg).Layout __EE683002, B_Property_Event_5(__in,__cfg).__ST160280_Layout __EE680237) := __EEQP(__EE683002.Prop_,__EE680237.Prop_);
-  __ST680461_Layout __JT683014(E_Sele_Property(__in,__cfg).Layout __l, B_Property_Event_5(__in,__cfg).__ST160280_Layout __r) := TRANSFORM
+  __JC718261(E_Sele_Property(__in,__cfg).Layout __EE718249, B_Property_Event_5(__in,__cfg).__ST160611_Layout __EE715604) := __EEQP(__EE718249.Prop_,__EE715604.Prop_);
+  __ST715828_Layout __JT718261(E_Sele_Property(__in,__cfg).Layout __l, B_Property_Event_5(__in,__cfg).__ST160611_Layout __r) := TRANSFORM
     SELF.Primary_Range__1_ := __r.Primary_Range_;
     SELF.Predirectional__1_ := __r.Predirectional_;
     SELF.Primary_Name__1_ := __r.Primary_Name_;
@@ -375,8 +345,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE683015 := JOIN(__EE683002,__EE680237,__JC683014(LEFT,RIGHT),__JT683014(LEFT,RIGHT),INNER,HASH);
-  SHARED __ST680875_Layout := RECORD
+  SHARED __EE718262 := JOIN(__EE718249,__EE715604,__JC718261(LEFT,RIGHT),__JT718261(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST716212_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property_Event().Typ) Event_;
     KEL.typ.nint Ult_I_D_;
@@ -413,7 +383,6 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ntyp(E_Property().Typ) Prop__1_;
     KEL.typ.nbool Is_Deed_;
     KEL.typ.nbool Is_Assessment_;
-    KEL.typ.nbool Is_Additional_Fares_Deed_;
     KEL.typ.nkdate Process_Date_;
     KEL.typ.nstr Vendor_Source_Code_;
     KEL.typ.nbool Current_Record_;
@@ -695,35 +664,6 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.nbool Additional_Name_Flag_;
     KEL.typ.nstr L_N_Buyer_Mailing_Country_Code_;
     KEL.typ.nstr L_N_Seller_Mailing_Country_Code_;
-    KEL.typ.nstr Fares_Owner_Et_Al_Indicator_;
-    KEL.typ.nstr Fares_Owner_Relationship_Code_;
-    KEL.typ.nstr Fares_Owner_Relationship_Type_;
-    KEL.typ.nstr Fares_Match_Code_;
-    KEL.typ.nkdate Fares_Document_Year_;
-    KEL.typ.nbool Fares_Corporate_Indicator_;
-    KEL.typ.nstr Fares_Transaction_Type_;
-    KEL.typ.nstr Fares_Lender_Address_;
-    KEL.typ.nstr Fares_Sales_Transaction_Code_;
-    KEL.typ.nbool Fares_Residential_Model_Ind_;
-    KEL.typ.nstr Fares_Mortgage_Deed_Type_;
-    KEL.typ.nstr Fares_Mortgage_Term_Code_;
-    KEL.typ.nint Fares_Mortgage_Term_;
-    KEL.typ.nint Fares_Mortgage_Assumption_Amount_;
-    KEL.typ.nstr Fares_Second_Mortgage_Loan_Type_Code_;
-    KEL.typ.nstr Fares_Second_Deed_Type_;
-    KEL.typ.nstr Fares_Absentee_Indicator_;
-    KEL.typ.nbool Fares_Partial_Interest_Indicator_;
-    KEL.typ.nstr Fares_Primary_Category_Code_;
-    KEL.typ.nstr Fares_Private_Party_Lender_;
-    KEL.typ.nstr Fares_Construction_Loan_;
-    KEL.typ.nstr Fares_Resale_New_Construction_;
-    KEL.typ.nstr Fares_Inter_Family_;
-    KEL.typ.nstr Fares_Cash_Mortgage_Purchase_;
-    KEL.typ.nint Fares_Building_Square_Feet_;
-    KEL.typ.nstr Fares_Foreclosure_;
-    KEL.typ.nstr Fares_Refincance_Flag_;
-    KEL.typ.nstr Fares_Equity_Flag_;
-    KEL.typ.nstr Fares_Iris_A_P_N_;
     KEL.typ.ndataset(E_Property_Event(__in,__cfg).Data_Sources_Layout) Data_Sources__2_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -733,8 +673,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC683403(E_Sele_Property_Event(__in,__cfg).Layout __EE682949, __ST680461_Layout __EE683015) := __EEQP(__EE683015.UID,__EE682949.Event_) AND __NNEQ(__EE682949.Legal_,__EE683015.Legal_) AND __T(__AND(__EEQ(__EE683015.UID,__EE682949.Event_),__OP2(__EE682949.Legal_,=,__EE683015.Legal_)));
-  __ST680875_Layout __JT683403(E_Sele_Property_Event(__in,__cfg).Layout __l, __ST680461_Layout __r) := TRANSFORM
+  __JC718620(E_Sele_Property_Event(__in,__cfg).Layout __EE718196, __ST715828_Layout __EE718262) := __EEQP(__EE718262.UID,__EE718196.Event_) AND __NNEQ(__EE718196.Legal_,__EE718262.Legal_) AND __T(__AND(__EEQ(__EE718262.UID,__EE718196.Event_),__OP2(__EE718196.Legal_,=,__EE718262.Legal_)));
+  __ST716212_Layout __JT718620(E_Sele_Property_Event(__in,__cfg).Layout __l, __ST715828_Layout __r) := TRANSFORM
     SELF.Legal__1_ := __r.Legal_;
     SELF.Ult_I_D__1_ := __r.Ult_I_D_;
     SELF.Org_I_D__1_ := __r.Org_I_D_;
@@ -746,8 +686,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE683404 := JOIN(__EE682949,__EE683015,__JC683403(LEFT,RIGHT),__JT683403(LEFT,RIGHT),INNER,HASH);
-  SHARED __ST679989_Layout := RECORD
+  SHARED __EE718621 := JOIN(__EE718196,__EE718262,__JC718620(LEFT,RIGHT),__JT718620(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST715356_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ndataset(E_Sele_Property_Event(__in,__cfg).Party_Details_Layout) Party_Details_;
@@ -759,8 +699,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
   END;
-  SHARED __EE683835 := PROJECT(__EE683404,TRANSFORM(__ST679989_Layout,SELF.Legal_ := LEFT.Legal__1_,SELF := LEFT));
-  SHARED __ST680076_Layout := RECORD
+  SHARED __EE719022 := PROJECT(__EE718621,TRANSFORM(__ST715356_Layout,SELF.Legal_ := LEFT.Legal__1_,SELF := LEFT));
+  SHARED __ST715443_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.bool Exp1_ := FALSE;
@@ -773,19 +713,19 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
   END;
-  SHARED __ST680076_Layout __ND683840__Project(__ST679989_Layout __PP683836) := TRANSFORM
-    __BS683851 := __T(__PP683836.Party_Details_);
-    SELF.Exp1_ := EXISTS(__BS683851(__T(__OR(__T(__PP683836.Party_Details_).Party_Is_Buyer_Or_Owner_,__T(__PP683836.Party_Details_).Party_Is_Seller_))));
-    __BS683864 := __T(__PP683836.Party_Details_);
-    SELF.Exp2_ := EXISTS(__BS683864(__T(__AND(__PP683836.Is_Current_Assessment_Record_,__T(__PP683836.Party_Details_).Party_Is_Buyer_Or_Owner_))));
-    __BS683876 := __T(__PP683836.Party_Details_);
-    SELF.Exp3_ := EXISTS(__BS683876(__T(__AND(__PP683836.Is_Deed_,__T(__PP683836.Party_Details_).Party_Is_Buyer_Or_Owner_))));
-    __BS683888 := __T(__PP683836.Party_Details_);
-    SELF.Exp4_ := EXISTS(__BS683888(__T(__T(__PP683836.Party_Details_).Party_Is_Seller_)));
-    SELF := __PP683836;
+  SHARED __ST715443_Layout __ND719027__Project(__ST715356_Layout __PP719023) := TRANSFORM
+    __BS719038 := __T(__PP719023.Party_Details_);
+    SELF.Exp1_ := EXISTS(__BS719038(__T(__OR(__T(__PP719023.Party_Details_).Party_Is_Buyer_Or_Owner_,__T(__PP719023.Party_Details_).Party_Is_Seller_))));
+    __BS719051 := __T(__PP719023.Party_Details_);
+    SELF.Exp2_ := EXISTS(__BS719051(__T(__AND(__PP719023.Is_Current_Assessment_Record_,__T(__PP719023.Party_Details_).Party_Is_Buyer_Or_Owner_))));
+    __BS719063 := __T(__PP719023.Party_Details_);
+    SELF.Exp3_ := EXISTS(__BS719063(__T(__AND(__PP719023.Is_Deed_,__T(__PP719023.Party_Details_).Party_Is_Buyer_Or_Owner_))));
+    __BS719075 := __T(__PP719023.Party_Details_);
+    SELF.Exp4_ := EXISTS(__BS719075(__T(__T(__PP719023.Party_Details_).Party_Is_Seller_)));
+    SELF := __PP719023;
   END;
-  SHARED __EE683903 := PROJECT(__EE683835,__ND683840__Project(LEFT));
-  SHARED __ST680110_Layout := RECORD
+  SHARED __EE719090 := PROJECT(__EE719022,__ND719027__Project(LEFT));
+  SHARED __ST715477_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Sele_Property_Event_ := 0;
     KEL.typ.int C_O_U_N_T___Sele_Property_Event__1_ := 0;
     KEL.typ.int C_O_U_N_T___Sele_Property_Event__2_ := 0;
@@ -798,8 +738,8 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
   END;
-  SHARED __EE683938 := PROJECT(__CLEANANDDO(__EE683903,TABLE(__EE683903,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.int C_O_U_N_T___Sele_Property_Event_ := COUNT(GROUP,__EE683903.Exp1_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__1_ := COUNT(GROUP,__EE683903.Exp2_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__2_ := COUNT(GROUP,__EE683903.Exp3_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__3_ := COUNT(GROUP,__EE683903.Exp4_),Legal_,Prop_},Legal_,Prop_,MERGE)),__ST680110_Layout);
-  SHARED __ST681339_Layout := RECORD
+  SHARED __EE719125 := PROJECT(__CLEANANDDO(__EE719090,TABLE(__EE719090,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.int C_O_U_N_T___Sele_Property_Event_ := COUNT(GROUP,__EE719090.Exp1_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__1_ := COUNT(GROUP,__EE719090.Exp2_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__2_ := COUNT(GROUP,__EE719090.Exp3_),KEL.typ.int C_O_U_N_T___Sele_Property_Event__3_ := COUNT(GROUP,__EE719090.Exp4_),Legal_,Prop_},Legal_,Prop_,MERGE)),__ST715477_Layout);
+  SHARED __ST716646_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -828,15 +768,15 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC683948(E_Sele_Property(__in,__cfg).Layout __EE678991, __ST680110_Layout __EE683938) := __EEQP(__EE678991.Prop_,__EE683938.Prop_) AND __EEQP(__EE678991.Legal_,__EE683938.Legal_);
-  __ST681339_Layout __JT683948(E_Sele_Property(__in,__cfg).Layout __l, __ST680110_Layout __r) := TRANSFORM
+  __JC719135(E_Sele_Property(__in,__cfg).Layout __EE714358, __ST715477_Layout __EE719125) := __EEQP(__EE714358.Prop_,__EE719125.Prop_) AND __EEQP(__EE714358.Legal_,__EE719125.Legal_);
+  __ST716646_Layout __JT719135(E_Sele_Property(__in,__cfg).Layout __l, __ST715477_Layout __r) := TRANSFORM
     SELF.Legal__1_ := __r.Legal_;
     SELF.Prop__1_ := __r.Prop_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE683949 := JOIN(__EE678991,__EE683938,__JC683948(LEFT,RIGHT),__JT683948(LEFT,RIGHT),LEFT OUTER,SMART);
-  EXPORT __ST156016_Layout := RECORD
+  SHARED __EE719136 := JOIN(__EE714358,__EE719125,__JC719135(LEFT,RIGHT),__JT719135(LEFT,RIGHT),LEFT OUTER,SMART);
+  EXPORT __ST156228_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -863,12 +803,12 @@ EXPORT B_Sele_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST156016_Layout __ND683991__Project(__ST681339_Layout __PP683950) := TRANSFORM
-    SELF.Is_Ever_Owned_ := __PP683950.C_O_U_N_T___Sele_Property_Event_ <> 0;
-    SELF.Property_Is_Owned_Assessment_ := __PP683950.C_O_U_N_T___Sele_Property_Event__1_ <> 0;
-    SELF.Property_Is_Owned_Deed_ := __PP683950.C_O_U_N_T___Sele_Property_Event__2_ <> 0;
-    SELF.Property_Is_Sold_ := __PP683950.C_O_U_N_T___Sele_Property_Event__3_ <> 0;
-    SELF := __PP683950;
+  SHARED __ST156228_Layout __ND719178__Project(__ST716646_Layout __PP719137) := TRANSFORM
+    SELF.Is_Ever_Owned_ := __PP719137.C_O_U_N_T___Sele_Property_Event_ <> 0;
+    SELF.Property_Is_Owned_Assessment_ := __PP719137.C_O_U_N_T___Sele_Property_Event__1_ <> 0;
+    SELF.Property_Is_Owned_Deed_ := __PP719137.C_O_U_N_T___Sele_Property_Event__2_ <> 0;
+    SELF.Property_Is_Sold_ := __PP719137.C_O_U_N_T___Sele_Property_Event__3_ <> 0;
+    SELF := __PP719137;
   END;
-  EXPORT __ENH_Sele_Property_4 := PROJECT(__EE683949,__ND683991__Project(LEFT));
+  EXPORT __ENH_Sele_Property_4 := PROJECT(__EE719136,__ND719178__Project(LEFT));
 END;

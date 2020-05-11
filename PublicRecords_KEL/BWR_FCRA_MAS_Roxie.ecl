@@ -8,6 +8,7 @@ NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
 //InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+// InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
 
 
 /* Data Setting 	FCRA 	
@@ -181,6 +182,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -194,6 +196,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Person := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -202,6 +205,7 @@ Passed_with_Extras :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -211,6 +215,7 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),

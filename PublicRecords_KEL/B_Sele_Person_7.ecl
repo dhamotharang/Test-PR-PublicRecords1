@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Person,E_Sele
 IMPORT * FROM KEL12.Null;
 EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Sele_Person().__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
-  SHARED __EE306036 := __E_Sele_Person;
-  EXPORT __ST166642_Layout := RECORD
+  SHARED __EE327185 := __E_Sele_Person;
+  EXPORT __ST167249_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -21,10 +21,10 @@ EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST166642_Layout __ND306000__Project(E_Sele_Person(__in,__cfg).Layout __PP305643) := TRANSFORM
-    __EE305995 := __PP305643.Contact_Info_;
-    SELF.Assoc_Date_ := KEL.Aggregates.MaxNN(__EE305995,KEL.era.ToDate(__T(__EE305995).Date_Last_Seen_));
-    SELF := __PP305643;
+  SHARED __ST167249_Layout __ND327149__Project(E_Sele_Person(__in,__cfg).Layout __PP326792) := TRANSFORM
+    __EE327144 := __PP326792.Contact_Info_;
+    SELF.Assoc_Date_ := KEL.Aggregates.MaxNN(__EE327144,KEL.era.ToDate(__T(__EE327144).Date_Last_Seen_));
+    SELF := __PP326792;
   END;
-  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE306036,__ND306000__Project(LEFT));
+  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE327185,__ND327149__Project(LEFT));
 END;

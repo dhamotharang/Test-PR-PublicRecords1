@@ -4,8 +4,8 @@ IMPORT B_Tradeline_3,CFG_Compile,E_Tradeline FROM PublicRecords_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_3().__ENH_Tradeline_3) __ENH_Tradeline_3 := B_Tradeline_3(__in,__cfg).__ENH_Tradeline_3;
-  SHARED __EE2092732 := __ENH_Tradeline_3;
-  EXPORT __ST137445_Layout := RECORD
+  SHARED __EE2125344 := __ENH_Tradeline_3;
+  EXPORT __ST137627_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -47,13 +47,13 @@ EXPORT B_Tradeline_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST137438_Layout := RECORD
+  EXPORT __ST137620_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST137445_Layout) Records_;
+    KEL.typ.ndataset(__ST137627_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_First_Of_Month_;
@@ -74,16 +74,16 @@ EXPORT B_Tradeline_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST137438_Layout __ND2092676__Project(B_Tradeline_3(__in,__cfg).__ST147924_Layout __PP2092385) := TRANSFORM
-    __EE2092735 := __PP2092385.Records_;
-    __ST137445_Layout __ND2092596__Project(B_Tradeline_3(__in,__cfg).__ST147931_Layout __PP2092387) := TRANSFORM
-      __EE2092589 := __PP2092385.Records_;
-      SELF.Is_Most_Recent_Active_Record_ := __AND(__PP2092385.Is_Active_,__OP2(__PP2092387.A_R_Date_,=,KEL.Aggregates.MaxNN(__EE2092589,__T(__EE2092589).A_R_Date_)));
-      SELF.Perf_Level_ := MAP(__T(__OP2(__PP2092387.Aging91_Plus_L_N_,>,__CN(0)))=>4,__T(__OP2(__PP2092387.Aging61_To90_L_N_,>,__CN(0)))=>3,__T(__OP2(__PP2092387.Aging31_To60_L_N_,>,__CN(0)))=>2,__T(__OP2(__PP2092387.Aging1_To30_L_N_,>,__CN(0)))=>1,0);
-      SELF := __PP2092387;
+  SHARED __ST137620_Layout __ND2125288__Project(B_Tradeline_3(__in,__cfg).__ST148060_Layout __PP2124997) := TRANSFORM
+    __EE2125347 := __PP2124997.Records_;
+    __ST137627_Layout __ND2125208__Project(B_Tradeline_3(__in,__cfg).__ST148067_Layout __PP2124999) := TRANSFORM
+      __EE2125201 := __PP2124997.Records_;
+      SELF.Is_Most_Recent_Active_Record_ := __AND(__PP2124997.Is_Active_,__OP2(__PP2124999.A_R_Date_,=,KEL.Aggregates.MaxNN(__EE2125201,__T(__EE2125201).A_R_Date_)));
+      SELF.Perf_Level_ := MAP(__T(__OP2(__PP2124999.Aging91_Plus_L_N_,>,__CN(0)))=>4,__T(__OP2(__PP2124999.Aging61_To90_L_N_,>,__CN(0)))=>3,__T(__OP2(__PP2124999.Aging31_To60_L_N_,>,__CN(0)))=>2,__T(__OP2(__PP2124999.Aging1_To30_L_N_,>,__CN(0)))=>1,0);
+      SELF := __PP2124999;
     END;
-    SELF.Records_ := __PROJECT(__EE2092735,__ND2092596__Project(LEFT));
-    SELF := __PP2092385;
+    SELF.Records_ := __PROJECT(__EE2125347,__ND2125208__Project(LEFT));
+    SELF := __PP2124997;
   END;
-  EXPORT __ENH_Tradeline_2 := PROJECT(__EE2092732,__ND2092676__Project(LEFT));
+  EXPORT __ENH_Tradeline_2 := PROJECT(__EE2125344,__ND2125288__Project(LEFT));
 END;

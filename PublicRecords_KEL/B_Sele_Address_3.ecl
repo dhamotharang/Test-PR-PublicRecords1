@@ -4,8 +4,8 @@ IMPORT B_Sele_Address_4,B_Sele_Address_5,CFG_Compile,E_Address,E_Business_Org,E_
 IMPORT * FROM KEL12.Null;
 EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Address_4().__ENH_Sele_Address_4) __ENH_Sele_Address_4 := B_Sele_Address_4(__in,__cfg).__ENH_Sele_Address_4;
-  SHARED __EE1108961 := __ENH_Sele_Address_4;
-  EXPORT __ST147173_Layout := RECORD
+  SHARED __EE1157873 := __ENH_Sele_Address_4;
+  EXPORT __ST147309_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate Date_First_Seen_Company_Address_;
@@ -18,7 +18,7 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST147117_Layout := RECORD
+  EXPORT __ST147253_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Primary_Range_;
@@ -34,9 +34,9 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).Best_Addresses_Layout) Best_Addresses_;
-    KEL.typ.ndataset(__ST147173_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST147309_Layout) Data_Sources_;
     KEL.typ.nbool Matches_Is_Best_Helper_Attr_;
-    KEL.typ.ndataset(B_Sele_Address_5(__in,__cfg).__ST481256_Layout) Rolled_Source_List_;
+    KEL.typ.ndataset(B_Sele_Address_5(__in,__cfg).__ST511086_Layout) Rolled_Source_List_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -44,10 +44,10 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST147117_Layout __ND1109521__Project(B_Sele_Address_4(__in,__cfg).__ST155726_Layout __PP1108662) := TRANSFORM
-    __EE1108853 := __PP1108662.Data_Sources_;
-    SELF.Data_Sources_ := __PROJECT(__EE1108853,__ST147173_Layout);
-    SELF := __PP1108662;
+  SHARED __ST147253_Layout __ND1158433__Project(B_Sele_Address_4(__in,__cfg).__ST155938_Layout __PP1157574) := TRANSFORM
+    __EE1157765 := __PP1157574.Data_Sources_;
+    SELF.Data_Sources_ := __PROJECT(__EE1157765,__ST147309_Layout);
+    SELF := __PP1157574;
   END;
-  EXPORT __ENH_Sele_Address_3 := PROJECT(__EE1108961,__ND1109521__Project(LEFT));
+  EXPORT __ENH_Sele_Address_3 := PROJECT(__EE1157873,__ND1158433__Project(LEFT));
 END;

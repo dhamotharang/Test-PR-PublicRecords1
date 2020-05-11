@@ -956,16 +956,46 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	
 // --------------------[ Property - Consumer and Business]--------------------	
 
-	EXPORT Layout_PropertyV2_Data_Temp := RECORD
-		LayoutAddressGeneric;
-		STRING LN_FARES_ID;
-		STRING Archive_Date;
-	END;	
-	
+//to help with memory limit errors in roxie we are removing fields that are not used. 
 	SHARED PropertyV2_Key_Assessor_Fid_Records := LN_PropertyV2.key_assessor_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Assessor_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Assessor_Fid_Records) - owner_occupied - fireplace_indicator - ln_mobile_home_indicator - ln_condo_indicator - ln_property_tax_exemption - current_record;
+		PropertyV2_Key_Assessor_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Assessor_Fid_Records.proc_date;
+		PropertyV2_Key_Assessor_Fid_Records.vendor_source_flag;
+		PropertyV2_Key_Assessor_Fid_Records.mailing_city_state_zip;
+		PropertyV2_Key_Assessor_Fid_Records.property_full_street_address;
+		PropertyV2_Key_Assessor_Fid_Records.property_city_state_zip;
+		PropertyV2_Key_Assessor_Fid_Records.standardized_land_use_code;
+		PropertyV2_Key_Assessor_Fid_Records.recording_date;
+		PropertyV2_Key_Assessor_Fid_Records.sale_date;
+		PropertyV2_Key_Assessor_Fid_Records.sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_amount;
+		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_type_code;
+		PropertyV2_Key_Assessor_Fid_Records.prior_recording_date;
+		PropertyV2_Key_Assessor_Fid_Records.prior_sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.assessed_total_value;
+		PropertyV2_Key_Assessor_Fid_Records.assessed_value_year;
+		PropertyV2_Key_Assessor_Fid_Records.market_total_value;
+		PropertyV2_Key_Assessor_Fid_Records.market_value_year;
+		PropertyV2_Key_Assessor_Fid_Records.tax_year;
+		PropertyV2_Key_Assessor_Fid_Records.land_square_footage;
+		PropertyV2_Key_Assessor_Fid_Records.lot_size;
+		PropertyV2_Key_Assessor_Fid_Records.building_area;
+		PropertyV2_Key_Assessor_Fid_Records.year_built;
+		PropertyV2_Key_Assessor_Fid_Records.effective_year_built;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_buildings;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_stories;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_units;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_rooms;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_bedrooms;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_baths;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_partial_baths;
+		PropertyV2_Key_Assessor_Fid_Records.garage_type_code;
+		PropertyV2_Key_Assessor_Fid_Records.parking_no_of_cars;
+		PropertyV2_Key_Assessor_Fid_Records.style_code;
+		PropertyV2_Key_Assessor_Fid_Records.tape_cut_date;
+		PropertyV2_Key_Assessor_Fid_Records.certification_date;
 		BOOLEAN owner_occupied;
 		BOOLEAN fireplace_indicator;
 		BOOLEAN ln_mobile_home_indicator;
@@ -978,10 +1008,22 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING2 src;
 	END;
 	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Deed_Fid_Records := LN_PropertyV2.key_deed_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Deed_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Deed_Fid_Records) - current_record - timeshare_flag - addl_name_flag;
+		PropertyV2_Key_Deed_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Deed_Fid_Records.process_date;
+		PropertyV2_Key_Deed_Fid_Records.buyer_or_borrower_ind;
+		PropertyV2_Key_Deed_Fid_Records.name1;
+		PropertyV2_Key_Deed_Fid_Records.name2;
+		PropertyV2_Key_Deed_Fid_Records.mailing_csz;
+		PropertyV2_Key_Deed_Fid_Records.property_full_street_address;
+		PropertyV2_Key_Deed_Fid_Records.property_address_citystatezip;
+		PropertyV2_Key_Deed_Fid_Records.contract_date;
+		PropertyV2_Key_Deed_Fid_Records.recording_date;
+		PropertyV2_Key_Deed_Fid_Records.sales_price;
+		PropertyV2_Key_Deed_Fid_Records.land_lot_size;
 		BOOLEAN current_record;
 		BOOLEAN timeshare_flag;
 		BOOLEAN addl_name_flag;
@@ -991,37 +1033,47 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING2 src;
 	END;
 	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Property_Did_Records := LN_PropertyV2.key_Property_did(Options.isFCRA);
-	EXPORT Layout_PropertyV2_Key_Property_Did_Records := RECORD
-		LayoutIDs;
-		RECORDOF(PropertyV2_Key_Property_Did_Records);
-		UNSIGNED8 DPMBitmap;
-		STRING Archive_Date;
-		STRING2 src;
-	END;
-	
-	SHARED PropertyV2_Key_Linkids_Records := LN_PropertyV2.Key_LinkIds.kfetch2;
-	EXPORT Layout_PropertyV2_Key_Linkids_Records := RECORD
-		LayoutIDs;
-		RECORDOF(PropertyV2_Key_Linkids_Records);
-		UNSIGNED8 DPMBitmap;
-		STRING Archive_Date;
-		STRING2 src;
-	END;
-	
-	SHARED PropertyV2_Key_Addr_Fid_Records := LN_PropertyV2.key_addr_fid(Options.isFCRA);
-	EXPORT Layout_PropertyV2_Key_Addr_Fid_Records := RECORD
+	EXPORT Layout_PropertyV2_Data_Temp := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Addr_Fid_Records);
-		UNSIGNED8 DPMBitmap;
+		PropertyV2_Key_Property_Did_Records.s_did;
+		PropertyV2_Key_Property_Did_Records.source_code_2;
+		PropertyV2_Key_Property_Did_Records.ln_fares_id;
+		PropertyV2_Key_Property_Did_Records.prim_range;
+		PropertyV2_Key_Property_Did_Records.predir;
+		PropertyV2_Key_Property_Did_Records.prim_name;
+		PropertyV2_Key_Property_Did_Records.suffix;
+		PropertyV2_Key_Property_Did_Records.postdir;
+		PropertyV2_Key_Property_Did_Records.sec_range;
+		PropertyV2_Key_Property_Did_Records.st;
+		PropertyV2_Key_Property_Did_Records.zip;
 		STRING Archive_Date;
-		STRING2 src;
-	END;
+	END;		
 	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Search_Fid_Records := LN_PropertyV2.key_search_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Search_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Search_Fid_Records);
+		PropertyV2_Key_Search_Fid_Records.source_code_2;
+		PropertyV2_Key_Search_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Search_Fid_Records.did;
+		PropertyV2_Key_Search_Fid_Records.prim_range;
+		PropertyV2_Key_Search_Fid_Records.predir;
+		PropertyV2_Key_Search_Fid_Records.prim_name;
+		PropertyV2_Key_Search_Fid_Records.suffix;
+		PropertyV2_Key_Search_Fid_Records.postdir;
+		PropertyV2_Key_Search_Fid_Records.unit_desig;
+		PropertyV2_Key_Search_Fid_Records.sec_range;
+		PropertyV2_Key_Search_Fid_Records.p_city_name;
+		PropertyV2_Key_Search_Fid_Records.v_city_name;
+		PropertyV2_Key_Search_Fid_Records.st;
+		PropertyV2_Key_Search_Fid_Records.zip;
+		PropertyV2_Key_Search_Fid_Records.ultid;
+		PropertyV2_Key_Search_Fid_Records.orgid;
+		PropertyV2_Key_Search_Fid_Records.seleid;
+		PropertyV2_Key_Search_Fid_Records.proxid;
+		PropertyV2_Key_Search_Fid_Records.powid;
 		BOOLEAN PartyIsBuyerOrOwner;
 		BOOLEAN PartyIsBorrower;
 		BOOLEAN PartyIsSeller;
@@ -1030,18 +1082,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		BOOLEAN SellerAddress;
 		BOOLEAN PropertyAddress;
 		BOOLEAN BorrowerAddress;
-		UNSIGNED8 DPMBitmap;
-		STRING2 src;
-		STRING Archive_Date;
-	END;
-	
-	SHARED PropertyV2_Key_Addl_Fares_Deed_Fid_Records := LN_PropertyV2.key_addl_fares_deed_fid;
-	EXPORT Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records := RECORD
-		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Addl_Fares_Deed_Fid_Records)- fares_corporate_indicator - fares_residential_model_ind - fares_partial_interest_ind;
-		BOOLEAN fares_corporate_indicator;
-		BOOLEAN fares_residential_model_ind;
-		BOOLEAN fares_partial_interest_ind;
 		UNSIGNED8 DPMBitmap;
 		STRING2 src;
 		STRING Archive_Date;
@@ -1315,7 +1355,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		DATASET(Layout_PropertyV2_Key_Assessor_Fid_Records) Dataset_PropertyV2__Key_Assessor_Fid;
 		DATASET(Layout_PropertyV2_Key_Deed_Fid_Records) Dataset_PropertyV2__Key_Deed_Fid_Fid;
 		DATASET(Layout_PropertyV2_Key_Search_Fid_Records) Dataset_PropertyV2__Key_Search_Fid;
-		DATASET(Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records) Dataset_PropertyV2__Key_Addl_Fares_Deed_Fid;
 		DATASET(Layout_AVM_V2_Key_AVM_Address_Norm_Records) Dataset_AVM_V2__Key_AVM_Address;
 
 

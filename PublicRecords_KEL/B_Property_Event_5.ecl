@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM Public
 IMPORT * FROM KEL12.Null;
 EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Property_Event().__Result) __E_Property_Event := E_Property_Event(__in,__cfg).__Result;
-  SHARED __EE479546 := __E_Property_Event;
-  EXPORT __ST160280_Layout := RECORD
+  SHARED __EE509526 := __E_Property_Event;
+  EXPORT __ST160611_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -18,7 +18,6 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nbool Is_Deed_;
     KEL.typ.nbool Is_Assessment_;
-    KEL.typ.nbool Is_Additional_Fares_Deed_;
     KEL.typ.nkdate Process_Date_;
     KEL.typ.nstr Vendor_Source_Code_;
     KEL.typ.nbool Current_Record_;
@@ -300,35 +299,6 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.nbool Additional_Name_Flag_;
     KEL.typ.nstr L_N_Buyer_Mailing_Country_Code_;
     KEL.typ.nstr L_N_Seller_Mailing_Country_Code_;
-    KEL.typ.nstr Fares_Owner_Et_Al_Indicator_;
-    KEL.typ.nstr Fares_Owner_Relationship_Code_;
-    KEL.typ.nstr Fares_Owner_Relationship_Type_;
-    KEL.typ.nstr Fares_Match_Code_;
-    KEL.typ.nkdate Fares_Document_Year_;
-    KEL.typ.nbool Fares_Corporate_Indicator_;
-    KEL.typ.nstr Fares_Transaction_Type_;
-    KEL.typ.nstr Fares_Lender_Address_;
-    KEL.typ.nstr Fares_Sales_Transaction_Code_;
-    KEL.typ.nbool Fares_Residential_Model_Ind_;
-    KEL.typ.nstr Fares_Mortgage_Deed_Type_;
-    KEL.typ.nstr Fares_Mortgage_Term_Code_;
-    KEL.typ.nint Fares_Mortgage_Term_;
-    KEL.typ.nint Fares_Mortgage_Assumption_Amount_;
-    KEL.typ.nstr Fares_Second_Mortgage_Loan_Type_Code_;
-    KEL.typ.nstr Fares_Second_Deed_Type_;
-    KEL.typ.nstr Fares_Absentee_Indicator_;
-    KEL.typ.nbool Fares_Partial_Interest_Indicator_;
-    KEL.typ.nstr Fares_Primary_Category_Code_;
-    KEL.typ.nstr Fares_Private_Party_Lender_;
-    KEL.typ.nstr Fares_Construction_Loan_;
-    KEL.typ.nstr Fares_Resale_New_Construction_;
-    KEL.typ.nstr Fares_Inter_Family_;
-    KEL.typ.nstr Fares_Cash_Mortgage_Purchase_;
-    KEL.typ.nint Fares_Building_Square_Feet_;
-    KEL.typ.nstr Fares_Foreclosure_;
-    KEL.typ.nstr Fares_Refincance_Flag_;
-    KEL.typ.nstr Fares_Equity_Flag_;
-    KEL.typ.nstr Fares_Iris_A_P_N_;
     KEL.typ.ndataset(E_Property_Event(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -338,10 +308,10 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST160280_Layout __ND480209__Project(E_Property_Event(__in,__cfg).Layout __PP477894) := TRANSFORM
-    __CC9528 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP477894.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP477894.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC9528)),<=,__CN(1)));
-    SELF := __PP477894;
+  SHARED __ST160611_Layout __ND510129__Project(E_Property_Event(__in,__cfg).Layout __PP508024) := TRANSFORM
+    __CC9199 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP508024.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP508024.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC9199)),<=,__CN(1)));
+    SELF := __PP508024;
   END;
-  EXPORT __ENH_Property_Event_5 := PROJECT(__EE479546,__ND480209__Project(LEFT));
+  EXPORT __ENH_Property_Event_5 := PROJECT(__EE509526,__ND510129__Project(LEFT));
 END;

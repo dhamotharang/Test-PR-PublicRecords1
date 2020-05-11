@@ -557,12 +557,7 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 				Options.IncludePersonProperty OR
 				Options.IncludePersonPropertyEvent OR
 				Options.IncludeAddressProperty OR
-				Options.IncludeAddressPropertyEvent);  	
-		
-	EXPORT DoFDCJoin_PropertyV2__Key_Addl_Fares_Deed_Fid := 
-			NOT Options.isFCRA AND
-			 (Options.IncludeProperty OR
-			 Options.IncludePropertyEvent);
+				Options.IncludeAddressPropertyEvent);
 	
 	EXPORT DoFDCJoin_AVM_V2__Key_AVM_Address := 
 			Options.IncludeProperty;
