@@ -559,8 +559,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1909_2']) => 54,
-  Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1909_1', 'fp1909_2']) => 54,  Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
       'fp1512_1','fp31604_0','fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1']) => 51, 
@@ -710,8 +709,7 @@ attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_ind
  	  ModelValidationResults := Models.FP1909_2_0(clam, 6, attributes);
  	  OUTPUT(ModelValidationResults, named('Results'));
     
-#ELSE
-// search for test seeds																					
+#ELSE// search for test seeds																					
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);	
 																																									
 // choose either test seed or real
