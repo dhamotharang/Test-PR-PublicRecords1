@@ -102,6 +102,7 @@
 	STRING6 P_InpClnPhoneHomeFlag;
 	STRING6 P_InpClnPhoneWorkFlag;
 	STRING6 P_InpClnEmailFlag;
+	STRING6 P_InpClnIPAddrFlag,
 	STRING6 P_InpValEmailUserAllZeroFlag,
 	STRING6 P_InpValEmailUserBadCharFlag,
 	STRING6 P_InpValEmailDomAllZeroFlag,
@@ -117,7 +118,8 @@
 	STRING6 P_InpValPhoneWorkBogusFlag;
 	STRING30 P_InpClnEmailUser;		
 	STRING30 P_InpClnEmailDom;		
-	STRING6  P_InpClnEmailExt;		
+	STRING6  P_InpClnEmailExt;	
+	STRING45 P_InpClnIPAddr,
 	// INTEGER4 PI_InpAddrAVMVal;		
 	// INTEGER4 PI_InpAddrAVMValA1Y;		
 	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;		
@@ -471,6 +473,7 @@
 	STRING6	B_InpClnAddrStatus;
 	// INTEGER7 B_InpClnAddrLocID;
 	STRING10 B_InpClnPhone;
+	STRING45 B_InpClnIPAddr;
 	STRING54 B_InpClnEmail;	
 	STRING6		B_Rep1InpClnNamePrfx;
 	STRING20 	B_Rep1InpClnNameFirst;
@@ -633,6 +636,7 @@
 	STRING6	B_InpClnAddrStatusFlag;
 	STRING6	B_InpClnPhoneFlag;
 	STRING6	B_InpClnTINFlag;
+	STRING6 B_InpClnIPAddrFlag;
 	STRING6	B_InpClnEmailFlag;
 	STRING6 B_Rep1InpClnNamePrfxFlag;
 	STRING6 B_Rep1InpClnNameFirstFlag;

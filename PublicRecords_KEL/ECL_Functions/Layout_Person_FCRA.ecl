@@ -102,6 +102,7 @@
 	STRING6 P_InpClnPhoneHomeFlag;
 	STRING6 P_InpClnPhoneWorkFlag;
 	STRING6 P_InpClnEmailFlag;
+	STRING6 P_InpClnIPAddrFlag,
 	STRING6 P_InpValEmailUserAllZeroFlag,
 	STRING6 P_InpValEmailUserBadCharFlag,
 	STRING6 P_InpValEmailDomAllZeroFlag,
@@ -118,6 +119,7 @@
 	STRING30 P_InpClnEmailUser;		
 	STRING30 P_InpClnEmailDom;		
 	STRING6  P_InpClnEmailExt;
+	STRING45 P_InpClnIPAddr;
 	// INTEGER4 PI_InpAddrAVMVal;
 	// INTEGER4 PI_InpAddrAVMValA1Y;
 	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;

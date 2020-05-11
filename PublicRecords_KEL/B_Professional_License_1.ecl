@@ -4,8 +4,8 @@ IMPORT B_Professional_License_2,CFG_Compile,E_Professional_License FROM PublicRe
 IMPORT * FROM KEL12.Null;
 EXPORT B_Professional_License_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_2().__ENH_Professional_License_2) __ENH_Professional_License_2 := B_Professional_License_2(__in,__cfg).__ENH_Professional_License_2;
-  SHARED __EE2795076 := __ENH_Professional_License_2;
-  EXPORT __ST124190_Layout := RECORD
+  SHARED __EE2825948 := __ENH_Professional_License_2;
+  EXPORT __ST124370_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -25,5 +25,5 @@ EXPORT B_Professional_License_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Professional_License_1 := PROJECT(__EE2795076,__ST124190_Layout);
+  EXPORT __ENH_Professional_License_1 := PROJECT(__EE2825948,__ST124370_Layout);
 END;

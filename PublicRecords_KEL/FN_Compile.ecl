@@ -127,9 +127,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC9681 := -99999;
+  SHARED __CC9352 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC9681,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC9352,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -163,7 +163,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nstr FN__fn_Naic_Code_Interpreter(KEL.typ.nstr __PNaicCodeInput) := FUNCTION
     NaicCodeInput := __T(__PNaicCodeInput);
     __IsNull := __NL(__PNaicCodeInput);
-    __Value := PublicRecords_KEL.ECL_Functions.fn_NaicCodeInterpreter((INTEGER)NaicCodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.fn_NaicCodeInterpreter(NaicCodeInput);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN__fn_Naic_Group_Code_Interpreter(KEL.typ.nstr __PNaicCodeGroup) := FUNCTION
@@ -172,7 +172,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nstr FN_Fn_S_I_C_Code_Interpreter(KEL.typ.nstr __PSic4CodeInput) := FUNCTION
     Sic4CodeInput := __T(__PSic4CodeInput);
     __IsNull := __NL(__PSic4CodeInput);
-    __Value := PublicRecords_KEL.ECL_Functions.Fn_SICCodeInterpreter((INTEGER)Sic4CodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_SICCodeInterpreter(Sic4CodeInput);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN_Fn_S_I_C_Group_Code_Interpreter(KEL.typ.nstr __PSicCodeGroup) := FUNCTION
@@ -231,6 +231,12 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT KEL.typ.nbool FN_Is_Phone_Match(KEL.typ.nstr __PPhoneOnFile, KEL.typ.nstr __PInputPhone) := FUNCTION
     RETURN MAP(__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(10)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(10))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone10_Match(__ECAST(KEL.typ.nstr,__PPhoneOnFile),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(7)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(7))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone7_Match(__ECAST(KEL.typ.nstr,__PPhoneOnFile),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(10)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(7))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone7_Match(__ECAST(KEL.typ.nstr,__FN3(KEL.Routines.SubStr2,__PPhoneOnFile,__CN(4),__CN(10))),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(7)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(10))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone10_Match(__ECAST(KEL.typ.nstr,__OP2(__FN3(KEL.Routines.SubStr2,__PInputPhone,__CN(1),__CN(3)),+,__PPhoneOnFile)),__ECAST(KEL.typ.nstr,__PInputPhone))),__ECAST(KEL.typ.nbool,__CN(FALSE)));
+  END;
+  EXPORT KEL.typ.nstr FN_Fn_I_P_Validate(KEL.typ.nstr __Pfield1) := FUNCTION
+    field1 := __T(__Pfield1);
+    __IsNull := __NL(__Pfield1);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_IPValidate(field1);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION
     RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),IN,__CN(['UCC-3 TERMINATION','TERMINATION','UCC3 TERMINATION'])))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CORRECTION')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('AMENDMENT')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('ASSIGNMENT')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CONTINUATION')))=>'5',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('FILING OFFICER STATEMENT')))=>'6',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('INITIAL FILING')))=>'7','7');

@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Geo_Link,E_Input_P_I_I,E_Person,E_Surname FROM PublicRecord
 IMPORT * FROM KEL12.Null;
 EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I().__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE287717 := __E_Input_P_I_I;
-  EXPORT __ST165827_Layout := RECORD
+  SHARED __EE307520 := __E_Input_P_I_I;
+  EXPORT __ST166413_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -87,9 +87,9 @@ EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST165827_Layout __ND287801__Project(E_Input_P_I_I(__in,__cfg).Layout __PP287327) := TRANSFORM
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP287327.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP287327.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP287327.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP287327.P___Inp_Addr_Line2_)));
-    SELF := __PP287327;
+  SHARED __ST166413_Layout __ND307604__Project(E_Input_P_I_I(__in,__cfg).Layout __PP307130) := TRANSFORM
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP307130.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP307130.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP307130.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP307130.P___Inp_Addr_Line2_)));
+    SELF := __PP307130;
   END;
-  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE287717,__ND287801__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE307520,__ND307604__Project(LEFT));
 END;
