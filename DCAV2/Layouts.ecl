@@ -4,20 +4,20 @@ use xlink_ids instead of header_ids.
 IMPORT AID,address,dca,standard,bipv2;
 EXPORT Layouts :=
 MODULE
-	
+
 	export clean_phones :=
 	record
-		string10   	Phone                        ;     
-		string10   	Fax                          ;      
-		string10   	Telex                        ;     
+		string10   	Phone                        ;
+		string10   	Fax                          ;
+		string10   	Telex                        ;
 	end;
 
 	export clean_dates :=
 	record
-		string8   	update_date                   ;     
+		string8   	update_date                   ;
 	end;
 
-	export Input := 
+	export Input :=
 	module
 
 		export killreport :=
@@ -30,7 +30,7 @@ MODULE
 			string100	kill_reason      ;
 			string10	kill_date        ;
 			string		__filename 				{ virtual(logicalfilename)};
-		end;                      
+		end;
 
 		export killreport_clean :=
 		record
@@ -46,7 +46,7 @@ MODULE
 			string9		kill_enterprise_nbr	;
 			string		__filename 				{ virtual(logicalfilename)};
 			string8		filedate				 ;
-		end;                      
+		end;
 
 		export MergerAcquis :=
 		record
@@ -62,7 +62,7 @@ MODULE
 			string20 	Last_Change_Date   			;
 			string9  	Updated_By							;
 			string		__filename 				{ virtual(logicalfilename)};
-		end;                      
+		end;
 
 		export MergerAcquis_clean :=
 		record
@@ -92,7 +92,7 @@ MODULE
 			string8		Last_Change_Date_clean	;
 			string		__filename 				{ virtual(logicalfilename)};
 			string8		filedate				 				;
-		end;                      
+		end;
 
 		export affpeople :=
 		record
@@ -107,7 +107,7 @@ MODULE
 			string4		birth_year       ;
 			string6		gender           ;
 			string		__filename 				{ virtual(logicalfilename)};
-		end;                      
+		end;
 
 		export affboards :=
 		record
@@ -124,7 +124,7 @@ MODULE
 			string262 committees      ;
 			string		__filename 				{ virtual(logicalfilename)};
 		end;
-		
+
 		export affPositions :=
 		record
 			string9		primary_id 			;
@@ -139,82 +139,82 @@ MODULE
 			string77	resp_codes      ;
 			string		__filename 				{ virtual(logicalfilename)};
 		end;
-		
-		export orig_addr := 
+
+		export orig_addr :=
 		record
-			string30   PO_Box_Bldg                  ;      
-			string70   Street                       ;     
-			string70   Foreign_PO                   ;     
-			string80   Misc__adr                    ;     
-			string15   Postal_Code_1                ;     
-			string30   City                         ;      
-			string2    State                        ;      
-			string15   Zip                          ;     
-			string20   Province                     ;     
-			string15   Postal_Code_2                ;      
-			string30   Country                      ;     
-			string15   Postal_Code_3                ;     
+			string30   PO_Box_Bldg                  ;
+			string70   Street                       ;
+			string70   Foreign_PO                   ;
+			string80   Misc__adr                    ;
+			string15   Postal_Code_1                ;
+			string30   City                         ;
+			string2    State                        ;
+			string15   Zip                          ;
+			string20   Province                     ;
+			string15   Postal_Code_2                ;
+			string30   Country                      ;
+			string15   Postal_Code_3                ;
 		end;
 		export sics :=
 		record
-			string30   Sic                         ;      
-			string150  Sic_Text                    ;     
+			string30   Sic                         ;
+			string150  Sic_Text                    ;
 		end;
-		export lexecutives := 
+		export lexecutives :=
 		record
-			string200  Name                       ;     
-			string65   Title                      ;     
-			string3    code                       ;      
+			string200  Name                       ;
+			string65   Title                      ;
+			string3    code                       ;
 		end;
-		export lexchanges := {string450  Exchange };    
-		export lnaics := 
+		export lexchanges := {string450  Exchange };
+		export lnaics :=
 		record
 			string7    Naics                       ;
-			string150  Naics_Text                  ; 
+			string150  Naics_Text                  ;
 		end;
-		
+
 		EXPORT sprayedchild :=
 		RECORD
 			string9		 	Enterprise_num							 ;
-			string9    	Parent_Enterprise_number     ;  
-			string9    	Ultimate_Enterprise_number   ;  
-			string70   	Company_Type		             ;     
-			string150  	Name                         ;    
-			string150  	Note                         ;    
-			string2    	Level                        ;      
-			string9    	Root                         ;      
-			string4    	Sub                          ;       
-			string150  	Parent_Name                  ;    
-			string15   	Parent_Number                ;     
-			string150  	JV_Parent1                   ;     
-			string15   	JV1_num                      ;      
-			string150  	JV_Parent2                   ;     
-			string15   	JV2_num                      ;     
+			string9    	Parent_Enterprise_number     ;
+			string9    	Ultimate_Enterprise_number   ;
+			string70   	Company_Type		             ;
+			string150  	Name                         ;
+			string150  	Note                         ;
+			string2    	Level                        ;
+			string9    	Root                         ;
+			string4    	Sub                          ;
+			string150  	Parent_Name                  ;
+			string15   	Parent_Number                ;
+			string150  	JV_Parent1                   ;
+			string15   	JV1_num                      ;
+			string150  	JV_Parent2                   ;
+			string15   	JV2_num                      ;
 			orig_addr	 	address1										 ;
-			string50   	Phone                        ;     
-			string50   	Fax                          ;      
-			string50   	Telex                        ;     
-			string120  	E_mail                       ;     
-			string120  	URL                          ;     
+			string50   	Phone                        ;
+			string50   	Fax                          ;
+			string50   	Telex                        ;
+			string120  	E_mail                       ;
+			string120  	URL                          ;
 			orig_addr	 	address2										 ;
-			string2    	Incorp                       ;       
-			string5    	percent_owned                ;      
-			string12   	Earnings                     ;     
-			string12   	Sales                        ;     
-			string50   	Sales_Desc                   ;      
-			string12   	Assets                       ;     
-			string12   	Liabilities                  ;     
-			string12   	Net_Worth                    ;     
-			string6    	FYE                          ;       
-			string9    	EMP_NUM                      ;      
-			string1    	DoesImport                   ;      
-			string50   	DoesExport      	           ;      
-			string4000 	Bus_Desc                     ;   
+			string2    	Incorp                       ;
+			string5    	percent_owned                ;
+			string12   	Earnings                     ;
+			string12   	Sales                        ;
+			string50   	Sales_Desc                   ;
+			string12   	Assets                       ;
+			string12   	Liabilities                  ;
+			string12   	Net_Worth                    ;
+			string6    	FYE                          ;
+			string9    	EMP_NUM                      ;
+			string1    	DoesImport                   ;
+			string50   	DoesExport      	           ;
+			string4000 	Bus_Desc                     ;
 			sics				sic_codes					[10]	 		 ;
-			lexecutives	executives				[10]			 ;	
+			lexecutives	executives				[10]			 ;
 			string20   	Ticker_Symbol                ;
 			lexchanges	exchanges					[20]			 ;
-			string4000 	Extended_Profile	           ; 
+			string4000 	Extended_Profile	           ;
 			string60   	CBSA                         ;
 			string5000 	Competitors               	 ;
 			lnaics			naics_codes				[10]			 ;
@@ -225,238 +225,238 @@ MODULE
 		EXPORT sprayed :=
 		RECORD
 			string9		 Enterprise_num							  ;
-			string9    Parent_Enterprise_number     ;  
-			string9    Ultimate_Enterprise_number   ;  
-			string70   Company_Type		              ;     
-			string150  Name                         ;    
-			string150  Note                         ;    
-			string2    Level                        ;      
-			string9    Root                         ;      
-			string4    Sub                          ;       
-			string150  Parent_Name                  ;    
-			string15   Parent_Number                ;     
-			string150  JV_Parent1                   ;     
-			string15   JV1_num                      ;      
-			string150  JV_Parent2                   ;     
-			string15   JV2_num                      ;     
+			string9    Parent_Enterprise_number     ;
+			string9    Ultimate_Enterprise_number   ;
+			string70   Company_Type		              ;
+			string150  Name                         ;
+			string150  Note                         ;
+			string2    Level                        ;
+			string9    Root                         ;
+			string4    Sub                          ;
+			string150  Parent_Name                  ;
+			string15   Parent_Number                ;
+			string150  JV_Parent1                   ;
+			string15   JV1_num                      ;
+			string150  JV_Parent2                   ;
+			string15   JV2_num                      ;
 			orig_addr	 	address1										 ;
-			string50   Phone                        ;     
-			string50   Fax                          ;      
-			string50   Telex                        ;     
-			string120  E_mail                       ;     
-			string120  URL                          ;     
+			string50   Phone                        ;
+			string50   Fax                          ;
+			string50   Telex                        ;
+			string120  E_mail                       ;
+			string120  URL                          ;
 			orig_addr	 	address2										 ;
-			string2    Incorp                       ;       
-			string5    percent_owned                ;      
-			string12   Earnings                     ;     
-			string12   Sales                        ;     
-			string50   Sales_Desc                   ;      
-			string12   Assets                       ;     
-			string12   Liabilities                  ;     
-			string12   Net_Worth                    ;     
-			string6    FYE                          ;       
-			string9    EMP_NUM                      ;      
-			string1    DoesImport                   ;      
-			string50   DoesExport      	            ;      
-			string4000 Bus_Desc                     ;   
-			string30   Sic1                         ;      
-			string150  Text1                        ;     
-			string30   Sic2                         ;      
-			string150  Text2                        ;      
-			string30   Sic3                         ;      
-			string150  Text3                        ;     
-			string30   Sic4                         ;      
-			string150  Text4                        ;      
-			string30   Sic5                         ;      
-			string150  Text5                        ;     
-			string30   Sic6                         ;      
-			string150  Text6                        ;      
-			string30   Sic7                         ;      
-			string150  Text7                        ;     
-			string30   Sic8                         ;      
-			string150  Text8                        ;      
-			string30   Sic9                         ;      
-			string150  Text9                        ;     
-			string30   Sic10                        ;      
-			string150  Text10                       ;      
-			string200  Name_1                       ;     
-			string65   Title_1                      ;     
-			string3    code_1                       ;      
-			string200  Name_2                       ;      
-			string65   Title_2                      ;     
-			string3    code_2                       ;      
-			string200  Name_3                       ;     
-			string65   Title_3                      ;      
-			string3    code_3                       ;      
-			string200  Name_4                       ;     
-			string65   Title_4                      ;     
-			string3    code_4                       ;       
-			string200  Name_5                       ;     
-			string65   Title_5                      ;     
-			string3    code_5                       ;      
-			string200  Name_6                       ;      
-			string65   Title_6                      ;     
-			string3    code_6                       ;      
-			string200  Name_7                       ;     
-			string65   Title_7                      ;      
-			string3    code_7                       ;      
-			string200  Name_8                       ;     
-			string65   Title_8                      ;     
-			string3    code_8                       ;       
-			string200  Name_9                       ;     
-			string65   Title_9                      ;     
-			string3    code_9                       ;      
-			string200  Name_10                      ;      
-			string65   Title_10                     ;     
-			string3    code_10                      ;      
-			string20   Ticker_Symbol                ;     
-			string450  Exchange1                    ;       
-			string450  Exchange2                    ;      
-			string450  Exchange3                    ;      
-			string450  Exchange4                    ;      
-			string450  Exchange5                    ;       
-			string450  Exchange6                    ;      
-			string450  Exchange7                    ;      
-			string450  Exchange8                    ;      
-			string450  Exchange9                    ;       
-			string450  Exchange10                   ;      
-			string450  Exchange11                   ;      
-			string450  Exchange12                   ;      
-			string450  Exchange13                   ;       
-			string450  Exchange14                   ;      
-			string450  Exchange15                   ;      
-			string450  Exchange16                   ;      
-			string450  Exchange17                   ;       
-			string450  Exchange18                   ;      
+			string2    Incorp                       ;
+			string5    percent_owned                ;
+			string12   Earnings                     ;
+			string12   Sales                        ;
+			string50   Sales_Desc                   ;
+			string12   Assets                       ;
+			string12   Liabilities                  ;
+			string12   Net_Worth                    ;
+			string6    FYE                          ;
+			string9    EMP_NUM                      ;
+			string1    DoesImport                   ;
+			string50   DoesExport      	            ;
+			string4000 Bus_Desc                     ;
+			string30   Sic1                         ;
+			string150  Text1                        ;
+			string30   Sic2                         ;
+			string150  Text2                        ;
+			string30   Sic3                         ;
+			string150  Text3                        ;
+			string30   Sic4                         ;
+			string150  Text4                        ;
+			string30   Sic5                         ;
+			string150  Text5                        ;
+			string30   Sic6                         ;
+			string150  Text6                        ;
+			string30   Sic7                         ;
+			string150  Text7                        ;
+			string30   Sic8                         ;
+			string150  Text8                        ;
+			string30   Sic9                         ;
+			string150  Text9                        ;
+			string30   Sic10                        ;
+			string150  Text10                       ;
+			string200  Name_1                       ;
+			string65   Title_1                      ;
+			string3    code_1                       ;
+			string200  Name_2                       ;
+			string65   Title_2                      ;
+			string3    code_2                       ;
+			string200  Name_3                       ;
+			string65   Title_3                      ;
+			string3    code_3                       ;
+			string200  Name_4                       ;
+			string65   Title_4                      ;
+			string3    code_4                       ;
+			string200  Name_5                       ;
+			string65   Title_5                      ;
+			string3    code_5                       ;
+			string200  Name_6                       ;
+			string65   Title_6                      ;
+			string3    code_6                       ;
+			string200  Name_7                       ;
+			string65   Title_7                      ;
+			string3    code_7                       ;
+			string200  Name_8                       ;
+			string65   Title_8                      ;
+			string3    code_8                       ;
+			string200  Name_9                       ;
+			string65   Title_9                      ;
+			string3    code_9                       ;
+			string200  Name_10                      ;
+			string65   Title_10                     ;
+			string3    code_10                      ;
+			string20   Ticker_Symbol                ;
+			string450  Exchange1                    ;
+			string450  Exchange2                    ;
+			string450  Exchange3                    ;
+			string450  Exchange4                    ;
+			string450  Exchange5                    ;
+			string450  Exchange6                    ;
+			string450  Exchange7                    ;
+			string450  Exchange8                    ;
+			string450  Exchange9                    ;
+			string450  Exchange10                   ;
+			string450  Exchange11                   ;
+			string450  Exchange12                   ;
+			string450  Exchange13                   ;
+			string450  Exchange14                   ;
+			string450  Exchange15                   ;
+			string450  Exchange16                   ;
+			string450  Exchange17                   ;
+			string450  Exchange18                   ;
 			string450  Exchange19                   ;
-			string450  Exchange20                   ;      
-			string4000 Extended_Profile	            ; 
+			string450  Exchange20                   ;
+			string4000 Extended_Profile	            ;
 			string60   CBSA                         ;
 			string5000 Competitors               		;
 			string7    Naics1                       ;
-			string150  Naics_Text1                  ; 
+			string150  Naics_Text1                  ;
 			string7    Naics2                       ;
 			string150  Naics_Text2                  ;
 			string7    Naics3                       ;
-			string150  Naics_Text3                  ; 
+			string150  Naics_Text3                  ;
 			string7    Naics4                       ;
 			string150  Naics_Text4                  ;
 			string7    Naics5                       ;
-			string150  Naics_Text5                  ; 
+			string150  Naics_Text5                  ;
 			string7    Naics6                       ;
 			string150  Naics_Text6                  ;
 			string7    Naics7                       ;
-			string150  Naics_Text7                  ; 
+			string150  Naics_Text7                  ;
 			string7    Naics8                       ;
 			string150  Naics_Text8                  ;
 			string7    Naics9                       ;
-			string150  Naics_Text9                  ; 
+			string150  Naics_Text9                  ;
 			string7    Naics10                      ;
 			string150  Naics_Text10                 ;
 			string8		 Update_Date                  ;
 			string100 	__filename 				{ virtual(logicalfilename)};
 		END;
-		
+
 		EXPORT sprayedexecs :=
 		RECORD
 			string9		 Enterprise_num							  ;
-			string9    Parent_Enterprise_number     ;  
-			string9    Ultimate_Enterprise_number   ;  
-			string70   Company_Type		              ;     
-			string150  Name                         ;    
-			string150  Note                         ;    
-			string2    Level                        ;      
-			string9    Root                         ;      
-			string4    Sub                          ;       
-			string150  Parent_Name                  ;    
-			string15   Parent_Number                ;     
-			string150  JV_Parent1                   ;     
-			string15   JV1_num                      ;      
-			string150  JV_Parent2                   ;     
-			string15   JV2_num                      ;     
+			string9    Parent_Enterprise_number     ;
+			string9    Ultimate_Enterprise_number   ;
+			string70   Company_Type		              ;
+			string150  Name                         ;
+			string150  Note                         ;
+			string2    Level                        ;
+			string9    Root                         ;
+			string4    Sub                          ;
+			string150  Parent_Name                  ;
+			string15   Parent_Number                ;
+			string150  JV_Parent1                   ;
+			string15   JV1_num                      ;
+			string150  JV_Parent2                   ;
+			string15   JV2_num                      ;
 			orig_addr	 address1										  ;
-			string50   Phone                        ;     
-			string50   Fax                          ;      
-			string50   Telex                        ;     
-			string120  E_mail                       ;     
-			string120  URL                          ;     
+			string50   Phone                        ;
+			string50   Fax                          ;
+			string50   Telex                        ;
+			string120  E_mail                       ;
+			string120  URL                          ;
 			orig_addr	 address2										  ;
-			string2    Incorp                       ;       
-			string5    percent_owned                ;      
-			string12   Earnings                     ;     
-			string12   Sales                        ;     
-			string50   Sales_Desc                   ;      
-			string12   Assets                       ;     
-			string12   Liabilities                  ;     
-			string12   Net_Worth                    ;     
-			string6    FYE                          ;       
-			string9    EMP_NUM                      ;      
-			string1    DoesImport                   ;      
-			string50   DoesExport      	            ;      
-			string4000 Bus_Desc                     ;   
-			string30   Sic1                         ;      
-			string150  Text1                        ;     
-			string30   Sic2                         ;      
-			string150  Text2                        ;      
-			string30   Sic3                         ;      
-			string150  Text3                        ;     
-			string30   Sic4                         ;      
-			string150  Text4                        ;      
-			string30   Sic5                         ;      
-			string150  Text5                        ;     
-			string30   Sic6                         ;      
-			string150  Text6                        ;      
-			string30   Sic7                         ;      
-			string150  Text7                        ;     
-			string30   Sic8                         ;      
-			string150  Text8                        ;      
-			string30   Sic9                         ;      
-			string150  Text9                        ;     
-			string30   Sic10                        ;      
-			string150  Text10                       ;      
-			dataset(lexecutives)	executives	{maxlength(50000)}			;	
-			string20   Ticker_Symbol                ;     
-			string450  Exchange1                    ;       
-			string450  Exchange2                    ;      
-			string450  Exchange3                    ;      
-			string450  Exchange4                    ;      
-			string450  Exchange5                    ;       
-			string450  Exchange6                    ;      
-			string450  Exchange7                    ;      
-			string450  Exchange8                    ;      
-			string450  Exchange9                    ;       
-			string450  Exchange10                   ;      
-			string450  Exchange11                   ;      
-			string450  Exchange12                   ;      
-			string450  Exchange13                   ;       
-			string450  Exchange14                   ;      
-			string450  Exchange15                   ;      
-			string450  Exchange16                   ;      
-			string450  Exchange17                   ;       
-			string450  Exchange18                   ;      
+			string2    Incorp                       ;
+			string5    percent_owned                ;
+			string12   Earnings                     ;
+			string12   Sales                        ;
+			string50   Sales_Desc                   ;
+			string12   Assets                       ;
+			string12   Liabilities                  ;
+			string12   Net_Worth                    ;
+			string6    FYE                          ;
+			string9    EMP_NUM                      ;
+			string1    DoesImport                   ;
+			string50   DoesExport      	            ;
+			string4000 Bus_Desc                     ;
+			string30   Sic1                         ;
+			string150  Text1                        ;
+			string30   Sic2                         ;
+			string150  Text2                        ;
+			string30   Sic3                         ;
+			string150  Text3                        ;
+			string30   Sic4                         ;
+			string150  Text4                        ;
+			string30   Sic5                         ;
+			string150  Text5                        ;
+			string30   Sic6                         ;
+			string150  Text6                        ;
+			string30   Sic7                         ;
+			string150  Text7                        ;
+			string30   Sic8                         ;
+			string150  Text8                        ;
+			string30   Sic9                         ;
+			string150  Text9                        ;
+			string30   Sic10                        ;
+			string150  Text10                       ;
+			dataset(lexecutives)	executives	{maxlength(50000)}			;
+			string20   Ticker_Symbol                ;
+			string450  Exchange1                    ;
+			string450  Exchange2                    ;
+			string450  Exchange3                    ;
+			string450  Exchange4                    ;
+			string450  Exchange5                    ;
+			string450  Exchange6                    ;
+			string450  Exchange7                    ;
+			string450  Exchange8                    ;
+			string450  Exchange9                    ;
+			string450  Exchange10                   ;
+			string450  Exchange11                   ;
+			string450  Exchange12                   ;
+			string450  Exchange13                   ;
+			string450  Exchange14                   ;
+			string450  Exchange15                   ;
+			string450  Exchange16                   ;
+			string450  Exchange17                   ;
+			string450  Exchange18                   ;
 			string450  Exchange19                   ;
-			string450  Exchange20                   ;      
-			string4000 Extended_Profile	            ; 
+			string450  Exchange20                   ;
+			string4000 Extended_Profile	            ;
 			string60   CBSA                         ;
 			string5000 Competitors               		;
 			string7    Naics1                       ;
-			string150  Naics_Text1                  ; 
+			string150  Naics_Text1                  ;
 			string7    Naics2                       ;
 			string150  Naics_Text2                  ;
 			string7    Naics3                       ;
-			string150  Naics_Text3                  ; 
+			string150  Naics_Text3                  ;
 			string7    Naics4                       ;
 			string150  Naics_Text4                  ;
 			string7    Naics5                       ;
-			string150  Naics_Text5                  ; 
+			string150  Naics_Text5                  ;
 			string7    Naics6                       ;
 			string150  Naics_Text6                  ;
 			string7    Naics7                       ;
-			string150  Naics_Text7                  ; 
+			string150  Naics_Text7                  ;
 			string7    Naics8                       ;
 			string150  Naics_Text8                  ;
 			string7    Naics9                       ;
-			string150  Naics_Text9                  ; 
+			string150  Naics_Text9                  ;
 			string7    Naics10                      ;
 			string150  Naics_Text10                 ;
 			string8		 Update_Date                  ;
@@ -465,37 +465,37 @@ MODULE
 		EXPORT sprayedflat :=
 		RECORD
 			string9		 Enterprise_num							  ;
-			string9    Parent_Enterprise_number     ;  
-			string9    Ultimate_Enterprise_number   ;  
-			string70   Company_Type		              ;     
-			string150  Name                         ;    
-			string150  Note                         ;    
-			string2    Level                        ;      
-			string9    Root                         ;      
-			string4    Sub                          ;       
-			string150  Parent_Name                  ;    
-			string15   Parent_Number                ;     
-			string150  JV_Parent1                   ;     
-			string15   JV1_num                      ;      
-			string150  JV_Parent2                   ;     
-			string15   JV2_num                      ;     
-			string30   PO_Box_Bldg                  ;      
-			string70   Street                       ;     
-			string70   Foreign_PO                   ;     
-			string80   Misc__adr                    ;     
-			string15   Postal_Code_1                ;     
-			string30   City                         ;      
-			string2    State                        ;      
-			string15   Zip                          ;     
-			string20   Province                     ;     
-			string15   Postal_Code_2                ;      
-			string30   Country                      ;     
-			string15   Postal_Code_3                ;     
-			string50   Phone                        ;     
-			string50   Fax                          ;      
-			string50   Telex                        ;     
-			string120  E_mail                       ;     
-			string120  URL                          ;     
+			string9    Parent_Enterprise_number     ;
+			string9    Ultimate_Enterprise_number   ;
+			string70   Company_Type		              ;
+			string150  Name                         ;
+			string150  Note                         ;
+			string2    Level                        ;
+			string9    Root                         ;
+			string4    Sub                          ;
+			string150  Parent_Name                  ;
+			string15   Parent_Number                ;
+			string150  JV_Parent1                   ;
+			string15   JV1_num                      ;
+			string150  JV_Parent2                   ;
+			string15   JV2_num                      ;
+			string30   PO_Box_Bldg                  ;
+			string70   Street                       ;
+			string70   Foreign_PO                   ;
+			string80   Misc__adr                    ;
+			string15   Postal_Code_1                ;
+			string30   City                         ;
+			string2    State                        ;
+			string15   Zip                          ;
+			string20   Province                     ;
+			string15   Postal_Code_2                ;
+			string30   Country                      ;
+			string15   Postal_Code_3                ;
+			string50   Phone                        ;
+			string50   Fax                          ;
+			string50   Telex                        ;
+			string120  E_mail                       ;
+			string120  URL                          ;
 		  string30   PO_Box_Bldg_A                ;
 		  string70   StreetA                      ;
 		  string70   Foreign_PO_BoxA              ;
@@ -508,111 +508,111 @@ MODULE
 		  string15   Postal_Code_2A               ;
 		  string30   CountryA                     ;
 		  string15   Postal_Code_3A               ;
-			string2    Incorp                       ;       
-			string5    percent_owned                ;      
-			string12   Earnings                     ;     
-			string12   Sales                        ;     
-			string50   Sales_Desc                   ;      
-			string12   Assets                       ;     
-			string12   Liabilities                  ;     
-			string12   Net_Worth                    ;     
-			string6    FYE                          ;       
-			string9    EMP_NUM                      ;      
-			string1    DoesImport                   ;      
-			string50   DoesExport      	            ;      
-			string4000 Bus_Desc                     ;   
-			string30   Sic1                         ;      
-			string150  Text1                        ;     
-			string30   Sic2                         ;      
-			string150  Text2                        ;      
-			string30   Sic3                         ;      
-			string150  Text3                        ;     
-			string30   Sic4                         ;      
-			string150  Text4                        ;      
-			string30   Sic5                         ;      
-			string150  Text5                        ;     
-			string30   Sic6                         ;      
-			string150  Text6                        ;      
-			string30   Sic7                         ;      
-			string150  Text7                        ;     
-			string30   Sic8                         ;      
-			string150  Text8                        ;      
-			string30   Sic9                         ;      
-			string150  Text9                        ;     
-			string30   Sic10                        ;      
-			string150  Text10                       ;      
-			string200  Name_1                       ;     
-			string65   Title_1                      ;     
-			string3    code_1                       ;      
-			string200  Name_2                       ;      
-			string65   Title_2                      ;     
-			string3    code_2                       ;      
-			string200  Name_3                       ;     
-			string65   Title_3                      ;      
-			string3    code_3                       ;      
-			string200  Name_4                       ;     
-			string65   Title_4                      ;     
-			string3    code_4                       ;       
-			string200  Name_5                       ;     
-			string65   Title_5                      ;     
-			string3    code_5                       ;      
-			string200  Name_6                       ;      
-			string65   Title_6                      ;     
-			string3    code_6                       ;      
-			string200  Name_7                       ;     
-			string65   Title_7                      ;      
-			string3    code_7                       ;      
-			string200  Name_8                       ;     
-			string65   Title_8                      ;     
-			string3    code_8                       ;       
-			string200  Name_9                       ;     
-			string65   Title_9                      ;     
-			string3    code_9                       ;      
-			string200  Name_10                      ;      
-			string65   Title_10                     ;     
-			string3    code_10                      ;      
-			string20   Ticker_Symbol                ;     
-			string450  Exchange1                    ;       
-			string450  Exchange2                    ;      
-			string450  Exchange3                    ;      
-			string450  Exchange4                    ;      
-			string450  Exchange5                    ;       
-			string450  Exchange6                    ;      
-			string450  Exchange7                    ;      
-			string450  Exchange8                    ;      
-			string450  Exchange9                    ;       
-			string450  Exchange10                   ;      
-			string450  Exchange11                   ;      
-			string450  Exchange12                   ;      
-			string450  Exchange13                   ;       
-			string450  Exchange14                   ;      
-			string450  Exchange15                   ;      
-			string450  Exchange16                   ;      
-			string450  Exchange17                   ;       
-			string450  Exchange18                   ;      
+			string2    Incorp                       ;
+			string5    percent_owned                ;
+			string12   Earnings                     ;
+			string12   Sales                        ;
+			string50   Sales_Desc                   ;
+			string12   Assets                       ;
+			string12   Liabilities                  ;
+			string12   Net_Worth                    ;
+			string6    FYE                          ;
+			string9    EMP_NUM                      ;
+			string1    DoesImport                   ;
+			string50   DoesExport      	            ;
+			string4000 Bus_Desc                     ;
+			string30   Sic1                         ;
+			string150  Text1                        ;
+			string30   Sic2                         ;
+			string150  Text2                        ;
+			string30   Sic3                         ;
+			string150  Text3                        ;
+			string30   Sic4                         ;
+			string150  Text4                        ;
+			string30   Sic5                         ;
+			string150  Text5                        ;
+			string30   Sic6                         ;
+			string150  Text6                        ;
+			string30   Sic7                         ;
+			string150  Text7                        ;
+			string30   Sic8                         ;
+			string150  Text8                        ;
+			string30   Sic9                         ;
+			string150  Text9                        ;
+			string30   Sic10                        ;
+			string150  Text10                       ;
+			string200  Name_1                       ;
+			string65   Title_1                      ;
+			string3    code_1                       ;
+			string200  Name_2                       ;
+			string65   Title_2                      ;
+			string3    code_2                       ;
+			string200  Name_3                       ;
+			string65   Title_3                      ;
+			string3    code_3                       ;
+			string200  Name_4                       ;
+			string65   Title_4                      ;
+			string3    code_4                       ;
+			string200  Name_5                       ;
+			string65   Title_5                      ;
+			string3    code_5                       ;
+			string200  Name_6                       ;
+			string65   Title_6                      ;
+			string3    code_6                       ;
+			string200  Name_7                       ;
+			string65   Title_7                      ;
+			string3    code_7                       ;
+			string200  Name_8                       ;
+			string65   Title_8                      ;
+			string3    code_8                       ;
+			string200  Name_9                       ;
+			string65   Title_9                      ;
+			string3    code_9                       ;
+			string200  Name_10                      ;
+			string65   Title_10                     ;
+			string3    code_10                      ;
+			string20   Ticker_Symbol                ;
+			string450  Exchange1                    ;
+			string450  Exchange2                    ;
+			string450  Exchange3                    ;
+			string450  Exchange4                    ;
+			string450  Exchange5                    ;
+			string450  Exchange6                    ;
+			string450  Exchange7                    ;
+			string450  Exchange8                    ;
+			string450  Exchange9                    ;
+			string450  Exchange10                   ;
+			string450  Exchange11                   ;
+			string450  Exchange12                   ;
+			string450  Exchange13                   ;
+			string450  Exchange14                   ;
+			string450  Exchange15                   ;
+			string450  Exchange16                   ;
+			string450  Exchange17                   ;
+			string450  Exchange18                   ;
 			string450  Exchange19                   ;
-			string450  Exchange20                   ;      
-			string4000 Extended_Profile	            ; 
+			string450  Exchange20                   ;
+			string4000 Extended_Profile	            ;
 			string60   CBSA                         ;
 			string5000 Competitors               		;
 			string7    Naics1                       ;
-			string150  Naics_Text1                  ; 
+			string150  Naics_Text1                  ;
 			string7    Naics2                       ;
 			string150  Naics_Text2                  ;
 			string7    Naics3                       ;
-			string150  Naics_Text3                  ; 
+			string150  Naics_Text3                  ;
 			string7    Naics4                       ;
 			string150  Naics_Text4                  ;
 			string7    Naics5                       ;
-			string150  Naics_Text5                  ; 
+			string150  Naics_Text5                  ;
 			string7    Naics6                       ;
 			string150  Naics_Text6                  ;
 			string7    Naics7                       ;
-			string150  Naics_Text7                  ; 
+			string150  Naics_Text7                  ;
 			string7    Naics8                       ;
 			string150  Naics_Text8                  ;
 			string7    Naics9                       ;
-			string150  Naics_Text9                  ; 
+			string150  Naics_Text9                  ;
 			string7    Naics10                      ;
 			string150  Naics_Text10                 ;
 			string8		 Update_Date                  ;
@@ -621,136 +621,136 @@ MODULE
 		EXPORT contacts :=
 		RECORD
 			string9		 	Enterprise_num							 ;
-			string2    	Level                        ;      
-			string150  	Name                         ;    
+			string2    	Level                        ;
+			string150  	Name                         ;
 			orig_addr	 	address1										 ;
-			string50   	Phone                        ;     
-			string50   	Fax                          ;      
-			string50   	Telex                        ;     
+			string50   	Phone                        ;
+			string50   	Fax                          ;
+			string50   	Telex                        ;
 			orig_addr	 	address2										 ;
-			lexecutives	executive										 ;	
+			lexecutives	executive										 ;
 			string8		 	Update_Date                  ;
 		END;
-		
+
 		EXPORT contactsall :=
 		RECORD
 			string9		 	Enterprise_num							 ;
-			string2    	Level                        ;      
-			string150  	Name                         ;    
+			string2    	Level                        ;
+			string150  	Name                         ;
 			orig_addr	 	address1										 ;
-			string50   	Phone                        ;     
-			string50   	Fax                          ;      
-			string50   	Telex                        ;     
+			string50   	Phone                        ;
+			string50   	Fax                          ;
+			string50   	Telex                        ;
 			orig_addr	 	address2										 ;
-			dataset(lexecutives)	executives				 ;	
+			dataset(lexecutives)	executives				 ;
 			string8		 	Update_Date                  ;
 		END;
 
 		EXPORT companies :=
 		RECORD
 			string9		 Enterprise_num							  ;
-			string9    Parent_Enterprise_number     ;  
-			string9    Ultimate_Enterprise_number   ;  
-			string70   Company_Type		              ;     
-			string150  Name                         ;    
-			string150  Note                         ;    
-			string2    Level                        ;      
-			string9    Root                         ;      
-			string4    Sub                          ;       
-			string150  Parent_Name                  ;    
-			string15   Parent_Number                ;     
-			string150  JV_Parent1                   ;     
-			string15   JV1_num                      ;      
-			string150  JV_Parent2                   ;     
-			string15   JV2_num                      ;     
+			string9    Parent_Enterprise_number     ;
+			string9    Ultimate_Enterprise_number   ;
+			string70   Company_Type		              ;
+			string150  Name                         ;
+			string150  Note                         ;
+			string2    Level                        ;
+			string9    Root                         ;
+			string4    Sub                          ;
+			string150  Parent_Name                  ;
+			string15   Parent_Number                ;
+			string150  JV_Parent1                   ;
+			string15   JV1_num                      ;
+			string150  JV_Parent2                   ;
+			string15   JV2_num                      ;
 			orig_addr	 	address1										 ;
-			string50   Phone                        ;     
-			string50   Fax                          ;      
-			string50   Telex                        ;     
-			string120  E_mail                       ;     
-			string120  URL                          ;     
+			string50   Phone                        ;
+			string50   Fax                          ;
+			string50   Telex                        ;
+			string120  E_mail                       ;
+			string120  URL                          ;
 			orig_addr	 	address2										 ;
-			string2    Incorp                       ;       
-			string5    percent_owned                ;      
-			string12   Earnings                     ;     
-			string12   Sales                        ;     
-			string50   Sales_Desc                   ;      
-			string12   Assets                       ;     
-			string12   Liabilities                  ;     
-			string12   Net_Worth                    ;     
-			string6    FYE                          ;       
-			string9    EMP_NUM                      ;      
-			string1    DoesImport                   ;      
-			string50   DoesExport      	            ;      
-			string4000 Bus_Desc                     ;   
-			string30   Sic1                         ;      
-			string150  Text1                        ;     
-			string30   Sic2                         ;      
-			string150  Text2                        ;      
-			string30   Sic3                         ;      
-			string150  Text3                        ;     
-			string30   Sic4                         ;      
-			string150  Text4                        ;      
-			string30   Sic5                         ;      
-			string150  Text5                        ;     
-			string30   Sic6                         ;      
-			string150  Text6                        ;      
-			string30   Sic7                         ;      
-			string150  Text7                        ;     
-			string30   Sic8                         ;      
-			string150  Text8                        ;      
-			string30   Sic9                         ;      
-			string150  Text9                        ;     
-			string30   Sic10                        ;      
-			string150  Text10                       ;      
-			string20   Ticker_Symbol                ;     
-			string450  Exchange1                    ;       
-			string450  Exchange2                    ;      
-			string450  Exchange3                    ;      
-			string450  Exchange4                    ;      
-			string450  Exchange5                    ;       
-			string450  Exchange6                    ;      
-			string450  Exchange7                    ;      
-			string450  Exchange8                    ;      
-			string450  Exchange9                    ;       
-			string450  Exchange10                   ;      
-			string450  Exchange11                   ;      
-			string450  Exchange12                   ;      
-			string450  Exchange13                   ;       
-			string450  Exchange14                   ;      
-			string450  Exchange15                   ;      
-			string450  Exchange16                   ;      
-			string450  Exchange17                   ;       
-			string450  Exchange18                   ;      
+			string2    Incorp                       ;
+			string5    percent_owned                ;
+			string12   Earnings                     ;
+			string12   Sales                        ;
+			string50   Sales_Desc                   ;
+			string12   Assets                       ;
+			string12   Liabilities                  ;
+			string12   Net_Worth                    ;
+			string6    FYE                          ;
+			string9    EMP_NUM                      ;
+			string1    DoesImport                   ;
+			string50   DoesExport      	            ;
+			string4000 Bus_Desc                     ;
+			string30   Sic1                         ;
+			string150  Text1                        ;
+			string30   Sic2                         ;
+			string150  Text2                        ;
+			string30   Sic3                         ;
+			string150  Text3                        ;
+			string30   Sic4                         ;
+			string150  Text4                        ;
+			string30   Sic5                         ;
+			string150  Text5                        ;
+			string30   Sic6                         ;
+			string150  Text6                        ;
+			string30   Sic7                         ;
+			string150  Text7                        ;
+			string30   Sic8                         ;
+			string150  Text8                        ;
+			string30   Sic9                         ;
+			string150  Text9                        ;
+			string30   Sic10                        ;
+			string150  Text10                       ;
+			string20   Ticker_Symbol                ;
+			string450  Exchange1                    ;
+			string450  Exchange2                    ;
+			string450  Exchange3                    ;
+			string450  Exchange4                    ;
+			string450  Exchange5                    ;
+			string450  Exchange6                    ;
+			string450  Exchange7                    ;
+			string450  Exchange8                    ;
+			string450  Exchange9                    ;
+			string450  Exchange10                   ;
+			string450  Exchange11                   ;
+			string450  Exchange12                   ;
+			string450  Exchange13                   ;
+			string450  Exchange14                   ;
+			string450  Exchange15                   ;
+			string450  Exchange16                   ;
+			string450  Exchange17                   ;
+			string450  Exchange18                   ;
 			string450  Exchange19                   ;
-			string450  Exchange20                   ;      
-			string4000 Extended_Profile	            ; 
+			string450  Exchange20                   ;
+			string4000 Extended_Profile	            ;
 			string60   CBSA                         ;
 			string5000 Competitors               		;
 			string7    Naics1                       ;
-			string150  Naics_Text1                  ; 
+			string150  Naics_Text1                  ;
 			string7    Naics2                       ;
 			string150  Naics_Text2                  ;
 			string7    Naics3                       ;
-			string150  Naics_Text3                  ; 
+			string150  Naics_Text3                  ;
 			string7    Naics4                       ;
 			string150  Naics_Text4                  ;
 			string7    Naics5                       ;
-			string150  Naics_Text5                  ; 
+			string150  Naics_Text5                  ;
 			string7    Naics6                       ;
 			string150  Naics_Text6                  ;
 			string7    Naics7                       ;
-			string150  Naics_Text7                  ; 
+			string150  Naics_Text7                  ;
 			string7    Naics8                       ;
 			string150  Naics_Text8                  ;
 			string7    Naics9                       ;
-			string150  Naics_Text9                  ; 
+			string150  Naics_Text9                  ;
 			string7    Naics10                      ;
 			string150  Naics_Text10                 ;
 			string8		 Update_Date                  ;
 		END;
-		
-		export old := 
+
+		export old :=
 		record
 			string6              Enterprise_num                                                              ;
 			string70             Type_orig                                                                   ;
@@ -881,11 +881,11 @@ MODULE
 		end;
 
 	end;
-	
+
 	EXPORT base :=
 	module
-	
-		export CCPA_fields := 
+
+		export CCPA_fields :=
 		Record
 			// The below 2 fields are added for CCPA (California Consumer Protection Act) project.
 			// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
@@ -893,7 +893,7 @@ MODULE
 			unsigned8 											record_sid 									:= 0;
 		end;
 
-		export Companies := 
+		export Companies :=
 		RECORD
 			unsigned6														src_rid					:= 0				;
 			unsigned6														rid													;
@@ -924,7 +924,7 @@ MODULE
 			CCPA_fields																											;
 		END;
 
-		export Contacts := 
+		export Contacts :=
 		RECORD
 			unsigned6														rid													;
 			unsigned6														did													;
@@ -953,16 +953,18 @@ MODULE
 			Address.Layout_Clean182_fips				physical_address						;
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
+			//*** Adding CCPA project fields as per Jira# CCPA-12, CCPA-1029
+			CCPA_fields																											;
 		END;
 
 		//old layout, but with increased enterprise num, root, sub, level, parent num, jv1_ & jv2_
-		export keybuild 		:= 
+		export keybuild 		:=
 		record
 			unsigned6            bdid                                                                        ;
 			string8              process_date                                                                ;
 			string9              Enterprise_num                                                              ;
-			string9    					 Parent_Enterprise_number     																							 ;  
-			string9    					 Ultimate_Enterprise_number   																							 ;  
+			string9    					 Parent_Enterprise_number     																							 ;
+			string9    					 Ultimate_Enterprise_number   																							 ;
 			string70             Type_orig                                                                   ;
 			string105            name                                                                        ;
 			string107            Note                                                                        ;
@@ -1203,10 +1205,10 @@ MODULE
 			string1              LF                                                                          ;
 			//*** Adding CCPA project fields as per Jira# CCPA-12
 			CCPA_fields																																											 ;
-			
+
 		end;
 
-		export keybuildEntNum := 
+		export keybuildEntNum :=
 		RECORD
 			keybuild;
 			string7		Naics1;
@@ -1229,22 +1231,22 @@ MODULE
 			string150	Naics_Text9;
 			string7		Naics10;
 			string150	Naics_Text10;
-		END;		
+		END;
 
 		export keybuildSlim := keybuild;
 
-		export autokeybuild := 
+		export autokeybuild :=
 		RECORD
 			keybuild.bdid;
-			STRING105 company_name; 	
+			STRING105 company_name;
 			STRING45  company_phone;
 			STRING2   Level;
 			STRING9   Root;
 			STRING4   Sub;
 			STRING105 Parent_Name;
-			STRING15  Parent_Number;			
+			STRING15  Parent_Number;
 			string9   Enterprise_num                                                              ;
-			string9   Parent_Enterprise_number     																							 ;  
+			string9   Parent_Enterprise_number     																							 ;
 			Standard.L_Address.base bus_addr;
 			UNSIGNED1 zero             :=  0;
 			STRING1   blank            := '';
@@ -1255,7 +1257,7 @@ MODULE
 			STRING1   blank_zip5       := '';
 			STRING1   blank_sec_range  := '';
 		END;
-		
+
 		export autokeybuild_bdid	:= autokeybuild;
 
 	end;
@@ -1264,21 +1266,21 @@ MODULE
 	////////////////////////////////////////////////////////////////////////
 	export Temporary :=
 	module
-		export hierarchy := 
+		export hierarchy :=
 		record
 			unsigned6		rid							;
 			unsigned3		lncaGID					;
 			unsigned3		lncaGHID				;
 			unsigned2		lncaIID					;
 			string9		 	Enterprise_num	;
-			string2    	Level           ;      
-			string9    	Root            ;      
-			string4    	Sub             ;       
+			string2    	Level           ;
+			string9    	Root            ;
+			string4    	Sub             ;
 			string105   name            ;
 			string6			file_type				;
 		end;
-		
-		export CompaniesChild := 
+
+		export CompaniesChild :=
 		RECORD
 			unsigned6														src_rid					:= 0				;
 			unsigned6														rid													;
@@ -1307,7 +1309,7 @@ MODULE
 			clean_dates													clean_dates									;
 		END;
 
-		export keybuildprep := 
+		export keybuildprep :=
 		RECORD
 			unsigned6														rid													;
 			unsigned6														did													;
@@ -1333,9 +1335,10 @@ MODULE
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
 			clean_dates													clean_dates									;
+			Base.CCPA_Fields;
 		END;
 
-		export ContactsPrep := 
+		export ContactsPrep :=
 		RECORD
 			unsigned6														rid													;
 			unsigned4   												date_first_seen							;
@@ -1352,7 +1355,7 @@ MODULE
 		END;
 
 
-		export big := 
+		export big :=
 		RECORD
 			string100			physical_address1				;
 			string50			physical_address2				;
@@ -1386,7 +1389,7 @@ MODULE
 			string8															filedate										;
 		END;
 
-		export bigchild := 
+		export bigchild :=
 		RECORD
 			string100			physical_address1				;
 			string50			physical_address2				;
@@ -1422,41 +1425,41 @@ MODULE
 
 		export companies_aid_prep :=
 		record
-		
+
 			string100			physical_address1				;
 			string50			physical_address2				;
 			string100			mailing_address1				;
 			string50			mailing_address2				;
 			Base.Companies											;
 			string8															filedate										;
-		
+
 		end;
-		
+
 		export companies_aid_prep_child :=
 		record
-		
+
 			string100			physical_address1				;
 			string50			physical_address2				;
 			string100			mailing_address1				;
 			string50			mailing_address2				;
 			CompaniesChild									;
 			string8															filedate										;
-		
+
 		end;
 
 		export contacts_aid_prep :=
 		record
-		
+
 			string100			physical_address1				;
 			string50			physical_address2				;
 			string100			mailing_address1				;
 			string50			mailing_address2				;
 			Base.Contacts												;
 			string8															filedate										;
-		
+
 		end;
 
-		export CompaniesStrata := 
+		export CompaniesStrata :=
 		RECORD
 			unsigned6														src_rid					:= 0				;
 			unsigned6														rid													;
@@ -1485,7 +1488,7 @@ MODULE
 			clean_dates													clean_dates									;
 		END;
 
-		export ContactsStrata := 
+		export ContactsStrata :=
 		RECORD
 			unsigned6														rid													;
 			unsigned6														did													;
@@ -1517,5 +1520,5 @@ MODULE
 		END;
 
 	end;
-		
+
 END;

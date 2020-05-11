@@ -1,17 +1,17 @@
-﻿IMPORT AutoHeaderI, AutoStandardI, Business_Header, Business_Header_SS, Corp2, DCA, doxie_cbrs, 
+﻿IMPORT AutoHeaderI, AutoStandardI, Business_Header, Business_Header_SS, Corp2, DCA, dx_dca, doxie_cbrs,
   LiensV2, LN_PropertyV2, UCCv2, BankruptcyV3, ut, STD, doxie, Suppress;
 
 EXPORT RollupBusiness_BatchService_Records(
 	DATASET(RollupBusiness_BatchService_Layouts.Input) indata,
 	RollupBusiness_BatchService_Interfaces.Input args) := MODULE
-  
+
 	SHARED mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
     EXPORT unsigned1 glb := args.glbpurpose;
     EXPORT unsigned1 dppa := args.dppapurpose;
-    
+
   END;
 	SHARED limits := RollupBusiness_BatchService_Constants.Limits;
-	
+
 	// First, project into the layout for Business Header Fetch.
 	it := AutoStandardI.InterfaceTranslator;
 	SHARED Header_Fetch_Records := PROJECT(indata,TRANSFORM(AutoHeaderI.Layouts.Fetch_Hdr_Batch_Biz_Layout,
@@ -70,21 +70,21 @@ EXPORT RollupBusiness_BatchService_Records(
 		SELF.city_value := it.city_value.val(PROJECT(tempmod,it.city_value.params)),
 		SELF.state_value := it.state_value.val(PROJECT(tempmod,it.state_value.params)),
 		SELF.zip_value := it.zip_value.val(PROJECT(tempmod,it.zip_value.params)),
-		boolean OTHER_INPUT_PRESENT := if(temp_company_name_value !='' and 
-		                                  temp_pname_value !='', 
+		boolean OTHER_INPUT_PRESENT := if(temp_company_name_value !='' and
+		                                  temp_pname_value !='',
 													            true, false);
-	  // Since certain input fein#s (i.e. 820100960 for Boise Cascade Corp at 
-		// address= 896 Mercury Ave Idaho Falls, ID 83402) retrieve way too many BDID_Records; 
+	  // Since certain input fein#s (i.e. 820100960 for Boise Cascade Corp at
+		// address= 896 Mercury Ave Idaho Falls, ID 83402) retrieve way too many BDID_Records;
 		// don't use the input fein# for AutoHeader fetches if a company_name and street_name
 		// was entered. (See RQ 100563).
 		SELF.fein_value := if(OTHER_INPUT_PRESENT,
 		                      0,it.fein_value.val(PROJECT(tempmod,it.fein_value.params))),
-	  // Since certain input phone#s (i.e. 2165235000 for Eaton Corporation at 
-		// address= PO BOX 818022 CLEVELAND OH 44181) retrieve way too many BDID_Records; 
+	  // Since certain input phone#s (i.e. 2165235000 for Eaton Corporation at
+		// address= PO BOX 818022 CLEVELAND OH 44181) retrieve way too many BDID_Records;
 		// don't use the input phone# for AutoHeader fetches if a company_name and street_name
 		// was entered. (See RQ 100563).
-		SELF.phone_value := if(OTHER_INPUT_PRESENT, 
-		                       '', it.phone_value.val(PROJECT(tempmod,it.phone_value.params))),		
+		SELF.phone_value := if(OTHER_INPUT_PRESENT,
+		                       '', it.phone_value.val(PROJECT(tempmod,it.phone_value.params))),
 		SELF.bdid_value := it.bdid_value.val(PROJECT(tempmod,it.bdid_value.params)),
 		SELF.nofail := FALSE,
 		SELF.searchignoresaddressonly_value := FALSE,
@@ -94,16 +94,16 @@ EXPORT RollupBusiness_BatchService_Records(
 		SELF.fein_mandatory_match := FALSE,
 		SELF.phone_mandatory_match := FALSE,
 		SELF := LEFT));
-	
+
 	// Get BDIDs. These can be obtained either by Header lookup, or by being passed into the
 	// batch service via the SOAP interface. Via SOAP is common when several batch services
 	// are chained together in a Kettle job.
-	
+
 	// Call the Business Header Fetch to get bdids based on input data. Project into a layout that
 	// describes the BDID as not from input.
 	SHARED BDID_Records_via_Header_pre := AutoHeaderI.FetchI_Hdr_Batch_Biz(Header_Fetch_Records);
-	
-	SHARED BDID_Records_via_Header := 
+
+	SHARED BDID_Records_via_Header :=
 		PROJECT(
 			BDID_Records_via_Header_pre,
 			TRANSFORM( {AutoHeaderI.Layouts.Fetch_Batch_PreOutput_Layout, BOOLEAN isInput},
@@ -111,10 +111,10 @@ EXPORT RollupBusiness_BatchService_Records(
 				SELF := LEFT
 			)
 		);
-	
-	// Project those input records having a BDID into a layout that describes the BDID as 
+
+	// Project those input records having a BDID into a layout that describes the BDID as
 	// originating from input.
-	SHARED BDID_Records_via_Input := 
+	SHARED BDID_Records_via_Input :=
 		PROJECT(
 			Header_Fetch_Records(bdid_value != 0),
 			TRANSFORM( {AutoHeaderI.Layouts.Fetch_Batch_PreOutput_Layout, BOOLEAN isInput},
@@ -123,24 +123,24 @@ EXPORT RollupBusiness_BatchService_Records(
 				SELF.id      := LEFT.bdid_value,
 				SELF.isInput := TRUE
 			)
-		); 
-	
+		);
+
 	// Sort and Dedup. RULE: For each acctno...
-	//   o  ...if there exists a bdid from the input batch, keep only that bdid and exclude 
-	//      any other bdids obtained from the Header. We'll favor the input bdid since 
+	//   o  ...if there exists a bdid from the input batch, keep only that bdid and exclude
+	//      any other bdids obtained from the Header. We'll favor the input bdid since
 	//      (assumption!) it was obtained from the ADL batch process earlier in the job.
-	//   o  ...else, keep all bdids. 
-	SHARED BDID_records_grouped := 
+	//   o  ...else, keep all bdids.
+	SHARED BDID_records_grouped :=
 		GROUP(SORT( (BDID_Records_via_Header + BDID_Records_via_Input), acctno), acctno);
-	
+
 	SHARED BDID_records_from_Input :=
 		HAVING( BDID_records_grouped, EXISTS(ROWS(LEFT)(isInput = TRUE)) )(isInput);
-		
+
 	SHARED BDID_records_from_Header_only :=
 		HAVING( BDID_records_grouped, NOT EXISTS(ROWS(LEFT)(isInput = TRUE)) );
-	
+
 	SHARED BDID_Records := BDID_records_from_Input + BDID_records_from_Header_only;
-	
+
 	// Next, for each bdid, get its GroupId.
 	SHARED GroupId_Layout := RECORD
 		AutoHeaderI.Layouts.Fetch_Batch_PreOutput_Layout;
@@ -154,27 +154,27 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.GroupId := RIGHT.group_id,
 			SELF := LEFT),
 		KEEP(limits.GROUPID_KEEP), LIMIT (0)); // GROUPID_KEEP = 1
-	
-	// NOTE: Level-0 Relatives are those bdids having the same group_id. 
+
+	// NOTE: Level-0 Relatives are those bdids having the same group_id.
 	SHARED Relatives_Layout := RECORD
 		UNSIGNED6 base_bdid;
 		UNSIGNED6 related_bdid;
 		UNSIGNED6 GroupId;
 		UNSIGNED1 level;        // Level 0 = those identified by AutoHeader search, Level 1 = their relatives, etc.
 	END;
-	
+
 	SHARED Relatives_Level_0 := PROJECT(GroupId_Records,TRANSFORM(Relatives_Layout,
 		SELF.base_bdid    := LEFT.id,
 		SELF.related_bdid := LEFT.id,
 		SELF.GroupId      := LEFT.GroupId,
 		SELF.level        := 0));
-	
+
 	// Get rid of duplicates and group for aggregate filter--Level 0.
-	SHARED Deduped_Relatives_Level_0 := 
+	SHARED Deduped_Relatives_Level_0 :=
 			GROUP(SORT(DEDUP(SORT(Relatives_Level_0,base_bdid),base_bdid),GroupId),GroupId);
 
 	// Filter down to all those group_ids having fewer than our limit of related bdids already--Level 0.
-	SHARED Reduced_Relatives_Level_0 := 
+	SHARED Reduced_Relatives_Level_0 :=
 			HAVING(Deduped_Relatives_Level_0, COUNT(ROWS(LEFT)) < limits.SUFFICIENT_NUMBER_OF_RELATIVES_AT_THIS_LEVEL);
 
 	// Go get first level relatives.
@@ -189,13 +189,13 @@ EXPORT RollupBusiness_BatchService_Records(
 		KEEP(limits.RELATIVES_KEEP));
 
 	// Get rid of duplicates and group for aggregate filter--Level 1.
-	SHARED Deduped_Relatives_Level1 := 
+	SHARED Deduped_Relatives_Level1 :=
 			GROUP(DEDUP(SORT(UNGROUP(Deduped_Relatives_Level_0) + Relatives_Level1,base_bdid,related_bdid,level),base_bdid,related_bdid),base_bdid);
-	
+
 	// Filter down to all those group_ids having fewer than our limit of related bdids already--Level 1.
-	SHARED Reduced_Relatives_Level1 := 
+	SHARED Reduced_Relatives_Level1 :=
 			HAVING(Deduped_Relatives_Level1, COUNT(ROWS(LEFT)) < limits.SUFFICIENT_NUMBER_OF_RELATIVES_AT_THIS_LEVEL);
-		
+
 	// Use what remains to do the process a couple more times.
 	SHARED Relatives_Level2 := JOIN(Reduced_Relatives_Level1(level = 1),Business_Header.Key_Business_Relatives,
 		LEFT.level = 1 AND
@@ -207,15 +207,15 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := LEFT),
 		LIMIT(limits.RELATIVES_LIMIT,SKIP),
 		KEEP(limits.RELATIVES_KEEP));
-	
+
 	// Get rid of duplicates and group for aggregate filter--Level 2.
-	SHARED Deduped_Relatives_Level2 := 
+	SHARED Deduped_Relatives_Level2 :=
 			GROUP(DEDUP(SORT(UNGROUP(Deduped_Relatives_Level1) + Relatives_Level2,base_bdid,related_bdid,level),base_bdid,related_bdid),base_bdid);
 
 	// Filter down to all those group_ids having fewer than our limit of related bdids already--Level 2.
-	SHARED Reduced_Relatives_Level2 := 
+	SHARED Reduced_Relatives_Level2 :=
 			HAVING(Deduped_Relatives_Level2, COUNT(ROWS(LEFT)) < limits.SUFFICIENT_NUMBER_OF_RELATIVES_AT_THIS_LEVEL);
-	
+
 	SHARED Relatives_Level3 := JOIN(Reduced_Relatives_Level2(level = 2),Business_Header.Key_Business_Relatives,
 		LEFT.level = 2 AND
 		KEYED(LEFT.related_bdid = RIGHT.bdid1) AND
@@ -226,10 +226,10 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := LEFT),
 		LIMIT(limits.RELATIVES_LIMIT,SKIP),
 		KEEP(limits.RELATIVES_KEEP));
-	
-	SHARED Deduped_Relatives_Level3 := 
+
+	SHARED Deduped_Relatives_Level3 :=
 			DEDUP(SORT(UNGROUP(Deduped_Relatives_Level2) + Relatives_Level3,base_bdid,related_bdid,level),base_bdid,related_bdid);
-	
+
 	SHARED Final_Relatives_Layout := RECORD
 		GroupId_Layout.acctno;
 		Relatives_Layout;
@@ -242,21 +242,21 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := RIGHT,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	// Now, combine BDIDs under the GroupId.  The cnt is a rough approximation of the "centralness of a BDID".
 	// The "level" indicates how many "steps" it takes to get from those BDIDs identified by the search to the BDID in question.
-	SHARED Tabled_GroupId_Results := 
+	SHARED Tabled_GroupId_Results :=
 		TABLE(
 			Final_Relatives_Records,
 			{acctno, groupid, related_bdid, UNSIGNED1 level := MIN(GROUP,level), UNSIGNED cnt := COUNT(GROUP)},
 			acctno,groupid,related_bdid
 		);
-	
-	SHARED Deduped_GroupId_Results_No_Filter := 
+
+	SHARED Deduped_GroupId_Results_No_Filter :=
 		DEDUP(
 			SORT(Tabled_GroupId_Results,acctno,groupid,level,-cnt,related_bdid),
 			acctno,groupid,keep limits.RELATIVES_KEEP);
-	
+
 	// Next, go and get the best info for each record
 	SHARED BestInfo_Records := JOIN(Deduped_GroupId_Results_No_Filter,Business_Header.Key_BH_Best,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
@@ -276,7 +276,7 @@ EXPORT RollupBusiness_BatchService_Records(
 				EXPORT isPRP := FALSE;
 				EXPORT scorethreshold := args.penaltThreshold;
 				EXPORT useGlobalScope := FALSE;
-				
+
 				// Company name
 				EXPORT asisname := '';
 				EXPORT cn := '';
@@ -285,7 +285,7 @@ EXPORT RollupBusiness_BatchService_Records(
 				EXPORT corpname := '';
 				EXPORT nameasis := '';
 				EXPORT cname_field := RIGHT.company_name;
-				
+
 				// Address
 				EXPORT addr := '';
 				EXPORT prim_range := LEFT.prim_range;
@@ -319,19 +319,19 @@ EXPORT RollupBusiness_BatchService_Records(
 				EXPORT city2_field := '';
 				EXPORT state_field := RIGHT.state;
 				EXPORT zip_field := IF(RIGHT.zip = 0,'',INTFORMAT(RIGHT.zip,5,1));
-				
+
 				// County
 				EXPORT county := '';
 				EXPORT county_field := '';
-				
+
 				// Phone
 				EXPORT phone := LEFT.workphone;
 				EXPORT phone_field := IF(RIGHT.phone = 0,'',INTFORMAT(RIGHT.phone,10,1));
-				
+
 				// FEIN
 				EXPORT fein := LEFT.fein;
 				EXPORT fein_field := IF(RIGHT.fein = 0,'',INTFORMAT(RIGHT.fein,9,1));
-				
+
 				// BDID
 				EXPORT bdid := LEFT.bdid;
 				EXPORT bdid_field := IF(RIGHT.bdid = 0,'',(STRING)RIGHT.bdid);
@@ -341,8 +341,8 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := LEFT),
 		LIMIT(limits.PENALTY_LIMIT,SKIP),
 		KEEP(limits.PENALTY_KEEP));
-	
-	SHARED Indata_Plus_Penalty := 
+
+	SHARED Indata_Plus_Penalty :=
 		DEDUP(
 			SORT(
 				DEDUP(
@@ -350,7 +350,7 @@ EXPORT RollupBusiness_BatchService_Records(
 					acctno,groupid),
 				acctno,penalt,groupid),
 			acctno,keep args.MaxResultsPerRow);
-	
+
 	SHARED Deduped_GroupId_Results := JOIN(Deduped_GroupId_Results_No_Filter,Indata_Plus_Penalty,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -362,15 +362,15 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.penalt := RIGHT.penalt,
 			SELF := LEFT
 		));
-	
+
 	// Get the FEIN records
 	SHARED FEIN_Records := TABLE(BestInfo_Records(fein != 0),{acctno,groupid,fein,UNSIGNED1 level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,fein);
 	SHARED Sorted_FEIN_Records := DEDUP(SORT(FEIN_Records,acctno,groupid,level,-cnt,fein),acctno,groupid,keep 10);
-	
+
 	// Get the Phone records
 	SHARED Phone_Records := TABLE(BestInfo_Records(phone != 0),{acctno,groupid,phone,UNSIGNED1 level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,phone);
 	SHARED Sorted_Phone_Records := DEDUP(SORT(Phone_Records,acctno,groupid,level,-cnt,phone),acctno,groupid,keep 10);
-	
+
 	// Get the Address records
   SHARED ExtraBestInfo_Records :=
 	  SORT(
@@ -379,10 +379,10 @@ EXPORT RollupBusiness_BatchService_Records(
 				AND LEFT.level <= 1
         AND (RIGHT.dt_first_seen != 0 OR RIGHT.dt_last_seen != 0) AND
         doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.source),
-				KEEP(Limits.EXTRABEST_KEEP), 
-				LIMIT(Limits.EXTRABEST_LIMIT, SKIP)), 
+				KEEP(Limits.EXTRABEST_KEEP),
+				LIMIT(Limits.EXTRABEST_LIMIT, SKIP)),
 	    company_name, bdid);
-	
+
   SHARED Address_Layout := RECORD
     Business_Header.Layout_BH_Best;
     AutoHeaderI.Types.acctno  acctno;
@@ -418,27 +418,27 @@ EXPORT RollupBusiness_BatchService_Records(
 	  AND LEFT.bdid = RIGHT.bdid,
 	  GROUP,
 	  DetermineDateSeen(LEFT, ROWS(RIGHT)));
-			
+
 	SHARED Address_Records := TABLE(BestAddressInfo_Records,{acctno,groupid,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,city,state,zip,zip4,dt_first_seen,dt_last_seen,UNSIGNED1 level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,city,state,zip,zip4,dt_first_seen,dt_last_seen);
 	SHARED Sorted_Address_Records := DEDUP(SORT(Address_Records,acctno,groupid,level,-cnt,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,city,state,zip,zip4),acctno,groupid,keep 10);
-	
-	
+
+
 	// Get the Name records
 	SHARED Name_Records := TABLE(BestInfo_Records,{acctno,groupid,company_name,UNSIGNED1 level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,company_name);
 	SHARED Sorted_Name_Records := DEDUP(SORT(Name_Records,acctno,groupid,level,-cnt,company_name),acctno,groupid,keep 10);
-	
+
 	// Get the SIC Code records
 	SHARED Raw_SIC_Codes := JOIN(Deduped_GroupId_Results,Business_Header.Key_SIC_Code,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
 		KEEP(limits.SIC_CODE_KEEP));
 	SHARED SIC_Code_Records := TABLE(Raw_SIC_Codes,{acctno,groupid,sic_code,UNSIGNED1 level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,sic_code);
 	SHARED Sorted_SIC_Code_Records := DEDUP(SORT(SIC_Code_Records,acctno,groupid,level,-cnt,sic_code),acctno,groupid,keep 10);
-	
+
 	// Get judgment & lien flag
 	SHARED JudgmentLiens_byBDID := JOIN(Deduped_GroupId_Results,LiensV2.key_liens_BDID,
 		KEYED(LEFT.related_bdid = RIGHT.p_bdid),
 		KEEP(limits.LIENS_TMSIDS_KEEP));
-	
+
 	SHARED JudgmentLiens_byTMSID := JOIN(JudgmentLiens_byBDID,LiensV2.key_liens_party_ID,
 		KEYED(LEFT.tmsid = RIGHT.tmsid) AND
 		KEYED(LEFT.rmsid = RIGHT.rmsid) AND
@@ -447,40 +447,40 @@ EXPORT RollupBusiness_BatchService_Records(
 		TRANSFORM(LEFT),
 		LIMIT(limits.LIENS_RECORDS_LIMIT,SKIP),
 		KEEP(limits.LIENS_RECORDS_KEEP));
-		
+
 		//output(JudgmentLiens_byTMSID, named('JudgmentLiens_byTMSID'));
-	
+
 	SHARED JudgmentLiens_Flags := DEDUP(SORT(JudgmentLiens_byTMSID,acctno,groupid),acctno,groupid);
-	
+
 	// get BK's
-	
+
 	SHARED Bankruptcies_byBDID := JOIN(Deduped_GroupId_Results,BankruptcyV3.key_bankruptcyv3_bdid(),
 		KEYED(LEFT.related_bdid = RIGHT.p_bdid),
 		KEEP(limits.LIENS_TMSIDS_KEEP));
- 
+
   SHARED Bankruptcies_ByTMSID := JOIN(Bankruptcies_byBDID, BankruptcyV3.key_bankruptcyv3_main_full(),
 	  KEYED(LEFT.tmsid = RIGHT.TMSID),
 		//LEFT.p_bdid = (UNSIGNED)RIGHT.bdid,
 		TRANSFORM(LEFT),
 		LIMIT(limits.LIENS_RECORDS_LIMIT,SKIP),
 		KEEP(limits.LIENS_RECORDS_KEEP));
-		
+
 	//	output(Bankruptcies_ByTMSID, named('Bankruptcies_ByTMSID'));
-		
+
 	// Get executives
-	
+
   Contacts_byBDID_pre := JOIN(Deduped_GroupId_Results,Business_Header.Key_Business_Contacts_BDID,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
-		KEEP(limits.CONTACTS_KEEP));	
-    
+		KEEP(limits.CONTACTS_KEEP));
+
   Contacts_byBDID_a := Suppress.MAC_SuppressSource(Contacts_byBDID_pre, mod_access);
-    
+
 	SHARED Contacts_byBDID := Contacts_byBDID_a(~glb or mod_access.isValidGLB());
 	SHARED Contacts_withTitle := JOIN(Contacts_byBDID,doxie_cbrs.executive_titles,
 		LEFT.company_title = RIGHT.stored_title);
-	
+
 	SHARED Tabled_Executives_Records := TABLE(Contacts_withTitle,{acctno,groupid,lname,fname,mname,name_suffix,title,title_rank,display_title,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,lname,fname,mname,name_suffix,title,title_rank,display_title);
-	
+
 	SHARED Rolledup_Executives_Records := ROLLUP(SORT(Tabled_Executives_Records,acctno,groupid,lname,fname,mname,name_suffix,title),
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid AND
@@ -495,15 +495,15 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.title_rank := MIN(LEFT.title_rank,RIGHT.title_rank),
 			SELF.display_title := LEFT.display_title + '; ' + RIGHT.display_title,
 			SELF := LEFT));
-	
+
 	SHARED Sorted_Executives_Records := DEDUP(SORT(Rolledup_Executives_Records,acctno,groupid,level,-cnt,title_rank,lname,fname,mname,name_suffix,title,display_title),acctno,groupid,keep 10);
-	
+
 	// Get UCC flag
 	SHARED UCCs_byBDID := JOIN(Deduped_GroupId_Results,uccv2.Key_Bdid,
 		KEYED(LEFT.related_bdid = RIGHT.bdid) AND
 		LEFT.level <= 2,
 		KEEP(limits.LIENS_TMSIDS_KEEP));
-	
+
 	SHARED UCCs_byTMSID := JOIN(UCCs_byBDID,uccv2.Key_Rmsid_Party(),
 		KEYED(LEFT.tmsid = RIGHT.tmsid) AND
 		KEYED(LEFT.rmsid = RIGHT.rmsid) AND
@@ -512,47 +512,47 @@ EXPORT RollupBusiness_BatchService_Records(
 		TRANSFORM(left),
 		LIMIT(limits.LIENS_RECORDS_LIMIT,SKIP),
 		KEEP(limits.LIENS_RECORDS_KEEP));
-		
+
 		//output(UCCs_bytmsid, named('uccs_bytmsid'));
-	
+
 	SHARED UCCs_Flags := DEDUP(SORT(UCCs_byTMSID,acctno,groupid),acctno,groupid);
-	
+
 	// Get Property flag
 	SHARED Props_byBDID := JOIN(Deduped_GroupId_Results,LN_PropertyV2.key_search_bdid,
 		KEYED(LEFT.related_bdid = RIGHT.s_bid),
 		KEEP(limits.PROPERTIES_KEEP));
-	
+
 	SHARED Props_Flags := DEDUP(SORT(Props_byBDID,acctno,groupid),acctno,groupid);
-	
+
 	// Get Corporate Filing records (for RA name, etc)
 	SHARED Corp_Records := JOIN(Deduped_GroupId_Results,Corp2.Key_Corp_BdidPL,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
 		KEEP(limits.CORPS_KEEP));
-	
+
 	SHARED Tabled_RA_Records := TABLE(Corp_Records(corp_ra_title1 != '' or corp_ra_fname1 != '' or corp_ra_mname1 != '' or corp_ra_lname1 != '' or corp_ra_name_suffix1 != '' or corp_ra_cname1 != '' or corp_ra_phone10 != ''),{acctno,groupid,corp_ra_title1,corp_ra_fname1,corp_ra_mname1,corp_ra_lname1,corp_ra_name_suffix1,corp_ra_cname1,corp_ra_phone10,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,corp_ra_title1,corp_ra_fname1,corp_ra_mname1,corp_ra_lname1,corp_ra_name_suffix1,corp_ra_cname1,corp_ra_phone10);
 	SHARED Sorted_RA_Records := DEDUP(SORT(Tabled_RA_Records,acctno,groupid,level,-cnt,corp_ra_title1,corp_ra_fname1,corp_ra_mname1,corp_ra_lname1,corp_ra_name_suffix1,corp_ra_cname1,corp_ra_phone10),acctno,groupid);
-	
+
 	// Also get the corporate status records
 	SHARED Tabled_Status_Records := TABLE(Corp_Records(corp_status_desc != ''),{acctno,groupid,corp_status_desc,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,corp_status_desc);
 	SHARED Sorted_Status_Records := DEDUP(SORT(Tabled_Status_Records,acctno,groupid,level,-cnt,corp_status_desc),acctno,groupid);
-	
-	// Get the DCA records
-	SHARED DCA_Records1 := JOIN(Deduped_GroupId_Results,DCA.Key_DCA_BDID,
-		KEYED(LEFT.related_bdid = RIGHT.bdid),
+
+	DCA_Records_Raw := dx_dca.get_bdid(Deduped_GroupId_Results, mod_access, related_bdid, TRUE);
+	SHARED DCA_Records1 := JOIN(Deduped_GroupId_Results, DCA_Records_Raw,
+		LEFT.related_bdid = RIGHT.bdid,
 		KEEP(limits.DCA_KEEP),
-    LIMIT (ut.limits.MAX_DCA_PER_BDID));
-		
+		LIMIT (ut.limits.MAX_DCA_PER_BDID));
+
 	SHARED Tabled_URL_Records := TABLE(DCA_Records1(url != ''),{acctno,groupid,url,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,url);
 	SHARED Sorted_URL_Records := DEDUP(SORT(Tabled_URL_Records,acctno,groupid,level,-cnt,url),acctno,groupid);
-	
+
 	SHARED Tabled_Email_Records := TABLE(DCA_Records1(e_mail != ''),{acctno,groupid,e_mail,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,e_mail);
 	SHARED Sorted_Email_Records := DEDUP(SORT(Tabled_Email_Records,acctno,groupid,level,-cnt,e_mail),acctno,groupid);
-	
+
 	SHARED Tabled_DCA_Records := TABLE(DCA_Records1,{acctno,groupid,root,sub,STRING10 emp_num := MAX(GROUP,emp_num),STRING10 sales_or_revenue := MAX(GROUP,sales_desc),STRING15 sales := MAX(GROUP,sales),UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,root,sub);
 	SHARED Sorted_DCA_Records := DEDUP(SORT(Tabled_DCA_Records,acctno,groupid,level,-cnt,root,sub),acctno,groupid);
-	
+
 	SHARED Tabled_DCA_Records1 := TABLE(DCA_Records1,{acctno,groupid,parent_number,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,parent_number);
-	
+
 	SHARED DCA_Records2 := JOIN(Tabled_DCA_Records1(parent_number != ''),DCA.Key_DCA_Root_Sub,
 		KEYED (LEFT.parent_number[1..9] 		= RIGHT.root) AND
 		KEYED (LEFT.parent_number[11..14] 	= RIGHT.sub),
@@ -561,9 +561,9 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := RIGHT,
 			SELF := LEFT),
 		KEEP (1), LIMIT (0));
-	
+
 	SHARED Tabled_DCA_Records2 := TABLE(DCA_Records2,{acctno,groupid,parent_number,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,parent_number);
-	
+
 	SHARED DCA_Records3 := JOIN(Tabled_DCA_Records2(parent_number != ''),DCA.Key_DCA_Root_Sub,
 		KEYED (LEFT.parent_number[1..9] 		= RIGHT.root) AND
 		KEYED (LEFT.parent_number[11..14] 	= RIGHT.sub),
@@ -572,9 +572,9 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := RIGHT,
 			SELF := LEFT),
 		KEEP (1), LIMIT (0));
-	
+
 	SHARED Tabled_DCA_Records3 := TABLE(DCA_Records3,{acctno,groupid,parent_number,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,parent_number);
-	
+
 	SHARED DCA_Records4 := JOIN(Tabled_DCA_Records3(parent_number != ''),DCA.Key_DCA_Root_Sub,
 		KEYED (LEFT.parent_number[1..9] 		= RIGHT.root) AND
 		KEYED (LEFT.parent_number[11..14] 	= RIGHT.sub),
@@ -583,9 +583,9 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := RIGHT,
 			SELF := LEFT),
 		KEEP (1), LIMIT (0));
-	
+
 	SHARED Tabled_DCA_Records4 := TABLE(DCA_Records4,{acctno,groupid,parent_number,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,parent_number);
-	
+
 	SHARED DCA_Records5 := JOIN(Tabled_DCA_Records4(parent_number != ''),DCA.Key_DCA_Root_Sub,
 		KEYED (LEFT.parent_number[1..9] 		= RIGHT.root) AND
 		KEYED (LEFT.parent_number[11..14] 	= RIGHT.sub),
@@ -594,9 +594,9 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF := RIGHT,
 			SELF := LEFT),
 		KEEP (1), LIMIT (0));
-	
+
 	SHARED Tabled_DCA_Records5 := TABLE(DCA_Records5,{acctno,groupid,parent_number,UNSIGNED level := MIN(GROUP,level),UNSIGNED cnt := SUM(GROUP,cnt)},acctno,groupid,parent_number);
-	
+
 	SHARED Final_DCA_Records := DEDUP(SORT(ROLLUP(
 		PROJECT(DCA_Records1(parent_number = ''),RECORDOF(DCA_Records2)) +
 		DCA_Records2(parent_number = '') +
@@ -611,15 +611,15 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.level := MIN(LEFT.level,RIGHT.level),
 			SELF.cnt := LEFT.cnt + RIGHT.cnt,
 			SELF := LEFT)),acctno,groupid,level,-cnt,root,sub),acctno,groupid);
-	
+
 	// output(Final_DCA_Records, named('Final_DCA_Records'));
-	
+
 	SHARED Seed_Records := PROJECT(DEDUP(SORT(Deduped_GroupId_Results,acctno,groupid),acctno,groupid),TRANSFORM(RollupBusiness_BatchService_Layouts.Final,
 		SELF.acctno := LEFT.acctno,
 		SELF.groupid := LEFT.groupid,
 		SELF.penalt := LEFT.penalt,
 		SELF := []));
-	
+
 	SHARED Add_Names := DENORMALIZE(Seed_Records,Sorted_Name_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -635,7 +635,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.company_name_var8 := IF(COUNTER = 9,RIGHT.company_name,LEFT.company_name_var8),
 			SELF.company_name_var9 := IF(COUNTER = 10,RIGHT.company_name,LEFT.company_name_var9),
 			SELF := LEFT));
-	
+
 	SHARED Add_Addresses := DENORMALIZE(Add_Names,Sorted_Address_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -771,7 +771,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.dt_first_seen_var9  := IF(COUNTER = 10,RIGHT.dt_first_seen                            ,LEFT.dt_first_seen_var9),
 			SELF.dt_last_seen_var9   := IF(COUNTER = 10,RIGHT.dt_last_seen                             ,LEFT.dt_last_seen_var9 ),
 			SELF := LEFT));
-	
+
 	SHARED Add_Phones := DENORMALIZE(Add_Addresses,Sorted_Phone_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -787,7 +787,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.phone_var8 := IF(COUNTER = 9,INTFORMAT(RIGHT.phone,10,1),LEFT.phone_var8),
 			SELF.phone_var9 := IF(COUNTER = 10,INTFORMAT(RIGHT.phone,10,1),LEFT.phone_var9),
 			SELF := LEFT));
-	
+
 	SHARED Add_FEINs := DENORMALIZE(Add_Phones,Sorted_FEIN_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -803,7 +803,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.fein_var8 := IF(COUNTER = 9,INTFORMAT(RIGHT.fein,9,1),LEFT.fein_var8),
 			SELF.fein_var9 := IF(COUNTER = 10,INTFORMAT(RIGHT.fein,9,1),LEFT.fein_var9),
 			SELF := LEFT));
-	
+
 	SHARED Add_SIC_Codes := DENORMALIZE(Add_FEINs,Sorted_SIC_Code_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -819,7 +819,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.sic_code_var8 := IF(COUNTER = 9,RIGHT.sic_code,LEFT.sic_code_var8),
 			SELF.sic_code_var9 := IF(COUNTER = 10,RIGHT.sic_code,LEFT.sic_code_var9),
 			SELF := LEFT));
-	
+
 	SHARED Add_Parent_Sub := DENORMALIZE(Add_SIC_Codes,DCA_Records1,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -827,7 +827,7 @@ EXPORT RollupBusiness_BatchService_Records(
 		TRANSFORM(RollupBusiness_BatchService_Layouts.Final,
 			SELF.parent_sub := IF(NOT EXISTS(ROWS(RIGHT)) OR EXISTS(ROWS(RIGHT)(parent_number = '')),'P','S'),
 			SELF := LEFT));
-	
+
 	SHARED Add_Parent_Info := JOIN(Add_Parent_Sub,Final_DCA_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid AND
@@ -849,22 +849,22 @@ EXPORT RollupBusiness_BatchService_Records(
 			// start extended layout info
 			SELF.FAX                 := RIGHT.FAX,
 		  SELF.Ticker_Symbol       := RIGHT.Ticker_Symbol,
-		  SELF.Net_Worth           := RIGHT.Net_Worth_,		  
+		  SELF.Net_Worth           := RIGHT.Net_Worth_,
 			SELF.count_JandL := 0,
 			SELF.count_ucc := 0;
 			SELF.count_bk := 0;
 			SELF := LEFT,
 			),
 		LEFT OUTER);
-	
+
 	SHARED Add_URL_Info := JOIN(Add_Parent_Info,Sorted_URL_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
 		TRANSFORM(RollupBusiness_BatchService_Layouts.Final_EXTENDED,
-			SELF.url := RIGHT.url,			
+			SELF.url := RIGHT.url,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_Email_Info := JOIN(Add_URL_Info,Sorted_Email_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -872,7 +872,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.email := RIGHT.e_mail,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_Registered_Agent := JOIN(Add_Email_Info,Sorted_RA_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -886,7 +886,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.ra_phone := RIGHT.corp_ra_phone10,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_Executives := DENORMALIZE(Add_Registered_Agent,Sorted_Executives_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -946,7 +946,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.executive_name_suffix_var9   := IF(COUNTER = 9,RIGHT.name_suffix  ,LEFT.executive_name_suffix_var9  ),
 			SELF.executive_display_title_var9 := IF(COUNTER = 9,RIGHT.display_title,LEFT.executive_display_title_var9),
 			SELF := LEFT));
-	
+
 	SHARED Add_Employees_Sales := JOIN(Add_Executives,Sorted_DCA_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -956,7 +956,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.sales_or_revenue := RIGHT.sales_or_revenue,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_Status := JOIN(Add_Employees_Sales,Sorted_Status_Records,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -964,7 +964,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.status := RIGHT.corp_status_desc,
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_JudgmentLiens_Flag := JOIN(Add_Status,JudgmentLiens_Flags,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -972,7 +972,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.judgmentlien_flag := IF(RIGHT.tmsid != '','Y',''),
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	 SHARED Add_UCCs_Flag := JOIN(Add_JudgmentLiens_Flag,UCCs_Flags,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -980,7 +980,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.ucc_flag := IF(RIGHT.tmsid != '','Y',''),
 			SELF := LEFT),
 		LEFT OUTER);
-	
+
 	SHARED Add_Props_Flag := JOIN(Add_UCCs_Flag,Props_Flags,
 		LEFT.acctno = RIGHT.acctno AND
 		LEFT.groupid = RIGHT.groupid,
@@ -988,7 +988,7 @@ EXPORT RollupBusiness_BatchService_Records(
 			SELF.property_flag := IF(RIGHT.ln_fares_id != '','Y',''),
 			SELF := LEFT),
 		LEFT OUTER);
-		
+
  SHARED count_add_JandL_flags := table(
                                       dedup(sort(JudgmentLiens_byTMSID,acctno,tmsid),
 																			                                 acctno,tmsid),
@@ -996,13 +996,13 @@ EXPORT RollupBusiness_BatchService_Records(
 	                                           acctno, FEW, UNSORTED);
 
    SHARED Add_JandL_Count_Info := JOIN(Add_Props_Flag, count_add_JandL_flags,
-     LEFT.acctno = RIGHT.acctno,		 
+     LEFT.acctno = RIGHT.acctno,
 		 TRANSFORM(rollupBusiness_Batchservice_Layouts.Final_EXTENDED,
 		    SELF.count_JandL := RIGHT.cnt,
 				SELF.count_ucc := 0;
 				SELF.count_bk := 0;
 				SELF := LEFT),
-		  LEFT OUTER);		
+		  LEFT OUTER);
 
   SHARED count_add_ucc_flags := table(
 	                                    dedup(sort(UCCs_byTMSID,acctno,tmsid),
@@ -1011,7 +1011,7 @@ EXPORT RollupBusiness_BatchService_Records(
 	                                           acctno, FEW, UNSORTED);
 
    SHARED Add_Ucc_Count_Info := JOIN(Add_JandL_Count_Info, Count_add_UCC_flags,
-     LEFT.acctno = RIGHT.acctno,		
+     LEFT.acctno = RIGHT.acctno,
 		 TRANSFORM(rollupBusiness_Batchservice_Layouts.Final_EXTENDED,
 		    SELF.count_ucc := RIGHT.cnt;
 				SELF.count_bk := 0;
@@ -1025,12 +1025,12 @@ EXPORT RollupBusiness_BatchService_Records(
 	                                           acctno, FEW, UNSORTED);
 
    SHARED Add_BK_Count_Info := JOIN(Add_UCC_Count_Info, Count_add_BK_flags,
-     LEFT.acctno = RIGHT.acctno,		 
+     LEFT.acctno = RIGHT.acctno,
 		 TRANSFORM(rollupBusiness_Batchservice_Layouts.Final_EXTENDED,
 		    SELF.count_bk := RIGHT.cnt,
 				SELF := LEFT),
-		  LEFT OUTER);			
-	                    
+		  LEFT OUTER);
+
   // Uncomment lines below as needed for debugging.
 	// output(Header_Fetch_Records,     named('Header_Fetch_Records'));
 	// output( BDID_Records_via_Header, NAMED('BDID_Records_via_Header') );
@@ -1052,14 +1052,14 @@ EXPORT RollupBusiness_BatchService_Records(
   //output(Reduced_Relatives_Level2, named('Reduced_Relatives_Level2'));
   //output(Relatives_Level3,         named('Relatives_Level3'));
   //output(Deduped_Relatives_Level3, named('Deduped_Relatives_Level3'));
-  //output(Final_Relatives_Records,  named('Final_Relatives_Records'));  
+  //output(Final_Relatives_Records,  named('Final_Relatives_Records'));
 	//output(JudgmentLiens_byTMSID, named('JudgmentLiens_byTMSID'));
-	//output(UCCs_bytmsid, named('uccs_bytmsid'));	
+	//output(UCCs_bytmsid, named('uccs_bytmsid'));
 	//output(count_add_ucc_flags, named('count_add_ucc_flags'));
-	
+
   // need to slim this layout a bit before returning thus project inside the sort.
 	EXPORT Records := SORT(project(Add_Props_Flag, TRANSFORM(RollupBusiness_BatchService_Layouts.Final,
 	                                self := left)),acctno,penalt,groupid);
   EXPORT Records_with_derog_COUNT := SORT(Add_BK_Count_Info,  acctno, penalt, groupid);
-	
+
 END;

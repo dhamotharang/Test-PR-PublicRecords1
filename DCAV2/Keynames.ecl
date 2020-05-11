@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 export Keynames(
 	 string		pversion							= ''
 	,boolean	pUseOtherEnvironment	= false
@@ -16,14 +16,17 @@ module
 	export HierP2C					:= tools.mod_FilenamesBuild(lsuperTmplt					+ '_hierarchy_parent_to_child_root_sub'	,pversion	,lLogicalTmplt						+ 'hierarchy_parent_to_child_root_sub');
 	export HierRootSub			:= tools.mod_FilenamesBuild(lsuperTmplt					+ '_hierarchy_root_sub'									,pversion	,lLogicalTmplt						+ 'hierarchy_root_sub'								);
 	export RootSub					:= tools.mod_FilenamesBuild(lsuperTmplt					+ '_root_sub'														,pversion	,lLogicalTmplt						+ 'root_sub'													);
-  
+
 	//new keys
 	export HierP2CNew				:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'hierarchy_parent_to_child_entnum'	,pversion	);
 	export HierEntNum 			:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'hierarchy_entnum'									,pversion	);
 	export EntNum						:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'entnum'														,pversion	);
 	export EntNumNonFilt		:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'entnum_NonFilt'										,pversion	);
 
-  export LinkIds				  := tools.mod_FilenamesBuild(lLogicalTmplt		      + 'linkIds'			                      ,pversion );
+	export LinkIds				  := tools.mod_FilenamesBuild(lLogicalTmplt		      + 'linkIds'			                      ,pversion );
+
+	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029
+	export ContactBDID			:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'contacts_bdid'											,pversion );
 
 	export autokeyroot	 		:= tools.mod_FilenamesBuild(lsuperautoTmplt																							,pversion	,llogicalautoTmplt																							);
 
@@ -34,8 +37,8 @@ module
 	export payload 					:= tools.mod_FilenamesBuild(lsuperautoTmplt			+ 'payload'															,pversion	,llogicalautoTmplt				+ 'payload'														);
 	export stnameb2 				:= tools.mod_FilenamesBuild(lsuperautoTmplt			+ 'stnameb2'														,pversion	,llogicalautoTmplt				+ 'stnameb2'													);
 	export zipb2 						:= tools.mod_FilenamesBuild(lsuperautoTmplt			+ 'zipb2'																,pversion	,llogicalautoTmplt				+ 'zipb2'															);
-  
-	export dNotAutokey_filenames := 
+
+	export dNotAutokey_filenames :=
 		  Bdid.dAll_filenames
 		+ BdidHier.dAll_filenames
 		+ HierP2C.dAll_filenames
@@ -46,9 +49,10 @@ module
 		+ EntNum.dAll_filenames
 		+ EntNumNonFilt.dAll_filenames
 		+ LinkIds.dAll_filenames
+		+ ContactBDID.dAll_filenames
 		;
 
-	export dAll_filenames := 
+	export dAll_filenames :=
 		  Bdid.dAll_filenames
 		+ BdidHier.dAll_filenames
 		+ HierP2C.dAll_filenames
@@ -66,6 +70,7 @@ module
 		+ stnameb2.dAll_filenames
 		+ zipb2.dAll_filenames
 		+ LinkIds.dAll_filenames
+		+ ContactBDID.dAll_filenames
 		;
 
 end;

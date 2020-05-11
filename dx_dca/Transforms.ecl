@@ -1,0 +1,131 @@
+IMPORT DCA, dx_dca;
+
+EXPORT Transforms := MODULE
+
+  SHARED mac_assign_contact(le, cnt) := MACRO
+    SELF.#EXPAND('name_' + cnt) := le.contacts[cnt].name;
+    SELF.#EXPAND('title_' + cnt) := le.contacts[cnt].title;
+    SELF.#EXPAND('code_' + cnt) := le.contacts[cnt].code;
+    SELF.#EXPAND('exec' + cnt + '_score') := le.contacts[cnt].exec_score;
+    SELF.#EXPAND('exec' + cnt + '_title') := le.contacts[cnt].exec_title;
+    SELF.#EXPAND('exec' + cnt + '_fname') := le.contacts[cnt].exec_fname;
+    SELF.#EXPAND('exec' + cnt + '_mname') := le.contacts[cnt].exec_mname;
+    SELF.#EXPAND('exec' + cnt + '_lname') := le.contacts[cnt].exec_lname;
+    SELF.#EXPAND('exec' + cnt + '_name_suffix') := le.contacts[cnt].exec_name_suffix;
+  ENDMACRO;
+
+  EXPORT DCA.Layout_DCA_Base_slim flatten_contacts(dx_dca.Layouts.dca_bdid_rollup_layout L) := TRANSFORM
+    mac_assign_contact(L, 1);
+    mac_assign_contact(L, 2);
+    mac_assign_contact(L, 3);
+    mac_assign_contact(L, 4);
+    mac_assign_contact(L, 5);
+    mac_assign_contact(L, 6);
+    mac_assign_contact(L, 7);
+    mac_assign_contact(L, 8);
+    mac_assign_contact(L, 9);
+    mac_assign_contact(L, 10);
+    SELF := L;
+  END;
+
+  EXPORT dx_dca.Layouts.dca_bdid_rollup_layout remove_contacts(DCA.Layout_DCA_Base_slim L) := TRANSFORM
+    SELF.name_1 := '';
+    SELF.title_1 := '';
+    SELF.code_1 := '';
+    SELF.exec1_score := '';
+    SELF.exec1_title := '';
+    SELF.exec1_fname := '';
+    SELF.exec1_mname := '';
+    SELF.exec1_lname := '';
+    SELF.exec1_name_suffix := '';
+    SELF.name_2 := '';
+    SELF.title_2 := '';
+    SELF.code_2 := '';
+    SELF.exec2_score := '';
+    SELF.exec2_title := '';
+    SELF.exec2_fname := '';
+    SELF.exec2_mname := '';
+    SELF.exec2_lname := '';
+    SELF.exec2_name_suffix := '';
+    SELF.name_3 := '';
+    SELF.title_3 := '';
+    SELF.code_3 := '';
+    SELF.exec3_score := '';
+    SELF.exec3_title := '';
+    SELF.exec3_fname := '';
+    SELF.exec3_mname := '';
+    SELF.exec3_lname := '';
+    SELF.exec3_name_suffix := '';
+    SELF.name_4 := '';
+    SELF.title_4 := '';
+    SELF.code_4 := '';
+    SELF.exec4_score := '';
+    SELF.exec4_title := '';
+    SELF.exec4_fname := '';
+    SELF.exec4_mname := '';
+    SELF.exec4_lname := '';
+    SELF.exec4_name_suffix := '';
+    SELF.name_5 := '';
+    SELF.title_5 := '';
+    SELF.code_5 := '';
+    SELF.exec5_score := '';
+    SELF.exec5_title := '';
+    SELF.exec5_fname := '';
+    SELF.exec5_mname := '';
+    SELF.exec5_lname := '';
+    SELF.exec5_name_suffix := '';
+    SELF.name_6 := '';
+    SELF.title_6 := '';
+    SELF.code_6 := '';
+    SELF.exec6_score := '';
+    SELF.exec6_title := '';
+    SELF.exec6_fname := '';
+    SELF.exec6_mname := '';
+    SELF.exec6_lname := '';
+    SELF.exec6_name_suffix := '';
+    SELF.name_7 := '';
+    SELF.title_7 := '';
+    SELF.code_7 := '';
+    SELF.exec7_score := '';
+    SELF.exec7_title := '';
+    SELF.exec7_fname := '';
+    SELF.exec7_mname := '';
+    SELF.exec7_lname := '';
+    SELF.exec7_name_suffix := '';
+    SELF.name_8 := '';
+    SELF.title_8 := '';
+    SELF.code_8 := '';
+    SELF.exec8_score := '';
+    SELF.exec8_title := '';
+    SELF.exec8_fname := '';
+    SELF.exec8_mname := '';
+    SELF.exec8_lname := '';
+    SELF.exec8_name_suffix := '';
+    SELF.name_9 := '';
+    SELF.title_9 := '';
+    SELF.code_9 := '';
+    SELF.exec9_score := '';
+    SELF.exec9_title := '';
+    SELF.exec9_fname := '';
+    SELF.exec9_mname := '';
+    SELF.exec9_lname := '';
+    SELF.exec9_name_suffix := '';
+    SELF.name_10 := '';
+    SELF.title_10 := '';
+    SELF.code_10 := '';
+    SELF.exec10_score := '';
+    SELF.exec10_title := '';
+    SELF.exec10_fname := '';
+    SELF.exec10_mname := '';
+    SELF.exec10_lname := '';
+    SELF.exec10_name_suffix := '';
+    SELF := L;
+  END;
+
+  EXPORT dx_dca.Layouts.dca_bdid_rollup_layout rollup_contacts(dx_dca.Layouts.dca_bdid_rollup_layout L,
+    dx_dca.Layouts.dca_bdid_rollup_layout R) := TRANSFORM
+      SELF.contacts := L.contacts + R.contacts;
+      SELF := L;
+  END;
+
+END;
