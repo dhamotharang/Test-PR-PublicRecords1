@@ -1,4 +1,4 @@
-import business_header, doxie_cbrs, autostandardi, Suppress, corp2_services;
+﻿import business_header, doxie_cbrs, autostandardi, Suppress, corp2_services;
 
 boolean INCLUDE_MVAWFA_HEADERS := false : stored('IncludeMVAWFAHeaders');
 #constant ('IsCRS', true);  //sets isCRS to true, which prevents some extra work
@@ -6,6 +6,8 @@ UNSIGNED1 max_bus_reg := 30;
 doxie_cbrs.mac_Selection_Declare();
 
 #stored('bdidsDerived', true);
+
+mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 //
 // Get the best BDID for the input
@@ -44,7 +46,7 @@ Suppress.MAC_Suppress(bdidsTmp,bdids,app_type,Suppress.Constants.LinkTypes.BDID,
 best_bdid_found := exists(brByGIDs);
 
 // get the report records for the best BDIDs
-recs := doxie_cbrs.all_base_records_prs(bdids, ssn_mask_val);
+recs := doxie_cbrs.all_base_records_prs(bdids, ssn_mask_val, mod_access);
 
 // add equifax gateway results to the output
 out_rec := doxie_cbrs.layout_report;
