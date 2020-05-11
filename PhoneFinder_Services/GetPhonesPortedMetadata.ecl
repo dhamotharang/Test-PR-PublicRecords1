@@ -133,7 +133,7 @@ FUNCTION
     SELF.FirstPortedDate := IF(inMod.ReturnPortingInfo, r.FirstPortedDate, l.FirstPortedDate);
     SELF.LastPortedDate  := IF(inMod.ReturnPortingInfo, r.LastPortedDate, l.LastPortedDate);
     SELF.NoContractCarrier  := IF(inMod.ReturnPortingInfo, r.NoContractCarrier, l.NoContractCarrier);
-    SELF.Prepaid				 := IF(inMod.ReturnPortingInfo, r.Prepaid, l.Prepaid);
+    SELF.Prepaid				 := IF(inMod.ReturnPortingInfo AND l.isprimaryphone, r.Prepaid, l.Prepaid); //Right has no information about other phones, also, prepaid info should only be shown for ReturnPortingInfo
     // deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
     SELF.PhoneStatus     :=  l.PhoneStatus;
     SELF.ActivationDate  := IF(l.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);

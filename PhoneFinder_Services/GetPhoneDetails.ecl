@@ -69,6 +69,7 @@
     SELF.PhoneStatus                                              := IF(le.phone_status = Phones.Constants.PhoneStatus.PresumedActive,
                                                                         PhoneFinder_Services.Constants.PhoneStatus.Active,
                                                                         le.phone_status);
+    SELF.Prepaid                                                  := IF(inMod.ReturnPortingInfo, (BOOLEAN)le.Prepaid, FALSE);
     SELF                                                          := [];
   END;
 
