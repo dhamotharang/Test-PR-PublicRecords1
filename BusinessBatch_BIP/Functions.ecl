@@ -38,7 +38,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
     EXPORT boolean includeMinors := FALSE;
   END;
 
-  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
+  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SearchKeyData(mod_access);
 
   TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
                               ds_bestInfoBatchProxIdRestricted,

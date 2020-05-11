@@ -58,7 +58,7 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                           DATASET([xfm_getInputForLinkIDsCall])
                          );  
                           
-    ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).Data2_;		
+    ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).SearchKeyData(mod_access);		
 
     // Only keep the first record 
     ds_linkIDs_deduped := CHOOSEN(DEDUP(SORT(ds_linkids(source <> 'D'), #EXPAND(BIPv2.IDmacros.mac_ListTop4Linkids()), -weight, -record_score), #EXPAND(BIPv2.IDmacros.mac_ListTop4Linkids()) ),1);

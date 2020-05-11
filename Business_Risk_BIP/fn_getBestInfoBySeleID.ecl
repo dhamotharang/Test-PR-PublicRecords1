@@ -34,7 +34,7 @@ EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig
 			SELF               := []));
 
 	// NAUGHTY per the linking team, but there's no interface for this. Get BIPIDs using only a SeleID.
-	ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).Data2_;		
+	ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).SearchKeyData(mod_access);		
 
 	ds_linkIDs_deduped := DEDUP(SORT(ds_linkIDs, AcctNo, -weight, UltID, OrgID, SeleID, ProxID, PowID), AcctNo);
 
