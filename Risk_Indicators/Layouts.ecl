@@ -1,4 +1,4 @@
-﻿import /* models, */ header, didville, Risk_Indicators, iesp;
+﻿import  models, header, didville, Risk_Indicators, iesp;
 
 export Layouts := module
 
@@ -37,8 +37,8 @@ export layout_watchlists := record
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
 	STRING10 Watchlist_Record_Number;
-	STRING20 Watchlist_fname;
-	STRING20 Watchlist_lname;
+	UNICODE20 Watchlist_fname;
+	UNICODE20 Watchlist_lname;
 	STRING65 Watchlist_address;
 	// parsed watchlist address
 	STRING10 WatchlistPrimRange;
@@ -52,7 +52,7 @@ export layout_watchlists := record
 	STRING2 Watchlist_state;
 	STRING5 Watchlist_zip;
 	STRING30 Watchlist_contry;
-	STRING200 Watchlist_Entity_Name;
+	UNICODE200 Watchlist_Entity_Name;
 end;
 
 export layout_watchlists_plus_seq := record
@@ -68,9 +68,7 @@ end;
 
 export layout_reason_codes_plus_seq := record
 	unsigned1 seq := 0;
-	// models.Layout_Reason_Codes;
-	STRING3 Reason_Code;
-	STRING Reason_Description;
+	models.Layout_Reason_Codes;
 end;	
 
 shared Layout_Accident := RECORD
@@ -738,6 +736,7 @@ export layout_HRI_Businesses := record
 end;
 
 export layout_header_plus_hist_date := record
+  unsigned4 seq;
 	header.layout_header;
 	unsigned3 historydate;
 end;
@@ -1294,6 +1293,7 @@ end;
 
 EXPORT inquiryVerification := RECORD
 	UNSIGNED1 inquiryNAPfirstcount := 0; 
+	UNSIGNED1 inquiryNAPmiddlecount:= 0; 
 	UNSIGNED1 inquiryNAPlastcount := 0; 
 	UNSIGNED1 inquiryNAPaddrcount := 0;  
 	UNSIGNED1 inquiryNAPphonecount := 0; 
@@ -1310,13 +1310,15 @@ EXPORT inquiryVerification := RECORD
 	STRING2  InquiryNAPst := '';
 	STRING5  InquiryNAPz5 := '';
 	STRING30 InquiryNAPfname := '';
+	STRING30 InquiryNAPmname := '';
 	STRING30 InquiryNAPlname := '';
 	STRING9 InquiryNAPssn := '';
 	STRING8 InquiryNAPdob := '';
 	STRING10 InquiryNAPphone := '';
 	UNSIGNED1 InquiryNAPaddrScore := 255;
 	UNSIGNED1 InquiryNAPfnameScore := 255;
-	UNSIGNED1 InquiryNAPlnameScore := 255;
+	UNSIGNED1 InquiryNAPmnameScore := 255;
+	UNSIGNED1 InquiryNAPlnameScore  := 255;
 	UNSIGNED1 InquiryNAPssnScore := 255;
 	UNSIGNED1 InquiryNAPdobScore := 255;
 	UNSIGNED1 InquiryNAPphoneScore := 255;
@@ -1461,14 +1463,20 @@ end;
 
 
 
-export layout_trustdefender_in := RECORD
-	unsigned seq;
-	string255 sessionID;
-	string255 OrgId;
-	string255 ApiKey; 
-	string50 Policy;
-	string20 ApiType;
-	string40 serviceType;
+export layout_trustdefender_in := RECORD 
+	string sessionID;
+	string OrgId;
+	string ApiKey; 
+	string Policy;
+	string ApiType;
+	string serviceType;
+  string Event_Type; //leave blank for testing, 'ACCOUNT_CREATION' for production
+  boolean NoPIIPersistence;  // set this to true when running tests or bocashells for testing.  for live product transactions, the default will be false
+  boolean DigitalIdReadOnly; //set this to true when running tests, otherwise false for production
+  string MerchantID; // 'LNRS_' + companyID
+  string MerchantName; // 'LNRS_' + company name
+  
+  Risk_Indicators.Layout_Input;
  end;
  
 export layout_fp201_attributes := RECORD
@@ -1492,7 +1500,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_npos_cnt	;
 	unsigned1	link_wgt_ssn4_npos_cnt	;
 	unsigned1	link_wgt_ssn5_npos_cnt	;
-	unsigned1	link_wgt_total_npos_cnt	;
 	unsigned1	link_wgt_dob_nneg_cnt	;
 	unsigned1	link_wgt_fname_nneg_cnt	;
 	unsigned1	link_wgt_lname_nneg_cnt	;
@@ -1501,7 +1508,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_nneg_cnt	;
 	unsigned1	link_wgt_ssn4_nneg_cnt	;
 	unsigned1	link_wgt_ssn5_nneg_cnt	;
-	unsigned1	link_wgt_total_nneg_cnt	;
 	unsigned1	link_wgt_dob_nzero_cnt	;
 	unsigned1	link_wgt_fname_nzero_cnt	;
 	unsigned1	link_wgt_lname_nzero_cnt	;
@@ -1510,7 +1516,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_nzero_cnt	;
 	unsigned1	link_wgt_ssn4_nzero_cnt	;
 	unsigned1	link_wgt_ssn5_nzero_cnt	;
-	unsigned1	link_wgt_total_nzero_cnt	;
 	string15	link_max_weight_element	;
 	string15	link_min_weight_element	;
 end;
@@ -1781,15 +1786,245 @@ export layout_BIP_Header_info := record
 	integer 	bus_active_SOS_filings_peradl := 0;
 end;
 
+//MS-123: new BIP header verification fields
+export layout_BIP_Header_info_54 := record
+	integer     bus_ver_sources_total := 0;
+	qstring100 	bus_ver_sources := '';
+	qstring200 	bus_ver_sources_first_seen := '';
+	qstring200 	bus_ver_sources_last_seen := '';
+	integer    	bus_fname_ver_sources_total := 0;
+	qstring100 	bus_fname_ver_sources := '';
+	qstring200 	bus_fname_ver_sources_first_seen := '';
+	qstring200 	bus_fname_ver_sources_last_seen := '';
+	integer    	bus_lname_ver_sources_total := 0;
+	qstring100 	bus_lname_ver_sources := '';
+	qstring200 	bus_lname_ver_sources_first_seen := '';
+	qstring200 	bus_lname_ver_sources_last_seen := '';
+	integer    	bus_addr_ver_sources_total := 0;
+	qstring100 	bus_addr_ver_sources := '';
+	qstring200 	bus_addr_ver_sources_first_seen	 := '';
+	qstring200 	bus_addr_ver_sources_last_seen		 := '';
+	integer    	bus_ssn_ver_sources_total		 := 0;
+	qstring100 	bus_ssn_ver_sources		 := '';
+	qstring200 	bus_ssn_ver_sources_first_seen		 := '';
+	qstring200 	bus_ssn_ver_sources_last_seen		 := '';
+	integer   	 bus_phone_ver_sources_total		 := 0;
+	qstring100 	bus_phone_ver_sources		 := '';
+	qstring200 	bus_phone_ver_sources_first_seen		 := '';
+	qstring200 	bus_phone_ver_sources_last_seen		 := '';
+//MS-124
+ integer3    bus_sos_filings_not_instate := 0;
+ integer3    bus_ucc_count := 0;
+ integer3    bus_ucc_active_count := 0;
+ integer3    bus_inq_count12 := 0;
+ integer3    bus_inq_credit_count12 := 0;
+ integer3    bus_inq_highriskcredit_count12 := 0;
+ integer3    bus_inq_other_count12 := 0;
+ boolean     bus_seleID_match := 0;
+end;
+
 //MS-167: new Equifax Fraud Flags fields
-// export layout_Equifax_FraudFlags := record
-	// integer 	factact_curr_active_duty := 0;
-	// integer 	factact_curr_active_duty_fseen := 0;
-	// integer 	factact_curr_fraud_alert := 0;
-	// integer 	factact_curr_fraud_alert_fseen := 0;
-	// integer 	factact_curr_alert_code := 0;
-	// integer 	factact_hist_fraud_alert_ct := 0;
-	// integer 	factact_hist_fraud_alert_lseen := 0;
-// end;
+export layout_Equifax_FraudFlags := record
+	integer 	factact_curr_active_duty := 0;
+	integer 	factact_curr_active_duty_fseen := 0;
+	integer 	factact_curr_fraud_alert := 0;
+	integer 	factact_curr_fraud_alert_fseen := 0;
+	string2 	factact_curr_alert_code := '';
+	integer 	factact_hist_fraud_alert_ct := 0;
+	integer 	factact_hist_fraud_alert_lseen := 0;
+ 
+end;
+
+
+export layout_threatmetrix_shell_results := record  
+  string8 TxinqWAddrFirst ;
+  string8 TxinqWAddrLast ;
+  string TxinqAddrStatusInd ;
+  string8 TxinqWEmailFirst ;
+  string8 TxinqWEmailLast ;
+  string TxinqEmailStatusInd ;
+  string8 TxinqWNameFirst ;
+  string8 TxinqWNameLast  ;
+  string TxinqNameStatusInd ;
+  string8 TxinqWPhoneFirst ;
+  string8 TxinqWPhoneLast ;
+  string TxinqPhoneStatusInd ;
+  string Tmxid ;
+  string TmxidConfidenceScore ;
+  string TxinqWTmxidFirst ;
+  string TxinqWTmxidLast ;
+  string TxinqTmxidStatusInd ;
+  string TmxPolicyScore ;
+  string6 SmartidPerEmailInTxinqCnt ;
+  string6 SmartidPerEmailInTxinqCnt1Y ;
+  string6 SmartidPerEmailInTxinqCnt6M ;
+  string6 SmartidPerEmailInTxinqCnt3M ;
+  string6 SmartidPerEmailInTxinqCnt1M ;
+  string6 SmartidPerPhoneInTxinqCnt ;
+  string6 SmartidPerPhoneInTxinqCnt1Y ;
+  string6 SmartidPerPhoneInTxinqCnt6M ;
+  string6 SmartidPerPhoneInTxinqCnt3M ;
+  string6 SmartidPerPhoneInTxinqCnt1M ;
+  string6 ExactidPerEmailInTxinqCnt ;
+  string6 ExactidPerEmailInTxinqCnt1Y ;
+  string6 ExactidPerEmailInTxinqCnt6M ;
+  string6 ExactidPerEmailInTxinqCnt3M ;
+  string6 ExactidPerEmailInTxinqCnt1M ;
+  string6 ExactidPerPhoneInTxinqCnt ;
+  string6 ExactidPerPhoneInTxinqCnt1Y ;
+  string6 ExactidPerPhoneInTxinqCnt6M ;
+  string6 ExactidPerPhoneInTxinqCnt3M ;
+  string6 ExactidPerPhoneInTxinqCnt1M ;
+  string6 EmailPerPhoneInTxinqCnt ;
+  string6 EmailPerPhoneInTxinqCnt1Y ;
+  string6 EmailPerPhoneInTxinqCnt1M ;
+  string6 EmailPerPhoneInTxinqCnt3M ;
+  string6 EmailPerPhoneInTxinqCnt6M ;
+  string6 PhonePerEmailInTxinqCnt1Y ;
+  string6 PhonePerEmailInTxinqCnt1M ;
+  string6 PhonePerEmailInTxinqCnt3M ;
+  string6 TmxidPerEmailInTxinqCnt ;
+  string6 TmxidPerEmailInTxinqCnt1Y ;
+  string6 TmxidPerEmailInTxinqCnt6M ;
+  string6 TmxidPerEmailInTxinqCnt3M ;
+  string6 TmxidPerEmailInTxinqCnt1M ;
+  string6 TmxidPerPhoneInTxinqCnt ;
+  string6 TmxidPerPhoneInTxinqCnt1Y ;
+  string6 TmxidPerPhoneInTxinqCnt6M ;
+  string6 TmxidPerPhoneInTxinqCnt3M ;
+  string6 TmxidPerPhoneInTxinqCnt1M ;
+  string6 OrgidPerEmailInTxinqCnt ;
+  string6 TrueipPerEmailInTxinqCnt ;
+  string6 TrueipgPerEmailInTxinqCnt ;
+  string6 TrueipPerPhoneInTxinqCnt ;
+  string6 DnsipPerEmailInTxinqCnt ;
+  string6 DnsipgPerEmailInTxinqCnt ;
+  string6 ProxyipPerEmailInTxinqCnt ;
+  string6 ProxyipgPerEmailInTxinqCnt ;
+  string6 BrowserPerEmailInTxinqCnt ;
+  string6 BrowserHashPerEmailInTxinqCnt ;
+  string6 BrowserHashPerPhoneInTxinqCnt ;
+  string6 ScreenResPerEmailInTxinqCnt ;
+  string6 TimeZonePerEmailInTxinqCnt ;
+  string6 CurrencyPerEmailInTxinqCnt ;
+  string6 LoginidPerPhoneInTxinqCnt ;
+  string6 AchPerEmailInTxinqCnt ;
+  string6 AgentpubkeyPerEmailInTxinqCnt ;
+  string6 CarrieridPerEmailInTxinqCnt ;
+  string6 CcardPerEmailInTxinqCnt ;
+  string6 TxinqCorrEmailWPhoneNameCnt ;
+  string6 TxinqCorrEmailWPhoneNameCnt1Y ;
+  string6 TxinqCorrEmailWPhoneNameCnt6M ;
+  string6 TxinqCorrEmailWPhoneNameCnt3M ;
+  string6 TxinqCorrEmailWPhoneNameCnt1M ;
+  string6 TxinqCorrEmailWPFLACnt ;
+  string6 TxinqCorrEmailWPFLACnt1Y ;
+  string6 TxinqCorrEmailWPFLACnt6M ;
+  string6 TxinqCorrEmailWPFLACnt3M ;
+  string6 TxinqCorrEmailWPFLACnt1M ;
+  string6 TxinqCorrEmailWPhoneCnt ;
+  string6 TxinqCorrEmailWPhoneCnt1Y ;
+  string6 TxinqCorrEmailWPhoneCnt6M ;
+  string6 TxinqCorrEmailWPhoneCnt3M ;
+  string6 TxinqCorrEmailWPhoneCnt1M ;
+  string6 TxinqWEmailCnt1Y ;
+  string8 TxinqWEmailCnt6M ;
+  string6 TxinqWPhoneCnt ;
+  string6 TxinqWPhoneCnt1Y ;
+  string8 TxinqWPhoneCnt6M ;
+  string6 TxinqCorrEmailWAddressCnt ;
+  string6 TxinqCorrEmailWAddressCnt1Y ;
+  string6 TxinqCorrEmailWAddressCnt6M ;
+  string6 TxinqCorrEmailWAddressCnt3M ;
+  string6 TxinqCorrEmailWAddressCnt1M ;
+  string6 TxinqCorrEmailWNameCnt ;
+  string6 TxinqCorrEmailWNameCnt1Y ;
+  string6 TxinqCorrEmailWNameCnt6M ;
+  string6 TxinqCorrEmailWNameCnt3M ;
+  string6 TxinqCorrEmailWNameCnt1M ;
+  string6 TxinqCorrNameWPhoneCnt ;
+  string6 TxinqCorrNameWPhoneCnt1Y ;
+  string6 TxinqCorrNameWPhoneCnt6M ;
+  string6 TxinqCorrNameWPhoneCnt3M ;
+  string6 TxinqCorrNameWPhoneCnt1M ;
+  string6 TxinqWEmailFinStatusRejCnt ;
+  string6 TxinqWEmailFinStatusRejCnt1M ;
+  string6 TxinqWEmailFinStatusAccCnt ;
+  string6 TxinqWEmailFinStatusAccCnt1M ;
+  string6 TxinqWPhoneFinStatusRejCnt ;
+  string6 TxinqWPhoneFinStatusRejCnt1M ;
+  string6 TxinqWPhoneFinStatusAccCnt ;
+  string6 TxinqWPhoneFinStatusAccCnt1M ;
+  string6 DistBtwTrueipWEmailAvg ;
+  string6 DistBtwTrueipWPhoneAvg ;
+  string8 TimeBtwTxinqWEmailAvg ;
+  string6 TimeBtwTxinqWPhoneAvg ;
+  string6 TrueiprcPerPhoneInTxinqCnt1W ;
+  string6 TrueiprcPerEmailInTxinqCnt1W ;
+  string6 ExactidPerTmxidInTxinqCnt1W ;
+  string6 TrueipgPerTmxidInTxinqCnt1W ;
+  string6 TrueipPerTmxidInTxinqCnt1W ;
+  string6 TrueipPerTmxidInTxinqCnt1M ;
+  string8 TxinqWTmxidCnt1M ;
+  string6 ExactidPerTmxidInTxinqDoCnt1W ;
+  string6 TrueipgPerTmxidInTxinqDoCnt1W ;
+  string6 SmartidPerTmxidInTxinqCnt ;
+  string6 ExactidPerTmxidInTxinqCnt ;
+  string6 EmailPerTmxidInTxinqCnt ;
+  string6 PhonePerTmxidInTxinqCnt ;
+  string6 NamePerTmxidInTxinqCnt ;
+  string6 TrueipPerTmxidInTxinqCnt ;
+  string6 RuleTmxidTrustVeryHighFlag ;
+  string6 RuleTmxidTrustHighFlag ;
+  string6 RuleTmxidTrustMediumFlag ;
+  string6 RuleTmxidTrustedByUserFlag1M ;
+  string6 RuleTmxidTrustedByUserFlag3M ;
+  string6 RuleTmxidTrustedByUserFlag6M ;
+  string6 RuleTmxidTrustedByUserFlag1Y ;
+  string6 RuleEmailTrustedByUserFlag1M ;
+  string6 RuleEmailTrustedByUserFlag3M ;
+  string6 RuleEmailTrustedByUserFlag6M ;
+  string6 RuleEmailTrustedByUserFlag1Y ;
+  string6 RuleTmxidFraudByUserFlag1M ;
+  string6 RuleTmxidFraudByUserFlag3M ;
+  string6 RuleTmxidFraudByUserFlag6M ;
+  string6 RuleTmxidFraudByUserFlag1Y ;
+  string6 RuleEmailBlistFlag ;
+  string6 RuleEmailBlistByBankFlag ;
+  string6 RuleEmailBlistByFinTechFlag ;
+  string6 RuleEmailBlistByEcommFlag ;
+  string6 RuleExactidBlistInTxinqWEFlag1M ;
+  string6 RuleExactidBlistInTxinqWEFlag ;
+  string6 RuleSmartidBlistInTxinqWEFlag1M ;
+  string6 RuleSmartidBlistInTxinqWEFlag ;
+  string6 RuleExactidBlistInTxinqWPFlag1M ;
+  string6 RuleExactidBlistInTxinqWPFlag1Y ;
+  string6 RuleSmartidBlistInTxinqWPFlag1M ;
+  string6 RuleSmartidBlistInTxinqWPFlag1Y ;
+  string6 RuleEmailHighRiskDomainFlag ;
+  string6 RuleEmailAliasFlag ;
+  string6 RuleEmailMachineGeneratedFlag ;
+end;
+
+export layout_tmx_extras := record
+  unsigned seq;  
+  string1 invalid_account_email;
+  string1 invalid_account_telephone;
+  string digital_id_result;
+  string account_telephone_result;
+  string account_email_result;
+  string account_name_result;
+  string account_address_result;
+end;
+
+export layout_threatmetrix_shell_internal_results := record  
+  layout_threatmetrix_shell_results;
+  
+  // fields added for UAT, or debugging the gateway.  
+  // not to be included in Risk_Indicators.Layout_Boca_Shell_Edina_v55
+  layout_tmx_extras;
+end; 
+  
+  
 
 END;
