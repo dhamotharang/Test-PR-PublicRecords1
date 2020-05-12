@@ -31,6 +31,7 @@ export t_EmailSearchV2Option := record (iesp.share.t_BaseSearchOptionEx)
 	boolean SkipTMX {xpath('SkipTMX')};//hidden[internal]
 	unsigned2 MaxEmailsForTMX {xpath('MaxEmailsForTMX')};//hidden[internal]
 	boolean IsMarketingUse {xpath('IsMarketingUse')};
+	string RestrictedUseCase {xpath('RestrictedUseCase')};//hidden[internal]
 end;
 		
 export t_EmailSearchV2OriginalData := record
@@ -69,8 +70,8 @@ export t_EmailSearchV2Record := record
 	t_EmailSearchV2BestInfo BestInfo {xpath('BestInfo')};
 	unsigned8 LexId {xpath('LexId')}; // Xsd type: string
 	iesp.share.t_Date ProcessDate {xpath('ProcessDate')};//hidden[internal]
-	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
-	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};//hidden[internal]
+	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};//hidden[internal]
 	iesp.share.t_Date DateVendorFirstReported {xpath('DateVendorFirstReported')};
 	iesp.share.t_Date DateVendorLastReported {xpath('DateVendorLastReported')};
 	string8 LatestOrigLoginDate {xpath('LatestOrigLoginDate')};
@@ -87,6 +88,8 @@ export t_EmailSearchV2Record := record
 	string AdditionalStatusInfo {xpath('AdditionalStatusInfo')};
 	string Relationship {xpath('Relationship')};
 	unsigned EmailId {xpath('EmailId')};//hidden[internal]
+	iesp.share.t_Date LNDateFirst {xpath('LNDateFirst')};
+	iesp.share.t_Date LNDateLast {xpath('LNDateLast')};
 end;
 		
 export t_EmailSearchV2InputSubject := record
