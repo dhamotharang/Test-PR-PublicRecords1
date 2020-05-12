@@ -114,6 +114,7 @@ function
   // shared restoredDs         := ds_restore;
 
   /* ---------------------- Persistence stats and QA tool outputs -------------------------------- */
+  import LinkingTools;
   ds_lgid3_persistence_stats                 := BIPV2_Strata.PersistenceStats(pDatasetOut,BIPV2.CommonBase.DS_BASE,rcid,lgid3) : independent;
   QA_Tool_lgid3_persistence_record_stats     := BIPV2_QA_Tool.mac_persistence_records_stats(ds_lgid3_persistence_stats ,'lgid3' ,pversion);
   QA_Tool_lgid3_persistence_cluster_stats    := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_lgid3_persistence_stats ,'lgid3' ,pversion);
