@@ -10,7 +10,7 @@ EXPORT FnThor_GetAttrsV11(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functi
 
 	mod_transforms := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Transforms;
 	
-	InputDataPrep := PROJECT(InputData, mod_transforms.xfm_InputDataPrep(LEFT),LOCAL);
+	InputDataPrep := PROJECT(InputData, mod_transforms.xfm_InputDataPrep(LEFT) );
 
 	PB11Attributes := ProfileBooster.ProfileBoosterV2_KEL.FnTHOR_GetPB11Attributes(InputDataPrep, OptionsRaw, KEL_Settings_PB);
 

@@ -370,7 +370,6 @@ EXPORT Layouts := MODULE
 		END;
 		
 	END;
-
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Id;
 		string2 	Customer_State;
@@ -384,7 +383,6 @@ EXPORT Layouts := MODULE
 		string 		Customer_Email; // Emails Separated by semicolon ";"
 		unsigned6 	fdn_file_info_id;
 	end;
-
 
 	EXPORT CustomerMappings := RECORD
 		unsigned6	fdn_file_info_id;
@@ -418,9 +416,11 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
-		
-		export RefreshProdDashVersion := Record
-		boolean RefreshVersion;
+
+
+		export CustomerActiveSprays := record 
+			string20 	Customer_Id;
+			string20	File_type;
 		end;
 	end;
 

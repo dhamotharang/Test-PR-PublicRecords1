@@ -174,10 +174,7 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 // ********************************************************************
 // Get the DID and Append the Input Account Number
 // ********************************************************************
-	with_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output(DID<>0), seq), 
-									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
-									
-	without_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output(DID=0), seq), 
+	with_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output, seq), 
 									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
 
 
@@ -284,8 +281,8 @@ donotmail_key := dma.key_DNM_Name_Address;
 													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
 		left.DID = right.DID, 
 		getInfutor(left,right), left outer, keep(1), local)
-	;	
-	// : PERSIST('~PROFILEBOOSTER::with_infutor_thor_full::' + prt); // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	// ;	
+	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full::' + prt); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
 	#IF(onThor)
 		withInfutor := withInfutor_thor;
@@ -754,7 +751,7 @@ end;
 																	self.HHInterestSportPersonMmbrCnt 	:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.sportsInterest = 1, 1, 0);  
 																	self.RaAInterestSportPersonMmbrCnt	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.sportsInterest = 1, 1, 0); 
 																	self := left), left outer, parallel);
-	with_Sports_thor := withSports_temp;// : PERSIST('~PROFILEBOOSTER::with_Sports_thor::' + prt) ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	with_Sports_thor := withSports_temp : PERSIST('~PROFILEBOOSTER::with_Sports_thor::' + prt) ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 
 	#IF(onThor)
 		withSports := with_Sports_thor;
@@ -1444,202 +1441,7 @@ ProfileBooster.Layouts.Layout_PB_BatchOut Blank_minors(ProfileBooster.Layouts.La
   self := le;
 END;
 
-FinalWithDID := PROJECT(with_mover_model, Blank_minors(left));
-
-ProfileBooster.Layouts.Layout_PB_BatchOut xfm_NoDIDs(Risk_Indicators.Layout_Output le) := TRANSFORM
-  self.seq																								:= le.seq;
-	self.AcctNo																							:= le.Account;
-	self.LexID																							:= le.did;
-  self.attributes.version1.DoNotMail 											:= '-1';
-	self.attributes.version1.VerifiedProspectFound 					:= '-1';
-	self.attributes.version1.VerifiedName 									:= '-1';
-	self.attributes.version1.VerifiedSSN 										:= '-1';
-	self.attributes.version1.VerifiedPhone 									:= '-1';
-	self.attributes.version1.VerifiedCurrResMatchIndex 			:= '-1';
-	self.attributes.version1.ProspectTimeOnRecord 					:= '-1';
-	self.attributes.version1.ProspectTimeLastUpdate 				:= '-1';
-	self.attributes.version1.ProspectLastUpdate12Mo 				:= '-1';
-	self.attributes.version1.ProspectAge 										:= '-1';
-	self.attributes.version1.ProspectGender 								:= '-1';
-	self.attributes.version1.ProspectMaritalStatus 					:= '-1';
-	self.attributes.version1.ProspectEstimatedIncomeRange 	:= '-1';
-	self.attributes.version1.ProspectDeceased 							:= '-1';
-	self.attributes.version1.ProspectCollegeAttending 			:= '-1';
-	self.attributes.version1.ProspectCollegeAttended 				:= '-1';
-	self.attributes.version1.ProspectCollegeProgramType 		:= '-1';
-	self.attributes.version1.ProspectCollegePrivate 				:= '-1';
-	self.attributes.version1.ProspectCollegeTier 						:= '-1';
-	self.attributes.version1.ProspectBankingExperience 			:= '-1';
-	self.attributes.version1.AssetCurrOwner 								:= '-1';
-	self.attributes.version1.PropCurrOwner 									:= '-1';
-	self.attributes.version1.PropCurrOwnedCnt 							:= '-1';
-	self.attributes.version1.PropCurrOwnedAssessedTtl 			:= '-1';
-	self.attributes.version1.PropCurrOwnedAVMTtl 						:= '-1';
-	self.attributes.version1.PropTimeLastSale 							:= '-1';
-	self.attributes.version1.PropEverOwnedCnt 							:= '-1';
-	self.attributes.version1.PropEverSoldCnt 								:= '-1';
-	self.attributes.version1.PropSoldCnt12Mo 								:= '-1';
-	self.attributes.version1.PropSoldRatio 									:= '-1';
-	self.attributes.version1.PropPurchaseCnt12Mo 						:= '-1';
-	self.attributes.version1.PPCurrOwner 										:= '-1';
-	self.attributes.version1.PPCurrOwnedCnt 								:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoCnt 						:= '-1';
-	self.attributes.version1.PPCurrOwnedMtrcycleCnt 				:= '-1';
-	self.attributes.version1.PPCurrOwnedAircrftCnt 					:= '-1';
-	self.attributes.version1.PPCurrOwnedWtrcrftCnt 					:= '-1';
-	self.attributes.version1.LifeEvTimeLastMove 						:= '-1';
-	self.attributes.version1.LifeEvNameChange 							:= '-1';
-	self.attributes.version1.LifeEvNameChangeCnt12Mo 				:= '-1';
-	self.attributes.version1.LifeEvTimeFirstAssetPurchase 	:= '-1';
-	self.attributes.version1.LifeEvTimeLastAssetPurchase 		:= '-1';
-	self.attributes.version1.LifeEvEverResidedCnt 					:= '-1';
-	self.attributes.version1.LifeEvLastMoveTaxRatioDiff 		:= '-1';
-	self.attributes.version1.LifeEvEconTrajectory 					:= '-1';
-	self.attributes.version1.LifeEvEconTrajectoryIndex 			:= '-1';
-	self.attributes.version1.ResCurrOwnershipIndex 					:= '-1';
-	self.attributes.version1.ResCurrAVMValue 								:= '-1';
-	self.attributes.version1.ResCurrAVMValue12Mo 						:= '-1';
-	self.attributes.version1.ResCurrAVMRatioDiff12Mo 				:= '-1';
-	self.attributes.version1.ResCurrAVMValue60Mo 						:= '-1';
-	self.attributes.version1.ResCurrAVMRatioDiff60Mo 				:= '-1';
-	self.attributes.version1.ResCurrAVMCntyRatio 						:= '-1';
-	self.attributes.version1.ResCurrAVMTractRatio 					:= '-1';
-	self.attributes.version1.ResCurrAVMBlockRatio 					:= '-1';
-	self.attributes.version1.ResCurrDwellType 							:= '-1';
-	self.attributes.version1.ResCurrDwellTypeIndex 					:= '-1';
-	self.attributes.version1.ResCurrMortgageType 						:= '-1';
-	self.attributes.version1.ResCurrMortgageAmount 					:= '-1';
-	self.attributes.version1.ResCurrBusinessCnt 						:= '-1';
-	self.attributes.version1.ResInputOwnershipIndex 				:= '-1';
-	self.attributes.version1.ResInputAVMValue 							:= '-1';
-	self.attributes.version1.ResInputAVMValue12Mo 					:= '-1';
-	self.attributes.version1.ResInputAVMRatioDiff12Mo 			:= '-1';
-	self.attributes.version1.ResInputAVMValue60Mo 					:= '-1';
-	self.attributes.version1.ResInputAVMRatioDiff60Mo 			:= '-1';
-	self.attributes.version1.ResInputAVMCntyRatio 					:= '-1';
-	self.attributes.version1.ResInputAVMTractRatio 					:= '-1';
-	self.attributes.version1.ResInputAVMBlockRatio 					:= '-1';
-	self.attributes.version1.ResInputDwellType 							:= '-1';
-	self.attributes.version1.ResInputDwellTypeIndex 				:= '-1';
-	self.attributes.version1.ResInputMortgageType 					:= '-1';
-	self.attributes.version1.ResInputMortgageAmount 				:= '-1';
-	self.attributes.version1.ResInputBusinessCnt 						:= '-1';	
-	self.attributes.version1.CrtRecCnt 											:= '-1';
-	self.attributes.version1.CrtRecCnt12Mo 									:= '-1';
-	self.attributes.version1.CrtRecTimeNewest 							:= '-1';
-	self.attributes.version1.CrtRecFelonyCnt 								:= '-1';
-	self.attributes.version1.CrtRecFelonyCnt12Mo 						:= '-1';
-	self.attributes.version1.CrtRecFelonyTimeNewest 				:= '-1';
-	self.attributes.version1.CrtRecMsdmeanCnt 							:= '-1';
-	self.attributes.version1.CrtRecMsdmeanCnt12Mo 					:= '-1';
-	self.attributes.version1.CrtRecMsdmeanTimeNewest 				:= '-1';
-	self.attributes.version1.CrtRecEvictionCnt 							:= '-1';
-	self.attributes.version1.CrtRecEvictionCnt12Mo 					:= '-1';
-	self.attributes.version1.CrtRecEvictionTimeNewest 			:= '-1';
-	self.attributes.version1.CrtRecLienJudgCnt 							:= '-1';
-	self.attributes.version1.CrtRecLienJudgCnt12Mo 					:= '-1';
-	self.attributes.version1.CrtRecLienJudgTimeNewest 			:= '-1';
-	self.attributes.version1.CrtRecLienJudgAmtTtl 					:= '-1';
-	self.attributes.version1.CrtRecBkrptCnt 								:= '-1';
-	self.attributes.version1.CrtRecBkrptCnt12Mo 						:= '-1';
-	self.attributes.version1.CrtRecBkrptTimeNewest 					:= '-1';
-	self.attributes.version1.CrtRecSeverityIndex 						:= '-1';
-	self.attributes.version1.OccProfLicense 								:= '-1';
-	self.attributes.version1.OccProfLicenseCategory 				:= '-1';
-	self.attributes.version1.OccBusinessAssociation 				:= '-1';
-	self.attributes.version1.OccBusinessAssociationTime 		:= '-1';
-	self.attributes.version1.OccBusinessTitleLeadership 		:= '-1';
-	self.attributes.version1.InterestSportPerson 						:= '-1';	
-	self.attributes.version1.HHTeenagerMmbrCnt 							:= '-1';
-	self.attributes.version1.HHYoungAdultMmbrCnt 						:= '-1';
-	self.attributes.version1.HHMiddleAgemmbrCnt 						:= '-1';
-	self.attributes.version1.HHSeniorMmbrCnt 								:= '-1';
-	self.attributes.version1.HHElderlyMmbrCnt 							:= '-1';
-	self.attributes.version1.HHCnt 													:= '-1';
-	self.attributes.version1.HHEstimatedIncomeRange 				:= '-1';
-	self.attributes.version1.HHCollegeAttendedMmbrCnt 			:= '-1';
-	self.attributes.version1.HHCollege2yrAttendedMmbrCnt 		:= '-1';
-	self.attributes.version1.HHCollege4yrAttendedMmbrCnt 		:= '-1';
-	self.attributes.version1.HHCollegeGradAttendedMmbrCnt 	:= '-1';
-	self.attributes.version1.HHCollegePrivateMmbrCnt 				:= '-1';
-	self.attributes.version1.HHCollegeTierMmbrHighest 			:= '-1';
-	self.attributes.version1.HHPropCurrOwnerMmbrCnt 				:= '-1';
-	self.attributes.version1.HHPropCurrOwnedCnt 						:= '-1';
-	self.attributes.version1.HHPropCurrAVMHighest 					:= '-1';
-	self.attributes.version1.HHPPCurrOwnedCnt 							:= '-1';
-	self.attributes.version1.HHPPCurrOwnedAutoCnt 					:= '-1';
-	self.attributes.version1.HHPPCurrOwnedMtrcycleCnt 			:= '-1';
-	self.attributes.version1.HHPPCurrOwnedAircrftCnt 				:= '-1';
-	self.attributes.version1.HHPPCurrOwnedWtrcrftCnt 				:= '-1';
-	self.attributes.version1.HHCrtRecMmbrCnt 								:= '-1';
-	self.attributes.version1.HHCrtRecMmbrCnt12Mo 						:= '-1';
-	self.attributes.version1.HHCrtRecFelonyMmbrCnt 					:= '-1';
-	self.attributes.version1.HHCrtRecFelonyMmbrCnt12Mo 			:= '-1';
-	self.attributes.version1.HHCrtRecMsdmeanMmbrCnt 				:= '-1';
-	self.attributes.version1.HHCrtRecMsdmeanMmbrCnt12Mo 		:= '-1';
-	self.attributes.version1.HHCrtRecEvictionMmbrCnt 				:= '-1';
-	self.attributes.version1.HHCrtRecEvictionMmbrCnt12Mo 		:= '-1';
-	self.attributes.version1.HHCrtRecLienJudgMmbrCnt 				:= '-1';
-	self.attributes.version1.HHCrtRecLienJudgMmbrCnt12Mo 		:= '-1';
-	self.attributes.version1.HHCrtRecLienJudgAmtTtl 				:= '-1';
-	self.attributes.version1.HHCrtRecBkrptMmbrCnt 					:= '-1';
-	self.attributes.version1.HHCrtRecBkrptMmbrCnt12Mo 			:= '-1';
-	self.attributes.version1.HHCrtRecBkrptMmbrCnt24Mo 			:= '-1';
-	self.attributes.version1.HHOccProfLicMmbrCnt 						:= '-1';
-	self.attributes.version1.HHOccBusinessAssocMmbrCnt 			:= '-1';
-	self.attributes.version1.HHInterestSportPersonMmbrCnt 	:= '-1';	
-	self.attributes.version1.RaATeenageMmbrCnt 							:= '-1';
-	self.attributes.version1.RaAYoungAdultMmbrCnt 					:= '-1';
-	self.attributes.version1.RaAMiddleAgeMmbrCnt 						:= '-1';
-	self.attributes.version1.RaASeniorMmbrCnt 							:= '-1';
-	self.attributes.version1.RaAElderlyMmbrCnt 							:= '-1';
-	self.attributes.version1.RaAHHCnt 											:= '-1';
-	self.attributes.version1.RaAMmbrCnt 										:= '-1';
-	self.attributes.version1.RaAMedIncomeRange 							:= '-1';
-	self.attributes.version1.RaACollegeAttendedMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACollege2yrAttendedMmbrCnt 	:= '-1';
-	self.attributes.version1.RaACollege4yrAttendedMmbrCnt 	:= '-1';
-	self.attributes.version1.RaACollegeGradAttendedMmbrCnt 	:= '-1';
-	self.attributes.version1.RaACollegePrivateMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACollegeTopTierMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACollegeMidTierMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACollegeLowTierMmbrCnt 			:= '-1';
-	self.attributes.version1.RaAPropCurrOwnerMmbrCnt 				:= '-1';
-	self.attributes.version1.RaAPropOwnerAVMHighest 				:= '-1';
-	self.attributes.version1.RaAPropOwnerAVMMed 						:= '-1';
-	self.attributes.version1.RaAPPCurrOwnerMmbrCnt 					:= '-1';
-	self.attributes.version1.RaAPPCurrOwnerAutoMmbrCnt 			:= '-1';
-	self.attributes.version1.RaAPPCurrOwnerMtrcycleMmbrCnt 	:= '-1';
-	self.attributes.version1.RaAPPCurrOwnerAircrftMmbrCnt 	:= '-1';
-	self.attributes.version1.RaAPPCurrOwnerWtrcrftMmbrCnt 	:= '-1';
-	self.attributes.version1.RaACrtRecMmbrCnt 							:= '-1';
-	self.attributes.version1.RaACrtRecMmbrCnt12Mo 					:= '-1';
-	self.attributes.version1.RaACrtRecFelonyMmbrCnt 				:= '-1';
-	self.attributes.version1.RaACrtRecFelonyMmbrCnt12Mo 		:= '-1';
-	self.attributes.version1.RaACrtRecMsdmeanMmbrCnt 				:= '-1';
-	self.attributes.version1.RaACrtRecMsdmeanMmbrCnt12Mo 		:= '-1';
-	self.attributes.version1.RaACrtRecEvictionMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACrtRecEvictionMmbrCnt12Mo 	:= '-1';
-	self.attributes.version1.RaACrtRecLienJudgMmbrCnt 			:= '-1';
-	self.attributes.version1.RaACrtRecLienJudgMmbrCnt12Mo 	:= '-1';
-	self.attributes.version1.RaACrtRecLienJudgAmtMax 				:= '-1';
-	self.attributes.version1.RaACrtRecBkrptMmbrCnt36Mo 			:= '-1';
-	self.attributes.version1.RaAOccProfLicMmbrCnt 					:= '-1';
-	self.attributes.version1.RaAOccBusinessAssocMmbrCnt 		:= '-1';
-	self.attributes.version1.RaAInterestSportPersonMmbrCnt 	:= '-1';
-	// new attributes added for bug RQ-13721
-	self.attributes.version1.PPCurrOwnedAutoVIN 						:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoYear 						:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoMake 						:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoModel 					:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoSeries 					:= '-1';
-	self.attributes.version1.PPCurrOwnedAutoType 						:= '-1';
-	self := [];
-END;
-
-FinalWithoutDID := PROJECT(without_DID, xfm_NoDIDs(left));
-
-Final := SORT(FinalWithDID + FinalWithoutDID, seq);
+Final := PROJECT(with_mover_model, Blank_minors(left));
 
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 // output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
@@ -1650,9 +1452,9 @@ Final := SORT(FinalWithDID + FinalWithoutDID, seq);
  
   // output(slimShell,,'~dvstemp::out::profilebooster::slimshell_' + thorlib.wuid());
 	
-  //output(with_mover_model, named('with_mover_model'));
-  // output(iid_prep, named('iid_prep'));
-  // output(with_DID, named('with_DID'));
+	  //output(with_mover_model, named('with_mover_model'));
+	 // output(iid_prep, named('iid_prep'));
+   // output(with_DID, named('with_DID'));
   // output(withDoNotMail, named('withDoNotMail'));
   // output(withVerification, named('withVerification'));
   // output(withDeceasedDID, named('withDeceasedDID'));
@@ -1686,8 +1488,8 @@ Final := SORT(FinalWithDID + FinalWithoutDID, seq);
   // output(p_address, named('p_address'));
   // output(ids_only, named('ids_only'));
 	 
-  // output(p_address,, '~dvstemp::profile_booster_property_testcase::p_address::mathis_' + thorlib.wuid());
-  // output(ids_only,, '~dvstemp::profile_booster_property_testcase::ids_only::mathis_' + thorlib.wuid());
+	// output(p_address,, '~dvstemp::profile_booster_property_testcase::p_address::mathis_' + thorlib.wuid());
+	// output(ids_only,, '~dvstemp::profile_booster_property_testcase::ids_only::mathis_' + thorlib.wuid());
 	
   // output(prop_common, named('prop_common'));	
   // output(withProperty, named('withProperty'));
@@ -1711,10 +1513,10 @@ Final := SORT(FinalWithDID + FinalWithoutDID, seq);
   // output(finalRollup, named('finalRollup'));
   // output(withRelaIncome, named('withRelaIncome'));
   // output(withRelaHHcnt, named('withRelaHHcnt'));
-  //output(attributes, named('attributes'));
+   //output(attributes, named('attributes'));
   // output(withIncome, named('withIncome'));
   // output(withHHIncome, named('withHHIncome'));
-  //output( withBankingExperiance, named('withBankingExperiance'));
+	 //output( withBankingExperiance, named('withBankingExperiance'));
 /* ********************/
 
 return Final;	

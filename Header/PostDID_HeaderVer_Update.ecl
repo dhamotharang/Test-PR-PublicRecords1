@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 import did_add,_Control,std;
-
+#option('skipFileFormatCrcCheck', 1);
 export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
 
 	// Flag file which contains the prod header version used for last DID process

@@ -101,7 +101,8 @@ module
 		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
-		export RefreshProdDashVersion := FraudGov_Prefix('flags') + 'kel::RefreshProdDashVersion';
+		export CustomerActiveSprays := FraudGov_Prefix('flags') + 'CustomerActiveSprays_flag';
+		
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
