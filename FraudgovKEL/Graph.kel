@@ -933,7 +933,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     DeceasedMatchCode = matchcode,
 		DateFirstSeen = dt_first_seen, // Contains information for ASOF
 		DateLastSeen = dt_last_seen),		// Contains information for ASOF
-	Address(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+	Address(FILTER(/*(STRING10)clean_address.prim_range <> '' AND */ (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
 		PrimaryRange = clean_address.prim_range,
 		Predirectional = clean_address.predir,
 		PrimaryName = clean_address.prim_name,
@@ -1692,8 +1692,8 @@ Event: => T20_DlPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR
 
 Event: => T18_IpAddrPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
 
-Event: => T_InAgencyFlag := MAP(AgencyUid != T_SrcAgencyUid => 0, 1);
 
+Event: => T_InAgencyFlag := MAP(rSourceCustomer != rCustomer => 0, 1);
 
 Event: => T_EvtType1KrCodeEcho := MAP(T_SrcClassType != 3 => -99998,
 																			event_type_1 = '' OR event_type_1:Null => -99997,
@@ -2361,7 +2361,7 @@ Event: => IpIsLastEventId := MAP(rInternetProtocol.LastRecordId = RecordId => 1,
 Event: => BnkIsLastEventId := MAP(rBankAccount.LastRecordId = RecordId => 1, 0);
 Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0);
 
-Event: => PersonLabel := TRIM(FirstName) + ' ' + TRIM(LastName);
+Event: => PersonLabel := TRIM(LastName) + ',' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
 Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => IpLabel := IpAddress;
@@ -2502,7 +2502,7 @@ Person: => AddressIsOfState30Flag := MAP(AddressIsOutOfState30Count>0 => 1, 0);
 // NOTE: This is "best" from the contributed not Best Best.
 
 Person: => BestFullName := ONLY(TOPN(FullName(TRIM(FirstName) != '' AND TRIM(LastName) != ''), 1, -EventDate));
-Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
+Person: => Label := TRIM(BestFullName.LastName) + ', ' + TRIM(BestFullName.FirstName);
 Person: => BestFirstName := BestFullName.FirstName;
 Person: => BestMiddleName := BestFullName.MiddleName;
 Person: => BestLastName := BestFullName.LastName;
@@ -2780,7 +2780,8 @@ Email: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCus
 Email: => DtFirstSeen := MIN(EmailEvent.Transaction, EventDate);
 Email: => DtLastSeen := MAX(EmailEvent.Transaction, EventDate);
 Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtLastSeen), RecordId),
-															MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.DtLastSeen), RecordId));
+															 MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.DtLastSeen), RecordId));
+
 
 Email: => IdentityCount := COUNT(PersonEmail{Subject});
 Email: => IdentityCountGt2 := MAP(IdentityCount > 2 => 1, 0);

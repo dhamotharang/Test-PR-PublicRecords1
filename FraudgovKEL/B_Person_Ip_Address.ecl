@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Internet_Protocol,E_Person,E_Person_Ip_Address FRO
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Ip_Address := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Ip_Address.__Result) __E_Person_Ip_Address := E_Person_Ip_Address.__Result;
-  SHARED __EE1077349 := __E_Person_Ip_Address;
-  EXPORT __ST29072_Layout := RECORD
+  SHARED __EE2033076 := __E_Person_Ip_Address;
+  EXPORT __ST43599_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Internet_Protocol.Typ) Ip_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Ip_Address := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST29072_Layout __ND1077383__Project(E_Person_Ip_Address.Layout __PP1077244) := TRANSFORM
-    __EE1077282 := __PP1077244.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE1077282,__T(__EE1077282).Event_Date_);
-    __EE1077311 := __PP1077244.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE1077311,__T(__EE1077311).Event_Date_);
-    SELF := __PP1077244;
+  SHARED __ST43599_Layout __ND2033110__Project(E_Person_Ip_Address.Layout __PP2032971) := TRANSFORM
+    __EE2033009 := __PP2032971.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2033009,__T(__EE2033009).Event_Date_);
+    __EE2033038 := __PP2032971.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2033038,__T(__EE2033038).Event_Date_);
+    SELF := __PP2032971;
   END;
-  EXPORT __ENH_Person_Ip_Address := PROJECT(__EE1077349,__ND1077383__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Ip_Address::Annotated',EXPIRE(7));
-  SHARED __EE1298727 := __ENH_Person_Ip_Address;
-  SHARED __IDX_Person_Ip_Address_Ip__Filtered := __EE1298727(__NN(__EE1298727.Ip_));
+  EXPORT __ENH_Person_Ip_Address := PROJECT(__EE2033076,__ND2033110__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Ip_Address::Annotated',EXPIRE(7));
+  SHARED __EE2277674 := __ENH_Person_Ip_Address;
+  SHARED __IDX_Person_Ip_Address_Ip__Filtered := __EE2277674(__NN(__EE2277674.Ip_));
   SHARED IDX_Person_Ip_Address_Ip__Layout := RECORD
     E_Internet_Protocol.Typ Ip_;
     __IDX_Person_Ip_Address_Ip__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Ip_Address := MODULE
   EXPORT IDX_Person_Ip_Address_Ip__Name := '~key::KEL::FraudgovKEL::Person_Ip_Address::Ip_';
   EXPORT IDX_Person_Ip_Address_Ip_ := INDEX(IDX_Person_Ip_Address_Ip__Projected,{Ip_},{IDX_Person_Ip_Address_Ip__Projected},IDX_Person_Ip_Address_Ip__Name);
   EXPORT IDX_Person_Ip_Address_Ip__Build := BUILD(IDX_Person_Ip_Address_Ip_,OVERWRITE);
-  EXPORT __ST1298729_Layout := RECORDOF(IDX_Person_Ip_Address_Ip_);
-  EXPORT IDX_Person_Ip_Address_Ip__Wrapped := PROJECT(IDX_Person_Ip_Address_Ip_,TRANSFORM(__ST29072_Layout,SELF.Ip_ := __CN(LEFT.Ip_),SELF:=LEFT));
+  EXPORT __ST2277676_Layout := RECORDOF(IDX_Person_Ip_Address_Ip_);
+  EXPORT IDX_Person_Ip_Address_Ip__Wrapped := PROJECT(IDX_Person_Ip_Address_Ip_,TRANSFORM(__ST43599_Layout,SELF.Ip_ := __CN(LEFT.Ip_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Ip_Address_Ip__Build);
 END;
