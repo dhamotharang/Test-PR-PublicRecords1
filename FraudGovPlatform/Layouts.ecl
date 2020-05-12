@@ -281,8 +281,8 @@ EXPORT Layouts := MODULE
 	END;	
 
   EXPORT clean_Drivers_License := RECORD
-			string2		Drivers_License_State;
-			string25	Drivers_License;
+			string2		Drivers_License_State := '';
+			string25	Drivers_License  := '';
   END;
 
 	EXPORT Provenance := RECORD
