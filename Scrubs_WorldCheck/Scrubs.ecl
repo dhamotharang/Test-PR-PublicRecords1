@@ -3,10 +3,10 @@ IMPORT Scrubs_WorldCheck; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 25;
-  EXPORT NumRulesFromFieldType := 25;
+  EXPORT NumRules := 23;
+  EXPORT NumRulesFromFieldType := 23;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 24;
+  EXPORT NumFieldsWithRules := 22;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_WorldCheck)
@@ -26,9 +26,7 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 social_security_number_Invalid;
     UNSIGNED1 location_Invalid;
     UNSIGNED1 countries_Invalid;
-    UNSIGNED1 companies_Invalid;
     UNSIGNED1 e_i_ind_Invalid;
-    UNSIGNED1 linked_tos_Invalid;
     UNSIGNED1 keywords_Invalid;
     UNSIGNED1 entered_Invalid;
     UNSIGNED1 updated_Invalid;
@@ -58,9 +56,7 @@ EXPORT Scrubs := MODULE
           ,'social_security_number:Invalid_SSN:ALLOW','social_security_number:Invalid_SSN:LENGTHS'
           ,'location:Invalid_AlphaChar:CUSTOM'
           ,'countries:Invalid_AlphaChar:CUSTOM'
-          ,'companies:Invalid_AlphaChar:CUSTOM'
           ,'e_i_ind:Invalid_Ind:ENUM'
-          ,'linked_tos:Invalid_AlphaChar:CUSTOM'
           ,'keywords:Invalid_Keywords:ALLOW'
           ,'entered:Invalid_Date:CUSTOM'
           ,'updated:Invalid_Date:CUSTOM'
@@ -90,9 +86,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_social_security_number(1),Fields.InvalidMessage_social_security_number(2)
           ,Fields.InvalidMessage_location(1)
           ,Fields.InvalidMessage_countries(1)
-          ,Fields.InvalidMessage_companies(1)
           ,Fields.InvalidMessage_e_i_ind(1)
-          ,Fields.InvalidMessage_linked_tos(1)
           ,Fields.InvalidMessage_keywords(1)
           ,Fields.InvalidMessage_entered(1)
           ,Fields.InvalidMessage_updated(1)
@@ -123,9 +117,7 @@ EXPORT FromNone(DATASET(Layout_WorldCheck) h) := MODULE
     SELF.social_security_number_Invalid := Fields.InValid_social_security_number((SALT311.StrType)le.social_security_number);
     SELF.location_Invalid := Fields.InValid_location((SALT311.StrType)le.location);
     SELF.countries_Invalid := Fields.InValid_countries((SALT311.StrType)le.countries);
-    SELF.companies_Invalid := Fields.InValid_companies((SALT311.StrType)le.companies);
     SELF.e_i_ind_Invalid := Fields.InValid_e_i_ind((SALT311.StrType)le.e_i_ind);
-    SELF.linked_tos_Invalid := Fields.InValid_linked_tos((SALT311.StrType)le.linked_tos);
     SELF.keywords_Invalid := Fields.InValid_keywords((SALT311.StrType)le.keywords);
     SELF.entered_Invalid := Fields.InValid_entered((SALT311.StrType)le.entered);
     SELF.updated_Invalid := Fields.InValid_updated((SALT311.StrType)le.updated);
@@ -136,7 +128,7 @@ EXPORT FromNone(DATASET(Layout_WorldCheck) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_WorldCheck);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.uid_Invalid << 0 ) + ( le.name_orig_Invalid << 1 ) + ( le.name_type_Invalid << 2 ) + ( le.last_name_Invalid << 3 ) + ( le.first_name_Invalid << 4 ) + ( le.category_Invalid << 5 ) + ( le.title_Invalid << 6 ) + ( le.sub_category_Invalid << 7 ) + ( le.position_Invalid << 8 ) + ( le.age_Invalid << 9 ) + ( le.date_of_birth_Invalid << 10 ) + ( le.places_of_birth_Invalid << 11 ) + ( le.date_of_death_Invalid << 12 ) + ( le.social_security_number_Invalid << 13 ) + ( le.location_Invalid << 15 ) + ( le.countries_Invalid << 16 ) + ( le.companies_Invalid << 17 ) + ( le.e_i_ind_Invalid << 18 ) + ( le.linked_tos_Invalid << 19 ) + ( le.keywords_Invalid << 20 ) + ( le.entered_Invalid << 21 ) + ( le.updated_Invalid << 22 ) + ( le.editor_Invalid << 23 ) + ( le.age_as_of_date_Invalid << 24 );
+    SELF.ScrubsBits1 := ( le.uid_Invalid << 0 ) + ( le.name_orig_Invalid << 1 ) + ( le.name_type_Invalid << 2 ) + ( le.last_name_Invalid << 3 ) + ( le.first_name_Invalid << 4 ) + ( le.category_Invalid << 5 ) + ( le.title_Invalid << 6 ) + ( le.sub_category_Invalid << 7 ) + ( le.position_Invalid << 8 ) + ( le.age_Invalid << 9 ) + ( le.date_of_birth_Invalid << 10 ) + ( le.places_of_birth_Invalid << 11 ) + ( le.date_of_death_Invalid << 12 ) + ( le.social_security_number_Invalid << 13 ) + ( le.location_Invalid << 15 ) + ( le.countries_Invalid << 16 ) + ( le.e_i_ind_Invalid << 17 ) + ( le.keywords_Invalid << 18 ) + ( le.entered_Invalid << 19 ) + ( le.updated_Invalid << 20 ) + ( le.editor_Invalid << 21 ) + ( le.age_as_of_date_Invalid << 22 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -174,14 +166,12 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.social_security_number_Invalid := (le.ScrubsBits1 >> 13) & 3;
     SELF.location_Invalid := (le.ScrubsBits1 >> 15) & 1;
     SELF.countries_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.companies_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.e_i_ind_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.linked_tos_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.keywords_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.entered_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.updated_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.editor_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.age_as_of_date_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.e_i_ind_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.keywords_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.entered_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.updated_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.editor_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.age_as_of_date_Invalid := (le.ScrubsBits1 >> 22) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -208,15 +198,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     social_security_number_Total_ErrorCount := COUNT(GROUP,h.social_security_number_Invalid>0);
     location_CUSTOM_ErrorCount := COUNT(GROUP,h.location_Invalid=1);
     countries_CUSTOM_ErrorCount := COUNT(GROUP,h.countries_Invalid=1);
-    companies_CUSTOM_ErrorCount := COUNT(GROUP,h.companies_Invalid=1);
     e_i_ind_ENUM_ErrorCount := COUNT(GROUP,h.e_i_ind_Invalid=1);
-    linked_tos_CUSTOM_ErrorCount := COUNT(GROUP,h.linked_tos_Invalid=1);
     keywords_ALLOW_ErrorCount := COUNT(GROUP,h.keywords_Invalid=1);
     entered_CUSTOM_ErrorCount := COUNT(GROUP,h.entered_Invalid=1);
     updated_CUSTOM_ErrorCount := COUNT(GROUP,h.updated_Invalid=1);
     editor_CUSTOM_ErrorCount := COUNT(GROUP,h.editor_Invalid=1);
     age_as_of_date_CUSTOM_ErrorCount := COUNT(GROUP,h.age_as_of_date_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.uid_Invalid > 0 OR h.name_orig_Invalid > 0 OR h.name_type_Invalid > 0 OR h.last_name_Invalid > 0 OR h.first_name_Invalid > 0 OR h.category_Invalid > 0 OR h.title_Invalid > 0 OR h.sub_category_Invalid > 0 OR h.position_Invalid > 0 OR h.age_Invalid > 0 OR h.date_of_birth_Invalid > 0 OR h.places_of_birth_Invalid > 0 OR h.date_of_death_Invalid > 0 OR h.social_security_number_Invalid > 0 OR h.location_Invalid > 0 OR h.countries_Invalid > 0 OR h.companies_Invalid > 0 OR h.e_i_ind_Invalid > 0 OR h.linked_tos_Invalid > 0 OR h.keywords_Invalid > 0 OR h.entered_Invalid > 0 OR h.updated_Invalid > 0 OR h.editor_Invalid > 0 OR h.age_as_of_date_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.uid_Invalid > 0 OR h.name_orig_Invalid > 0 OR h.name_type_Invalid > 0 OR h.last_name_Invalid > 0 OR h.first_name_Invalid > 0 OR h.category_Invalid > 0 OR h.title_Invalid > 0 OR h.sub_category_Invalid > 0 OR h.position_Invalid > 0 OR h.age_Invalid > 0 OR h.date_of_birth_Invalid > 0 OR h.places_of_birth_Invalid > 0 OR h.date_of_death_Invalid > 0 OR h.social_security_number_Invalid > 0 OR h.location_Invalid > 0 OR h.countries_Invalid > 0 OR h.e_i_ind_Invalid > 0 OR h.keywords_Invalid > 0 OR h.entered_Invalid > 0 OR h.updated_Invalid > 0 OR h.editor_Invalid > 0 OR h.age_as_of_date_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -224,9 +212,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.uid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_orig_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sub_category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.position_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.places_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_of_death_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.social_security_number_Total_ErrorCount > 0, 1, 0) + IF(le.location_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countries_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.companies_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.e_i_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.linked_tos_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entered_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.editor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_as_of_date_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.uid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_orig_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sub_category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.position_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.places_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_of_death_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.social_security_number_Total_ErrorCount > 0, 1, 0) + IF(le.location_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countries_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.e_i_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entered_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.editor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_as_of_date_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.uid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_orig_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sub_category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.position_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.places_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_of_death_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.social_security_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.social_security_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.location_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countries_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.companies_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.e_i_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.linked_tos_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entered_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.editor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_as_of_date_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.uid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_orig_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sub_category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.position_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.places_of_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_of_death_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.social_security_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.social_security_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.location_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countries_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.e_i_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.keywords_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entered_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.updated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.editor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.age_as_of_date_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -241,8 +229,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.uid_Invalid,le.name_orig_Invalid,le.name_type_Invalid,le.last_name_Invalid,le.first_name_Invalid,le.category_Invalid,le.title_Invalid,le.sub_category_Invalid,le.position_Invalid,le.age_Invalid,le.date_of_birth_Invalid,le.places_of_birth_Invalid,le.date_of_death_Invalid,le.social_security_number_Invalid,le.location_Invalid,le.countries_Invalid,le.companies_Invalid,le.e_i_ind_Invalid,le.linked_tos_Invalid,le.keywords_Invalid,le.entered_Invalid,le.updated_Invalid,le.editor_Invalid,le.age_as_of_date_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_uid(le.uid_Invalid),Fields.InvalidMessage_name_orig(le.name_orig_Invalid),Fields.InvalidMessage_name_type(le.name_type_Invalid),Fields.InvalidMessage_last_name(le.last_name_Invalid),Fields.InvalidMessage_first_name(le.first_name_Invalid),Fields.InvalidMessage_category(le.category_Invalid),Fields.InvalidMessage_title(le.title_Invalid),Fields.InvalidMessage_sub_category(le.sub_category_Invalid),Fields.InvalidMessage_position(le.position_Invalid),Fields.InvalidMessage_age(le.age_Invalid),Fields.InvalidMessage_date_of_birth(le.date_of_birth_Invalid),Fields.InvalidMessage_places_of_birth(le.places_of_birth_Invalid),Fields.InvalidMessage_date_of_death(le.date_of_death_Invalid),Fields.InvalidMessage_social_security_number(le.social_security_number_Invalid),Fields.InvalidMessage_location(le.location_Invalid),Fields.InvalidMessage_countries(le.countries_Invalid),Fields.InvalidMessage_companies(le.companies_Invalid),Fields.InvalidMessage_e_i_ind(le.e_i_ind_Invalid),Fields.InvalidMessage_linked_tos(le.linked_tos_Invalid),Fields.InvalidMessage_keywords(le.keywords_Invalid),Fields.InvalidMessage_entered(le.entered_Invalid),Fields.InvalidMessage_updated(le.updated_Invalid),Fields.InvalidMessage_editor(le.editor_Invalid),Fields.InvalidMessage_age_as_of_date(le.age_as_of_date_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.uid_Invalid,le.name_orig_Invalid,le.name_type_Invalid,le.last_name_Invalid,le.first_name_Invalid,le.category_Invalid,le.title_Invalid,le.sub_category_Invalid,le.position_Invalid,le.age_Invalid,le.date_of_birth_Invalid,le.places_of_birth_Invalid,le.date_of_death_Invalid,le.social_security_number_Invalid,le.location_Invalid,le.countries_Invalid,le.e_i_ind_Invalid,le.keywords_Invalid,le.entered_Invalid,le.updated_Invalid,le.editor_Invalid,le.age_as_of_date_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_uid(le.uid_Invalid),Fields.InvalidMessage_name_orig(le.name_orig_Invalid),Fields.InvalidMessage_name_type(le.name_type_Invalid),Fields.InvalidMessage_last_name(le.last_name_Invalid),Fields.InvalidMessage_first_name(le.first_name_Invalid),Fields.InvalidMessage_category(le.category_Invalid),Fields.InvalidMessage_title(le.title_Invalid),Fields.InvalidMessage_sub_category(le.sub_category_Invalid),Fields.InvalidMessage_position(le.position_Invalid),Fields.InvalidMessage_age(le.age_Invalid),Fields.InvalidMessage_date_of_birth(le.date_of_birth_Invalid),Fields.InvalidMessage_places_of_birth(le.places_of_birth_Invalid),Fields.InvalidMessage_date_of_death(le.date_of_death_Invalid),Fields.InvalidMessage_social_security_number(le.social_security_number_Invalid),Fields.InvalidMessage_location(le.location_Invalid),Fields.InvalidMessage_countries(le.countries_Invalid),Fields.InvalidMessage_e_i_ind(le.e_i_ind_Invalid),Fields.InvalidMessage_keywords(le.keywords_Invalid),Fields.InvalidMessage_entered(le.entered_Invalid),Fields.InvalidMessage_updated(le.updated_Invalid),Fields.InvalidMessage_editor(le.editor_Invalid),Fields.InvalidMessage_age_as_of_date(le.age_as_of_date_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.uid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.name_orig_Invalid,'CUSTOM','UNKNOWN')
@@ -260,19 +248,17 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.social_security_number_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.location_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.countries_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.companies_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.e_i_ind_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.linked_tos_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.keywords_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.entered_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.updated_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.editor_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.age_as_of_date_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'uid','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','social_security_number','location','countries','companies','e_i_ind','linked_tos','keywords','entered','updated','editor','age_as_of_date','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_AlphaChar','Invalid_No','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaCaps','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_AlphaChar','Invalid_Date','Invalid_SSN','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Ind','Invalid_AlphaChar','Invalid_Keywords','Invalid_Date','Invalid_Date','Invalid_AlphaChar','Invalid_Date','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.uid,(SALT311.StrType)le.name_orig,(SALT311.StrType)le.name_type,(SALT311.StrType)le.last_name,(SALT311.StrType)le.first_name,(SALT311.StrType)le.category,(SALT311.StrType)le.title,(SALT311.StrType)le.sub_category,(SALT311.StrType)le.position,(SALT311.StrType)le.age,(SALT311.StrType)le.date_of_birth,(SALT311.StrType)le.places_of_birth,(SALT311.StrType)le.date_of_death,(SALT311.StrType)le.social_security_number,(SALT311.StrType)le.location,(SALT311.StrType)le.countries,(SALT311.StrType)le.companies,(SALT311.StrType)le.e_i_ind,(SALT311.StrType)le.linked_tos,(SALT311.StrType)le.keywords,(SALT311.StrType)le.entered,(SALT311.StrType)le.updated,(SALT311.StrType)le.editor,(SALT311.StrType)le.age_as_of_date,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'uid','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','social_security_number','location','countries','e_i_ind','keywords','entered','updated','editor','age_as_of_date','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_AlphaChar','Invalid_No','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Alpha','Invalid_AlphaCaps','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_AlphaChar','Invalid_Date','Invalid_SSN','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_Ind','Invalid_Keywords','Invalid_Date','Invalid_Date','Invalid_AlphaChar','Invalid_Date','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.uid,(SALT311.StrType)le.name_orig,(SALT311.StrType)le.name_type,(SALT311.StrType)le.last_name,(SALT311.StrType)le.first_name,(SALT311.StrType)le.category,(SALT311.StrType)le.title,(SALT311.StrType)le.sub_category,(SALT311.StrType)le.position,(SALT311.StrType)le.age,(SALT311.StrType)le.date_of_birth,(SALT311.StrType)le.places_of_birth,(SALT311.StrType)le.date_of_death,(SALT311.StrType)le.social_security_number,(SALT311.StrType)le.location,(SALT311.StrType)le.countries,(SALT311.StrType)le.e_i_ind,(SALT311.StrType)le.keywords,(SALT311.StrType)le.entered,(SALT311.StrType)le.updated,(SALT311.StrType)le.editor,(SALT311.StrType)le.age_as_of_date,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,24,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,22,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -301,9 +287,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.social_security_number_ALLOW_ErrorCount,le.social_security_number_LENGTHS_ErrorCount
           ,le.location_CUSTOM_ErrorCount
           ,le.countries_CUSTOM_ErrorCount
-          ,le.companies_CUSTOM_ErrorCount
           ,le.e_i_ind_ENUM_ErrorCount
-          ,le.linked_tos_CUSTOM_ErrorCount
           ,le.keywords_ALLOW_ErrorCount
           ,le.entered_CUSTOM_ErrorCount
           ,le.updated_CUSTOM_ErrorCount
@@ -333,9 +317,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.social_security_number_ALLOW_ErrorCount,le.social_security_number_LENGTHS_ErrorCount
           ,le.location_CUSTOM_ErrorCount
           ,le.countries_CUSTOM_ErrorCount
-          ,le.companies_CUSTOM_ErrorCount
           ,le.e_i_ind_ENUM_ErrorCount
-          ,le.linked_tos_CUSTOM_ErrorCount
           ,le.keywords_ALLOW_ErrorCount
           ,le.entered_CUSTOM_ErrorCount
           ,le.updated_CUSTOM_ErrorCount
@@ -397,9 +379,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'social_security_number:' + getFieldTypeText(h.social_security_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'location:' + getFieldTypeText(h.location) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'countries:' + getFieldTypeText(h.countries) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'companies:' + getFieldTypeText(h.companies) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'e_i_ind:' + getFieldTypeText(h.e_i_ind) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'linked_tos:' + getFieldTypeText(h.linked_tos) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'keywords:' + getFieldTypeText(h.keywords) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'entered:' + getFieldTypeText(h.entered) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'updated:' + getFieldTypeText(h.updated) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -424,9 +404,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_social_security_number_cnt
           ,le.populated_location_cnt
           ,le.populated_countries_cnt
-          ,le.populated_companies_cnt
           ,le.populated_e_i_ind_cnt
-          ,le.populated_linked_tos_cnt
           ,le.populated_keywords_cnt
           ,le.populated_entered_cnt
           ,le.populated_updated_cnt
@@ -451,9 +429,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_social_security_number_pcnt
           ,le.populated_location_pcnt
           ,le.populated_countries_pcnt
-          ,le.populated_companies_pcnt
           ,le.populated_e_i_ind_pcnt
-          ,le.populated_linked_tos_pcnt
           ,le.populated_keywords_pcnt
           ,le.populated_entered_pcnt
           ,le.populated_updated_pcnt
@@ -461,7 +437,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_age_as_of_date_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,26,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,24,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -477,7 +453,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_WorldCheck));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),26,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),24,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

@@ -2,7 +2,7 @@
 IMPORT Scrubs_WorldCheck; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
-EXPORT NumFields := 26;
+EXPORT NumFields := 24;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Alpha','Invalid_AlphaCaps','Invalid_AlphaChar','Invalid_Keywords','Invalid_Ind','Invalid_SSN','Invalid_Date');
@@ -61,11 +61,11 @@ END;
 EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs_WorldCheck.Fn_Valid.Date(s)>0);
 EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_WorldCheck.Fn_Valid.Date'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'uid','key','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','passports','social_security_number','location','countries','companies','e_i_ind','linked_tos','keywords','entered','updated','editor','age_as_of_date');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'uid','key','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','passports','social_security_number','location','countries','companies','e_i_ind','linked_tos','keywords','entered','updated','editor','age_as_of_date');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'uid' => 0,'key' => 1,'name_orig' => 2,'name_type' => 3,'last_name' => 4,'first_name' => 5,'category' => 6,'title' => 7,'sub_category' => 8,'position' => 9,'age' => 10,'date_of_birth' => 11,'places_of_birth' => 12,'date_of_death' => 13,'passports' => 14,'social_security_number' => 15,'location' => 16,'countries' => 17,'companies' => 18,'e_i_ind' => 19,'linked_tos' => 20,'keywords' => 21,'entered' => 22,'updated' => 23,'editor' => 24,'age_as_of_date' => 25,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],[],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['ALLOW','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'uid','key','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','passports','social_security_number','location','countries','e_i_ind','keywords','entered','updated','editor','age_as_of_date');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'uid','key','name_orig','name_type','last_name','first_name','category','title','sub_category','position','age','date_of_birth','places_of_birth','date_of_death','passports','social_security_number','location','countries','e_i_ind','keywords','entered','updated','editor','age_as_of_date');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'uid' => 0,'key' => 1,'name_orig' => 2,'name_type' => 3,'last_name' => 4,'first_name' => 5,'category' => 6,'title' => 7,'sub_category' => 8,'position' => 9,'age' => 10,'date_of_birth' => 11,'places_of_birth' => 12,'date_of_death' => 13,'passports' => 14,'social_security_number' => 15,'location' => 16,'countries' => 17,'e_i_ind' => 18,'keywords' => 19,'entered' => 20,'updated' => 21,'editor' => 22,'age_as_of_date' => 23,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],[],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['ALLOW','LENGTHS'],['CUSTOM'],['CUSTOM'],['ENUM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -141,17 +141,9 @@ EXPORT Make_countries(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
 EXPORT InValid_countries(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
 EXPORT InValidMessage_countries(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
-EXPORT Make_companies(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
-EXPORT InValid_companies(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
-EXPORT InValidMessage_companies(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
- 
 EXPORT Make_e_i_ind(SALT311.StrType s0) := MakeFT_Invalid_Ind(s0);
 EXPORT InValid_e_i_ind(SALT311.StrType s) := InValidFT_Invalid_Ind(s);
 EXPORT InValidMessage_e_i_ind(UNSIGNED1 wh) := InValidMessageFT_Invalid_Ind(wh);
- 
-EXPORT Make_linked_tos(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
-EXPORT InValid_linked_tos(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
-EXPORT InValidMessage_linked_tos(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
 EXPORT Make_keywords(SALT311.StrType s0) := MakeFT_Invalid_Keywords(s0);
 EXPORT InValid_keywords(SALT311.StrType s) := InValidFT_Invalid_Keywords(s);
@@ -212,9 +204,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_social_security_number;
     BOOLEAN Diff_location;
     BOOLEAN Diff_countries;
-    BOOLEAN Diff_companies;
     BOOLEAN Diff_e_i_ind;
-    BOOLEAN Diff_linked_tos;
     BOOLEAN Diff_keywords;
     BOOLEAN Diff_entered;
     BOOLEAN Diff_updated;
@@ -243,16 +233,14 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_social_security_number := le.social_security_number <> ri.social_security_number;
     SELF.Diff_location := le.location <> ri.location;
     SELF.Diff_countries := le.countries <> ri.countries;
-    SELF.Diff_companies := le.companies <> ri.companies;
     SELF.Diff_e_i_ind := le.e_i_ind <> ri.e_i_ind;
-    SELF.Diff_linked_tos := le.linked_tos <> ri.linked_tos;
     SELF.Diff_keywords := le.keywords <> ri.keywords;
     SELF.Diff_entered := le.entered <> ri.entered;
     SELF.Diff_updated := le.updated <> ri.updated;
     SELF.Diff_editor := le.editor <> ri.editor;
     SELF.Diff_age_as_of_date := le.age_as_of_date <> ri.age_as_of_date;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_uid,1,0)+ IF( SELF.Diff_key,1,0)+ IF( SELF.Diff_name_orig,1,0)+ IF( SELF.Diff_name_type,1,0)+ IF( SELF.Diff_last_name,1,0)+ IF( SELF.Diff_first_name,1,0)+ IF( SELF.Diff_category,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_sub_category,1,0)+ IF( SELF.Diff_position,1,0)+ IF( SELF.Diff_age,1,0)+ IF( SELF.Diff_date_of_birth,1,0)+ IF( SELF.Diff_places_of_birth,1,0)+ IF( SELF.Diff_date_of_death,1,0)+ IF( SELF.Diff_passports,1,0)+ IF( SELF.Diff_social_security_number,1,0)+ IF( SELF.Diff_location,1,0)+ IF( SELF.Diff_countries,1,0)+ IF( SELF.Diff_companies,1,0)+ IF( SELF.Diff_e_i_ind,1,0)+ IF( SELF.Diff_linked_tos,1,0)+ IF( SELF.Diff_keywords,1,0)+ IF( SELF.Diff_entered,1,0)+ IF( SELF.Diff_updated,1,0)+ IF( SELF.Diff_editor,1,0)+ IF( SELF.Diff_age_as_of_date,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_uid,1,0)+ IF( SELF.Diff_key,1,0)+ IF( SELF.Diff_name_orig,1,0)+ IF( SELF.Diff_name_type,1,0)+ IF( SELF.Diff_last_name,1,0)+ IF( SELF.Diff_first_name,1,0)+ IF( SELF.Diff_category,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_sub_category,1,0)+ IF( SELF.Diff_position,1,0)+ IF( SELF.Diff_age,1,0)+ IF( SELF.Diff_date_of_birth,1,0)+ IF( SELF.Diff_places_of_birth,1,0)+ IF( SELF.Diff_date_of_death,1,0)+ IF( SELF.Diff_passports,1,0)+ IF( SELF.Diff_social_security_number,1,0)+ IF( SELF.Diff_location,1,0)+ IF( SELF.Diff_countries,1,0)+ IF( SELF.Diff_e_i_ind,1,0)+ IF( SELF.Diff_keywords,1,0)+ IF( SELF.Diff_entered,1,0)+ IF( SELF.Diff_updated,1,0)+ IF( SELF.Diff_editor,1,0)+ IF( SELF.Diff_age_as_of_date,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -283,9 +271,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_social_security_number := COUNT(GROUP,%Closest%.Diff_social_security_number);
     Count_Diff_location := COUNT(GROUP,%Closest%.Diff_location);
     Count_Diff_countries := COUNT(GROUP,%Closest%.Diff_countries);
-    Count_Diff_companies := COUNT(GROUP,%Closest%.Diff_companies);
     Count_Diff_e_i_ind := COUNT(GROUP,%Closest%.Diff_e_i_ind);
-    Count_Diff_linked_tos := COUNT(GROUP,%Closest%.Diff_linked_tos);
     Count_Diff_keywords := COUNT(GROUP,%Closest%.Diff_keywords);
     Count_Diff_entered := COUNT(GROUP,%Closest%.Diff_entered);
     Count_Diff_updated := COUNT(GROUP,%Closest%.Diff_updated);

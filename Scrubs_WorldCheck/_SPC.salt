@@ -31,9 +31,9 @@ FIELD:passports:TYPE(STRING):0,0
 FIELD:social_security_number:TYPE(STRING):LIKE(Invalid_SSN):0,0
 FIELD:location:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
 FIELD:countries:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
-FIELD:companies:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+//FIELD:companies:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
 FIELD:e_i_ind:TYPE(STRING):LIKE(Invalid_Ind):0,0
-FIELD:linked_tos:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+//FIELD:linked_tos:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
 FIELD:keywords:TYPE(STRING):LIKE(Invalid_Keywords):0,0
 FIELD:entered:TYPE(STRING):LIKE(Invalid_Date):0,0
 FIELD:updated:TYPE(STRING):LIKE(Invalid_Date):0,0

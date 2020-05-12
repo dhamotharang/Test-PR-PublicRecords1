@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_uid = '',Input_key = '',Input_name_orig = '',Input_name_type = '',Input_last_name = '',Input_first_name = '',Input_category = '',Input_title = '',Input_sub_category = '',Input_position = '',Input_age = '',Input_date_of_birth = '',Input_places_of_birth = '',Input_date_of_death = '',Input_passports = '',Input_social_security_number = '',Input_location = '',Input_countries = '',Input_companies = '',Input_e_i_ind = '',Input_linked_tos = '',Input_keywords = '',Input_entered = '',Input_updated = '',Input_editor = '',Input_age_as_of_date = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_uid = '',Input_key = '',Input_name_orig = '',Input_name_type = '',Input_last_name = '',Input_first_name = '',Input_category = '',Input_title = '',Input_sub_category = '',Input_position = '',Input_age = '',Input_date_of_birth = '',Input_places_of_birth = '',Input_date_of_death = '',Input_passports = '',Input_social_security_number = '',Input_location = '',Input_countries = '',Input_e_i_ind = '',Input_keywords = '',Input_entered = '',Input_updated = '',Input_editor = '',Input_age_as_of_date = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_WorldCheck;
   #uniquename(of)
   %of% := RECORD
@@ -116,22 +116,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_uid = '',Input_key = '',Inpu
         IF( le.Input_countries = (TYPEOF(le.Input_countries))'','',':countries')
     #END
  
-+    #IF( #TEXT(Input_companies)='' )
-      '' 
-    #ELSE
-        IF( le.Input_companies = (TYPEOF(le.Input_companies))'','',':companies')
-    #END
- 
 +    #IF( #TEXT(Input_e_i_ind)='' )
       '' 
     #ELSE
         IF( le.Input_e_i_ind = (TYPEOF(le.Input_e_i_ind))'','',':e_i_ind')
-    #END
- 
-+    #IF( #TEXT(Input_linked_tos)='' )
-      '' 
-    #ELSE
-        IF( le.Input_linked_tos = (TYPEOF(le.Input_linked_tos))'','',':linked_tos')
     #END
  
 +    #IF( #TEXT(Input_keywords)='' )

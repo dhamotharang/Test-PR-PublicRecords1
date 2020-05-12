@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'WorldCheck';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,uid,key,name_orig,name_type,last_name,first_name,category,title,sub_category,position,age,date_of_birth,places_of_birth,date_of_death,passports,social_security_number,location,countries,companies,e_i_ind,linked_tos,keywords,entered,updated,editor,age_as_of_date';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,uid,key,name_orig,name_type,last_name,first_name,category,title,sub_category,position,age,date_of_birth,places_of_birth,date_of_death,passports,social_security_number,location,countries,e_i_ind,keywords,entered,updated,editor,age_as_of_date';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -71,9 +71,9 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:social_security_number:TYPE(STRING):LIKE(Invalid_SSN):0,0\n'
     + 'FIELD:location:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:countries:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
-    + 'FIELD:companies:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
+    + '//FIELD:companies:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:e_i_ind:TYPE(STRING):LIKE(Invalid_Ind):0,0\n'
-    + 'FIELD:linked_tos:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
+    + '//FIELD:linked_tos:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:keywords:TYPE(STRING):LIKE(Invalid_Keywords):0,0\n'
     + 'FIELD:entered:TYPE(STRING):LIKE(Invalid_Date):0,0\n'
     + 'FIELD:updated:TYPE(STRING):LIKE(Invalid_Date):0,0\n'
