@@ -218,8 +218,8 @@ export clean_phones :=
 	end;
 
 EXPORT clean_Drivers_License := RECORD
-		string2		Drivers_License_State;
-		string25	Drivers_License;
+		string2		Drivers_License_State := '';
+		string25	Drivers_License  := '';
 END;
 
 export address_cleaner :=
