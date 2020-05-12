@@ -17,6 +17,7 @@ export _proc_lgid3(
   ,pnumMaxIters   = '15'                                                          // -- maximum number of iterations
   ,pcluster       = 'BIPV2_Build._Constants().Groupname'                          // -- thor to run on
   ,pCompileTest   = 'false'                                                       // -- doing a compile test?
+  ,pEmailList     = 'BIPV2_Build.mod_email.emailList'                             // -- for testing, make sure to put in your email address to receive the emails
   ,pds_debug      = '\'dataset([],WsWorkunits.Layouts.DebugValues)\''             // -- use code from an origin branch optionally
 
 ) := 
@@ -78,14 +79,14 @@ functionmacro
   StopCondition       := '(PostClusterCount / PreClusterCount * 100.0) > (99.999)';
   SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
 
-  kickInit	:= Workman.mac_WorkMan(eclInit,version,cluster,1,1,pBuildName := 'LGID3Init',pNotifyEmails := BIPV2_Build.mod_email.emailList
+  kickInit	:= Workman.mac_WorkMan(eclInit,version,cluster,1,1,pBuildName := 'LGID3Init',pNotifyEmails := pEmailList
     ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_lgid3.Init'
     ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
     ,pCompileOnly      := pCompileTest
     ,pDebugValues      := pds_debug
   );
   
-  kickSpec	:= Workman.mac_WorkMan(eclSpec,version,cluster,1,1,pBuildName := 'LGID3Specs',pNotifyEmails := BIPV2_Build.mod_email.emailList
+  kickSpec	:= Workman.mac_WorkMan(eclSpec,version,cluster,1,1,pBuildName := 'LGID3Specs',pNotifyEmails := pEmailList
     ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_lgid3.Specificities'
     ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
     ,pCompileOnly      := pCompileTest
@@ -97,14 +98,14 @@ functionmacro
     ,pStopCondition       := StopCondition
     ,pSetNameCalculations := SetNameCalculations
     ,pBuildName           := 'LGID3Iters'
-    ,pNotifyEmails        := BIPV2_Build.mod_email.emailList
+    ,pNotifyEmails        := pEmailList
     ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_lgid3.iterations'
     ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
     ,pCompileOnly         := pCompileTest
     ,pDebugValues         := pds_debug
   );
   
-  kickPost  := Workman.mac_WorkMan(eclPost,version ,cluster  ,1         ,1        ,pBuildName := 'LGID3Post',pNotifyEmails := BIPV2_Build.mod_email.emailList
+  kickPost  := Workman.mac_WorkMan(eclPost,version ,cluster  ,1         ,1        ,pBuildName := 'LGID3Post',pNotifyEmails := pEmailList
     ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_lgid3.Post'
     ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
     ,pCompileOnly      := pCompileTest

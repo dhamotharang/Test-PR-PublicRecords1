@@ -12,6 +12,7 @@ export proc_lgid3(
   ,pnumMaxIters   = '15'                                  // -- maximum number of iterations
   ,pcluster       = 'BIPV2_Build._Constants().Groupname'  // -- thor to run on
   ,pCompileTest   = 'false'                               // -- doing a compile test?
+  ,pEmailList     = 'BIPV2_Build.mod_email.emailList'                             // -- for testing, make sure to put in your email address to receive the emails
   ,pds_debug      = '\'dataset([],WsWorkunits.Layouts.DebugValues)\''
 ) :=
 functionmacro
@@ -29,7 +30,8 @@ functionmacro
     ,pInputFile
     ,pnumMaxIters  
     ,pcluster      
-    ,pCompileTest 
+    ,pCompileTest
+    ,pEmailList
     ,pds_debug
   );
 
