@@ -10,5 +10,8 @@ export _Constants(
 		,pMaxRecordSize				:= 4096
 		,pIsTesting						:= Tools._Constants.IsDataland
 	))
+
+  export doStrata         := if(IsDataland = true ,false,true);
+  export copy2storagethor := if(IsDataland = true ,false,true);
 	
 end;
