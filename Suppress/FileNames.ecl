@@ -10,7 +10,7 @@ EXPORT	Filenames(STRING	pversion	=	'')	:=	MODULE
 		EXPORT	Base						:=	'~' + thorCluster + 'base::' +	name;
 		EXPORT	Base_FCRA					:=	'~' + thorCluster + 'base::' +	name + '_fcra';
 
-		EXPORT OutFileToRBI					:= '~'	+ thorCluster + 'out::'	 +	name + '::opt_out::' + pversion + '::opt_out_rbi.csv';
+		EXPORT OutFileToRBI					:= '~'	+ thorCluster + 'out::'	 +	name + '::' + pversion + '::opt_out_rbi.csv';
 		
 	END;
 	
