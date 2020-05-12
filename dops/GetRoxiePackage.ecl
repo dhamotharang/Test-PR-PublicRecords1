@@ -11,6 +11,11 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	export rBase := record
 		string baseid {xpath('@id')};
 	end;
+	
+	export rEnvironment := record
+		string environmentid {xpath('@id')};
+		string environmentvalue {xpath('@val')};
+	end;
 
 	export rSubFile := record
 		string subfile {xpath('@value')};
@@ -29,6 +34,10 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	////////////////////////// with queries
 	export	rPackageWithQueries := record
 			string pid {xpath('@id')};
+			string compulsory {xpath('@compulsory')};
+			string enablefieldtranslation {xpath('@enablefieldtranslation')};
+			string daliip {xpath('@daliip')};
+			dataset(rEnvironment) environmentids {xpath('Environment')};
 			dataset(rBase) baseids {xpath('Base')};
 			dataset(rSuperFile) superfiles {xpath('SuperFile')};
 	end;
@@ -66,12 +75,17 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	////////////////////////// with queries
 	
 	export rPackageKeyInfoWithQueries := record
-			string packagename {xpath('PackageMaps/@id')};
-			string partid {xpath('Part/@id')};
-			string packageid {xpath('Package/@id')};
-			string baseid {xpath('Base/@id')};
-			string superfile {xpath('SuperFile/@id')};
-			string subfile {xpath('SubFile/@value')};
+			string packagename {xpath('PackageMaps/@id')} := '';
+			string partid {xpath('Part/@id')} := '';
+			string packageid {xpath('Package/@id')} := '';
+			string daliip {xpath('Package/@dallip')} := '';
+			string compulsory {xpath('Package/@compulsory')} := '';
+			string enablefieldtranslation {xpath('Package/@enablefieldtranslation')} := '';
+			string baseid {xpath('Base/@id')} := '';
+			string environmentid {xpath('Environment/@id')} := '';
+			string environmentvalue {xpath('Environment/@val')} := '';
+			string superfile {xpath('SuperFile/@id')} := '';
+			string subfile {xpath('SubFile/@value')} := '';
 	end;
 
 	export PackageFromXML() := function
@@ -206,12 +220,17 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		return dFromXMLtoDataset;
 	end;
 	
-	export fXMLPackageAsDataset() := function
+	export fXMLPackageAsDataset(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)) := function
 
 		rNormPackage := record
 			string pkgmapid := '';
 			string partid := '';
 			string pid := '';
+			string daliip := '';
+			string compulsory := '';
+			string enablefieldtranslation := '';
+			string environmentid := '';
+			string environmentvalue := '';
 			string baseid := '';
 			string superfileid := '';
 			string subfileid := '';
@@ -219,6 +238,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 			dataset(rSuperFile) superfiles;
 			dataset(rSubFile) subfiles;
 			dataset(rBase) baseids;
+			dataset(rEnvironment) environmentids;
 		end;
 		
 		rNormPackage xNormParts(rPackageMapWithQueries l, rPartWithQueries r) := transform
@@ -228,6 +248,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 			self.superfiles := [];
 			self.subfiles := [];
 			self.baseids := [];
+			self.environmentids := [];
 			self := l;
 		end;
 
@@ -236,8 +257,12 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		rNormPackage xNormPackage(dNormPart l, rPackageWithQueries r) := transform
 			//self.pkgmapid := l.pkgmaps;
 			self.pid := r.pid;
+			self.daliip := r.daliip;
+			self.compulsory := r.compulsory;
+			self.enablefieldtranslation := r.enablefieldtranslation;
 			self.superfiles := r.superfiles;
 			self.baseids := r.baseids;
+			self.environmentids := r.environmentids;
 			self.subfiles := [];
 			self := l;
 		end;
@@ -250,6 +275,14 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		end;
 
 		dNormBase := normalize(dNormPackage,left.baseids,xNormBase(left,right));
+		
+		rNormPackage xNormEnvironment(dNormPackage l, rEnvironment r) := transform
+			self.environmentid := r.environmentid;
+			self.environmentvalue := r.environmentvalue;
+			self := l;
+		end;
+
+		dNormEnvironment := normalize(dNormPackage,left.environmentids,xNormEnvironment(left,right));
 
 		rNormPackage xNormSuperFile(dNormPackage l, rSuperFile r) := transform
 			self.superfileid := r.superfile;
@@ -266,13 +299,18 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 
 		dNormSubFile := normalize(dNormSuperFile,left.subfiles,xNormSubFile(left,right));
 
-		dFull := dNormBase + dNormSubFile;
+		dFull := dNormEnvironment + dNormBase + dNormSubFile;
 
 		rPackageKeyInfoWithQueries xPackageInfo(dNormBase l) := transform
 			self.packagename := l.pkgmapid;
 			self.packageid := l.pid;
 			self.partid := l.partid;
 			self.baseid := l.baseid;
+			self.environmentid := l.environmentid;
+			self.environmentvalue := l.environmentvalue;
+			self.daliip := l.daliip;
+			self.compulsory := l.compulsory;
+			self.enablefieldtranslation := l.enablefieldtranslation;
 			self.superfile := l.superfileid;
 			self.subfile := l.subfileid;
 		end;
@@ -284,12 +322,26 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	end;
 	
 	
-	export fDatasetAsXMLPackage(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)) := function
+	export fDatasetAsXMLPackage(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)
+																	,boolean pBuildWithoutPart = true) := function
 		
-		dGetPackageAsDataset := if (count(pGetPackageAsDataset) = 0
-															,sort(fXMLPackageAsDataset(),packagename,partid,packageid,baseid,superfile)
-															,sort(pGetPackageAsDataset,packagename,partid,packageid,baseid,superfile)
+		dGetPackageAsDatasetWithPart := if (count(pGetPackageAsDataset) = 0
+															,sort(fXMLPackageAsDataset(),packagename,partid,packageid,environmentid,baseid,superfile)
+															,sort(pGetPackageAsDataset,packagename,partid,packageid,environmentid,baseid,superfile)
 															): independent;
+															
+		typeof(dGetPackageAsDatasetWithPart) xNoParts(dGetPackageAsDatasetWithPart l) := transform
+			self.partid := '';
+			self := l;
+		end;
+		
+		dGetPackageAsDatasetWithoutPart := project(dGetPackageAsDatasetWithPart,xNoParts(left));
+		
+		dGetPackageAsDataset := if (pBuildWithoutPart
+																	,dGetPackageAsDatasetWithoutPart
+																	,dGetPackageAsDatasetWithPart);
+		
+		dGetPackageEnvironment := dGetPackageAsDataset(environmentid <> '');
 		
 		dGetPackageBase := dGetPackageAsDataset(baseid <> '');
 		
@@ -305,6 +357,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		rPackageWithSubFiles xProjectBase(dGetPackageBase l) := transform
 			self.pid := l.packageid;
 			self.baseids := dataset([{l.baseid}],rBase);
+			self.environmentids := [];
 			self.superfiles := [];
 			self.subfiles := [];
 			self.pkgs := [];
@@ -320,9 +373,32 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		
 		dRollupBase := sort(rollup(dProjectBase,packagename+partid+packageid,xRollupBase(left,right)),partid,packageid,baseid);
 		
+		
+		// environment ids
+		rPackageWithSubFiles xProjectEnvironment(dGetPackageEnvironment l) := transform
+			self.pid := l.packageid;
+			self.environmentids := dataset([{l.environmentid,l.environmentvalue}],rEnvironment);
+			self.baseids := [];
+			self.superfiles := [];
+			self.subfiles := [];
+			self.pkgs := [];
+			self := l;
+		end;
+
+		dProjectEnvironment := project(dGetPackageEnvironment,xProjectEnvironment(left));
+		
+		rPackageWithSubFiles xRollupEnvironment(dProjectEnvironment l, dProjectEnvironment r) := transform
+			self.environmentids := l.environmentids + row({r.environmentids[1].environmentid,r.environmentids[1].environmentvalue},rEnvironment);
+			self := l;
+		end;
+		
+		dRollupEnvironment := sort(rollup(dProjectEnvironment,packagename+partid+packageid,xRollupEnvironment(left,right)),partid,packageid,environmentid);
+		
+		
 		// subfiles
 		rPackageWithSubFiles xProjectSubFiles(dGetPackageSubFiles l) := transform
 			self.pid := l.packageid;
+			self.environmentids := [];
 			self.baseids := [];
 			self.superfiles := [];
 			self.pkgs := [];
@@ -342,6 +418,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		rPackageWithSubFiles xPopulateSubFiles(dGetPackageSubFiles l, dRollupSubFiles r) := transform
 			self.pid := l.packageid;
 			self.baseids := [];
+			self.environmentids := [];
 			self.superfiles := [];
 			self.pkgs := [];
 			self.subfiles  := r.subfiles;
@@ -374,10 +451,10 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		dRollupSuperFiles := rollup(dProjectSuperFiles,partid+packageid,xRollupSuperFiles(left,right));
 		
 		// combine base + supers
-		dCombine := sort(dRollupBase + dRollupSuperFiles,packagename,partid);
+		dCombine := sort(dRollupEnvironment + dRollupBase + dRollupSuperFiles,packagename,partid);
 		
 		rPackageWithSubFiles xProjectPackage(dCombine l) := transform
-			self.pkgs := dataset([{l.pid,l.baseids,l.superfiles}],rPackageWithQueries);
+			self.pkgs := dataset([{l.pid,l.compulsory,l.enablefieldtranslation,l.daliip,l.environmentids,l.baseids,l.superfiles}],rPackageWithQueries);
 			self := l;
 		end;
 
@@ -390,7 +467,13 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		dConvertToPackageLayout := project(dProjectPackages,xConvertToPackageLayout(left));
 		
 		rPartWithQueries xRollupParts(dConvertToPackageLayout l, dConvertToPackageLayout r) := transform
-			self.pkgs := l.pkgs + dataset([{r.pkgs[1].pid,r.pkgs[1].baseids,r.pkgs[1].superfiles}],rPackageWithQueries);
+			self.pkgs := l.pkgs + dataset([{r.pkgs[1].pid
+																	,r.pkgs[1].compulsory
+																	,r.pkgs[1].enablefieldtranslation
+																	,r.pkgs[1].daliip
+																	,r.pkgs[1].environmentids
+																	,r.pkgs[1].baseids
+																	,r.pkgs[1].superfiles}],rPackageWithQueries);
 			self := l;
 		end;
 		
@@ -431,45 +514,54 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	
 	export fGetXMLPackageAsString(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)
 																	,string pPackageMapName = ''
-																	,boolean pGetPartPackageAsString = false) := function
+																	,string pGetPartPackage = 'onepart.pkg'
+																	,boolean pCombineParts = true) := function
 	
 		string lPackageMapName := if (pPackageMapName <> '',pPackageMapName, 'roxie');
 	
 		dDatasetAsXMLPackage := fDatasetAsXMLPackage(pGetPackageAsDataset);
 		
-		rPartWithQueriesSlim := record
-			rPartWithQueries - partid;
-		end;
-		
-		rPartWithQueriesSlim xConvertToPackageLayout(dDatasetAsXMLPackage l) := transform
-			self := l;
-		end;
-		
-		dConvertToPackageLayout := project(dDatasetAsXMLPackage,xConvertToPackageLayout(left));
-		
-		// rPackageFile xGetPackageString(dDatasetAsXMLPackage l) := transform
-			// self.PackageXMLAsString := (string)TOXML(row(l,recordof(dDatasetAsXMLPackage)));
-			// self := l;
-		// end;
 		
 		rPackageFile xGetPackageString(dDatasetAsXMLPackage l) := transform
 			self.packagemaps := lPackageMapName;
-			self.PackageXMLAsString := '<Part id=\"'+trim(l.partid,left,right)+'\">'+fRemovePartFromXML(dDatasetAsXMLPackage,l.partid)+'</Part>';
+			self.partid := if (~pCombineParts, l.partid, pGetPartPackage);
+			// removing part for now, can add later if need be
+			//self.PackageXMLAsString := '<Part id=\"'+trim(l.partid,left,right)+'\">'+fRemovePartFromXML(dDatasetAsXMLPackage,l.partid)+'</Part>';
+			self.PackageXMLAsString := fRemovePartFromXML(dDatasetAsXMLPackage,l.partid);
 			self := l;
 		end;
 		
 		
 		dGetPackageString := project(dDatasetAsXMLPackage,xGetPackageString(left));
 		
-		rPackageFile xRollupPackageString(dGetPackageString l, dGetPackageString r) := transform
+		rPackageFile xRollupParts(dGetPackageString l, dGetPackageString r) := transform
 			self.PackageXMLAsString := l.PackageXMLAsString + r.PackageXMLAsString;
 			self := l;
 		end;
 		
-		dRollupPackageString := rollup(dGetPackageString,packagemaps,xRollupPackageString(left,right));
+		dRollupParts := rollup(dGetPackageString,partid,xRollupParts(left,right));
 		
-		return if (pGetPartPackageAsString, dGetPackageString, dRollupPackageString);
+		
+		rFinalPackageString := record, maxlength(30000000)
+			string PackageXMLAsString;
+		end;
+		
+		dPackage := if (~pCombineParts
+												,if (pGetPartPackage <> ''
+														,dGetPackageString(partid = pGetPartPackage)
+														,dRollupParts)
+												,dRollupParts
+											
+										);
+		rFinalPackageString xFinalPackageString(dPackage l) := transform
+			self.PackageXMLAsString := '<RoxiePackage>'+trim(l.PackageXMLAsString)+'</RoxiePackage>';
+		end;
+		
+		dFinalPackageString := project(dPackage,xFinalPackageString(left));
+		
+		return dFinalPackageString[1].PackageXMLAsString;
 	end;
 
 	
 end;
+/////

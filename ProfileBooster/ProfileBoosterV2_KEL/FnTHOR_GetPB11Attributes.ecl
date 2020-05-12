@@ -10,8 +10,8 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 
 	// Common_Functions := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Common_Functions;
 	
-	RecordsWithLexID := DISTRIBUTE(InputData(P_LexID > 0),P_LexID);
-	RecordsWithoutLexID := DISTRIBUTE(InputData(P_LexID <= 0),P_LexID);
+	RecordsWithLexID := InputData(P_LexID > 0);
+	RecordsWithoutLexID := InputData(P_LexID <= 0);
 	
 	UNSIGNED8 PDPM := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(Options.Data_Restriction_Mask, 
 																																																Options.Data_Permission_Mask, 
@@ -28,11 +28,11 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 																																																
 	mod_transforms := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Transforms;
 	
-	LexIDAttributesInput := PROJECT(RecordsWithLexID, mod_transforms.xfm_LexIDAttributesInput(LEFT, Options.KEL_Permissions_Mask),LOCAL);
+	LexIDAttributesInput := PROJECT(RecordsWithLexID, mod_transforms.xfm_LexIDAttributesInput(LEFT, Options.KEL_Permissions_Mask) );
 	
 	PB2AttributesRaw := ProfileBooster.ProfileBoosterV2_KEL.RQ_Non_F_C_R_A_Profile_Booster_V2(LexIDAttributesInput, KEL_Settings).Res0;
    																													 
-	PB2AttributesRawCleaned := DISTRIBUTE(KEL.Clean(PB2AttributesRaw, TRUE, TRUE, TRUE),LexID);		
+	PB2AttributesRawCleaned := KEL.Clean(PB2AttributesRaw, TRUE, TRUE, TRUE);		
 	
 	// Cast Attributes back to their string values
 	PB2AttributesWithLexID := JOIN(RecordsWithLexID, PB2AttributesRawCleaned, LEFT.P_LexID = RIGHT.LexID, 
@@ -191,12 +191,11 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER3)RIGHT.PL_AstVehAutoEmrgPriceMin, 0);
 			SELF := LEFT;
-		),LEFT OUTER, KEEP(1), LOCAL); 
+		),LEFT OUTER, KEEP(1)); 
       	
-   	PB2AttributesWithoutLexID := PROJECT(RecordsWithoutLexID, mod_transforms.xfm_MissingInputData(LEFT), LOCAL );
+   	PB2AttributesWithoutLexID := PROJECT(RecordsWithoutLexID, mod_transforms.xfm_MissingInputData(LEFT) );
    			
-   	// PB2Attributes := SORT( PB2AttributesWithLexID + PB2AttributesWithoutLexID, G_ProcUID ); 
-   	PB2Attributes := PB2AttributesWithLexID + PB2AttributesWithoutLexID;
+   	PB2Attributes := SORT( PB2AttributesWithLexID + PB2AttributesWithoutLexID, G_ProcUID ); 
 
 		//DEBUGGING
 		// OUTPUT(CHOOSEN(LexIDAttributesInput,100), NAMED('LexIDAttributesInput_100'));
