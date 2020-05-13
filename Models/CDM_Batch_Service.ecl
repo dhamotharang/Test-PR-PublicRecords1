@@ -67,7 +67,7 @@ export CDM_Batch_Service := MACRO
 	boolean   ofac_Only := false;
 
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+	string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
   
     //CCPA fields
