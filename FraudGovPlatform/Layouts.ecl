@@ -281,8 +281,8 @@ EXPORT Layouts := MODULE
 	END;	
 
   EXPORT clean_Drivers_License := RECORD
-			string2		Drivers_License_State;
-			string25	Drivers_License;
+			string2		Drivers_License_State := '';
+			string25	Drivers_License  := '';
   END;
 
 	EXPORT Provenance := RECORD
@@ -815,6 +815,9 @@ Export CIID := RECORD
 		STRING3 	score_any_phn;
 		STRING3		score_any_fzzy;
 		STRING		errorcode;
+    STRING2		best_drivers_license_state := '';
+    STRING25	best_drivers_license := '';    
+    STRING8   best_drivers_license_exp := '';
  END;
 
  EXPORT CoverageDates := RECORD
