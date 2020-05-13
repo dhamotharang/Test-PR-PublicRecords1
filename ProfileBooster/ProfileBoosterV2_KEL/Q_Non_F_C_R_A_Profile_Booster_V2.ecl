@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
 IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_1,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_Vehicle_1,B_Person_Vehicle_10,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Person_Vehicle_4,B_Person_Vehicle_5,B_Person_Vehicle_6,B_Person_Vehicle_7,B_Person_Vehicle_8,B_Person_Vehicle_9,B_Vehicle_1,B_Vehicle_2,B_Vehicle_3,B_Vehicle_4,B_Vehicle_5,B_Vehicle_6,B_Vehicle_7,B_Vehicle_8,B_Vehicle_9,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
@@ -6,7 +6,7 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2(KEL.typ.uid __PLexID_in, KEL.typ.kdate _
   SHARED __cfg_Local := MODULE(CFG_Compile)
     SHARED DATASET(CurrentDateLayout) CurrentDateData := DATASET([{0,__PP_InpClnArchDt}],CurrentDateLayout);
   END;
-  SHARED E_Person_Filtered_2(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__cfg))
+  SHARED E_Person_Filtered_1(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds((__ds.__Permits & __PDPM) = __ds.__Permits);
     SHARED __GroupTest(ExpandedPreEntityLayout __r) := EXISTS(__r.__Payload(__T(__OP2(__r.__Payload.UID,=,__CN(__PLexID_in)))));
@@ -14,20 +14,17 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2(KEL.typ.uid __PLexID_in, KEL.typ.kdate _
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
     SHARED __PreEntityFilter(DATASET(ExpandedPreEntityLayout) __ds) := __PreEntityGroupFilter(__ds);
   END;
-  SHARED E_Person_Vehicle_Filtered_1(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person_Vehicle(__cfg))
+  SHARED E_Person_Vehicle_Filtered(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person_Vehicle(__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds((__ds.__Permits & __PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
-    SHARED __PreEntityFilter(DATASET(ExpandedPreEntityLayout) __ds) := JOIN(__ds,E_Person_Filtered_2(__cfg).__PostFilter,__EEQP(LEFT.Subject_,RIGHT.UID),TRANSFORM(ExpandedPreEntityLayout,SELF:=LEFT),HASH,KEEP(1));
   END;
   SHARED E_Vehicle_Filtered(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Vehicle(__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds((__ds.__Permits & __PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
-    SHARED __PreEntityFilter(DATASET(ExpandedPreEntityLayout) __ds) := JOIN(__ds,E_Person_Vehicle_Filtered_1(__cfg).__PostFilter,__EEQP(LEFT.UID,RIGHT.Automobile_),TRANSFORM(ExpandedPreEntityLayout,SELF:=LEFT),HASH,KEEP(1));
   END;
-  SHARED E_Person_Filtered := E_Person_Filtered_2;
-  SHARED E_Person_Vehicle_Filtered := E_Person_Vehicle_Filtered_1;
+  SHARED E_Person_Filtered := E_Person_Filtered_1;
   SHARED B_Person_Vehicle_10_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(B_Person_Vehicle_10(__cfg))
     SHARED TYPEOF(E_Person_Vehicle(__cfg).__Result) __E_Person_Vehicle := E_Person_Vehicle_Filtered(__cfg).__Result;
   END;
@@ -127,9 +124,9 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2(KEL.typ.uid __PLexID_in, KEL.typ.kdate _
     SHARED TYPEOF(B_Vehicle_1(__cfg).__ENH_Vehicle_1) __ENH_Vehicle_1 := B_Vehicle_1_Local(__cfg).__ENH_Vehicle_1;
   END;
   SHARED TYPEOF(B_Person(__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__cfg_Local).__ENH_Person;
-  SHARED __EE176916 := __ENH_Person;
-  SHARED __EE177600 := __EE176916(__T(__OP2(__EE176916.UID,=,__CN(__PLexID_in))));
-  SHARED __ST5160_Layout := RECORD
+  SHARED __EE176860 := __ENH_Person;
+  SHARED __EE177544 := __EE176860(__T(__OP2(__EE176860.UID,=,__CN(__PLexID_in))));
+  SHARED __ST5155_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.nint P_L___Purch_New_Amt_;
     KEL.typ.nint P_L___Purch_Tot_Ev_;
@@ -185,5 +182,5 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2(KEL.typ.uid __PLexID_in, KEL.typ.kdate _
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE177600,TRANSFORM(__ST5160_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE177544,TRANSFORM(__ST5155_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
 END;

@@ -1,43 +1,56 @@
-IMPORT ut,SALT33;
+﻿IMPORT SALT311,STD;
 EXPORT addresshistory_counties_hygiene(dataset(addresshistory_counties_layout_crim) h) := MODULE
+ 
 //A simple summary record
-EXPORT Summary(SALT33.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION
+EXPORT Summary(SALT311.Str30Type  txt,BOOLEAN Glob=TRUE) := FUNCTION
   SummaryLayout := RECORD
     txt;
-    Source := MAX(GROUP,h.vendor);    NumberOfRecords := COUNT(GROUP);
+    Source := IF(Glob, (TYPEOF(h.vendor))'', MAX(GROUP,h.vendor));
+    NumberOfRecords := COUNT(GROUP);
+    populated_recordid_cnt := COUNT(GROUP,h.recordid <> (TYPEOF(h.recordid))'');
     populated_recordid_pcnt := AVE(GROUP,IF(h.recordid = (TYPEOF(h.recordid))'',0,100));
-    maxlength_recordid := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.recordid)));
-    avelength_recordid := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.recordid)),h.recordid<>(typeof(h.recordid))'');
+    maxlength_recordid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.recordid)));
+    avelength_recordid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.recordid)),h.recordid<>(typeof(h.recordid))'');
+    populated_statecode_cnt := COUNT(GROUP,h.statecode <> (TYPEOF(h.statecode))'');
     populated_statecode_pcnt := AVE(GROUP,IF(h.statecode = (TYPEOF(h.statecode))'',0,100));
-    maxlength_statecode := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.statecode)));
-    avelength_statecode := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.statecode)),h.statecode<>(typeof(h.statecode))'');
+    maxlength_statecode := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.statecode)));
+    avelength_statecode := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.statecode)),h.statecode<>(typeof(h.statecode))'');
+    populated_street_cnt := COUNT(GROUP,h.street <> (TYPEOF(h.street))'');
     populated_street_pcnt := AVE(GROUP,IF(h.street = (TYPEOF(h.street))'',0,100));
-    maxlength_street := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.street)));
-    avelength_street := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.street)),h.street<>(typeof(h.street))'');
+    maxlength_street := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.street)));
+    avelength_street := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.street)),h.street<>(typeof(h.street))'');
+    populated_unit_cnt := COUNT(GROUP,h.unit <> (TYPEOF(h.unit))'');
     populated_unit_pcnt := AVE(GROUP,IF(h.unit = (TYPEOF(h.unit))'',0,100));
-    maxlength_unit := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.unit)));
-    avelength_unit := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.unit)),h.unit<>(typeof(h.unit))'');
+    maxlength_unit := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.unit)));
+    avelength_unit := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.unit)),h.unit<>(typeof(h.unit))'');
+    populated_city_cnt := COUNT(GROUP,h.city <> (TYPEOF(h.city))'');
     populated_city_pcnt := AVE(GROUP,IF(h.city = (TYPEOF(h.city))'',0,100));
-    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.city)));
-    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.city)),h.city<>(typeof(h.city))'');
+    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)));
+    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)),h.city<>(typeof(h.city))'');
+    populated_orig_state_cnt := COUNT(GROUP,h.orig_state <> (TYPEOF(h.orig_state))'');
     populated_orig_state_pcnt := AVE(GROUP,IF(h.orig_state = (TYPEOF(h.orig_state))'',0,100));
-    maxlength_orig_state := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.orig_state)));
-    avelength_orig_state := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.orig_state)),h.orig_state<>(typeof(h.orig_state))'');
+    maxlength_orig_state := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.orig_state)));
+    avelength_orig_state := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.orig_state)),h.orig_state<>(typeof(h.orig_state))'');
+    populated_orig_zip_cnt := COUNT(GROUP,h.orig_zip <> (TYPEOF(h.orig_zip))'');
     populated_orig_zip_pcnt := AVE(GROUP,IF(h.orig_zip = (TYPEOF(h.orig_zip))'',0,100));
-    maxlength_orig_zip := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.orig_zip)));
-    avelength_orig_zip := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.orig_zip)),h.orig_zip<>(typeof(h.orig_zip))'');
+    maxlength_orig_zip := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.orig_zip)));
+    avelength_orig_zip := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.orig_zip)),h.orig_zip<>(typeof(h.orig_zip))'');
+    populated_addresstype_cnt := COUNT(GROUP,h.addresstype <> (TYPEOF(h.addresstype))'');
     populated_addresstype_pcnt := AVE(GROUP,IF(h.addresstype = (TYPEOF(h.addresstype))'',0,100));
-    maxlength_addresstype := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.addresstype)));
-    avelength_addresstype := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.addresstype)),h.addresstype<>(typeof(h.addresstype))'');
+    maxlength_addresstype := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.addresstype)));
+    avelength_addresstype := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.addresstype)),h.addresstype<>(typeof(h.addresstype))'');
+    populated_sourcename_cnt := COUNT(GROUP,h.sourcename <> (TYPEOF(h.sourcename))'');
     populated_sourcename_pcnt := AVE(GROUP,IF(h.sourcename = (TYPEOF(h.sourcename))'',0,100));
-    maxlength_sourcename := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.sourcename)));
-    avelength_sourcename := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.sourcename)),h.sourcename<>(typeof(h.sourcename))'');
+    maxlength_sourcename := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sourcename)));
+    avelength_sourcename := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sourcename)),h.sourcename<>(typeof(h.sourcename))'');
+    populated_sourceid_cnt := COUNT(GROUP,h.sourceid <> (TYPEOF(h.sourceid))'');
     populated_sourceid_pcnt := AVE(GROUP,IF(h.sourceid = (TYPEOF(h.sourceid))'',0,100));
-    maxlength_sourceid := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.sourceid)));
-    avelength_sourceid := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.sourceid)),h.sourceid<>(typeof(h.sourceid))'');
+    maxlength_sourceid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sourceid)));
+    avelength_sourceid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sourceid)),h.sourceid<>(typeof(h.sourceid))'');
+    populated_vendor_cnt := COUNT(GROUP,h.vendor <> (TYPEOF(h.vendor))'');
     populated_vendor_pcnt := AVE(GROUP,IF(h.vendor = (TYPEOF(h.vendor))'',0,100));
-    maxlength_vendor := MAX(GROUP,LENGTH(TRIM((SALT33.StrType)h.vendor)));
-    avelength_vendor := AVE(GROUP,LENGTH(TRIM((SALT33.StrType)h.vendor)),h.vendor<>(typeof(h.vendor))'');
+    maxlength_vendor := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.vendor)));
+    avelength_vendor := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.vendor)),h.vendor<>(typeof(h.vendor))'');
   END;
     T := IF(Glob,TABLE(h,SummaryLayout),TABLE(h,SummaryLayout,vendor,FEW));
   R1 := RECORD
@@ -46,7 +59,9 @@ EXPORT Summary(SALT33.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
-EXPORT SourceCounts := Summary('SummaryBySource',FALSE);  R := RECORD
+ 
+EXPORT SourceCounts := Summary('SummaryBySource',FALSE);
+  R := RECORD
     STRING vendor1;
     STRING vendor2;
     UNSIGNED LinkingPotential;
@@ -58,9 +73,9 @@ EXPORT SourceCounts := Summary('SummaryBySource',FALSE);  R := RECORD
   END;
 EXPORT CrossLinkingPotential := JOIN(SourceCounts,SourceCounts,LEFT.Source<>RIGHT.Source,T(LEFT,RIGHT),ALL);
 summary0 := Summary('Summary');
-invRec := RECORD
+  invRec := RECORD
   UNSIGNED  FldNo;
-  SALT33.StrType FieldName;
+  SALT311.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -77,18 +92,18 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 11, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT33.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
   SELF.Src := le.vendor;
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT33.StrType)le.recordid),TRIM((SALT33.StrType)le.statecode),TRIM((SALT33.StrType)le.street),TRIM((SALT33.StrType)le.unit),TRIM((SALT33.StrType)le.city),TRIM((SALT33.StrType)le.orig_state),TRIM((SALT33.StrType)le.orig_zip),TRIM((SALT33.StrType)le.addresstype),TRIM((SALT33.StrType)le.sourcename),TRIM((SALT33.StrType)le.sourceid),TRIM((SALT33.StrType)le.vendor)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.recordid),TRIM((SALT311.StrType)le.statecode),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.unit),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.orig_state),TRIM((SALT311.StrType)le.orig_zip),TRIM((SALT311.StrType)le.addresstype),TRIM((SALT311.StrType)le.sourcename),TRIM((SALT311.StrType)le.sourceid),TRIM((SALT311.StrType)le.vendor)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,11,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT33.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 11);
   SELF.FldNo2 := 1 + (C % 11);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT33.StrType)le.recordid),TRIM((SALT33.StrType)le.statecode),TRIM((SALT33.StrType)le.street),TRIM((SALT33.StrType)le.unit),TRIM((SALT33.StrType)le.city),TRIM((SALT33.StrType)le.orig_state),TRIM((SALT33.StrType)le.orig_zip),TRIM((SALT33.StrType)le.addresstype),TRIM((SALT33.StrType)le.sourcename),TRIM((SALT33.StrType)le.sourceid),TRIM((SALT33.StrType)le.vendor)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT33.StrType)le.recordid),TRIM((SALT33.StrType)le.statecode),TRIM((SALT33.StrType)le.street),TRIM((SALT33.StrType)le.unit),TRIM((SALT33.StrType)le.city),TRIM((SALT33.StrType)le.orig_state),TRIM((SALT33.StrType)le.orig_zip),TRIM((SALT33.StrType)le.addresstype),TRIM((SALT33.StrType)le.sourcename),TRIM((SALT33.StrType)le.sourceid),TRIM((SALT33.StrType)le.vendor)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.recordid),TRIM((SALT311.StrType)le.statecode),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.unit),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.orig_state),TRIM((SALT311.StrType)le.orig_zip),TRIM((SALT311.StrType)le.addresstype),TRIM((SALT311.StrType)le.sourcename),TRIM((SALT311.StrType)le.sourceid),TRIM((SALT311.StrType)le.vendor)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.recordid),TRIM((SALT311.StrType)le.statecode),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.unit),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.orig_state),TRIM((SALT311.StrType)le.orig_zip),TRIM((SALT311.StrType)le.addresstype),TRIM((SALT311.StrType)le.sourcename),TRIM((SALT311.StrType)le.sourceid),TRIM((SALT311.StrType)le.vendor)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),11*11,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'recordid'}
@@ -101,10 +116,13 @@ SHARED FldIds := DATASET([{1,'recordid'}
       ,{8,'addresstype'}
       ,{9,'sourcename'}
       ,{10,'sourceid'}
-      ,{11,'vendor'}],SALT33.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT33.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
-EXPORT SrcProfiles := SALT33.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
-EXPORT Correlations := SALT33.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+      ,{11,'vendor'}],SALT311.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+ 
+EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+ 
+EXPORT Correlations := SALT311.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+ 
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -112,17 +130,17 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    addresshistory_counties_Fields.InValid_recordid((SALT33.StrType)le.recordid),
-    addresshistory_counties_Fields.InValid_statecode((SALT33.StrType)le.statecode),
-    addresshistory_counties_Fields.InValid_street((SALT33.StrType)le.street),
-    addresshistory_counties_Fields.InValid_unit((SALT33.StrType)le.unit),
-    addresshistory_counties_Fields.InValid_city((SALT33.StrType)le.city),
-    addresshistory_counties_Fields.InValid_orig_state((SALT33.StrType)le.orig_state),
-    addresshistory_counties_Fields.InValid_orig_zip((SALT33.StrType)le.orig_zip),
-    addresshistory_counties_Fields.InValid_addresstype((SALT33.StrType)le.addresstype),
-    addresshistory_counties_Fields.InValid_sourcename((SALT33.StrType)le.sourcename),
-    addresshistory_counties_Fields.InValid_sourceid((SALT33.StrType)le.sourceid),
-    addresshistory_counties_Fields.InValid_vendor((SALT33.StrType)le.vendor),
+    addresshistory_counties_Fields.InValid_recordid((SALT311.StrType)le.recordid),
+    addresshistory_counties_Fields.InValid_statecode((SALT311.StrType)le.statecode),
+    addresshistory_counties_Fields.InValid_street((SALT311.StrType)le.street),
+    addresshistory_counties_Fields.InValid_unit((SALT311.StrType)le.unit),
+    addresshistory_counties_Fields.InValid_city((SALT311.StrType)le.city),
+    addresshistory_counties_Fields.InValid_orig_state((SALT311.StrType)le.orig_state),
+    addresshistory_counties_Fields.InValid_orig_zip((SALT311.StrType)le.orig_zip),
+    addresshistory_counties_Fields.InValid_addresstype((SALT311.StrType)le.addresstype),
+    addresshistory_counties_Fields.InValid_sourcename((SALT311.StrType)le.sourcename),
+    addresshistory_counties_Fields.InValid_sourceid((SALT311.StrType)le.sourceid),
+    addresshistory_counties_Fields.InValid_vendor((SALT311.StrType)le.vendor),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
   SELF.vendor := le.vendor;
@@ -144,4 +162,21 @@ PrettyErrorTotals := RECORD
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := JOIN(ValErr,TABLE(SourceCounts,{Source,NumberOfRecords}),LEFT.vendor=RIGHT.Source,LOOKUP); // Add source group counts for STRATA compliance
+EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doSummaryPerSrc = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  fieldPopulationOverall := Summary('');
+  fieldPopulationPerSource := Summary('', FALSE);
+ 
+  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_Crim, addresshistory_counties_Fields, 'RECORDOF(fieldPopulationOverall)', TRUE);
+ 
+  fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+  fieldPopulationPerSource_Standard := IF(doSummaryPerSrc, NORMALIZE(fieldPopulationPerSource, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'src', 'src')));
+ 
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', TRUE, 'all'));
+  fieldPopulationPerSource_TotalRecs_Standard := IF(doSummaryPerSrc, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationPerSource, myTimeStamp, 'src', TRUE, 'src'));
+ 
+  allProfiles_Standard := IF(doAllProfiles, SALT311.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+ 
+  RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & fieldPopulationPerSource_Standard & fieldPopulationPerSource_TotalRecs_Standard & allProfiles_Standard;
+END;
 END;
