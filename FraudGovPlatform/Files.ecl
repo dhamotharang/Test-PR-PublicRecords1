@@ -30,8 +30,7 @@ module
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
-											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																					
-
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																																
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
@@ -69,6 +68,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint,Layouts.FraudPoint,FraudPoint);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BestInfo,Layouts.BestInfo,BestInfo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CoverageDates,Layouts.CoverageDates,CoverageDates);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
@@ -125,8 +126,7 @@ module
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
-		export CustomerActiveSprays := dataset(Filenames().Flags.CustomerActiveSprays,Layouts.Flags.CustomerActiveSprays,thor,opt);
-
+		export RefreshProdDashVersion	:= dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
 	end;
 
 	
