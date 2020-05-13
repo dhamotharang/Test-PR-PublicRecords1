@@ -16,9 +16,21 @@ output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~gov::otto::eventpivot', ove
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~gov::otto::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, '~gov::otto::pivotentitystatsfilter', overwrite, compressed);
 */
+/*
+output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
+output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
+*/
 
-output(FraudgovKEL.KEL_GraphPrep,,'~fraudgov::rin2::graphprep', overwrite);
+FraudgovKEL.KEL_GraphPrep.LinksPrep(customerid = 20989869 AND industrytype =	1014 and treeuid = '_011039698450');
+FraudgovKEL.KEL_GraphPrep.LinksPrep(customerid = 20989869 AND industrytype =	1014 and treeuid = '_092247340211570905463');
+FraudgovKEL.KEL_GraphPrep.Edges(customerid = 20989869 AND industrytype =	1014 and treeuid = '_011039698450');
+FraudgovKEL.KEL_GraphPrep.Edges(customerid = 20989869 AND industrytype =	1014 and treeuid = '_092247340211570905463');
 
-
+/*
+FraudgovKEL.KEL_GraphPrep.Edges(customerid = 20989869 AND industrytype =	1014 and treeuid = '_011039698450');
+FraudgovKEL.KEL_GraphPrep.Vertices(customerid = 20989869 AND industrytype =	1014 and treeuid = '_011039698450');
+FraudgovKEL.KEL_GraphPrep.Edges(customerid = 20989869 AND industrytype =	1014 and treeuid = '_092247340211570905463');
+FraudgovKEL.KEL_GraphPrep.Vertices(customerid = 20989869 AND industrytype =	1014 and treeuid = '_092247340211570905463');
+*/
 //output(FraudgovKEL.KEL_PivotIndexPrep);
 
