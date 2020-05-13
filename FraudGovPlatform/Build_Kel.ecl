@@ -51,13 +51,13 @@ BuildStatusReport :=
 										,Build_Keys(pVersion).Delta_All
 										,Build_Base_Kel(pVersion).Delta_All
 										,Promote(pversion).buildfiles.New2Built
-										,Promote(pversion).buildfiles.Built2QA
+										,Promote(pversion,,true).buildfiles.Built2QA
 										,Build_Keys(pVersion).All
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
-										,Promote(pversion).buildfiles.Built2QA
-										,FraudGovPlatform.Promote(pversion).promote_keys
-										,FraudGovPlatform.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
+										,Promote(pversion,,true).buildfiles.Built2QA
+										,Promote(pversion,,true).promote_keys
+										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
 										,FraudGovPlatform.Send_Emails(pversion).Roxie										

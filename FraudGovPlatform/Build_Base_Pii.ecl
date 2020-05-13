@@ -81,6 +81,7 @@ Export All := 	Sequential
 											,Build_IPMetaData_Base
 											,Build_Advo_Base
 											,Build_BestInfo_Base
+											,Build_PrepaidPhone_Base
 											,Promote(pversion).buildfiles.New2Built
 											)
 								;
