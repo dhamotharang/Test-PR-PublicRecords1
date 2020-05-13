@@ -33,7 +33,7 @@ module
 
 	run_scrubs := Scrubs_Sheila_Greco.Fn_RunScrubs(pversion);
 
-	build_keys := IF(Scrubs.mac_ScrubsFailureTest('Scrubs_Sheila_Greco',pversion),Proc_Build_Keys(pversion).all ,OUTPUT('Key update failed due to Scrubs reject warnings',NAMED('Key_Status')));
+	build_keys := IF(Scrubs.mac_ScrubsFailureTest('Scrubs_Sheila_Greco_Contacts,Scrubs_Sheila_Greco_Companies',pversion),Proc_Build_Keys(pversion).all ,OUTPUT('Key update failed due to Scrubs reject warnings',NAMED('Key_Status')));
 	
 	export full_build := sequential(
 		 Create_Supers
