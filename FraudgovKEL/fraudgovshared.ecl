@@ -34,6 +34,7 @@ CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(FraudgovKEL.fraudgovprep),
                            UNSIGNED AssociatedCustomerFileInfo,
                          },
 												   // Code here to fake the demo customers in cert/prod to look like they have contributed...
+													 /*
                            SELF.SourceCustomerFileInfo := 
 													              MAP(RIGHT.targetcustomerhash in Set_associated71 AND RIGHT.sourcecustomerhash = 3977509724 => RIGHT.targetcustomerhash,
 													              MAP(RIGHT.targetcustomerhash in Set_associated91 AND RIGHT.sourcecustomerhash = 2459821998 => RIGHT.targetcustomerhash,
@@ -44,11 +45,12 @@ CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(FraudgovKEL.fraudgovprep),
                                         MAP(RIGHT.targetcustomerhash in SetTNUnemployment AND RIGHT.sourcecustomerhash = 2481802344 => RIGHT.targetcustomerhash, // TN UI
                                         MAP(RIGHT.targetcustomerhash in SetFLIrma AND RIGHT.sourcecustomerhash = 2274708080 => RIGHT.targetcustomerhash, // FL IRMA
 													                      RIGHT.sourcecustomerhash))))))));
-
+                           */
+													 SELF.SourceCustomerFileInfo := RIGHT.sourcecustomerhash,
                            SELF.AssociatedCustomerFileInfo := RIGHT.targetcustomerhash,
 //                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
 //                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
-                           SELF := LEFT), LOOKUP, MANY) 
+                           SELF := LEFT), LOOKUP, MANY) 													
                            /*
 (did in 
 [
@@ -129,8 +131,8 @@ Set_incarcerated :=[1827476821,534129826,526759047,527051771,1821981777,66722978
 Set_deceased:=[005833281834,001221827365,002209147253,001121716198,001892209088,001015604649,006596394694,001572128934,001626021421,000366396035,002082436265,000067483195,193624502313,001223722398,005932460606,002448688047,000832128245,001920526549,000667829288,001135744453,000930695925,002076432220,002325394720,002650916976,001118089236,001591026867,006599937540,001248312984,002419000127,001154915008,000953608420,000300538964,000022789263,190422171676,002454663194,001879567162,000408622523,002194326335,154000969919,002191250495,000677223347,190240556257,001538005865,001945222164,000161911916,000774366026,001413067774,038562693324,038562693324,000466370453,001609447496,001774357015,000521898550,043843880213,001506286503,000036296523,002243815736,001618782818,002588210869,000502808424,002476722094,000166164997,002386852440,000783005329,000685235819,000873656160,000843589875,000032085445,006676580373,002244721351,001562280857,002210304308,000036389194,002083789087,060012961335,000771778303,134331934516,014027789599,001192633844,002164675371,005882637569,002407266410,238181708623,001717322926,002306408759,000022298459,001521767177,001425532139,000220376278,001114418758,000375896705,000523261063,001948275730,183279543021,194042664866,000551358055,001186200784,000015171447,001775135918];
 Set_Addresses := [12638153115695167395,10246789559473286115];
 
-tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
-          // (did in Set_incarcerated OR did in Set_deceased or did % 100000 = 1 or OttoAddressId in Set_Addresses);
+tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR))
+           ( SourceCustomerFileInfo NOT IN[DemoHashes] AND did in Set_incarcerated OR did in Set_deceased or did % 100000 = 1 or OttoAddressId in Set_Addresses);
 //output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
 EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; 
