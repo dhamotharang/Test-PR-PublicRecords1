@@ -126,7 +126,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := RiskIndicators_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Unknown','Invalid_No','Invalid_Alpha','Unknown','Invalid_Risk','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Date','Invalid_No','Invalid_Alpha','Unknown','Invalid_Risk','Invalid_File');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,RiskIndicators_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_phone_id(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_sequence_number(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_date_added(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_risk_indicator_id(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_risk_indicator_level(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_risk_indicator_text(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_risk_indicator_category(TotalErrors.ErrorNum),RiskIndicators_Fields.InValidMessage_filename(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

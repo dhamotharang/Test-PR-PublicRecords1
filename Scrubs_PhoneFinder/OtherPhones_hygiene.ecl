@@ -150,7 +150,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := OtherPhones_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Unknown','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_File');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,OtherPhones_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_sequence_number(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phonenumber(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_risk_indicator(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_type(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_status(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_listing_name(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_porting_code(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_forwarded(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_verified_carrier(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_date_added(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_filename(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

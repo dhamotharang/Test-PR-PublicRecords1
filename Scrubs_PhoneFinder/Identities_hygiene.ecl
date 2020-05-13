@@ -138,7 +138,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Identities_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_No','Unknown','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_AlphaChar','Invalid_AlphaNumChar','Invalid_AlphaChar','Invalid_State','Invalid_Zip','Invalid_No','Invalid_Date','Invalid_File');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Identities_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_sequence_number(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_lexid(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_full_name(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_full_address(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_city(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_state(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_zip(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_verified_carrier(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_date_added(TotalErrors.ErrorNum),Identities_Fields.InValidMessage_filename(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

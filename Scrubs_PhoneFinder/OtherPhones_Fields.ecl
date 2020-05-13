@@ -1,68 +1,81 @@
 ﻿IMPORT SALT311;
+IMPORT Scrubs_PhoneFinder; // Import modules for FieldTypes attribute definitions
 EXPORT OtherPhones_Fields := MODULE
  
 EXPORT NumFields := 13;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_ID','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_Port','Invalid_AlphaChar','Invalid_Phone');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_ID' => 2,'Invalid_Risk' => 3,'Invalid_Type' => 4,'Invalid_Status' => 5,'Invalid_Port' => 6,'Invalid_AlphaChar' => 7,'Invalid_Phone' => 8,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_ID','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_Port','Invalid_AlphaChar','Invalid_Phone','Invalid_Date','Invalid_File');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_ID' => 2,'Invalid_Risk' => 3,'Invalid_Type' => 4,'Invalid_Status' => 5,'Invalid_Port' => 6,'Invalid_AlphaChar' => 7,'Invalid_Phone' => 8,'Invalid_Date' => 9,'Invalid_File' => 10,0);
  
 EXPORT MakeFT_Invalid_No(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789\\\\N'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_No(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789\\\\N'))));
+EXPORT InValidMessageFT_Invalid_No(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789\\\\N'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_ID(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789R'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789R\\\\N'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789R'))));
-EXPORT InValidMessageFT_Invalid_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789R'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789R\\\\N'))));
+EXPORT InValidMessageFT_Invalid_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789R\\\\N'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Risk(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Risk(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['PASS','FAIL','WARN','']);
-EXPORT InValidMessageFT_Invalid_Risk(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('PASS|FAIL|WARN|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Risk(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['PASS','FAIL','WARN','\\N','']);
+EXPORT InValidMessageFT_Invalid_Risk(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('PASS|FAIL|WARN|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['LANDLINE','POSSIBLE WIRELESS','PAGER','POSSIBLE VOIP','WIRELESS','VOIP','']);
-EXPORT InValidMessageFT_Invalid_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['LANDLINE','POSSIBLE WIRELESS','PAGER','POSSIBLE VOIP','WIRELESS','VOIP','OTHER/UNKNOWN','\\N','']);
+EXPORT InValidMessageFT_Invalid_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|OTHER/UNKNOWN|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Status(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Status(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['ACTIVE','NOT AVAILABLE','INACTIVE','']);
-EXPORT InValidMessageFT_Invalid_Status(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('ACTIVE|NOT AVAILABLE|INACTIVE|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Status(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['ACTIVE','NOT AVAILABLE','INACTIVE','\\N','']);
+EXPORT InValidMessageFT_Invalid_Status(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('ACTIVE|NOT AVAILABLE|INACTIVE|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Port(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Port(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['Not Ported','Ported','']);
-EXPORT InValidMessageFT_Invalid_Port(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('Not Ported|Ported|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Port(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['Not Ported','Ported','\\N','']);
+EXPORT InValidMessageFT_Invalid_Port(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('Not Ported|Ported|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaChar(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/\''); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-&|\\\\\''); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/\''))));
-EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/\''),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-&|\\\\\''))));
+EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-&|\\\\\''),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Phone(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789\\\\N'); // Only allow valid symbols
   RETURN  MakeFT_Invalid_No(s1);
 END;
-EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 10));
-EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,9,10'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789\\\\N'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 10));
+EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789\\\\N'),SALT311.HygieneErrors.NotLength('0,9,10'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs_PhoneFinder.Fun.Split_Date(s)>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_PhoneFinder.Fun.Split_Date'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_File(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_Invalid_File(SALT311.StrType s) := WHICH(~Scrubs_PhoneFinder.Fun.Check_File(s)>0);
+EXPORT InValidMessageFT_Invalid_File(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_PhoneFinder.Fun.Check_File'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','filename');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','filename');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'transaction_id' => 0,'sequence_number' => 1,'phone_id' => 2,'phonenumber' => 3,'risk_indicator' => 4,'phone_type' => 5,'phone_status' => 6,'listing_name' => 7,'porting_code' => 8,'phone_forwarded' => 9,'verified_carrier' => 10,'date_added' => 11,'filename' => 12,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['ENUM'],['ALLOW'],['ENUM'],['ALLOW'],['ALLOW'],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['ENUM'],['ALLOW'],['ENUM'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -111,13 +124,13 @@ EXPORT Make_verified_carrier(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_verified_carrier(SALT311.StrType s) := InValidFT_Invalid_No(s);
 EXPORT InValidMessage_verified_carrier(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_date_added(SALT311.StrType s0) := s0;
-EXPORT InValid_date_added(SALT311.StrType s) := 0;
-EXPORT InValidMessage_date_added(UNSIGNED1 wh) := '';
+EXPORT Make_date_added(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_date_added(SALT311.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT InValidMessage_date_added(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_filename(SALT311.StrType s0) := s0;
-EXPORT InValid_filename(SALT311.StrType s) := 0;
-EXPORT InValidMessage_filename(UNSIGNED1 wh) := '';
+EXPORT Make_filename(SALT311.StrType s0) := MakeFT_Invalid_File(s0);
+EXPORT InValid_filename(SALT311.StrType s) := InValidFT_Invalid_File(s);
+EXPORT InValidMessage_filename(UNSIGNED1 wh) := InValidMessageFT_Invalid_File(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO

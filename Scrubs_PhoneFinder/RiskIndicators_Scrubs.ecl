@@ -1,20 +1,23 @@
 ﻿IMPORT SALT311,STD;
+IMPORT Scrubs_PhoneFinder; // Import modules for FieldTypes attribute definitions
 EXPORT RiskIndicators_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 6;
-  EXPORT NumRulesFromFieldType := 6;
+  EXPORT NumRules := 8;
+  EXPORT NumRulesFromFieldType := 8;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 6;
+  EXPORT NumFieldsWithRules := 8;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(RiskIndicators_Layout_PhoneFinder)
     UNSIGNED1 transaction_id_Invalid;
     UNSIGNED1 phone_id_Invalid;
     UNSIGNED1 sequence_number_Invalid;
+    UNSIGNED1 date_added_Invalid;
     UNSIGNED1 risk_indicator_id_Invalid;
     UNSIGNED1 risk_indicator_level_Invalid;
     UNSIGNED1 risk_indicator_category_Invalid;
+    UNSIGNED1 filename_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(RiskIndicators_Layout_PhoneFinder)
     UNSIGNED8 ScrubsBits1;
@@ -26,9 +29,11 @@ EXPORT RiskIndicators_Scrubs := MODULE
           ,'transaction_id:Invalid_ID:ALLOW'
           ,'phone_id:Invalid_No:ALLOW'
           ,'sequence_number:Invalid_No:ALLOW'
+          ,'date_added:Invalid_Date:CUSTOM'
           ,'risk_indicator_id:Invalid_No:ALLOW'
           ,'risk_indicator_level:Invalid_Alpha:ALLOW'
-          ,'risk_indicator_category:Invalid_Risk:ENUM'
+          ,'risk_indicator_category:Invalid_Risk:CUSTOM'
+          ,'filename:Invalid_File:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -40,9 +45,11 @@ EXPORT RiskIndicators_Scrubs := MODULE
           ,RiskIndicators_Fields.InvalidMessage_transaction_id(1)
           ,RiskIndicators_Fields.InvalidMessage_phone_id(1)
           ,RiskIndicators_Fields.InvalidMessage_sequence_number(1)
+          ,RiskIndicators_Fields.InvalidMessage_date_added(1)
           ,RiskIndicators_Fields.InvalidMessage_risk_indicator_id(1)
           ,RiskIndicators_Fields.InvalidMessage_risk_indicator_level(1)
           ,RiskIndicators_Fields.InvalidMessage_risk_indicator_category(1)
+          ,RiskIndicators_Fields.InvalidMessage_filename(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -55,15 +62,17 @@ EXPORT FromNone(DATASET(RiskIndicators_Layout_PhoneFinder) h) := MODULE
     SELF.transaction_id_Invalid := RiskIndicators_Fields.InValid_transaction_id((SALT311.StrType)le.transaction_id);
     SELF.phone_id_Invalid := RiskIndicators_Fields.InValid_phone_id((SALT311.StrType)le.phone_id);
     SELF.sequence_number_Invalid := RiskIndicators_Fields.InValid_sequence_number((SALT311.StrType)le.sequence_number);
+    SELF.date_added_Invalid := RiskIndicators_Fields.InValid_date_added((SALT311.StrType)le.date_added);
     SELF.risk_indicator_id_Invalid := RiskIndicators_Fields.InValid_risk_indicator_id((SALT311.StrType)le.risk_indicator_id);
     SELF.risk_indicator_level_Invalid := RiskIndicators_Fields.InValid_risk_indicator_level((SALT311.StrType)le.risk_indicator_level);
     SELF.risk_indicator_category_Invalid := RiskIndicators_Fields.InValid_risk_indicator_category((SALT311.StrType)le.risk_indicator_category);
+    SELF.filename_Invalid := RiskIndicators_Fields.InValid_filename((SALT311.StrType)le.filename);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),RiskIndicators_Layout_PhoneFinder);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.transaction_id_Invalid << 0 ) + ( le.phone_id_Invalid << 1 ) + ( le.sequence_number_Invalid << 2 ) + ( le.risk_indicator_id_Invalid << 3 ) + ( le.risk_indicator_level_Invalid << 4 ) + ( le.risk_indicator_category_Invalid << 5 );
+    SELF.ScrubsBits1 := ( le.transaction_id_Invalid << 0 ) + ( le.phone_id_Invalid << 1 ) + ( le.sequence_number_Invalid << 2 ) + ( le.date_added_Invalid << 3 ) + ( le.risk_indicator_id_Invalid << 4 ) + ( le.risk_indicator_level_Invalid << 5 ) + ( le.risk_indicator_category_Invalid << 6 ) + ( le.filename_Invalid << 7 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -88,9 +97,11 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.transaction_id_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.phone_id_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.sequence_number_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.risk_indicator_id_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.risk_indicator_level_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.risk_indicator_category_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.date_added_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.risk_indicator_id_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.risk_indicator_level_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.risk_indicator_category_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.filename_Invalid := (le.ScrubsBits1 >> 7) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -102,10 +113,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     transaction_id_ALLOW_ErrorCount := COUNT(GROUP,h.transaction_id_Invalid=1);
     phone_id_ALLOW_ErrorCount := COUNT(GROUP,h.phone_id_Invalid=1);
     sequence_number_ALLOW_ErrorCount := COUNT(GROUP,h.sequence_number_Invalid=1);
+    date_added_CUSTOM_ErrorCount := COUNT(GROUP,h.date_added_Invalid=1);
     risk_indicator_id_ALLOW_ErrorCount := COUNT(GROUP,h.risk_indicator_id_Invalid=1);
     risk_indicator_level_ALLOW_ErrorCount := COUNT(GROUP,h.risk_indicator_level_Invalid=1);
-    risk_indicator_category_ENUM_ErrorCount := COUNT(GROUP,h.risk_indicator_category_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.transaction_id_Invalid > 0 OR h.phone_id_Invalid > 0 OR h.sequence_number_Invalid > 0 OR h.risk_indicator_id_Invalid > 0 OR h.risk_indicator_level_Invalid > 0 OR h.risk_indicator_category_Invalid > 0);
+    risk_indicator_category_CUSTOM_ErrorCount := COUNT(GROUP,h.risk_indicator_category_Invalid=1);
+    filename_CUSTOM_ErrorCount := COUNT(GROUP,h.filename_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.transaction_id_Invalid > 0 OR h.phone_id_Invalid > 0 OR h.sequence_number_Invalid > 0 OR h.date_added_Invalid > 0 OR h.risk_indicator_id_Invalid > 0 OR h.risk_indicator_level_Invalid > 0 OR h.risk_indicator_category_Invalid > 0 OR h.filename_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -113,9 +126,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_level_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_category_ENUM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_level_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filename_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_level_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_category_ENUM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_level_ALLOW_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_category_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filename_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -130,20 +143,22 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.transaction_id_Invalid,le.phone_id_Invalid,le.sequence_number_Invalid,le.risk_indicator_id_Invalid,le.risk_indicator_level_Invalid,le.risk_indicator_category_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,RiskIndicators_Fields.InvalidMessage_transaction_id(le.transaction_id_Invalid),RiskIndicators_Fields.InvalidMessage_phone_id(le.phone_id_Invalid),RiskIndicators_Fields.InvalidMessage_sequence_number(le.sequence_number_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_id(le.risk_indicator_id_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_level(le.risk_indicator_level_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_category(le.risk_indicator_category_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.transaction_id_Invalid,le.phone_id_Invalid,le.sequence_number_Invalid,le.date_added_Invalid,le.risk_indicator_id_Invalid,le.risk_indicator_level_Invalid,le.risk_indicator_category_Invalid,le.filename_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,RiskIndicators_Fields.InvalidMessage_transaction_id(le.transaction_id_Invalid),RiskIndicators_Fields.InvalidMessage_phone_id(le.phone_id_Invalid),RiskIndicators_Fields.InvalidMessage_sequence_number(le.sequence_number_Invalid),RiskIndicators_Fields.InvalidMessage_date_added(le.date_added_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_id(le.risk_indicator_id_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_level(le.risk_indicator_level_Invalid),RiskIndicators_Fields.InvalidMessage_risk_indicator_category(le.risk_indicator_category_Invalid),RiskIndicators_Fields.InvalidMessage_filename(le.filename_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.transaction_id_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone_id_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.sequence_number_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.date_added_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.risk_indicator_id_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.risk_indicator_level_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.risk_indicator_category_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'transaction_id','phone_id','sequence_number','risk_indicator_id','risk_indicator_level','risk_indicator_category','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_ID','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_Risk','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.transaction_id,(SALT311.StrType)le.phone_id,(SALT311.StrType)le.sequence_number,(SALT311.StrType)le.risk_indicator_id,(SALT311.StrType)le.risk_indicator_level,(SALT311.StrType)le.risk_indicator_category,'***SALTBUG***');
+          ,CHOOSE(le.risk_indicator_category_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.filename_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'transaction_id','phone_id','sequence_number','date_added','risk_indicator_id','risk_indicator_level','risk_indicator_category','filename','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Date','Invalid_No','Invalid_Alpha','Invalid_Risk','Invalid_File','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.transaction_id,(SALT311.StrType)le.phone_id,(SALT311.StrType)le.sequence_number,(SALT311.StrType)le.date_added,(SALT311.StrType)le.risk_indicator_id,(SALT311.StrType)le.risk_indicator_level,(SALT311.StrType)le.risk_indicator_category,(SALT311.StrType)le.filename,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,6,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,8,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -159,9 +174,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.transaction_id_ALLOW_ErrorCount
           ,le.phone_id_ALLOW_ErrorCount
           ,le.sequence_number_ALLOW_ErrorCount
+          ,le.date_added_CUSTOM_ErrorCount
           ,le.risk_indicator_id_ALLOW_ErrorCount
           ,le.risk_indicator_level_ALLOW_ErrorCount
-          ,le.risk_indicator_category_ENUM_ErrorCount
+          ,le.risk_indicator_category_CUSTOM_ErrorCount
+          ,le.filename_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -173,9 +190,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.transaction_id_ALLOW_ErrorCount
           ,le.phone_id_ALLOW_ErrorCount
           ,le.sequence_number_ALLOW_ErrorCount
+          ,le.date_added_CUSTOM_ErrorCount
           ,le.risk_indicator_id_ALLOW_ErrorCount
           ,le.risk_indicator_level_ALLOW_ErrorCount
-          ,le.risk_indicator_category_ENUM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.risk_indicator_category_CUSTOM_ErrorCount
+          ,le.filename_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
