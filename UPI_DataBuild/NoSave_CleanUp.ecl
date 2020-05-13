@@ -11,6 +11,7 @@ EXPORT NoSave_CleanUp := MODULE
 	export str_base							:= 'BASE';											
 	export str_to_batch					:= 'TO_BATCH';							
 	export str_to_batch_metrics	:= 'TO_BATCH_METRICS';	
+	export str_slim_history			:= 'SLIM_HISTORY';
 	export str_delim 						:= '::';
 	export str_delim_secondary	:= '_';
 	export grace_period_days 		:= 5;
@@ -431,6 +432,7 @@ EXPORT NoSave_CleanUp := MODULE
 			ds_base							:= search_logical_files(asOfDate,'BASE');
 			ds_to_batch					:= search_logical_files(asOfDate,'TO_BATCH');
 			ds_to_batch_metrics	:= search_logical_files(asOfDate,'TO_BATCH_METRICS');
+			ds_slim_history			:= search_logical_files(asOfDate,'SLIM_HISTORY');
 			
 			ds_from_super				:= search_files_super_nosave(asOfDate,'FROM_BATCH');
 			ds_process_super		:= search_files_super_nosave(asOfDate,'PROCESSED_INPUT');
@@ -439,9 +441,10 @@ EXPORT NoSave_CleanUp := MODULE
 			ds_base_super				:= search_files_super_nosave(asOfDate,'BASE');
 			ds_to_batch_super		:= search_files_super_nosave(asOfDate,'TO_BATCH');
 			ds_metrics_super		:= search_files_super_nosave(asOfDate,'TO_BATCH_METRICS');
+			ds_slim_super				:= search_files_super_nosave(asOfDate,'SLIM_HISTORY');
 			
-			ds_logical := ds_from + ds_process + ds_asheader + ds_temp_header + ds_base + ds_to_batch + ds_to_batch_metrics;
-			ds_super	 := ds_from_super + ds_process_super + ds_asheader_super + ds_temp_super + ds_base_super + ds_to_batch_super + ds_metrics_super;
+			ds_logical := ds_from + ds_process + ds_asheader + ds_temp_header + ds_base + ds_to_batch + ds_to_batch_metrics + ds_slim_history;
+			ds_super	 := ds_from_super + ds_process_super + ds_asheader_super + ds_temp_super + ds_base_super + ds_to_batch_super + ds_metrics_super + ds_slim_super;
 			
 			//check for deletes needed - logicals
 			delete_overdue	 	:= ds_logical(days_till_delete < 0);
