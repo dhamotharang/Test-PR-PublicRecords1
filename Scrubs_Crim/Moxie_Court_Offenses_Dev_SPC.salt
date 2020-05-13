@@ -15,8 +15,8 @@ FIELDTYPE:Invalid_FCRADateFlag:ENUM(S|D|M|F|)
 FIELDTYPE:Invalid_ConOverDateFlag:ENUM(D|F|O|A|S|M|)
 FIELDTYPE:Invalid_OffenseScore:ENUM(U|F|M|I|)
 FIELDTYPE:Invalid_Num:ALLOW(0123456789)
-FIELDTYPE:Invalid_CourtOffLev:CUSTOM(Scrubs_Crim.fn_CourtOffensesV3Check>0,vendor)
-FIELDTYPE:Invalid_ArrOffLev:CUSTOM(Scrubs_Crim.fn_ArrestOffensesV3Check>0,vendor)
+FIELDTYPE:Invalid_CourtOffLev:CUSTOM(Scrubs_Crim.fn_v3Code_check>0,'COURT_OFF_LEV','COURT_OFFENSES')
+FIELDTYPE:Invalid_ArrOffLev:CUSTOM(Scrubs_Crim.fn_v3Code_check>0,'ARR_OFF_LEV','COURT_OFFENSES')
 
 
 FIELD:process_date:LIKE(Invalid_Current_Date):TYPE(STRING8):0,0

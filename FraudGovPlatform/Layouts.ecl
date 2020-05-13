@@ -280,6 +280,11 @@ EXPORT Layouts := MODULE
 			string10	Work_phone   ; 
 	END;	
 
+  EXPORT clean_Drivers_License := RECORD
+			string2		Drivers_License_State := '';
+			string25	Drivers_License  := '';
+  END;
+
 	EXPORT Provenance := RECORD
 				string75 FileName	:=''
 				,unsigned4 process_date	:=0
@@ -306,7 +311,8 @@ EXPORT Layouts := MODULE
 			unsigned3		file_type;
 			unsigned6		ind_type;
 			string100 	source := '';
-			Provenance;			
+			Provenance;
+      		clean_Drivers_License clean_Drivers_License;		
 		END;
 		EXPORT KnownFraud := RECORD
 			Sprayed.KnownFraud;
@@ -325,6 +331,7 @@ EXPORT Layouts := MODULE
 			unsigned6		ind_type;
 			string100 	source := '';
 			Provenance;
+      		clean_Drivers_License clean_Drivers_License;
 		END;
 		EXPORT Deltabase := RECORD
 			Sprayed.Deltabase;
@@ -339,6 +346,7 @@ EXPORT Layouts := MODULE
 			string12		cell_phone := '';
 			string100 	source := '';
 			Provenance;
+      		clean_Drivers_License clean_Drivers_License;
 		END;
 		
 		EXPORT ConfigRiskLevel	:= RECORD
@@ -362,7 +370,6 @@ EXPORT Layouts := MODULE
 		END;
 		
 	END;
-
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Id;
 		string2 	Customer_State;
@@ -376,7 +383,6 @@ EXPORT Layouts := MODULE
 		string 		Customer_Email; // Emails Separated by semicolon ";"
 		unsigned6 	fdn_file_info_id;
 	end;
-
 
 	EXPORT CustomerMappings := RECORD
 		unsigned6	fdn_file_info_id;
@@ -410,9 +416,11 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
-		
-		export RefreshProdDashVersion := Record
-		boolean RefreshVersion;
+
+
+		export CustomerActiveSprays := record 
+			string20 	Customer_Id;
+			string20	File_type;
 		end;
 	end;
 
