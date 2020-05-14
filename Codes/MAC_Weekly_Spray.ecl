@@ -30,24 +30,24 @@ import RoxieKeyBuild, PRTE, codes, Scrubs_Codes, lib_fileservices;
 %add_super% := fileservices.addsuperfile('~thor_data400::base::codes_v3','~thor_data400::in::codes_v3_'+filedate); 
 
 %check_codes% := IF(EXISTS(codes.Check_Codes),
-lib_fileservices.fileservices.sendemail('john.freibaum@lexisnexis.com','Check codes v3 updates', thorlib.WUID()),
+lib_fileservices.fileservices.sendemail('Darren.Knowles@lexisnexisrisk.com','Check codes v3 updates', thorlib.WUID()),
 
 output('ECL codes match')); 
 
 %build_keys% := Codes.Proc_build_keys(filedate);
 %build_keys_PRTE% := PRTE.Proc_Build_CodesV3_Keys(filedate);
-%updatedops% := RoxieKeyBuild.updateversion('CodesV3Keys',filedate,'john.freibaum@lexisnexis.com',,'N|F|B');
+%updatedops% := RoxieKeyBuild.updateversion('CodesV3Keys',filedate,'Darren.Knowles@lexisnexisrisk.com',,'N|F|B');
 %updateidops% 		:= RoxieKeyBuild.updateversion('CodesV3Keys',filedate,'jfreibaum@seisint.com',,'N|T|F',,,'A');  
 %update_orbiti% 	:= Codes.Proc_Orbiti_CreateBuild(filedate);
 
 
 %e_mail_success% := fileservices.sendemail(
-                                  'john.freibaum@lexisnexis.com',
+                                  'Darren.Knowles@lexisnexisrisk.com',
                                   'Codes_V3 Roxie Build Succeeded ' + filedate,'keys: 1) thor_data400::key::codes_v3_qa(thor_data400::key::codes::'+filedate+'::codes_v3),\n' + 
                                   ' have been built and ready to be deployed to QA.');
                                                                                                                 
 %e_mail_fail% := fileservices.sendemail(
-                                  'john.freibaum@lexisnexis.com',
+                                  'Darren.Knowles@lexisnexisrisk.com',
                                   'Codes_V3 Roxie Build FAILED', failmessage);
 
                 // To kick off the script in 10.194.72.226 (Ananth)
@@ -63,7 +63,7 @@ output('ECL codes match'));
   
 sequential(%spray_file%,%clear_super_csv%,%add_super_csv%,
 output(%preprocess%,,'~thor_data400::in::codes_v3_'+filedate,overwrite), %clear_super%,%add_super%, 
-%build_keys%, %build_keys_PRTE%, %updatedops%, /*%alphacopy%,*/%updateidops%, Scrubs_Codes.fn_RunScrubs(filedate,'john.freibaum@lexisnexis.com'),%update_orbiti%) : success(%e_mail_success%), failure(%e_mail_fail%);
+%build_keys%, %build_keys_PRTE%, %updatedops%, /*%alphacopy%,*/%updateidops%, Scrubs_Codes.fn_RunScrubs(filedate,'Darren.Knowles@lexisnexisrisk.com'),%update_orbiti%) : success(%e_mail_success%), failure(%e_mail_fail%);
 endmacro;
 
 
