@@ -802,11 +802,14 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 													,self.fdn_file_info_id := left.fdn_file_info_id
 													,self:=right)):independent;
 
-			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
 
-			Append_DLN := Best_DLN(BestInfo_Update).All;
+			Append_DLN := Best_DLN(BestInfo_base_map).All;
 
-			Export all := Append_DLN;
+			BestInfo_Update	:= if(UpdatePii,dedup((Append_DLN + BestInfo_base),all),Append_DLN);
+
+			
+
+			Export all := BestInfo_Update;
 								
 	END;
 
