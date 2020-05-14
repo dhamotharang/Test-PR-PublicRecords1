@@ -1,4 +1,4 @@
-
+// This module stores the core layouts
 
 header := Header_Anomalies.Files.Header; 
 watchdog := Header_Anomalies.Files.Watchdog; 
