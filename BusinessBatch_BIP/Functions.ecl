@@ -1,4 +1,4 @@
-﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts, 
+﻿﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts, 
        Business_Risk, Business_Risk_BIP, BusinessBatch_BIP, Codes, Corp2, DCAV2,
        diversity_certification, Doxie, FAA, Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
        MDR, TopBusiness_Services, OSHAIR, Risk_Indicators, SAM, STD, Suppress,
@@ -38,7 +38,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
     EXPORT boolean includeMinors := FALSE;
   END;
 
-  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
+  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SearchKeyData(mod_access);
 
   TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
                               ds_bestInfoBatchProxIdRestricted,

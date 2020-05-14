@@ -18,7 +18,7 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
         SELF.acctno        := (STRING)LEFT.seq,
         SELF               := []));
 
-    ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).Data2_;		
+    ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).SearchKeyData(mod_access);		
 
     ds_linkIDs_deduped := DEDUP(SORT(ds_linkIDs, AcctNo, -weight, UltID, OrgID, SeleID, ProxID, PowID), AcctNo);
 
