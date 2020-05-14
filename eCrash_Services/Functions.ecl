@@ -1,4 +1,4 @@
-﻿import iesp, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
+﻿import iesp, ut, FLAccidents_Ecrash, doxie, Std, eCrash_Services;
 
 export Functions := MODULE
 
@@ -518,6 +518,7 @@ export Functions := MODULE
 					self.JurisdictionState := l.jurisdiction_state,
 					self.Jurisdiction :=l.jurisdiction,
 					self.IsReadyForPublic :=trim(l.is_available_for_public) = '1' or l.report_code in eCrash_Services.constants.Inhouse_src;
+					self.IncidentId := l.vehicle_incident_id;
 					//getting involved parties from the latest report
 					InvolvedParties := r(report_id = l.report_id);
 					

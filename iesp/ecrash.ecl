@@ -83,6 +83,7 @@ export t_ECrashSearchRecordData := record (t_ECrashSearchShared)
 	string ReportHashKey {xpath('ReportHashKey')};
 	boolean HasCoverSheet {xpath('HasCoverSheet')};
 	boolean IsReadyForPublic {xpath('IsReadyForPublic')};
+	string IncidentId {xpath('IncidentId')};
 	string StateReportNumber {xpath('StateReportNumber')};
 	dataset(t_ECrashInvolvedParty) InvolvedParties {xpath('InvolvedParties/Party'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Involved_Parties)};
 	string SuperReportID {xpath('SuperReportID')};
@@ -121,6 +122,7 @@ export t_ECrashSearchRecord := record
 	string ReportHashKey {xpath('ReportHashKey')};
 	boolean HasCoverSheet {xpath('HasCoverSheet')};
 	boolean IsReadyForPublic {xpath('IsReadyForPublic')};
+	string IncidentId {xpath('IncidentId')};
 	string StateReportNumber {xpath('StateReportNumber')};
 	dataset(t_ECrashInvolvedParty) InvolvedParties {xpath('InvolvedParties/Party'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Involved_Parties)};
 	string SuperReportID {xpath('SuperReportID')};
