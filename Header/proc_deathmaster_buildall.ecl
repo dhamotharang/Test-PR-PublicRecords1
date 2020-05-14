@@ -38,7 +38,7 @@ FUNCTION
 											,Header.proc_deathmaster_buildkey_ssa(filedate)
 											,Death_Master.proc_autokeybuild(filedate)
 											,Death_Master.proc_autokeybuild_ssa(filedate)
-											,Death_master.Proc_Build_Boolean_key(filedate)
+											//,Death_master.Proc_Build_Boolean_key(filedate)
 											,Death_master.Proc_Build_Boolean_key_ssa(filedate)
 											,Header.out_base_dev_stats_deaths(filedate)
 											,Header.out_base_dev_stats_deaths_ssa(filedate)
