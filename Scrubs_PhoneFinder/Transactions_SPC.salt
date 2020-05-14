@@ -16,8 +16,8 @@ FIELDTYPE:Invalid_Forward:ENUM(FORWARDED|NOT FORWARDED|\\N|)
 FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)
 FIELDTYPE:Invalid_Zip:LIKE(Invalid_No):LENGTHS(0,2,5)
 FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,2,9,10)
-FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Fun.Split_Date > 0)
-FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Fun.Check_File > 0)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)
+FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)
 
 FIELD:transaction_id:TYPE(STRING16):LIKE(Invalid_ID):0,0
 FIELD:transaction_date:TYPE(STRING20):LIKE(Invalid_Date):0,0

@@ -1,6 +1,6 @@
 IMPORT STD, Scrubs;
 
-EXPORT Fun := MODULE 
+EXPORT Functions := MODULE 
 
     EXPORT Split_Date(string st) := FUNCTION 
 
