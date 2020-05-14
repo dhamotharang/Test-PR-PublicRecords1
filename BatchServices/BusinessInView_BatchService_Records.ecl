@@ -1,4 +1,4 @@
-import iesp, BatchServices, ut, Business_Header, DNB, Gateway, STD;
+﻿import iesp, BatchServices, ut, Business_Header, DNB, Gateway, STD, Doxie;
 
 export BusinessInView_BatchService_Records := module
 
@@ -212,6 +212,7 @@ layout_with_dt_last_seen
 					END;
 								
 duns_num_only := JOIN(batch_input(duns_num <> ''),DNB.key_DNB_DunsNum, KEYED(LEFT.duns_num=RIGHT.duns)
+           AND Doxie.DataPermission.use_DNB
 											AND RIGHT.record_type = 'C',
 											Xfm_joined_recset(LEFT, RIGHT));
 											
