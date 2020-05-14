@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService" wuTimeout="300000">
 	<part name="DunsNumber" 		type="xsd:string"/>
 	<part name="Phone" 			type='xsd:string'/>
@@ -53,6 +53,7 @@ export SearchService := MACRO
 		tempmod := module(project(AutoStandardI.GlobalModule(),dnb_Services.SearchService_Records.params,opt))
 			EXPORT string15 Duns_Number := '' : stored('DunsNumber');
 			export PenaltThreshold := 10 : stored('PenaltThreshold');
+   EXPORT DataPermissionMask := '' : STORED('DataPermissionMask');
 			end;
 		tmp := DNB_Services.SearchService_Records.val(tempmod);
 		

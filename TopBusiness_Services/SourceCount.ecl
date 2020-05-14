@@ -11,6 +11,7 @@ EXPORT SourceCount(
       EXPORT application_type := in_options.app_type;
       EXPORT ssn_mask := in_options.ssn_mask;
       EXPORT DataRestrictionMask := in_mod.DataRestrictionMask;
+      EXPORT DataPermissionMask := '' : STORED('DataPermissionMask');
       EXPORT dppa := in_mod.DPPAPurpose;
       EXPORT glb := in_mod.GLBPurpose;
       EXPORT show_minors := in_mod.IncludeMinors;
