@@ -5,9 +5,16 @@ EXPORT GetDIDs(DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn, BOOLEA
 FUNCTION
   lBatchInDID := PhoneFinder_Services.Layouts.BatchInAppendDID;
 
+  rADLSeq_Layout := RECORD(Autokey_batch.Layouts.rec_inBatchMaster)
+    	UNSIGNED8   adl_seq := 0;
+  END;
+
+  //Adding a unique Seq number for ADL processing
+  dBatch_ADLseq := PROJECT (dBatchIn,  TRANSFORM (rADLSeq_Layout, SELF.adl_seq := COUNTER, SELF := LEFT));
+
   // ADL process to get dids for pii search
-  didville.Layout_Did_OutBatch tFormat2ADLInput(Autokey_batch.Layouts.rec_inBatchMaster l) := TRANSFORM
-    SELF.seq     := l.seq;
+  didville.Layout_Did_OutBatch tFormat2ADLInput(rADLSeq_Layout l) := TRANSFORM
+    SELF.seq     := l.adl_seq;
     SELF.phone10 := l.homephone;
     SELF.fname   := l.name_first;
     SELF.mname   := l.name_middle;
@@ -17,7 +24,7 @@ FUNCTION
     SELF         := [];
   END;
 
-  dADLBatchIn := PROJECT(dBatchIn, tFormat2ADLInput(LEFT));
+  dADLBatchIn := PROJECT(dBatch_ADLseq, tFormat2ADLInput(LEFT));
 
   // append did
   Didville.MAC_DidAppend(dADLBatchIn, dADLBatchOut, getBest, '');
@@ -37,7 +44,7 @@ FUNCTION
 
   dCntDIDs := ROLLUP(dFormat2CntDIDs, seq, tCntDIDs(LEFT, RIGHT));
 
-  lBatchInDID tFormat2In(Autokey_batch.Layouts.rec_inBatchMaster le, rCntDIDs_Layout ri) :=
+  lBatchInDID tFormat2In(rADLSeq_Layout le, rCntDIDs_Layout ri) :=
   TRANSFORM
     SELF.did       := ri.did;
     SELF.did_count := ri.did_count;
@@ -45,9 +52,9 @@ FUNCTION
     SELF           := le;
   END;
 
-  dWithDIDs := JOIN(dBatchIn,
+  dWithDIDs := JOIN(dBatch_ADLseq,
                     dCntDIDs,
-                    LEFT.seq = RIGHT.seq,
+                    LEFT.adl_seq = RIGHT.seq,
                     tFormat2In(LEFT, RIGHT),
                     LIMIT(0), KEEP(1));
 
