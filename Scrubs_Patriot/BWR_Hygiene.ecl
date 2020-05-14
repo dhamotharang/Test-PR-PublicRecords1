@@ -1,0 +1,135 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_Patriot.BWR_Hygiene - Hygiene & Stats - SALT V3.11.11');
+IMPORT Scrubs_Patriot,SALT311;
+// First create an instantiated hygiene module
+  infile := Scrubs_Patriot.In_Patriot;
+  ip := DISTRIBUTE(infile, SKEW(0.1));
+  h := Scrubs_Patriot.hygiene(ip);
+  p := h.AllProfiles; // Detailed profile of every field
+  OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
+  OUTPUT(h.SourceCounts,ALL,NAMED('SourceCounts'));
+  OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
+  OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
+  OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
+  OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_Patriot'),NAMED('OptimizedLayout'));// File layout suggested by data
+  // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
+  OUTPUT(SALT311.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  // ****** Cross Tabs *******
+  // It is possible to create a cross table between any two fields, see documentation on SALT311.MAC_CrossTab
+  // These commented out lines will create crosstabs from the sourcefield to each individual field
+  // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
+   Examples := 10;
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,pty_key,Examples),NAMED('pty_keyBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,source,Examples),NAMED('sourceBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,orig_pty_name,Examples),NAMED('orig_pty_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,orig_vessel_name,Examples),NAMED('orig_vessel_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,country,Examples),NAMED('countryBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,name_type,Examples),NAMED('name_typeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_1,Examples),NAMED('addr_1Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_2,Examples),NAMED('addr_2Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_3,Examples),NAMED('addr_3Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_4,Examples),NAMED('addr_4Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_5,Examples),NAMED('addr_5Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_6,Examples),NAMED('addr_6Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_7,Examples),NAMED('addr_7Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_8,Examples),NAMED('addr_8Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_9,Examples),NAMED('addr_9Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_10,Examples),NAMED('addr_10Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_1,Examples),NAMED('remarks_1Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_2,Examples),NAMED('remarks_2Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_3,Examples),NAMED('remarks_3Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_4,Examples),NAMED('remarks_4Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_5,Examples),NAMED('remarks_5Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_6,Examples),NAMED('remarks_6Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_7,Examples),NAMED('remarks_7Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_8,Examples),NAMED('remarks_8Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_9,Examples),NAMED('remarks_9Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_10,Examples),NAMED('remarks_10Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_11,Examples),NAMED('remarks_11Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_12,Examples),NAMED('remarks_12Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_13,Examples),NAMED('remarks_13Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_14,Examples),NAMED('remarks_14Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_15,Examples),NAMED('remarks_15Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_16,Examples),NAMED('remarks_16Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_17,Examples),NAMED('remarks_17Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_18,Examples),NAMED('remarks_18Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_19,Examples),NAMED('remarks_19Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_20,Examples),NAMED('remarks_20Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_21,Examples),NAMED('remarks_21Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_22,Examples),NAMED('remarks_22Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_23,Examples),NAMED('remarks_23Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_24,Examples),NAMED('remarks_24Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_25,Examples),NAMED('remarks_25Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_26,Examples),NAMED('remarks_26Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_27,Examples),NAMED('remarks_27Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_28,Examples),NAMED('remarks_28Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_29,Examples),NAMED('remarks_29Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,remarks_30,Examples),NAMED('remarks_30Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,cname,Examples),NAMED('cnameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,title,Examples),NAMED('titleBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,fname,Examples),NAMED('fnameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,mname,Examples),NAMED('mnameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,lname,Examples),NAMED('lnameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,suffix,Examples),NAMED('suffixBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,a_score,Examples),NAMED('a_scoreBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,prim_range,Examples),NAMED('prim_rangeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,predir,Examples),NAMED('predirBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,prim_name,Examples),NAMED('prim_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,addr_suffix,Examples),NAMED('addr_suffixBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,postdir,Examples),NAMED('postdirBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,unit_desig,Examples),NAMED('unit_desigBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,sec_range,Examples),NAMED('sec_rangeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,p_city_name,Examples),NAMED('p_city_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,v_city_name,Examples),NAMED('v_city_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,st,Examples),NAMED('stBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,zip,Examples),NAMED('zipBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,zip4,Examples),NAMED('zip4Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,cart,Examples),NAMED('cartBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,cr_sort_sz,Examples),NAMED('cr_sort_szBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,lot,Examples),NAMED('lotBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,lot_order,Examples),NAMED('lot_orderBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,dpbc,Examples),NAMED('dpbcBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,chk_digit,Examples),NAMED('chk_digitBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,record_type,Examples),NAMED('record_typeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,ace_fips_st,Examples),NAMED('ace_fips_stBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,county,Examples),NAMED('countyBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,geo_lat,Examples),NAMED('geo_latBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,geo_long,Examples),NAMED('geo_longBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,msa,Examples),NAMED('msaBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,geo_blk,Examples),NAMED('geo_blkBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,geo_match,Examples),NAMED('geo_matchBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,err_stat,Examples),NAMED('err_statBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,global_sid,Examples),NAMED('global_sidBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,record_sid,Examples),NAMED('record_sidBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,did,Examples),NAMED('didBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_prim_range,Examples),NAMED('aid_prim_rangeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_predir,Examples),NAMED('aid_predirBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_prim_name,Examples),NAMED('aid_prim_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_addr_suffix,Examples),NAMED('aid_addr_suffixBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_postdir,Examples),NAMED('aid_postdirBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_unit_desig,Examples),NAMED('aid_unit_desigBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_sec_range,Examples),NAMED('aid_sec_rangeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_p_city_name,Examples),NAMED('aid_p_city_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_v_city_name,Examples),NAMED('aid_v_city_nameBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_st,Examples),NAMED('aid_stBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_zip,Examples),NAMED('aid_zipBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_zip4,Examples),NAMED('aid_zip4Bysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_cart,Examples),NAMED('aid_cartBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_cr_sort_sz,Examples),NAMED('aid_cr_sort_szBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_lot,Examples),NAMED('aid_lotBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_lot_order,Examples),NAMED('aid_lot_orderBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_dpbc,Examples),NAMED('aid_dpbcBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_chk_digit,Examples),NAMED('aid_chk_digitBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_record_type,Examples),NAMED('aid_record_typeBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_fips_st,Examples),NAMED('aid_fips_stBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_county,Examples),NAMED('aid_countyBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_geo_lat,Examples),NAMED('aid_geo_latBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_geo_long,Examples),NAMED('aid_geo_longBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_msa,Examples),NAMED('aid_msaBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_geo_blk,Examples),NAMED('aid_geo_blkBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_geo_match,Examples),NAMED('aid_geo_matchBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,aid_err_stat,Examples),NAMED('aid_err_statBysrc_key'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,src_key,append_rawaid,Examples),NAMED('append_rawaidBysrc_key'));

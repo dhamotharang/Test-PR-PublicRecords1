@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
 IMPORT KEL12 AS KEL;
 IMPORT B_Vehicle_5,B_Vehicle_7,CFG_Compile,E_Vehicle,FN_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle_4(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Vehicle_5(__cfg).__ENH_Vehicle_5) __ENH_Vehicle_5 := B_Vehicle_5(__cfg).__ENH_Vehicle_5;
-  SHARED __EE37547 := __ENH_Vehicle_5;
-  EXPORT __ST9866_Layout := RECORD
+  SHARED __EE37542 := __ENH_Vehicle_5;
+  EXPORT __ST9861_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -126,10 +126,10 @@ EXPORT B_Vehicle_4(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST9866_Layout __ND37789__Project(B_Vehicle_7(__cfg).__ST11253_Layout __PP36949) := TRANSFORM
-    SELF.Flag_Other_ := __OP2(__PP36949.Vehicle_Type_,IN,__CN(['Work Vehicle','ATV/Off Road Motorcycle/Side by Side','Scooter','Camper/Motorhome','Street/Racing Motorcycle']));
-    SELF.Flag_Vina_Make_Desc_ := FN_Compile(__cfg).FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP36949.Vina_Make_Description_));
-    SELF := __PP36949;
+  SHARED __ST9861_Layout __ND37784__Project(B_Vehicle_7(__cfg).__ST11248_Layout __PP36944) := TRANSFORM
+    SELF.Flag_Other_ := __OP2(__PP36944.Vehicle_Type_,IN,__CN(['Work Vehicle','ATV/Off Road Motorcycle/Side by Side','Scooter','Camper/Motorhome','Street/Racing Motorcycle']));
+    SELF.Flag_Vina_Make_Desc_ := FN_Compile(__cfg).FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP36944.Vina_Make_Description_));
+    SELF := __PP36944;
   END;
-  EXPORT __ENH_Vehicle_4 := PROJECT(__EE37547,__ND37789__Project(LEFT));
+  EXPORT __ENH_Vehicle_4 := PROJECT(__EE37542,__ND37784__Project(LEFT));
 END;

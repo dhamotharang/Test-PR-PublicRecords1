@@ -1,4 +1,4 @@
-MODULE:Scrubs_Crim
+﻿MODULE:Scrubs_Crim
 FILENAME:crim
 NAMESCOPE:Moxie_DOC_Offenses_Dev
 SOURCEFIELD:vendor
@@ -9,7 +9,7 @@ FIELDTYPE:Non_Blank:LENGTHS(1..)
 FIELDTYPE:Invalid_Num:ALLOW(0123456789 )
 FIELDTYPE:Invalid_Off_Typ:ENUM(F|M|I| )
 FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012456789)
-FIELDTYPE:Invalid_CtyConvCd:ENUM(AA|99|)
+FIELDTYPE:Invalid_CtyConvCd:ENUM(AA|99|17|PA|)
 FIELDTYPE:Invalid_FCRAConFlag:ENUM(D|U|)
 FIELDTYPE:Invalid_FCRATrafficFlag:ALLOW(N)
 FIELDTYPE:Invalid_FCRADateFlag:ENUM(S|I|D|B|)
