@@ -5,6 +5,7 @@ EXPORT Files := MODULE
 	export	Hdr_Out := dataset(cortera.Constants.sfCorteraHdr, cortera.Layout_Header_Out, thor);
 	export	Attributes := dataset(cortera.Constants.sfAttributes, Cortera.Layout_Attributes_Out, thor);
 	export	Executives := dataset(cortera.Constants.sfExecutives, cortera.Layout_Executives, thor);
+	export	ExecLinkID := dataset(cortera.Constants.sfExecLinkID, cortera.Layout_ExecLinkID, thor);
 	// fAs_Business_Header - Needed for Business Header Build per Vern Bentley
 	export	Bus_hdr := dataset('~thor_data400::cortera::out::20170131::business',Business_Header.Layout_Business_Header_New, thor);
 
