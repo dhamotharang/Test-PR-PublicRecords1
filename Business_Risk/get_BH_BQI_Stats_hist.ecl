@@ -1,6 +1,7 @@
-﻿IMPORT Gong, dx_header, DNB, IRS5500, Business_Header, riskwise;
+﻿﻿IMPORT Gong, dx_header, DNB, IRS5500, Business_Header, riskwise, doxie;
 
-export get_BH_BQI_Stats_hist(dataset(Business_Risk.Layout_Output) biid) := FUNCTION
+export get_BH_BQI_Stats_hist(dataset(Business_Risk.Layout_Output) biid,
+                             doxie.IDataAccess mod_access) := FUNCTION
 
 slim_layout := record
 	unsigned seq;
@@ -239,11 +240,11 @@ l_temp append_dunsnumber(with_address_counts le, dnb.Key_DNB_BDID rt) := transfo
 end;
 
 duns_number := join(with_address_counts, dnb.key_dnb_bdid, 
-						  keyed(left.bdid=right.bd),
+						  keyed(left.bdid=right.bd) and mod_access.use_DNB(),
 						  append_dunsnumber(left, right), 
 						  ATMOST(keyed(left.bdid=right.bd), RiskWise.max_atmost), keep(1),
 						  left outer);
-// output(duns_number);
+ //output(duns_number);
 
 
 
@@ -251,7 +252,7 @@ duns_number := join(with_address_counts, dnb.key_dnb_bdid,
 
 
 bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
-					keyed(left.dn=right.duns) and
+					keyed(left.dn=right.duns) and mod_access.use_DNB() and
 					 right.active_duns_number = 'Y' and right.record_type = 'C' and
 					 (unsigned)right.date_first_seen[1..6] < left.historydate, 
 					transform(l_temp, 
@@ -266,7 +267,7 @@ bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 							ATMOST(keyed(left.dn=right.duns),RiskWise.max_atmost),
 					keep(100));
 
-// output(bs_dnb, named('bs_dnb'));
+ //output(bs_dnb, named('bs_dnb'));
 
 bs_dnb_dedup := DEDUP(SORT(bs_dnb, bdid, -dnb_date_last_seen), bdid);
 // output(bs_dnb_dedup, named('bs_dnb_dedup'));
