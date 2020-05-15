@@ -62,7 +62,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
-					and left.ClientId=right.ClientId,
+					and left.ClientId=right.ClientId
+					AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No client matches
@@ -71,7 +72,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
-					and left.ClientId=right.ClientId,
+					and left.ClientId=right.ClientId
+					AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		// case matched
@@ -79,7 +81,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					left.GroupId=right.GroupId
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId,
+					and left.CaseId=right.CaseId
+					AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No case matches
@@ -87,13 +90,19 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					left.GroupId=right.GroupId
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId,
+					and left.CaseId=right.CaseId
+					AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		
 		return ds_cl_match + ds_ca_match + ds_ca_nomatch;
 END;
 
+/**
+In order to support superfiles, we no longer deduo here.
+The records are now deduped when the file is processed. Dedupe occurs only within a file.
+
+**/
 
 EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
 
@@ -101,9 +110,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
 										)), hash32(CaseId));
-										
-	cases := DEDUP(SORT(ca1(errors=0), CaseId,ProgramState,ProgramCode,GroupId, -seqnum, local),
-									CaseId,ProgramState,ProgramCode,GroupId, local);
+
+	cases := $.fn_rollupCases(ca1(errors=0));
 
 	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
@@ -111,16 +119,14 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 											)
 										), HASH32(ClientId));
 
-	clients := DEDUP(SORT(cl1(errors=0), ClientId,CaseId,ProgramState,ProgramCode,GroupId,-seqnum, local),
-									ClientId,CaseId,ProgramState,ProgramCode,GroupId, local);
+	clients := cl1(errors=0);
 
 	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));
 
-	addresses := DEDUP(SORT(ad1(errors=0), CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType,-seqnum, local),
-									CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local);
+	addresses := ad1(errors=0);
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;
@@ -147,11 +153,12 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								));
 
 	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
+							DISTRIBUTE(clients, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
 								left.GroupId=right.GroupId
 								AND left.ProgramState=right.ProgramState
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
+								AND left.CaseId=right.CaseId
+								AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
 					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
@@ -205,11 +212,12 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					
 	// add head of household as case name
 	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients(HHIndicator='Y'), HASH32(ProgramState,ProgramCode,CaseId)),
+							DISTRIBUTE(clients(HHIndicator='Y'), HASH32(ProgramState,ProgramCode,CaseId)),
 								left.GroupId=right.GroupId
 								AND left.ProgramState=right.ProgramState
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
+								AND left.CaseId=right.CaseId
+								AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
 					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);

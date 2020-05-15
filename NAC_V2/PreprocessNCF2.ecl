@@ -2,9 +2,10 @@
 
 /*
 
-	Perform preliminary processing
-		1.	Field level validation
-		2.	Set dates
+	Perform preliminary processing on a new file or superfile
+    1. Remove duplicate record types. The last record in the file is used	
+    2. Field level validation
+		2. Rollup up records in the case of 
 
 */
 
@@ -32,7 +33,6 @@ EXPORT PreprocessNCF2(string ilfn) := function
 
 	clients1 := 	NAC_V2.proc_CleanClients(
 									Nac_V2.mod_Validation.ClientFile(GetClients(ilfn)));
-
 
 	// address validation requires cleaned addresses
 	addresses1 := 	Nac_V2.mod_Validation.AddressFile(
