@@ -6,24 +6,30 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
                                                               pRetries = 0,
                                                               BOOLEAN pMakeGatewayCall = FALSE) := FUNCTION
                                 
-gateway_URL :=  pGWCfg.url;
+    gateway_URL :=  pGWCfg.url;
 
-IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoResponseEx onError(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest le) := transform
-    self.response._Header.message := FAILMESSAGE;
-    self.response._header.status := FAILCODE;
-    self := [];
-end;
+    DTEGetRequestInfoResponseWithErrorHandling := RECORD
+    STRING ErrorMessage := '';
+    INTEGER ErrorCode := 0;
+    IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoResponseEx;
+    END;
 
-d_recs_out := IF(pMakeGatewayCall, SOAPCALL(recs_in,
-gateway_URL,
-'DTEGetRequestInfo', 
-{recs_in},
-dataset(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoResponseEx),
-XPATH('DTEGetRequestInfoResponse'),
-ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
+    DTEGetRequestInfoResponseWithErrorHandling onError(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest le) := transform
+        SELF.ErrorMessage := FAILMESSAGE;
+        SELF.ErrorCode := FAILCODE;
+        self := [];
+    end;
 
-ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
+    d_recs_out := IF(pMakeGatewayCall, SOAPCALL(recs_in,
+    gateway_URL,
+    'DTEGetRequestInfo', 
+    {recs_in},
+    dataset(DTEGetRequestInfoResponseWithErrorHandling),
+    XPATH('DTEGetRequestInfoResponse'),
+    ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
 
-RETURN ParsedJSON;	
-            
+    ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
+
+    RETURN ParsedJSON;	
+
 END;

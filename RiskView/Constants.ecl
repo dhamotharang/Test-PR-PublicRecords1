@@ -67,6 +67,13 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
+export StatusRefresh_error_desc(string5 error_code) := FUNCTION
+    desc := map(
+			trim(error_code) = '22OKC' => 'Error occurred in status refresh.',
+			'');
+	return desc;
+END;
+
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 
 export set_alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
