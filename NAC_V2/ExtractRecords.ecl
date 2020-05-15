@@ -5,7 +5,9 @@ GetFileName(string ilfn) := FUNCTION
 		n := COUNT(s1);
 		return s1[n];
 END;
+
 RightNow := Std.Date.Today();
+
 EXPORT ExtractRecords(string ilfn) := MODULE
 
 	shared rNac := RECORD
@@ -99,9 +101,20 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										self := [];
 										));
 										
+		export badRecords :=	
+							PROJECT(nacin(RecordCode NOT IN Nac_V2.Layouts2.validRecordCodes),
+								TRANSFORM(Nac_V2.Layouts2.rBadRecord,
+										self := LEFT.BadRec;
+										self.RecordCode := left.RecordCode;
+							));
+
+										
 		export types := 
 			TABLE(nacin, {nacin.RecordCode, n := COUNT(GROUP)}, RecordCode, few);
-			
+		
+		export filenames := 
+			TABLE(nacin, {nacin.filename, n := COUNT(GROUP)}, filename, few);
+		
 		export RecordCount := COUNT(nacin);
 
 END;
