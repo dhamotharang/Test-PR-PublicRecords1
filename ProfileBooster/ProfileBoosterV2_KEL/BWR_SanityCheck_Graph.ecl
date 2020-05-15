@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL12 AS KEL;
 IMPORT CFG_Graph,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;

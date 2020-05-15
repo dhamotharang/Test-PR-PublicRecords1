@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT CFG_Compile,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle_9(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Vehicle(__cfg).__Result) __E_Vehicle := E_Vehicle(__cfg).__Result;
-  SHARED __EE14946 := __E_Vehicle;
-  EXPORT __ST11900_Layout := RECORD
+  SHARED __EE14951 := __E_Vehicle;
+  EXPORT __ST11905_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -122,10 +122,10 @@ EXPORT B_Vehicle_9(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST11900_Layout __ND15181__Project(E_Vehicle(__cfg).Layout __PP14361) := TRANSFORM
-    SELF.Vina_Body_Style_Vehicle_Type_ := __OP2(__OP2(__FN1(KEL.Routines.TrimBoth,__PP14361.Vina_Body_Style_Description_),+,__CN('-')),+,__FN1(KEL.Routines.TrimBoth,__PP14361.Vina_Vehicle_Type_));
-    SELF.Vina_Model_Date_ := __ECAST(KEL.typ.nstr,__FN3(KEL.Routines.DateFromParts,__OP2(__PP14361.Vina_Model_Year_,-,__CN(1)),__CN(1),__CN(1)));
-    SELF := __PP14361;
+  SHARED __ST11905_Layout __ND15186__Project(E_Vehicle(__cfg).Layout __PP14366) := TRANSFORM
+    SELF.Vina_Body_Style_Vehicle_Type_ := __OP2(__OP2(__FN1(KEL.Routines.TrimBoth,__PP14366.Vina_Body_Style_Description_),+,__CN('-')),+,__FN1(KEL.Routines.TrimBoth,__PP14366.Vina_Vehicle_Type_));
+    SELF.Vina_Model_Date_ := __ECAST(KEL.typ.nstr,__FN3(KEL.Routines.DateFromParts,__OP2(__PP14366.Vina_Model_Year_,-,__CN(1)),__CN(1),__CN(1)));
+    SELF := __PP14366;
   END;
-  EXPORT __ENH_Vehicle_9 := PROJECT(__EE14946,__ND15181__Project(LEFT));
+  EXPORT __ENH_Vehicle_9 := PROJECT(__EE14951,__ND15186__Project(LEFT));
 END;

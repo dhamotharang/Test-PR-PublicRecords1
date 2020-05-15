@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_1,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_Vehicle,B_Person_Vehicle_1,B_Person_Vehicle_10,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Person_Vehicle_4,B_Person_Vehicle_5,B_Person_Vehicle_6,B_Person_Vehicle_7,B_Person_Vehicle_8,B_Person_Vehicle_9,B_Vehicle,B_Vehicle_1,B_Vehicle_2,B_Vehicle_3,B_Vehicle_4,B_Vehicle_5,B_Vehicle_6,B_Vehicle_7,B_Vehicle_8,B_Vehicle_9,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
@@ -17,10 +17,14 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     KEL.typ.nuid UID;
     UNSIGNED4 __Part;
   END;
-  SHARED __Person_KeyList_1 := PROJECT(__Params,TRANSFORM(__UIDLayout,SELF.UID:=__CN(LEFT.Lex_I_D__in_),SELF.__Part:=LEFT.__Part));
-  SHARED __Person_KeyList := __Person_KeyList_1;
+  SHARED __Person_KeyList_2 := PROJECT(__Params,TRANSFORM(__UIDLayout,SELF.UID:=__CN(LEFT.Lex_I_D__in_),SELF.__Part:=LEFT.__Part));
+  SHARED __FC345445(__UIDLayout __l, B_Person_Vehicle(__cfg_Local).__ST458876_Layout __r) := KEYED(KEL.Indexing.Key(__r.Subject_) = __T(__l.UID));
+  SHARED __Person_Vehicle_KeyList_1 := JOIN(__Person_KeyList_2,B_Person_Vehicle(__cfg_Local).IDX_Person_Vehicle_Subject_,__FC345445(LEFT,RIGHT),TRANSFORM(E_Person_Vehicle(__cfg_Local).PreEntityLayout,SELF.__Part:=LEFT.__Part,SELF.Subject_:=__CN(RIGHT.Subject_),SELF:=RIGHT),ATMOST(10000));
+  SHARED __Vehicle_KeyList := PROJECT(__Person_Vehicle_KeyList_1,TRANSFORM(__UIDLayout,SELF.UID:=LEFT.Automobile_,SELF.__Part:=LEFT.__Part));
+  SHARED __Person_KeyList := __Person_KeyList_2;
+  SHARED __Person_Vehicle_KeyList := __Person_Vehicle_KeyList_1;
   SHARED E_Person_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__cfg))
-    EXPORT __PreEntities := JOIN(DEDUP(__Person_KeyList,RECORD,ALL),B_Person(__cfg).IDX_Person_UID,KEL.Indexing.Key(RIGHT.UID) = __T(LEFT.UID),TRANSFORM(PreEntityLayout,SELF.__Part:=LEFT.__Part,SELF.UID:=__CN(RIGHT.UID),SELF:=RIGHT));
+    EXPORT __PreEntities := JOIN(DEDUP(__Person_KeyList,RECORD,ALL),B_Person(__cfg).IDX_Person_UID,KEYED(KEL.Indexing.Key(RIGHT.UID) = __T(LEFT.UID)),TRANSFORM(PreEntityLayout,SELF.__Part:=LEFT.__Part,SELF.UID:=__CN(RIGHT.UID),SELF:=RIGHT),ATMOST(10000));
     __PreEntityPayloadFilter(DATASET(PreEntityPayloadLayout) __ds, RECORDOF(__Partitions) __p) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__p.__Asof))) AND (__ds.__Permits & __p.__Using) = __ds.__Permits);
     __PreentitiesFiltered := PROJECT(__PreEntities,TRANSFORM(PreEntityLayout,SELF.__Payload:=__PreEntityPayloadFilter(LEFT.__Payload,ROW((__PartDict)[LEFT.__Part],RECORDOF(__Partitions))),SELF:=LEFT));
     ExpandedPreEntityLayout ToExpandedPreEntity(PreEntityLayout __r) := TRANSFORM
@@ -31,7 +35,7 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     SHARED VIRTUAL __PreEntityFilter(DATASET(ExpandedPreEntityLayout) __ds) := __PreentitiesExpandedFiltered;
   END;
   SHARED E_Person_Vehicle_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person_Vehicle(__cfg))
-    EXPORT __PreEntities := JOIN(B_Person_Vehicle(__cfg).IDX_Person_Vehicle_Subject__Wrapped,__Partitions,TRUE,TRANSFORM(E_Person_Vehicle(__cfg).PreEntityLayout,SELF.__Part:=RIGHT.__Part,SELF:=LEFT),ALL);
+    EXPORT __PreEntities := DEDUP(__Person_Vehicle_KeyList,RECORD,ALL);
     __PreEntityPayloadFilter(DATASET(PreEntityPayloadLayout) __ds, RECORDOF(__Partitions) __p) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__p.__Asof))) AND (__ds.__Permits & __p.__Using) = __ds.__Permits);
     __PreentitiesFiltered := PROJECT(__PreEntities,TRANSFORM(PreEntityLayout,SELF.__Payload:=__PreEntityPayloadFilter(LEFT.__Payload,ROW((__PartDict)[LEFT.__Part],RECORDOF(__Partitions))),SELF:=LEFT));
     ExpandedPreEntityLayout ToExpandedPreEntity(PreEntityLayout __r) := TRANSFORM
@@ -42,7 +46,7 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     SHARED VIRTUAL __PreEntityFilter(DATASET(ExpandedPreEntityLayout) __ds) := __PreentitiesExpandedFiltered;
   END;
   SHARED E_Vehicle_Local(CFG_Compile __cfg = CFG_Compile) := MODULE(E_Vehicle(__cfg))
-    EXPORT __PreEntities := JOIN(B_Vehicle(__cfg).IDX_Vehicle_UID_Wrapped,__Partitions,TRUE,TRANSFORM(E_Vehicle(__cfg).PreEntityLayout,SELF.__Part:=RIGHT.__Part,SELF:=LEFT),ALL);
+    EXPORT __PreEntities := JOIN(DEDUP(__Vehicle_KeyList,RECORD,ALL),B_Vehicle(__cfg).IDX_Vehicle_UID,KEYED(KEL.Indexing.Key(RIGHT.UID) = __T(LEFT.UID)),TRANSFORM(PreEntityLayout,SELF.__Part:=LEFT.__Part,SELF.UID:=__CN(RIGHT.UID),SELF:=RIGHT),ATMOST(10000));
     __PreEntityPayloadFilter(DATASET(PreEntityPayloadLayout) __ds, RECORDOF(__Partitions) __p) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__p.__Asof))) AND (__ds.__Permits & __p.__Using) = __ds.__Permits);
     __PreentitiesFiltered := PROJECT(__PreEntities,TRANSFORM(PreEntityLayout,SELF.__Payload:=__PreEntityPayloadFilter(LEFT.__Payload,ROW((__PartDict)[LEFT.__Part],RECORDOF(__Partitions))),SELF:=LEFT));
     ExpandedPreEntityLayout ToExpandedPreEntity(PreEntityLayout __r) := TRANSFORM
@@ -151,9 +155,9 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     SHARED TYPEOF(B_Vehicle_1(__cfg).__ENH_Vehicle_1) __ENH_Vehicle_1 := B_Vehicle_1_Local(__cfg).__ENH_Vehicle_1;
   END;
   SHARED TYPEOF(B_Person(__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__cfg_Local).__ENH_Person;
-  SHARED __EE332893 := __Params;
-  SHARED __EE332898 := __ENH_Person;
-  SHARED __ST333969_Layout := RECORD
+  SHARED __EE333158 := __Params;
+  SHARED __EE333163 := __ENH_Person;
+  SHARED __ST334234_Layout := RECORD
     KEL.typ.uid __QueryId := 0;
     KEL.typ.uid Lex_I_D__in_ := 0;
     KEL.typ.kdate P___Inp_Cln_Arch_Dt_ := 0;
@@ -222,13 +226,13 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  __JC457431(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __EE332893, B_Person(__cfg_Local).__ST7281_Layout __EE332898) := __NNEQ(__EE332898.UID,__CN(__EE332893.Lex_I_D__in_)) AND __T(__OP2(__EE332898.UID,=,__CN(__EE332893.Lex_I_D__in_))) AND __EE332893.__Part = __EE332898.__Part;
-  __ST333969_Layout __JT457431(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __l, B_Person(__cfg_Local).__ST7281_Layout __r) := TRANSFORM
+  __JC457856(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __EE333158, B_Person(__cfg_Local).__ST7286_Layout __EE333163) := __NNEQ(__EE333163.UID,__CN(__EE333158.Lex_I_D__in_)) AND __T(__OP2(__EE333163.UID,=,__CN(__EE333158.Lex_I_D__in_))) AND __EE333158.__Part = __EE333163.__Part;
+  __ST334234_Layout __JT457856(CFG_Compile.Non_F_C_R_A_Profile_Booster_V2_Params_Layout __l, B_Person(__cfg_Local).__ST7286_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE457521 := JOIN(__EE332898,__EE332893,__JC457431(RIGHT,LEFT),__JT457431(RIGHT,LEFT),INNER,SMART);
-  SHARED __ST332718_Layout := RECORD
+  SHARED __EE457946 := JOIN(__EE333163,__EE333158,__JC457856(RIGHT,LEFT),__JT457856(RIGHT,LEFT),INNER,SMART);
+  SHARED __ST332983_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.nint P_L___Purch_New_Amt_;
     KEL.typ.nint P_L___Purch_Tot_Ev_;
@@ -285,7 +289,7 @@ EXPORT RQ_Non_F_C_R_A_Profile_Booster_V2(DATASET(CFG_Compile.Non_F_C_R_A_Profile
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE457521,TRANSFORM(__ST332718_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE457946,TRANSFORM(__ST332983_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
   EXPORT DBG_Params := __UNWRAP(__Params);
   EXPORT DBG_E_Person_PreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PreEntities);
   EXPORT DBG_E_Person_FilteredPreEntity := __UNWRAP(E_Person_Local(__cfg_Local).__PostFilter);
