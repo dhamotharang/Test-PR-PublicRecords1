@@ -16,16 +16,18 @@ EXPORT Fn_Get_All_BRM_Attrs(DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.
 	// cleanBusiness
 	Prep_CleanBusiness := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputBII(ds_input);
 	
-	// cleanReps and get lexids
-	Prep_RepInput := Dataset([],PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII); //We are not passing rep because we do not need any rep information
-
+	//This function echos the input account number to p_inpacct which is used by the KEL query to get b_inpacct.
+	Prep_RepInput := BRM_Marketing_attributes.Fn_BRM_Prep_InputRepPII(ds_input);
+	
 	// Append BIP IDs
 	withBIPIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendBIPIDs_Roxie( Prep_CleanBusiness, Prep_RepInput, Options );
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Prep_RepInput, Options, withBIPIDs );
 	
+	//PIIBII Attributes
 	InputPIIBIIAttributes := BRM_Marketing_Attributes.Fn_GetBRM_InputBIIAttributes(withBIPIDs, Prep_RepInput, Options);
 
+ //Business Sele Attributes
 	BusinessSeleIDAttributes :=BRM_Marketing_Attributes.Fn_GetBRM_SeleIDAttributes(withBIPIDs, Prep_RepInput, FDCDataset, Options);
 
 	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
@@ -34,7 +36,8 @@ EXPORT Fn_Get_All_BRM_Attrs(DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, ATMOST(100));	
-		
+	
+	//BusinessProx Attributes
 	BusinessProxIDAttributes := BRM_Marketing_Attributes.Fn_GetBRM_ProxIDAttributes(withBIPIDs, Prep_RepInput, FDCDataset, Options);
 
 	withBusinessProxIDAttributes := JOIN(withBusinessSeleIDAttributes, BusinessProxIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
@@ -52,6 +55,7 @@ EXPORT Fn_Get_All_BRM_Attrs(DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.
 	// output(BusinessProxIDAttributes,named('BusinessProxIDAttributes'));
 	// output(withBusinessSeleIDAttributes,named('withBusinessSeleIDAttributes'));
 	// output(results,named('results'));
+
 	 return withBusinessProxIDAttributes;
 
 END;
