@@ -42,7 +42,8 @@ EXPORT Search_Function(
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
 	boolean IncludeStatusRefreshChecks = FALSE,
 	string32 DeferredTransactionID = '',
-    string5 StatusRefreshWaitPeriod = ''
+    string5 StatusRefreshWaitPeriod = '',
+    string10 ESPInterfaceVersion = ''
   ) := function
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -1323,7 +1324,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
   
 riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
 
-riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod),
+riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion),
                                                                    IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID <> '' => Riskview.Functions.JuLiProcessDTE(DeferredTransactionID, clam, gateways, riskview5_final_results),
                                                                    riskview5_final_results);
                                                                    

@@ -11,7 +11,7 @@ export t_Task := record
 	boolean IsTaskTimedOut {xpath('IsTaskTimedOut')};
 	string10 TaskErrorCode {xpath('TaskErrorCode')};
 	string50 TaskErrorDescription {xpath('TaskErrorDescription')};
-	string255 ResponseOpaqueContent {xpath('ResponseOpaqueContent')};
+	string4096 ResponseOpaqueContent {xpath('ResponseOpaqueContent')};
 end;
 		
 export t_TaskExtended := record (t_Task)
@@ -21,7 +21,7 @@ export t_TaskExtended := record (t_Task)
 end;
 		
 export t_DTERequest := record
-	t_TaskExtended TaskEx {xpath('TaskEx')};
+        dataset(t_TaskExtended) TaskExs {xpath('TaskExs/TaskEx'), MAXCOUNT(10)};
 	string80 NotificationEmail {xpath('NotificationEmail')};
 	string255 RequestXML {xpath('RequestXML')};
 end;

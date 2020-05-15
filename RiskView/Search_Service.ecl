@@ -344,7 +344,8 @@ search_results_temp := ungroup(
       		ExcludeReportingSources := ExcludeReportingSources,
 			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
             DeferredTransactionID := DeferredTransactionID,
-            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod
+            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
+            ESPInterfaceVersion := InterfaceVersion
       		) 
       	);
   
@@ -1105,11 +1106,16 @@ search_results_temp := ungroup(
 															 left.Exception_code,  
 															 '', 									
 															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+               ds_excep_status_refresh := DATASET([{'Roxie', 
+                                                             left.Exception_code,  
+                                                             '', 									
+                                                             RiskView.Constants.StatusRefresh_error_desc(left.Exception_code)}], iesp.share.t_WsException);
 
 				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
 																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
 																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
                                         SubscriberId = 0 and STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
+                                        IncludeStatusRefreshChecks = TRUE AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
 																			  ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
 
