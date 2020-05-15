@@ -54,7 +54,8 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'ssnentitycontextuid', (STRING)LEFT.ssnentitycontextuid},
 															{'ipentitycontextuid', (STRING)LEFT.ipentitycontextuid},
 															{'bankaccountentitycontextuid', (STRING)LEFT.bankaccountentitycontextuid},
-															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid}
+															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid},
+															{'t_inagencyflag', (STRING)LEFT.t_inagencyflag}
 														 ], NvpRec),
 														 SELF := LEFT));
 
