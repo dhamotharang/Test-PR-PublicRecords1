@@ -1183,7 +1183,7 @@ StatHeading		:=	'Cnt_Unique_Business_Recs|Cnt_Companies_Returned|Per_Companies_R
 									'Cnt_500_749_Employees|Per_500_749_Employees|Cnt_750_999_Employees|Per_750_999_Employees|' +
 									'Cnt_1000_1249_Employees|Per_1000_1249_Employees|Cnt_1250_1499_Employees|Per_1250_1499_Employees|' +
 									'Cnt_1500_and_Above_Employees|Per_1500_and_Above_Employees|Cnt_Less_Than_2_Years|Per_Less_Than_2_Years|' +		
-									'Cnt_2_5_Years|Per_2_5_Years|Cnt_6_10_Years|Per_6_10_Years|Cnt_More_Than_10_Years|Per_More_Than_10_Years|' +
+									'Cnt_2_5_Years|Per_2_5_Years|Cnt_6_10_Years|Per_6_10_Years|Cnt_More_Than_10_Years|Per_More_Than_10_Years' +
 									'Cnt_Total_SIC|Per_Total_SIC|Cnt_Total_NAICS|Per_Total_NAICS|Cnt_SIC_Agriculture_Forestry_And_Fishing|' +
 									'Per_SIC_Agriculture_Forestry_And_Fishing|Cnt_SIC_Mining|Per_SIC_Mining|Cnt_SIC_Construction|' +
 									'Per_SIC_Construction|Cnt_SIC_Manufacturing|Per_SIC_Manufacturing|' + 
