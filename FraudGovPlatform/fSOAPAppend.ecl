@@ -626,7 +626,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			layout_soap := RECORD
 				INTEGER ALLOWALL := 1;
-				STRING120 APPENDS := 'BEST_ADDR';
+				STRING120 APPENDS := 'BEST_ALL, VERIFY_ALL';				
 				STRING APPENDTHRESHOLD := '';
 				STRING APPLICATIONTYPE := '';
 				STRING DATAPERMISSIONMASK := DataPermission;
@@ -640,7 +640,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 				UNSIGNED8 MAX_RESULTS_PER_ACCT := 1;
 				BOOLEAN PATRIOTPROCESS := FALSE;
 				STRING SSNMASK := '';
-				STRING120 VERIFY := 'BEST_ADDR';
+				STRING120 VERIFY := 'BEST_ALL, VERIFY_ALL';
 				BOOLEAN INCLUDERANKING := FALSE;
 			END;
 

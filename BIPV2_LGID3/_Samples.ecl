@@ -16,7 +16,7 @@ export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := mod
 	export ReviewSamples := module
 		shared psetReviewers					:= BIPV2._Config.Set_Sample_Reviewers;
 		shared pNumSamplesPerReviewer	:= 30;//20;
-		shared ConfThreshold					:= '40'; //'42';
+		shared ConfThreshold					:= 40; //'42';
 		shared kmtch									:= BIPV2_LGID3.Keys(ih).MatchSample;
 		shared kcand									:= BIPV2_LGID3.Keys(ih).Candidates;
     shared ExtraMatchFilter       := '';
@@ -25,7 +25,7 @@ export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := mod
 	export ReviewSamples_sbfe := module
 		shared psetReviewers					:= BIPV2._Config.Set_Sample_Reviewers;
 		shared pNumSamplesPerReviewer	:= 30;//20;
-		shared ConfThreshold					:=  '40'; //'42';
+		shared ConfThreshold					:= 40; //'42';
 		shared kmtch									:= BIPV2_LGID3.Keys(ih).MatchSample;
 		shared kcand									:= BIPV2_LGID3.Keys(ih).Candidates;
     shared ExtraMatchFilter       := 'sbfe_id_score > 0';

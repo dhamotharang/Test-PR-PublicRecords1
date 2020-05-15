@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
 IMPORT KEL12 AS KEL;
 IMPORT CFG_Compile,E_Person FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Person_7(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person(__cfg).__Result) __E_Person := E_Person(__cfg).__Result;
-  SHARED __EE18328 := __E_Person;
-  EXPORT __ST10974_Layout := RECORD
+  SHARED __EE18323 := __E_Person;
+  EXPORT __ST10969_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -22,10 +22,10 @@ EXPORT B_Person_7(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST10974_Layout __ND18628__Project(E_Person(__cfg).Layout __PP18129) := TRANSFORM
-    __BS18262 := __T(__PP18129.Data_Sources_);
-    SELF.P___Lex_I_D_Seen_Flag_ := IF(EXISTS(__BS18262(__T(__T(__PP18129.Data_Sources_).Header_Hit_Flag_))),'1','0');
-    SELF := __PP18129;
+  SHARED __ST10969_Layout __ND18623__Project(E_Person(__cfg).Layout __PP18124) := TRANSFORM
+    __BS18257 := __T(__PP18124.Data_Sources_);
+    SELF.P___Lex_I_D_Seen_Flag_ := IF(EXISTS(__BS18257(__T(__T(__PP18124.Data_Sources_).Header_Hit_Flag_))),'1','0');
+    SELF := __PP18124;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE18328,__ND18628__Project(LEFT));
+  EXPORT __ENH_Person_7 := PROJECT(__EE18323,__ND18623__Project(LEFT));
 END;
