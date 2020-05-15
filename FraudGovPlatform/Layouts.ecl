@@ -418,9 +418,8 @@ EXPORT Layouts := MODULE
 		end;
 
 
-		export CustomerActiveSprays := record 
-			string20 	Customer_Id;
-			string20	File_type;
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
 		end;
 	end;
 
