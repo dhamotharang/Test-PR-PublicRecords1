@@ -53,7 +53,9 @@ SHARED high_risk_gw_input := PROJECT(cleaned_gw_input,
                                                         SELF := [];));
 	
 EXPORT StatusRefreshRecommended := Gateway.SoapCall_OKCStatusRefreshRecommended(high_risk_gw_input, StatusRefreshRecommendedGatewayCfg, pWaitTime, pRetries, makeStatusRefreshRecommendedGatewayCall);
-					
+
+EXPORT RefreshRecommendedGatewayError := COUNT(StatusRefreshRecommended(response._Header.message <> '')) > 0;
+
 /* ****************************************************************
 *                    OKC Status Refresh Gateway Call  		              *
 ******************************************************************/
@@ -76,6 +78,8 @@ SHARED status_refresh_gw_input := JOIN(StatusRefreshRecommended, cleaned_gw_inpu
                                                                    );
                           
 EXPORT StatusRefresh := Gateway.SoapCall_OKCStatusRefresh(status_refresh_gw_input, StatusRefreshGatewayCfg, pWaitTime, pRetries, makeStatusRefreshGatewayCall);		
+
+EXPORT RefreshGatewayError := COUNT(StatusRefresh(response._Header.message <> '')) > 0;
 
 EXPORT SuppressRecordsJudgments() := FUNCTION
 

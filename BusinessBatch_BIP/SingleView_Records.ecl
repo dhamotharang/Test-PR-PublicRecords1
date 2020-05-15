@@ -43,6 +43,7 @@ module
     biz_consumer_ap := biz_links.ConsumerAppend();
     biz_bip_ap := biz_links.BipAppend();
     biz_summary := biz_links.summary;
+    biz_verify := biz_links.VerifyInputs();
 
 
     // add business summary elements and restore original acctno
@@ -61,6 +62,32 @@ module
     results_summary := join(batch_in, biz_summary, 
       (unsigned)left.acctno = right.request_id, 
       summary_trans_0(left, right), 
+      left outer, keep(1), limit(0)
+    );
+
+
+    // add verification info to business summary
+    BusinessBatch_BIP.Layouts.SingleView.Output_Summary verify_trans(BusinessBatch_BIP.Layouts.SingleView.Output_Summary l, 
+      recordof(biz_verify) r) := transform
+      self.match_first_last_name := r.first_last_name;
+      self.match_first_name := r.first_name;
+      self.match_last_name := r.last_name;
+      self.match_first_bus_name_addr1 := r.first_bus_name_addr1;
+      self.match_last_bus_name_addr1 := r.last_bus_name_addr1;
+      self.match_first_bus_name := r.first_bus_name;
+      self.match_last_bus_name := r.last_bus_name;
+      self.match_addr1 := r.addr1;
+      self.match_bus_addr1 := r.bus_addr1;
+      self.match_ssn := r.ssn;
+      self.match_ssn_fein := r.ssn_fein;
+      self.match_phone := r.phone;
+      self.match_bus_phone := r.bus_phone;
+      self := l;
+    end;
+
+    results_verify := join(results_summary, biz_verify, 
+      left.request_id = right.request_id, 
+      verify_trans(left, right), 
       left outer, keep(1), limit(0)
     );
 
@@ -87,7 +114,7 @@ module
       self := l;
     end;
 
-    results_w_consumer := join(results_summary, biz_consumer_ap, 
+    results_w_consumer := join(results_verify, biz_consumer_ap, 
       left.request_id = right.seq, 
       summary_trans_1(left, right), 
       left outer, keep(1), limit(0)

@@ -17,16 +17,17 @@ EXPORT Functions := MODULE;
 		RETURN rec;
 	END; // ParseResponseOpaqueContent END
   
-    EXPORT ParseGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoResponseEx) DTERecs) := FUNCTION
+    EXPORT ParseGetRequestInfo(DATASET({STRING ErrorMessage, INTEGER ErrorCode, IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoResponseEx}) DTERecs) := FUNCTION
         
         OutLayout := RECORD
         iesp.dte_getrequestinfo.t_DTEGetRequestInfoResponseEx;
         DATASET(DeferredTask.Layouts.ResponseOpaqueContentLayout) ResponseJSON;
         END;
-        
+
         ParsedJSON := PROJECT(DTERecs, TRANSFORM(OutLayout, 
-        SELF.ResponseJSON := ParseResponseOpaqueContent(LEFT.response.DTERequest.TaskEx.ResponseOpaqueContent);
-        SELF := LEFT;));
+        SELF.ResponseJSON := ParseResponseOpaqueContent(LEFT.response.DTERequest.TaskExs[1].ResponseOpaqueContent);
+        SELF := LEFT;
+        SELF := []));
         
         RETURN ParsedJSON;
     END; // ParseGetRequestInfo END
