@@ -1,5 +1,6 @@
 //never run this on prod
-import crim_offense_cat, std;
+ import crim_offense_cat, std;
+/*
 filename1 := '20191205';
 filename2:= '20200220';
 seq := crim_offense_cat.MAC_build_all('20191205');
@@ -14,4 +15,7 @@ sequential(
     seq,
     output('starting ' + filename2),
     crim_offense_cat.BWR(filename2)
-);
+); */
+std.file.AddSuperFile(crim_offense_cat.filenames().ProcessedIn,'~'+
+                                                std.file.getsuperfilesubname(crim_offense_cat.filenames().basein,1))
+//output(std.file.getsuperfilesubname(crim_offense_cat.filenames().basein,1));
