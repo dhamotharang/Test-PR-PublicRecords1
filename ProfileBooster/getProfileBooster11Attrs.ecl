@@ -3,8 +3,8 @@ IMPORT KEL12 AS KEL;
 
 EXPORT getProfileBooster11Attrs(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_wseq, 
 																INTEGER Score_threshold = 80,
-																INTEGER GLBA = 1,
-																INTEGER DPPA = 3,
+																INTEGER GLBA = 1, //1 for PB11 0 for PB10,PB20
+																INTEGER DPPA = 3, //3 for PB11 0 for PB10,PB20
 																STRING  DataRestrictionMask	= '00000000000000000000000000000000000000000000000000',
 																STRING  DataPermissionMask	= '11111111111111111111111111111111111111111111111111'
 																
@@ -12,8 +12,7 @@ EXPORT getProfileBooster11Attrs(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_
 	
 	mod_transforms := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Transforms;
 	
-	PP1 := PROJECT(PB_wseq, mod_transforms.xfm_Prepare_PB11_Input(LEFT,COUNTER));	
-	PP := DISTRIBUTE(PP1, RANDOM());
+	PP := PROJECT(PB_wseq, mod_transforms.xfm_Prepare_PB11_Input(LEFT,COUNTER), LOCAL);	
 
 	Options := MODULE(ProfileBooster.ProfileBoosterV2_KEL.Interface_Options)
 		EXPORT STRING AttributeSetName := 'Development KEL Attributes';
@@ -30,7 +29,7 @@ EXPORT getProfileBooster11Attrs(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_
 		EXPORT BOOLEAN isMarketing := TRUE; // When TRUE enables Marketing Restrictions
 	END;
 
-	PB11Result:= ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetAttrsV11(PP, Options);
+	PB11Result:= DISTRIBUTE(ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetAttrsV11(PP, Options),HASH64(P_InpAcct));
 	
 	FinalResult := JOIN(PB_wseq, PB11Result,
 											LEFT.AcctNo = RIGHT.P_InpAcct,

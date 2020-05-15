@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle,FN_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Person_Vehicle_10(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Vehicle(__cfg).__Result) __E_Person_Vehicle := E_Person_Vehicle(__cfg).__Result;
-  SHARED __EE13043 := __E_Person_Vehicle;
-  EXPORT __ST12028_Layout := RECORD
+  SHARED __EE13048 := __E_Person_Vehicle;
+  EXPORT __ST12033_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
@@ -18,9 +18,9 @@ EXPORT B_Person_Vehicle_10(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST12028_Layout __ND13272__Project(E_Person_Vehicle(__cfg).Layout __PP12869) := TRANSFORM
-    SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN((__cfg.CurrentDate)[__PP12869.__Part].__Asof));
-    SELF := __PP12869;
+  SHARED __ST12033_Layout __ND13277__Project(E_Person_Vehicle(__cfg).Layout __PP12874) := TRANSFORM
+    SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN((__cfg.CurrentDate)[__PP12874.__Part].__Asof));
+    SELF := __PP12874;
   END;
-  EXPORT __ENH_Person_Vehicle_10 := PROJECT(__EE13043,__ND13272__Project(LEFT));
+  EXPORT __ENH_Person_Vehicle_10 := PROJECT(__EE13048,__ND13277__Project(LEFT));
 END;
