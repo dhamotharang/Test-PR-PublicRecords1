@@ -122,13 +122,10 @@ EXPORT copy_from_alpha(string filedt) := function
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
 
     aPrefLoc := 'thor_data400::key::insuranceheader_locid::';
-    
-//thor_data400::key::insuranceheader_locid::qa::locid
-//thor_data400::key::insuranceheader_locid::20200401::locid
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-     bldSegmentation // creates blank segmentation did_ind key  
+     fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
@@ -145,6 +142,7 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc(get_alogical(aPref+'header')             ,fName(filedt, '::idl'))
        
     //copy to cluster - thor400_36
+    ,fc8('~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind' ,'~thor400_36::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc8(fName(filedt, '::did::refs::address') ,fName8(filedt, '::did::refs::address'))
     ,fc8(fName(filedt, '::did::refs::dln')     ,fName8(filedt, '::did::refs::dln'))
     ,fc8(fName(filedt, '::did::refs::dob')     ,fName8(filedt, '::did::refs::dob'))
@@ -208,7 +206,6 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
 
 // Remove incrementals from 'qa', update 'inc' superfiles and add new incrementals to the 'qa' superfiles
 EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := function
-
     return sequential(
      updateSupers('::did::refs::address',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::dln',skipIncSFupdate, ,filedt)
@@ -295,6 +292,43 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpCAminor, cpLab, cpUniqEx);
 END;
 
+inspr(string spr, string newLogical):=FUNCTION
+    spr_cntns:=STD.File.SuperFileContents(spr);
+    RETURN (newLogical in set(spr_cntns,name));
+END;
+
+update_segmentation_supers(string spr0, string newLogical) := function
+
+    spr:='~'+ case( spr0, 
+                  'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
+                  'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
+                  'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
+                  'thor400_44::key::insuranceheader_segmentation::did_ind_built',
+                  'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
+                  ,spr0);
+    
+    return if(~inspr(spr,newLogical)
+          ,sequential(
+            output(dataset([{spr,'~'+newLogical,'Updating'}],{string super, string new_logical,string comment}),named('cp_built_update'),extend)
+           ,std.file.RemoveOwnedSubFiles(spr,TRUE)
+           ,std.file.clearsuperfile     (spr)
+           ,if(std.file.SuperFileExists('~'+newLogical)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical       )
+             );)
+          ,output(dataset([{spr,'~'+newLogical,'Already up-to-date'}],{string super, string new_logical, string comment}),named('cp_built_update'),extend)
+          );
+end;
+
+ver(string nm,string new_ver, string clstr='') :=    
+    regexreplace('<<version>>',if(clstr=''
+                                 ,nm
+                                 ,regexreplace('thor_data400',nm,clstr)),new_ver);
+
+nm := 'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind';
 aPrefLoc := '~thor_data400::key::insuranceheader_locid::';
 father := aPrefLoc + 'father::locid';
 qa     := aPrefLoc + 'qa::locid';
@@ -308,6 +342,9 @@ EXPORT movetoQA(string filedt) := sequential(
     STD.File.ClearSuperFile(qa),
     STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
+    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
+    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
     update_inc_superfiles(,filedt),
     );
         
