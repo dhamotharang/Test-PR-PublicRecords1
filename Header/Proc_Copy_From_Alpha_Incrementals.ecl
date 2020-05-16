@@ -293,7 +293,7 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
 END;
 
 inspr(string spr, string newLogical):=FUNCTION
-    spr_cntns:=STD.File.SuperFileContents(spr);
+    spr_cntns:=nothor(STD.File.SuperFileContents(spr));
     RETURN (newLogical in set(spr_cntns,name));
 END;
 
@@ -313,11 +313,11 @@ update_segmentation_supers(string spr0, string newLogical) := function
     return if(~inspr(spr,newLogical)
           ,sequential(
             output(dataset([{spr,'~'+newLogical,'Updating'}],{string super, string new_logical,string comment}),named('cp_built_update'),extend)
-           ,nothor(std.file.RemoveOwnedSubFiles(spr,TRUE))
-           ,nothor(std.file.clearsuperfile     (spr))
-           ,if(nothor(std.file.SuperFileExists('~'+newLogical))
-             ,nothor(std.file.addsuperfile       (spr   , '~'+newLogical ,,true))
-             ,nothor(std.file.addsuperfile       (spr   , '~'+newLogical       ))
+           ,std.file.RemoveOwnedSubFiles(spr,TRUE)
+           ,std.file.clearsuperfile     (spr)
+           ,if(std.file.SuperFileExists('~'+newLogical)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical       )
              );)
           ,output(dataset([{spr,'~'+newLogical,'Already up-to-date'}],{string super, string new_logical, string comment}),named('cp_built_update'),extend)
           );
