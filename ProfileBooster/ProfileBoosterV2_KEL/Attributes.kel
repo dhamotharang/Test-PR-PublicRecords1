@@ -233,7 +233,7 @@ Person: => PL_AstVehAutoEmrgPriceAvg := MAP(
 Person: => AstVehAutoEmrgPriceSet			:= TOPN(PersonVehicle(VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv AND Automobile.FlagAuto AND FlagDepreciatedPrice){VinaVin:=Automobile.VinaVin,DepreciatedPrice,DateFirstSeenCapped},1,-DateFirstSeenCapped);
 Person: => PL_AstVehAutoEmrgPrice1 		:= IF(ONLY(AstVehAutoEmrgPriceSet,DepreciatedPrice):Null,0,ONLY(AstVehAutoEmrgPriceSet,DepreciatedPrice));
 Person: => PL_AstVehAutoEmrgPrice1Vin := ONLY(AstVehAutoEmrgPriceSet,VinaVin);
-Person: => PL_AstVehAutoEmrgPriceSet2 := TOPN(PersonVehicle(Automobile.FlagAuto AND DATE(VehicleMinDate)<DATE(Person.PL_AstVehAutoEmrgNewDtEv) AND FlagDepreciatedPrice AND Automobile.VinaVin != Person.PL_AstVehAutoEmrgPrice1Vin){VinaVin:=Automobile.VinaVin,DepreciatedPrice,DateFirstSeenCapped},1,-DateFirstSeenCapped);
+Person: => PL_AstVehAutoEmrgPriceSet2 := TOPN(PersonVehicle(Automobile.FlagAuto AND Automobile.VinaVin != Person.PL_AstVehAutoEmrgPrice1Vin  AND DATE(VehicleMinDate)<DATE(Person.PL_AstVehAutoEmrgNewDtEv) AND FlagDepreciatedPrice){VinaVin:=Automobile.VinaVin,DepreciatedPrice,DateFirstSeenCapped},1,-DateFirstSeenCapped);
 Person: => PL_AstVehAutoEmrgPrice2 		:= IF(ONLY(PL_AstVehAutoEmrgPriceSet2,DepreciatedPrice):Null,0,ONLY(PL_AstVehAutoEmrgPriceSet2,DepreciatedPrice));
 Person: => PL_AstVehAutoEmrgPrice2Vin := ONLY(PL_AstVehAutoEmrgPriceSet2,VinaVin);
 Person: => PL_AstVehAutoEmrgPriceDiff := MAP(

@@ -1,10 +1,10 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Person_Vehicle(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED __EE457219 := E_Person_Vehicle(__cfg).PreEntityInternal(true);
-  SHARED __IDX_Person_Vehicle_Subject__Filtered := __EE457219(__NN(__EE457219.Subject_));
+  SHARED __EE457761 := E_Person_Vehicle(__cfg).PreEntityInternal(true);
+  SHARED __IDX_Person_Vehicle_Subject__Filtered := __EE457761(__NN(__EE457761.Subject_));
   SHARED IDX_Person_Vehicle_Subject__Layout := RECORD
     E_Person().Typ Subject_;
     __IDX_Person_Vehicle_Subject__Filtered.Automobile_;
@@ -17,7 +17,7 @@ EXPORT B_Person_Vehicle(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT IDX_Person_Vehicle_Subject__LogicalName := '~key::kel::publicrecords_kel::' + IF(__cfg.LogicalFileFragment = '','',__cfg.LogicalFileFragment + '::') + 'Person_Vehicle::Subject_';
   EXPORT IDX_Person_Vehicle_Subject__Build_From(TYPEOF(IDX_Person_Vehicle_Subject__BaseFile) source) := BUILD(source,{Subject_},{source},IDX_Person_Vehicle_Subject__LogicalName,SORTED,OVERWRITE);
   EXPORT IDX_Person_Vehicle_Subject__Build := IDX_Person_Vehicle_Subject__Build_From(IDX_Person_Vehicle_Subject__BaseFile);
-  EXPORT __ST458423_Layout := RECORDOF(IDX_Person_Vehicle_Subject_);
+  EXPORT __ST458876_Layout := RECORDOF(IDX_Person_Vehicle_Subject_);
   EXPORT IDX_Person_Vehicle_Subject__Wrapped := PROJECT(IDX_Person_Vehicle_Subject_,TRANSFORM(E_Person_Vehicle(__cfg).PreEntityLayout,SELF.Subject_ := __CN(LEFT.Subject_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Vehicle_Subject__Build);
 END;

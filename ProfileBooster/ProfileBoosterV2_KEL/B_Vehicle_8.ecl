@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT B_Vehicle_9,CFG_Compile,E_Vehicle,FN_Compile FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle_8(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Vehicle_9(__cfg).__ENH_Vehicle_9) __ENH_Vehicle_9 := B_Vehicle_9(__cfg).__ENH_Vehicle_9;
-  SHARED __EE17618 := __ENH_Vehicle_9;
-  EXPORT __ST11583_Layout := RECORD
+  SHARED __EE17623 := __ENH_Vehicle_9;
+  EXPORT __ST11588_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -123,9 +123,9 @@ EXPORT B_Vehicle_8(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST11583_Layout __ND17735__Project(B_Vehicle_9(__cfg).__ST11900_Layout __PP17036) := TRANSFORM
-    SELF.Vehicle_Type_ := FN_Compile(__cfg).FN_Vehicle_Type_Group(__ECAST(KEL.typ.nstr,__PP17036.Vina_Body_Style_Vehicle_Type_));
-    SELF := __PP17036;
+  SHARED __ST11588_Layout __ND17740__Project(B_Vehicle_9(__cfg).__ST11905_Layout __PP17041) := TRANSFORM
+    SELF.Vehicle_Type_ := FN_Compile(__cfg).FN_Vehicle_Type_Group(__ECAST(KEL.typ.nstr,__PP17041.Vina_Body_Style_Vehicle_Type_));
+    SELF := __PP17041;
   END;
-  EXPORT __ENH_Vehicle_8 := PROJECT(__EE17618,__ND17735__Project(LEFT));
+  EXPORT __ENH_Vehicle_8 := PROJECT(__EE17623,__ND17740__Project(LEFT));
 END;

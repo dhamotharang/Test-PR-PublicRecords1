@@ -812,6 +812,54 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			Export all := Append_DLN;
 								
 	END;
+	
+	EXPORT PrepaidPhone	:= MODULE
+		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
+	//get transactions between phone vendor dates
+		jPhone1 := join(distribute(Phone_key,hash(phone))
+					,distribute(pii_input(home_phone<>''),hash(home_phone))
+					,left.phone=right.home_phone
+					and 
+					((unsigned8)right.reported_date between left.vendor_first_reported_dt and left.vendor_last_reported_dt)				
+					,Transform(Layouts.PrepaidPhone
+							,self.phone:=right.home_phone
+							,self.reported_date:=right.reported_date
+							,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+							,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+							,self.prepaid := left.prepaid
+							,self.record_id :=right.record_id
+							,self.fdn_file_info_id	:=right.fdn_file_info_id
+							,self:=right)
+					,right outer,local);
+
+		dPhone1 := dedup(sort(jPhone1(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+	//get remaining prepaid matches
+		pii_input_2 := Join(pii_input(home_phone<>''),dPhone1,left.record_id=right.record_id,left only);
+
+		jPhone2 := join(distribute(Phone_key,hash(phone))
+								,distribute(pii_input_2,hash(home_phone))
+								,left.phone=right.home_phone
+								and 
+								((unsigned8)right.reported_date >= left.vendor_first_reported_dt)				
+								,Transform(Layouts.PrepaidPhone
+										,self.phone:=right.home_phone
+										,self.reported_date:=right.reported_date
+										,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+										,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+										,self.prepaid := left.prepaid
+										,self.record_id :=right.record_id
+										,self.fdn_file_info_id	:=right.fdn_file_info_id
+										,self:=right)
+								,right outer,local);
+								
+		dPhone2 := dedup(sort(jPhone2(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+
+		Phone_final := dPhone1 + dPhone2;
+
+		Export All	:= If(UpdatePii, dedup((Phone_final + PrepaidPhone_Base),all) , Phone_final);
+		 
+	END;
+	
 
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
