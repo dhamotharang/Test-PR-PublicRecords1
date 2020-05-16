@@ -338,7 +338,7 @@ EXPORT movetoQA(string filedt) := sequential(
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
-    STD.File.AddSuperFile(father,qa),
+    STD.File.AddSuperFile(father,qa, addcontents := true),
     STD.File.ClearSuperFile(qa),
     STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
