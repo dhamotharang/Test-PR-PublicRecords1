@@ -293,7 +293,7 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
 END;
 
 inspr(string spr, string newLogical):=FUNCTION
-    spr_cntns:=STD.File.SuperFileContents(spr);
+    spr_cntns:=nothor(STD.File.SuperFileContents(spr));
     RETURN (newLogical in set(spr_cntns,name));
 END;
 
@@ -338,7 +338,7 @@ EXPORT movetoQA(string filedt) := sequential(
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
-    STD.File.AddSuperFile(father,qa),
+    STD.File.AddSuperFile(father,qa, addcontents := true),
     STD.File.ClearSuperFile(qa),
     STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
