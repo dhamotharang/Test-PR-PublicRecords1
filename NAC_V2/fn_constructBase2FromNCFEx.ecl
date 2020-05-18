@@ -62,8 +62,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
-					and left.ClientId=right.ClientId
-					AND left.filename=right.filename,
+					and left.ClientId=right.ClientId,
+					//AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No client matches
@@ -72,8 +72,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
-					and left.ClientId=right.ClientId
-					AND left.filename=right.filename,
+					and left.ClientId=right.ClientId,
+					//AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		// case matched
@@ -81,8 +81,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					left.GroupId=right.GroupId
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId
-					AND left.filename=right.filename,
+					and left.CaseId=right.CaseId,
+					//AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No case matches
@@ -90,8 +90,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					left.GroupId=right.GroupId
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId
-					AND left.filename=right.filename,
+					and left.CaseId=right.CaseId,
+					//AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		
@@ -119,7 +119,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 											)
 										), HASH32(ClientId));
 
-	clients := cl1(errors=0);
+	clients := $.fn_rollupClients(cl1(errors=0));
 
 	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
@@ -157,8 +157,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								left.GroupId=right.GroupId
 								AND left.ProgramState=right.ProgramState
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId
-								AND left.filename=right.filename,
+								AND left.CaseId=right.CaseId,
+								//AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
 					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
@@ -216,8 +216,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								left.GroupId=right.GroupId
 								AND left.ProgramState=right.ProgramState
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId
-								AND left.filename=right.filename,
+								AND left.CaseId=right.CaseId,
+								//AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
 					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
