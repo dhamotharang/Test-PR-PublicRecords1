@@ -4,6 +4,6 @@ IMPORT B_Person_Address,E_Address,E_Customer,E_Person,E_Person_Address FROM Frau
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Address_Person := MODULE
   SHARED TYPEOF(B_Person_Address.__ENH_Person_Address) __ENH_Person_Address := B_Person_Address.__ENH_Person_Address;
-  SHARED __EE2204821 := __ENH_Person_Address;
-  EXPORT Res0 := __UNWRAP(__EE2204821);
+  SHARED __EE2212535 := __ENH_Person_Address;
+  EXPORT Res0 := __UNWRAP(__EE2212535);
 END;
