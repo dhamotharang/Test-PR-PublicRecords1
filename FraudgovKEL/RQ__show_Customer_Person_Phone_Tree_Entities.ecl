@@ -3,9 +3,9 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Customer,B_Customer_4,B_Person,B_Person_1,B_Person_Phone,B_Phone,E_Address,E_Customer,E_Person,E_Person_Phone,E_Phone FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
-  SHARED __EE2362264 := PROJECT(B_Person_Phone.IDX_Person_Phone_Phone_Number__Wrapped,E_Person_Phone.Layout);
-  SHARED __EE2362267 := B_Person.IDX_Person_UID_Wrapped;
-  SHARED __ST2271850_Layout := RECORD
+  SHARED __EE2420703 := PROJECT(B_Person_Phone.IDX_Person_Phone_Phone_Number__Wrapped,E_Person_Phone.Layout);
+  SHARED __EE2420706 := B_Person.IDX_Person_UID_Wrapped;
+  SHARED __ST2329598_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Phone.Typ) Phone_Number_;
@@ -82,13 +82,13 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.nstr Best_City_;
     KEL.typ.nstr Best_Email_;
     KEL.typ.nstr Best_First_Name_;
-    B_Person_1.__NS1184561_Layout Best_Full_Name_;
+    B_Person_1.__NS1213661_Layout Best_Full_Name_;
     KEL.typ.nstr Best_Last_Name_;
     KEL.typ.nstr Best_Middle_Name_;
     KEL.typ.nstr Best_Name_Suffix_;
-    B_Person_1.__NS1184583_Layout Best_Reported_Address_;
-    B_Person_1.__NS1184603_Layout Best_Reported_Email_;
-    B_Person_1.__NS1184611_Layout Best_Reported_Ssn_;
+    B_Person_1.__NS1213683_Layout Best_Reported_Address_;
+    B_Person_1.__NS1213703_Layout Best_Reported_Email_;
+    B_Person_1.__NS1213711_Layout Best_Reported_Ssn_;
     KEL.typ.nstr Best_Ssn_;
     KEL.typ.nstr Best_State_;
     KEL.typ.nstr Best_Street_Address_;
@@ -214,15 +214,15 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC2362275(E_Person_Phone.Layout __EE2362264, B_Person.__ST43253_Layout __EE2362267) := __EEQP(__EE2362264.Subject_,__EE2362267.UID);
-  __ST2271850_Layout __JT2362275(E_Person_Phone.Layout __l, B_Person.__ST43253_Layout __r) := TRANSFORM
+  __JC2420714(E_Person_Phone.Layout __EE2420703, B_Person.__ST45077_Layout __EE2420706) := __EEQP(__EE2420703.Subject_,__EE2420706.UID);
+  __ST2329598_Layout __JT2420714(E_Person_Phone.Layout __l, B_Person.__ST45077_Layout __r) := TRANSFORM
     SELF._r_Customer__1_ := __r._r_Customer_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE2362276 := JOIN(__EE2362264,__EE2362267,__JC2362275(LEFT,RIGHT),__JT2362275(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE2362546 := B_Phone.IDX_Phone_UID_Wrapped;
-  SHARED __ST2272164_Layout := RECORD
+  SHARED __EE2420715 := JOIN(__EE2420703,__EE2420706,__JC2420714(LEFT,RIGHT),__JT2420714(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE2420985 := B_Phone.IDX_Phone_UID_Wrapped;
+  SHARED __ST2329912_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Phone.Typ) Phone_Number_;
@@ -299,13 +299,13 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.nstr Best_City_;
     KEL.typ.nstr Best_Email_;
     KEL.typ.nstr Best_First_Name_;
-    B_Person_1.__NS1184561_Layout Best_Full_Name_;
+    B_Person_1.__NS1213661_Layout Best_Full_Name_;
     KEL.typ.nstr Best_Last_Name_;
     KEL.typ.nstr Best_Middle_Name_;
     KEL.typ.nstr Best_Name_Suffix_;
-    B_Person_1.__NS1184583_Layout Best_Reported_Address_;
-    B_Person_1.__NS1184603_Layout Best_Reported_Email_;
-    B_Person_1.__NS1184611_Layout Best_Reported_Ssn_;
+    B_Person_1.__NS1213683_Layout Best_Reported_Address_;
+    B_Person_1.__NS1213703_Layout Best_Reported_Email_;
+    B_Person_1.__NS1213711_Layout Best_Reported_Ssn_;
     KEL.typ.nstr Best_Ssn_;
     KEL.typ.nstr Best_State_;
     KEL.typ.nstr Best_Street_Address_;
@@ -439,6 +439,9 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.int Aot_Phn_Kr_Act_Shrd_Cnt_Ev_ := 0;
     KEL.typ.nkdate Aot_Phn_Kr_Act_Shrd_New_Dt_Ev_;
     KEL.typ.nkdate Aot_Phn_Kr_Act_Shrd_Old_Dt_Ev_;
+    KEL.typ.int Aot_Phn_Safe_Act_Cnt_Ev_ := 0;
+    KEL.typ.nkdate Aot_Phn_Safe_Act_New_Dt_Ev_;
+    KEL.typ.nkdate Aot_Phn_Safe_Act_Old_Dt_Ev_;
     KEL.typ.int Contributor_Safe_Flag__1_ := 0;
     KEL.typ.nint Customer_Id__1_;
     KEL.typ.nkdate Dt_First_Seen__1_;
@@ -485,8 +488,8 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC2362554(__ST2271850_Layout __EE2362276, B_Phone.__ST44106_Layout __EE2362546) := __EEQP(__EE2362276.Phone_Number_,__EE2362546.UID);
-  __ST2272164_Layout __JT2362554(__ST2271850_Layout __l, B_Phone.__ST44106_Layout __r) := TRANSFORM
+  __JC2420993(__ST2329598_Layout __EE2420715, B_Phone.__ST45967_Layout __EE2420985) := __EEQP(__EE2420715.Phone_Number_,__EE2420985.UID);
+  __ST2329912_Layout __JT2420993(__ST2329598_Layout __l, B_Phone.__ST45967_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF._r_Customer__2_ := __r._r_Customer_;
     SELF.Source_Customers__1_ := __r.Source_Customers_;
@@ -527,9 +530,9 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE2362555 := JOIN(__EE2362276,__EE2362546,__JC2362554(LEFT,RIGHT),__JT2362554(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE2363356 := PROJECT(B_Customer.IDX_Customer_UID_Wrapped,E_Customer.Layout);
-  SHARED __ST2272604_Layout := RECORD
+  SHARED __EE2420994 := JOIN(__EE2420715,__EE2420985,__JC2420993(LEFT,RIGHT),__JT2420993(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE2421801 := PROJECT(B_Customer.IDX_Customer_UID_Wrapped,E_Customer.Layout);
+  SHARED __ST2330355_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Phone.Typ) Phone_Number_;
@@ -606,13 +609,13 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.nstr Best_City_;
     KEL.typ.nstr Best_Email_;
     KEL.typ.nstr Best_First_Name_;
-    B_Person_1.__NS1184561_Layout Best_Full_Name_;
+    B_Person_1.__NS1213661_Layout Best_Full_Name_;
     KEL.typ.nstr Best_Last_Name_;
     KEL.typ.nstr Best_Middle_Name_;
     KEL.typ.nstr Best_Name_Suffix_;
-    B_Person_1.__NS1184583_Layout Best_Reported_Address_;
-    B_Person_1.__NS1184603_Layout Best_Reported_Email_;
-    B_Person_1.__NS1184611_Layout Best_Reported_Ssn_;
+    B_Person_1.__NS1213683_Layout Best_Reported_Address_;
+    B_Person_1.__NS1213703_Layout Best_Reported_Email_;
+    B_Person_1.__NS1213711_Layout Best_Reported_Ssn_;
     KEL.typ.nstr Best_Ssn_;
     KEL.typ.nstr Best_State_;
     KEL.typ.nstr Best_Street_Address_;
@@ -746,6 +749,9 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.int Aot_Phn_Kr_Act_Shrd_Cnt_Ev_ := 0;
     KEL.typ.nkdate Aot_Phn_Kr_Act_Shrd_New_Dt_Ev_;
     KEL.typ.nkdate Aot_Phn_Kr_Act_Shrd_Old_Dt_Ev_;
+    KEL.typ.int Aot_Phn_Safe_Act_Cnt_Ev_ := 0;
+    KEL.typ.nkdate Aot_Phn_Safe_Act_New_Dt_Ev_;
+    KEL.typ.nkdate Aot_Phn_Safe_Act_Old_Dt_Ev_;
     KEL.typ.int Contributor_Safe_Flag__1_ := 0;
     KEL.typ.nint Customer_Id__1_;
     KEL.typ.nkdate Dt_First_Seen__1_;
@@ -796,16 +802,16 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC2363370(__ST2272164_Layout __EE2362555, E_Customer.Layout __EE2363356) := __EEQP(__EE2362555._r_Customer_,__EE2363356.UID);
-  __ST2272604_Layout __JT2363370(__ST2272164_Layout __l, E_Customer.Layout __r) := TRANSFORM
+  __JC2421815(__ST2329912_Layout __EE2420994, E_Customer.Layout __EE2421801) := __EEQP(__EE2420994._r_Customer_,__EE2421801.UID);
+  __ST2330355_Layout __JT2421815(__ST2329912_Layout __l, E_Customer.Layout __r) := TRANSFORM
     SELF.U_I_D__2_ := __r.UID;
     SELF.Customer_Id__2_ := __r.Customer_Id_;
     SELF.Industry_Type__2_ := __r.Industry_Type_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE2363718 := JOIN(__EE2362555,__EE2363356,__JC2363370(LEFT,RIGHT),__JT2363370(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST2271755_Layout := RECORD
+  SHARED __EE2422166 := JOIN(__EE2420994,__EE2421801,__JC2421815(LEFT,RIGHT),__JT2421815(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __ST2329503_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
@@ -815,12 +821,12 @@ EXPORT RQ__show_Customer_Person_Phone_Tree_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST2271755_Layout __ND2364057__Project(__ST2272604_Layout __PP2363719) := TRANSFORM
-    SELF.Source_Customer_ := __PP2363719._r_Customer_;
-    SELF.Customer_Id_ := __PP2363719.Customer_Id__2_;
-    SELF.Industry_Type_ := __PP2363719.Industry_Type__2_;
-    SELF.Tree_Uid_ := __PP2363719.Entity_Context_Uid__1_;
-    SELF := __PP2363719;
+  SHARED __ST2329503_Layout __ND2422508__Project(__ST2330355_Layout __PP2422167) := TRANSFORM
+    SELF.Source_Customer_ := __PP2422167._r_Customer_;
+    SELF.Customer_Id_ := __PP2422167.Customer_Id__2_;
+    SELF.Industry_Type_ := __PP2422167.Industry_Type__2_;
+    SELF.Tree_Uid_ := __PP2422167.Entity_Context_Uid__1_;
+    SELF := __PP2422167;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE2363718,__ND2364057__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_Customer_,Customer_Id_,Industry_Type_,Tree_Uid_,Entity_Context_Uid_},Source_Customer_,Customer_Id_,Industry_Type_,Tree_Uid_,Entity_Context_Uid_,MERGE),__ST2271755_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE2422166,__ND2422508__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_Customer_,Customer_Id_,Industry_Type_,Tree_Uid_,Entity_Context_Uid_},Source_Customer_,Customer_Id_,Industry_Type_,Tree_Uid_,Entity_Context_Uid_,MERGE),__ST2329503_Layout));
 END;
