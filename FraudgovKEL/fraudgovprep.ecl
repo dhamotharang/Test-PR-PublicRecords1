@@ -28,7 +28,7 @@ FraudGovWithDeceased := JOIN(FraudGovWithBank, FraudgovKEL.PersonDeceased, LEFT.
 // FraudPoint
 //FraudGovWithFraudpoint := JOIN(FraudGovWithCIID, FraudgovKEL.PersonFraudPoint, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
-FraudGovWithBocashell := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonBocashell, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+FraudGovWithBocashell := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonBocashell, LEFT.record_id = RIGHT.record_id, TRANSFORM({RECORDOF(LEFT),RECORDOF(RIGHT),boolean BocashellHit, unsigned bocashelldid}, SELf.BocashellHit := MAP(RIGHT.record_id>0 => 1, 0), SELF.bocashelldid := RIGHT.did, SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1), HASH);
 
 // IP Metadata
 FraudGovWithIPMetadata := JOIN(FraudGovWithBocashell, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
