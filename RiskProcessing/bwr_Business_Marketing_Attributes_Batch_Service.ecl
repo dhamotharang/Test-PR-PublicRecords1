@@ -192,6 +192,7 @@ END;
 
 	pp:= project(P,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
 		SELF.G_ProcBusUID :=Counter;
+		SELF.acctno :=left.accountnumber;
 		SELF.historydate:=(INTEGER)left.archivedate[1..8];
 		SELF.historydateyyyymm:=(INTEGER)left.archivedate[1..6];
 		SELF.streetaddressline1 := left.Addr1;
@@ -225,7 +226,7 @@ soapLayout trans1(pp le, INTEGER c) := TRANSFORM
          self.g_procbusuid:=c;
 						self.historydate :=le.historydate;
 						self.historydateyyyymm :=le.historydateyyyymm;
-         self.accountnumber:=le.accountnumber;
+         self.acctno:=le.acctno;
          self.companyname := le.companyname;
          self.AlternateCompanyName := le.AlternateCompanyName;
          self.streetaddressline1 := le.streetaddressline1;
