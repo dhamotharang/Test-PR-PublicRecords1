@@ -1,7 +1,7 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
 RunKelDemo :=false:stored('RunKelDemo');
 
-
+/*
 edina_layout_input := RECORD
    string20 fname;
    string120 in_streetaddress;
@@ -1605,5 +1605,5 @@ rBocaShell := RECORD
 
 
 Bocashell := DATASET('~foreign::10.173.14.201::fraudgov::base::20200506a::bocashell', rBocaShell, THOR);
-
-EXPORT PersonBocaShell := BocaShell;
+*/
+EXPORT PersonBocaShell := FraudGovPlatform.files().base.bocashell.built;

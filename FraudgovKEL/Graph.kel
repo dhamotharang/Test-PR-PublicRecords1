@@ -1815,7 +1815,7 @@ Event: => T_FirstNmPopFlag := MAP(T_InpClnFirstNmEcho IN ['-99999','-99998','-99
 Event: => T_LastNmPopFlag := MAP(T_InpClnLastNmEcho IN ['-99999','-99998','-99997'] => 0, 1);
 Event: => T_DobPopFlag := MAP(T_InpClnDobEcho < -99997 => 0, 1);
 
-//Current Profile flag attrs
+//Current Profile flag attrs joe
 Event: => P1_AotIdCurrProfFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																			ALL(PersonEvent.Transaction,T_SrcClassType<2) => -99998,
 																			T_SrcClassType < 2 => -99997,
