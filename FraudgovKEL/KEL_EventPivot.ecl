@@ -14,17 +14,6 @@ SHARED UIStats := PROJECT(FraudgovKEL.KEL_EventShell.UIStats, TRANSFORM(RECORDOF
 	SELF := LEFT));
 
 
-EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStats, 'industrytype,customerid,entitycontextuid,recordid', 
-'eventdate,' +
-'deceased,currentlyincarceratedflag,addressisvacant,addressiscmra,addressispobox,invalidaddress,addressoutofstate,' +
-'t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,p1_aotidkrgenfrdactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev'
-/*
-FraudgovKEL.KEL_EventShell.OriginalAttr + ',' +
-FraudgovKEL.KEL_EventShell.StructuralAttr + ',' +
-FraudgovKEL.KEL_EventShell.NicoleAttr
-*/
-);
-
 /* 
   DO THE EVENT ASSESSMENT AND OUTPUT THE RULES DETAIL
 */ 
@@ -35,6 +24,7 @@ rulesoutrec := RECORD
 	 INTEGER1 RuleFlag;
 END;
 
+/*
 MyRules := DATASET([
   {0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't18_ipaddrlocmiamiflag', '1', 0, 0, 3},
   {0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 'addressoutofstate', '1', 0, 0, 3},
@@ -56,15 +46,29 @@ MyRules := DATASET([
   {20995369, 1014, 9, 'Rule5', 'Address is vacant.', 'addressisvacant', '1', 0, 0, 3}
   ],
   {UNSIGNED Customer_id, UNSIGNED industry_type, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel});
+*/
 
+
+EXPORT MyRules := DATASET('~fraudgov::in::sprayed::rules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
 
 // This is just to make sure there aren't duplicates. Should be moved into the build code for the index to check everything and validate.
-MyRulesCnt := TABLE(MyRules, {RuleName, customer_id, industry_type, entitytype, Reccount := COUNT(GROUP)}, RuleName, customer_id, entitytype, industry_type, FEW);
+SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
 //output(MyRulesCnt, named('MyRulesCnt'));
 
+SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStats, 'industrytype,customerid,entitycontextuid,recordid', 
+'eventdate,' +
+// Need the list of the rules attributes here to limit the pivot to only attributes used in rules.
+'deceased,currentlyincarceratedflag,addressisvacant,addressiscmra,addressispobox,invalidaddress,addressoutofstate,' +
+'t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,p1_aotidkrgenfrdactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev'
+/*
+FraudgovKEL.KEL_EventShell.OriginalAttr + ',' +
+FraudgovKEL.KEL_EventShell.StructuralAttr + ',' +
+FraudgovKEL.KEL_EventShell.NicoleAttr
+*/
+);
 
-RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customer_id), 
-                         LEFT.Field=RIGHT.Field AND ((LEFT.customerid=RIGHT.customer_id AND LEFT.industrytype = RIGHT.industry_type) OR RIGHT.customer_id = 0) AND 
+RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customerid), 
+                         LEFT.Field=RIGHT.Field AND ((LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype) OR RIGHT.customerid = 0) AND 
                          (
                            (
                              RIGHT.Value NOT IN ['','0'] AND LEFT.Value = RIGHT.Value
@@ -89,11 +93,11 @@ RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customer_
 														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
 																					 LEFT.Label);
                             */
-                            SELF.field := LEFT.field;
-														SELF.RuleName := RIGHT.RuleName;
-														SELF.EntityType := RIGHT.EntityType;
-														SELF.Description := RIGHT.Description;
-														SELF.Default := (INTEGER1)(RIGHT.customer_id = 0);
+                            SELF.field := LEFT.field,
+														SELF.RuleName := RIGHT.RuleName,
+														SELF.EntityType := RIGHT.EntityType,
+														SELF.Description := RIGHT.Description,
+														SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
                             SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~temp::deleteme41');
 														
 //output(RulesResult(entitycontextuid = '_1194033204'), all, named('RulesResult'));
@@ -109,8 +113,8 @@ RulesResultAgg := DEDUP(SORT(DISTRIBUTE(RulesResultAggPrep, HASH64(customerid, i
 
 // Add how many flags for each rule matched
 EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt, 
-                        ((LEFT.customerid=RIGHT.customer_id AND LEFT.industrytype = RIGHT.industry_type AND LEFT.RuleName = RIGHT.RuleName) OR
-												  (RIGHT.customer_id = 0 AND RIGHT.industry_type = 0 AND LEFT.RuleName = RIGHT.RuleName)) AND LEFT.reccount = RIGHT.reccount, 
+                        ((LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.RuleName = RIGHT.RuleName) OR
+												  (RIGHT.customerid = 0 AND RIGHT.industrytype = 0 AND LEFT.RuleName = RIGHT.RuleName)) AND LEFT.reccount = RIGHT.reccount, 
                         TRANSFORM({LEFT.customerid,LEFT.industrytype,LEFT.entitycontextuid,LEFT.entitytype, LEFT.rulename,LEFT.description,LEFT.risklevel}, SELF := LEFT),
                         LOOKUP, HASH);
 
@@ -178,7 +182,7 @@ OutRec := RECORD
 	INTEGER1 entitytype;
 	STRING Label;
 	INTEGER1 RiskIndx;		
-	INTEGER1 islastentityeventflag;
+	INTEGER1 AotCurrProfFlag;
 	INTEGER1 aotkractflagev;
 	INTEGER1 aotsafeactflagev;
 	UNSIGNED eventcount;
@@ -213,16 +217,16 @@ OutRec NormIt(d1 L, INTEGER C) := TRANSFORM
 																			L.P19_BnkAcctRiskIndx,
 																			L.P20_DLRiskIndx);
 																																																																																																	
-  SELF.islastentityeventflag := CHOOSE(C, 
-																			L.idislasteventid,
-																			L.addrislasteventid,
-																			L.ssnislasteventid,
-																			L.phislasteventid,
-																			L.emlislasteventid,
-																			L.ipislasteventid,
-																			L.bnkislasteventid,
-																			L.dlislasteventid);
-																															
+  SELF.AotCurrProfFlag := CHOOSE(C, 
+																			L.P1_AotIdCurrProfFlag,
+																			L.P9_AotAddrCurrProfFlag,
+																			L.P15_AotSsnCurrProfFlag,
+																			L.P16_AotPhnCurrProfFlag,
+																			L.P17_AotEmailCurrProfFlag,
+																			L.P18_AotIpAddrCurrProfFlag,
+																			L.P19_AotBnkAcctCurrProfFlag,
+																			L.P20_AotDlCurrProfFlag);
+																													
 	SELF.aotkractflagev := CHOOSE(C, 
 																			L.p1_aotidkractflagev,
 																			L.p9_aotaddrkractflagev,
@@ -233,15 +237,16 @@ OutRec NormIt(d1 L, INTEGER C) := TRANSFORM
 																			L.p19_aotbnkacctkractflagev,
 																			L.p20_aotdlkractflagev);	
 
-	SELF.aotsafeactflagev := 0; /*CHOOSE(C, 
-																			L.p1_aotidkractflagev,
-																			L.p9_aotaddrkractflagev,
-																			L.p15_aotssnkractflagev,
-																			L.p16_aotphnkractflagev,
-																			L.p17_aotemailkractflagev,
-																			L.p18_aotipkractflagev,
-																			L.p19_aotbnkacctkractflagev,
-																			L.p20_aotdlkractflagev);	*/
+	SELF.aotsafeactflagev := CHOOSE(C, 
+																			0/*L.p1_aotidkractflagev*/,
+																			L.p9_aotaddrsafeactflagev,
+																			0/*L.p15_aotssnkractflagev*/,
+																			L.p16_aotphnsafeactflagev,
+																			0/*L.p17_aotemailkractflagev*/,
+																			L.p18_aotipaddrsafeactflagev,
+																			0/*L.p19_aotbnkacctkractflagev*/,
+																			0/*L.p20_aotdlkractflagev*/);	
+																			
 																			
 	SELF.eventcount := CHOOSE(C, 
 																			L.personeventcount,
@@ -309,7 +314,7 @@ SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(PivotToEntities, RECOR
 // Transform the rules so that we have identity/element entity context uid with the rules at the last transaction that triggered 
 // So one per entity.
 
-SHARED LastRulesForEntities := JOIN(PivotToEntities(islastentityeventflag=1), RulesFlagsMatched,
+SHARED LastRulesForEntities := JOIN(PivotToEntities(AotCurrProfFlag=1), RulesFlagsMatched,
                           LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND ('_11' + LEFT.recordid) = RIGHT.entitycontextuid AND LEFT.entitytype=RIGHT.entitytype, 
                           TRANSFORM(RECORDOF(RIGHT) AND NOT [entitytype], SELF.entitycontextuid := LEFT.entitycontextuid, SELF := RIGHT), HASH);
 													
