@@ -370,6 +370,7 @@ EXPORT Layouts := MODULE
 		END;
 		
 	END;
+
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Id;
 		string2 	Customer_State;
@@ -383,6 +384,7 @@ EXPORT Layouts := MODULE
 		string 		Customer_Email; // Emails Separated by semicolon ";"
 		unsigned6 	fdn_file_info_id;
 	end;
+
 
 	EXPORT CustomerMappings := RECORD
 		unsigned6	fdn_file_info_id;
@@ -418,9 +420,8 @@ EXPORT Layouts := MODULE
 		end;
 
 
-		export CustomerActiveSprays := record 
-			string20 	Customer_Id;
-			string20	File_type;
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
 		end;
 	end;
 
@@ -480,15 +481,19 @@ Export PII	:=RECORD
 	string2 postdir;
 	string10 unit_desig;
 	string8 sec_range;
+	string25 p_city_name;
   string2 st;
   string5 zip;
+	string100 address_1;
   string10 ssn;
   string10 dob;
   string25 drivers_license;
   string2 drivers_license_state;
   string10 home_phone;
   string10 work_phone_;
+	string50 email_address;
   string25 ip_address;
+	string8	reported_date;
 	unsigned8 Record_ID;
 	unsigned6 fdn_file_info_id;
 
@@ -824,6 +829,16 @@ Export CIID := RECORD
     unsigned4	max_process_date := 0;
     unsigned4	record_count := 1;				
   END;
+	
+ EXPORT PrepaidPhone	:= RECORD
+	string10	phone;
+	string8	reported_date;
+	unsigned8	vendor_first_reported_dt;
+	unsigned8	vendor_last_reported_dt;
+	string2	prepaid;
+	unsigned8	record_id;
+	unsigned6	fdn_file_info_id;
+ END;
  
  
  //KEL Layouts
