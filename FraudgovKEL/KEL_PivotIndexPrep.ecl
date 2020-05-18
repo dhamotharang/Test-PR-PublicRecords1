@@ -23,7 +23,7 @@ EXPORT KEL_PivotIndexPrep := MODULE
 																																LEFT.customerid,LEFT.industrytype,																																	//customer info
 																																LEFT.entitycontextuid,LEFT.entitytype, 																										//entity info
 																																LEFT.recordid,LEFT.eventdate,
-																																LEFT.caseid
+																																LEFT.caseid,
 																																LEFT.label, 
 																																LEFT.RiskIndx, LEFT.aotkractflagev,LEFT.aotsafeactflagev,		//risk info
 																																LEFT.islastentityeventflag,
