@@ -18,7 +18,6 @@ import RoxieKeyBuild, PRTE, codes, Scrubs_Codes, lib_fileservices, strata;
 #uniquename(build_keys_PRTE)
 #uniquename(updateidops)
 #uniquename(update_orbiti)
-#uniquename(run_strata)
 
 %spray_file% := fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_44','~thor_data400::in::codes_v3::csv_'+filedate,-1,,,true,true); //added ::csv to in file
 
@@ -62,11 +61,11 @@ output('ECL codes match'));
                                         // fileservices.Despray('~thor_data400::out::codesv3_version','10.194.64.250',
 																				// '/data/orbitprod/codesv3/process/codesv3flag.txt',,,,TRUE));
   
-%run_strata% := SEQUENTIAL(
-  strata.mac_Pops(Scrubs_Codes.CodesV3_in_Codes,dCodesPops),
-  strata.mac_CreateXMLStats(dCodesPops,'CodesV3',,filedate,'Darren.Knowles@lexisnexisrisk.com',dCodesPopsOut),
-  dCodesPopsOut
-);
+
+  strata.mac_Pops(Scrubs_Codes.CodesV3_in_Codes,dCodesPops);
+  strata.mac_CreateXMLStats(dCodesPops,'CodesV3','data','20200518test','Darren.Knowles@lexisnexisrisk.com',dCodesPopsOut);
+
+
 
 SEQUENTIAL(
   %spray_file%,
@@ -81,7 +80,7 @@ SEQUENTIAL(
   /*%alphacopy%,*/
   %updateidops%, 
   Scrubs_Codes.fn_RunScrubs(filedate,'Darren.Knowles@lexisnexisrisk.com'),
-  %run_strata%,
+  dCodesPopsOut,
   %update_orbiti%) : success(%e_mail_success%), failure(%e_mail_fail%
 );
 endmacro;
