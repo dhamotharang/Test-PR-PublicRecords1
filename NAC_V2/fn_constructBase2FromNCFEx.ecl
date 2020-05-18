@@ -126,7 +126,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));
 
-	addresses := ad1(errors=0);
+	addresses := $.fn_rollupAddresses(ad1(errors=0));
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;

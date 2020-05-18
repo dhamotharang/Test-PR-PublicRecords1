@@ -1,5 +1,5 @@
 ﻿// get record types from file
-import STD;
+import Std;
 GetFileName(string ilfn) := FUNCTION
 		s1 := Std.Str.SplitWords(ilfn, '::');
 		n := COUNT(s1);
@@ -7,6 +7,9 @@ GetFileName(string ilfn) := FUNCTION
 END;
 
 RightNow := Std.Date.Today();
+uc(string s) := Std.Str.ToUpperCase(s);
+
+GetGid(string filename) := uc(filename[6..9]);
 
 EXPORT ExtractRecords(string ilfn) := MODULE
 
@@ -36,8 +39,8 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
-										self.GroupId := left.filename[6..9];
-										self.OrigGroupId := left.filename[6..9];
+										self.GroupId := GetGid(left.filename);
+										self.OrigGroupId := GetGid(left.filename);
 										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
@@ -50,8 +53,8 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
-											self.GroupId := left.filename[6..9];
-											self.OrigGroupId := left.filename[6..9];
+											self.GroupId := GetGid(left.filename);
+											self.OrigGroupId := GetGid(left.filename);
 											//self.filename := fname;
 											self.Created := RightNow;
 											self.Updated := RightNow;
@@ -65,8 +68,8 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 							PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
-												self.GroupId := left.filename[6..9];
-												self.OrigGroupId := left.filename[6..9];
+												self.GroupId := GetGid(left.filename);
+												self.OrigGroupId := GetGid(left.filename);
 												//self.filename := fname;
 												self.Created := RightNow;
 												self.Updated := RightNow;
@@ -79,8 +82,8 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
 										self := LEFT.StateContactRec;
 										self.RecordCode := left.RecordCode;
-										self.GroupId := left.filename[6..9];
-										self.OrigGroupId := left.filename[6..9];
+										self.GroupId := GetGid(left.filename);
+										self.OrigGroupId := GetGid(left.filename);
 										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
@@ -93,7 +96,7 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rExceptionEx,
 										self := LEFT.ExceptionRec;
 										self.RecordCode := left.RecordCode;
-										self.SourceGroupId := left.filename[6..9];
+										self.SourceGroupId := GetGid(left.filename);
 										self.filename := left.filename;
 										self.Created := RightNow;
 										self.Updated := RightNow;

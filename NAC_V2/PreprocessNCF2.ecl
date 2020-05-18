@@ -9,22 +9,50 @@
 
 */
 
+uc(string s) := Std.Str.ToUpperCase(s);
 
-GetCases(string ilfn) := 
+GetCases(string ilfn) := PROJECT(
 		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
-					CaseId, filename, -seqnum, LOCAL), CaseId, filename, LOCAL);
+					CaseId, filename, -seqnum, LOCAL), CaseId, filename, LOCAL),
+				TRANSFORM($.Layouts2.rCaseEx,
+					self.ProgramState := uc(left.ProgramState);
+					self.CountyName := uc(left.CountyName);
+					self := left;
+			));
 					
-GetClients(string ilfn) := 
+GetClients(string ilfn) := PROJECT(
 		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId)),
 					ClientId, CaseId, filename, -seqnum, LOCAL),
-					ClientId, CaseId, filename, LOCAL);
-		
-GetAddresses(string ilfn) := 
+					ClientId, CaseId, filename, LOCAL),
+				TRANSFORM($.Layouts2.rClientEx,
+					self.ProgramState := uc(left.ProgramState);
+					self.LastName := uc(left.LastName);
+					self.FirstName := uc(left.FirstName);
+					self.MiddleName := uc(left.MiddleName);
+					self.NameSuffix := uc(left.NameSuffix);
+					self := left;
+			));
+					
+GetAddresses(string ilfn) := PROJECT(
 		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses, hash32(CaseId, ClientId)),
 					CaseId, ClientId, AddressType, filename, -seqnum, LOCAL),
-					CaseId, ClientId, AddressType, filename, LOCAL);
+					CaseId, ClientId, AddressType, filename, LOCAL),
+					TRANSFORM($.Layouts2.rAddressEx,
+						self.ProgramState := uc(left.ProgramState);
+						self.Street1 := uc(left.Street1);
+						self.Street2 := uc(left.Street2);
+						self.City := uc(left.City);
+						self.State := uc(left.State);						
+						self := left;
+			));
 
-GetContacts(string ilfn) := $.ExtractRecords(ilfn).contacts;
+GetContacts(string ilfn) := PROJECT($.ExtractRecords(ilfn).contacts,
+						TRANSFORM($.Layouts2.rStateContactEx;
+							self.ProgramState := uc(left.ProgramState);
+							self.ContactName := uc(left.ContactName);
+							self := left;
+						));
+
 GetExceptions(string ilfn) := $.ExtractRecords(ilfn).exceptions;
 																	
 EXPORT PreprocessNCF2(string ilfn) := function	
