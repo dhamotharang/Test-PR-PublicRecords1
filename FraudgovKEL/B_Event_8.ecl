@@ -4,8 +4,8 @@ IMPORT B_Event_9,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_8 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_9.__ENH_Event_9) __ENH_Event_9 := B_Event_9.__ENH_Event_9;
-  SHARED __EE72052 := __ENH_Event_9;
-  EXPORT __ST67306_Layout := RECORD
+  SHARED __EE75067 := __ENH_Event_9;
+  EXPORT __ST70318_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -236,11 +236,11 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST67306_Layout __ND72517__Project(B_Event_9.__ST67900_Layout __PP70880) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP70880.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP70880.Lex_Id_),=,__CN('')),__NT(__PP70880.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP70880.Lex_Id_));
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP70880.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP70880.T___Src_Type_,IN,__CN([4,6,8,11])))=>1,__T(__OP2(__PP70880.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP70880.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP70880;
+  SHARED __ST70318_Layout __ND75532__Project(B_Event_9.__ST70912_Layout __PP73892) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP73892.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP73892.Lex_Id_),=,__CN('')),__NT(__PP73892.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP73892.Lex_Id_));
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP73892.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP73892.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP73892.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP73892.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP73892.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP73892;
   END;
-  EXPORT __ENH_Event_8 := PROJECT(__EE72052,__ND72517__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Event_8 := PROJECT(__EE75067,__ND75532__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
 END;
