@@ -26,7 +26,7 @@ EXPORT KEL_PivotIndexPrep := MODULE
 																																LEFT.caseid,
 																																LEFT.label, 
 																																LEFT.RiskIndx, LEFT.aotkractflagev,LEFT.aotsafeactflagev,		//risk info
-																																LEFT.islastentityeventflag,
+																																LEFT.aotcurrprofflag,
 																																LEFT.t_personuidecho,
 																																LEFT.t_inpclnfirstnmecho, LEFT.t_inpclnlastnmecho,											//name
 																																LEFT.t_inpclnssnecho,																																																		//ssn
