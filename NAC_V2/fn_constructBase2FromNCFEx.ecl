@@ -175,11 +175,13 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.case_Monthly_Allotment := left.case_Monthly_Allotment;
 					self.case_Phone1 := left.case_Phone1;
 					self.case_Phone2 := left.case_Phone2;
-					self.case_Email := left.case_Email;
-					self.filename := left.filename;
-					self.OrigGroupId := left.OrigGroupId;
-					self.Created := left.Created;
-					self.Updated := left.Updated;
+					// use client record if available
+					self.OrigGroupId := $.Coalesce(right.OrigGroupId, left.OrigGroupId);
+					self.Created := if(right.Created=0, left.Created, right.Created);
+					self.Updated := if(right.Updated=0, left.Updated, right.Updated);
+					self.filename := $.Coalesce(right.filename, left.filename);
+					self.NCF_FileDate := (unsigned4)self.filename[11..18];
+					self.NCF_FileTime := self.filename[20..25];
 										
 					// add client information
 					self.eligibility_status_indicator := right.Eligibility;
@@ -211,8 +213,9 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					), LEFT OUTER, LOCAL);
 					
 	// add head of household as case name
-	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
-							DISTRIBUTE(clients(HHIndicator='Y'), HASH32(ProgramState,ProgramCode,CaseId)),
+/*
+	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
+							DISTRIBUTE(clients(HHIndicator='Y'), HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
 								left.GroupId=right.GroupId
 								AND left.ProgramState=right.ProgramState
 								AND left.ProgramCode=right.ProgramCode
@@ -227,8 +230,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					), LEFT OUTER, KEEP(1), LOCAL);
 					
 	ds4 := ds2(case_last_name<>'') + ds3;
-	
-	ds5 := JoinAddresses(ds4, addresses);
+*/	
+	ds5 := JoinAddresses(ds2, addresses);
 
 	return ds5;
 

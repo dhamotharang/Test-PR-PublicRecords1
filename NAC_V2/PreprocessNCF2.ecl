@@ -22,8 +22,8 @@ GetCases(string ilfn) := PROJECT(
 					
 GetClients(string ilfn) := PROJECT(
 		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId)),
-					ClientId, CaseId, filename, -seqnum, LOCAL),
-					ClientId, CaseId, filename, LOCAL),
+					ClientId, CaseId, Eligibility, filename, -seqnum, LOCAL),
+					ClientId, CaseId, Eligibility, filename, LOCAL),
 				TRANSFORM($.Layouts2.rClientEx,
 					self.ProgramState := uc(left.ProgramState);
 					self.LastName := uc(left.LastName);
