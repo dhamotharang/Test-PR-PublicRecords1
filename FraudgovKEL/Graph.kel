@@ -42,6 +42,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
 		STRING LastName=NULL(),
 		STRING NameSuffix=NULL(),
     INTEGER rin_source,
+
   
     // Deceased
     
@@ -122,6 +123,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     DriversLicense rDriversLicense=UID(AssociatedCustomerFileInfo, OttoDriversLicenseId),
 		
     INTEGER rin_source,
+		STRING rin_sourcelabel,
 		
     INTEGER LexId, 
     STRING PhoneNumber,
@@ -277,8 +279,25 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING add_curr_long,
     BOOLEAN add_input_isbestmatch,
 		
-    // Deceased
-    
+		STRING historydatetimestamp,
+		INTEGER reported_dob,
+		
+		// Best 
+		
+    BOOLEAN BestHit,
+		STRING best_phone,
+		STRING best_drivers_license_state,
+		STRING best_drivers_license,
+		STRING best_drivers_license_exp,
+		
+		// Phones Meta
+    BOOLEAN PhonesMetaHit,
+		DATE phone_reported_date,
+		DATE phone_vendor_first_reported_dt,
+		DATE phone_vendor_last_reported_dt,
+		STRING phone_prepaid,
+		
+    // Deceased    
     DATE DeceasedDate,
     DATE DeceasedDateOfBirth,
     STRING DeceasedFirst,
@@ -376,6 +395,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     rPhone,rEmail,rInternetProtocol,rBankAccount,rDriversLicense,rSsn,
     Title,FirstName,MiddleName,LastName,NameSuffix,		
 		rin_source,
+	  rin_sourcelabel,		
+		
     LexId,
 	  BocashellHit,
 	  BocashellLexId,
@@ -399,10 +420,15 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		
     DeceasedMatchCode,
     isdeepdive,
-
+    
+		// bocashell
     nap_summary,nas_summary,cvi,fp3_stolenidentityindex,syntheticidentityindex_v3,manipulatedidentityindex_v3,socsdobflag,pwsocsdobflag,dobmatchlevel,
-		sourcerisklevel,reason1,reason2,reason3,reason4,reason5,reason6,socsvalflag,drlcvalflag,hphonevalflag,
-		
+		sourcerisklevel,reason1,reason2,reason3,reason4,reason5,reason6,socsvalflag,drlcvalflag,hphonevalflag,historydatetimestamp,reported_dob,
+		// best
+    BestHit,best_phone,best_drivers_license_state,best_drivers_license,best_drivers_license_exp,
+		// phones meta
+    PhonesMetaHit, phone_reported_date,phone_vendor_first_reported_dt,phone_vendor_last_reported_dt,phone_prepaid,
+	
     truedid,best_fname,best_lname,best_ssn,				
 		input_fname_isbestmatch,input_lname_isbestmatch,input_ssn_isbestmatch,add_curr_pop,add_curr_prim_range,
 		add_curr_predir,add_curr_prim_name,add_curr_addr_suffix,add_curr_postdir,add_curr_unit_desig,add_curr_sec_range,

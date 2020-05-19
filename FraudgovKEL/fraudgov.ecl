@@ -93,4 +93,4 @@ Set_Addresses := [12638153115695167395,10246789559473286115];
 
 tempFinal := DATASET('~foreign::10.173.14.201::temp::fraudgov', RECORDOF(Final), THOR)(did in Set_incarcerated OR did in Set_deceased or did % 100000 = 1 or OttoAddressId in Set_Addresses or event_Date[1..7] = '2019112');
 
-EXPORT fraudgov := tempfinal;//final;
+EXPORT fraudgov := tempFinal; // final

@@ -4,8 +4,8 @@ IMPORT B_Person_8,E_Address,E_Customer,E_Person FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_7 := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_8.__ENH_Person_8) __ENH_Person_8 := B_Person_8.__ENH_Person_8;
-  SHARED __EE80792 := __ENH_Person_8;
-  EXPORT __ST70000_Layout := RECORD
+  SHARED __EE81507 := __ENH_Person_8;
+  EXPORT __ST70234_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -39,9 +39,9 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST70000_Layout __ND81247__Project(B_Person_8.__ST70648_Layout __PP80481) := TRANSFORM
-    SELF.Deceased_Match_ := MAP(__PP80481.Deceased_ = 1 AND __PP80481.Deceased_Name_Match_ = 1 AND __PP80481.Deceased_Dob_Match_ = 1=>1,0);
-    SELF := __PP80481;
+  SHARED __ST70234_Layout __ND81962__Project(B_Person_8.__ST70908_Layout __PP81196) := TRANSFORM
+    SELF.Deceased_Match_ := MAP(__PP81196.Deceased_ = 1 AND __PP81196.Deceased_Name_Match_ = 1 AND __PP81196.Deceased_Dob_Match_ = 1=>1,0);
+    SELF := __PP81196;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE80792,__ND81247__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_7',EXPIRE(7));
+  EXPORT __ENH_Person_7 := PROJECT(__EE81507,__ND81962__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_7',EXPIRE(7));
 END;

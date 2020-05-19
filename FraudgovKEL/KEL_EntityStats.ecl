@@ -3,7 +3,7 @@
 
 
 //	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel:newweighting.csv', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING Indicatortype,	STRING IndicatorDescription, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT WeightingChart := DATASET('~fraudgov::in::configrisklevel::new', {integer8 entitytype,string200 field, string value, decimal64_32 low, decimal64_32 high, integer8 risklevel, string indicatortype, string indicatordescription, integer8 weight, string uidescription}, THOR);
+	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes', {integer8 entitytype,string200 field, string value, decimal64_32 low, decimal64_32 high, integer8 risklevel, string indicatortype, string indicatordescription, integer8 weight, string uidescription}, THOR);
 	
 
 //	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
