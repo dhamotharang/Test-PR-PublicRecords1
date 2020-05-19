@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 24;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Int','Invalid_Float','Invalid_CaseNo','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNumChar','Invalid_Date');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Int' => 2,'Invalid_Float' => 3,'Invalid_CaseNo' => 4,'Invalid_Alpha' => 5,'Invalid_AlphaNum' => 6,'Invalid_AlphaNumChar' => 7,'Invalid_Date' => 8,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Int','Invalid_Float','Invalid_CaseNo','Invalid_URL','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNumChar','Invalid_Date');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_No' => 1,'Invalid_Int' => 2,'Invalid_Float' => 3,'Invalid_CaseNo' => 4,'Invalid_URL' => 5,'Invalid_Alpha' => 6,'Invalid_AlphaNum' => 7,'Invalid_AlphaNumChar' => 8,'Invalid_Date' => 9,0);
  
 EXPORT MakeFT_Invalid_No(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -36,6 +36,13 @@ END;
 EXPORT InValidFT_Invalid_CaseNo(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
 EXPORT InValidMessageFT_Invalid_CaseNo(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
  
+EXPORT MakeFT_Invalid_URL(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789:-./ abcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_URL(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789:-./ abcdefghijklmnopqrstuvwxyz'))));
+EXPORT InValidMessageFT_Invalid_URL(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789:-./ abcdefghijklmnopqrstuvwxyz'),SALT311.HygieneErrors.Good);
+ 
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
@@ -63,7 +70,7 @@ EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneE
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','dockettext','court_code','district','boca_court','catevent_description','catevent_category');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','dockettext','court_code','district','boca_court','catevent_description','catevent_category');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dractivitytypecode' => 0,'docketentryid' => 1,'courtid' => 2,'casekey' => 3,'casetype' => 4,'bkcasenumber' => 5,'bkcasenumberurl' => 6,'proceedingscasenumber' => 7,'proceedingscasenumberurl' => 8,'caseid' => 9,'pacercaseid' => 10,'attachmenturl' => 11,'entrynumber' => 12,'entereddate' => 13,'pacer_entereddate' => 14,'fileddate' => 15,'score' => 16,'drcategoryeventid' => 17,'dockettext' => 18,'court_code' => 19,'district' => 20,'boca_court' => 21,'catevent_description' => 22,'catevent_category' => 23,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],[],['ALLOW'],[],['ALLOW'],['ALLOW'],[],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -92,17 +99,17 @@ EXPORT Make_bkcasenumber(SALT311.StrType s0) := MakeFT_Invalid_CaseNo(s0);
 EXPORT InValid_bkcasenumber(SALT311.StrType s) := InValidFT_Invalid_CaseNo(s);
 EXPORT InValidMessage_bkcasenumber(UNSIGNED1 wh) := InValidMessageFT_Invalid_CaseNo(wh);
  
-EXPORT Make_bkcasenumberurl(SALT311.StrType s0) := s0;
-EXPORT InValid_bkcasenumberurl(SALT311.StrType s) := 0;
-EXPORT InValidMessage_bkcasenumberurl(UNSIGNED1 wh) := '';
+EXPORT Make_bkcasenumberurl(SALT311.StrType s0) := MakeFT_Invalid_URL(s0);
+EXPORT InValid_bkcasenumberurl(SALT311.StrType s) := InValidFT_Invalid_URL(s);
+EXPORT InValidMessage_bkcasenumberurl(UNSIGNED1 wh) := InValidMessageFT_Invalid_URL(wh);
  
 EXPORT Make_proceedingscasenumber(SALT311.StrType s0) := MakeFT_Invalid_CaseNo(s0);
 EXPORT InValid_proceedingscasenumber(SALT311.StrType s) := InValidFT_Invalid_CaseNo(s);
 EXPORT InValidMessage_proceedingscasenumber(UNSIGNED1 wh) := InValidMessageFT_Invalid_CaseNo(wh);
  
-EXPORT Make_proceedingscasenumberurl(SALT311.StrType s0) := s0;
-EXPORT InValid_proceedingscasenumberurl(SALT311.StrType s) := 0;
-EXPORT InValidMessage_proceedingscasenumberurl(UNSIGNED1 wh) := '';
+EXPORT Make_proceedingscasenumberurl(SALT311.StrType s0) := MakeFT_Invalid_URL(s0);
+EXPORT InValid_proceedingscasenumberurl(SALT311.StrType s) := InValidFT_Invalid_URL(s);
+EXPORT InValidMessage_proceedingscasenumberurl(UNSIGNED1 wh) := InValidMessageFT_Invalid_URL(wh);
  
 EXPORT Make_caseid(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_caseid(SALT311.StrType s) := InValidFT_Invalid_No(s);
@@ -112,9 +119,9 @@ EXPORT Make_pacercaseid(SALT311.StrType s0) := MakeFT_Invalid_Int(s0);
 EXPORT InValid_pacercaseid(SALT311.StrType s) := InValidFT_Invalid_Int(s);
 EXPORT InValidMessage_pacercaseid(UNSIGNED1 wh) := InValidMessageFT_Invalid_Int(wh);
  
-EXPORT Make_attachmenturl(SALT311.StrType s0) := s0;
-EXPORT InValid_attachmenturl(SALT311.StrType s) := 0;
-EXPORT InValidMessage_attachmenturl(UNSIGNED1 wh) := '';
+EXPORT Make_attachmenturl(SALT311.StrType s0) := MakeFT_Invalid_URL(s0);
+EXPORT InValid_attachmenturl(SALT311.StrType s) := InValidFT_Invalid_URL(s);
+EXPORT InValidMessage_attachmenturl(UNSIGNED1 wh) := InValidMessageFT_Invalid_URL(wh);
  
 EXPORT Make_entrynumber(SALT311.StrType s0) := MakeFT_Invalid_Int(s0);
 EXPORT InValid_entrynumber(SALT311.StrType s) := InValidFT_Invalid_Int(s);
@@ -160,9 +167,9 @@ EXPORT Make_catevent_description(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumC
 EXPORT InValid_catevent_description(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
 EXPORT InValidMessage_catevent_description(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
-EXPORT Make_catevent_category(SALT311.StrType s0) := s0;
-EXPORT InValid_catevent_category(SALT311.StrType s) := 0;
-EXPORT InValidMessage_catevent_category(UNSIGNED1 wh) := '';
+EXPORT Make_catevent_category(SALT311.StrType s0) := MakeFT_Invalid_AlphaNumChar(s0);
+EXPORT InValid_catevent_category(SALT311.StrType s) := InValidFT_Invalid_AlphaNumChar(s);
+EXPORT InValidMessage_catevent_category(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNumChar(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO

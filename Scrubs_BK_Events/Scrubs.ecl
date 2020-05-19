@@ -3,10 +3,10 @@ IMPORT Scrubs,Scrubs_BK_Events; // Import modules for FieldTypes attribute defin
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 19;
-  EXPORT NumRulesFromFieldType := 19;
+  EXPORT NumRules := 23;
+  EXPORT NumRulesFromFieldType := 23;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 19;
+  EXPORT NumFieldsWithRules := 23;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_BK_Events)
@@ -16,9 +16,12 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 casekey_Invalid;
     UNSIGNED1 casetype_Invalid;
     UNSIGNED1 bkcasenumber_Invalid;
+    UNSIGNED1 bkcasenumberurl_Invalid;
     UNSIGNED1 proceedingscasenumber_Invalid;
+    UNSIGNED1 proceedingscasenumberurl_Invalid;
     UNSIGNED1 caseid_Invalid;
     UNSIGNED1 pacercaseid_Invalid;
+    UNSIGNED1 attachmenturl_Invalid;
     UNSIGNED1 entrynumber_Invalid;
     UNSIGNED1 entereddate_Invalid;
     UNSIGNED1 pacer_entereddate_Invalid;
@@ -29,6 +32,7 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 district_Invalid;
     UNSIGNED1 boca_court_Invalid;
     UNSIGNED1 catevent_description_Invalid;
+    UNSIGNED1 catevent_category_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_BK_Events)
     UNSIGNED8 ScrubsBits1;
@@ -43,9 +47,12 @@ EXPORT Scrubs := MODULE
           ,'casekey:Invalid_No:ALLOW'
           ,'casetype:Invalid_Alpha:CUSTOM'
           ,'bkcasenumber:Invalid_CaseNo:ALLOW'
+          ,'bkcasenumberurl:Invalid_URL:ALLOW'
           ,'proceedingscasenumber:Invalid_CaseNo:ALLOW'
+          ,'proceedingscasenumberurl:Invalid_URL:ALLOW'
           ,'caseid:Invalid_No:ALLOW'
           ,'pacercaseid:Invalid_Int:ALLOW'
+          ,'attachmenturl:Invalid_URL:ALLOW'
           ,'entrynumber:Invalid_Int:ALLOW'
           ,'entereddate:Invalid_Date:CUSTOM'
           ,'pacer_entereddate:Invalid_Date:CUSTOM'
@@ -56,6 +63,7 @@ EXPORT Scrubs := MODULE
           ,'district:Invalid_Alpha:CUSTOM'
           ,'boca_court:Invalid_Alpha:CUSTOM'
           ,'catevent_description:Invalid_AlphaNumChar:CUSTOM'
+          ,'catevent_category:Invalid_AlphaNumChar:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -70,9 +78,12 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_casekey(1)
           ,Fields.InvalidMessage_casetype(1)
           ,Fields.InvalidMessage_bkcasenumber(1)
+          ,Fields.InvalidMessage_bkcasenumberurl(1)
           ,Fields.InvalidMessage_proceedingscasenumber(1)
+          ,Fields.InvalidMessage_proceedingscasenumberurl(1)
           ,Fields.InvalidMessage_caseid(1)
           ,Fields.InvalidMessage_pacercaseid(1)
+          ,Fields.InvalidMessage_attachmenturl(1)
           ,Fields.InvalidMessage_entrynumber(1)
           ,Fields.InvalidMessage_entereddate(1)
           ,Fields.InvalidMessage_pacer_entereddate(1)
@@ -83,6 +94,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_district(1)
           ,Fields.InvalidMessage_boca_court(1)
           ,Fields.InvalidMessage_catevent_description(1)
+          ,Fields.InvalidMessage_catevent_category(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -98,9 +110,12 @@ EXPORT FromNone(DATASET(Layout_BK_Events) h) := MODULE
     SELF.casekey_Invalid := Fields.InValid_casekey((SALT311.StrType)le.casekey);
     SELF.casetype_Invalid := Fields.InValid_casetype((SALT311.StrType)le.casetype);
     SELF.bkcasenumber_Invalid := Fields.InValid_bkcasenumber((SALT311.StrType)le.bkcasenumber);
+    SELF.bkcasenumberurl_Invalid := Fields.InValid_bkcasenumberurl((SALT311.StrType)le.bkcasenumberurl);
     SELF.proceedingscasenumber_Invalid := Fields.InValid_proceedingscasenumber((SALT311.StrType)le.proceedingscasenumber);
+    SELF.proceedingscasenumberurl_Invalid := Fields.InValid_proceedingscasenumberurl((SALT311.StrType)le.proceedingscasenumberurl);
     SELF.caseid_Invalid := Fields.InValid_caseid((SALT311.StrType)le.caseid);
     SELF.pacercaseid_Invalid := Fields.InValid_pacercaseid((SALT311.StrType)le.pacercaseid);
+    SELF.attachmenturl_Invalid := Fields.InValid_attachmenturl((SALT311.StrType)le.attachmenturl);
     SELF.entrynumber_Invalid := Fields.InValid_entrynumber((SALT311.StrType)le.entrynumber);
     SELF.entereddate_Invalid := Fields.InValid_entereddate((SALT311.StrType)le.entereddate);
     SELF.pacer_entereddate_Invalid := Fields.InValid_pacer_entereddate((SALT311.StrType)le.pacer_entereddate);
@@ -111,12 +126,13 @@ EXPORT FromNone(DATASET(Layout_BK_Events) h) := MODULE
     SELF.district_Invalid := Fields.InValid_district((SALT311.StrType)le.district);
     SELF.boca_court_Invalid := Fields.InValid_boca_court((SALT311.StrType)le.boca_court);
     SELF.catevent_description_Invalid := Fields.InValid_catevent_description((SALT311.StrType)le.catevent_description);
+    SELF.catevent_category_Invalid := Fields.InValid_catevent_category((SALT311.StrType)le.catevent_category);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_BK_Events);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dractivitytypecode_Invalid << 0 ) + ( le.docketentryid_Invalid << 1 ) + ( le.courtid_Invalid << 2 ) + ( le.casekey_Invalid << 3 ) + ( le.casetype_Invalid << 4 ) + ( le.bkcasenumber_Invalid << 5 ) + ( le.proceedingscasenumber_Invalid << 6 ) + ( le.caseid_Invalid << 7 ) + ( le.pacercaseid_Invalid << 8 ) + ( le.entrynumber_Invalid << 9 ) + ( le.entereddate_Invalid << 10 ) + ( le.pacer_entereddate_Invalid << 11 ) + ( le.fileddate_Invalid << 12 ) + ( le.score_Invalid << 13 ) + ( le.drcategoryeventid_Invalid << 14 ) + ( le.court_code_Invalid << 15 ) + ( le.district_Invalid << 16 ) + ( le.boca_court_Invalid << 17 ) + ( le.catevent_description_Invalid << 18 );
+    SELF.ScrubsBits1 := ( le.dractivitytypecode_Invalid << 0 ) + ( le.docketentryid_Invalid << 1 ) + ( le.courtid_Invalid << 2 ) + ( le.casekey_Invalid << 3 ) + ( le.casetype_Invalid << 4 ) + ( le.bkcasenumber_Invalid << 5 ) + ( le.bkcasenumberurl_Invalid << 6 ) + ( le.proceedingscasenumber_Invalid << 7 ) + ( le.proceedingscasenumberurl_Invalid << 8 ) + ( le.caseid_Invalid << 9 ) + ( le.pacercaseid_Invalid << 10 ) + ( le.attachmenturl_Invalid << 11 ) + ( le.entrynumber_Invalid << 12 ) + ( le.entereddate_Invalid << 13 ) + ( le.pacer_entereddate_Invalid << 14 ) + ( le.fileddate_Invalid << 15 ) + ( le.score_Invalid << 16 ) + ( le.drcategoryeventid_Invalid << 17 ) + ( le.court_code_Invalid << 18 ) + ( le.district_Invalid << 19 ) + ( le.boca_court_Invalid << 20 ) + ( le.catevent_description_Invalid << 21 ) + ( le.catevent_category_Invalid << 22 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -144,19 +160,23 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.casekey_Invalid := (le.ScrubsBits1 >> 3) & 1;
     SELF.casetype_Invalid := (le.ScrubsBits1 >> 4) & 1;
     SELF.bkcasenumber_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.proceedingscasenumber_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.caseid_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.pacercaseid_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.entrynumber_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.entereddate_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.pacer_entereddate_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.fileddate_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.score_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.drcategoryeventid_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.court_code_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.district_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.boca_court_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.catevent_description_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.bkcasenumberurl_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.proceedingscasenumber_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.proceedingscasenumberurl_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.caseid_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.pacercaseid_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.attachmenturl_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.entrynumber_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.entereddate_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.pacer_entereddate_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.fileddate_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.score_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.drcategoryeventid_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.court_code_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.district_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.boca_court_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.catevent_description_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.catevent_category_Invalid := (le.ScrubsBits1 >> 22) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -171,9 +191,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     casekey_ALLOW_ErrorCount := COUNT(GROUP,h.casekey_Invalid=1);
     casetype_CUSTOM_ErrorCount := COUNT(GROUP,h.casetype_Invalid=1);
     bkcasenumber_ALLOW_ErrorCount := COUNT(GROUP,h.bkcasenumber_Invalid=1);
+    bkcasenumberurl_ALLOW_ErrorCount := COUNT(GROUP,h.bkcasenumberurl_Invalid=1);
     proceedingscasenumber_ALLOW_ErrorCount := COUNT(GROUP,h.proceedingscasenumber_Invalid=1);
+    proceedingscasenumberurl_ALLOW_ErrorCount := COUNT(GROUP,h.proceedingscasenumberurl_Invalid=1);
     caseid_ALLOW_ErrorCount := COUNT(GROUP,h.caseid_Invalid=1);
     pacercaseid_ALLOW_ErrorCount := COUNT(GROUP,h.pacercaseid_Invalid=1);
+    attachmenturl_ALLOW_ErrorCount := COUNT(GROUP,h.attachmenturl_Invalid=1);
     entrynumber_ALLOW_ErrorCount := COUNT(GROUP,h.entrynumber_Invalid=1);
     entereddate_CUSTOM_ErrorCount := COUNT(GROUP,h.entereddate_Invalid=1);
     pacer_entereddate_CUSTOM_ErrorCount := COUNT(GROUP,h.pacer_entereddate_Invalid=1);
@@ -184,7 +207,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     district_CUSTOM_ErrorCount := COUNT(GROUP,h.district_Invalid=1);
     boca_court_CUSTOM_ErrorCount := COUNT(GROUP,h.boca_court_Invalid=1);
     catevent_description_CUSTOM_ErrorCount := COUNT(GROUP,h.catevent_description_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.dractivitytypecode_Invalid > 0 OR h.docketentryid_Invalid > 0 OR h.courtid_Invalid > 0 OR h.casekey_Invalid > 0 OR h.casetype_Invalid > 0 OR h.bkcasenumber_Invalid > 0 OR h.proceedingscasenumber_Invalid > 0 OR h.caseid_Invalid > 0 OR h.pacercaseid_Invalid > 0 OR h.entrynumber_Invalid > 0 OR h.entereddate_Invalid > 0 OR h.pacer_entereddate_Invalid > 0 OR h.fileddate_Invalid > 0 OR h.score_Invalid > 0 OR h.drcategoryeventid_Invalid > 0 OR h.court_code_Invalid > 0 OR h.district_Invalid > 0 OR h.boca_court_Invalid > 0 OR h.catevent_description_Invalid > 0);
+    catevent_category_CUSTOM_ErrorCount := COUNT(GROUP,h.catevent_category_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.dractivitytypecode_Invalid > 0 OR h.docketentryid_Invalid > 0 OR h.courtid_Invalid > 0 OR h.casekey_Invalid > 0 OR h.casetype_Invalid > 0 OR h.bkcasenumber_Invalid > 0 OR h.bkcasenumberurl_Invalid > 0 OR h.proceedingscasenumber_Invalid > 0 OR h.proceedingscasenumberurl_Invalid > 0 OR h.caseid_Invalid > 0 OR h.pacercaseid_Invalid > 0 OR h.attachmenturl_Invalid > 0 OR h.entrynumber_Invalid > 0 OR h.entereddate_Invalid > 0 OR h.pacer_entereddate_Invalid > 0 OR h.fileddate_Invalid > 0 OR h.score_Invalid > 0 OR h.drcategoryeventid_Invalid > 0 OR h.court_code_Invalid > 0 OR h.district_Invalid > 0 OR h.boca_court_Invalid > 0 OR h.catevent_description_Invalid > 0 OR h.catevent_category_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -192,9 +216,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dractivitytypecode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.docketentryid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.courtid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casekey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casetype_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkcasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.caseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pacercaseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entrynumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pacer_entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fileddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drcategoryeventid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.court_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.district_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.boca_court_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_description_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dractivitytypecode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.docketentryid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.courtid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casekey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casetype_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkcasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkcasenumberurl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumberurl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.caseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pacercaseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.attachmenturl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entrynumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pacer_entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fileddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drcategoryeventid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.court_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.district_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.boca_court_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_description_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_category_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dractivitytypecode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.docketentryid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.courtid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casekey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casetype_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkcasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.caseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pacercaseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entrynumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pacer_entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fileddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drcategoryeventid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.court_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.district_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.boca_court_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_description_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dractivitytypecode_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.docketentryid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.courtid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casekey_ALLOW_ErrorCount > 0, 1, 0) + IF(le.casetype_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.bkcasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bkcasenumberurl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proceedingscasenumberurl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.caseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.pacercaseid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.attachmenturl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entrynumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.pacer_entereddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fileddate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drcategoryeventid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.court_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.district_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.boca_court_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_description_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.catevent_category_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -209,8 +233,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dractivitytypecode_Invalid,le.docketentryid_Invalid,le.courtid_Invalid,le.casekey_Invalid,le.casetype_Invalid,le.bkcasenumber_Invalid,le.proceedingscasenumber_Invalid,le.caseid_Invalid,le.pacercaseid_Invalid,le.entrynumber_Invalid,le.entereddate_Invalid,le.pacer_entereddate_Invalid,le.fileddate_Invalid,le.score_Invalid,le.drcategoryeventid_Invalid,le.court_code_Invalid,le.district_Invalid,le.boca_court_Invalid,le.catevent_description_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dractivitytypecode(le.dractivitytypecode_Invalid),Fields.InvalidMessage_docketentryid(le.docketentryid_Invalid),Fields.InvalidMessage_courtid(le.courtid_Invalid),Fields.InvalidMessage_casekey(le.casekey_Invalid),Fields.InvalidMessage_casetype(le.casetype_Invalid),Fields.InvalidMessage_bkcasenumber(le.bkcasenumber_Invalid),Fields.InvalidMessage_proceedingscasenumber(le.proceedingscasenumber_Invalid),Fields.InvalidMessage_caseid(le.caseid_Invalid),Fields.InvalidMessage_pacercaseid(le.pacercaseid_Invalid),Fields.InvalidMessage_entrynumber(le.entrynumber_Invalid),Fields.InvalidMessage_entereddate(le.entereddate_Invalid),Fields.InvalidMessage_pacer_entereddate(le.pacer_entereddate_Invalid),Fields.InvalidMessage_fileddate(le.fileddate_Invalid),Fields.InvalidMessage_score(le.score_Invalid),Fields.InvalidMessage_drcategoryeventid(le.drcategoryeventid_Invalid),Fields.InvalidMessage_court_code(le.court_code_Invalid),Fields.InvalidMessage_district(le.district_Invalid),Fields.InvalidMessage_boca_court(le.boca_court_Invalid),Fields.InvalidMessage_catevent_description(le.catevent_description_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dractivitytypecode_Invalid,le.docketentryid_Invalid,le.courtid_Invalid,le.casekey_Invalid,le.casetype_Invalid,le.bkcasenumber_Invalid,le.bkcasenumberurl_Invalid,le.proceedingscasenumber_Invalid,le.proceedingscasenumberurl_Invalid,le.caseid_Invalid,le.pacercaseid_Invalid,le.attachmenturl_Invalid,le.entrynumber_Invalid,le.entereddate_Invalid,le.pacer_entereddate_Invalid,le.fileddate_Invalid,le.score_Invalid,le.drcategoryeventid_Invalid,le.court_code_Invalid,le.district_Invalid,le.boca_court_Invalid,le.catevent_description_Invalid,le.catevent_category_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dractivitytypecode(le.dractivitytypecode_Invalid),Fields.InvalidMessage_docketentryid(le.docketentryid_Invalid),Fields.InvalidMessage_courtid(le.courtid_Invalid),Fields.InvalidMessage_casekey(le.casekey_Invalid),Fields.InvalidMessage_casetype(le.casetype_Invalid),Fields.InvalidMessage_bkcasenumber(le.bkcasenumber_Invalid),Fields.InvalidMessage_bkcasenumberurl(le.bkcasenumberurl_Invalid),Fields.InvalidMessage_proceedingscasenumber(le.proceedingscasenumber_Invalid),Fields.InvalidMessage_proceedingscasenumberurl(le.proceedingscasenumberurl_Invalid),Fields.InvalidMessage_caseid(le.caseid_Invalid),Fields.InvalidMessage_pacercaseid(le.pacercaseid_Invalid),Fields.InvalidMessage_attachmenturl(le.attachmenturl_Invalid),Fields.InvalidMessage_entrynumber(le.entrynumber_Invalid),Fields.InvalidMessage_entereddate(le.entereddate_Invalid),Fields.InvalidMessage_pacer_entereddate(le.pacer_entereddate_Invalid),Fields.InvalidMessage_fileddate(le.fileddate_Invalid),Fields.InvalidMessage_score(le.score_Invalid),Fields.InvalidMessage_drcategoryeventid(le.drcategoryeventid_Invalid),Fields.InvalidMessage_court_code(le.court_code_Invalid),Fields.InvalidMessage_district(le.district_Invalid),Fields.InvalidMessage_boca_court(le.boca_court_Invalid),Fields.InvalidMessage_catevent_description(le.catevent_description_Invalid),Fields.InvalidMessage_catevent_category(le.catevent_category_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dractivitytypecode_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.docketentryid_Invalid,'ALLOW','UNKNOWN')
@@ -218,9 +242,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.casekey_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.casetype_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.bkcasenumber_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.bkcasenumberurl_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.proceedingscasenumber_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.proceedingscasenumberurl_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.caseid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.pacercaseid_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.attachmenturl_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.entrynumber_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.entereddate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.pacer_entereddate_Invalid,'CUSTOM','UNKNOWN')
@@ -230,12 +257,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.court_code_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.district_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.boca_court_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.catevent_description_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','proceedingscasenumber','caseid','pacercaseid','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','court_code','district','boca_court','catevent_description','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_Alpha','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_CaseNo','Invalid_CaseNo','Invalid_No','Invalid_Int','Invalid_Int','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Float','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNumChar','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dractivitytypecode,(SALT311.StrType)le.docketentryid,(SALT311.StrType)le.courtid,(SALT311.StrType)le.casekey,(SALT311.StrType)le.casetype,(SALT311.StrType)le.bkcasenumber,(SALT311.StrType)le.proceedingscasenumber,(SALT311.StrType)le.caseid,(SALT311.StrType)le.pacercaseid,(SALT311.StrType)le.entrynumber,(SALT311.StrType)le.entereddate,(SALT311.StrType)le.pacer_entereddate,(SALT311.StrType)le.fileddate,(SALT311.StrType)le.score,(SALT311.StrType)le.drcategoryeventid,(SALT311.StrType)le.court_code,(SALT311.StrType)le.district,(SALT311.StrType)le.boca_court,(SALT311.StrType)le.catevent_description,'***SALTBUG***');
+          ,CHOOSE(le.catevent_description_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.catevent_category_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','court_code','district','boca_court','catevent_description','catevent_category','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_Alpha','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_CaseNo','Invalid_URL','Invalid_CaseNo','Invalid_URL','Invalid_No','Invalid_Int','Invalid_URL','Invalid_Int','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Float','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNumChar','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dractivitytypecode,(SALT311.StrType)le.docketentryid,(SALT311.StrType)le.courtid,(SALT311.StrType)le.casekey,(SALT311.StrType)le.casetype,(SALT311.StrType)le.bkcasenumber,(SALT311.StrType)le.bkcasenumberurl,(SALT311.StrType)le.proceedingscasenumber,(SALT311.StrType)le.proceedingscasenumberurl,(SALT311.StrType)le.caseid,(SALT311.StrType)le.pacercaseid,(SALT311.StrType)le.attachmenturl,(SALT311.StrType)le.entrynumber,(SALT311.StrType)le.entereddate,(SALT311.StrType)le.pacer_entereddate,(SALT311.StrType)le.fileddate,(SALT311.StrType)le.score,(SALT311.StrType)le.drcategoryeventid,(SALT311.StrType)le.court_code,(SALT311.StrType)le.district,(SALT311.StrType)le.boca_court,(SALT311.StrType)le.catevent_description,(SALT311.StrType)le.catevent_category,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,19,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,23,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -254,9 +282,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.casekey_ALLOW_ErrorCount
           ,le.casetype_CUSTOM_ErrorCount
           ,le.bkcasenumber_ALLOW_ErrorCount
+          ,le.bkcasenumberurl_ALLOW_ErrorCount
           ,le.proceedingscasenumber_ALLOW_ErrorCount
+          ,le.proceedingscasenumberurl_ALLOW_ErrorCount
           ,le.caseid_ALLOW_ErrorCount
           ,le.pacercaseid_ALLOW_ErrorCount
+          ,le.attachmenturl_ALLOW_ErrorCount
           ,le.entrynumber_ALLOW_ErrorCount
           ,le.entereddate_CUSTOM_ErrorCount
           ,le.pacer_entereddate_CUSTOM_ErrorCount
@@ -267,6 +298,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.district_CUSTOM_ErrorCount
           ,le.boca_court_CUSTOM_ErrorCount
           ,le.catevent_description_CUSTOM_ErrorCount
+          ,le.catevent_category_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -281,9 +313,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.casekey_ALLOW_ErrorCount
           ,le.casetype_CUSTOM_ErrorCount
           ,le.bkcasenumber_ALLOW_ErrorCount
+          ,le.bkcasenumberurl_ALLOW_ErrorCount
           ,le.proceedingscasenumber_ALLOW_ErrorCount
+          ,le.proceedingscasenumberurl_ALLOW_ErrorCount
           ,le.caseid_ALLOW_ErrorCount
           ,le.pacercaseid_ALLOW_ErrorCount
+          ,le.attachmenturl_ALLOW_ErrorCount
           ,le.entrynumber_ALLOW_ErrorCount
           ,le.entereddate_CUSTOM_ErrorCount
           ,le.pacer_entereddate_CUSTOM_ErrorCount
@@ -293,7 +328,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.court_code_CUSTOM_ErrorCount
           ,le.district_CUSTOM_ErrorCount
           ,le.boca_court_CUSTOM_ErrorCount
-          ,le.catevent_description_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.catevent_description_CUSTOM_ErrorCount
+          ,le.catevent_category_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)

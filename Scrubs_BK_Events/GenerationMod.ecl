@@ -46,6 +46,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Int:ALLOW(0123456789- )\n'
     + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789., )\n'
     + 'FIELDTYPE:Invalid_CaseNo:ALLOW(0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
+    + 'FIELDTYPE:Invalid_URL:ALLOW(0123456789:-./ abcdefghijklmnopqrstuvwxyz)\n'
     + 'FIELDTYPE:Invalid_Alpha:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'Alpha\')\n'
     + 'FIELDTYPE:Invalid_AlphaNum:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNum\', true)\n'
     + 'FIELDTYPE:Invalid_AlphaNumChar:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNumChar\', true)\n'
@@ -57,12 +58,12 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:casekey:TYPE(STRING7):LIKE(Invalid_No):0,0\n'
     + 'FIELD:casetype:TYPE(STRING2):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:bkcasenumber:TYPE(STRING24):LIKE(Invalid_CaseNo):0,0\n'
-    + 'FIELD:bkcasenumberurl:TYPE(STRING200):0,0\n'
+    + 'FIELD:bkcasenumberurl:TYPE(STRING200):LIKE(Invalid_URL):0,0\n'
     + 'FIELD:proceedingscasenumber:TYPE(STRING24):LIKE(Invalid_CaseNo):0,0\n'
-    + 'FIELD:proceedingscasenumberurl:TYPE(STRING200):0,0\n'
+    + 'FIELD:proceedingscasenumberurl:TYPE(STRING200):LIKE(Invalid_URL):0,0\n'
     + 'FIELD:caseid:TYPE(STRING10):LIKE(Invalid_No):0,0\n'
     + 'FIELD:pacercaseid:TYPE(STRING10):LIKE(Invalid_Int):0,0\n'
-    + 'FIELD:attachmenturl:TYPE(STRING200):0,0\n'
+    + 'FIELD:attachmenturl:TYPE(STRING200):LIKE(Invalid_URL):0,0\n'
     + 'FIELD:entrynumber:TYPE(STRING10):LIKE(Invalid_Int):0,0\n'
     + 'FIELD:entereddate:TYPE(STRING24):LIKE(Invalid_Date):0,0\n'
     + 'FIELD:pacer_entereddate:TYPE(STRING24):LIKE(Invalid_Date):0,0\n'
@@ -74,7 +75,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:district:TYPE(STRING40):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:boca_court:TYPE(STRING5):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:catevent_description:TYPE(STRING200):LIKE(Invalid_AlphaNumChar):0,0\n'
-    + 'FIELD:catevent_category:TYPE(STRING200):0,0\n'
+    + 'FIELD:catevent_category:TYPE(STRING200):LIKE(Invalid_AlphaNumChar):0,0\n'
     ;
  
   // Structured values
