@@ -78,10 +78,6 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
     populated_drcategoryeventid_pcnt := AVE(GROUP,IF(h.drcategoryeventid = (TYPEOF(h.drcategoryeventid))'',0,100));
     maxlength_drcategoryeventid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.drcategoryeventid)));
     avelength_drcategoryeventid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.drcategoryeventid)),h.drcategoryeventid<>(typeof(h.drcategoryeventid))'');
-    populated_dockettext_cnt := COUNT(GROUP,h.dockettext <> (TYPEOF(h.dockettext))'');
-    populated_dockettext_pcnt := AVE(GROUP,IF(h.dockettext = (TYPEOF(h.dockettext))'',0,100));
-    maxlength_dockettext := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.dockettext)));
-    avelength_dockettext := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.dockettext)),h.dockettext<>(typeof(h.dockettext))'');
     populated_court_code_cnt := COUNT(GROUP,h.court_code <> (TYPEOF(h.court_code))'');
     populated_court_code_pcnt := AVE(GROUP,IF(h.court_code = (TYPEOF(h.court_code))'',0,100));
     maxlength_court_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.court_code)));
@@ -105,7 +101,7 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
-    UNSIGNED LinkingPotential :=  + T.Populated_dractivitytypecode_pcnt *   0.00 / 100 + T.Populated_docketentryid_pcnt *   0.00 / 100 + T.Populated_courtid_pcnt *   0.00 / 100 + T.Populated_casekey_pcnt *   0.00 / 100 + T.Populated_casetype_pcnt *   0.00 / 100 + T.Populated_bkcasenumber_pcnt *   0.00 / 100 + T.Populated_bkcasenumberurl_pcnt *   0.00 / 100 + T.Populated_proceedingscasenumber_pcnt *   0.00 / 100 + T.Populated_proceedingscasenumberurl_pcnt *   0.00 / 100 + T.Populated_caseid_pcnt *   0.00 / 100 + T.Populated_pacercaseid_pcnt *   0.00 / 100 + T.Populated_attachmenturl_pcnt *   0.00 / 100 + T.Populated_entrynumber_pcnt *   0.00 / 100 + T.Populated_entereddate_pcnt *   0.00 / 100 + T.Populated_pacer_entereddate_pcnt *   0.00 / 100 + T.Populated_fileddate_pcnt *   0.00 / 100 + T.Populated_score_pcnt *   0.00 / 100 + T.Populated_drcategoryeventid_pcnt *   0.00 / 100 + T.Populated_dockettext_pcnt *   0.00 / 100 + T.Populated_court_code_pcnt *   0.00 / 100 + T.Populated_district_pcnt *   0.00 / 100 + T.Populated_boca_court_pcnt *   0.00 / 100 + T.Populated_catevent_description_pcnt *   0.00 / 100 + T.Populated_catevent_category_pcnt *   0.00 / 100;
+    UNSIGNED LinkingPotential :=  + T.Populated_dractivitytypecode_pcnt *   0.00 / 100 + T.Populated_docketentryid_pcnt *   0.00 / 100 + T.Populated_courtid_pcnt *   0.00 / 100 + T.Populated_casekey_pcnt *   0.00 / 100 + T.Populated_casetype_pcnt *   0.00 / 100 + T.Populated_bkcasenumber_pcnt *   0.00 / 100 + T.Populated_bkcasenumberurl_pcnt *   0.00 / 100 + T.Populated_proceedingscasenumber_pcnt *   0.00 / 100 + T.Populated_proceedingscasenumberurl_pcnt *   0.00 / 100 + T.Populated_caseid_pcnt *   0.00 / 100 + T.Populated_pacercaseid_pcnt *   0.00 / 100 + T.Populated_attachmenturl_pcnt *   0.00 / 100 + T.Populated_entrynumber_pcnt *   0.00 / 100 + T.Populated_entereddate_pcnt *   0.00 / 100 + T.Populated_pacer_entereddate_pcnt *   0.00 / 100 + T.Populated_fileddate_pcnt *   0.00 / 100 + T.Populated_score_pcnt *   0.00 / 100 + T.Populated_drcategoryeventid_pcnt *   0.00 / 100 + T.Populated_court_code_pcnt *   0.00 / 100 + T.Populated_district_pcnt *   0.00 / 100 + T.Populated_boca_court_pcnt *   0.00 / 100 + T.Populated_catevent_description_pcnt *   0.00 / 100 + T.Populated_catevent_category_pcnt *   0.00 / 100;
     T;
   END;
   RETURN TABLE(T,R1);
@@ -123,27 +119,27 @@ END;
 invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.FldNo := C;
   SELF.NumberOfRecords := le.NumberOfRecords;
-  SELF.FieldName := CHOOSE(C,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','dockettext','court_code','district','boca_court','catevent_description','catevent_category');
-  SELF.populated_pcnt := CHOOSE(C,le.populated_dractivitytypecode_pcnt,le.populated_docketentryid_pcnt,le.populated_courtid_pcnt,le.populated_casekey_pcnt,le.populated_casetype_pcnt,le.populated_bkcasenumber_pcnt,le.populated_bkcasenumberurl_pcnt,le.populated_proceedingscasenumber_pcnt,le.populated_proceedingscasenumberurl_pcnt,le.populated_caseid_pcnt,le.populated_pacercaseid_pcnt,le.populated_attachmenturl_pcnt,le.populated_entrynumber_pcnt,le.populated_entereddate_pcnt,le.populated_pacer_entereddate_pcnt,le.populated_fileddate_pcnt,le.populated_score_pcnt,le.populated_drcategoryeventid_pcnt,le.populated_dockettext_pcnt,le.populated_court_code_pcnt,le.populated_district_pcnt,le.populated_boca_court_pcnt,le.populated_catevent_description_pcnt,le.populated_catevent_category_pcnt);
-  SELF.maxlength := CHOOSE(C,le.maxlength_dractivitytypecode,le.maxlength_docketentryid,le.maxlength_courtid,le.maxlength_casekey,le.maxlength_casetype,le.maxlength_bkcasenumber,le.maxlength_bkcasenumberurl,le.maxlength_proceedingscasenumber,le.maxlength_proceedingscasenumberurl,le.maxlength_caseid,le.maxlength_pacercaseid,le.maxlength_attachmenturl,le.maxlength_entrynumber,le.maxlength_entereddate,le.maxlength_pacer_entereddate,le.maxlength_fileddate,le.maxlength_score,le.maxlength_drcategoryeventid,le.maxlength_dockettext,le.maxlength_court_code,le.maxlength_district,le.maxlength_boca_court,le.maxlength_catevent_description,le.maxlength_catevent_category);
-  SELF.avelength := CHOOSE(C,le.avelength_dractivitytypecode,le.avelength_docketentryid,le.avelength_courtid,le.avelength_casekey,le.avelength_casetype,le.avelength_bkcasenumber,le.avelength_bkcasenumberurl,le.avelength_proceedingscasenumber,le.avelength_proceedingscasenumberurl,le.avelength_caseid,le.avelength_pacercaseid,le.avelength_attachmenturl,le.avelength_entrynumber,le.avelength_entereddate,le.avelength_pacer_entereddate,le.avelength_fileddate,le.avelength_score,le.avelength_drcategoryeventid,le.avelength_dockettext,le.avelength_court_code,le.avelength_district,le.avelength_boca_court,le.avelength_catevent_description,le.avelength_catevent_category);
+  SELF.FieldName := CHOOSE(C,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','court_code','district','boca_court','catevent_description','catevent_category');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_dractivitytypecode_pcnt,le.populated_docketentryid_pcnt,le.populated_courtid_pcnt,le.populated_casekey_pcnt,le.populated_casetype_pcnt,le.populated_bkcasenumber_pcnt,le.populated_bkcasenumberurl_pcnt,le.populated_proceedingscasenumber_pcnt,le.populated_proceedingscasenumberurl_pcnt,le.populated_caseid_pcnt,le.populated_pacercaseid_pcnt,le.populated_attachmenturl_pcnt,le.populated_entrynumber_pcnt,le.populated_entereddate_pcnt,le.populated_pacer_entereddate_pcnt,le.populated_fileddate_pcnt,le.populated_score_pcnt,le.populated_drcategoryeventid_pcnt,le.populated_court_code_pcnt,le.populated_district_pcnt,le.populated_boca_court_pcnt,le.populated_catevent_description_pcnt,le.populated_catevent_category_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_dractivitytypecode,le.maxlength_docketentryid,le.maxlength_courtid,le.maxlength_casekey,le.maxlength_casetype,le.maxlength_bkcasenumber,le.maxlength_bkcasenumberurl,le.maxlength_proceedingscasenumber,le.maxlength_proceedingscasenumberurl,le.maxlength_caseid,le.maxlength_pacercaseid,le.maxlength_attachmenturl,le.maxlength_entrynumber,le.maxlength_entereddate,le.maxlength_pacer_entereddate,le.maxlength_fileddate,le.maxlength_score,le.maxlength_drcategoryeventid,le.maxlength_court_code,le.maxlength_district,le.maxlength_boca_court,le.maxlength_catevent_description,le.maxlength_catevent_category);
+  SELF.avelength := CHOOSE(C,le.avelength_dractivitytypecode,le.avelength_docketentryid,le.avelength_courtid,le.avelength_casekey,le.avelength_casetype,le.avelength_bkcasenumber,le.avelength_bkcasenumberurl,le.avelength_proceedingscasenumber,le.avelength_proceedingscasenumberurl,le.avelength_caseid,le.avelength_pacercaseid,le.avelength_attachmenturl,le.avelength_entrynumber,le.avelength_entereddate,le.avelength_pacer_entereddate,le.avelength_fileddate,le.avelength_score,le.avelength_drcategoryeventid,le.avelength_court_code,le.avelength_district,le.avelength_boca_court,le.avelength_catevent_description,le.avelength_catevent_category);
 END;
-EXPORT invSummary := NORMALIZE(summary0, 24, invert(LEFT,COUNTER));
+EXPORT invSummary := NORMALIZE(summary0, 23, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
 SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.dockettext),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
   SELF.FldNo := C;
 END;
-SHARED FldInv0 := NORMALIZE(h,24,Into(LEFT,COUNTER));
+SHARED FldInv0 := NORMALIZE(h,23,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
 SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
-  SELF.FldNo1 := 1 + (C / 24);
-  SELF.FldNo2 := 1 + (C % 24);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.dockettext),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.dockettext),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
+  SELF.FldNo1 := 1 + (C / 23);
+  SELF.FldNo2 := 1 + (C % 23);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.dractivitytypecode),TRIM((SALT311.StrType)le.docketentryid),TRIM((SALT311.StrType)le.courtid),TRIM((SALT311.StrType)le.casekey),TRIM((SALT311.StrType)le.casetype),TRIM((SALT311.StrType)le.bkcasenumber),TRIM((SALT311.StrType)le.bkcasenumberurl),TRIM((SALT311.StrType)le.proceedingscasenumber),TRIM((SALT311.StrType)le.proceedingscasenumberurl),TRIM((SALT311.StrType)le.caseid),TRIM((SALT311.StrType)le.pacercaseid),TRIM((SALT311.StrType)le.attachmenturl),TRIM((SALT311.StrType)le.entrynumber),TRIM((SALT311.StrType)le.entereddate),TRIM((SALT311.StrType)le.pacer_entereddate),TRIM((SALT311.StrType)le.fileddate),TRIM((SALT311.StrType)le.score),TRIM((SALT311.StrType)le.drcategoryeventid),TRIM((SALT311.StrType)le.court_code),TRIM((SALT311.StrType)le.district),TRIM((SALT311.StrType)le.boca_court),TRIM((SALT311.StrType)le.catevent_description),TRIM((SALT311.StrType)le.catevent_category)));
   END;
-SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),24*24,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),23*23,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'dractivitytypecode'}
       ,{2,'docketentryid'}
       ,{3,'courtid'}
@@ -162,12 +158,11 @@ SHARED FldIds := DATASET([{1,'dractivitytypecode'}
       ,{16,'fileddate'}
       ,{17,'score'}
       ,{18,'drcategoryeventid'}
-      ,{19,'dockettext'}
-      ,{20,'court_code'}
-      ,{21,'district'}
-      ,{22,'boca_court'}
-      ,{23,'catevent_description'}
-      ,{24,'catevent_category'}],SALT311.MAC_Character_Counts.Field_Identification);
+      ,{19,'court_code'}
+      ,{20,'district'}
+      ,{21,'boca_court'}
+      ,{22,'catevent_description'}
+      ,{23,'catevent_category'}],SALT311.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
 EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
@@ -198,7 +193,6 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     Fields.InValid_fileddate((SALT311.StrType)le.fileddate),
     Fields.InValid_score((SALT311.StrType)le.score),
     Fields.InValid_drcategoryeventid((SALT311.StrType)le.drcategoryeventid),
-    Fields.InValid_dockettext((SALT311.StrType)le.dockettext),
     Fields.InValid_court_code((SALT311.StrType)le.court_code),
     Fields.InValid_district((SALT311.StrType)le.district),
     Fields.InValid_boca_court((SALT311.StrType)le.boca_court),
@@ -207,7 +201,7 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
-Errors := NORMALIZE(h,24,NoteErrors(LEFT,COUNTER));
+Errors := NORMALIZE(h,23,NoteErrors(LEFT,COUNTER));
 ErrorRecordsTotals := RECORD
   Errors.FieldNum;
   Errors.ErrorNum;
@@ -216,8 +210,8 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_Alpha','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_CaseNo','Invalid_URL','Invalid_CaseNo','Invalid_URL','Invalid_No','Invalid_Int','Invalid_URL','Invalid_Int','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Float','Invalid_No','Unknown','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNumChar');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_dractivitytypecode(TotalErrors.ErrorNum),Fields.InValidMessage_docketentryid(TotalErrors.ErrorNum),Fields.InValidMessage_courtid(TotalErrors.ErrorNum),Fields.InValidMessage_casekey(TotalErrors.ErrorNum),Fields.InValidMessage_casetype(TotalErrors.ErrorNum),Fields.InValidMessage_bkcasenumber(TotalErrors.ErrorNum),Fields.InValidMessage_bkcasenumberurl(TotalErrors.ErrorNum),Fields.InValidMessage_proceedingscasenumber(TotalErrors.ErrorNum),Fields.InValidMessage_proceedingscasenumberurl(TotalErrors.ErrorNum),Fields.InValidMessage_caseid(TotalErrors.ErrorNum),Fields.InValidMessage_pacercaseid(TotalErrors.ErrorNum),Fields.InValidMessage_attachmenturl(TotalErrors.ErrorNum),Fields.InValidMessage_entrynumber(TotalErrors.ErrorNum),Fields.InValidMessage_entereddate(TotalErrors.ErrorNum),Fields.InValidMessage_pacer_entereddate(TotalErrors.ErrorNum),Fields.InValidMessage_fileddate(TotalErrors.ErrorNum),Fields.InValidMessage_score(TotalErrors.ErrorNum),Fields.InValidMessage_drcategoryeventid(TotalErrors.ErrorNum),Fields.InValidMessage_dockettext(TotalErrors.ErrorNum),Fields.InValidMessage_court_code(TotalErrors.ErrorNum),Fields.InValidMessage_district(TotalErrors.ErrorNum),Fields.InValidMessage_boca_court(TotalErrors.ErrorNum),Fields.InValidMessage_catevent_description(TotalErrors.ErrorNum),Fields.InValidMessage_catevent_category(TotalErrors.ErrorNum));
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_Alpha','Invalid_No','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_CaseNo','Invalid_URL','Invalid_CaseNo','Invalid_URL','Invalid_No','Invalid_Int','Invalid_URL','Invalid_Int','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Float','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNumChar','Invalid_AlphaNumChar');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_dractivitytypecode(TotalErrors.ErrorNum),Fields.InValidMessage_docketentryid(TotalErrors.ErrorNum),Fields.InValidMessage_courtid(TotalErrors.ErrorNum),Fields.InValidMessage_casekey(TotalErrors.ErrorNum),Fields.InValidMessage_casetype(TotalErrors.ErrorNum),Fields.InValidMessage_bkcasenumber(TotalErrors.ErrorNum),Fields.InValidMessage_bkcasenumberurl(TotalErrors.ErrorNum),Fields.InValidMessage_proceedingscasenumber(TotalErrors.ErrorNum),Fields.InValidMessage_proceedingscasenumberurl(TotalErrors.ErrorNum),Fields.InValidMessage_caseid(TotalErrors.ErrorNum),Fields.InValidMessage_pacercaseid(TotalErrors.ErrorNum),Fields.InValidMessage_attachmenturl(TotalErrors.ErrorNum),Fields.InValidMessage_entrynumber(TotalErrors.ErrorNum),Fields.InValidMessage_entereddate(TotalErrors.ErrorNum),Fields.InValidMessage_pacer_entereddate(TotalErrors.ErrorNum),Fields.InValidMessage_fileddate(TotalErrors.ErrorNum),Fields.InValidMessage_score(TotalErrors.ErrorNum),Fields.InValidMessage_drcategoryeventid(TotalErrors.ErrorNum),Fields.InValidMessage_court_code(TotalErrors.ErrorNum),Fields.InValidMessage_district(TotalErrors.ErrorNum),Fields.InValidMessage_boca_court(TotalErrors.ErrorNum),Fields.InValidMessage_catevent_description(TotalErrors.ErrorNum),Fields.InValidMessage_catevent_category(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);

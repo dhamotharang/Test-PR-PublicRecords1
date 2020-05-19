@@ -386,7 +386,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'fileddate:' + getFieldTypeText(h.fileddate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'score:' + getFieldTypeText(h.score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'drcategoryeventid:' + getFieldTypeText(h.drcategoryeventid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'dockettext:' + getFieldTypeText(h.dockettext) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'court_code:' + getFieldTypeText(h.court_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'district:' + getFieldTypeText(h.district) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'boca_court:' + getFieldTypeText(h.boca_court) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -411,7 +410,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_fileddate_cnt
           ,le.populated_score_cnt
           ,le.populated_drcategoryeventid_cnt
-          ,le.populated_dockettext_cnt
           ,le.populated_court_code_cnt
           ,le.populated_district_cnt
           ,le.populated_boca_court_cnt
@@ -436,7 +434,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_fileddate_pcnt
           ,le.populated_score_pcnt
           ,le.populated_drcategoryeventid_pcnt
-          ,le.populated_dockettext_pcnt
           ,le.populated_court_code_pcnt
           ,le.populated_district_pcnt
           ,le.populated_boca_court_pcnt
@@ -444,7 +441,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_catevent_category_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,24,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,23,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -460,7 +457,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_BK_Events));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),24,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),23,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

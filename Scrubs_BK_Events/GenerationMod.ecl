@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'BK_Events';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dractivitytypecode,docketentryid,courtid,casekey,casetype,bkcasenumber,bkcasenumberurl,proceedingscasenumber,proceedingscasenumberurl,caseid,pacercaseid,attachmenturl,entrynumber,entereddate,pacer_entereddate,fileddate,score,drcategoryeventid,dockettext,court_code,district,boca_court,catevent_description,catevent_category';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dractivitytypecode,docketentryid,courtid,casekey,casetype,bkcasenumber,bkcasenumberurl,proceedingscasenumber,proceedingscasenumberurl,caseid,pacercaseid,attachmenturl,entrynumber,entereddate,pacer_entereddate,fileddate,score,drcategoryeventid,court_code,district,boca_court,catevent_description,catevent_category';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -46,7 +46,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Int:ALLOW(0123456789- )\n'
     + 'FIELDTYPE:Invalid_Float:ALLOW(0123456789., )\n'
     + 'FIELDTYPE:Invalid_CaseNo:ALLOW(0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
-    + 'FIELDTYPE:Invalid_URL:ALLOW(0123456789:-./ abcdefghijklmnopqrstuvwxyz)\n'
+    + 'FIELDTYPE:Invalid_URL:ALLOW(0123456789:;-_=&./? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:Invalid_Alpha:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'Alpha\')\n'
     + 'FIELDTYPE:Invalid_AlphaNum:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNum\', true)\n'
     + 'FIELDTYPE:Invalid_AlphaNumChar:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNumChar\', true)\n'
@@ -70,7 +70,6 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:fileddate:TYPE(STRING24):LIKE(Invalid_Date):0,0\n'
     + 'FIELD:score:TYPE(STRING5):LIKE(Invalid_Float):0,0\n'
     + 'FIELD:drcategoryeventid:TYPE(STRING5):LIKE(Invalid_No):0,0\n'
-    + 'FIELD:dockettext:TYPE(STRING5000):0,0\n'
     + 'FIELD:court_code:TYPE(STRING5):LIKE(Invalid_AlphaNum):0,0\n'
     + 'FIELD:district:TYPE(STRING40):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:boca_court:TYPE(STRING5):LIKE(Invalid_Alpha):0,0\n'

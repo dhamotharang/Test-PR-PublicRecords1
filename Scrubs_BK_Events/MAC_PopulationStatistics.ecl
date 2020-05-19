@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dractivitytypecode = '',Input_docketentryid = '',Input_courtid = '',Input_casekey = '',Input_casetype = '',Input_bkcasenumber = '',Input_bkcasenumberurl = '',Input_proceedingscasenumber = '',Input_proceedingscasenumberurl = '',Input_caseid = '',Input_pacercaseid = '',Input_attachmenturl = '',Input_entrynumber = '',Input_entereddate = '',Input_pacer_entereddate = '',Input_fileddate = '',Input_score = '',Input_drcategoryeventid = '',Input_dockettext = '',Input_court_code = '',Input_district = '',Input_boca_court = '',Input_catevent_description = '',Input_catevent_category = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dractivitytypecode = '',Input_docketentryid = '',Input_courtid = '',Input_casekey = '',Input_casetype = '',Input_bkcasenumber = '',Input_bkcasenumberurl = '',Input_proceedingscasenumber = '',Input_proceedingscasenumberurl = '',Input_caseid = '',Input_pacercaseid = '',Input_attachmenturl = '',Input_entrynumber = '',Input_entereddate = '',Input_pacer_entereddate = '',Input_fileddate = '',Input_score = '',Input_drcategoryeventid = '',Input_court_code = '',Input_district = '',Input_boca_court = '',Input_catevent_description = '',Input_catevent_category = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_BK_Events;
   #uniquename(of)
   %of% := RECORD
@@ -114,12 +114,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dractivitytypecode = '',Inpu
       '' 
     #ELSE
         IF( le.Input_drcategoryeventid = (TYPEOF(le.Input_drcategoryeventid))'','',':drcategoryeventid')
-    #END
- 
-+    #IF( #TEXT(Input_dockettext)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dockettext = (TYPEOF(le.Input_dockettext))'','',':dockettext')
     #END
  
 +    #IF( #TEXT(Input_court_code)='' )

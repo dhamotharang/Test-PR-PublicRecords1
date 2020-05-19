@@ -2,7 +2,7 @@
 IMPORT Scrubs,Scrubs_BK_Events; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
-EXPORT NumFields := 24;
+EXPORT NumFields := 23;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_No','Invalid_Int','Invalid_Float','Invalid_CaseNo','Invalid_URL','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNumChar','Invalid_Date');
@@ -37,11 +37,11 @@ EXPORT InValidFT_Invalid_CaseNo(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LEN
 EXPORT InValidMessageFT_Invalid_CaseNo(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_URL(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789:-./ abcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789:;-_=&./? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_URL(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789:-./ abcdefghijklmnopqrstuvwxyz'))));
-EXPORT InValidMessageFT_Invalid_URL(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789:-./ abcdefghijklmnopqrstuvwxyz'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_URL(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789:;-_=&./? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_Invalid_URL(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789:;-_=&./? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -67,11 +67,11 @@ END;
 EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs_BK_Events.Fn_Valid_Date(s)>0);
 EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_BK_Events.Fn_Valid_Date'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','dockettext','court_code','district','boca_court','catevent_description','catevent_category');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','dockettext','court_code','district','boca_court','catevent_description','catevent_category');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dractivitytypecode' => 0,'docketentryid' => 1,'courtid' => 2,'casekey' => 3,'casetype' => 4,'bkcasenumber' => 5,'bkcasenumberurl' => 6,'proceedingscasenumber' => 7,'proceedingscasenumberurl' => 8,'caseid' => 9,'pacercaseid' => 10,'attachmenturl' => 11,'entrynumber' => 12,'entereddate' => 13,'pacer_entereddate' => 14,'fileddate' => 15,'score' => 16,'drcategoryeventid' => 17,'dockettext' => 18,'court_code' => 19,'district' => 20,'boca_court' => 21,'catevent_description' => 22,'catevent_category' => 23,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','court_code','district','boca_court','catevent_description','catevent_category');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dractivitytypecode','docketentryid','courtid','casekey','casetype','bkcasenumber','bkcasenumberurl','proceedingscasenumber','proceedingscasenumberurl','caseid','pacercaseid','attachmenturl','entrynumber','entereddate','pacer_entereddate','fileddate','score','drcategoryeventid','court_code','district','boca_court','catevent_description','catevent_category');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dractivitytypecode' => 0,'docketentryid' => 1,'courtid' => 2,'casekey' => 3,'casetype' => 4,'bkcasenumber' => 5,'bkcasenumberurl' => 6,'proceedingscasenumber' => 7,'proceedingscasenumberurl' => 8,'caseid' => 9,'pacercaseid' => 10,'attachmenturl' => 11,'entrynumber' => 12,'entereddate' => 13,'pacer_entereddate' => 14,'fileddate' => 15,'score' => 16,'drcategoryeventid' => 17,'court_code' => 18,'district' => 19,'boca_court' => 20,'catevent_description' => 21,'catevent_category' => 22,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -147,10 +147,6 @@ EXPORT Make_drcategoryeventid(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_drcategoryeventid(SALT311.StrType s) := InValidFT_Invalid_No(s);
 EXPORT InValidMessage_drcategoryeventid(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_dockettext(SALT311.StrType s0) := s0;
-EXPORT InValid_dockettext(SALT311.StrType s) := 0;
-EXPORT InValidMessage_dockettext(UNSIGNED1 wh) := '';
- 
 EXPORT Make_court_code(SALT311.StrType s0) := MakeFT_Invalid_AlphaNum(s0);
 EXPORT InValid_court_code(SALT311.StrType s) := InValidFT_Invalid_AlphaNum(s);
 EXPORT InValidMessage_court_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaNum(wh);
@@ -210,7 +206,6 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_fileddate;
     BOOLEAN Diff_score;
     BOOLEAN Diff_drcategoryeventid;
-    BOOLEAN Diff_dockettext;
     BOOLEAN Diff_court_code;
     BOOLEAN Diff_district;
     BOOLEAN Diff_boca_court;
@@ -239,14 +234,13 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_fileddate := le.fileddate <> ri.fileddate;
     SELF.Diff_score := le.score <> ri.score;
     SELF.Diff_drcategoryeventid := le.drcategoryeventid <> ri.drcategoryeventid;
-    SELF.Diff_dockettext := le.dockettext <> ri.dockettext;
     SELF.Diff_court_code := le.court_code <> ri.court_code;
     SELF.Diff_district := le.district <> ri.district;
     SELF.Diff_boca_court := le.boca_court <> ri.boca_court;
     SELF.Diff_catevent_description := le.catevent_description <> ri.catevent_description;
     SELF.Diff_catevent_category := le.catevent_category <> ri.catevent_category;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_dractivitytypecode,1,0)+ IF( SELF.Diff_docketentryid,1,0)+ IF( SELF.Diff_courtid,1,0)+ IF( SELF.Diff_casekey,1,0)+ IF( SELF.Diff_casetype,1,0)+ IF( SELF.Diff_bkcasenumber,1,0)+ IF( SELF.Diff_bkcasenumberurl,1,0)+ IF( SELF.Diff_proceedingscasenumber,1,0)+ IF( SELF.Diff_proceedingscasenumberurl,1,0)+ IF( SELF.Diff_caseid,1,0)+ IF( SELF.Diff_pacercaseid,1,0)+ IF( SELF.Diff_attachmenturl,1,0)+ IF( SELF.Diff_entrynumber,1,0)+ IF( SELF.Diff_entereddate,1,0)+ IF( SELF.Diff_pacer_entereddate,1,0)+ IF( SELF.Diff_fileddate,1,0)+ IF( SELF.Diff_score,1,0)+ IF( SELF.Diff_drcategoryeventid,1,0)+ IF( SELF.Diff_dockettext,1,0)+ IF( SELF.Diff_court_code,1,0)+ IF( SELF.Diff_district,1,0)+ IF( SELF.Diff_boca_court,1,0)+ IF( SELF.Diff_catevent_description,1,0)+ IF( SELF.Diff_catevent_category,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_dractivitytypecode,1,0)+ IF( SELF.Diff_docketentryid,1,0)+ IF( SELF.Diff_courtid,1,0)+ IF( SELF.Diff_casekey,1,0)+ IF( SELF.Diff_casetype,1,0)+ IF( SELF.Diff_bkcasenumber,1,0)+ IF( SELF.Diff_bkcasenumberurl,1,0)+ IF( SELF.Diff_proceedingscasenumber,1,0)+ IF( SELF.Diff_proceedingscasenumberurl,1,0)+ IF( SELF.Diff_caseid,1,0)+ IF( SELF.Diff_pacercaseid,1,0)+ IF( SELF.Diff_attachmenturl,1,0)+ IF( SELF.Diff_entrynumber,1,0)+ IF( SELF.Diff_entereddate,1,0)+ IF( SELF.Diff_pacer_entereddate,1,0)+ IF( SELF.Diff_fileddate,1,0)+ IF( SELF.Diff_score,1,0)+ IF( SELF.Diff_drcategoryeventid,1,0)+ IF( SELF.Diff_court_code,1,0)+ IF( SELF.Diff_district,1,0)+ IF( SELF.Diff_boca_court,1,0)+ IF( SELF.Diff_catevent_description,1,0)+ IF( SELF.Diff_catevent_category,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -277,7 +271,6 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_fileddate := COUNT(GROUP,%Closest%.Diff_fileddate);
     Count_Diff_score := COUNT(GROUP,%Closest%.Diff_score);
     Count_Diff_drcategoryeventid := COUNT(GROUP,%Closest%.Diff_drcategoryeventid);
-    Count_Diff_dockettext := COUNT(GROUP,%Closest%.Diff_dockettext);
     Count_Diff_court_code := COUNT(GROUP,%Closest%.Diff_court_code);
     Count_Diff_district := COUNT(GROUP,%Closest%.Diff_district);
     Count_Diff_boca_court := COUNT(GROUP,%Closest%.Diff_boca_court);
