@@ -113,11 +113,11 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 
 	cases := $.fn_rollupCases(ca1(errors=0));
 
-	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+	cl1 := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
-										), HASH32(ClientId));
+										);
 
 	clients := $.fn_rollupClients(cl1(errors=0));
 
