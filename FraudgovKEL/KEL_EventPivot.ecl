@@ -49,7 +49,7 @@ MyRules := DATASET([
 */
 
 
-EXPORT MyRules := DATASET('~fraudgov::in::sprayed::rules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
+EXPORT MyRules := DATASET('~fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
 
 // This is just to make sure there aren't duplicates. Should be moved into the build code for the index to check everything and validate.
 SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
@@ -157,7 +157,7 @@ EntityAssessmentPrep := SORT(PROJECT(EntityEventAssessment,
 //output(EntityAssessmentPrep(entitycontextuid = '_1194033204'), all, named('EntityAssessmentPrep'));
 
 
-EntityAssessment := TABLE(EntityAssessmentPrep, {
+EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 											 industrytype, customerid, entitycontextuid, 
 											 INTEGER1 P1_IDRiskIndx := MAX(GROUP, P1_IDRiskIndx),
 											 INTEGER1 P15_SSNRiskIndx:= MAX(GROUP, P15_SSNRiskIndx),
@@ -166,7 +166,17 @@ EntityAssessment := TABLE(EntityAssessmentPrep, {
 											 INTEGER1 P19_BnkAcctRiskIndx:= MAX(GROUP, P19_BnkAcctRiskIndx),
 											 INTEGER1 P20_DLRiskIndx:= MAX(GROUP, P20_DLRiskIndx),
 											 INTEGER1 P18_IPAddrRiskIndx:= MAX(GROUP, P18_IPAddrRiskIndx),
-											 INTEGER1 P9_AddrRiskIndx:= MAX(GROUP, P9_AddrRiskIndx)}, industrytype, customerid, entitycontextuid, MERGE);
+											 INTEGER1 P9_AddrRiskIndx:= MAX(GROUP, P9_AddrRiskIndx)}, industrytype, customerid, entitycontextuid, MERGE),
+                        TRANSFORM(RECORDOF(LEFT), 
+                          SELF.P1_IDRiskIndx := MAP(P1_IDRiskIndx=0=>1, P1_IDRiskIndx),
+                          SELF.P15_SSNRiskIndx:= MAP(P15_SSNRiskIndx=0=>1, 0),
+                          SELF.P16_PhnRiskIndx:= MAP(P16_PhnRiskIndx=0=>1, 0),
+                          SELF.P17_EmailRiskIndx:= MAP(P17_EmailRiskIndx=0=>1, 0),
+                          SELF.P19_BnkAcctRiskIndx:= MAP(P19_BnkAcctRiskIndx=0=>1, 0), 
+                          SELF.P20_DLRiskIndx:= MAP(P20_DLRiskIndx=0=>1, 0), 
+                          SELF.P18_IPAddrRiskIndx:= MAP(P18_IPAddrRiskIndx=0=>1, 0), 
+                          SELF.P9_AddrRiskIndx:= MAP(P9_AddrRiskIndx=0=>1, 0),
+                          SELF := LEFT)); // PROJECT to DEFAULT 1 for low risk for anything without any risk.						  
 											
 //output(EntityAssessment(entitycontextuid = '_1194033204'), named('EntityAssessment'));
 

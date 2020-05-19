@@ -17,7 +17,8 @@ EXPORT KEL_EventShell := MODULE
 		'addrevent30count,ssnevent30count,personevent30count,phoneevent30count,emailevent30count,ipevent30count,bankaccountevent30count,driverslicenseevent30count,' +
 		'addrevent365count,ssnevent365count,personevent365count,phoneevent365count,emailevent365count,ipevent365count,bankaccountevent365count,driverslicenseevent365count';
 
-	EXPORT StructuralAttr := 'addreventafterkrflag,ssneventafterkrflag,personeventafterkrflag,phoneeventafterkrflag,emaileventafterkrflag,ipeventafterkrflag,bankaccounteventafterkrflag,driverslicenseeventafterkrflag,'+
+	EXPORT StructuralAttr := 'rin_sourcelabel,rin_source,' +
+	    'addreventafterkrflag,ssneventafterkrflag,personeventafterkrflag,phoneeventafterkrflag,emaileventafterkrflag,ipeventafterkrflag,bankaccounteventafterkrflag,driverslicenseeventafterkrflag,'+
 		'addreventafterkrcount,ssneventafterkrcount,personeventafterkrcount,phoneeventafterkrcount,emaileventafterkrcount,ipeventafterkrcount,bankaccounteventafterkrcount,driverslicenseeventafterkrcount,'+
 		'kreventafterknownrisk,krpersonprofileflag,kremailprofileflag,kraddressprofileflag,kripprofileflag,krssnprofileflag,krphoneprofileflag,krbankaccountprofileflag,krdriverslicenseprofileflag,' +
 		'idislasteventid,emlislasteventid,addrislasteventid,ipislasteventid,bnkislasteventid,dlislasteventid,ssnislasteventid,phislasteventid,' +

@@ -30,8 +30,21 @@ FraudGovWithDeceased := JOIN(FraudGovWithBank, FraudgovKEL.PersonDeceased, LEFT.
 
 FraudGovWithBocashell := JOIN(FraudGovWithDeceased, FraudgovKEL.PersonBocashell, LEFT.record_id = RIGHT.record_id, TRANSFORM({RECORDOF(LEFT),RECORDOF(RIGHT),boolean BocashellHit, unsigned bocashelldid}, SELf.BocashellHit := MAP(RIGHT.record_id>0 => 1, 0), SELF.bocashelldid := RIGHT.did, SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1), HASH);
 
+// Best 
+FraudGovWithBest := JOIN(FraudGovWithBocashell, FraudgovKEL.PersonBest, LEFT.record_id = RIGHT.record_id, TRANSFORM({RECORDOF(LEFT),boolean BestHit, RIGHT.best_phone, RIGHT.best_drivers_license_state, RIGHT.best_drivers_license, RIGHT.best_drivers_license_exp}, SELf.BestHit := MAP(RIGHT.record_id>0 => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1), HASH);
+
+// Phones Meta
+FraudGovWithPhonesMeta := JOIN(FraudGovWithBest, FraudgovKEL.PersonPhonesMeta, LEFT.record_id = RIGHT.record_id, 
+   TRANSFORM({RECORDOF(LEFT),RECORDOF(RIGHT),boolean PhonesMetaHit,string8 phone_reported_date,unsigned8 phone_vendor_first_reported_dt,unsigned8 phone_vendor_last_reported_dt,string2 phone_prepaid}, 
+	  SELF.PhonesMetaHit := MAP(RIGHT.record_id>0 => 1, 0), 
+    SELF.phone_reported_date := RIGHT.reported_date,
+    SELF.phone_vendor_first_reported_dt := RIGHT.vendor_first_reported_dt,
+    SELF.phone_vendor_last_reported_dt := RIGHT.vendor_last_reported_dt,
+    SELF.phone_prepaid := RIGHT.prepaid,
+    SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1), HASH);
+		
 // IP Metadata
-FraudGovWithIPMetadata := JOIN(FraudGovWithBocashell, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+FraudGovWithIPMetadata := JOIN(FraudGovWithPhonesMeta, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // Crim
 FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, FraudgovKEL.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
