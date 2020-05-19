@@ -23,10 +23,10 @@ EXPORT KEL_PivotIndexPrep := MODULE
 																																LEFT.customerid,LEFT.industrytype,																																	//customer info
 																																LEFT.entitycontextuid,LEFT.entitytype, 																										//entity info
 																																LEFT.recordid,LEFT.eventdate,
-																																//LEFT.caseid
+																																LEFT.caseid,
 																																LEFT.label, 
 																																LEFT.RiskIndx, LEFT.aotkractflagev,LEFT.aotsafeactflagev,		//risk info
-																																LEFT.islastentityeventflag,
+																																LEFT.aotcurrprofflag,
 																																LEFT.t_personuidecho,
 																																LEFT.t_inpclnfirstnmecho, LEFT.t_inpclnlastnmecho,											//name
 																																LEFT.t_inpclnssnecho,																																																		//ssn
@@ -41,11 +41,14 @@ EXPORT KEL_PivotIndexPrep := MODULE
 																																//LEFT.streetaddress, 
 																																LEFT.t_inpclnaddrcityecho, LEFT.t_inpclnaddrstecho, LEFT.t_inpclnaddrzip5echo, //address
 																																LEFT.t_inpclnipaddrecho, LEFT.t18_ipaddrispnm, LEFT.t18_ipaddrcountry,		//IP info
-																																LEFT.t_inpclnphnecho,																																																		//email
+																																LEFT.t_inpclnphnecho,																																																		//phone
+																																LEFT.t_inpclnemailecho,																																														// email
 																																LEFT.t19_bnkacctbnknm, LEFT.t_inpclnbnkacctecho, LEFT.t_inpclnbnkacctrtgecho,		//bank info
 																																LEFT.t_inpclndlstecho, LEFT.t_inpclndlecho,																					//DL info
 																																LEFT.event30count, LEFT.eventcount, LEFT.personeventcount,	//event counts
+														STRING100 deviceid,
 														DATASET(NvpRec) Nvp},  
+														SELF.deviceid := '',
 														SELF.nvp := DATASET([
 														 {'personentitycontextuid', (STRING)LEFT.personentitycontextuid},
 															{'phoneentitycontextuid', (STRING)LEFT.phoneentitycontextuid},
@@ -54,7 +57,8 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'ssnentitycontextuid', (STRING)LEFT.ssnentitycontextuid},
 															{'ipentitycontextuid', (STRING)LEFT.ipentitycontextuid},
 															{'bankaccountentitycontextuid', (STRING)LEFT.bankaccountentitycontextuid},
-															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid}
+															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid},
+															{'t_inagencyflag', (STRING)LEFT.t_inagencyflag}
 														 ], NvpRec),
 														 SELF := LEFT));
 
