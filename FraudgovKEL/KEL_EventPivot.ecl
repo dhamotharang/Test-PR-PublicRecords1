@@ -168,14 +168,14 @@ EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 											 INTEGER1 P18_IPAddrRiskIndx:= MAX(GROUP, P18_IPAddrRiskIndx),
 											 INTEGER1 P9_AddrRiskIndx:= MAX(GROUP, P9_AddrRiskIndx)}, industrytype, customerid, entitycontextuid, MERGE),
                         TRANSFORM(RECORDOF(LEFT), 
-                          SELF.P1_IDRiskIndx := MAP(P1_IDRiskIndx=0=>1, P1_IDRiskIndx),
-                          SELF.P15_SSNRiskIndx:= MAP(P15_SSNRiskIndx=0=>1, 0),
-                          SELF.P16_PhnRiskIndx:= MAP(P16_PhnRiskIndx=0=>1, 0),
-                          SELF.P17_EmailRiskIndx:= MAP(P17_EmailRiskIndx=0=>1, 0),
-                          SELF.P19_BnkAcctRiskIndx:= MAP(P19_BnkAcctRiskIndx=0=>1, 0), 
-                          SELF.P20_DLRiskIndx:= MAP(P20_DLRiskIndx=0=>1, 0), 
-                          SELF.P18_IPAddrRiskIndx:= MAP(P18_IPAddrRiskIndx=0=>1, 0), 
-                          SELF.P9_AddrRiskIndx:= MAP(P9_AddrRiskIndx=0=>1, 0),
+                          SELF.P1_IDRiskIndx := MAP(LEFT.P1_IDRiskIndx=0=>1, LEFT.P1_IDRiskIndx),
+                          SELF.P15_SSNRiskIndx:= MAP(LEFT.P15_SSNRiskIndx=0=>1, LEFT.P15_SSNRiskIndx),
+                          SELF.P16_PhnRiskIndx:= MAP(LEFT.P16_PhnRiskIndx=0=>1, LEFT.P16_PhnRiskIndx),
+                          SELF.P17_EmailRiskIndx:= MAP(LEFT.P17_EmailRiskIndx=0=>1, LEFT.P17_EmailRiskIndx),
+                          SELF.P19_BnkAcctRiskIndx:= MAP(LEFT.P19_BnkAcctRiskIndx=0=>1, LEFT.P19_BnkAcctRiskIndx), 
+                          SELF.P20_DLRiskIndx:= MAP(LEFT.P20_DLRiskIndx=0=>1, LEFT.P20_DLRiskIndx), 
+                          SELF.P18_IPAddrRiskIndx:= MAP(LEFT.P18_IPAddrRiskIndx=0=>1, LEFT.P18_IPAddrRiskIndx), 
+                          SELF.P9_AddrRiskIndx:= MAP(LEFT.P9_AddrRiskIndx=0=>1, LEFT.P9_AddrRiskIndx),
                           SELF := LEFT)); // PROJECT to DEFAULT 1 for low risk for anything without any risk.						  
 											
 //output(EntityAssessment(entitycontextuid = '_1194033204'), named('EntityAssessment'));
