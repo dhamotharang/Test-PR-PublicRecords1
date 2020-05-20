@@ -9,15 +9,15 @@ IMPORT Std;
 
 Set_recordid:=[100042207,98396537,88091596,92371598,103657507,105277042,86770921,93547646,93955623,97576259,100486875,100599348,100599726,103659109,92350043,100874669,93645928,93955623];
 
-FraudgovKEL.KEL_EventShell.CleanEventShell(BocaShellHit);
-FraudgovKEL.KEL_EventShell.CleanEventShell(PhonesMetaHit);
+//FraudgovKEL.KEL_EventShell.CleanEventShell(BocaShellHit);
+//FraudgovKEL.KEL_EventShell.CleanEventShell(PhonesMetaHit);
 //OUTPUT(COUNT(Std.Str.SplitWords(KEL_EventShell.NicoleAttr, ',')), named('AttributeCount'));
 
-/*
+
 ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 output(ModelingOutput,,'~temp::deleteme_nd', overwrite);	
 output(ModelingOutput,,'~temp::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);	
-*/
+
 /*
 d1 := TABLE(ModelingOutput, {m_T15_SsnIsKrFlag := MAX(GROUP, T15_SsnIsKrFlag),										 
 m_T20_DlIsKrFlag := MAX(GROUP,T20_DlIsKrFlag ),
@@ -31,11 +31,11 @@ output(d1);
 */
 
 
-/*
+
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~gov::otto::eventpivot', overwrite, compressed);	
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~gov::otto::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, '~gov::otto::pivotentitystatsfilter', overwrite, compressed);
-*/
+
 
 /*
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);

@@ -4,9 +4,9 @@ IMPORT B_Event_5,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_4 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_5.__ENH_Event_5) __ENH_Event_5 := B_Event_5.__ENH_Event_5;
-  SHARED __EE175754 := __ENH_Event_5;
-  SHARED __EE176766 := __EE175754;
-  SHARED __ST178125_Layout := RECORD
+  SHARED __EE176400 := __ENH_Event_5;
+  SHARED __EE177418 := __EE176400;
+  SHARED __ST178783_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -73,6 +73,8 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.nint _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nint _reported__dob_;
+    KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
+    KEL.typ.nkdate _bocashell__addr1__date__last__seen_;
     KEL.typ.nbool Best_Hit_;
     KEL.typ.nstr _best__phone_;
     KEL.typ.nstr _best__drivers__license__state_;
@@ -317,21 +319,21 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __ST178125_Layout __JT178122(B_Event_5.__ST67874_Layout __l, E_Event.Event_Types_Layout __r) := TRANSFORM
+  __ST178783_Layout __JT178780(B_Event_5.__ST67902_Layout __l, E_Event.Event_Types_Layout __r) := TRANSFORM
     SELF.__RecordCount := __r.__RecordCount;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE178123 := NORMALIZE(__EE176766,__T(LEFT.Event_Types_),__JT178122(LEFT,RIGHT));
-  SHARED __ST177012_Layout := RECORD
+  SHARED __EE178781 := NORMALIZE(__EE177418,__T(LEFT.Event_Types_),__JT178780(LEFT,RIGHT));
+  SHARED __ST177664_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Event_Type_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE178461 := PROJECT(__EE178123,__ST177012_Layout);
-  SHARED __ST177041_Layout := RECORD
+  SHARED __EE179121 := PROJECT(__EE178781,__ST177664_Layout);
+  SHARED __ST177693_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nbool Exp1_;
     KEL.typ.nbool Exp2_;
@@ -339,14 +341,14 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST177041_Layout __ND180925__Project(__ST177012_Layout __PP180897) := TRANSFORM
-    SELF.Exp1_ := __OP2(__PP180897.Event_Type_,IN,__CN(['100','191']));
-    SELF.Exp2_ := __OP2(__PP180897.Event_Type_,IN,__CN(['103','104','105','190','193']));
-    SELF.Exp3_ := __OP2(__PP180897.Event_Type_,IN,__CN(['101','192']));
-    SELF := __PP180897;
+  SHARED __ST177693_Layout __ND181599__Project(__ST177664_Layout __PP181571) := TRANSFORM
+    SELF.Exp1_ := __OP2(__PP181571.Event_Type_,IN,__CN(['100','191']));
+    SELF.Exp2_ := __OP2(__PP181571.Event_Type_,IN,__CN(['103','104','105','190','193']));
+    SELF.Exp3_ := __OP2(__PP181571.Event_Type_,IN,__CN(['101','192']));
+    SELF := __PP181571;
   END;
-  SHARED __EE180935 := PROJECT(__EE178461,__ND180925__Project(LEFT));
-  SHARED __ST177066_Layout := RECORD
+  SHARED __EE181609 := PROJECT(__EE179121,__ND181599__Project(LEFT));
+  SHARED __ST177718_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Event_Types_ := 0;
     KEL.typ.int C_O_U_N_T___Event_Types__1_ := 0;
     KEL.typ.int C_O_U_N_T___Event_Types__2_ := 0;
@@ -354,8 +356,8 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE182787 := PROJECT(__CLEANANDDO(__EE180935,TABLE(__EE180935,{KEL.typ.int C_O_U_N_T___Event_Types_ := COUNT(GROUP,__T(__EE180935.Exp1_)),KEL.typ.int C_O_U_N_T___Event_Types__1_ := COUNT(GROUP,__T(__EE180935.Exp2_)),KEL.typ.int C_O_U_N_T___Event_Types__2_ := COUNT(GROUP,__T(__EE180935.Exp3_)),UID},UID,MERGE)),__ST177066_Layout);
-  SHARED __ST178468_Layout := RECORD
+  SHARED __EE183471 := PROJECT(__CLEANANDDO(__EE181609,TABLE(__EE181609,{KEL.typ.int C_O_U_N_T___Event_Types_ := COUNT(GROUP,__T(__EE181609.Exp1_)),KEL.typ.int C_O_U_N_T___Event_Types__1_ := COUNT(GROUP,__T(__EE181609.Exp2_)),KEL.typ.int C_O_U_N_T___Event_Types__2_ := COUNT(GROUP,__T(__EE181609.Exp3_)),UID},UID,MERGE)),__ST177718_Layout);
+  SHARED __ST179128_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -422,6 +424,8 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.nint _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nint _reported__dob_;
+    KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
+    KEL.typ.nkdate _bocashell__addr1__date__last__seen_;
     KEL.typ.nbool Best_Hit_;
     KEL.typ.nstr _best__phone_;
     KEL.typ.nstr _best__drivers__license__state_;
@@ -669,14 +673,14 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC182796(B_Event_5.__ST67874_Layout __EE175754, __ST177066_Layout __EE182787) := __EEQP(__EE175754.UID,__EE182787.UID);
-  __ST178468_Layout __JT182796(B_Event_5.__ST67874_Layout __l, __ST177066_Layout __r) := TRANSFORM
+  __JC183480(B_Event_5.__ST67902_Layout __EE176400, __ST177718_Layout __EE183471) := __EEQP(__EE176400.UID,__EE183471.UID);
+  __ST179128_Layout __JT183480(B_Event_5.__ST67902_Layout __l, __ST177718_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE182797 := JOIN(__EE175754,__EE182787,__JC182796(LEFT,RIGHT),__JT182796(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST65677_Layout := RECORD
+  SHARED __EE183481 := JOIN(__EE176400,__EE183471,__JC183480(LEFT,RIGHT),__JT183480(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST65701_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -743,6 +747,8 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.nint _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nint _reported__dob_;
+    KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
+    KEL.typ.nkdate _bocashell__addr1__date__last__seen_;
     KEL.typ.nbool Best_Hit_;
     KEL.typ.nstr _best__phone_;
     KEL.typ.nstr _best__drivers__license__state_;
@@ -1002,24 +1008,24 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST65677_Layout __ND181290__Project(__ST178468_Layout __PP181286) := TRANSFORM
-    SELF.Kr_High_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181286.C_O_U_N_T___Event_Types_),<>,__CN(0)))=>1,0);
-    SELF.Kr_Identity_Flag_ := MAP(__PP181286.Kr_High_Risk_Identity_Flag_ = 1 OR __PP181286.Kr_Medium_Risk_Identity_Flag_ = 1 OR __PP181286.Kr_Low_Risk_Identity_Flag_ = 1=>1,0);
-    SELF.Kr_Low_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181286.C_O_U_N_T___Event_Types__1_),<>,__CN(0)))=>1,0);
-    SELF.Kr_Medium_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181286.C_O_U_N_T___Event_Types__2_),<>,__CN(0)))=>1,0);
-    SELF.T15___Ssn_Is_Kr_Flag_ := MAP(__PP181286.T15___Ssn_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Ssn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Ssn_Status_Code_Echo_),IN,__CN(['100','101','190','191','192','193'])))=>1, -99997);
-    SELF.T16___Phn_Is_Kr_Flag_ := MAP(__PP181286.T16___Phn_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Phn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Phn_Status_Code_Echo_),IN,__CN(['400','401','402','490','491','492','493'])))=>1, -99997);
-    SELF.T16___Phn_Is_Safe_Flag_ := MAP(__PP181286.T16___Phn_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181286.T___Phn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181286.T___Phn_Status_Code_Echo_,IN,__CN([5400,5401,5490])))=>1, -99997);
-    SELF.T17___Email_Is_Kr_Flag_ := MAP(__PP181286.T17___Email_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Email_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Email_Status_Code_Echo_),IN,__CN(['500','501','502','590','591','592','593'])))=>1, -99997);
-    SELF.T18___Ip_Addr_Is_Kr_Flag_ := MAP(__PP181286.T18___Ip_Addr_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Ip_Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Ip_Addr_Status_Code_Echo_),IN,__CN(['600','601','602','603','604','605','1000','1001','1090','1091','1092','1093'])))=>1, -99997);
-    SELF.T18___Ip_Addr_Is_Safe_Flag_ := MAP(__PP181286.T18___Ip_Addr_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181286.T___Ip_Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181286.T___Ip_Addr_Status_Code_Echo_,IN,__CN([5600,5601,5690])))=>1, -99997);
-    SELF.T19___Bnk_Acct_Is_Kr_Flag_ := MAP(__PP181286.T19___Bnk_Acct_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Bnk_Acct_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Bnk_Acct_Status_Code_Echo_),IN,__CN(['800','801','802','890','891','892','893'])))=>1, -99997);
-    SELF.T1___Id_Is_Kr_Flag_ := MAP(__PP181286.T1___Lex_Id_Pop_Flag_ = 0 AND __PP181286.T1___Rin_Id_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__PP181286.T1___Id_Is_Kr_Gen_Frd_Flag_ = -99997=>0,__PP181286.T1___Id_Is_Kr_Gen_Frd_Flag_ = 1 OR __PP181286.T1___Id_Is_Kr_Stol_Id_Flag_ = 1 OR __PP181286.T1___Id_Is_Kr_App_Frd_Flag_ = 1 OR __PP181286.T1___Id_Is_Kr_Oth_Frd_Flag_ = 1=>1,0);
-    SELF.T20___Dl_Is_Kr_Flag_ := MAP(__PP181286.T20___Dl_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Dl_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Dl_Status_Code_Echo_),IN,__CN(['200','201','202','203','204','290','291','292','293'])))=>1, -99997);
-    SELF.T9___Addr_Is_Kr_Flag_ := MAP(__PP181286.T9___Addr_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181286.T___Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181286.T___Addr_Status_Code_Echo_),IN,__CN(['300','301','302','303','390','391','392','393'])))=>1, -99997);
-    SELF.T9___Addr_Is_Safe_Flag_ := MAP(__PP181286.T9___Addr_Pop_Flag_ = 0=> -99999,__PP181286.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181286.T___Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181286.T___Addr_Status_Code_Echo_,IN,__CN([5300,5301,5302,5303,5390])))=>1, -99997);
-    SELF.T___In_Agency_Flag_ := MAP(__T(__OP2(__PP181286._r_Source_Customer_,<>,__PP181286._r_Customer_))=>0,1);
-    SELF := __PP181286;
+  SHARED __ST65701_Layout __ND181966__Project(__ST179128_Layout __PP181962) := TRANSFORM
+    SELF.Kr_High_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181962.C_O_U_N_T___Event_Types_),<>,__CN(0)))=>1,0);
+    SELF.Kr_Identity_Flag_ := MAP(__PP181962.Kr_High_Risk_Identity_Flag_ = 1 OR __PP181962.Kr_Medium_Risk_Identity_Flag_ = 1 OR __PP181962.Kr_Low_Risk_Identity_Flag_ = 1=>1,0);
+    SELF.Kr_Low_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181962.C_O_U_N_T___Event_Types__1_),<>,__CN(0)))=>1,0);
+    SELF.Kr_Medium_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP181962.C_O_U_N_T___Event_Types__2_),<>,__CN(0)))=>1,0);
+    SELF.T15___Ssn_Is_Kr_Flag_ := MAP(__PP181962.T15___Ssn_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Ssn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Ssn_Status_Code_Echo_),IN,__CN(['100','101','190','191','192','193'])))=>1, -99997);
+    SELF.T16___Phn_Is_Kr_Flag_ := MAP(__PP181962.T16___Phn_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Phn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Phn_Status_Code_Echo_),IN,__CN(['400','401','402','490','491','492','493'])))=>1, -99997);
+    SELF.T16___Phn_Is_Safe_Flag_ := MAP(__PP181962.T16___Phn_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181962.T___Phn_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181962.T___Phn_Status_Code_Echo_,IN,__CN([5400,5401,5490])))=>1, -99997);
+    SELF.T17___Email_Is_Kr_Flag_ := MAP(__PP181962.T17___Email_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Email_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Email_Status_Code_Echo_),IN,__CN(['500','501','502','590','591','592','593'])))=>1, -99997);
+    SELF.T18___Ip_Addr_Is_Kr_Flag_ := MAP(__PP181962.T18___Ip_Addr_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Ip_Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Ip_Addr_Status_Code_Echo_),IN,__CN(['600','601','602','603','604','605','1000','1001','1090','1091','1092','1093'])))=>1, -99997);
+    SELF.T18___Ip_Addr_Is_Safe_Flag_ := MAP(__PP181962.T18___Ip_Addr_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181962.T___Ip_Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181962.T___Ip_Addr_Status_Code_Echo_,IN,__CN([5600,5601,5690])))=>1, -99997);
+    SELF.T19___Bnk_Acct_Is_Kr_Flag_ := MAP(__PP181962.T19___Bnk_Acct_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Bnk_Acct_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Bnk_Acct_Status_Code_Echo_),IN,__CN(['800','801','802','890','891','892','893'])))=>1, -99997);
+    SELF.T1___Id_Is_Kr_Flag_ := MAP(__PP181962.T1___Lex_Id_Pop_Flag_ = 0 AND __PP181962.T1___Rin_Id_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__PP181962.T1___Id_Is_Kr_Gen_Frd_Flag_ = -99997=>0,__PP181962.T1___Id_Is_Kr_Gen_Frd_Flag_ = 1 OR __PP181962.T1___Id_Is_Kr_Stol_Id_Flag_ = 1 OR __PP181962.T1___Id_Is_Kr_App_Frd_Flag_ = 1 OR __PP181962.T1___Id_Is_Kr_Oth_Frd_Flag_ = 1=>1,0);
+    SELF.T20___Dl_Is_Kr_Flag_ := MAP(__PP181962.T20___Dl_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Dl_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Dl_Status_Code_Echo_),IN,__CN(['200','201','202','203','204','290','291','292','293'])))=>1, -99997);
+    SELF.T9___Addr_Is_Kr_Flag_ := MAP(__PP181962.T9___Addr_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 3=> -99998,__T(__OP2(__PP181962.T___Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__CAST(KEL.typ.str,__PP181962.T___Addr_Status_Code_Echo_),IN,__CN(['300','301','302','303','390','391','392','393'])))=>1, -99997);
+    SELF.T9___Addr_Is_Safe_Flag_ := MAP(__PP181962.T9___Addr_Pop_Flag_ = 0=> -99999,__PP181962.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP181962.T___Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP181962.T___Addr_Status_Code_Echo_,IN,__CN([5300,5301,5302,5303,5390])))=>1, -99997);
+    SELF.T___In_Agency_Flag_ := MAP(__T(__OP2(__PP181962._r_Source_Customer_,<>,__PP181962._r_Customer_))=>0,1);
+    SELF := __PP181962;
   END;
-  EXPORT __ENH_Event_4 := PROJECT(__EE182797,__ND181290__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_4',EXPIRE(7));
+  EXPORT __ENH_Event_4 := PROJECT(__EE183481,__ND181966__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_4',EXPIRE(7));
 END;

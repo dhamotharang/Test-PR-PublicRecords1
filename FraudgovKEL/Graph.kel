@@ -278,6 +278,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING add_curr_lat,
     STRING add_curr_long,
     BOOLEAN add_input_isbestmatch,
+
+    DATE bocashell_addr1_dt_first_seen,
+		DATE bocashell_addr1_date_last_seen,
+
 		
 		STRING historydatetimestamp,
 		INTEGER reported_dob,
@@ -424,6 +428,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		// bocashell
     nap_summary,nas_summary,cvi,fp3_stolenidentityindex,syntheticidentityindex_v3,manipulatedidentityindex_v3,socsdobflag,pwsocsdobflag,dobmatchlevel,
 		sourcerisklevel,reason1,reason2,reason3,reason4,reason5,reason6,socsvalflag,drlcvalflag,hphonevalflag,historydatetimestamp,reported_dob,
+    bocashell_addr1_dt_first_seen,bocashell_addr1_date_last_seen,
+
 		// best
     BestHit,best_phone,best_drivers_license_state,best_drivers_license,best_drivers_license_exp,
 		// phones meta
@@ -912,7 +918,9 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     input_fname_isbestmatch	= best_pii_flags.input_fname_isbestmatch,
     input_lname_isbestmatch	= best_pii_flags.input_lname_isbestmatch,
     input_ssn_isbestmatch	= best_pii_flags.input_ssn_isbestmatch,
-		
+    bocashell_addr1_dt_first_seen = address_verification.address_history_1.date_first_seen,
+		bocashell_addr1_date_last_seen = address_verification.address_history_1.date_last_seen,
+    		
     add_curr_prim_range = add_curr_prim_range,
     add_curr_predir = add_curr_predir,
     add_curr_prim_name = add_curr_prim_name,

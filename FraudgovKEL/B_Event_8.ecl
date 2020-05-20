@@ -4,8 +4,8 @@ IMPORT B_Event_9,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_8 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_9.__ENH_Event_9) __ENH_Event_9 := B_Event_9.__ENH_Event_9;
-  SHARED __EE75653 := __ENH_Event_9;
-  EXPORT __ST70604_Layout := RECORD
+  SHARED __EE75733 := __ENH_Event_9;
+  EXPORT __ST70644_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -72,6 +72,8 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.nint _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nint _reported__dob_;
+    KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
+    KEL.typ.nkdate _bocashell__addr1__date__last__seen_;
     KEL.typ.nbool Best_Hit_;
     KEL.typ.nstr _best__phone_;
     KEL.typ.nstr _best__drivers__license__state_;
@@ -251,11 +253,11 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST70604_Layout __ND76148__Project(B_Event_9.__ST71228_Layout __PP74403) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP74403.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP74403.Lex_Id_),=,__CN('')),__NT(__PP74403.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP74403.Lex_Id_));
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP74403.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP74403.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP74403.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP74403.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP74403.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP74403;
+  SHARED __ST70644_Layout __ND76232__Project(B_Event_9.__ST71272_Layout __PP74473) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP74473.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP74473.Lex_Id_),=,__CN('')),__NT(__PP74473.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP74473.Lex_Id_));
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP74473.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP74473;
   END;
-  EXPORT __ENH_Event_8 := PROJECT(__EE75653,__ND76148__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Event_8 := PROJECT(__EE75733,__ND76232__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
 END;

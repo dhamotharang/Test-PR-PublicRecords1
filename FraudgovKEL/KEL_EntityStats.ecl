@@ -127,7 +127,8 @@ SuperSpecialEntityStatsForFilter := JOIN(EntityStats, EntityEventPivot, LEFT.cus
                                       TRANSFORM({RECORDOF(LEFT), 
                                         RIGHT.aotkractflagev, RIGHT.aotsafeactflagev,
 																				RIGHT.t_actdtecho, RIGHT.t9_addriskrflag,RIGHT.t18_ipaddrlocmiamiflag,RIGHT.t18_ipaddrlocnonusflag,RIGHT.t18_ipaddrhostedflag,RIGHT.t18_ipaddrvpnflag,RIGHT.t18_ipaddrtornodeflag,RIGHT.t18_ipaddriskrflag,RIGHT.t19_bnkaccthrprepdrtgflag,RIGHT.t19_bnkacctiskrflag,RIGHT.t17_emaildomaindispflag,
-																				RIGHT.t17_emailiskrflag,RIGHT.t15_ssniskrflag,RIGHT.t20_dliskrflag,RIGHT.t16_phniskrflag,RIGHT.t1_idiskrflag,RIGHT.t1_idiskrgenfrdflag,RIGHT.t1_idiskrappfrdflag,RIGHT.t1_idiskrothfrdflag,																				
+																				RIGHT.t17_emailiskrflag,RIGHT.t15_ssniskrflag,RIGHT.t20_dliskrflag,RIGHT.t16_phniskrflag,RIGHT.t1_idiskrflag,RIGHT.t1_idiskrgenfrdflag,RIGHT.t1_idiskrappfrdflag,RIGHT.t1_idiskrothfrdflag,		
+																				RIGHT.p1_aotidkrstolidactflagev, RIGHT.p1_aotidkrgenfrdactflagev,RIGHT.p1_aotidkrappfrdactflagev,RIGHT.p1_aotidkrothfrdactflagev,RIGHT.p9_aotaddrkractflagev,RIGHT.p15_aotssnkractflagev,RIGHT.p16_aotphnkractflagev,RIGHT.p17_aotemailkractflagev,RIGHT.p18_aotipaddrkractflagev,RIGHT.p19_aotbnkacctkractflagev,RIGHT.p20_aotdlkractflagev,
 																				RIGHT.eventdate,RIGHT.incustomerpopulation,RIGHT.kreventafterknownrisk,RIGHT.RiskIndx
 																				},
                                         SELF := LEFT, SELF := RIGHT), KEEP(1), HASH);
