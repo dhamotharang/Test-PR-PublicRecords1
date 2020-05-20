@@ -68,8 +68,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true))) //Fcra
-       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false))) //NFcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true),TRUE)) //Fcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false),TRUE)) //NFcra
        ,STD.File.FinishSuperFileTransaction( )
        );
   

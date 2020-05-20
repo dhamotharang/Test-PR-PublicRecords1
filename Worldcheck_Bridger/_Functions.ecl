@@ -1315,6 +1315,7 @@
 				trim(kword, left, right) = 'EU-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_NIC,
 				trim(kword, left, right) = 'IDBAPPEBTI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDBAPPEBTI,
 				trim(kword, left, right) = 'IMOJ-SO' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMOJ_SO,
+				trim(kword, left, right) = 'CNSAFE' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAFE,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
