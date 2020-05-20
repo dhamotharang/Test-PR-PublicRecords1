@@ -139,7 +139,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 
 END;
 
-EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
+ver1_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 	c1 := DISTRIBUTE(newbase, HASH32(ClientId)); 
 	clients := DEDUP(SORT(c1, ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate,-$.fn_lfnversion(filename), local),
 									ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate, local);
@@ -190,6 +190,59 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 					xForm(RIGHT, LEFT),
 					inner, local);
 
+	result := unchanged + directUpdates + remaining + newClients;
+
+	return result;
+END;
+
+EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
+	clients := DISTRIBUTE(newbase, HASH32(ClientId)); 
+	
+	current := DISTRIBUTE(base,HASH32(ClientId));
+	
+	// find unchanged records
+	unchanged := JOIN(current, clients,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
+					and left.StartDate=right.StartDate
+					and left.EndDate=right.EndDate
+					and left.eligibility_status_indicator=right.eligibility_status_indicator,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), left only, local);
+
+// new client, case or timeframe
+	newClients := JOIN(current, clients,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
+					and	(left.StartDate > right.EndDate 
+						or left.EndDate < right.StartDate
+						or left.eligibility_status_indicator<>right.eligibility_status_indicator),
+					TRANSFORM(nac_v2.Layout_Base2,
+							self.Created := RIGHT.Created;
+							self := right;
+						), right only, local);
+						
+	// find records with possible changes
+	candidates := current - unchanged;
+	updates := clients - newClients;
+
+// only update if date range overlaps
+	directUpdates := JOIN(candidates, updates,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
+					xForm(RIGHT, LEFT),
+					inner, local);
+	remaining := JOIN(candidates, updates,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
+					and	(left.StartDate > right.EndDate or left.EndDate < right.StartDate),
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := right;), right only, local);					
 	result := unchanged + directUpdates + remaining + newClients;
 
 	return result;
