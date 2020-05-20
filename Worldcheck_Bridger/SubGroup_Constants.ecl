@@ -1212,6 +1212,8 @@
 		export string KEYWORD_BGRE_WC								:= '898';
 		export string KEYWORD_EU_NIC								:= '899';
 		export string KEYWORD_IDBAPPEBTI						:= '900';
+		export string KEYWORD_IMOJ_SO								:= '901';
+		export string KEYWORD_CNSAFE								:= '902';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

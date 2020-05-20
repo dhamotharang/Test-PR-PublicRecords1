@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
 IMPORT KEL12 AS KEL;
 IMPORT B_Person,B_Person_1,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_Vehicle_1,B_Person_Vehicle_10,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Person_Vehicle_4,B_Person_Vehicle_5,B_Person_Vehicle_6,B_Person_Vehicle_7,B_Person_Vehicle_8,B_Person_Vehicle_9,B_Vehicle_1,B_Vehicle_2,B_Vehicle_3,B_Vehicle_4,B_Vehicle_5,B_Vehicle_6,B_Vehicle_7,B_Vehicle_8,B_Vehicle_9,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
@@ -120,8 +120,8 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2_All(KEL.typ.kdate __PInputArchiveDateCle
     SHARED TYPEOF(B_Vehicle_1(__cfg).__ENH_Vehicle_1) __ENH_Vehicle_1 := B_Vehicle_1_Local(__cfg).__ENH_Vehicle_1;
   END;
   SHARED TYPEOF(B_Person(__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__cfg_Local).__ENH_Person;
-  SHARED __EE280981 := __ENH_Person;
-  SHARED __ST5269_Layout := RECORD
+  SHARED __EE281278 := __ENH_Person;
+  SHARED __ST5274_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.nint P_L___Purch_New_Amt_;
     KEL.typ.nint P_L___Purch_Tot_Ev_;
@@ -177,5 +177,5 @@ EXPORT Q_Non_F_C_R_A_Profile_Booster_V2_All(KEL.typ.kdate __PInputArchiveDateCle
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE280981,TRANSFORM(__ST5269_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE281278,TRANSFORM(__ST5274_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)),'__Part');
 END;

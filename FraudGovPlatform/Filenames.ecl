@@ -101,7 +101,7 @@ module
 		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
-		export CustomerActiveSprays := FraudGov_Prefix('flags') + 'CustomerActiveSprays_flag';
+		export RefreshProdDashVersion := FraudGov_Prefix('flags') + 'kel::RefreshProdDashVersion';
 		
 	end;
 	//////////////////////////////////////////////////////////////////
@@ -131,6 +131,7 @@ module
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
 		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
 		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
+		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
 		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -204,6 +205,7 @@ module
 			FraudPoint.dAll_filenames +
 			BestInfo.dAll_filenames +
 			CoverageDates.dAll_filenames +
+			PrepaidPhone.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +

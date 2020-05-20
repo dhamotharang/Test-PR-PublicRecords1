@@ -2,12 +2,12 @@
 Import STD, AID;
 
 
-infile := Header_Anomalies.Watchdog_Match_Report.ds_rollflagged_rec;
+infile := Header_Anomalies.Header_Watchdog_Match.ds_rollflagged_rec;
 
 
 Export Header_Percentages := Module 
 
-
+// infiles filtererd with all of the values that are true or false in flagged watchdog_match_report
 Shared nonblank_fname := infile( fname_match = 'T' or fname_match = 'F' ); 
 
 Shared nonblank_lname := infile( lname_match = 'T' or lname_match = 'F' );
@@ -23,7 +23,7 @@ Shared nonblank_addressall := infile( address_match_all = 'T' or address_match_a
 
 // ================================= Counted Totals Per File and Per Field =================================
 
-//count how many true and how many records per source 
+// count how many true and how many records per source 
 // counted totals per source
 total_layout := Record
     infile.source_name; 
