@@ -132,7 +132,7 @@ Set_deceased:=[005833281834,001221827365,002209147253,001121716198,001892209088,
 Set_Addresses := [12638153115695167395,10246789559473286115];
 
 tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR))
-           ( SourceCustomerFileInfo NOT IN[DemoHashes] AND did in Set_incarcerated OR did in Set_deceased or did % 100000 = 1 or OttoAddressId in Set_Addresses or event_Date[1..7] = '2019112');
+           (SourceCustomerFileInfo NOT IN [DemoHashes] AND did in Set_incarcerated OR did in Set_deceased or did % 1000000 = 1 or OttoAddressId in Set_Addresses);
 //output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
 Set_t_actuid:=[103440709,103441780,103438078,103442605,103447499,103476589,97478957,103383954,103350539,103490202,103420116,103417917,103413818,103465100];

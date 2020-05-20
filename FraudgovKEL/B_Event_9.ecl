@@ -4,8 +4,8 @@ IMPORT E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_Email,E_Ev
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_9 := MODULE
   SHARED VIRTUAL TYPEOF(E_Event.__Result) __E_Event := E_Event.__Result;
-  SHARED __EE72934 := __E_Event;
-  EXPORT __ST71228_Layout := RECORD
+  SHARED __EE72992 := __E_Event;
+  EXPORT __ST71272_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -72,6 +72,8 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.nint _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nint _reported__dob_;
+    KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
+    KEL.typ.nkdate _bocashell__addr1__date__last__seen_;
     KEL.typ.nbool Best_Hit_;
     KEL.typ.nstr _best__phone_;
     KEL.typ.nstr _best__drivers__license__state_;
@@ -248,9 +250,9 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST71228_Layout __ND73427__Project(E_Event.Layout __PP71715) := TRANSFORM
-    SELF.T___Src_Type_ := MAP(__T(__OR(__OP2(__PP71715._rin__source_,<=,__CN(0)),__OP2(__PP71715._rin__source_,>,__CN(15))))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP71715._rin__source_));
-    SELF := __PP71715;
+  SHARED __ST71272_Layout __ND73489__Project(E_Event.Layout __PP71763) := TRANSFORM
+    SELF.T___Src_Type_ := MAP(__T(__OR(__OP2(__PP71763._rin__source_,<=,__CN(0)),__OP2(__PP71763._rin__source_,>,__CN(15))))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP71763._rin__source_));
+    SELF := __PP71763;
   END;
-  EXPORT __ENH_Event_9 := PROJECT(__EE72934,__ND73427__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
+  EXPORT __ENH_Event_9 := PROJECT(__EE72992,__ND73489__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
 END;
