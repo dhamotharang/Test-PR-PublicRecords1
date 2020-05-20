@@ -29,6 +29,11 @@ EXPORT Constants := MODULE
 	EXPORT TOO_MANY_SUBJECTS_CODE  := AutoKeyI.errorcodes._codes.TOO_MANY_SUBJECTS; // 203
 	EXPORT INSUFFICIENT_INPUT_CODE := AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT; // 301
 
+	EXPORT NO_LEXID_FOUND_MSG      := AutoKeyI.errorcodes._msgs(NO_LEXID_FOUND_CODE);
+	EXPORT LOW_LEXID_SCORE_MSG     := AutoKeyI.errorcodes._msgs(LOW_LEXID_SCORE_CODE);
+	EXPORT TOO_MANY_SUBJECTS_MSG   := AutoKeyI.errorcodes._msgs(TOO_MANY_SUBJECTS_CODE);
+	EXPORT INSUFFICIENT_INPUT_MSG  := AutoKeyI.errorcodes._msgs(INSUFFICIENT_INPUT_CODE);
+
 	EXPORT NO_LEXID_FOUND     := 'NL'; // = No LexID found';
 	EXPORT LOW_LEXID_SCORE    := 'LS'; // = Low LexID score (less than threshold)';
 	EXPORT TOO_MANY_SUBJECTS  := 'ID'; // = Multiple identities (subjects) associated to a LexID';
@@ -39,5 +44,11 @@ EXPORT Constants := MODULE
 	EXPORT OWNER := 'O';
 	EXPORT BORROWER := 'B';
 	EXPORT PROPERTY := 'P';
+
+	EXPORT ASSESSMENT := 'A';
+	EXPORT DEED := 'D';
+
+	EXPORT VERIFIED := 'Verified';
+	EXPORT PROOF := 'Proof';
 
 END;
