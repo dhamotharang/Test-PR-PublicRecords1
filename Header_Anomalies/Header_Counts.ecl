@@ -1,8 +1,3 @@
-/* 
-please start working on a module with exports. 
-Each export should populate one of these tables, and additional exports to provide drill down on the top values in these summary tables. 
-Please ignor 1.c (business names). The deliverable here is a code module that we will add to the header folder which we can call to generate these tables and drill down
-*/ 
 
 
 Import STD, AID;
@@ -39,6 +34,7 @@ header := Dedup(sdt, did, fname, lname,
 
 
 Export Header_Counts := Module 
+
 // 1. NAMES
 // A. Most common names accross all records
 
@@ -63,6 +59,7 @@ Export lanmes_across_file := Sort(table_lname, -lname_count );
 
 
 // B. Most common names across diffeent lexids 
+
 // Most common first names accross lexids 
 layout_fnamelexid := Record
     header.did;
@@ -149,9 +146,6 @@ Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt_per_ssn );
 
 // 3. Address
 //    A. Addresses with the highest count of (Different) LexIds 
-
-// list of all src 
-// 
 
 // Get the multiples of addresses per lexids
 layout_address := Record
@@ -395,4 +389,4 @@ t2_dob := Table(t1_dob, {dob_mmdd, lexid_count := Count(Group)}, dob_mmdd );
 
 Export normal_distribution := Sort(t2_dob, -lexid_count );
 
-End; // Do not delete 
+End; 

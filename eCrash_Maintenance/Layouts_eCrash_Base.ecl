@@ -1,4 +1,4 @@
-﻿EXPORT Layout_Basefile := RECORD,MAXLENGTH(40000)
+﻿EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
 	STRING8 date_vendor_first_reported;
 	STRING8 date_vendor_last_reported;
 	STRING8 dt_first_seen;
@@ -926,6 +926,4 @@
 	STRING10 Dui_Suspected;
 	//Data Ingestion New Enum fields
 	STRING Drug_Test_Result;
-	//CR-1237		
-	STRING Marijuana_Use_Suspected;
-	END;
+END;
