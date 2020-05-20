@@ -184,7 +184,7 @@ Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := transform
 */
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := '';  //For now Agency_id EA, TM, TF are used for CRU.	 	
+		self.agency_id                := l.agency_id;	 	
 		self						              := l;
 		self						              := [];
 end;
@@ -295,7 +295,7 @@ Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := tran
   				
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := '';  //For now Agency_id EA, TM, TF are used for CRU.	
+		self.agency_id                := l.agency_id;	
 		self						              := l;
 		self						              := [];
 end;
