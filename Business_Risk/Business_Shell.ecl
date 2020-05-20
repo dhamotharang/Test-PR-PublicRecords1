@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+﻿﻿/*--SOAP--
 <message name="Business Shell">
 	<part name="seq" type="xsd:integer"/>
 	<part name="AccountNumber" type="xsd:string"/>

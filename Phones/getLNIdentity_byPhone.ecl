@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
 This function pulls inhouse phones data from gong, phonesplus, and bip.
 */
 IMPORT Doxie, BIPV2, dx_Gong, MDR, Phones, phonesplus_batch, Suppress, ut;
@@ -70,7 +70,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 														SELF.Contact_did:=LEFT.did,
 														SELF.hsort:=TRUE, // bip requirement - always make true
 														SELF:=LEFT,SELF:=[]));
-	//get bip data		 - dx_Gong.key_history_LinkIDs	may be added later - exploring the value.
+	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.
 	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).SearchKeyData(mod_access);
 	dsBips := DEDUP(dsBipData2(source<>MDR.SourceTools.src_Dunn_Bradstreet),all); //filter out Dunn's records, should only be used for linking
 
