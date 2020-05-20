@@ -244,7 +244,7 @@ duns_number := join(with_address_counts, dnb.key_dnb_bdid,
 						  append_dunsnumber(left, right),
 						  ATMOST(keyed(left.bdid=right.bd), RiskWise.max_atmost), keep(1),
 						  left outer);
-// output(duns_number);
+ //output(duns_number);
 
 bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 					keyed(left.dn=right.duns) and mod_access.use_DNB() and
@@ -262,7 +262,7 @@ bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 							ATMOST(keyed(left.dn=right.duns),RiskWise.max_atmost),
 					keep(100));
 
-// output(bs_dnb, named('bs_dnb'));
+ //output(bs_dnb, named('bs_dnb'));
 
 bs_dnb_dedup := DEDUP(SORT(bs_dnb, bdid, -dnb_date_last_seen), bdid);
 // output(bs_dnb_dedup, named('bs_dnb_dedup'));

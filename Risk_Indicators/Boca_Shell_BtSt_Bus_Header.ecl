@@ -1,4 +1,4 @@
-﻿/*2016-01-08T01:08:11Z (Andi Koenen)
+﻿﻿/*2016-01-08T01:08:11Z (Andi Koenen)
 RR: 192631: CBD 5.0 new attributes
 */
 /*
