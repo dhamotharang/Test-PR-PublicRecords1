@@ -13,14 +13,6 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
   unsigned1	NPA,
   unsigned1	Neighbors_Per_NA,
   unsigned1	Neighbor_Recency,
-  // string5		industry_class_value, // for MAC_GlbClean_Header
-  // unsigned1 GLB_Purpose,
-  // unsigned1	DPPA_Purpose,
-  // boolean		probation_override_value, // for MAC_GlbClean_Header
-  // boolean		no_scrub, // for MAC_GlbClean_Header
-  // boolean		glb_ok, //not used, delete, if refactoring
-  // boolean		dppa_ok,  //not used, delete, if refactoring
-  // string6		ssn_mask,
   boolean   use_Max_Nbrhoods = true,
   boolean   switch_Targetseq = true,
   unsigned1 proximity_radius = 10, // defines proximity in terms of "unitrs": houses, appartments, and alike

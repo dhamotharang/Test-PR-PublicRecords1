@@ -51,6 +51,12 @@ export MLAScore 	 			:= '444';
 export gatewayErrorCode := '22';
 export InputErrorCode 	:= '23';
 export purposeErrorCode := '24';
+export FDSubscriberIDErrorCode := '25';
+
+export SubscriberID_error_desc(string5 error_code) := function
+	desc := if(trim(error_code) = FDSubscriberIDErrorCode, 'Request for RiskView Checking Indicators denied due to incomplete account setup', '');
+	return desc;
+end;
 
 export MLA_error_desc(string5 error_code) := function
 	desc := map(
@@ -61,10 +67,19 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
+export StatusRefresh_error_desc(string5 error_code) := FUNCTION
+    desc := map(
+			trim(error_code) = '22OKC' => 'Error occurred in status refresh.',
+			'');
+	return desc;
+END;
+
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 
 export set_alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export set_numbers 	:= '0123456789';
+
+export checking_indicators_attribute_request := 'rvcheckingattrv5';
 
 export set_leadership_titles := [
 'PRESIDENT',

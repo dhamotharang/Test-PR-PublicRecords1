@@ -3,7 +3,7 @@
 
 EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod, 
 															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs,																														
-															string8 bestCode
+															string8 bestCode								
 														  ) := MODULE
 
 	SHARED todaysDate := std.Date.Today();
@@ -279,26 +279,24 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	past_7_year_creditutil_tab := TABLE(past_7_year_trade_recs_srt, yearlyCreditUtil, Sbfe_Contributor_Number,Contract_Account_Number, Account_Type_Reported, Cycle_end_date[1..4]);
 
 	past_7_year_creditutil_tab_sort := SORT(past_7_year_creditutil_tab, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()), -year);
+	
+	// NEW LINE
+	past_7_year_creditutil_tab_sortSlim := TOPN(GROUP(past_7_year_creditutil_tab_sort,  #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
+	                                                                                  BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL,  #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 
-	PaymentHistoryRecs := DEDUP(SORT(TradeRecs_Raw,#EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), cycle_end_date);
-	 
-	setofContributorIDs :=  Std.Str.SplitWords(inmod.SBFEContributorIds, BusinessCredit_Services.Constants.Delimiter); // creates a set of contributor IDs;
-								
-	iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory trans_paymenthistory (PaymentHistoryRecs L ) := TRANSFORM
-
-		paymentStatus := BusinessCredit_Services.Functions.fn_WorstStatus(L.Date_Account_Closed, L.Account_Closure_Basis, L.Account_Status_1, L.Account_Status_2, L.Payment_Status_Category);
-		SELF.ReportedDate				:= iesp.ECL2ESP.toDatestring8(L.Cycle_End_Date);
-		SELF.ClosureDate				:= iesp.ECL2ESP.toDatestring8(L.Date_Account_Closed);
-		SELF.ClosureReason			:= BusinessCredit_Services.Functions.fn_AccountClosureReason(L.Account_Closure_Basis);
-		SELF.CurrentCreditLimit	:= L.Current_Credit_Limit;
-		SELF.AmountOutstanding	:= L.Remaining_Balance;
-		SELF.PaymentStatus			:= paymentStatus;
-		SELF.PastDueAmount			:= L.Past_Due_Amount;
-		SELF.IsExtendedOverdue	:= L.Cycle_End_Date BETWEEN ut.getDateOffset(BusinessCredit_Services.Constants.PAST84MONTHSInDays) 
-																										AND ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) 
-																										AND STD.Str.Contains(paymentStatus, 'Overdue', TRUE);
-	END;
-
+	PaymentHistoryRecsBig := DEDUP(SORT(TradeRecs_Raw,#EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), cycle_end_date);
+	
+	
+	paymentHistoryRecsSlim := if (inmod.LimitPaymentHistory24Months, 
+	                             TOPN(GROUP(PaymentHistoryRecsBig, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())), BusinessCredit_Services.Constants.TWO_YR_PAYMENT_HISTORY,
+		                       #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
+																												   
+	                                                       TOPN(GROUP(PaymentHistoryRecsBig, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY,
+		                                                 #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()))
+											);						                                
+	  paymentHistoryRecs := UNGROUP(paymentHistoryRecsSlim);
+		
+	   setofContributorIDs :=  Std.Str.SplitWords(inmod.SBFEContributorIds, BusinessCredit_Services.Constants.Delimiter); // creates a set of contributor IDs;
       
 	iesp.businesscreditreport.t_BusinessCreditAccountDetail trans_AccDetail (TradeRecs_dedup L) := TRANSFORM
     // Not being used anywhere in the code
@@ -347,21 +345,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		SELF.GovernmentGuaranteed	 				:=	IF(L.Government_Guarantee_Flag = 'Y' , TRUE, FALSE);
 		SELF.GovernmentGuaranteedCategory :=	BusinessCredit_Services.Functions.fn_GovernmentGuaranteedCategoryDesc(L.Government_Guarantee_Category);
 		SELF.NumberOfGuarantors						:=	L.Number_Of_Guarantors;
-		SELF.YearlyCreditUtils						:=	CHOOSEN(PROJECT(past_7_year_creditutil_tab_sort(Sbfe_Contributor_Number = L.Sbfe_Contributor_Number and 
-																														                    Contract_Account_Number = L.Contract_Account_Number and
-																																	    Account_Type_Reported 	= L.Account_Type_Reported), 
-																									iesp.businesscreditreport.t_BusinessYearlyCreditUtilized), BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL);
-		tmpAccountPaymentHistory :=  PROJECT(PaymentHistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number and 
-																							Contract_Account_Number = L.Contract_Account_Number and
-																							Account_Type_Reported = L.Account_Type_Reported) ,
-																						      trans_paymenthistory(LEFT));
-		// SBCREDIT ADD here till end of transform
-		SELF.AccountPaymentHistory := if (inmod.LimitPaymentHistory24Months, 
-													CHOOSEN(tmpAccountPaymentHistory,BusinessCredit_Services.Constants.TWO_YR_PAYMENT_HISTORY),
-													CHOOSEN(tmpAccountPaymentHistory, BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY)
-													);
-           																															
-		 SELF.PaymentStatus :=  tmpAccountPaymentHistory[1].PaymentStatus; 
+	
 		 SELF.ChargedOff  :=    if ( L.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
                                                              L.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
 											  (UNSIGNED) L.amount_charged_off_by_creditor > 0 OR
@@ -388,11 +372,101 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 													        '');  // need to keep this as a string so that it can be Y or N or '' (roxie no output tag if null)
 															// so then esp will not  output tag.
 				 
-																							
+			SELF := [];																				
 	END;
 	
-	AccDetail_Recs 				         := PROJECT(TradeRecs_dedup , trans_AccDetail(LEFT));
+	tempAccDetail_Recs 				         := PROJECT(TradeRecs_dedup , trans_AccDetail(LEFT));
 	
+	// start new code #2
+	
+	rolledYearlyCreditUtils := record
+	dataset(iesp.businesscreditreport.t_BusinessYearlyCreditUtilized) tmpYearlyCreditUtils;
+	string30 BusinessContributorNumber;
+	string50 BusinessAccountNumber;
+	 string3 AccountTypeReportedCode; 
+	 end;
+	 
+	 rolledYearlyCreditUtils   FillYearlyCreditUtils(  recordof(past_7_year_creditutil_tab_sortSlim) Le,
+	                                                                                       dataset(RECORDOF(past_7_year_creditutil_tab_sortSlim)) allrows ) := TRANSFORM
+	
+		
+		SELF.BusinessContributorNumber 		:= 	Le.sbfe_contributor_number;
+		SELF.BusinessAccountNumber 				:= 	Le.contract_account_number;
+		SELF.AccountTypeReportedCode 			:= 	Le.account_type_reported;
+		
+		self.tmpYearlyCreditUtils :=  CHOOSEN(PROJECT(allrows,  iesp.businesscreditreport.t_BusinessYearlyCreditUtilized), BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL);
+		
+		END;
+		
+		TEMP2AccDetail_YearCreditUtils  := rollup( group(past_7_year_creditutil_tab_sortSlim, 
+	                                                                     Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported),
+														group, 
+														FillYearlyCreditUtils(left, rows(left)));
+		
+	        tempAcctDetail_RecsYearlyCreditUtils := Join(tempAccDetail_Recs, TEMP2AccDetail_YearCreditUtils,
+	                                                                                LEFT.BusinessContributorNumber = RIGHT.BusinessContributorNumber and
+																LEFT.BusinessAccountNumber = RIGHT.BusinessAccountNumber and
+																LEFT.AccountTypeReportedCode = RIGHT.AccountTypeReportedCode,
+																TRANSFORM(RECORDOF(LEFT),
+																SELF.YearlyCreditUtils := RIGHT.TmpYearlyCreditUtils;
+																SELF := LEFT), LEFT OUTER); // important to do left outer here as not every set of
+                                                   //  xml path businessContributorNumbor/BusinessAccountNumber/AccountTypeReportedCode has this structure of yearCreditUtils																																																																																																				 
+	
+	// end new code #2
+	
+	// START new CODE #1
+	
+	rolledPaymentHistory := record
+	dataset(iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory) tmpAccountPaymentHistory;
+	string30 BusinessContributorNumber;
+	string50 BusinessAccountNumber;
+	 string3 AccountTypeReportedCode; 
+	 end;
+	 
+	rolledPaymentHistory  FillPaymentHIstory( recordof (PaymentHistoryRecs) Le ,
+                                                                                    dataset(recordof(PaymentHistoryRecs)) allrows )
+																 := TRANSFORM																									
+            iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory trans_paymenthistory (PaymentHistoryRecs L ) := TRANSFORM
+		paymentStatus := BusinessCredit_Services.Functions.fn_WorstStatus(L.Date_Account_Closed, L.Account_Closure_Basis, L.Account_Status_1, L.Account_Status_2, L.Payment_Status_Category);
+		SELF.ReportedDate				:= iesp.ECL2ESP.toDatestring8(L.Cycle_End_Date);
+		SELF.ClosureDate				:= iesp.ECL2ESP.toDatestring8(L.Date_Account_Closed);
+		SELF.ClosureReason			:= BusinessCredit_Services.Functions.fn_AccountClosureReason(L.Account_Closure_Basis);
+		SELF.CurrentCreditLimit	:= L.Current_Credit_Limit;
+		SELF.AmountOutstanding	:= L.Remaining_Balance;
+		SELF.PaymentStatus			:= paymentStatus;
+		SELF.PastDueAmount			:= L.Past_Due_Amount;
+		SELF.IsExtendedOverdue	:= L.Cycle_End_Date BETWEEN ut.getDateOffset(BusinessCredit_Services.Constants.PAST84MONTHSInDays) 
+																										AND ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) 
+																										AND STD.Str.Contains(paymentStatus, 'Overdue', TRUE);
+	END;
+	
+		SELF.BusinessContributorNumber 		:= 	Le.sbfe_contributor_number;
+		SELF.BusinessAccountNumber 				:= 	Le.contract_account_number;
+		SELF.AccountTypeReportedCode 			:= 	Le.account_type_reported;
+	     tmpAccountPaymentHistory := Project(Allrows, trans_paymentHistory(left));
+	     self.tmpaccountpaymentHistory  := if (inmod.LimitPaymentHistory24Months, 
+													CHOOSEN(tmpAccountPaymentHistory,BusinessCredit_Services.Constants.TWO_YR_PAYMENT_HISTORY),
+													CHOOSEN(tmpAccountPaymentHistory, BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY)
+													);
+	END;
+	
+	TEMP2AccDetail_Recs  := rollup( group(PaymentHistoryRecs, 
+	                                                                     Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported),
+														group, 
+														FillPaymentHIstory(left, rows(left)));
+						
+		AccDetail_Recs :=  JOIN(tempAcctDetail_RecsYearlyCreditUtils,  TEMP2AccDetail_Recs,
+										  LEFT.BusinessContributorNumber = RIGHT.BusinessContributorNumber and
+						                  LEFT.BusinessAccountNumber = RIGHT.BusinessAccountNumber and
+									  LEFT.AccountTypeReportedCode = RIGHT.AccountTypeReportedCode,
+										 TRANSFORM(RECORDOF(LEFT),
+										   self.AccountPaymentHistory := right.tmpAccountPaymentHistory;
+											  SELF.PaymentStatus :=  right.tmpAccountPaymentHistory[1].PaymentStatus; 
+										  SELF := LEFT), LEFT OUTER); // left outer here is just to make sure  as accountPaymentHistory seems to be on each set of 
+                                                              // xml path businessContributorNumbor/BusinessAccountNumber/AccountTypeReportedCode                                                              
+										
+		 
+		 // ** END new code #1
 	  // logic added here to get a max 50 of recs with chargedOff = 'Y' to top. always get at least 10 if available and keep at top.  If more than 10 then if any left after
 		// (50- non charge off recs ) put that set of recs at bottom
 		//   If there are no recs = chargeoff ='N' then just output as many chargeoff = 'Y' as possible up to 50.
@@ -453,12 +527,21 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 						// output(NumChargeOffsToPutOnEnd ,named('NumChargeOffsToPutOnEnd'));
 						// output(c_AccDetail_recsChargedOff, named('c_AccDetail_recsChargedOff'));
 						// output(c_AccDetail_recsNoChargedOff, named('count_AccDetail_recsNoChargedOff'));
-						
+		// output(count(PaymentHistoryRecsBig), named('PaymentHistoryRecsBig_count'));
+		// output(count(paymentHistoryRecs), named('paymentHistoryRecs_count'));
            // output(CHOOSEN(AccDetail_recsChargedOff,50), named('first3'));
 		// output(CHOOSEN(AccDetail_recsChargedOff,2), named('first2')); 		
 		// output(ChargeOffsRecsToPutOnEnd, named('ChargeOffsRecsToPutOnEnd'));
 	 // added coding for pushing chargeoff recs to top of heap..
-	 
+	 //output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
+   // output(tempAccDetail_Recs, named('tempAccDetail_Recs'));
+   // output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
+	 // output(past_7_year_creditutil_tab_sortSlim, named('past_7_year_creditutil_tab_sortSlim'));
+
+   // output(TEMP2AccDetail_YearCreditUtils, named('TEMP2AccDetail_YearCreditUtils'));
+   // output(tempAcctDetail_RecsYearlyCreditUtils, named('tempAcctDetail_RecsYearlyCreditUtils'));
+   // output(TEMP2AccDetail_Recs, named('TEMP2AccDetail_Recs'));
+   // output(AccDetail_Recs, named('AccDetail_Recs'));
 
   // output(TradeRecs_Raw, named('fn_getBuzCreditTrades__TradeRecs_Raw'));
   // output(TradeRecs_dedup, named('fn_getBuzCreditTrades__TradeRecs_dedup'));

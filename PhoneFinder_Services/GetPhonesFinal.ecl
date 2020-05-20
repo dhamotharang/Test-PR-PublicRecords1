@@ -45,6 +45,7 @@ FUNCTION
                                         PhoneFinder_Services.Constants.PhoneType.Other);
     SELF.ListingType             := IF(le.ListingType != '', le.ListingType, ri.ListingType);
     SELF.PhoneStatus             := IF(le.PhoneStatus = $.Constants.PhoneStatus.NotAvailable, ri.PhoneStatus, le.PhoneStatus);
+    SELF.Prepaid                 := IF(le.Prepaid , le.Prepaid, ri.Prepaid);
     SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator OR ri.PhoneOwnershipIndicator; // only valid for other phones
     SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' OR le.CallForwardingIndicator = $.Functions.CallForwardingDesc(1),
                                         le.CallForwardingIndicator,

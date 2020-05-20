@@ -1,4 +1,4 @@
-import $, corp2, doxie, doxie_cbrs, doxie_raw, dx_death_master, gong, AutoStandardI, DeathV2_Services,
+import $, corp2, doxie, doxie_cbrs, doxie_raw, dx_death_master, dx_Gong, AutoStandardI, DeathV2_Services,
  Address, Risk_Indicators, Suppress, WorkPlace_Services, Business_Header, Header;
 
 export WorkPlace_Functions := module
@@ -61,7 +61,7 @@ shared glb_ok := death_params.isValidGlb();
       unsigned8 record_sid;
     END;
 
-    pre_dk := JOIN(phones, gong.Key_History_phone,
+    pre_dk := JOIN(phones, dx_Gong.key_history_phone(),
       (keyed(right.p7 = left.phone[4..10]) and
       keyed(right.p3 = left.phone[1..3])
       and right.current_flag
@@ -91,7 +91,7 @@ shared glb_ok := death_params.isValidGlb();
       unsigned8 record_sid;
     END;
 
-    pre_gh_slim := join(bdids, gong.Key_History_BDID,
+    pre_gh_slim := join(bdids, dx_Gong.key_history_bdid(),
       left.bdid!=0 and
       keyed(left.bdid=right.bdid) and
       right.current_record_flag='Y',
@@ -390,7 +390,7 @@ shared glb_ok := death_params.isValidGlb();
     // 2. Check company_phone1 on gong history to see if it is:
     //    i.  disconnected (no rec with current_flag = true)                   OR
     //    ii. it is not a business phone# (no rec with business_flag=true).
-    pre_ds_inrecs_gong_checked1 := join(ds_inrecs_npanxx_checked1, gong.Key_History_phone,
+    pre_ds_inrecs_gong_checked1 := join(ds_inrecs_npanxx_checked1, dx_Gong.key_history_phone(),
       keyed(left.company_phone1[4..10] = right.p7) and
       keyed(left.company_phone1[1..3]  = right.p3) and
       right.current_flag and //we only want current data
@@ -436,7 +436,7 @@ shared glb_ok := death_params.isValidGlb();
     // 4. Check company_phone2 on gong history to see if it is:
     //    i.  disconnected (no rec with current_flag = true)                   OR
     //    ii. it is not a business phone# (no rec with business_flag=true).
-    pre_ds_inrecs_gong_checked2 := join(ds_inrecs_npanxx_checked2, gong.Key_History_phone,
+    pre_ds_inrecs_gong_checked2 := join(ds_inrecs_npanxx_checked2, dx_Gong.key_history_phone(),
       keyed(left.company_phone2[4..10] = right.p7) and
       keyed(left.company_phone2[1..3]  = right.p3) and
       right.current_flag and //we only want current data

@@ -372,7 +372,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                 SELF.recordtype := RIGHT.recordtype;
                 SELF.incdate := LEFT.incdate;
                 SELF.incstate := LEFT.incstate;
-                ), ATMOST(riskwise.max_atmost));
+                ), LEFT OUTER, ATMOST(riskwise.max_atmost));
                 
 				newestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, -IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
 				oldestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
@@ -624,28 +624,30 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-	// *********************
-	//   DEBUGGING OUTPUTS
-	// *********************
-	// OUTPUT( Shell, NAMED('Shell') );
-	// OUTPUT( LinkIDs, NAMED('LinkIDs') );
-	// OUTPUT( EBR_recs, NAMED('EBR_recs') );
-	// OUTPUT( EBR_recs_rollup, NAMED('EBR_recs_rollup') );
-	// OUTPUT( CorpFilings_raw, NAMED('CorpFilings_raw') );
-	// OUTPUT( CorpFilings_seq, NAMED('CorpFilings_seq') );
-    // OUTPUT( CorpFilings_withSrcCode, NAMED('CorpFilings_withSrcCode') );
-	// OUTPUT( CorpFilings_recs, NAMED('CorpFilings_recs') );
-	// OUTPUT( CorpFilings_recs_filt, NAMED('CorpFilings_recs_filt'), ALL );
-	// OUTPUT( CorpFilingsCleaned, NAMED('CorpFilingsCleaned') );
-	// OUTPUT( CorpFilings_recs_srtd, NAMED('CorpFilings_recs_srtd'), ALL );
-	// OUTPUT( CorpFilingsRolled1, NAMED('CorpFilingsRolled1'));
-	// OUTPUT( CorpFilingsRolledClean, NAMED('CorpFilingsRolledClean') );
-	// OUTPUT( CorpFilingsRolled, NAMED('CorpFilingsRolled') );
-    // OUTPUT(Options.BusShellVersion, named('Options_BusShellVersion'));
-    // OUTPUT(Business_Risk_BIP.Constants.BusShellVersion_v30, named('Business_Risk_BIP_Constants_BusShellVersion'));
-	// OUTPUT( withCorpFilingsData_Old, NAMED('withCorpFilingsData_Old') );
-	// OUTPUT( withCorpFilingsData_New, NAMED('withCorpFilingsData_New') );
-	// OUTPUT( withCorpFilingsData, NAMED('withCorpFilingsData') );
+  // *********************
+  //   DEBUGGING OUTPUTS
+  // *********************
+  // OUTPUT( Shell, NAMED('Shell') );
+  // OUTPUT( LinkIDs, NAMED('LinkIDs') );
+  // OUTPUT( EBR_recs, NAMED('EBR_recs') );
+  // OUTPUT( EBR_recs_rollup, NAMED('EBR_recs_rollup') );
+  // OUTPUT( CorpFilings_raw, NAMED('CorpFilings_raw') );
+  // OUTPUT( CorpFilings_seq, NAMED('CorpFilings_seq') );
+  // OUTPUT( CorpFilings_withSrcCode, NAMED('CorpFilings_withSrcCode') );
+  // OUTPUT( CorpFilings_recs, NAMED('CorpFilings_recs') );
+  // OUTPUT( CorpFilings_recs_filt, NAMED('CorpFilings_recs_filt'), ALL );
+  // OUTPUT( CorpFilingsCleaned, NAMED('CorpFilingsCleaned') );
+  // OUTPUT( CorpFilings_recs_srtd, NAMED('CorpFilings_recs_srtd'), ALL );
+  // OUTPUT( CorpFilingsRolled1, NAMED('CorpFilingsRolled1'));
+  // OUTPUT( CorpFilingsRolledClean, NAMED('CorpFilingsRolledClean') );
+  // OUTPUT( CorpFilingsRolled, NAMED('CorpFilingsRolled') );
+  // OUTPUT(Options.BusShellVersion, named('Options_BusShellVersion'));
+  // OUTPUT(Business_Risk_BIP.Constants.BusShellVersion_v30, named('Business_Risk_BIP_Constants_BusShellVersion'));
+  // OUTPUT( withOwnership, NAMED('withOwnership') );
+  // OUTPUT( withCorpFilingsData_Old, NAMED('withCorpFilingsData_Old') );
+  // OUTPUT( withCorpFilingsData_New, NAMED('withCorpFilingsData_New') );
+  // OUTPUT( withCorpFilingsData_BIID20, NAMED('withCorpFilingsData_BIID20') );
+  // OUTPUT( withCorpFilingsData, NAMED('withCorpFilingsData') );
 
 	RETURN withErrorCodes;
 END;

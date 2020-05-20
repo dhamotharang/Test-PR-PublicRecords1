@@ -1,4 +1,4 @@
-﻿﻿import risk_indicators, Doxie, Business_Risk;
+﻿import risk_indicators, Doxie, Business_Risk;
 
 export Business_Shell_Function(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
                                                         unsigned1 LexIdSourceOptout = 1,

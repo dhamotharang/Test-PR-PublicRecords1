@@ -1,4 +1,4 @@
-﻿﻿ IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, Phones;
+﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, Phones;
 
   EXPORT Layouts :=
   MODULE
@@ -73,6 +73,11 @@
     RECORD
       STRING3 Src;
     END;
+
+    EXPORT _type := RECORD
+      STRING40 _Type;
+    END;
+
     // Phones common layout
     EXPORT Common :=
     RECORD(doxie.layout_pp_raw_common)
@@ -925,11 +930,22 @@
     STRING32 risk_indicator_category;
     END;
 
+    EXPORT delta_phones_rpt_sources:= RECORD
+     STRING16 transaction_id;
+     STRING15 phonenumber;
+     UNSIGNED lexid;
+     STRING category;
+     UNSIGNED totalsourcecount;
+     STRING60 _type;
+     STRING3  Source;
+    END;
+
   EXPORT delta_phones_rpt_Usage_RECORDs := RECORD
     DATASET(delta_phones_rpt_transaction) delta_phones_rpt_transaction {xpath('delta__phonefinder_delta__phones_rpt__transaction/Row')};
     DATASET(delta_phones_rpt_otherphones) delta_phones_rpt_otherphones {xpath('delta__phonefinder_delta__phones_rpt__otherphones/Row')};
     DATASET(delta_phones_rpt_identities) delta_phones_rpt_identities {xpath('delta__phonefinder_delta__phones_rpt__identities/Row')};
     DATASET(delta_phones_rpt_riskindicators) delta_phones_rpt_riskindicators {xpath('delta__phonefinder_delta__phones_rpt__riskindicators/Row')};
+    DATASET(delta_phones_rpt_sources) delta_phones_rpt_sources {xpath('delta__phonefinder_delta__phones_rpt__sources/Row')};
   END;
 
 END;

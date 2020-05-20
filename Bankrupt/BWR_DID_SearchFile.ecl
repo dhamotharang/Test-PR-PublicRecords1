@@ -1,4 +1,4 @@
-import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header_SS, Business_Header;
+import bankrupt, did_add, ut, Business_Header_SS, Business_Header;
 
 
 /*---------------[ IMPORTANT ]---------------*/
@@ -41,7 +41,7 @@ did_add.MAC_Match_Flex(df2,myset,debtor_ssn,foo,debtor_fname,debtor_mname,debtor
 	debtor_name_suffix,prim_range, prim_name, sec_range, z5,st,foo,
 	did,temprec,true,did_score,70,outf)
 
-did_add.MAC_Add_SSN_By_DID(outf,did,ssn_appended,out2,true)	
+did_add.MAC_Add_SSN_By_DID(outf,did,ssn_appended,out2,true)
 
 to_bdid := out2 : persist('TEMP::bankrupt_search_did');
 to_bdid_company := to_bdid(debtor_company <> '');
@@ -58,7 +58,7 @@ Business_Header.MAC_Source_Match(to_bdid_company, bdid_init,
                         FALSE, phone_field,
                         FALSE, fein_field,
 				    TRUE, vendor_id)
- 
+
 bdid_match := bdid_init(bdid_new <> 0);
 
 bdid_nomatch := bdid_init(bdid_new = 0);
@@ -66,18 +66,18 @@ bdid_nomatch := bdid_init(bdid_new = 0);
 
 Business_Header_SS.MAC_Add_BDID_FLEX(
 	bdid_nomatch, business_matchset,
-	debtor_company, 
-	prim_range, prim_name, z5, 
+	debtor_company,
+	prim_range, prim_name, z5,
 	sec_range, st,
 	phone_field, fein_field,
-	bdid_new,	
+	bdid_new,
 	temprec,
 	false, BDID_Score_field,  //these should default to zero in definition
 	bdid_rematch)
-	
+
 out3 := to_bdid_no_company + bdid_match + bdid_rematch;
 
-				
+
 typeof(df) into(out3 L) := transform
 	boolean ssn_flag := If ((length(trim(L.debtor_ssn)) = 4 AND length(trim(L.ssn_appended)) = 9 AND l.debtor_ssn[1..4] <> L.ssn_appended[6..9]) OR
 					 (length(trim(L.debtor_ssn)) = 9 AND length(trim(L.ssn_appended)) = 9 AND L.debtor_ssn <> L.ssn_appended) OR

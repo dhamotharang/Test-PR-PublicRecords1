@@ -1,5 +1,5 @@
 ﻿IMPORT census_data, location_services, AddressReport_Services, doxie_cbrs, ut, suppress,
-       DriversV2_Services, VehicleV2_Services, Doxie_Raw, LiensV2_Services, header, Gong,
+       DriversV2_Services, VehicleV2_Services, Doxie_Raw, LiensV2_Services, header, dx_Gong,
        BankruptcyV2_Services, doxie, iesp, AutoStandardI, Address, LN_PropertyV2_Services,
        BIPV2, hunting_fishing_services, STD, VehicleV2, dx_header;
 
@@ -347,7 +347,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
   business_recs_all_old  :=dedup(sort(business_recs_out_old,bdid),bdid);
 
-  key_gong_bus      :=Gong.Key_History_BDID;
+  key_gong_bus      :=dx_Gong.Key_History_BDID();
   rec_bus  :=record
     AddressReport_Services.layouts.layout_Business_out;
     boolean gong_flag;
@@ -389,7 +389,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
   // business_recs_all_new  :=dedup(sort(business_recs_out,bdid),bdid);
   //no need to dedup, new business header records are already unique by BIP ids
   gong_in := project(business_recs_out_new, BIPV2.IDlayouts.l_xlink_ids);
-  gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, mod_access, param.BusinessReportFetchLevel);
+  gong_out := dx_Gong.key_history_LinkIDs.kfetch(gong_in, mod_access, param.BusinessReportFetchLevel);
 
   rec_bus flag_bus_new(business_recs_out_new l,gong_out r):=TRANSFORM
     self.gong_flag  :=if(trim(r.phone10)<>'',true,false);

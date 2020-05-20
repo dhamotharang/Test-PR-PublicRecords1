@@ -547,6 +547,7 @@ export Layout_Riskview_Batch_In := RECORD
 	string64 custom_input23 := '';
 	string64 custom_input24 := '';
 	string64 custom_input25 := '';
+	string32 DeferredTransactionID := '';
 END;
 
 export Layout_Custom_Inputs := RECORD
@@ -923,6 +924,7 @@ end;
                 'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
                 'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
                 'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+				'STRING7 Liens' + %'cntLiens'% + '_AgencyID;' +
                 'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
                 'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
                 'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
@@ -959,6 +961,7 @@ end;
                 'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
                 'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
                 'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+				'STRING7 Jgmts' + %'cntJgmts'% + '_AgencyID;' +
                 'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
                 'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
                 'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
@@ -1136,5 +1139,21 @@ export layout_RV5capOneBatch_searchResults := record
   layout_riskview5_alerts-ConsumerStatementText;
   STRING12 inquiry_lexid := '';
 end;
+
+export  Checking_Indicators_Layout := RECORD
+ unsigned4 seq;
+ string10 CheckProfileIndex;
+ string10 CheckTimeOldest;
+ string10 CheckTimeNewest;
+ string10 CheckNegTimeOldest;
+ string10 CheckNegRiskDecTimeNewest;
+ string10 CheckNegPaidTimeNewest;
+ string10 CheckCountTotal;
+ string10 CheckAmountTotal;
+ string10 CheckAmountTotalSinceNegPaid;
+ string10 CheckAmountTotal03Month;
+ boolean  FDGatewayCalled;
+ string5  Exception_code := ''; 
+ END;
 
 end;

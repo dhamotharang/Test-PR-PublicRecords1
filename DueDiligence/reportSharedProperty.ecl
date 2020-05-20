@@ -26,7 +26,7 @@ EXPORT reportSharedProperty (DATASET(DueDiligence.LayoutsInternalReport.SharedPr
                                                                SELF.geo_blk := LEFT.geo_blk;
                                                                SELF := [];));
    
-    propertyOwnedRisk := DueDiligence.Common.getGeographicRisk(geoPropertyAddress);
+    propertyOwnedRisk := DueDiligence.CommonAddress.getAddressRisk(geoPropertyAddress);
    
    
     //add the risk back to the property details

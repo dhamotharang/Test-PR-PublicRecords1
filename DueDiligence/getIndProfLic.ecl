@@ -139,7 +139,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 	allLicenseDateClean:= DueDiligence.Common.CleanDatasetDateFields(allLicenses, 'license.dateFirstSeen');
 	
 	// Filter out records after our history date.
-	allLicenseFilt := DueDiligence.Common.FilterRecordsSingleDate(allLicenseDateClean, license.dateFirstSeen);
+	allLicenseFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(allLicenseDateClean, license.dateFirstSeen);
 	
 	sortLicenses := SORT(allLicenseFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, license.licenseNumber, license.dateFirstSeen);
 	rollupLicenses := ROLLUP(sortLicenses,

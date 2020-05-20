@@ -1,4 +1,4 @@
-﻿IMPORT iesp, risk_indicators, ut, Advo;
+﻿IMPORT iesp, risk_indicators, BusinessInstantID20_Services;
 
 // --------------------[ Components for InputEcho section ]--------------------
 
@@ -115,7 +115,7 @@ iesp.businessinstantid20.t_BIID20InputEcho xfm_AddInputEcho(BusinessInstantID20_
 		SELF.Company.Address.Zip4                := '';
 		SELF.Company.Phone                       := le.in_bus_phone10;
 		SELF.Company.FEIN                        := le.in_bus_fein;
-		SELF.AuthorizedRepresentatives           := fn_NormalizeAuthReps( le );		
+		SELF.AuthorizedRepresentatives           := fn_NormalizeAuthReps( le );
 		SELF := [];
 	END;
 
@@ -125,7 +125,7 @@ iesp.businessinstantid20.t_BIID20InputEcho xfm_AddInputEcho(BusinessInstantID20_
 
 temp_VerifiedLayout := {BusinessInstantID20_Services.Layouts.VerifiedLayout AND NOT [seq]};
 
-iesp.businessinstantid20.t_BIID20Company xfm_VerifiedInput( temp_VerifiedLayout le ) := 
+iesp.businessinstantid20.t_BIID20Company xfm_VerifiedInput( temp_VerifiedLayout le) := 
 	TRANSFORM
 		SELF.CompanyName                 := le.bus_ver_name;
 		SELF.AlternateCompanyName        := le.bus_ver_altname;
@@ -151,9 +151,9 @@ iesp.businessinstantid20.t_BIID20Company xfm_VerifiedInput( temp_VerifiedLayout 
 
 temp_VerificationLayout := {BusinessInstantID20_Services.Layouts.VerificationLayout AND NOT [seq]};
 
-iesp.businessinstantid20.t_BIID20VerificationIndicators xfm_VerificationIndicators( temp_VerificationLayout le ) := 
+iesp.businessinstantid20.t_BIID20VerificationIndicators xfm_VerificationIndicators( temp_VerificationLayout le) := 
 	TRANSFORM
-		SELF.CompanyName   := IF( le.ver_name_indicator = '1', le.ver_name_indicator, le.ver_altname_indicator );
+		SELF.CompanyName   := IF(le.ver_name_indicator = '1',  le.ver_name_indicator,  le.ver_altname_indicator);
 		SELF.StreetAddress := le.ver_streetaddr_indicator;
 		SELF.City          := le.ver_city_indicator;
 		SELF.State         := le.ver_state_indicator;
@@ -167,30 +167,30 @@ iesp.businessinstantid20.t_BIID20VerificationIndicators xfm_VerificationIndicato
 
 temp_BestInfoLayout := {BusinessInstantID20_Services.Layouts.BestInfoLayout AND NOT [Seq,isactive,isdefunct,dt_first_seen,dt_last_seen,best_bus_county]};
 				
-iesp.businessinstantid20.t_BIID20Company xfm_BestInformation( temp_BestInfoLayout le ) := 
+iesp.businessinstantid20.t_BIID20Company xfm_BestInformation( temp_BestInfoLayout le, BOOLEAN isValidate ) := 
 	TRANSFORM
 		SELF.CompanyName                 := le.best_bus_name;
 		SELF.AlternateCompanyName        := '';
-		SELF.Address.StreetNumber        := le.best_bus_prim_range;
-		SELF.Address.StreetPreDirection  := le.best_bus_predir;
-		SELF.Address.StreetName          := le.best_bus_prim_name;
-		SELF.Address.StreetSuffix        := le.best_bus_addr_suffix;
-		SELF.Address.StreetPostDirection := le.best_bus_postdir;
-		SELF.Address.UnitDesignation     := le.best_bus_unit_desig;
-		SELF.Address.UnitNumber          := le.best_bus_sec_range;
+		SELF.Address.StreetNumber        := IF(isValidate, '', le.best_bus_prim_range);
+		SELF.Address.StreetPreDirection  := IF(isValidate, '', le.best_bus_predir);
+		SELF.Address.StreetName          := IF(isValidate, '', le.best_bus_prim_name);
+		SELF.Address.StreetSuffix        := IF(isValidate, '', le.best_bus_addr_suffix);
+		SELF.Address.StreetPostDirection := IF(isValidate, '', le.best_bus_postdir);
+		SELF.Address.UnitDesignation     := IF(isValidate, '', le.best_bus_unit_desig);
+		SELF.Address.UnitNumber          := IF(isValidate, '', le.best_bus_sec_range);
 		SELF.Address.StreetAddress1      := le.best_bus_addr;
 		SELF.Address.StreetAddress2      := ''; // TODO?
 		SELF.Address.City                := le.best_bus_city;
 		SELF.Address.State               := le.best_bus_state;
 		SELF.Address.Zip5                := le.best_bus_zip;
-		SELF.Address.Zip4                := le.best_bus_zip4;
+		SELF.Address.Zip4                := IF(isValidate, '', le.best_bus_zip4);
 		SELF.Phone                       := le.best_bus_phone;
 		SELF.FEIN                        := le.best_bus_fein;
 		SELF := [];
 	END;
 
 //  4. CompanyResults: NamesAddressesOfPhone (3) 
-fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le ) := 
+fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le) := 
 	FUNCTION
 		iesp.businessinstantid20.t_BIID20NameAddressLinkIDs xfm_Rec1 := TRANSFORM
 			SELF.CompanyName                 := le.BusinessByPhone.bus_phone_match_company_1;
@@ -210,11 +210,11 @@ fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByPhone.bus_phone_match_powid_1;
-			SELF.BusinessIDs.ProxID              := le.BusinessByPhone.bus_phone_match_proxid_1;
-			SELF.BusinessIDs.SeleID              := le.BusinessByPhone.bus_phone_match_seleid_1;
-			SELF.BusinessIDs.OrgID               := le.BusinessByPhone.bus_phone_match_orgid_1;
-			SELF.BusinessIDs.UltID               := le.BusinessByPhone.bus_phone_match_ultid_1;
+			SELF.BusinessIDs.POWID           := le.BusinessByPhone.bus_phone_match_powid_1;
+			SELF.BusinessIDs.ProxID          := le.BusinessByPhone.bus_phone_match_proxid_1;
+			SELF.BusinessIDs.SeleID          := le.BusinessByPhone.bus_phone_match_seleid_1;
+			SELF.BusinessIDs.OrgID           := le.BusinessByPhone.bus_phone_match_orgid_1;
+			SELF.BusinessIDs.UltID           := le.BusinessByPhone.bus_phone_match_ultid_1;
 			SELF := [];
 		END;
 
@@ -236,11 +236,11 @@ fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByPhone.bus_phone_match_powid_2;
-			SELF.BusinessIDs.ProxID              := le.BusinessByPhone.bus_phone_match_proxid_2;
-			SELF.BusinessIDs.SeleID              := le.BusinessByPhone.bus_phone_match_seleid_2;
-			SELF.BusinessIDs.OrgID               := le.BusinessByPhone.bus_phone_match_orgid_2;
-			SELF.BusinessIDs.UltID               := le.BusinessByPhone.bus_phone_match_ultid_2;
+			SELF.BusinessIDs.POWID           := le.BusinessByPhone.bus_phone_match_powid_2;
+			SELF.BusinessIDs.ProxID          := le.BusinessByPhone.bus_phone_match_proxid_2;
+			SELF.BusinessIDs.SeleID          := le.BusinessByPhone.bus_phone_match_seleid_2;
+			SELF.BusinessIDs.OrgID           := le.BusinessByPhone.bus_phone_match_orgid_2;
+			SELF.BusinessIDs.UltID           := le.BusinessByPhone.bus_phone_match_ultid_2;
 			SELF := [];
 		END;
 	
@@ -262,11 +262,11 @@ fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByPhone.bus_phone_match_powid_3;
-			SELF.BusinessIDs.ProxID              := le.BusinessByPhone.bus_phone_match_proxid_3;
-			SELF.BusinessIDs.SeleID              := le.BusinessByPhone.bus_phone_match_seleid_3;
-			SELF.BusinessIDs.OrgID               := le.BusinessByPhone.bus_phone_match_orgid_3;
-			SELF.BusinessIDs.UltID               := le.BusinessByPhone.bus_phone_match_ultid_3;
+			SELF.BusinessIDs.POWID           := le.BusinessByPhone.bus_phone_match_powid_3;
+			SELF.BusinessIDs.ProxID          := le.BusinessByPhone.bus_phone_match_proxid_3;
+			SELF.BusinessIDs.SeleID          := le.BusinessByPhone.bus_phone_match_seleid_3;
+			SELF.BusinessIDs.OrgID           := le.BusinessByPhone.bus_phone_match_orgid_3;
+			SELF.BusinessIDs.UltID           := le.BusinessByPhone.bus_phone_match_ultid_3;
 			SELF := [];
 		END;
 		
@@ -280,15 +280,14 @@ fn_GetNamesAddressesFromPhone( BusinessInstantID20_Services.layouts.OutputLayout
 fn_GetPhonesFromAddress( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le) := 
 	FUNCTION
 		PhonesOfNameAddress := 
-			DATASET( 
-				[
-					{le.PhonesByAddress.bus_addr_match_phone_1},
-					{le.PhonesByAddress.bus_addr_match_phone_2},
-					{le.PhonesByAddress.bus_addr_match_phone_3}
-				], 
-				iesp.businessinstantid20.t_BIID20PhoneOfNameAddress 
-			);
-		
+        DATASET( 
+          [
+            {le.PhonesByAddress.bus_addr_match_phone_1},
+            {le.PhonesByAddress.bus_addr_match_phone_2},
+            {le.PhonesByAddress.bus_addr_match_phone_3}
+          ], 
+          iesp.businessinstantid20.t_BIID20PhoneOfNameAddress 
+        );
 		RETURN PhonesOfNameAddress(PhoneOfNameAddress != '');
 	END;
 	
@@ -313,11 +312,11 @@ fn_GetNamesAddressesFromFEIN( BusinessInstantID20_Services.layouts.OutputLayout_
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByFEIN.bus_fein_match_powid_1;
-			SELF.BusinessIDs.ProxID              := le.BusinessByFEIN.bus_fein_match_proxid_1;
-			SELF.BusinessIDs.SeleID              := le.BusinessByFEIN.bus_fein_match_seleid_1;
-			SELF.BusinessIDs.OrgID               := le.BusinessByFEIN.bus_fein_match_orgid_1;
-			SELF.BusinessIDs.UltID               := le.BusinessByFEIN.bus_fein_match_ultid_1;
+			SELF.BusinessIDs.POWID           := le.BusinessByFEIN.bus_fein_match_powid_1;
+			SELF.BusinessIDs.ProxID          := le.BusinessByFEIN.bus_fein_match_proxid_1;
+			SELF.BusinessIDs.SeleID          := le.BusinessByFEIN.bus_fein_match_seleid_1;
+			SELF.BusinessIDs.OrgID           := le.BusinessByFEIN.bus_fein_match_orgid_1;
+			SELF.BusinessIDs.UltID           := le.BusinessByFEIN.bus_fein_match_ultid_1;
 			SELF := [];
 		END;
 
@@ -339,11 +338,11 @@ fn_GetNamesAddressesFromFEIN( BusinessInstantID20_Services.layouts.OutputLayout_
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByFEIN.bus_fein_match_powid_2;
-			SELF.BusinessIDs.ProxID              := le.BusinessByFEIN.bus_fein_match_proxid_2;
-			SELF.BusinessIDs.SeleID              := le.BusinessByFEIN.bus_fein_match_seleid_2;
-			SELF.BusinessIDs.OrgID               := le.BusinessByFEIN.bus_fein_match_orgid_2;
-			SELF.BusinessIDs.UltID               := le.BusinessByFEIN.bus_fein_match_ultid_2;
+			SELF.BusinessIDs.POWID           := le.BusinessByFEIN.bus_fein_match_powid_2;
+			SELF.BusinessIDs.ProxID          := le.BusinessByFEIN.bus_fein_match_proxid_2;
+			SELF.BusinessIDs.SeleID          := le.BusinessByFEIN.bus_fein_match_seleid_2;
+			SELF.BusinessIDs.OrgID           := le.BusinessByFEIN.bus_fein_match_orgid_2;
+			SELF.BusinessIDs.UltID           := le.BusinessByFEIN.bus_fein_match_ultid_2;
 			SELF := [];
 		END;
 	
@@ -365,12 +364,11 @@ fn_GetNamesAddressesFromFEIN( BusinessInstantID20_Services.layouts.OutputLayout_
 			SELF.Address.County              := '';
 			SELF.Address.PostalCode          := '';
 			SELF.Address.StateCityZip 		   := '';
-			SELF.BusinessIDs.POWID               := le.BusinessByFEIN.bus_fein_match_powid_3;
-			SELF.BusinessIDs.ProxID              := le.BusinessByFEIN.bus_fein_match_proxid_3;
-			SELF.BusinessIDs.SeleID              := le.BusinessByFEIN.bus_fein_match_seleid_3;
-			SELF.BusinessIDs.OrgID               := le.BusinessByFEIN.bus_fein_match_orgid_3;
-			SELF.BusinessIDs.UltID               := le.BusinessByFEIN.bus_fein_match_ultid_3;
-
+			SELF.BusinessIDs.POWID           := le.BusinessByFEIN.bus_fein_match_powid_3;
+			SELF.BusinessIDs.ProxID          := le.BusinessByFEIN.bus_fein_match_proxid_3;
+			SELF.BusinessIDs.SeleID          := le.BusinessByFEIN.bus_fein_match_seleid_3;
+			SELF.BusinessIDs.OrgID           := le.BusinessByFEIN.bus_fein_match_orgid_3;
+			SELF.BusinessIDs.UltID           := le.BusinessByFEIN.bus_fein_match_ultid_3;
 			SELF := [];
 		END;
 		
@@ -382,15 +380,15 @@ fn_GetNamesAddressesFromFEIN( BusinessInstantID20_Services.layouts.OutputLayout_
 	
 //  7. CompanyResults: LinkIDs
  
-iesp.share.t_BusinessIdentity xfm_LinkIDs(BusinessInstantID20_Services.Layouts.InputEchoLayout le) :=
+iesp.share.t_BusinessIdentity xfm_LinkIDs(BusinessInstantID20_Services.Layouts.InputEchoLayout le, BOOLEAN isValidate) :=
 	TRANSFORM
 		SELF.DotID  := 0;
 		SELF.EmpID  := 0;
-		SELF.POWID  := le.powid;
-		SELF.ProxID := le.proxid;
+		SELF.POWID  := IF(isValidate, 0, le.powid);
+		SELF.ProxID := IF(isValidate, 0, le.proxid);
 		SELF.SeleID := le.seleid;
-		SELF.OrgID  := le.orgid;
-		SELF.UltID  := le.ultid;
+		SELF.OrgID  := IF(isValidate, 0, le.orgid);
+		SELF.UltID  := IF(isValidate, 0, le.ultid);
 	END;
 
 // 8. CompanyResults: BusinessVerificationIndex
@@ -755,7 +753,7 @@ fn_GetRiskIndicators( BusinessInstantID20_Services.layouts.OutputLayout_intermed
 	END;
 
 // 16. CompanyResults: Verification Summaries
-fn_GetVerificationSummaries( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le ) :=
+fn_GetVerificationSummaries( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le) :=
 	FUNCTION
 		layout_tempVerificationSummary := RECORD
 			string20 _type;
@@ -845,29 +843,29 @@ iesp.businessinstantid20.t_BIID20BusinessAddressRisk xfm_BusinessAddressRisk(tem
 	END;
 
 // CompanyResults
-iesp.businessinstantid20.t_BIID20CompanyResults xfm_AddCompanyResults(BusinessInstantID20_Services.Layouts.OutputLayout_intermediate le) := 
+iesp.businessinstantid20.t_BIID20CompanyResults xfm_AddCompanyResults(BusinessInstantID20_Services.Layouts.OutputLayout_intermediate le, BOOLEAN isValidate) := 
 	TRANSFORM
-		SELF.VerifiedInput                      := ROW( xfm_VerifiedInput(le.VerifiedEcho) );
-		SELF.VerificationIndicators             := ROW( xfm_VerificationIndicators(le.Verification) );
-		SELF.BestInformation                    := ROW( xfm_BestInformation(le.BestEcho) );
-		SELF.NamesAddressesOfPhones             := fn_GetNamesAddressesFromPhone(le); 
-		SELF.PhonesOfNameAddresses              := fn_GetPhonesFromAddress(le);
-		SELF.FEINMatchResults                   := fn_GetNamesAddressesFromFEIN(le);
-		SELF.BusinessIDs                        := ROW( xfm_LinkIDs(le.InputEcho) );
+		SELF.VerifiedInput                      := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20Company)[1], ROW( xfm_VerifiedInput(le.VerifiedEcho) ));
+		SELF.VerificationIndicators             := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20VerificationIndicators)[1], ROW( xfm_VerificationIndicators(le.Verification) ));
+		SELF.BestInformation                    := ROW( xfm_BestInformation(le.BestEcho, isValidate) );
+		SELF.NamesAddressesOfPhones             := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20NameAddressLinkIDs), fn_GetNamesAddressesFromPhone(le)); 
+		SELF.PhonesOfNameAddresses              := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20PhoneOfNameAddress), fn_GetPhonesFromAddress(le));
+		SELF.FEINMatchResults                   := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20NameAddressLinkIDs), fn_GetNamesAddressesFromFEIN(le));
+		SELF.BusinessIDs                        := ROW( xfm_LinkIDs(le.InputEcho, isValidate) );
 		SELF.BusinessVerification               := ROW( xfm_BusinessVerification(le.VerificationSummaries) );
 		SELF.RiskIndicators                     := fn_GetRiskIndicators(le);
-		SELF.VerificationSummaries              := fn_GetVerificationSummaries(le); 
-		SELF.ResidentialBusinesses              := DATASET( [ xfm_ResidentialBusiness(le.ResidentialBus) ] );
-		SELF.OFACWatchLists                     := fn_GetOFAC(le);
+		SELF.VerificationSummaries              := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20VerificationSummary), fn_GetVerificationSummaries(le));
+		SELF.ResidentialBusinesses              := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20ResidentialBusiness), DATASET( [ xfm_ResidentialBusiness(le.ResidentialBus) ] )); //Double check this 
+		SELF.OFACWatchLists                     := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20WatchList), fn_GetOFAC(le));
 		SELF.BusinessToAuthorizedRepLinkIndexes := fn_GetBus2ExecIndexes(le); 
-		SELF.Compliance                         := ROW( xfm_Compliance(le) );
-		SELF.SBFEVerification                   := ROW( xfm_SBFEVerification(le.SBFEVerification) );
+		SELF.Compliance                         := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20Compliance)[1], ROW( xfm_Compliance(le) ));
+		SELF.SBFEVerification                   := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20SBFEVerification)[1], ROW( xfm_SBFEVerification(le.SBFEVerification) ));
 		SELF.AddressRisk                        := ROW( xfm_BusinessAddressRisk(le.BusinessAddressRisk) );
 		SELF := [];
 	END;
 
 // Authorized Rep results 
-iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepResults(BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout le) := 
+iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepResults(BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout le, BOOLEAN isValidate) := 
 	TRANSFORM
 		SELF.UniqueId := (STRING)le.did;
 		
@@ -910,50 +908,50 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 
 		// Verified Input
 		SELF.VerifiedInput.Name.Full	                 := '';
-		SELF.VerifiedInput.Name.First	                 := le.verfirst;
+		SELF.VerifiedInput.Name.First	                 := IF(isValidate, '', le.verfirst);
 		SELF.VerifiedInput.Name.Middle	               := '';
-		SELF.VerifiedInput.Name.Last	                 := le.verlast;
+		SELF.VerifiedInput.Name.Last	                 := IF(isValidate, '', le.verlast);
 		SELF.VerifiedInput.Name.Suffix	               := '';
 		SELF.VerifiedInput.Name.Prefix                 := '';
-		SELF.VerifiedInput.Address.StreetNumber	       := le.VerPrimRange;
-		SELF.VerifiedInput.Address.StreetPreDirection	 := le.VerPreDir;
-		SELF.VerifiedInput.Address.StreetName	         := le.VerPrimName;
-		SELF.VerifiedInput.Address.StreetSuffix	       := le.VerAddrSuffix;
-		SELF.VerifiedInput.Address.StreetPostDirection := le.VerPostDir;
-		SELF.VerifiedInput.Address.UnitDesignation	   := le.VerUnitDesignation;
-		SELF.VerifiedInput.Address.UnitNumber          := le.VerSecRange;
-		SELF.VerifiedInput.Address.StreetAddress1	     := le.veraddr;
+		SELF.VerifiedInput.Address.StreetNumber	       := IF(isValidate, '', le.VerPrimRange);
+		SELF.VerifiedInput.Address.StreetPreDirection	 := IF(isValidate, '', le.VerPreDir);
+		SELF.VerifiedInput.Address.StreetName	         := IF(isValidate, '', le.VerPrimName);
+		SELF.VerifiedInput.Address.StreetSuffix	       := IF(isValidate, '', le.VerAddrSuffix);
+		SELF.VerifiedInput.Address.StreetPostDirection := IF(isValidate, '', le.VerPostDir);
+		SELF.VerifiedInput.Address.UnitDesignation	   := IF(isValidate, '', le.VerUnitDesignation);
+		SELF.VerifiedInput.Address.UnitNumber          := IF(isValidate, '', le.VerSecRange);
+		SELF.VerifiedInput.Address.StreetAddress1	     := IF(isValidate, '', le.veraddr);
 		SELF.VerifiedInput.Address.StreetAddress2	     := '';
-		SELF.VerifiedInput.Address.City	               := le.vercity;
-		SELF.VerifiedInput.Address.State               := le.verstate;	
-		SELF.VerifiedInput.Address.Zip5	               := le.verzip;
-		SELF.VerifiedInput.Address.Zip4	               := le.verzip4;
-		SELF.VerifiedInput.Address.County              := le.vercounty;	
+		SELF.VerifiedInput.Address.City	               := IF(isValidate, '', le.vercity);
+		SELF.VerifiedInput.Address.State               := IF(isValidate, '', le.verstate);	
+		SELF.VerifiedInput.Address.Zip5	               := IF(isValidate, '', le.verzip);
+		SELF.VerifiedInput.Address.Zip4	               := IF(isValidate, '', le.verzip4);
+		SELF.VerifiedInput.Address.County              := IF(isValidate, '', le.vercounty);	
 		SELF.VerifiedInput.Address.PostalCode          := '';
 		SELF.VerifiedInput.Address.StateCityZip        := '';
-		SELF.VerifiedInput.SSN                         := le.verssn;
+		SELF.VerifiedInput.SSN                         := IF(isValidate, '', le.verssn);
 		SELF.VerifiedInput.Phone                       := le.verhphone;
-		SELF.VerifiedInput.DOB.Year                    := (INTEGER)le.verdob[1..4];
-		SELF.VerifiedInput.DOB.Month                   := (INTEGER)le.verdob[5..6];
-		SELF.VerifiedInput.DOB.Day                     := (INTEGER)le.verdob[7..8];
-		SELF.VerifiedInput.DriverLicenseNumber         := le.verDL;
+		SELF.VerifiedInput.DOB.Year                    := IF(isValidate, 0, (INTEGER)le.verdob[1..4]);
+		SELF.VerifiedInput.DOB.Month                   := IF(isValidate, 0, (INTEGER)le.verdob[5..6]);
+		SELF.VerifiedInput.DOB.Day                     := IF(isValidate, 0, (INTEGER)le.verdob[7..8]);
+		SELF.VerifiedInput.DriverLicenseNumber         := IF(isValidate, '', le.verDL);
 
 		// Some scalar values.
 		SELF.SSNFoundForLexID               					 := le.SSNFoundForLexID;
-		SELF.DOBMatchLevel                             := le.DOBMatchLevel;
-		SELF.NameAddressSSNSummary          					 := le.NAS_Summary;
-		SELF.NameAddressPhoneSummary        					 := le.NAP_Summary;
-		SELF.NameAddressPhoneType           					 := le.NAP_Type;
-		SELF.NameAddressPhoneStatus         					 := le.NAP_Status;
+		SELF.DOBMatchLevel                             := IF(isValidate, '', le.DOBMatchLevel);
+		SELF.NameAddressSSNSummary          					 := IF(isValidate, 0, le.NAS_Summary);
+		SELF.NameAddressPhoneSummary        					 := IF(isValidate, 0, le.NAP_Summary);
+		SELF.NameAddressPhoneType           					 := IF(isValidate, '', le.NAP_Type);
+		SELF.NameAddressPhoneStatus         					 := IF(isValidate, '', le.NAP_Status);
 		SELF.ComprehensiveVerificationIndex 					 := (INTEGER1)le.CVI;
 
 		// Risk Indicators
-				iesp.share.t_SequencedRiskIndicator xfm_RiskIndicators(risk_indicators.layouts.layout_desc_plus_seq riski_le) := 
-					TRANSFORM	
-						SELF.RiskCode    := riski_le.hri;
-						SELF.Description := riski_le.desc;
-						SELF.Sequence    := riski_le.seq;
-					END;
+      iesp.share.t_SequencedRiskIndicator xfm_RiskIndicators(risk_indicators.layouts.layout_desc_plus_seq riski_le) := 
+        TRANSFORM	
+          SELF.RiskCode    := riski_le.hri;
+          SELF.Description := riski_le.desc;
+          SELF.Sequence    := riski_le.seq;
+        END;
 						
 		SELF.RiskIndicators := PROJECT( le.ri, xfm_RiskIndicators(LEFT) );
 		
@@ -964,23 +962,23 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 						SELF.Description := fua_le.desc;
 					END;
 			
-		SELF.PotentialFollowupActions := PROJECT( le.fua, xfm_FollowUpActions(LEFT) );
+		SELF.PotentialFollowupActions := IF(isValidate, DATASET([], iesp.share.t_RiskIndicator), PROJECT( le.fua, xfm_FollowUpActions(LEFT) ));
 		
 		// Best Information
 		SELF.InputCorrected.Name.Full	                  := '';
 		SELF.InputCorrected.Name.First	                := '';
 		SELF.InputCorrected.Name.Middle	                := '';
-		SELF.InputCorrected.Name.Last	                  := le.corrected_lname;
+		SELF.InputCorrected.Name.Last	                  := IF(isValidate, '', le.corrected_lname);
 		SELF.InputCorrected.Name.Suffix	                := '';
 		SELF.InputCorrected.Name.Prefix                 := '';
-		SELF.InputCorrected.Address.StreetNumber	      := le.CorrectedPrimRange;
-		SELF.InputCorrected.Address.StreetPreDirection	:= le.CorrectedPreDir;
-		SELF.InputCorrected.Address.StreetName	        := le.CorrectedPrimName;
-		SELF.InputCorrected.Address.StreetSuffix	      := le.CorrectedAddrSuffix;
-		SELF.InputCorrected.Address.StreetPostDirection := le.CorrectedPostDir;
-		SELF.InputCorrected.Address.UnitDesignation	    := le.CorrectedUnitDesignation;
-		SELF.InputCorrected.Address.UnitNumber          := le.CorrectedSecRange;
-		SELF.InputCorrected.Address.StreetAddress1	    := le.corrected_address;
+		SELF.InputCorrected.Address.StreetNumber	      := IF(isValidate, '', le.CorrectedPrimRange);
+		SELF.InputCorrected.Address.StreetPreDirection	:= IF(isValidate, '', le.CorrectedPreDir);
+		SELF.InputCorrected.Address.StreetName	        := IF(isValidate, '', le.CorrectedPrimName);
+		SELF.InputCorrected.Address.StreetSuffix	      := IF(isValidate, '', le.CorrectedAddrSuffix);
+		SELF.InputCorrected.Address.StreetPostDirection := IF(isValidate, '', le.CorrectedPostDir);
+		SELF.InputCorrected.Address.UnitDesignation	    := IF(isValidate, '', le.CorrectedUnitDesignation);
+		SELF.InputCorrected.Address.UnitNumber          := IF(isValidate, '', le.CorrectedSecRange);
+		SELF.InputCorrected.Address.StreetAddress1	    := IF(isValidate, '', le.corrected_address);
 		SELF.InputCorrected.Address.StreetAddress2	    := '';
 		SELF.InputCorrected.Address.City	              := '';
 		SELF.InputCorrected.Address.State               := '';	
@@ -989,24 +987,24 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.InputCorrected.Address.County              := '';	
 		SELF.InputCorrected.Address.PostalCode          := '';
 		SELF.InputCorrected.Address.StateCityZip        := '';
-		SELF.InputCorrected.SSN                         := le.corrected_ssn;
-		SELF.InputCorrected.Phone                       := le.corrected_phone;
-		SELF.InputCorrected.DOB.Year                    := (INTEGER)le.corrected_dob[1..4];
-		SELF.InputCorrected.DOB.Month                   := (INTEGER)le.corrected_dob[5..6];
-		SELF.InputCorrected.DOB.Day                     := (INTEGER)le.corrected_dob[7..8];
+		SELF.InputCorrected.SSN                         := IF(isValidate, '', le.corrected_ssn);
+		SELF.InputCorrected.Phone                       := IF(isValidate, '', le.corrected_phone);
+		SELF.InputCorrected.DOB.Year                    := IF(isValidate, 0, (INTEGER)le.corrected_dob[1..4]);
+		SELF.InputCorrected.DOB.Month                   := IF(isValidate, 0, (INTEGER)le.corrected_dob[5..6]);
+		SELF.InputCorrected.DOB.Day                     := IF(isValidate, 0, (INTEGER)le.corrected_dob[7..8]);
 		
 		// New Area Code
-		SELF.AreaCodeSplitFlag               := IF( le.area_code_split != '', 'Y', 'N' );
-		SELF.NewAreaCode.AreaCode            := le.area_code_split;
-		SELF.NewAreaCode.EffectiveDate.Year  := (INTEGER)le.area_code_split_date[1..4];
-		SELF.NewAreaCode.EffectiveDate.Month := (INTEGER)le.area_code_split_date[5..6];
-		SELF.NewAreaCode.EffectiveDate.Day   := (INTEGER)le.area_code_split_date[7..8];
+		SELF.AreaCodeSplitFlag               := IF(isValidate, '', IF( le.area_code_split != '', 'Y', 'N' )); //double check this 
+		SELF.NewAreaCode.AreaCode            := IF(isValidate, '', le.area_code_split);
+		SELF.NewAreaCode.EffectiveDate.Year  := IF(isValidate, 0, (INTEGER)le.area_code_split_date[1..4]);
+		SELF.NewAreaCode.EffectiveDate.Month := IF(isValidate, 0, (INTEGER)le.area_code_split_date[5..6]);
+		SELF.NewAreaCode.EffectiveDate.Day   := IF(isValidate, 0, (INTEGER)le.area_code_split_date[7..8]);
 
 		// Reverse phone 
 		SELF.ReversePhone.Name.Full										:= '';
-		SELF.ReversePhone.Name.First									:= (STRING20)le.phone_fname;	
+		SELF.ReversePhone.Name.First									:= IF(isValidate, '', (STRING20)le.phone_fname);	
 		SELF.ReversePhone.Name.Middle									:= '';
-		SELF.ReversePhone.Name.Last										:= (STRING20)le.phone_lname;
+		SELF.ReversePhone.Name.Last										:= IF(isValidate, '', (STRING20)le.phone_lname);
 		SELF.ReversePhone.Name.Suffix									:= '';
 		SELF.ReversePhone.Name.Prefix 								:= '';
 		SELF.ReversePhone.Address.StreetNumber			 	:= '';
@@ -1016,7 +1014,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.ReversePhone.Address.StreetPostDirection	:= '';
 		SELF.ReversePhone.Address.UnitDesignation	 		:= '';
 		SELF.ReversePhone.Address.UnitNumber	 				:= '';
-		SELF.ReversePhone.Address.StreetAddress1	 		:= (STRING65)le.phone_address;
+		SELF.ReversePhone.Address.StreetAddress1	 		:= IF(isValidate, '', (STRING65)le.phone_address);
 		SELF.ReversePhone.Address.StreetAddress2	 		:= '';
 		SELF.ReversePhone.Address.City	 							:= '';
 		SELF.ReversePhone.Address.State	 							:= '';
@@ -1027,37 +1025,37 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.ReversePhone.Address.StateCityZip 				:= '';
 
 		// PhoneOfNameAddress 		
-		SELF.PhoneOfNameAddress := (STRING10)le.name_addr_phone;
+		SELF.PhoneOfNameAddress := IF(isValidate, '', (STRING10)le.name_addr_phone);
 		
 		// PhoneAddress                  
-		SELF.PhoneAddress.StreetNumber				:= le.PhonePrimRange;	
-		SELF.PhoneAddress.StreetPreDirection	:= le.PhonePreDir;
-		SELF.PhoneAddress.StreetName					:= le.PhonePrimName;
-		SELF.PhoneAddress.StreetSuffix				:= le.PhoneAddrSuffix;
-		SELF.PhoneAddress.StreetPostDirection	:= le.PhonePostDir;
-		SELF.PhoneAddress.UnitDesignation			:= le.PhoneUnitDesignation;
-		SELF.PhoneAddress.UnitNumber					:= le.PhoneSecRange;
-		SELF.PhoneAddress.StreetAddress1			:= le.phone_address;
+		SELF.PhoneAddress.StreetNumber				:= IF(isValidate, '', le.PhonePrimRange);	
+		SELF.PhoneAddress.StreetPreDirection	:= IF(isValidate, '', le.PhonePreDir);
+		SELF.PhoneAddress.StreetName					:= IF(isValidate, '', le.PhonePrimName);
+		SELF.PhoneAddress.StreetSuffix				:= IF(isValidate, '', le.PhoneAddrSuffix);
+		SELF.PhoneAddress.StreetPostDirection	:= IF(isValidate, '', le.PhonePostDir);
+		SELF.PhoneAddress.UnitDesignation			:= IF(isValidate, '', le.PhoneUnitDesignation);
+		SELF.PhoneAddress.UnitNumber					:= IF(isValidate, '', le.PhoneSecRange);
+		SELF.PhoneAddress.StreetAddress1			:= IF(isValidate, '', le.phone_address);
 		SELF.PhoneAddress.StreetAddress2			:= '';
-		SELF.PhoneAddress.City								:= le.phone_city;
-		SELF.PhoneAddress.State								:= le.phone_st;
-		SELF.PhoneAddress.Zip5								:= le.phone_zip;
+		SELF.PhoneAddress.City								:= IF(isValidate, '', le.phone_city);
+		SELF.PhoneAddress.State								:= IF(isValidate, '', le.phone_st);
+		SELF.PhoneAddress.Zip5								:= IF(isValidate, '', le.phone_zip);
 		SELF.PhoneAddress.Zip4								:= '';
 		SELF.PhoneAddress.County							:= '';
 		SELF.PhoneAddress.PostalCode					:= '';
 		SELF.PhoneAddress.StateCityZip 				:= '';
 		
 		// SSN Info 
-		SELF.SSNInfo.SSN                   := le.verssn;
-		SELF.SSNInfo.Valid                 := le.valid_ssn;
-		SELF.SSNInfo.IssuedStartDate.Year	 := (INTEGER)le.ssa_date_first[1..4];
-		SELF.SSNInfo.IssuedStartDate.Month := (INTEGER)le.ssa_date_first[5..6];
-		SELF.SSNInfo.IssuedStartDate.Day 	 := (INTEGER)le.ssa_date_first[7..8];
-		SELF.SSNInfo.IssuedEndDate.Year		 := (INTEGER)le.ssa_date_last[1..4];
-		SELF.SSNInfo.IssuedEndDate.Month 	 := (INTEGER)le.ssa_date_last[5..6];
-		SELF.SSNInfo.IssuedEndDate.Day 		 := (INTEGER)le.ssa_date_last[7..8];
-		SELF.SSNInfo.IssuedState 					 := (STRING2)le.ssa_state;
-		SELF.SSNInfo.IssuedStateName			 := (STRING20)le.ssa_state_name;
+		SELF.SSNInfo.SSN                   := IF(isValidate, '', le.verssn);
+		SELF.SSNInfo.Valid                 := IF(isValidate, '', le.valid_ssn);
+		SELF.SSNInfo.IssuedStartDate.Year	 := IF(isValidate, 0, (INTEGER)le.ssa_date_first[1..4]);
+		SELF.SSNInfo.IssuedStartDate.Month := IF(isValidate, 0, (INTEGER)le.ssa_date_first[5..6]);
+		SELF.SSNInfo.IssuedStartDate.Day 	 := IF(isValidate, 0, (INTEGER)le.ssa_date_first[7..8]);
+		SELF.SSNInfo.IssuedEndDate.Year		 := IF(isValidate, 0, (INTEGER)le.ssa_date_last[1..4]);
+		SELF.SSNInfo.IssuedEndDate.Month 	 := IF(isValidate, 0, (INTEGER)le.ssa_date_last[5..6]);
+		SELF.SSNInfo.IssuedEndDate.Day 		 := IF(isValidate, 0, (INTEGER)le.ssa_date_last[7..8]);
+		SELF.SSNInfo.IssuedState 					 := IF(isValidate, '', (STRING2)le.ssa_state);
+		SELF.SSNInfo.IssuedStateName			 := IF(isValidate, '', (STRING20)le.ssa_state_name);
 					
 		// Current Name
 		SELF.CurrentName.Full    := '';
@@ -1068,34 +1066,34 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.CurrentName.Prefix	 := '';
 	
 				// Chronology Histories
-				iesp.instantid.t_ChronologyHistory xfm_ChronologyHistory(Risk_Indicators.Layout_AddressHistory chron_le) := TRANSFORM
-					SELF.Address.StreetNumber					:= chron_le.primrange;
-					SELF.Address.StreetPreDirection		:= chron_le.PreDir;
-					SELF.Address.StreetName						:= chron_le.PrimName;
-					SELF.Address.StreetSuffix					:= chron_le.AddrSuffix;
-					SELF.Address.StreetPostDirection	:= chron_le.PostDir;
-					SELF.Address.UnitDesignation			:= chron_le.UnitDesignation;
-					SELF.Address.UnitNumber						:= chron_le.SecRange;
+				iesp.instantid.t_ChronologyHistory xfm_ChronologyHistory(Risk_Indicators.Layout_AddressHistory chron_le, BOOLEAN isValidate) := TRANSFORM
+					SELF.Address.StreetNumber					:= IF(isValidate, '', chron_le.primrange);
+					SELF.Address.StreetPreDirection		:= IF(isValidate, '', chron_le.PreDir);
+					SELF.Address.StreetName						:= IF(isValidate, '', chron_le.PrimName);
+					SELF.Address.StreetSuffix					:= IF(isValidate, '', chron_le.AddrSuffix);
+					SELF.Address.StreetPostDirection	:= IF(isValidate, '', chron_le.PostDir);
+					SELF.Address.UnitDesignation			:= IF(isValidate, '', chron_le.UnitDesignation);
+					SELF.Address.UnitNumber						:= IF(isValidate, '', chron_le.SecRange);
 					SELF.Address.StreetAddress1				:= chron_le.address;
-					SELF.Address.StreetAddress2				:= '';
+					SELF.Address.StreetAddress2				:= ''; //Currently not being used 
 					SELF.Address.City									:= chron_le.City;
 					SELF.Address.State								:= chron_le.St;
 					SELF.Address.Zip5									:= chron_le.Zip;
-					SELF.Address.Zip4									:= chron_le.Zip4;
+					SELF.Address.Zip4									:= IF(isValidate, '', chron_le.Zip4);
 					SELF.Address.County								:= '';
 					SELF.Address.PostalCode						:= '';
 					SELF.Address.StateCityZip					:= '';		
-					SELF.Phone 												:= chron_le.phone;
-					SELF.DateFirstSeen.Year						:= (INTEGER)((STRING)chron_le.dt_first_seen)[1..4];
-					SELF.DateFirstSeen.Month					:= (INTEGER)((STRING)chron_le.dt_first_seen)[5..6];
-					SELF.DateFirstSeen.Day						:= (INTEGER)((STRING)chron_le.dt_first_seen)[7..8];
-					SELF.DateLastSeen.Year						:= (INTEGER)((STRING)chron_le.dt_last_seen)[1..4];
-					SELF.DateLastSeen.Month						:= (INTEGER)((STRING)chron_le.dt_last_seen)[5..6];
-					SELF.DateLastSeen.Day							:= (INTEGER)((STRING)chron_le.dt_last_seen)[7..8];
+					SELF.Phone 												:= IF(isValidate, '', chron_le.phone);
+					SELF.DateFirstSeen.Year						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_first_seen)[1..4]);
+					SELF.DateFirstSeen.Month					:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_first_seen)[5..6]);
+					SELF.DateFirstSeen.Day						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_first_seen)[7..8]);
+					SELF.DateLastSeen.Year						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[1..4]);
+					SELF.DateLastSeen.Month						:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[5..6]);
+					SELF.DateLastSeen.Day							:= IF(isValidate, 0, (INTEGER)((STRING)chron_le.dt_last_seen)[7..8]);
 					SELF.IsBestAddress								:= chron_le.isBestMatch;
 				END;
 	
-		SELF.ChronologyHistories := PROJECT( le.Chronology, xfm_ChronologyHistory(LEFT) );
+		SELF.ChronologyHistories := PROJECT( le.Chronology, xfm_ChronologyHistory(LEFT, isValidate) );
 				
 		// AKAs		
 				iesp.businessinstantid20.t_BIID20ConsumerInstantIDAlternateName xfm_AlternateNames( Risk_Indicators.Layout_LastNames aka_le ) := TRANSFORM
@@ -1110,7 +1108,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.DateLastSeen.Day 	:= (INTEGER)aka_le.date_last[7..8];
 				END;
 		
-		SELF.AKAs := PROJECT( le.Additional_Lname, xfm_AlternateNames(LEFT) );
+		SELF.AKAs := IF(isValidate, DATASET([], iesp.businessinstantid20.t_BIID20ConsumerInstantIDAlternateName), PROJECT( le.Additional_Lname, xfm_AlternateNames(LEFT) ));
 
 		// WatchLists
 				iesp.instantid.t_WatchList xfm_Watchlists( risk_indicators.layouts.layout_watchlists_plus_seq gwl_le) := TRANSFORM
@@ -1145,7 +1143,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF := [];
 				END;
 				
-				ds_WatchlistRecords := PROJECT( le.WatchLists, xfm_Watchlists(LEFT) );
+				ds_WatchlistRecords := IF(isValidate, DATASET([], iesp.instantid.t_WatchList), PROJECT( le.WatchLists, xfm_Watchlists(LEFT) ));
 		
 		SELF.Watchlists := SORT( ds_WatchlistRecords, Sequence );
 
@@ -1154,34 +1152,34 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.AddressRisk.AddressIsCMRA  := le.addressCMRA;
 
 		// Decedent Info
-		SELF.DecedentInfo.Name.Full		  :='';
-		SELF.DecedentInfo.Name.First	  := le.DeceasedFirst;
-		SELF.DecedentInfo.Name.Middle	  :='';
-		SELF.DecedentInfo.Name.Last		  := le.DeceasedLast;
-		SELF.DecedentInfo.Name.Suffix	  :='';
-		SELF.DecedentInfo.Name.Prefix	  :='';
-		SELF.DecedentInfo.DOD.Year		  :=(INTEGER)le.deceasedDate[1..4];	
-		SELF.DecedentInfo.DOD.Month		  :=(INTEGER)le.deceasedDate[5..6];
-		SELF.DecedentInfo.DOD.Day			  :=(INTEGER)le.deceasedDate[7..8];
-		SELF.DecedentInfo.DOB.Year		  :=(INTEGER)le.deceasedDOB[1..4];	
-		SELF.DecedentInfo.DOB.Month		  :=(INTEGER)le.deceasedDOB[5..6];
-		SELF.DecedentInfo.DOB.Day			  :=(INTEGER)le.deceasedDOB[7..8];
+		SELF.DecedentInfo.Name.Full		  := '';
+		SELF.DecedentInfo.Name.First	  := IF(isValidate, '', le.DeceasedFirst);
+		SELF.DecedentInfo.Name.Middle	  := '';
+		SELF.DecedentInfo.Name.Last		  := IF(isValidate, '', le.DeceasedLast);
+		SELF.DecedentInfo.Name.Suffix	  := '';
+		SELF.DecedentInfo.Name.Prefix	  := '';
+		SELF.DecedentInfo.DOD.Year		  := IF(isValidate, 0, (INTEGER)le.deceasedDate[1..4]);	
+		SELF.DecedentInfo.DOD.Month		  := IF(isValidate, 0, (INTEGER)le.deceasedDate[5..6]);
+		SELF.DecedentInfo.DOD.Day			  := IF(isValidate, 0, (INTEGER)le.deceasedDate[7..8]);
+		SELF.DecedentInfo.DOB.Year		  := IF(isValidate, 0, (INTEGER)le.deceasedDOB[1..4]);	
+		SELF.DecedentInfo.DOB.Month		  := IF(isValidate, 0, (INTEGER)le.deceasedDOB[5..6]);
+		SELF.DecedentInfo.DOB.Day			  := IF(isValidate, 0, (INTEGER)le.deceasedDOB[7..8]);
 		
 		SELF := [];
 	END;
 
 // --------------------[ Transform to IESP compliant layout ]--------------------
 
-EXPORT iesp.businessinstantid20.t_BIID20Result xfm_ToIespLayout(BusinessInstantID20_Services.Layouts.OutputLayout_intermediate le) := 
+EXPORT iesp.businessinstantid20.t_BIID20Result xfm_ToIespLayout(BusinessInstantID20_Services.Layouts.OutputLayout_intermediate le, BOOLEAN isValidate) := 
 	TRANSFORM
 		// NumberValidAuthRepsInput must be at least 1, since this field is also used to indicate
 		// a hit even if there are no valid Authorized Reps.
 		SELF.NumberValidAuthRepsInput := IF( le.InputEcho.NumberValidAuthRepsInput = 0, 1, le.InputEcho.NumberValidAuthRepsInput );
 		SELF.InputEcho                := ROW( xfm_AddInputEcho(le.InputEcho) );
-		SELF.CompanyResults           := PROJECT( le, xfm_AddCompanyResults(LEFT) );
-		SELF.AuthorizedRepresentativeResults := PROJECT( le.ConsumerInstantID, xfm_AddAuthRepResults(LEFT) );
+		SELF.CompanyResults           := PROJECT( le, xfm_AddCompanyResults(LEFT, isValidate) );
+		SELF.AuthorizedRepresentativeResults := PROJECT( le.ConsumerInstantID, xfm_AddAuthRepResults(LEFT, isValidate) );
 		SELF.Models                   := le.Models;
-		SELF.Attributes               := le.AttributeGroup;
+		SELF.Attributes               := IF( isValidate, DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup), le.AttributeGroup );
 		SELF := [];
 	END;
 

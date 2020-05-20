@@ -20,6 +20,7 @@ export Search_Service := MACRO
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 	#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
+	#stored('RVCheckingSubscriberId', 0);
   
 #WEBSERVICE(FIELDS(
 		'RiskView2Request',
@@ -30,7 +31,8 @@ export Search_Service := MACRO
 		'SSNMask',
 		'DLMask',
 		'DOBMask',
-		'RetainInputDID'
+		'RetainInputDID',
+    'RVCheckingSubscriberId'
 	));
 
 /* ***************************************
@@ -149,9 +151,14 @@ export Search_Service := MACRO
 	unsigned6 MinimumAmount := MIN(option.LiensJudgmentsReportOptions.MinimumAmount, 999999999);
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates := option.LiensJudgmentsReportOptions.ExcludeStates;
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources := option.LiensJudgmentsReportOptions.ExcludeReportingSources;
+	boolean AttributesOnly := option.LiensJudgmentsReportOptions.AttributesOnly;
+    boolean ExcludeStatusRefresh := option.LiensJudgmentsReportOptions.ExcludeStatusRefresh;
+    string32 DeferredTransactionID := option.LiensJudgmentsReportOptions.DeferredTransactionID;
+    string5 StatusRefreshWaitPeriod := option.LiensJudgmentsReportOptions.StatusRefreshWaitPeriod;
+	
 	// if the boolean flag is true, use the boolean flags
-	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType
-		
+	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType	
+	
 	tmpCityFltr := if(ExcludeCityTaxLiens, '0', tmpFilterLienTypes[1..1]);
 	tmpCountyFltr := if(ExcludeCountyTaxLiens, '0', tmpFilterLienTypes[2..2]);
 	tmpStateWarrantFltr := if(ExcludeStateTaxWarrants, '0', tmpFilterLienTypes[3..3]);
@@ -161,6 +168,9 @@ export Search_Service := MACRO
 	tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 	tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
 	tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
+	tmpAttributesOnlyFltr := if(AttributesOnly, '0', tmpFilterLienTypes[10..10]);
+    tmpExcludeStatusRefresh := if(ExcludeStatusRefresh, '0', tmpFilterLienTypes[11..11]);
+	
 		//We now have boolean options for each of these filters. We built the code to use a bit (string)
 		//saying which ones they want and which ones they want to filter. I take the boolean flags and 
 		//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
@@ -173,12 +183,15 @@ export Search_Service := MACRO
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
 		tmpEvictionsFltr +
-		tmpReleasedCasesFltr;
+		tmpReleasedCasesFltr +
+		tmpAttributesOnlyFltr +
+        tmpExcludeStatusRefresh;
 		
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
   
   //Used only by Checking Indicators
-  STRING8 SubscriberId :=  (string8)option.RVCheckingSubscriberId;
+  Integer outOfBandSubscriberId := 0 : stored('RVCheckingSubscriberId');
+  INTEGER8 SubscriberId := IF(option.RVCheckingSubscriberId <> 0, option.RVCheckingSubscriberId, outOfBandSubscriberId);
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -186,7 +199,7 @@ export Search_Service := MACRO
 		SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
     self.properties := if(le.servicename IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
                         self.name := 'SubscriberId';
-                        self.val := SubscriberId;)]),
+                        self.val := (string8)SubscriberId;)]),
     Dataset([], Gateway.Layouts.ConfigProperties));
 		SELF := le;
 	END;
@@ -267,8 +280,10 @@ MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND ban
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
 
 rpt_period_error_message := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
+
+attr_only_error_message := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
             
-input_ok := map((( 
+check_valid_input := IF((( 
 							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
 							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
 								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
@@ -277,26 +292,15 @@ input_ok := map(((
 								) or
 							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
 							  ) or
-							(unsigned)packagedInput[1].LexID <> 0) 
-           and
-        (ReportingPeriod > 0 and ReportingPeriod <= 84)
-         => true,
-       (( 
-							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
-							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
-								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
-								(trim(packagedInput[1].z5)<>'' OR (trim(packagedInput[1].p_city_name)<>'' AND trim(packagedInput[1].St)<>'')))												// zip or city/state check
-							)
-								) or
-							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
-							  ) or
-							(unsigned)packagedInput[1].LexID <> 0) 
-           and
-        (ReportingPeriod <= 0 or ReportingPeriod > 84) // same as above, everything is good EXCEPT reportingperiod
-         => ERROR(301,rpt_period_error_message),
+							(unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
+
+input_ok := map(AttributesOnly AND ExcludeReleasedCases => ERROR(301,attr_only_error_message),
+							check_valid_input and (ReportingPeriod > 0 and ReportingPeriod <= 84) => true,
+							check_valid_input and (ReportingPeriod <= 0 or ReportingPeriod > 84) => ERROR(301,rpt_period_error_message), // Reporting period must be within 0 - 84.
 							ERROR(301,error_message) // else if anything else is wrong, give the other error message first priority.
-						);
-		//output(input_ok);				
+							);
+		
+		// output(input_ok);						
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
@@ -338,7 +342,10 @@ search_results_temp := ungroup(
       		MinimumAmount := MinimumAmount,
       		ExcludeStates := ExcludeStates,
       		ExcludeReportingSources := ExcludeReportingSources,
-			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks
+			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+            DeferredTransactionID := DeferredTransactionID,
+            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
+            ESPInterfaceVersion := InterfaceVersion
       		) 
       	);
   
@@ -366,7 +373,7 @@ search_results_temp := ungroup(
 				includeLnj),	// TestSeed Values
 		  search_results_temp
 	 )
-   );			
+   );						
 	 
 /* ***************************************
 	 *    Convert Search Results to name/value pairs for ESDL:   *
@@ -916,11 +923,11 @@ search_results_temp := ungroup(
 		
 		self.name := score_name;
 		
-		SELF.Scores := project(Risk_Indicators.iid_constants.ds_Record, transform(iesp.riskview2.t_RiskView2ScoreHRI,
+		SELF.Scores := DATASET([transform(iesp.riskview2.t_RiskView2ScoreHRI,
 			self.value := (unsigned)score_value;
 			self._type := score_type;
 			self.ScoreReasons := ds_reasons;
-			));
+			)]);
 	END;
 	
 	modelResults := normalize(	search_results , 9, intoModel(LEFT, counter)	)(name<>'');
@@ -1034,6 +1041,7 @@ search_results_temp := ungroup(
 	LnJ_liens := project(search_results[1].LnJliens, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForLien,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -1048,6 +1056,7 @@ search_results_temp := ungroup(
 	LnJ_jdgmts := project(search_results[1].LnJJudgments, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForJudgement,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -1069,14 +1078,13 @@ search_results_temp := ungroup(
 			  self.Result.AttributesGroup.attributes := nameValuePairsVersion5;
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ, left.report.summary);
+				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly, left.report.summary);
 				self.Result.Report := IF(run_riskview_report, left.report);
 				
 				self.Result.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
-				self.Result.LiensJudgmentsReports.Liens := LnJ_liens;
-				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
+				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly, LnJ_liens);
+				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly, LnJ_jdgmts);
 				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport;
-        
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore
         self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);
@@ -1092,13 +1100,23 @@ search_results_temp := ungroup(
 				ds_excep := DATASET([{'Roxie', 
 															 left.Exception_code,  
 															 '', 									
-															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException); 
+															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+                               
+       ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
+															 left.Exception_code,  
+															 '', 									
+															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+               ds_excep_status_refresh := DATASET([{'Roxie', 
+                                                             left.Exception_code,  
+                                                             '', 									
+                                                             RiskView.Constants.StatusRefresh_error_desc(left.Exception_code)}], iesp.share.t_WsException);
 
-				SELF._Header.Exceptions := if((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
-																			 custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
-																			 custom5_model_name = 'mla1608_0') and left.Exception_code <> '',
-																			ds_excep, 
-																			ds_excep_blank);
+				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
+																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
+																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
+                                        SubscriberId = 0 and STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
+                                        IncludeStatusRefreshChecks = TRUE AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
+																			  ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
 
 				SELF._Header := [];

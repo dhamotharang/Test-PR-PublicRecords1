@@ -1,7 +1,7 @@
 IMPORT Doxie, dx_gateway, iesp, Gateway, Royalty;
 
 EXPORT Records(
-  iesp.ca_avm_request.t_CaAvmReportRequest rec_in,
+  iesp.gw_ca_avm_request.t_CaAvmReportRequest rec_in,
   Doxie.IDataAccess mod_access,
   DATASET(Gateway.layouts.config) gws)
 := FUNCTION

@@ -1,4 +1,4 @@
-import iesp, Address, AutoStandardI, doxie, DeathV2_Services, Healthcare_Header_Services;
+﻿import iesp, Address, AutoStandardI, doxie, DeathV2_Services, Healthcare_Header_Services, Suppress;
 
 EXPORT DisclosedEntity_Functions := MODULE
 	shared myLayout:=Healthcare_Services.DisclosedEntity_Layouts;
@@ -114,11 +114,17 @@ EXPORT DisclosedEntity_Functions := MODULE
 	end;
 	Export appendDeath (dataset(DisclosedEntity_Layouts.entityIds) inputRecs) := function
 		gm := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
 		glb_ok := deathparams.isValidGlb();
-		deathRecs := join(inputRecs,doxie.Key_Death_MasterV2_ssa_Did,
+		deathRawRec := join(inputRecs,doxie.Key_Death_MasterV2_ssa_Did,
 								keyed(left.did = right.l_did)
 								and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
+								transform(right),
+								keep(1), limit(0));
+    supdeathRecs:=Suppress.MAC_SuppressSource(deathRawRec, mod_access); 
+		deathRecs := join(inputRecs,supdeathRecs,
+								left.did = right.l_did,
 								transform(DisclosedEntity_Layouts.entityIds, self.dod:=right.dod8;self:=left),
 								keep(1), limit(0),left outer);
 		return deathRecs;

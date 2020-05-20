@@ -1,4 +1,4 @@
-﻿import Address, Autokey_batch, BatchServices, doxie, gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
+﻿import Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
        corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
@@ -363,7 +363,7 @@ export Functions := module
       unsigned6 key_did;
     END;
 
-    pre_ds_all_phone1_gongcomp := join(ds_all_phone1_deduped, gong.Key_History_phone,
+    pre_ds_all_phone1_gongcomp := join(ds_all_phone1_deduped, dx_Gong.key_history_phone(),
       keyed(left.company_phone1[4..10] = right.p7 and
       left.company_phone1[1..3]  = right.p3) and
       right.current_flag and //we only want current data
@@ -470,7 +470,7 @@ export Functions := module
 
     // 2. Join the ds unique non-zero bdids with the gong history bdid key file
     //    to get the phone#.
-    pre_ds_all_bdids_gongphone := join(ds_all_bdids_deduped, gong.Key_History_BDID,
+    pre_ds_all_bdids_gongphone := join(ds_all_bdids_deduped, dx_Gong.key_history_bdid(),
       keyed(left.bdid=right.bdid) and
       //we only want current data
       right.current_record_flag = BatchServices.WorkPlace_Constants.GONG_HIST_CURRENT and

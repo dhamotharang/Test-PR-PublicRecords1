@@ -1,6 +1,6 @@
 ﻿﻿IMPORT autostandardI, BIPV2, BIPV2_Best,
   BIPV2_WAF, Census_Data, Doxie,
-  gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
+  dx_Gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
 
 EXPORT BusinessSearch_Records := MODULE
 
@@ -21,13 +21,13 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
  string6 ssn_mask_value := mod_access.ssn_mask;
 
-		string8 CurDate  := (STRING8) std.Date.Today();		
+		string8 CurDate  := (STRING8) std.Date.Today();
            Boolean   useBusinessCreditSorting  := AutoStandardI.DataPermissionI.val(
            MODULE( AutoStandardI.DataPermissionI.params )
 			EXPORT dataPermissionMask := global_mod.dataPermissionMask;
 		END
-                  ).use_SBFEData AND In_Options.IncludeBusinessCredit;                                   
-                  
+                  ).use_SBFEData AND In_Options.IncludeBusinessCredit;
+
 		// needed for project into userpermits for salt WAF (we also found) key.
 		in_mod_WAF_KEY := PROJECT(global_mod, BIPV2.mod_sources.iParams,OPT);
 		unsigned userpermits_SALT := BIPV2.mod_sources.in_mod_values(in_mod_WAF_KEY).my_bmap;
@@ -257,12 +257,12 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		 //
 	 rec_tmp_SELEID :=record
      recordof(deduped_unique_phones_SELEID);
-     gong.Key_History_phone;
+     dx_Gong.layouts.i_history_phone;
    end;
 
 	 ds_tmp_SELEID :=dedup(sort(project(deduped_unique_phones_SELEID,  rec_tmp_Phone),phone),phone);
    //Look up unique phone#s on gong history to get meta-data
-   unique_phones_wgongdata_0_SELEID_raw := join(ds_tmp_SELEID, gong.Key_History_phone,
+   unique_phones_wgongdata_0_SELEID_raw := join(ds_tmp_SELEID, dx_Gong.Key_History_phone(),
     keyed(left.phone[4..10] = right.p7) and
     keyed(left.phone[1..3]  = right.p3),
     limit(TopBusiness_Services.Constants.defaultJoinLimit,skip)); // if there are more than this, just don't worry about it.
@@ -347,13 +347,13 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
   rec_tmp:=record
     recordof(deduped_unique_phones);
-    gong.Key_History_phone;
+    dx_Gong.layouts.i_history_phone;
   end;
 
   ds_tmp:=dedup(sort(project(deduped_unique_phones,  rec_tmp_phone),phone),phone);
 
 	//Look up unique phone#s on gong history to get meta-data
-  unique_phones_wgongdata_0_a_raw := join(ds_tmp, gong.Key_History_phone,
+  unique_phones_wgongdata_0_a_raw := join(ds_tmp, dx_Gong.Key_History_phone(),
     keyed(left.phone[4..10] = right.p7) and
     keyed(left.phone[1..3]  = right.p3),
     limit(TopBusiness_Services.Constants.defaultJoinLimit,skip)); // if there are more than this, just don't worry about it.
@@ -910,7 +910,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 							//
                 SELEIDWAFBooleans := project( dedup(sort(tmp_return_results_NEW, ultid, orgid, seleid),
                                                                                                 ultid, orgid, seleid)
-                                                                         , transform({		
+                                                                         , transform({
 			                                                   BIPV2_WAF.Process_Biz_Layouts.id_stream_layout;
 			                                                      boolean incorp;
 																														boolean uccs;
@@ -937,8 +937,8 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 												//
                         TmpUltWAFBooleans := dedup(sort( tmp_return_results_New(ultimate.businessIDs.seleid > 0),
                                                                                     ultimate.businessIds.ultid,ultimate.businessIds.orgid, ultimate.businessIds.seleid),
-                                                                                      ultimate.businessIds.ultid,ultimate.businessIds.orgid, ultimate.businessIds.seleid);       
-         ultWAFBooleans := project(tmpUltWAFBooleans,       
+                                                                                      ultimate.businessIds.ultid,ultimate.businessIds.orgid, ultimate.businessIds.seleid);
+         ultWAFBooleans := project(tmpUltWAFBooleans,
 			 transform({BIPV2_WAF.Process_Biz_Layouts.id_stream_layout;
 			                                                      boolean incorp;
 																														boolean uccs;
@@ -952,7 +952,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 											 self.proxid := 0;
 											 self.UniqueID := counter;
 											 self := []
-											 ));                                    
+											 ));
 
        SELEIDWAFBooleansIn := project(SELEIDWAFBooleans, transform(BIPV2_WAF.Process_Biz_Layouts.id_stream_layout,
 			                           self.ultid := left.ultid;
@@ -1151,7 +1151,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 					 self := []),
 		     left outer);
 
-    // gongLinkidsHasCurrentPhone := exists(Gong.key_History_LinkIDs.kfetch(project(add_metadata_1, transform(BIPV2.IDlayouts.l_xlink_ids,
+    // gongLinkidsHasCurrentPhone := exists(dx_Gong.key_history_LinkIDs.kfetch(project(add_metadata_1, transform(BIPV2.IDlayouts.l_xlink_ids,
 		                                                 // self.ultid := left.businessIDs.ultid,
 																										 // self.orgid := left.BusinessIDs.orgid,
 																										 // self.seleid := left.businessIDs.seleid,
@@ -1187,10 +1187,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 				                   (ut.StringSimilar(tmpcname ,right.listed_name) <= TopBusiness_Services.Constants.STRINGSIMILARCONSTANT));
 				 //                         and gongLinkidsHasCurrentPhone);
 			                             // for isActive and isDefunct
-			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)         
-         
+			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)
+
          self.Best.IsDefunct := left.Best.isDefunct and (NOT(right.active_EDA = 'Y' and right.listing_type = 'B'));
-                               
+
 			   self := left;
 			   self := []),
 		   left outer);
@@ -1387,7 +1387,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		// output(topResultsPreSuppress, named('topResultsPreSuppress'));
            // output(topResults, named('TopResults'));
 		// output(tmpTopResultsScored, named('tmpTopResultsScored'));
-	
+
 //	  output(possible_Lafn, named('possible_lafn'));
 //	  output(possible_truncation, named('possible_truncation'));
 //	  output(ds_linkIDsNonRestricted, named('ds_linkIDsNonRestricted'));
@@ -1424,7 +1424,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
     // output(topResultsPreSuppress, named('topResultsPreSuppress'));
 	  // output(TopResultsScored_wirelessIndicator, named('TopResultsScored_wirelessIndicator'));
-	  // output(choosen(tmp_return_results_NEW,500), named('tmp_return_results_new'));		
+	  // output(choosen(tmp_return_results_NEW,500), named('tmp_return_results_new'));
 
 		// output(unique_phones, named('unique_phones'));
 		// output(unique_phones_wgongdata_0, named('unique_phones_wgongdata_0'));
@@ -1481,7 +1481,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		//output(gongLinkidsHasCurrentPhone, named('gongLinkidsHasCurrentPhone'));
 // output(ds_seleidBest, named('ds_seleidBest1'));
                      // output(SELE_SALT_WAF_FETCH, named('SELE_SALT_WAF_FETCH'));
-                     
+
                      // output(count(SeleidWAFResult), named('count_SeleidWAFResult'));
                      // output(count(ds_add_waf), named('count_ds_add_waf'));
                 // output(count(tmp_return_results_NEW), named('count_tmp_return_results_NEW1'));

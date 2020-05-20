@@ -1,4 +1,4 @@
-import AutostandardI, iesp, doxie, dx_header, Gong, Risk_Indicators, Phones, dx_PhonesInfo, Suppress, ut, bipv2;
+import AutostandardI, iesp, doxie, dx_header, dx_Gong, Risk_Indicators, Phones, dx_PhonesInfo, Suppress, ut, bipv2;
 
 EXPORT ReversePhoneTeaserRecords := Module
 
@@ -59,7 +59,7 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
     unsigned8 record_sid;
   END;
   // get info for land line phones based on phone input
-  pre_AddrInfo_valueFromPhone := JOIN(phone_recs, Gong.Key_History_phone,
+  pre_AddrInfo_valueFromPhone := JOIN(phone_recs, dx_Gong.key_history_phone(),
   LEFT.PhoneVal[4..10] = RIGHT.p7 AND
   LEFT.PhoneVal[1..3] = RIGHT.p3,
   TRANSFORM(optout_layout,

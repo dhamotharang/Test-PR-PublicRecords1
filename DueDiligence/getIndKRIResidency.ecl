@@ -3,7 +3,7 @@
 EXPORT getIndKRIResidency(DueDiligence.Layouts.Indv_Internal indv) := FUNCTION
 
 		/* PERSON US RESIDENCY */ 
-		reportedAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)indv.firstReportedDate, (STRING)indv.historyDate);       
+		reportedAge := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)indv.firstReportedDate, (STRING)indv.historyDate);       
 		indDOB := indv.individual.dob;
 		usResidencyFlag9 := IF(indv.validSSN = FALSE OR (indv.hasSSN = FALSE AND indv.hasITIN = FALSE), 'T', 'F');                                                            		 
 		usResidencyFlag8 := IF(indv.hasITIN OR indv.hasImmigrantSSN, 'T', 'F');                                		 

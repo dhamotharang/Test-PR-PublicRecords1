@@ -1,4 +1,4 @@
-﻿import riskwise, AML, VerificationOfOccupancy, iesp;
+﻿import riskwise, AML, VerificationOfOccupancy, iesp, risk_indicators;
 
 Layout_Address_Validation :=
 RECORD
@@ -945,7 +945,9 @@ RECORD
 	Risk_Indicators.Layouts.layout_BIP_Header_info_54 BIP_Header54;	//MS-123	
 	
 	string2 phone_ver_bureau; //replacement for Experian
-  
+	
+  boolean skip_opt_out := false;  // short circuit for opt out suppression, if we know the DID is not on the list, doesn't pay to search it for all records.
+	
   risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
   
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)

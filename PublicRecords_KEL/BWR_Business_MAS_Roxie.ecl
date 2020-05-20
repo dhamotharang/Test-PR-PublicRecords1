@@ -1,4 +1,5 @@
-﻿﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
+﻿﻿﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
+#workunit('name','MAS Busienss dev156 1 thread 100k');
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
 
@@ -6,6 +7,7 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
+// InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
 
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
@@ -67,7 +69,7 @@ eyeball := 120;
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~lweiner::out::Business_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::Business_Roxie_100k_Archive_KS-5842_test_errors_'+ ThorLib.wuid();
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -254,6 +256,7 @@ END;
 // ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 layout_MAS_Business_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
@@ -318,6 +321,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -331,6 +335,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Business := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -339,6 +344,7 @@ Passed_with_Extras :=
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.B_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -348,6 +354,7 @@ Passed_Business :=
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.B_InpAcct, 
 		TRANSFORM(Layout_Business,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),

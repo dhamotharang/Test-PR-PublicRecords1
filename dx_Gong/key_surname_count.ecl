@@ -1,4 +1,4 @@
-﻿//former: DayBatchEda.Key_gong_phone
+﻿//former: Gong.key_surname_count
 
 IMPORT data_services;
 IMPORT $;
@@ -10,5 +10,5 @@ keyed_fields := RECORD
 END;
 
 
-EXPORT key_surname_count (integer data_category = 0) := 
+EXPORT key_surname_count (integer data_category = 0) :=
          INDEX (keyed_fields, {rec - keyed_fields}, $.names().i_surname_count);

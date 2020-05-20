@@ -825,6 +825,7 @@ export Layout_Output := RECORD
 	unsigned8 rawaid3 := 0;
 	integer ssnLookupFlag := 0;
 	string120 errMsg := '';
+	boolean skip_opt_out := false;
   risk_indicators.Layout_ConsumerFlags						ConsumerFlags;
   risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
   Models.Layout_IID - seq iid_tmx;

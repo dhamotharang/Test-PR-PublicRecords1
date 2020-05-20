@@ -14,13 +14,13 @@ EXPORT SoapCall_OKCStatusRefreshRecommended(DATASET(iesp.okc_statusrefreshrecomm
 					self := [];
 			end;
 
-			d_recs_out := SOAPCALL(recs_in,
+			d_recs_out := IF(pMakeGatewayCall, SOAPCALL(recs_in,
 			gateway_URL,
 			'OkcStatusRefreshRecommended', 
 			{recs_in},
 			dataset(iesp.okc_statusrefreshrecommended_request.t_OkcStatusRefreshRecommendedResponseEx),
 			XPATH('OkcStatusRefreshRecommendedResponseEx'),
-			ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries));
+			ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
 				
 			RETURN d_recs_out;
 END;

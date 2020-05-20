@@ -323,7 +323,7 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
-export LnJDefault := '111111111';		
+export LnJDefault := '11111111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
  return (if(trim(title) != '', trim(title) + ' ','') +
@@ -521,8 +521,11 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		disablenongovernmentdldata =1 << 35,
 		enableEquifaxPhoneMart   =1 << 36,
 		TurnOffTumblings=1 << 37,  // option to speed up bocashell 5.3 and higher if it's not needed
-	 UseIngestDate=1 << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
-    	ReleasedCaseFltr = 1		<< 39
+        UseIngestDate=1 << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
+        ReleasedCaseFltr = 1		<< 39,
+        TurnOffRelativeProperty=1 << 40,
+        AttributesOnly = 1				<< 41,
+        ExcludeStatusRefresh = 1 << 42
   );
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
@@ -539,6 +542,8 @@ export FlagLiensOptions(string FilterLienTypes) := function
 	Judgments := CheckifFlagged(LiensInput, 7);
 	Evictions := CheckifFlagged(LiensInput, 8);
 	ReleasedCases := CheckifFlagged(LiensInput, 9);
+	AttributesOnly := CheckifFlagged(LiensInput, 10);
+    ExcludeStatusRefresh := CheckifFlagged(LiensInput, 11);
 	return (if(CityTaxLiens, BSOptions.CityTaxLien, 0) +
 		if(CountyTaxLiens, BSOptions.CountyTaxLien, 0) +
 		if(StateTaxWarrants, BSOptions.StateTaxWarrant, 0) +
@@ -547,7 +552,9 @@ export FlagLiensOptions(string FilterLienTypes) := function
 		if(OtherLiens, BSOptions.OtherLien, 0) +
 		if(Judgments, BSOptions.Judgment, 0) +
 		if(Evictions, BSOptions.Eviction, 0) +
-		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0));
+		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0) +
+		if(AttributesOnly, BSOptions.AttributesOnly, 0) +
+        if(ExcludeStatusRefresh, BSOptions.ExcludeStatusRefresh, 0));
 end;
 
 export GoodSSNLength(string9 inSSN) :=  inSSN != '' and 

@@ -1,20 +1,20 @@
 ﻿//
-//	Where Did They Go?
+//  Where Did They Go?
 //
-//	Search for gong recs that appeared near a certain moment in time, near some area(s).
+//  Search for gong recs that appeared near a certain moment in time, near some area(s).
 //
 
 /*
   Sample calls:
 
-  lname				:= 'LEONARD';
-  fname				:= 'TODD';
-  lat					:= '29.691933';
-  lon					:= '-082.406916';
-  zip					:= '32606';
-  zipset			:= ['32606','45458','48105','49428'];
-  did					:= 1502648379;
-  targetDate	:= '20010701';
+  lname       := 'LEONARD';
+  fname       := 'TODD';
+  lat         := '29.691933';
+  lon         := '-082.406916';
+  zip         := '32606';
+  zipset      := ['32606','45458','48105','49428'];
+  did         := 1502648379;
+  targetDate  := '20010701';
 
   output( Relocations.wdtg.get_gong(lname,fname,targetDate).near_LL(lat,lon) );
   output( Relocations.wdtg.get_gong(lname,fname,targetDate).near_zip(zip) );
@@ -33,7 +33,7 @@
   get_gong_by_did(did[,targetDate][,radius][,maxDaysBefore][,maxDaysAfter][,fuzzyLast][,exactFirst][,allowNonCurrent])
 */
 
-import AutostandardI, Doxie, Suppress, Gong, ut, doxie, NID;
+import AutostandardI, Suppress, dx_Gong, ut, doxie, NID;
 
 
 // STUB - are these two routines worthy of inclusion in module ut?
@@ -51,60 +51,60 @@ integer8 vDaysApart(string8 d1, string8 d2) :=
 export wdtg := module
 
   // constants
-  export default_maxResults	:= 25;
-  export default_radius			:= 30;
-  export default_daysBefore	:= 60;
-  export default_daysAfter	:= 180;
+  export default_maxResults := 25;
+  export default_radius     := 30;
+  export default_daysBefore := 60;
+  export default_daysAfter  := 180;
 
-  shared max_rawHits				:= 500;
+  shared max_rawHits        := 500;
 
-  shared time_max_great			:= 30;
-  shared time_max_good			:= 60;
-  shared time_penalt_great	:= 0;
-  shared time_penalt_good		:= 2;
-  shared time_penalt_bad		:= 4;
+  shared time_max_great     := 30;
+  shared time_max_good      := 60;
+  shared time_penalt_great  := 0;
+  shared time_penalt_good   := 2;
+  shared time_penalt_bad    := 4;
 
-  shared dist_max_great			:= 10;
-  shared dist_max_good			:= 20;
-  shared dist_penalt_great	:= 0;
-  shared dist_penalt_good		:= 2;
-  shared dist_penalt_bad		:= 4;
+  shared dist_max_great     := 10;
+  shared dist_max_good      := 20;
+  shared dist_penalt_great  := 0;
+  shared dist_penalt_good   := 2;
+  shared dist_penalt_bad    := 4;
 
-  shared name_penalt_minor	:= 1;
-  shared name_penalt_major	:= 5;
+  shared name_penalt_minor  := 1;
+  shared name_penalt_major  := 5;
 
-  shared gong_key						:= Gong.key_history_zip_name;
-  shared gong_key_date			:= Relocations.key_wdtgGong;
+  shared gong_key           := dx_Gong.key_history_zip_name();
+  shared gong_key_date      := Relocations.key_wdtgGong;
 
-  shared layout_narrow			:= Relocations.layout_wdtg.narrow;
-  shared layout_final				:= Relocations.layout_wdtg.final;
+  shared layout_narrow      := Relocations.layout_wdtg.narrow;
+  shared layout_final       := Relocations.layout_wdtg.final;
 
   // internal (infernal?) layouts
   shared layout_target := record
-    string8		tDate;
-    string8		tDateBef;
-    string8		tDateAft;
-    string20	tFirst;
-    string20	tMiddle;
-    string20	tLast;
-    string5		tZip;
+    string8   tDate;
+    string8   tDateBef;
+    string8   tDateAft;
+    string20  tFirst;
+    string20  tMiddle;
+    string20  tLast;
+    string5   tZip;
     set of integer4 areaZips;
-    string10	reason;
+    string10  reason;
   end;
   shared layout_raw := record
-    string5		targetZip := '';
-    string10	targetLat := '';
-    string11	targetLon := '';
-    string8		targetDate := '';
-    string20	targetLname := '';
-    string20	targetFname := '';
+    string5   targetZip := '';
+    string10  targetLat := '';
+    string11  targetLon := '';
+    string8   targetDate := '';
+    string20  targetLname := '';
+    string20  targetFname := '';
 
     layout_final;
 
     typeof(gong_key.dt_first_seen) hitDate;
-    unsigned2	fuzziness;
-    integer2	dTime;
-    real8			dSpace; // NOTE: Below, we count on this being the last column
+    unsigned2 fuzziness;
+    integer2  dTime;
+    real8     dSpace; // NOTE: Below, we count on this being the last column
   end;
 
   shared layout_raw_optout := RECORD
@@ -114,21 +114,21 @@ export wdtg := module
   END;
 
   shared layout_zip := record
-    string5		zip,
-    string10	reason
+    string5   zip,
+    string10  reason
   end;
 
 
   export dataset(layout_final) get_gong_by_did(
-    unsigned6 targetDID,		//HIDDEN ASSUMPTION THAT THIS > 0 AND HAS HEADER RECORDS
-    string8		targetDate_in		= '',
-    real8			radius					= default_radius,
-    unsigned2	maxDaysBefore 	= default_daysBefore,
-    unsigned2	maxDaysAfter		= default_daysAfter,
-    boolean		noNickname			= false,
-    boolean		allowNonCurrent	= false,
-    boolean		useLatestLName	= false,
-    boolean		useRelatives		= false
+    unsigned6 targetDID,    //HIDDEN ASSUMPTION THAT THIS > 0 AND HAS HEADER RECORDS
+    string8   targetDate_in   = '',
+    real8     radius          = default_radius,
+    unsigned2 maxDaysBefore   = default_daysBefore,
+    unsigned2 maxDaysAfter    = default_daysAfter,
+    boolean   noNickname      = false,
+    boolean   allowNonCurrent = false,
+    boolean   useLatestLName  = false,
+    boolean   useRelatives    = false
   ) := function
 
     // get the header records for the target subject, and reduce to just zips
@@ -137,7 +137,7 @@ export wdtg := module
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
     headerRecs :=
       doxie.Comp_Subject_Addresses(dids,mod_access := mod_access).addresses;
-    headerSort	:= sort(headerRecs,-dt_last_seen);
+    headerSort  := sort(headerRecs,-dt_last_seen);
     headerRecs_z := project(headerRecs, transform(layout_zip, self.zip:=left.zip, self.reason:='header'));
     // output(headerSort, named('headerSort')); // DEBUG
 
@@ -148,15 +148,15 @@ export wdtg := module
 
     // get target date from the most recent header record, or override
     targetDate := map(
-      targetDate_in=''	=> (string8)(headerSort[1].dt_last_seen * 100),
-      targetDate_in='0'	=> '',
+      targetDate_in=''  => (string8)(headerSort[1].dt_last_seen * 100),
+      targetDate_in='0' => '',
       targetDate_in
     );
 
     // get zips from relatives (optionally)
-    relRecs		:= doxie.Relative_Records(false);
-    relRecs_d	:= dedup( sort(relRecs, did, -dt_last_seen), did );
-    relRecs_z	:= if(
+    relRecs    := doxie.Relative_Records(false);
+    relRecs_d  := dedup( sort(relRecs, did, -dt_last_seen), did );
+    relRecs_z  := if(
       useRelatives,
       project(relRecs_d, transform(layout_zip, self.zip:=left.zip, self.reason:='relative')),
       dataset([], layout_zip)
@@ -171,30 +171,30 @@ export wdtg := module
       dedup(zip_s, zip),
       reason, record
     );
-    // output(zip_s, named('zip_s'));		// DEBUG
-    // output(zip_ds, named('zip_ds'));	// DEBUG
+    // output(zip_s, named('zip_s'));    // DEBUG
+    // output(zip_ds, named('zip_ds'));  // DEBUG
 
     // get unique lnames from all header records
     headerRecs_lnames := if(useLatestLName, choosen(headerSort,1), headerRecs);
     lname_ds := dedup( sort( project(headerRecs_lnames, {string20 lname}), record ), record );
 
     // generate target combinations
-    zip_ds2		:= project( zip_ds, 	transform({string1 foo; zip_ds;}, 	self.foo := 'X', self:=left) );
-    lname_ds2	:= project( lname_ds, transform({string1 foo; lname_ds;}, self.foo := 'X', self:=left) );
+    zip_ds2    := project( zip_ds,   transform({string1 foo; zip_ds;},   self.foo := 'X', self:=left) );
+    lname_ds2  := project( lname_ds, transform({string1 foo; lname_ds;}, self.foo := 'X', self:=left) );
     targets := join(
       lname_ds2, zip_ds2,
       left.foo=right.foo, // we want all zip/lname combinations
       transform(
         layout_target,
-        self.tDate		:= targetDate;
-        self.tDateBef	:= if(targetDate<>'', date_YYYYMMDD_delta(targetDate, -maxDaysBefore), '');
-        self.tDateAft	:= if(targetDate<>'', date_YYYYMMDD_delta(targetDate, maxDaysAfter), '');
-        self.tFirst		:= targetFirst;
-        self.tMiddle	:= targetMiddle;
-        self.tLast		:= left.lname;
-        self.tZip			:= right.zip;
-        self.areaZips	:= ZipLib.ZipsWithinRadius(right.zip, radius);
-        self.reason		:= right.reason;
+        self.tDate    := targetDate;
+        self.tDateBef := if(targetDate<>'', date_YYYYMMDD_delta(targetDate, -maxDaysBefore), '');
+        self.tDateAft := if(targetDate<>'', date_YYYYMMDD_delta(targetDate, maxDaysAfter), '');
+        self.tFirst   := targetFirst;
+        self.tMiddle  := targetMiddle;
+        self.tLast    := left.lname;
+        self.tZip     := right.zip;
+        self.areaZips := ZipLib.ZipsWithinRadius(right.zip, radius);
+        self.reason   := right.reason;
       )
     );
     // output(targets, named('targets')); // DEBUG
@@ -207,19 +207,19 @@ export wdtg := module
     mac_toOut(L,R) := macro
       tLat := trim(ut.getLL(L.tZip)[1..9]);
       tLon := trim(ut.getLL(L.tZip)[11..21]);
-      self.targetZip		:= L.tZip;
-      self.targetLat		:= tLat;
-      self.targetLon		:= tLon;
-      self.targetDate		:= L.tDate;
-      self.targetLname	:= L.tLast;
-      self.targetFname	:= L.tFirst;
-      self.hitDate			:= R.dt_first_seen;
-      self.fuzziness		:=
+      self.targetZip    := L.tZip;
+      self.targetLat    := tLat;
+      self.targetLon    := tLon;
+      self.targetDate   := L.tDate;
+      self.targetLname  := L.tLast;
+      self.targetFname  := L.tFirst;
+      self.hitDate      := R.dt_first_seen;
+      self.fuzziness    :=
         if(R.name_last<>L.tLast, name_penalt_minor, 0) +
         if(R.name_first<>L.tFirst, name_penalt_minor, 0) +
         if(~NID.mod_PFirstTools.RinPFL(L.tFirst,R.p_name_first),name_penalt_major, 0);
-      self.dTime				:= if(L.tDate<>'', vDaysApart(R.dt_first_seen, L.tDate), 0);
-      self.dSpace				:= ut.LL_Dist(
+      self.dTime        := if(L.tDate<>'', vDaysApart(R.dt_first_seen, L.tDate), 0);
+      self.dSpace       := ut.LL_Dist(
         (real)(tLat), (real)(tLon),
         (real)(R.geo_lat), (real)(R.geo_long)
       );
@@ -269,9 +269,9 @@ export wdtg := module
     // rollup dates on each targetZip/addr/phone triple (not needed if we use the custom key)
     gong_raw toRoll(gong_raw L, gong_raw R) := transform
       self.dt_first_seen := (string8)ut.min2((integer)L.dt_first_seen, (integer)R.dt_first_seen);
-      hitLeft 			:= abs(L.dTime) < abs(R.dTime);
-      self.dTime		:= if(hitLeft, L.dTime, R.dTime);
-      self.hitDate	:= if(hitLeft, L.hitDate, R.hitDate);
+      hitLeft       := abs(L.dTime) < abs(R.dTime);
+      self.dTime    := if(hitLeft, L.dTime, R.dTime);
+      self.hitDate  := if(hitLeft, L.hitDate, R.hitDate);
       self := L;
     end;
     gong_rolled_nodate := rollup(
@@ -302,13 +302,13 @@ export wdtg := module
       self.penalt :=
         L.fuzziness +
         map(
-          abs(L.dTime)<=time_max_great	=> time_penalt_great,
-          abs(L.dTime)<=time_max_good		=> time_penalt_good,
+          abs(L.dTime)<=time_max_great  => time_penalt_great,
+          abs(L.dTime)<=time_max_good   => time_penalt_good,
           time_penalt_bad
         ) +
         map(
-          abs(L.dSpace)<=dist_max_great	=> dist_penalt_great,
-          abs(L.dSpace)<=dist_max_good	=> dist_penalt_good,
+          abs(L.dSpace)<=dist_max_great => dist_penalt_great,
+          abs(L.dSpace)<=dist_max_good  => dist_penalt_good,
           dist_penalt_bad
         );
       self := L;

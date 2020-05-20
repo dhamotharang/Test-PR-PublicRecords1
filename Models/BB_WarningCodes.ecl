@@ -15,11 +15,6 @@ HRI_DS_Layout := Record
 DATASET(HRILAYOUT) HRIs;
 END;
 
-empty_record := RECORD
-  UNSIGNED a;
-END;
-
-
  	MODEL_DEBUG := FALSE;
 	// MODEL_DEBUG := TRUE;
 
@@ -391,11 +386,11 @@ Risk_Indicators.Layout_Boca_Shell clam;
 Business_Risk_BIP.Layouts.OutputLayout busShell;
 
 END;
-   Layout_Debug doModel(empty_record le)  := TRANSFORM 
+   Layout_Debug doModel()  := TRANSFORM 
 #else   
      
     
-     HRI_DS_Layout doModel(empty_record le) := TRANSFORM
+     HRI_DS_Layout doModel() := TRANSFORM
   
   #end  
   
@@ -511,10 +506,10 @@ NULL := -999999999;
 
 
 
-INTEGER contains_i( string haystack, string needle ) := __common__(  (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0) )  ;
+INTEGER contains_i( string haystack, string needle ) := __common__(  (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0) )  ;
 
 
-sysdate := __common__(  common.sas_date(if(clam.historydate=999999, (string)std.date.today(), (string6)clam.historydate+'01')))  ;
+sysdate := __common__(  models.common.sas_date(if(clam.historydate=999999, (string)std.date.today(), (string6)clam.historydate+'01')))  ;
 
 
 
@@ -530,7 +525,7 @@ ver_src_fsrc := Models.Common.getw(ver_sources, 1);
 
 ver_src_fsrc_fdate := Models.Common.getw(ver_sources_first_seen, 1);
 
-ver_src_fsrc_fdate2 := common.sas_date((string)(ver_src_fsrc_fdate));
+ver_src_fsrc_fdate2 := models.common.sas_date((string)(ver_src_fsrc_fdate));
 
 yr_ver_src_fsrc_fdate := if(min(sysdate, ver_src_fsrc_fdate2) = NULL, NULL, (sysdate - ver_src_fsrc_fdate2) / 365.25);
 
@@ -542,11 +537,11 @@ ver_src_ak := ver_src_ak_pos > 0;
 
 _ver_src_fdate_ak := if(ver_src_ak_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ak_pos), '0');
 
-ver_src_fdate_ak := common.sas_date((string)(_ver_src_fdate_ak));
+ver_src_fdate_ak := models.common.sas_date((string)(_ver_src_fdate_ak));
 
 _ver_src_ldate_ak := if(ver_src_ak_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ak_pos), '0');
 
-ver_src_ldate_ak := common.sas_date((string)(_ver_src_ldate_ak));
+ver_src_ldate_ak := models.common.sas_date((string)(_ver_src_ldate_ak));
 
 ver_src_cnt_ak := if(ver_src_ak_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ak_pos), 0);
 
@@ -558,11 +553,11 @@ ver_src_am := ver_src_am_pos > 0;
 
 _ver_src_fdate_am := if(ver_src_am_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_am_pos), '0');
 
-ver_src_fdate_am := common.sas_date((string)(_ver_src_fdate_am));
+ver_src_fdate_am := models.common.sas_date((string)(_ver_src_fdate_am));
 
 _ver_src_ldate_am := if(ver_src_am_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_am_pos), '0');
 
-ver_src_ldate_am := common.sas_date((string)(_ver_src_ldate_am));
+ver_src_ldate_am := models.common.sas_date((string)(_ver_src_ldate_am));
 
 ver_src_cnt_am := if(ver_src_am_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_am_pos), 0);
 
@@ -574,11 +569,11 @@ ver_src_ar := ver_src_ar_pos > 0;
 
 _ver_src_fdate_ar := if(ver_src_ar_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ar_pos), '0');
 
-ver_src_fdate_ar := common.sas_date((string)(_ver_src_fdate_ar));
+ver_src_fdate_ar := models.common.sas_date((string)(_ver_src_fdate_ar));
 
 _ver_src_ldate_ar := if(ver_src_ar_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ar_pos), '0');
 
-ver_src_ldate_ar := common.sas_date((string)(_ver_src_ldate_ar));
+ver_src_ldate_ar := models.common.sas_date((string)(_ver_src_ldate_ar));
 
 ver_src_cnt_ar := if(ver_src_ar_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ar_pos), 0);
 
@@ -590,11 +585,11 @@ ver_src_ba := ver_src_ba_pos > 0;
 
 _ver_src_fdate_ba := if(ver_src_ba_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ba_pos), '0');
 
-ver_src_fdate_ba := common.sas_date((string)(_ver_src_fdate_ba));
+ver_src_fdate_ba := models.common.sas_date((string)(_ver_src_fdate_ba));
 
 _ver_src_ldate_ba := if(ver_src_ba_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ba_pos), '0');
 
-ver_src_ldate_ba := common.sas_date((string)(_ver_src_ldate_ba));
+ver_src_ldate_ba := models.common.sas_date((string)(_ver_src_ldate_ba));
 
 ver_src_cnt_ba := if(ver_src_ba_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ba_pos), 0);
 
@@ -606,11 +601,11 @@ ver_src_cg := ver_src_cg_pos > 0;
 
 _ver_src_fdate_cg := if(ver_src_cg_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cg_pos), '0');
 
-ver_src_fdate_cg := common.sas_date((string)(_ver_src_fdate_cg));
+ver_src_fdate_cg := models.common.sas_date((string)(_ver_src_fdate_cg));
 
 _ver_src_ldate_cg := if(ver_src_cg_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cg_pos), '0');
 
-ver_src_ldate_cg := common.sas_date((string)(_ver_src_ldate_cg));
+ver_src_ldate_cg := models.common.sas_date((string)(_ver_src_ldate_cg));
 
 ver_src_cnt_cg := if(ver_src_cg_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_cg_pos), 0);
 
@@ -622,11 +617,11 @@ ver_src_co := ver_src_co_pos > 0;
 
 _ver_src_fdate_co := if(ver_src_co_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_co_pos), '0');
 
-ver_src_fdate_co := common.sas_date((string)(_ver_src_fdate_co));
+ver_src_fdate_co := models.common.sas_date((string)(_ver_src_fdate_co));
 
 _ver_src_ldate_co := if(ver_src_co_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_co_pos), '0');
 
-ver_src_ldate_co := common.sas_date((string)(_ver_src_ldate_co));
+ver_src_ldate_co := models.common.sas_date((string)(_ver_src_ldate_co));
 
 ver_src_cnt_co := if(ver_src_co_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_co_pos), 0);
 
@@ -638,11 +633,11 @@ ver_src_cy := ver_src_cy_pos > 0;
 
 _ver_src_fdate_cy := if(ver_src_cy_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cy_pos), '0');
 
-ver_src_fdate_cy := common.sas_date((string)(_ver_src_fdate_cy));
+ver_src_fdate_cy := models.common.sas_date((string)(_ver_src_fdate_cy));
 
 _ver_src_ldate_cy := if(ver_src_cy_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cy_pos), '0');
 
-ver_src_ldate_cy := common.sas_date((string)(_ver_src_ldate_cy));
+ver_src_ldate_cy := models.common.sas_date((string)(_ver_src_ldate_cy));
 
 ver_src_cnt_cy := if(ver_src_cy_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_cy_pos), 0);
 
@@ -654,11 +649,11 @@ ver_src_da := ver_src_da_pos > 0;
 
 _ver_src_fdate_da := if(ver_src_da_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_da_pos), '0');
 
-ver_src_fdate_da := common.sas_date((string)(_ver_src_fdate_da));
+ver_src_fdate_da := models.common.sas_date((string)(_ver_src_fdate_da));
 
 _ver_src_ldate_da := if(ver_src_da_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_da_pos), '0');
 
-ver_src_ldate_da := common.sas_date((string)(_ver_src_ldate_da));
+ver_src_ldate_da := models.common.sas_date((string)(_ver_src_ldate_da));
 
 ver_src_cnt_da := if(ver_src_da_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_da_pos), 0);
 
@@ -670,11 +665,11 @@ ver_src_d := ver_src_d_pos > 0;
 
 _ver_src_fdate_d := if(ver_src_d_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_d_pos), '0');
 
-ver_src_fdate_d := common.sas_date((string)(_ver_src_fdate_d));
+ver_src_fdate_d := models.common.sas_date((string)(_ver_src_fdate_d));
 
 _ver_src_ldate_d := if(ver_src_d_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_d_pos), '0');
 
-ver_src_ldate_d := common.sas_date((string)(_ver_src_ldate_d));
+ver_src_ldate_d := models.common.sas_date((string)(_ver_src_ldate_d));
 
 ver_src_cnt_d := if(ver_src_d_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_d_pos), 0);
 
@@ -686,11 +681,11 @@ ver_src_dl := ver_src_dl_pos > 0;
 
 _ver_src_fdate_dl := if(ver_src_dl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_dl_pos), '0');
 
-ver_src_fdate_dl := common.sas_date((string)(_ver_src_fdate_dl));
+ver_src_fdate_dl := models.common.sas_date((string)(_ver_src_fdate_dl));
 
 _ver_src_ldate_dl := if(ver_src_dl_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_dl_pos), '0');
 
-ver_src_ldate_dl := common.sas_date((string)(_ver_src_ldate_dl));
+ver_src_ldate_dl := models.common.sas_date((string)(_ver_src_ldate_dl));
 
 ver_src_cnt_dl := if(ver_src_dl_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_dl_pos), 0);
 
@@ -702,11 +697,11 @@ ver_src_ds := ver_src_ds_pos > 0;
 
 _ver_src_fdate_ds := if(ver_src_ds_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ds_pos), '0');
 
-ver_src_fdate_ds := common.sas_date((string)(_ver_src_fdate_ds));
+ver_src_fdate_ds := models.common.sas_date((string)(_ver_src_fdate_ds));
 
 _ver_src_ldate_ds := if(ver_src_ds_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ds_pos), '0');
 
-ver_src_ldate_ds := common.sas_date((string)(_ver_src_ldate_ds));
+ver_src_ldate_ds := models.common.sas_date((string)(_ver_src_ldate_ds));
 
 ver_src_cnt_ds := if(ver_src_ds_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ds_pos), 0);
 
@@ -718,11 +713,11 @@ ver_src_de := ver_src_de_pos > 0;
 
 _ver_src_fdate_de := if(ver_src_de_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_de_pos), '0');
 
-ver_src_fdate_de := common.sas_date((string)(_ver_src_fdate_de));
+ver_src_fdate_de := models.common.sas_date((string)(_ver_src_fdate_de));
 
 _ver_src_ldate_de := if(ver_src_de_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_de_pos), '0');
 
-ver_src_ldate_de := common.sas_date((string)(_ver_src_ldate_de));
+ver_src_ldate_de := models.common.sas_date((string)(_ver_src_ldate_de));
 
 ver_src_cnt_de := if(ver_src_de_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_de_pos), 0);
 
@@ -734,11 +729,11 @@ ver_src_eb := ver_src_eb_pos > 0;
 
 _ver_src_fdate_eb := if(ver_src_eb_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_eb_pos), '0');
 
-ver_src_fdate_eb := common.sas_date((string)(_ver_src_fdate_eb));
+ver_src_fdate_eb := models.common.sas_date((string)(_ver_src_fdate_eb));
 
 _ver_src_ldate_eb := if(ver_src_eb_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_eb_pos), '0');
 
-ver_src_ldate_eb := common.sas_date((string)(_ver_src_ldate_eb));
+ver_src_ldate_eb := models.common.sas_date((string)(_ver_src_ldate_eb));
 
 ver_src_cnt_eb := if(ver_src_eb_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_eb_pos), 0);
 
@@ -750,11 +745,11 @@ ver_src_em := ver_src_em_pos > 0;
 
 _ver_src_fdate_em := if(ver_src_em_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_em_pos), '0');
 
-ver_src_fdate_em := common.sas_date((string)(_ver_src_fdate_em));
+ver_src_fdate_em := models.common.sas_date((string)(_ver_src_fdate_em));
 
 _ver_src_ldate_em := if(ver_src_em_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_em_pos), '0');
 
-ver_src_ldate_em := common.sas_date((string)(_ver_src_ldate_em));
+ver_src_ldate_em := models.common.sas_date((string)(_ver_src_ldate_em));
 
 ver_src_cnt_em := if(ver_src_em_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_em_pos), 0);
 
@@ -766,11 +761,11 @@ ver_src_e1 := ver_src_e1_pos > 0;
 
 _ver_src_fdate_e1 := if(ver_src_e1_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e1_pos), '0');
 
-ver_src_fdate_e1 := common.sas_date((string)(_ver_src_fdate_e1));
+ver_src_fdate_e1 := models.common.sas_date((string)(_ver_src_fdate_e1));
 
 _ver_src_ldate_e1 := if(ver_src_e1_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_e1_pos), '0');
 
-ver_src_ldate_e1 := common.sas_date((string)(_ver_src_ldate_e1));
+ver_src_ldate_e1 := models.common.sas_date((string)(_ver_src_ldate_e1));
 
 ver_src_cnt_e1 := if(ver_src_e1_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_e1_pos), 0);
 
@@ -782,11 +777,11 @@ ver_src_e2 := ver_src_e2_pos > 0;
 
 _ver_src_fdate_e2 := if(ver_src_e2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e2_pos), '0');
 
-ver_src_fdate_e2 := common.sas_date((string)(_ver_src_fdate_e2));
+ver_src_fdate_e2 := models.common.sas_date((string)(_ver_src_fdate_e2));
 
 _ver_src_ldate_e2 := if(ver_src_e2_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_e2_pos), '0');
 
-ver_src_ldate_e2 := common.sas_date((string)(_ver_src_ldate_e2));
+ver_src_ldate_e2 := models.common.sas_date((string)(_ver_src_ldate_e2));
 
 ver_src_cnt_e2 := if(ver_src_e2_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_e2_pos), 0);
 
@@ -798,11 +793,11 @@ ver_src_e3 := ver_src_e3_pos > 0;
 
 _ver_src_fdate_e3 := if(ver_src_e3_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e3_pos), '0');
 
-ver_src_fdate_e3 := common.sas_date((string)(_ver_src_fdate_e3));
+ver_src_fdate_e3 := models.common.sas_date((string)(_ver_src_fdate_e3));
 
 _ver_src_ldate_e3 := if(ver_src_e3_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_e3_pos), '0');
 
-ver_src_ldate_e3 := common.sas_date((string)(_ver_src_ldate_e3));
+ver_src_ldate_e3 := models.common.sas_date((string)(_ver_src_ldate_e3));
 
 ver_src_cnt_e3 := if(ver_src_e3_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_e3_pos), 0);
 
@@ -814,11 +809,11 @@ ver_src_e4 := ver_src_e4_pos > 0;
 
 _ver_src_fdate_e4 := if(ver_src_e4_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e4_pos), '0');
 
-ver_src_fdate_e4 := common.sas_date((string)(_ver_src_fdate_e4));
+ver_src_fdate_e4 := models.common.sas_date((string)(_ver_src_fdate_e4));
 
 _ver_src_ldate_e4 := if(ver_src_e4_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_e4_pos), '0');
 
-ver_src_ldate_e4 := common.sas_date((string)(_ver_src_ldate_e4));
+ver_src_ldate_e4 := models.common.sas_date((string)(_ver_src_ldate_e4));
 
 ver_src_cnt_e4 := if(ver_src_e4_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_e4_pos), 0);
 
@@ -830,11 +825,11 @@ ver_src_en := ver_src_en_pos > 0;
 
 _ver_src_fdate_en := if(ver_src_en_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_en_pos), '0');
 
-ver_src_fdate_en := common.sas_date((string)(_ver_src_fdate_en));
+ver_src_fdate_en := models.common.sas_date((string)(_ver_src_fdate_en));
 
 _ver_src_ldate_en := if(ver_src_en_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_en_pos), '0');
 
-ver_src_ldate_en := common.sas_date((string)(_ver_src_ldate_en));
+ver_src_ldate_en := models.common.sas_date((string)(_ver_src_ldate_en));
 
 ver_src_cnt_en := if(ver_src_en_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_en_pos), 0);
 
@@ -846,11 +841,11 @@ ver_src_eq := ver_src_eq_pos > 0;
 
 _ver_src_fdate_eq := if(ver_src_eq_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_eq_pos), '0');
 
-ver_src_fdate_eq := common.sas_date((string)(_ver_src_fdate_eq));
+ver_src_fdate_eq := models.common.sas_date((string)(_ver_src_fdate_eq));
 
 _ver_src_ldate_eq := if(ver_src_eq_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_eq_pos), '0');
 
-ver_src_ldate_eq := common.sas_date((string)(_ver_src_ldate_eq));
+ver_src_ldate_eq := models.common.sas_date((string)(_ver_src_ldate_eq));
 
 ver_src_cnt_eq := if(ver_src_eq_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_eq_pos), 0);
 
@@ -862,11 +857,11 @@ ver_src_fe := ver_src_fe_pos > 0;
 
 _ver_src_fdate_fe := if(ver_src_fe_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_fe_pos), '0');
 
-ver_src_fdate_fe := common.sas_date((string)(_ver_src_fdate_fe));
+ver_src_fdate_fe := models.common.sas_date((string)(_ver_src_fdate_fe));
 
 _ver_src_ldate_fe := if(ver_src_fe_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_fe_pos), '0');
 
-ver_src_ldate_fe := common.sas_date((string)(_ver_src_ldate_fe));
+ver_src_ldate_fe := models.common.sas_date((string)(_ver_src_ldate_fe));
 
 ver_src_cnt_fe := if(ver_src_fe_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_fe_pos), 0);
 
@@ -878,11 +873,11 @@ ver_src_ff := ver_src_ff_pos > 0;
 
 _ver_src_fdate_ff := if(ver_src_ff_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ff_pos), '0');
 
-ver_src_fdate_ff := common.sas_date((string)(_ver_src_fdate_ff));
+ver_src_fdate_ff := models.common.sas_date((string)(_ver_src_fdate_ff));
 
 _ver_src_ldate_ff := if(ver_src_ff_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ff_pos), '0');
 
-ver_src_ldate_ff := common.sas_date((string)(_ver_src_ldate_ff));
+ver_src_ldate_ff := models.common.sas_date((string)(_ver_src_ldate_ff));
 
 ver_src_cnt_ff := if(ver_src_ff_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ff_pos), 0);
 
@@ -894,11 +889,11 @@ ver_src_fr := ver_src_fr_pos > 0;
 
 _ver_src_fdate_fr := if(ver_src_fr_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_fr_pos), '0');
 
-ver_src_fdate_fr := common.sas_date((string)(_ver_src_fdate_fr));
+ver_src_fdate_fr := models.common.sas_date((string)(_ver_src_fdate_fr));
 
 _ver_src_ldate_fr := if(ver_src_fr_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_fr_pos), '0');
 
-ver_src_ldate_fr := common.sas_date((string)(_ver_src_ldate_fr));
+ver_src_ldate_fr := models.common.sas_date((string)(_ver_src_ldate_fr));
 
 ver_src_cnt_fr := if(ver_src_fr_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_fr_pos), 0);
 
@@ -910,11 +905,11 @@ ver_src_l2 := ver_src_l2_pos > 0;
 
 _ver_src_fdate_l2 := if(ver_src_l2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_l2_pos), '0');
 
-ver_src_fdate_l2 := common.sas_date((string)(_ver_src_fdate_l2));
+ver_src_fdate_l2 := models.common.sas_date((string)(_ver_src_fdate_l2));
 
 _ver_src_ldate_l2 := if(ver_src_l2_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_l2_pos), '0');
 
-ver_src_ldate_l2 := common.sas_date((string)(_ver_src_ldate_l2));
+ver_src_ldate_l2 := models.common.sas_date((string)(_ver_src_ldate_l2));
 
 ver_src_cnt_l2 := if(ver_src_l2_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_l2_pos), 0);
 
@@ -926,11 +921,11 @@ ver_src_li := ver_src_li_pos > 0;
 
 _ver_src_fdate_li := if(ver_src_li_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_li_pos), '0');
 
-ver_src_fdate_li := common.sas_date((string)(_ver_src_fdate_li));
+ver_src_fdate_li := models.common.sas_date((string)(_ver_src_fdate_li));
 
 _ver_src_ldate_li := if(ver_src_li_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_li_pos), '0');
 
-ver_src_ldate_li := common.sas_date((string)(_ver_src_ldate_li));
+ver_src_ldate_li := models.common.sas_date((string)(_ver_src_ldate_li));
 
 ver_src_cnt_li := if(ver_src_li_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_li_pos), 0);
 
@@ -942,11 +937,11 @@ ver_src_mw := ver_src_mw_pos > 0;
 
 _ver_src_fdate_mw := if(ver_src_mw_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_mw_pos), '0');
 
-ver_src_fdate_mw := common.sas_date((string)(_ver_src_fdate_mw));
+ver_src_fdate_mw := models.common.sas_date((string)(_ver_src_fdate_mw));
 
 _ver_src_ldate_mw := if(ver_src_mw_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_mw_pos), '0');
 
-ver_src_ldate_mw := common.sas_date((string)(_ver_src_ldate_mw));
+ver_src_ldate_mw := models.common.sas_date((string)(_ver_src_ldate_mw));
 
 ver_src_cnt_mw := if(ver_src_mw_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_mw_pos), 0);
 
@@ -958,11 +953,11 @@ ver_src_nt := ver_src_nt_pos > 0;
 
 _ver_src_fdate_nt := if(ver_src_nt_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_nt_pos), '0');
 
-ver_src_fdate_nt := common.sas_date((string)(_ver_src_fdate_nt));
+ver_src_fdate_nt := models.common.sas_date((string)(_ver_src_fdate_nt));
 
 _ver_src_ldate_nt := if(ver_src_nt_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_nt_pos), '0');
 
-ver_src_ldate_nt := common.sas_date((string)(_ver_src_ldate_nt));
+ver_src_ldate_nt := models.common.sas_date((string)(_ver_src_ldate_nt));
 
 ver_src_cnt_nt := if(ver_src_nt_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_nt_pos), 0);
 
@@ -974,11 +969,11 @@ ver_src_p := ver_src_p_pos > 0;
 
 _ver_src_fdate_p := if(ver_src_p_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_p_pos), '0');
 
-ver_src_fdate_p := common.sas_date((string)(_ver_src_fdate_p));
+ver_src_fdate_p := models.common.sas_date((string)(_ver_src_fdate_p));
 
 _ver_src_ldate_p := if(ver_src_p_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_p_pos), '0');
 
-ver_src_ldate_p := common.sas_date((string)(_ver_src_ldate_p));
+ver_src_ldate_p := models.common.sas_date((string)(_ver_src_ldate_p));
 
 ver_src_cnt_p := if(ver_src_p_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_p_pos), 0);
 
@@ -990,11 +985,11 @@ ver_src_pl := ver_src_pl_pos > 0;
 
 _ver_src_fdate_pl := if(ver_src_pl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_pl_pos), '0');
 
-ver_src_fdate_pl := common.sas_date((string)(_ver_src_fdate_pl));
+ver_src_fdate_pl := models.common.sas_date((string)(_ver_src_fdate_pl));
 
 _ver_src_ldate_pl := if(ver_src_pl_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_pl_pos), '0');
 
-ver_src_ldate_pl := common.sas_date((string)(_ver_src_ldate_pl));
+ver_src_ldate_pl := models.common.sas_date((string)(_ver_src_ldate_pl));
 
 ver_src_cnt_pl := if(ver_src_pl_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_pl_pos), 0);
 
@@ -1006,11 +1001,11 @@ ver_src_tn := ver_src_tn_pos > 0;
 
 _ver_src_fdate_tn := if(ver_src_tn_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_tn_pos), '0');
 
-ver_src_fdate_tn := common.sas_date((string)(_ver_src_fdate_tn));
+ver_src_fdate_tn := models.common.sas_date((string)(_ver_src_fdate_tn));
 
 _ver_src_ldate_tn := if(ver_src_tn_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_tn_pos), '0');
 
-ver_src_ldate_tn := common.sas_date((string)(_ver_src_ldate_tn));
+ver_src_ldate_tn := models.common.sas_date((string)(_ver_src_ldate_tn));
 
 ver_src_cnt_tn := if(ver_src_tn_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_tn_pos), 0);
 
@@ -1022,11 +1017,11 @@ ver_src_ts := ver_src_ts_pos > 0;
 
 _ver_src_fdate_ts := if(ver_src_ts_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ts_pos), '0');
 
-ver_src_fdate_ts := common.sas_date((string)(_ver_src_fdate_ts));
+ver_src_fdate_ts := models.common.sas_date((string)(_ver_src_fdate_ts));
 
 _ver_src_ldate_ts := if(ver_src_ts_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_ts_pos), '0');
 
-ver_src_ldate_ts := common.sas_date((string)(_ver_src_ldate_ts));
+ver_src_ldate_ts := models.common.sas_date((string)(_ver_src_ldate_ts));
 
 ver_src_cnt_ts := if(ver_src_ts_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_ts_pos), 0);
 
@@ -1038,11 +1033,11 @@ ver_src_tu := ver_src_tu_pos > 0;
 
 _ver_src_fdate_tu := if(ver_src_tu_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_tu_pos), '0');
 
-ver_src_fdate_tu := common.sas_date((string)(_ver_src_fdate_tu));
+ver_src_fdate_tu := models.common.sas_date((string)(_ver_src_fdate_tu));
 
 _ver_src_ldate_tu := if(ver_src_tu_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_tu_pos), '0');
 
-ver_src_ldate_tu := common.sas_date((string)(_ver_src_ldate_tu));
+ver_src_ldate_tu := models.common.sas_date((string)(_ver_src_ldate_tu));
 
 ver_src_cnt_tu := if(ver_src_tu_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_tu_pos), 0);
 
@@ -1054,11 +1049,11 @@ ver_src_sl := ver_src_sl_pos > 0;
 
 _ver_src_fdate_sl := if(ver_src_sl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_sl_pos), '0');
 
-ver_src_fdate_sl := common.sas_date((string)(_ver_src_fdate_sl));
+ver_src_fdate_sl := models.common.sas_date((string)(_ver_src_fdate_sl));
 
 _ver_src_ldate_sl := if(ver_src_sl_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_sl_pos), '0');
 
-ver_src_ldate_sl := common.sas_date((string)(_ver_src_ldate_sl));
+ver_src_ldate_sl := models.common.sas_date((string)(_ver_src_ldate_sl));
 
 ver_src_cnt_sl := if(ver_src_sl_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_sl_pos), 0);
 
@@ -1070,11 +1065,11 @@ ver_src_v := ver_src_v_pos > 0;
 
 _ver_src_fdate_v := if(ver_src_v_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_v_pos), '0');
 
-ver_src_fdate_v := common.sas_date((string)(_ver_src_fdate_v));
+ver_src_fdate_v := models.common.sas_date((string)(_ver_src_fdate_v));
 
 _ver_src_ldate_v := if(ver_src_v_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_v_pos), '0');
 
-ver_src_ldate_v := common.sas_date((string)(_ver_src_ldate_v));
+ver_src_ldate_v := models.common.sas_date((string)(_ver_src_ldate_v));
 
 ver_src_cnt_v := if(ver_src_v_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_v_pos), 0);
 
@@ -1086,11 +1081,11 @@ ver_src_vo := ver_src_vo_pos > 0;
 
 _ver_src_fdate_vo := if(ver_src_vo_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_vo_pos), '0');
 
-ver_src_fdate_vo := common.sas_date((string)(_ver_src_fdate_vo));
+ver_src_fdate_vo := models.common.sas_date((string)(_ver_src_fdate_vo));
 
 _ver_src_ldate_vo := if(ver_src_vo_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_vo_pos), '0');
 
-ver_src_ldate_vo := common.sas_date((string)(_ver_src_ldate_vo));
+ver_src_ldate_vo := models.common.sas_date((string)(_ver_src_ldate_vo));
 
 ver_src_cnt_vo := if(ver_src_vo_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_vo_pos), 0);
 
@@ -1102,11 +1097,11 @@ ver_src_w := ver_src_w_pos > 0;
 
 _ver_src_fdate_w := if(ver_src_w_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_w_pos), '0');
 
-ver_src_fdate_w := common.sas_date((string)(_ver_src_fdate_w));
+ver_src_fdate_w := models.common.sas_date((string)(_ver_src_fdate_w));
 
 _ver_src_ldate_w := if(ver_src_w_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_w_pos), '0');
 
-ver_src_ldate_w := common.sas_date((string)(_ver_src_ldate_w));
+ver_src_ldate_w := models.common.sas_date((string)(_ver_src_ldate_w));
 
 ver_src_cnt_w := if(ver_src_w_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_w_pos), 0);
 
@@ -1118,11 +1113,11 @@ ver_src_wp := ver_src_wp_pos > 0;
 
 _ver_src_fdate_wp := if(ver_src_wp_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_wp_pos), '0');
 
-ver_src_fdate_wp := common.sas_date((string)(_ver_src_fdate_wp));
+ver_src_fdate_wp := models.common.sas_date((string)(_ver_src_fdate_wp));
 
 _ver_src_ldate_wp := if(ver_src_wp_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_wp_pos), '0');
 
-ver_src_ldate_wp := common.sas_date((string)(_ver_src_ldate_wp));
+ver_src_ldate_wp := models.common.sas_date((string)(_ver_src_ldate_wp));
 
 ver_src_cnt_wp := if(ver_src_wp_pos > 0, (real)Models.Common.getw(ver_sources_count, ver_src_wp_pos), 0);
 
@@ -1133,11 +1128,11 @@ wc10p := rc_decsflag = '1';
 
 wc11b := ver_src_id_count < '1';
 
-wc12b := bankruptcy_chapter = '13';
+wc12b := bankruptcy_chapter = '13' and ver_src_id_count > '0';
 
-wc13b := sos_standing = '1';
+wc13b := sos_standing = '1' and ver_src_id_count > '0';
 
-wc14b := sos_standing = '2';
+wc14b := sos_standing = '2' and ver_src_id_count > '0';
 
 wc15p := (integer)fp_srchunvrfdssncount > 2 or (integer)fp_srchunvrfdaddrcount > 2 or (integer)fp_srchunvrfddobcount > 2 or (integer)fp_srchunvrfdphonecount > 2;
 
@@ -1199,7 +1194,7 @@ wc32p := inq_perphone > 5;
 
 wc33p := fp_divrisktype >= '5';
 
-wc34b := pop_bus_state ='1'  and sos_inc_filing_count > '0' and sos_state_input_match = '0';
+wc34b := pop_bus_state ='1'  and sos_inc_filing_count > '0' and sos_state_input_match = '0' and ver_src_id_count >'0';
 
 wc35p := inq_ssnsperaddr > 2;
 
@@ -1229,7 +1224,7 @@ wc47p := felony_count > 0;
 
 wc48p := if(max(liens_unreleased_count84, attr_eviction_count84, filing_count120, felony_count) = NULL, NULL, sum(if(liens_unreleased_count84 = NULL, 0, liens_unreleased_count84), if(attr_eviction_count84 = NULL, 0, attr_eviction_count84), if(filing_count120 = NULL, 0, filing_count120), if(felony_count = NULL, 0, felony_count))) > 2;
 
-wc49b := (integer)inq_total_count03 > 2;
+wc49b := (integer)inq_total_count03 > 2 and ver_src_id_count >'0';
 
 wc50p := inq_peradl > 5;
 
@@ -1897,7 +1892,7 @@ self.HRIs := TopWarningCodes;
         
 #end 
 END;
-model := project(risk_indicators.iid_constants.ds_Record, doModel(left));
+model := dataset([doModel()]);
 
 return model;
 END;
