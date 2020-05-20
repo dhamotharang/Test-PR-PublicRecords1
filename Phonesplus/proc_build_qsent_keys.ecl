@@ -9,8 +9,9 @@ sfShuffle := sequential(
 	//fileservices.addsuperfile('~thor_data400::base::qsent_grandfather','~thor_data400::base::qsent_father',0,true),
 	//fileservices.clearsuperfile('~thor_data400::base::qsent_father'),
 	//fileservices.addsuperfile('~thor_data400::base::qsent_father','~thor_data400::base::qsent',0,true),
-	// fileservices.clearsuperfile('~thor_data400::base::qsent', true),
-	// fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
+	//DF-27305 - add following lines back to ensure latest base file is added to the super file
+	fileservices.clearsuperfile('~thor_data400::base::qsent', true),
+	fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
 	fileservices.finishsuperfiletransaction()
 	);
 	

@@ -16,17 +16,16 @@ export GenCrosswalk(
      bestContacts   := BIPV2_Crosswalk.BestContactTitles();
      
      contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.keybuilt), hash32(seleid));
-     // contactSources := set(dedup(contactKeyDs, source, all, hash), source);
+     // contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.key), hash32(seleid));
 
      bipBaseA       := BIPV2.CommonBase.DS_Built;
+     // bipBaseA       := BIPV2.CommonBase.DS_LOCAL;
      bipBase        := BIPV2.CommonBase.xlink(bipBaseA);
      bipDates       := dedup(project(bipBase(dt_first_seen>0 and dt_last_seen>0), Layouts.DateWorkRec), ultid, orgid, seleid, dt_first_seen, dt_last_seen, all, hash);
 
      bipContacts    := bipBase(empId>0 or contact_did>0 and lname!='');
-     // bipSources     := set(dedup(bipContacts, source, all, hash), source);
 
      pawContacts    := pull(PAW.Key_LinkIDs.Key)(seleid>0 and lname!='' and from_hdr='N');
-     // pawSources     := set(dedup(pawContacts, source, all, hash), source);
      
      poeContacts    := PoeAppend([]);
 
@@ -42,8 +41,9 @@ export GenCrosswalk(
                                           self.jobTitleOrder               := map(left.dt_last_seen_contact  > TwoYearsAgo   => 1,
                                                                                   left.dt_last_seen_contact  > SevenYearsAgo => 2,
                                                                                   3);                                          
-                                          self.job_title                   := if(left.executive_ind_order > 0 and left.source not in RestrictedSources, left.contact_job_title_derived, ''),
-                                          self.contact_rank          := 0,
+                                          self.job_title                   := if(left.source not in RestrictedSources, left.contact_job_title_derived, ''),
+																					self.executive_ind_order         := if(left.executive_ind_order > 0,left.executive_ind_order, 99);
+                                          self.contact_rank                := 0,
                                           self.seg_ind                     := '',
                                           self.sourceGroup                 := 'CONTACT_KEYS',
                                           self.dt_first_seen_at_business   := left.dt_first_seen_contact;
@@ -54,11 +54,11 @@ export GenCrosswalk(
 
      bipRecs := project(bipContacts(lname!=''), 
                         transform(Layouts.CrossWalkWorkRec1,
-                                  self.job_title                     := '',
-                                  self.executive_ind_order           := 0,
+                                  self.job_title                     := if(left.source not in RestrictedSources, left.contact_job_title_derived, ''),
+                                  self.executive_ind_order           := 99,
                                   self.jobTitleOrder                 := 0,
                                   self.sourceGroup                   := 'BIP',
-                                  self.contact_rank            := 0,
+                                  self.contact_rank                  := 0,
                                   self.seg_ind                       := '',
                                   self.dt_first_seen_at_business     := left.dt_first_seen_contact;
                                   self.dt_last_seen_at_business      := left.dt_last_seen_contact;
@@ -75,7 +75,7 @@ export GenCrosswalk(
                                   self.contact_phone             := left.phone,
                                   self.v_city_name               := left.city,
                                   self.st                        := left.state,
-                                  self.contact_rank        := 0,
+                                  self.contact_rank              := 0,
                                   self.seg_ind                   := '',
                                   self.executive_ind_order       := 0,
                                   self.jobTitleOrder             := 0,
@@ -98,7 +98,7 @@ export GenCrosswalk(
                                    self.job_title                 := '',
                                    self.contact_email             := '',
                                    self.vl_id                     := '',
-                                   self.contact_rank        := 0,
+                                   self.contact_rank              := 0,
                                    self.seg_ind                   := '',
                                    self.contact_phone             := (string) left.subject_phone,
                                    self.contact_ssn               := (string) left.subject_ssn,
@@ -118,7 +118,7 @@ export GenCrosswalk(
 
      /*******Combine All Inputs into one dataset*******************/
      combineRecs   := contactKeyRecs + bipRecs + pawRecs + poeRecs;
-     // combineRecs   := contactKeyRecs + bipRecs + pawRecs;// + poeRecs;
+     // combineRecs   := contactKeyRecs + bipRecs;// + pawRecs;// + poeRecs;
      
      /**
       Break up into the 3 categories:
@@ -276,13 +276,15 @@ export GenCrosswalk(
        createJobTitles           := project(sortLexIDJobTitleRecs,
                                             transform(Layouts.CrossWalkWorkRec2,
                                                       permits                 := BIPV2.mod_sources.src2bmap(left.source, left.vl_id);
-                                                      self.jobTitles          := dataset([{left.job_title,left.executive_ind_order,left.sourceGroup, left.source,left.source_record_id,permits,left.dt_first_seen_at_business,left.dt_last_seen_at_business,left.jobTitleOrder,left.global_sid, left.record_sid}],Layouts.JobTitleRec),
+																											exec_ind                := if(left.executive_ind_order = 99, 0, left.executive_ind_order);
+                                                      self.jobTitles          := dataset([{left.job_title,exec_ind,left.sourceGroup, left.source,left.source_record_id,permits,left.dt_first_seen_at_business,left.dt_last_seen_at_business,left.jobTitleOrder,left.global_sid, left.record_sid}],Layouts.JobTitleRec),
                                                       self                    := left));
                                                       
             
        rollJobTitles             := rollup(createJobTitles,
                                            left.ultid=right.ultid and left.orgid=right.orgid and left.seleid=right.seleid and left.proxid = right.proxid and left.contact_did=right.contact_did,
                                            transform(Layouts.CrossWalkWorkRec2,
+																					           skip(count(left.jobTitles)>20),
                                                      self.jobTitles := left.jobTitles + right.jobTitles,
                                                      self           := left));
  
@@ -298,6 +300,7 @@ export GenCrosswalk(
        rollEmpJobTitles          := rollup(createEmpJobTitles,
                                            left.ultid=right.ultid and left.orgid=right.orgid and left.seleid=right.seleid and left.proxid=right.proxid and left.empid=right.empid,
                                            transform(Layouts.CrossWalkWorkRec2,
+																					           skip(count(left.jobTitles)>20),
                                                      self.jobTitles := left.jobTitles + right.jobTitles,
                                                      self           := left),local);
                                                      

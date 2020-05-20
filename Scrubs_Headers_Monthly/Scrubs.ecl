@@ -1,4 +1,4 @@
-﻿IMPORT SALT39,STD;
+﻿IMPORT SALT311,STD;
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -99,218 +99,325 @@ EXPORT Scrubs := MODULE
     UNSIGNED8 ScrubsBits2;
     UNSIGNED8 ScrubsCleanBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Layout_File)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'did:did:ALLOW','did:did:WORDS'
+          ,'rid:rid:ALLOW','rid:rid:WORDS'
+          ,'pflag1:pflag1:ALLOW','pflag1:pflag1:LENGTHS','pflag1:pflag1:WORDS'
+          ,'pflag2:pflag2:ALLOW','pflag2:pflag2:LENGTHS','pflag2:pflag2:WORDS'
+          ,'pflag3:pflag3:ALLOW','pflag3:pflag3:LENGTHS','pflag3:pflag3:WORDS'
+          ,'src:src:ALLOW','src:src:LENGTHS','src:src:WORDS'
+          ,'dt_first_seen:dt_first_seen:ALLOW','dt_first_seen:dt_first_seen:LENGTHS','dt_first_seen:dt_first_seen:WORDS'
+          ,'dt_last_seen:dt_last_seen:ALLOW','dt_last_seen:dt_last_seen:LENGTHS','dt_last_seen:dt_last_seen:WORDS'
+          ,'dt_vendor_last_reported:dt_vendor_last_reported:ALLOW','dt_vendor_last_reported:dt_vendor_last_reported:LENGTHS','dt_vendor_last_reported:dt_vendor_last_reported:WORDS'
+          ,'dt_vendor_first_reported:dt_vendor_first_reported:ALLOW','dt_vendor_first_reported:dt_vendor_first_reported:LENGTHS','dt_vendor_first_reported:dt_vendor_first_reported:WORDS'
+          ,'dt_nonglb_last_seen:dt_nonglb_last_seen:ALLOW','dt_nonglb_last_seen:dt_nonglb_last_seen:LENGTHS','dt_nonglb_last_seen:dt_nonglb_last_seen:WORDS'
+          ,'rec_type:rec_type:ALLOW','rec_type:rec_type:LENGTHS','rec_type:rec_type:WORDS'
+          ,'vendor_id:vendor_id:ALLOW','vendor_id:vendor_id:WORDS'
+          ,'phone:phone:ALLOW','phone:phone:WORDS'
+          ,'ssn:ssn:ALLOW','ssn:ssn:LENGTHS','ssn:ssn:WORDS'
+          ,'dob:dob:ALLOW','dob:dob:LENGTHS','dob:dob:WORDS'
+          ,'title:title:ALLOW','title:title:LENGTHS'
+          ,'fname:fname:ALLOW'
+          ,'mname:mname:ALLOW'
+          ,'lname:lname:ALLOW'
+          ,'name_suffix:name_suffix:ALLOW'
+          ,'prim_range:prim_range:ALLOW'
+          ,'predir:predir:ALLOW'
+          ,'prim_name:prim_name:ALLOW'
+          ,'suffix:suffix:ALLOW'
+          ,'postdir:postdir:ALLOW'
+          ,'unit_desig:unit_desig:ALLOW'
+          ,'sec_range:sec_range:ALLOW'
+          ,'city_name:city_name:ALLOW'
+          ,'st:st:ALLOW'
+          ,'zip:zip:ALLOW','zip:zip:LENGTHS','zip:zip:WORDS'
+          ,'zip4:zip4:ALLOW','zip4:zip4:LENGTHS','zip4:zip4:WORDS'
+          ,'county:county:ALLOW','county:county:LENGTHS','county:county:WORDS'
+          ,'geo_blk:geo_blk:ALLOW','geo_blk:geo_blk:LENGTHS','geo_blk:geo_blk:WORDS'
+          ,'cbsa:cbsa:ALLOW','cbsa:cbsa:LENGTHS','cbsa:cbsa:WORDS'
+          ,'tnt:tnt:ALLOW','tnt:tnt:LENGTHS','tnt:tnt:WORDS'
+          ,'valid_ssn:valid_ssn:ALLOW','valid_ssn:valid_ssn:LENGTHS','valid_ssn:valid_ssn:WORDS'
+          ,'jflag1:jflag1:ALLOW','jflag1:jflag1:LENGTHS','jflag1:jflag1:WORDS'
+          ,'jflag2:jflag2:ALLOW','jflag2:jflag2:LENGTHS','jflag2:jflag2:WORDS'
+          ,'jflag3:jflag3:ALLOW','jflag3:jflag3:LENGTHS','jflag3:jflag3:WORDS'
+          ,'rawaid:rawaid:ALLOW','rawaid:rawaid:LENGTHS','rawaid:rawaid:WORDS'
+          ,'dodgy_tracking:dodgy_tracking:ALLOW','dodgy_tracking:dodgy_tracking:LENGTHS','dodgy_tracking:dodgy_tracking:WORDS'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Fields.InvalidMessage_did(1),Fields.InvalidMessage_did(2)
+          ,Fields.InvalidMessage_rid(1),Fields.InvalidMessage_rid(2)
+          ,Fields.InvalidMessage_pflag1(1),Fields.InvalidMessage_pflag1(2),Fields.InvalidMessage_pflag1(3)
+          ,Fields.InvalidMessage_pflag2(1),Fields.InvalidMessage_pflag2(2),Fields.InvalidMessage_pflag2(3)
+          ,Fields.InvalidMessage_pflag3(1),Fields.InvalidMessage_pflag3(2),Fields.InvalidMessage_pflag3(3)
+          ,Fields.InvalidMessage_src(1),Fields.InvalidMessage_src(2),Fields.InvalidMessage_src(3)
+          ,Fields.InvalidMessage_dt_first_seen(1),Fields.InvalidMessage_dt_first_seen(2),Fields.InvalidMessage_dt_first_seen(3)
+          ,Fields.InvalidMessage_dt_last_seen(1),Fields.InvalidMessage_dt_last_seen(2),Fields.InvalidMessage_dt_last_seen(3)
+          ,Fields.InvalidMessage_dt_vendor_last_reported(1),Fields.InvalidMessage_dt_vendor_last_reported(2),Fields.InvalidMessage_dt_vendor_last_reported(3)
+          ,Fields.InvalidMessage_dt_vendor_first_reported(1),Fields.InvalidMessage_dt_vendor_first_reported(2),Fields.InvalidMessage_dt_vendor_first_reported(3)
+          ,Fields.InvalidMessage_dt_nonglb_last_seen(1),Fields.InvalidMessage_dt_nonglb_last_seen(2),Fields.InvalidMessage_dt_nonglb_last_seen(3)
+          ,Fields.InvalidMessage_rec_type(1),Fields.InvalidMessage_rec_type(2),Fields.InvalidMessage_rec_type(3)
+          ,Fields.InvalidMessage_vendor_id(1),Fields.InvalidMessage_vendor_id(2)
+          ,Fields.InvalidMessage_phone(1),Fields.InvalidMessage_phone(2)
+          ,Fields.InvalidMessage_ssn(1),Fields.InvalidMessage_ssn(2),Fields.InvalidMessage_ssn(3)
+          ,Fields.InvalidMessage_dob(1),Fields.InvalidMessage_dob(2),Fields.InvalidMessage_dob(3)
+          ,Fields.InvalidMessage_title(1),Fields.InvalidMessage_title(2)
+          ,Fields.InvalidMessage_fname(1)
+          ,Fields.InvalidMessage_mname(1)
+          ,Fields.InvalidMessage_lname(1)
+          ,Fields.InvalidMessage_name_suffix(1)
+          ,Fields.InvalidMessage_prim_range(1)
+          ,Fields.InvalidMessage_predir(1)
+          ,Fields.InvalidMessage_prim_name(1)
+          ,Fields.InvalidMessage_suffix(1)
+          ,Fields.InvalidMessage_postdir(1)
+          ,Fields.InvalidMessage_unit_desig(1)
+          ,Fields.InvalidMessage_sec_range(1)
+          ,Fields.InvalidMessage_city_name(1)
+          ,Fields.InvalidMessage_st(1)
+          ,Fields.InvalidMessage_zip(1),Fields.InvalidMessage_zip(2),Fields.InvalidMessage_zip(3)
+          ,Fields.InvalidMessage_zip4(1),Fields.InvalidMessage_zip4(2),Fields.InvalidMessage_zip4(3)
+          ,Fields.InvalidMessage_county(1),Fields.InvalidMessage_county(2),Fields.InvalidMessage_county(3)
+          ,Fields.InvalidMessage_geo_blk(1),Fields.InvalidMessage_geo_blk(2),Fields.InvalidMessage_geo_blk(3)
+          ,Fields.InvalidMessage_cbsa(1),Fields.InvalidMessage_cbsa(2),Fields.InvalidMessage_cbsa(3)
+          ,Fields.InvalidMessage_tnt(1),Fields.InvalidMessage_tnt(2),Fields.InvalidMessage_tnt(3)
+          ,Fields.InvalidMessage_valid_ssn(1),Fields.InvalidMessage_valid_ssn(2),Fields.InvalidMessage_valid_ssn(3)
+          ,Fields.InvalidMessage_jflag1(1),Fields.InvalidMessage_jflag1(2),Fields.InvalidMessage_jflag1(3)
+          ,Fields.InvalidMessage_jflag2(1),Fields.InvalidMessage_jflag2(2),Fields.InvalidMessage_jflag2(3)
+          ,Fields.InvalidMessage_jflag3(1),Fields.InvalidMessage_jflag3(2),Fields.InvalidMessage_jflag3(3)
+          ,Fields.InvalidMessage_rawaid(1),Fields.InvalidMessage_rawaid(2),Fields.InvalidMessage_rawaid(3)
+          ,Fields.InvalidMessage_dodgy_tracking(1),Fields.InvalidMessage_dodgy_tracking(2),Fields.InvalidMessage_dodgy_tracking(3)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
 EXPORT FromNone(DATASET(Layout_File) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.did_Invalid := Fields.InValid_did((SALT39.StrType)le.did);
-    clean_did := (TYPEOF(le.did))Fields.Make_did((SALT39.StrType)le.did);
-    clean_did_Invalid := Fields.InValid_did((SALT39.StrType)clean_did);
+    SELF.did_Invalid := Fields.InValid_did((SALT311.StrType)le.did);
+    clean_did := (TYPEOF(le.did))Fields.Make_did((SALT311.StrType)le.did);
+    clean_did_Invalid := Fields.InValid_did((SALT311.StrType)clean_did);
     SELF.did := IF(withOnfail, clean_did, le.did); // ONFAIL(CLEAN)
-    SELF.did_wouldClean := TRIM((SALT39.StrType)le.did) <> TRIM((SALT39.StrType)clean_did);
-    SELF.rid_Invalid := Fields.InValid_rid((SALT39.StrType)le.rid);
-    clean_rid := (TYPEOF(le.rid))Fields.Make_rid((SALT39.StrType)le.rid);
-    clean_rid_Invalid := Fields.InValid_rid((SALT39.StrType)clean_rid);
+    SELF.did_wouldClean := TRIM((SALT311.StrType)le.did) <> TRIM((SALT311.StrType)clean_did);
+    SELF.rid_Invalid := Fields.InValid_rid((SALT311.StrType)le.rid);
+    clean_rid := (TYPEOF(le.rid))Fields.Make_rid((SALT311.StrType)le.rid);
+    clean_rid_Invalid := Fields.InValid_rid((SALT311.StrType)clean_rid);
     SELF.rid := IF(withOnfail, clean_rid, le.rid); // ONFAIL(CLEAN)
-    SELF.rid_wouldClean := TRIM((SALT39.StrType)le.rid) <> TRIM((SALT39.StrType)clean_rid);
-    SELF.pflag1_Invalid := Fields.InValid_pflag1((SALT39.StrType)le.pflag1);
-    clean_pflag1 := (TYPEOF(le.pflag1))Fields.Make_pflag1((SALT39.StrType)le.pflag1);
-    clean_pflag1_Invalid := Fields.InValid_pflag1((SALT39.StrType)clean_pflag1);
+    SELF.rid_wouldClean := TRIM((SALT311.StrType)le.rid) <> TRIM((SALT311.StrType)clean_rid);
+    SELF.pflag1_Invalid := Fields.InValid_pflag1((SALT311.StrType)le.pflag1);
+    clean_pflag1 := (TYPEOF(le.pflag1))Fields.Make_pflag1((SALT311.StrType)le.pflag1);
+    clean_pflag1_Invalid := Fields.InValid_pflag1((SALT311.StrType)clean_pflag1);
     SELF.pflag1 := IF(withOnfail, clean_pflag1, le.pflag1); // ONFAIL(CLEAN)
-    SELF.pflag1_wouldClean := TRIM((SALT39.StrType)le.pflag1) <> TRIM((SALT39.StrType)clean_pflag1);
-    SELF.pflag2_Invalid := Fields.InValid_pflag2((SALT39.StrType)le.pflag2);
-    clean_pflag2 := (TYPEOF(le.pflag2))Fields.Make_pflag2((SALT39.StrType)le.pflag2);
-    clean_pflag2_Invalid := Fields.InValid_pflag2((SALT39.StrType)clean_pflag2);
+    SELF.pflag1_wouldClean := TRIM((SALT311.StrType)le.pflag1) <> TRIM((SALT311.StrType)clean_pflag1);
+    SELF.pflag2_Invalid := Fields.InValid_pflag2((SALT311.StrType)le.pflag2);
+    clean_pflag2 := (TYPEOF(le.pflag2))Fields.Make_pflag2((SALT311.StrType)le.pflag2);
+    clean_pflag2_Invalid := Fields.InValid_pflag2((SALT311.StrType)clean_pflag2);
     SELF.pflag2 := IF(withOnfail, clean_pflag2, le.pflag2); // ONFAIL(CLEAN)
-    SELF.pflag2_wouldClean := TRIM((SALT39.StrType)le.pflag2) <> TRIM((SALT39.StrType)clean_pflag2);
-    SELF.pflag3_Invalid := Fields.InValid_pflag3((SALT39.StrType)le.pflag3);
-    clean_pflag3 := (TYPEOF(le.pflag3))Fields.Make_pflag3((SALT39.StrType)le.pflag3);
-    clean_pflag3_Invalid := Fields.InValid_pflag3((SALT39.StrType)clean_pflag3);
+    SELF.pflag2_wouldClean := TRIM((SALT311.StrType)le.pflag2) <> TRIM((SALT311.StrType)clean_pflag2);
+    SELF.pflag3_Invalid := Fields.InValid_pflag3((SALT311.StrType)le.pflag3);
+    clean_pflag3 := (TYPEOF(le.pflag3))Fields.Make_pflag3((SALT311.StrType)le.pflag3);
+    clean_pflag3_Invalid := Fields.InValid_pflag3((SALT311.StrType)clean_pflag3);
     SELF.pflag3 := IF(withOnfail, clean_pflag3, le.pflag3); // ONFAIL(CLEAN)
-    SELF.pflag3_wouldClean := TRIM((SALT39.StrType)le.pflag3) <> TRIM((SALT39.StrType)clean_pflag3);
-    SELF.src_Invalid := Fields.InValid_src((SALT39.StrType)le.src);
-    clean_src := (TYPEOF(le.src))Fields.Make_src((SALT39.StrType)le.src);
-    clean_src_Invalid := Fields.InValid_src((SALT39.StrType)clean_src);
+    SELF.pflag3_wouldClean := TRIM((SALT311.StrType)le.pflag3) <> TRIM((SALT311.StrType)clean_pflag3);
+    SELF.src_Invalid := Fields.InValid_src((SALT311.StrType)le.src);
+    clean_src := (TYPEOF(le.src))Fields.Make_src((SALT311.StrType)le.src);
+    clean_src_Invalid := Fields.InValid_src((SALT311.StrType)clean_src);
     SELF.src := IF(withOnfail, clean_src, le.src); // ONFAIL(CLEAN)
-    SELF.src_wouldClean := TRIM((SALT39.StrType)le.src) <> TRIM((SALT39.StrType)clean_src);
-    SELF.dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT39.StrType)le.dt_first_seen);
-    clean_dt_first_seen := (TYPEOF(le.dt_first_seen))Fields.Make_dt_first_seen((SALT39.StrType)le.dt_first_seen);
-    clean_dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT39.StrType)clean_dt_first_seen);
+    SELF.src_wouldClean := TRIM((SALT311.StrType)le.src) <> TRIM((SALT311.StrType)clean_src);
+    SELF.dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT311.StrType)le.dt_first_seen);
+    clean_dt_first_seen := (TYPEOF(le.dt_first_seen))Fields.Make_dt_first_seen((SALT311.StrType)le.dt_first_seen);
+    clean_dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT311.StrType)clean_dt_first_seen);
     SELF.dt_first_seen := IF(withOnfail, clean_dt_first_seen, le.dt_first_seen); // ONFAIL(CLEAN)
-    SELF.dt_first_seen_wouldClean := TRIM((SALT39.StrType)le.dt_first_seen) <> TRIM((SALT39.StrType)clean_dt_first_seen);
-    SELF.dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT39.StrType)le.dt_last_seen);
-    clean_dt_last_seen := (TYPEOF(le.dt_last_seen))Fields.Make_dt_last_seen((SALT39.StrType)le.dt_last_seen);
-    clean_dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT39.StrType)clean_dt_last_seen);
+    SELF.dt_first_seen_wouldClean := TRIM((SALT311.StrType)le.dt_first_seen) <> TRIM((SALT311.StrType)clean_dt_first_seen);
+    SELF.dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT311.StrType)le.dt_last_seen);
+    clean_dt_last_seen := (TYPEOF(le.dt_last_seen))Fields.Make_dt_last_seen((SALT311.StrType)le.dt_last_seen);
+    clean_dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT311.StrType)clean_dt_last_seen);
     SELF.dt_last_seen := IF(withOnfail, clean_dt_last_seen, le.dt_last_seen); // ONFAIL(CLEAN)
-    SELF.dt_last_seen_wouldClean := TRIM((SALT39.StrType)le.dt_last_seen) <> TRIM((SALT39.StrType)clean_dt_last_seen);
-    SELF.dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT39.StrType)le.dt_vendor_last_reported);
-    clean_dt_vendor_last_reported := (TYPEOF(le.dt_vendor_last_reported))Fields.Make_dt_vendor_last_reported((SALT39.StrType)le.dt_vendor_last_reported);
-    clean_dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT39.StrType)clean_dt_vendor_last_reported);
+    SELF.dt_last_seen_wouldClean := TRIM((SALT311.StrType)le.dt_last_seen) <> TRIM((SALT311.StrType)clean_dt_last_seen);
+    SELF.dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
+    clean_dt_vendor_last_reported := (TYPEOF(le.dt_vendor_last_reported))Fields.Make_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
+    clean_dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT311.StrType)clean_dt_vendor_last_reported);
     SELF.dt_vendor_last_reported := IF(withOnfail, clean_dt_vendor_last_reported, le.dt_vendor_last_reported); // ONFAIL(CLEAN)
-    SELF.dt_vendor_last_reported_wouldClean := TRIM((SALT39.StrType)le.dt_vendor_last_reported) <> TRIM((SALT39.StrType)clean_dt_vendor_last_reported);
-    SELF.dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT39.StrType)le.dt_vendor_first_reported);
-    clean_dt_vendor_first_reported := (TYPEOF(le.dt_vendor_first_reported))Fields.Make_dt_vendor_first_reported((SALT39.StrType)le.dt_vendor_first_reported);
-    clean_dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT39.StrType)clean_dt_vendor_first_reported);
+    SELF.dt_vendor_last_reported_wouldClean := TRIM((SALT311.StrType)le.dt_vendor_last_reported) <> TRIM((SALT311.StrType)clean_dt_vendor_last_reported);
+    SELF.dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported);
+    clean_dt_vendor_first_reported := (TYPEOF(le.dt_vendor_first_reported))Fields.Make_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported);
+    clean_dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT311.StrType)clean_dt_vendor_first_reported);
     SELF.dt_vendor_first_reported := IF(withOnfail, clean_dt_vendor_first_reported, le.dt_vendor_first_reported); // ONFAIL(CLEAN)
-    SELF.dt_vendor_first_reported_wouldClean := TRIM((SALT39.StrType)le.dt_vendor_first_reported) <> TRIM((SALT39.StrType)clean_dt_vendor_first_reported);
-    SELF.dt_nonglb_last_seen_Invalid := Fields.InValid_dt_nonglb_last_seen((SALT39.StrType)le.dt_nonglb_last_seen);
-    clean_dt_nonglb_last_seen := (TYPEOF(le.dt_nonglb_last_seen))Fields.Make_dt_nonglb_last_seen((SALT39.StrType)le.dt_nonglb_last_seen);
-    clean_dt_nonglb_last_seen_Invalid := Fields.InValid_dt_nonglb_last_seen((SALT39.StrType)clean_dt_nonglb_last_seen);
+    SELF.dt_vendor_first_reported_wouldClean := TRIM((SALT311.StrType)le.dt_vendor_first_reported) <> TRIM((SALT311.StrType)clean_dt_vendor_first_reported);
+    SELF.dt_nonglb_last_seen_Invalid := Fields.InValid_dt_nonglb_last_seen((SALT311.StrType)le.dt_nonglb_last_seen);
+    clean_dt_nonglb_last_seen := (TYPEOF(le.dt_nonglb_last_seen))Fields.Make_dt_nonglb_last_seen((SALT311.StrType)le.dt_nonglb_last_seen);
+    clean_dt_nonglb_last_seen_Invalid := Fields.InValid_dt_nonglb_last_seen((SALT311.StrType)clean_dt_nonglb_last_seen);
     SELF.dt_nonglb_last_seen := IF(withOnfail, clean_dt_nonglb_last_seen, le.dt_nonglb_last_seen); // ONFAIL(CLEAN)
-    SELF.dt_nonglb_last_seen_wouldClean := TRIM((SALT39.StrType)le.dt_nonglb_last_seen) <> TRIM((SALT39.StrType)clean_dt_nonglb_last_seen);
-    SELF.rec_type_Invalid := Fields.InValid_rec_type((SALT39.StrType)le.rec_type);
-    clean_rec_type := (TYPEOF(le.rec_type))Fields.Make_rec_type((SALT39.StrType)le.rec_type);
-    clean_rec_type_Invalid := Fields.InValid_rec_type((SALT39.StrType)clean_rec_type);
+    SELF.dt_nonglb_last_seen_wouldClean := TRIM((SALT311.StrType)le.dt_nonglb_last_seen) <> TRIM((SALT311.StrType)clean_dt_nonglb_last_seen);
+    SELF.rec_type_Invalid := Fields.InValid_rec_type((SALT311.StrType)le.rec_type);
+    clean_rec_type := (TYPEOF(le.rec_type))Fields.Make_rec_type((SALT311.StrType)le.rec_type);
+    clean_rec_type_Invalid := Fields.InValid_rec_type((SALT311.StrType)clean_rec_type);
     SELF.rec_type := IF(withOnfail, clean_rec_type, le.rec_type); // ONFAIL(CLEAN)
-    SELF.rec_type_wouldClean := TRIM((SALT39.StrType)le.rec_type) <> TRIM((SALT39.StrType)clean_rec_type);
-    SELF.vendor_id_Invalid := Fields.InValid_vendor_id((SALT39.StrType)le.vendor_id);
-    clean_vendor_id := (TYPEOF(le.vendor_id))Fields.Make_vendor_id((SALT39.StrType)le.vendor_id);
-    clean_vendor_id_Invalid := Fields.InValid_vendor_id((SALT39.StrType)clean_vendor_id);
+    SELF.rec_type_wouldClean := TRIM((SALT311.StrType)le.rec_type) <> TRIM((SALT311.StrType)clean_rec_type);
+    SELF.vendor_id_Invalid := Fields.InValid_vendor_id((SALT311.StrType)le.vendor_id);
+    clean_vendor_id := (TYPEOF(le.vendor_id))Fields.Make_vendor_id((SALT311.StrType)le.vendor_id);
+    clean_vendor_id_Invalid := Fields.InValid_vendor_id((SALT311.StrType)clean_vendor_id);
     SELF.vendor_id := IF(withOnfail, clean_vendor_id, le.vendor_id); // ONFAIL(CLEAN)
-    SELF.vendor_id_wouldClean := TRIM((SALT39.StrType)le.vendor_id) <> TRIM((SALT39.StrType)clean_vendor_id);
-    SELF.phone_Invalid := Fields.InValid_phone((SALT39.StrType)le.phone);
-    clean_phone := (TYPEOF(le.phone))Fields.Make_phone((SALT39.StrType)le.phone);
-    clean_phone_Invalid := Fields.InValid_phone((SALT39.StrType)clean_phone);
+    SELF.vendor_id_wouldClean := TRIM((SALT311.StrType)le.vendor_id) <> TRIM((SALT311.StrType)clean_vendor_id);
+    SELF.phone_Invalid := Fields.InValid_phone((SALT311.StrType)le.phone);
+    clean_phone := (TYPEOF(le.phone))Fields.Make_phone((SALT311.StrType)le.phone);
+    clean_phone_Invalid := Fields.InValid_phone((SALT311.StrType)clean_phone);
     SELF.phone := IF(withOnfail, clean_phone, le.phone); // ONFAIL(CLEAN)
-    SELF.phone_wouldClean := TRIM((SALT39.StrType)le.phone) <> TRIM((SALT39.StrType)clean_phone);
-    SELF.ssn_Invalid := Fields.InValid_ssn((SALT39.StrType)le.ssn);
-    clean_ssn := (TYPEOF(le.ssn))Fields.Make_ssn((SALT39.StrType)le.ssn);
-    clean_ssn_Invalid := Fields.InValid_ssn((SALT39.StrType)clean_ssn);
+    SELF.phone_wouldClean := TRIM((SALT311.StrType)le.phone) <> TRIM((SALT311.StrType)clean_phone);
+    SELF.ssn_Invalid := Fields.InValid_ssn((SALT311.StrType)le.ssn);
+    clean_ssn := (TYPEOF(le.ssn))Fields.Make_ssn((SALT311.StrType)le.ssn);
+    clean_ssn_Invalid := Fields.InValid_ssn((SALT311.StrType)clean_ssn);
     SELF.ssn := IF(withOnfail, clean_ssn, le.ssn); // ONFAIL(CLEAN)
-    SELF.ssn_wouldClean := TRIM((SALT39.StrType)le.ssn) <> TRIM((SALT39.StrType)clean_ssn);
-    SELF.dob_Invalid := Fields.InValid_dob((SALT39.StrType)le.dob);
-    clean_dob := (TYPEOF(le.dob))Fields.Make_dob((SALT39.StrType)le.dob);
-    clean_dob_Invalid := Fields.InValid_dob((SALT39.StrType)clean_dob);
+    SELF.ssn_wouldClean := TRIM((SALT311.StrType)le.ssn) <> TRIM((SALT311.StrType)clean_ssn);
+    SELF.dob_Invalid := Fields.InValid_dob((SALT311.StrType)le.dob);
+    clean_dob := (TYPEOF(le.dob))Fields.Make_dob((SALT311.StrType)le.dob);
+    clean_dob_Invalid := Fields.InValid_dob((SALT311.StrType)clean_dob);
     SELF.dob := IF(withOnfail, clean_dob, le.dob); // ONFAIL(CLEAN)
-    SELF.dob_wouldClean := TRIM((SALT39.StrType)le.dob) <> TRIM((SALT39.StrType)clean_dob);
-    SELF.title_Invalid := Fields.InValid_title((SALT39.StrType)le.title);
-    clean_title := (TYPEOF(le.title))Fields.Make_title((SALT39.StrType)le.title);
-    clean_title_Invalid := Fields.InValid_title((SALT39.StrType)clean_title);
+    SELF.dob_wouldClean := TRIM((SALT311.StrType)le.dob) <> TRIM((SALT311.StrType)clean_dob);
+    SELF.title_Invalid := Fields.InValid_title((SALT311.StrType)le.title);
+    clean_title := (TYPEOF(le.title))Fields.Make_title((SALT311.StrType)le.title);
+    clean_title_Invalid := Fields.InValid_title((SALT311.StrType)clean_title);
     SELF.title := IF(withOnfail, clean_title, le.title); // ONFAIL(CLEAN)
-    SELF.title_wouldClean := TRIM((SALT39.StrType)le.title) <> TRIM((SALT39.StrType)clean_title);
-    SELF.fname_Invalid := Fields.InValid_fname((SALT39.StrType)le.fname);
-    clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT39.StrType)le.fname);
-    clean_fname_Invalid := Fields.InValid_fname((SALT39.StrType)clean_fname);
+    SELF.title_wouldClean := TRIM((SALT311.StrType)le.title) <> TRIM((SALT311.StrType)clean_title);
+    SELF.fname_Invalid := Fields.InValid_fname((SALT311.StrType)le.fname);
+    clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT311.StrType)le.fname);
+    clean_fname_Invalid := Fields.InValid_fname((SALT311.StrType)clean_fname);
     SELF.fname := IF(withOnfail, clean_fname, le.fname); // ONFAIL(CLEAN)
-    SELF.fname_wouldClean := TRIM((SALT39.StrType)le.fname) <> TRIM((SALT39.StrType)clean_fname);
-    SELF.mname_Invalid := Fields.InValid_mname((SALT39.StrType)le.mname);
-    clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT39.StrType)le.mname);
-    clean_mname_Invalid := Fields.InValid_mname((SALT39.StrType)clean_mname);
+    SELF.fname_wouldClean := TRIM((SALT311.StrType)le.fname) <> TRIM((SALT311.StrType)clean_fname);
+    SELF.mname_Invalid := Fields.InValid_mname((SALT311.StrType)le.mname);
+    clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT311.StrType)le.mname);
+    clean_mname_Invalid := Fields.InValid_mname((SALT311.StrType)clean_mname);
     SELF.mname := IF(withOnfail, clean_mname, le.mname); // ONFAIL(CLEAN)
-    SELF.mname_wouldClean := TRIM((SALT39.StrType)le.mname) <> TRIM((SALT39.StrType)clean_mname);
-    SELF.lname_Invalid := Fields.InValid_lname((SALT39.StrType)le.lname);
-    clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT39.StrType)le.lname);
-    clean_lname_Invalid := Fields.InValid_lname((SALT39.StrType)clean_lname);
+    SELF.mname_wouldClean := TRIM((SALT311.StrType)le.mname) <> TRIM((SALT311.StrType)clean_mname);
+    SELF.lname_Invalid := Fields.InValid_lname((SALT311.StrType)le.lname);
+    clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT311.StrType)le.lname);
+    clean_lname_Invalid := Fields.InValid_lname((SALT311.StrType)clean_lname);
     SELF.lname := IF(withOnfail, clean_lname, le.lname); // ONFAIL(CLEAN)
-    SELF.lname_wouldClean := TRIM((SALT39.StrType)le.lname) <> TRIM((SALT39.StrType)clean_lname);
-    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT39.StrType)le.name_suffix);
-    clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT39.StrType)le.name_suffix);
-    clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT39.StrType)clean_name_suffix);
+    SELF.lname_wouldClean := TRIM((SALT311.StrType)le.lname) <> TRIM((SALT311.StrType)clean_lname);
+    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT311.StrType)le.name_suffix);
+    clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT311.StrType)le.name_suffix);
+    clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT311.StrType)clean_name_suffix);
     SELF.name_suffix := IF(withOnfail, clean_name_suffix, le.name_suffix); // ONFAIL(CLEAN)
-    SELF.name_suffix_wouldClean := TRIM((SALT39.StrType)le.name_suffix) <> TRIM((SALT39.StrType)clean_name_suffix);
-    SELF.prim_range_Invalid := Fields.InValid_prim_range((SALT39.StrType)le.prim_range);
-    clean_prim_range := (TYPEOF(le.prim_range))Fields.Make_prim_range((SALT39.StrType)le.prim_range);
-    clean_prim_range_Invalid := Fields.InValid_prim_range((SALT39.StrType)clean_prim_range);
+    SELF.name_suffix_wouldClean := TRIM((SALT311.StrType)le.name_suffix) <> TRIM((SALT311.StrType)clean_name_suffix);
+    SELF.prim_range_Invalid := Fields.InValid_prim_range((SALT311.StrType)le.prim_range);
+    clean_prim_range := (TYPEOF(le.prim_range))Fields.Make_prim_range((SALT311.StrType)le.prim_range);
+    clean_prim_range_Invalid := Fields.InValid_prim_range((SALT311.StrType)clean_prim_range);
     SELF.prim_range := IF(withOnfail, clean_prim_range, le.prim_range); // ONFAIL(CLEAN)
-    SELF.prim_range_wouldClean := TRIM((SALT39.StrType)le.prim_range) <> TRIM((SALT39.StrType)clean_prim_range);
-    SELF.predir_Invalid := Fields.InValid_predir((SALT39.StrType)le.predir);
-    clean_predir := (TYPEOF(le.predir))Fields.Make_predir((SALT39.StrType)le.predir);
-    clean_predir_Invalid := Fields.InValid_predir((SALT39.StrType)clean_predir);
+    SELF.prim_range_wouldClean := TRIM((SALT311.StrType)le.prim_range) <> TRIM((SALT311.StrType)clean_prim_range);
+    SELF.predir_Invalid := Fields.InValid_predir((SALT311.StrType)le.predir);
+    clean_predir := (TYPEOF(le.predir))Fields.Make_predir((SALT311.StrType)le.predir);
+    clean_predir_Invalid := Fields.InValid_predir((SALT311.StrType)clean_predir);
     SELF.predir := IF(withOnfail, clean_predir, le.predir); // ONFAIL(CLEAN)
-    SELF.predir_wouldClean := TRIM((SALT39.StrType)le.predir) <> TRIM((SALT39.StrType)clean_predir);
-    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT39.StrType)le.prim_name);
-    clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT39.StrType)le.prim_name);
-    clean_prim_name_Invalid := Fields.InValid_prim_name((SALT39.StrType)clean_prim_name);
+    SELF.predir_wouldClean := TRIM((SALT311.StrType)le.predir) <> TRIM((SALT311.StrType)clean_predir);
+    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT311.StrType)le.prim_name);
+    clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT311.StrType)le.prim_name);
+    clean_prim_name_Invalid := Fields.InValid_prim_name((SALT311.StrType)clean_prim_name);
     SELF.prim_name := IF(withOnfail, clean_prim_name, le.prim_name); // ONFAIL(CLEAN)
-    SELF.prim_name_wouldClean := TRIM((SALT39.StrType)le.prim_name) <> TRIM((SALT39.StrType)clean_prim_name);
-    SELF.suffix_Invalid := Fields.InValid_suffix((SALT39.StrType)le.suffix);
-    clean_suffix := (TYPEOF(le.suffix))Fields.Make_suffix((SALT39.StrType)le.suffix);
-    clean_suffix_Invalid := Fields.InValid_suffix((SALT39.StrType)clean_suffix);
+    SELF.prim_name_wouldClean := TRIM((SALT311.StrType)le.prim_name) <> TRIM((SALT311.StrType)clean_prim_name);
+    SELF.suffix_Invalid := Fields.InValid_suffix((SALT311.StrType)le.suffix);
+    clean_suffix := (TYPEOF(le.suffix))Fields.Make_suffix((SALT311.StrType)le.suffix);
+    clean_suffix_Invalid := Fields.InValid_suffix((SALT311.StrType)clean_suffix);
     SELF.suffix := IF(withOnfail, clean_suffix, le.suffix); // ONFAIL(CLEAN)
-    SELF.suffix_wouldClean := TRIM((SALT39.StrType)le.suffix) <> TRIM((SALT39.StrType)clean_suffix);
-    SELF.postdir_Invalid := Fields.InValid_postdir((SALT39.StrType)le.postdir);
-    clean_postdir := (TYPEOF(le.postdir))Fields.Make_postdir((SALT39.StrType)le.postdir);
-    clean_postdir_Invalid := Fields.InValid_postdir((SALT39.StrType)clean_postdir);
+    SELF.suffix_wouldClean := TRIM((SALT311.StrType)le.suffix) <> TRIM((SALT311.StrType)clean_suffix);
+    SELF.postdir_Invalid := Fields.InValid_postdir((SALT311.StrType)le.postdir);
+    clean_postdir := (TYPEOF(le.postdir))Fields.Make_postdir((SALT311.StrType)le.postdir);
+    clean_postdir_Invalid := Fields.InValid_postdir((SALT311.StrType)clean_postdir);
     SELF.postdir := IF(withOnfail, clean_postdir, le.postdir); // ONFAIL(CLEAN)
-    SELF.postdir_wouldClean := TRIM((SALT39.StrType)le.postdir) <> TRIM((SALT39.StrType)clean_postdir);
-    SELF.unit_desig_Invalid := Fields.InValid_unit_desig((SALT39.StrType)le.unit_desig);
-    clean_unit_desig := (TYPEOF(le.unit_desig))Fields.Make_unit_desig((SALT39.StrType)le.unit_desig);
-    clean_unit_desig_Invalid := Fields.InValid_unit_desig((SALT39.StrType)clean_unit_desig);
+    SELF.postdir_wouldClean := TRIM((SALT311.StrType)le.postdir) <> TRIM((SALT311.StrType)clean_postdir);
+    SELF.unit_desig_Invalid := Fields.InValid_unit_desig((SALT311.StrType)le.unit_desig);
+    clean_unit_desig := (TYPEOF(le.unit_desig))Fields.Make_unit_desig((SALT311.StrType)le.unit_desig);
+    clean_unit_desig_Invalid := Fields.InValid_unit_desig((SALT311.StrType)clean_unit_desig);
     SELF.unit_desig := IF(withOnfail, clean_unit_desig, le.unit_desig); // ONFAIL(CLEAN)
-    SELF.unit_desig_wouldClean := TRIM((SALT39.StrType)le.unit_desig) <> TRIM((SALT39.StrType)clean_unit_desig);
-    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT39.StrType)le.sec_range);
-    clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT39.StrType)le.sec_range);
-    clean_sec_range_Invalid := Fields.InValid_sec_range((SALT39.StrType)clean_sec_range);
+    SELF.unit_desig_wouldClean := TRIM((SALT311.StrType)le.unit_desig) <> TRIM((SALT311.StrType)clean_unit_desig);
+    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT311.StrType)le.sec_range);
+    clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT311.StrType)le.sec_range);
+    clean_sec_range_Invalid := Fields.InValid_sec_range((SALT311.StrType)clean_sec_range);
     SELF.sec_range := IF(withOnfail, clean_sec_range, le.sec_range); // ONFAIL(CLEAN)
-    SELF.sec_range_wouldClean := TRIM((SALT39.StrType)le.sec_range) <> TRIM((SALT39.StrType)clean_sec_range);
-    SELF.city_name_Invalid := Fields.InValid_city_name((SALT39.StrType)le.city_name);
-    clean_city_name := (TYPEOF(le.city_name))Fields.Make_city_name((SALT39.StrType)le.city_name);
-    clean_city_name_Invalid := Fields.InValid_city_name((SALT39.StrType)clean_city_name);
+    SELF.sec_range_wouldClean := TRIM((SALT311.StrType)le.sec_range) <> TRIM((SALT311.StrType)clean_sec_range);
+    SELF.city_name_Invalid := Fields.InValid_city_name((SALT311.StrType)le.city_name);
+    clean_city_name := (TYPEOF(le.city_name))Fields.Make_city_name((SALT311.StrType)le.city_name);
+    clean_city_name_Invalid := Fields.InValid_city_name((SALT311.StrType)clean_city_name);
     SELF.city_name := IF(withOnfail, clean_city_name, le.city_name); // ONFAIL(CLEAN)
-    SELF.city_name_wouldClean := TRIM((SALT39.StrType)le.city_name) <> TRIM((SALT39.StrType)clean_city_name);
-    SELF.st_Invalid := Fields.InValid_st((SALT39.StrType)le.st);
-    clean_st := (TYPEOF(le.st))Fields.Make_st((SALT39.StrType)le.st);
-    clean_st_Invalid := Fields.InValid_st((SALT39.StrType)clean_st);
+    SELF.city_name_wouldClean := TRIM((SALT311.StrType)le.city_name) <> TRIM((SALT311.StrType)clean_city_name);
+    SELF.st_Invalid := Fields.InValid_st((SALT311.StrType)le.st);
+    clean_st := (TYPEOF(le.st))Fields.Make_st((SALT311.StrType)le.st);
+    clean_st_Invalid := Fields.InValid_st((SALT311.StrType)clean_st);
     SELF.st := IF(withOnfail, clean_st, le.st); // ONFAIL(CLEAN)
-    SELF.st_wouldClean := TRIM((SALT39.StrType)le.st) <> TRIM((SALT39.StrType)clean_st);
-    SELF.zip_Invalid := Fields.InValid_zip((SALT39.StrType)le.zip);
-    clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT39.StrType)le.zip);
-    clean_zip_Invalid := Fields.InValid_zip((SALT39.StrType)clean_zip);
+    SELF.st_wouldClean := TRIM((SALT311.StrType)le.st) <> TRIM((SALT311.StrType)clean_st);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT311.StrType)le.zip);
+    clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT311.StrType)le.zip);
+    clean_zip_Invalid := Fields.InValid_zip((SALT311.StrType)clean_zip);
     SELF.zip := IF(withOnfail, clean_zip, le.zip); // ONFAIL(CLEAN)
-    SELF.zip_wouldClean := TRIM((SALT39.StrType)le.zip) <> TRIM((SALT39.StrType)clean_zip);
-    SELF.zip4_Invalid := Fields.InValid_zip4((SALT39.StrType)le.zip4);
-    clean_zip4 := (TYPEOF(le.zip4))Fields.Make_zip4((SALT39.StrType)le.zip4);
-    clean_zip4_Invalid := Fields.InValid_zip4((SALT39.StrType)clean_zip4);
+    SELF.zip_wouldClean := TRIM((SALT311.StrType)le.zip) <> TRIM((SALT311.StrType)clean_zip);
+    SELF.zip4_Invalid := Fields.InValid_zip4((SALT311.StrType)le.zip4);
+    clean_zip4 := (TYPEOF(le.zip4))Fields.Make_zip4((SALT311.StrType)le.zip4);
+    clean_zip4_Invalid := Fields.InValid_zip4((SALT311.StrType)clean_zip4);
     SELF.zip4 := IF(withOnfail, clean_zip4, le.zip4); // ONFAIL(CLEAN)
-    SELF.zip4_wouldClean := TRIM((SALT39.StrType)le.zip4) <> TRIM((SALT39.StrType)clean_zip4);
-    SELF.county_Invalid := Fields.InValid_county((SALT39.StrType)le.county);
-    clean_county := (TYPEOF(le.county))Fields.Make_county((SALT39.StrType)le.county);
-    clean_county_Invalid := Fields.InValid_county((SALT39.StrType)clean_county);
+    SELF.zip4_wouldClean := TRIM((SALT311.StrType)le.zip4) <> TRIM((SALT311.StrType)clean_zip4);
+    SELF.county_Invalid := Fields.InValid_county((SALT311.StrType)le.county);
+    clean_county := (TYPEOF(le.county))Fields.Make_county((SALT311.StrType)le.county);
+    clean_county_Invalid := Fields.InValid_county((SALT311.StrType)clean_county);
     SELF.county := IF(withOnfail, clean_county, le.county); // ONFAIL(CLEAN)
-    SELF.county_wouldClean := TRIM((SALT39.StrType)le.county) <> TRIM((SALT39.StrType)clean_county);
-    SELF.geo_blk_Invalid := Fields.InValid_geo_blk((SALT39.StrType)le.geo_blk);
-    clean_geo_blk := (TYPEOF(le.geo_blk))Fields.Make_geo_blk((SALT39.StrType)le.geo_blk);
-    clean_geo_blk_Invalid := Fields.InValid_geo_blk((SALT39.StrType)clean_geo_blk);
+    SELF.county_wouldClean := TRIM((SALT311.StrType)le.county) <> TRIM((SALT311.StrType)clean_county);
+    SELF.geo_blk_Invalid := Fields.InValid_geo_blk((SALT311.StrType)le.geo_blk);
+    clean_geo_blk := (TYPEOF(le.geo_blk))Fields.Make_geo_blk((SALT311.StrType)le.geo_blk);
+    clean_geo_blk_Invalid := Fields.InValid_geo_blk((SALT311.StrType)clean_geo_blk);
     SELF.geo_blk := IF(withOnfail, clean_geo_blk, le.geo_blk); // ONFAIL(CLEAN)
-    SELF.geo_blk_wouldClean := TRIM((SALT39.StrType)le.geo_blk) <> TRIM((SALT39.StrType)clean_geo_blk);
-    SELF.cbsa_Invalid := Fields.InValid_cbsa((SALT39.StrType)le.cbsa);
-    clean_cbsa := (TYPEOF(le.cbsa))Fields.Make_cbsa((SALT39.StrType)le.cbsa);
-    clean_cbsa_Invalid := Fields.InValid_cbsa((SALT39.StrType)clean_cbsa);
+    SELF.geo_blk_wouldClean := TRIM((SALT311.StrType)le.geo_blk) <> TRIM((SALT311.StrType)clean_geo_blk);
+    SELF.cbsa_Invalid := Fields.InValid_cbsa((SALT311.StrType)le.cbsa);
+    clean_cbsa := (TYPEOF(le.cbsa))Fields.Make_cbsa((SALT311.StrType)le.cbsa);
+    clean_cbsa_Invalid := Fields.InValid_cbsa((SALT311.StrType)clean_cbsa);
     SELF.cbsa := IF(withOnfail, clean_cbsa, le.cbsa); // ONFAIL(CLEAN)
-    SELF.cbsa_wouldClean := TRIM((SALT39.StrType)le.cbsa) <> TRIM((SALT39.StrType)clean_cbsa);
-    SELF.tnt_Invalid := Fields.InValid_tnt((SALT39.StrType)le.tnt);
-    clean_tnt := (TYPEOF(le.tnt))Fields.Make_tnt((SALT39.StrType)le.tnt);
-    clean_tnt_Invalid := Fields.InValid_tnt((SALT39.StrType)clean_tnt);
+    SELF.cbsa_wouldClean := TRIM((SALT311.StrType)le.cbsa) <> TRIM((SALT311.StrType)clean_cbsa);
+    SELF.tnt_Invalid := Fields.InValid_tnt((SALT311.StrType)le.tnt);
+    clean_tnt := (TYPEOF(le.tnt))Fields.Make_tnt((SALT311.StrType)le.tnt);
+    clean_tnt_Invalid := Fields.InValid_tnt((SALT311.StrType)clean_tnt);
     SELF.tnt := IF(withOnfail, clean_tnt, le.tnt); // ONFAIL(CLEAN)
-    SELF.tnt_wouldClean := TRIM((SALT39.StrType)le.tnt) <> TRIM((SALT39.StrType)clean_tnt);
-    SELF.valid_ssn_Invalid := Fields.InValid_valid_ssn((SALT39.StrType)le.valid_ssn);
-    clean_valid_ssn := (TYPEOF(le.valid_ssn))Fields.Make_valid_ssn((SALT39.StrType)le.valid_ssn);
-    clean_valid_ssn_Invalid := Fields.InValid_valid_ssn((SALT39.StrType)clean_valid_ssn);
+    SELF.tnt_wouldClean := TRIM((SALT311.StrType)le.tnt) <> TRIM((SALT311.StrType)clean_tnt);
+    SELF.valid_ssn_Invalid := Fields.InValid_valid_ssn((SALT311.StrType)le.valid_ssn);
+    clean_valid_ssn := (TYPEOF(le.valid_ssn))Fields.Make_valid_ssn((SALT311.StrType)le.valid_ssn);
+    clean_valid_ssn_Invalid := Fields.InValid_valid_ssn((SALT311.StrType)clean_valid_ssn);
     SELF.valid_ssn := IF(withOnfail, clean_valid_ssn, le.valid_ssn); // ONFAIL(CLEAN)
-    SELF.valid_ssn_wouldClean := TRIM((SALT39.StrType)le.valid_ssn) <> TRIM((SALT39.StrType)clean_valid_ssn);
-    SELF.jflag1_Invalid := Fields.InValid_jflag1((SALT39.StrType)le.jflag1);
-    clean_jflag1 := (TYPEOF(le.jflag1))Fields.Make_jflag1((SALT39.StrType)le.jflag1);
-    clean_jflag1_Invalid := Fields.InValid_jflag1((SALT39.StrType)clean_jflag1);
+    SELF.valid_ssn_wouldClean := TRIM((SALT311.StrType)le.valid_ssn) <> TRIM((SALT311.StrType)clean_valid_ssn);
+    SELF.jflag1_Invalid := Fields.InValid_jflag1((SALT311.StrType)le.jflag1);
+    clean_jflag1 := (TYPEOF(le.jflag1))Fields.Make_jflag1((SALT311.StrType)le.jflag1);
+    clean_jflag1_Invalid := Fields.InValid_jflag1((SALT311.StrType)clean_jflag1);
     SELF.jflag1 := IF(withOnfail, clean_jflag1, le.jflag1); // ONFAIL(CLEAN)
-    SELF.jflag1_wouldClean := TRIM((SALT39.StrType)le.jflag1) <> TRIM((SALT39.StrType)clean_jflag1);
-    SELF.jflag2_Invalid := Fields.InValid_jflag2((SALT39.StrType)le.jflag2);
-    clean_jflag2 := (TYPEOF(le.jflag2))Fields.Make_jflag2((SALT39.StrType)le.jflag2);
-    clean_jflag2_Invalid := Fields.InValid_jflag2((SALT39.StrType)clean_jflag2);
+    SELF.jflag1_wouldClean := TRIM((SALT311.StrType)le.jflag1) <> TRIM((SALT311.StrType)clean_jflag1);
+    SELF.jflag2_Invalid := Fields.InValid_jflag2((SALT311.StrType)le.jflag2);
+    clean_jflag2 := (TYPEOF(le.jflag2))Fields.Make_jflag2((SALT311.StrType)le.jflag2);
+    clean_jflag2_Invalid := Fields.InValid_jflag2((SALT311.StrType)clean_jflag2);
     SELF.jflag2 := IF(withOnfail, clean_jflag2, le.jflag2); // ONFAIL(CLEAN)
-    SELF.jflag2_wouldClean := TRIM((SALT39.StrType)le.jflag2) <> TRIM((SALT39.StrType)clean_jflag2);
-    SELF.jflag3_Invalid := Fields.InValid_jflag3((SALT39.StrType)le.jflag3);
-    clean_jflag3 := (TYPEOF(le.jflag3))Fields.Make_jflag3((SALT39.StrType)le.jflag3);
-    clean_jflag3_Invalid := Fields.InValid_jflag3((SALT39.StrType)clean_jflag3);
+    SELF.jflag2_wouldClean := TRIM((SALT311.StrType)le.jflag2) <> TRIM((SALT311.StrType)clean_jflag2);
+    SELF.jflag3_Invalid := Fields.InValid_jflag3((SALT311.StrType)le.jflag3);
+    clean_jflag3 := (TYPEOF(le.jflag3))Fields.Make_jflag3((SALT311.StrType)le.jflag3);
+    clean_jflag3_Invalid := Fields.InValid_jflag3((SALT311.StrType)clean_jflag3);
     SELF.jflag3 := IF(withOnfail, clean_jflag3, le.jflag3); // ONFAIL(CLEAN)
-    SELF.jflag3_wouldClean := TRIM((SALT39.StrType)le.jflag3) <> TRIM((SALT39.StrType)clean_jflag3);
-    SELF.rawaid_Invalid := Fields.InValid_rawaid((SALT39.StrType)le.rawaid);
-    clean_rawaid := (TYPEOF(le.rawaid))Fields.Make_rawaid((SALT39.StrType)le.rawaid);
-    clean_rawaid_Invalid := Fields.InValid_rawaid((SALT39.StrType)clean_rawaid);
+    SELF.jflag3_wouldClean := TRIM((SALT311.StrType)le.jflag3) <> TRIM((SALT311.StrType)clean_jflag3);
+    SELF.rawaid_Invalid := Fields.InValid_rawaid((SALT311.StrType)le.rawaid);
+    clean_rawaid := (TYPEOF(le.rawaid))Fields.Make_rawaid((SALT311.StrType)le.rawaid);
+    clean_rawaid_Invalid := Fields.InValid_rawaid((SALT311.StrType)clean_rawaid);
     SELF.rawaid := IF(withOnfail, clean_rawaid, le.rawaid); // ONFAIL(CLEAN)
-    SELF.rawaid_wouldClean := TRIM((SALT39.StrType)le.rawaid) <> TRIM((SALT39.StrType)clean_rawaid);
-    SELF.dodgy_tracking_Invalid := Fields.InValid_dodgy_tracking((SALT39.StrType)le.dodgy_tracking);
-    clean_dodgy_tracking := (TYPEOF(le.dodgy_tracking))Fields.Make_dodgy_tracking((SALT39.StrType)le.dodgy_tracking);
-    clean_dodgy_tracking_Invalid := Fields.InValid_dodgy_tracking((SALT39.StrType)clean_dodgy_tracking);
+    SELF.rawaid_wouldClean := TRIM((SALT311.StrType)le.rawaid) <> TRIM((SALT311.StrType)clean_rawaid);
+    SELF.dodgy_tracking_Invalid := Fields.InValid_dodgy_tracking((SALT311.StrType)le.dodgy_tracking);
+    clean_dodgy_tracking := (TYPEOF(le.dodgy_tracking))Fields.Make_dodgy_tracking((SALT311.StrType)le.dodgy_tracking);
+    clean_dodgy_tracking_Invalid := Fields.InValid_dodgy_tracking((SALT311.StrType)clean_dodgy_tracking);
     SELF.dodgy_tracking := IF(withOnfail, clean_dodgy_tracking, le.dodgy_tracking); // ONFAIL(CLEAN)
-    SELF.dodgy_tracking_wouldClean := TRIM((SALT39.StrType)le.dodgy_tracking) <> TRIM((SALT39.StrType)clean_dodgy_tracking);
+    SELF.dodgy_tracking_wouldClean := TRIM((SALT311.StrType)le.dodgy_tracking) <> TRIM((SALT311.StrType)clean_dodgy_tracking);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -322,6 +429,19 @@ EXPORT FromNone(DATASET(Layout_File) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0 OR (mask&le.ScrubsBits2)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND le.ScrubsBits2=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -661,8 +781,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT39.StrType ErrorMessage;
-    SALT39.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -713,7 +833,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dodgy_tracking_Invalid,'ALLOW','LENGTHS','WORDS','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'did','rid','pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','vendor_id','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','county','geo_blk','cbsa','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'did','rid','pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','vendor_id','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','county','geo_blk','cbsa','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.did,(SALT39.StrType)le.rid,(SALT39.StrType)le.pflag1,(SALT39.StrType)le.pflag2,(SALT39.StrType)le.pflag3,(SALT39.StrType)le.src,(SALT39.StrType)le.dt_first_seen,(SALT39.StrType)le.dt_last_seen,(SALT39.StrType)le.dt_vendor_last_reported,(SALT39.StrType)le.dt_vendor_first_reported,(SALT39.StrType)le.dt_nonglb_last_seen,(SALT39.StrType)le.rec_type,(SALT39.StrType)le.vendor_id,(SALT39.StrType)le.phone,(SALT39.StrType)le.ssn,(SALT39.StrType)le.dob,(SALT39.StrType)le.title,(SALT39.StrType)le.fname,(SALT39.StrType)le.mname,(SALT39.StrType)le.lname,(SALT39.StrType)le.name_suffix,(SALT39.StrType)le.prim_range,(SALT39.StrType)le.predir,(SALT39.StrType)le.prim_name,(SALT39.StrType)le.suffix,(SALT39.StrType)le.postdir,(SALT39.StrType)le.unit_desig,(SALT39.StrType)le.sec_range,(SALT39.StrType)le.city_name,(SALT39.StrType)le.st,(SALT39.StrType)le.zip,(SALT39.StrType)le.zip4,(SALT39.StrType)le.county,(SALT39.StrType)le.geo_blk,(SALT39.StrType)le.cbsa,(SALT39.StrType)le.tnt,(SALT39.StrType)le.valid_ssn,(SALT39.StrType)le.jflag1,(SALT39.StrType)le.jflag2,(SALT39.StrType)le.jflag3,(SALT39.StrType)le.rawaid,(SALT39.StrType)le.dodgy_tracking,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.did,(SALT311.StrType)le.rid,(SALT311.StrType)le.pflag1,(SALT311.StrType)le.pflag2,(SALT311.StrType)le.pflag3,(SALT311.StrType)le.src,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_nonglb_last_seen,(SALT311.StrType)le.rec_type,(SALT311.StrType)le.vendor_id,(SALT311.StrType)le.phone,(SALT311.StrType)le.ssn,(SALT311.StrType)le.dob,(SALT311.StrType)le.title,(SALT311.StrType)le.fname,(SALT311.StrType)le.mname,(SALT311.StrType)le.lname,(SALT311.StrType)le.name_suffix,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.suffix,(SALT311.StrType)le.postdir,(SALT311.StrType)le.unit_desig,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.county,(SALT311.StrType)le.geo_blk,(SALT311.StrType)le.cbsa,(SALT311.StrType)le.tnt,(SALT311.StrType)le.valid_ssn,(SALT311.StrType)le.jflag1,(SALT311.StrType)le.jflag2,(SALT311.StrType)le.jflag3,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.dodgy_tracking,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,42,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -721,114 +841,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_File) prevDS = DATASET([], Layout_File), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'did:did:ALLOW','did:did:WORDS'
-          ,'rid:rid:ALLOW','rid:rid:WORDS'
-          ,'pflag1:pflag1:ALLOW','pflag1:pflag1:LENGTHS','pflag1:pflag1:WORDS'
-          ,'pflag2:pflag2:ALLOW','pflag2:pflag2:LENGTHS','pflag2:pflag2:WORDS'
-          ,'pflag3:pflag3:ALLOW','pflag3:pflag3:LENGTHS','pflag3:pflag3:WORDS'
-          ,'src:src:ALLOW','src:src:LENGTHS','src:src:WORDS'
-          ,'dt_first_seen:dt_first_seen:ALLOW','dt_first_seen:dt_first_seen:LENGTHS','dt_first_seen:dt_first_seen:WORDS'
-          ,'dt_last_seen:dt_last_seen:ALLOW','dt_last_seen:dt_last_seen:LENGTHS','dt_last_seen:dt_last_seen:WORDS'
-          ,'dt_vendor_last_reported:dt_vendor_last_reported:ALLOW','dt_vendor_last_reported:dt_vendor_last_reported:LENGTHS','dt_vendor_last_reported:dt_vendor_last_reported:WORDS'
-          ,'dt_vendor_first_reported:dt_vendor_first_reported:ALLOW','dt_vendor_first_reported:dt_vendor_first_reported:LENGTHS','dt_vendor_first_reported:dt_vendor_first_reported:WORDS'
-          ,'dt_nonglb_last_seen:dt_nonglb_last_seen:ALLOW','dt_nonglb_last_seen:dt_nonglb_last_seen:LENGTHS','dt_nonglb_last_seen:dt_nonglb_last_seen:WORDS'
-          ,'rec_type:rec_type:ALLOW','rec_type:rec_type:LENGTHS','rec_type:rec_type:WORDS'
-          ,'vendor_id:vendor_id:ALLOW','vendor_id:vendor_id:WORDS'
-          ,'phone:phone:ALLOW','phone:phone:WORDS'
-          ,'ssn:ssn:ALLOW','ssn:ssn:LENGTHS','ssn:ssn:WORDS'
-          ,'dob:dob:ALLOW','dob:dob:LENGTHS','dob:dob:WORDS'
-          ,'title:title:ALLOW','title:title:LENGTHS'
-          ,'fname:fname:ALLOW'
-          ,'mname:mname:ALLOW'
-          ,'lname:lname:ALLOW'
-          ,'name_suffix:name_suffix:ALLOW'
-          ,'prim_range:prim_range:ALLOW'
-          ,'predir:predir:ALLOW'
-          ,'prim_name:prim_name:ALLOW'
-          ,'suffix:suffix:ALLOW'
-          ,'postdir:postdir:ALLOW'
-          ,'unit_desig:unit_desig:ALLOW'
-          ,'sec_range:sec_range:ALLOW'
-          ,'city_name:city_name:ALLOW'
-          ,'st:st:ALLOW'
-          ,'zip:zip:ALLOW','zip:zip:LENGTHS','zip:zip:WORDS'
-          ,'zip4:zip4:ALLOW','zip4:zip4:LENGTHS','zip4:zip4:WORDS'
-          ,'county:county:ALLOW','county:county:LENGTHS','county:county:WORDS'
-          ,'geo_blk:geo_blk:ALLOW','geo_blk:geo_blk:LENGTHS','geo_blk:geo_blk:WORDS'
-          ,'cbsa:cbsa:ALLOW','cbsa:cbsa:LENGTHS','cbsa:cbsa:WORDS'
-          ,'tnt:tnt:ALLOW','tnt:tnt:LENGTHS','tnt:tnt:WORDS'
-          ,'valid_ssn:valid_ssn:ALLOW','valid_ssn:valid_ssn:LENGTHS','valid_ssn:valid_ssn:WORDS'
-          ,'jflag1:jflag1:ALLOW','jflag1:jflag1:LENGTHS','jflag1:jflag1:WORDS'
-          ,'jflag2:jflag2:ALLOW','jflag2:jflag2:LENGTHS','jflag2:jflag2:WORDS'
-          ,'jflag3:jflag3:ALLOW','jflag3:jflag3:LENGTHS','jflag3:jflag3:WORDS'
-          ,'rawaid:rawaid:ALLOW','rawaid:rawaid:LENGTHS','rawaid:rawaid:WORDS'
-          ,'dodgy_tracking:dodgy_tracking:ALLOW','dodgy_tracking:dodgy_tracking:LENGTHS','dodgy_tracking:dodgy_tracking:WORDS'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY'
-          ,'record:Number_Edited_Records:SUMMARY'
-          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Fields.InvalidMessage_did(1),Fields.InvalidMessage_did(2)
-          ,Fields.InvalidMessage_rid(1),Fields.InvalidMessage_rid(2)
-          ,Fields.InvalidMessage_pflag1(1),Fields.InvalidMessage_pflag1(2),Fields.InvalidMessage_pflag1(3)
-          ,Fields.InvalidMessage_pflag2(1),Fields.InvalidMessage_pflag2(2),Fields.InvalidMessage_pflag2(3)
-          ,Fields.InvalidMessage_pflag3(1),Fields.InvalidMessage_pflag3(2),Fields.InvalidMessage_pflag3(3)
-          ,Fields.InvalidMessage_src(1),Fields.InvalidMessage_src(2),Fields.InvalidMessage_src(3)
-          ,Fields.InvalidMessage_dt_first_seen(1),Fields.InvalidMessage_dt_first_seen(2),Fields.InvalidMessage_dt_first_seen(3)
-          ,Fields.InvalidMessage_dt_last_seen(1),Fields.InvalidMessage_dt_last_seen(2),Fields.InvalidMessage_dt_last_seen(3)
-          ,Fields.InvalidMessage_dt_vendor_last_reported(1),Fields.InvalidMessage_dt_vendor_last_reported(2),Fields.InvalidMessage_dt_vendor_last_reported(3)
-          ,Fields.InvalidMessage_dt_vendor_first_reported(1),Fields.InvalidMessage_dt_vendor_first_reported(2),Fields.InvalidMessage_dt_vendor_first_reported(3)
-          ,Fields.InvalidMessage_dt_nonglb_last_seen(1),Fields.InvalidMessage_dt_nonglb_last_seen(2),Fields.InvalidMessage_dt_nonglb_last_seen(3)
-          ,Fields.InvalidMessage_rec_type(1),Fields.InvalidMessage_rec_type(2),Fields.InvalidMessage_rec_type(3)
-          ,Fields.InvalidMessage_vendor_id(1),Fields.InvalidMessage_vendor_id(2)
-          ,Fields.InvalidMessage_phone(1),Fields.InvalidMessage_phone(2)
-          ,Fields.InvalidMessage_ssn(1),Fields.InvalidMessage_ssn(2),Fields.InvalidMessage_ssn(3)
-          ,Fields.InvalidMessage_dob(1),Fields.InvalidMessage_dob(2),Fields.InvalidMessage_dob(3)
-          ,Fields.InvalidMessage_title(1),Fields.InvalidMessage_title(2)
-          ,Fields.InvalidMessage_fname(1)
-          ,Fields.InvalidMessage_mname(1)
-          ,Fields.InvalidMessage_lname(1)
-          ,Fields.InvalidMessage_name_suffix(1)
-          ,Fields.InvalidMessage_prim_range(1)
-          ,Fields.InvalidMessage_predir(1)
-          ,Fields.InvalidMessage_prim_name(1)
-          ,Fields.InvalidMessage_suffix(1)
-          ,Fields.InvalidMessage_postdir(1)
-          ,Fields.InvalidMessage_unit_desig(1)
-          ,Fields.InvalidMessage_sec_range(1)
-          ,Fields.InvalidMessage_city_name(1)
-          ,Fields.InvalidMessage_st(1)
-          ,Fields.InvalidMessage_zip(1),Fields.InvalidMessage_zip(2),Fields.InvalidMessage_zip(3)
-          ,Fields.InvalidMessage_zip4(1),Fields.InvalidMessage_zip4(2),Fields.InvalidMessage_zip4(3)
-          ,Fields.InvalidMessage_county(1),Fields.InvalidMessage_county(2),Fields.InvalidMessage_county(3)
-          ,Fields.InvalidMessage_geo_blk(1),Fields.InvalidMessage_geo_blk(2),Fields.InvalidMessage_geo_blk(3)
-          ,Fields.InvalidMessage_cbsa(1),Fields.InvalidMessage_cbsa(2),Fields.InvalidMessage_cbsa(3)
-          ,Fields.InvalidMessage_tnt(1),Fields.InvalidMessage_tnt(2),Fields.InvalidMessage_tnt(3)
-          ,Fields.InvalidMessage_valid_ssn(1),Fields.InvalidMessage_valid_ssn(2),Fields.InvalidMessage_valid_ssn(3)
-          ,Fields.InvalidMessage_jflag1(1),Fields.InvalidMessage_jflag1(2),Fields.InvalidMessage_jflag1(3)
-          ,Fields.InvalidMessage_jflag2(1),Fields.InvalidMessage_jflag2(2),Fields.InvalidMessage_jflag2(3)
-          ,Fields.InvalidMessage_jflag3(1),Fields.InvalidMessage_jflag3(2),Fields.InvalidMessage_jflag3(3)
-          ,Fields.InvalidMessage_rawaid(1),Fields.InvalidMessage_rawaid(2),Fields.InvalidMessage_rawaid(3)
-          ,Fields.InvalidMessage_dodgy_tracking(1),Fields.InvalidMessage_dodgy_tracking(2),Fields.InvalidMessage_dodgy_tracking(3)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors'
-          ,'Edited records'
-          ,'Rules leading to edits','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.did_ALLOW_ErrorCount,le.did_WORDS_ErrorCount
           ,le.rid_ALLOW_ErrorCount,le.rid_WORDS_ErrorCount
@@ -923,7 +941,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.jflag2_ALLOW_ErrorCount,le.jflag2_LENGTHS_ErrorCount,le.jflag2_WORDS_ErrorCount
           ,le.jflag3_ALLOW_ErrorCount,le.jflag3_LENGTHS_ErrorCount,le.jflag3_WORDS_ErrorCount
           ,le.rawaid_ALLOW_ErrorCount,le.rawaid_LENGTHS_ErrorCount,le.rawaid_WORDS_ErrorCount
-          ,le.dodgy_tracking_ALLOW_ErrorCount,le.dodgy_tracking_LENGTHS_ErrorCount,le.dodgy_tracking_WORDS_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.dodgy_tracking_ALLOW_ErrorCount,le.dodgy_tracking_LENGTHS_ErrorCount,le.dodgy_tracking_WORDS_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -939,12 +957,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -959,7 +977,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -1109,7 +1127,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,46,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -1134,12 +1152,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(Layout_File) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Headers_Monthly, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Headers_Monthly, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -1150,10 +1168,10 @@ EXPORT StandardStats(DATASET(Layout_File) inFile, BOOLEAN doErrorOverall = TRUE)
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

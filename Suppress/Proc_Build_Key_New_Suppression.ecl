@@ -22,14 +22,23 @@ update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'christopher.b
 
 create_build := Orbit3.proc_Orbit3_CreateBuild('Suppressions',pVersion,'N|B|F');
          										
+validate_recs:= Suppress.fn_validate;
+
 													
 RETURN Sequential(parallel(bld_key,bld_key_fcra),
 																		parallel(mv_built, mv_built_fcra),
 																		parallel(mv_qa, mv_qa_fcra),
-																		parallel(update_dops, update_dops_fcra),
-																		Samples,
-																	if(ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
+																		if(ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
+																		        parallel(update_dops, update_dops_fcra),
+																            output('No need to update since its Saturday or Sunday')),
+																						
+																						if(ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
 																						create_build,/*,update_idops,Suppress.Proc_OrbitI_CreateBuild(pVersion,'nonfcra')*/
-																						output('No Orbit Entries Needed for weekend builds')));
+																						output('No Orbit Entries Needed for weekend builds')),
+																						
+																		Samples,
+																	  if(ut.Weekday((integer)pVersion[1..8]) = 'SATURDAY', 
+																	          validate_recs(pVersion),
+																		        output('No need to run validation since its not Saturday')));
 
 end;

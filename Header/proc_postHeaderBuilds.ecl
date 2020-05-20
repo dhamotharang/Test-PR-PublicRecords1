@@ -118,7 +118,7 @@ export proc_postHeaderBuilds(string pBldVer = '') := module
                                  if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
                                 ,checkLinkingVersion(BldVer)
                                 ,Doxie.Proc_Doxie_Keys_All(,elist_owners)
-                                ,Header.Proc_Copy_To_Alpha(BldVer)
+                                ,_control.fSubmitNewWorkunit('Header.Proc_Copy_To_Alpha('+BldVer+').hhid;','hthor_eclcc')
                                 ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
                                 )
                                 :success(header.msg(cmpltd,elist_build_in_qa).good)
@@ -156,7 +156,8 @@ export proc_postHeaderBuilds(string pBldVer = '') := module
     export FCRAheader := sequential(
                                 if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
                                 ,checkLinkingVersion(pBldVer)
-                                ,Doxie.Proc_FCRA_Doxie_keys_All(,,pBldVer)
+                                ,Header.Proc_re_did_FCRA_EN(pBldVer) // only run in monthly
+                                // ,Doxie.Proc_FCRA_Doxie_keys_All(,,pBldVer)
                                 )
                                 :success(header.msg(cmpltd,elist_fcra).good)
                                 ,failure(header.msg(failed,elist_owners).bad)
@@ -180,8 +181,8 @@ export proc_postHeaderBuilds(string pBldVer = '') := module
                                 ;
     export run_scrubs_reports:= sequential(
                                         Scrubs_HeaderSlimSortSrc_Monthly.proc_generate_report(),
-                                        Scrubs_FileRelative_Monthly.proc_generate_report(),
-                                        Scrubs_Headers_Monthly.proc_generate_report()
+                                        Scrubs_FileRelative_Monthly.proc_generate_report()
+                                        // Scrubs_Headers_Monthly.proc_generate_report()
 
                                 );
 end;

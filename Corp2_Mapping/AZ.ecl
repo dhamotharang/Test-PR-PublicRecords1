@@ -2,7 +2,7 @@
 
 Export AZ := MODULE; 
 
- Export Update(String fileDate, String version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) := function
+ Export Update(String fileDate, String version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland, boolean pRunFlag = false) := function
  
   state_origin		 := 'AZ' ;
   state_fips	 		 := '04';
@@ -13,7 +13,13 @@ Export AZ := MODULE;
 	ChgExt := dedup(sort(distribute(Corp2_Raw_AZ.Files(filedate,pUseProd).Input.CHGEXT.logical,hash(Entity_Number)),record,local), record,local) : independent;	
 	FlmExt := dedup(sort(distribute(Corp2_Raw_AZ.Files(filedate,pUseProd).Input.FLMEXT.logical,hash(Entity_Number)),record,local), record,local) : independent;	
 	OffExt := dedup(sort(distribute(Corp2_Raw_AZ.Files(filedate,pUseProd).Input.OFFEXT.logical,hash(Entity_Number)),record,local), record,local) : independent;	
-
+  Inactv := dedup(sort(distribute(Corp2_Raw_AZ.Files(filedate,pUseProd).Input.INACTV.logical,hash(Entity_Number)),record,local), record,local) : independent;	
+  
+	//The vendor may or may not include the Inactive File when they send the data
+	//Concatenate the active master records and the inactive master records whenever the vendor sends the Inactive master records
+	//otherwise only use the active master records
+	dAllCor := if(pRunFlag = false, CorExt, CorExt + Inactv);
+ 
   //------------------	
 	//Begin Corp Mapping
 	//------------------
@@ -38,7 +44,8 @@ Export AZ := MODULE;
 		self.Norm_Type    := choose(cnt ,'PHYS' ,'MAIL'); 
 		self			        := l;
 	end;
-	normCOREXT	:= normalize(COREXT, 2, normTrf(left, counter));		
+	
+	normCOREXT	:= normalize(dAllCor, 2, normTrf(left, counter));		
 
  	 //COREXT Transform
 	 corp2_Mapping.LayoutsCommon.Main CorextTrf(Corp2_Raw_AZ.Layouts.normLayout  input):=transform
@@ -129,7 +136,7 @@ Export AZ := MODULE;
   MapCOREXT := project(normCOREXT, CorextTrf(left)) ;
 	
   //CHGEXT Transform
-		jCHGEXT	:= join(CHGEXT, COREXT, 
+		jCHGEXT	:= join(CHGEXT, dAllCor, 
 										corp2.t2u(left.ENTITY_NUMBER) = corp2.t2u(right.ENTITY_NUMBER),
 										transform(Corp2_Raw_AZ.Layouts.CHGEXT_TempLay, self:=left; self:=right; self:=[];),
 										left outer,local) : independent;
@@ -192,7 +199,7 @@ Export AZ := MODULE;
 	//---------------------
 		
 		// Join the COREXT and OFFEXT files
-		joinOffextCorext 	:= join(COREXT, OFFEXT,
+		joinOffextCorext 	:= join(dAllCor, OFFEXT,
 												 corp2.t2u(left.ENTITY_NUMBER) = corp2.t2u(right.ENTITY_NUMBER),											
 												 transform(Corp2_Raw_AZ.Layouts.OFFEXT_COREXT,
 												 self := left;	self := right; self := [];),
@@ -369,10 +376,8 @@ Export AZ := MODULE;
 	
  	  //Submits Profile's stats to Orbit
 		Main_SubmitStats 					:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_AZ_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_AZ_Main').SubmitStats;
-		// Main_SubmitStats 					:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_AZ_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_AZ_Main').SubmitStats;
 
 	  Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_AZ_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_AZ_Main').CompareToProfile_with_Examples;
-	  // Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_AZ_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_AZ_Main').CompareToProfile_with_Examples;
 	
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
@@ -482,10 +487,8 @@ Export AZ := MODULE;
  	
     //Submits Profile's stats to Orbit
 		Event_SubmitStats 				:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_AZ_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_AZ_Event').SubmitStats;
-	  // Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_AZ_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_AZ_Event').SubmitStats;
 			
 		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_AZ_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_AZ_Event').CompareToProfile_with_Examples;
-	  // Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_AZ_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_AZ_Event').CompareToProfile_with_Examples;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -558,7 +561,7 @@ Export AZ := MODULE;
   											,Event_All
 												,Main_All	
 										);
-															
+		
  		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-35) and ut.date_math(filedate,35),true,false);
 		return sequential (if (isFileDateValid
 														,mapAZ

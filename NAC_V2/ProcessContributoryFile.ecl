@@ -2,6 +2,8 @@
 
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
+Archive(varstring ilfn) := NOTHOR(IF(STD.File.FindSuperFileSubName($.Superfile_List.sfNCF2,ilfn)=0,
+													STD.File.AddSuperFile($.Superfile_List.sfNCF2,ilfn)));
 /**
   dataDir			has incoming and ougoing subdirectories
 	maintenance	has spraying, done, error subdirectories
@@ -67,7 +69,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		doit := sequential(
 				MoveReadyToSpraying
-				,SprayIt										
+				,SprayIt
+				,Archive(ilfn)
 				,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
 				,OUTPUT(reports.TotalRecords, named('total_records'))
 				,OUTPUT(reports.ErrorCount, named('Error_Count'))

@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.11.3');
+#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.11.4');
 IMPORT BIPV2_ProxID,SALT311;
 //BIPV2_ProxID.Specificities(BIPV2_ProxID.In_DOT_Base).Build; // Used to create calibration keys
 // Proc_Iterate also supports a dataset parameter to allow an arbitrary file as starting point.

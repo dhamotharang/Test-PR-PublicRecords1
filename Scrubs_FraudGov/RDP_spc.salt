@@ -48,6 +48,7 @@ FIELD:Phone:TYPE(string12):LIKE(invalid_phone):0,0
 FIELD:Lexid_Discovered:TYPE(unsigned6):LIKE(invalid_numeric):0,0
 FIELD:RemoteIPAddress:TYPE(string25):LIKE(invalid_ip):0,0
 FIELD:ConsumerIPAddress:TYPE(string25):LIKE(invalid_ip):0,0
+FIELD:Email_Address:TYPE(string256):LIKE(invalid_email):0,0 
 
 
 // CONCEPT statements should be used to group together interellated fields; such as address

@@ -5,7 +5,7 @@ EXPORT Proc_FirstData_buildall(
 	STRING  pServerIP  = FirstData.Constants(pVersion).serverIP,
 	STRING  pDirectory = FirstData.Constants(pVersion).Directory + pVersion + '/',
 	STRING  pFilename  = '*csv',
-	STRING  pContacts  = Email_Notification_Lists().BuildSuccess, 
+	STRING  pContacts  = Email_Notification_Lists().BuildSuccess,
 	STRING  pGroupName = _Dataset().pGroupname,
 	BOOLEAN pIsTesting = FALSE,
 	BOOLEAN pOverwrite = FALSE
@@ -22,7 +22,11 @@ EXPORT Proc_FirstData_buildall(
 			pOverwrite
 		)
 	);
-	shared dops_update		:=	dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N'); 															
+
+	shared dops_update := SEQUENTIAL(
+		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N'),
+		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F')
+	);
 	
 	// All filenames associated with this Dataset
 	SHARED dAll_filenames := Filenames().dAll_filenames;

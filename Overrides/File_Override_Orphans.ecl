@@ -9,7 +9,7 @@ string12 DID;
 string100 recID;
 end;
 
-export orphan_file := dataset(data_services.foreign_prod + 'thor_data400::lookup::override::orphans', orphan_rec, flat);
+export orphan_file := dataset('~thor_data400::lookup::override::orphans', orphan_rec, flat,opt);
 
 
 end;

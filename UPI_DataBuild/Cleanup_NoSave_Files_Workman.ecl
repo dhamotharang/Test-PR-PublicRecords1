@@ -18,7 +18,7 @@ EXPORT Cleanup_NoSave_Files_Workman(pAsOfDate):= functionmacro
   workmanPreamble(STRING runText)  :=  FUNCTION
     workmanPreambleECL  :=  'IMPORT versioncontrol, _control, ut, tools, UPI_DataBuild;' +
 		
-                            '\npAsOfDate 				:= \''+AsOfDate+'\';' +		
+                            '\npAsOfDate 				:= \''+pAsOfDate+'\';' +		
                             '\n#WORKUNIT(\'name\',\'UPI_DataBuild '+runText+' \' + \' Cleanup Files for NoSave Customers \' );' +
                             '\n#WORKUNIT(\'priority\',\'high\');' +
                             '\n';
@@ -28,7 +28,7 @@ EXPORT Cleanup_NoSave_Files_Workman(pAsOfDate):= functionmacro
 
   step1_Text  :=  'CleanUp_NoSave_Files';
   step1_ECL   :=  workmanPreamble(step1_Text)+
-                      '\nUPI_DataBuild.Cleanup_NoSave_All.step1';
+                      '\nUPI_DataBuild.Cleanup_NoSave_All(pAsOfDate).step1';
 
 	// workman code should be called from hthor, and then within the code, switch to other clusters if needed	
   pStep1      :=  Workman.mac_WorkMan(
@@ -60,7 +60,7 @@ EXPORT Cleanup_NoSave_Files_Workman(pAsOfDate):= functionmacro
 
   Step2_Text :=  'Cleanup_NoSave_Linking_Files';
   Step2_ECL  :=  workmanPreamble(Step2_Text) +
-                        '\nUPI_DataBuild.Cleanup_NoSave_All.Step2;';
+                        '\nUPI_DataBuild.Cleanup_NoSave_All(pAsOfDate).Step2;';
   pStep2    :=  Workman.mac_WorkMan(
                         Step2_ECL                //  pECL
                         ,pAsOfDate                       //  pversion

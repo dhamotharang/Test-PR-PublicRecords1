@@ -2,6 +2,9 @@
 
 EXPORT Constants := module
 
+EXPORT dops_name                    :='LNPropertyV2Keys';
+EXPORT fcra_dops_name               :='FCRA_LNPropertyV2Keys';
+
 EXPORT KeyName_ln_propertyv2 := 	'~prte::key::ln_propertyv2::'; 
 
 EXPORT FCRA_KeyName_ln_propertyv2 := '~prte::key::ln_propertyv2::fcra::';

@@ -3,11 +3,9 @@ IMPORT SALT311;
 EXPORT Proc_Iterate(STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/,DATASET(Layout_DOT_Base) InFile = BIPV2_ProxID.In_DOT_Base,STRING OutFileNameP = '~temp::Proxid::BIPV2_ProxID::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED MM := BIPV2_ProxID.matches(InFile, MatchThreshold); // Get the matching module
 SHARED S := Specificities(InFile).Specificities[1];
-dsOSR := CHOOSEN(MM.MatchSampleRecords,1000);
-dsOSL := CHOOSEN(MM.ToSlice,1000);
-OSL := OUTPUT(dsOSL,NAMED('SliceOutCandidates'));
+dsOSR := CHOOSEN(MM.MatchSampleRecords,1000)/* HACKProcIterate04 lower match sample records output*/;
 OSR := OUTPUT(dsOSR,NAMED('MatchSampleRecords'));
-EXPORT OutputSamples := PARALLEL(OSR,OSL);// Provide the records!
+EXPORT OutputSamples := OSR;// Provide the records!
 SHARED BM := BIPV2_ProxID.BasicMatch(InFile);
 dsBMSF := CHOOSEN(BM.Block, 1000);
 dsOMatchSamples := CHOOSEN(MM.MatchSample,1000);
@@ -17,7 +15,7 @@ dsThr := RECORD
   UNSIGNED BasicMatchThreshold := Config.BasicMatchThreshold;
   UNSIGNED MatchThreshold := MatchThreshold;
   UNSIGNED LowerMatchThreshold := MatchThreshold-3; // as defined in matches/Debug (not Underlinks)
-  UNSIGNED IntraMatchThreshold := MatchThreshold-3 - Config.SliceDistance;
+  UNSIGNED IntraMatchThreshold := MatchThreshold-3 /*- Config.SliceDistance*//*HACKProcIterate05*/;
 END;
 mtch := Debug(InFile, S, MatchThreshold).AnnotateMatches(MM.PossibleMatches,MM.All_Attribute_Matches);
 MSD :=
@@ -32,7 +30,7 @@ Thr := OUTPUT(ROW(dsThr),NAMED('Thresholds'));
 OMSD := OUTPUT(MSD,NAMED('MatchSampleDebug'),ALL);
 BMSF := OUTPUT(dsBMSF, NAMED ('BasicMatch_Block'));
 EXPORT OutputExtraSamples := PARALLEL(OMatchSamples, OBSamples, OAS, BMS, Thr, OMSD, BMSF); // This is not called automatically - call yourself if you want them!
-dsMPSP := DATASET([{'MatchesPerformed', MM.MatchesPerformed}, {'BasicMatchesPerformed', BM.basic_match_count}, {'SlicesPerformed', MM.SlicesPerformed}], {STRING label, UNSIGNED value});
+dsMPSP := DATASET([{'MatchesPerformed', MM.MatchesPerformed}, {'BasicMatchesPerformed', BM.basic_match_count}], {STRING label, UNSIGNED value});
 dsPS := DATASET([{'PropagationAssisted_Pcnt', MM.MatchesPropAssisted * 100 / MM.MatchesPerformed}, {'PropagationRequired_Pcnt', MM.MatchesPropRequired * 100 / MM.MatchesPerformed}], {STRING label, UNSIGNED Pcnt});
 dsRE := TOPN(MM.RuleEfficacy,1000,RuleNumber);
 dsCB := TOPN(MM.ConfidenceBreakdown,1000,conf);

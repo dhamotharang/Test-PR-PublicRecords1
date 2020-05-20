@@ -15,7 +15,7 @@ Export EVENT_NAME     							:= WU_NAME + ' EVENT';
 sDaily                 							:= if(pDaily, 'true','false');
 sFCRA                  							:= if(isFCRA, 'true','false');
 
-FILES_SCRUB_ECL            	  			:= 'Scrubs_Inquiry_History.proc_generate_report()\n';
+FILES_SCRUB_ECL            	  			:= 'Scrubs_Inquiry_History.proc_generate_report();\n';
 BASE_BUILD_ECL              				:= 'INQL_FFD.Build_all(\'' + version + '\',' + sFCRA + ');\n';
 
 PROCESS_ECL 												:= Case(pProcessName, 

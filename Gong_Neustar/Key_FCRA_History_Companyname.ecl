@@ -1,3 +1,6 @@
+//######################################################
+//## This Key is no longer in FCRA_GongKeys 2/26/2020 ##
+//######################################################
 Import Data_Services, gong, doxie, ut, gong_services, _Control, gong;
 
 hist_in := File_History_Full_Prepped_for_FCRA_Keys((unsigned)phone10<>0, listing_type_bus<>'', listed_name<>'');

@@ -34,8 +34,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT address_layout_new := RECORD ,MAXLENGTH(max_size)
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100		ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -114,8 +114,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT dea_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -141,8 +141,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT disciplinaryact_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -172,8 +172,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT education_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -207,8 +207,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT entity_layout_new := RECORD
 				string12		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -241,8 +241,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT language_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -279,8 +279,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT license_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -326,8 +326,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT npi_layout_new := RECORD
 				string15		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -349,8 +349,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT phone_layout_new := RECORD
 			string15	load_id;
-			string10	load_source_data_date;
-			string10	load_qa_approval_date;
+			// string10	load_source_data_date;
+			// string10	load_qa_approval_date;
 			phone_layout;
 		END;
 		
@@ -366,8 +366,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT specialty_layout_new	:= RECORD
 			string15	load_id;
-			string10	load_source_data_date;
-			string10	load_qa_approval_date;
+			// string10	load_source_data_date;
+			// string10	load_qa_approval_date;
 			specialty_layout;
 		END;
 		
@@ -387,6 +387,23 @@ EXPORT layouts := MODULE
 		
 		EXPORT stliclookup_layout_new := RECORD
 				stliclookup_layout;
+		END;
+		
+		EXPORT stliclookup_layout_from_alpha := RECORD
+			string load_id;
+			string lic_state;
+			string lic_class_type;
+			string lic_subtype;
+			string lic_status;
+			string lic_substatus;
+			string lic_qualifier1;
+			string lic_qualifier2;
+			string mapped_class;
+			string mapped_status;
+			string mapped_qualifier1;
+			string mapped_qualifier2;
+			string mapped_pdma;
+			string mapped_pract_type;
 		END;
 		
 		EXPORT statelicense_layout := RECORD

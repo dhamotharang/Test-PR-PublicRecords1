@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate,IDLExternalLinking;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate,IDLExternalLinking,InsuranceHeader_xlink,SALT37;
 EXPORT Build_Input_Deltabase(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -7,7 +7,7 @@ EXPORT Build_Input_Deltabase(
 ) :=
 module
 
-firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
+  shared firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 
 	deltabaseUpdate :=	if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0,
 		Files(pversion).Sprayed.Deltabase, 
@@ -23,9 +23,14 @@ firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 		self.FileDate := (unsigned)l.fn[sub..sub+7];
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
-		self.rawlinkid	:= Map(l.rawlinkid>0 and l.rawlinkid <firstrinid => if(exists(IDLExternalLinking.did_getAllRecs(l.rawlinkid)),l.rawlinkid,0)
-												,l.rawlinkid>=firstrinid => if(exists(Fraudshared.key_did('FraudGov')(did=l.rawlinkid)),l.rawlinkid,0)
-												,l.rawlinkid);
+		self.rawlinkid	:= l.rawlinkid;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+		self.RIN_Source := map(	l.file_type = 3  => 4, //identity
+								l.file_type = 1 and l.deceitful_confidence != '3'  => 5, //knownrisk
+								l.file_type = 1 and l.deceitful_confidence = '3'  => 7,  //safelist
+								l.file_type = 5  => 6,  //status update
+								l.RIN_Source); 
+
 		self:=l;
 		self:=[];
 	end;
@@ -37,7 +42,27 @@ firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 
 	MAC_Sequence_Records( f1, source_rec_id, f1_source_rec_id, max_uid);
 	
-	shared d_source_rec_id := distribute(f1_source_rec_id);
+	f1_did := f1_source_rec_id(rawlinkid>0 and rawlinkid <firstrinid);
+	f1_rinid := f1_source_rec_id(rawlinkid>=firstrinid);
+	f1_rawlinkid_zero:= f1_source_rec_id(rawlinkid=0);
+	
+//validate did with PR
+	validate_did := IDLExternalLinking.did_getAllRecs_batch(f1_did,rawlinkid,source_rec_id);
+	j_did := Join(f1_did,validate_did,left.source_rec_id=right.source_rec_id and right.did>0
+							,Transform(recordof(left)
+							,self.rawlinkid :=if(right.did>0,left.rawlinkid,0)
+							,self:=left),left outer,keep(1));
+							
+//validate rinid's with RIN system						
+	j_rinid :=Join(f1_rinid,Fraudshared.key_did('FraudGov'),
+								left.rawlinkid =right.did
+								,Transform(recordof(left)
+								,self.rawlinkid :=if(left.rawlinkid=right.did,left.rawlinkid,0)
+								,self:=left),left outer,keep(1));
+								
+	final_rawlinkid := 	f1_rawlinkid_zero+j_did+j_rinid;						
+		
+	shared d_source_rec_id := distribute(final_rawlinkid);
 	
 	shared append_source := join(
 		d_source_rec_id,

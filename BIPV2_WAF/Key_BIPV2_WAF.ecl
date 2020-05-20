@@ -1,4 +1,4 @@
-IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - provides 'we also found' capability
+﻿IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - provides 'we also found' capability
 
 EXPORT Key_BIPV2_WAF := Module
 
@@ -46,7 +46,10 @@ EXPORT Key_BIPV2_WAF := Module
 			UNSIGNED4 Cnt;
 			UNSIGNED2 Permits;
 		END;
-		N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&1022 = 1022) and permits <> 0);
+		//*** Jira DF-27682, Modified code as suggested in the ticket.
+		//*** A change was made to bip2.mod_sources.in_mod_values.my_bmap to remove the +  [code.MARKETING_UNRESTRICTED]
+		//*** Thus as a result, changed the below code to ensure results are same. Changed the bip map value from 1022 to 510 below (i.e 1022-512).
+		N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&510 = 510) and permits <> 0);
 		RETURN TABLE(N,{ UniqueID, Child_Id, UNSIGNED Cnt := SUM(GROUP,Cnt)},UniqueId,Child_Id,FEW);
 	END;
 

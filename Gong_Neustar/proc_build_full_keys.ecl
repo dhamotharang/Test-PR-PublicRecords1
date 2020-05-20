@@ -1,134 +1,88 @@
-﻿import ut,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs, watchdog, Promotesupers;
+﻿
+IMPORT dx_Gong, ut, RoxieKeyBuild, DayBatchEda, EDA_VIA_XML, Promotesupers;
 
-//#workunit('priority','high');
-//#workunit('priority',09);
+EXPORT proc_build_full_keys(string rundate) := FUNCTION
 
+//logical files' common prefix (old and new format)
+prefix_weekly             := '~thor_data400::key::gong_weekly::' + rundate + '::';
+prefix_std                := '~thor_data400::key::gong::'+ rundate + '::';
 
-export proc_build_full_keys(string rundate) := function
+//Logical files' names
+name_phone                := prefix_weekly + 'phone';
+name_czsslf               := prefix_weekly + 'czsslf';
+name_lczf                 := prefix_weekly + 'lczf';
+name_address_current      := prefix_weekly + 'address_current';
+name_surnamecnt           := prefix_weekly + 'surnamecnt';
+name_phone10              := prefix_weekly + 'cbrs.phone10_gong';
+name_zip                  := prefix_std    + 'zip';
+name_npa                  := prefix_std    + 'npa';
+name_scoring_attributes   := '~thor_data400::key::gong_scoring::' + rundate + '::phone_nm';
 
-Gong_SuperKeyName	:= '~thor_data400::key::Gong::@version@::'; // created during the introduction of bug 75617
-Gong_BaseKeyName	:= '~thor_data400::key::Gong::'+rundate ;
+//Build - note suprefile name is not used for =building= the keys, so I'm explicitely passing empty string 
+// *** NOT in package *** RoxieKeyBuild.Mac_SK_BuildProcess_Local($.key_bdid,'~thor_data400::key::gong_weekly::'+rundate+'::bdid','~thor_data400::key::gong_bdid',bk_bdid,3);                 
+RoxieKeybuild.MAC_build_logical(dx_Gong.key_phone(), DayBatchEda.data_key_gong_phone, '', name_phone, bk_phone);
+RoxieKeybuild.MAC_build_logical(dx_Gong.key_czsslf(), DayBatchEda.data_key_gong_batch_czsslf, '', name_czsslf, bk_czsslf);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_lczf(), DayBatchEda.data_key_gong_batch_lczf, '', name_lczf, bk_lczf);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_address_current(), Gong_Neustar.data_key_address_current, '', name_address_current, bk_addr_curr);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_surname_count(), Gong_Neustar.data_key_SurnameCount, '', name_surnamecnt, bk_srnmct);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_phone10(), Gong_Neustar.data_key_phone10, '', name_phone10, bk_phone10);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_zip(), Gong_Neustar.data_key_zip, '', name_zip, bk_zip);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_npa(), Gong_Neustar.data_key_npa, '', name_npa, bk_npa);
+RoxieKeyBuild.MAC_build_logical(dx_Gong.key_scoring_attributes(), Gong_Neustar.data_Key_GongScoringAttributes, '', name_scoring_attributes, bk_scoring);
 
-pre1 := ut.SF_MaintBuilding('~thor_data400::base::gong');
+//Add to "build" superfile
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_phone, dx_Gong.names('').i_phone, mv_phone, 3);
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_czsslf, dx_Gong.names('').i_czsslf, mv_czsslf, 3);
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_lczf, dx_Gong.names('').i_lczf, mv_lczf, 3);
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_surnamecnt, dx_Gong.names('').i_surname_count, mv_srnmct, 3);
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_address_current, dx_Gong.names('').i_address_current, mv_addr_curr, 3);
+RoxieKeyBuild.Mac_SK_Move_To_Built_v2(dx_Gong.names('').i_phone10, name_phone10 , mv_phone10);
+RoxieKeyBuild.Mac_SK_Move_To_Built_V2(dx_Gong.names('').i_zip, name_zip, mv_zip);
+RoxieKeyBuild.Mac_SK_Move_To_Built_V2(dx_Gong.names('').i_npa, name_npa, mv_npa);
+RoxieKeyBuild.Mac_SK_Move_To_Built(name_scoring_attributes, dx_Gong.names('').i_scoring_attributes, mv_scoring, 3);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_bdid,'~thor_data400::key::gong_weekly::'+rundate+'::bdid','~thor_data400::key::gong_bdid',bk_bdid,3);								 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(DayBatchEda.Key_gong_phone,'~thor_data400::key::gong_weekly::'+rundate+'::phone','~thor_data400::key::gong_phone',bk_phone,3);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(DayBatchEda.key_gong_batch_czsslf,'~thor_data400::key::gong_weekly::'+rundate+'::czsslf','~thor_data400::key::gong_czsslf',bk_czsslf,3);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(DayBatchEda.key_gong_batch_lczf,'~thor_data400::key::gong_weekly::'+rundate+'::lczf','~thor_data400::key::gong_lczf',bk_lczf,3);											
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(EDA_VIA_XML.Key_npa_nxx_line,'~thor_data400::key::gong_weekly::'+rundate+'::eda_npa_nxx_line','~thor_data400::key::gong_eda_npa_nxx_line',bk_npa_nxx_line,3);		
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(EDA_VIA_XML.Key_st_lname_city,'~thor_data400::key::gong_weekly::'+rundate+'::eda_st_lname_city','~thor_data400::key::gong_eda_st_lname_city',bk_st_lname_city,3);			
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(EDA_VIA_XML.Key_st_lname_fname_city,'~thor_data400::key::gong_weekly::'+rundate+'::eda_st_lname_fname_city','~thor_data400::key::gong_eda_st_lname_fname_city',bk_st_lname_fname_city,3);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(EDA_VIA_XML.Key_st_bizword_city,'~thor_data400::key::gong_weekly::'+rundate+'::eda_st_bizword_city','~thor_data400::key::gong_eda_st_bizword_city',bk_st_bizword_city,3);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(EDA_VIA_XML.Key_st_city_prim_name_prim_range,'~thor_data400::key::gong_weekly::'+rundate+'::eda_st_city_prim_name_prim_range','~thor_data400::key::gong_eda_st_city_prim_name_prim_range',bk_st_city_prim_name_prim_range,3);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_address_current,'~thor_data400::key::gong_weekly::'+rundate+'::address_current','~thor_data400::key::gong_address_current',bk_addr_curr,3);									
-/* //////Bug: #53260 - new roxie key for surname counts in apple app */
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(Key_SurnameCount,'~thor_data400::key::gong_weekly::'+rundate+'::surnamecnt','~thor_data400::key::gong_surnamecnt',bk_srnmct,3);										 
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(doxie_cbrs.key_phone_gong, '~thor_data400::key::cbrs.phone10_gong','~thor_data400::key::gong_weekly::'+rundate+'::cbrs.phone10_gong',kpg);
-/* /////Build keys Bug 75617					 */
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(key_zip,Gong_SuperKeyName+'zip',Gong_BaseKeyName+'::zip',Gong_zip_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(key_npa,Gong_SuperKeyName+'npa',Gong_BaseKeyName+'::npa',Gong_npa_key);											
-/* /////Build keys Bug 95514					 */		
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(Key_GongScoringAttributes,'~thor_data400::key::gong_scoring::'+rundate+'::phone_nm', '~thor_data400::key::gong_scoring',bk_ph_scoring,3);
-				 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::bdid','~thor_data400::key::gong_bdid',mv_bdid,3);								 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::phone','~thor_data400::key::gong_phone',mv_phone,3);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::czsslf','~thor_data400::key::gong_czsslf',mv_czsslf,3);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::lczf','~thor_data400::key::gong_lczf',mv_lczf,3);											 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::eda_npa_nxx_line','~thor_data400::key::gong_eda_npa_nxx_line',mv_npa_nxx_line,3);					 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::eda_st_lname_city','~thor_data400::key::gong_eda_st_lname_city',mv_st_lname_city,3);					 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::eda_st_lname_fname_city','~thor_data400::key::gong_eda_st_lname_fname_city',mv_st_lname_fname_city,3);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::eda_st_bizword_city','~thor_data400::key::gong_eda_st_bizword_city',mv_st_bizword_city,3);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::eda_st_city_prim_name_prim_range','~thor_data400::key::gong_eda_st_city_prim_name_prim_range',mv_st_city_prim_name_prim_range,3);	
-/* //////Bug: #53260 - new roxie key for surname counts in apple app */
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::surnamecnt','~thor_data400::key::gong_surnamecnt',mv_srnmct,3);				 
-/* //////Bug: #      - new by Vladamir */
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::address_current','~thor_data400::key::gong_address_current',mv_addr_curr,3);									
-RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::cbrs.phone10_gong','~thor_data400::key::gong_weekly::'+rundate+'::cbrs.phone10_gong',kpg1);
-/* //////Move keys to build Bug 75617	 */
-RoxieKeyBuild.Mac_SK_Move_To_Built_V2(Gong_SuperKeyName+'zip',Gong_BaseKeyName+'::zip',mv_Gong_zip_key);
-RoxieKeyBuild.Mac_SK_Move_To_Built_V2(Gong_SuperKeyName+'npa',Gong_BaseKeyName+'::npa',mv_Gong_npa_key);
-/* /////Build keys Bug 95514					 */		
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_scoring::'+rundate+'::phone_nm', '~thor_data400::key::gong_scoring',mv_ph_scoring,3);
-
-
-//full1 := if (fileservices.getsuperfilesubname('~thor_data400::base::gong',1) =      
-//fileservices.getsuperfilesubname('~thor_data400::base::gong_built',1),
-
-	//	   output('base file BASE = BUILT, Nothing done.'),
-		   //sequential(
-	full1		:=	sequential(
-					parallel(
-								bk_bdid, 
-								bk_phone,
-								bk_czsslf,
-								bk_lczf,
-							bk_npa_nxx_line,
-						bk_st_lname_city,
-						bk_st_lname_fname_city,
-						bk_st_bizword_city,
-						bk_st_city_prim_name_prim_range,
-								kpg,
-								bk_addr_curr,
-								bk_srnmct,
-								Gong_zip_key,
-								Gong_npa_key,
-								bk_ph_scoring
-								),
-			parallel(			
-								mv_bdid,
-								mv_phone,
-								mv_czsslf,
-								mv_lczf,
-								mv_npa_nxx_line,
-								mv_st_lname_city,
-								mv_st_lname_fname_city,
-								mv_st_bizword_city,
-								mv_st_city_prim_name_prim_range,
-								kpg1,
-								mv_addr_curr,
-								mv_srnmct,
-								mv_Gong_zip_key,
-								mv_Gong_npa_key,
-								mv_ph_scoring
-								));
-		   
+full1 :=  SEQUENTIAL(
+            PARALLEL(
+              bk_phone,
+              bk_czsslf,
+              bk_lczf,
+              bk_phone10,
+              bk_addr_curr,
+              bk_srnmct,
+              bk_zip,
+              bk_npa,
+              bk_scoring),
+            PARALLEL(      
+              mv_phone,
+              mv_czsslf,
+              mv_lczf,
+              mv_phone10,
+              mv_addr_curr,
+              mv_srnmct,
+              mv_zip,
+              mv_npa,
+              mv_scoring)
+          );
+       
 post1 := Promotesupers.SF_MaintBuilt('~thor_data400::base::gong');
 
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_bdid','Q',out0);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_phone','Q',out4);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_czsslf','Q',out5);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_lczf','Q',out6);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_eda_npa_nxx_line','Q',out7);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_eda_st_lname_city','Q',out8);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_eda_st_lname_fname_city','Q',out9);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_eda_st_bizword_city','Q',out10);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_eda_st_city_prim_name_prim_range','Q',out11);
-Promotesupers.MAC_SK_Move_v2('~thor_data400::key::cbrs.phone10_gong','Q', kpg2);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_surnamecnt','Q',out_srnmct);
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_address_current','Q',out14);
-// Move keys to QA Bug 75617
-RoxieKeyBuild.MAC_SK_Move_V2(Gong_SuperKeyName+'zip','Q',mv_Gong_zip_key_qa);
-RoxieKeyBuild.MAC_SK_Move_V2(Gong_SuperKeyName+'npa','Q',mv_Gong_npa_key_qa);
+//Move from "build" to "QA" version
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_phone, 'Q', out4);
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_czsslf, 'Q', out5);
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_lczf, 'Q', out6);
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_address_current, 'Q', out14);
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_surname_count, 'Q', out_srnmct);
+Promotesupers.MAC_SK_Move_v2(dx_Gong.names('').i_phone10, 'Q', out_phone10);
+RoxieKeyBuild.MAC_SK_Move_V2(dx_Gong.names('').i_zip, 'Q', out_zip);
+RoxieKeyBuild.MAC_SK_Move_V2(dx_Gong.names('').i_npa, 'Q', out_npa);
+roxiekeybuild.mac_sk_move(dx_Gong.names('').i_scoring_attributes, 'Q', out_scoring);
 
-// Move keys to QA Bug 95514
-roxiekeybuild.mac_sk_move('~thor_data400::key::gong_scoring','Q',out15);
 
-move1 := parallel(out0, out4, out5, out6, out7, out8, out9, out10, out11, out14, out15,out_srnmct,
-						kpg2, mv_Gong_zip_key_qa, mv_Gong_npa_key_qa);
+move1 := parallel(out4, out5, out6,out14, 
+                  out_srnmct, out_phone10, out_zip, out_npa, out_scoring);
 
 //build_keys := full1;
-build_keys := sequential(/*pre1,*/full1,post1,move1);
-//sequential(
-							//pre1,
-							//full1	//,post1,move1
-						/*bk_st_lname_city,
-						bk_st_lname_fname_city,
-						bk_st_city_prim_name_prim_range,
-						bk_st_bizword_city
-						*/
-					//);
-//					: SUCCESS(FileServices.SendEmail('QualityAssurance@seisint.com,cbrodeur@seisint.com, intel357@bellsouth.net, cguyton@seisint.com, kdevore@seisint.com', 'GONG - GongKeys Weekly Complete', thorlib.wuid() + ' Version: ' + rundate)),
-//					  Failure(FileServices.SendEmail('Afterhourssupport@seisint.com, cbrodeur@seisint.com, cguyton@seisint.com, cnguyton@tmo.blackberry.net, intel357@bellsouth.net, chuck.salvo@gmail.com', 'GONG-EDA GongKeys Weekly Failure', thorlib.wuid() + '\n' + FAILMESSAGE));
+build_keys := sequential(full1,post1,move1);
 
 return build_keys;
 

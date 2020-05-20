@@ -1,4 +1,4 @@
-﻿// Logic to handle the matching around RAAddresses
+// Logic to handle the matching around RAAddresses
  
 IMPORT SALT311,ut,std;
 EXPORT MOD_Attr_RAAddresses(DATASET(layout_DOT_Base) ih,UNSIGNED MatchThreshold = 36) := MODULE
@@ -60,17 +60,13 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
   INTEGER2 active_enterprise_number_score_temp := MAP( le.active_enterprise_number_isnull OR ri.active_enterprise_number_isnull => 0,
                         le.active_enterprise_number = ri.active_enterprise_number  => le.active_enterprise_number_weight100,
                         SALT311.Fn_Fail_Scale(le.active_enterprise_number_weight100,s.active_enterprise_number_switch));
-  INTEGER2 active_domestic_corp_key_score_temp := MAP( le.active_domestic_corp_key_isnull OR ri.active_domestic_corp_key_isnull => 0,
-                        le.active_domestic_corp_key = ri.active_domestic_corp_key  => le.active_domestic_corp_key_weight100,
-                        SALT311.Fn_Fail_Scale(le.active_domestic_corp_key_weight100,s.active_domestic_corp_key_switch));
   INTEGER2 active_duns_number_score_temp := MAP( le.active_duns_number_isnull OR ri.active_duns_number_isnull => 0,
                         le.active_duns_number = ri.active_duns_number  => le.active_duns_number_weight100,
                         SALT311.Fn_Fail_Scale(le.active_duns_number_weight100,s.active_duns_number_switch));
   INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= 0, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_enterprise_number_score := IF ( active_enterprise_number_score_temp >= 0, active_enterprise_number_score_temp, SKIP ); // Enforce FORCE parameter
-  INTEGER2 active_domestic_corp_key_score := IF ( active_domestic_corp_key_score_temp >= 0, active_domestic_corp_key_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_duns_number_score := IF ( active_duns_number_score_temp >= 0, active_duns_number_score_temp, SKIP ); // Enforce FORCE parameter
-  SELF.Conf_Prop := (cnp_number_score + active_enterprise_number_score + active_domestic_corp_key_score + active_duns_number_score) / 100; // Score based on forced fields
+  SELF.Conf_Prop := (cnp_number_score + active_enterprise_number_score + active_duns_number_score) / 100; // Score based on forced fields
   SELF.Conf := ri.Basis_weight100 *  1.00/100;
 end;
 Matches0 := DISTRIBUTE(JOIN(Cands,Cands,LEFT.Basis = RIGHT.Basis AND LEFT.Proxid > RIGHT.Proxid,Score(LEFT,RIGHT)),Proxid1+Proxid2);

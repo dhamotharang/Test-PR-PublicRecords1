@@ -1,4 +1,4 @@
-/*2017-03-22T17:50:04Z (Srilatha Katukuri)
+﻿/*2017-03-22T17:50:04Z (Srilatha Katukuri)
 ECH-4531 Analytics key Injury count correction
 */
 IMPORT FLAccidents_Ecrash, STD, UT, doxie, Data_Services;
@@ -67,7 +67,7 @@ END;
 
 accidents_by_CT_slim2 CountCT({dsVehiclesRolled} L) := TRANSFORM
 	SELF.AccidentCnt					:= 1;
-	    NewCTString  := stringlib.StringToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
+	    NewCTString  := STD.Str.ToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
 	SELF.CTFrontRear					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTREAR) > 0,1,0); 
 	SELF.CTFrontFront					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTFRONT) > 0,1,0);
 	SELF.CTAngle							:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.ANGLE) > 0,1,0);

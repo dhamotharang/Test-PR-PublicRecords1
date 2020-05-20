@@ -70,6 +70,7 @@ EXPORT Layouts_SeqdSrc := module
 	EXPORT SL_src_rec:={lsrc, american_student_list.layout_american_student_base};
 	EXPORT S1_src_rec:={lsrc, OKC_Student_List.Layout_Base.base};
 	EXPORT VO_src_rec:={lsrc, VotersV2.Layouts_Voters.Layout_Voters_Base};
+	EXPORT UM_src_rec:={lsrc, VotersV2.Layouts_Voters.Layout_Voters_Base};
 	EXPORT CY_src_rec:={lsrc, Certegy.layouts.base};
 	EXPORT ND_src_rec:={lsrc, Property.Layout_Fares_Foreclosure};
 	EXPORT EL_src_rec:={lsrc, ExperianIRSG_Build.Layouts.Layout_Out};

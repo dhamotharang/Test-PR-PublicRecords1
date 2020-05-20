@@ -457,30 +457,51 @@ EXPORT Layouts := MODULE
 		string7 Naics10;
 		string150 Naics_Text10;
 		string8 Update_Date;
+	
+	//EXEC1	
+		string8 exec1_link_dob;
+		string9 exec1_link_ssn;
+		unsigned6 exec1_did;
 		string5 exec1_title;
 		string20 exec1_fname;
 		string20 exec1_mname;
 		string20 exec1_lname;
 		string5 exec1_name_suffix;
 		string3 exec1_score;
+	//EXEC2
+		string8 exec2_link_dob;
+		string9 exec2_link_ssn;
+		unsigned6 exec2_did;
 		string5 exec2_title;
 		string20 exec2_fname;
 		string20 exec2_mname;
 		string20 exec2_lname;
 		string5 exec2_name_suffix;
 		string3 exec2_score;
+	//EXEC3
+		string8 exec3_link_dob;
+		string9 exec3_link_ssn;
+		unsigned6 exec3_did;
 		string5 exec3_title;
 		string20 exec3_fname;
 		string20 exec3_mname;
 		string20 exec3_lname;
 		string5 exec3_name_suffix;
 		string3 exec3_score;
+	//EXEC4
+		string8 exec4_link_dob;
+		string9 exec4_link_ssn;
+		unsigned6 exec4_did;
 		string5 exec4_title;
 		string20 exec4_fname;
 		string20 exec4_mname;
 		string20 exec4_lname;
 		string5 exec4_name_suffix;
 		string3 exec4_score;
+	//EXEC5
+		string8 exec5_link_dob;
+		string9 exec5_link_ssn;
+		unsigned6 exec5_did;
 		string5 exec5_title;
 		string20 exec5_fname;
 		string20 exec5_mname;
@@ -519,8 +540,8 @@ EXPORT Layouts := MODULE
 		string3 exec10_score;
 		string150 cust_name;
 		string20 bug_num;
-		string8 link_dob;
-		string9 link_ssn;
+		// string8 link_dob;
+		// string9 link_ssn;
 		string link_fein;
 		string8 link_inc_date;
 	END;
@@ -555,6 +576,7 @@ EXPORT Layouts := MODULE
 		unsigned6 dotid; 
 		PRTE2.Layouts.DEFLT_CPA;
 		unsigned8 row_id;
+		string file_type;
 	END;
    
 //the rest are used to build empty keys	

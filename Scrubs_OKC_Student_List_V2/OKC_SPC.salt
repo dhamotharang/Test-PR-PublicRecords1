@@ -35,7 +35,7 @@ FIELDTYPE:invalid_state:LIKE(uppercase):LENGTHS(0,2)
 FIELDTYPE:invalid_semester:ENUM(SPRING|SUMMER|FALL|AUTUMN|WINTER|):LENGTHS(0,4,6)
 // FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
 FIELDTYPE:invalid_email:LIKE(alphasandnums):SPACES(.@-_)
-FIELDTYPE:invalid_addresstype:ENUM(CURRENT|Permanent|DORM|HOME|)
+FIELDTYPE:invalid_addresstype:ENUM(CURRENT|Permanent|DORM|HOME|PERMANENT|)
 FIELDTYPE:invalid_MajorCode:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:invalid_NewMajorCode:CUSTOM(Scrubs_OKC_Student_List_V2.validNewMajorCode>0)
 FIELD:cleanaddr1:LIKE(invalid_address):TYPE(STRING):0,0

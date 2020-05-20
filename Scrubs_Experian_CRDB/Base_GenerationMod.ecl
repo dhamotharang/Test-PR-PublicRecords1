@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT Base_GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_Experian_CRDB';
   EXPORT spc_NAMESCOPE := 'Base';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'Experian_CRDB';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,seleid,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight,bdid,bdid_score,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,experian_bus_id,business_name,address,city,state,zip_code,zip_plus_4,carrier_route,county_code,county_name,phone_number,msa_code,msa_description,establish_date,latest_reported_date,years_in_file,geo_code_latitude,geo_code_latitude_direction,geo_code_longitude,geo_code_longitude_direction,recent_update_code,years_in_business_code,year_business_started,months_in_file,address_type_code,estimated_number_of_employees,employee_size_code,estimated_annual_sales_amount_sign,estimated_annual_sales_amount,annual_sales_size_code,location_code,primary_sic_code_industry_classification,primary_sic_code_4_digit,primary_sic_code,second_sic_code,third_sic_code,fourth_sic_code,fifth_sic_code,sixth_sic_code,primary_naics_code,second_naics_code,third_naics_code,fourth_naics_code,executive_count,executive_last_name,executive_first_name,executive_middle_initial,executive_title,business_type,ownership_code,url,derogatory_indicator,recent_derogatory_filed_date,derogatory_liability_amount_sign,derogatory_liability_amount,ucc_data_indicator,ucc_count,number_of_legal_items,legal_balance_sign,legal_balance_amount,pmtkbankruptcy,pmtkjudgment,pmtktaxlien,pmtkpayment,bankruptcy_filed,number_of_derogatory_legal_items,lien_count,judgment_count,bkc006,bkc007,bkc008,bko009,bkb001_sign,bkb001,bkb003_sign,bkb003,bko010,bko011,jdc010,jdc011,jdc012,jdb004,jdb005,jdb006,jDO013,jDO014,jdb002,jdp016,lgc004,pro001,pro003,txc010,txc011,txb004_sign,txb004,txo013,txb002_sign,txb002,txp016,ucc001,ucc002,ucc003,intelliscore_plus,percentile_model,model_action,score_factor_1,score_factor_2,score_factor_3,score_factor_4,model_code,model_type,last_experian_inquiry_date,recent_high_credit_sign,recent_high_credit,median_credit_amount_sign,median_credit_amount,total_combined_trade_lines_count,dbt_of_combined_trade_totals,combined_trade_balance,aged_trade_lines,experian_credit_rating,quarter_1_average_dbt,quarter_2_average_dbt,quarter_3_average_dbt,quarter_4_average_dbt,quarter_5_average_dbt,combined_dbt,total_account_balance_sign,total_account_balance,combined_account_balance_sign,combined_account_balance,collection_count,atc021,atc022,atc023,atc024,atc025,last_activity_age_code,cottage_indicator,nonprofit_indicator,financial_stability_risk_score,fsr_risk_class,fsr_score_factor_1,fsr_score_factor_2,fsr_score_factor_3,fsr_score_factor_4,ip_score_change_sign,ip_score_change,fsr_score_change_sign,fsr_score_change,dba_name,clean_dba_name,clean_phone,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip,zip4,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,fips_state,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,recent_update_desc,years_in_business_desc,address_type_desc,employee_size_desc,annual_sales_size_desc,location_desc,primary_sic_code_industry_class_desc,business_type_desc,ownership_code_desc,ucc_data_indicator_desc,experian_credit_rating_desc,last_activity_age_desc,cottage_indicator_desc,nonprofit_indicator_desc,company_name,p_title,p_fname,p_mname,p_lname,p_name_suffix,raw_aid,ace_aid,prep_addr_line1,prep_addr_line_last,source_rec_id';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -36,7 +58,7 @@ EXPORT Base_GenerationMod := MODULE
     + 'FIELDTYPE:invalid_numericPeriod:ALLOW(.0123456789)  \n'
     + 'FIELDTYPE:invalid_zero_blank:ENUM(0|)\n'
     + 'FIELDTYPE:invalid_model_action:ENUM(MEDIUM RISK|LOW-MEDIUM RISK|LOW RISK|MEDIUM-HIGH RISK|HIGH RISK|INSUFFICIENT DATA TO SCORE|RECENT BANKRUPTCY ON FILE)\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_numeric>0)\n'
+    + 'FIELDTYPE:invalid_numeric:ALLOW(0123456789)\n'
     + 'FIELDTYPE:invalid_experian_bus_id:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_numeric>0,9)\n'
     + 'FIELDTYPE:invalid_percentage:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_range_numeric>0,0,100)\n'
     + 'FIELDTYPE:invalid_sic_codes:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_sic_code>0) \n'
@@ -89,7 +111,6 @@ EXPORT Base_GenerationMod := MODULE
     + 'FIELDTYPE:invalid_ace_aid:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_numeric>0)\n'
     + 'FIELDTYPE:invalid_direction:ALLOW(ENSW)\n'
     + 'FIELDTYPE:invalid_year:CUSTOM(Scrubs_Experian_CRDB.Functions.fn_valid_year>0)\n'
-    + 'FIELDTYPE:invalid_clean_dba_name:CUSTOM(Scrubs_Experian_CRDB.functions.fn_clean_dba_name>0,dba_name) \n'
     + 'FIELDTYPE:invalid_bName_pName:CUSTOM(Scrubs_Experian_CRDB.functions.fn_bName_pName>0,p_fname,p_mname,p_lname) \n'
     + 'FIELDTYPE:invalid_bName_fName:CUSTOM(Scrubs_Experian_CRDB.functions.fn_bName_pName>0,company_name,p_mname,p_lname) \n'
     + 'FIELDTYPE:invalid_bName_mName:CUSTOM(Scrubs_Experian_CRDB.functions.fn_bName_pName>0,company_name,p_fname,p_lname) \n'
@@ -274,7 +295,7 @@ EXPORT Base_GenerationMod := MODULE
     + 'FIELD:fsr_score_change_sign:LIKE(invalid_sign):TYPE(STRING1):0,0\n'
     + 'FIELD:fsr_score_change:LIKE(invalid_numeric):TYPE(STRING2):0,0\n'
     + 'FIELD:dba_name:TYPE(STRING122):0,0\n'
-    + 'FIELD:clean_dba_name:LIKE(invalid_clean_dba_name):TYPE(STRING122):0,0\n'
+    + 'FIELD:clean_dba_name:TYPE(STRING122):0,0\n'
     + 'FIELD:clean_phone:TYPE(STRING10):0,0\n'
     + 'FIELD:prim_range:TYPE(STRING10):0,0\n'
     + 'FIELD:predir:TYPE(STRING2):LIKE(invalid_direction):0,0\n'
@@ -339,3 +360,4 @@ EXPORT Base_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

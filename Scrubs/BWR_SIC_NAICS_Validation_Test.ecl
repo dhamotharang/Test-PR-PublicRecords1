@@ -14,6 +14,7 @@ OUTPUT(SCRUBS.fn_valid_SicCode('7777777'),NAMED('fn_valid_sic_test11_FALSE'));
 OUTPUT(SCRUBS.fn_valid_SicCode('011901'),NAMED('fn_valid_sic_test12_TRUE'));
 OUTPUT(SCRUBS.fn_valid_SicCode('01190303'),NAMED('fn_valid_sic_test13_TRUE'));
 
+
 OUTPUT(SCRUBS.fn_valid_NAICSCode('11'),NAMED('fn_valid_naics1_FALSE'));
 OUTPUT(SCRUBS.fn_valid_NAICSCode('333'),NAMED('fn_valid_naics2_TRUE'));
 OUTPUT(SCRUBS.fn_valid_NAICSCode('80410101'),NAMED('fn_valid_naics3_FALSE'));

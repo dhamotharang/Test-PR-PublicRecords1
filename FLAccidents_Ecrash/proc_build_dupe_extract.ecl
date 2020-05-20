@@ -4,9 +4,8 @@
 /*2015-02-18T00:03:55Z (Ayeesha Kayttala)
 bug# 173256 code review
 */
+import Data_Services;
 export proc_build_dupe_extract(string filedate,string timestamp):= function
-
-import ut;
 
 //state_report_number is unique for TF.
 incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'NULL','0'] and source_id in ['TF','EA']), 
@@ -68,7 +67,7 @@ alldupes := sort(join(dels,keepers,
 
 
 //Remove dupes already reported
-dupehistory := dataset(ut.foreign_prod+'thor_data400::out::ecrash::dupes',outrec,csv(terminator('\n'), separator(',')));
+dupehistory := dataset(Data_Services.foreign_prod+'thor_data400::out::ecrash::dupes',outrec,csv(terminator('\n'), separator(',')));
 
 alldupes trecs2(alldupes L, dupehistory R) := transform
 self := L;
@@ -270,10 +269,10 @@ end;
 
 //TFDE := base (report_code ='TF' and report_type_id = 'DE'); 
 
-TFDE := dedup(Sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TFDE := dedup(sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 //TM_TF_A := base(report_code in ['TM','TF'] and report_type_id = 'A'); 
-TM_TF_A := dedup(Sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TM_TF_A := dedup(sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 
 

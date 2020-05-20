@@ -11,6 +11,8 @@ NINES:3
 THRESHOLD:30
 BLOCKTHRESHOLD:5
 HACK:MAXBLOCKSIZE:20000
+HACK:NOSLICE
+HACK:NO_PARALLEL_MATCH
 // FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields 
 //FIELDTYPE:wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
 FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
@@ -30,20 +32,22 @@ FUZZY:NormSuffix:RST:CUSTOM(fn_normSuffix):TYPE(STRING5)
 // Active ID fields from reliable sources
 FIELD:active_duns_number:PROP:18,78
 FIELD:active_enterprise_number:FORCE(--):PROP:20,15
-FIELD:active_domestic_corp_key:FORCE(--):PROP:19,1
+FIELD:company_inc_state:6,34
+FIELD:company_charter_number:CONTEXT(company_inc_state):26,110
+FIELD:active_corp_key:CARRY:0,0
 FIELD:sbfe_id:SWITCH0:27,475
 // Historical and non-domestic IDs from reliable sources
 // If match, add to score, if not, don't care(SWITCH0)
 FIELD:hist_enterprise_number:PROP:20,22
 FIELD:hist_duns_number:PROP:18,72
-FIELD:hist_domestic_corp_key:PROP:19,151
-FIELD:foreign_corp_key:SWITCH0:PROP:19,418
-FIELD:unk_corp_key:SWITCH0:PROP:19,133
+FIELD:hist_corp_key:SWITCH0:PROP:19,151
+// FIELD:foreign_corp_key:SWITCH0:PROP:19,418
+// FIELD:unk_corp_key:SWITCH0:PROP:19,133
 FIELD:ebr_file_number:PROP:20,427
 FIELD:company_fein:PROP:EDIT1:17,227
 FIELD:company_name:CARRY:0,0
 FIELD:cnp_name_phonetic:PHONETIC:12,334
-FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic),OR(sbfe_id)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
+FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(company_charter_number),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic),OR(sbfe_id)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
 // FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137
 //FIELD:source:CARRY:0,0
 FIELD:company_name_type_raw:CARRY:0,0
@@ -108,14 +112,14 @@ HACK:CUSTOMINTERNALJOIN:_mj_extra
 // ------------------------------------
 //  Cleaves
 // ------------------------------------
-CLEAVE:solo_corp_key:BASIS(active_domestic_corp_key):MINIMUM(1)
+// CLEAVE:solo_corp_key:BASIS(active_domestic_corp_key):MINIMUM(1)
 //CLEAVE:solo_active_duns:BASIS(active_duns_number):MINIMUM(1)
 CLEAVE:solo_cnp_number:BASIS(cnp_number):MINIMUM(1)
 // ------------------------------------
 //  Attribute Files
 // ------------------------------------
 ATTRIBUTEFILE:SrcRidVlid:NAMED(file_SrcRidVlid):VALUES(source:source_record_id:vl_id):IDFIELD(Proxid):SUPPORTS(cnp_name):19,753
-ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):19,321
+ATTRIBUTEFILE:ActiveCorpKeys:NAMED(_File_Active_Corpkeys):VALUES(charter_number<inc_state):FORCE(--,ALL):SUPPORTS(cnp_name):IDFIELD(Proxid):19,321
 ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):18,196
 ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):12,5
 ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):SUPPORTS(cnp_name):IDFIELD(ProxID):20,0

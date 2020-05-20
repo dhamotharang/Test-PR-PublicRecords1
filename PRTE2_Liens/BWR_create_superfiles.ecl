@@ -1,4 +1,4 @@
-IMPORT PromoteSupers, roxiekeybuild, PRTE2_Liens;
+﻿IMPORT PromoteSupers, roxiekeybuild, PRTE2_Liens;
 
 //Input files
 FileServices.CreateSuperFile(Constants.IN_PREFIX + 'main');
@@ -20,7 +20,8 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'main
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'main::tmsid.rmsid');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'party::tmsid.rmsid');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'party::linkids');//empty
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'party::tmsid.rmsid_linkids');//empty
+
+
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::liensV2', 'party::SourceRecId');//empty
 
 //FCRA Keys

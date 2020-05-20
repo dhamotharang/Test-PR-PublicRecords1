@@ -1,4 +1,4 @@
-EXPORT fn_apply_main_best_to_relatives(DATASET(reunion.layouts.lRelativesSlim) dInRelatives,DATASET(RECORDOF(mapping_reunion_main)) dInMain):=FUNCTION
+EXPORT fn_apply_main_best_to_relatives(DATASET(reunion.layouts.lRelativesSlim) dInRelatives,DATASET(RECORDOF(reunion.mapping_reunion_main().all)) dInMain):=FUNCTION
 
   dRelatives01:=DISTRIBUTE(dInRelatives,HASH(person1));
   dMain:=DISTRIBUTE(dInMain,HASH(did));

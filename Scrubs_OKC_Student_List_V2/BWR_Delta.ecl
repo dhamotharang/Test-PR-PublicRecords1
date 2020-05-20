@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_OKC_Student_List_V2.BWR_Delta - Finding the Delta of Two Files - SALT V3.11.4');
+#workunit('name','Scrubs_OKC_Student_List_V2.BWR_Delta - Finding the Delta of Two Files - SALT V3.11.9');
 IMPORT Scrubs_OKC_Student_List_V2,SALT311;
-FilePrev := DATASET([], Layout_OKC_Student_List);
-FileNew := DATASET([], Layout_OKC_Student_List);
+FilePrev := DATASET([], Scrubs_OKC_Student_List_V2.Layout_OKC_Student_List);
+FileNew := DATASET([], Scrubs_OKC_Student_List_V2.Layout_OKC_Student_List);
 d := Scrubs_OKC_Student_List_V2.Delta(FilePrev, FileNew); // Instantiate delta module
 globalStats := TRUE;
 PARALLEL(OUTPUT(d.DifferenceSummary(globalStats), NAMED('Summary'), ALL),

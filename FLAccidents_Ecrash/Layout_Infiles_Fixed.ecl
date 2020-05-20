@@ -471,6 +471,11 @@
 		STRING7 Alcohol_Involved;
 	END;
 	
+	EXPORT incident_ori := RECORD
+	  incident;
+	  STRING11 agency_ori;
+	END;
+	
 	EXPORT persn := RECORD
 		STRING11 Person_ID;
 		STRING19 Creation_Date;
@@ -991,6 +996,8 @@
 		STRING4 Work_Type_ID;
 		STRING11 Report_ID;
 		STRING11 Agency_ID;
+		STRING100 Agency_Name;
+		STRING11 Agency_ori;
 		STRING19 Sent_to_HPCC_DateTime;
 		STRING4 Corrected_Incident;
 		STRING9 CRU_Order_ID;
@@ -1140,7 +1147,6 @@
 		
 		STRING20 Photographer_ID;
 		STRING50 Photography_Agency_Name;
-		STRING100 Agency_Name;
 		STRING30 Judicial_District;
 		STRING30 Precinct;
 		STRING20 Beat;

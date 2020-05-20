@@ -20,9 +20,9 @@ export MAC_Build_Advo (
   NewRecs := distribute(DedupRecs,HASH(SampleRecs.date_last_seen,SampleRecs.prim_range,SampleRecs.cleanaid,SampleRecs.dpbc_digit,SampleRecs.chk_digit));
   FIRST1000 := choosen(NewRecs,1000);
 	movetoResearch := Advo.AddtoReseachSF;
-	idops := dops.updateversion('CDSKeys',pversion,'michael.gould@lexisnexisrisk.com,Sudhir.Kasavajjala@lexisnexisrisk.com,insdataops@LexisNexisRisk.com',,'N',,,'A');
-  ldops :=  sequential(dops.updateversion('CDSKeys',pversion,'michael.gould@lexisnexisrisk.com',,'N'),
-                dops.updateversion('FCRA_CDSKeys',pversion,'michael.gould@lexisnexisrisk.com',,'F'));
+	idops := dops.updateversion('CDSKeys',pversion,'Sudhir.Kasavajjala@lexisnexisrisk.com,insdataops@LexisNexisRisk.com',,'N',,,'A');
+  ldops :=  sequential(dops.updateversion('CDSKeys',pversion,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N'),
+                dops.updateversion('FCRA_CDSKeys',pversion,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'F'));
 	buildOrbit := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('CDS',pversion,'N'),
 	                         Orbit3.proc_Orbit3_CreateBuild ('FCRA CDS',pversion,'F'),
 																	 

@@ -1,12 +1,12 @@
-/*2012-08-09T16:09:24Z (skasavajjala)
+﻿/*2012-08-09T16:09:24Z (skasavajjala)
 C:\Users\KasavaSX\AppData\Roaming\HPCC Systems\eclide\skasavajjala\bocadataland\faa\Spray_In\2012-08-09T16_09_24Z.ecl
 */
-import	lib_stringlib,lib_fileservices,_control,AID,Address;
+import	lib_stringlib,lib_fileservices,_control,AID,Address, std;
 
 export	Spray_In(string	process_date)	:=
 function
 	srcIP			:=	_control.IPAddress.bctlpedata11;
-	targetGrp	:=	'thor400_44';
+	targetGrp	:=		STD.System.Thorlib.Group(); //'thor400_44'; 
 
 	filenames	:=	'~thor_data400::in::faa::'	+	process_date;
 
@@ -55,9 +55,11 @@ function
 				 
 	spray_airmen_nonpilot	:=	if(	checkairmenfileexists('NONPILOT.txt') and '~'+FileServices.GetSuperFileSubName('~thor_data400::in::faa::airmen_nonpilot',1) <> filenames+'::airmen_nonpilot',
 	                       Sequential(
-	                        FileServices.sprayfixed(	srcIP
+																			FileServices.sprayvariable(	srcIP
 																								,'/data/prod_data_build_13/production_data/faa/in/airmen'+'/NONPILOT.txt'
-																								,200,targetGrp,filenames+'::airmen_nonpilot'
+																								,,,,
+																								,targetGrp
+																								,filenames + '::airmen_nonpilot'
 																								,,,,true,false,true
 																							),add_super_nonpilot)
 																						,

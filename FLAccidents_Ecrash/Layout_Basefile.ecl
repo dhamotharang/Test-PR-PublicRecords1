@@ -98,6 +98,8 @@
 	STRING4 work_type_id;
 	STRING11 report_id;
 	STRING11 agency_id;
+	STRING100 agency_name;
+	STRING11 agency_ori;
 	STRING19 sent_to_hpcc_datetime;
 	STRING4 corrected_incident;
 	STRING9 cru_order_id;
@@ -247,7 +249,6 @@
 	
 	STRING20 photographer_id;
 	STRING50 photography_agency_name;
-	STRING100 agency_name;
 	STRING30 judicial_district;
 	STRING30 precinct;
 	STRING20 beat;
@@ -925,4 +926,6 @@
 	STRING10 Dui_Suspected;
 	//Data Ingestion New Enum fields
 	STRING Drug_Test_Result;
+	//CR-1237		
+	STRING Marijuana_Use_Suspected;
 	END;

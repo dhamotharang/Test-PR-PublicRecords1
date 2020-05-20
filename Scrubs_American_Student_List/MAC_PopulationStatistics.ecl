@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_key = '',Input_ssn = '',Input_did = '',Input_process_date = '',Input_date_first_seen = '',Input_date_last_seen = '',Input_date_vendor_first_reported = '',Input_date_vendor_last_reported = '',Input_historical_flag = '',Input_full_name = '',Input_first_name = '',Input_last_name = '',Input_address_1 = '',Input_address_2 = '',Input_city = '',Input_state = '',Input_zip = '',Input_zip_4 = '',Input_crrt_code = '',Input_delivery_point_barcode = '',Input_zip4_check_digit = '',Input_address_type_code = '',Input_address_type = '',Input_county_number = '',Input_county_name = '',Input_gender_code = '',Input_gender = '',Input_age = '',Input_birth_date = '',Input_dob_formatted = '',Input_telephone = '',Input_class = '',Input_college_class = '',Input_college_name = '',Input_ln_college_name = '',Input_college_major = '',Input_new_college_major = '',Input_college_code = '',Input_college_code_exploded = '',Input_college_type = '',Input_college_type_exploded = '',Input_head_of_household_first_name = '',Input_head_of_household_gender_code = '',Input_head_of_household_gender = '',Input_income_level_code = '',Input_income_level = '',Input_new_income_level_code = '',Input_new_income_level = '',Input_file_type = '',Input_tier = '',Input_school_size_code = '',Input_competitive_code = '',Input_tuition_code = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_rawaid = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_z5 = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dpbc = '',Input_chk_digit = '',Input_rec_type = '',Input_county = '',Input_ace_fips_st = '',Input_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_tier2 = '',Input_source = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_American_Student_List;
+  IMPORT SALT311,Scrubs_American_Student_List;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

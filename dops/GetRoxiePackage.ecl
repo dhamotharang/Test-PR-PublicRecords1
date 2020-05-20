@@ -12,16 +12,6 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 		string baseid {xpath('@id')};
 	end;
 
-	export rPackageFile := record, maxlength(5000000)
-			string packagemaps := '';
-			string partid := '';
-			string PackageXMLAsString := '';
-	end;
-
-	export rBase := record
-		string baseid {xpath('@id')};
-	end;
-
 	export rSubFile := record
 		string subfile {xpath('@value')};
 	end;
@@ -185,11 +175,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	export XMLPackageWithQueries() := function
 		InputRec := record
 			string datasetname{xpath('Target')} := roxietarget;
-<<<<<<< HEAD
 			string location{xpath('Process')} := roxieprocess;
-=======
-			string location{xpath('Process')} := '*';
->>>>>>> 7817ea0e20f6e69551477fdabedab887db3a58e2
 		end;
 	
 		outrec := record,maxlength(5000000)
@@ -221,7 +207,6 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 	end;
 	
 	export fXMLPackageAsDataset() := function
-<<<<<<< HEAD
 
 		rNormPackage := record
 			string pkgmapid := '';
@@ -396,182 +381,6 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
 			self := l;
 		end;
 
-=======
-
-		rNormPackage := record
-			string pkgmapid := '';
-			string partid := '';
-			string pid := '';
-			string baseid := '';
-			string superfileid := '';
-			string subfileid := '';
-			dataset(rPackageWithQueries) pkgs;
-			dataset(rSuperFile) superfiles;
-			dataset(rSubFile) subfiles;
-			dataset(rBase) baseids;
-		end;
-		
-		rNormPackage xNormParts(rPackageMapWithQueries l, rPartWithQueries r) := transform
-			self.pkgmapid := l.pkgmaps;
-			self.partid := r.partid;
-			self.pkgs := r.pkgs;
-			self.superfiles := [];
-			self.subfiles := [];
-			self.baseids := [];
-			self := l;
-		end;
-
-		dNormPart := normalize(XMLPackageWithQueries(),left.parts,xNormParts(left,right));
-	
-		rNormPackage xNormPackage(dNormPart l, rPackageWithQueries r) := transform
-			//self.pkgmapid := l.pkgmaps;
-			self.pid := r.pid;
-			self.superfiles := r.superfiles;
-			self.baseids := r.baseids;
-			self.subfiles := [];
-			self := l;
-		end;
-
-		dNormPackage := normalize(dNormPart,left.pkgs,xNormPackage(left,right));
-		
-		rNormPackage xNormBase(dNormPackage l, rBase r) := transform
-			self.baseid := r.baseid;
-			self := l;
-		end;
-
-		dNormBase := normalize(dNormPackage,left.baseids,xNormBase(left,right));
-
-		rNormPackage xNormSuperFile(dNormPackage l, rSuperFile r) := transform
-			self.superfileid := r.superfile;
-			self.subfiles := r.subfiles;
-			self := l;
-		end;
-
-		dNormSuperFile := normalize(dNormPackage,left.superfiles,xNormSuperFile(left,right));
-
-		rNormPackage xNormSubFile(dNormSuperFile l, rSubFile r) := transform
-			self.subfileid := r.subfile;
-			self := l;
-		end;
-
-		dNormSubFile := normalize(dNormSuperFile,left.subfiles,xNormSubFile(left,right));
-
-		dFull := dNormBase + dNormSubFile;
-
-		rPackageKeyInfoWithQueries xPackageInfo(dNormBase l) := transform
-			self.packagename := l.pkgmapid;
-			self.packageid := l.pid;
-			self.partid := l.partid;
-			self.baseid := l.baseid;
-			self.superfile := l.superfileid;
-			self.subfile := l.subfileid;
-		end;
-
-		dPackageInfo := project(dFull,xPackageInfo(left))(~regexfind('GENERATION[0-9]+$',packageid));
-
-		return dPackageInfo;
-
-	end;
-	
-	
-	export fDatasetAsXMLPackage(dataset(rPackageKeyInfoWithQueries) pGetPackageAsDataset = dataset([],rPackageKeyInfoWithQueries)) := function
-		
-		dGetPackageAsDataset := if (count(pGetPackageAsDataset) = 0
-															,sort(fXMLPackageAsDataset(),packagename,partid,packageid,baseid,superfile)
-															,sort(pGetPackageAsDataset,packagename,partid,packageid,baseid,superfile)
-															): independent;
-		
-		dGetPackageBase := dGetPackageAsDataset(baseid <> '');
-		
-		dGetPackageSubFiles := dGetPackageAsDataset(subfile <> '');
-		
-		rPackageWithSubFiles := record
-			rPackageKeyInfoWithQueries;
-			rPartWithQueries;
-			rPackageWithQueries;
-			dataset(rSubFile) subfiles;
-		end;
-		// base ids
-		rPackageWithSubFiles xProjectBase(dGetPackageBase l) := transform
-			self.pid := l.packageid;
-			self.baseids := dataset([{l.baseid}],rBase);
-			self.superfiles := [];
-			self.subfiles := [];
-			self.pkgs := [];
-			self := l;
-		end;
-
-		dProjectBase := project(dGetPackageBase,xProjectBase(left));
-		
-		rPackageWithSubFiles xRollupBase(dProjectBase l, dProjectBase r) := transform
-			self.baseids := l.baseids + row({r.baseids[1].baseid},rBase);
-			self := l;
-		end;
-		
-		dRollupBase := sort(rollup(dProjectBase,packagename+partid+packageid,xRollupBase(left,right)),partid,packageid,baseid);
-		
-		// subfiles
-		rPackageWithSubFiles xProjectSubFiles(dGetPackageSubFiles l) := transform
-			self.pid := l.packageid;
-			self.baseids := [];
-			self.superfiles := [];
-			self.pkgs := [];
-			self.subfiles := dataset([{l.subfile}],rSubFile);
-			self := l;
-		end;
-
-		dProjectSubFiles := project(dGetPackageSubFiles,xProjectSubFiles(left));
-		
-		rPackageWithSubFiles xRollupSubFiles(dProjectSubFiles l, dProjectSubFiles r) := transform
-			self.subfiles := l.subfiles + row({r.subfiles[1].subfile},rSubFile);
-			self := l;
-		end;
-		
-		dRollupSubFiles := sort(rollup(dProjectSubFiles,partid+packageid+superfile,xRollupSubFiles(left,right)),partid,packageid,superfile);
-		
-		rPackageWithSubFiles xPopulateSubFiles(dGetPackageSubFiles l, dRollupSubFiles r) := transform
-			self.pid := l.packageid;
-			self.baseids := [];
-			self.superfiles := [];
-			self.pkgs := [];
-			self.subfiles  := r.subfiles;
-			self := l;
-		end;
-		
-		dPopulateSubFiles := dedup(sort(join(dGetPackageSubFiles
-															,dRollupSubFiles
-															,left.partid = right.partid
-																and left.packageid = right.packageid
-																and left.superfile = right.superfile
-															,xPopulateSubFiles(left,right)
-															,left outer
-															),partid,packageid,superfile),partid,packageid,superfile);
-		
-		
-		// superfiles
-		rPackageWithSubFiles xProjectSuperFiles(dPopulateSubFiles l) := transform
-			self.superfiles := dataset([{l.superfile,l.subfiles}],rSuperFile);
-			self := l;
-		end;
-
-		dProjectSuperFiles := project(dPopulateSubFiles,xProjectSuperFiles(left));
-		
-		rPackageWithSubFiles xRollupSuperFiles(dProjectSuperFiles l, dProjectSuperFiles r) := transform
-			self.superfiles := l.superfiles + row({r.superfiles[1].superfile,r.superfiles[1].subfiles},rSuperFile);
-			self := l;
-		end;
-		
-		dRollupSuperFiles := rollup(dProjectSuperFiles,partid+packageid,xRollupSuperFiles(left,right));
-		
-		// combine base + supers
-		dCombine := sort(dRollupBase + dRollupSuperFiles,packagename,partid);
-		
-		rPackageWithSubFiles xProjectPackage(dCombine l) := transform
-			self.pkgs := dataset([{l.pid,l.baseids,l.superfiles}],rPackageWithQueries);
-			self := l;
-		end;
-
->>>>>>> 7817ea0e20f6e69551477fdabedab887db3a58e2
 		dProjectPackages := project(dCombine,xProjectPackage(left));
 		
 		rPartWithQueries xConvertToPackageLayout(dProjectPackages l) := transform

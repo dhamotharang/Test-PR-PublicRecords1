@@ -1,4 +1,5 @@
-﻿EXPORT Proc_Stats (  
+﻿IMPORT STD;
+EXPORT Proc_Stats (  
                     STRING  pSrc
                     , STRING  pIter = '1'
                     , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header)  pInputFile
@@ -53,17 +54,19 @@
                   {'Iteration',pIter},
                   {'WorkUnit',WorkUnit},
                   {'Source',pSrc},
-                  {'Total Record Count',COUNT(pInputFile)},
                   {'','records','pcnt'},
-                  {'Total Singletons',COUNT(dNoMatchSingletons),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons)/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with No LexID',COUNT(dNoMatchSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons(LexID=0))/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with LexID',COUNT(dNoMatchSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons(LexID>0))/COUNT(pInputFile),2),5,2)},
+                  {'Total Record Count',COUNT(pInputFile)},
+                  {'Total LexIDs Appended',COUNT(pInputFile(LexID>0)),REALFORMAT(ROUND(100*COUNT(pInputFile(LexID>0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Minors',COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob)),REALFORMAT(ROUND(100*COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons',COUNT(dNoMatchSingletons),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons)/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with No LexID',COUNT(dNoMatchSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons(LexID=0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with LexID',COUNT(dNoMatchSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dNoMatchSingletons(LexID>0))/COUNT(pInputFile),2),6,2)},
                   {'','clusters','records'},
                   {'Total Non-Singletons',COUNT(results),SUM(results,results.ClusterCount)},
                   {'','clusters','pcnt'},
                   // {'Total Non-Singleton Records',SUM(results,results.ClusterCount)},
-                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),5,2)},
-                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),5,2)},
+                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),6,2)},
+                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),6,2)},
                   {'','clusters','records'},
                   {'Clusters with Different Field Values',COUNT(results(
                                                                   MultipleLexIDs  OR
@@ -83,25 +86,25 @@
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Names',COUNT(results(MultipleNames)),REALFORMAT(ROUND(100*COUNT(results(MultipleNames))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple DOBs',COUNT(results(MultipleDOBs)),REALFORMAT(ROUND(100*COUNT(results(MultipleDOBs))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Addresses',COUNT(results(MultipleAddr)),REALFORMAT(ROUND(100*COUNT(results(MultipleAddr))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr
-                                                                )),2),5,2)}
+                                                                )),2),6,2)}
                 ],rStats);
     Stats             :=  OUTPUT(dStats,NAMED('Stats'),OVERWRITE);
     ClusterSizeCounts :=  OUTPUT(SORT(TABLE(SORT(results,ClusterCount),{ClusterCount,cnt:=COUNT(GROUP)},ClusterCount,FEW),-ClusterCount),NAMED('ClusterSizeCounts'),OVERWRITE);
@@ -199,19 +202,21 @@
                   {'WorkUnit',WorkUnit},
                   {'Source',pSrc},
                   {'Source name',pSrcName},
-                  {'Total Record Count',COUNT(pInputFile)},
                   {'','records','pcnt'},
-                  {'Total Singletons',COUNT(dCRKSingletons),REALFORMAT(ROUND(100*COUNT(dCRKSingletons)/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with No LexID',COUNT(dCRKSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dCRKSingletons(LexID=0))/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with LexID',COUNT(dCRKSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dCRKSingletons(LexID>0))/COUNT(pInputFile),2),5,2)},
-                  {'Total Records with No LexID in a LexID Cluster',COUNT(dCRKNonSingletons(LexID=0 AND crk[1]='L')),REALFORMAT(ROUND(100*COUNT(dCRKNonSingletons(LexID=0 AND crk[1]='L'))/COUNT(pInputFile),2),5,2)},
+                  {'Total Record Count',COUNT(pInputFile)},
+                  {'Total LexIDs Appended',COUNT(pInputFile(LexID>0)),REALFORMAT(ROUND(100*COUNT(pInputFile(LexID>0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Minors',COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob)),REALFORMAT(ROUND(100*COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons',COUNT(dCRKSingletons),REALFORMAT(ROUND(100*COUNT(dCRKSingletons)/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with No LexID',COUNT(dCRKSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dCRKSingletons(LexID=0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with LexID',COUNT(dCRKSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dCRKSingletons(LexID>0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Records with No LexID in a LexID Cluster',COUNT(dCRKNonSingletons(LexID=0 AND crk[1]='L')),REALFORMAT(ROUND(100*COUNT(dCRKNonSingletons(LexID=0 AND crk[1]='L'))/COUNT(pInputFile),2),6,2)},
                   {'','clusters','records'},
                   {'Total Non-Singletons',COUNT(results),SUM(results,results.ClusterCount)},
                   {'','clusters','pcnt'},
                   // {'Total Non-Singleton Records',SUM(results,results.ClusterCount)},
-                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),5,2)},
-                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),5,2)},
-                  {'Clusters with Multiple NoMatchIDs',COUNT(results(MultipleNoMatchIDs)),REALFORMAT(ROUND(100*COUNT(results(MultipleNoMatchIDs))/COUNT(results),2),5,2)},
+                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),6,2)},
+                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),6,2)},
+                  {'Clusters with Multiple NoMatchIDs',COUNT(results(MultipleNoMatchIDs)),REALFORMAT(ROUND(100*COUNT(results(MultipleNoMatchIDs))/COUNT(results),2),6,2)},
                   {'','clusters','records'},
                   {'Clusters with Multiple Field Values',COUNT(results(
                                                                   MultipleLexIDs  OR
@@ -234,28 +239,28 @@
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Names',COUNT(results(MultipleNames)),REALFORMAT(ROUND(100*COUNT(results(MultipleNames))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple DOBs',COUNT(results(MultipleDOBs)),REALFORMAT(ROUND(100*COUNT(results(MultipleDOBs))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Addresses',COUNT(results(MultipleAddr)),REALFORMAT(ROUND(100*COUNT(results(MultipleAddr))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)}
+                                                                )),2),6,2)}
                 ],rStats);
     Stats             :=  OUTPUT(dStats,NAMED('Stats'),OVERWRITE);
     ClusterSizeCounts :=  OUTPUT(SORT(TABLE(SORT(results,ClusterCount),{ClusterCount,cnt:=COUNT(GROUP)},ClusterCount,FEW),-ClusterCount),NAMED('ClusterSizeCounts'),OVERWRITE);
@@ -303,6 +308,13 @@
               ,SampleLexIDClustersWithNoLexIDRecords
             );
   END; // CRK_Stats
+  
+  
+  
+  /*************************************/
+  /* NoMatchID Stats - Stats based on  */
+  /* NoMatchID Field (Not CRK Field)   */
+  /*************************************/
  
   EXPORT  NoMatchID_Stats := FUNCTION
     pThreshold  :=  HealthcareNoMatchHeader_InternalLinking.Config.MatchThreshold;
@@ -358,19 +370,21 @@
                   {'WorkUnit',WorkUnit},
                   {'Source',pSrc},
                   {'Source name',pSrcName},
-                  {'Total Record Count',COUNT(pInputFile)},
                   {'','records','pcnt'},
-                  {'Total Singletons',COUNT(dNoMatchIDSingletons),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons)/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with No LexID',COUNT(dNoMatchIDSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons(LexID=0))/COUNT(pInputFile),2),5,2)},
-                  {'Total Singletons with LexID',COUNT(dNoMatchIDSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons(LexID>0))/COUNT(pInputFile),2),5,2)},
-                  {'Total Records with No LexID in a LexID Cluster',COUNT(dNoMatchIDNonSingletons(LexID=0 AND crk[1]='L')),REALFORMAT(ROUND(100*COUNT(dNoMatchIDNonSingletons(LexID=0 AND crk[1]='L'))/COUNT(pInputFile),2),5,2)},
+                  {'Total Record Count',COUNT(pInputFile)},
+                  {'Total LexIDs Appended',COUNT(pInputFile(LexID>0)),REALFORMAT(ROUND(100*COUNT(pInputFile(LexID>0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Minors',COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob)),REALFORMAT(ROUND(100*COUNT(pInputFile(Std.Date.AdjustDate(Std.Date.Today(),-18,0,0)<=dob))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons',COUNT(dNoMatchIDSingletons),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons)/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with No LexID',COUNT(dNoMatchIDSingletons(LexID=0)),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons(LexID=0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Singletons with LexID',COUNT(dNoMatchIDSingletons(LexID>0)),REALFORMAT(ROUND(100*COUNT(dNoMatchIDSingletons(LexID>0))/COUNT(pInputFile),2),6,2)},
+                  {'Total Records with No LexID in a LexID Cluster',COUNT(dNoMatchIDNonSingletons(LexID=0 AND crk[1]='L')),REALFORMAT(ROUND(100*COUNT(dNoMatchIDNonSingletons(LexID=0 AND crk[1]='L'))/COUNT(pInputFile),2),6,2)},
                   {'','clusters','records'},
                   {'Total Non-Singletons',COUNT(results),SUM(results,results.ClusterCount)},
                   {'','clusters','pcnt'},
                   // {'Total Non-Singleton Records',SUM(results,results.ClusterCount)},
-                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),5,2)},
-                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),5,2)},
-                  {'Clusters with Multiple NoMatchIDs',COUNT(results(MultipleNoMatchIDs)),REALFORMAT(ROUND(100*COUNT(results(MultipleNoMatchIDs))/COUNT(results),2),5,2)},
+                  {'Clusters with No LexID',COUNT(results(HasNoLexID)),REALFORMAT(ROUND(100*COUNT(results(HasNoLexID))/COUNT(results),2),6,2)},
+                  {'Clusters with Unique LexID',COUNT(results(HasUniqueLexID)),REALFORMAT(ROUND(100*COUNT(results(HasUniqueLexID))/COUNT(results),2),6,2)},
+                  {'Clusters with Multiple NoMatchIDs',COUNT(results(MultipleNoMatchIDs)),REALFORMAT(ROUND(100*COUNT(results(MultipleNoMatchIDs))/COUNT(results),2),6,2)},
                   {'','clusters','records'},
                   {'Clusters with Multiple Field Values',COUNT(results(
                                                                   MultipleLexIDs  OR
@@ -393,28 +407,28 @@
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Names',COUNT(results(MultipleNames)),REALFORMAT(ROUND(100*COUNT(results(MultipleNames))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple DOBs',COUNT(results(MultipleDOBs)),REALFORMAT(ROUND(100*COUNT(results(MultipleDOBs))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)},
+                                                                )),2),6,2)},
                   {'Clusters with Multiple Addresses',COUNT(results(MultipleAddr)),REALFORMAT(ROUND(100*COUNT(results(MultipleAddr))/COUNT(results(
                                                                   MultipleLexIDs  OR
                                                                   MultipleNames   OR
                                                                   MultipleDOBs    OR
                                                                   MultipleAddr    OR
                                                                   MultipleNoMatchIDs
-                                                                )),2),5,2)}
+                                                                )),2),6,2)}
                 ],rStats);
     Stats             :=  OUTPUT(dStats,NAMED('Stats'),OVERWRITE);
     ClusterSizeCounts :=  OUTPUT(SORT(TABLE(SORT(results,ClusterCount),{ClusterCount,cnt:=COUNT(GROUP)},ClusterCount,FEW),-ClusterCount),NAMED('ClusterSizeCounts'),OVERWRITE);

@@ -17,12 +17,12 @@ function
 
 	ingestMod := Equifax_Business_Data.Ingest(FALSE,,MyDelta,dStandardizedInputFile);
 	
-	//Ingest Output File
+	// Ingest Output File
 	dIngest := ingestMod.AllRecords_Notag;	
 	
 	dStandardize_NameAddr		:= Standardize_NameAddr.fAll (dIngest);
 	
-	dAppendIds							:= Append_Ids.fAll					(dStandardize_NameAddr			); 								 
+	dAppendIds							:= Append_Ids.fAll					(dStandardize_NameAddr			); 
 	
 	dRollup									:= Rollup_Base							(dAppendIds									);
 	

@@ -244,6 +244,40 @@ EXPORT Layouts_V2 := MODULE
 		unsigned1		guardian_min_lexid_score;
 		unsigned1		guardian_max_lexid_score;
 		unsigned1		guardian_ave_lexid_score;
+		unsigned4		cnt_new_crk;
+	END;
+	
+	EXPORT slim_history := RECORD
+		base.batch_jobid;
+		base.dt_vendor_last_reported;
+		base.source_rid;
+		base.input_crk;
+		base.crk;
+		base.crk_changed;
+		base.input_lexid;
+		base.lexid;
+		base.lexid_score;
+		base.lexid_changed;
+	END;
+	
+	EXPORT aggregate_fields := RECORD
+		unsigned1	min_lexid_score;
+		unsigned1	max_lexid_score;
+		unsigned1	ave_lexid_score;
+		unsigned4	cnt_lexid_change;
+		unsigned1	pct_lexid_change; 
+		unsigned4	distinct_lexid_cnt;
+		unsigned4	dup_lexid_cnt;
+		unsigned4	cnt_crk_change;
+		unsigned1	pct_crk_change;
+		unsigned4	distinct_crk_cnt; 
+		unsigned4	dup_crk_cnt;
+		unsigned4	new_crk_cnt;
+		unsigned4	match_crk_cnt;
+	END;
+	
+	EXPORT jobID_list := RECORD
+		base.batch_jobid;
 	END;
 
 END;

@@ -11,6 +11,7 @@ module
     string2               state               ;
     string5               zip5                ;
     string5               county              ;
+    string31              county_name         ;
     string4               msa                 ;
     string4               err_stat            ;
     string3               age_of_company      ;
@@ -56,7 +57,21 @@ module
     unsigned6             empid                 ;
     string                fname                 ;
     string                lname                 ;
+   
+   // -- new
+    unsigned4             dt_first_seen         ;
+    unsigned4             dt_last_seen          ;
+    
+    string70              contact_address       ;
+    string25              city                  ;
+    string2               state                 ;
+    string5               zip5                  ;
+    string5               county                ;
+    string31              county_name           ;
 
+    string60              contact_email_address ;
+    // -- end new
+    
     string                title                 ;
     unsigned4             title_dt_first_seen   ;
     unsigned4             title_dt_last_seen    ;
@@ -104,6 +119,7 @@ module
     string4               err_stat            ;
     string2               fips_state          ;
     string3               fips_county         ;
+    string31              county_name         ;
     string3               age_of_company      ;
     unsigned4             dt_first_seen       ;
     unsigned4             dt_last_seen        ;

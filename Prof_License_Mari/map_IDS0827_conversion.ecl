@@ -28,8 +28,8 @@ EXPORT map_IDS0827_conversion(STRING pVersion) := FUNCTION
 	invalid_addr := '(N/A|NONE |NO VALID|SAME |UNKNOWN)';
 	C_O_Ind := '(C/O |ATTN: |ATTN )';
 	DBA_Ind := '( DBA |D/B/A |/DBA | A/K/A | AKA )';
-	GR_Ind	:= ['BO','CO','LC','LP','PA','PR','PT'];
-	MD_Ind	:= ['AABL ','AB','BK','ABL','ASL','DB','ISL','LB ','SP','IBL','MA','MB','MS','BR','TS'];
+	GR_Ind	:= ['BO','CO','CL','LC','LP','NO','PA','PR','PT'];
+	MD_Ind	:= ['AABL ','AB','BK','ABL','ASL','CB','DB','ISL','LB ','SP','IBL','MA','MB','MS','BR','TS'];
 	
 	
 date_ind := '^([A-Z][^\\,]+)\\,\\s([0-9]+){0,2}\\s([0-9]+){1,4}';
@@ -276,7 +276,13 @@ END;
 															IF(REGEXFIND('(%)',StdNAME_OFFICE),StdNAME_OFFICE,
 																		Prof_License_Mari.mod_clean_name_addr.strippunctMisc(StdNAME_OFFICE))); 
 			
-			SELF.NAME_OFFICE	  :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
+		
+		  SELF.NAME_OFFICE      := MAP(TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
+		                               TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST, ALL) => '',
+																   TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST, ALL) => '',
+																   StringLib.StringCleanSpaces(CleanNAME_OFFICE));			
+			
+			// SELF.NAME_OFFICE	  :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
 			SELF.OFFICE_PARSE		:= IF(SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'GR',
 																		IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'MD',
 																								''));

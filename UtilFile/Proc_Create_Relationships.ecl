@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 export Proc_Create_Relationships(string filedate) := function
 		
 	checkkey(string keyname) := function
@@ -153,7 +153,7 @@ export Proc_Create_Relationships(string filedate) := function
 						),
 					FileServices.sendemail
 						(
-						'akayttala@seisint.com;michael.gould@lexisnexis.com', 
+						'akayttala@seisint.com', 
 						'Utility Add Key Relationship - FAILED:'+filedate,
 						'Following indexes are not available on thor \n' + keylist
 						)

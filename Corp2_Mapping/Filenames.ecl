@@ -72,18 +72,20 @@ module
 	export az_raw :=
 	module
 
-		export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::chgext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
-		export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
-		export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::flmext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
-		export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::offext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
-	
+			export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::chgext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+			export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+			export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::flmext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+			export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::offext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+			export INACTV                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::inactv::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+				
 		export dAll_filenames :=
-			  CHGEXT.dAll_filenames
+		    CHGEXT.dAll_filenames
 			+ COREXT.dAll_filenames
 			+ FLMEXT.dAll_filenames
 			+ OFFEXT.dAll_filenames
-			;
-
+			+ INACTV.dAll_filenames
+      ;
+			
 	end;
 
 	export ca_raw :=

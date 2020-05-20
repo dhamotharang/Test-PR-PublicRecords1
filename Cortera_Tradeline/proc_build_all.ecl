@@ -1,5 +1,5 @@
 ﻿import Cortera;
-EXPORT proc_build_all ( string version) := function
+EXPORT proc_build_all ( string version, boolean pIsTesting = false) := function
 
 build_name := 'Cortera Tradeline';
 
@@ -23,6 +23,9 @@ build_all := SEQUENTIAL(
 	Cortera_Tradeline.BuildTradelineScrubsReport(version),
 	Cortera.UpdateDops(version,build_name),
 	Cortera.UpdateOrbit(version,build_name)
-	) : success(Cortera.Send_Email(version,build_name).buildsuccess), failure(Cortera.Send_Email(version,build_name).buildfailure);
+	) 	: 
+	success(Cortera.send_emails(version,,not pIsTesting).buildsuccess), 
+	    failure(Cortera.send_emails(version,,not pIsTesting).buildfailure)
+			;
 return build_all;
 end;

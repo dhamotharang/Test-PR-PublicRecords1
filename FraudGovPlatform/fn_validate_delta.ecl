@@ -1,10 +1,16 @@
-﻿EXPORT fn_validate_delta(pBaseFile):=FUNCTIONMACRO
+﻿Import FraudGovPlatform,FraudShared;
+EXPORT fn_validate_delta(
+	dataset(FraudShared.Layouts.Base.Main) FileBase
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
+) := FUNCTION
+
+previous_delta := Previous_Build(regexfind('delta',source,nocase));
 
 FirstRinID := FraudGovPlatform.Constants().FirstRinID;
 
-Non_Deltabase	:= pBaseFile(~regexfind('delta',source,nocase));
+Non_Deltabase	:= FileBase(~regexfind('delta',source,nocase));
 
-Deltabase_	:= pBaseFile(regexfind('delta',source,nocase));
+Deltabase_	:= FileBase(regexfind('delta',source,nocase));
 
 without_did 	:= Deltabase_(DID=0);	
 with_did_rawlinkid 		:= Deltabase_(DID > 0 and rawlinkid>0);
@@ -119,8 +125,17 @@ FraudShared.Layouts.Base.Main T_Did_Pii_Clean(FraudShared.Layouts.Base.Main L) :
 			
 pDid_Pii_Clean	:= Project(with_did_rawlinkid,T_Did_Pii_Clean(Left));
 
-Main_Clean	:= Non_Deltabase + without_did + with_did_no_rawlinkid + pDid_Pii_Clean;
+//Join with previous delta to extract previous record_id if any match found.
+
+jdid_pii_clean := Join(Previous_delta,pDid_Pii_Clean,
+												left.source=right.source
+											and left.source_rec_id = right.source_rec_id
+											,Transform(recordof(right)
+											,self.record_id := if(left.source=right.source and left.source_rec_id=right.source_rec_id,left.record_id,right.record_id)
+											,self:=right)
+											,right outer);
+Main_Clean	:= Non_Deltabase + without_did + with_did_no_rawlinkid + jdid_pii_clean;
 
 Return Main_Clean;
 
-ENDMACRO;
+END;

@@ -139,7 +139,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								self.ProcessDate := (unsigned4)Version;
 								self.filename := left.filename;
 								self.NCF_FileDate := (unsigned4)left.filename[11..18];
-								self.NCF_FileTime := left.filename[20..26];
+								self.NCF_FileTime := left.filename[20..25];
 								self.created := left.created;
 								self.updated := left.updated;
 								self.replaced := left.replaced;
@@ -191,6 +191,14 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.StartDate := IF(right.PeriodType='M',fn_FirstDayOfMonth(right.StartDate), (integer)right.StartDate);
 					self.EndDate := IF(right.PeriodType='M',fn_LastDayOfMonth(right.EndDate), (integer)right.EndDate);
 					
+					// create unique id. For backward compatibility, this is limited to 6 bytes
+					day := ((unsigned)(right.filename[15..16]))*31 + ((unsigned)(right.filename[17..18]));
+					year := ((unsigned)(right.filename[11..14])) - 2020; // nothing before 2020
+					id := (day * 40) + year;		// good for 40 years
+					self.PrepRecSeq := if(right.filename='',0,
+						HASH32(right.GroupId,right.ProgramCode,right.Caseid,right.ClientId,right.filename[11..18]) | 
+										(id << 32) );
+
 					self := right;
 					self := left;
 					), LEFT OUTER, LOCAL);

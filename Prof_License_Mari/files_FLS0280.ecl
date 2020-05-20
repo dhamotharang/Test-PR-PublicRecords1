@@ -1,4 +1,4 @@
-//Raw professional license files from the source FLS0280 RLE/APR
+﻿//Raw professional license files from the source FLS0280 RLE/APR
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices;
 
 EXPORT files_FLS0280 := MODULE
@@ -14,20 +14,9 @@ EXPORT files_FLS0280 := MODULE
 																					CSV(SEPARATOR(','),heading(0),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
 	EXPORT re							 			:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_re + '1', 
 																					Prof_License_Mari.layout_FLS0280.re,
-																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))) +
-																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_re + '2', 
-																					Prof_License_Mari.layout_FLS0280.re,
-																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))) +
-																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_re + '3', 
-																					Prof_License_Mari.layout_FLS0280.re,
-																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))) +
-																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_re + '4', 
-																					Prof_License_Mari.layout_FLS0280.re,
-																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))) +
-																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_re + '5', 
-																					Prof_License_Mari.layout_FLS0280.re,
-																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))) +
-																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_corp, 
+																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
+
+	EXPORT co   					 			:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_corp, 
 																					Prof_License_Mari.layout_FLS0280.re,
 																					CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
 

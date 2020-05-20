@@ -860,7 +860,8 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name, unsigned2 quali
 		// other unclassified names
 		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
-		// final checks before person
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+	// final checks before person
 		
 		REGEXFIND('^BABY (BOY|GIRL) ',s) => MatchType.Inv,		//MatchType.Unclass,
 
@@ -872,8 +873,8 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name, unsigned2 quali
 
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
-
 		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
+
 
 		REGEXFIND('^[A-Z]+ +[0-9] +[A-Z]+$',s) => MatchType.Inv,	// name numeral name
 		IsGreekFrat(words) => MatchType.Business,

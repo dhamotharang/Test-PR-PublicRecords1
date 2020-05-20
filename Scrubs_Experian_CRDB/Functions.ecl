@@ -70,13 +70,6 @@ EXPORT Functions := MODULE
     RETURN IF(LENGTH(TRIM(Busname, ALL)) > 0, 1, 0);
   END;
   
-  //****************************************************************************
-  //fn_clean_dba_name: returns true if dba_name is populated then clean value should be
-  //****************************************************************************
-   EXPORT fn_clean_dba_name(STRING clean_dba_name,STRING dba_name) := FUNCTION
-       RETURN IF( TRIM(dba_name, ALL)<>'' and TRIM(clean_dba_name, ALL) ='', 0, 1);
-   END;
-  
    //****************************************************************************
    //fn_bName_pName: returns true either valid company_name or valid people names available in the data 
   //****************************************************************************
@@ -113,8 +106,14 @@ EXPORT Functions := MODULE
 	//****************************************************************************
 	EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
 
-		RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
-		Stringlib.StringFilterOut(nmbr, '0123456789') = '' and (integer)nmbr<>0, 1, 0);
+		RETURN IF(
+			//IF(size = 0, 
+				//LENGTH(TRIM(nmbr, ALL)) > 0, 
+			(LENGTH(TRIM(nmbr, ALL)) = size OR LENGTH(TRIM(nmbr, ALL)) = 0)
+			AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',
+			//and (integer)nmbr<>0, 
+			1, 
+			0);
 
 	END;
 
@@ -146,7 +145,7 @@ EXPORT Functions := MODULE
 	EXPORT fn_past_yyyymmdd(STRING sDate) := FUNCTION
 
 		clean_date  := TRIM(sDate, ALL);
-		isValidDate := IF(LENGTH(clean_date) = 8, Scrubs.fn_valid_pastDate(clean_date) > 0, FALSE);
+		isValidDate := IF(LENGTH(clean_date) = 8, Scrubs.fn_valid_pastDate(clean_date) > 0, LENGTH(clean_date) = 0);
 		RETURN IF(isValidDate, 1, 0);
 
 	END;
@@ -156,9 +155,6 @@ EXPORT Functions := MODULE
 	// a valid state abbreviation.
 	//****************************************************************************
 	EXPORT fn_verify_state(STRING code) := function
-    
 		RETURN IF(LENGTH(Codes.St2Name(code)) > 0, 1, 0);
-
 	END;
-
 END;

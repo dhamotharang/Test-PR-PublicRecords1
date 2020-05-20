@@ -1,4 +1,6 @@
-﻿#workunit('name','Profile Booster OneMain');
+﻿IMPORT STD;
+#workunit('priority','high'); 
+#workunit('name','Profile Booster OneMain');
 
 //Step 1 Check _Control.Environment  onThor := TRUE if not = TRUE sandbox to TRUE before running
 //Step 2 Doxie.Version_SuperKey  needs to be sandboxed from 'qa' to 'pb'
@@ -6,11 +8,10 @@
 //Step 4 after job finishes notify team that the OneMain is available on bctlpedata11
  
  NotifyListtemp := '';  //   add additional email addresses if needed, comma delimited similar ProfileBooster.Constants.ECL_Developers_Slim
- // IPaddrTemp := '10.121.149.194';  //dev bctlpedata12 
- IPaddrTemp := '10.121.149.193';  //prod  bctlpedata11 
+ IPaddrTemp := '10.121.149.194';  //dev bctlpedata12 use this one for now
+ // IPaddrTemp := '10.121.149.193';  //prod  bctlpedata11 
 
-today := Std.Date.Today();
 
-AbsolutePathtemp := '/data/Builds/builds/OneMain/data/fulfillment/' + today;  
+AbsolutePathtemp := '/data/Builds/builds/OneMain/data';  
 
 ProfileBooster.ProcBuild_ProfileBooster_OneMain( IPaddr := IPaddrTemp,  AbsolutePath := AbsolutePathtemp,  NotifyList := NotifyListtemp);

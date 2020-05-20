@@ -7,7 +7,7 @@ EXPORT _Proc_Iterate(
   ,pInfile         = 'BIPV2_ProxID.In_DOT_Base'
   ,pMatchThreshold = 'BIPV2_ProxID.Config.MatchThreshold'
   ,pDotFilename    = 'BIPV2_Files.files_dotid().FILE_BASE'
-  
+  ,pIsTesting      = 'false'
 ) := 
 functionmacro
     
@@ -38,14 +38,14 @@ functionmacro
     ,piterate
     // ,DebugKeys
     ,BIPV2_ProxID.promote(combo,'^(?!.*?(wkhistory|changes).*).*$',pMove2DeleteSuper := true).new2built
-    ,BIPV2_ProxID.promote(,'base',pDelete := true,pIncludeBuiltDelete := true,pCleanupFilter := 'base').Cleanup //cleanup iterations as we go
+    ,if(pIsTesting = false  ,BIPV2_ProxID.promote(,'base',pDelete := true,pIncludeBuiltDelete := true,pCleanupFilter := 'base').Cleanup) //cleanup iterations as we go if not testing
     ,BIPV2_ProxID._Output_Review_Samples(pMatchThreshold)
     // ,outputwksummary
     ,if(BIPV2_ProxID._Constants().Add2WorkmanSuper  ,BIPV2_ProxID.promote(combo,'(wkhistory|changes)').new2qaMult)
-    ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter)
-    // ,BIPV2_ProxID.fStatMissingProxIDLinks(BIPV2_ProxID.In_DOT_Base, piteration)
-		,if(BIPV2_ProxID._Constants().doTraceBackFiles  ,constructTraceFiles)//PUT BACK!!!
-    ,BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,proxid ,pversion  ,piteration  ,BIPV2_Proxid.Config.MatchThreshold ,'BIPV2_Proxid')
+    // ,if(pIsTesting = false ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter))
+    // ,if(pIsTesting = false ,BIPV2_ProxID.fStatMissingProxIDLinks(BIPV2_ProxID.In_DOT_Base, piteration))
+		,if(BIPV2_ProxID._Constants().doTraceBackFiles and pIsTesting = false  ,constructTraceFiles)//PUT BACK!!!
+    ,if(pIsTesting = false  ,BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,proxid ,pversion  ,piteration  ,BIPV2_Proxid.Config.MatchThreshold ,'BIPV2_Proxid') )
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
 ENDmacro;

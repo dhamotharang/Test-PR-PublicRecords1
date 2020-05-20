@@ -1,6 +1,6 @@
-export Email_notification_lists (string filedate) := function
+﻿export Email_notification_lists (string filedate) := function
 
-BuildCompletion	:= fileservices.sendemail('Sudhir.Kasavajjala@lexisnexis.com;qualityassurance@seisint.com;Michael.Gould@lexisnexis.com',
+BuildCompletion	:= fileservices.sendemail('Sudhir.Kasavajjala@lexisnexis.com;qualityassurance@seisint.com',
 			'LN PropertyV2 Full Build Process Completed ' + filedate,
 			'workunit: ' + workunit);
 			

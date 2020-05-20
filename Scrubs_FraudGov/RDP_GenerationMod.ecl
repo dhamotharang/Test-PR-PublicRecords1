@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT RDP_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -22,7 +22,7 @@ EXPORT RDP_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'RDP';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,Transaction_ID,TransactionDate,FirstName,LastName,MiddleName,Suffix,BirthDate,SSN,Lexid_Input,Street1,Street2,Suite,City,State,Zip5,Phone,Lexid_Discovered,RemoteIPAddress,ConsumerIPAddress';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,Transaction_ID,TransactionDate,FirstName,LastName,MiddleName,Suffix,BirthDate,SSN,Lexid_Input,Street1,Street2,Suite,City,State,Zip5,Phone,Lexid_Discovered,RemoteIPAddress,ConsumerIPAddress,Email_Address';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -88,6 +88,7 @@ EXPORT RDP_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:Lexid_Discovered:TYPE(unsigned6):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:RemoteIPAddress:TYPE(string25):LIKE(invalid_ip):0,0\n'
     + 'FIELD:ConsumerIPAddress:TYPE(string25):LIKE(invalid_ip):0,0\n'
+    + 'FIELD:Email_Address:TYPE(string256):LIKE(invalid_email):0,0 \n'
     + '\n'
     + '\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'

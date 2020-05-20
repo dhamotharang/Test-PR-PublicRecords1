@@ -162,8 +162,8 @@ EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygiene
 EXPORT MakeFT_invalid_addresstype(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_addresstype(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['CURRENT','Permanent','DORM','HOME','']);
-EXPORT InValidMessageFT_invalid_addresstype(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('CURRENT|Permanent|DORM|HOME|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_addresstype(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['CURRENT','Permanent','DORM','HOME','PERMANENT','']);
+EXPORT InValidMessageFT_invalid_addresstype(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('CURRENT|Permanent|DORM|HOME|PERMANENT|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_MajorCode(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols

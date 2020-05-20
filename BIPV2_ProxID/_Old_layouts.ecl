@@ -122,169 +122,169 @@ module
    END;
 
   
-  active_duns_number_childrec := RECORD
+  export active_duns_number_childrec := RECORD
      string9 active_duns_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  active_enterprise_number_childrec := RECORD
+  export active_enterprise_number_childrec := RECORD
      string9 active_enterprise_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  active_domestic_corp_key_childrec := RECORD
+  export active_domestic_corp_key_childrec := RECORD
      string30 active_domestic_corp_key;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  hist_enterprise_number_childrec := RECORD
+  export hist_enterprise_number_childrec := RECORD
      string9 hist_enterprise_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  hist_duns_number_childrec := RECORD
+  export hist_duns_number_childrec := RECORD
      string9 hist_duns_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  hist_domestic_corp_key_childrec := RECORD
+  export hist_domestic_corp_key_childrec := RECORD
      string30 hist_domestic_corp_key;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  foreign_corp_key_childrec := RECORD
+  export foreign_corp_key_childrec := RECORD
      string30 foreign_corp_key;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  unk_corp_key_childrec := RECORD
+  export unk_corp_key_childrec := RECORD
      string30 unk_corp_key;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  ebr_file_number_childrec := RECORD
+  export ebr_file_number_childrec := RECORD
      string9 ebr_file_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_fein_childrec := RECORD
+  export company_fein_childrec := RECORD
      string9 company_fein;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  cnp_name_childrec := RECORD
+  export cnp_name_childrec := RECORD
      string250 cnp_name;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_name_type_derived_childrec := RECORD
+  export company_name_type_derived_childrec := RECORD
      string50 company_name_type_derived;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  cnp_number_childrec := RECORD
+  export cnp_number_childrec := RECORD
      string30 cnp_number;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  cnp_btype_childrec := RECORD
+  export cnp_btype_childrec := RECORD
      string10 cnp_btype;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_phone_childrec := RECORD
+  export company_phone_childrec := RECORD
      string10 company_phone;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  prim_name_derived_childrec := RECORD
+  export prim_name_derived_childrec := RECORD
      string28 prim_name_derived;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  sec_range_childrec := RECORD
+  export sec_range_childrec := RECORD
      string8 sec_range;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  v_city_name_childrec := RECORD
+  export v_city_name_childrec := RECORD
      string25 v_city_name;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  st_childrec := RECORD
+  export st_childrec := RECORD
      string2 st;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  zip_childrec := RECORD
+  export zip_childrec := RECORD
      string5 zip;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  prim_range_derived_childrec := RECORD
+  export prim_range_derived_childrec := RECORD
      string10 prim_range_derived;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_csz_childrec := RECORD
+  export company_csz_childrec := RECORD
      unsigned4 company_csz;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_addr1_childrec := RECORD
+  export company_addr1_childrec := RECORD
      unsigned4 company_addr1;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  company_address_childrec := RECORD
+  export company_address_childrec := RECORD
      unsigned4 company_address;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  dt_first_seen_childrec := RECORD
+  export dt_first_seen_childrec := RECORD
      unsigned4 dt_first_seen;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  dt_last_seen_childrec := RECORD
+  export dt_last_seen_childrec := RECORD
      unsigned4 dt_last_seen;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  srcridvlid_childrec := RECORD
+  export srcridvlid_childrec := RECORD
      string basis;
      unsigned8 cnt;
      unsigned4 id;
     END;
 
-  uber_childrec := RECORD
+  export uber_childrec := RECORD
      string30 word;
      unsigned8 cnt;
      unsigned4 id;

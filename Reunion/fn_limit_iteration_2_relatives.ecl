@@ -1,14 +1,14 @@
-IMPORT header,watchdog;
+IMPORT header,watchdog,infutor;
 
-EXPORT fn_limit_iteration_2_relatives(DATASET(reunion.layouts.lIteration) dInFile):=FUNCTION
+EXPORT fn_limit_iteration_2_relatives(DATASET(reunion.layouts.lIteration) dInFile, UNSIGNED1 mode):=FUNCTION
 
-  dDIDCounts:=DISTRIBUTE(header.counts_per_did(header.File_Headers),HASH(did));
+  dDIDCounts:=DISTRIBUTE(reunion.counts_per_did(infutor.infutor_header),HASH(did));
 	dUniqueDIDCounts:=TABLE(dDIDCounts,{did,did_ct},did,did_ct,LOCAL);
 
   dCandidates:=DISTRIBUTE(dInFile(came_from<>'1'),HASH(did));
   dNotCandidates:=dInFile(came_from='1');
 	
-	dWatchdog:=DISTRIBUTE(reunion.watchdog_for_reunion,HASH(did));
+	dWatchdog:=DISTRIBUTE(reunion.infutor_for_reunion(mode),HASH(did));
 
   lCandidateCounts:=RECORD
     dCandidates;

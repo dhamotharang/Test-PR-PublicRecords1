@@ -92,5 +92,20 @@ export Promote_V2  := module
             export buildfiles    := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete := true,pisTesting := false, pnGenerations := 2);
     
     end;
+		
+    export Promote_aggregate(
+        string                              pVersion
+        ,boolean                            pUseProd
+				,string															gcid
+				,string															pHistMode
+        ,string                             pFilter             = ''
+        ,boolean                            pDelete             = false
+        ,boolean                            pisTesting          = false
+        ,unsigned1                          pnGenerations       = 3                           
+       ,dataset(lay_builds)    pBuildFilenames =     Filenames_V2(pVersion,pUseProd,gcid,pHistMode).aggregate_report_file.dAll_filenames
+        ) :=    module
+            export buildfiles    := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete := true,pisTesting := false, pnGenerations := 2);
+    
+    end;		
 		    
 end;

@@ -11,8 +11,8 @@ export _Constants(
 		,pIsTesting						:= Tools._Constants.IsDataland
 	))
 	
-  export doStrata         := true;
-  export copy2storagethor := true;
+  export doStrata         := if(IsDataland = true ,false,true);
+  export copy2storagethor := if(IsDataland = true ,false,true);
   export doTraceBackFiles := true;
   export RunPostProcess   := true;
   export Add2WorkmanSuper := true;

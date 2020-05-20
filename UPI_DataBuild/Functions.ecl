@@ -53,8 +53,19 @@ EXPORT Functions := MODULE
 	
 			flat_file := UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).tobatch_metrics_file.new;
 			
-			// pipe_delimited :=	output(flat_file,,'~ushc::crk::to_batch_pipe::'+gcid+'::'+ Batch_JobID +'::out_tobatch_metrics',CSV(HEADING(SINGLE),SEPARATOR('|'),TERMINATOR('\n'),QUOTE('\"')),OVERWRITE);
 			pipe_delimited :=	output(flat_file,,'~ushc::crk::' + trim(gcid, all) + '_' + trim(Batch_JobID, all) + '_metrics',CSV(HEADING(SINGLE),SEPARATOR('|'),TERMINATOR('\r\n'),QUOTE('\"')),OVERWRITE);
+		
+		RETURN pipe_delimited;
+	END;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//  UPI Transform Flat Aggregate Report File to Pipe Delimited
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	EXPORT PipeAggregateFile(string pVersion, boolean pUseProd, string gcid, string pHistMode, string Batch_JobID) := FUNCTION
+	
+			flat_file := UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).aggregate_report_file.new;
+			
+			pipe_delimited :=	output(flat_file,,'~ushc::crk::' + trim(gcid, all) + '_' + trim(Batch_JobID, all) + '_aggregate',CSV(HEADING(SINGLE),SEPARATOR('|'),TERMINATOR('\r\n'),QUOTE('\"')),OVERWRITE);
 		
 		RETURN pipe_delimited;
 	END;
@@ -97,5 +108,24 @@ EXPORT Functions := MODULE
 																			true); //boolean allowoverwrite
 																			
 		RETURN NOTHOR(UPI_Metrics_DeSpray);
+	END; 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DESPRAY AGGREGATE TO BATCH
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		EXPORT UPI_Aggregate_DeSpray(STRING Batch_JobID, string gcid, STRING Batch_IP, STRING Batch_Destination, STRING Batch_FileType) := FUNCTION
+		Batch_FileName := MAP(STD.Str.ToUpperCase(Batch_FileType) = 'F' => '~ushc::crk::' + trim(gcid, all) + '_'+ trim(Batch_JobID, all) + '_aggregate',
+																								'unknown_out');																						
+
+		UPI_Aggregate_DeSpray := STD.File.DeSpray(
+																			// '~ushc::crk::'+Batch_FileName+'::'+gcid+'::'+ Batch_JobID + '::out_tobatch_metrics', //varstring logicalName
+																			Batch_FileName,//varstring logicalName
+																			Batch_IP, //varstring destinationIP
+																			Batch_Destination, //varstring destinationPath
+																			-1, //integer4 timeOut
+																			, //varstring espServerIpPort=GETENV('ws_fs_server')
+																			, //integer4 masConnections
+																			true); //boolean allowoverwrite
+																			
+		RETURN NOTHOR(UPI_Aggregate_DeSpray);
 	END; 
 END;

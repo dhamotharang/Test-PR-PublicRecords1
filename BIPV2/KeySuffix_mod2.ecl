@@ -88,7 +88,10 @@ end;
 // export constant_ThisBuild_versionDate := '20191104'; // S76 BH-563
 // export constant_ThisBuild_versionDate := '20191127'; // S77 BH-564
 // export constant_ThisBuild_versionDate := '20200108'; // S78 BH-755
-export constant_ThisBuild_versionDate := '20200203'; // S79 BH-756
+// export constant_ThisBuild_versionDate := '20200203'; // S79 BH-756
+// export constant_ThisBuild_versionDate := '20200303'; // S80 BH-757
+// export constant_ThisBuild_versionDate := '20200403'; // S81 BH-758
+export constant_ThisBuild_versionDate := '20200501'; // S82 BH-759
 
 
 export ds :=
@@ -185,6 +188,9 @@ dataset([
 ,{  77, '' ,  '20191127',  '20191127', '', '',         '',         'Ingested S76 base, applied  BH-749. KS-4782, BH-687, BH-747,BH-749,BH-753,BH-738  . BH-564 -- BIP Build 77 - December 2019'}
 ,{  78, '' ,  '20200108',  '20200108', '', '',         '',         'Ingested S77 base, applied  BH-738 & BH-754. BH-743, BH-789. BH-755 -- BIP Build 78 - January 2020'}
 ,{  79, '' ,  '20200203',  '20200203', '', '',         '',         'Ingested S78 base, applied  BH-742 & DF-25635.  BH-756 -- BIP Build 79 - February 2020'}
+,{  80, '' ,  '20200303',  '20200303', '', '',         '',         'Ingested S79 base, applied  BH-819.  BH-757 -- BIP Build 80 - March 2020'}
+,{  81, '' ,  '20200403',  '20200403', '', '',         '',         'Ingested S80 base, BH-758 -- BIP Build 81 - April 2020'}
+,{  82, '' ,  '20200501',  '20200501', '', '',         '',         'Ingested S81 base,applied LNK-4137 ,BH-832, BH-828, BH-759 -- BIP Build 82 - May 2020'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

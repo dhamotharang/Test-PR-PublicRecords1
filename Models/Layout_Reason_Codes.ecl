@@ -1,5 +1,5 @@
-export Layout_Reason_Codes :=
+﻿export Layout_Reason_Codes :=
 RECORD
-	STRING3 Reason_Code;
-	STRING Reason_Description;
+	STRING5 Reason_Code;
+	STRING150 Reason_Description;
 END;

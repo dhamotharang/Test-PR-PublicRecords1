@@ -22,7 +22,8 @@ EXPORT Rewind_Build(
 
    string                                       pversion                      // version of the build you are rolling back
   ,string                                       PWuid                         // all files created in this workunit and subsequent workunits in this build will be deleted.
-  ,dataset(Workman.Layouts.wks_slim_filename  ) pWorkman_Superfile            // the workman superfile for your build.  it should contain all of the workman build files.
+  // ,dataset(Workman.Layouts.wks_slim_filename ) pWorkman_Superfile            // the workman superfile for your build.  it should contain all of the workman build files.
+  ,dataset(Workman.Layouts.wks_slim_filename2 ) pWorkman_Superfile            // the workman superfile for your build.  it should contain all of the workman build files.  this uses a real __filename field that was appended on thor because doing the virtual one on hthor didn't work.
   ,boolean                                      pDeleteFiles        = false   // true = output the files to the workunit + delete them.  false = output the files to the workunit
   ,string                                       pFilter             = ''      // optional regex filter for the files to delete.
   ,dataset({string name,string esp}           ) pExtraFiles         = dataset([],{string name,string esp})
@@ -108,6 +109,7 @@ function
         ,STD.System.Log.addWorkunitInformation('Done restoring '  + dfu_wuid + ' on ' + Workman.getTimeDate())
      )))
      ,outputdebug
+    // ,output(ds_workman                         ,named('ds_workman'                         ),all)
     // -- delete remote files first
     ,iff(pDeleteFiles  = true 
       ,iff(exists(files2delete(isLocal = false)) ,apply(global(files2delete(isLocal = false),few)

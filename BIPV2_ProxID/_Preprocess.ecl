@@ -1,21 +1,29 @@
-﻿import bipv2,bipv2_files,BIPV2_ProxID,tools,bipv2_tools,wk_ut,std,mdr;
+﻿import bipv2,bipv2_files,BIPV2_ProxID,tools,bipv2_tools,wk_ut,std,mdr,corp2,paw;
+
+lay_an_corpkeys := recordof(BIPV2_Files.tools_dotid().Solo_Assumed_Name_Corpkeys());
+
 EXPORT _Preprocess(
-   dataset(layouts.orig_DOT_Base) pDataset          = BIPV2_Files.files_dotid().DS_BASE
-  ,string                         pversion          = bipv2.KeySuffix  
-  ,string                         pFilename         = BIPV2_Files.files_dotid().FILE_BASE  //should be the filename from the above dataset
-  ,string                         pStrataBuildStep  = ''
-  ,boolean                        pFilterMC         = false
-  ,boolean                        pDoStrata         = BIPV2_ProxID._Constants().doStrata
-  ,boolean                        pCopy2StorageThor = BIPV2_ProxID._Constants().copy2storagethor
+   dataset(layouts.orig_DOT_Base                  )   pDataset          = BIPV2_Files.files_dotid().DS_BASE
+  ,string                                             pversion          = bipv2.KeySuffix  
+  ,string                                             pFilename         = BIPV2_Files.files_dotid().FILE_BASE  //should be the filename from the above dataset
+  ,string                                             pStrataBuildStep  = ''
+  ,boolean                                            pFilterMC         = false
+  ,boolean                                            pDoStrata         = BIPV2_ProxID._Constants().doStrata
+  ,boolean                                            pCopy2StorageThor = BIPV2_ProxID._Constants().copy2storagethor
 ) := 
 function
 
   ds_slim           := project(pDataset,transform(BIPV2_ProxID.layout_DOT_Base 
     ,self.cnp_name_phonetic := left.cnp_name
     ,self.sbfe_id           := if(mdr.sourceTools.SourceIsBusiness_Credit(left.source) ,left.vl_id ,'')
+    ,self.active_corp_key   := ''
+    ,self.hist_corp_key     := ''
     ,self                   := left
   ));
-  ds_patch_proxids  := BIPV2_Tools.initParentID(ds_slim,dotid,proxid);
+
+  ds_pop_corpkeys := BIPV2_Tools.mac_Populate_Corpkeys(ds_slim);
+    
+  ds_patch_proxids  := BIPV2_Tools.initParentID(ds_pop_corpkeys,dotid,proxid);
   ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_patch_proxids ,ds_slim);
 
   // -- only use match candidates
@@ -24,7 +32,7 @@ function
   // -- only use match candidates
   
   // ds_out := if(pFilterMC = false ,ds_use  ,ds_get_only_mc);
-  ds_out := ds_use;
+  ds_out := project(ds_use  ,transform(recordof(left),self.company_inc_state := if(trim(left.active_corp_key) != '' ,left.company_inc_state ,'') ,self.company_charter_number := if(trim(left.active_corp_key) != '' ,left.company_charter_number ,'') ,self := left));
   
   writefile   := tools.macf_writefile(BIPV2_ProxID.filenames(pversion).base.logical ,ds_out ,poverwrite := true ,pDescription := 'BIPV2_ProxID._Preprocess');
   promotefile := BIPV2_ProxID.promote(pversion).new2built;

@@ -4395,20 +4395,54 @@ EXPORT InputEcho := RECORD
 			string3 IndustrySeg2_PastDueAgingAmount31to60Percent; 
 			string3 IndustrySeg2_PastDueAgingAmount61to90Percent; 
 			string3 IndustrySeg2_PastDueAgingAmount91PlusPercent;
-			// Account Details
+			
+      // Account Detail - AcctDet1
 			string20 AcctDet1_AccountNo; 
 			string10 AcctDet1_Status;
 			string25 AcctDet1_IndustrySegment;
 			string8 AcctDet1_AccountDateReported; 
 			string12 AcctDet1_AmountOutstanding; 
-			string20 AcctDet2_AccountNo; 
-			string10 AcctDet2_Status; 
-			string25 AcctDet2_IndustrySegment;
-			string8 AcctDet2_AccountDateReported; 
-			string12 AcctDet2_AmountOutstanding;
-			
-			string5 StatusCode;
-			string40 StatusDescription;
+
+      // Account Detail, AcctDet1, 24 Month Payment History - two accounts
+      STRING12 AcctDet1_1_TotalCurrentExposure;
+      STRING3  AcctDet1_1_WithinTermsTotal;
+      STRING3  AcctDet1_1_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet1_1_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet1_1_DateReported;
+      STRING12 AcctDet1_2_TotalCurrentExposure;
+      STRING3  AcctDet1_2_WithinTermsTotal;
+      STRING3  AcctDet1_2_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet1_2_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet1_2_DateReported;
+
+      // Account Detail - AcctDet2
+      STRING20 AcctDet2_AccountNo; 
+      STRING10 AcctDet2_Status; 
+      STRING25 AcctDet2_IndustrySegment;
+      STRING8 AcctDet2_AccountDateReported; 
+      STRING12 AcctDet2_AmountOutstanding;
+
+      // Account Detail, AcctDet2, 24 Month Payment History - two accounts
+      STRING12 AcctDet2_1_TotalCurrentExposure;
+      STRING3  AcctDet2_1_WithinTermsTotal;
+      STRING3  AcctDet2_1_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet2_1_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet2_1_DateReported;
+      STRING12 AcctDet2_2_TotalCurrentExposure;
+      STRING3  AcctDet2_2_WithinTermsTotal;
+      STRING3  AcctDet2_2_PastDueAgingAmount01to30Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount31to60Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount61to90Percent;
+      STRING3  AcctDet2_2_PastDueAgingAmount91PlusPercent;
+      STRING8  AcctDet2_2_DateReported;
+      string5 StatusCode;
+      string40 StatusDescription;
 	END;
 	
 	EXPORT Flat_BusinessCreditReport := record

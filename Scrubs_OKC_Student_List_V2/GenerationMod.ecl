@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_VERSION := 'V3.11.9';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -75,7 +75,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_semester:ENUM(SPRING|SUMMER|FALL|AUTUMN|WINTER|):LENGTHS(0,4,6)\n'
     + '// FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)\n'
     + 'FIELDTYPE:invalid_email:LIKE(alphasandnums):SPACES(.@-_)\n'
-    + 'FIELDTYPE:invalid_addresstype:ENUM(CURRENT|Permanent|DORM|HOME|)\n'
+    + 'FIELDTYPE:invalid_addresstype:ENUM(CURRENT|Permanent|DORM|HOME|PERMANENT|)\n'
     + 'FIELDTYPE:invalid_MajorCode:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:invalid_NewMajorCode:CUSTOM(Scrubs_OKC_Student_List_V2.validNewMajorCode>0)\n'
     + 'FIELD:cleanaddr1:LIKE(invalid_address):TYPE(STRING):0,0\n'

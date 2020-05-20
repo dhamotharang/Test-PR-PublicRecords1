@@ -56,6 +56,7 @@ EXPORT Layouts := MODULE
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
 			string11	geo_long;
+      		unsigned2   RIN_Source := 0;
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -171,6 +172,7 @@ EXPORT Layouts := MODULE
 			string20	external_referral_or_casenumber;
 			string3		cleared_fraud;
 			string		reason_cleared_code;
+      		unsigned2   RIN_Source := 0;
 		END;
 		EXPORT SafeList	:= RECORD
 			KnownFraud;
@@ -233,6 +235,7 @@ EXPORT Layouts := MODULE
 			string250	reason_description;
 			string30	event_type_1;
 			string30	event_entity_1;
+      		unsigned2   RIN_Source := 0;
 		END;
 
 		EXPORT RDP := record
@@ -255,6 +258,7 @@ EXPORT Layouts := MODULE
 			unsigned6 Lexid_Discovered;
 			string25 RemoteIPAddress;
 			string25 ConsumerIPAddress;
+      		string256 Email_Address;
 		END;
 	
 		EXPORT validate_record := record
@@ -275,6 +279,11 @@ EXPORT Layouts := MODULE
 			string10	cell_phone   ; 
 			string10	Work_phone   ; 
 	END;	
+
+  EXPORT clean_Drivers_License := RECORD
+			string2		Drivers_License_State := '';
+			string25	Drivers_License  := '';
+  END;
 
 	EXPORT Provenance := RECORD
 				string75 FileName	:=''
@@ -302,7 +311,8 @@ EXPORT Layouts := MODULE
 			unsigned3		file_type;
 			unsigned6		ind_type;
 			string100 	source := '';
-			Provenance;			
+			Provenance;
+      		clean_Drivers_License clean_Drivers_License;		
 		END;
 		EXPORT KnownFraud := RECORD
 			Sprayed.KnownFraud;
@@ -321,6 +331,7 @@ EXPORT Layouts := MODULE
 			unsigned6		ind_type;
 			string100 	source := '';
 			Provenance;
+      		clean_Drivers_License clean_Drivers_License;
 		END;
 		EXPORT Deltabase := RECORD
 			Sprayed.Deltabase;
@@ -335,6 +346,7 @@ EXPORT Layouts := MODULE
 			string12		cell_phone := '';
 			string100 	source := '';
 			Provenance;
+      		clean_Drivers_License clean_Drivers_License;
 		END;
 		
 		EXPORT ConfigRiskLevel	:= RECORD
@@ -358,6 +370,7 @@ EXPORT Layouts := MODULE
 		END;
 		
 	END;
+
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Id;
 		string2 	Customer_State;
@@ -371,6 +384,7 @@ EXPORT Layouts := MODULE
 		string 		Customer_Email; // Emails Separated by semicolon ";"
 		unsigned6 	fdn_file_info_id;
 	end;
+
 
 	EXPORT CustomerMappings := RECORD
 		unsigned6	fdn_file_info_id;
@@ -406,9 +420,8 @@ EXPORT Layouts := MODULE
 		end;
 
 
-		export CustomerActiveSprays := record 
-			string20 	Customer_Id;
-			string20	File_type;
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
 		end;
 	end;
 
@@ -468,15 +481,19 @@ Export PII	:=RECORD
 	string2 postdir;
 	string10 unit_desig;
 	string8 sec_range;
+	string25 p_city_name;
   string2 st;
   string5 zip;
+	string100 address_1;
   string10 ssn;
   string10 dob;
   string25 drivers_license;
   string2 drivers_license_state;
   string10 home_phone;
   string10 work_phone_;
+	string50 email_address;
   string25 ip_address;
+	string8	reported_date;
 	unsigned8 Record_ID;
 	unsigned6 fdn_file_info_id;
 
@@ -767,6 +784,63 @@ Export CIID := RECORD
   string100 organizationname;
  END;
  
+ EXPORT BestInfo := RECORD
+		unsigned8 Record_ID;
+		unsigned6 did;
+		unsigned6 fdn_file_info_id;
+		string10 	best_phone;
+		string9  	best_ssn;
+		string9  	max_ssn;
+		string5		best_title;
+		string20	best_fname;
+		string20	best_mname;
+		string20	best_lname;
+		string5		best_name_suffix;
+		string120 best_addr1;
+		string30	best_city;
+		string2		best_state;
+		string5		best_zip;
+		string4		best_zip4;
+		STRING6		best_addr_date;
+		string8  	best_dob;
+		string8  	best_dod;
+		STRING3 	verify_best_phone;
+		STRING3 	verify_best_ssn;
+		STRING3 	verify_best_address;
+		STRING3 	verify_best_name;
+		STRING3 	verify_best_dob;
+		STRING3 	score_any_ssn;
+		STRING3 	score_any_addr;
+		STRING3 	any_addr_date;
+		STRING3 	score_any_dob;
+		STRING3 	score_any_phn;
+		STRING3		score_any_fzzy;
+		STRING		errorcode;
+ END;
+
+ EXPORT CoverageDates := RECORD
+    unsigned6 customer_id;
+    string2		customer_state;
+    string1   customer_program;
+    string100 contribution_code;
+    string100	source := '';
+    string100	source_group := '';
+    unsigned4	max_reported_date := 0;
+    unsigned4	max_process_date := 0;
+    unsigned4	record_count := 1;				
+  END;
+	
+ EXPORT PrepaidPhone	:= RECORD
+	string10	phone;
+	string8	reported_date;
+	unsigned8	vendor_first_reported_dt;
+	unsigned8	vendor_last_reported_dt;
+	string2	prepaid;
+	unsigned8	record_id;
+	unsigned6	fdn_file_info_id;
+ END;
+ 
+ 
  //KEL Layouts
  shared flagsrec := RECORD
    string indicator;
@@ -868,14 +942,18 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_percentile_;
   unsigned1 __cl_active7_identity_count_percentile__flags;
   integer8 cl_address_count_;
+  integer8 cl_address_high_identity_count_;
   integer8 cl_adjacent_no_safe_flag_;
   integer8 cl_adjacent_safe_flag_;
   integer8 cl_adjacent_safe_identity_count_;
+  integer8 cl_bank_account_high_identity_count_;
   integer8 cl_bank_identity_count_gt2_count_;
   integer8 cl_bank_identity_count_gt2_top10_;
   integer8 cl_death_prior_to_all_events_identity_count_;
+  integer8 cl_drivers_license_high_identity_count_;
   integer8 cl_element_count_;
   integer8 cl_email_count_;
+  integer8 cl_email_high_identity_count_;
   integer8 cl_event_count_;
   integer8 cl_event_count_percentile_;
   unsigned1 __cl_event_count_percentile__flags;
@@ -898,9 +976,11 @@ Export CIID := RECORD
   unsigned1 __cl_identity_count_decile__flags;
   integer8 cl_identity_count_percentile_;
   unsigned1 __cl_identity_count_percentile__flags;
-  real8 cl_identity_event_avg_;
+  string cl_identity_event_avg_;
+  unsigned1 __cl_identity_event_avg__flags;
   real8 cl_impact_weight_;
   unsigned1 __cl_impact_weight__flags;
+  integer8 cl_ip_high_identity_count_;
   integer8 cl_ip_high_risk_city_event_count_;
   integer8 cl_ip_high_risk_city_identity_count_;
   integer8 cl_ip_high_risk_count_;
@@ -927,6 +1007,8 @@ Export CIID := RECORD
   integer8 cl_p_r_identity_match_count_;
   real8 cl_p_r_identity_match_percent_;
   integer8 cl_p_r_identity_no_match_;
+  integer8 cl_phone_high_identity_count_;
+  integer8 cl_ssn_high_identity_count_;
   integer8 cluster_score_;
   unsigned1 __cluster_score__flags;
   integer8 contributor_safe_flag_;
@@ -970,11 +1052,16 @@ Export CIID := RECORD
   integer8 kr_addr301_flag_;
   integer8 kr_addr302_flag_;
   integer8 kr_addr303_flag_;
+  integer8 kr_addr390_flag_;
+  integer8 kr_addr391_flag_;
+  integer8 kr_addr392_flag_;
+  integer8 kr_addr393_flag_;
   integer8 kr_event_after_last_known_risk_count_;
   integer8 kr_event_after_last_known_risk_flag_;
   integer8 kr_high_risk_flag_;
   unsigned4 kr_last_event_date_;
   unsigned1 __kr_last_event_date__flags;
+  integer8 kr_low_risk_flag_;
   integer8 kr_medium_risk_flag_;
   unsigned4 last_event_date_;
   unsigned1 __last_event_date__flags;
@@ -1002,7 +1089,6 @@ Export CIID := RECORD
   unsigned2 date_last_seen_;
   integer8 __recordcount;
  END;
-
 
  Export customerdashtopclustersandelements := RECORD
   unsigned8 source_customer_;
@@ -1046,6 +1132,7 @@ Export CIID := RECORD
   integer8 cl_high_risk_pattern5_flag_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 currently_incarcerated_flag_;
   integer8 fraud_offenses_flag_;
   integer8 associated_with_incarcerated_flag_;
@@ -1461,6 +1548,16 @@ RECORD
    integer8 __recordcount;
   END) event_types_;
   unsigned1 __event_types__flags;
+  unsigned8 _r_phone_;
+  unsigned1 ___r_phone__flags;
+  unsigned8 _r_email_;
+  unsigned1 ___r_email__flags;
+  unsigned8 _r_internet_protocol_;
+  unsigned1 ___r_internet_protocol__flags;
+  unsigned8 _r_bank_account_;
+  unsigned1 ___r_bank_account__flags;
+  unsigned8 _r_drivers_license_;
+  unsigned1 ___r_drivers_license__flags;
   string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   unsigned4 date_of_birth_;
@@ -1475,6 +1572,14 @@ RECORD
   unsigned1 __deceased_middle__flags;
   string deceased_last_;
   unsigned1 __deceased_last__flags;
+  string phone_number_;
+  unsigned1 __phone_number__flags;
+  string otto_email_id_;
+  unsigned1 __otto_email_id__flags;
+  string otto_ip_address_id_;
+  unsigned1 __otto_ip_address_id__flags;
+  string otto_drivers_license_id_;
+  unsigned1 __otto_drivers_license_id__flags;
   string deceased_match_code_;
   unsigned1 __deceased_match_code__flags;
   boolean _isdeepdive_;
@@ -1731,6 +1836,22 @@ RECORD
   unsigned1 ___device__risk__code__flags;
   integer8 _identity__risk__code_;
   unsigned1 ___identity__risk__code__flags;
+  string _advo__hitflag_;
+  unsigned1 ___advo__hitflag__flags;
+  string _advo__vacancyindicator_;
+  unsigned1 ___advo__vacancyindicator__flags;
+  string _advo__addressstyle_;
+  unsigned1 ___advo__addressstyle__flags;
+  string _advo__dropindicator_;
+  unsigned1 ___advo__dropindicator__flags;
+  string _advo__residentialorbusinessindicator_;
+  unsigned1 ___advo__residentialorbusinessindicator__flags;
+  string _advo__addresstype_;
+  unsigned1 ___advo__addresstype__flags;
+  string _advo__addressusagetype_;
+  unsigned1 ___advo__addressusagetype__flags;
+  string a_c_e_cleaner_error_code_;
+  unsigned1 __a_c_e_cleaner_error_code__flags;
   integer8 addr_hri11_flag_;
   integer8 addr_hri12_flag_;
   integer8 addr_hri14_flag_;
@@ -1744,6 +1865,10 @@ RECORD
   integer8 addr_hri_va_flag_;
   string address_entity_context_uid_;
   unsigned1 __address_entity_context_uid__flags;
+  integer8 address_is_cmra_;
+  integer8 address_is_po_box_;
+  integer8 address_is_vacant_;
+  integer8 address_out_of_state_;
   integer8 age_;
   unsigned1 __age__flags;
   integer8 contributor_safe_flag_;
@@ -1764,6 +1889,7 @@ RECORD
   unsigned1 __event_year_month__flags;
   string full_address_;
   unsigned1 __full_address__flags;
+  integer8 has_known_risk_element_;
   integer8 hri03_flag_;
   integer8 hri06_flag_;
   integer8 hri07_flag_;
@@ -1811,6 +1937,7 @@ RECORD
   integer8 in_customer_population_;
   integer8 industry_type_;
   unsigned1 __industry_type__flags;
+  integer8 invalid_address_;
   integer8 ip_high_risk_city_;
   integer8 ip_hosted_;
   integer8 ip_not_us_;
@@ -1820,6 +1947,10 @@ RECORD
   integer8 kr_addr301_flag_;
   integer8 kr_addr302_flag_;
   integer8 kr_addr303_flag_;
+  integer8 kr_addr390_flag_;
+  integer8 kr_addr391_flag_;
+  integer8 kr_addr392_flag_;
+  integer8 kr_addr393_flag_;
   integer8 kr_bnk800_flag_;
   integer8 kr_bnk801_flag_;
   integer8 kr_bnk802_flag_;
@@ -1843,6 +1974,7 @@ RECORD
   integer8 kr_eml591_flag_;
   integer8 kr_eml592_flag_;
   integer8 kr_eml593_flag_;
+  integer8 kr_event_after_known_risk_;
   integer8 kr_high_risk_address_flag_;
   integer8 kr_high_risk_bank_flag_;
   integer8 kr_high_risk_dl_flag_;
@@ -1896,27 +2028,60 @@ RECORD
   integer8 kr_id13007_flag_;
   integer8 kr_id14000_flag_;
   integer8 kr_id14001_flag_;
+  integer8 kr_id14900_flag_;
+  integer8 kr_id14901_flag_;
+  integer8 kr_id14902_flag_;
+  integer8 kr_id14903_flag_;
   integer8 kr_id2025_flag_;
   integer8 kr_identity_risk_;
   integer8 kr_ip1000_flag_;
   integer8 kr_ip1001_flag_;
+  integer8 kr_ip1090_flag_;
+  integer8 kr_ip1091_flag_;
+  integer8 kr_ip1092_flag_;
+  integer8 kr_ip1093_flag_;
   integer8 kr_ip600_flag_;
   integer8 kr_ip601_flag_;
   integer8 kr_ip602_flag_;
   integer8 kr_ip603_flag_;
   integer8 kr_ip604_flag_;
   integer8 kr_ip605_flag_;
+  integer8 kr_ip690_flag_;
+  integer8 kr_ip691_flag_;
+  integer8 kr_ip692_flag_;
+  integer8 kr_ip693_flag_;
+  integer8 kr_low_risk_address_flag_;
   integer8 kr_low_risk_bank_flag_;
   integer8 kr_low_risk_dl_flag_;
+  integer8 kr_low_risk_email_flag_;
+  integer8 kr_low_risk_identity_flag_;
+  integer8 kr_low_risk_ip_address_flag_;
+  integer8 kr_low_risk_phone_flag_;
+  integer8 kr_low_risk_ssn_flag_;
   integer8 kr_medium_risk_address_flag_;
   integer8 kr_medium_risk_bank_flag_;
   integer8 kr_medium_risk_dl_flag_;
+  integer8 kr_medium_risk_email_flag_;
   integer8 kr_medium_risk_identity_flag_;
+  integer8 kr_medium_risk_ip_address_flag_;
+  integer8 kr_medium_risk_phone_flag_;
+  integer8 kr_medium_risk_ssn_flag_;
   integer8 kr_phn400_flag_;
   integer8 kr_phn401_flag_;
   integer8 kr_phn402_flag_;
+  integer8 kr_phn490_flag_;
+  integer8 kr_phn491_flag_;
+  integer8 kr_phn492_flag_;
+  integer8 kr_phn493_flag_;
   integer8 kr_ssn100_flag_;
   integer8 kr_ssn101_flag_;
+  integer8 kr_ssn103_flag_;
+  integer8 kr_ssn104_flag_;
+  integer8 kr_ssn105_flag_;
+  integer8 kr_ssn190_flag_;
+  integer8 kr_ssn191_flag_;
+  integer8 kr_ssn192_flag_;
+  integer8 kr_ssn193_flag_;
   string lat_long_id_;
   unsigned1 __lat_long_id__flags;
   real8 latitude_;
@@ -2022,6 +2187,7 @@ RECORD
   integer8 cl_nap3_identity_count_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 kr_event_after_last_known_risk_flag_;
   integer8 vl_event30_active_flag_;
   integer8 cl_identity_count_decile_;

@@ -136,19 +136,24 @@ jPEP_out := IF(MissingPEP > 0,FAIL(MissingPEP + ' PoliticallyExposedPersons_InRa
 output(jPEP,named('PoliticallyExposedPersons_InRaw_notbase'));
 //9============================================================================================
 // World Bank Ineligible Firms 
-  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank( (~regexfind('^(Firm|Downloaded)', TRIM(orig_firm_name,ALL)) AND TRIM(orig_firm_name,ALL) <> '') ) ;
+  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank(~REGEXFIND('^(Name: |SortFirm Name|Downloaded)',orig_firm_name)
+																															AND address <> 'Address'
+																															AND TRIM(orig_firm_name) <> '') ;
   WBIFBase  := ProdBase(source = 'World Bank Ineligible Firms' AND TRIM(orig_pty_name,ALL) <> '');	
 	
 	ClnRawName(string InName)	:= FUNCTION
-	  StdAKA							:= IF(REGEXFIND('also known as',InName), REGEXREPLACE('also known as ',InName,'AKA '),InName);
+	  StdAKA							:= STD.Str.CleanSpaces(REGEXREPLACE('\\*[0-9]+',REGEXREPLACE('ALSO KNOWN AS ',ut.CleanSpacesAndUpper(InName),'AKA '),''));
 		ClnName							:= IF(STD.Str.Find(StdAKA,'*',1) >0, REGEXREPLACE('(.*)[\\*](.*)',StdAKA,'$1'),StdAKA);
-		TempName						:= REGEXREPLACE('^DBA ',STD.Str.FilterOut(ClnName, '",*'),'');
+		TempName						:= STD.Str.FilterOut(ClnName, '",*');
 		ParseEntity			 		:= IF(REGEXFIND('(.*)(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,NOCASE),
 															REGEXFIND('(.*)(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,1,NOCASE),
 															TempName);
-		FinalClean					:= ut.CleanSpacesAndUpper(REGEXREPLACE('(\\([?]+\\))',
-																													REGEXREPLACE(' \\(CURRENTLY$| \\($',trim(ParseEntity,left,right),'',NOCASE),
-																													''));
+		RmvAKA							:= IF(REGEXFIND('^(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,NOCASE),
+															REGEXFIND('^(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,2,NOCASE),
+															ParseEntity);
+		FinalClean					:= STD.Str.CleanSpaces(REGEXREPLACE('(\\([?]+\\))',
+																									REGEXREPLACE(' \\(CURRENTLY$| \\($',trim(RmvAKA,left,right),'',NOCASE),
+																									''));
 		RETURN FinalClean;
 	END;
 	

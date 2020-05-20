@@ -629,9 +629,18 @@ EXPORT Update_Base_V2 (
    	
    				this_batch_only	:= prepReturn;
    				
-   				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only).get_all;
+   				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only, pHistMode).get_all;
    				
    			RETURN prepMetrics;
+   	END;
+		
+ 	EXPORT Slim_Report	:= FUNCTION
+   	
+   				this_batch_only	:= prepReturn;
+   				
+   				slim_down				:= project(this_batch_only, UPI_DataBuild.Layouts_V2.slim_history);
+   				
+   			RETURN slim_down;
    	END;
 	
   	EXPORT All_Data_Base := FUNCTION

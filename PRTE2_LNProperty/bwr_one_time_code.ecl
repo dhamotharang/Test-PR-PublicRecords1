@@ -1,4 +1,4 @@
-
+﻿
 EXPORT BWR_ONE_TIME_CODE := MODULE
 
 SHARED MakeSuperKeys(string name) := FUNCTION
@@ -65,7 +65,7 @@ MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.bdid');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.did');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.fid');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.fid_county');
-MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.fid_linkids');
+
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::search.linkids');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::addr.full_v4');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::addr.full_v4_no_fares');
@@ -76,7 +76,6 @@ MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::ownership.did');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::ownership_addr');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::ownership_did');
 MakeSuperKeys ('~prte::key::ln_propertyv2::@version@::tax_summary');
-
 
 
 MakeSuperFiles ('~PRTE::BASE::ln_propertyv2::deed@version@');

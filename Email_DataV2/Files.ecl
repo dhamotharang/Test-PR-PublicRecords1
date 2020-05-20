@@ -1,11 +1,13 @@
 ﻿EXPORT Files := MODULE
 
-IMPORT Email_Data, Data_Services, MDR, ut;
+	IMPORT Email_DataV2, Email_data, Data_Services, MDR, ut;
 
 	//Base files
-	EXPORT Email_Base := DATASET('~thor_data400::base::email_dataV2', Email_DataV2.Layouts.Base_BIP, THOR);
-	EXPORT Email_Base_FCRA := DATASET('~thor_data400::base::email_dataV2_fcra', Email_DataV2.Layouts.Base_BIP, THOR);
-	
+	EXPORT Email_Base := prep_build.EmailV2_NonFcra(DATASET(Data_Services.Data_location.Prefix() + 'thor_data400::base::email_dataV2', Email_DataV2.Layouts.Base_BIP, THOR));
+
+	// EXPORT Email_Base_FCRA := DATASET('~thor_data400::base::email_dataV2_fcra', Email_DataV2.Layouts.Base_BIP, THOR);
+	EXPORT Email_Base_FCRA := prep_build.EmailV2_Fcra(DATASET(Data_Services.Data_location.Prefix() + 'thor_data400::base::email_dataV2_fcra', Email_DataV2.Layouts.Base_BIP, THOR));
+
 	//Filters for Keys
 	EXPORT DID_File	:= Email_Base(did > 0);
 	

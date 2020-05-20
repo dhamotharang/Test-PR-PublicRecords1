@@ -1,4 +1,4 @@
-import versioncontrol,_control,uspis_hotlist;
+﻿import versioncontrol,_control,uspis_hotlist;
 
 export Send_Email(
 	
@@ -10,7 +10,7 @@ export Send_Email(
 
 	export notificationlist := if(VersionControl._Flags.IsDataland
 																,_Control.myinfo.EmailAddressNotify
-																,'Angela.Herzberg@LexisNexis.com; Sudhir.Kasavajjala@LexisNexis.com; michael.gould@lexisnexis.com;Book_Retro_Team@choicepoint.com;RISBCTQualityAssurance@lexisnexis.com '+ _Control.myinfo.EmailAddressNotify
+																,'Angela.Herzberg@LexisNexis.com; Sudhir.Kasavajjala@LexisNexis.com; Book_Retro_Team@choicepoint.com;RISBCTQualityAssurance@lexisnexis.com '+ _Control.myinfo.EmailAddressNotify
 															);
 							
 	export build_success := fileservices.sendemail(

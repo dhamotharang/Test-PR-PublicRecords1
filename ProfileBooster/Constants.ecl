@@ -34,7 +34,8 @@ EXPORT recType := ENUM(
 											 
 EXPORT setValidAttributeVersions := ['PBATTRV1', 'PBATTRV1HHEIR'];
 
-EXPORT TeamEmailList					:= 'CPPM-Data.Acquisitions.Management2@risk.lexisnexis.com';
+EXPORT TeamEmailList			  := 'a&rdata.engineering.support@lexisnexisrisk.com';
+EXPORT QC_email_target			  := 'InsDataOps@lexisnexis.com, a&rdata.engineering.support@lexisnexisrisk.com,Todd.Steil@lexisnexisrisk.com,Michele.Walklin@lexisnexisrisk.com,David.Schlangen@lexisnexisrisk.com,Kevin.Huls@lexisnexisrisk.com';
 
 EXPORT ECL_Developers_Slim :=  
 										'Todd.Steil@lexisnexisrisk.com,' + 

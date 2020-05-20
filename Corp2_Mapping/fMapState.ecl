@@ -1,4 +1,4 @@
-import _control, corp2, corp2_mapping;
+﻿import _control, corp2, corp2_mapping;
 
 EXPORT fMapState(
 	 STRING		pState
@@ -10,6 +10,7 @@ EXPORT fMapState(
 	,BOOLEAN	pOverwrite			= true
 	,STRING		pEmailAddress		= Corp2.Email_Notification_Lists.spray + ';' + _control.MyInfo.emailaddressnotify
   ,BOOLEAN  pQuartlyReload  = false
+	,BOOLEAN  pIncludeInactv  = false
 ) :=
 FUNCTION
 
@@ -22,7 +23,7 @@ FUNCTION
 	  ,'ak'										=> Corp2_Mapping.AK.Update						(pVersion			,pVersion   	,pShouldSpray,pOverwrite)
 		,'al'										=> Corp2_Mapping.AL.Update						(pVersion			,pVersion   	,pShouldSpray,pOverwrite)
 		,'ar'										=> Corp2_Mapping.ARKANSAS.Update			(pVersion			,pVersion   	,pShouldSpray,pOverwrite)
-		,'az'										=> Corp2_Mapping.AZ.Update    				(pVersion			,pVersion   	,pShouldSpray,pOverwrite)
+		,'az'										=> Corp2_Mapping.AZ.Update    				(pVersion			,pVersion   	,pShouldSpray,pOverwrite,,pIncludeInactv)
 		,'ca'										=> Corp2_Mapping.CA.Update						(pVersion			,pVersion 		,pShouldSpray,pOverwrite)
 		,'co'										=> Corp2_Mapping.CO.Update			 			(pVersion			,pVersion  		,pShouldSpray,pOverwrite,	, pCotmVersion)
 		,'ct'										=> Corp2_Mapping.CT.Update    				(pVersion			,pVersion   	,pShouldSpray,pOverwrite)

@@ -2,11 +2,12 @@
 
 EXPORT Files := MODULE
 
-  //Base
- EXPORT Thrive_Base := dataset(PRTE2_Thrive.Constants.base_prefix +'Thrive', PRTE2_Thrive.Layouts.Base, thor);
+ //Base
+ EXPORT Thrive_Base := DATASET(PRTE2_Thrive.Constants.base_prefix +'Thrive', PRTE2_Thrive.Layouts.Base, thor);
   
  //Key Build
- EXPORT Thrive_did := project(Thrive_Base, transform(Layouts.key, self := left, self := [])); 
+ EXPORT Thrive_did := PROJECT(Thrive_Base, TRANSFORM(Layouts.key, self := left, self := [])); 
+
    
  //Input Files
  EXPORT Input_INS := dataset('~prte::in::thrive::ins', PRTE2_Thrive.Layouts.INPUT, CSV(HEADING(3), 

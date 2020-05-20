@@ -53,5 +53,30 @@ export Layouts := Module
     Integer8   delta_count:=0;
     Decimal5_2 delta_count_perc:=0;
 End;
+    export StatisticsPoints:=RECORD
+        Real       Min;
+        Real       Q1;
+        Real       Median;
+        Real       Q3;
+        Real       Max;
+        Real       Mean;
+        Real       Variance;
+        Real       StDev;
+        Real       Plus2StDev;
+        Real       Minus2StDev;
+        Unsigned   NumLessThanQ1;
+        Unsigned   BtwnQ1AndQ3;
+        Unsigned   NumMoreThanQ3;
+    END;
+    export StatisticsRec:=RECORD
+        String25   datasetname;
+        String60   superkey;
+        String1    updateflag;
+        unsigned   numberofdeltas;
+        StatisticsPoints FileSizeReal;
+        StatisticsPoints FileSizePerc;
+        StatisticsPoints NumberOfRecordsReal;
+        StatisticsPoints NumberOfRecordsPerc;
+    END;
 
 End;

@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_LN_PropertyV2_Assessor.BWR_Hygiene - Hygiene & Stats - SALT V3.11.0');
+#workunit('name','Scrubs_LN_PropertyV2_Assessor.BWR_Hygiene - Hygiene & Stats - SALT V3.11.9');
 IMPORT Scrubs_LN_PropertyV2_Assessor,SALT311;
 // First create an instantiated hygiene module
   infile := Scrubs_LN_PropertyV2_Assessor.In_Property_Assessor;

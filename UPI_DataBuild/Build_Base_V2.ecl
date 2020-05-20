@@ -143,6 +143,35 @@ export Build_Base_V2 := module
 								,output('No Valid version parameter passed, skipping batch metrics build')
 						);
 		END; 
+		
+		EXPORT build_slim_report(
+					 string				pVersion
+					,boolean			pUseProd
+					,string				gcid
+					,unsigned1		pLexidThreshold
+					,string1			pHistMode
+					,string100		gcid_name
+					,string10			pBatch_jobID
+					,string1			pAppendOption) := module
+	
+					shared build_slim_report := UPI_DataBuild.Update_Base_V2(pVersion,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).slim_report;
+					VersionControl.macBuildNewLogicalFile(
+																					 Filenames_V2(pVersion, pUseProd, gcid, pHistMode).slim_history_file.new
+																				 	,build_slim_report
+																					,Build_slim_file
+																					);
+					export full_build_slim_report	:=  
+						sequential(				
+						 		 Build_slim_file
+								// ,Promote_V2.promote_tobatch_metrics(pVersion, pUseProd, gcid, pHistMode).buildfiles.New2Built); // figure out promote, can it be done at time of built?
+						);
+	
+					export slim_all	:=
+						if(VersionControl.IsValidVersion(pVersion[1..8])
+								,full_build_slim_report
+								,output('No Valid version parameter passed, skipping slim report file build')
+						);
+		END; 
 
 		EXPORT Build_temp_header(
 			 string				pVersion
@@ -170,6 +199,5 @@ export Build_Base_V2 := module
 						,output('No Valid version parameter passed, skipping temp_header build')
 				);
 	END;
-
-							
+								
 END;

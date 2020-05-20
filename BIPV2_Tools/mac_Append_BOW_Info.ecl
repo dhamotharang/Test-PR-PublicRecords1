@@ -2,6 +2,7 @@
 
    pID                      = 'proxid'
   ,pDataset                 = 'bipv2.CommonBase.ds_base'
+  ,pPersistUnique           = '\'\''
   ,pBOW_field               = 'cnp_name'
   ,pBOW_Index               = 'BIPV2_proxid.specificities(BIPV2_proxid.In_DOT_Base).cnp_name_values_index'
   ,pBOW_Function            = 'SALT37.MatchBagOfWords'
@@ -18,7 +19,7 @@ functionmacro
     import BIPV2_ProxID,salt37;
     
     // -- only care about records with a cluster id on them.
-    ds_has_ID := pDataset(pID != 0)  : persist('~persist::BIPV2_Tools::mac_Append_BOW_Info::ds_has_ID.' + #TEXT(pID));
+    ds_has_ID := pDataset(pID != 0)  : persist('~persist::BIPV2_Tools::mac_Append_BOW_Info::ds_has_ID.' + #TEXT(pID) + trim(pPersistUnique));
     
     ds_slim := table(ds_has_ID ,{pID,duns_number,deleted_key,prev_deleted_duns,cnp_name},pID,duns_number,deleted_key,prev_deleted_duns,cnp_name,merge);
     

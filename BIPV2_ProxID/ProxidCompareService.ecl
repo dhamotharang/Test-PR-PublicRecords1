@@ -1,4 +1,4 @@
-﻿/*HACKCompareService*/
+/*HACKCompareService*/
 /*--SOAP--
 <message name="ProxidCompareService">
 <part name="ProxidOne" type="xsd:string"/>

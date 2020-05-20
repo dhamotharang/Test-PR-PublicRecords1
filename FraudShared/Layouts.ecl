@@ -217,6 +217,10 @@ export clean_phones :=
 	string10            Work_phone   ; 
 	end;
 
+EXPORT clean_Drivers_License := RECORD
+		string2		Drivers_License_State := '';
+		string25	Drivers_License  := '';
+END;
 
 export address_cleaner :=
 	record
@@ -510,8 +514,14 @@ export Main         :=
 	string10					investigator_id := '';	
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
+
+//  Other fields
 	unsigned4					global_sid := 0;
-	unsigned8					record_sid := 0; 	
+	unsigned8					record_sid := 0;
+	unsigned2					RIN_Source := 0;
+	clean_Drivers_License 		clean_Drivers_License;
+	string10					geo_lat := '';
+	string11					geo_long := '';	
 end; 
 
 end; 
@@ -711,14 +721,19 @@ export keybuild
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';
-	string10  				amount_paid := '';
+	string10  					amount_paid := '';
 	string10					region_code := '';
 	string10					investigator_id := '';
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
-	unsigned4					global_sid := 0;
-	unsigned8 				record_sid := 0; 	
 
+//  Other fields	
+	unsigned4					global_sid := 0;
+	unsigned8 					record_sid := 0; 	
+	unsigned2					RIN_Source := 0;
+	clean_Drivers_License 		clean_Drivers_License;
+	string10					geo_lat := '';
+	string11					geo_long := '';	
 end; 
 
 export temp := module 

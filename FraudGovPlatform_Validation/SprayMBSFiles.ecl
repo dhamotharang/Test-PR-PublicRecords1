@@ -1,4 +1,4 @@
-﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS, ut;
+﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS, ut, STD;
 
 export SprayMBSFiles(
 	 string pversion
@@ -102,6 +102,8 @@ function
 		, if(not FraudShared._Flags.FileExists.Input.MBSmarketAppend or pOverwrite , SprayTheFile(FilesToSprayMBSmarketAppend ))
 		, if(not FraudShared._Flags.FileExists.Input.MBSFdnCCID or pOverwrite , SprayTheFile(FilesToSprayMBSFdnCCID ))
 		, if(not FraudShared._Flags.FileExists.Input.MBSFdnHHID or pOverwrite , SprayTheFile(FilesToSprayMBSFdnHHID ))
+		, if(~STD.File.FileExists(FraudShared.Filenames(pversion).Input.MBSFdnHHID.new(pversion)),STD.File.SwapSuperFile(fraudshared.filenames().input.MBSFdnHHID.used,fraudshared.filenames().input.MBSFdnHHID.sprayed))
+		, if(~STD.File.FileExists(FraudShared.Filenames(pversion).Input.MBSmarketAppend.new(pversion)),STD.File.SwapSuperFile(fraudshared.filenames().input.MBSmarketAppend.used,fraudshared.filenames().input.MBSmarketAppend.sprayed))
 		, If(FraudGovPlatform._Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl)
 		);
 

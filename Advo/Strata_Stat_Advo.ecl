@@ -1,4 +1,4 @@
-import STRATA;
+﻿import STRATA;
 
 export Strata_Stat_Advo(
 
@@ -91,7 +91,7 @@ STRATA.createXMLStats(Srt_dPopulationStats_advo_base
 					 ,'DL'
 					 ,'advo'
 					 ,pVersion
-					 ,'michael.gould@lexisnexis.com'
+					 ,'Sudhir.Kasavajjala@lexisnexisrisk.com'
 					 ,zadvo_base);
 
 return zadvo_base;
