@@ -53,11 +53,15 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 	END;
 	// kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
 
-	mod_access := MODULE(Doxie.IDataAccess)
-		EXPORT UNSIGNED1 lexid_source_optout := Options.LexIdSourceOptout;
-		EXPORT STRING transaction_id := Options.TransactionID; // esp transaction id or batch uid
-		EXPORT UNSIGNED6 global_company_id := Options.GlobalCompanyId; // mbs gcid
-	END;
+  mod_access := MODULE(Doxie.IDataAccess)
+    EXPORT glb := options.GLBAPurpose;
+    EXPORT dppa := options.DPPAPurpose;
+    EXPORT DataPermissionMask := options.Data_Permission_Mask;
+    EXPORT DataRestrictionMask := options.Data_Restriction_Mask;
+    EXPORT UNSIGNED1 lexid_source_optout := Options.LexIdSourceOptout;
+    EXPORT STRING transaction_id := Options.TransactionID; // esp transaction id or batch uid
+    EXPORT UNSIGNED6 global_company_id := Options.GlobalCompanyId; // mbs gcid
+  END;
 
   unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 

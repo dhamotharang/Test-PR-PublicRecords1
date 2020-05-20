@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+﻿﻿/*--SOAP--
 <message name="Business Shell">
 	<part name="seq" type="xsd:integer"/>
 	<part name="AccountNumber" type="xsd:string"/>
@@ -44,7 +44,7 @@
 */
 /*--INFO-- This Service is an interface for modelers to see all data available from BIID and Profile Risk Score. */
 
-IMPORT RiskWise, business_risk, Risk_Indicators, STD;
+IMPORT RiskWise, business_risk, Risk_Indicators, STD, Gateway;
 
 export Business_Shell := macro
 
@@ -231,7 +231,7 @@ biid := business_risk.InstantID_Function(indata, gateways, false, dppa, glb, fal
                                             BatchUID := BatchUID, 
                                             GlobalCompanyID := GlobalCompanyID);
 
-bus_shell := business_risk.Business_Shell_Function(biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID);
+bus_shell := business_risk.Business_Shell_Function(biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID, DataPermission);
 
 output(bus_shell, named('Results'));
 

@@ -1,4 +1,4 @@
-﻿IMPORT autostandardI, BIPV2, BIPV2_Best,
+﻿﻿IMPORT autostandardI, BIPV2, BIPV2_Best,
   BIPV2_WAF, Census_Data, Doxie,
   gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
 
@@ -32,7 +32,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		in_mod_WAF_KEY := PROJECT(global_mod, BIPV2.mod_sources.iParams,OPT);
 		unsigned userpermits_SALT := BIPV2.mod_sources.in_mod_values(in_mod_WAF_KEY).my_bmap;
 
-		ds_linkIDsNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).Data2_;
+		ds_linkIDsNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).SearchKeyData(mod_access);
 
     // NOTE:  this export BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).Data2_
 		// is referred to as Data2_ export below in the code.
@@ -72,7 +72,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		 // SELEBEST export which ultimately calls the bipv2_best.key_linkids.kfetch call
 		 //
 
-		 ds_seleidBest := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).SELEBest(company_name <> '');
+		 ds_seleidBest := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).SeleBest2(mod_access)(company_name <> '');
 
 		 ds_seleidBestPreWirelessIndicator := project(ds_seleidBest,transform({recordof(left);
 		                                                                        string3 timeZone;
@@ -1501,5 +1501,3 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 	END;
 
 END;
-
-
