@@ -50,7 +50,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Alpha:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'Alpha\')\n'
     + 'FIELDTYPE:Invalid_AlphaNum:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNum\', true)\n'
     + 'FIELDTYPE:Invalid_AlphaNumChar:CUSTOM(Scrubs.Fn_Allow_ws > 0, \'AlphaNumChar\', true)\n'
-    + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_BK_Events.Fn_Valid_Date > 0)\n'
+    + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_BK_Events.Functions.Fn_Valid_Date > 0)\n'
     + '\n'
     + 'FIELD:dractivitytypecode:TYPE(QSTRING1):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:docketentryid:TYPE(STRING100):LIKE(Invalid_No):0,0\n'
