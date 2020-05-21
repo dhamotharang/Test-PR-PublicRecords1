@@ -3,6 +3,6 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Customer,B_Customer_4,E_Customer FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer := MODULE
-  SHARED __EE2524115 := B_Customer.IDX_Customer_UID_Wrapped;
-  EXPORT Res0 := __UNWRAP(__EE2524115);
+  SHARED __EE2600909 := B_Customer.IDX_Customer_UID_Wrapped;
+  EXPORT Res0 := __UNWRAP(__EE2600909);
 END;

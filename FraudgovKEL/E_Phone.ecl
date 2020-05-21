@@ -116,7 +116,7 @@ EXPORT E_Phone := MODULE
     {'Phone','FraudgovKEL.fraudgovshared','UID',COUNT(FraudgovKEL_fraudgovshared_1_Invalid),COUNT(__d0)},
     {'Phone','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
     {'Phone','FraudgovKEL.fraudgovshared','SourceCustomerFileInfo',COUNT(__d0(__NL(_r_Source_Customer_))),COUNT(__d0(__NN(_r_Source_Customer_)))},
-    {'Phone','FraudgovKEL.fraudgovshared','cell_phone_formatted',COUNT(__d0(__NL(Phone_Formatted_))),COUNT(__d0(__NN(Phone_Formatted_)))},
+    {'Phone','FraudgovKEL.fraudgovshared','Cell_phone_Formatted',COUNT(__d0(__NL(Phone_Formatted_))),COUNT(__d0(__NN(Phone_Formatted_)))},
     {'Phone','FraudgovKEL.fraudgovshared','clean_phones.cell_phone',COUNT(__d0(__NL(Phone_Number_))),COUNT(__d0(__NN(Phone_Number_)))},
     {'Phone','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'Phone','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
