@@ -170,6 +170,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING cleared_fraud,
 		STRING reason_description,
 		STRING reported_by,
+		STRING reason_cleared_code,
 
     BOOLEAN addresspobox,
     BOOLEAN addresscmra,
@@ -488,6 +489,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		cleared_fraud,
 		reason_description,
 		reported_by,
+		reason_cleared_code,
 		
 		Device_ID,unique_number, mac_address, serial_number, device_type, device_identification_provider,
 		
