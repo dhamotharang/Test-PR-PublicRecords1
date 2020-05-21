@@ -1,9 +1,10 @@
 ﻿IMPORT SALT311,STD;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Cert_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 163;
-  EXPORT NumRulesFromFieldType := 163;
+  EXPORT NumRules := 166;
+  EXPORT NumRulesFromFieldType := 166;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 163;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -182,27 +183,27 @@ EXPORT Cert_Scrubs := MODULE
     STRING Rules {MAXLENGTH(1000)};
   END;
   SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
-          ,'dartid:Test:ALLOW'
-          ,'dateadded:Test:ALLOW'
-          ,'dateupdated:Test:ALLOW'
-          ,'website:Test:ALLOW'
-          ,'state:Test:ALLOW'
-          ,'lninscertrecordid:Test:ALLOW'
-          ,'profilelastupdated:Test:ALLOW'
-          ,'siid:Test:ALLOW'
+          ,'dartid:Invalid_No:ALLOW'
+          ,'dateadded:Invalid_Date:CUSTOM'
+          ,'dateupdated:Invalid_Date:CUSTOM'
+          ,'website:Invalid_Alpha:ALLOW'
+          ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
+          ,'lninscertrecordid:Invalid_No:ALLOW'
+          ,'profilelastupdated:Invalid_Date:CUSTOM'
+          ,'siid:Invalid_No:ALLOW'
           ,'sipstatuscode:Test:ALLOW'
-          ,'wcbempnumber:Test:ALLOW'
-          ,'ubinumber:Test:ALLOW'
-          ,'cofanumber:Test:ALLOW'
-          ,'usdotnumber:Test:ALLOW'
-          ,'businessname:Test:ALLOW'
-          ,'dba:Test:ALLOW'
-          ,'addressline1:Test:ALLOW'
-          ,'addressline2:Test:ALLOW'
-          ,'addresscity:Test:ALLOW'
-          ,'addressstate:Test:ALLOW'
-          ,'addresszip:Test:ALLOW'
-          ,'zip4:Test:ALLOW'
+          ,'wcbempnumber:Invalid_No:ALLOW'
+          ,'ubinumber:Invalid_No:ALLOW'
+          ,'cofanumber:Invalid_No:ALLOW'
+          ,'usdotnumber:Invalid_No:ALLOW'
+          ,'businessname:Invalid_AlphaChar:ALLOW'
+          ,'dba:Invalid_AlphaChar:ALLOW'
+          ,'addressline1:Invalid_AlphaChar:ALLOW'
+          ,'addressline2:Invalid_AlphaNum:ALLOW'
+          ,'addresscity:Invalid_AlphaCaps:ALLOW'
+          ,'addressstate:Invalid_State:ALLOW','addressstate:Invalid_State:LENGTHS'
+          ,'addresszip:Invalid_Zip:ALLOW','addresszip:Invalid_Zip:LENGTHS'
+          ,'zip4:Invalid_No:ALLOW'
           ,'phone1:Test:ALLOW'
           ,'phone2:Test:ALLOW'
           ,'phone3:Test:ALLOW'
@@ -242,7 +243,7 @@ EXPORT Cert_Scrubs := MODULE
           ,'policyholdernamesuffix:Test:ALLOW'
           ,'statepolicyfilenumber:Test:ALLOW'
           ,'coverageinjuryillnessdate:Test:ALLOW'
-          ,'selfinsurancegroup:Test:ALLOW'
+          ,'selfinsurancegroup:Invalid_AlphaCaps:ALLOW'
           ,'selfinsurancegroupphone:Test:ALLOW'
           ,'selfinsurancegroupid:Test:ALLOW'
           ,'numberofemployees:Test:ALLOW'
@@ -357,7 +358,7 @@ EXPORT Cert_Scrubs := MODULE
           ,Cert_Fields.InvalidMessage_dateadded(1)
           ,Cert_Fields.InvalidMessage_dateupdated(1)
           ,Cert_Fields.InvalidMessage_website(1)
-          ,Cert_Fields.InvalidMessage_state(1)
+          ,Cert_Fields.InvalidMessage_state(1),Cert_Fields.InvalidMessage_state(2)
           ,Cert_Fields.InvalidMessage_lninscertrecordid(1)
           ,Cert_Fields.InvalidMessage_profilelastupdated(1)
           ,Cert_Fields.InvalidMessage_siid(1)
@@ -371,8 +372,8 @@ EXPORT Cert_Scrubs := MODULE
           ,Cert_Fields.InvalidMessage_addressline1(1)
           ,Cert_Fields.InvalidMessage_addressline2(1)
           ,Cert_Fields.InvalidMessage_addresscity(1)
-          ,Cert_Fields.InvalidMessage_addressstate(1)
-          ,Cert_Fields.InvalidMessage_addresszip(1)
+          ,Cert_Fields.InvalidMessage_addressstate(1),Cert_Fields.InvalidMessage_addressstate(2)
+          ,Cert_Fields.InvalidMessage_addresszip(1),Cert_Fields.InvalidMessage_addresszip(2)
           ,Cert_Fields.InvalidMessage_zip4(1)
           ,Cert_Fields.InvalidMessage_phone1(1)
           ,Cert_Fields.InvalidMessage_phone2(1)
@@ -693,9 +694,9 @@ EXPORT FromNone(DATASET(Cert_Layout_Insurance_Cert) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Cert_Layout_Insurance_Cert);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dartid_Invalid << 0 ) + ( le.dateadded_Invalid << 1 ) + ( le.dateupdated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.lninscertrecordid_Invalid << 5 ) + ( le.profilelastupdated_Invalid << 6 ) + ( le.siid_Invalid << 7 ) + ( le.sipstatuscode_Invalid << 8 ) + ( le.wcbempnumber_Invalid << 9 ) + ( le.ubinumber_Invalid << 10 ) + ( le.cofanumber_Invalid << 11 ) + ( le.usdotnumber_Invalid << 12 ) + ( le.businessname_Invalid << 13 ) + ( le.dba_Invalid << 14 ) + ( le.addressline1_Invalid << 15 ) + ( le.addressline2_Invalid << 16 ) + ( le.addresscity_Invalid << 17 ) + ( le.addressstate_Invalid << 18 ) + ( le.addresszip_Invalid << 19 ) + ( le.zip4_Invalid << 20 ) + ( le.phone1_Invalid << 21 ) + ( le.phone2_Invalid << 22 ) + ( le.phone3_Invalid << 23 ) + ( le.fax1_Invalid << 24 ) + ( le.fax2_Invalid << 25 ) + ( le.email1_Invalid << 26 ) + ( le.email2_Invalid << 27 ) + ( le.businesstype_Invalid << 28 ) + ( le.namefirst_Invalid << 29 ) + ( le.namemiddle_Invalid << 30 ) + ( le.namelast_Invalid << 31 ) + ( le.namesuffix_Invalid << 32 ) + ( le.nametitle_Invalid << 33 ) + ( le.mailingaddress1_Invalid << 34 ) + ( le.mailingaddress2_Invalid << 35 ) + ( le.mailingaddresscity_Invalid << 36 ) + ( le.mailingaddressstate_Invalid << 37 ) + ( le.mailingaddresszip_Invalid << 38 ) + ( le.mailingaddresszip4_Invalid << 39 ) + ( le.contactnamefirst_Invalid << 40 ) + ( le.contactnamemiddle_Invalid << 41 ) + ( le.contactnamelast_Invalid << 42 ) + ( le.contactnamesuffix_Invalid << 43 ) + ( le.contactbusinessname_Invalid << 44 ) + ( le.contactaddressline1_Invalid << 45 ) + ( le.contactaddressline2_Invalid << 46 ) + ( le.contactcity_Invalid << 47 ) + ( le.contactstate_Invalid << 48 ) + ( le.contactzip_Invalid << 49 ) + ( le.contactzip4_Invalid << 50 ) + ( le.contactphone_Invalid << 51 ) + ( le.contactfax_Invalid << 52 ) + ( le.contactemail_Invalid << 53 ) + ( le.policyholdernamefirst_Invalid << 54 ) + ( le.policyholdernamemiddle_Invalid << 55 ) + ( le.policyholdernamelast_Invalid << 56 ) + ( le.policyholdernamesuffix_Invalid << 57 ) + ( le.statepolicyfilenumber_Invalid << 58 ) + ( le.coverageinjuryillnessdate_Invalid << 59 ) + ( le.selfinsurancegroup_Invalid << 60 ) + ( le.selfinsurancegroupphone_Invalid << 61 ) + ( le.selfinsurancegroupid_Invalid << 62 ) + ( le.numberofemployees_Invalid << 63 );
-    SELF.ScrubsBits2 := ( le.licensedcontractor_Invalid << 0 ) + ( le.mconame_Invalid << 1 ) + ( le.mconumber_Invalid << 2 ) + ( le.mcoaddressline1_Invalid << 3 ) + ( le.mcoaddressline2_Invalid << 4 ) + ( le.mcocity_Invalid << 5 ) + ( le.mcostate_Invalid << 6 ) + ( le.mcozip_Invalid << 7 ) + ( le.mcozip4_Invalid << 8 ) + ( le.mcophone_Invalid << 9 ) + ( le.governingclasscode_Invalid << 10 ) + ( le.licensenumber_Invalid << 11 ) + ( le.class_Invalid << 12 ) + ( le.classificationdescription_Invalid << 13 ) + ( le.licensestatus_Invalid << 14 ) + ( le.licenseadditionalinfo_Invalid << 15 ) + ( le.licenseissuedate_Invalid << 16 ) + ( le.licenseexpirationdate_Invalid << 17 ) + ( le.naicscode_Invalid << 18 ) + ( le.officerexemptfirstname1_Invalid << 19 ) + ( le.officerexemptlastname1_Invalid << 20 ) + ( le.officerexemptmiddlename1_Invalid << 21 ) + ( le.officerexempttitle1_Invalid << 22 ) + ( le.officerexempteffectivedate1_Invalid << 23 ) + ( le.officerexemptterminationdate1_Invalid << 24 ) + ( le.officerexempttype1_Invalid << 25 ) + ( le.officerexemptbusinessactivities1_Invalid << 26 ) + ( le.officerexemptfirstname2_Invalid << 27 ) + ( le.officerexemptlastname2_Invalid << 28 ) + ( le.officerexemptmiddlename2_Invalid << 29 ) + ( le.officerexempttitle2_Invalid << 30 ) + ( le.officerexempteffectivedate2_Invalid << 31 ) + ( le.officerexemptterminationdate2_Invalid << 32 ) + ( le.officerexempttype2_Invalid << 33 ) + ( le.officerexemptbusinessactivities2_Invalid << 34 ) + ( le.officerexemptfirstname3_Invalid << 35 ) + ( le.officerexemptlastname3_Invalid << 36 ) + ( le.officerexemptmiddlename3_Invalid << 37 ) + ( le.officerexempttitle3_Invalid << 38 ) + ( le.officerexempteffectivedate3_Invalid << 39 ) + ( le.officerexemptterminationdate3_Invalid << 40 ) + ( le.officerexempttype3_Invalid << 41 ) + ( le.officerexemptbusinessactivities3_Invalid << 42 ) + ( le.officerexemptfirstname4_Invalid << 43 ) + ( le.officerexemptlastname4_Invalid << 44 ) + ( le.officerexemptmiddlename4_Invalid << 45 ) + ( le.officerexempttitle4_Invalid << 46 ) + ( le.officerexempteffectivedate4_Invalid << 47 ) + ( le.officerexemptterminationdate4_Invalid << 48 ) + ( le.officerexempttype4_Invalid << 49 ) + ( le.officerexemptbusinessactivities4_Invalid << 50 ) + ( le.officerexemptfirstname5_Invalid << 51 ) + ( le.officerexemptlastname5_Invalid << 52 ) + ( le.officerexemptmiddlename5_Invalid << 53 ) + ( le.officerexempttitle5_Invalid << 54 ) + ( le.officerexempteffectivedate5_Invalid << 55 ) + ( le.officerexemptterminationdate5_Invalid << 56 ) + ( le.officerexempttype5_Invalid << 57 ) + ( le.officerexemptbusinessactivities5_Invalid << 58 ) + ( le.dba1_Invalid << 59 ) + ( le.dbadatefrom1_Invalid << 60 ) + ( le.dbadateto1_Invalid << 61 ) + ( le.dbatype1_Invalid << 62 ) + ( le.dba2_Invalid << 63 );
-    SELF.ScrubsBits3 := ( le.dbadatefrom2_Invalid << 0 ) + ( le.dbadateto2_Invalid << 1 ) + ( le.dbatype2_Invalid << 2 ) + ( le.dba3_Invalid << 3 ) + ( le.dbadatefrom3_Invalid << 4 ) + ( le.dbadateto3_Invalid << 5 ) + ( le.dbatype3_Invalid << 6 ) + ( le.dba4_Invalid << 7 ) + ( le.dbadatefrom4_Invalid << 8 ) + ( le.dbadateto4_Invalid << 9 ) + ( le.dbatype4_Invalid << 10 ) + ( le.dba5_Invalid << 11 ) + ( le.dbadatefrom5_Invalid << 12 ) + ( le.dbadateto5_Invalid << 13 ) + ( le.dbatype5_Invalid << 14 ) + ( le.subsidiaryname1_Invalid << 15 ) + ( le.subsidiarystartdate1_Invalid << 16 ) + ( le.subsidiaryname2_Invalid << 17 ) + ( le.subsidiarystartdate2_Invalid << 18 ) + ( le.subsidiaryname3_Invalid << 19 ) + ( le.subsidiarystartdate3_Invalid << 20 ) + ( le.subsidiaryname4_Invalid << 21 ) + ( le.subsidiarystartdate4_Invalid << 22 ) + ( le.subsidiaryname5_Invalid << 23 ) + ( le.subsidiarystartdate5_Invalid << 24 ) + ( le.subsidiaryname6_Invalid << 25 ) + ( le.subsidiarystartdate6_Invalid << 26 ) + ( le.subsidiaryname7_Invalid << 27 ) + ( le.subsidiarystartdate7_Invalid << 28 ) + ( le.subsidiaryname8_Invalid << 29 ) + ( le.subsidiarystartdate8_Invalid << 30 ) + ( le.subsidiaryname9_Invalid << 31 ) + ( le.subsidiarystartdate9_Invalid << 32 ) + ( le.subsidiaryname10_Invalid << 33 ) + ( le.subsidiarystartdate10_Invalid << 34 );
+    SELF.ScrubsBits1 := ( le.dartid_Invalid << 0 ) + ( le.dateadded_Invalid << 1 ) + ( le.dateupdated_Invalid << 2 ) + ( le.website_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.lninscertrecordid_Invalid << 6 ) + ( le.profilelastupdated_Invalid << 7 ) + ( le.siid_Invalid << 8 ) + ( le.sipstatuscode_Invalid << 9 ) + ( le.wcbempnumber_Invalid << 10 ) + ( le.ubinumber_Invalid << 11 ) + ( le.cofanumber_Invalid << 12 ) + ( le.usdotnumber_Invalid << 13 ) + ( le.businessname_Invalid << 14 ) + ( le.dba_Invalid << 15 ) + ( le.addressline1_Invalid << 16 ) + ( le.addressline2_Invalid << 17 ) + ( le.addresscity_Invalid << 18 ) + ( le.addressstate_Invalid << 19 ) + ( le.addresszip_Invalid << 21 ) + ( le.zip4_Invalid << 23 ) + ( le.phone1_Invalid << 24 ) + ( le.phone2_Invalid << 25 ) + ( le.phone3_Invalid << 26 ) + ( le.fax1_Invalid << 27 ) + ( le.fax2_Invalid << 28 ) + ( le.email1_Invalid << 29 ) + ( le.email2_Invalid << 30 ) + ( le.businesstype_Invalid << 31 ) + ( le.namefirst_Invalid << 32 ) + ( le.namemiddle_Invalid << 33 ) + ( le.namelast_Invalid << 34 ) + ( le.namesuffix_Invalid << 35 ) + ( le.nametitle_Invalid << 36 ) + ( le.mailingaddress1_Invalid << 37 ) + ( le.mailingaddress2_Invalid << 38 ) + ( le.mailingaddresscity_Invalid << 39 ) + ( le.mailingaddressstate_Invalid << 40 ) + ( le.mailingaddresszip_Invalid << 41 ) + ( le.mailingaddresszip4_Invalid << 42 ) + ( le.contactnamefirst_Invalid << 43 ) + ( le.contactnamemiddle_Invalid << 44 ) + ( le.contactnamelast_Invalid << 45 ) + ( le.contactnamesuffix_Invalid << 46 ) + ( le.contactbusinessname_Invalid << 47 ) + ( le.contactaddressline1_Invalid << 48 ) + ( le.contactaddressline2_Invalid << 49 ) + ( le.contactcity_Invalid << 50 ) + ( le.contactstate_Invalid << 51 ) + ( le.contactzip_Invalid << 52 ) + ( le.contactzip4_Invalid << 53 ) + ( le.contactphone_Invalid << 54 ) + ( le.contactfax_Invalid << 55 ) + ( le.contactemail_Invalid << 56 ) + ( le.policyholdernamefirst_Invalid << 57 ) + ( le.policyholdernamemiddle_Invalid << 58 ) + ( le.policyholdernamelast_Invalid << 59 ) + ( le.policyholdernamesuffix_Invalid << 60 ) + ( le.statepolicyfilenumber_Invalid << 61 ) + ( le.coverageinjuryillnessdate_Invalid << 62 ) + ( le.selfinsurancegroup_Invalid << 63 );
+    SELF.ScrubsBits2 := ( le.selfinsurancegroupphone_Invalid << 0 ) + ( le.selfinsurancegroupid_Invalid << 1 ) + ( le.numberofemployees_Invalid << 2 ) + ( le.licensedcontractor_Invalid << 3 ) + ( le.mconame_Invalid << 4 ) + ( le.mconumber_Invalid << 5 ) + ( le.mcoaddressline1_Invalid << 6 ) + ( le.mcoaddressline2_Invalid << 7 ) + ( le.mcocity_Invalid << 8 ) + ( le.mcostate_Invalid << 9 ) + ( le.mcozip_Invalid << 10 ) + ( le.mcozip4_Invalid << 11 ) + ( le.mcophone_Invalid << 12 ) + ( le.governingclasscode_Invalid << 13 ) + ( le.licensenumber_Invalid << 14 ) + ( le.class_Invalid << 15 ) + ( le.classificationdescription_Invalid << 16 ) + ( le.licensestatus_Invalid << 17 ) + ( le.licenseadditionalinfo_Invalid << 18 ) + ( le.licenseissuedate_Invalid << 19 ) + ( le.licenseexpirationdate_Invalid << 20 ) + ( le.naicscode_Invalid << 21 ) + ( le.officerexemptfirstname1_Invalid << 22 ) + ( le.officerexemptlastname1_Invalid << 23 ) + ( le.officerexemptmiddlename1_Invalid << 24 ) + ( le.officerexempttitle1_Invalid << 25 ) + ( le.officerexempteffectivedate1_Invalid << 26 ) + ( le.officerexemptterminationdate1_Invalid << 27 ) + ( le.officerexempttype1_Invalid << 28 ) + ( le.officerexemptbusinessactivities1_Invalid << 29 ) + ( le.officerexemptfirstname2_Invalid << 30 ) + ( le.officerexemptlastname2_Invalid << 31 ) + ( le.officerexemptmiddlename2_Invalid << 32 ) + ( le.officerexempttitle2_Invalid << 33 ) + ( le.officerexempteffectivedate2_Invalid << 34 ) + ( le.officerexemptterminationdate2_Invalid << 35 ) + ( le.officerexempttype2_Invalid << 36 ) + ( le.officerexemptbusinessactivities2_Invalid << 37 ) + ( le.officerexemptfirstname3_Invalid << 38 ) + ( le.officerexemptlastname3_Invalid << 39 ) + ( le.officerexemptmiddlename3_Invalid << 40 ) + ( le.officerexempttitle3_Invalid << 41 ) + ( le.officerexempteffectivedate3_Invalid << 42 ) + ( le.officerexemptterminationdate3_Invalid << 43 ) + ( le.officerexempttype3_Invalid << 44 ) + ( le.officerexemptbusinessactivities3_Invalid << 45 ) + ( le.officerexemptfirstname4_Invalid << 46 ) + ( le.officerexemptlastname4_Invalid << 47 ) + ( le.officerexemptmiddlename4_Invalid << 48 ) + ( le.officerexempttitle4_Invalid << 49 ) + ( le.officerexempteffectivedate4_Invalid << 50 ) + ( le.officerexemptterminationdate4_Invalid << 51 ) + ( le.officerexempttype4_Invalid << 52 ) + ( le.officerexemptbusinessactivities4_Invalid << 53 ) + ( le.officerexemptfirstname5_Invalid << 54 ) + ( le.officerexemptlastname5_Invalid << 55 ) + ( le.officerexemptmiddlename5_Invalid << 56 ) + ( le.officerexempttitle5_Invalid << 57 ) + ( le.officerexempteffectivedate5_Invalid << 58 ) + ( le.officerexemptterminationdate5_Invalid << 59 ) + ( le.officerexempttype5_Invalid << 60 ) + ( le.officerexemptbusinessactivities5_Invalid << 61 ) + ( le.dba1_Invalid << 62 ) + ( le.dbadatefrom1_Invalid << 63 );
+    SELF.ScrubsBits3 := ( le.dbadateto1_Invalid << 0 ) + ( le.dbatype1_Invalid << 1 ) + ( le.dba2_Invalid << 2 ) + ( le.dbadatefrom2_Invalid << 3 ) + ( le.dbadateto2_Invalid << 4 ) + ( le.dbatype2_Invalid << 5 ) + ( le.dba3_Invalid << 6 ) + ( le.dbadatefrom3_Invalid << 7 ) + ( le.dbadateto3_Invalid << 8 ) + ( le.dbatype3_Invalid << 9 ) + ( le.dba4_Invalid << 10 ) + ( le.dbadatefrom4_Invalid << 11 ) + ( le.dbadateto4_Invalid << 12 ) + ( le.dbatype4_Invalid << 13 ) + ( le.dba5_Invalid << 14 ) + ( le.dbadatefrom5_Invalid << 15 ) + ( le.dbadateto5_Invalid << 16 ) + ( le.dbatype5_Invalid << 17 ) + ( le.subsidiaryname1_Invalid << 18 ) + ( le.subsidiarystartdate1_Invalid << 19 ) + ( le.subsidiaryname2_Invalid << 20 ) + ( le.subsidiarystartdate2_Invalid << 21 ) + ( le.subsidiaryname3_Invalid << 22 ) + ( le.subsidiarystartdate3_Invalid << 23 ) + ( le.subsidiaryname4_Invalid << 24 ) + ( le.subsidiarystartdate4_Invalid << 25 ) + ( le.subsidiaryname5_Invalid << 26 ) + ( le.subsidiarystartdate5_Invalid << 27 ) + ( le.subsidiaryname6_Invalid << 28 ) + ( le.subsidiarystartdate6_Invalid << 29 ) + ( le.subsidiaryname7_Invalid << 30 ) + ( le.subsidiarystartdate7_Invalid << 31 ) + ( le.subsidiaryname8_Invalid << 32 ) + ( le.subsidiarystartdate8_Invalid << 33 ) + ( le.subsidiaryname9_Invalid << 34 ) + ( le.subsidiarystartdate9_Invalid << 35 ) + ( le.subsidiaryname10_Invalid << 36 ) + ( le.subsidiarystartdate10_Invalid << 37 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -721,165 +722,165 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.dateadded_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.dateupdated_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.website_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.lninscertrecordid_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.profilelastupdated_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.siid_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.sipstatuscode_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.wcbempnumber_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.ubinumber_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.cofanumber_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.usdotnumber_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.businessname_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.dba_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.addressline1_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.addressline2_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.addresscity_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.addressstate_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.addresszip_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.zip4_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.phone1_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.phone2_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.phone3_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.fax1_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.fax2_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.email1_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.email2_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.businesstype_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.namefirst_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.namemiddle_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.namelast_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.namesuffix_Invalid := (le.ScrubsBits1 >> 32) & 1;
-    SELF.nametitle_Invalid := (le.ScrubsBits1 >> 33) & 1;
-    SELF.mailingaddress1_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.mailingaddress2_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.mailingaddresscity_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.mailingaddressstate_Invalid := (le.ScrubsBits1 >> 37) & 1;
-    SELF.mailingaddresszip_Invalid := (le.ScrubsBits1 >> 38) & 1;
-    SELF.mailingaddresszip4_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.contactnamefirst_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.contactnamemiddle_Invalid := (le.ScrubsBits1 >> 41) & 1;
-    SELF.contactnamelast_Invalid := (le.ScrubsBits1 >> 42) & 1;
-    SELF.contactnamesuffix_Invalid := (le.ScrubsBits1 >> 43) & 1;
-    SELF.contactbusinessname_Invalid := (le.ScrubsBits1 >> 44) & 1;
-    SELF.contactaddressline1_Invalid := (le.ScrubsBits1 >> 45) & 1;
-    SELF.contactaddressline2_Invalid := (le.ScrubsBits1 >> 46) & 1;
-    SELF.contactcity_Invalid := (le.ScrubsBits1 >> 47) & 1;
-    SELF.contactstate_Invalid := (le.ScrubsBits1 >> 48) & 1;
-    SELF.contactzip_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.contactzip4_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.contactphone_Invalid := (le.ScrubsBits1 >> 51) & 1;
-    SELF.contactfax_Invalid := (le.ScrubsBits1 >> 52) & 1;
-    SELF.contactemail_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.policyholdernamefirst_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.policyholdernamemiddle_Invalid := (le.ScrubsBits1 >> 55) & 1;
-    SELF.policyholdernamelast_Invalid := (le.ScrubsBits1 >> 56) & 1;
-    SELF.policyholdernamesuffix_Invalid := (le.ScrubsBits1 >> 57) & 1;
-    SELF.statepolicyfilenumber_Invalid := (le.ScrubsBits1 >> 58) & 1;
-    SELF.coverageinjuryillnessdate_Invalid := (le.ScrubsBits1 >> 59) & 1;
-    SELF.selfinsurancegroup_Invalid := (le.ScrubsBits1 >> 60) & 1;
-    SELF.selfinsurancegroupphone_Invalid := (le.ScrubsBits1 >> 61) & 1;
-    SELF.selfinsurancegroupid_Invalid := (le.ScrubsBits1 >> 62) & 1;
-    SELF.numberofemployees_Invalid := (le.ScrubsBits1 >> 63) & 1;
-    SELF.licensedcontractor_Invalid := (le.ScrubsBits2 >> 0) & 1;
-    SELF.mconame_Invalid := (le.ScrubsBits2 >> 1) & 1;
-    SELF.mconumber_Invalid := (le.ScrubsBits2 >> 2) & 1;
-    SELF.mcoaddressline1_Invalid := (le.ScrubsBits2 >> 3) & 1;
-    SELF.mcoaddressline2_Invalid := (le.ScrubsBits2 >> 4) & 1;
-    SELF.mcocity_Invalid := (le.ScrubsBits2 >> 5) & 1;
-    SELF.mcostate_Invalid := (le.ScrubsBits2 >> 6) & 1;
-    SELF.mcozip_Invalid := (le.ScrubsBits2 >> 7) & 1;
-    SELF.mcozip4_Invalid := (le.ScrubsBits2 >> 8) & 1;
-    SELF.mcophone_Invalid := (le.ScrubsBits2 >> 9) & 1;
-    SELF.governingclasscode_Invalid := (le.ScrubsBits2 >> 10) & 1;
-    SELF.licensenumber_Invalid := (le.ScrubsBits2 >> 11) & 1;
-    SELF.class_Invalid := (le.ScrubsBits2 >> 12) & 1;
-    SELF.classificationdescription_Invalid := (le.ScrubsBits2 >> 13) & 1;
-    SELF.licensestatus_Invalid := (le.ScrubsBits2 >> 14) & 1;
-    SELF.licenseadditionalinfo_Invalid := (le.ScrubsBits2 >> 15) & 1;
-    SELF.licenseissuedate_Invalid := (le.ScrubsBits2 >> 16) & 1;
-    SELF.licenseexpirationdate_Invalid := (le.ScrubsBits2 >> 17) & 1;
-    SELF.naicscode_Invalid := (le.ScrubsBits2 >> 18) & 1;
-    SELF.officerexemptfirstname1_Invalid := (le.ScrubsBits2 >> 19) & 1;
-    SELF.officerexemptlastname1_Invalid := (le.ScrubsBits2 >> 20) & 1;
-    SELF.officerexemptmiddlename1_Invalid := (le.ScrubsBits2 >> 21) & 1;
-    SELF.officerexempttitle1_Invalid := (le.ScrubsBits2 >> 22) & 1;
-    SELF.officerexempteffectivedate1_Invalid := (le.ScrubsBits2 >> 23) & 1;
-    SELF.officerexemptterminationdate1_Invalid := (le.ScrubsBits2 >> 24) & 1;
-    SELF.officerexempttype1_Invalid := (le.ScrubsBits2 >> 25) & 1;
-    SELF.officerexemptbusinessactivities1_Invalid := (le.ScrubsBits2 >> 26) & 1;
-    SELF.officerexemptfirstname2_Invalid := (le.ScrubsBits2 >> 27) & 1;
-    SELF.officerexemptlastname2_Invalid := (le.ScrubsBits2 >> 28) & 1;
-    SELF.officerexemptmiddlename2_Invalid := (le.ScrubsBits2 >> 29) & 1;
-    SELF.officerexempttitle2_Invalid := (le.ScrubsBits2 >> 30) & 1;
-    SELF.officerexempteffectivedate2_Invalid := (le.ScrubsBits2 >> 31) & 1;
-    SELF.officerexemptterminationdate2_Invalid := (le.ScrubsBits2 >> 32) & 1;
-    SELF.officerexempttype2_Invalid := (le.ScrubsBits2 >> 33) & 1;
-    SELF.officerexemptbusinessactivities2_Invalid := (le.ScrubsBits2 >> 34) & 1;
-    SELF.officerexemptfirstname3_Invalid := (le.ScrubsBits2 >> 35) & 1;
-    SELF.officerexemptlastname3_Invalid := (le.ScrubsBits2 >> 36) & 1;
-    SELF.officerexemptmiddlename3_Invalid := (le.ScrubsBits2 >> 37) & 1;
-    SELF.officerexempttitle3_Invalid := (le.ScrubsBits2 >> 38) & 1;
-    SELF.officerexempteffectivedate3_Invalid := (le.ScrubsBits2 >> 39) & 1;
-    SELF.officerexemptterminationdate3_Invalid := (le.ScrubsBits2 >> 40) & 1;
-    SELF.officerexempttype3_Invalid := (le.ScrubsBits2 >> 41) & 1;
-    SELF.officerexemptbusinessactivities3_Invalid := (le.ScrubsBits2 >> 42) & 1;
-    SELF.officerexemptfirstname4_Invalid := (le.ScrubsBits2 >> 43) & 1;
-    SELF.officerexemptlastname4_Invalid := (le.ScrubsBits2 >> 44) & 1;
-    SELF.officerexemptmiddlename4_Invalid := (le.ScrubsBits2 >> 45) & 1;
-    SELF.officerexempttitle4_Invalid := (le.ScrubsBits2 >> 46) & 1;
-    SELF.officerexempteffectivedate4_Invalid := (le.ScrubsBits2 >> 47) & 1;
-    SELF.officerexemptterminationdate4_Invalid := (le.ScrubsBits2 >> 48) & 1;
-    SELF.officerexempttype4_Invalid := (le.ScrubsBits2 >> 49) & 1;
-    SELF.officerexemptbusinessactivities4_Invalid := (le.ScrubsBits2 >> 50) & 1;
-    SELF.officerexemptfirstname5_Invalid := (le.ScrubsBits2 >> 51) & 1;
-    SELF.officerexemptlastname5_Invalid := (le.ScrubsBits2 >> 52) & 1;
-    SELF.officerexemptmiddlename5_Invalid := (le.ScrubsBits2 >> 53) & 1;
-    SELF.officerexempttitle5_Invalid := (le.ScrubsBits2 >> 54) & 1;
-    SELF.officerexempteffectivedate5_Invalid := (le.ScrubsBits2 >> 55) & 1;
-    SELF.officerexemptterminationdate5_Invalid := (le.ScrubsBits2 >> 56) & 1;
-    SELF.officerexempttype5_Invalid := (le.ScrubsBits2 >> 57) & 1;
-    SELF.officerexemptbusinessactivities5_Invalid := (le.ScrubsBits2 >> 58) & 1;
-    SELF.dba1_Invalid := (le.ScrubsBits2 >> 59) & 1;
-    SELF.dbadatefrom1_Invalid := (le.ScrubsBits2 >> 60) & 1;
-    SELF.dbadateto1_Invalid := (le.ScrubsBits2 >> 61) & 1;
-    SELF.dbatype1_Invalid := (le.ScrubsBits2 >> 62) & 1;
-    SELF.dba2_Invalid := (le.ScrubsBits2 >> 63) & 1;
-    SELF.dbadatefrom2_Invalid := (le.ScrubsBits3 >> 0) & 1;
-    SELF.dbadateto2_Invalid := (le.ScrubsBits3 >> 1) & 1;
-    SELF.dbatype2_Invalid := (le.ScrubsBits3 >> 2) & 1;
-    SELF.dba3_Invalid := (le.ScrubsBits3 >> 3) & 1;
-    SELF.dbadatefrom3_Invalid := (le.ScrubsBits3 >> 4) & 1;
-    SELF.dbadateto3_Invalid := (le.ScrubsBits3 >> 5) & 1;
-    SELF.dbatype3_Invalid := (le.ScrubsBits3 >> 6) & 1;
-    SELF.dba4_Invalid := (le.ScrubsBits3 >> 7) & 1;
-    SELF.dbadatefrom4_Invalid := (le.ScrubsBits3 >> 8) & 1;
-    SELF.dbadateto4_Invalid := (le.ScrubsBits3 >> 9) & 1;
-    SELF.dbatype4_Invalid := (le.ScrubsBits3 >> 10) & 1;
-    SELF.dba5_Invalid := (le.ScrubsBits3 >> 11) & 1;
-    SELF.dbadatefrom5_Invalid := (le.ScrubsBits3 >> 12) & 1;
-    SELF.dbadateto5_Invalid := (le.ScrubsBits3 >> 13) & 1;
-    SELF.dbatype5_Invalid := (le.ScrubsBits3 >> 14) & 1;
-    SELF.subsidiaryname1_Invalid := (le.ScrubsBits3 >> 15) & 1;
-    SELF.subsidiarystartdate1_Invalid := (le.ScrubsBits3 >> 16) & 1;
-    SELF.subsidiaryname2_Invalid := (le.ScrubsBits3 >> 17) & 1;
-    SELF.subsidiarystartdate2_Invalid := (le.ScrubsBits3 >> 18) & 1;
-    SELF.subsidiaryname3_Invalid := (le.ScrubsBits3 >> 19) & 1;
-    SELF.subsidiarystartdate3_Invalid := (le.ScrubsBits3 >> 20) & 1;
-    SELF.subsidiaryname4_Invalid := (le.ScrubsBits3 >> 21) & 1;
-    SELF.subsidiarystartdate4_Invalid := (le.ScrubsBits3 >> 22) & 1;
-    SELF.subsidiaryname5_Invalid := (le.ScrubsBits3 >> 23) & 1;
-    SELF.subsidiarystartdate5_Invalid := (le.ScrubsBits3 >> 24) & 1;
-    SELF.subsidiaryname6_Invalid := (le.ScrubsBits3 >> 25) & 1;
-    SELF.subsidiarystartdate6_Invalid := (le.ScrubsBits3 >> 26) & 1;
-    SELF.subsidiaryname7_Invalid := (le.ScrubsBits3 >> 27) & 1;
-    SELF.subsidiarystartdate7_Invalid := (le.ScrubsBits3 >> 28) & 1;
-    SELF.subsidiaryname8_Invalid := (le.ScrubsBits3 >> 29) & 1;
-    SELF.subsidiarystartdate8_Invalid := (le.ScrubsBits3 >> 30) & 1;
-    SELF.subsidiaryname9_Invalid := (le.ScrubsBits3 >> 31) & 1;
-    SELF.subsidiarystartdate9_Invalid := (le.ScrubsBits3 >> 32) & 1;
-    SELF.subsidiaryname10_Invalid := (le.ScrubsBits3 >> 33) & 1;
-    SELF.subsidiarystartdate10_Invalid := (le.ScrubsBits3 >> 34) & 1;
+    SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 3;
+    SELF.lninscertrecordid_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.profilelastupdated_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.siid_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.sipstatuscode_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.wcbempnumber_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.ubinumber_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.cofanumber_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.usdotnumber_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.businessname_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.dba_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.addressline1_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.addressline2_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.addresscity_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.addressstate_Invalid := (le.ScrubsBits1 >> 19) & 3;
+    SELF.addresszip_Invalid := (le.ScrubsBits1 >> 21) & 3;
+    SELF.zip4_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.phone1_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.phone2_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.phone3_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.fax1_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.fax2_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.email1_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.email2_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.businesstype_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.namefirst_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.namemiddle_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.namelast_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.namesuffix_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.nametitle_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.mailingaddress1_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.mailingaddress2_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.mailingaddresscity_Invalid := (le.ScrubsBits1 >> 39) & 1;
+    SELF.mailingaddressstate_Invalid := (le.ScrubsBits1 >> 40) & 1;
+    SELF.mailingaddresszip_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.mailingaddresszip4_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.contactnamefirst_Invalid := (le.ScrubsBits1 >> 43) & 1;
+    SELF.contactnamemiddle_Invalid := (le.ScrubsBits1 >> 44) & 1;
+    SELF.contactnamelast_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.contactnamesuffix_Invalid := (le.ScrubsBits1 >> 46) & 1;
+    SELF.contactbusinessname_Invalid := (le.ScrubsBits1 >> 47) & 1;
+    SELF.contactaddressline1_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.contactaddressline2_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.contactcity_Invalid := (le.ScrubsBits1 >> 50) & 1;
+    SELF.contactstate_Invalid := (le.ScrubsBits1 >> 51) & 1;
+    SELF.contactzip_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.contactzip4_Invalid := (le.ScrubsBits1 >> 53) & 1;
+    SELF.contactphone_Invalid := (le.ScrubsBits1 >> 54) & 1;
+    SELF.contactfax_Invalid := (le.ScrubsBits1 >> 55) & 1;
+    SELF.contactemail_Invalid := (le.ScrubsBits1 >> 56) & 1;
+    SELF.policyholdernamefirst_Invalid := (le.ScrubsBits1 >> 57) & 1;
+    SELF.policyholdernamemiddle_Invalid := (le.ScrubsBits1 >> 58) & 1;
+    SELF.policyholdernamelast_Invalid := (le.ScrubsBits1 >> 59) & 1;
+    SELF.policyholdernamesuffix_Invalid := (le.ScrubsBits1 >> 60) & 1;
+    SELF.statepolicyfilenumber_Invalid := (le.ScrubsBits1 >> 61) & 1;
+    SELF.coverageinjuryillnessdate_Invalid := (le.ScrubsBits1 >> 62) & 1;
+    SELF.selfinsurancegroup_Invalid := (le.ScrubsBits1 >> 63) & 1;
+    SELF.selfinsurancegroupphone_Invalid := (le.ScrubsBits2 >> 0) & 1;
+    SELF.selfinsurancegroupid_Invalid := (le.ScrubsBits2 >> 1) & 1;
+    SELF.numberofemployees_Invalid := (le.ScrubsBits2 >> 2) & 1;
+    SELF.licensedcontractor_Invalid := (le.ScrubsBits2 >> 3) & 1;
+    SELF.mconame_Invalid := (le.ScrubsBits2 >> 4) & 1;
+    SELF.mconumber_Invalid := (le.ScrubsBits2 >> 5) & 1;
+    SELF.mcoaddressline1_Invalid := (le.ScrubsBits2 >> 6) & 1;
+    SELF.mcoaddressline2_Invalid := (le.ScrubsBits2 >> 7) & 1;
+    SELF.mcocity_Invalid := (le.ScrubsBits2 >> 8) & 1;
+    SELF.mcostate_Invalid := (le.ScrubsBits2 >> 9) & 1;
+    SELF.mcozip_Invalid := (le.ScrubsBits2 >> 10) & 1;
+    SELF.mcozip4_Invalid := (le.ScrubsBits2 >> 11) & 1;
+    SELF.mcophone_Invalid := (le.ScrubsBits2 >> 12) & 1;
+    SELF.governingclasscode_Invalid := (le.ScrubsBits2 >> 13) & 1;
+    SELF.licensenumber_Invalid := (le.ScrubsBits2 >> 14) & 1;
+    SELF.class_Invalid := (le.ScrubsBits2 >> 15) & 1;
+    SELF.classificationdescription_Invalid := (le.ScrubsBits2 >> 16) & 1;
+    SELF.licensestatus_Invalid := (le.ScrubsBits2 >> 17) & 1;
+    SELF.licenseadditionalinfo_Invalid := (le.ScrubsBits2 >> 18) & 1;
+    SELF.licenseissuedate_Invalid := (le.ScrubsBits2 >> 19) & 1;
+    SELF.licenseexpirationdate_Invalid := (le.ScrubsBits2 >> 20) & 1;
+    SELF.naicscode_Invalid := (le.ScrubsBits2 >> 21) & 1;
+    SELF.officerexemptfirstname1_Invalid := (le.ScrubsBits2 >> 22) & 1;
+    SELF.officerexemptlastname1_Invalid := (le.ScrubsBits2 >> 23) & 1;
+    SELF.officerexemptmiddlename1_Invalid := (le.ScrubsBits2 >> 24) & 1;
+    SELF.officerexempttitle1_Invalid := (le.ScrubsBits2 >> 25) & 1;
+    SELF.officerexempteffectivedate1_Invalid := (le.ScrubsBits2 >> 26) & 1;
+    SELF.officerexemptterminationdate1_Invalid := (le.ScrubsBits2 >> 27) & 1;
+    SELF.officerexempttype1_Invalid := (le.ScrubsBits2 >> 28) & 1;
+    SELF.officerexemptbusinessactivities1_Invalid := (le.ScrubsBits2 >> 29) & 1;
+    SELF.officerexemptfirstname2_Invalid := (le.ScrubsBits2 >> 30) & 1;
+    SELF.officerexemptlastname2_Invalid := (le.ScrubsBits2 >> 31) & 1;
+    SELF.officerexemptmiddlename2_Invalid := (le.ScrubsBits2 >> 32) & 1;
+    SELF.officerexempttitle2_Invalid := (le.ScrubsBits2 >> 33) & 1;
+    SELF.officerexempteffectivedate2_Invalid := (le.ScrubsBits2 >> 34) & 1;
+    SELF.officerexemptterminationdate2_Invalid := (le.ScrubsBits2 >> 35) & 1;
+    SELF.officerexempttype2_Invalid := (le.ScrubsBits2 >> 36) & 1;
+    SELF.officerexemptbusinessactivities2_Invalid := (le.ScrubsBits2 >> 37) & 1;
+    SELF.officerexemptfirstname3_Invalid := (le.ScrubsBits2 >> 38) & 1;
+    SELF.officerexemptlastname3_Invalid := (le.ScrubsBits2 >> 39) & 1;
+    SELF.officerexemptmiddlename3_Invalid := (le.ScrubsBits2 >> 40) & 1;
+    SELF.officerexempttitle3_Invalid := (le.ScrubsBits2 >> 41) & 1;
+    SELF.officerexempteffectivedate3_Invalid := (le.ScrubsBits2 >> 42) & 1;
+    SELF.officerexemptterminationdate3_Invalid := (le.ScrubsBits2 >> 43) & 1;
+    SELF.officerexempttype3_Invalid := (le.ScrubsBits2 >> 44) & 1;
+    SELF.officerexemptbusinessactivities3_Invalid := (le.ScrubsBits2 >> 45) & 1;
+    SELF.officerexemptfirstname4_Invalid := (le.ScrubsBits2 >> 46) & 1;
+    SELF.officerexemptlastname4_Invalid := (le.ScrubsBits2 >> 47) & 1;
+    SELF.officerexemptmiddlename4_Invalid := (le.ScrubsBits2 >> 48) & 1;
+    SELF.officerexempttitle4_Invalid := (le.ScrubsBits2 >> 49) & 1;
+    SELF.officerexempteffectivedate4_Invalid := (le.ScrubsBits2 >> 50) & 1;
+    SELF.officerexemptterminationdate4_Invalid := (le.ScrubsBits2 >> 51) & 1;
+    SELF.officerexempttype4_Invalid := (le.ScrubsBits2 >> 52) & 1;
+    SELF.officerexemptbusinessactivities4_Invalid := (le.ScrubsBits2 >> 53) & 1;
+    SELF.officerexemptfirstname5_Invalid := (le.ScrubsBits2 >> 54) & 1;
+    SELF.officerexemptlastname5_Invalid := (le.ScrubsBits2 >> 55) & 1;
+    SELF.officerexemptmiddlename5_Invalid := (le.ScrubsBits2 >> 56) & 1;
+    SELF.officerexempttitle5_Invalid := (le.ScrubsBits2 >> 57) & 1;
+    SELF.officerexempteffectivedate5_Invalid := (le.ScrubsBits2 >> 58) & 1;
+    SELF.officerexemptterminationdate5_Invalid := (le.ScrubsBits2 >> 59) & 1;
+    SELF.officerexempttype5_Invalid := (le.ScrubsBits2 >> 60) & 1;
+    SELF.officerexemptbusinessactivities5_Invalid := (le.ScrubsBits2 >> 61) & 1;
+    SELF.dba1_Invalid := (le.ScrubsBits2 >> 62) & 1;
+    SELF.dbadatefrom1_Invalid := (le.ScrubsBits2 >> 63) & 1;
+    SELF.dbadateto1_Invalid := (le.ScrubsBits3 >> 0) & 1;
+    SELF.dbatype1_Invalid := (le.ScrubsBits3 >> 1) & 1;
+    SELF.dba2_Invalid := (le.ScrubsBits3 >> 2) & 1;
+    SELF.dbadatefrom2_Invalid := (le.ScrubsBits3 >> 3) & 1;
+    SELF.dbadateto2_Invalid := (le.ScrubsBits3 >> 4) & 1;
+    SELF.dbatype2_Invalid := (le.ScrubsBits3 >> 5) & 1;
+    SELF.dba3_Invalid := (le.ScrubsBits3 >> 6) & 1;
+    SELF.dbadatefrom3_Invalid := (le.ScrubsBits3 >> 7) & 1;
+    SELF.dbadateto3_Invalid := (le.ScrubsBits3 >> 8) & 1;
+    SELF.dbatype3_Invalid := (le.ScrubsBits3 >> 9) & 1;
+    SELF.dba4_Invalid := (le.ScrubsBits3 >> 10) & 1;
+    SELF.dbadatefrom4_Invalid := (le.ScrubsBits3 >> 11) & 1;
+    SELF.dbadateto4_Invalid := (le.ScrubsBits3 >> 12) & 1;
+    SELF.dbatype4_Invalid := (le.ScrubsBits3 >> 13) & 1;
+    SELF.dba5_Invalid := (le.ScrubsBits3 >> 14) & 1;
+    SELF.dbadatefrom5_Invalid := (le.ScrubsBits3 >> 15) & 1;
+    SELF.dbadateto5_Invalid := (le.ScrubsBits3 >> 16) & 1;
+    SELF.dbatype5_Invalid := (le.ScrubsBits3 >> 17) & 1;
+    SELF.subsidiaryname1_Invalid := (le.ScrubsBits3 >> 18) & 1;
+    SELF.subsidiarystartdate1_Invalid := (le.ScrubsBits3 >> 19) & 1;
+    SELF.subsidiaryname2_Invalid := (le.ScrubsBits3 >> 20) & 1;
+    SELF.subsidiarystartdate2_Invalid := (le.ScrubsBits3 >> 21) & 1;
+    SELF.subsidiaryname3_Invalid := (le.ScrubsBits3 >> 22) & 1;
+    SELF.subsidiarystartdate3_Invalid := (le.ScrubsBits3 >> 23) & 1;
+    SELF.subsidiaryname4_Invalid := (le.ScrubsBits3 >> 24) & 1;
+    SELF.subsidiarystartdate4_Invalid := (le.ScrubsBits3 >> 25) & 1;
+    SELF.subsidiaryname5_Invalid := (le.ScrubsBits3 >> 26) & 1;
+    SELF.subsidiarystartdate5_Invalid := (le.ScrubsBits3 >> 27) & 1;
+    SELF.subsidiaryname6_Invalid := (le.ScrubsBits3 >> 28) & 1;
+    SELF.subsidiarystartdate6_Invalid := (le.ScrubsBits3 >> 29) & 1;
+    SELF.subsidiaryname7_Invalid := (le.ScrubsBits3 >> 30) & 1;
+    SELF.subsidiarystartdate7_Invalid := (le.ScrubsBits3 >> 31) & 1;
+    SELF.subsidiaryname8_Invalid := (le.ScrubsBits3 >> 32) & 1;
+    SELF.subsidiarystartdate8_Invalid := (le.ScrubsBits3 >> 33) & 1;
+    SELF.subsidiaryname9_Invalid := (le.ScrubsBits3 >> 34) & 1;
+    SELF.subsidiarystartdate9_Invalid := (le.ScrubsBits3 >> 35) & 1;
+    SELF.subsidiaryname10_Invalid := (le.ScrubsBits3 >> 36) & 1;
+    SELF.subsidiarystartdate10_Invalid := (le.ScrubsBits3 >> 37) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -889,12 +890,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
     dartid_ALLOW_ErrorCount := COUNT(GROUP,h.dartid_Invalid=1);
-    dateadded_ALLOW_ErrorCount := COUNT(GROUP,h.dateadded_Invalid=1);
-    dateupdated_ALLOW_ErrorCount := COUNT(GROUP,h.dateupdated_Invalid=1);
+    dateadded_CUSTOM_ErrorCount := COUNT(GROUP,h.dateadded_Invalid=1);
+    dateupdated_CUSTOM_ErrorCount := COUNT(GROUP,h.dateupdated_Invalid=1);
     website_ALLOW_ErrorCount := COUNT(GROUP,h.website_Invalid=1);
     state_ALLOW_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
+    state_LENGTHS_ErrorCount := COUNT(GROUP,h.state_Invalid=2);
+    state_Total_ErrorCount := COUNT(GROUP,h.state_Invalid>0);
     lninscertrecordid_ALLOW_ErrorCount := COUNT(GROUP,h.lninscertrecordid_Invalid=1);
-    profilelastupdated_ALLOW_ErrorCount := COUNT(GROUP,h.profilelastupdated_Invalid=1);
+    profilelastupdated_CUSTOM_ErrorCount := COUNT(GROUP,h.profilelastupdated_Invalid=1);
     siid_ALLOW_ErrorCount := COUNT(GROUP,h.siid_Invalid=1);
     sipstatuscode_ALLOW_ErrorCount := COUNT(GROUP,h.sipstatuscode_Invalid=1);
     wcbempnumber_ALLOW_ErrorCount := COUNT(GROUP,h.wcbempnumber_Invalid=1);
@@ -907,7 +910,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     addressline2_ALLOW_ErrorCount := COUNT(GROUP,h.addressline2_Invalid=1);
     addresscity_ALLOW_ErrorCount := COUNT(GROUP,h.addresscity_Invalid=1);
     addressstate_ALLOW_ErrorCount := COUNT(GROUP,h.addressstate_Invalid=1);
+    addressstate_LENGTHS_ErrorCount := COUNT(GROUP,h.addressstate_Invalid=2);
+    addressstate_Total_ErrorCount := COUNT(GROUP,h.addressstate_Invalid>0);
     addresszip_ALLOW_ErrorCount := COUNT(GROUP,h.addresszip_Invalid=1);
+    addresszip_LENGTHS_ErrorCount := COUNT(GROUP,h.addresszip_Invalid=2);
+    addresszip_Total_ErrorCount := COUNT(GROUP,h.addresszip_Invalid>0);
     zip4_ALLOW_ErrorCount := COUNT(GROUP,h.zip4_Invalid=1);
     phone1_ALLOW_ErrorCount := COUNT(GROUP,h.phone1_Invalid=1);
     phone2_ALLOW_ErrorCount := COUNT(GROUP,h.phone2_Invalid=1);
@@ -1059,9 +1066,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateupdated_ALLOW_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lninscertrecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_ALLOW_ErrorCount > 0, 1, 0) + IF(le.siid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sipstatuscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wcbempnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ubinumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cofanumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.usdotnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nametitle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactbusinessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactfax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactemail_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statepolicyfilenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.coverageinjuryillnessdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroup_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.numberofemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensedcontractor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconame_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcocity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcostate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcophone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.governingclasscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classificationdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensestatus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseadditionalinfo_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseissuedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseexpirationdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.naicscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate10_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.lninscertrecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sipstatuscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wcbempnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ubinumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cofanumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.usdotnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_Total_ErrorCount > 0, 1, 0) + IF(le.addresszip_Total_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nametitle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactbusinessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactfax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactemail_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statepolicyfilenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.coverageinjuryillnessdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroup_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.numberofemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensedcontractor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconame_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcocity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcostate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcophone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.governingclasscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classificationdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensestatus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseadditionalinfo_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseissuedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseexpirationdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.naicscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate10_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateupdated_ALLOW_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lninscertrecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_ALLOW_ErrorCount > 0, 1, 0) + IF(le.siid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sipstatuscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wcbempnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ubinumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cofanumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.usdotnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nametitle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactbusinessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactfax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactemail_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statepolicyfilenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.coverageinjuryillnessdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroup_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.numberofemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensedcontractor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconame_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcocity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcostate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcophone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.governingclasscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classificationdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensestatus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseadditionalinfo_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseissuedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseexpirationdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.naicscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate10_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dartid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dateadded_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dateupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.website_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.lninscertrecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.profilelastupdated_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.siid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sipstatuscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.wcbempnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ubinumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.cofanumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.usdotnumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressstate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.addresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addresszip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fax2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.businesstype_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.namesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nametitle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresscity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddressstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingaddresszip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactnamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactbusinessname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactstate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactzip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactfax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contactemail_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamefirst_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamemiddle_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamelast_ALLOW_ErrorCount > 0, 1, 0) + IF(le.policyholdernamesuffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statepolicyfilenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.coverageinjuryillnessdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroup_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupphone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selfinsurancegroupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.numberofemployees_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensedcontractor_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconame_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mconumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcoaddressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcocity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcostate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcozip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mcophone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.governingclasscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.class_ALLOW_ErrorCount > 0, 1, 0) + IF(le.classificationdescription_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licensestatus_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseadditionalinfo_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseissuedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.licenseexpirationdate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.naicscode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptfirstname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptlastname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptmiddlename5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttitle5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempteffectivedate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptterminationdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexempttype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.officerexemptbusinessactivities5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dba5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadatefrom5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbadateto5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dbatype5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate9_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiaryname10_ALLOW_ErrorCount > 0, 1, 0) + IF(le.subsidiarystartdate10_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -1080,12 +1087,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Cert_Fields.InvalidMessage_dartid(le.dartid_Invalid),Cert_Fields.InvalidMessage_dateadded(le.dateadded_Invalid),Cert_Fields.InvalidMessage_dateupdated(le.dateupdated_Invalid),Cert_Fields.InvalidMessage_website(le.website_Invalid),Cert_Fields.InvalidMessage_state(le.state_Invalid),Cert_Fields.InvalidMessage_lninscertrecordid(le.lninscertrecordid_Invalid),Cert_Fields.InvalidMessage_profilelastupdated(le.profilelastupdated_Invalid),Cert_Fields.InvalidMessage_siid(le.siid_Invalid),Cert_Fields.InvalidMessage_sipstatuscode(le.sipstatuscode_Invalid),Cert_Fields.InvalidMessage_wcbempnumber(le.wcbempnumber_Invalid),Cert_Fields.InvalidMessage_ubinumber(le.ubinumber_Invalid),Cert_Fields.InvalidMessage_cofanumber(le.cofanumber_Invalid),Cert_Fields.InvalidMessage_usdotnumber(le.usdotnumber_Invalid),Cert_Fields.InvalidMessage_businessname(le.businessname_Invalid),Cert_Fields.InvalidMessage_dba(le.dba_Invalid),Cert_Fields.InvalidMessage_addressline1(le.addressline1_Invalid),Cert_Fields.InvalidMessage_addressline2(le.addressline2_Invalid),Cert_Fields.InvalidMessage_addresscity(le.addresscity_Invalid),Cert_Fields.InvalidMessage_addressstate(le.addressstate_Invalid),Cert_Fields.InvalidMessage_addresszip(le.addresszip_Invalid),Cert_Fields.InvalidMessage_zip4(le.zip4_Invalid),Cert_Fields.InvalidMessage_phone1(le.phone1_Invalid),Cert_Fields.InvalidMessage_phone2(le.phone2_Invalid),Cert_Fields.InvalidMessage_phone3(le.phone3_Invalid),Cert_Fields.InvalidMessage_fax1(le.fax1_Invalid),Cert_Fields.InvalidMessage_fax2(le.fax2_Invalid),Cert_Fields.InvalidMessage_email1(le.email1_Invalid),Cert_Fields.InvalidMessage_email2(le.email2_Invalid),Cert_Fields.InvalidMessage_businesstype(le.businesstype_Invalid),Cert_Fields.InvalidMessage_namefirst(le.namefirst_Invalid),Cert_Fields.InvalidMessage_namemiddle(le.namemiddle_Invalid),Cert_Fields.InvalidMessage_namelast(le.namelast_Invalid),Cert_Fields.InvalidMessage_namesuffix(le.namesuffix_Invalid),Cert_Fields.InvalidMessage_nametitle(le.nametitle_Invalid),Cert_Fields.InvalidMessage_mailingaddress1(le.mailingaddress1_Invalid),Cert_Fields.InvalidMessage_mailingaddress2(le.mailingaddress2_Invalid),Cert_Fields.InvalidMessage_mailingaddresscity(le.mailingaddresscity_Invalid),Cert_Fields.InvalidMessage_mailingaddressstate(le.mailingaddressstate_Invalid),Cert_Fields.InvalidMessage_mailingaddresszip(le.mailingaddresszip_Invalid),Cert_Fields.InvalidMessage_mailingaddresszip4(le.mailingaddresszip4_Invalid),Cert_Fields.InvalidMessage_contactnamefirst(le.contactnamefirst_Invalid),Cert_Fields.InvalidMessage_contactnamemiddle(le.contactnamemiddle_Invalid),Cert_Fields.InvalidMessage_contactnamelast(le.contactnamelast_Invalid),Cert_Fields.InvalidMessage_contactnamesuffix(le.contactnamesuffix_Invalid),Cert_Fields.InvalidMessage_contactbusinessname(le.contactbusinessname_Invalid),Cert_Fields.InvalidMessage_contactaddressline1(le.contactaddressline1_Invalid),Cert_Fields.InvalidMessage_contactaddressline2(le.contactaddressline2_Invalid),Cert_Fields.InvalidMessage_contactcity(le.contactcity_Invalid),Cert_Fields.InvalidMessage_contactstate(le.contactstate_Invalid),Cert_Fields.InvalidMessage_contactzip(le.contactzip_Invalid),Cert_Fields.InvalidMessage_contactzip4(le.contactzip4_Invalid),Cert_Fields.InvalidMessage_contactphone(le.contactphone_Invalid),Cert_Fields.InvalidMessage_contactfax(le.contactfax_Invalid),Cert_Fields.InvalidMessage_contactemail(le.contactemail_Invalid),Cert_Fields.InvalidMessage_policyholdernamefirst(le.policyholdernamefirst_Invalid),Cert_Fields.InvalidMessage_policyholdernamemiddle(le.policyholdernamemiddle_Invalid),Cert_Fields.InvalidMessage_policyholdernamelast(le.policyholdernamelast_Invalid),Cert_Fields.InvalidMessage_policyholdernamesuffix(le.policyholdernamesuffix_Invalid),Cert_Fields.InvalidMessage_statepolicyfilenumber(le.statepolicyfilenumber_Invalid),Cert_Fields.InvalidMessage_coverageinjuryillnessdate(le.coverageinjuryillnessdate_Invalid),Cert_Fields.InvalidMessage_selfinsurancegroup(le.selfinsurancegroup_Invalid),Cert_Fields.InvalidMessage_selfinsurancegroupphone(le.selfinsurancegroupphone_Invalid),Cert_Fields.InvalidMessage_selfinsurancegroupid(le.selfinsurancegroupid_Invalid),Cert_Fields.InvalidMessage_numberofemployees(le.numberofemployees_Invalid),Cert_Fields.InvalidMessage_licensedcontractor(le.licensedcontractor_Invalid),Cert_Fields.InvalidMessage_mconame(le.mconame_Invalid),Cert_Fields.InvalidMessage_mconumber(le.mconumber_Invalid),Cert_Fields.InvalidMessage_mcoaddressline1(le.mcoaddressline1_Invalid),Cert_Fields.InvalidMessage_mcoaddressline2(le.mcoaddressline2_Invalid),Cert_Fields.InvalidMessage_mcocity(le.mcocity_Invalid),Cert_Fields.InvalidMessage_mcostate(le.mcostate_Invalid),Cert_Fields.InvalidMessage_mcozip(le.mcozip_Invalid),Cert_Fields.InvalidMessage_mcozip4(le.mcozip4_Invalid),Cert_Fields.InvalidMessage_mcophone(le.mcophone_Invalid),Cert_Fields.InvalidMessage_governingclasscode(le.governingclasscode_Invalid),Cert_Fields.InvalidMessage_licensenumber(le.licensenumber_Invalid),Cert_Fields.InvalidMessage_class(le.class_Invalid),Cert_Fields.InvalidMessage_classificationdescription(le.classificationdescription_Invalid),Cert_Fields.InvalidMessage_licensestatus(le.licensestatus_Invalid),Cert_Fields.InvalidMessage_licenseadditionalinfo(le.licenseadditionalinfo_Invalid),Cert_Fields.InvalidMessage_licenseissuedate(le.licenseissuedate_Invalid),Cert_Fields.InvalidMessage_licenseexpirationdate(le.licenseexpirationdate_Invalid),Cert_Fields.InvalidMessage_naicscode(le.naicscode_Invalid),Cert_Fields.InvalidMessage_officerexemptfirstname1(le.officerexemptfirstname1_Invalid),Cert_Fields.InvalidMessage_officerexemptlastname1(le.officerexemptlastname1_Invalid),Cert_Fields.InvalidMessage_officerexemptmiddlename1(le.officerexemptmiddlename1_Invalid),Cert_Fields.InvalidMessage_officerexempttitle1(le.officerexempttitle1_Invalid),Cert_Fields.InvalidMessage_officerexempteffectivedate1(le.officerexempteffectivedate1_Invalid),Cert_Fields.InvalidMessage_officerexemptterminationdate1(le.officerexemptterminationdate1_Invalid),Cert_Fields.InvalidMessage_officerexempttype1(le.officerexempttype1_Invalid),Cert_Fields.InvalidMessage_officerexemptbusinessactivities1(le.officerexemptbusinessactivities1_Invalid),Cert_Fields.InvalidMessage_officerexemptfirstname2(le.officerexemptfirstname2_Invalid),Cert_Fields.InvalidMessage_officerexemptlastname2(le.officerexemptlastname2_Invalid),Cert_Fields.InvalidMessage_officerexemptmiddlename2(le.officerexemptmiddlename2_Invalid),Cert_Fields.InvalidMessage_officerexempttitle2(le.officerexempttitle2_Invalid),Cert_Fields.InvalidMessage_officerexempteffectivedate2(le.officerexempteffectivedate2_Invalid),Cert_Fields.InvalidMessage_officerexemptterminationdate2(le.officerexemptterminationdate2_Invalid),Cert_Fields.InvalidMessage_officerexempttype2(le.officerexempttype2_Invalid),Cert_Fields.InvalidMessage_officerexemptbusinessactivities2(le.officerexemptbusinessactivities2_Invalid),Cert_Fields.InvalidMessage_officerexemptfirstname3(le.officerexemptfirstname3_Invalid),Cert_Fields.InvalidMessage_officerexemptlastname3(le.officerexemptlastname3_Invalid),Cert_Fields.InvalidMessage_officerexemptmiddlename3(le.officerexemptmiddlename3_Invalid),Cert_Fields.InvalidMessage_officerexempttitle3(le.officerexempttitle3_Invalid),Cert_Fields.InvalidMessage_officerexempteffectivedate3(le.officerexempteffectivedate3_Invalid),Cert_Fields.InvalidMessage_officerexemptterminationdate3(le.officerexemptterminationdate3_Invalid),Cert_Fields.InvalidMessage_officerexempttype3(le.officerexempttype3_Invalid),Cert_Fields.InvalidMessage_officerexemptbusinessactivities3(le.officerexemptbusinessactivities3_Invalid),Cert_Fields.InvalidMessage_officerexemptfirstname4(le.officerexemptfirstname4_Invalid),Cert_Fields.InvalidMessage_officerexemptlastname4(le.officerexemptlastname4_Invalid),Cert_Fields.InvalidMessage_officerexemptmiddlename4(le.officerexemptmiddlename4_Invalid),Cert_Fields.InvalidMessage_officerexempttitle4(le.officerexempttitle4_Invalid),Cert_Fields.InvalidMessage_officerexempteffectivedate4(le.officerexempteffectivedate4_Invalid),Cert_Fields.InvalidMessage_officerexemptterminationdate4(le.officerexemptterminationdate4_Invalid),Cert_Fields.InvalidMessage_officerexempttype4(le.officerexempttype4_Invalid),Cert_Fields.InvalidMessage_officerexemptbusinessactivities4(le.officerexemptbusinessactivities4_Invalid),Cert_Fields.InvalidMessage_officerexemptfirstname5(le.officerexemptfirstname5_Invalid),Cert_Fields.InvalidMessage_officerexemptlastname5(le.officerexemptlastname5_Invalid),Cert_Fields.InvalidMessage_officerexemptmiddlename5(le.officerexemptmiddlename5_Invalid),Cert_Fields.InvalidMessage_officerexempttitle5(le.officerexempttitle5_Invalid),Cert_Fields.InvalidMessage_officerexempteffectivedate5(le.officerexempteffectivedate5_Invalid),Cert_Fields.InvalidMessage_officerexemptterminationdate5(le.officerexemptterminationdate5_Invalid),Cert_Fields.InvalidMessage_officerexempttype5(le.officerexempttype5_Invalid),Cert_Fields.InvalidMessage_officerexemptbusinessactivities5(le.officerexemptbusinessactivities5_Invalid),Cert_Fields.InvalidMessage_dba1(le.dba1_Invalid),Cert_Fields.InvalidMessage_dbadatefrom1(le.dbadatefrom1_Invalid),Cert_Fields.InvalidMessage_dbadateto1(le.dbadateto1_Invalid),Cert_Fields.InvalidMessage_dbatype1(le.dbatype1_Invalid),Cert_Fields.InvalidMessage_dba2(le.dba2_Invalid),Cert_Fields.InvalidMessage_dbadatefrom2(le.dbadatefrom2_Invalid),Cert_Fields.InvalidMessage_dbadateto2(le.dbadateto2_Invalid),Cert_Fields.InvalidMessage_dbatype2(le.dbatype2_Invalid),Cert_Fields.InvalidMessage_dba3(le.dba3_Invalid),Cert_Fields.InvalidMessage_dbadatefrom3(le.dbadatefrom3_Invalid),Cert_Fields.InvalidMessage_dbadateto3(le.dbadateto3_Invalid),Cert_Fields.InvalidMessage_dbatype3(le.dbatype3_Invalid),Cert_Fields.InvalidMessage_dba4(le.dba4_Invalid),Cert_Fields.InvalidMessage_dbadatefrom4(le.dbadatefrom4_Invalid),Cert_Fields.InvalidMessage_dbadateto4(le.dbadateto4_Invalid),Cert_Fields.InvalidMessage_dbatype4(le.dbatype4_Invalid),Cert_Fields.InvalidMessage_dba5(le.dba5_Invalid),Cert_Fields.InvalidMessage_dbadatefrom5(le.dbadatefrom5_Invalid),Cert_Fields.InvalidMessage_dbadateto5(le.dbadateto5_Invalid),Cert_Fields.InvalidMessage_dbatype5(le.dbatype5_Invalid),Cert_Fields.InvalidMessage_subsidiaryname1(le.subsidiaryname1_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate1(le.subsidiarystartdate1_Invalid),Cert_Fields.InvalidMessage_subsidiaryname2(le.subsidiaryname2_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate2(le.subsidiarystartdate2_Invalid),Cert_Fields.InvalidMessage_subsidiaryname3(le.subsidiaryname3_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate3(le.subsidiarystartdate3_Invalid),Cert_Fields.InvalidMessage_subsidiaryname4(le.subsidiaryname4_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate4(le.subsidiarystartdate4_Invalid),Cert_Fields.InvalidMessage_subsidiaryname5(le.subsidiaryname5_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate5(le.subsidiarystartdate5_Invalid),Cert_Fields.InvalidMessage_subsidiaryname6(le.subsidiaryname6_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate6(le.subsidiarystartdate6_Invalid),Cert_Fields.InvalidMessage_subsidiaryname7(le.subsidiaryname7_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate7(le.subsidiarystartdate7_Invalid),Cert_Fields.InvalidMessage_subsidiaryname8(le.subsidiaryname8_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate8(le.subsidiarystartdate8_Invalid),Cert_Fields.InvalidMessage_subsidiaryname9(le.subsidiaryname9_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate9(le.subsidiarystartdate9_Invalid),Cert_Fields.InvalidMessage_subsidiaryname10(le.subsidiaryname10_Invalid),Cert_Fields.InvalidMessage_subsidiarystartdate10(le.subsidiarystartdate10_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dartid_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.dateadded_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.dateupdated_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.dateadded_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.dateupdated_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.website_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.state_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.lninscertrecordid_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.profilelastupdated_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.profilelastupdated_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.siid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.sipstatuscode_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.wcbempnumber_Invalid,'ALLOW','UNKNOWN')
@@ -1097,8 +1104,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.addressline1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.addressline2_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.addresscity_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.addressstate_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.addresszip_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.addressstate_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.addresszip_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.zip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone2_Invalid,'ALLOW','UNKNOWN')
@@ -1243,7 +1250,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.subsidiaryname10_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.subsidiarystartdate10_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dartid','dateadded','dateupdated','website','state','lninscertrecordid','profilelastupdated','siid','sipstatuscode','wcbempnumber','ubinumber','cofanumber','usdotnumber','businessname','dba','addressline1','addressline2','addresscity','addressstate','addresszip','zip4','phone1','phone2','phone3','fax1','fax2','email1','email2','businesstype','namefirst','namemiddle','namelast','namesuffix','nametitle','mailingaddress1','mailingaddress2','mailingaddresscity','mailingaddressstate','mailingaddresszip','mailingaddresszip4','contactnamefirst','contactnamemiddle','contactnamelast','contactnamesuffix','contactbusinessname','contactaddressline1','contactaddressline2','contactcity','contactstate','contactzip','contactzip4','contactphone','contactfax','contactemail','policyholdernamefirst','policyholdernamemiddle','policyholdernamelast','policyholdernamesuffix','statepolicyfilenumber','coverageinjuryillnessdate','selfinsurancegroup','selfinsurancegroupphone','selfinsurancegroupid','numberofemployees','licensedcontractor','mconame','mconumber','mcoaddressline1','mcoaddressline2','mcocity','mcostate','mcozip','mcozip4','mcophone','governingclasscode','licensenumber','class','classificationdescription','licensestatus','licenseadditionalinfo','licenseissuedate','licenseexpirationdate','naicscode','officerexemptfirstname1','officerexemptlastname1','officerexemptmiddlename1','officerexempttitle1','officerexempteffectivedate1','officerexemptterminationdate1','officerexempttype1','officerexemptbusinessactivities1','officerexemptfirstname2','officerexemptlastname2','officerexemptmiddlename2','officerexempttitle2','officerexempteffectivedate2','officerexemptterminationdate2','officerexempttype2','officerexemptbusinessactivities2','officerexemptfirstname3','officerexemptlastname3','officerexemptmiddlename3','officerexempttitle3','officerexempteffectivedate3','officerexemptterminationdate3','officerexempttype3','officerexemptbusinessactivities3','officerexemptfirstname4','officerexemptlastname4','officerexemptmiddlename4','officerexempttitle4','officerexempteffectivedate4','officerexemptterminationdate4','officerexempttype4','officerexemptbusinessactivities4','officerexemptfirstname5','officerexemptlastname5','officerexemptmiddlename5','officerexempttitle5','officerexempteffectivedate5','officerexemptterminationdate5','officerexempttype5','officerexemptbusinessactivities5','dba1','dbadatefrom1','dbadateto1','dbatype1','dba2','dbadatefrom2','dbadateto2','dbatype2','dba3','dbadatefrom3','dbadateto3','dbatype3','dba4','dbadatefrom4','dbadateto4','dbatype4','dba5','dbadatefrom5','dbadateto5','dbatype5','subsidiaryname1','subsidiarystartdate1','subsidiaryname2','subsidiarystartdate2','subsidiaryname3','subsidiarystartdate3','subsidiaryname4','subsidiarystartdate4','subsidiaryname5','subsidiarystartdate5','subsidiaryname6','subsidiarystartdate6','subsidiaryname7','subsidiarystartdate7','subsidiaryname8','subsidiarystartdate8','subsidiaryname9','subsidiarystartdate9','subsidiaryname10','subsidiarystartdate10','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_Date','Invalid_Date','Invalid_Alpha','Invalid_State','Invalid_No','Invalid_Date','Invalid_No','Test','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaChar','Invalid_AlphaNum','Invalid_AlphaCaps','Invalid_State','Invalid_Zip','Invalid_No','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Invalid_AlphaCaps','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','Test','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dartid,(SALT311.StrType)le.dateadded,(SALT311.StrType)le.dateupdated,(SALT311.StrType)le.website,(SALT311.StrType)le.state,(SALT311.StrType)le.lninscertrecordid,(SALT311.StrType)le.profilelastupdated,(SALT311.StrType)le.siid,(SALT311.StrType)le.sipstatuscode,(SALT311.StrType)le.wcbempnumber,(SALT311.StrType)le.ubinumber,(SALT311.StrType)le.cofanumber,(SALT311.StrType)le.usdotnumber,(SALT311.StrType)le.businessname,(SALT311.StrType)le.dba,(SALT311.StrType)le.addressline1,(SALT311.StrType)le.addressline2,(SALT311.StrType)le.addresscity,(SALT311.StrType)le.addressstate,(SALT311.StrType)le.addresszip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.phone1,(SALT311.StrType)le.phone2,(SALT311.StrType)le.phone3,(SALT311.StrType)le.fax1,(SALT311.StrType)le.fax2,(SALT311.StrType)le.email1,(SALT311.StrType)le.email2,(SALT311.StrType)le.businesstype,(SALT311.StrType)le.namefirst,(SALT311.StrType)le.namemiddle,(SALT311.StrType)le.namelast,(SALT311.StrType)le.namesuffix,(SALT311.StrType)le.nametitle,(SALT311.StrType)le.mailingaddress1,(SALT311.StrType)le.mailingaddress2,(SALT311.StrType)le.mailingaddresscity,(SALT311.StrType)le.mailingaddressstate,(SALT311.StrType)le.mailingaddresszip,(SALT311.StrType)le.mailingaddresszip4,(SALT311.StrType)le.contactnamefirst,(SALT311.StrType)le.contactnamemiddle,(SALT311.StrType)le.contactnamelast,(SALT311.StrType)le.contactnamesuffix,(SALT311.StrType)le.contactbusinessname,(SALT311.StrType)le.contactaddressline1,(SALT311.StrType)le.contactaddressline2,(SALT311.StrType)le.contactcity,(SALT311.StrType)le.contactstate,(SALT311.StrType)le.contactzip,(SALT311.StrType)le.contactzip4,(SALT311.StrType)le.contactphone,(SALT311.StrType)le.contactfax,(SALT311.StrType)le.contactemail,(SALT311.StrType)le.policyholdernamefirst,(SALT311.StrType)le.policyholdernamemiddle,(SALT311.StrType)le.policyholdernamelast,(SALT311.StrType)le.policyholdernamesuffix,(SALT311.StrType)le.statepolicyfilenumber,(SALT311.StrType)le.coverageinjuryillnessdate,(SALT311.StrType)le.selfinsurancegroup,(SALT311.StrType)le.selfinsurancegroupphone,(SALT311.StrType)le.selfinsurancegroupid,(SALT311.StrType)le.numberofemployees,(SALT311.StrType)le.licensedcontractor,(SALT311.StrType)le.mconame,(SALT311.StrType)le.mconumber,(SALT311.StrType)le.mcoaddressline1,(SALT311.StrType)le.mcoaddressline2,(SALT311.StrType)le.mcocity,(SALT311.StrType)le.mcostate,(SALT311.StrType)le.mcozip,(SALT311.StrType)le.mcozip4,(SALT311.StrType)le.mcophone,(SALT311.StrType)le.governingclasscode,(SALT311.StrType)le.licensenumber,(SALT311.StrType)le.class,(SALT311.StrType)le.classificationdescription,(SALT311.StrType)le.licensestatus,(SALT311.StrType)le.licenseadditionalinfo,(SALT311.StrType)le.licenseissuedate,(SALT311.StrType)le.licenseexpirationdate,(SALT311.StrType)le.naicscode,(SALT311.StrType)le.officerexemptfirstname1,(SALT311.StrType)le.officerexemptlastname1,(SALT311.StrType)le.officerexemptmiddlename1,(SALT311.StrType)le.officerexempttitle1,(SALT311.StrType)le.officerexempteffectivedate1,(SALT311.StrType)le.officerexemptterminationdate1,(SALT311.StrType)le.officerexempttype1,(SALT311.StrType)le.officerexemptbusinessactivities1,(SALT311.StrType)le.officerexemptfirstname2,(SALT311.StrType)le.officerexemptlastname2,(SALT311.StrType)le.officerexemptmiddlename2,(SALT311.StrType)le.officerexempttitle2,(SALT311.StrType)le.officerexempteffectivedate2,(SALT311.StrType)le.officerexemptterminationdate2,(SALT311.StrType)le.officerexempttype2,(SALT311.StrType)le.officerexemptbusinessactivities2,(SALT311.StrType)le.officerexemptfirstname3,(SALT311.StrType)le.officerexemptlastname3,(SALT311.StrType)le.officerexemptmiddlename3,(SALT311.StrType)le.officerexempttitle3,(SALT311.StrType)le.officerexempteffectivedate3,(SALT311.StrType)le.officerexemptterminationdate3,(SALT311.StrType)le.officerexempttype3,(SALT311.StrType)le.officerexemptbusinessactivities3,(SALT311.StrType)le.officerexemptfirstname4,(SALT311.StrType)le.officerexemptlastname4,(SALT311.StrType)le.officerexemptmiddlename4,(SALT311.StrType)le.officerexempttitle4,(SALT311.StrType)le.officerexempteffectivedate4,(SALT311.StrType)le.officerexemptterminationdate4,(SALT311.StrType)le.officerexempttype4,(SALT311.StrType)le.officerexemptbusinessactivities4,(SALT311.StrType)le.officerexemptfirstname5,(SALT311.StrType)le.officerexemptlastname5,(SALT311.StrType)le.officerexemptmiddlename5,(SALT311.StrType)le.officerexempttitle5,(SALT311.StrType)le.officerexempteffectivedate5,(SALT311.StrType)le.officerexemptterminationdate5,(SALT311.StrType)le.officerexempttype5,(SALT311.StrType)le.officerexemptbusinessactivities5,(SALT311.StrType)le.dba1,(SALT311.StrType)le.dbadatefrom1,(SALT311.StrType)le.dbadateto1,(SALT311.StrType)le.dbatype1,(SALT311.StrType)le.dba2,(SALT311.StrType)le.dbadatefrom2,(SALT311.StrType)le.dbadateto2,(SALT311.StrType)le.dbatype2,(SALT311.StrType)le.dba3,(SALT311.StrType)le.dbadatefrom3,(SALT311.StrType)le.dbadateto3,(SALT311.StrType)le.dbatype3,(SALT311.StrType)le.dba4,(SALT311.StrType)le.dbadatefrom4,(SALT311.StrType)le.dbadateto4,(SALT311.StrType)le.dbatype4,(SALT311.StrType)le.dba5,(SALT311.StrType)le.dbadatefrom5,(SALT311.StrType)le.dbadateto5,(SALT311.StrType)le.dbatype5,(SALT311.StrType)le.subsidiaryname1,(SALT311.StrType)le.subsidiarystartdate1,(SALT311.StrType)le.subsidiaryname2,(SALT311.StrType)le.subsidiarystartdate2,(SALT311.StrType)le.subsidiaryname3,(SALT311.StrType)le.subsidiarystartdate3,(SALT311.StrType)le.subsidiaryname4,(SALT311.StrType)le.subsidiarystartdate4,(SALT311.StrType)le.subsidiaryname5,(SALT311.StrType)le.subsidiarystartdate5,(SALT311.StrType)le.subsidiaryname6,(SALT311.StrType)le.subsidiarystartdate6,(SALT311.StrType)le.subsidiaryname7,(SALT311.StrType)le.subsidiarystartdate7,(SALT311.StrType)le.subsidiaryname8,(SALT311.StrType)le.subsidiarystartdate8,(SALT311.StrType)le.subsidiaryname9,(SALT311.StrType)le.subsidiarystartdate9,(SALT311.StrType)le.subsidiaryname10,(SALT311.StrType)le.subsidiarystartdate10,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,163,Into(LEFT,COUNTER));
@@ -1260,12 +1267,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.dartid_ALLOW_ErrorCount
-          ,le.dateadded_ALLOW_ErrorCount
-          ,le.dateupdated_ALLOW_ErrorCount
+          ,le.dateadded_CUSTOM_ErrorCount
+          ,le.dateupdated_CUSTOM_ErrorCount
           ,le.website_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount
+          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.lninscertrecordid_ALLOW_ErrorCount
-          ,le.profilelastupdated_ALLOW_ErrorCount
+          ,le.profilelastupdated_CUSTOM_ErrorCount
           ,le.siid_ALLOW_ErrorCount
           ,le.sipstatuscode_ALLOW_ErrorCount
           ,le.wcbempnumber_ALLOW_ErrorCount
@@ -1277,8 +1284,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.addressline1_ALLOW_ErrorCount
           ,le.addressline2_ALLOW_ErrorCount
           ,le.addresscity_ALLOW_ErrorCount
-          ,le.addressstate_ALLOW_ErrorCount
-          ,le.addresszip_ALLOW_ErrorCount
+          ,le.addressstate_ALLOW_ErrorCount,le.addressstate_LENGTHS_ErrorCount
+          ,le.addresszip_ALLOW_ErrorCount,le.addresszip_LENGTHS_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
           ,le.phone1_ALLOW_ErrorCount
           ,le.phone2_ALLOW_ErrorCount
@@ -1431,12 +1438,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.dartid_ALLOW_ErrorCount
-          ,le.dateadded_ALLOW_ErrorCount
-          ,le.dateupdated_ALLOW_ErrorCount
+          ,le.dateadded_CUSTOM_ErrorCount
+          ,le.dateupdated_CUSTOM_ErrorCount
           ,le.website_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount
+          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.lninscertrecordid_ALLOW_ErrorCount
-          ,le.profilelastupdated_ALLOW_ErrorCount
+          ,le.profilelastupdated_CUSTOM_ErrorCount
           ,le.siid_ALLOW_ErrorCount
           ,le.sipstatuscode_ALLOW_ErrorCount
           ,le.wcbempnumber_ALLOW_ErrorCount
@@ -1448,8 +1455,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.addressline1_ALLOW_ErrorCount
           ,le.addressline2_ALLOW_ErrorCount
           ,le.addresscity_ALLOW_ErrorCount
-          ,le.addressstate_ALLOW_ErrorCount
-          ,le.addresszip_ALLOW_ErrorCount
+          ,le.addressstate_ALLOW_ErrorCount,le.addressstate_LENGTHS_ErrorCount
+          ,le.addresszip_ALLOW_ErrorCount,le.addresszip_LENGTHS_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
           ,le.phone1_ALLOW_ErrorCount
           ,le.phone2_ALLOW_ErrorCount
