@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta4
 IMPORT KEL12 AS KEL;
 IMPORT B_Vehicle_8,CFG_Compile,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Vehicle_7(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Vehicle_8(__cfg).__ENH_Vehicle_8) __ENH_Vehicle_8 := B_Vehicle_8(__cfg).__ENH_Vehicle_8;
-  SHARED __EE20113 := __ENH_Vehicle_8;
-  EXPORT __ST11253_Layout := RECORD
+  SHARED __EE20108 := __ENH_Vehicle_8;
+  EXPORT __ST11248_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -124,9 +124,9 @@ EXPORT B_Vehicle_7(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST11253_Layout __ND20351__Project(B_Vehicle_8(__cfg).__ST11588_Layout __PP19526) := TRANSFORM
-    SELF.Flag_Auto_ := __OP2(__PP19526.Vehicle_Type_,IN,__CN(['Car','SUV','Truck','Van']));
-    SELF := __PP19526;
+  SHARED __ST11248_Layout __ND20346__Project(B_Vehicle_8(__cfg).__ST11583_Layout __PP19521) := TRANSFORM
+    SELF.Flag_Auto_ := __OP2(__PP19521.Vehicle_Type_,IN,__CN(['Car','SUV','Truck','Van']));
+    SELF := __PP19521;
   END;
-  EXPORT __ENH_Vehicle_7 := PROJECT(__EE20113,__ND20351__Project(LEFT));
+  EXPORT __ENH_Vehicle_7 := PROJECT(__EE20108,__ND20346__Project(LEFT));
 END;

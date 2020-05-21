@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.0beta2
 IMPORT KEL12 AS KEL;
 IMPORT ProfileBoosterV2_KEL,Risk_Indicators;
 IMPORT CFG_Graph FROM ProfileBooster.ProfileBoosterV2_KEL;
