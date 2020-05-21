@@ -230,14 +230,23 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
 					xForm(RIGHT, LEFT),
 					inner, local);
+// different timeframe, so new base records
 	remaining := JOIN(updates, directUpdates,
 					left.ClientId=right.ClientId and left.caseId=right.CaseId 
 					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
 					and left.GroupId=right.GroupId
-					and	left.StartDate = right.StartDate and left.EndDate = right.EndDate,
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
 					TRANSFORM(nac_v2.Layout_Base2,
-						self := left;), left only, local);				
-	result := unchanged + directUpdates + remaining + newClients;
+						self := left;), left only, local);
+// did not get modified
+asis := JOIN(candidates,updates,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), left only, local);
+	result := unchanged + directUpdates + remaining + asis + newClients;
 
 	return result(clientId<>'');
 END;
