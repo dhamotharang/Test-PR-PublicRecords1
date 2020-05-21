@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Person,E_Person_Phone,E_Phone FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Phone := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Phone.__Result) __E_Person_Phone := E_Person_Phone.__Result;
-  SHARED __EE2268118 := __E_Person_Phone;
-  EXPORT __ST45813_Layout := RECORD
+  SHARED __EE2341438 := __E_Person_Phone;
+  EXPORT __ST45890_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Phone.Typ) Phone_Number_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Phone := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST45813_Layout __ND2268152__Project(E_Person_Phone.Layout __PP2268013) := TRANSFORM
-    __EE2268051 := __PP2268013.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2268051,__T(__EE2268051).Event_Date_);
-    __EE2268080 := __PP2268013.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2268080,__T(__EE2268080).Event_Date_);
-    SELF := __PP2268013;
+  SHARED __ST45890_Layout __ND2341472__Project(E_Person_Phone.Layout __PP2341333) := TRANSFORM
+    __EE2341371 := __PP2341333.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2341371,__T(__EE2341371).Event_Date_);
+    __EE2341400 := __PP2341333.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2341400,__T(__EE2341400).Event_Date_);
+    SELF := __PP2341333;
   END;
-  EXPORT __ENH_Person_Phone := PROJECT(__EE2268118,__ND2268152__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Phone::Annotated',EXPIRE(7));
-  SHARED __EE2523998 := __ENH_Person_Phone;
-  SHARED __IDX_Person_Phone_Phone_Number__Filtered := __EE2523998(__NN(__EE2523998.Phone_Number_));
+  EXPORT __ENH_Person_Phone := PROJECT(__EE2341438,__ND2341472__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Phone::Annotated',EXPIRE(7));
+  SHARED __EE2600884 := __ENH_Person_Phone;
+  SHARED __IDX_Person_Phone_Phone_Number__Filtered := __EE2600884(__NN(__EE2600884.Phone_Number_));
   SHARED IDX_Person_Phone_Phone_Number__Layout := RECORD
     E_Phone.Typ Phone_Number_;
     __IDX_Person_Phone_Phone_Number__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Phone := MODULE
   EXPORT IDX_Person_Phone_Phone_Number__Name := '~key::KEL::FraudgovKEL::Person_Phone::Phone_Number_';
   EXPORT IDX_Person_Phone_Phone_Number_ := INDEX(IDX_Person_Phone_Phone_Number__Projected,{Phone_Number_},{IDX_Person_Phone_Phone_Number__Projected},IDX_Person_Phone_Phone_Number__Name);
   EXPORT IDX_Person_Phone_Phone_Number__Build := BUILD(IDX_Person_Phone_Phone_Number_,OVERWRITE);
-  EXPORT __ST2524000_Layout := RECORDOF(IDX_Person_Phone_Phone_Number_);
-  EXPORT IDX_Person_Phone_Phone_Number__Wrapped := PROJECT(IDX_Person_Phone_Phone_Number_,TRANSFORM(__ST45813_Layout,SELF.Phone_Number_ := __CN(LEFT.Phone_Number_),SELF:=LEFT));
+  EXPORT __ST2600886_Layout := RECORDOF(IDX_Person_Phone_Phone_Number_);
+  EXPORT IDX_Person_Phone_Phone_Number__Wrapped := PROJECT(IDX_Person_Phone_Phone_Number_,TRANSFORM(__ST45890_Layout,SELF.Phone_Number_ := __CN(LEFT.Phone_Number_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Phone_Phone_Number__Build);
 END;

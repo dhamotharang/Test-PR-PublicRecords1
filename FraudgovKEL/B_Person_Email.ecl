@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Email,E_Person,E_Person_Email FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Email := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Email.__Result) __E_Person_Email := E_Person_Email.__Result;
-  SHARED __EE2267754 := __E_Person_Email;
-  EXPORT __ST45767_Layout := RECORD
+  SHARED __EE2341074 := __E_Person_Email;
+  EXPORT __ST45844_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Email.Typ) Emailof_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Email := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST45767_Layout __ND2267788__Project(E_Person_Email.Layout __PP2267649) := TRANSFORM
-    __EE2267687 := __PP2267649.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2267687,__T(__EE2267687).Event_Date_);
-    __EE2267716 := __PP2267649.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2267716,__T(__EE2267716).Event_Date_);
-    SELF := __PP2267649;
+  SHARED __ST45844_Layout __ND2341108__Project(E_Person_Email.Layout __PP2340969) := TRANSFORM
+    __EE2341007 := __PP2340969.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2341007,__T(__EE2341007).Event_Date_);
+    __EE2341036 := __PP2340969.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2341036,__T(__EE2341036).Event_Date_);
+    SELF := __PP2340969;
   END;
-  EXPORT __ENH_Person_Email := PROJECT(__EE2267754,__ND2267788__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Email::Annotated',EXPIRE(7));
-  SHARED __EE2523640 := __ENH_Person_Email;
-  SHARED __IDX_Person_Email_Emailof__Filtered := __EE2523640(__NN(__EE2523640.Emailof_));
+  EXPORT __ENH_Person_Email := PROJECT(__EE2341074,__ND2341108__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Email::Annotated',EXPIRE(7));
+  SHARED __EE2599603 := __ENH_Person_Email;
+  SHARED __IDX_Person_Email_Emailof__Filtered := __EE2599603(__NN(__EE2599603.Emailof_));
   SHARED IDX_Person_Email_Emailof__Layout := RECORD
     E_Email.Typ Emailof_;
     __IDX_Person_Email_Emailof__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Email := MODULE
   EXPORT IDX_Person_Email_Emailof__Name := '~key::KEL::FraudgovKEL::Person_Email::Emailof_';
   EXPORT IDX_Person_Email_Emailof_ := INDEX(IDX_Person_Email_Emailof__Projected,{Emailof_},{IDX_Person_Email_Emailof__Projected},IDX_Person_Email_Emailof__Name);
   EXPORT IDX_Person_Email_Emailof__Build := BUILD(IDX_Person_Email_Emailof_,OVERWRITE);
-  EXPORT __ST2523642_Layout := RECORDOF(IDX_Person_Email_Emailof_);
-  EXPORT IDX_Person_Email_Emailof__Wrapped := PROJECT(IDX_Person_Email_Emailof_,TRANSFORM(__ST45767_Layout,SELF.Emailof_ := __CN(LEFT.Emailof_),SELF:=LEFT));
+  EXPORT __ST2599605_Layout := RECORDOF(IDX_Person_Email_Emailof_);
+  EXPORT IDX_Person_Email_Emailof__Wrapped := PROJECT(IDX_Person_Email_Emailof_,TRANSFORM(__ST45844_Layout,SELF.Emailof_ := __CN(LEFT.Emailof_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Email_Emailof__Build);
 END;
