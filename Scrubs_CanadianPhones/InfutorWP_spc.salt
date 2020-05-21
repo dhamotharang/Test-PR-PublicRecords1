@@ -1,0 +1,33 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_CanadianPhones
+FILENAME:CanadianPhones
+NAMESCOPE:InfutorWP
+
+FIELDTYPE:invalid_phone:ALLOW(0123456789):LENGTHS(10,0)
+FIELDTYPE:invalid_canadian_zip:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ):LENGTHS(0,6)
+FIELDTYPE:invalid_province:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2,0)
+FIELDTYPE:invalid_record_type:ENUM(B|R|):LENGTHS(1,0)
+FIELDTYPE:invalid_address:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'):SPACES( ()-&/\#.;,\:"=*+):LENGTHS(0..)
+FIELDTYPE:invalid_city:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'.,&/):SPACES( ):LENGTHS(0..)
+FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'"+=@#$%^&+-_\:*!?`):SPACES( ,.(){}/\;):LENGTHS(0..)
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+_`):SPACES( -'/.):LENGTHS(0..)
+
+
+FIELD:can_phone:LIKE(invalid_phone):TYPE(STRING10):0,0
+FIELD:can_title:LIKE(invalid_alpha):TYPE(STRING15):0,0
+FIELD:can_fname:LIKE(invalid_alpha):TYPE(STRING50):0,0
+FIELD:can_lname:LIKE(invalid_name):TYPE(STRING255):0,0
+FIELD:can_suffix:LIKE(invalid_alpha):TYPE(STRING10):0,0
+FIELD:can_address1:LIKE(invalid_address):TYPE(STRING100):0,0
+FIELD:can_house:LIKE(invalid_address):TYPE(STRING10):0,0
+FIELD:can_predir:LIKE(invalid_address):TYPE(STRING4):0,0
+FIELD:can_street:LIKE(invalid_address):TYPE(STRING40):0,0
+FIELD:can_strtype:LIKE(invalid_address):TYPE(STRING4):0,0
+FIELD:can_postdir:LIKE(invalid_address):TYPE(STRING2):0,0
+FIELD:can_apttype:LIKE(invalid_address):TYPE(STRING14):0,0
+FIELD:can_aptnbr:LIKE(invalid_address):TYPE(STRING6):0,0
+FIELD:can_city:LIKE(invalid_city):TYPE(STRING40):0,0
+FIELD:can_province:LIKE(invalid_province):TYPE(STRING2):0,0
+FIELD:can_postalcd:LIKE(invalid_canadian_zip):TYPE(STRING6):0,0
+FIELD:can_lang:TYPE(STRING1):0,0
+FIELD:can_rectype:LIKE(invalid_record_type):TYPE(STRING1):0,0

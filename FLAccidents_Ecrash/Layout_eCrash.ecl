@@ -159,6 +159,7 @@ EXPORT Layout_eCrash := MODULE
 		STRING2   motorcycle_cylinder_coding;
 		STRING60 next_street;
 		STRING40 addl_report_number;
+		STRING11 agency_id;
 		STRING9 agency_ori;		
 	  STRING11 orig_agency_ori;
 		STRING100 Insurance_Company_Standardized ;
@@ -246,6 +247,10 @@ EXPORT Layout_eCrash := MODULE
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
 		STRING100 Citation_Detail1;
+		
+		//CR-1237
+		STRING64 Citation_Status; 
+		
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
 		STRING60 Violation_Code3;
@@ -280,6 +285,9 @@ EXPORT Layout_eCrash := MODULE
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
+		
+		//CR-1237		
+		STRING Marijuana_Use_Suspected;
   END;
 
   EXPORT Consolidation := RECORD

@@ -183,9 +183,10 @@ Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := transform
        SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */
 		//Appriss Integration
-		self.Releasable                     := '1'; 	
-		self						:= L;
-		self						:= [];
+		self.Releasable               := '1'; 	
+		self.agency_id                := l.agency_id;	 	
+		self						              := l;
+		self						              := [];
 end;
 
 pntl := project(ntlFile,slimrec(left));
@@ -293,13 +294,11 @@ Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := tran
 */ 
   				
 		//Appriss Integration
-		self.Releasable                     := '1'; 	
-		self						:= L;
-
-		self						:= [];
-
+		self.Releasable               := '1'; 	
+		self.agency_id                := l.agency_id;	
+		self						              := l;
+		self						              := [];
 end;
-
 	pinq:=  normalize(inqFile,3,slimrec2(left,counter));
 	
 //Iyetek 
@@ -389,6 +388,7 @@ Layout_eCrash.Consolidation_AgencyOri slimrec3(eFile L, unsigned1 cnt) := transf
 		self.vehicle_unit_number 						:= L.unit_number;
 		self.next_street 										:= l.next_street;
 		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
+		self.agency_id											:= l.agency_id;
 		self.agency_ori											:= l.ori_number;
 		self.orig_agency_ori								:= l.agency_ori;
 		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
@@ -416,10 +416,8 @@ Layout_eCrash.Consolidation_AgencyOri slimrec3(eFile L, unsigned1 cnt) := transf
 		//Appriss Integration
 		self.Releasable                     := IF(TRIM(L.Releasable,left,right) IN ['\\N', 'NULL', ''],  '1', L.Releasable); 			
 		self								                := L;
-		self                                := [];
-   
+		self                                := [];   
 end;
-
 pec := normalize(eFile,2,slimrec3(left,counter));
 
 allrecs := pntl+pflc_ss2+pinq+pec;

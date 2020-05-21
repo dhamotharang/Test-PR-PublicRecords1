@@ -10,23 +10,7 @@ LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)):global(few);
 dsFileListSorted := sort(dsFileList,modified);
-
-new_rec:=record
-	dsFileListSorted;
-	string20 customer_id;
-	string20 file_type;
-end;
-Proj_dsFileListSorted := project(dsFileListSorted, transform(new_rec,
-	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
-	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
-	self:=left));
-	
-J_dsFileListSorted	:= join(Proj_dsFileListSorted, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
-		left.customer_id = right.customer_id and
-		left.file_type = right.file_type
-	 );
-	 
-pfile:=STD.STR.SplitWords(J_dsFileListSorted[1].Name,'/');
+pfile:=STD.STR.SplitWords(dsFileListSorted[1].Name,'/');
 FileDir:=RootDir + pfile[1] +'/';
 
 lECL1 :=
@@ -51,7 +35,6 @@ lECL1 :=
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInput(version,\''+IP+'\',\''+FileDir+'\'))\n'
 +'	);\n'
 ;
-
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Input Prep Schedule');
 

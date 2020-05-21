@@ -926,4 +926,6 @@
 	STRING10 Dui_Suspected;
 	//Data Ingestion New Enum fields
 	STRING Drug_Test_Result;
+	//CR-1237		
+	STRING Marijuana_Use_Suspected;
 	END;
