@@ -3,20 +3,11 @@
 
 
 //	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel:newweighting.csv', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING Indicatortype,	STRING IndicatorDescription, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes', {integer8 entitytype,string200 field, string value, decimal64_32 low, decimal64_32 high, integer8 risklevel, string indicatortype, string indicatordescription, integer8 weight, string uidescription}, THOR);
-	
-
-//	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT CustomWeightingChart := PROJECT(WeightingChart, TRANSFORM({STRING customer_id, STRING industry_type, RECORDOF(LEFT)}, SELF.customer_id := '20989869', SELF.industry_type := '1014', SELF := LEFT));
-
-/*
-	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT CustomWeightingChart := DATASET('~fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-*/
+	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
 
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
-	EXPORT WeightingChartPrepped := PROJECT(WeightingChart, TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF.Indicatortype := Std.Str.ToUpperCase(LEFT.Indicatortype), SELF := LEFT));
-	EXPORT CustomWeightingChartPrepped := PROJECT(CustomWeightingChart, TRANSFORM({RECORDOF(CustomWeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF.Indicatortype := Std.Str.ToUpperCase(LEFT.Indicatortype), SELF := LEFT));
+	EXPORT WeightingChartPrepped := PROJECT(WeightingChart(customerid=0 and industrytype = 0), TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF.Indicatortype := Std.Str.ToUpperCase(LEFT.Indicatortype), SELF := LEFT));
+	EXPORT CustomWeightingChartPrepped := PROJECT(WeightingChart(customerid !=0 and industrytype != 0), TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF.Indicatortype := Std.Str.ToUpperCase(LEFT.Indicatortype), SELF := LEFT));
 
 
 NicoleAttr := 'agencyuid,agencyprogtype,agencyprogjurst,t_srcagencyuid,t_srcagencyprogtype,t_actuid,t_actdtecho,t_srctype,t_srcclasstype,t_personuidecho,' +
@@ -86,7 +77,7 @@ NicoleAttr
                             SELF := LEFT), LOOKUP, LEFT OUTER);
 														
   WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChartPrepped, 
-	                       (UNSIGNED)LEFT.customerid = (UNSIGNED)RIGHT.customer_id AND (UNSIGNED)LEFT.industrytype= (UNSIGNED)RIGHT.industry_type AND
+	                       (UNSIGNED)LEFT.customerid = (UNSIGNED)RIGHT.customerid AND (UNSIGNED)LEFT.industrytype= (UNSIGNED)RIGHT.industrytype AND
                          LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1 AND RIGHT.EntityType = 11) AND
                          (
                            (

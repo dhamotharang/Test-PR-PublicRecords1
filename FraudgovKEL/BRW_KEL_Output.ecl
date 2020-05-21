@@ -13,11 +13,11 @@ Set_recordid:=[100042207,98396537,88091596,92371598,103657507,105277042,86770921
 //FraudgovKEL.KEL_EventShell.CleanEventShell(PhonesMetaHit);
 //OUTPUT(COUNT(Std.Str.SplitWords(KEL_EventShell.NicoleAttr, ',')), named('AttributeCount'));
 
-
+/*
 ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 output(ModelingOutput,,'~temp::deleteme_nd', overwrite);	
 output(ModelingOutput,,'~temp::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);	
-
+*/
 /*
 d1 := TABLE(ModelingOutput, {m_T15_SsnIsKrFlag := MAX(GROUP, T15_SsnIsKrFlag),										 
 m_T20_DlIsKrFlag := MAX(GROUP,T20_DlIsKrFlag ),
