@@ -134,6 +134,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING OttoSSNId,
 		STRING OttoBankAccountId,
     STRING CaseId,
+    STRING ClientId, 
     INTEGER RecordId=record_id,
     DATE EventDate,
     STRING EventType, 
@@ -180,6 +181,25 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING ACECleanerErrorCode=NULL(),
 		BOOLEAN isAdditional,
 
+	  STRING MailingPrimaryRange=NULL(),
+		STRING MailingPredirectional=NULL(),
+		STRING MailingPrimaryName=NULL(),
+		STRING MailingSuffix=NULL(),
+		STRING MailingPostdirectional=NULL(),
+		STRING MailingUnitDesignation=NULL(),
+		STRING MailingSecondaryRange=NULL(),
+		STRING MailingPostalCity=NULL(),
+		STRING MailingVanityCity=NULL(),
+		STRING MailingState=NULL(),
+		STRING MailingZip=NULL(),
+		STRING MailingZip4=NULL(),
+		STRING MailingTypeCode=NULL(),
+		INTEGER MailingCounty=NULL(),
+		REAL MailingLatitude=NULL(),
+		REAL MailingLongitude=NULL(),
+		STRING MailingGeoMatch=NULL(),
+		STRING MailingACECleanerErrorCode=NULL(),
+
     STRING PhoneFormatted,
 
     STRING LicenseNumber,
@@ -203,7 +223,16 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING HeadofficeBranchcodes,
     STRING AccountNumber,
     STRING BankHit,
-				
+
+    STRING RoutingNumber2,
+    STRING FullBankname2,
+    STRING AbbreviatedBankname2,
+    STRING FractionalRoutingnumber2,
+    STRING HeadofficeRoutingnumber2,
+    STRING HeadofficeBranchcodes2,
+    STRING AccountNumber2,
+    STRING BankHit2,
+		
     INTEGER Confidence_that_activity_was_deceitful_id,
     INTEGER name_risk_code,
     INTEGER dob_risk_code,
@@ -417,6 +446,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     OttoIpAddressId,
 		OttoSSNId,
     CaseId,
+		ClientId,
     OttoDriversLicenseId,
 		OttoBankAccountId,
 
@@ -446,7 +476,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     addresspobox, addresscmra, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, 
 		Zip, Zip4, CarrierRouteNumber, CarrierRouteSortationAtZIP, LineOfTravel, LineOfTravelOrder, DeliveryPointBarcode, DeliveryPointBarcodeCheckDigit, 
 		TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,
-		
+
+		MailingPrimaryRange,MailingPredirectional,MailingPrimaryName,MailingSuffix,MailingPostdirectional,MailingUnitDesignation,MailingSecondaryRange,
+		MailingPostalCity,MailingVanityCity,MailingState,MailingZip,MailingZip4,MailingTypeCode,MailingCounty,MailingLatitude,MailingLongitude,MailingGeoMatch,MailingACECleanerErrorCode,		
+
 		LicenseNumber,
     LicenseState,
 
@@ -457,6 +490,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     Ssn, SsnFormatted,
 
     RoutingNumber,FullBankname,AbbreviatedBankname,FractionalRoutingnumber,HeadofficeRoutingnumber,HeadofficeBranchcodes,AccountNumber,BankHit,
+    RoutingNumber2,FullBankname2,AbbreviatedBankname2,FractionalRoutingnumber2,HeadofficeRoutingnumber2,HeadofficeBranchcodes2,AccountNumber2,BankHit2,
 
     curr_incar_flag,
     off_cat_list,
@@ -842,6 +876,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     LexId = did,
 		BocashellLexId = bocashelldid,
 		CaseId = household_id,
+		ClientId = Customer_Person_ID,
     EventDate = event_date,
 		DateOfBirth = dob,		
 		Title = cleaned_name.title,
@@ -852,6 +887,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		PhoneNumber = clean_phones.phone_number,
 		LicenseNumber = drivers_license,
     LicenseState = drivers_license_state,
+		
 		PrimaryRange = clean_address.prim_range,
 		Predirectional = clean_address.predir,
 		PrimaryName = clean_address.prim_name,
@@ -879,6 +915,27 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		GeoMatch = clean_address.geo_match,
 		ACECleanerErrorCode = clean_address.err_stat,
 		isAdditional=FALSE,
+		
+		MailingPrimaryRange = additional_address.clean_address.prim_range,
+		MailingPredirectional = additional_address.clean_address.predir,
+		MailingPrimaryName = additional_address.clean_address.prim_name,
+		MailingSuffix = additional_address.clean_address.addr_suffix,
+		MailingPostdirectional = additional_address.clean_address.postdir,
+		MailingUnitDesignation = additional_address.clean_address.unit_desig,
+		MailingSecondaryRange = additional_address.clean_address.sec_range,
+		MailingPostalCity = additional_address.clean_address.p_city_name,
+		MailingVanityCity = additional_address.clean_address.v_city_name,
+		MailingState = additional_address.clean_address.st,
+		MailingZip = additional_address.clean_address.zip,
+		MailingZip4 = additional_address.clean_address.zip4,
+
+		MailingTypeCode = additional_address.clean_address.rec_type,
+		MailingCounty = additional_address.clean_address.ace_fips_county,
+		MailingLatitude = additional_address.clean_address.geo_lat,
+		MailingLongitude = additional_address.clean_address.geo_long,
+		MailingGeoMatch = additional_address.clean_address.geo_match,
+		MailingACECleanerErrorCode = additional_address.clean_address.err_stat,
+		
 		EmailAddress=email_address,
 		Type=email_address_type,
 		CreatedOn=email_address_date,
@@ -937,9 +994,26 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     add_curr_long = add_curr_long,
     
     add_curr_pop	= address_verification.address_history_1.addrpop,
-    add_input_isbestmatch	= address_verification.input_address_information.isbestmatch
+    add_input_isbestmatch	= address_verification.input_address_information.isbestmatch,
 
-		
+    AccountNumber = bank_account_number_1,
+    RoutingNumber = bank_routing_number_1,
+    FullBankname = bank1FullBankname,
+    AbbreviatedBankname = bank1AbbreviatedBankname,
+    FractionalRoutingnumber = bank1FractionalRoutingnumber,
+    HeadofficeRoutingnumber = bank1HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank1HeadofficeBranchcodes,
+    BankHit = bank1hit, 
+ 
+    AccountNumber2 = bank_account_number_1,
+    RoutingNumber2 = bank_routing_number_1,
+    FullBankname2 = bank1FullBankname,
+    AbbreviatedBankname2 = bank1AbbreviatedBankname,
+    FractionalRoutingnumber2 = bank1FractionalRoutingnumber,
+    HeadofficeRoutingnumber2 = bank1HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank1HeadofficeBranchcodes,
+    BankHit2 = bank1hit 
+
     ),
 	Person(FILTER((UNSIGNED)did <> 0),
     LexId = did,
@@ -1327,6 +1401,8 @@ Event: => DeceasedToEventYearDiff := MAP(DeceasedMatch = 1 => YEARSBETWEEN(Event
 Event: => FullAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => StreetAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange)))))))));
 Event: => City := PostalCity;
+Event: => MailingStreetAddress := CleanSpaces(TRIM(TRIM(MailingPrimaryRange) + ' ' + TRIM(TRIM(MailingPredirectional) + ' ' + TRIM(TRIM(MailingPrimaryName) + ' ' + TRIM(TRIM(MailingSuffix) + ' ' + TRIM(TRIM(MailingPostdirectional) + ' ' + TRIM(TRIM(MailingUnitDesignation) + ' ' + TRIM(TRIM(MailingSecondaryRange)))))))));
+Event: => MailingCity := MailingPostalCity;
 
 Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
 Event: => EventTypeCount := COUNT(EventTypes);

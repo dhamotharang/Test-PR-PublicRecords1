@@ -4,8 +4,8 @@ IMPORT B_Event_9,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_8 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_9.__ENH_Event_9) __ENH_Event_9 := B_Event_9.__ENH_Event_9;
-  SHARED __EE75733 := __ENH_Event_9;
-  EXPORT __ST70644_Layout := RECORD
+  SHARED __EE76974 := __ENH_Event_9;
+  EXPORT __ST71345_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -42,6 +42,7 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Case_Id_;
+    KEL.typ.nstr Client_Id_;
     KEL.typ.nstr Otto_Drivers_License_Id_;
     KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.nstr _unique__number_;
@@ -141,6 +142,24 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
+    KEL.typ.nstr Mailing_Primary_Range_;
+    KEL.typ.nstr Mailing_Predirectional_;
+    KEL.typ.nstr Mailing_Primary_Name_;
+    KEL.typ.nstr Mailing_Suffix_;
+    KEL.typ.nstr Mailing_Postdirectional_;
+    KEL.typ.nstr Mailing_Unit_Designation_;
+    KEL.typ.nstr Mailing_Secondary_Range_;
+    KEL.typ.nstr Mailing_Postal_City_;
+    KEL.typ.nstr Mailing_Vanity_City_;
+    KEL.typ.nstr Mailing_State_;
+    KEL.typ.nstr Mailing_Zip_;
+    KEL.typ.nstr Mailing_Zip4_;
+    KEL.typ.nstr Mailing_Type_Code_;
+    KEL.typ.nint Mailing_County_;
+    KEL.typ.nfloat Mailing_Latitude_;
+    KEL.typ.nfloat Mailing_Longitude_;
+    KEL.typ.nstr Mailing_Geo_Match_;
+    KEL.typ.nstr Mailing_A_C_E_Cleaner_Error_Code_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
     KEL.typ.nstr Phone_Formatted_;
@@ -160,6 +179,14 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.nstr Headoffice_Branchcodes_;
     KEL.typ.nstr Account_Number_;
     KEL.typ.nstr Bank_Hit_;
+    KEL.typ.nstr Routing_Number2_;
+    KEL.typ.nstr Full_Bankname2_;
+    KEL.typ.nstr Abbreviated_Bankname2_;
+    KEL.typ.nstr Fractional_Routingnumber2_;
+    KEL.typ.nstr Headoffice_Routingnumber2_;
+    KEL.typ.nstr Headoffice_Branchcodes2_;
+    KEL.typ.nstr Account_Number2_;
+    KEL.typ.nstr Bank_Hit2_;
     KEL.typ.nstr _curr__incar__flag_;
     KEL.typ.nstr _off__cat__list_;
     KEL.typ.nint _name__ssn__dob__match_;
@@ -253,11 +280,11 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST70644_Layout __ND76232__Project(B_Event_9.__ST71272_Layout __PP74473) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP74473.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP74473.Lex_Id_),=,__CN('')),__NT(__PP74473.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP74473.Lex_Id_));
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP74473.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP74473.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP74473;
+  SHARED __ST71345_Layout __ND77527__Project(B_Event_9.__ST72027_Layout __PP75579) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP75579.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OP2(__CAST(KEL.typ.str,__PP75579.Lex_Id_),=,__CN('')),__NT(__PP75579.Lex_Id_)))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP75579.Lex_Id_));
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP75579.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP75579.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP75579.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP75579.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP75579.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP75579;
   END;
-  EXPORT __ENH_Event_8 := PROJECT(__EE75733,__ND76232__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Event_8 := PROJECT(__EE76974,__ND77527__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
 END;
