@@ -1,6 +1,6 @@
 ﻿OPTIONS:-gh
-MODULE:Scrubs_Experian_Monthly_2
-FILENAME:Experian_Monthly
+MODULE:Scrubs_Experian_Monthly
+FILENAME:File
 
 
 //Uncomment up to NINES for internal or external adl
