@@ -7,4 +7,4 @@ dExecLinkID := dataset([], $.Layout_ExecLinkID);
 #END
 
 EXPORT Key_Executive_Link_id := INDEX(dExecLinkID, {Link_ID, persistent_record_id}, {dExecLinkID},
-  data_services.Data_Location.Prefix('')+'thor::cortera::key::' + doxie.version_superkey + '::executive_linkid');
+  data_services.Data_Location.Prefix('')+'thor_data400::key::cortera::' + doxie.version_superkey + '::executive_linkid');
