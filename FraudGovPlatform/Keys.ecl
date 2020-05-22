@@ -1,4 +1,4 @@
-﻿import tools,KELOtto;
+﻿import tools,KELOtto,FraudgovKEL;
 
 export Keys(
 	 string pversion = ''
@@ -14,7 +14,22 @@ export Keys(
 																											,self.entitytype := (integer8)left.entitytype , self.low	:=(decimal64_32)left.low
 																											,self.high	:= (decimal64_32)left.high , self.risklevel	:= (integer8)left.risklevel
 																											,self.weight	:= (integer8)left.weight,self:=left));
-																									
+	shared Base_EntityProfile							:= PROJECT(FraudgovKEL.KEL_PivotIndexPrep.ds_KEL_PivotIndexPrep(aotcurrprofflag=1)
+																											,Transform(Layouts_Key.EntityProfile
+																											,self.entitycontextuid :=left.entitycontextuid,self:=left));	
+	shared Base_ConfigAttributes					:= PROJECT(Files().Input.ConfigAttributes.Sprayed
+																							,Transform(Layouts_Key.ConfigAttributes
+																								,self.entitytype	:= (integer8)left.entitytype
+																								,self.field	:= (string200)left.field
+																								,self.low:=(decimal)left.low
+																								,self.high:=(decimal)left.high
+																								,self.risklevel	:=(integer)left.risklevel
+																								,self.weight	:=(integer)left.weight
+																								,self.customerid	:=(unsigned)left.customerid
+																								,self.industrytype	:=(unsigned)left.industrytype
+																								,Self:=left));
+	shared Base_ConfigRules								:= PROJECT(Files().Input.ConfigRules.Sprayed,Transform(Layouts_Key.ConfigRules,Self:=left));
+																																																		
 	shared Base_ClusterDetails_Demo 			:= Base_ClusterDetails_prep;
 	shared Base_ElementPivot_Demo 				:= Base_ElementPivot_prep;
 	shared Base_ScoreBreakdown_Demo 			:= Base_ScoreBreakdown_prep;
@@ -38,5 +53,8 @@ export Keys(
 	tools.mac_FilesIndex('Base_ClusterDetails_Delta,{customer_id_,industry_type_,entity_context_uid_,tree_uid_},{Base_ClusterDetails_Delta}',KeyNames(pversion).Main.ClusterDetails_Delta,ClusterDetails_Delta);
 	tools.mac_FilesIndex('Base_ElementPivot_Delta,{customer_id_,industry_type_,entity_context_uid_},{Base_ElementPivot_Delta}',KeyNames(pversion).Main.ElementPivot_Delta,ElementPivot_Delta);
 	tools.mac_FilesIndex('Base_ScoreBreakdown_Delta,{customer_id_,industry_type_,entity_context_uid_},{Base_ScoreBreakdown_Delta}',KeyNames(pversion).Main.ScoreBreakdown_Delta,ScoreBreakdown_Delta);
+	tools.mac_FilesIndex('Base_EntityProfile,{customerid,industrytype,entitycontextuid},{Base_EntityProfile}',KeyNames(pversion).Main.EntityProfile,EntityProfile);
+	tools.mac_FilesIndex('Base_ConfigAttributes,{Field, EntityType, CustomerId, IndustryType},{Base_ConfigAttributes}',KeyNames(pversion).Main.ConfigAttributes,ConfigAttributes);
+	tools.mac_FilesIndex('Base_ConfigRules,{CustomerId, IndustryType, Field, EntityType},{Base_ConfigRules}',KeyNames(pversion).Main.ConfigRules,ConfigRules);
 	end; 	
 end;
