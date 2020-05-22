@@ -121,8 +121,7 @@ module
 		LOOKUP);
 
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);
 	
 	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
 
