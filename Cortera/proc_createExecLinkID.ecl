@@ -4,7 +4,7 @@ EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FU
 
   fNameIsBlank (l, c) := FUNCTIONMACRO
     BOOLEAN bIsBlank :=  MAP (
-      c = 1 => FALSE,
+      c = 1 AND l.EXECUTIVE_NAME1 = '' => TRUE,
       c = 2 AND l.EXECUTIVE_NAME2 = '' => TRUE,
       c = 3 AND l.EXECUTIVE_NAME3 = '' => TRUE,
       c = 4 AND l.EXECUTIVE_NAME4 = '' => TRUE,
@@ -24,7 +24,7 @@ EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FU
   END;
 
   LayoutFullCortera xExecutives(RECORDOF(dCortera) l, UNSIGNED c) := TRANSFORM, 
-    SKIP(c > 1 AND fNameIsBlank(l, c) = TRUE)
+    SKIP(fNameIsBlank(l, c) = TRUE)
     SELF.Executive_Name := CHOOSE(c, l.EXECUTIVE_NAME1, l.EXECUTIVE_NAME2, l.EXECUTIVE_NAME3, l.EXECUTIVE_NAME4, l.EXECUTIVE_NAME5,
       l.EXECUTIVE_NAME6, l.EXECUTIVE_NAME7, l.EXECUTIVE_NAME8, l.EXECUTIVE_NAME9, l.EXECUTIVE_NAME10);
     SELF.Executive_Title := CHOOSE(c, l.TITLE1, l.TITLE2, l.TITLE3, l.TITLE4, l.TITLE5,l.TITLE6, l.TITLE7, l.TITLE8, l.TITLE9, l.TITLE10);

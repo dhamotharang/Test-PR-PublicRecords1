@@ -1,4 +1,4 @@
-import business_header_ss,ut, lib_fileservices, header_services,codes,mdr,data_services, PRTE2_Business_Header;
+﻿import business_header_ss,ut, lib_fileservices, header_services,codes,mdr,data_services, PRTE2_Business_Header;
 
 #IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
 bh_base := PRTE2_Business_Header.Files().Base.Business_Headers.built;
@@ -19,7 +19,6 @@ required_src_set := set(codesV3(file_name = 'BUSINESS-HEADER'
 
 
 bh_best_layout := Business_Header.Layout_BH_Best;
-
 
 bh_best_layout  filterDNBAddressPhone(bh_best_layout l) := 
 transform
@@ -46,11 +45,12 @@ bh_base_filtered := project(f_best(source in required_src_set), filterDNBAddress
 
 // need to match back to BH to see if the dnb records with address information have another source
 
-Business_Header.Layout_BH_Best tblanksource(Business_Header.Layout_BH_Best l) :=
-transform
-	self.source := '';
-	self := l;
-end;
+//** Commented the below trasform "tblanksource" code to retain the source values as per Jira# DF-27729 Business Header Best key Source Update /*
+//Business_Header.Layout_BH_Best tblanksource(Business_Header.Layout_BH_Best l) :=
+//transform
+//	self.source := '';
+//	self := l;
+//end;
 
 //CNG W20070816-150957 dat//////////////////////////////////
 
@@ -101,9 +101,10 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOV
 
 /////////////////////////////////////////////////////
 
-in_hdr := project(bh_base_filtered, tblanksource(left));
+//** Commented as pe Jira# DF-27729 Business Header Best key Source Update
+//in_hdr := project(bh_base_filtered, tblanksource(left));
 
-mainDataSet := in_hdr + Base_File_Append;
+mainDataSet := bh_base_filtered + Base_File_Append;
 
 f_bbs := join(	mainDataSet, 
 								Base_File_Append,
