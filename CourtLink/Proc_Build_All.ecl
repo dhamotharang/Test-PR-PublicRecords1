@@ -10,7 +10,7 @@ BuildKeys := CourtLink.Proc_Build_Keys(pversion);
 
 //Upate Roxie Page
 UpdateRoxiePage := IF(
-					Scrubs.mac_ScrubsFailureTest()
+					Scrubs.mac_ScrubsFailureTest('Scrubs_LitigiousDebtor',pversion)
 					,RoxieKeybuild.updateversion('LitigiousDebtorKeys', pversion, _control.MyInfo.EmailAddressNotify,,'N')
 					,OUTPUT('Keys update failed due to Scrubs failure(s)!', NAMED('Key_status'))
 					);
