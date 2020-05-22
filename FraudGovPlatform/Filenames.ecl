@@ -73,6 +73,8 @@ module
 		export MBSDemoData									:= tools.mod_FilenamesInput(Template('MBSDemoData'),pversion);
 		
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
+		export ConfigAttributes							:= tools.mod_FilenamesInput(Template('ConfigAttributes'),pversion);
+		export ConfigRules									:= tools.mod_FilenamesInput(Template('ConfigRules'),pversion);
 		
 		
 		export dAll_filenames :=
@@ -147,7 +149,9 @@ module
 		export kel_CustomerDashTopEntityStats				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats'),pversion);
 		export kel_CustomerDashTopClustersAndElements				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements'),pversion);
 		export kel_CustomerDashTopClusters				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters'),pversion);
-		
+		export kel_EntityProfile								:= tools.mod_FilenamesBuild(Template('kel::EntityProfile'),pversion);
+		export kel_ConfigAttributes							:= tools.mod_FilenamesBuild(Template('kel::ConfigAttributes'),pversion);
+				
 		//Kel files demo
 		export kel_customeraddress_Demo	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Demo'),pversion);
 		export kel_personstats_Demo			:= tools.mod_FilenamesBuild(Template('kel::personstats_Demo'),pversion);
@@ -221,6 +225,8 @@ module
 			kel_CustomerDashTopEntityStats.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements.dAll_filenames + 
 			kel_CustomerDashTopClusters.dAll_filenames + 
+			kel_EntityProfile.dAll_filenames + 
+			kel_ConfigAttributes.dAll_filenames + 
 			//kel demo files
 			kel_customeraddress_Demo.dAll_filenames +
 			kel_personstats_Demo.dAll_filenames +
