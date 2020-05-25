@@ -1,4 +1,4 @@
-IMPORT Insurance_Certification as IC;
+IMPORT Insurance_Certification;
 
 EXPORT 
-Cert_In_Insurance_Cert := IC.Files().cert_input.used;
+Cert_In_Insurance_Cert := Insurance_Certification.Files().base_cert.qa;

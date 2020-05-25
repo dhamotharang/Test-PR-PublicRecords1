@@ -1,3 +1,4 @@
-IMPORT Insurance_Certification as IC;
+IMPORT Insurance_Certification;
 
-EXPORT Cert_Layout_Insurance_Cert := RecordOf(IC.Files().cert_input.used);
+EXPORT 
+Cert_Layout_Insurance_Cert := RecordOf(Insurance_Certification.Files().base_cert.qa);

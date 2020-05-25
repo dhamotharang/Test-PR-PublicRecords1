@@ -1,7 +1,0 @@
-﻿//This is the code to execute in a builder window
-#OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Insurance_Cert.Pol_BWR_PopulationStatistics - Population Statistics - SALT V3.11.9');
-IMPORT Scrubs_Insurance_Cert,SALT311;
-// In the line below substitute the file you want statistics for; and substitute any field names you can
-  Scrubs_Insurance_Cert.Pol_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* lnpolicyid_field */,/* lninscertrecordid_field */,/* dartid_field */,/* insuranceprovider_field */,/* policynumber_field */,/* coveragestartdate_field */,/* coverageexpirationdate_field */,/* coveragewrapup_field */,/* policystatus_field */,/* insuranceprovideraddressline_field */,/* insuranceprovideraddressline2_field */,/* insuranceprovidercity_field */,/* insuranceproviderstate_field */,/* insuranceproviderzip_field */,/* insuranceproviderzip4_field */,/* insuranceproviderphone_field */,/* insuranceproviderfax_field */,/* coveragereinstatedate_field */,/* coveragecancellationdate_field */,/* coveragewrapupdate_field */,/* businessnameduringcoverage_field */,/* addresslineduringcoverage_field */,/* addressline2duringcoverage_field */,/* cityduringcoverage_field */,/* stateduringcoverage_field */,/* zipduringcoverage_field */,/* zip4duringcoverage_field */,/* numberofemployeesduringcoverage_field */,/* insuranceprovidercontactdept_field */,/* insurancetype_field */,/* coverageposteddate_field */,/* coverageamountfrom_field */,/* coverageamountto_field */,outfile);
-  OUTPUT(outfile,NAMED('PopulationStatistics'));

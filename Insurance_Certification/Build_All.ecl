@@ -50,7 +50,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 						      ,PromoteFiles(pversion).fPromote_New2Built
 						      ,PromoteFiles(pversion).fPromote_Built2QA
 									,Proc_AutokeyBuild_BDID(pversion)    /* Build BDID & DID AutoKeys   */
-									,Proc_Build_Keys(pversion)					 /* Build Roxie Keys            */
+									,Proc_Build_Keys(pversion)			 /* Build Roxie Keys  */
 									,out_STRATApopulation_stats(pversion)
 									,out_STRATApopulation_stats_Policy(pversion)
 									,dops_update

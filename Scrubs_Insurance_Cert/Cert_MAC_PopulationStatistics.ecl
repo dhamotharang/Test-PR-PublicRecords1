@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_dateadded = '',Input_dateupdated = '',Input_website = '',Input_state = '',Input_lninscertrecordid = '',Input_profilelastupdated = '',Input_siid = '',Input_sipstatuscode = '',Input_wcbempnumber = '',Input_ubinumber = '',Input_cofanumber = '',Input_usdotnumber = '',Input_businessname = '',Input_dba = '',Input_addressline1 = '',Input_addressline2 = '',Input_addresscity = '',Input_addressstate = '',Input_addresszip = '',Input_zip4 = '',Input_phone1 = '',Input_phone2 = '',Input_phone3 = '',Input_fax1 = '',Input_fax2 = '',Input_email1 = '',Input_email2 = '',Input_businesstype = '',Input_namefirst = '',Input_namemiddle = '',Input_namelast = '',Input_namesuffix = '',Input_nametitle = '',Input_mailingaddress1 = '',Input_mailingaddress2 = '',Input_mailingaddresscity = '',Input_mailingaddressstate = '',Input_mailingaddresszip = '',Input_mailingaddresszip4 = '',Input_contactnamefirst = '',Input_contactnamemiddle = '',Input_contactnamelast = '',Input_contactnamesuffix = '',Input_contactbusinessname = '',Input_contactaddressline1 = '',Input_contactaddressline2 = '',Input_contactcity = '',Input_contactstate = '',Input_contactzip = '',Input_contactzip4 = '',Input_contactphone = '',Input_contactfax = '',Input_contactemail = '',Input_policyholdernamefirst = '',Input_policyholdernamemiddle = '',Input_policyholdernamelast = '',Input_policyholdernamesuffix = '',Input_statepolicyfilenumber = '',Input_coverageinjuryillnessdate = '',Input_selfinsurancegroup = '',Input_selfinsurancegroupphone = '',Input_selfinsurancegroupid = '',Input_numberofemployees = '',Input_licensedcontractor = '',Input_mconame = '',Input_mconumber = '',Input_mcoaddressline1 = '',Input_mcoaddressline2 = '',Input_mcocity = '',Input_mcostate = '',Input_mcozip = '',Input_mcozip4 = '',Input_mcophone = '',Input_governingclasscode = '',Input_licensenumber = '',Input_class = '',Input_classificationdescription = '',Input_licensestatus = '',Input_licenseadditionalinfo = '',Input_licenseissuedate = '',Input_licenseexpirationdate = '',Input_naicscode = '',Input_officerexemptfirstname1 = '',Input_officerexemptlastname1 = '',Input_officerexemptmiddlename1 = '',Input_officerexempttitle1 = '',Input_officerexempteffectivedate1 = '',Input_officerexemptterminationdate1 = '',Input_officerexempttype1 = '',Input_officerexemptbusinessactivities1 = '',Input_officerexemptfirstname2 = '',Input_officerexemptlastname2 = '',Input_officerexemptmiddlename2 = '',Input_officerexempttitle2 = '',Input_officerexempteffectivedate2 = '',Input_officerexemptterminationdate2 = '',Input_officerexempttype2 = '',Input_officerexemptbusinessactivities2 = '',Input_officerexemptfirstname3 = '',Input_officerexemptlastname3 = '',Input_officerexemptmiddlename3 = '',Input_officerexempttitle3 = '',Input_officerexempteffectivedate3 = '',Input_officerexemptterminationdate3 = '',Input_officerexempttype3 = '',Input_officerexemptbusinessactivities3 = '',Input_officerexemptfirstname4 = '',Input_officerexemptlastname4 = '',Input_officerexemptmiddlename4 = '',Input_officerexempttitle4 = '',Input_officerexempteffectivedate4 = '',Input_officerexemptterminationdate4 = '',Input_officerexempttype4 = '',Input_officerexemptbusinessactivities4 = '',Input_officerexemptfirstname5 = '',Input_officerexemptlastname5 = '',Input_officerexemptmiddlename5 = '',Input_officerexempttitle5 = '',Input_officerexempteffectivedate5 = '',Input_officerexemptterminationdate5 = '',Input_officerexempttype5 = '',Input_officerexemptbusinessactivities5 = '',Input_dba1 = '',Input_dbadatefrom1 = '',Input_dbadateto1 = '',Input_dbatype1 = '',Input_dba2 = '',Input_dbadatefrom2 = '',Input_dbadateto2 = '',Input_dbatype2 = '',Input_dba3 = '',Input_dbadatefrom3 = '',Input_dbadateto3 = '',Input_dbatype3 = '',Input_dba4 = '',Input_dbadatefrom4 = '',Input_dbadateto4 = '',Input_dbatype4 = '',Input_dba5 = '',Input_dbadatefrom5 = '',Input_dbadateto5 = '',Input_dbatype5 = '',Input_subsidiaryname1 = '',Input_subsidiarystartdate1 = '',Input_subsidiaryname2 = '',Input_subsidiarystartdate2 = '',Input_subsidiaryname3 = '',Input_subsidiarystartdate3 = '',Input_subsidiaryname4 = '',Input_subsidiarystartdate4 = '',Input_subsidiaryname5 = '',Input_subsidiarystartdate5 = '',Input_subsidiaryname6 = '',Input_subsidiarystartdate6 = '',Input_subsidiaryname7 = '',Input_subsidiarystartdate7 = '',Input_subsidiaryname8 = '',Input_subsidiarystartdate8 = '',Input_subsidiaryname9 = '',Input_subsidiarystartdate9 = '',Input_subsidiaryname10 = '',Input_subsidiarystartdate10 = '',OutFile) := MACRO
+EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_date_firstseen = '',Input_date_lastseen = '',Input_bdid = '',Input_did = '',Input_dotid = '',Input_dotscore = '',Input_dotweight = '',Input_empid = '',Input_empscore = '',Input_empweight = '',Input_powid = '',Input_powscore = '',Input_powweight = '',Input_proxid = '',Input_proxscore = '',Input_proxweight = '',Input_seleid = '',Input_selescore = '',Input_seleweight = '',Input_orgid = '',Input_orgscore = '',Input_orgweight = '',Input_ultid = '',Input_ultscore = '',Input_ultweight = '',Input_unique_id = '',Input_norm_type = '',Input_norm_businessname = '',Input_norm_firstname = '',Input_norm_middle = '',Input_norm_last = '',Input_norm_suffix = '',Input_norm_address1 = '',Input_norm_address2 = '',Input_norm_city = '',Input_norm_state = '',Input_norm_zip = '',Input_norm_zip4 = '',Input_norm_phone = '',Input_dartid = '',Input_dateadded = '',Input_dateupdated = '',Input_website = '',Input_state = '',Input_lninscertrecordid = '',Input_profilelastupdated = '',Input_siid = '',Input_sipstatuscode = '',Input_wcbempnumber = '',Input_ubinumber = '',Input_cofanumber = '',Input_usdotnumber = '',Input_phone2 = '',Input_phone3 = '',Input_fax1 = '',Input_fax2 = '',Input_email1 = '',Input_email2 = '',Input_businesstype = '',Input_nametitle = '',Input_mailingaddress1 = '',Input_mailingaddress2 = '',Input_mailingaddresscity = '',Input_mailingaddressstate = '',Input_mailingaddresszip = '',Input_mailingaddresszip4 = '',Input_contactfax = '',Input_contactemail = '',Input_policyholdernamefirst = '',Input_policyholdernamemiddle = '',Input_policyholdernamelast = '',Input_policyholdernamesuffix = '',Input_statepolicyfilenumber = '',Input_coverageinjuryillnessdate = '',Input_selfinsurancegroup = '',Input_selfinsurancegroupphone = '',Input_selfinsurancegroupid = '',Input_numberofemployees = '',Input_licensedcontractor = '',Input_mconame = '',Input_mconumber = '',Input_mcoaddressline1 = '',Input_mcoaddressline2 = '',Input_mcocity = '',Input_mcostate = '',Input_mcozip = '',Input_mcozip4 = '',Input_mcophone = '',Input_governingclasscode = '',Input_licensenumber = '',Input_class = '',Input_classificationdescription = '',Input_licensestatus = '',Input_licenseadditionalinfo = '',Input_licenseissuedate = '',Input_licenseexpirationdate = '',Input_naicscode = '',Input_officerexemptfirstname1 = '',Input_officerexemptlastname1 = '',Input_officerexemptmiddlename1 = '',Input_officerexempttitle1 = '',Input_officerexempteffectivedate1 = '',Input_officerexemptterminationdate1 = '',Input_officerexempttype1 = '',Input_officerexemptbusinessactivities1 = '',Input_officerexemptfirstname2 = '',Input_officerexemptlastname2 = '',Input_officerexemptmiddlename2 = '',Input_officerexempttitle2 = '',Input_officerexempteffectivedate2 = '',Input_officerexemptterminationdate2 = '',Input_officerexempttype2 = '',Input_officerexemptbusinessactivities2 = '',Input_officerexemptfirstname3 = '',Input_officerexemptlastname3 = '',Input_officerexemptmiddlename3 = '',Input_officerexempttitle3 = '',Input_officerexempteffectivedate3 = '',Input_officerexemptterminationdate3 = '',Input_officerexempttype3 = '',Input_officerexemptbusinessactivities3 = '',Input_officerexemptfirstname4 = '',Input_officerexemptlastname4 = '',Input_officerexemptmiddlename4 = '',Input_officerexempttitle4 = '',Input_officerexempteffectivedate4 = '',Input_officerexemptterminationdate4 = '',Input_officerexempttype4 = '',Input_officerexemptbusinessactivities4 = '',Input_officerexemptfirstname5 = '',Input_officerexemptlastname5 = '',Input_officerexemptmiddlename5 = '',Input_officerexempttitle5 = '',Input_officerexempteffectivedate5 = '',Input_officerexemptterminationdate5 = '',Input_officerexempttype5 = '',Input_officerexemptbusinessactivities5 = '',Input_dba1 = '',Input_dbadatefrom1 = '',Input_dbadateto1 = '',Input_dbatype1 = '',Input_dba2 = '',Input_dbadatefrom2 = '',Input_dbadateto2 = '',Input_dbatype2 = '',Input_dba3 = '',Input_dbadatefrom3 = '',Input_dbadateto3 = '',Input_dbatype3 = '',Input_dba4 = '',Input_dbadatefrom4 = '',Input_dbadateto4 = '',Input_dbatype4 = '',Input_dba5 = '',Input_dbadatefrom5 = '',Input_dbadateto5 = '',Input_dbatype5 = '',Input_subsidiaryname1 = '',Input_subsidiarystartdate1 = '',Input_subsidiaryname2 = '',Input_subsidiarystartdate2 = '',Input_subsidiaryname3 = '',Input_subsidiarystartdate3 = '',Input_subsidiaryname4 = '',Input_subsidiarystartdate4 = '',Input_subsidiaryname5 = '',Input_subsidiarystartdate5 = '',Input_subsidiaryname6 = '',Input_subsidiarystartdate6 = '',Input_subsidiaryname7 = '',Input_subsidiarystartdate7 = '',Input_subsidiaryname8 = '',Input_subsidiarystartdate8 = '',Input_subsidiaryname9 = '',Input_subsidiarystartdate9 = '',Input_subsidiaryname10 = '',Input_subsidiarystartdate10 = '',Input_append_mailaddress1 = '',Input_append_mailaddresslast = '',Input_append_mailrawaid = '',Input_append_mailaceaid = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_Insurance_Cert;
   #uniquename(of)
   %of% := RECORD
@@ -8,7 +8,241 @@ EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_datea
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
     SELF.fields :=
-    #IF( #TEXT(Input_dartid)='' )
+    #IF( #TEXT(Input_date_firstseen)='' )
+      '' 
+    #ELSE
+        IF( le.Input_date_firstseen = (TYPEOF(le.Input_date_firstseen))'','',':date_firstseen')
+    #END
+ 
++    #IF( #TEXT(Input_date_lastseen)='' )
+      '' 
+    #ELSE
+        IF( le.Input_date_lastseen = (TYPEOF(le.Input_date_lastseen))'','',':date_lastseen')
+    #END
+ 
++    #IF( #TEXT(Input_bdid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_bdid = (TYPEOF(le.Input_bdid))'','',':bdid')
+    #END
+ 
++    #IF( #TEXT(Input_did)='' )
+      '' 
+    #ELSE
+        IF( le.Input_did = (TYPEOF(le.Input_did))'','',':did')
+    #END
+ 
++    #IF( #TEXT(Input_dotid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_dotid = (TYPEOF(le.Input_dotid))'','',':dotid')
+    #END
+ 
++    #IF( #TEXT(Input_dotscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_dotscore = (TYPEOF(le.Input_dotscore))'','',':dotscore')
+    #END
+ 
++    #IF( #TEXT(Input_dotweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_dotweight = (TYPEOF(le.Input_dotweight))'','',':dotweight')
+    #END
+ 
++    #IF( #TEXT(Input_empid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_empid = (TYPEOF(le.Input_empid))'','',':empid')
+    #END
+ 
++    #IF( #TEXT(Input_empscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_empscore = (TYPEOF(le.Input_empscore))'','',':empscore')
+    #END
+ 
++    #IF( #TEXT(Input_empweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_empweight = (TYPEOF(le.Input_empweight))'','',':empweight')
+    #END
+ 
++    #IF( #TEXT(Input_powid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_powid = (TYPEOF(le.Input_powid))'','',':powid')
+    #END
+ 
++    #IF( #TEXT(Input_powscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_powscore = (TYPEOF(le.Input_powscore))'','',':powscore')
+    #END
+ 
++    #IF( #TEXT(Input_powweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_powweight = (TYPEOF(le.Input_powweight))'','',':powweight')
+    #END
+ 
++    #IF( #TEXT(Input_proxid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_proxid = (TYPEOF(le.Input_proxid))'','',':proxid')
+    #END
+ 
++    #IF( #TEXT(Input_proxscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_proxscore = (TYPEOF(le.Input_proxscore))'','',':proxscore')
+    #END
+ 
++    #IF( #TEXT(Input_proxweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_proxweight = (TYPEOF(le.Input_proxweight))'','',':proxweight')
+    #END
+ 
++    #IF( #TEXT(Input_seleid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_seleid = (TYPEOF(le.Input_seleid))'','',':seleid')
+    #END
+ 
++    #IF( #TEXT(Input_selescore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_selescore = (TYPEOF(le.Input_selescore))'','',':selescore')
+    #END
+ 
++    #IF( #TEXT(Input_seleweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_seleweight = (TYPEOF(le.Input_seleweight))'','',':seleweight')
+    #END
+ 
++    #IF( #TEXT(Input_orgid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_orgid = (TYPEOF(le.Input_orgid))'','',':orgid')
+    #END
+ 
++    #IF( #TEXT(Input_orgscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_orgscore = (TYPEOF(le.Input_orgscore))'','',':orgscore')
+    #END
+ 
++    #IF( #TEXT(Input_orgweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_orgweight = (TYPEOF(le.Input_orgweight))'','',':orgweight')
+    #END
+ 
++    #IF( #TEXT(Input_ultid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ultid = (TYPEOF(le.Input_ultid))'','',':ultid')
+    #END
+ 
++    #IF( #TEXT(Input_ultscore)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ultscore = (TYPEOF(le.Input_ultscore))'','',':ultscore')
+    #END
+ 
++    #IF( #TEXT(Input_ultweight)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ultweight = (TYPEOF(le.Input_ultweight))'','',':ultweight')
+    #END
+ 
++    #IF( #TEXT(Input_unique_id)='' )
+      '' 
+    #ELSE
+        IF( le.Input_unique_id = (TYPEOF(le.Input_unique_id))'','',':unique_id')
+    #END
+ 
++    #IF( #TEXT(Input_norm_type)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_type = (TYPEOF(le.Input_norm_type))'','',':norm_type')
+    #END
+ 
++    #IF( #TEXT(Input_norm_businessname)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_businessname = (TYPEOF(le.Input_norm_businessname))'','',':norm_businessname')
+    #END
+ 
++    #IF( #TEXT(Input_norm_firstname)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_firstname = (TYPEOF(le.Input_norm_firstname))'','',':norm_firstname')
+    #END
+ 
++    #IF( #TEXT(Input_norm_middle)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_middle = (TYPEOF(le.Input_norm_middle))'','',':norm_middle')
+    #END
+ 
++    #IF( #TEXT(Input_norm_last)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_last = (TYPEOF(le.Input_norm_last))'','',':norm_last')
+    #END
+ 
++    #IF( #TEXT(Input_norm_suffix)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_suffix = (TYPEOF(le.Input_norm_suffix))'','',':norm_suffix')
+    #END
+ 
++    #IF( #TEXT(Input_norm_address1)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_address1 = (TYPEOF(le.Input_norm_address1))'','',':norm_address1')
+    #END
+ 
++    #IF( #TEXT(Input_norm_address2)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_address2 = (TYPEOF(le.Input_norm_address2))'','',':norm_address2')
+    #END
+ 
++    #IF( #TEXT(Input_norm_city)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_city = (TYPEOF(le.Input_norm_city))'','',':norm_city')
+    #END
+ 
++    #IF( #TEXT(Input_norm_state)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_state = (TYPEOF(le.Input_norm_state))'','',':norm_state')
+    #END
+ 
++    #IF( #TEXT(Input_norm_zip)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_zip = (TYPEOF(le.Input_norm_zip))'','',':norm_zip')
+    #END
+ 
++    #IF( #TEXT(Input_norm_zip4)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_zip4 = (TYPEOF(le.Input_norm_zip4))'','',':norm_zip4')
+    #END
+ 
++    #IF( #TEXT(Input_norm_phone)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_phone = (TYPEOF(le.Input_norm_phone))'','',':norm_phone')
+    #END
+ 
++    #IF( #TEXT(Input_dartid)='' )
       '' 
     #ELSE
         IF( le.Input_dartid = (TYPEOF(le.Input_dartid))'','',':dartid')
@@ -86,60 +320,6 @@ EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_datea
         IF( le.Input_usdotnumber = (TYPEOF(le.Input_usdotnumber))'','',':usdotnumber')
     #END
  
-+    #IF( #TEXT(Input_businessname)='' )
-      '' 
-    #ELSE
-        IF( le.Input_businessname = (TYPEOF(le.Input_businessname))'','',':businessname')
-    #END
- 
-+    #IF( #TEXT(Input_dba)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dba = (TYPEOF(le.Input_dba))'','',':dba')
-    #END
- 
-+    #IF( #TEXT(Input_addressline1)='' )
-      '' 
-    #ELSE
-        IF( le.Input_addressline1 = (TYPEOF(le.Input_addressline1))'','',':addressline1')
-    #END
- 
-+    #IF( #TEXT(Input_addressline2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_addressline2 = (TYPEOF(le.Input_addressline2))'','',':addressline2')
-    #END
- 
-+    #IF( #TEXT(Input_addresscity)='' )
-      '' 
-    #ELSE
-        IF( le.Input_addresscity = (TYPEOF(le.Input_addresscity))'','',':addresscity')
-    #END
- 
-+    #IF( #TEXT(Input_addressstate)='' )
-      '' 
-    #ELSE
-        IF( le.Input_addressstate = (TYPEOF(le.Input_addressstate))'','',':addressstate')
-    #END
- 
-+    #IF( #TEXT(Input_addresszip)='' )
-      '' 
-    #ELSE
-        IF( le.Input_addresszip = (TYPEOF(le.Input_addresszip))'','',':addresszip')
-    #END
- 
-+    #IF( #TEXT(Input_zip4)='' )
-      '' 
-    #ELSE
-        IF( le.Input_zip4 = (TYPEOF(le.Input_zip4))'','',':zip4')
-    #END
- 
-+    #IF( #TEXT(Input_phone1)='' )
-      '' 
-    #ELSE
-        IF( le.Input_phone1 = (TYPEOF(le.Input_phone1))'','',':phone1')
-    #END
- 
 +    #IF( #TEXT(Input_phone2)='' )
       '' 
     #ELSE
@@ -182,30 +362,6 @@ EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_datea
         IF( le.Input_businesstype = (TYPEOF(le.Input_businesstype))'','',':businesstype')
     #END
  
-+    #IF( #TEXT(Input_namefirst)='' )
-      '' 
-    #ELSE
-        IF( le.Input_namefirst = (TYPEOF(le.Input_namefirst))'','',':namefirst')
-    #END
- 
-+    #IF( #TEXT(Input_namemiddle)='' )
-      '' 
-    #ELSE
-        IF( le.Input_namemiddle = (TYPEOF(le.Input_namemiddle))'','',':namemiddle')
-    #END
- 
-+    #IF( #TEXT(Input_namelast)='' )
-      '' 
-    #ELSE
-        IF( le.Input_namelast = (TYPEOF(le.Input_namelast))'','',':namelast')
-    #END
- 
-+    #IF( #TEXT(Input_namesuffix)='' )
-      '' 
-    #ELSE
-        IF( le.Input_namesuffix = (TYPEOF(le.Input_namesuffix))'','',':namesuffix')
-    #END
- 
 +    #IF( #TEXT(Input_nametitle)='' )
       '' 
     #ELSE
@@ -246,78 +402,6 @@ EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_datea
       '' 
     #ELSE
         IF( le.Input_mailingaddresszip4 = (TYPEOF(le.Input_mailingaddresszip4))'','',':mailingaddresszip4')
-    #END
- 
-+    #IF( #TEXT(Input_contactnamefirst)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactnamefirst = (TYPEOF(le.Input_contactnamefirst))'','',':contactnamefirst')
-    #END
- 
-+    #IF( #TEXT(Input_contactnamemiddle)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactnamemiddle = (TYPEOF(le.Input_contactnamemiddle))'','',':contactnamemiddle')
-    #END
- 
-+    #IF( #TEXT(Input_contactnamelast)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactnamelast = (TYPEOF(le.Input_contactnamelast))'','',':contactnamelast')
-    #END
- 
-+    #IF( #TEXT(Input_contactnamesuffix)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactnamesuffix = (TYPEOF(le.Input_contactnamesuffix))'','',':contactnamesuffix')
-    #END
- 
-+    #IF( #TEXT(Input_contactbusinessname)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactbusinessname = (TYPEOF(le.Input_contactbusinessname))'','',':contactbusinessname')
-    #END
- 
-+    #IF( #TEXT(Input_contactaddressline1)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactaddressline1 = (TYPEOF(le.Input_contactaddressline1))'','',':contactaddressline1')
-    #END
- 
-+    #IF( #TEXT(Input_contactaddressline2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactaddressline2 = (TYPEOF(le.Input_contactaddressline2))'','',':contactaddressline2')
-    #END
- 
-+    #IF( #TEXT(Input_contactcity)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactcity = (TYPEOF(le.Input_contactcity))'','',':contactcity')
-    #END
- 
-+    #IF( #TEXT(Input_contactstate)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactstate = (TYPEOF(le.Input_contactstate))'','',':contactstate')
-    #END
- 
-+    #IF( #TEXT(Input_contactzip)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactzip = (TYPEOF(le.Input_contactzip))'','',':contactzip')
-    #END
- 
-+    #IF( #TEXT(Input_contactzip4)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactzip4 = (TYPEOF(le.Input_contactzip4))'','',':contactzip4')
-    #END
- 
-+    #IF( #TEXT(Input_contactphone)='' )
-      '' 
-    #ELSE
-        IF( le.Input_contactphone = (TYPEOF(le.Input_contactphone))'','',':contactphone')
     #END
  
 +    #IF( #TEXT(Input_contactfax)='' )
@@ -984,6 +1068,30 @@ EXPORT Cert_MAC_PopulationStatistics(infile,Ref='',Input_dartid = '',Input_datea
       '' 
     #ELSE
         IF( le.Input_subsidiarystartdate10 = (TYPEOF(le.Input_subsidiarystartdate10))'','',':subsidiarystartdate10')
+    #END
+ 
++    #IF( #TEXT(Input_append_mailaddress1)='' )
+      '' 
+    #ELSE
+        IF( le.Input_append_mailaddress1 = (TYPEOF(le.Input_append_mailaddress1))'','',':append_mailaddress1')
+    #END
+ 
++    #IF( #TEXT(Input_append_mailaddresslast)='' )
+      '' 
+    #ELSE
+        IF( le.Input_append_mailaddresslast = (TYPEOF(le.Input_append_mailaddresslast))'','',':append_mailaddresslast')
+    #END
+ 
++    #IF( #TEXT(Input_append_mailrawaid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_append_mailrawaid = (TYPEOF(le.Input_append_mailrawaid))'','',':append_mailrawaid')
+    #END
+ 
++    #IF( #TEXT(Input_append_mailaceaid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_append_mailaceaid = (TYPEOF(le.Input_append_mailaceaid))'','',':append_mailaceaid')
     #END
 ;
   END;
