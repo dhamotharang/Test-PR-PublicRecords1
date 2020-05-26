@@ -159,7 +159,7 @@
  EXPORT ConfigAttributes := Record
   integer8 entitytype;
   string200 field; 
-  string value; 
+  string250 value; 
   decimal low;
   decimal high; 
   integer risklevel; 
@@ -175,7 +175,7 @@
   unsigned8 customerid;
   unsigned8 industrytype;
   integer1 entitytype;
-  string rulename;
+  string100 rulename;
   string description;
   string200 field;
   string value;
