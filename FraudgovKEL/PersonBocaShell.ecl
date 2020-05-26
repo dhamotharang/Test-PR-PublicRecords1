@@ -1521,7 +1521,7 @@ rBocaShell := RECORD
   boolean truedid;
   string15 adlcategory;
   boolean diddeceased;
-  unsigned4 diddeceaseddate;
+  unsigned4 =[;
   integer8 swappednames;
   edina_layout_input shell_input;
   layout_instantid_results iid;

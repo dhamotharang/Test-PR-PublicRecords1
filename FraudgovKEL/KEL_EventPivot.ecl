@@ -9,9 +9,85 @@ EXPORT KEL_EventPivot := MODULE
 
 // JP debug this is to force a link chart that has 2 degrees even if we use the sample dataset needs to come out for PROD
 Set_entity_context_uid_:=['_011288247490','_011565616510','_01191436849360','_01900002842380','_011599706980','_0131464757620','_01238528759680','_012601547200','_011774479870','_01237628984950','_01187859961720','_01900001576080','_01169473326670','_01900002892420','_01900002892510','_011985235570','_01900001596510','_011039698450','_0195869363320','_013181789260','_014389096870','_0158670530380','_01193865000580','_011214890110','_01190949021280','_01141059383650','_01182614587030','_01900002980440','_01900002988270','_01165072987270','_011548552240','_011613908620','_01900002995650','_01164190937410','_012462366430','_01236826239310','_01900002120760','_01900003014460','_01237694830480','_012331850230','_01146058766560','_01900002818530','_01900002097990','_012136562290','_01900003050910','_0165744435430','_01160028460','_01148798099170','_01720186030','_01900003056670'];
-SHARED UIStats := PROJECT(FraudgovKEL.KEL_EventShell.UIStats, TRANSFORM(RECORDOF(LEFT), 
+SHARED UIStats1 := PROJECT(FraudgovKEL.KEL_EventShell.UIStats, TRANSFORM(RECORDOF(LEFT), 
   self.addressentitycontextuid := MAP(LEFT.personentitycontextuid in Set_entity_context_uid_ => '_092247340211570905463', LEFT.addressentitycontextuid), 
 	SELF := LEFT));
+
+
+
+setFields := ['t_evttype1statuscodeecho','t_evttype2statuscodeecho','t_evttype3statuscodeecho','t_idstatuscodeecho','t_namestatuscodeecho','t_addrstatuscodeecho','t_bnkacctstatuscodeecho','t_dlstatuscodeecho','t_emailstatuscodeecho','t_ipaddrstatuscodeecho','t_phnstatuscodeecho','t_ssnstatuscodeecho'];
+
+// jp temp
+dConfig := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
+
+dictEvtType1 := DICTIONARY(dConfig(field = 't_evttype1statuscodeecho'),{value => uidescription});
+dictEvtType2 := DICTIONARY(dConfig(field = 't_evttype2statuscodeecho'),{value => uidescription});
+dictEvtType3 := DICTIONARY(dConfig(field = 't_evttype3statuscodeecho'),{value => uidescription});
+dictIdStat  := DICTIONARY(dConfig(field = 't_idstatuscodeecho'),{value => uidescription});
+dictNameStat  := DICTIONARY(dConfig(field = 't_namestatuscodeecho'),{value => uidescription});
+dictAddrStat := DICTIONARY(dConfig(field = 't_addrstatuscodeecho'),{value => uidescription});
+dictBankStat := DICTIONARY(dConfig(field = 't_bnkacctstatuscodeecho'),{value => uidescription});
+dictDlStat := DICTIONARY(dConfig(field = 't_dlstatuscodeecho'),{value => uidescription});
+dictEmailStat := DICTIONARY(dConfig(field = 't_emailstatuscodeecho'),{value => uidescription});
+dictIpStat := DICTIONARY(dConfig(field = 't_ipaddrstatuscodeecho'),{value => uidescription});
+dictPhnStat := DICTIONARY(dConfig(field = 't_phnstatuscodeecho'),{value => uidescription});
+dictSsnStat := DICTIONARY(dConfig(field = 't_ssnstatuscodeecho'),{value => uidescription});
+      
+SHARED UIStats := PROJECT(UIStats1, 
+  TRANSFORM({RECORDOF(LEFT),
+  STRING t_addrstatusdesc,
+  STRING t_bnkacctstatusdesc,
+  STRING t_dlstatusdesc,
+  STRING t_emailstatusdesc,
+  STRING t_evttype1statusdesc,
+  STRING t_evttype2statusdesc,
+  STRING t_evttype3statusdesc,
+  STRING t_idstatusdesc,
+  STRING t_namestatusdesc,
+  STRING t_ipaddrstatusdesc,
+  STRING t_phnstatusdesc,
+  STRING t_ssnstatusdesc,
+
+	STRING t_inpdvciprovecho, // jp these have to come out when NN puts the actual attr in
+	STRING t_inpclnbnkacct2rtg2echo // 
+	}, 
+ 
+
+		
+ // SELF.t_srcdesC := LEFT.rin_sourcelabel;
+ // SELF.t1_iddtofdeath := LEFT.deceaseddate;
+ // SELF.t_inpdvcuniquenumecho := LEFT.unique_number;
+ // SELF.t_inpdvcmacaddrecho := LEFT.mac_address;
+ // SELF.t_inpdvcserialnumecho := LEFT.serial_number;
+ // SELF.t_inpdvctypeecho := LEFT.device_type;
+ // SELF.t_inpdvciprovecho := LEFT.device_identification_provider;
+
+  /*
+  SELF.aotnewkraftidactcntev := LEFT.eventafterkrcount;
+  SELF.aotidactcnt30d := LEFT.personevent30count;
+  SELF.aotidactcntev := LEFT.personeventcount;
+
+  SELF.aotnonstactcnt30d := LEFT.event30count;
+  SELF.aotnewkraftnonstactcntev := LEFT.eventafterkrcount;
+  */
+
+	SELF.t_inpdvciprovecho := '',
+	SELF.t_inpclnbnkacct2rtg2echo := LEFT.routingnumber2,		
+	
+  SELF.t_evttype1statusdesc := dictEvtType1[(STRING)LEFT.t_evttype1statuscodeecho].uidescription;
+  SELF.t_evttype2statusdesc := dictEvtType2[(STRING)LEFT.t_evttype2statuscodeecho].uidescription;
+  SELF.t_evttype3statusdesc := dictEvtType3[(STRING)LEFT.t_evttype3statuscodeecho].uidescription;
+  SELF.t_idstatusdesc := dictIdStat[(STRING)LEFT.t_idstatuscodeecho].uidescription;
+  SELF.t_namestatusdesc := dictNameStat[(STRING)LEFT.t_namestatuscodeecho].uidescription;
+  SELF.t_addrstatusdesc := dictAddrStat[(STRING)LEFT.t_addrstatuscodeecho].uidescription;
+  SELF.t_bnkacctstatusdesc := dictBankStat[(STRING)LEFT.t_bnkacctstatuscodeecho].uidescription;
+  SELF.t_dlstatusdesc := dictDlStat[(STRING)LEFT.t_dlstatuscodeecho].uidescription;
+  SELF.t_emailstatusdesc := dictEmailStat[(STRING)LEFT.t_emailstatuscodeecho].uidescription;
+  SELF.t_ipaddrstatusdesc := dictIpStat[(STRING)LEFT.t_ipaddrstatuscodeecho].uidescription;
+  SELF.t_phnstatusdesc := dictPhnStat[(STRING)LEFT.t_phnstatuscodeecho].uidescription;
+  SELF.t_ssnstatusdesc := dictSsnStat[(STRING)LEFT.t_ssnstatuscodeecho].uidescription;
+  SELF := LEFT,
+  SELF := []));
 
 
 /* 
@@ -115,7 +191,7 @@ RulesResultAgg := DEDUP(SORT(DISTRIBUTE(RulesResultAggPrep, HASH64(customerid, i
 EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt, 
                         ((LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.RuleName = RIGHT.RuleName) OR
 												  (RIGHT.customerid = 0 AND RIGHT.industrytype = 0 AND LEFT.RuleName = RIGHT.RuleName)) AND LEFT.reccount = RIGHT.reccount, 
-                        TRANSFORM({LEFT.customerid,LEFT.industrytype,LEFT.entitycontextuid,LEFT.entitytype, LEFT.rulename,LEFT.description,LEFT.risklevel}, SELF := LEFT),
+                        TRANSFORM({UNSIGNED customerid,UNSIGNED industrytype,STRING100 entitycontextuid,UNSIGNED entitytype, STRING100 rulename,STRING250 description,INTEGER1 risklevel}, SELF := LEFT),
                         LOOKUP, HASH);
 
 //output(RulesFlagsMatched(entitycontextuid = '_1194033204'), named('RulesFlagsMatched'));
@@ -195,14 +271,20 @@ OutRec := RECORD
 	INTEGER1 AotCurrProfFlag;
 	INTEGER1 aotkractflagev;
 	INTEGER1 aotsafeactflagev;
-	UNSIGNED eventcount;
-	UNSIGNED event30count;
-	UNSIGNED event365count;
-	INTEGER1 eventafterkrflag;
-	UNSIGNED eventafterkrcount;	
+	UNSIGNED aotkractnewdtev;
+  UNSIGNED aotkractcntev;
+	UNSIGNED aotnonstactcntev;
+	UNSIGNED aotnewkraftidactcntev;
+	UNSIGNED aotidactcnt30d;
+  UNSIGNED aotnonstactcnt30d;
+	UNSIGNED aotnewkraftnonstactcntev;
+	UNSIGNED aothiidcurrprofusngcntev;
+	UNSIGNED aotidusngcntev;
+	UNSIGNED aotidactcntev;
+
   RECORDOF(d1);
 END;
-	
+				
 OutRec NormIt(d1 L, INTEGER C) := TRANSFORM
 	SELF.entitytype := CHOOSE(C, 1, 9, 15, 16, 17, 18, 19, 20);
 	SELF.Label := CHOOSE(C, L.personlabel, L.addresslabel, L.ssnlabel, L.phonelabel, L.emaillabel,  L.iplabel, L.bankaccountlabel, L.driverslicenselabel);
@@ -257,57 +339,88 @@ OutRec NormIt(d1 L, INTEGER C) := TRANSFORM
 																			0/*L.p19_aotbnkacctkractflagev*/,
 																			0/*L.p20_aotdlkractflagev*/);	
 																			
+SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
+																			L.p9_aotaddrkractnewdtev,
+																			L.p15_aotssnkractnewdtev,
+																			L.p16_aotphnkractnewdtev,
+																			L.p17_aotemailkractnewdtev,
+																			L.p18_aotipaddrkractnewdtev,
+																			L.p19_aotbnkacctkractnewdtev,
+																			L.p20_aotdlkractnewdtev);
 																			
-	SELF.eventcount := CHOOSE(C, 
-																			L.personeventcount,
-																			L.addreventcount,
-																			L.ssneventcount,
-																			L.phoneeventcount,
-																			L.emaileventcount,
-																			L.ipeventcount,
-																			L.bankaccounteventcount,
-																			L.driverslicenseeventcount);		
+SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
+																			l.p9_aotaddrkractcntev,
+																			l.p15_aotssnkractcntev,
+																			l.p16_aotphnkractcntev,
+																			l.p17_aotemailkractcntev,
+																			l.p18_aotipaddrkractcntev,
+																			l.p19_aotbnkacctkractcntev,
+																			l.p20_aotdlkractcntev);
 																			
-	SELF.event30count := CHOOSE(C, 
-																			L.personevent30count,
-																			L.addrevent30count,
-																			L.ssnevent30count,
-																			L.phoneevent30count,
-																			L.emailevent30count,
-																			L.ipevent30count,
-																			L.bankaccountevent30count,
-																			L.driverslicenseevent30count);		
+SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
+																			l.p9_AotNonStActCntEv,
+																			l.p15_AotNonStActCntEv,
+																			l.p16_AotNonStActCntEv,
+																			l.p17_AotNonStActCntEv,
+																			l.p18_AotNonStActCntEv,
+																			l.p19_AotNonStActCntEv,
+																			l.p20_AotNonStActCntEv);
+		
+SELF.aotnewkraftidactcntev := CHOOSE(C, L.P1_aotidnewkraftidactcntev,
+																			l.p9_aotaddrnewkraftidactcntev,
+																			l.p15_aotssnnewkraftidactcntev,
+																			l.p16_aotphnnewkraftidactcntev,
+																			l.p17_aotemlnewkraftidactcntev,
+																			l.p18_aotipnewkraftidactcntev,
+																			l.p19_aotbkacnewkraftidactcntev,
+																			l.p20_aotdlnewkraftidactcntev);
 																			
-	SELF.event365count := CHOOSE(C, 
-																			L.personevent365count,
-																			L.addrevent365count,
-																			L.ssnevent365count,
-																			L.phoneevent365count,
-																			L.emailevent365count,
-																			L.ipevent365count,
-																			L.bankaccountevent365count,
-																			L.driverslicenseevent365count);		
+																			
+SELF.aotidactcnt30d := CHOOSE(C, L.P1_aotidactcnt30d,
+																			l.p9_aotidactcnt30d,
+																			l.p15_aotidactcnt30d,
+																			l.p16_aotidactcnt30d,
+																			l.p17_aotidactcnt30d,
+																			l.p18_aotidactcnt30d,
+																			l.p19_aotidactcnt30d,
+																			l.p20_aotidactcnt30d);																	
 
-	SELF.eventafterkrflag := CHOOSE(C, 
-																			L.personeventafterkrflag,
-																			L.addreventafterkrflag,
-																			L.ssneventafterkrflag,
-																			L.phoneeventafterkrflag,
-																			L.emaileventafterkrflag,
-																			L.ipeventafterkrflag,
-																			L.bankaccounteventafterkrflag,
-																			L.driverslicenseeventafterkrflag);		
+SELF.aotnonstactcnt30d := CHOOSE(C, L.P1_aotnonstactcnt30d,
+																			l.p9_aotnonstactcnt30d,
+																			l.p15_aotnonstactcnt30d,
+																			l.p16_aotnonstactcnt30d,
+																			l.p17_aotnonstactcnt30d,
+																			l.p18_aotnonstactcnt30d,
+																			l.p19_aotnonstactcnt30d,
+																			l.p20_aotnonstactcnt30d);		
+SELF.aotnewkraftnonstactcntev	:= CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
+																			l.p9_aotaddrnewkraftnonstactcntev,
+																			l.p15_aotssnnewkraftnonstactcntev,
+																			l.p16_aotphnnewkraftnonstactcntev,
+																			l.p17_aotemlnewkraftnonstactcntev,
+																			l.p18_aotipnewkraftnonstactcntev,
+																			l.p19_aotbkacnewkraftnonstactcntev,
+																			l.p20_aotdlnewkraftnonstactcntev);	
 
-	SELF.eventafterkrcount := CHOOSE(C, 
-																			L.personeventafterkrcount,
-																			L.addreventafterkrcount,
-																			L.ssneventafterkrcount,
-																			L.phoneeventafterkrcount,
-																			L.emaileventafterkrcount,
-																			L.ipeventafterkrcount,
-																			L.bankaccounteventafterkrcount,
-																			L.driverslicenseeventafterkrcount);	
-						
+SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count     
+                             
+SELF.aotidusngcntev := CHOOSE(C, 1,
+                                      l.p9_aotidusngaddrcntev,
+																			l.p15_aotidusngssncntev,
+																			l.p16_aotidusngphncntev,
+																			l.p17_aotidusngemailcntev,
+																			l.p18_aotidusngipaddrcntev,
+																			l.p19_aotidusngbnkacctcntev,
+																			l.p20_aotidusngdlcntev);	
+
+SELF.aotidactcntev := CHOOSE(C, L.p1_aotidactcntev,
+																			l.p9_aotidactcntev,
+																			l.p15_aotidactcntev,
+																			l.p16_aotidactcntev,
+																			l.p17_aotidactcntev,
+																			l.p18_aotidactcntev,
+																			l.p19_aotidactcntev,
+																			l.p20_aotidactcntev);
 	SELF := L;
 END;
 
