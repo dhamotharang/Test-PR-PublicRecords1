@@ -1,4 +1,4 @@
-﻿import tools;
+﻿﻿import tools;
 
 export Filenames(
 
@@ -102,7 +102,6 @@ module
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
 		export RefreshProdDashVersion := FraudGov_Prefix('flags') + 'kel::RefreshProdDashVersion';
-		
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
@@ -132,6 +131,7 @@ module
 		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
 		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
 		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
+		export BocaShell		:= tools.mod_FilenamesBuild(Template('BocaShell'),pversion);
 		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -206,6 +206,7 @@ module
 			BestInfo.dAll_filenames +
 			CoverageDates.dAll_filenames +
 			PrepaidPhone.dAll_filenames +
+			BocaShell.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
