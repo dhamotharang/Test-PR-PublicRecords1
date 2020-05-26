@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo;
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	Shared nodes				:= thorlib.nodes();
@@ -7,10 +7,9 @@ EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 	//PII Input Process Begin
 
 	Shared base := Files().Base.Main_Orig.built;
-
 	shared pii_current :=Files().base.pii.built; //pii current build
 
-shared pii_previous := Files().base.pii.qa;			//pii previous build
+	shared pii_previous := Files().base.pii.qa;			//pii previous build
 
 	shared pii_updates := Join(pii_current,pii_previous,left.record_id=right.record_id,left only); //pii updates
 
@@ -54,6 +53,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared Advo_Base				:= Files().base.Advo.qa;
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
+	
+	shared PrepaidPhone_Base:= Files().base.PrepaidPhone.qa;
 
 	//original soap output files
 
@@ -80,15 +81,19 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 												,self.postdir								:=left.clean_address.postdir
 												,self.unit_desig						:=left.clean_address.unit_desig
 												,self.sec_range							:=left.clean_address.sec_range
+												,self.p_city_name						:=left.clean_address.p_city_name
 												,self.st										:=left.clean_address.st
 												,self.zip										:=left.clean_address.zip
+												,self.address_1							:=left.address_1
 												,self.ssn										:=left.clean_ssn
 												,self.dob										:=left.clean_dob
 												,self.drivers_license				:=left.drivers_license
 												,self.drivers_license_state	:=left.drivers_license_state
 												,self.home_phone						:=left.clean_phones.phone_number
 												,self.work_phone_						:=left.clean_phones.work_phone
+												,self.email_address					:=left.email_address
 												,self.ip_address						:=left.ip_address
+												,self.reported_date					:=left.reported_date
 												,self.record_id							:=left.record_id
 												,self.fdn_file_info_id			:=left.classification_Permissible_use_access.fdn_file_info_id
 												,self												:=left)
@@ -626,7 +631,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			layout_soap := RECORD
 				INTEGER ALLOWALL := 1;
-				STRING120 APPENDS := 'BEST_ADDR';
+				STRING120 APPENDS := 'BEST_ALL, VERIFY_ALL';				
 				STRING APPENDTHRESHOLD := '';
 				STRING APPLICATIONTYPE := '';
 				STRING DATAPERMISSIONMASK := DataPermission;
@@ -640,7 +645,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 				UNSIGNED8 MAX_RESULTS_PER_ACCT := 1;
 				BOOLEAN PATRIOTPROCESS := FALSE;
 				STRING SSNMASK := '';
-				STRING120 VERIFY := 'BEST_ADDR';
+				STRING120 VERIFY := 'BEST_ALL, VERIFY_ALL';
 				BOOLEAN INCLUDERANKING := FALSE;
 			END;
 
@@ -691,5 +696,53 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			Export all			:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
 								
 	END;
+	
+	EXPORT PrepaidPhone	:= MODULE
+		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
+	//get transactions between phone vendor dates
+		jPhone1 := join(distribute(Phone_key,hash(phone))
+					,distribute(pii_input(home_phone<>''),hash(home_phone))
+					,left.phone=right.home_phone
+					and 
+					((unsigned8)right.reported_date between left.vendor_first_reported_dt and left.vendor_last_reported_dt)				
+					,Transform(Layouts.PrepaidPhone
+							,self.phone:=right.home_phone
+							,self.reported_date:=right.reported_date
+							,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+							,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+							,self.prepaid := left.prepaid
+							,self.record_id :=right.record_id
+							,self.fdn_file_info_id	:=right.fdn_file_info_id
+							,self:=right)
+					,right outer,local);
+
+		dPhone1 := dedup(sort(jPhone1(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+	//get remaining prepaid matches
+		pii_input_2 := Join(pii_input(home_phone<>''),dPhone1,left.record_id=right.record_id,left only);
+
+		jPhone2 := join(distribute(Phone_key,hash(phone))
+								,distribute(pii_input_2,hash(home_phone))
+								,left.phone=right.home_phone
+								and 
+								((unsigned8)right.reported_date >= left.vendor_first_reported_dt)				
+								,Transform(Layouts.PrepaidPhone
+										,self.phone:=right.home_phone
+										,self.reported_date:=right.reported_date
+										,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+										,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+										,self.prepaid := left.prepaid
+										,self.record_id :=right.record_id
+										,self.fdn_file_info_id	:=right.fdn_file_info_id
+										,self:=right)
+								,right outer,local);
+								
+		dPhone2 := dedup(sort(jPhone2(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+
+		Phone_final := dPhone1 + dPhone2;
+
+		Export All	:= If(UpdatePii, dedup((Phone_final + PrepaidPhone_Base),all) , Phone_final);
+		 
+	END;
+	
 
 END;

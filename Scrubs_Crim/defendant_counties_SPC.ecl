@@ -1,3 +1,4 @@
+﻿OPTIONS:-gh
 MODULE:Scrubs_Crim
 FILENAME:crim
 NAMESCOPE:defendant_counties
@@ -8,12 +9,12 @@ FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:Invalid_Current_Date:CUSTOM(Scrubs.fn_valid_date>0)
 FIELDTYPE:Invalid_Future_Date:CUSTOM(Scrubs.fn_valid_date>0,'future')
 FIELDTYPE:Invalid_Source_ID:ALLOW(0123456789C)
-FIELDTYPE:Invalid_Inmate_Num:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-*,#)
+FIELDTYPE:Invalid_Inmate_Num:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-*,#/ )
 FIELDTYPE:Invalid_Gender:ENUM(MALE|FEMALE|Female|Male|female|male|f|m|F|M|Unknown|UNKNOWN|U|u|)
 FIELDTYPE:Invalid_Zip:ALLOW(0123456789)
 FIELDTYPE:Invalid_Race:CUSTOM(Scrubs_Crim.fn_StandardizeRace>0)
 FIELDTYPE:Invalid_Height:ALLOW(0123456789,"')
-FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,? )
+FIELDTYPE:Invalid_City:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,?' )
 
 FIELD:recordid:LIKE(Invalid_Record_ID):TYPE(STRING40):0,0
 FIELD:sourcename:TYPE(STRING100):0,0

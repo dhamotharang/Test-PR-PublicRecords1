@@ -22,10 +22,10 @@
   unsigned2 ultweight;
   string8 dt_first_seen;
   string8 dt_last_seen;
-  string2 report_code;
+  string4 report_code;
   string25 report_category;
   string65 report_code_desc;
-  string11 vehicle_incident_id;
+  string14 vehicle_incident_id;
   string1 vehicle_status;
   string100 accident_location;
   string100 accident_street;

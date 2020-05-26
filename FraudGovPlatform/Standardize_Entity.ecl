@@ -34,13 +34,22 @@ ENDMACRO;
 
 EXPORT Clean_InputFields(pInputFile) := 
 FUNCTIONMACRO
-	import std,_Validate;
+	import std,_Validate,ut;
 	pInputFile tr(pInputFile l) := TRANSFORM
+
 		SELF.clean_ssn				:= If(regexfind('^[0-9]*$',ut.CleanSpacesAndUpper(l.ssn)) = true,ut.CleanSpacesAndUpper(l.ssn),'');
 		SELF.clean_Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
 		SELF.clean_Zip				:= If(regexfind('^[0-9]*$',	STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) = true,
 						if(length(STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) in [5,9],l.zip,'')
-						,'');		
+						,'');
+
+		valid_dl := if (ut.CleanSpacesAndUpper(l.Drivers_License_State) <> ''
+						AND ut.CleanSpacesAndUpper(l.Drivers_License) <> ''	
+						AND ut.CleanSpacesAndUpper(l.Drivers_License_State) IN FraudGovPlatform.Constants().states,
+						true,false);
+
+		SELF.clean_Drivers_License.Drivers_License := if (valid_dl,l.Drivers_License,'');
+		SELF.clean_Drivers_License.Drivers_License_State := if (valid_dl,l.Drivers_License_State,'');
 		SELF.clean_dob				:= if (_Validate.Date.fIsValid(l.dob) and 
 														(unsigned)l.dob <= (unsigned)(STRING8)Std.Date.Today(),
 														_validate.date.fCorrectedDateString(l.dob),

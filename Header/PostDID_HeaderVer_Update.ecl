@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 import did_add,_Control,std;
-
+#option('skipFileFormatCrcCheck', 1);
 export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
 
 	// Flag file which contains the prod header version used for last DID process
@@ -19,7 +19,16 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
 	
 	// Temp file which will be renamed after the process
 	
-	newflagfilename := '~thor_data400::flag::' + datasetname + '::prodheaderversion::'+workunit;
+	logicalflagfilename := '~thor_data400::flag::' + datasetname + '::prodheaderversion::'+workunit;
+	
+	newflagfilename := nothor(IF (STD.File.SuperFileExists(flagfilename)
+														,if (STD.File.FindSuperFileSubName(flagfilename,logicalflagfilename) = 0
+																	,logicalflagfilename
+																	,logicalflagfilename+'_1'
+																)
+												,logicalflagfilename));
+	
+	getlogical := dataset('~thor_data400::flag::' + datasetname + '::prodheaderversion_holdlogical',{string logicalname},thor,opt)[1].logicalname;
 	
 	// Get header version
 	
@@ -28,7 +37,7 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
 	// LayoHeader for all the above files
 	
 	prodheaderdate_rec := record
-		string10 prodheaderdate;
+		string prodheaderdate;
 		string pkgvariable;
 	end;
 	
@@ -48,27 +57,30 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
 	
 	// Create a new file - if the flag file above does not exist.
 	
-	proj_out := dataset([{hdrversion,pkgvar}],{string10 prodheaderdate,string pkgvariable});
+	proj_out := dataset([{hdrversion,pkgvar}],{string prodheaderdate,string pkgvariable});
 
 		
 	create_out := 
                 sequential(
-                            if(fileservices.fileexists(flagfilename),sequential(
-                                std.file.startsuperfiletransaction(),
-                                std.file.clearsuperfile(flagfilename),
-                                std.file.finishsuperfiletransaction(),
-                                if ( count(datesetfile_ds(pkgvariable = pkgvar)) > 0,
-                                        output(process_out,,newflagfilename,overwrite),
-                                        output(datesetfile_ds + proj_out,,newflagfilename,overwrite)
-                                )),
-                                sequential( std.file.createsuperfile(flagfilename),
-                                            output(proj_out,,newflagfilename,overwrite)
-                                )
-                            ),
-                            std.file.startsuperfiletransaction(),
-                            std.file.clearsuperfile (flagfilename,true),  //delete when clearing
-                            std.file.addsuperfile   (flagfilename,newflagfilename),
-                            std.file.finishsuperfiletransaction()
+														output(dataset([{newflagfilename}],{string logicalname})
+																,,'~thor_data400::flag::' + datasetname + '::prodheaderversion_holdlogical'
+																,overwrite)
+                            ,if(~STD.File.SuperFileExists(flagfilename)
+															,STD.File.CreateSuperFile(flagfilename))
+														,if(~STD.File.SuperFileExists(flagfilename+'_delete')
+															,STD.File.CreateSuperFile(flagfilename+'_delete'))
+														,sequential(
+                                	if ( count(datesetfile_ds(pkgvariable = pkgvar)) > 0,
+                                        output(process_out,,getlogical,overwrite),
+                                        output(datesetfile_ds + proj_out,,getlogical,overwrite)
+																			)
+																)
+                            
+														,STD.File.AddSuperFile(flagfilename+'_delete',flagfilename,,true)
+                            ,std.file.clearsuperfile (flagfilename)
+                            ,std.file.addsuperfile   (flagfilename,getlogical)
+														,std.file.clearsuperfile   (flagfilename+'_delete',true)
+                            
                 );
 
 	return create_out;
