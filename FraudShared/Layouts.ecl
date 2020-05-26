@@ -522,6 +522,7 @@ export Main         :=
 	clean_Drivers_License 		clean_Drivers_License;
 	string10					geo_lat := '';
 	string11					geo_long := '';	
+	string20					RIN_SourceLabel := '';
 end; 
 
 end; 
@@ -734,6 +735,7 @@ export keybuild
 	clean_Drivers_License 		clean_Drivers_License;
 	string10					geo_lat := '';
 	string11					geo_long := '';	
+	string20					RIN_SourceLabel := '';
 end; 
 
 export temp := module 

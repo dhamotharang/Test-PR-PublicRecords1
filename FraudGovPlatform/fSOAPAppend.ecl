@@ -1,4 +1,5 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
+Autokey_batch,DriversV2_Services;
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	Shared nodes				:= thorlib.nodes();
@@ -586,6 +587,133 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
+	EXPORT Best_DLN(dataset(FraudGovPlatform.Layouts.BestInfo) BestInfo)		:= MODULE
+
+		service_name	:= 'driversv2_services.batch_service';
+
+		soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+		ResultNarrow := DriversV2_Services.layouts.result_narrow;
+		AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
+		Seq := DriversV2_Services.layouts.seq;
+		AcctRec := RECORD(Seq)
+			AutoKeyBatchInput.acctno;
+			UNSIGNED6	did := 0;
+			STRING24	dl_number := '';
+			STRING2		dlstate := '';
+		END;		
+
+		layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
+		layout_out := RECORD(ResultNarrow)
+			AcctRec.acctno;
+			STRING10	height_desc;
+		END;
+
+		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
+		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
+
+		layout_in make_batch_in(BestInfo L) := TRANSFORM
+				SELF.acctno := (string)l.record_id;
+				SELF.Name_First := L.best_fname;
+				SELF.Name_Middle := L.best_mname;
+				SELF.Name_Last := L.best_lname;
+				SELF.Name_suffix := L.best_name_suffix;
+				SELF.SSN := L.best_ssn;
+				SELF.DOB := L.best_dob;
+				SELF.did := L.did;	
+				SELF := [];
+		END;
+					
+		layout_soap := RECORD
+			datapermissionmask :=DataPermission;
+			string datarestrictionmask:= DataRestriction;
+			INTEGER DPPAPurpose:=1;
+			INTEGER GLBPurpose:= 5;
+			BOOLEAN return_current_only := true;
+			DATASET(layout_in) batch_in;
+		END;
+
+		layout_Soap trans(BestInfo L) := TRANSFORM
+				batch := PROJECT(L, make_batch_in(LEFT));
+				SELF.batch_in := batch;
+				self := L;
+		END;
+
+
+		soap_input := DISTRIBUTE(project(BestInfo, trans(LEFT)),RANDOM() % nodes);
+					
+					
+		xlayout := RECORD
+			(layout_out)
+			STRING errorcode;
+		END;
+
+
+		xlayout myFail(soap_input le) := TRANSFORM
+			SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+			SELF := [];
+		END;			
+
+
+
+		soap_results := soapcall( soap_input, 
+			soap_host, 
+			service_name,  
+			{soap_input},
+			DATASET(xlayout),
+			PARALLEL(threads), 
+			onFail(myFail(LEFT))
+			)
+			(errorcode='')
+		;			
+
+		shared p	:=	dedup(project(soap_results,Transform(Layouts.BestInfo,
+			self.record_id	:= (unsigned8)left.AcctNo,
+			self.did	:= (unsigned6)left.did,
+			self.fdn_file_info_id := 0,
+			self.best_phone := '',
+			self.best_ssn := '',
+			self.max_ssn := '',
+			self.best_title := '',
+			self.best_fname := '',
+			self.best_mname := '',
+			self.best_lname := '',
+			self.best_name_suffix := '',
+			self.best_addr1 := '',
+			self.best_city := '',
+			self.best_state := '',
+			self.best_zip := '',
+			self.best_zip4 := '',
+			self.best_addr_date := '',
+			self.best_dob := '',
+			self.best_dod := '',
+			self.verify_best_phone := '',
+			self.verify_best_ssn := '',
+			self.verify_best_address := '',
+			self.verify_best_name := '',
+			self.verify_best_dob := '',
+			self.score_any_ssn := '',
+			self.score_any_addr := '',
+			self.any_addr_date := '',
+			self.score_any_dob := '',
+			self.score_any_phn := '',
+			self.score_any_fzzy := '',
+			self.errorcode := '',			
+			self.best_drivers_license := left.dl_number,
+			self.best_drivers_license_state := left.orig_state,
+			self.best_drivers_license_exp := (STRING8)left.expiration_date,
+			self:=left,self:=[])),record,all);
+
+		//Assign Driver's License
+
+		shared BestInfo_base_map	:= Join(BestInfo , p, left.record_id=right.record_id,Transform(Layouts.BestInfo
+												,self.best_drivers_license := right.best_drivers_license
+												,self.best_drivers_license_state := right.best_drivers_license_state
+												,self.best_drivers_license_exp := right.best_drivers_license_exp
+												,self:=left), LEFT OUTER):independent;
+
+		Export all			:= BestInfo_base_map;
+	END;
 	EXPORT Best_Info		:= MODULE
 
 			service_name	:= 'didville.did_batch_service_raw';
@@ -605,25 +733,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 					SELF.acctno := (string)L.record_id;
 					SELF.did := (string)L.did;
-					// SELF.ssn := L.SSN;
-					// SELF.dob := (string)L.dob;
-					// SELF.phoneno := L.home_phone;
-					// SELF.title := '';
-					// SELF.name_first := L.fname;
-					// SELF.name_middle := L.mname;
-					// SELF.name_last := L.lname;
-					// SELF.name_suffix := L.name_suffix;
-					// SELF.prim_range := L.prim_range;
-					// SELF.predir := '';
-					// SELF.prim_name := L.prim_name;
-					// SELF.suffix := '';
-					// SELF.postdir := '';
-					// SELF.unit_desig := '';
-					// SELF.sec_range := L.sec_range;
-					// SELF.p_city_name := '';
-					// SELF.st := L.st;
-					// SELF.z5 := L.ZIP;
-					// SELF.zip4 := '';			
 					SELF := [];
 			END;
 
@@ -693,10 +802,17 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 													,self.fdn_file_info_id := left.fdn_file_info_id
 													,self:=right)):independent;
 
-			Export all			:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
+
+			Append_DLN := Best_DLN(BestInfo_base_map).All;
+
+			BestInfo_Update	:= if(UpdatePii,dedup((Append_DLN + BestInfo_base),all),Append_DLN);
+
+			
+
+			Export all := BestInfo_Update;
 								
 	END;
-	
+
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
 	//get transactions between phone vendor dates

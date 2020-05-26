@@ -816,6 +816,9 @@ Export CIID := RECORD
 		STRING3 	score_any_phn;
 		STRING3		score_any_fzzy;
 		STRING		errorcode;
+    STRING2		best_drivers_license_state := '';
+    STRING25	best_drivers_license := '';    
+    STRING8   best_drivers_license_exp := '';
  END;
 
  EXPORT CoverageDates := RECORD
