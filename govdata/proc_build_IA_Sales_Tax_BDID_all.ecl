@@ -1,4 +1,4 @@
-IMPORT ut, _control, tools;
+﻿IMPORT ut, _control, tools, Scrubs, Scrubs_IA_SalesTax;
 
 EXPORT proc_build_ia_sales_tax_BDID_all(STRING pfiledate) := FUNCTION
 
@@ -8,6 +8,9 @@ sprayfile := FileServices.SprayVariable(_control.IPAddress.bctlpedata11
 									,,,,
                   , tools.fun_Groupname(),
 									'~thor_data400::in::ia::sprayed::' + pfiledate + '::sales_tax',-1,,,TRUE,TRUE,TRUE);
+									
+//Scrub Input File
+scrub_input := Scrubs.ScrubsPlus('IA_SalesTax','Scrubs_IA_SalesTax','Scrubs_IA_SalesTax', 'Input', pfiledate,Email_Notification_Lists().BuildFailure,false);
 
 //Superfile Transactions
 superfile_transac := SEQUENTIAL( FileServices.StartSuperFileTransaction(),
@@ -30,9 +33,14 @@ make_bdid := govdata.Make_IA_SalesTax_BDID;
 strata_counts := govdata.Strata_Population_Stats.IA_Sales_pop;
 
 retval := SEQUENTIAL(sprayfile, 
-                     superfile_transac,                     
-                     make_bdid,
-				             strata_counts);
+                     scrub_input,
+										 IF(Scrubs.Mac_ScrubsFailureTest('Scrubs_IA_SalesTax',pfiledate),
+										   SEQUENTIAL(superfile_transac,                     
+																  make_bdid,
+																  strata_counts),
+											 OUTPUT('Scrubs failed.  Keys not built.',NAMED('Scrubs_Failure'))
+											 )
+											);
 
 RETURN retval;
 END;
