@@ -4,28 +4,28 @@ IMPORT E_Customer FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Customer_4 := MODULE
   SHARED VIRTUAL TYPEOF(E_Customer.__Result) __E_Customer := E_Customer.__Result;
-  SHARED __EE157369 := __E_Customer;
-  EXPORT __NS157419_Layout := RECORD
+  SHARED __EE176716 := __E_Customer;
+  EXPORT __NS176766_Layout := RECORD
     KEL.typ.nstr State_;
     KEL.typ.nint State_Count_;
   END;
-  EXPORT __ST64377_Layout := RECORD
+  EXPORT __ST73648_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
     KEL.typ.ndataset(E_Customer.States_Layout) States_;
-    __NS157419_Layout Jurisdiction_State_Top_;
+    __NS176766_Layout Jurisdiction_State_Top_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST64377_Layout __ND157405__Project(E_Customer.Layout __PP157283) := TRANSFORM
-    __EE157321 := __PP157283.States_;
-    __BS157380 := __T(__EE157321);
-    __EE157391 := __BN(TOPN(__BS157380(__NN(__T(__EE157321).State_Count_)),1, -__T(__T(__EE157321).State_Count_),__T(State_)),__NL(__EE157321));
-    __EE157392 := __EE157391;
-    SELF.Jurisdiction_State_Top_ := (__T(__EE157392))[1];
-    SELF := __PP157283;
+  SHARED __ST73648_Layout __ND176752__Project(E_Customer.Layout __PP176630) := TRANSFORM
+    __EE176668 := __PP176630.States_;
+    __BS176727 := __T(__EE176668);
+    __EE176738 := __BN(TOPN(__BS176727(__NN(__T(__EE176668).State_Count_)),1, -__T(__T(__EE176668).State_Count_),__T(State_)),__NL(__EE176668));
+    __EE176739 := __EE176738;
+    SELF.Jurisdiction_State_Top_ := (__T(__EE176739))[1];
+    SELF := __PP176630;
   END;
-  EXPORT __ENH_Customer_4 := PROJECT(__EE157369,__ND157405__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Customer::Annotated_4',EXPIRE(7));
+  EXPORT __ENH_Customer_4 := PROJECT(__EE176716,__ND176752__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Customer::Annotated_4',EXPIRE(7));
 END;

@@ -221,8 +221,6 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING MailingGeoMatch=NULL(),
 		STRING MailingACECleanerErrorCode=NULL(),
 
-    STRING PhoneFormatted,
-
     STRING LicenseNumber,
     STRING LicenseState, 
 
@@ -334,7 +332,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 
 		
 		STRING historydatetimestamp,
-		INTEGER reported_dob,
+		DATE reported_dob,
 		
 		// Best 
 		
@@ -2666,8 +2664,8 @@ Event: => T1L_BestSsnPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 														 T1L_BestSsnEcho = -99997 => 0, 1);
 Event: => T1L_BestDobEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 reported_dob = '' OR reported_dob:Null OR LENGTH(reported_dob)<8 => -99997,
-														 reported_dob);
+														 /*reported_dob = '' OR reported_dob:Null OR */ NOT ISVALIDDATE(reported_dob) => -99997,
+														 INTEGER(reported_dob));
 Event: => T1L_BestDobPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 														 T1L_BestDobEcho = -99997 => 0, 1);
