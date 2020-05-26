@@ -4,7 +4,7 @@ r:=RECORD
   unsigned8 industrytype;
   string200 field;
   integer1 entitytype;
-  string rulename;
+  string100 rulename;
   string description;
   string value;
   decimal64_32 low;
@@ -14,6 +14,6 @@ r:=RECORD
 
 d	:=dataset([],r);
 
-EXPORT Key_ConfigRules	:= Index(d,{customerid,industrytype,field,entitytype},{d},
+EXPORT Key_ConfigRules	:= Index(d,{customerid,industrytype,field,entitytype,rulename},{d},
 																									 data_services.Data_location.Prefix('FraudGov') + 'thor_data400::key::fraudgov::' 
 																									 + doxie.Version_SuperKey +'::kel::configrules');
