@@ -17,6 +17,7 @@ FUNCTION
 									L.RIN_Source = 2 	=> 'FILE',
 									L.RIN_Source = 5 	=> 'RIN WEB',
 									L.RIN_Source = 3 	=> 'FILE',
+									L.RIN_Source = 6 	=> 'RIN',
 									L.RIN_Source = 7 	=> 'RIN WEB',
 									L.RIN_Source = 4 	=> 'RIN WEB',
 									L.RIN_Source = 12 => 'RIN BATCH FILE',
