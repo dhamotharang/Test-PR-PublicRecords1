@@ -49,30 +49,11 @@ SHARED UIStats := PROJECT(UIStats1,
   STRING t_ssnstatusdesc,
 
 	STRING t_inpdvciprovecho, // jp these have to come out when NN puts the actual attr in
-	STRING t_inpclnbnkacct2rtg2echo // 
+	STRING t_inpclnbnkacct2rtg2echo // jp temp needs to come out 
 	}, 
  
-
-		
- // SELF.t_srcdesC := LEFT.rin_sourcelabel;
- // SELF.t1_iddtofdeath := LEFT.deceaseddate;
- // SELF.t_inpdvcuniquenumecho := LEFT.unique_number;
- // SELF.t_inpdvcmacaddrecho := LEFT.mac_address;
- // SELF.t_inpdvcserialnumecho := LEFT.serial_number;
- // SELF.t_inpdvctypeecho := LEFT.device_type;
- // SELF.t_inpdvciprovecho := LEFT.device_identification_provider;
-
-  /*
-  SELF.aotnewkraftidactcntev := LEFT.eventafterkrcount;
-  SELF.aotidactcnt30d := LEFT.personevent30count;
-  SELF.aotidactcntev := LEFT.personeventcount;
-
-  SELF.aotnonstactcnt30d := LEFT.event30count;
-  SELF.aotnewkraftnonstactcntev := LEFT.eventafterkrcount;
-  */
-
-	SELF.t_inpdvciprovecho := '',
-	SELF.t_inpclnbnkacct2rtg2echo := LEFT.routingnumber2,		
+	SELF.t_inpdvciprovecho := '', // jp temp needs to come out 
+	SELF.t_inpclnbnkacct2rtg2echo := LEFT.routingnumber2, // jp temp needs to come out
 	
   SELF.t_evttype1statusdesc := dictEvtType1[(STRING)LEFT.t_evttype1statuscodeecho].uidescription;
   SELF.t_evttype2statusdesc := dictEvtType2[(STRING)LEFT.t_evttype2statuscodeecho].uidescription;
