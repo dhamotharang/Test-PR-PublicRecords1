@@ -1,10 +1,10 @@
 ﻿
 EXPORT KEL_GraphPrep := MODULE
 
-  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
+  IMPORT FraudgovKEL, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
-//  SHARED EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell;
-	
+	/*
+  // LEAVING THIS HERE FOR R&D to switch in to limit compile times.
 	jr := RECORD
   integer1 entitytype;
   string label;
@@ -341,9 +341,11 @@ EXPORT KEL_GraphPrep := MODULE
  END;
 
 	SHARED EntityEventPivot := DATASET('~gov::otto::eventpivot', jr, THOR);
+*/
+	SHARED EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell;
 
 	// build only for profile records in pivot
-  EXPORT LinksPrep := JOIN(EntityEventPivot(islastentityeventflag = 1), EntityEventPivot, 
+  EXPORT LinksPrep := JOIN(EntityEventPivot(AotCurrProfFlag = 1), EntityEventPivot, 
 	               LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.recordid=RIGHT.recordid AND LEFT.entitycontextuid != RIGHT.entitycontextuid AND 
 								 (LEFT.entitytype != 1 AND RIGHT.entitytype = 1 OR LEFT.entitytype = 1 AND RIGHT.entitytype != 1),
 	               TRANSFORM({LEFT.customerid, LEFT.industrytype, STRING treeuid, RIGHT.entitycontextuid, LEFT.t_actdtecho}, SELF.treeuid := LEFT.entitycontextuid, SELF.entitycontextuid := RIGHT.entitycontextuid, SELF := LEFT), HASH);
