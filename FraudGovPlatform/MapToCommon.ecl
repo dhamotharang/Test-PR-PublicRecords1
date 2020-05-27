@@ -108,9 +108,8 @@ module
 	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
 	//Label RIN Source
-	EXPORT AppendRinSource := FraudShared.Append_RinSource(pversion,NewBaseDelta);
-	
+	EXPORT AppendRinSourceLabel := FraudGovPlatform.Append_RinSource(NewBaseDelta):independent;
 	// Build Main File
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,AppendRinSource);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,AppendRinSourceLabel);
 
 END;
