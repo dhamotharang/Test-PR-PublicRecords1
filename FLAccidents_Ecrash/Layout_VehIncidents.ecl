@@ -2,7 +2,7 @@
 
 	EXPORT SlimIncidents := record
 		STRING40		accident_nbr;
-	 STRING11 		vehicle_incident_id;
+	 STRING14 		vehicle_incident_id;
 	 STRING8 		Sent_to_HPCC_DateTime;
 	 STRING11 		agency_id;
 	 STRING4 		report_code;
@@ -13,7 +13,7 @@
 	 STRING4 		report_type_id;
 	 STRING4 		Work_Type_ID;
 	 STRING9 		CRU_Order_ID;
-		STRING11 		vehicle_incident_id_latest;
+		STRING14 		vehicle_incident_id_latest;
 		STRING11 		jurisdiction_nbr;
 		STRING9 		ORI_Number;
 		STRING50 		Crash_City;
@@ -29,8 +29,8 @@
 	EXPORT MeowLayout := RECORD
 		UNSIGNED6 	idfield;
 		UNSIGNED6 	rid;
-		STRING2				report_code;
-		STRING11 			vehicle_incident_id;
+		STRING4				report_code;
+		STRING14 			vehicle_incident_id;
 		STRING1 			vehicle_status;
 		STRING100 		accident_street;
 		STRING100 		accident_cross_street;
@@ -108,7 +108,9 @@
 		//PRtCC new fields
 		STRING7 citation_issued;
 		STRING7 citation_type;
-		STRING100 citation_detail1;
+		STRING100 citation_detail1;		
+	  //CR-1237
+	  STRING64 citation_status; 		
 		STRING60 violation_code1;
 		STRING60 violation_code2;
 		STRING60 violation_code3;
@@ -147,6 +149,8 @@
 		DATASET(enum_code_desc) pedestrian_actions_at_time_of_crash;
 		DATASET(enum_code_desc) pedalcyclist_actions_at_time_of_crash;
 		DATASET(enum_code_desc) passenger_actions_at_time_of_crash;
+	  //CR-1237		
+	  DATASET(enum_code_desc) marijuana_use_suspected;
 		UNSIGNED8 	__internal_fpos__;
 	END;
 

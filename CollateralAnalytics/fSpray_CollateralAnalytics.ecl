@@ -20,7 +20,7 @@ FilesToSpray := DATASET([
 			pServerIP, 																//	SourceIP
 			pDirectory,//+'/',							//	SourceDirectory
 			//pFilename,																//	directory_filter
-			'CA_MLS_INSURANCE_'+pVersionDate+'.txt',
+			pFilename,
 			0, 																				//	record_size
 			CollateralAnalytics.Filenames(pVersionDate).input.new(pVersionDate),	//	Thor_filename_template
 			[ {CollateralAnalytics.Filenames(pVersionDate).input.sprayed	}	],		//	dSuperfilenames
