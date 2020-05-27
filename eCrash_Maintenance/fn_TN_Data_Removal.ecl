@@ -1,4 +1,4 @@
-﻿IMPORT Data_Services, STD;
+﻿IMPORT Data_Services, STD, FLAccidents_Ecrash;
 
 EXPORT  fn_TN_Data_Removal(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)) := FUNCTION
 
@@ -39,11 +39,31 @@ EXPORT  fn_TN_Data_Removal(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)) :
 	
 	//Unique Incidents
 	unq_incident := DEDUP(SORT(d_incident(incident_id <> ''), incident_id, -(sent_to_hpcc_datetime), LOCAL), incident_id, LOCAL):INDEPENDENT;
+	
+	/*[3:08 PM] Nagula, Sai (RIS-ATL)
+    delete * from  incident
+where loss_state_abbr = 'TN'
+and work_type_id = 0
+and source_id in ('TM','TF')
+and agency_id   = 1513202
+ and creation_date between '2017-10-23 00:00:00' and '2019-03-12 00:00:00';
+​[3:08 PM] Nagula, Sai (RIS-ATL)
+    delete * from  incident
+where loss_state_abbr = 'TN'
+and work_type_id = 0
+and source_id in ('TM','TF')
+and agency_id  <> 1513202
+ and creation_date between '2016-08-11 00:00:00' and '2019-03-12 00:00:00';*/
 
 	//TN Incidents									
-	tn_incident := d_incident(loss_state_abbr = 'TN' AND creation_date < '2019-04-01' AND work_type_id = '0'
-										        AND source_id IN ['TM','TF'] AND agency_id NOT IN ['1627940','1626500','1629790','1521612']):PERSIST('~THOR::BASE::PERSIST::ECRASH::TN_DATA_REMOVAL::INCIDENTS', EXPIRE(30), SINGLE);;
-													
+	memphis_incident := d_incident(std.str.touppercase(TRIM(loss_state_abbr, ALL)) = 'TN' AND (creation_date BETWEEN '2017-10-23' AND '2019-03-11') AND 
+	                               work_type_id = '0' AND std.str.touppercase(TRIM(source_id, ALL)) IN ['TM','TF'] AND agency_id = '1513202');
+														
+	not_memphis_incident := d_incident(std.str.touppercase(TRIM(loss_state_abbr, ALL)) = 'TN' AND (creation_date BETWEEN '2016-08-11' AND '2019-03-11') AND 
+	                                   work_type_id = '0' AND std.str.touppercase(TRIM(source_id, ALL)) IN ['TM','TF'] AND agency_id <> '1513202');
+	
+	tn_incident := (memphis_incident + not_memphis_incident) :PERSIST('~THOR::BASE::PERSIST::ECRASH::TN_DATA_REMOVAL::INCIDENTS', EXPIRE(30), SINGLE);
+	
 	//Unique TN incidents
 	unq_tn_incident := DEDUP(SORT(tn_incident(incident_id <> ''), incident_id, -(sent_to_hpcc_datetime), LOCAL), incident_id, LOCAL):PERSIST('~THOR::BASE::PERSIST::ECRASH::TN_DATA_REMOVAL::UNIQUE_INCIDENTS', EXPIRE(30), SINGLE);
 	
@@ -88,11 +108,17 @@ EXPORT  fn_TN_Data_Removal(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)) :
 													 );
 
   //Incident file deletion
-  incident_after_tn_deletion := d_incident(~(loss_state_abbr = 'TN' AND
-																					 creation_date < '2019-04-01' AND 
-																					 work_type_id = '0' AND
-																					 source_id IN ['TM','TF'] AND 
-																					 agency_id NOT IN ['1627940','1626500','1629790','1521612'])):INDEPENDENT;
+  incident_after_tn_deletion := d_incident(~((std.str.touppercase(TRIM(loss_state_abbr, ALL)) = 'TN' AND 
+	                                            (creation_date BETWEEN '2017-10-23' AND '2019-03-11') AND 
+																						  work_type_id = '0' AND 
+																						  std.str.touppercase(TRIM(source_id, ALL)) IN ['TM','TF'] AND 
+																						  agency_id = '1513202')
+																             OR 
+																					   (std.str.touppercase(TRIM(loss_state_abbr, ALL)) = 'TN' AND 
+																						  (creation_date BETWEEN '2016-08-11' AND '2019-03-11') AND 
+	                                             work_type_id = '0' AND 
+																							 std.str.touppercase(TRIM(source_id, ALL)) IN ['TM','TF'] AND 
+																							 agency_id <> '1513202'))):INDEPENDENT;
 
   OUTPUT(incident_after_tn_deletion,,'~thor_data400::in::ecrash::tn_data_removal_incident_'+WORKUNIT,OVERWRITE,__COMPRESSED__,
 		     CSV(TERMINATOR('\n'), SEPARATOR(','),QUOTE('"'),MAXLENGTH(60000)));
