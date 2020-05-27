@@ -17,38 +17,57 @@ EXPORT KEL_PivotIndexPrep := MODULE
 	 STRING Name;
 	 STRING Value;
 	END;
+	
+	profileRec := RECORD
+  integer8 customerid;
+  integer8 industrytype;
+  string entitycontextuid;
+  integer1 entitytype;
+  integer8 recordid;
+  unsigned4 eventdate;
+  string caseid;
+  string label;
+  integer1 riskindx;
+  integer1 aotkractflagev;
+  integer1 aotsafeactflagev;
+  integer1 aotcurrprofflag;
+  integer8 t_personuidecho;
+  string t_inpclnfirstnmecho;
+  string t_inpclnlastnmecho;
+  string t_inpclnssnecho;
+  integer8 t_inpclndobecho;
+  string t_inpclnaddrprimrangeecho;
+  string t_inpclnaddrpredirecho;
+  string t_inpclnaddrprimnmecho;
+  string t_inpclnaddrsuffixecho;
+  string t_inpclnaddrpostdirecho;
+  string t_inpclnaddrunitdesigecho;
+  string t_inpclnaddrsecrangeecho;
+  string t_inpclnaddrcityecho;
+  string t_inpclnaddrstecho;
+  string t_inpclnaddrzip5echo;
+  string t_inpclnipaddrecho;
+  string t18_ipaddrispnm;
+  string t18_ipaddrcountry;
+  string t_inpclnphnecho;
+  string t_inpclnemailecho;
+  string t19_bnkacctbnknm;
+  string t_inpclnbnkacctecho;
+  string t_inpclnbnkacctrtgecho;
+  string t_inpclndlstecho;
+  string t_inpclndlecho;
+  unsigned8 event30count;
+  unsigned8 eventcount;
+  integer8 personeventcount;
+  string100 deviceid;
+  DATASET(nvprec) nvp;
+ END;
 
 	BaseIndexPrepWithNVP := PROJECT(MainEventShell, 
-														TRANSFORM({ 
-																																LEFT.customerid,LEFT.industrytype,																																	//customer info
-																																LEFT.entitycontextuid,LEFT.entitytype, 																										//entity info
-																																LEFT.recordid,LEFT.eventdate,
-																																LEFT.caseid,
-																																LEFT.label, 
-																																LEFT.RiskIndx, LEFT.aotkractflagev,LEFT.aotsafeactflagev,		//risk info
-																																LEFT.aotcurrprofflag,
-																																LEFT.t_personuidecho,
-																																LEFT.t_inpclnfirstnmecho, LEFT.t_inpclnlastnmecho,											//name
-																																LEFT.t_inpclnssnecho,																																																		//ssn
-																																LEFT.t_inpclndobecho,																																																		//DOB
-																																LEFT.t_inpclnaddrprimrangeecho,
-																																LEFT.t_inpclnaddrpredirecho,
-																																LEFT.t_inpclnaddrprimnmecho,
-																																LEFT.t_inpclnaddrsuffixecho,
-																																LEFT.t_inpclnaddrpostdirecho,
-																																LEFT.t_inpclnaddrunitdesigecho,
-																																LEFT.t_inpclnaddrsecrangeecho,
-																																//LEFT.streetaddress, 
-																																LEFT.t_inpclnaddrcityecho, LEFT.t_inpclnaddrstecho, LEFT.t_inpclnaddrzip5echo, //address
-																																LEFT.t_inpclnipaddrecho, LEFT.t18_ipaddrispnm, LEFT.t18_ipaddrcountry,		//IP info
-																																LEFT.t_inpclnphnecho,																																																		//phone
-																																LEFT.t_inpclnemailecho,																																														// email
-																																LEFT.t19_bnkacctbnknm, LEFT.t_inpclnbnkacctecho, LEFT.t_inpclnbnkacctrtgecho,		//bank info
-																																LEFT.t_inpclndlstecho, LEFT.t_inpclndlecho,																					//DL info
-																																LEFT.event30count, LEFT.eventcount, LEFT.personeventcount,	//event counts
-														STRING100 deviceid,
-														DATASET(NvpRec) Nvp},  
-														SELF.deviceid := '',
+														TRANSFORM(profileRec,
+														SELF.event30count := LEFT.aotnonstactcnt30d,
+														SELF.eventcount := LEFT.aotnonstactcntev,
+														SELF.deviceid := LEFT.t_inpcaseidecho,
 														SELF.nvp := DATASET([
 														 {'personentitycontextuid', (STRING)LEFT.personentitycontextuid},
 															{'phoneentitycontextuid', (STRING)LEFT.phoneentitycontextuid},
