@@ -56,16 +56,20 @@ module
 		v_time := v_datetime[10..];
 		self.reported_date	:= v_date;
 		self.reported_time	:= v_time;
-		self.event_date			:= v_date;
+		self.event_date	:= v_date;
 		self.ln_report_date	:= v_date;
-		self.ln_report_Time	:= v_time;
-		self.ssn_risk_code 							:= if(left.event_entity_1 = 'FULL_SSN'					, left.event_type_1, '') ;
-		self.identity_risk_code 				:= if(left.event_entity_1 = 'LEXID'							, left.event_type_1, '') ;
-		self.physical_address_risk_code	:= if(left.event_entity_1 = 'PHYSICAL_ADDRESS'	, left.event_type_1, '') ;
-		self.phone_risk_code 						:= if(left.event_entity_1 = 'PHONE'							, left.event_type_1, '') ;
-		self.ip_address_fraud_code 			:= if(left.event_entity_1 = 'IP_ADDRESS'				, left.event_type_1, '') ;
-		self.investigation_referral_case_id  := left.Household_ID;
-		self.additional_address.Street_1	:= left.mailing_street_1; 
+		self.ln_report_Time	:= v_time;		
+		//Risk codes handleing https://jira.rsi.lexisnexis.com/browse/GRP-4633
+		self.ssn_risk_code 					:= if(left.event_entity_1 = 'FULL_SSN'	, left.event_type_1, '') ;
+		self.drivers_license_risk_code 		:= if(left.event_entity_1 = 'DLN'				, left.event_type_1, '') ;
+		self.physical_address_risk_code		:= if(left.event_entity_1 = 'PHYSICAL_ADDRESS'	, left.event_type_1, '') ;
+		self.phone_risk_code 				:= if(left.event_entity_1 = 'PHONENO'		, left.event_type_1, '') ;
+		self.bank_account_1_risk_code 		:= if(left.event_entity_1 = 'BANK_ACCOUNT'			, left.event_type_1, '') ;
+		self.email_address_risk_code 			:= if(left.event_entity_1 = 'EMAIL'			, left.event_type_1, '') ;	
+		self.ip_address_fraud_code 			:= if(left.event_entity_1 = 'IP_ADDRESS', left.event_type_1, '') ;
+		self.identity_risk_code 				:= if(left.event_entity_1 = 'LEXID'			, left.event_type_1, '') ;
+		self.investigation_referral_case_id  	:= left.Household_ID;
+		self.additional_address.Street_1		:= left.mailing_street_1; 
 		self.additional_address.City			:= left.Mailing_City;
 		self.additional_address.State			:= left.Mailing_State;
 		self.additional_address.Zip				:= left.Mailing_Zip;
@@ -103,7 +107,9 @@ module
 	//Validate Deltabase 
 	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	//Identify RIN Source
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
+	//Label RIN Source
+	EXPORT AppendRinSourceLabel := FraudGovPlatform.Append_RinSource(NewBaseDelta):independent;
+	// Build Main File
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,AppendRinSourceLabel);
 
 END;

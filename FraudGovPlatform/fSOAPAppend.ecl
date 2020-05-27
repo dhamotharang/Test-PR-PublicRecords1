@@ -1,4 +1,6 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
+gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
+
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	Shared nodes				:= thorlib.nodes();
@@ -55,6 +57,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
 	shared PrepaidPhone_Base:= Files().base.PrepaidPhone.qa;
+	
+	shared BocaShell_Base		:= Files().base.BocaShell.qa;
 
 	//original soap output files
 
@@ -586,6 +590,133 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
+	EXPORT Best_DLN(dataset(FraudGovPlatform.Layouts.BestInfo) BestInfo)		:= MODULE
+
+		service_name	:= 'driversv2_services.batch_service';
+
+		soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+		ResultNarrow := DriversV2_Services.layouts.result_narrow;
+		AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
+		Seq := DriversV2_Services.layouts.seq;
+		AcctRec := RECORD(Seq)
+			AutoKeyBatchInput.acctno;
+			UNSIGNED6	did := 0;
+			STRING24	dl_number := '';
+			STRING2		dlstate := '';
+		END;		
+
+		layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
+		layout_out := RECORD(ResultNarrow)
+			AcctRec.acctno;
+			STRING10	height_desc;
+		END;
+
+		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
+		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
+
+		layout_in make_batch_in(BestInfo L) := TRANSFORM
+				SELF.acctno := (string)l.record_id;
+				SELF.Name_First := L.best_fname;
+				SELF.Name_Middle := L.best_mname;
+				SELF.Name_Last := L.best_lname;
+				SELF.Name_suffix := L.best_name_suffix;
+				SELF.SSN := L.best_ssn;
+				SELF.DOB := L.best_dob;
+				SELF.did := L.did;	
+				SELF := [];
+		END;
+					
+		layout_soap := RECORD
+			datapermissionmask :=DataPermission;
+			string datarestrictionmask:= DataRestriction;
+			INTEGER DPPAPurpose:=1;
+			INTEGER GLBPurpose:= 5;
+			BOOLEAN return_current_only := true;
+			DATASET(layout_in) batch_in;
+		END;
+
+		layout_Soap trans(BestInfo L) := TRANSFORM
+				batch := PROJECT(L, make_batch_in(LEFT));
+				SELF.batch_in := batch;
+				self := L;
+		END;
+
+
+		soap_input := DISTRIBUTE(project(BestInfo, trans(LEFT)),RANDOM() % nodes);
+					
+					
+		xlayout := RECORD
+			(layout_out)
+			STRING errorcode;
+		END;
+
+
+		xlayout myFail(soap_input le) := TRANSFORM
+			SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+			SELF := [];
+		END;			
+
+
+
+		soap_results := soapcall( soap_input, 
+			soap_host, 
+			service_name,  
+			{soap_input},
+			DATASET(xlayout),
+			PARALLEL(threads), 
+			onFail(myFail(LEFT))
+			)
+			(errorcode='')
+		;			
+
+		shared p	:=	dedup(project(soap_results,Transform(Layouts.BestInfo,
+			self.record_id	:= (unsigned8)left.AcctNo,
+			self.did	:= (unsigned6)left.did,
+			self.fdn_file_info_id := 0,
+			self.best_phone := '',
+			self.best_ssn := '',
+			self.max_ssn := '',
+			self.best_title := '',
+			self.best_fname := '',
+			self.best_mname := '',
+			self.best_lname := '',
+			self.best_name_suffix := '',
+			self.best_addr1 := '',
+			self.best_city := '',
+			self.best_state := '',
+			self.best_zip := '',
+			self.best_zip4 := '',
+			self.best_addr_date := '',
+			self.best_dob := '',
+			self.best_dod := '',
+			self.verify_best_phone := '',
+			self.verify_best_ssn := '',
+			self.verify_best_address := '',
+			self.verify_best_name := '',
+			self.verify_best_dob := '',
+			self.score_any_ssn := '',
+			self.score_any_addr := '',
+			self.any_addr_date := '',
+			self.score_any_dob := '',
+			self.score_any_phn := '',
+			self.score_any_fzzy := '',
+			self.errorcode := '',			
+			self.best_drivers_license := left.dl_number,
+			self.best_drivers_license_state := left.orig_state,
+			self.best_drivers_license_exp := (STRING8)left.expiration_date,
+			self:=left,self:=[])),record,all);
+
+		//Assign Driver's License
+
+		shared BestInfo_base_map	:= Join(BestInfo , p, left.record_id=right.record_id,Transform(Layouts.BestInfo
+												,self.best_drivers_license := right.best_drivers_license
+												,self.best_drivers_license_state := right.best_drivers_license_state
+												,self.best_drivers_license_exp := right.best_drivers_license_exp
+												,self:=left), LEFT OUTER):independent;
+
+		Export all			:= BestInfo_base_map;
+	END;
 	EXPORT Best_Info		:= MODULE
 
 			service_name	:= 'didville.did_batch_service_raw';
@@ -605,25 +736,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 					SELF.acctno := (string)L.record_id;
 					SELF.did := (string)L.did;
-					// SELF.ssn := L.SSN;
-					// SELF.dob := (string)L.dob;
-					// SELF.phoneno := L.home_phone;
-					// SELF.title := '';
-					// SELF.name_first := L.fname;
-					// SELF.name_middle := L.mname;
-					// SELF.name_last := L.lname;
-					// SELF.name_suffix := L.name_suffix;
-					// SELF.prim_range := L.prim_range;
-					// SELF.predir := '';
-					// SELF.prim_name := L.prim_name;
-					// SELF.suffix := '';
-					// SELF.postdir := '';
-					// SELF.unit_desig := '';
-					// SELF.sec_range := L.sec_range;
-					// SELF.p_city_name := '';
-					// SELF.st := L.st;
-					// SELF.z5 := L.ZIP;
-					// SELF.zip4 := '';			
 					SELF := [];
 			END;
 
@@ -693,10 +805,16 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 													,self.fdn_file_info_id := left.fdn_file_info_id
 													,self:=right)):independent;
 
-			Export all			:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
+			Append_DLN := Best_DLN(BestInfo_base_map).All;
+
+			BestInfo_Update	:= if(UpdatePii,dedup((Append_DLN + BestInfo_base),all),Append_DLN);
+
+			
+
+			Export all := BestInfo_Update;
 								
 	END;
-	
+
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
 	//get transactions between phone vendor dates
@@ -744,5 +862,136 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 	
+	 EXPORT BocaShell	:= Module
+   	
+   unsigned1 parallel_calls :=if(_control.ThisEnvironment.Name <> 'Prod_Thor',2,30);  
+   boolean FraudPointMode := true;
+   boolean RemoveFares := false;	
+   boolean LeadIntegrityMode := false; 
+   string DataRestrictionMask := risk_indicators.iid_constants.default_DataRestriction;
+   string DataPermissionMask  := risk_indicators.iid_constants.default_DataPermission; 
+   string IntendedPurpose := '';  
+   unsigned3 LastSeenThreshold := 0;	
+   unsigned1 glba := 5;
+   unsigned1 dppa := 1;
+   boolean RetainInputDID := True; 
+   layout_input := RECORD
+       STRING Account;
+       STRING FirstName;
+       STRING MiddleName;
+       STRING LastName;
+       STRING StreetAddress;
+       STRING City;
+       STRING State;
+       STRING Zip;
+       STRING HomePhone;
+       STRING SSN;
+       STRING DateOfBirth;
+       STRING WorkPhone;
+       STRING income;  
+       string DLNumber;
+       string DLState;			
+       string BALANCE; 
+       string CHARGEOFFD; 
+       string FormerName;
+       string EMAIL;  
+       string employername;
+       string historydate;
+       string IPAddr;
+    		string LexID; 
+   		unsigned8 record_id;
+   		unsigned6 fdn_file_info_id;
+    END;
+   bs_service := 'risk_indicators.boca_shell';  
+   roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; 
+	 
+   ds_in := Project(pii_input,Transform(layout_input,
+   						   self.Account :=(string)left.record_id
+   							,self.FirstName :=left.fname
+   							,self.MiddleName :=left.mname
+   							,self.LastName :=left.lname
+   							,self.StreetAddress :=left.address_1
+   							,self.City :=left.p_city_name
+   							,self.State :=left.st
+   							,self.Zip :=left.zip
+   							,self.HomePhone :=left.home_phone
+   							,self.SSN :=left.ssn
+   							,self.DateOfBirth :=left.dob
+   							,self.WorkPhone :=left.work_phone_
+   							,self.income :=''
+   							,self.DLNumber :=left.drivers_license
+   							,self.DLState :=left.drivers_license_state
+   							,self.BALANCE :='' 
+   							,self.CHARGEOFFD :='' 
+   							,self.FormerName :=''
+   							,self.EMAIL :=left.email_address  
+   							,self.employername :=''
+   							,self.historydate :=left.reported_date
+   							,self.IPAddr :=left.ip_address
+   							,self.LexID :=(string)left.did
+   							,self.record_id						:=left.record_id
+   							,self.fdn_file_info_id		:=left.fdn_file_info_id
+   							,self:=left));
+   ds_input := ds_in;
+  
+	l := RECORD
+		string old_account_number;
+    Risk_Indicators.Layout_InstID_SoapCall;
+   END;
+	
+	l assignAccount (ds_input le, INTEGER c) := TRANSFORM
+		self.old_account_number := le.Account;
+		SELF.AccountNumber := (string)c;
+    SELF.GLBPurpose  := glba;
+    SELF.DPPAPurpose := dppa;
+   	self.retainInputDID := RetainInputDID;
+   	self.did := le.LexID; 
+   self.historydateyyyymm := map(
+   		regexfind('^\\d{8} \\d{8}$', le.historydate) => (unsigned)le.historydate[..6],
+   		regexfind('^\\d{8}$',        le.historydate) => (unsigned)le.historydate[..6],
+   		                                                (unsigned)le.historydate
+   );
+     self.historyDateTimeStamp := map(
+         le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
+   			regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
+   			regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
+   			regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		
+   			                                                le.historydate
+   	);
+     SELF.IncludeScore := true;
+     SELF.datarestrictionmask := datarestrictionmask;
+    SELF.datapermissionmask := datapermissionmask;
+    SELF.FraudPointMode := FraudPointMode;
+    SELF.RemoveFares := RemoveFares;
+   SELF.LeadIntegrityMode := LeadIntegrityMode;
+    SELF.LastSeenThreshold := LastSeenThreshold;
+   	self.bsversion := 55;	
+   	tmx_gw := riskwise.shortcuts.gw_threatmetrix;
+    self.gateways := project(tmx_gw, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev TMX gateway
+		self.TurnOffTumblings := true; 
+   	SELF := le;
+    SELF := [];
+   END;
+   p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
+   s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+                                                  bs_service, roxieIP, parallel_calls);
+																									
+
+		riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
+			SELF.AccountNumber := ri.old_account_number;
+			SELF := le;
+		END;
+
+	 res := JOIN (distribute(s,hash(seq))
+						,distribute(p_f,hash(accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT));	
+						
+   isFCRA := false;
+   Shell_Out := FraudGovPlatform.fn_BocaShell_ToRin(res, isFCRA, DataRestrictionMask, IntendedPurpose);
+	 
+	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
+											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
+	 
+	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , Base_Map);
+   END;
 
 END;

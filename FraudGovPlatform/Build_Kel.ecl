@@ -1,4 +1,4 @@
-﻿/**************************************************************************************************************************************************/
+﻿﻿/**************************************************************************************************************************************************/
 /* PROJECT: RISK INTELLIGENCE NETWORK - AKA: RIN, OTTO, FraudGov
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
 /* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
@@ -47,7 +47,8 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-										 Build_Keys(pVersion).Delta_All
+										 Build_Base_Pii(pVersion).BocaShell_patch
+										,Build_Keys(pVersion).Delta_All
 										,Build_Base_Kel(pVersion).Delta_All
 										,Promote(pversion).buildfiles.New2Built
 										,Promote(pversion).buildfiles.Built2QA
