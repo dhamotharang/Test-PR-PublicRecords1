@@ -382,5 +382,19 @@ EXPORT Functions := MODULE
 	 EXPORT fn_verify_stkexc(STRING code) := function    
 			RETURN IF(Equifax_Business_Data.EFX_STKEXC_TABLE.STKEXC(code) = 'INVALID', 0, 1);
   END;	
+				
+   //****************************************************************************
+	 //fn_verify_title
+	 //****************************************************************************
+	 EXPORT fn_verify_title(STRING code) := function    
+			RETURN IF(Equifax_Business_Data.EFX_TITLE_TABLE.TITLE(code) = 'INVALID', 0, 1);
+  END;	
+	
+   //****************************************************************************
+	 //fn_verify_title_desc
+	 //****************************************************************************
+	 EXPORT fn_verify_title_desc(STRING code) := function    
+			RETURN IF(Equifax_Business_Data.EFX_TITLE_DESC_TABLE.TITLE_DESC(code) = 'INVALID', 0, 1);
+  END;	
 	
 END;
