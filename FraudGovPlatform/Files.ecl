@@ -1,4 +1,4 @@
-﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
+﻿﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
 export Files(
 
 	 string		pversion = ''
