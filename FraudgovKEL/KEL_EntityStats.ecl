@@ -87,15 +87,16 @@ NicoleAttr
                                  (RIGHT.High > 0 AND (DECIMAL10_3)LEFT.Value <= RIGHT.High OR RIGHT.High = 0) 
                                )
                            )
-                         ), TRANSFORM({RECORDOF(LEFT), RIGHT.Weight}, 
+                         ), TRANSFORM({RECORDOF(LEFT), RIGHT.Weight, RIGHT.EntityType}, 
                             SELF.Weight := MAP(RIGHT.Field != '' => RIGHT.Weight, 0),
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
                             SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => 
 														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
 																					 LEFT.Label);
-                            SELF.field := LEFT.field;
-														SELF.IndicatorType := RIGHT.IndicatorType;
-														SELF.IndicatorDescription := RIGHT.IndicatorDescription;
+                            SELF.field := LEFT.field,
+														SELF.EntityType := RIGHT.EntityType,														
+														SELF.IndicatorType := RIGHT.IndicatorType,
+														SELF.IndicatorDescription := RIGHT.IndicatorDescription,
                             SELF := LEFT), LOOKUP, LEFT OUTER);
 														
   WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChartPrepped, 
@@ -117,22 +118,21 @@ NicoleAttr
                                  (RIGHT.High > 0 AND (DECIMAL10_3)LEFT.Value <= RIGHT.High OR RIGHT.High = 0) 
                                )
                            )
-                         ), TRANSFORM({RECORDOF(LEFT), RIGHT.EntityType},
+                         ), TRANSFORM(RECORDOF(LEFT),
                             SELF.Weight := MAP(RIGHT.Field != '' => RIGHT.Weight, LEFT.Weight),
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, LEFT.RiskLevel), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
                             SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => 
 														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
 																					 LEFT.Label);
                             SELF.field := LEFT.field,
-														SELF.EntityType := (INTEGER)LEFT.entitycontextuid[2..3],
+														SELF.EntityType := RIGHT.EntityType,
 														SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
 														SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
                             SELF := LEFT), LOOKUP, LEFT OUTER);// : PERSIST('~temp::deleteme92', EXPIRE(7));
-														
-  
+	
 EntityStats := WeightedResult(RiskLevel in [0,1,2,3] AND Value != '0') : INDEPENDENT;
 
-output(EntityStats,, '~gov::otto::pivotentitystats', overwrite, compressed);
+//output(EntityStats,, '~gov::otto::pivotentitystats', overwrite, compressed);
 
 
 SuperSpecialEntityStatsForFilter := JOIN(EntityStats, EntityEventPivot, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND

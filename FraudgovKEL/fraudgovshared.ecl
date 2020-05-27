@@ -147,4 +147,4 @@ SELF.bank_account_1_risk_code := MAP(LEFT.record_id in Set_t_actuid => '800', ''
 SELF.rin_source := MAP(LEFT.record_id in Set_t_actuid => 3, LEFT.rin_source),
 SELF := LEFT));
 
-EXPORT FraudGovShared := tempbuild;//CustomerAddressPersonPrep1; //tempbuild
+EXPORT FraudGovShared := CustomerAddressPersonPrep1; //tempbuild
