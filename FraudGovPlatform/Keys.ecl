@@ -54,7 +54,7 @@ export Keys(
 	tools.mac_FilesIndex('Base_ElementPivot_Delta,{customer_id_,industry_type_,entity_context_uid_},{Base_ElementPivot_Delta}',KeyNames(pversion).Main.ElementPivot_Delta,ElementPivot_Delta);
 	tools.mac_FilesIndex('Base_ScoreBreakdown_Delta,{customer_id_,industry_type_,entity_context_uid_},{Base_ScoreBreakdown_Delta}',KeyNames(pversion).Main.ScoreBreakdown_Delta,ScoreBreakdown_Delta);
 	tools.mac_FilesIndex('Base_EntityProfile,{customerid,industrytype,entitycontextuid},{Base_EntityProfile}',KeyNames(pversion).Main.EntityProfile,EntityProfile);
-	tools.mac_FilesIndex('Base_ConfigAttributes,{Field, EntityType, CustomerId, IndustryType},{Base_ConfigAttributes}',KeyNames(pversion).Main.ConfigAttributes,ConfigAttributes);
-	tools.mac_FilesIndex('Base_ConfigRules,{CustomerId, IndustryType, Field, EntityType},{Base_ConfigRules}',KeyNames(pversion).Main.ConfigRules,ConfigRules);
+	tools.mac_FilesIndex('Base_ConfigAttributes,{Field, EntityType, CustomerId, IndustryType,value},{Base_ConfigAttributes}',KeyNames(pversion).Main.ConfigAttributes,ConfigAttributes);
+	tools.mac_FilesIndex('Base_ConfigRules,{CustomerId, IndustryType, Field, EntityType,rulename},{Base_ConfigRules}',KeyNames(pversion).Main.ConfigRules,ConfigRules);
 	end; 	
 end;
