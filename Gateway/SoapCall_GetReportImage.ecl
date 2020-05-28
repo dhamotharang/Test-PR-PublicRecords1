@@ -18,8 +18,8 @@ EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReport
 		SELF := [];
 	END;
 
-	//Get the timeout from "User.MaxWaitSeconds" in the request. If it's set to zero or less, assume 180 seconds.
-	DefaultTimeout := 180;
+	//Get the timeout from "User.MaxWaitSeconds" in the request. If it's set to zero or less, assume 120 seconds.
+	DefaultTimeout := 120;
 	RawTimeout := (INTEGER) Request[1].User.MaxWaitSeconds;
 	TrueTimeout := IF(RawTimeout <= 0, DefaultTimeout, RawTimeout);
 

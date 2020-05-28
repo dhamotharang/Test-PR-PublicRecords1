@@ -79,7 +79,6 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.Options.RequestType := RequestType;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
-			SELF.User.MaxWaitSeconds := MaxWaitSeconds;
 			SELF := [];	
 		END;	
 		
