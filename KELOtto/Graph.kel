@@ -839,7 +839,7 @@ PersonPerson := ASSOCIATION(FLAT(
 
     ));
 
-USE KELOtto.fraudgovshared(FLAT,
+USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,
     EventDate = event_date,
@@ -1135,12 +1135,12 @@ USE KELOtto.fraudgovshared(FLAT,
         
 );
 
-USE KELOtto.PersonEventTypes(FLAT, 
+USE FraudgovKEL.PersonEventTypes(FLAT, 
   Event(FILTER((UNSIGNED)record_id > 0),
   EventType = event_type)
 );
 
-USE KELOtto.SharingRules(FLAT,
+USE FraudgovKEL.SharingRules(FLAT,
   Customer(FILTER((UNSIGNED)fdn_ind_type_gc_id_inclusion>0),
     CustomerId=inclusion_id,
     IndustryType=Ind_type)
@@ -1196,7 +1196,7 @@ USE KELOtto.PersonIPMetadata(FLAT,
     )
   );
 */  
-USE KELOtto.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
+USE FraudgovKEL.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
   PersonPerson);
 
 /* LOGIC STATEMENTS - Attributes */

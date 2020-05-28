@@ -1,0 +1,150 @@
+﻿IMPORT FraudgovKEL;
+
+/* 
+This is specifically to work around the massive skews because of the input data.
+
+*/
+
+Set_associated71 :=[2727638882, 1139485299];
+
+Set_associated91 :=[3635312545, 1026679856];
+
+Set_associated81 :=[3005794324, 866735130];
+
+Set_DCF := [324153257];  // SIU Account
+
+SetFLSnap := [324153257]; // SIU Account
+SetFLDsnap := [240265095]; // SIU Account
+SetTNUnemployment := [1613712331]; // SIU Account
+
+SetFLIrma := [1454157906]; // SIU Account
+
+DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
+// take this distribute out jp
+CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(FraudgovKEL.fraudgovprep),
+                                   FraudgovKEL.SharingRules/*(targetcustomerhash not in demohashes)*/, 
+                       //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
+                       
+                       LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id,// AND LEFT.classification_Permissible_use_access.Ind_type = RIGHT.ind_type,
+//                       HASH32(TRIM(LEFT.Customer_Id) + '|' + TRIM((STRING)LEFT.classification_Permissible_use_access.Ind_type))=RIGHT.sourcecustomerhash,
+                       TRANSFORM(
+                         {
+                           RECORDOF(LEFT),
+                           UNSIGNED SourceCustomerFileInfo,
+                           UNSIGNED AssociatedCustomerFileInfo,
+                         },
+												   // Code here to fake the demo customers in cert/prod to look like they have contributed...
+													 /*
+                           SELF.SourceCustomerFileInfo := 
+													              MAP(RIGHT.targetcustomerhash in Set_associated71 AND RIGHT.sourcecustomerhash = 3977509724 => RIGHT.targetcustomerhash,
+													              MAP(RIGHT.targetcustomerhash in Set_associated91 AND RIGHT.sourcecustomerhash = 2459821998 => RIGHT.targetcustomerhash,
+													              MAP(RIGHT.targetcustomerhash in Set_associated81 AND RIGHT.sourcecustomerhash = 4401323 => RIGHT.targetcustomerhash,
+                                        MAP(RIGHT.targetcustomerhash in Set_DCF AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetFLSnap AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetFLDsnap AND RIGHT.sourcecustomerhash = 2887396112 => RIGHT.targetcustomerhash, // DCF
+                                        MAP(RIGHT.targetcustomerhash in SetTNUnemployment AND RIGHT.sourcecustomerhash = 2481802344 => RIGHT.targetcustomerhash, // TN UI
+                                        MAP(RIGHT.targetcustomerhash in SetFLIrma AND RIGHT.sourcecustomerhash = 2274708080 => RIGHT.targetcustomerhash, // FL IRMA
+													                      RIGHT.sourcecustomerhash))))))));
+                           */
+													 SELF.SourceCustomerFileInfo := RIGHT.sourcecustomerhash,
+                           SELF.AssociatedCustomerFileInfo := RIGHT.targetcustomerhash,
+//                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
+//                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
+                           SELF := LEFT), LOOKUP, MANY) 													
+                           /*
+(did in 
+[
+1866498437,229517290,1087197263,2308576643,193851693630,1271418440,102648498593,99641229116,160817499539,
+002793839908,
+002314180468,
+002223687078,
+001968431040,
+000504216844,
+001679079503,
+191598155078,
+000222517473,
+001052154195,
+002751830495,
+001226302464,
+001812885190,
+191341327686,
+002244045497,
+002601008342,
+000628566798,
+001690258286,
+000090116056,
+001296192874,
+002471332025,
+002612912220,
+001050179813,
+002053435988,
+002271916895,
+002625599029,
+000456139406,
+000787566034,
+236476394138,
+000972228099,
+001417343736,
+002747119251,
+002486823459,
+001098243248,
+002063840473,
+001801392343,
+001091527175,
+001877498418,
+001026137024,
+001803370882,
+002283601122,
+002150507087,
+002506247577,
+001108612766,
+001586783317,
+000958763719,
+001083912153,
+001713412026,
+001146019180,
+001845397439,
+001196579107,
+002353522418,
+000443794297,
+002314730297,
+000868958759,
+001521253976,
+000527730584,
+010372993855,
+193127355866,
+193050695510,
+001463799695,
+000189194521,
+000763787957,
+001851308255,
+001366551533,
+000503942122,
+010412123969
+] 
+or ssn in ['595637941','589650781','770703763'])
+*/
+                           : PERSIST('~temp::deleteme52');
+                           
+// output this to setup ramps cert to be able to build without having all the appends.
+Set_incarcerated :=[1827476821,534129826,526759047,527051771,1821981777,6672297807,593005830,148817897437,367245121,675778281,1915541466,3481771341,2276270774,870827823,1383194201,46497666030,436144045,2679710352,188867426707,43877742503,765854572,148780558675,1749351853,1501573728,31586766681,1114876192,1934356903,1850405015,1371817878,167401080066,2396718209,756376509,193953567453,2577902354,2713111104,1660387572,2508979098,36651851059,6601023603,237186462711,659231636,150191143780,1494665688,1161797222,142067250441,149836013443,139402809773,2159071645,113144129980,376586860,402345123,167509230,114634410852,1106655635,2186532992,2316117104,168028641252,2595547542,141004135630,15173002,1140618113,147322718713,108379862872,0,4230168185,444324819,38973667625,211832407,2722023829,2154752325,2727354695,1101484466,237413401954,13931228315,148795771274,301563514,122751249706,1671090744,1748628418,1888126032,154508991757,1617342537,13057073917,155542429498,533687812,668687990,223311182,105003805884,753550513,224223671,1483643237,450630455,13874269785,2588542324,108663767933,7507222963,64893769376,193048736507,191446594631,37876922];
+Set_deceased:=[005833281834,001221827365,002209147253,001121716198,001892209088,001015604649,006596394694,001572128934,001626021421,000366396035,002082436265,000067483195,193624502313,001223722398,005932460606,002448688047,000832128245,001920526549,000667829288,001135744453,000930695925,002076432220,002325394720,002650916976,001118089236,001591026867,006599937540,001248312984,002419000127,001154915008,000953608420,000300538964,000022789263,190422171676,002454663194,001879567162,000408622523,002194326335,154000969919,002191250495,000677223347,190240556257,001538005865,001945222164,000161911916,000774366026,001413067774,038562693324,038562693324,000466370453,001609447496,001774357015,000521898550,043843880213,001506286503,000036296523,002243815736,001618782818,002588210869,000502808424,002476722094,000166164997,002386852440,000783005329,000685235819,000873656160,000843589875,000032085445,006676580373,002244721351,001562280857,002210304308,000036389194,002083789087,060012961335,000771778303,134331934516,014027789599,001192633844,002164675371,005882637569,002407266410,238181708623,001717322926,002306408759,000022298459,001521767177,001425532139,000220376278,001114418758,000375896705,000523261063,001948275730,183279543021,194042664866,000551358055,001186200784,000015171447,001775135918];
+Set_Addresses := [12638153115695167395,10246789559473286115];
+
+tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
+       //    (SourceCustomerFileInfo NOT IN [DemoHashes] AND did in Set_incarcerated OR did in Set_deceased or did % 1000000 = 1 or OttoAddressId in Set_Addresses);
+//output(distribute(FraudgovKEL.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
+
+Set_t_actuid:=[103440709,103441780,103438078,103442605,103447499,103476589,97478957,103383954,103350539,103490202,103420116,103417917,103413818,103465100];
+
+d1 := PROJECT(tempBuild, TRANSFORM(RECORDOF(LEFT), 
+SELF.ssn_risk_code := MAP(LEFT.record_id in Set_t_actuid => '100', ''),
+SELF.drivers_license_risk_code := MAP(LEFT.record_id in Set_t_actuid => '200', ''),
+SELF.phone_risk_code := MAP(LEFT.record_id in Set_t_actuid => '400', ''),
+SELF.email_address_risk_code := MAP(LEFT.record_id in Set_t_actuid => '500', ''),
+SELF.ip_address_fraud_code := MAP(LEFT.record_id in Set_t_actuid => '600', ''),
+SELF.bank_account_1_risk_code := MAP(LEFT.record_id in Set_t_actuid => '800', ''),
+SELF.rin_source := MAP(LEFT.record_id in Set_t_actuid => 3, LEFT.rin_source),
+SELF := LEFT));
+
+EXPORT FraudGovShared := CustomerAddressPersonPrep1; //tempbuild

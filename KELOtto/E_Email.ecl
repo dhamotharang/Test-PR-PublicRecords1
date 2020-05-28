@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
-IMPORT KELOtto;
+IMPORT FraudgovKEL;
 IMPORT E_Customer FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT E_Email := MODULE
@@ -25,7 +25,7 @@ EXPORT E_Email := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := KELOtto.fraudgovshared((STRING50)email_address <> '');
+  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared((STRING50)email_address <> '');
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoEmailId)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
@@ -44,11 +44,11 @@ EXPORT E_Email := MODULE
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),email_address(Email_Address_:\'\'),email_address_type(Type_:\'\'),ottoemailid(Otto_Email_Id_:\'\'),email_address_date(Created_On_:DATE),host(Host_:\'\'),emaillastdomain(Email_Last_Domain_:\'\'),isdisposableemail(_isdisposableemail_:0),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Out := RECORD
-    RECORDOF(KELOtto.fraudgovshared);
+    RECORDOF(FraudgovKEL.fraudgovshared);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoEmailId) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT KELOtto_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT FraudgovKEL_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
@@ -110,19 +110,19 @@ EXPORT E_Email := MODULE
   EXPORT _isdisposableemail__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_isdisposableemail_);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT _r_Source_Customer__Orphan := JOIN(InData(__NN(_r_Source_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Source_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(KELOtto_fraudgovshared_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(Email_Address__SingleValue_Invalid),COUNT(Otto_Email_Id__SingleValue_Invalid),COUNT(Email_Last_Domain__SingleValue_Invalid),COUNT(_isdisposableemail__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int KELOtto_fraudgovshared_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int Email_Address__SingleValue_Invalid,KEL.typ.int Otto_Email_Id__SingleValue_Invalid,KEL.typ.int Email_Last_Domain__SingleValue_Invalid,KEL.typ.int _isdisposableemail__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(FraudgovKEL_fraudgovshared_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(Email_Address__SingleValue_Invalid),COUNT(Otto_Email_Id__SingleValue_Invalid),COUNT(Email_Last_Domain__SingleValue_Invalid),COUNT(_isdisposableemail__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int FraudgovKEL_fraudgovshared_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int Email_Address__SingleValue_Invalid,KEL.typ.int Otto_Email_Id__SingleValue_Invalid,KEL.typ.int Email_Last_Domain__SingleValue_Invalid,KEL.typ.int _isdisposableemail__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'Email','KELOtto.fraudgovshared','UID',COUNT(KELOtto_fraudgovshared_Invalid),COUNT(__d0)},
-    {'Email','KELOtto.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
-    {'Email','KELOtto.fraudgovshared','SourceCustomerFileInfo',COUNT(__d0(__NL(_r_Source_Customer_))),COUNT(__d0(__NN(_r_Source_Customer_)))},
-    {'Email','KELOtto.fraudgovshared','email_address',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
-    {'Email','KELOtto.fraudgovshared','email_address_type',COUNT(__d0(__NL(Type_))),COUNT(__d0(__NN(Type_)))},
-    {'Email','KELOtto.fraudgovshared','OttoEmailId',COUNT(__d0(__NL(Otto_Email_Id_))),COUNT(__d0(__NN(Otto_Email_Id_)))},
-    {'Email','KELOtto.fraudgovshared','email_address_date',COUNT(__d0(__NL(Created_On_))),COUNT(__d0(__NN(Created_On_)))},
-    {'Email','KELOtto.fraudgovshared','Host',COUNT(__d0(__NL(Host_))),COUNT(__d0(__NN(Host_)))},
-    {'Email','KELOtto.fraudgovshared','EmailLastDomain',COUNT(__d0(__NL(Email_Last_Domain_))),COUNT(__d0(__NN(Email_Last_Domain_)))},
-    {'Email','KELOtto.fraudgovshared','isdisposableemail',COUNT(__d0(__NL(_isdisposableemail_))),COUNT(__d0(__NN(_isdisposableemail_)))},
-    {'Email','KELOtto.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Email','KELOtto.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'Email','FraudgovKEL.fraudgovshared','UID',COUNT(FraudgovKEL_fraudgovshared_Invalid),COUNT(__d0)},
+    {'Email','FraudgovKEL.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
+    {'Email','FraudgovKEL.fraudgovshared','SourceCustomerFileInfo',COUNT(__d0(__NL(_r_Source_Customer_))),COUNT(__d0(__NN(_r_Source_Customer_)))},
+    {'Email','FraudgovKEL.fraudgovshared','email_address',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
+    {'Email','FraudgovKEL.fraudgovshared','email_address_type',COUNT(__d0(__NL(Type_))),COUNT(__d0(__NN(Type_)))},
+    {'Email','FraudgovKEL.fraudgovshared','OttoEmailId',COUNT(__d0(__NL(Otto_Email_Id_))),COUNT(__d0(__NN(Otto_Email_Id_)))},
+    {'Email','FraudgovKEL.fraudgovshared','email_address_date',COUNT(__d0(__NL(Created_On_))),COUNT(__d0(__NN(Created_On_)))},
+    {'Email','FraudgovKEL.fraudgovshared','Host',COUNT(__d0(__NL(Host_))),COUNT(__d0(__NN(Host_)))},
+    {'Email','FraudgovKEL.fraudgovshared','EmailLastDomain',COUNT(__d0(__NL(Email_Last_Domain_))),COUNT(__d0(__NN(Email_Last_Domain_)))},
+    {'Email','FraudgovKEL.fraudgovshared','isdisposableemail',COUNT(__d0(__NL(_isdisposableemail_))),COUNT(__d0(__NN(_isdisposableemail_)))},
+    {'Email','FraudgovKEL.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Email','FraudgovKEL.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
