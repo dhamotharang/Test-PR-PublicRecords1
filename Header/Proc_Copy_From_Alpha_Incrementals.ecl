@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
-export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
-export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
 
 
 // generic function to get the FIRST subfie in the super
@@ -37,7 +37,6 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
     output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('checked_file'),extend);
     
     return filedt;
-        // return '20181005';
 
 END;
 
