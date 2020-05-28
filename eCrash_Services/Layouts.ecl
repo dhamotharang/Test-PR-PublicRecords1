@@ -54,7 +54,7 @@ EXPORT Layouts := MODULE
 		// ****** For resolving bug 138974 modified eCrashRecordStrure to add date_added , I have added date_added  to enable the query
 		// *** to pick up the latest report instance from delta base.
 		EXPORT eCrashRecordStructure := 		RECORD 
-			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrV1;
+			FLAccidents_Ecrash.key_EcrashV2_accnbrV1;
 			String20 date_added := '';
 			STRING2 person_addr_st := '';
 			STRING100 address := '';
