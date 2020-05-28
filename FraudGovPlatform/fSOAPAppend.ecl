@@ -590,7 +590,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
-	EXPORT Best_DLN(dataset(FraudGovPlatform.Layouts.BestInfo) BestInfo)		:= MODULE
+	EXPORT Best_DLN	(dataset(Layouts.BestInfo) BestInfo_base_map)	:= MODULE
 
 		service_name	:= 'driversv2_services.batch_service';
 
@@ -615,15 +615,26 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
 		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
 
-		layout_in make_batch_in(BestInfo L) := TRANSFORM
-				SELF.acctno := (string)l.record_id;
-				SELF.Name_First := L.best_fname;
-				SELF.Name_Middle := L.best_mname;
-				SELF.Name_Last := L.best_lname;
-				SELF.Name_suffix := L.best_name_suffix;
-				SELF.SSN := L.best_ssn;
-				SELF.DOB := L.best_dob;
-				SELF.did := L.did;	
+		layout_in make_batch_in(pii_base le, integer c) := TRANSFORM
+				self.seq := c;
+				self.acctno := (string)le.record_id;
+				SELF.Name_First := le.fname;
+				SELF.Name_Middle := le.mname;
+				SELF.Name_Last := le.lname;
+				SELF.Name_suffix := le.name_suffix;
+				SELF.prim_name := le.prim_name;
+				SELF.prim_range := le.prim_range;
+				SELF.sec_range := le.sec_range;
+				SELF.St := le.st;
+				SELF.z5 := le.ZIP;
+				SELF.Homephone := le.home_phone;
+				SELF.Workphone := le.work_phone_;
+				SELF.SSN := le.SSN;
+				SELF.DOB := (string)le.dob;
+				SELF.dl := le.drivers_license;
+				SELF.dlstate := le.drivers_license_state;
+				SELF.did := le.did;	
+				SELF.max_results := '1';
 				SELF := [];
 		END;
 					
@@ -636,14 +647,14 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			DATASET(layout_in) batch_in;
 		END;
 
-		layout_Soap trans(BestInfo L) := TRANSFORM
-				batch := PROJECT(L, make_batch_in(LEFT));
+		layout_Soap trans(pii_base L, integer c) := TRANSFORM
+				batch := PROJECT(L, make_batch_in(LEFT, c));
 				SELF.batch_in := batch;
 				self := L;
 		END;
 
 
-		soap_input := DISTRIBUTE(project(BestInfo, trans(LEFT)),RANDOM() % nodes);
+		soap_input := DISTRIBUTE(project(pii_base, trans(LEFT, counter)),RANDOM() % nodes);
 					
 					
 		xlayout := RECORD
@@ -670,52 +681,21 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			(errorcode='')
 		;			
 
-		shared p	:=	dedup(project(soap_results,Transform(Layouts.BestInfo,
-			self.record_id	:= (unsigned8)left.AcctNo,
-			self.did	:= (unsigned6)left.did,
-			self.fdn_file_info_id := 0,
-			self.best_phone := '',
-			self.best_ssn := '',
-			self.max_ssn := '',
-			self.best_title := '',
-			self.best_fname := '',
-			self.best_mname := '',
-			self.best_lname := '',
-			self.best_name_suffix := '',
-			self.best_addr1 := '',
-			self.best_city := '',
-			self.best_state := '',
-			self.best_zip := '',
-			self.best_zip4 := '',
-			self.best_addr_date := '',
-			self.best_dob := '',
-			self.best_dod := '',
-			self.verify_best_phone := '',
-			self.verify_best_ssn := '',
-			self.verify_best_address := '',
-			self.verify_best_name := '',
-			self.verify_best_dob := '',
-			self.score_any_ssn := '',
-			self.score_any_addr := '',
-			self.any_addr_date := '',
-			self.score_any_dob := '',
-			self.score_any_phn := '',
-			self.score_any_fzzy := '',
-			self.errorcode := '',			
-			self.best_drivers_license := left.dl_number,
-			self.best_drivers_license_state := left.orig_state,
-			self.best_drivers_license_exp := (STRING8)left.expiration_date,
-			self:=left,self:=[])),record,all);
-
+		shared bdl	:= dedup(project(soap_results	,Transform(Layouts.BestInfo
+																				,self.record_id	:=(unsigned8)left.acctno
+																				,self.did := (unsigned6)left.did
+																				,self.best_drivers_license := left.dl_number
+																				,self.best_drivers_license_state := left.orig_state
+																				,self.best_drivers_license_exp := left.expiration_date																				
+																				,self:=left,self:=[])),record,all);
 		//Assign Driver's License
-
-		shared BestInfo_base_map	:= Join(BestInfo , p, left.record_id=right.record_id,Transform(Layouts.BestInfo
-												,self.best_drivers_license := right.best_drivers_license
-												,self.best_drivers_license_state := right.best_drivers_license_state
-												,self.best_drivers_license_exp := right.best_drivers_license_exp
+		shared BestInfo_with_BDL	:= Join(BestInfo_base_map , bdl, left.record_id=right.record_id,
+										Transform(Layouts.BestInfo
+												,self.best_drivers_license 			:= right.best_drivers_license
+												,self.best_drivers_license_state 	:= right.best_drivers_license_state
+												,self.best_drivers_license_exp 		:= right.best_drivers_license_exp
 												,self:=left), LEFT OUTER):independent;
-
-		Export all			:= BestInfo_base_map;
+		Export all			:= BestInfo_with_BDL;
 	END;
 	EXPORT Best_Info		:= MODULE
 
