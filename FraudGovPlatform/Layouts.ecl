@@ -812,9 +812,9 @@ Export CIID := RECORD
  END;
  
  EXPORT BestInfo := RECORD
-		unsigned8 Record_ID;
-		unsigned6 did;
-		unsigned6 fdn_file_info_id;
+		unsigned8 	Record_ID;
+		unsigned6 	did;
+		unsigned6 	fdn_file_info_id;
 		string10 	best_phone;
 		string9  	best_ssn;
 		string9  	max_ssn;
@@ -823,7 +823,7 @@ Export CIID := RECORD
 		string20	best_mname;
 		string20	best_lname;
 		string5		best_name_suffix;
-		string120 best_addr1;
+		string120 	best_addr1;
 		string30	best_city;
 		string2		best_state;
 		string5		best_zip;
@@ -843,9 +843,9 @@ Export CIID := RECORD
 		STRING3 	score_any_phn;
 		STRING3		score_any_fzzy;
 		STRING		errorcode;
-    STRING2		best_drivers_license_state := '';
-    STRING25	best_drivers_license := '';    
-    STRING8   best_drivers_license_exp := '';
+		STRING2		best_drivers_license_state := '';
+		STRING25	best_drivers_license := '';    
+		unsigned8   best_drivers_license_exp := 0;
  END;
 
  EXPORT CoverageDates := RECORD
