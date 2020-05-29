@@ -1,4 +1,4 @@
-import _Control, CourtLink, RoxieKeyBuild;
+import _Control, CourtLink, RoxieKeyBuild, Scrubs;
 
 export Proc_Build_All(string pversion, string directory) := function
 
@@ -9,12 +9,16 @@ DoBuild := CourtLink.Build_All(pversion, directory).all;
 BuildKeys := CourtLink.Proc_Build_Keys(pversion);
 
 //Upate Roxie Page
-UpdateRoxiePage := RoxieKeybuild.updateversion('LitigiousDebtorKeys', pversion, _control.MyInfo.EmailAddressNotify,,'N');
+UpdateRoxiePage := IF(
+					Scrubs.mac_ScrubsFailureTest('Scrubs_LitigiousDebtor',pversion)
+					,RoxieKeybuild.updateversion('LitigiousDebtorKeys', pversion, _control.MyInfo.EmailAddressNotify,,'N')
+					,OUTPUT('Keys update failed due to Scrubs failure(s)!', NAMED('Key_status'))
+					);
 
 //Sample Records
 SampleRecs := output(choosen(sort(Files().Base.qa , -dt_vendor_last_reported), 1000), named ('SampleRecords'));
 
-retval := sequential (DoBuild
+retval := sequential (			DoBuild
 							  , BuildKeys
 							  , UpdateRoxiePage
 							  , SampleRecs
