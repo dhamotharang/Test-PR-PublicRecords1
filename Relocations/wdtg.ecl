@@ -74,7 +74,7 @@ export wdtg := module
   shared name_penalt_major  := 5;
 
   shared gong_key           := dx_Gong.key_history_zip_name();
-  shared gong_key_date      := Relocations.key_wdtgGong;
+  shared gong_key_date      := dx_Gong.key_history_wdtg();
 
   shared layout_narrow      := Relocations.layout_wdtg.narrow;
   shared layout_final       := Relocations.layout_wdtg.final;
