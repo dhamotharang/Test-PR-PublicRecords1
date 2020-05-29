@@ -1,11 +1,14 @@
-﻿IMPORT RiskIntelligenceNetwork_Analytics;
+﻿IMPORT FraudgovPlatform, RiskIntelligenceNetwork_Analytics;
+
+configAttrCNT := COUNT(FraudgovPlatform.Key_ConfigAttributes) % 3;
+configRlsCNT := COUNT(FraudgovPlatform.Key_ConfigRules) % 3;
 
 RiskOutput := DATASET([{
 	1,//  UNSIGNED8 record_id;
 	3,//	INTEGER1 P1_IDRiskIndx;// 1
 	1,//	INTEGER1 P15_SSNRiskIndx;// 15
-	1,//	INTEGER1 P16_PhnRiskIndx;// 16
-	1,//	INTEGER1 P17_EmailRiskIndx;// 17
+	configAttrCNT,//	INTEGER1 P16_PhnRiskIndx;// 16
+	configRlsCNT,//	INTEGER1 P17_EmailRiskIndx;// 17
 	1,//	INTEGER1 P19_BnkAcctRiskIndx;// 19
 	1,//	INTEGER1 P20_DLRiskIndx;// 20
 	3,//	INTEGER1 P18_IPAddrRiskIndx;// 18
@@ -29,6 +32,6 @@ RiskOutput := DATASET([{
     {1,'t_evttype1statuscodeecho', '10000', 'KR', 'Known Risk', 'Identity theft: Confirmed stolen or compromised', 3}
 	]
 	}
-	], FraudgovKELRoxie.Layouts.LayoutRiskScore);
+	], RiskIntelligenceNetwork_Analytics.Layouts.LayoutRiskScore);
 	
 	EXPORT RinAssessmentOutput := RiskOutput;

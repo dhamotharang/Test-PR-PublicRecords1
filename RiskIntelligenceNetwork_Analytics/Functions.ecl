@@ -3,7 +3,7 @@
 EXPORT Functions := MODULE
 
 		EXPORT GetRealtimeAssessment(DATASET(RiskIntelligenceNetwork_Services.Layouts.realtime_appends_rec) ds_in) := FUNCTION
-					results := FraudgovKELRoxie.RinAssessmentOutput;
+					results := RiskIntelligenceNetwork_Analytics.RinAssessmentOutput;
 					RETURN results;
 		END;
 		
