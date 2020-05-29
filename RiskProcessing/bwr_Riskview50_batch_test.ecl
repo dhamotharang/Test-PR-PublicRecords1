@@ -59,7 +59,7 @@ roxieIP := RiskWise.Shortcuts.prod_batch_fcra; 		// FCRAbatch Roxie
 //====================================================
 //=====================  R U N  ======================
 //====================================================
-ds_in := dataset (infile_name, layout_input, csv(heading(1),quote('"')));
+ds_in := dataset (infile_name, layout_input, csv(quote('"')));
 
 all_input := IF (record_limit = 0, ds_in, CHOOSEN (ds_in, record_limit));
 OUTPUT (choosen(all_input, eyeball), NAMED ('input'));
@@ -293,4 +293,4 @@ dsErrorInputs := join(ds_inseq, rv50(errorcode not in valid_error_codes),
 	self := left));
 output(choosen(dsErrorInputs,eyeball), named('dsErrorInputs'));
 
-output(dsDroppedInputs + dsErrorInputs,,outfile_name+'_RecsToReprocess',CSV(heading(1), quote('"')));
+output(dsDroppedInputs + dsErrorInputs,,outfile_name+'_RecsToReprocess',CSV(quote('"')));
