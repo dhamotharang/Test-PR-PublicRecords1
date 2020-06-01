@@ -34,7 +34,7 @@
 ) :=
 functionmacro
 
-  #IF(count(pECL) = 1)
+  #IF(trim(#GETDATATYPE(pECL)) = 'string')
     return_result := 
     WorkMan.mac_Work(
        pECL                        
