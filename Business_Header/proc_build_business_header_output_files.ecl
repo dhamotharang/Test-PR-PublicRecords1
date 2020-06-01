@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, versioncontrol, lib_fileservices, header_services,mdr;
+﻿IMPORT Business_Header, ut, versioncontrol, lib_fileservices, header_services,mdr;
 
 export proc_build_business_header_output_files(
 
@@ -524,81 +524,8 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 	// Remove relatives with name relationship only
 	br := pBH_Relatives;
 
-	Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	Record
-		string15 bdid1;
-		string15 bdid2;
-		string1 corp_charter_number;
-		string1 business_registration;
-		string1 bankruptcy_filing;
-		string1 duns_number;
-		string1 duns_tree;  // might point to a group
-		string1 edgar_cik;
-		string1 name;  // might point to a group
-		string1 name_address;
-		string1 name_phone;
-		string1 gong_group;
-		string1 ucc_filing;
-		string1 fbn_filing;
-		string1 fein;
-		string1 phone;
-		string1 addr;
-		string1 mail_addr;
-		string1 dca_company_number;  // Directory of Corporate Affilications Company Number (Root and Sub)
-		string1 dca_hierarchy;
-		string1 abi_number;     // InfoUSA - American Business ID Company Number
-		string1 abi_hierarchy;
-		string1 lien_properties;
-		string1 liens_v2;
-		//string1 shared_contacts;
-		string1 rel_group;
-		string2 EOR;
-	end; 
-
-	header_services.Supplemental_Data.mac_verify('file_businessrelatives_inj.txt', Drop_Header_Layout, attr);
-
-	Base_File_Append_In := attr();
-
-	business_header.Layout_Business_Relative reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	 transform
-		self.bdid1 := (unsigned6)L.bdid1;
-		self.bdid2 := (unsigned6) L.bdid2;
-		self.corp_charter_number := (boolean)((unsigned)L.corp_charter_number);
-		self.business_registration := (boolean)((unsigned)L.business_registration);
-		self.bankruptcy_filing := (boolean)((unsigned)L.bankruptcy_filing);
-		self.duns_number := (boolean)((unsigned)L.duns_number);
-		self.duns_tree := (boolean)((unsigned)L.duns_tree);
-		self.edgar_cik := (boolean)((unsigned)L.edgar_cik);
-		self.name := (boolean)((unsigned)L.name);
-		self.name_address := (boolean)((unsigned)L.name_address);
-		self.name_phone := (boolean)((unsigned)L.name_phone);
-		self.gong_group := (boolean)((unsigned)L.gong_group);
-		self.ucc_filing := (boolean)((unsigned)L.ucc_filing);
-		self.fbn_filing := (boolean)((unsigned)L.fbn_filing);
-		self.fein := (boolean)((unsigned)L.fein);
-		self.phone := (boolean)((unsigned)L.phone);
-		self.addr := (boolean)((unsigned)L.addr);
-		self.mail_addr := (boolean)((unsigned)L.mail_addr);
-		self.dca_company_number := (boolean)((unsigned)L.dca_company_number);
-		self.dca_hierarchy := (boolean)((unsigned)L.dca_hierarchy);
-		self.abi_number := (boolean)((unsigned)L.abi_number);
-		self.abi_hierarchy := (boolean)((unsigned)L.abi_hierarchy);
-		self.lien_properties := (boolean)((unsigned)L.lien_properties);
-		self.liens_v2 := (boolean)((unsigned)L.liens_v2);
-		self.rel_group := (boolean)((unsigned)L.rel_group);
-	 end;
-
-	Relatives_Base_File_Append1 := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-
-	business_header.Layout_Business_Relative add_reverse(business_header.Layout_Business_Relative L) := transform
-  	self.bdid1 := (unsigned6)L.bdid2;
-  	self.bdid2 := (unsigned6)L.bdid1;  
-    self := L;
-  end;
-
-  Base_File_Append2 := project(relatives_Base_File_Append1, add_reverse(left)); 
-
-  relatives_base_file_append := relatives_base_file_append1 + base_file_append2;
+	emptyBusinessRelatives := DATASET([], business_header.Layout_Business_Relative);
+  relatives_base_file_append := Business_Header.Prep_Build.applyBusinessRelativesInj(emptyBusinessRelatives); 
 
   Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
