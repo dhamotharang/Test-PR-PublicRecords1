@@ -58,7 +58,8 @@ function
 		                    and IF(ut.IndustryClass.is_knowx
 		                           ,RIGHT.source in ut.IndustryClass.BH_KnowX_src
 					                     ,true) AND
-                        ut.PermissionTools.glb.SrcOk(glb_purpose,right.source)
+                        ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) AND 
+                        (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB)
 					             ,BaseRecs(left,RIGHT)
 					    				 ,LIMIT(0)											 
 											 ,KEEP(50));
