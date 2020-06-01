@@ -54,7 +54,7 @@
 		// EXPORT fileScope						:= 'gov::otto::';
 		// EXPORT fileScope						:= 'fraudgov::base::20191025::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
-		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMjAh';
+		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMjAhISE=';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspCert							:= 'dsp-cert';
