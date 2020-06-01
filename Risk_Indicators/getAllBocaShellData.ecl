@@ -46,7 +46,8 @@ EXPORT getAllBocaShellData (
   // myGetDate := iid_constants.myGetDate(history_date);  // full history date
   checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
   IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
-
+  IsFIS  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsFISattributes) > 0;
+  
   // =============== Get Property Info ===============
   risk_indicators.layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
     SELF.fname := le.Shell_Input.fname;
@@ -170,7 +171,7 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
   #ELSE
     prop_common := prop_common_roxie;
   #END
-
+  
   //*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
 
   Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
@@ -253,6 +254,8 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
         BSversion >= 50             => prop_common,
                                        IF(production_realtime_mode, prop, prop_hist)
        );
+       
+ single_property_fis := IF(IsFIS, IF(production_realtime_mode, prop, prop_hist), group(Dataset([],Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd),seq));
 
 // AML
   Layout_prop_ownership := RECORD
@@ -314,6 +317,8 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   // Generate the totals
   Rel_Property_Rolled := Risk_Indicators.Roll_Relative_Property(Single_Property(property_status_family<>' '));
   Per_Property_Rolled := Risk_Indicators.Roll_Applicant_Property(Single_Property(property_status_applicant<>' '));
+  
+  Per_Property_Rolled_FIS := Risk_Indicators.Roll_Applicant_Property(single_property_fis(property_status_applicant<>' '));
 
   // Apply the address specific information
   risk_indicators.Layout_Boca_Shell check_best(risk_indicators.Layout_Boca_Shell le, Single_Property ri) :=
@@ -489,8 +494,13 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   History_2_Property_Added_a :=
     group (sort (denormalize (p2, single_property,  left.seq = right.seq, check_best (LEFT,RIGHT)),
                  seq), seq);
-
+         
   History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
+   
+  History_2_Property_Added_1_fis :=
+    group (sort (denormalize (p2, single_property_fis,  left.seq = right.seq, check_best (LEFT,RIGHT)),
+                 seq), seq);
+  History_2_Property_added_fis := History_2_Property_Added_1_fis + group(sort(pullid_recs, seq),seq);
 
   // =============== Vehicles ===============
   vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
@@ -1136,9 +1146,47 @@ risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell
                                                                                                                               ri.bus_sold.property_owned_assessed_count);
   SELF := le;
 END;
-per_prop := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
+per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
 
 
+  //join v5 and v3 to get the v3 prop owned count if FIS custom attributes are being requested
+  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS, 
+                          left.seq = right.seq,
+                          Transform(Risk_Indicators.Layout_Boca_Shell, 
+                                    self.FIS.ambiguous_property_total := right.ambiguous.property_total,
+                                    self.FIS.sold_property_purchase_count := right.sold.property_owned_purchase_count,
+                                    self.FIS.sold_property_purchase_total := right.sold.property_owned_purchase_total,
+                                    self.FIS.sold_property_total := right.sold.property_total,
+                                    self.FIS.owned_assessed_total := right.owned.property_owned_assessed_total,
+                                    self.FIS.owned_purchase_total := right.owned.property_owned_purchase_total,
+                                    self.FIS.owned_property_total := right.owned.property_total,
+                                    self := left), 
+                          left outer, atmost(riskwise.max_atmost));
+                          
+                          
+                          
+ //join to history2_fis
+ append_fis_addr_hist := join(append_fis_prop_owned, History_2_Property_added_fis,
+                           left.seq = right.seq,
+                           Transform(Risk_Indicators.Layout_Boca_Shell,
+                                     self.FIS.add1_assessed_amount := right.Address_Verification.Input_Address_Information.assessed_amount,
+                                     self.FIS.add1_naprop          := right.Address_Verification.Input_Address_Information.naprop,
+                                     self.FIS.add1_purchase_amount := right.Address_Verification.Input_Address_Information.purchase_amount,
+                                     self.FIS.add2_assessed_amount := right.Address_Verification.Address_History_1.assessed_amount,
+                                     self.FIS.add2_naprop          := right.Address_Verification.Address_History_1.naprop,
+                                     self.FIS.add2_purchase_amount := right.Address_Verification.Address_History_1.purchase_amount,
+                                     self.FIS.add3_assessed_amount := right.Address_Verification.Address_History_2.assessed_amount,
+                                     self.FIS.add3_naprop          := right.Address_Verification.Address_History_2.naprop,
+                                     self.FIS.add3_purchase_amount := right.Address_Verification.Address_History_2.purchase_amount,
+                                     self := left),
+                           left outer, atmost(riskwise.max_atmost));
+ 
+ //Fis will never run on thor, extra joins not needed.
+ #IF(onthor)
+   per_prop := per_prop_original;
+ #Else
+   per_prop := IF(IsFIS, group(append_fis_addr_hist, seq), per_prop_original);
+ #End
 
 // ================ Add Back Watercraft ================
 risk_indicators.Layout_Boca_Shell add_back_watercraft(risk_indicators.Layout_Boca_Shell le, watercraft_rolled_indv ri) := TRANSFORM
@@ -1393,7 +1441,7 @@ easi_census := ungroup(join(iid, Easi.Key_Easi_Census,
                 self.geo_blk:=left.geo_blk,
                 self := right), ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1)));
 
-wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layout_census), easi_census), isFCRA);
+wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layout_census), easi_census), isFCRA, IsFIS);
 
 withWealth := join(impulse_added_back, wealth,
         left.seq=right.seq,
@@ -1891,8 +1939,15 @@ final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 // output(prop_with_advo_deduped, named('prop_with_advo_deduped'));
 // output(single_property, named('single_property'));
 // output(Rel_Property_Rolled, named('Rel_Property_Rolled'));
-// output(Per_Property_Rolled, named('Per_Property_Rolled'));
+// output(Per_Property_Rolled_FIS, named('Per_Property_Rolled_FIS'));
+// output(History_2_Property_added_fis, named('History_2_Property_added_fis'));
+// output(append_fis_prop_owned, named('append_fis_prop_owned'));
+// output(append_fis_addr_hist, named('append_fis_addr_hist'));
 // output(per_prop, named('per_prop'));
+// output(per_prop_original, named('per_prop_original'));
+// output(p_address, named('p_address'), overwrite);
+// output(prop, named('prop'), overwrite);
+// output(prop_common, named('prop_common'), overwrite);
 
 RETURN final55;
 

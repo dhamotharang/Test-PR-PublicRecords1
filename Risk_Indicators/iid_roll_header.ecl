@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, ut;
+﻿import _Control, risk_indicators, STD, ut;
 onThor := _Control.Environment.OnThor;
 
 export iid_roll_header(grouped DATASET(risk_indicators.layout_output) all_header, boolean suppressNearDups=false,
@@ -46,17 +46,17 @@ sortedBest := if(bsversion>=50, address_hierarchy_sort, sortedBest_original);
 risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indicators.layout_output r) := transform
 	SELF.header_footprint := l.header_footprint + r.header_footprint;
 	
-	source_seen := r.src='XX' OR Stringlib.StringFind(l.sources,r.src+',',1)>0;
-	firstnamesource_seen := r.src='XX' OR Stringlib.StringFind(l.firstnamesources,r.src+',',1)>0;
-  middlenamesource_seen := r.src='XX' OR Stringlib.StringFind(l.middlenamesources,r.src+',',1)>0;
-	lastnamesource_seen := r.src='XX' OR Stringlib.StringFind(l.lastnamesources,r.src+',',1)>0;
-	addrsource_seen := r.src='XX' OR Stringlib.StringFind(l.addrsources,r.src+',',1)>0;
-	socssource_seen := r.src='XX' OR Stringlib.StringFind(l.socssources,r.src+',',1)>0;
+	source_seen := r.src='XX' OR STD.STR.Find(l.sources,r.src+',',1)>0;
+	firstnamesource_seen := r.src='XX' OR STD.STR.Find(l.firstnamesources,r.src+',',1)>0;
+  middlenamesource_seen := r.src='XX' OR STD.STR.Find(l.middlenamesources,r.src+',',1)>0;
+	lastnamesource_seen := r.src='XX' OR STD.STR.Find(l.lastnamesources,r.src+',',1)>0;
+	addrsource_seen := r.src='XX' OR STD.STR.Find(l.addrsources,r.src+',',1)>0;
+	socssource_seen := r.src='XX' OR STD.STR.Find(l.socssources,r.src+',',1)>0;
 	
-	hphonesource_seen := r.src='XX' OR Stringlib.StringFind(l.hphonesources,r.src+',',1)>0;
-	wphonesource_seen := r.src='XX' OR Stringlib.StringFind(l.wphonesources,r.src+',',1)>0;
-	cmpysource_seen := r.src='XX' OR Stringlib.StringFind(l.cmpysources,r.src+',',1)>0;
-	dobsource_seen := r.src='XX' OR Stringlib.StringFind(l.dobsources,r.src+',',1)>0;
+	hphonesource_seen := r.src='XX' OR STD.STR.Find(l.hphonesources,r.src+',',1)>0;
+	wphonesource_seen := r.src='XX' OR STD.STR.Find(l.wphonesources,r.src+',',1)>0;
+	cmpysource_seen := r.src='XX' OR STD.STR.Find(l.cmpysources,r.src+',',1)>0;
+	dobsource_seen := r.src='XX' OR STD.STR.Find(l.dobsources,r.src+',',1)>0;
 	
   SELF.sources := IF(source_seen,l.sources,TRIM(l.sources)+r.src+',');
   SELF.firstnamesources := IF(firstnamesource_seen OR r.firstcount=0,l.firstnamesources,TRIM(l.firstnamesources)+r.src+',');
@@ -69,7 +69,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
   SELF.cmpysources := IF(cmpysource_seen OR r.cmpycount=0,l.cmpysources,TRIM(l.cmpysources)+r.src+',');
   SELF.dobsources := IF(dobsource_seen OR r.dobcount=0,l.dobsources,TRIM(l.dobsources)+r.src+',');
 	
-	em_only_sources_seen := Stringlib.StringFind(trim(l.em_only_sources),trim(r.em_only_sources),1)>0 or r.src not in ['EM','E1','E2','E3','E4'];
+	em_only_sources_seen := STD.STR.Find(trim(l.em_only_sources),trim(r.em_only_sources),1)>0 or r.src not in ['EM','E1','E2','E3','E4'];
 	self.em_only_sources := if(em_only_sources_seen,l.em_only_sources,TRIM(l.em_only_sources)+r.em_only_sources);
 	
 	SELF.numsource := l.numsource + IF(source_seen,0,1);
@@ -82,7 +82,8 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	self.num_nonderogs24 := l.num_nonderogs24 + IF(~source_seen and r.num_nonderogs24>0, 1, 0);
 	self.num_nonderogs36 := l.num_nonderogs36 + IF(~source_seen and r.num_nonderogs36>0, 1, 0);
 	self.num_nonderogs60 := l.num_nonderogs60 + IF(~source_seen and r.num_nonderogs60>0, 1, 0);
-	
+	self.FIS_num_nonderogs := l.FIS_num_nonderogs + IF(~source_seen and r.FIS_num_nonderogs>0, 1, 0);
+  
 	chooser(BOOLEAN seen, INTEGER i, INTEGER x) := IF(seen,i,i+x);
 
   self.firstcount := chooser(firstnamesource_seen, l.firstcount, r.firstcount);
@@ -165,7 +166,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 								 4);
 
 	// chronology that keeps track of which sources
-	chrono_source_seen := IF(howmany=1,r.src='XX' OR Stringlib.StringFind(l.chrono_sources,trim(r.CHRONO_SOURCES),1)>0,false);
+	chrono_source_seen := IF(howmany=1,r.src='XX' OR STD.STR.Find(l.chrono_sources,trim(r.CHRONO_SOURCES),1)>0,false);
 	SELF.chrono_sources := IF(howmany<>1 OR chrono_source_seen, l.chrono_sources, TRIM(l.chrono_sources)+r.CHRONO_SOURCES);
 	SELF.chrono_addrcount := IF(howmany<>1 OR chrono_source_seen,l.chrono_addrcount,l.chrono_addrcount+1);
 	SELF.chrono_eqfsaddrcount := IF(howmany<>1,l.chrono_eqfsaddrcount,l.chrono_eqfsaddrcount OR r.chrono_eqfsaddrcount);
@@ -193,7 +194,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	self.chronoaddrscore := IF(howmany=1,if(bsversion>=50, l.chronoaddrscore,r.chronoaddrscore),l.chronoaddrscore);
   self.rawaid1 := IF(howmany=1,if(bsversion>=50, l.rawaid_orig,r.rawaid_orig),l.rawaid_orig);
 
-	chrono_source_seen2 := IF(howmany=2,r.src='XX' OR Stringlib.StringFind(l.chrono_sources2,trim(r.chrono_sources),1)>0,false);
+	chrono_source_seen2 := IF(howmany=2,r.src='XX' OR STD.STR.Find(l.chrono_sources2,trim(r.chrono_sources),1)>0,false);
 	SELF.chrono_sources2 := IF(howmany<>2 OR chrono_source_seen2, l.chrono_sources2, TRIM(l.chrono_sources2)+r.chrono_sources);
 	SELF.chrono_addrcount2 := IF(howmany<>2 OR chrono_source_seen2,l.chrono_addrcount2,l.chrono_addrcount2+1);
 	SELF.chrono_eqfsaddrcount2 := IF(howmany<>2,l.chrono_eqfsaddrcount2,l.chrono_eqfsaddrcount2 OR r.chrono_eqfsaddrcount);
@@ -220,7 +221,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	self.chronoaddrscore2 := IF(howmany=2,r.chronoaddrscore,l.chronoaddrscore2);
 	self.rawaid2 := IF(howmany=2,r.rawaid_orig,l.rawaid2);
 
-	chrono_source_seen3 := IF(howmany=3,r.src='XX' OR Stringlib.StringFind(l.chrono_sources3,trim(r.chrono_sources),1)>0,false);
+	chrono_source_seen3 := IF(howmany=3,r.src='XX' OR STD.STR.Find(l.chrono_sources3,trim(r.chrono_sources),1)>0,false);
 	SELF.chrono_sources3 := IF(howmany<>3 OR chrono_source_seen3, l.chrono_sources3, TRIM(l.chrono_sources3)+r.chrono_sources);
 	SELF.chrono_addrcount3 := IF(howmany<>3 OR chrono_source_seen3,l.chrono_addrcount3,l.chrono_addrcount3+1);
 	SELF.chrono_eqfsaddrcount3 := IF(howmany<>3,l.chrono_eqfsaddrcount3,l.chrono_eqfsaddrcount3 OR r.chrono_eqfsaddrcount);
@@ -383,7 +384,7 @@ rollbestcount := rollup(sortedbest, countadd(left,right), seq, did);	// rollup b
 risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := TRANSFORM
 	isOnly1 := ((INTEGER)(BOOLEAN)le.firstcount+(INTEGER)(BOOLEAN)le.middlecount+(INTEGER)(BOOLEAN)le.lastcount+(INTEGER)(BOOLEAN)le.addrcount+(INTEGER)(BOOLEAN)le.socscount+(INTEGER)(BOOLEAN)le.dobcount) = 1;
 				
-	blankOut := isOnly1 and StringLib.StringFind(le.src,'CO',1)=0;
+	blankOut := isOnly1 and STD.STR.Find(le.src,'CO',1)=0;
 	
 	self.did := if(blankOut and ~RetainInputDID, 0, le.did);  // checking RetainInputDID option because we were given DID but we want to keep it, for services that pass in DID (2016 = ID2).
 
@@ -600,7 +601,8 @@ risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := 
 	self.num_nonderogs24 := if(blankOut, 0, le.num_nonderogs24);
 	self.num_nonderogs36 := if(blankOut, 0, le.num_nonderogs36);
 	self.num_nonderogs60 := if(blankOut, 0, le.num_nonderogs60);
-	
+	self.FIS_num_nonderogs := if(blankOut, 0, le.FIS_num_nonderogs);
+  
 	self.iid_flags := if(blankOut, 0, le.iid_flags);
 	
 	// the rest of the fields that were in the iid_getHeader join that weren't blanked out
@@ -637,6 +639,8 @@ risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := 
 	self.addrs_last_5years 	:=	if(blankOut, 0, le.addrs_last_5years	);
 	self.addrs_last_10years 	:=	if(blankOut, 0, le.addrs_last_10years	);
 	self.addrs_last_15years 	:=	if(blankOut, 0, le.addrs_last_15years	);
+  self.FIS_addrs_last12 	:=	if(blankOut, 0, le.FIS_addrs_last12	);
+  self.FIS_addrs_last60 	:=	if(blankOut, 0, le.FIS_addrs_last60	);
 	self.hdr_dt_first_seen 	:=	if(blankOut, 0, le.hdr_dt_first_seen	);
 	self.hdr_dt_last_seen 	:=	if(blankOut, 0, le.hdr_dt_last_seen	);
 	self.dobcount2 	:=	if(blankOut, 0, le.dobcount2	);

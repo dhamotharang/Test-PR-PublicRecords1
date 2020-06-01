@@ -201,5 +201,6 @@ export BillingIndex := MODULE
     export FP1902_1     := '182'; //FP1902_1 - Fraudpoint 3.0 Custom Model for elevate(182 % 100 + 30 = 112)    
     export DI31906_0    := '183'; //DI31906_0 - ThreatMetrix Flagship Model(183 - 70 = 113)
     export FP1909_1    	:= '184'; //FP1909_1 - Fraudpoint 3.0 Custom Model for Fifth Third (184 - 70 = 114)
-    export FP1909_2    	:= '185'; //FP1909_2 - Fraudpoint 3.0 Custom Model for Fifth Third (185 - 70 = 115)    
+    export FP1909_2    	:= '185'; //FP1909_2 - Fraudpoint 3.0 Custom Model for Fifth Third (185 - 70 = 115)
+    export FP1908_1     := '188'; //FP1908_1_0 -  Fraudpoint 3.0 Custom Model for SCUSA (188 - 70 = 118)
 END;
