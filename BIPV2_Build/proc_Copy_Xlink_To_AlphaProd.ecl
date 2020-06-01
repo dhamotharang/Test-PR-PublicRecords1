@@ -7,7 +7,7 @@ EXPORT proc_Copy_Xlink_To_AlphaProd(
   ,pCompileTest     = 'false'
   ,pdoParallel      = 'true'
   ,pLESP            = '\'alpha_prod_thor_esp.risk.regn.net\''
-  ,pds_debug        = '\'dataset([{\\\'Boca-branch\\\',\\\'ThorProd\\\'},{\\\'Boca-URL\\\',\\\'https://gitlab.ins.risk.regn.net/BentleLA/PublicRecords.git\\\'}],WsWorkunits.Layouts.DebugValues)\''
+  ,pds_debug        = '\'dataset([],WsWorkunits.Layouts.DebugValues)\''
   
 ) :=
 functionmacro
