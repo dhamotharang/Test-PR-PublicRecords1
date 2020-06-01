@@ -170,6 +170,8 @@ self.vertical :=left.bus_intel.vertical;
 self.sub_market :=left.bus_intel.sub_market;
 self.function_description:=left.search_info.function_description;
 self.product_code:=left.search_info.product_code;
+self.use:=left.bus_intel.use;
+self.sequence_number:=left.search_info.sequence_number;
 self:=left;
 self := [];
 ));
