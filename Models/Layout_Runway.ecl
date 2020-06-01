@@ -1407,6 +1407,13 @@ string3 RVA1904_1_0_reason3 := '';
 string3 RVA1904_1_0_reason4 := '';
 string3 RVA1904_1_0_reason5 := '';
 
+String3 RVA1908_1_0_score := '';
+string3 RVA1908_1_0_reason1 := '';
+string3 RVA1908_1_0_reason2 := '';
+string3 RVA1908_1_0_reason3 := '';
+string3 RVA1908_1_0_reason4 := '';
+string3 RVA1908_1_0_reason5 := '';
+
 String3 RVG1808_2_0_score := '';
 string3 RVG1808_2_0_reason1 := '';
 string3 RVG1808_2_0_reason2 := '';
