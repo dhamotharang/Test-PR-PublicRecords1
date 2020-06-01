@@ -6,7 +6,7 @@ EXPORT Keys := MODULE
                                   {Files.address_siccode},
                                    Constants.KEY_PREFIX + doxie.Version_SuperKey + '::address_siccode');
 
-  EXPORT business_risk_bdid := index(Files.business_risk_bdid, {bdid}, {Files.business_risk_bdid},
+  EXPORT business_risk_bdid := index(Files.business_Property, {bdid}, {Files.business_Property},
                                      Constants.KEY_PREFIX + doxie.Version_SuperKey + '::business_risk_bdid');
 
   EXPORT hri_address_siccode := index(Files.hri_address_siccode, {z5, prim_name, suffix, predir, postdir, prim_range, sec_range}, {Files.hri_address_siccode},
