@@ -824,6 +824,13 @@ export Layout_Output := RECORD
 	unsigned8 rawaid2 := 0;
 	unsigned8 rawaid3 := 0;
 	integer ssnLookupFlag := 0;
+  
+  //FIS custom attribute support fields
+  BOOLEAN FIS_trueDID := false;
+  unsigned1 FIS_num_nonderogs := 0;
+  unsigned1 FIS_addrs_last12;
+  unsigned1 FIS_addrs_last60;
+  
 	string120 errMsg := '';
 	boolean skip_opt_out := false;
   risk_indicators.Layout_ConsumerFlags						ConsumerFlags;

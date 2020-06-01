@@ -276,7 +276,8 @@ Custom_model_name_array := SET(ucase_custom_models, model);
    //BF _ Followings are added only for insurnace
     if(InsuranceMode, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
                       Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException, 0) +
-		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0);
+		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0) +
+    IF(STD.Str.ToLowerCase(AttributesVersionRequest) = 'riskviewattrv5fis', Risk_Indicators.iid_constants.BSOptions.IsFISattributes, 0);
 
 	AttributesOnly := (BSOptions & risk_indicators.iid_constants.BSOptions.AttributesOnly) > 0;
     ExcludeStatusRefresh := (BSOptions & risk_indicators.iid_constants.BSOptions.ExcludeStatusRefresh) > 0;

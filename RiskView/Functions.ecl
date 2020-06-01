@@ -97,4 +97,30 @@ RETURN MAP(StatusRefreshRecommendGWError OR StatusRefreshGWError => riskview5_st
                           riskview5_suppressed);
 END; // JuLiProcessStatusRefresh END
 
+  EXPORT Format_riskview_attrs(Dataset(riskview.layouts.layout_riskview5_search_results) Search_results,
+                               STRING20 AttributesVersionRequest
+                              ) := FUNCTION
+     
+    Invalid_addr_request := Trim(Std.Str.ToLowerCase(AttributesVersionRequest)) not in RiskView.Constants.valid_attributes;
+    FIS_custom_addr_request := Trim(Std.Str.ToLowerCase(AttributesVersionRequest)) = RiskView.Constants.FIS_custom_attr_request;
+
+    emptyNameValuePairs := Dataset([], iesp.share.t_NameValuePair);
+
+    nameValuePairsVersion5 :=  NORMALIZE(Search_results, 202, RiskView.Transforms.intoVersion5(LEFT, COUNTER))(trim(value)<>'');
+    nameValuePairsFIS := NORMALIZE(Search_results, 8, RiskView.Transforms.intoFISattrs(LEFT, COUNTER));
+    
+    //Assign tags to sort the order of the attribute groups
+    Version5Tagged := PROJECT(nameValuePairsVersion5, TRANSFORM({iesp.share.t_NameValuePair, UNSIGNED1 Tag}, SELF.Tag := 1; SELF := LEFT));
+    FISTagged      := PROJECT(nameValuePairsFIS, TRANSFORM({iesp.share.t_NameValuePair, UNSIGNED1 Tag}, SELF.Tag := 2; SELF := LEFT));
+    
+    FIS_attr_set := PROJECT(SORT(Version5Tagged + FISTagged, Tag), TRANSFORM(iesp.share.t_NameValuePair, SELF := LEFT));
+     
+    FullAttrSet := Map(Invalid_addr_request    => emptyNameValuePairs,     //invalid request, return nothing
+                       FIS_custom_addr_request => FIS_attr_set,            //FIS custom attrs requested, return v5 set plus FIS custom set
+                                                  nameValuePairsVersion5); //Otherwise return the normal v5 set
+     
+     Return FullAttrSet;
+     
+  END;
+
 END; // Functions Module END
