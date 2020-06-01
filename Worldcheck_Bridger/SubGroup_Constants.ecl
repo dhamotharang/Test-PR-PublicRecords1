@@ -1213,6 +1213,9 @@
 		export string KEYWORD_EU_NIC								:= '899';
 		export string KEYWORD_IDBAPPEBTI						:= '900';
 		export string KEYWORD_IMOJ_SO								:= '901';
+		export string KEYWORD_CNSAFE								:= '902';
+		export string KEYWORD_OFAC_CAATSA_IRAN			:= '903';
+		export string KEYWORD_IRAN_IEI							:= '904';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

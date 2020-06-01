@@ -12,6 +12,9 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.ElementPivot.New'											,BuildElementPivotKey				);
 	tools.mac_WriteIndex('TheKeys.Main.ScoreBreakdown.New'										,BuildScoreBreakdownKey			);
 	tools.mac_WriteIndex('TheKeys.Main.WeightingChart.New'										,BuildWeightingChartKey			);
+	tools.mac_WriteIndex('TheKeys.Main.EntityProfile.New'											,BuildEntityProfileKey			);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigAttributes.New'									,BuildConfigAttributesKey		);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigRules.New'												,BuildConfigRulesKey				);
 	//Kel Demo
 	tools.mac_WriteIndex('TheKeys.Main.ClusterDetails_Demo.New'								,BuildClusterDetailsKey_Demo	);
 	tools.mac_WriteIndex('TheKeys.Main.ElementPivot_Demo.New'									,BuildElementPivotKey_Demo		);
@@ -27,6 +30,9 @@ export Build_Keys(
 			,BuildClusterDetailsKey	
 			,BuildElementPivotKey
 			,BuildScoreBreakdownKey	
+			,BuildEntityProfileKey
+			,BuildConfigAttributesKey
+			,BuildConfigRulesKey
 		 )
 		;
 	

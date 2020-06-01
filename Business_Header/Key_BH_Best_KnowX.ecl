@@ -20,7 +20,6 @@ required_src_set := set(codesV3(file_name = 'BUSINESS-HEADER'
 
 bh_best_layout := Business_Header.Layout_BH_Best;
 
-
 bh_best_layout  filterDNBAddressPhone(bh_best_layout l) := 
 transform
 	self.prim_range		:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.prim_range	);
