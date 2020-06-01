@@ -982,9 +982,9 @@ END;
 scores_out := IF(count(model_url(url<>''))>0,riskwise.ScoreController(model_url(url<>''),PROJECT(ungroup(d),scoredata(LEFT))));
 
 models.layouts.Layout_Score_IID_wFP limit_scores( models.layouts.Layout_Score_FP le ) := TRANSFORM
-  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1'], 6, 4);  // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
+  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1', 'FP1908_1'], 6, 4);  // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
 	self.reason_codes := choosen( le.reason_codes, num_reasons ); 
-  self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1'], 
+  self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1', 'FP1908_1'], 
                           dataset([{'StolenIdentityIndex', le.StolenIdentityIndex},
                                    {'SyntheticIdentityIndex', le.SyntheticIdentityIndex},
                                    {'ManipulatedIdentityIndex', le.ManipulatedIdentityIndex},
