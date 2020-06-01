@@ -1043,7 +1043,6 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	
 	dobmatch := risk_indicators.iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
 	
-	
 	trueDID_original := le.h.did<>0;
 	    
   // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
@@ -1054,7 +1053,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
   le.ConsumerFlags.legal_hold_alert or  
   (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
     false, trueDID_original);
-    
+  
+  self.FIS_trueDID := trueDID_original;
     
 	// FYI, if we add any new sources to this list or modify this mapping, let Jesse Shaw know about it so that he can update KEL attribute IdentityReport.graph
 	converted_src := map(
@@ -1126,7 +1126,9 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	self.addrs_last_5years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_5years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
 	self.addrs_last_10years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_10years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.tenyears, le.historydate), 1, 0));
 	self.addrs_last_15years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_15years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fifteenyears, le.historydate), 1, 0));
-					 
+  self.FIS_addrs_last12 := if(le.historydate=risk_indicators.iid_constants.default_history_date, le.FIS_addrs_last12, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.oneyear, le.historydate), 1, 0));
+  self.FIS_addrs_last60 := if(le.historydate=risk_indicators.iid_constants.default_history_date, le.FIS_addrs_last60, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
+  
 	self.firstcount := IF(firstmatch,1,0);
  self.middlecount := IF(middlematch,1,0);
 	self.lastcount := IF(lastmatch,1,0);
@@ -1360,6 +1362,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	nonderog_source_50 := non_derog_category > 0;
 	nonderog_source := if(bsversion>=50, nonderog_source_50, nonderog_source_41);	
 	self.num_nonderogs := if(nonderog_source, 1, 0);	
+
+  self.FIS_num_nonderogs := IF(nonderog_source_41, 1, 0);
 	
 	realtimeMode := le.historydate=risk_indicators.iid_constants.default_history_date or le.historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);
 	
