@@ -300,5 +300,6 @@ Minimum_Input_not_met := Passed(TRIM(Error_msg)='minimum input criteria not met'
 OUTPUT( CHOOSEN(Minimum_Input_not_met,eyeball), NAMED('Minimum_Input_not_met_records') );
 OUTPUT( COUNT(Minimum_Input_not_met), NAMED('Minimum_Input_not_met_Cnt') );
 
-OUTPUT( Passed, , OutputFile, THOR, overwrite );
-
+OUTPUT(Passed,, OutputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+OUTPUT(Minimum_Input_not_met,, OutputFile + 'Minimum_Input_not_met', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+OUTPUT(Failed,, OutputFile + '_failed_records', CSV(QUOTE('"')), OVERWRITE);
