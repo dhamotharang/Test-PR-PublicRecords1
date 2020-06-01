@@ -1,6 +1,7 @@
 ﻿IMPORT  PRTE2_DOC,PromoteSupers, prte2,ut, std, address, aid;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
+   filename:= constants.lookup_file;
 		
 		prte2.CleanFields(Files.corrections_offenses_IN, DOC_Offenses_Clean);
 
@@ -14,13 +15,31 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 		
 		df_offenses := PROJECT(	DOC_Offenses_Clean, 
 														transform( Layouts.layout_offenses_base_plus, 
-																			 self.offense_category := 0, 
-																			 self := left));
+																			 self := left;
+																			 self:=[];
+																			 ));
+																			 
+       df_offenses_2:= Project(df_Offenses,
+		                      TRANSFORM(Layouts.layout_offenses_base_plus,
+													self.offense_category:=(unsigned8)functions.get_category(left.off_desc_1);
+												                         self:=left;));  
+		
+		
+		
+		
+		df_offenses_3:=dedup(df_offenses_2);
 		
 		df_CourtOffenses := PROJECT(DOC_CourtOffenses_Clean, layouts.layout_court_offenses_base_plus);
-
-		// New offenders records need address and name cleaning and linking.
-		in_offenders_new := DOC_Offenders_Clean(cust_name != '');
+						
+		df_Court_offenses_2:= Project(df_CourtOffenses,
+		                      TRANSFORM(Layouts.layout_court_offenses_base_plus,
+													self.offense_category:=if(left.data_type='2',(unsigned8)functions.get_category(left.court_off_desc_1),
+												                         if(left.data_type = '5',(unsigned8)functions.get_category(left.arr_off_desc_1),0));
+												  self:=left;));
+		
+	 df_court_offenses_3:=dedup(df_court_offenses_2);
+	
+	 in_offenders_new := DOC_Offenders_Clean(cust_name != '');
 
 		in_offenders_new_clean_address := PRTE2.AddressCleaner(		in_offenders_new, 					// Record set with addresses to be cleaned
 																															['street_address_1'],  			// Set of fields containing address line 1
@@ -80,9 +99,9 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
 		df_activity := PROJECT(DOC_Activity_Clean, layouts.layout_activity_base_plus);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_offenses,'~PRTE::BASE::corrections::offenses', writefile_offenses,,,,filedate);
+		PromoteSupers.MAC_SF_BuildProcess(df_offenses_3,'~PRTE::BASE::corrections::offenses', writefile_offenses,,,,filedate);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_CourtOffenses,'~PRTE::BASE::corrections::court_offenses', writefile_court_offenses,,,,filedate);
+		PromoteSupers.MAC_SF_BuildProcess(df_Court_Offenses_3,'~PRTE::BASE::corrections::court_offenses', writefile_court_offenses,,,,filedate);
 
 		PromoteSupers.MAC_SF_BuildProcess(df_offenders,'~PRTE::BASE::corrections::offenders', writefile_offenders,,,,filedate);
 
@@ -91,5 +110,6 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 		PromoteSupers.MAC_SF_BuildProcess(df_activity,'~PRTE::BASE::corrections::activity', writefile_activity,,,,filedate);
 
 		return sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
+		
 		
 END;
