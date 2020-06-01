@@ -166,7 +166,7 @@ EXPORT FP_models := MODULE
     doIDAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.IDattr]);
     doAttributesVersion2 := Check_Valid_Attributes(Attr_Request, attributesV2set) and inputok;
     doAttributesVersion201 := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV201]) and inputok;
-    doAttributesVersion202 := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV202]) and inputok;
+    doAttributesVersion202 := (Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV202]) or Model_Check(ModelRequest, ['fp1908_1'])) and inputok;
     doParoAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvparo]) and inputok;
     doTMXAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvTMX]) and inputok;
     
@@ -265,7 +265,10 @@ EXPORT FP_models := MODULE
     model_fp1710_1 := Models.FP1710_1_0( ungroup(FP_mod._clam), 6);
     model_fp1803_1 := Models.FP1803_1_0( ungroup(FP_mod._clam), 6);
     model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6);
-		model_fp1909_1 := Models.fp1909_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDatributes);    model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
+    model_fp1908_1 := Models.fp1908_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		
+    model_fp1909_1 := Models.fp1909_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		
+    model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDatributes);    
+    model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
     
     //These models use the RiskIndicies from fp1109 so they are assigned to temp variables for the joins below
     model_fp1303_1_temp := Models.FP1303_1_0( ungroup(FP_mod._clam), 6, false);
@@ -394,7 +397,7 @@ EXPORT FP_models := MODULE
                           self.score := right.score;
                           self := right));
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
-		model_info := model_fp1909_2; 
+		model_info := model_fp1908_1; 
 
 #ELSE
 
@@ -452,7 +455,10 @@ EXPORT FP_models := MODULE
                         'fp1803_1' => model_fp1803_1,
                         'fp1806_1' => model_fp1806_1,
                         'fp1902_1' => model_fp1902_1,
-                        'fp1909_1' => model_fp1909_1,                        'fp1909_2' => model_fp1909_2,                        'di31906_0' => model_di31906_0,
+                        'fp1908_1' => model_fp1908_1,
+                        'fp1909_1' => model_fp1909_1,
+                        'fp1909_2' => model_fp1909_2,
+                        'di31906_0' => model_di31906_0,
                         'msn1803_1' => model_msn1803_1,
                         'rsn804_1'  => model_rsn804_1,
                                        DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
