@@ -2,6 +2,7 @@
 
 EXPORT Functions := MODULE
 
+/*
 EXPORT JuLiProcessDTE(STRING DeferredTransactionID,  grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results) := FUNCTION
 
 RecsToDTE := DATASET([TRANSFORM(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest, SELF.TransactionID := DeferredTransactionID; SELF := [];)]);
@@ -79,7 +80,7 @@ SELF := LEFT;))));
 
 /* ****************************************************************
 *  Deferred Task ESP (DTE) Logging Functionality  *
-******************************************************************/
+****************************************************************** /
 StatusRefreshWithRequestXML := PROJECT(StatusRefreshResults, TRANSFORM({RECORDOF(StatusRefreshResults), STRING50 RMSID, STRING50 TMSID}, 
 SELF.RMSID := IF(clam[1].LnJ_datasets.lnjliens[1].rmsid <> '', clam[1].LnJ_datasets.lnjliens[1].rmsid, clam[1].LnJ_datasets.lnjjudgments[1].rmsid);
 SELF.TMSID := IF(clam[1].LnJ_datasets.lnjliens[1].tmsid <> '', clam[1].LnJ_datasets.lnjliens[1].tmsid, clam[1].LnJ_datasets.lnjjudgments[1].tmsid);
@@ -96,6 +97,8 @@ RETURN MAP(StatusRefreshRecommendGWError OR StatusRefreshGWError => riskview5_st
                           (REAL)ESPInterfaceVersion >= 2.4 AND (REAL)ESPInterfaceVersion < 2.5 => riskview5_final_results,
                           riskview5_suppressed);
 END; // JuLiProcessStatusRefresh END
+
+*/
 
   EXPORT Format_riskview_attrs(Dataset(riskview.layouts.layout_riskview5_search_results) Search_results,
                                STRING20 AttributesVersionRequest
