@@ -33,11 +33,11 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
-		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1902_1'];
+		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1902_1', 'fp1908_1'];
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
-		bsVersion := MAP( model_name IN ['fp1902_1'] => 54,
+		bsVersion := MAP( model_name IN ['fp1902_1', 'fp1908_1'] => 54,
                       doParo or requestedattributegroups IN ['fraudpointattrv202','fraudpointattrv203'] or model_name IN ['fp1508_1','msn1803_1','rsn804_1','msnrsn_1'] => 53, // bs 53
                       model_name IN ['fp1705_1'] => 52,
                       model_name IN [fraudpoint3_models,'fp1702_2','fp1702_1'] => 51,
@@ -944,10 +944,9 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			),
 			left outer
 		);
-		
-		
+
 #IF(VALIDATION)
-	wmodel := Models.MSN1803_1_0(ungroup(clam )); 	// For validation only 
+	wmodel := Models.FP1908_1_0(clam, 6, attr); 	// For validation only 
   // RETURN wmodel ;	
 #ELSE
 
@@ -997,7 +996,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
       'fp3fdn1505_9'  => Models.FP3FDN1505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
       'fp1508_1'      => Models.fp1508_1_0( ungroup(clam), 6), 
       'fp1705_1'      => Models.fp1705_1_0( ungroup(clam), 6), 
-      'fp1902_1'      => Models.FP1902_1_0( clam_ip, 6), 
+      'fp1902_1'      => Models.FP1902_1_0( clam_ip, 6),
+      'fp1908_1'      => Models.FP1908_1_0( clam, 6, attr),
                          dataset( [], Models.Layouts.layout_fp1109 )
     );
     
@@ -1041,6 +1041,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 					model_name='msnrsn_1' => Risk_Indicators.BillingIndex.MSNRSN_1,
 					model_name='fp1705_1' => Risk_Indicators.BillingIndex.FP1705_1,
 					model_name='fp1902_1' => Risk_Indicators.BillingIndex.FP1902_1,
+					model_name='fp1908_1' => Risk_Indicators.BillingIndex.FP1908_1,
 					''
 				),
 				
@@ -1058,7 +1059,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
           model_name IN ['msn1803_1', 'msnrsn_1']  => 'FraudPointMSN1803_1',
           model_name IN ['rsn804_1']               => 'FraudPointRSN804_1',
           model_name IN ['fp1902_1']               => 'FraudPointFP1902_1',
-                                                      ''
+          model_name IN ['fp1908_1']               => 'FraudPointFP1908_1',
+          ''
         ),
 				
 				self.scorename1 := map( model_name IN ['fp3710_0', 'fp31105_1', 'fp1210_1', 'fp1409_2', 'msn1803_1', 'msnrsn_1',

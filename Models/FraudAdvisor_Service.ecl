@@ -514,7 +514,9 @@ doAttributesVersion1 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [M
 doIDAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.IDattr]);                          // Output IDAttributes if requested
 doAttributesVersion2 := Models.FP_Models.Check_Valid_Attributes(attributesIn, attributesV2set) and input_ok;	                            // output version2 if requested and minimum input entered
 doAttributesVersion201 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV201]) and input_ok;	  // output version201 if requested and minimum input entered
-doAttributesVersion202 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) and input_ok;	  // output version202 if requested and minimum input entered
+doAttributesVersion202 := (Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) 
+                          or Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1'])) // run attributes by this model name in case model called by FlexID
+                          and input_ok;	  // output version202 if requested and minimum input entered
 doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
 doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
 
@@ -559,7 +561,8 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1909_1', 'fp1909_2']) => 54,  Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2']) => 54,  
+  Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
       'fp1512_1','fp31604_0','fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1']) => 51, 
