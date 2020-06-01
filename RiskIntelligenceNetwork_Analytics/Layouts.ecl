@@ -2483,7 +2483,7 @@
 		INTEGER1 P19_BnkAcctRiskIndx;// 19
 		INTEGER1 P20_DLRiskIndx;// 20
 		INTEGER1 P18_IPAddrRiskIndx;// 18
-		INTEGER1 P9_AddrRiskIndx;
+		INTEGER1 P9_AddrRiskIndx;// 9
 		DATASET(LayoutRulesFlagsMatched) RulesFlagsMatched;
 		DATASET(LayoutEntityStats) EntityStats;
 	END;
