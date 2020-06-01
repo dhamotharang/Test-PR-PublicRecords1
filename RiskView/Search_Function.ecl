@@ -263,7 +263,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
    //BF _ Followings are added only for insurnace
     if(InsuranceMode, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
                       Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException, 0) +
-		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0);
+		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0) +
+    IF(STD.Str.ToLowerCase(AttributesVersionRequest) = 'riskviewattrv5fis', Risk_Indicators.iid_constants.BSOptions.IsFISattributes, 0);
 
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
 	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;

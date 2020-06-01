@@ -27,7 +27,7 @@ EXPORT getAllBocaShellData (
   dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
   dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
   ) := FUNCTION
-  
+
    mod_access := MODULE(Doxie.IDataAccess)
       EXPORT glb := ^.glb;
       EXPORT dppa := ^.dppa;
@@ -46,6 +46,7 @@ EXPORT getAllBocaShellData (
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
   IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
+  IsFIS  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsFISattributes) > 0;
 
   // =============== Get Property Info ===============
   risk_indicators.layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
@@ -162,73 +163,73 @@ EXPORT getAllBocaShellData (
 	prop_common_thor_pre := distribute(Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE), hash64(seq))	:	PERSIST('~BOCASHELLFCRA::bocashell_property_results', expire(3));
 	prop_common_thor := sort(group(sort(prop_common_thor_pre, seq, local), seq, local),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce);
 
-	#IF(onThor)
-		prop_common := prop_common_thor;
-	#ELSE
-		prop_common := prop_common_roxie;
-	#END
+  #IF(onThor)
+    prop_common := prop_common_thor;
+  #ELSE
+    prop_common := prop_common_roxie;
+  #END
 
-	//*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
+  //*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
 
-	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
-		self.zip5 												:= l.zip5;
-		self.prim_range 									:= l.prim_range;
-		self.prim_name 										:= l.prim_name;
-		self.addr_suffix 									:= l.addr_suffix;
-		self.predir 											:= l.predir;
-		self.postdir 											:= l.postdir;
-		self.sec_range 										:= l.sec_range;
-		self.city_name										:= l.city_name;
-		self.st 													:= l.st;
-		self.historydate									:= r.historydate;
-		self.Residential_or_Business_Ind	:= '';
-		self															:= l;
-	end;
+  Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
+    self.zip5                         := l.zip5;
+    self.prim_range                   := l.prim_range;
+    self.prim_name                    := l.prim_name;
+    self.addr_suffix                  := l.addr_suffix;
+    self.predir                       := l.predir;
+    self.postdir                      := l.postdir;
+    self.sec_range                    := l.sec_range;
+    self.city_name                    := l.city_name;
+    self.st                           := l.st;
+    self.historydate                  := r.historydate;
+    self.Residential_or_Business_Ind  := '';
+    self                              := l;
+  end;
 
-	pre_ADVO := group(join(prop_common(~isrelat), p,	//we're only counting the input subject's properties, so we can drop any relatives properties before searching ADVO
-												 left.seq = right.seq,
-												 tf_pre_ADVO(left, right), left outer), seq);
+  pre_ADVO := group(join(prop_common(~isrelat), p,  //we're only counting the input subject's properties, so we can drop any relatives properties before searching ADVO
+                         left.seq = right.seq,
+                         tf_pre_ADVO(left, right), left outer), seq);
 
-	advo_key := if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history);
+  advo_key := if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history);
 
-	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd getAdvo1(pre_ADVO le, advo_key ri) := TRANSFORM
-		self.Residential_or_Business_Ind	:= ri.Residential_or_Business_Ind;
-		self 															:= le;
-	END;
+  Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd getAdvo1(pre_ADVO le, advo_key ri) := TRANSFORM
+    self.Residential_or_Business_Ind  := ri.Residential_or_Business_Ind;
+    self                               := le;
+  END;
 
-	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
-	prop_with_advo_roxie := join(pre_ADVO, advo_key,  //join to appropriate FCRA/nonFCRA key
-					left.zip5 != '' and 
-					left.prim_range != '' and
-					keyed(left.zip5 = right.zip) and
-					keyed(left.prim_range = right.prim_range) and
-					keyed(left.prim_name = right.prim_name) and
-					keyed(left.addr_suffix = right.addr_suffix) and
-					keyed(left.predir = right.predir) and
-					keyed(left.postdir = right.postdir) and
-					keyed(left.sec_range = right.sec_range)  and
-					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)),
-					getAdvo1(LEFT,RIGHT),
-					left outer,
-					atmost(riskwise.max_atmost));
+  //do search of ADVO by property to pick up address type - we are specifically looking for business addresses
+  prop_with_advo_roxie := join(pre_ADVO, advo_key,  //join to appropriate FCRA/nonFCRA key
+          left.zip5 != '' and
+          left.prim_range != '' and
+          keyed(left.zip5 = right.zip) and
+          keyed(left.prim_range = right.prim_range) and
+          keyed(left.prim_name = right.prim_name) and
+          keyed(left.addr_suffix = right.addr_suffix) and
+          keyed(left.predir = right.predir) and
+          keyed(left.postdir = right.postdir) and
+          keyed(left.sec_range = right.sec_range)  and
+          ((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)),
+          getAdvo1(LEFT,RIGHT),
+          left outer,
+          atmost(riskwise.max_atmost));
 
-	prop_with_advo_thor := join(distribute(pre_ADVO, hash64(zip5,
-																												 prim_range,
-																												 prim_name)), 
-					distribute(pull(advo_key), hash64(zip, prim_range, prim_name)),  //join to appropriate FCRA/nonFCRA key
-					left.zip5 != '' and 
-					left.prim_range != '' and
-					left.zip5 = right.zip and
-					left.prim_range = right.prim_range and
-					left.prim_name = right.prim_name and
-					left.addr_suffix = right.addr_suffix and
-					left.predir = right.predir and
-					left.postdir = right.postdir and
-					left.sec_range = right.sec_range  and
-					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)),
-					getAdvo1(LEFT,RIGHT),
-					left outer,
-					atmost(left.zip5 = right.zip and
+  prop_with_advo_thor := join(distribute(pre_ADVO, hash64(zip5,
+                                                         prim_range,
+                                                         prim_name)),
+          distribute(pull(advo_key), hash64(zip, prim_range, prim_name)),  //join to appropriate FCRA/nonFCRA key
+          left.zip5 != '' and
+          left.prim_range != '' and
+          left.zip5 = right.zip and
+          left.prim_range = right.prim_range and
+          left.prim_name = right.prim_name and
+          left.addr_suffix = right.addr_suffix and
+          left.predir = right.predir and
+          left.postdir = right.postdir and
+          left.sec_range = right.sec_range  and
+          ((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)),
+          getAdvo1(LEFT,RIGHT),
+          left outer,
+          atmost(left.zip5 = right.zip and
                  left.prim_range = right.prim_range and
                  left.prim_name = right.prim_name and
                  left.addr_suffix = right.addr_suffix and
@@ -246,10 +247,12 @@ EXPORT getAllBocaShellData (
 																												seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
 
   single_property :=
-		MAP(BSversion >= 53 						=> sort(group(sort(prop_with_advo_deduped + prop_common(isrelat), seq), seq),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce),
-				BSversion >= 50 						=> prop_common,
-																			 IF(production_realtime_mode, prop, prop_hist)
-			 );
+    MAP(BSversion >= 53             => sort(group(sort(prop_with_advo_deduped + prop_common(isrelat), seq), seq),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce),
+        BSversion >= 50             => prop_common,
+                                       IF(production_realtime_mode, prop, prop_hist)
+       );
+
+ single_property_fis := IF(IsFIS, IF(production_realtime_mode, prop, prop_hist), group(Dataset([],Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd),seq));
 
 // AML
 	Layout_prop_ownership := RECORD
@@ -312,182 +315,189 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   Rel_Property_Rolled := Risk_Indicators.Roll_Relative_Property(Single_Property(property_status_family<>' '));
   Per_Property_Rolled := Risk_Indicators.Roll_Applicant_Property(Single_Property(property_status_applicant<>' '));
 
-	// Apply the address specific information
-	risk_indicators.Layout_Boca_Shell check_best(risk_indicators.Layout_Boca_Shell le, Single_Property ri) :=
-	TRANSFORM
-		Input_match := LE.Address_Verification.Input_Address_Information.prim_range=RI.prim_range AND
-					LE.Address_Verification.Input_Address_Information.prim_name=RI.prim_name AND
-					LE.Address_Verification.Input_Address_Information.zip5=RI.zip5 AND
-					LE.Address_Verification.Input_Address_Information.sec_range=RI.sec_range;
-		Hist1_Match := LE.Address_Verification.Address_History_1.prim_range=RI.prim_range AND
-					LE.Address_Verification.Address_History_1.prim_name=RI.prim_name AND
-					LE.Address_Verification.Address_History_1.zip5=RI.zip5 AND
-					LE.Address_Verification.Address_History_1.sec_range=RI.sec_range;
-		Hist2_Match := LE.Address_Verification.Address_History_2.prim_range=RI.prim_range AND
-					LE.Address_Verification.Address_History_2.prim_name=RI.prim_name AND
-					LE.Address_Verification.Address_History_2.zip5=RI.zip5 AND
-					LE.Address_Verification.Address_History_2.sec_range=RI.sec_range;
+  Per_Property_Rolled_FIS := Risk_Indicators.Roll_Applicant_Property(single_property_fis(property_status_applicant<>' '));
+
+  // Apply the address specific information
+  risk_indicators.Layout_Boca_Shell check_best(risk_indicators.Layout_Boca_Shell le, Single_Property ri) :=
+  TRANSFORM
+    Input_match := LE.Address_Verification.Input_Address_Information.prim_range=RI.prim_range AND
+          LE.Address_Verification.Input_Address_Information.prim_name=RI.prim_name AND
+          LE.Address_Verification.Input_Address_Information.zip5=RI.zip5 AND
+          LE.Address_Verification.Input_Address_Information.sec_range=RI.sec_range;
+    Hist1_Match := LE.Address_Verification.Address_History_1.prim_range=RI.prim_range AND
+          LE.Address_Verification.Address_History_1.prim_name=RI.prim_name AND
+          LE.Address_Verification.Address_History_1.zip5=RI.zip5 AND
+          LE.Address_Verification.Address_History_1.sec_range=RI.sec_range;
+    Hist2_Match := LE.Address_Verification.Address_History_2.prim_range=RI.prim_range AND
+          LE.Address_Verification.Address_History_2.prim_name=RI.prim_name AND
+          LE.Address_Verification.Address_History_2.zip5=RI.zip5 AND
+          LE.Address_Verification.Address_History_2.sec_range=RI.sec_range;
 
 
-		SELF.Address_Verification.Input_Address_Information.applicant_owned := if (input_match, ri.applicant_owned, le.Address_Verification.Input_Address_Information.applicant_owned);
-		SELF.Address_Verification.Input_Address_Information.family_owned := if (input_match, ri.family_owned, LE.Address_Verification.Input_Address_Information.family_owned);
-		SELF.Address_Verification.Input_Address_Information.family_sold := if (input_match, ri.family_sold, LE.Address_Verification.Input_Address_Information.family_sold);
-		SELF.Address_Verification.Input_Address_Information.applicant_sold := if (input_match, ri.applicant_sold, LE.Address_Verification.Input_Address_Information.applicant_sold);
-		SELF.Address_Verification.Input_Address_Information.family_buy_found := if (input_match, ri.family_buy_found, LE.Address_Verification.Input_Address_Information.family_buy_found);
-		SELF.Address_Verification.Input_Address_Information.applicant_buy_found := if (input_match, ri.applicant_buy_found, LE.Address_Verification.Input_Address_Information.applicant_buy_found);
-		SELF.Address_Verification.Input_Address_Information.family_sale_found := if (input_match, ri.family_sale_found, LE.Address_Verification.Input_Address_Information.family_sale_found);
-		SELF.Address_Verification.Input_Address_Information.applicant_sale_found := if (input_match, ri.applicant_sale_found, LE.Address_Verification.Input_Address_Information.applicant_sale_found);
-		SELF.Address_Verification.Input_Address_Information.occupant_owned := if (input_match, ri.occupant_owned, LE.Address_Verification.Input_Address_Information.occupant_owned);
-		SELF.Address_Verification.Input_Address_Information.purchase_date := if (input_match, ri.purchase_date, LE.Address_Verification.Input_Address_Information.purchase_date);
-		SELF.Address_Verification.Input_Address_Information.built_date := if (input_match, ri.built_date, LE.Address_Verification.Input_Address_Information.built_date);
-		SELF.Address_Verification.Input_Address_Information.purchase_amount := if (input_match, ri.purchase_amount, LE.Address_Verification.Input_Address_Information.purchase_amount);
-		SELF.Address_Verification.Input_Address_Information.mortgage_amount := if (input_match, ri.mortgage_amount, LE.Address_Verification.Input_Address_Information.mortgage_amount);
-		SELF.Address_Verification.Input_Address_Information.mortgage_date := if (input_match, ri.mortgage_date, LE.Address_Verification.Input_Address_Information.mortgage_date);
-		SELF.Address_Verification.Input_Address_Information.mortgage_type := if( input_match, ri.mortgage_type, LE.Address_Verification.Input_Address_Information.mortgage_type);
-		SELF.Address_Verification.Input_Address_Information.type_financing := if( input_match, ri.type_financing, LE.Address_Verification.Input_Address_Information.type_financing);
-		SELF.Address_Verification.Input_Address_Information.first_td_due_date := if( input_match, ri.first_td_due_date, LE.Address_Verification.Input_Address_Information.first_td_due_date);
-		SELF.Address_Verification.Input_Address_Information.assessed_amount := if (input_match, ri.assessed_amount, LE.Address_Verification.Input_Address_Information.assessed_amount);
-		SELF.Address_Verification.Input_Address_Information.assessed_total_value := if (input_match, ri.assessed_total_value, LE.Address_Verification.Input_Address_Information.assessed_total_value);
-		SELF.Address_Verification.Input_Address_Information.naprop := if (input_match, ri.naprop, LE.Address_Verification.Input_Address_Information.naprop);
-		SELF.Address_Verification.Input_Address_Information.HR_Address := if (input_match, ri.HR_Address, LE.Address_Verification.Input_Address_Information.HR_Address);
-		self.Address_Verification.Input_Address_Information.standardized_land_use_code := if (input_match, ri.standardized_land_use_code, LE.Address_Verification.Input_Address_Information.standardized_land_use_code);
-		self.Address_Verification.Input_Address_Information.building_area := if (input_match, ri.building_area, LE.Address_Verification.Input_Address_Information.building_area);
-		self.Address_Verification.Input_Address_Information.no_of_buildings := if (input_match, ri.no_of_buildings, LE.Address_Verification.Input_Address_Information.no_of_buildings);
-		self.Address_Verification.Input_Address_Information.no_of_stories := if (input_match, ri.no_of_stories, LE.Address_Verification.Input_Address_Information.no_of_stories);
-		self.Address_Verification.Input_Address_Information.assessed_value_year := if (input_match, ri.assessed_value_year, LE.Address_Verification.Input_Address_Information.assessed_value_year);
-		self.Address_Verification.Input_Address_Information.no_of_rooms := if (input_match, ri.no_of_rooms, LE.Address_Verification.Input_Address_Information.no_of_rooms);
-		self.Address_Verification.Input_Address_Information.no_of_bedrooms := if (input_match, ri.no_of_bedrooms, LE.Address_Verification.Input_Address_Information.no_of_bedrooms);
-		self.Address_Verification.Input_Address_Information.no_of_baths := if (input_match, ri.no_of_baths, LE.Address_Verification.Input_Address_Information.no_of_baths);
-		self.Address_Verification.Input_Address_Information.no_of_partial_baths := if (input_match, ri.no_of_partial_baths, LE.Address_Verification.Input_Address_Information.no_of_partial_baths);
-		self.Address_Verification.Input_Address_Information.garage_type_code := if (input_match, ri.garage_type_code, LE.Address_Verification.Input_Address_Information.garage_type_code);
-		self.Address_Verification.Input_Address_Information.parking_no_of_cars := if (input_match, ri.parking_no_of_cars, LE.Address_Verification.Input_Address_Information.parking_no_of_cars);
-		self.Address_Verification.Input_Address_Information.style_code := if (input_match, ri.style_code, LE.Address_Verification.Input_Address_Information.style_code);
+    SELF.Address_Verification.Input_Address_Information.applicant_owned := if (input_match, ri.applicant_owned, le.Address_Verification.Input_Address_Information.applicant_owned);
+    SELF.Address_Verification.Input_Address_Information.family_owned := if (input_match, ri.family_owned, LE.Address_Verification.Input_Address_Information.family_owned);
+    SELF.Address_Verification.Input_Address_Information.family_sold := if (input_match, ri.family_sold, LE.Address_Verification.Input_Address_Information.family_sold);
+    SELF.Address_Verification.Input_Address_Information.applicant_sold := if (input_match, ri.applicant_sold, LE.Address_Verification.Input_Address_Information.applicant_sold);
+    SELF.Address_Verification.Input_Address_Information.family_buy_found := if (input_match, ri.family_buy_found, LE.Address_Verification.Input_Address_Information.family_buy_found);
+    SELF.Address_Verification.Input_Address_Information.applicant_buy_found := if (input_match, ri.applicant_buy_found, LE.Address_Verification.Input_Address_Information.applicant_buy_found);
+    SELF.Address_Verification.Input_Address_Information.family_sale_found := if (input_match, ri.family_sale_found, LE.Address_Verification.Input_Address_Information.family_sale_found);
+    SELF.Address_Verification.Input_Address_Information.applicant_sale_found := if (input_match, ri.applicant_sale_found, LE.Address_Verification.Input_Address_Information.applicant_sale_found);
+    SELF.Address_Verification.Input_Address_Information.occupant_owned := if (input_match, ri.occupant_owned, LE.Address_Verification.Input_Address_Information.occupant_owned);
+    SELF.Address_Verification.Input_Address_Information.purchase_date := if (input_match, ri.purchase_date, LE.Address_Verification.Input_Address_Information.purchase_date);
+    SELF.Address_Verification.Input_Address_Information.built_date := if (input_match, ri.built_date, LE.Address_Verification.Input_Address_Information.built_date);
+    SELF.Address_Verification.Input_Address_Information.purchase_amount := if (input_match, ri.purchase_amount, LE.Address_Verification.Input_Address_Information.purchase_amount);
+    SELF.Address_Verification.Input_Address_Information.mortgage_amount := if (input_match, ri.mortgage_amount, LE.Address_Verification.Input_Address_Information.mortgage_amount);
+    SELF.Address_Verification.Input_Address_Information.mortgage_date := if (input_match, ri.mortgage_date, LE.Address_Verification.Input_Address_Information.mortgage_date);
+    SELF.Address_Verification.Input_Address_Information.mortgage_type := if( input_match, ri.mortgage_type, LE.Address_Verification.Input_Address_Information.mortgage_type);
+    SELF.Address_Verification.Input_Address_Information.type_financing := if( input_match, ri.type_financing, LE.Address_Verification.Input_Address_Information.type_financing);
+    SELF.Address_Verification.Input_Address_Information.first_td_due_date := if( input_match, ri.first_td_due_date, LE.Address_Verification.Input_Address_Information.first_td_due_date);
+    SELF.Address_Verification.Input_Address_Information.assessed_amount := if (input_match, ri.assessed_amount, LE.Address_Verification.Input_Address_Information.assessed_amount);
+    SELF.Address_Verification.Input_Address_Information.assessed_total_value := if (input_match, ri.assessed_total_value, LE.Address_Verification.Input_Address_Information.assessed_total_value);
+    SELF.Address_Verification.Input_Address_Information.naprop := if (input_match, ri.naprop, LE.Address_Verification.Input_Address_Information.naprop);
+    SELF.Address_Verification.Input_Address_Information.HR_Address := if (input_match, ri.HR_Address, LE.Address_Verification.Input_Address_Information.HR_Address);
+    self.Address_Verification.Input_Address_Information.standardized_land_use_code := if (input_match, ri.standardized_land_use_code, LE.Address_Verification.Input_Address_Information.standardized_land_use_code);
+    self.Address_Verification.Input_Address_Information.building_area := if (input_match, ri.building_area, LE.Address_Verification.Input_Address_Information.building_area);
+    self.Address_Verification.Input_Address_Information.no_of_buildings := if (input_match, ri.no_of_buildings, LE.Address_Verification.Input_Address_Information.no_of_buildings);
+    self.Address_Verification.Input_Address_Information.no_of_stories := if (input_match, ri.no_of_stories, LE.Address_Verification.Input_Address_Information.no_of_stories);
+    self.Address_Verification.Input_Address_Information.assessed_value_year := if (input_match, ri.assessed_value_year, LE.Address_Verification.Input_Address_Information.assessed_value_year);
+    self.Address_Verification.Input_Address_Information.no_of_rooms := if (input_match, ri.no_of_rooms, LE.Address_Verification.Input_Address_Information.no_of_rooms);
+    self.Address_Verification.Input_Address_Information.no_of_bedrooms := if (input_match, ri.no_of_bedrooms, LE.Address_Verification.Input_Address_Information.no_of_bedrooms);
+    self.Address_Verification.Input_Address_Information.no_of_baths := if (input_match, ri.no_of_baths, LE.Address_Verification.Input_Address_Information.no_of_baths);
+    self.Address_Verification.Input_Address_Information.no_of_partial_baths := if (input_match, ri.no_of_partial_baths, LE.Address_Verification.Input_Address_Information.no_of_partial_baths);
+    self.Address_Verification.Input_Address_Information.garage_type_code := if (input_match, ri.garage_type_code, LE.Address_Verification.Input_Address_Information.garage_type_code);
+    self.Address_Verification.Input_Address_Information.parking_no_of_cars := if (input_match, ri.parking_no_of_cars, LE.Address_Verification.Input_Address_Information.parking_no_of_cars);
+    self.Address_Verification.Input_Address_Information.style_code := if (input_match, ri.style_code, LE.Address_Verification.Input_Address_Information.style_code);
 
-		SELF.Address_Verification.Address_History_1.applicant_owned := if (hist1_match, ri.applicant_owned, LE.Address_Verification.Address_History_1.applicant_owned);
-		SELF.Address_Verification.Address_History_1.family_owned := if (hist1_match, ri.family_owned, LE.Address_Verification.Address_History_1.family_owned);
-		SELF.Address_Verification.Address_History_1.family_sold := if (hist1_match, ri.family_sold, LE.Address_Verification.Address_History_1.family_sold);
-		SELF.Address_Verification.Address_History_1.applicant_sold := if (hist1_match, ri.applicant_sold, LE.Address_Verification.Address_History_1.applicant_sold);
-		SELF.Address_Verification.Address_History_1.family_buy_found := if (hist1_match, ri.family_buy_found, LE.Address_Verification.Address_History_1.family_buy_found);
-		SELF.Address_Verification.Address_History_1.applicant_buy_found := if (hist1_match, ri.applicant_buy_found, LE.Address_Verification.Address_History_1.applicant_buy_found);
-		SELF.Address_Verification.Address_History_1.family_sale_found := if (hist1_match, ri.family_sale_found, LE.Address_Verification.Address_History_1.family_sale_found);
-		SELF.Address_Verification.Address_History_1.applicant_sale_found := if (hist1_match, ri.applicant_sale_found, LE.Address_Verification.Address_History_1.applicant_sale_found);
-		SELF.Address_Verification.Address_History_1.occupant_owned := if (hist1_match, ri.occupant_owned, LE.Address_Verification.Address_History_1.occupant_owned);	// check whether this works
-		SELF.Address_Verification.Address_History_1.purchase_date := if (hist1_match, ri.purchase_date, LE.Address_Verification.Address_History_1.purchase_date);
-		SELF.Address_Verification.Address_History_1.built_date := if (hist1_match, ri.built_date, LE.Address_Verification.Address_History_1.built_date);
-		SELF.Address_Verification.Address_History_1.purchase_amount := if (hist1_match, ri.purchase_amount, LE.Address_Verification.Address_History_1.purchase_amount);
-		SELF.Address_Verification.Address_History_1.mortgage_amount := if (hist1_match, ri.mortgage_amount, LE.Address_Verification.Address_History_1.mortgage_amount);
-		SELF.Address_Verification.Address_History_1.mortgage_date := if (hist1_match, ri.mortgage_date, LE.Address_Verification.Address_History_1.mortgage_date);
-		SELF.Address_Verification.Address_History_1.mortgage_type := if (hist1_match, ri.mortgage_type, LE.Address_Verification.Address_History_1.mortgage_type);
-		SELF.Address_Verification.Address_History_1.type_financing := if (hist1_match, ri.type_financing, LE.Address_Verification.Address_History_1.type_financing);
-		SELF.Address_Verification.Address_History_1.first_td_due_date := if (hist1_match, ri.first_td_due_date, LE.Address_Verification.Address_History_1.first_td_due_date);
-		SELF.Address_Verification.Address_History_1.assessed_amount := if (hist1_match, ri.assessed_amount, LE.Address_Verification.Address_History_1.assessed_amount);
-		SELF.Address_Verification.Address_History_1.assessed_total_value := if (hist1_match, ri.assessed_total_value, LE.Address_Verification.Address_History_1.assessed_total_value);
-		SELF.Address_Verification.Address_History_1.naprop := if (hist1_match, ri.naprop, LE.Address_Verification.Address_History_1.naprop);
-		SELF.Address_Verification.Address_History_1.HR_Address := if (hist1_match, ri.HR_Address, LE.Address_Verification.Address_History_1.HR_Address);
-		self.Address_Verification.Address_History_1.standardized_land_use_code := if (hist1_match, ri.standardized_land_use_code, LE.Address_Verification.Address_History_1.standardized_land_use_code);
-		self.Address_Verification.Address_History_1.building_area := if (hist1_match, ri.building_area, LE.Address_Verification.Address_History_1.building_area);
-		self.Address_Verification.Address_History_1.no_of_buildings := if (hist1_match, ri.no_of_buildings, LE.Address_Verification.Address_History_1.no_of_buildings);
-		self.Address_Verification.Address_History_1.no_of_stories := if (hist1_match, ri.no_of_stories, LE.Address_Verification.Address_History_1.no_of_stories);
-		self.Address_Verification.Address_History_1.assessed_value_year := if (hist1_match, ri.assessed_value_year, LE.Address_Verification.Address_History_1.assessed_value_year);
-		self.Address_Verification.Address_History_1.no_of_rooms := if (hist1_match, ri.no_of_rooms, LE.Address_Verification.Address_History_1.no_of_rooms);
-		self.Address_Verification.Address_History_1.no_of_bedrooms := if (hist1_match, ri.no_of_bedrooms, LE.Address_Verification.Address_History_1.no_of_bedrooms);
-		self.Address_Verification.Address_History_1.no_of_baths := if (hist1_match, ri.no_of_baths, LE.Address_Verification.Address_History_1.no_of_baths);
-		self.Address_Verification.Address_History_1.no_of_partial_baths := if (hist1_match, ri.no_of_partial_baths, LE.Address_Verification.Address_History_1.no_of_partial_baths);
-		self.Address_Verification.Address_History_1.garage_type_code := if (hist1_match, ri.garage_type_code, LE.Address_Verification.Address_History_1.garage_type_code);
-		self.Address_Verification.Address_History_1.parking_no_of_cars := if (hist1_match, ri.parking_no_of_cars, LE.Address_Verification.Address_History_1.parking_no_of_cars);
-		self.Address_Verification.Address_History_1.style_code := if (hist1_match, ri.style_code, LE.Address_Verification.Address_History_1.style_code);
+    SELF.Address_Verification.Address_History_1.applicant_owned := if (hist1_match, ri.applicant_owned, LE.Address_Verification.Address_History_1.applicant_owned);
+    SELF.Address_Verification.Address_History_1.family_owned := if (hist1_match, ri.family_owned, LE.Address_Verification.Address_History_1.family_owned);
+    SELF.Address_Verification.Address_History_1.family_sold := if (hist1_match, ri.family_sold, LE.Address_Verification.Address_History_1.family_sold);
+    SELF.Address_Verification.Address_History_1.applicant_sold := if (hist1_match, ri.applicant_sold, LE.Address_Verification.Address_History_1.applicant_sold);
+    SELF.Address_Verification.Address_History_1.family_buy_found := if (hist1_match, ri.family_buy_found, LE.Address_Verification.Address_History_1.family_buy_found);
+    SELF.Address_Verification.Address_History_1.applicant_buy_found := if (hist1_match, ri.applicant_buy_found, LE.Address_Verification.Address_History_1.applicant_buy_found);
+    SELF.Address_Verification.Address_History_1.family_sale_found := if (hist1_match, ri.family_sale_found, LE.Address_Verification.Address_History_1.family_sale_found);
+    SELF.Address_Verification.Address_History_1.applicant_sale_found := if (hist1_match, ri.applicant_sale_found, LE.Address_Verification.Address_History_1.applicant_sale_found);
+    SELF.Address_Verification.Address_History_1.occupant_owned := if (hist1_match, ri.occupant_owned, LE.Address_Verification.Address_History_1.occupant_owned);  // check whether this works
+    SELF.Address_Verification.Address_History_1.purchase_date := if (hist1_match, ri.purchase_date, LE.Address_Verification.Address_History_1.purchase_date);
+    SELF.Address_Verification.Address_History_1.built_date := if (hist1_match, ri.built_date, LE.Address_Verification.Address_History_1.built_date);
+    SELF.Address_Verification.Address_History_1.purchase_amount := if (hist1_match, ri.purchase_amount, LE.Address_Verification.Address_History_1.purchase_amount);
+    SELF.Address_Verification.Address_History_1.mortgage_amount := if (hist1_match, ri.mortgage_amount, LE.Address_Verification.Address_History_1.mortgage_amount);
+    SELF.Address_Verification.Address_History_1.mortgage_date := if (hist1_match, ri.mortgage_date, LE.Address_Verification.Address_History_1.mortgage_date);
+    SELF.Address_Verification.Address_History_1.mortgage_type := if (hist1_match, ri.mortgage_type, LE.Address_Verification.Address_History_1.mortgage_type);
+    SELF.Address_Verification.Address_History_1.type_financing := if (hist1_match, ri.type_financing, LE.Address_Verification.Address_History_1.type_financing);
+    SELF.Address_Verification.Address_History_1.first_td_due_date := if (hist1_match, ri.first_td_due_date, LE.Address_Verification.Address_History_1.first_td_due_date);
+    SELF.Address_Verification.Address_History_1.assessed_amount := if (hist1_match, ri.assessed_amount, LE.Address_Verification.Address_History_1.assessed_amount);
+    SELF.Address_Verification.Address_History_1.assessed_total_value := if (hist1_match, ri.assessed_total_value, LE.Address_Verification.Address_History_1.assessed_total_value);
+    SELF.Address_Verification.Address_History_1.naprop := if (hist1_match, ri.naprop, LE.Address_Verification.Address_History_1.naprop);
+    SELF.Address_Verification.Address_History_1.HR_Address := if (hist1_match, ri.HR_Address, LE.Address_Verification.Address_History_1.HR_Address);
+    self.Address_Verification.Address_History_1.standardized_land_use_code := if (hist1_match, ri.standardized_land_use_code, LE.Address_Verification.Address_History_1.standardized_land_use_code);
+    self.Address_Verification.Address_History_1.building_area := if (hist1_match, ri.building_area, LE.Address_Verification.Address_History_1.building_area);
+    self.Address_Verification.Address_History_1.no_of_buildings := if (hist1_match, ri.no_of_buildings, LE.Address_Verification.Address_History_1.no_of_buildings);
+    self.Address_Verification.Address_History_1.no_of_stories := if (hist1_match, ri.no_of_stories, LE.Address_Verification.Address_History_1.no_of_stories);
+    self.Address_Verification.Address_History_1.assessed_value_year := if (hist1_match, ri.assessed_value_year, LE.Address_Verification.Address_History_1.assessed_value_year);
+    self.Address_Verification.Address_History_1.no_of_rooms := if (hist1_match, ri.no_of_rooms, LE.Address_Verification.Address_History_1.no_of_rooms);
+    self.Address_Verification.Address_History_1.no_of_bedrooms := if (hist1_match, ri.no_of_bedrooms, LE.Address_Verification.Address_History_1.no_of_bedrooms);
+    self.Address_Verification.Address_History_1.no_of_baths := if (hist1_match, ri.no_of_baths, LE.Address_Verification.Address_History_1.no_of_baths);
+    self.Address_Verification.Address_History_1.no_of_partial_baths := if (hist1_match, ri.no_of_partial_baths, LE.Address_Verification.Address_History_1.no_of_partial_baths);
+    self.Address_Verification.Address_History_1.garage_type_code := if (hist1_match, ri.garage_type_code, LE.Address_Verification.Address_History_1.garage_type_code);
+    self.Address_Verification.Address_History_1.parking_no_of_cars := if (hist1_match, ri.parking_no_of_cars, LE.Address_Verification.Address_History_1.parking_no_of_cars);
+    self.Address_Verification.Address_History_1.style_code := if (hist1_match, ri.style_code, LE.Address_Verification.Address_History_1.style_code);
 
-		SELF.Address_Verification.Address_History_2.applicant_owned := if (hist2_match, ri.applicant_owned, LE.Address_Verification.Address_History_2.applicant_owned);
-		SELF.Address_Verification.Address_History_2.family_owned := if (hist2_match, ri.family_owned, LE.Address_Verification.Address_History_2.family_owned);
-		SELF.Address_Verification.Address_History_2.family_sold := if (hist2_match, ri.family_sold, LE.Address_Verification.Address_History_2.family_sold);
-		SELF.Address_Verification.Address_History_2.applicant_sold := if (hist2_match, ri.applicant_sold, LE.Address_Verification.Address_History_2.applicant_sold);
-		SELF.Address_Verification.Address_History_2.family_buy_found := if (hist2_match, ri.family_buy_found, LE.Address_Verification.Address_History_2.family_buy_found);
-		SELF.Address_Verification.Address_History_2.applicant_buy_found := if (hist2_match, ri.applicant_buy_found, LE.Address_Verification.Address_History_2.applicant_buy_found);
-		SELF.Address_Verification.Address_History_2.family_sale_found := if (hist2_match, ri.family_sale_found, LE.Address_Verification.Address_History_2.family_sale_found);
-		SELF.Address_Verification.Address_History_2.applicant_sale_found := if (hist2_match, ri.applicant_sale_found, LE.Address_Verification.Address_History_2.applicant_sale_found);
-		SELF.Address_Verification.Address_History_2.occupant_owned := if (hist2_match, ri.occupant_owned, LE.Address_Verification.Address_History_2.occupant_owned);	// check whether this works
-		SELF.Address_Verification.Address_History_2.purchase_date := if (hist2_match, ri.purchase_date, LE.Address_Verification.Address_History_2.purchase_date);
-		SELF.Address_Verification.Address_History_2.built_date := if (hist2_match, ri.built_date, LE.Address_Verification.Address_History_2.built_date);
-		SELF.Address_Verification.Address_History_2.purchase_amount := if (hist2_match, ri.purchase_amount, LE.Address_Verification.Address_History_2.purchase_amount);
-		SELF.Address_Verification.Address_History_2.mortgage_amount := if (hist2_match, ri.mortgage_amount, LE.Address_Verification.Address_History_2.mortgage_amount);
-		SELF.Address_Verification.Address_History_2.mortgage_date := if (hist2_match, ri.mortgage_date, LE.Address_Verification.Address_History_2.mortgage_date);
-		SELF.Address_Verification.Address_History_2.mortgage_type := if (hist2_match, ri.mortgage_type, LE.Address_Verification.Address_History_2.mortgage_type);
-		SELF.Address_Verification.Address_History_2.type_financing := if (hist2_match, ri.type_financing, LE.Address_Verification.Address_History_2.type_financing);
-		SELF.Address_Verification.Address_History_2.first_td_due_date := if (hist2_match, ri.first_td_due_date, LE.Address_Verification.Address_History_2.first_td_due_date);
-		SELF.Address_Verification.Address_History_2.assessed_amount := if (hist2_match, ri.assessed_amount, LE.Address_Verification.Address_History_2.assessed_amount);
-		SELF.Address_Verification.Address_History_2.assessed_total_value := if (hist2_match, ri.assessed_total_value, LE.Address_Verification.Address_History_2.assessed_total_value);
-		SELF.Address_Verification.Address_History_2.naprop := if (hist2_match, ri.naprop, LE.Address_Verification.Address_History_2.naprop);
-		SELF.Address_Verification.Address_History_2.HR_Address := if (hist2_match, ri.HR_Address, LE.Address_Verification.Address_History_2.HR_Address);
-		// edina shell will not get these but populate internally for consistency with other 2 addresses
-		self.Address_Verification.Address_History_2.standardized_land_use_code := if (hist2_match, ri.standardized_land_use_code, LE.Address_Verification.Address_History_2.standardized_land_use_code);
-		self.Address_Verification.Address_History_2.building_area := if (hist2_match, ri.building_area, LE.Address_Verification.Address_History_2.building_area);
-		self.Address_Verification.Address_History_2.no_of_buildings := if (hist2_match, ri.no_of_buildings, LE.Address_Verification.Address_History_2.no_of_buildings);
-		self.Address_Verification.Address_History_2.no_of_stories := if (hist2_match, ri.no_of_stories, LE.Address_Verification.Address_History_2.no_of_stories);
-		self.Address_Verification.Address_History_2.assessed_value_year := if (hist2_match, ri.assessed_value_year, LE.Address_Verification.Address_History_2.assessed_value_year);
-		self.Address_Verification.Address_History_2.no_of_rooms := if (hist2_match, ri.no_of_rooms, LE.Address_Verification.Address_History_2.no_of_rooms);
-		self.Address_Verification.Address_History_2.no_of_bedrooms := if (hist2_match, ri.no_of_bedrooms, LE.Address_Verification.Address_History_2.no_of_bedrooms);
-		self.Address_Verification.Address_History_2.no_of_baths := if (hist2_match, ri.no_of_baths, LE.Address_Verification.Address_History_2.no_of_baths);
-		self.Address_Verification.Address_History_2.no_of_partial_baths := if (hist2_match, ri.no_of_partial_baths, LE.Address_Verification.Address_History_2.no_of_partial_baths);
-		self.Address_Verification.Address_History_2.garage_type_code := if (hist2_match, ri.garage_type_code, LE.Address_Verification.Address_History_2.garage_type_code);
-		self.Address_Verification.Address_History_2.parking_no_of_cars := if (hist2_match, ri.parking_no_of_cars, LE.Address_Verification.Address_History_2.parking_no_of_cars);
-		self.Address_Verification.Address_History_2.style_code := if (hist2_match, ri.style_code, LE.Address_Verification.Address_History_2.style_code);
+    SELF.Address_Verification.Address_History_2.applicant_owned := if (hist2_match, ri.applicant_owned, LE.Address_Verification.Address_History_2.applicant_owned);
+    SELF.Address_Verification.Address_History_2.family_owned := if (hist2_match, ri.family_owned, LE.Address_Verification.Address_History_2.family_owned);
+    SELF.Address_Verification.Address_History_2.family_sold := if (hist2_match, ri.family_sold, LE.Address_Verification.Address_History_2.family_sold);
+    SELF.Address_Verification.Address_History_2.applicant_sold := if (hist2_match, ri.applicant_sold, LE.Address_Verification.Address_History_2.applicant_sold);
+    SELF.Address_Verification.Address_History_2.family_buy_found := if (hist2_match, ri.family_buy_found, LE.Address_Verification.Address_History_2.family_buy_found);
+    SELF.Address_Verification.Address_History_2.applicant_buy_found := if (hist2_match, ri.applicant_buy_found, LE.Address_Verification.Address_History_2.applicant_buy_found);
+    SELF.Address_Verification.Address_History_2.family_sale_found := if (hist2_match, ri.family_sale_found, LE.Address_Verification.Address_History_2.family_sale_found);
+    SELF.Address_Verification.Address_History_2.applicant_sale_found := if (hist2_match, ri.applicant_sale_found, LE.Address_Verification.Address_History_2.applicant_sale_found);
+    SELF.Address_Verification.Address_History_2.occupant_owned := if (hist2_match, ri.occupant_owned, LE.Address_Verification.Address_History_2.occupant_owned);  // check whether this works
+    SELF.Address_Verification.Address_History_2.purchase_date := if (hist2_match, ri.purchase_date, LE.Address_Verification.Address_History_2.purchase_date);
+    SELF.Address_Verification.Address_History_2.built_date := if (hist2_match, ri.built_date, LE.Address_Verification.Address_History_2.built_date);
+    SELF.Address_Verification.Address_History_2.purchase_amount := if (hist2_match, ri.purchase_amount, LE.Address_Verification.Address_History_2.purchase_amount);
+    SELF.Address_Verification.Address_History_2.mortgage_amount := if (hist2_match, ri.mortgage_amount, LE.Address_Verification.Address_History_2.mortgage_amount);
+    SELF.Address_Verification.Address_History_2.mortgage_date := if (hist2_match, ri.mortgage_date, LE.Address_Verification.Address_History_2.mortgage_date);
+    SELF.Address_Verification.Address_History_2.mortgage_type := if (hist2_match, ri.mortgage_type, LE.Address_Verification.Address_History_2.mortgage_type);
+    SELF.Address_Verification.Address_History_2.type_financing := if (hist2_match, ri.type_financing, LE.Address_Verification.Address_History_2.type_financing);
+    SELF.Address_Verification.Address_History_2.first_td_due_date := if (hist2_match, ri.first_td_due_date, LE.Address_Verification.Address_History_2.first_td_due_date);
+    SELF.Address_Verification.Address_History_2.assessed_amount := if (hist2_match, ri.assessed_amount, LE.Address_Verification.Address_History_2.assessed_amount);
+    SELF.Address_Verification.Address_History_2.assessed_total_value := if (hist2_match, ri.assessed_total_value, LE.Address_Verification.Address_History_2.assessed_total_value);
+    SELF.Address_Verification.Address_History_2.naprop := if (hist2_match, ri.naprop, LE.Address_Verification.Address_History_2.naprop);
+    SELF.Address_Verification.Address_History_2.HR_Address := if (hist2_match, ri.HR_Address, LE.Address_Verification.Address_History_2.HR_Address);
+    // edina shell will not get these but populate internally for consistency with other 2 addresses
+    self.Address_Verification.Address_History_2.standardized_land_use_code := if (hist2_match, ri.standardized_land_use_code, LE.Address_Verification.Address_History_2.standardized_land_use_code);
+    self.Address_Verification.Address_History_2.building_area := if (hist2_match, ri.building_area, LE.Address_Verification.Address_History_2.building_area);
+    self.Address_Verification.Address_History_2.no_of_buildings := if (hist2_match, ri.no_of_buildings, LE.Address_Verification.Address_History_2.no_of_buildings);
+    self.Address_Verification.Address_History_2.no_of_stories := if (hist2_match, ri.no_of_stories, LE.Address_Verification.Address_History_2.no_of_stories);
+    self.Address_Verification.Address_History_2.assessed_value_year := if (hist2_match, ri.assessed_value_year, LE.Address_Verification.Address_History_2.assessed_value_year);
+    self.Address_Verification.Address_History_2.no_of_rooms := if (hist2_match, ri.no_of_rooms, LE.Address_Verification.Address_History_2.no_of_rooms);
+    self.Address_Verification.Address_History_2.no_of_bedrooms := if (hist2_match, ri.no_of_bedrooms, LE.Address_Verification.Address_History_2.no_of_bedrooms);
+    self.Address_Verification.Address_History_2.no_of_baths := if (hist2_match, ri.no_of_baths, LE.Address_Verification.Address_History_2.no_of_baths);
+    self.Address_Verification.Address_History_2.no_of_partial_baths := if (hist2_match, ri.no_of_partial_baths, LE.Address_Verification.Address_History_2.no_of_partial_baths);
+    self.Address_Verification.Address_History_2.garage_type_code := if (hist2_match, ri.garage_type_code, LE.Address_Verification.Address_History_2.garage_type_code);
+    self.Address_Verification.Address_History_2.parking_no_of_cars := if (hist2_match, ri.parking_no_of_cars, LE.Address_Verification.Address_History_2.parking_no_of_cars);
+    self.Address_Verification.Address_History_2.style_code := if (hist2_match, ri.style_code, LE.Address_Verification.Address_History_2.style_code);
 
 
-		// for NON-FCRA, make sure the input DID matches the DID on the single property record before selecting the dates
-		isApplicant := le.did=ri.did;
-		dt_first_purchased := if( (le.other_address_info.date_first_purchase!=0 and le.other_address_info.date_first_purchase <= ri.purchase_date_by_did) or ri.purchase_date_by_did=0,
-																											le.other_address_info.date_first_purchase, ri.purchase_date_by_did);
-		self.other_address_info.date_first_purchase := if(isApplicant, dt_first_purchased, le.other_address_info.date_first_purchase);
-		dt_most_recent_purchase := MAX(le.other_address_info.date_most_recent_purchase,ri.purchase_date_by_did);
-		self.other_address_info.date_most_recent_purchase := if(isApplicant, dt_most_recent_purchase, le.other_address_info.date_most_recent_purchase);
+    // for NON-FCRA, make sure the input DID matches the DID on the single property record before selecting the dates
+    isApplicant := le.did=ri.did;
+    dt_first_purchased := if( (le.other_address_info.date_first_purchase!=0 and le.other_address_info.date_first_purchase <= ri.purchase_date_by_did) or ri.purchase_date_by_did=0,
+                                                      le.other_address_info.date_first_purchase, ri.purchase_date_by_did);
+    self.other_address_info.date_first_purchase := if(isApplicant, dt_first_purchased, le.other_address_info.date_first_purchase);
+    dt_most_recent_purchase := MAX(le.other_address_info.date_most_recent_purchase,ri.purchase_date_by_did);
+    self.other_address_info.date_most_recent_purchase := if(isApplicant, dt_most_recent_purchase, le.other_address_info.date_most_recent_purchase);
 
-		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
+    myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 
-		// use the purchase date by did field to match the date most recent purchase field (using this field should imply that the purchase date is for the DID, so no additional checking should need to be done)
-		self.other_address_info.num_purchase30 := le.other_address_info.num_purchase30 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,30), 1, 0);
-		self.other_address_info.num_purchase90 := le.other_address_info.num_purchase90 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,90), 1, 0);
-		self.other_address_info.num_purchase180 := le.other_address_info.num_purchase180 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,180), 1, 0);
-		self.other_address_info.num_purchase12 := le.other_address_info.num_purchase12 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(1)), 1, 0);
-		self.other_address_info.num_purchase24 := le.other_address_info.num_purchase24 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(2)), 1, 0);
-		self.other_address_info.num_purchase36 := le.other_address_info.num_purchase36 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(3)), 1, 0);
-		self.other_address_info.num_purchase60 := le.other_address_info.num_purchase60 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(5)), 1, 0);
+    // use the purchase date by did field to match the date most recent purchase field (using this field should imply that the purchase date is for the DID, so no additional checking should need to be done)
+    self.other_address_info.num_purchase30 := le.other_address_info.num_purchase30 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,30), 1, 0);
+    self.other_address_info.num_purchase90 := le.other_address_info.num_purchase90 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,90), 1, 0);
+    self.other_address_info.num_purchase180 := le.other_address_info.num_purchase180 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,180), 1, 0);
+    self.other_address_info.num_purchase12 := le.other_address_info.num_purchase12 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(1)), 1, 0);
+    self.other_address_info.num_purchase24 := le.other_address_info.num_purchase24 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(2)), 1, 0);
+    self.other_address_info.num_purchase36 := le.other_address_info.num_purchase36 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(3)), 1, 0);
+    self.other_address_info.num_purchase60 := le.other_address_info.num_purchase60 + if(isApplicant and checkDays(myGetDate,(string)ri.purchase_date_by_did,ut.DaysInNYears(5)), 1, 0);
 
-		dt_first_sale := if(le.other_address_info.date_first_sale=0 or le.other_address_info.date_first_sale > ri.sale_date_by_did, ri.sale_date_by_did, le.other_address_info.date_first_sale);
-		self.other_address_info.date_first_sale := if(isApplicant, dt_first_sale, le.other_address_info.date_first_sale);
+    dt_first_sale := if(le.other_address_info.date_first_sale=0 or le.other_address_info.date_first_sale > ri.sale_date_by_did, ri.sale_date_by_did, le.other_address_info.date_first_sale);
+    self.other_address_info.date_first_sale := if(isApplicant, dt_first_sale, le.other_address_info.date_first_sale);
 
-		dt_most_recent_sale := MAX(le.other_address_info.date_most_recent_sale,ri.sale_date_by_did);
-		self.other_address_info.date_most_recent_sale := if(isApplicant, dt_most_recent_sale, le.other_address_info.date_most_recent_sale);
+    dt_most_recent_sale := MAX(le.other_address_info.date_most_recent_sale,ri.sale_date_by_did);
+    self.other_address_info.date_most_recent_sale := if(isApplicant, dt_most_recent_sale, le.other_address_info.date_most_recent_sale);
 
-		// use the sale date by did field to amtch the date most recent sale field (using this field should imply that the sale date is for the DID, so no additonal checking should need to be done)
-		self.other_address_info.num_sold30 := le.other_address_info.num_sold30 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,30), 1, 0);
-		self.other_address_info.num_sold90 := le.other_address_info.num_sold90 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,90), 1, 0);
-		self.other_address_info.num_sold180 := le.other_address_info.num_sold180 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,180), 1, 0);
-		self.other_address_info.num_sold12 := le.other_address_info.num_sold12 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(1)), 1, 0);
-		self.other_address_info.num_sold24 := le.other_address_info.num_sold24 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(2)), 1, 0);
-		self.other_address_info.num_sold36 := le.other_address_info.num_sold36 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(3)), 1, 0);
-		self.other_address_info.num_sold60 := le.other_address_info.num_sold60 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(5)), 1, 0);
+    // use the sale date by did field to amtch the date most recent sale field (using this field should imply that the sale date is for the DID, so no additonal checking should need to be done)
+    self.other_address_info.num_sold30 := le.other_address_info.num_sold30 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,30), 1, 0);
+    self.other_address_info.num_sold90 := le.other_address_info.num_sold90 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,90), 1, 0);
+    self.other_address_info.num_sold180 := le.other_address_info.num_sold180 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,180), 1, 0);
+    self.other_address_info.num_sold12 := le.other_address_info.num_sold12 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(1)), 1, 0);
+    self.other_address_info.num_sold24 := le.other_address_info.num_sold24 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(2)), 1, 0);
+    self.other_address_info.num_sold36 := le.other_address_info.num_sold36 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(3)), 1, 0);
+    self.other_address_info.num_sold60 := le.other_address_info.num_sold60 + if(isApplicant and checkDays(myGetDate,(string)ri.sale_date_by_did,ut.DaysInNYears(5)), 1, 0);
 
-		// distressed sale output from bocashell 3.0
-		self.address_verification.recent_property_sales.sale_price1       := if(isApplicant AND ri.sale_price1 > 0      , ri.sale_price1      , le.address_verification.recent_property_sales.sale_price1);
-		self.address_verification.recent_property_sales.sale_date1        := if(isApplicant AND ri.sale_date1 > 0       , ri.sale_date1       , le.address_verification.recent_property_sales.sale_date1);
-		self.address_verification.recent_property_sales.prev_purch_price1 := if(isApplicant AND ri.prev_purch_price1 > 0, ri.prev_purch_price1, le.address_verification.recent_property_sales.prev_purch_price1);
-		self.address_verification.recent_property_sales.prev_purch_date1  := if(isApplicant AND ri.prev_purch_date1 > 0 , ri.prev_purch_date1 , le.address_verification.recent_property_sales.prev_purch_date1);
-		self.address_verification.recent_property_sales.sale_price2       := if(isApplicant AND ri.sale_price2 > 0      , ri.sale_price2      , le.address_verification.recent_property_sales.sale_price2);
-		self.address_verification.recent_property_sales.sale_date2        := if(isApplicant AND ri.sale_date2 > 0       , ri.sale_date2       , le.address_verification.recent_property_sales.sale_date2);
-		self.address_verification.recent_property_sales.prev_purch_price2 := if(isApplicant AND ri.prev_purch_price2 > 0, ri.prev_purch_price2, le.address_verification.recent_property_sales.prev_purch_price2);
-		self.address_verification.recent_property_sales.prev_purch_date2  := if(isApplicant AND ri.prev_purch_date2 > 0 , ri.prev_purch_date2 , le.address_verification.recent_property_sales.prev_purch_date2);
+    // distressed sale output from bocashell 3.0
+    self.address_verification.recent_property_sales.sale_price1       := if(isApplicant AND ri.sale_price1 > 0      , ri.sale_price1      , le.address_verification.recent_property_sales.sale_price1);
+    self.address_verification.recent_property_sales.sale_date1        := if(isApplicant AND ri.sale_date1 > 0       , ri.sale_date1       , le.address_verification.recent_property_sales.sale_date1);
+    self.address_verification.recent_property_sales.prev_purch_price1 := if(isApplicant AND ri.prev_purch_price1 > 0, ri.prev_purch_price1, le.address_verification.recent_property_sales.prev_purch_price1);
+    self.address_verification.recent_property_sales.prev_purch_date1  := if(isApplicant AND ri.prev_purch_date1 > 0 , ri.prev_purch_date1 , le.address_verification.recent_property_sales.prev_purch_date1);
+    self.address_verification.recent_property_sales.sale_price2       := if(isApplicant AND ri.sale_price2 > 0      , ri.sale_price2      , le.address_verification.recent_property_sales.sale_price2);
+    self.address_verification.recent_property_sales.sale_date2        := if(isApplicant AND ri.sale_date2 > 0       , ri.sale_date2       , le.address_verification.recent_property_sales.sale_date2);
+    self.address_verification.recent_property_sales.prev_purch_price2 := if(isApplicant AND ri.prev_purch_price2 > 0, ri.prev_purch_price2, le.address_verification.recent_property_sales.prev_purch_price2);
+    self.address_verification.recent_property_sales.prev_purch_date2  := if(isApplicant AND ri.prev_purch_date2 > 0 , ri.prev_purch_date2 , le.address_verification.recent_property_sales.prev_purch_date2);
 
-		SELF := le;
-	END;
+    SELF := le;
+  END;
 
-	p2 := p(iid.pullidflag = '');
-	pullid_recs := p(iid.pullidflag = '1');
+  p2 := p(iid.pullidflag = '');
+  pullid_recs := p(iid.pullidflag = '1');
 
-	History_2_Property_Added_a :=
-		group (sort (denormalize (p2, single_property,	left.seq = right.seq, check_best (LEFT,RIGHT)),
-								 seq), seq);
+  History_2_Property_Added_a :=
+    group (sort (denormalize (p2, single_property,  left.seq = right.seq, check_best (LEFT,RIGHT)),
+                 seq), seq);
 
-	History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
+  History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
+
+  History_2_Property_Added_1_fis :=
+    group (sort (denormalize (p2, single_property_fis,  left.seq = right.seq, check_best (LEFT,RIGHT)),
+                 seq), seq);
+  History_2_Property_added_fis := History_2_Property_Added_1_fis + group(sort(pullid_recs, seq),seq);
 
   // =============== Vehicles ===============
   vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
@@ -512,7 +522,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
 	// =============== Watercraft ===============
 	watercraft := IF (IsFCRA,
-											Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion), 
+											Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
 											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
 	watercraft_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
@@ -526,14 +536,14 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Professional Licenses ===============
 	proflic := IF (IsFCRA,
 											Risk_Indicators.Boca_Shell_Proflic_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose),
-											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion, 
+											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion,
                                                                               LexIdSourceOptout,
                                                                               TransactionID,
                                                                               BatchUID,
                                                                               GlobalCompanyId));
 	proflic_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Proflic_Hist_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose),
-												    Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion, 
+												    Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion,
                                                                               LexIdSourceOptout,
                                                                               TransactionID,
                                                                               BatchUID,
@@ -544,7 +554,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares, mod_access));  
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares, mod_access));
 													// filter_out_fares is our option that tells us we are running this for leadIntegrity.
 													// Use that same option here as our marketing flag within student function
 
@@ -564,25 +574,25 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	avm_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_AVM_FCRA (ids_wide(~isrelat)),
 												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat)));
-								
-								
+
+
 	//=========== Gong ============
 	gong_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_Gong_FCRA (ids_wide(~isrelat)),
 												Risk_Indicators.Boca_Shell_Gong			 (ids_wide(~isrelat), mod_access));
-												
-												
+
+
 	// ============ Infutor =============
 	infutor_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Infutor_FCRA (ids_wide(~isrelat)),
 													Risk_Indicators.Boca_Shell_Infutor      (ids_wide(~isrelat), mod_access));
-													
-													
+
+
 	// =========== Impulse ==============
 	impulse_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Impulse_FCRA (ids_wide(~isrelat), bsversion, isDirectToConsumerPurpose),
 													Risk_indicators.Boca_Shell_Impulse      (ids_wide(~isrelat), bsversion, mod_access));
-																						
+
 
 
 
@@ -1133,9 +1143,47 @@ risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell
 																																																															ri.bus_sold.property_owned_assessed_count);
 	SELF := le;
 END;
-per_prop := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
+per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
 
 
+  //join v5 and v3 to get the v3 prop owned count if FIS custom attributes are being requested
+  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS,
+                          left.seq = right.seq,
+                          Transform(Risk_Indicators.Layout_Boca_Shell,
+                                    self.FIS.ambiguous_property_total := right.ambiguous.property_total,
+                                    self.FIS.sold_property_purchase_count := right.sold.property_owned_purchase_count,
+                                    self.FIS.sold_property_purchase_total := right.sold.property_owned_purchase_total,
+                                    self.FIS.sold_property_total := right.sold.property_total,
+                                    self.FIS.owned_assessed_total := right.owned.property_owned_assessed_total,
+                                    self.FIS.owned_purchase_total := right.owned.property_owned_purchase_total,
+                                    self.FIS.owned_property_total := right.owned.property_total,
+                                    self := left),
+                          left outer, atmost(riskwise.max_atmost));
+
+
+
+ //join to history2_fis
+ append_fis_addr_hist := join(append_fis_prop_owned, History_2_Property_added_fis,
+                           left.seq = right.seq,
+                           Transform(Risk_Indicators.Layout_Boca_Shell,
+                                     self.FIS.add1_assessed_amount := right.Address_Verification.Input_Address_Information.assessed_amount,
+                                     self.FIS.add1_naprop          := right.Address_Verification.Input_Address_Information.naprop,
+                                     self.FIS.add1_purchase_amount := right.Address_Verification.Input_Address_Information.purchase_amount,
+                                     self.FIS.add2_assessed_amount := right.Address_Verification.Address_History_1.assessed_amount,
+                                     self.FIS.add2_naprop          := right.Address_Verification.Address_History_1.naprop,
+                                     self.FIS.add2_purchase_amount := right.Address_Verification.Address_History_1.purchase_amount,
+                                     self.FIS.add3_assessed_amount := right.Address_Verification.Address_History_2.assessed_amount,
+                                     self.FIS.add3_naprop          := right.Address_Verification.Address_History_2.naprop,
+                                     self.FIS.add3_purchase_amount := right.Address_Verification.Address_History_2.purchase_amount,
+                                     self := left),
+                           left outer, atmost(riskwise.max_atmost));
+
+ //Fis will never run on thor, extra joins not needed.
+ #IF(onthor)
+   per_prop := per_prop_original;
+ #Else
+   per_prop := IF(IsFIS, group(append_fis_addr_hist, seq), per_prop_original);
+ #End
 
 // ================ Add Back Watercraft ================
 risk_indicators.Layout_Boca_Shell add_back_watercraft(risk_indicators.Layout_Boca_Shell le, watercraft_rolled_indv ri) := TRANSFORM
@@ -1390,7 +1438,7 @@ easi_census := ungroup(join(iid, Easi.Key_Easi_Census,
 								self.geo_blk:=left.geo_blk,
 								self := right), ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1)));
 
-wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layout_census), easi_census), isFCRA);
+wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layout_census), easi_census), isFCRA, IsFIS);
 
 withWealth := join(impulse_added_back, wealth,
 				left.seq=right.seq,
@@ -1423,19 +1471,19 @@ shell3_bsdata := if(bsversion >= 2, shell3_bsdata_newIncomeLevelCode, shell3_bsd
 
 // new sections of data for shell 4.0 content
 advo_rolled := risk_indicators.boca_shell_advo(ids_wide(~isrelat), isFCRA, datarestriction, isPreScreen, bsversion);  // change to neutral layout
-employment_rolled := risk_indicators.boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);	
+employment_rolled := risk_indicators.boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);
 
 // need to populate the phones_on_file from the gong search.  inquiries search expects that to be populated
 inquiries_input_roxie := join(ids_wide(~isrelat), gong_added_back, left.seq=right.seq,
-		transform(risk_indicators.Layout_BocaShell_Neutral, 
+		transform(risk_indicators.Layout_BocaShell_Neutral,
 						self.header_summary.phones_on_file := right.header_summary.phones_on_file,
 						self.header_summary.phones_on_file_created12months := right.header_summary.phones_on_file_created12months,
 						self := left));
-						
+
 inquiries_input_thor := join(
-												distribute(ids_wide(~isrelat), seq), 
+												distribute(ids_wide(~isrelat), seq),
 												distribute(gong_added_back, seq), left.seq=right.seq,
-		transform(risk_indicators.Layout_BocaShell_Neutral, 
+		transform(risk_indicators.Layout_BocaShell_Neutral,
 						self.header_summary.phones_on_file := right.header_summary.phones_on_file,
 						self.header_summary.phones_on_file_created12months := right.header_summary.phones_on_file_created12months,
 						self := left), left outer, local);
@@ -1445,8 +1493,8 @@ inquiries_input_thor := join(
 #ELSE
 	inquiries_input := group(inquiries_input_roxie, seq);
 #END
- 						
-inquiries_rolled := if(isFCRA, 
+
+inquiries_rolled := if(isFCRA,
 										risk_indicators.boca_shell_inquiries_FCRA(inquiries_input, BSOptions, bsversion, gateways),
 										risk_indicators.boca_shell_inquiries(inquiries_input, BSOptions, bsversion, gateways, DataPermission, mod_access));
 LastSeenThreshold := risk_indicators.iid_constants.oneyear;	// set this to default like what it was prior to my BSOptions change
@@ -1693,10 +1741,10 @@ with_bureau_phone_verification := join(with_insurance_phones, bureau_phones_roll
 // everything in shell 5.0 up to this point is non-fcra only.  if isFCRA, start with bsdata41
 shell50_branch1 := if(isFCRA, group(bsdata41, seq), group(with_bureau_phone_verification, seq));
 
-with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA);		
-with_source_profile := risk_indicators.getSourceProfile(with_college_attendance, isFCRA);		
-with_economic_trajectory := risk_indicators.getEconomicTrajectory(with_source_profile);		
-with_address_occupancy := Risk_Indicators.Boca_Shell_Address_Occupancy(with_economic_trajectory, isFCRA);		
+with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA);
+with_source_profile := risk_indicators.getSourceProfile(with_college_attendance, isFCRA);
+with_economic_trajectory := risk_indicators.getEconomicTrajectory(with_source_profile);
+with_address_occupancy := Risk_Indicators.Boca_Shell_Address_Occupancy(with_economic_trajectory, isFCRA);
 with_build_dates := risk_indicators.Boca_Shell_data_build_dates(with_address_occupancy, isFCRA);
 
 bsData50 := if(bsversion>=50, group(with_build_dates, seq), group(bsdata41, seq));
@@ -1859,7 +1907,7 @@ risk_indicators.Layout_Boca_Shell BlankDImodel(risk_indicators.Layout_Boca_Shell
   self.fd_scores.digital_insight_reason3 := '';
   self.fd_scores.digital_insight_reason4 := '';
   self.fd_scores.digital_insight_reason5 := '';
-  self.fd_scores.digital_insight_reason6 := '';	
+  self.fd_scores.digital_insight_reason6 := '';
   self := le;
 END;
 
@@ -1888,8 +1936,15 @@ final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 // output(prop_with_advo_deduped, named('prop_with_advo_deduped'));
 // output(single_property, named('single_property'));
 // output(Rel_Property_Rolled, named('Rel_Property_Rolled'));
-// output(Per_Property_Rolled, named('Per_Property_Rolled'));
+// output(Per_Property_Rolled_FIS, named('Per_Property_Rolled_FIS'));
+// output(History_2_Property_added_fis, named('History_2_Property_added_fis'));
+// output(append_fis_prop_owned, named('append_fis_prop_owned'));
+// output(append_fis_addr_hist, named('append_fis_addr_hist'));
 // output(per_prop, named('per_prop'));
+// output(per_prop_original, named('per_prop_original'));
+// output(p_address, named('p_address'), overwrite);
+// output(prop, named('prop'), overwrite);
+// output(prop_common, named('prop_common'), overwrite);
 
 RETURN final55;
 
