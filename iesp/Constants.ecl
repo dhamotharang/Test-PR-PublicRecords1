@@ -613,8 +613,14 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_NVP := 1000;
 		export unsigned2 MAX_TIMELINE_PHONES := 20;
 	end;
-
-	export Fraud_Point := MODULE
+  
+  export RIN := MODULE
+    export unsigned2 MAX_COUNT_NVP := 1000;
+    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
+    export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
+  end;
+	
+  export Fraud_Point := MODULE
 		export unsigned2 MaxAttributes := 256; // update after reviewing attribute return counts.
 	end;
 
@@ -2195,4 +2201,5 @@ EXPORT Constants := MODULE
     export unsigned2 MaxCollectionRecords := 2000;
   end;
 
-END;
+END;  
+
