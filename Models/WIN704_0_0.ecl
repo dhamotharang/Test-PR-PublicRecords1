@@ -1,37 +1,70 @@
-import ut, risk_indicators, RiskWise, easi, doxie_files;
+﻿import risk_indicators, easi;
 // wealth indicator model that accepts the clam
 
-export WIN704_0_0(GROUPED dataset(Risk_Indicators.Layout_Boca_Shell) clam , dataset(easi.layout_census) easi, 
-									boolean isFCRA=false) := FUNCTION
+export WIN704_0_0(GROUPED dataset(Risk_Indicators.Layout_Boca_Shell) clam ,
+                  dataset(easi.layout_census) easi, 
+                  boolean isFCRA=false,
+                  boolean IsFIS = false) := FUNCTION
 
-	layout_out := record
-		unsigned4 seq;
-		unsigned6 did;
-		integer1  wealth_indicator;
+debug := false;
+
+  layout_out := record
+    unsigned4 seq;
+    unsigned6 did;
+    integer1  wealth_indicator;
+    #IF(debug)
+    Integer ADD1_ASSESSED_AMOUNT;
+    Integer ADD1_NAPROP;
+    Integer ADD1_PURCHASE_AMOUNT;
+    Integer ADD2_ASSESSED_AMOUNT;
+    Integer ADD2_NAPROP;
+    Integer ADD2_PURCHASE_AMOUNT;
+    Integer ADD3_ASSESSED_AMOUNT;
+    Integer ADD3_NAPROP;
+    Integer ADD3_PURCHASE_AMOUNT;
+    Integer PROPERTY_AMBIG_TOTAL;
+    Integer PROPERTY_OWNED_ASSESSED_TOTAL;
+    Integer PROPERTY_OWNED_PURCHASE_TOTAL;
+    Integer PROPERTY_SOLD_PURCHASE_COUNT;
+    Integer PROPERTY_SOLD_PURCHASE_TOTAL;
+    Integer PROPERTY_SOLD_TOTAL;
+    Integer PROPERTY_OWNED_TOTAL;
+    boolean _ever_owned;
+    Real _mod10_pct_a;
+    Real _mod10_pct_b;
+    Real _mod10_pct_c;
+    Real _mod10_pct_d;
+    Real _mod10_pct_e;
+    Real _mod10_pct_f;
+    Real _mod10_pct1;
+    Real _mod10_pct2;
+    Real _mod10_pct;
+    
+    #end
 	end;
 
 	layout_out doModel( clam le, easi ri ) := TRANSFORM
 		// input fields
 			C_MED_HVAL := (INTEGER)ri.MED_HVAL;
 
-			// clam values
-				ADD1_ASSESSED_AMOUNT          := le.Address_Verification.Input_Address_Information.assessed_amount;
-				ADD1_NAPROP                   := le.Address_Verification.Input_Address_Information.naprop;
-				ADD1_PURCHASE_AMOUNT          := le.Address_Verification.Input_Address_Information.purchase_amount;
-				ADD2_ASSESSED_AMOUNT          := le.Address_Verification.Address_History_1.assessed_amount;
-				ADD2_NAPROP                   := le.Address_Verification.Address_History_1.naprop;
-				ADD2_PURCHASE_AMOUNT          := le.Address_Verification.Address_History_1.purchase_amount;
-				ADD3_ASSESSED_AMOUNT          := le.Address_Verification.Address_History_2.assessed_amount;
-				ADD3_NAPROP                   := le.Address_Verification.Address_History_2.naprop;
-				ADD3_PURCHASE_AMOUNT          := le.Address_Verification.Address_History_2.purchase_amount;
-				PROPERTY_AMBIG_TOTAL          := le.Address_Verification.ambiguous.property_total;
-				PROPERTY_OWNED_ASSESSED_TOTAL := le.Address_Verification.owned.property_owned_assessed_total;
-				PROPERTY_OWNED_PURCHASE_TOTAL := le.Address_Verification.owned.property_owned_purchase_total;
-				PROPERTY_SOLD_PURCHASE_COUNT  := le.Address_Verification.sold.property_owned_purchase_count;
-				PROPERTY_SOLD_PURCHASE_TOTAL  := le.Address_Verification.sold.property_owned_purchase_total;
-				PROPERTY_SOLD_TOTAL           := le.Address_Verification.sold.property_total;
-				PROPERTY_OWNED_TOTAL          := le.Address_Verification.owned.property_total;
-			//
+      // clam values
+        ADD1_ASSESSED_AMOUNT          := IF(IsFIS, le.FIS.add1_assessed_amount, le.Address_Verification.Input_Address_Information.assessed_amount);
+        ADD1_NAPROP                   := IF(IsFIS, le.FIS.add1_naprop, le.Address_Verification.Input_Address_Information.naprop);
+        ADD1_PURCHASE_AMOUNT          := IF(IsFIS, le.FIS.add1_purchase_amount, le.Address_Verification.Input_Address_Information.purchase_amount);
+        ADD2_ASSESSED_AMOUNT          := IF(IsFIS, le.FIS.add2_assessed_amount, le.Address_Verification.Address_History_1.assessed_amount);
+        ADD2_NAPROP                   := IF(IsFIS, le.FIS.add2_naprop, le.Address_Verification.Address_History_1.naprop);
+        ADD2_PURCHASE_AMOUNT          := IF(IsFIS, le.FIS.add2_purchase_amount, le.Address_Verification.Address_History_1.purchase_amount);
+        ADD3_ASSESSED_AMOUNT          := IF(IsFIS, le.FIS.add3_assessed_amount, le.Address_Verification.Address_History_2.assessed_amount);
+        ADD3_NAPROP                   := IF(IsFIS, le.FIS.add3_naprop, le.Address_Verification.Address_History_2.naprop);
+        ADD3_PURCHASE_AMOUNT          := IF(IsFIS, le.FIS.add3_purchase_amount, le.Address_Verification.Address_History_2.purchase_amount);
+        PROPERTY_AMBIG_TOTAL          := IF(IsFIS, le.FIS.ambiguous_property_total, le.Address_Verification.ambiguous.property_total);
+        PROPERTY_OWNED_ASSESSED_TOTAL := IF(IsFIS, le.FIS.owned_assessed_total, le.Address_Verification.owned.property_owned_assessed_total);
+        PROPERTY_OWNED_PURCHASE_TOTAL := IF(IsFIS, le.FIS.owned_purchase_total, le.Address_Verification.owned.property_owned_purchase_total);
+        PROPERTY_OWNED_TOTAL          := IF(IsFIS, le.FIS.owned_property_total, le.Address_Verification.owned.property_total);
+        PROPERTY_SOLD_PURCHASE_COUNT  := IF(IsFIS, le.FIS.sold_property_purchase_count, le.Address_Verification.sold.property_owned_purchase_count);
+        PROPERTY_SOLD_PURCHASE_TOTAL  := IF(IsFIS, le.FIS.sold_property_purchase_total, le.Address_Verification.sold.property_owned_purchase_total);
+        PROPERTY_SOLD_TOTAL           := IF(IsFIS, le.FIS.sold_property_total, le.Address_Verification.sold.property_total);
+      //
 
 			sMIN( a, b ) := MACRO if( a < b, a, b ) ENDMACRO;
 			sMAX( a, b ) := MACRO if( a > b, a, b ) ENDMACRO;
@@ -194,6 +227,7 @@ export WIN704_0_0(GROUPED dataset(Risk_Indicators.Layout_Boca_Shell) clam , data
 
 			// if the aircraft count > 0 and the mod10_pct2 is less than or equal to 40, add 40 points just for aircraft
 			mod10_pct := mod10_pct2 + if( le.aircraft.aircraft_count>0 and property_val=0 and mod10_pct2 <= 40, 40, 0 );
+      
 			self.wealth_indicator := map(
 				mod10_pct = 0						 => 0,
 				mod10_pct = 10           => 1,
@@ -207,6 +241,35 @@ export WIN704_0_0(GROUPED dataset(Risk_Indicators.Layout_Boca_Shell) clam , data
                             
 		self.seq := le.seq;
 		self.did := le.did;
+    
+    #IF(debug)
+    Self.ADD1_ASSESSED_AMOUNT := ADD1_ASSESSED_AMOUNT;
+    Self.ADD1_NAPROP := ADD1_NAPROP;
+    Self.ADD1_PURCHASE_AMOUNT := ADD1_PURCHASE_AMOUNT;
+    Self.ADD2_ASSESSED_AMOUNT := ADD2_ASSESSED_AMOUNT;
+    Self.ADD2_NAPROP := ADD2_NAPROP;
+    Self.ADD2_PURCHASE_AMOUNT := ADD2_PURCHASE_AMOUNT;
+    Self.ADD3_ASSESSED_AMOUNT := ADD3_ASSESSED_AMOUNT;
+    Self.ADD3_NAPROP := ADD3_NAPROP;
+    Self.ADD3_PURCHASE_AMOUNT := ADD3_PURCHASE_AMOUNT;
+    Self.PROPERTY_AMBIG_TOTAL := PROPERTY_AMBIG_TOTAL;
+    Self.PROPERTY_OWNED_ASSESSED_TOTAL := PROPERTY_OWNED_ASSESSED_TOTAL;
+    Self.PROPERTY_OWNED_PURCHASE_TOTAL := PROPERTY_OWNED_PURCHASE_TOTAL;
+    Self.PROPERTY_SOLD_PURCHASE_COUNT := PROPERTY_SOLD_PURCHASE_COUNT;
+    Self.PROPERTY_SOLD_PURCHASE_TOTAL := PROPERTY_SOLD_PURCHASE_TOTAL;
+    Self.PROPERTY_SOLD_TOTAL := PROPERTY_SOLD_TOTAL;
+    Self.PROPERTY_OWNED_TOTAL := PROPERTY_OWNED_TOTAL;
+    self._ever_owned := ever_owned;
+    self._mod10_pct_a := mod10_pct_a;
+    self._mod10_pct_b := mod10_pct_b;
+    self._mod10_pct_c := mod10_pct_c;
+    self._mod10_pct_d := mod10_pct_d;
+    self._mod10_pct_e := mod10_pct_e;
+    self._mod10_pct_f := mod10_pct_f;
+    self._mod10_pct1  := mod10_pct1;
+    self._mod10_pct2  := mod10_pct2;
+    self._mod10_pct   := mod10_pct;
+    #end
 
 	END;
 	

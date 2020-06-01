@@ -11,7 +11,10 @@ export batch := 'batch';
 export online := 'online';
 export no_riskview_report := false; //default to false as don't want to run the report
 
-export valid_attributes := ['riskviewattrv5', 'insurview2attr', 'rvcheckingattrv5'];
+export checking_indicators_attribute_request := 'rvcheckingattrv5';
+export FIS_custom_attr_request := 'riskviewattrv5fis';
+
+export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
 
 //student
 export Public_schl := 'PUBLIC';
@@ -78,8 +81,6 @@ export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 
 export set_alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export set_numbers 	:= '0123456789';
-
-export checking_indicators_attribute_request := 'rvcheckingattrv5';
 
 export set_leadership_titles := [
 'PRESIDENT',
