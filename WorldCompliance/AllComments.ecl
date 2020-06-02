@@ -26,7 +26,8 @@ END;
    			self					:= L;
    	END;
 			
-   	return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+   	//return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+		return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
 	END;
 
 	GetPosition(dataset(Layouts.rEntity) src) := PROJECT(src, TRANSFORM(rComments, 
@@ -88,9 +89,8 @@ END;
 			self.Ent_Id := LEFT.Ent_Id;
 			self.sorter := 5;
 			self.subcmts := '';
-			//self.cmts := if(trim(LEFT.EntLevel, left, right) in ['N/A', ''], '', 'Level: ' + LEFT.EntLevel + ' | ') + 
 			self.cmts := 'Category: ' + LEFT.EntryCategory + ' | Subcategory:' + if(LEFT.EntrySubCategory = 'N/A', '', ' ' + LEFT.EntrySubCategory)));// + ' | ' + 
-			 //'Last Updated: ' + ut.ConvertDate(TRIM(Left.Touchdate),'%Y-%m-%d', '%Y-%m-%d');));
+
 //Multi Cat/Subcat section
 	 GetMultReasons(dataset(Layouts.rWCOCategories) src) := PROJECT(src, TRANSFORM(rComments,
 			SKIP(Left.IsActivePEP = 'N'),

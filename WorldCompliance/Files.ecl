@@ -66,7 +66,7 @@ EXPORT Files := MODULE
 
 Entities 					:= ['Individual','Organization','Vessel','Bank','Aircraft'];
 
-export dsEntities := DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in Entities,Ent_Id<>0);
+export dsEntities := distribute(DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in Entities,Ent_Id<>0),Ent_ID);
 export dsCountryEntities := 
 				DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType = 'Country',Ent_Id<>0);
 export dsAddresses := DISTRIBUTE(
@@ -78,7 +78,7 @@ export dsSanctionsDOB := DISTRIBUTE(
 					DATASET(root+'SanctionsDOB', Layouts.rSanctionsDOB, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),
 					SanctionsDobId);
 
-export MdsWCOCategories := DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE));
+export MdsWCOCategories := distribute(DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),EntityID);
 
 //export dsWCOCategories :=sort(DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),Ent_ID);
 WhiteListEntities := ['Branch', 'Lead', 'Member', 'Single', 'Sponsoring Entity'];
@@ -93,7 +93,7 @@ export dsRelDefs := DATASET(root+'reldefs', Layouts.rCategories, CSV(separator('
 
 					
 export dsMasters_base := 			// master entries
-				distribute(dsEntities(ParentId=0) + dsWhiteListEntities(ParentId=0),Ent_ID);
+				dsEntities(ParentId=0) + dsWhiteListEntities(ParentId=0);
 
 export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,
 										Transform(Layouts.rWCOCategories,

@@ -75,7 +75,7 @@ EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) :=
 					TRANSFORM(Layout_XG.routp,
 						self.additional_info_list.additionalinfo := RIGHT.additionalinfo;
 						self := LEFT;
-					), LEFT OUTER, LOCAL);
+					), NOSORT(right), LEFT OUTER, LOCAL);
 										
 
 	withAddr := JOIN(withInfo, distribute(AllAddresses, id), LEFT.id=Right.id,
