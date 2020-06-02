@@ -12,31 +12,31 @@
 uc(string s) := Std.Str.ToUpperCase(s);
 
 GetCases(string ilfn) := PROJECT(
-		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
-					CaseId, filename, -seqnum, LOCAL), CaseId, filename, LOCAL),
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
+					CaseId, filename, seqnum, LOCAL),
 				TRANSFORM($.Layouts2.rCaseEx,
 					self.ProgramState := uc(left.ProgramState);
 					self.CountyName := uc(left.CountyName);
 					self := left;
 			));
-					
+
 GetClients(string ilfn) := PROJECT(
-		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId)),
-					ClientId, CaseId, Eligibility, filename, -seqnum, LOCAL),
-					ClientId, CaseId, Eligibility, filename, LOCAL),
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId)),
+					ClientId, CaseId, Eligibility, filename, seqnum, LOCAL),
+				//	ClientId, CaseId, Eligibility, filename, LOCAL),
 				TRANSFORM($.Layouts2.rClientEx,
 					self.ProgramState := uc(left.ProgramState);
 					self.LastName := uc(left.LastName);
 					self.FirstName := uc(left.FirstName);
 					self.MiddleName := uc(left.MiddleName);
 					self.NameSuffix := uc(left.NameSuffix);
+					self.Email := TRIM(left.email,left,right);
 					self := left;
 			));
-					
+				
 GetAddresses(string ilfn) := PROJECT(
-		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses, hash32(CaseId, ClientId)),
-					CaseId, ClientId, AddressType, filename, -seqnum, LOCAL),
-					CaseId, ClientId, AddressType, filename, LOCAL),
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses, hash32(CaseId, ClientId)),
+					CaseId, ClientId, AddressType, filename, seqnum, LOCAL),
 					TRANSFORM($.Layouts2.rAddressEx,
 						self.ProgramState := uc(left.ProgramState);
 						self.Street1 := uc(left.Street1);
