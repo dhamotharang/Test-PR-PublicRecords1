@@ -14,7 +14,6 @@ Usage: InFile = input file to be checked
 export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', inLinkID = '\'\'', 
 										 inDocType = '\'\'', inDocID = '\'\'', batch = false, demo_cust = '\'\'', use_acctno = false) := macro
 	import suppress;
-/*
 				#uniquename(tra)
 				#uniquename(suppressFile)
 				#uniquename(validCriteria)
@@ -76,6 +75,4 @@ export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', in
 				outFile := if(inLinkType=Suppress.Constants.LinkTypes.DID and ~suppress.DemoPartition(demo_cust).include_all,
                       inFile(suppress.DemoPartition(demo_cust).retainDID((unsigned6)inLinkID)),
                       if (%validCriteria%,%outFile1%,inFile));
-*/
-  outfile := inFile;
 	endmacro;
