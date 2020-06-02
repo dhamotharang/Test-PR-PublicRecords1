@@ -51,13 +51,15 @@ Export Bocashell :=Sequential(
 															);
 															
 //move bocashell file to thor400														
-Shell_in := distribute(FraudGovPlatform.files().base.BocaShell.built,hash(record_id));	
+Shell_in := distribute((FraudGovPlatform.files().base.BocaShell.built
+											+FraudGovPlatform.files().base.BocaShell.qa),hash(record_id));	
 
 tools.mac_WriteFile(Filenames(pversion+'_patch').Base.BocaShell.New,Shell_in,Build_BocaShell_Patch);
 
 Export BocaShell_patch :=
 								Sequential( 
 										 Build_BocaShell_Patch
+										,Promote(pversion).buildfiles.Built2QA
 										,STD.File.StartSuperFileTransaction()
 										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.qa)
 										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.Built, true)
