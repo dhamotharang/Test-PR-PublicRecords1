@@ -1,4 +1,4 @@
-IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
+﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 
 EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
@@ -121,6 +121,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.gender									:= TRIM(Stringlib.StringToUpperCase(L.gender), LEFT, RIGHT);
 			SELF.upin										:= TRIM(L.upin, LEFT, RIGHT);
 			SELF.clean_dob							:= IF(L.birth_year <> '',_validate.date.fCorrectedDateString((string)SELF.birth_year + '0000',false), '');
+			SELF.dotid									:= IF(L.cpa_optout = 'Y', 1, 0); // pushing opt out flag to dotid to avoid layout change for keys
 			SELF  :=  L;
 			SELF  :=  [];
 		END;

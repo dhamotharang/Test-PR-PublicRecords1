@@ -1082,7 +1082,7 @@ end;
 			SELF						 							:= L;
 		END;
 	
-		with_ccpa := project(good_recs, add_sid (left));
+		with_ccpa := distribute(project(good_recs, add_sid (left)));
 
 		RETURN with_ccpa;
 	END;
