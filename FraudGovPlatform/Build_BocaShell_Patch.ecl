@@ -1,9 +1,9 @@
 ﻿Import tools, _control, FraudGovPlatform_Validation, STD;
 EXPORT Build_BocaShell_Patch(	 string version 	) := module
 
-ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
+shared ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
-Build_Kel_Ecl := 
+shared Build_Kel_Ecl := 
  'import tools, FraudGovPlatform, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;\n'
 +'#CONSTANT(\'RunKelDemo\',false);\n'
 +'#CONSTANT(\'Platform\',\'FraudGov\');\n'
@@ -30,8 +30,27 @@ Build_Kel_Ecl :=
 +'	):failure(email(\'FraudGov Kel Build failed\'));\n'
 ;
 
-	Export All := Sequential(FraudGovPlatform.Build_Base_Pii(version).BocaShell_patch,	
-													_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
+//move bocashell file to thor400														
+Shell_in := distribute((FraudGovPlatform.files().base.BocaShell.built
+											+FraudGovPlatform.files().base.BocaShell.qa),hash(record_id));	
+
+tools.mac_WriteFile(Filenames(version+'_patch').Base.BocaShell.New,Shell_in,Build_BocaShell_Copy);
+
+BocaShell_patch :=
+								Sequential( 
+										 Build_BocaShell_Copy
+										,Promote(version).buildfiles.Built2QA
+										,STD.File.StartSuperFileTransaction()
+										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.qa)
+										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.Built, true)
+										,FileServices.AddSuperfile(FraudGovplatform.Filenames().Base.BocaShell.Built,FraudGovplatform.Filenames(version+'_Patch').Base.BocaShell.New)
+										,FileServices.AddSuperfile(FraudGovplatform.Filenames().Base.BocaShell.QA,FraudGovplatform.Filenames(version+'_Patch').Base.BocaShell.New)
+										,STD.File.FinishSuperFileTransaction()
+													);
+
+
+Export All := Sequential(BocaShell_patch,	
+													_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName) 
 													);
 													
 END;													
