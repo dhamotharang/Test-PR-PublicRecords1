@@ -1,4 +1,4 @@
-﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
+﻿﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
 export Files(
 
 	 string		pversion = ''
@@ -30,8 +30,7 @@ module
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
-											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																					
-
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																																
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
@@ -49,6 +48,8 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
@@ -70,6 +71,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BestInfo,Layouts.BestInfo,BestInfo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CoverageDates,Layouts.CoverageDates,CoverageDates);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
@@ -114,6 +116,9 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_delta,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClusters_delta,Layouts.CustomerDashTopClusters, kel_CustomerDashTopClusters_delta);
 		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityProfile,Layouts.EntityProfile, kel_EntityProfile);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_ConfigAttributes,Layouts.ConfigAttributes, kel_ConfigAttributes);
+		
 	end;
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
@@ -127,7 +132,6 @@ module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
 		export RefreshProdDashVersion	:= dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
-
 	end;
 
 	

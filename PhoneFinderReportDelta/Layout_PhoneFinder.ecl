@@ -43,6 +43,7 @@
 			string20 	last_spoof_date;
 			string32 	phone_forwarded;
 			string20 	date_added;
+			integer5	identity_count;
 	end;
 
 	export Transactions_Raw := record
@@ -71,6 +72,7 @@
 			string32 	phone_forwarded;
 			integer1 	verified_carrier;
 			string20 	date_added;
+			integer5	identity_count;
 	end;
 	
 	export OtherPhones_Raw := record

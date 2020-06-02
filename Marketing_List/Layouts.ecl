@@ -145,5 +145,14 @@ module
     unsigned2 rank_order  ;
     string2   source      ;
   end;
+
+  export best_lexid_contact_address :=
+  record
+    unsigned6             lexid                 ;
+    string70              contact_address       ;
+    string25              city                  ;
+    string2               state                 ;
+    string5               zip5                  ;
+  end;
   
 end;

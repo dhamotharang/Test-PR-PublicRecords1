@@ -49,7 +49,7 @@ function
     // -- get best address and company name that are marketing approved.  
     best_company_name := topn(left.company_name   ((company_name_data_permits    & mktg_bmap) != 0) ,1,-dt_last_seen          )[1];
     best_address      := topn(left.company_address((company_address_data_permits & mktg_bmap) != 0) ,1, company_address_method)[1];
-    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0) ,1, company_phone_method  )[1];
+    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0,Marketing_List.Validate_phone(company_phone) != '') ,1, company_phone_method  )[1];
   
   
     self.seleid              := left.seleid                             ;
@@ -74,7 +74,7 @@ function
     self.fips_county         := best_address.county_fips                ;
     self.county_name         := ''                                      ;//get this below
     self.age_of_company      := ''                                      ;
-    self.business_phone      := best_phone.company_phone                ;
+    self.business_phone      := Marketing_List.Validate_phone(best_phone.company_phone)                ;
     self.business_email      := ''                                      ;//need to get this from the base file
     self.annual_revenue      := 0                                       ;
     self.src_revenue         := ''                                      ;
