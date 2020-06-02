@@ -37,6 +37,7 @@
 			SELF.Loss_cross_street 					:= IF(stringlib.stringtouppercase(TRIM(L.Loss_cross_street,LEFT,RIGHT))='NULL','',L.Loss_cross_street);
 			SELF.vehicle_incident_id_latest	:= 	'';
 			SELF 																		:= 	L;
+			SELF  := [];
 	END; 
 
 	CleanIncidents := PROJECT(Incidents_DE_Suppression,RemoveNulls(LEFT)) :INDEPENDENT;
