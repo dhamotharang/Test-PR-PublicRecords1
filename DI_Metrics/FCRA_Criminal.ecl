@@ -64,19 +64,6 @@ despray_doc_src_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metri
 																				pHostname, 
 																				pTarget +'/tbl_FCRA_DOCOffenses_offenses_bySource_'+ filedate +'.csv'
 																				,,,,true);
-SEQUENTIAL(
-					output(sort(tbl_FCRA_CrimOffender_records, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_records_by_src_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CrimOffender_DIDs_bySource, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_DIDs_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CourtOffenses_records, data_type,state_origin),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_records_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CourtOffenses_offenses_bySource, data_type,state_origin,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_DOCOffenses_records, data_type,orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_records'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_DOCOffenses_offenses_bySource, data_type,orig_state,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_crim_src_tbl
-					,despray_crim_did_tbl
-					,despray_court_tbl
-					,despray_court_src_tbl
-					,despray_doc_tbl
-					,despray_doc_src_tbl);
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
@@ -92,8 +79,8 @@ email_alert := SEQUENTIAL(
 					,despray_court_src_tbl
 					,despray_doc_tbl
 					,despray_doc_src_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Criminal Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Criminal Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Criminal Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Criminal Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 													
 return email_alert;
