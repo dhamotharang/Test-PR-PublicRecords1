@@ -41,8 +41,7 @@ module
 			MBSTableCol.dAll_filenames +
 			MBSColValDesc.dAll_filenames +
 			MBSmarketAppend.dAll_filenames +
-			MbsFdnMasterIDIndTypeInclusion.dAll_filenames +
-			MbsVelocityRules.dAll_filenames;
+			MbsFdnMasterIDIndTypeInclusion.dAll_filenames;
 			
 			
 	end;
