@@ -851,6 +851,7 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                                 EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
                                                 EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
                                                 EXPORT Dataset(easi.layout_census) _easicensus := easi_census;
+                                                EXPORT Dataset(Models.Layout_FraudAttributes) _FDatributes := attributes;
                                               END;
 
                                               custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
