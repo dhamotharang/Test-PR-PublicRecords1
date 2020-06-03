@@ -1,7 +1,7 @@
-
+﻿
 export mac_get_type_h(f_h_did, f_h_acctno, f_h_out, modAccess) := macro
 
-import dx_Gong, doxie, address, progressive_phone, ut, STD;
+import dx_Gong, doxie, address, progressive_phone, ut, STD, suppress;
 
 #uniquename(gong_addr_key)
 %gong_addr_key% := dx_Gong.key_Address_current();
@@ -101,8 +101,14 @@ end;
 %f_nbrs% := TopN(%f_nbrs_ready%, 100, nbr_rank);
 
 #uniquename(by_addr_lname)
-progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs% l,
-                                                               %gong_addr_key% r) := transform
+#uniquename(layout_supp);
+%layout_supp% := record(progressive_phone.layout_progressive_batch_out_with_did)
+                  unsigned4 global_sid;
+                  unsigned8 record_sid;
+                  unsigned6 phone_did;
+                 end;
+
+%layout_supp% %by_addr_lname%(%f_nbrs% l,%gong_addr_key% r) := transform
 	self.acctno := if(r.phone10='', skip, (string20)l.seqtarget);
      self.subj_first := l.fname;
      self.subj_middle := l.mname;
@@ -120,6 +126,7 @@ progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs%
                                        r.listing_type & dx_Gong.Constants.PTYPE.GOVERNMENT  = dx_Gong.Constants.PTYPE.GOVERNMENT => 'G',
                                        '');
 	self.did := l.did;
+	self.phone_did := l.did;
 	self.sort_order_internal := l.nbr_rank;
 	string182 addr := r.prim_range+' '+r.predir+' '+r.prim_name+' '+r.suffix+' '+r.sec_range;
 	cln := address.CleanAddressFieldsFips(address.CleanAddress182(addr,r.z5));
@@ -135,6 +142,8 @@ progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs%
 	self.st := cln.st;
 	self.zip5 := cln.zip;
 	self.sub_rule_number := 81;
+  self.global_sid := r.global_sid;
+  self.record_sid := r.record_sid;
 	self := [];
 end;
 
@@ -161,8 +170,10 @@ end;
 		                         %by_addr_lname%(left, right),limit(ut.limits.PHONE_PER_PERSON, skip));
 
 #uniquename(f_h_nbr_out_dep)
-%f_h_nbr_out_dep% := dedup(sort(%f_h_nbr_out_ready%, acctno, subj_phone10, -subj_date_last, -subj_date_first),
-                       acctno, subj_phone10);
+%f_h_nbr_out_dep% := project(suppress.MAC_FlagSuppressedSource(dedup(sort(%f_h_nbr_out_ready%, acctno, subj_phone10, -subj_date_last, -subj_date_first),
+                       acctno, subj_phone10),modAccess,phone_did), 
+                           transform(progressive_phone.layout_progressive_batch_out_with_did,
+                                     self.subj_phone10 := if(left.is_suppressed,'',left.subj_phone10), self := left));
 
 progressive_phone.mac_get_back_acctno(%f_h_nbr_out_dep%, f_h_acctno, f_h_out)
 

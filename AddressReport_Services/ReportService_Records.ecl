@@ -318,7 +318,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
   Bankruptcies_filtered    :=iesp.transform_bankruptcy(Bankruptcies);
   vehicles_filtered        :=vehicles;
   LiensJudgments_filtered  :=LiensJudgments;
-  Phones                   :=doxie.fn_AppendGongByAddr(gong_input);
+  Phones                   :=doxie.fn_AppendGongByAddr(gong_input,mod_access);
   phones_Filtered          :=project(dedup(phones(not(publish_code = 'N' or omit_phone = 'Y')),phone),
                                     transform (AddressReport_Services.layouts.phone_out_layout, Self.name_first := Left.fname;
                                                Self.name_last := Left.lname; Self := Left));

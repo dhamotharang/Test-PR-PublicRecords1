@@ -1,4 +1,4 @@
-IMPORT $, AutoStandardI, dx_header, Address, doxie_raw, iesp,
+﻿IMPORT $, AutoStandardI, dx_header, Address, doxie_raw, iesp,
        LN_PropertyV2, dx_Gong, Location_Services, VehicleV2_Services, DriversV2_Services, doxie, Suppress;
 
 types := dx_Gong.Constants.PTYPE;
@@ -100,12 +100,12 @@ EXPORT CountService_Records ($.input.params param,
 // Phone
 //*************************************//
 
-    ph_key:=dx_Gong.key_address_current();
+    ph_key:= dx_Gong.key_address_current();
     typeof(ph_key) get_Ph(srchrec l, ph_key R) :=TRANSFORM
       SELF := R;
     END;
 
-    Ph_final := JOIN(srchrec,ph_key,
+    Ph_final_pre_suppression := JOIN(srchrec,ph_key,
                         keyed(left.prim_name = right.prim_name) and
                         keyed(left.st = right.st) and
                         keyed(left.zip = right.z5) and
@@ -114,7 +114,8 @@ EXPORT CountService_Records ($.input.params param,
                         keyed(left.predir = right.predir) and
                         keyed(left.suffix = right.suffix),
                        get_Ph(LEFT,RIGHT),LIMIT(0),keep(10000));
-
+                       
+    Ph_final := suppress.MAC_SuppressSource(Ph_final_pre_suppression,mod_access);
     shared Ph_dedup:=dedup(sort(Ph_final(phone10<>''),phone10),phone10);
     shared Ph_Bus_cnt:=count(Ph_dedup(listing_type & types.BUSINESS    = types.BUSINESS));
     shared Ph_Res_cnt:=count(Ph_dedup(listing_type & types.RESIDENTIAL = types.RESIDENTIAL));
