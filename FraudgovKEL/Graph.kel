@@ -1982,7 +1982,7 @@ Event: => P1_AotIdCurrProfFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 =>
 Event: => P9_AotAddrCurrProfFlag := MAP(T9_AddrPopFlag=0 => -99999,
 																			ALL(AddressEvent,Transaction.T_SrcClassType<2) => -99998,
 																			T_SrcClassType < 2 => -99997,
-																			IdIsLastEventId);
+																			AddrIsLastEventId);
 Event: => P15_AotSsnCurrProfFlag := MAP(T15_SsnPopFlag=0 => -99999,
 																			ALL(SsnEvent.Transaction,T_SrcClassType<2) => -99998,
 																			T_SrcClassType < 2 => -99997,
@@ -3013,7 +3013,7 @@ Event: => IpIsLastEventId := MAP(rInternetProtocol.LastRecordId = RecordId => 1,
 Event: => BnkIsLastEventId := MAP(rBankAccount.LastRecordId = RecordId => 1, 0);
 Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0);
 
-Event: => PersonLabel := TRIM(LastName) + ',' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
+Event: => PersonLabel := TRIM(LastName) + ', ' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
 Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => IpLabel := IpAddress;
