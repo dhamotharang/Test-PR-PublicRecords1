@@ -89,7 +89,7 @@ GetMultCategories(dataset(Layouts.rWCOCategories) restored) := FUNCTION
 END;
 EXPORT CCriteria := FUNCTION
 
-		oldcat0 := (Files.dsMasters);
+		oldcat0 := distribute((Files.dsMasters),Ent_ID);
 		oldcat := DEDUP(SORT(oldcat0, ent_id, EntryCategory, EntrySubcategory, local),
 			Ent_ID, EntryCategory, EntrySubcategory, local);
 		oldpeps := oldcat(EntryCategory='PEP');
@@ -100,7 +100,7 @@ EXPORT CCriteria := FUNCTION
 									self := left), left only, local);
 		oldrestored := oldcat(EntryCategory<>'PEP') + oldjustformer + oldnoformer;
 	
-	newcat0 := (Files.dsWCOCategories);
+	newcat0 := distribute((Files.dsWCOCategories), entityid);
 	newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel, subcategorydesc, -isactivepep, local),
 		entityid, segmenttype, subcategorylabel, subcategorydesc, isactivepep, local);
 	peps := newcat(segmenttype='PEP');
@@ -149,9 +149,9 @@ EXPORT CCriteria := FUNCTION
 
 //Allreasons := sort((GetReasons(infile) & GetMultReasons(restored)), Ent_ID, cmts, local);
 //finalcat := DEDUP(SORT(DISTRIBUTE(SORT(GetCategories(oldcat) + GetMultCategories(restored),id,criteria,Local),id), id, criteria, LOCAL),id, criteria, LOCAL);
-//finalcat := DEDUP(SORT(GetCategories(oldrestored) + GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // Pre IsActivePEP
+finalcat := DEDUP(SORT(GetCategories(oldrestored) + GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // Pre IsActivePEP
 //finalcat := DEDUP(SORT(GetCategories(oldrestored),id,criteria,Local),id, criteria, LOCAL); // This is last run
-finalcat := DEDUP(SORT(GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // This is last run
+//finalcat := DEDUP(SORT(GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // This is last run
 
 Group_3 := ROLLUP(finalcat, mergeValue(LEFT, RIGHT), id, LOCAL);
 return Group_3;

@@ -15,17 +15,17 @@ shared hdg_Pt5b := '<Entity_List Count="';
 shared hdg_Pt6:= '">\r\n';
 
 shared SourceCodetoFilter(string SourceCode) := CASE(SourceCode,
-'WorldCompliance - Adverse Media' => Filters.fAdverseMedia,
-'WorldCompliance - Enforcement' => Filters.fEnforcement,
-'WorldCompliance - Expanded Due Diligence' => Filters.fEdd,
-'WorldCompliance - State Owned Entities' => Filters.fStateOwned,
-'WorldCompliance - Politically Exposed Persons' => Filters.fPep,
-'WorldCompliance - Sanctions and Enforcements' => Filters.fSanctionsAndEnforcement,
-'WorldCompliance - Sanctions' => Filters.fSanctions,
+'WorldCompliance - Adverse Media' => Filters.fFull,
+'WorldCompliance - Enforcement' => Filters.fFull,
+'WorldCompliance - Expanded Due Diligence' => Filters.fFull,
+'WorldCompliance - State Owned Entities' => Filters.fFull,
+'WorldCompliance - Politically Exposed Persons' => Filters.fFull,
+'WorldCompliance - Sanctions and Enforcements' => Filters.fFull,
+'WorldCompliance - Sanctions' => Filters.fFull,
 'WorldCompliance - Full' => Filters.fFull,
 'WorldCompliance - Countries' => [],
-'Belgium Financial Sector Federation' => Filters.fSanctions,
-'WorldCompliance - Registrations' => Filters.fRegistrations,
+'Belgium Financial Sector Federation' => Filters.fFull,
+'WorldCompliance - Registrations' => Filters.fFull,
 []);
 
 shared integer SourceCodetoCountryFilter(string SourceCode) := CASE(SourceCode,
