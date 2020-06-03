@@ -26,7 +26,7 @@ outf fixComp(var_string L) := transform
 end;
 
 a := project(var_string,fixComp(left));
-dd := doxie.fn_AppendGongByAddr(a,secRangeStrict)(returnRestricted OR not(publish_code = 'N' or omit_phone = 'Y'));
+dd := doxie.fn_AppendGongByAddr(a,mod_access,secRangeStrict)(returnRestricted OR not(publish_code = 'N' or omit_phone = 'Y'));
 
 score_rec := record
 	dd;

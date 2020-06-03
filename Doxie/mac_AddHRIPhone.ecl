@@ -1,4 +1,4 @@
-export mac_AddHRIPhone(infile, outfile) := macro
+﻿export mac_AddHRIPhone(infile, outfile) := macro
 import ut,dx_Gong,codes,risk_indicators;
 #uniquename(temp_rec)
 %temp_rec% := record
@@ -110,7 +110,7 @@ end;
 	self.diffnum := Rphone10=''; // this phone not found at that address
 	self := L;
 end;
-
+/* The below join does not need to be suppressed as no data is being taken out of the key */
 #uniquename(outf4)
 %outf4% := join(%outf3%,dx_Gong.key_address_current(), keyed(left.prim_name = right.prim_name) and
 								  keyed(left.st = right.st) and
@@ -131,7 +131,7 @@ end;
 //is it missing from either?
 //should be saying
 //is it missing from both?
-
+/* The below join does not need to be suppressed as no data is being taken out of the key */
 #uniquename(outf5)
 %outf5% := join(%outf4%,dx_Gong.key_address_current(),
 									LEFT.diffnum AND

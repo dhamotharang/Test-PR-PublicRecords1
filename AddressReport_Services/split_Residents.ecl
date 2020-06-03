@@ -1,4 +1,4 @@
-IMPORT doxie, ut, iesp, Suppress, header, DeathV2_Services, dx_death_master, dx_header;
+﻿IMPORT doxie, ut, iesp, Suppress, header, DeathV2_Services, dx_death_master, dx_header;
 
 export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp, 
   DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
@@ -199,7 +199,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     self := l;
   end;
   a := project(Prior_res_dedup,fixComp(left));
-  cur_phones := doxie.fn_AppendGongByAddr(a(prim_name<>'', prim_range<>'', st<>''),true)(not(publish_code = 'N' or omit_phone = 'Y'));   
+  cur_phones := doxie.fn_AppendGongByAddr(a(prim_name<>'', prim_range<>'', st<>''),mod_access,true)(not(publish_code = 'N' or omit_phone = 'Y'));   
   
   AddressReport_Services.layouts.residents_final_out add_phones(Prior_res_dedup L, cur_phones R):=transform
     self.CurrentPhone := project(r, transform(iesp.addressreport.t_AddrReportRealTimePhone,
