@@ -1,17 +1,17 @@
 /*--SOAP--
 <message name="ReportService">
-  <part name="Addr" 							 type="xsd:string"/>
-  <part name="City" 							 type="xsd:string"/>
-  <part name="State"							 type="xsd:string"/>
-  <part name="Zip"								 type="xsd:string"/>
+  <part name="Addr" type="xsd:string"/>
+  <part name="City" type="xsd:string"/>
+  <part name="State" type="xsd:string"/>
+  <part name="Zip" type="xsd:string"/>
   <separator />
   <part name="DID" type="xsd:string" required="1" />
-	<separator />
-	<part name="AddressfeedbackReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
+  <separator />
+  <part name="AddressfeedbackReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
 */
 /*--INFO-- This service returns address feedback information.*/
-/*--HELP-- 
+/*--HELP--
 <pre>
 &lt;AddressfeedbackReportRequest&gt;
   &lt;Row&gt;
@@ -47,16 +47,16 @@ export ReportService := macro
 //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_AddrFeedback_ReportService();
 
-	ds_in := dataset([], iesp.addressfeedback.t_AddressFeedbackReportRequest) : stored('AddressfeedbackReportRequest', FEW);
-	first_row := global(ds_in[1]) : independent;
-	iesp.ECL2ESP.SetInputBaseRequest(first_row);
-	AddressFeedback_Services.IParam.SetInputReportBy(first_row.reportBy);	
-	
-	in_mod 	:= AddressFeedback_Services.IParam.getReportModule(first_row.ReportBy);
-	recs 		:= AddressFeedback_Services.Records(in_mod);		
-	results := AddressFeedback_Services.Functions.formatReport(recs);		
-								
-	output(results, named('Results'));
+  ds_in := dataset([], iesp.addressfeedback.t_AddressFeedbackReportRequest) : stored('AddressfeedbackReportRequest', FEW);
+  first_row := global(ds_in[1]) : independent;
+  iesp.ECL2ESP.SetInputBaseRequest(first_row);
+  AddressFeedback_Services.IParam.SetInputReportBy(first_row.reportBy);
+  
+  in_mod := AddressFeedback_Services.IParam.getReportModule(first_row.ReportBy);
+  recs := AddressFeedback_Services.Records(in_mod);
+  results := AddressFeedback_Services.Functions.formatReport(recs);
+                
+  output(results, named('Results'));
 
 
 endmacro;
