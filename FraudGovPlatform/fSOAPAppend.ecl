@@ -1022,7 +1022,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
 											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
 	 
-	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , Base_Map);
+	 Export All := dedup(Base_Map,all);
    END;
 
 END;
