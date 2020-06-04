@@ -1,7 +1,7 @@
 ﻿import _Control, BuildLogger, PromoteSupers, RoxieKeybuild, Scrubs_IP_Metadata, Std, Orbit3;
 
-EXPORT Proc_Build_IP_Metadata_ipv6(string version ='20200601c'
-	//, const varstring eclsourceip, string srcdir = '/data/data_999/phones/ip_metadata/build/', string suffixF = 'ip_metadata_header.csv'
+EXPORT Proc_Build_IP_Metadata_ipv6(string version ='20200519'
+	, const varstring eclsourceip = '10.121.149.192', string srcdir = '/data/Builds/builds/ip_metadata/data/processing/', string suffixF = 'ip_metadata_header.csv'
 		):= function
 
 	#workunit('name', 'IP Metadata Build IPv6 - ' + version);
@@ -10,7 +10,7 @@ EXPORT Proc_Build_IP_Metadata_ipv6(string version ='20200601c'
 	//Spray IP_Metadata Files to Thor////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		//sprayRaw 				:= IP_Metadata.Spray_IP_Metadata(version, eclsourceip, srcdir, suffixF);
+		sprayRaw 				:= IP_Metadata.Spray_IP_Metadata_ipv6(version, eclsourceip, srcdir, suffixF);
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build/Move IP_Metadata Base////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,12 +62,12 @@ EXPORT Proc_Build_IP_Metadata_ipv6(string version ='20200601c'
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 			:= RoxieKeybuild.updateversion('IP_MetadataKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N');
+		dopsUpdate 			:= RoxieKeybuild.updateversion('IP_MetadataKeys_IPV6', version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', , 'N');
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Orbit Update ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'); 
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata_IPV6',version,'N'); 
 
 	
 	
@@ -83,8 +83,8 @@ orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'
 	//Build Scrubs Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 																						
-		scrubsRuns		:= sequential(Scrubs_IP_Metadata.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com'), 
-																Scrubs_IP_Metadata.BaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com')
+		scrubsRuns		:= sequential(Scrubs_IP_Metadata.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com'), 
+																Scrubs_IP_Metadata.BaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com')
 																);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,24 +92,25 @@ orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		sendEmail			:=  sequential(
-			//BuildLogger.BuildStart(false),
-			//																										BuildLogger.PrepStart(false), 
-			//																										sprayRaw, 
-			//																										BuildLogger.PrepEnd(false),
-			//																										BuildLogger.BaseStart(False), 
-																													bldBase, 
-			//																										BuildLogger.BaseEnd(False),
-																													clrDelete, mvBase, ccatRawHistory, mvRawHistory,
-			//																										BuildLogger.KeyStart(false), 
-																													bldIPMetadata, mvBldIPMetadata, mvQAIPMetadata //, 
-			//																										BuildLogger.KeyEnd(false),
-			//																										BuildLogger.PostStart(False),
-			//																										dopsUpdate, orbit_update, buildStrata, scrubsRuns, 
-			//																										BuildLogger.PostEnd(False), 
-			//																										BuildLogger.BuildEnd(false)):
-			//																										Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
-			//																										Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
-			);					
+																				BuildLogger.BuildStart(false),
+																				BuildLogger.PrepStart(false), 
+																				sprayRaw, 
+																				BuildLogger.PrepEnd(false),
+																				BuildLogger.BaseStart(False), 
+																				bldBase, 
+																				BuildLogger.BaseEnd(False),
+																				clrDelete, mvBase, ccatRawHistory, mvRawHistory,
+																				BuildLogger.KeyStart(false), 
+																				bldIPMetadata, mvBldIPMetadata, mvQAIPMetadata, 
+																				BuildLogger.KeyEnd(false),
+																				BuildLogger.PostStart(False),
+																				dopsUpdate, orbit_update, 
+																				//buildStrata, scrubsRuns, 
+																				BuildLogger.PostEnd(False), 
+																				BuildLogger.BuildEnd(false)):
+																										Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
+																										Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
+		);					
 																												
 	return sendEmail;
 

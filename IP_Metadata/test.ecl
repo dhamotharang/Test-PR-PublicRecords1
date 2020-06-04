@@ -72,4 +72,4 @@ IP_Metadata.Layout_IP_Metadata.base_ipv6 trFile(inFile L):= transform
 	end;
 
 	cleanRec		:= project(inFile, trFile(left));
-output(cleanrec);
+output(IP_Metadata.File_IP_Metadata.Raw_ipv6);

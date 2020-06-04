@@ -9,7 +9,7 @@ EXPORT Map_IP_Metadata_ipv6(string8 version) := function
 	//Cleanup Fields////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	inFile :=  dataset($.File_IP_Metadata.raw_path_ipv6, IP_metadata.Layout_IP_Metadata.Raw_ipv6, flat);//IP_Metadata.File_IP_Metadata.History_ipv6;
+	inFile :=  IP_Metadata.File_IP_Metadata.Raw_ipv6;
 
 	IP_Metadata.Layout_IP_Metadata.base_ipv6 trFile(inFile L):= transform
 		self.dt_first_seen						:= version;
@@ -98,8 +98,8 @@ EXPORT Map_IP_Metadata_ipv6(string8 version) := function
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		srtNewRec				:= sort(distribute(concatExpRecs, hash(ip_rng_beg_full, ip_rng_end_full)), ip_rng_beg_full, ip_rng_end_full, -dt_last_seen, local);
-		srtOldRec				:= dataset( [],IP_Metadata.Layout_IP_Metadata.base_ipv6);
-									//sort(distribute(IP_Metadata.File_IP_Metadata.Base_ipv6, hash(ip_rng_beg_full, ip_rng_end_full)), ip_rng_beg_full, ip_rng_end_full, -dt_last_seen, local); 
+		srtOldRec				:= //dataset( [],IP_Metadata.Layout_IP_Metadata.base_ipv6);
+									sort(distribute(IP_Metadata.File_IP_Metadata.Base_ipv6, hash(ip_rng_beg_full, ip_rng_end_full)), ip_rng_beg_full, ip_rng_end_full, -dt_last_seen, local); 
 		//Flag existing and new records as "current"	
 		Layout_IP_Metadata.Base_ipv6 compActF(srtNewRec l, srtOldRec r):= transform
 			self.dt_first_seen:= (string)(ut.min2((unsigned)l.dt_first_seen, (unsigned)r.dt_first_seen));
@@ -114,6 +114,8 @@ EXPORT Map_IP_Metadata_ipv6(string8 version) := function
 												//left.ip_rng_end = right.ip_rng_end and 
 												left.ip_rng_beg_full = right.ip_rng_beg_full and
 												left.ip_rng_end_full = right.ip_rng_end_full and 
+												left.ip_rng_beg_full6_39 = right.ip_rng_beg_full6_39 and
+												left.ip_rng_end_full6_39 = right.ip_rng_end_full6_39 and
 												left.edge_country = right.edge_country and 
 												left.edge_region = right.edge_region and 
 												left.edge_city = right.edge_city and 
