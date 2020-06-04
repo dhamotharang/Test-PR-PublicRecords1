@@ -66,8 +66,8 @@ EXPORT WorkunitTimingDetails(string esp
 		dGetWUList := GetWUList();
 		// DUS-519
 		rWUTimingDetails xConvertToLocalLayout(dGetWUList l) := transform
-			s_time := STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Created' and application = '')[1].time;
-			e_time := STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = '')[1].time;
+			s_time := min(STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Created' and application = ''),time);
+			e_time := max(STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = ''),time);
 			startseconds := if (s_time <> '',STD.Date.SecondsFromParts((integer)s_time[1..4]
 																												,(integer)s_time[6..7]
 																												,(integer)s_time[9..10]
@@ -105,7 +105,7 @@ EXPORT WorkunitTimingDetails(string esp
 			self := l;
 		end;
 		
-		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left));
+		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left)) : independent;
 		
 		rWUTimingDetails xGetDFUWUIDs(dWUTimingDetails l,lib_workunitservices.WsStatistic r) := transform
 			getcount := STD.Str.CountWords(r.scope,'-');
@@ -114,7 +114,9 @@ EXPORT WorkunitTimingDetails(string esp
 			self := l;
 		end;
 		
-		dGetDFUWUIDs := dedup(sort(normalize(dWUTimingDetails,left.dfuids,xGetDFUWUIDs(left,right)),wuid), record);
+		dGetDFUWUIDs_temp := dedup(sort(normalize(dWUTimingDetails(count(dfuids) > 0),left.dfuids,xGetDFUWUIDs(left,right)),wuid), record);
+		dGetDFUWUIDs := dGetDFUWUIDs_temp + dWUTimingDetails(count(dfuids) = 0);
+		// dGetDFUWUIDs := normalize(dWUTimingDetails,left.dfuids,xGetDFUWUIDs(left,right));
 		
 		rDataVizInfo xCaptureTimings(dGetDFUWUIDs l,integer c) := transform
 			
