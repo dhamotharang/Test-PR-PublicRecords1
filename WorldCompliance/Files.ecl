@@ -185,7 +185,7 @@ export srcGlobalStateOwned 				:= dedup(dsMasters(EntryCategory in Filters.fStat
 export srcPep 										:= dedup(dsMasters(EntryCategory in Filters.fPep),Ent_ID,ALL);
 export srcSanctionsAndEnforcement := dedup(dsMasters(EntryCategory in Filters.fSanctionsAndEnforcement),Ent_ID,ALL);
 export srcSanctions 							:= dedup(dsMasters(EntryCategory in Filters.fSanctions),Ent_ID,ALL);
-export srcFull 										:= dsMaster_base(EntryCategory in Filters.fFull);
+export srcFull 										:= dsMasters_base(EntryCategory in Filters.fFull);
 export srcRegistrations := dedup(project(dsMasters(EntryCategory in Filters.fRegistrations),
 															transform(Layouts.rEntity, self.EntryCategory := if(left.EntryCategory = 'High Risk', 'Registrations', left.EntryCategory); self := left;)),Ent_ID,ALL);
 				

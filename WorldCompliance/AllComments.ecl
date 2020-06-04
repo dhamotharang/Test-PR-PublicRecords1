@@ -26,8 +26,8 @@ END;
    			self					:= L;
    	END;
 			
-   	//return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
-		return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+   	return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+		//return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
 	END;
 
 	GetPosition(dataset(Layouts.rEntity) src) := PROJECT(src, TRANSFORM(rComments, 
@@ -162,7 +162,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 									self := left), left only, local);
 		oldrestored := oldcat(EntryCategory<>'PEP') + oldjustformer + oldnoformer;
 
-			newcat0 := Files.dsWCOCategories;
+			newcat0 := Distribute((Files.dsWCOCategories),entityid);
 			newcat := DEDUP(SORT(newcat0, entityid, segmenttype, subcategorylabel,subcategorydesc, -isactivepep, local),
 														entityid, segmenttype, subcategorylabel,subcategorydesc, isactivepep,local);
 
