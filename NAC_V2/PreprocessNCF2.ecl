@@ -21,7 +21,7 @@ GetCases(string ilfn) := PROJECT(
 			));
 
 GetClients(string ilfn) := PROJECT(
-		SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId)),
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId,CaseId)),
 					ClientId, CaseId, Eligibility, filename, seqnum, LOCAL),
 				//	ClientId, CaseId, Eligibility, filename, LOCAL),
 				TRANSFORM($.Layouts2.rClientEx,
