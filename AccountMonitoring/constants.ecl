@@ -5,10 +5,14 @@ EXPORT constants := MODULE
 	EXPORT STRING SPRAY_GROUPNAME  := STD.System.Thorlib.Group();
 	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20','thor400_44','thor400_198_a','thor400_198_eclcc'],
 																			 '~', 							// thor400_30 and thor400_20
+																			 // '~'); //(monitor testing) 
 																			 Data_Services.foreign_prod); 	// thorwatch and thor_10_219 
 	//EXPORT STRING FILENAME_CLUSTER := '~' + SPRAY_GROUPNAME  + '::';
 	EXPORT STRING FILENAME_CLUSTER := '~' + IF(SPRAY_GROUPNAME in ['thor_10_219'], SPRAY_GROUPNAME, 'batchr3') + '::';	
-	
+  
+	// Created so that QA runs can point to prod version of monitor keys without impacting existing utilities.
+	EXPORT STRING MONITOR_KEY_CLUSTER := DATA_LOCATION + 'batchr3::';	
+
 	// Candidate record disposition.
 	EXPORT UNSIGNED1 UNCHANGED  := 1;
 	EXPORT UNSIGNED1 NEW        := 2;
