@@ -21,10 +21,15 @@
   ,pForceRun          = 'false'                                       // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                                       // if true, then it will skip all failures and continue with the next iteration.  FALSE will ask if you want to rerun, skip or fail.
   ,pCleanupSuper      = 'false'                                       // if true, then it will cleanup the superfile for all subfiles except ones that contain this version(pversion above)
-  ,pDebugValues       = 'dataset([],WsWorkunits.Layouts.DebugValues)' // for the spawning of the wuids.  can use other repositories using this.
+  ,pDebugValues       = '\'dataset([],WsWorkunits.Layouts.DebugValues)\'' // for the spawning of the wuids.  can use other repositories/branches that have been pushed to your origin in gitlab.  It is a string because that helps with specifying only selective named parameters
+                                                                          // Ex for boca publicrecords: pDebugValues := 'dataset([{\'Boca-branch\',\'LBP-183\'},{\'Boca-URL\',\'https://gitlab.ins.risk.regn.net/BentleLA/PublicRecords.git\'}],WsWorkunits.Layouts.DebugValues)'
+                                                                          // DO NOT USE #TEXT() around the code because it causes weird issues with the parameter order, just pass this parameter in as a string and backslash any embedded quotes.  embed the actual dataset definition,
+                                                                          // DO NOT assign the dataset definition to a value type, then assign this parameter to that value type because this is going to get used in spawned wuids which will not know what that value type is.
   ,pDont_Wait         = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will just submit the childrunner.  doesn't work if pECL is a dataset.
   ,pParallel          = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will submit the childrunner and also compile set results with the previous call
   ,pCompileOnly       = 'false'                                       // if false, will run the build as normal.  true = it will compile the wuid.  this also means it will only compile one iteration of it.  it will not save the workman files either.  this is mainly for testing.
+  ,pAutoResubmit      = 'false'                                       // if true, then it will automatically resubmit the wuid upon failure.  FALSE it will not(the default).  This only works for runtime failures.  If it fails to compile, it will not autoreubmit.
+                                                                      // this is because fixing a compile time failure requires manual intervention, and we don't want to be constantly resubmitting code with syntax errors.
 
 ) :=
 functionmacro
@@ -32,30 +37,31 @@ functionmacro
   #IF(count(pECL) = 1)
     return_result := 
     WorkMan.mac_Work(
-       pECL
-      ,pversion            
-      ,pcluster            
-      ,pStartIteration     
-      ,pNumMaxIterations   
-      ,pNumMinIterations   
-      ,pOutputFilename     
-      ,pOutputSuperfile    
-      ,pSetResults         
-      ,pStopCondition      
-      ,pSetNameCalculations
-      ,pBuildName       
-      ,pESP             
-      ,pNotifyEmails    
-      ,pFailureEmails    
-      ,pShouldEmail     
-      ,pPollingFrequency
-      ,pForceRun        
-      ,pForceSkip       
-      ,pCleanupSuper    
-      ,pDebugValues     
-      ,pDont_Wait 
-      ,pParallel
-      ,pCompileOnly
+       pECL                        
+      ,pversion                    
+      ,pcluster                    
+      ,pStartIteration             
+      ,pNumMaxIterations           
+      ,pNumMinIterations           
+      ,pOutputFilename             
+      ,pOutputSuperfile            
+      ,pSetResults                 
+      ,pStopCondition              
+      ,pSetNameCalculations     
+      ,pBuildName               
+      ,pESP                     
+      ,pNotifyEmails            
+      ,pFailureEmails           
+      ,pShouldEmail             
+      ,pPollingFrequency        
+      ,pForceRun                
+      ,pForceSkip               
+      ,pCleanupSuper            
+      ,pDebugValues             
+      ,pDont_Wait               
+      ,pParallel                
+      ,pCompileOnly             
+      ,pAutoResubmit
     );
   #ELSE
     //first thing is to generate the code for each call to WorkMan.mac_Work in a transform
@@ -116,7 +122,7 @@ functionmacro
       + '  ,' + if(left.forcerun  = true or pForceRun  = true,'true'           ,'false'           ) + '\n'
       + '  ,' + if(left.forceskip = true or pForceSkip = true,'true'           ,'false'           ) + '\n'
       + '  ,' + if(pCleanupSuper = true, 'true','false') + '\n'
-      + '  ,' + #TEXT(pDebugValues) + '\n'
+      + '  ,' + pDebugValues + '\n'
       + '  ,false\n'
       + '  ,false\n'
       + '  ,' + if(left.compile_only = true or pCompileOnly = true,'true'           ,'false'           ) + '\n'
@@ -126,7 +132,7 @@ functionmacro
   ));
 
   ds_return := project(ds_prep,transform(recordof(left),
-    self.wuid        := WorkMan.CreateWuid_Raw(left.ecl_query,WorkMan._Config.Esp2Hthor(left.esp),left.esp,,pDebugValues);
+    self.wuid        := WorkMan.CreateWuid_Raw(left.ecl_query,WorkMan._Config.Esp2Hthor(left.esp),left.esp,,#EXPAND(pDebugValues));
     self             := left
   )) : independent;
   
@@ -200,6 +206,17 @@ WorkMan.mac_Workman_Test(
     );
   #END
 */
+// parallel(
+      // output(dataset([
+      // {'pECL'     ,pECL}
+     // ,{'pcluster' ,pcluster}
+     // ,{'pESP    ' ,pESP    }
+     // ,{'pNotifyEmails    ' ,pNotifyEmails    }
+     
+    // ],{string stat,string statvalue}) ,named('Workman_mac_Workman'))
+    // ,output(pDebugValues  ,named('Workman_mac_Workman_Debugvalues'))
+    // );
+
   return return_result;
 
 endmacro;

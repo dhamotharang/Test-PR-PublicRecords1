@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_VERSION := 'V3.11.9';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -88,7 +88,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:cart:LIKE(Invalid_Char):TYPE(STRING4):0,0\n'
     + 'FIELD:cr_sort_sz:LIKE(Invalid_Char):TYPE(STRING1):0,0\n'
     + 'FIELD:lot:LIKE(Invalid_Num):TYPE(STRING4):0,0\n'
-    + 'FIELD:lot_order:LIKE(Invalid_Num):TYPE(STRING1):0,0\n'
+    + 'FIELD:lot_order:TYPE(STRING1):0,0\n'
     + 'FIELD:dbpc:LIKE(Invalid_Num):TYPE(STRING2):0,0\n'
     + 'FIELD:chk_digit:LIKE(Invalid_Num):TYPE(STRING1):0,0\n'
     + 'FIELD:rec_type:LIKE(Invalid_RecType):TYPE(STRING2):0,0\n'

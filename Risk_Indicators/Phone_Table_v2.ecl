@@ -1,4 +1,4 @@
-import business_header,header,gong_Neustar,fcra, ut;
+﻿import business_header,header,gong_Neustar,fcra, ut;
 
 EXPORT Phone_Table_v2 (boolean isFCRA = false, boolean gongFilter=false) := FUNCTION
 
@@ -26,6 +26,10 @@ rec := RECORD
 	STRING2 	nxx_type := '';
 	integer did_ct;
 	integer did_ct_c6;	
+	//CCPA-22 add did/global_sid/record_sid
+	UNSIGNED6 did := 0;
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 
@@ -113,6 +117,7 @@ with_busflag := join (with_cotype,bheader,
 
 // any High risk business
 hribphones := hri_business_phones (IsFCRA);
+
 
 rec check_hri(rec le, hribphones ri) := TRANSFORM
 	SELF.sic_code := ri.sic_code;

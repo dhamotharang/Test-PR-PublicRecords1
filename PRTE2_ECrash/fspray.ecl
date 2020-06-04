@@ -1,7 +1,7 @@
-IMPORT prte2;
+﻿IMPORT prte2;
 
 EXPORT fSpray := FUNCTION
 
-return prte2.SprayFiles.Spray_Raw_Data('EcrashV2', '', 'ecrashv2');
+return prte2.SprayFiles.Spray_Raw_Data('ecrashv2', '', 'ecrashv2');
 
 END;

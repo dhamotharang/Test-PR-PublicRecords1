@@ -1,4 +1,4 @@
-IMPORT ut, doxie_build, header_quick, header, mdr, STD;
+﻿IMPORT ut, doxie_build, header_quick, header, mdr, STD;
 
 today := risk_indicators.iid_constants.todaydate DIV 100;
 isFCRA := false;  // currently only need to build this for non-fcra for fraud
@@ -7,7 +7,9 @@ hf1 := doxie_build.file_header_building(did!=0 AND ~iid_constants.filtered_sourc
 h_quick := PROJECT( header_quick.file_header_quick(did!=0 AND ~iid_constants.filtered_source(src, st)), TRANSFORM(Header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), SELF := LEFT));
 headerprod_building := UNGROUP(hf1 + h_quick);
 
-base_hf := DISTRIBUTE(PROJECT(headerprod_building(dt_last_seen<>0),TRANSFORM(Header.Layout_Header, SELF := LEFT)), HASH(did));
+base_hf_before_suppress := DISTRIBUTE(PROJECT(headerprod_building(dt_last_seen<>0),TRANSFORM(Header.Layout_Header, SELF := LEFT)), HASH(did));
+
+base_hf := fn_suppress_ccpa(base_hf_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
 
 did_slim := RECORD
 	base_hf.did;
@@ -55,9 +57,16 @@ suspicious_ssns := join(
 dids_with_suspicious_ssns := dedup(sort(distribute(suspicious_ssns, hash(did)), did, ssn, local), did, local);
 
 // atmost 1 record per DID in suspicious_header and 1 per DID in dids_with_suspicious_ssns
+layout_suspicious_id := RECORD
+	risk_indicators.Boca_Shell_Fraud.layout_identities_output - historydate;
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
+END;
+
 suspicious_identities := join(suspicious_header,dids_with_suspicious_ssns, left.did=right.did,
 	transform(
-		risk_indicators.Boca_Shell_Fraud.layout_identities_output - historydate, 
+		layout_suspicious_id, 
 		// don't need the date on the key, we'll be able to see the date in the logical file name
 		// risk_indicators.Boca_Shell_Fraud.layout_identities_output, 
 		// self.historydate := today;
@@ -75,4 +84,6 @@ suspicious_identities := join(suspicious_header,dids_with_suspicious_ssns, left.
 		// ), full outer, local) : persist('persist::suspicious_identities');
 // output(suspicious_ssns,,'~dvstemp::out::suspicious_ssns_testing');
 
-EXPORT Suspicious_Identities_Base := suspicious_identities;
+	addGlobalSID := mdr.macGetGlobalSID(suspicious_identities,'RiskTable_Virtual','','global_sid'); //DF-26530: Populate Global_SID Field
+
+EXPORT Suspicious_Identities_Base := addGlobalSID;

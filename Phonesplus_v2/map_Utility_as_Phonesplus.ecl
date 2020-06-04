@@ -1,9 +1,9 @@
-import Gong, ut, _validate, Mdr,phonesplus_v2,UtilFile, header;
-phone_file := UtilFile.file_util.full_did_for_index((phone<>'' or work_phone<>'') and ~header.IsOldUtil(ut.GetDate, false, record_date));
+﻿import Gong, ut, _validate, Mdr,phonesplus_v2,UtilFile, header, std;
+phone_file := UtilFile.file_util.full_did_for_index((phone<>'' or work_phone<>'') and ~header.IsOldUtil((STRING8)Std.Date.Today(), false, record_date));
 
 unsigned3 add4(unsigned3 dt) := if ((dt+4) % 100 > 12, dt + 104 - 12, dt+4);
 
-unsigned3 todaydate := (unsigned3)((integer)ut.GetDate div 100);
+unsigned3 todaydate := (unsigned3)((integer)(STRING8)Std.Date.Today() div 100);
 
 // will be used to adjust date last seens -- if d_first_seen+4 < today, use dfs+4, else today
 // not defining a condition to handle an incoming value of 0 would return a value of 4
@@ -41,7 +41,7 @@ util_noID := dedup(util_dis, all,local);
 //map to a common layout
 phonesplus_v2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(util_noID input) := Transform
 
-	boolean future_dt 				:= input.date_first_seen>ut.getdate;
+	boolean future_dt 				:= input.date_first_seen>(STRING8)Std.Date.Today();
 
 	self.DateFirstSeen := if(future_dt,0,(integer)input.date_first_seen div 100);
     self.DateLastSeen := lesser((integer)self.DateFirstSeen);
@@ -75,6 +75,8 @@ phonesplus_v2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(util_noI
 	self.addr_suffix				:= input.address_street_Type;
 	self.ace_fips_county			:= input.county;
 	self.did						:= (unsigned)input.did;
+	self.source					:= input.src; //DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784	
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

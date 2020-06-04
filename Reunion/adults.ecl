@@ -1,4 +1,4 @@
-IMPORT header,ut,driversv2,american_student_list,watchdog;
+IMPORT header,ut,driversv2,american_student_list,watchdog,infutor;
 
 INTEGER iTodayInMonths:=header.ConvertYYYYMMToNumberOfMonths((INTEGER)ut.GetDate);
 
@@ -34,7 +34,7 @@ END;
 dMinorFlagsBestNonGLB:=PROJECT(watchdog.file_best_nonglb,tFlagBestNonGLB(LEFT));
 
 dMinorFlags:=DEDUP(SORT(DISTRIBUTE(dMinorFlagsBest+dMinorFlagsBestNonGLB,HASH(did)),did,LOCAL),RECORD,ALL,LOCAL);
- 
+
 lMinorFlags tRoll(lMinorFlags L, lMinorFlags R):=TRANSFORM
   SELF.wdog_glb_under_18:=if(L.wdog_glb_under_18='Y',L.wdog_glb_under_18,R.wdog_glb_under_18);
   SELF.wdog_glb_over_18:=if(L.wdog_glb_over_18='Y',L.wdog_glb_over_18,R.wdog_glb_over_18);
@@ -46,7 +46,9 @@ dMinorFlagsRolled:=ROLLUP(dMinorFlags,LEFT.did=RIGHT.did,tRoll(LEFT,RIGHT),LOCAL
 
 //drop minors
 dNoMinors:=dMinorFlagsRolled(~(wdog_glb_under_18='Y' OR wdog_nonglb_under_18='Y'));
+
 //keep adults
 dAdults:=dNoMinors(wdog_glb_over_18='Y' OR wdog_nonglb_over_18='Y');
 
-EXPORT adults:=dAdults:PERSIST('~thor::persist::mylife::adults_wdog_only');
+
+EXPORT adults:=dAdults : PERSIST('~thor::persist::mylife::adults_wdog_only', EXPIRE(10), REFRESH(FALSE));

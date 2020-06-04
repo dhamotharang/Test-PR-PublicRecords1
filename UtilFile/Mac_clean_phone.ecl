@@ -1,8 +1,9 @@
-IMPORT yellowpages, ut, Cellphone;
+﻿IMPORT yellowpages, ut, Cellphone;
 
 EXPORT Mac_clean_phone(infile, outfile) := macro
+import data_services;
 
-file_phonetype := dataset('~thor_data400::base::utility_phonetype',utilfile.layout_phonetype, flat);
+file_phonetype := dataset(data_services.data_location.prefix('Utility') + 'thor_data400::base::utility_phonetype',utilfile.layout_phonetype, flat);
 file_invalid_phonetype := file_phonetype(phonetype = 'INVALID-NPA/NXX/TB');
 
 infile tjoin_phone(infile le, file_invalid_phonetype ri) := transform

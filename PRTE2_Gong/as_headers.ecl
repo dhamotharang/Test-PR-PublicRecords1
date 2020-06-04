@@ -1,4 +1,4 @@
-import header, mdr,gong_build,ut,Business_Header,_validate, gong_v2, gong;
+﻿import header, mdr,gong_build,ut,Business_Header,_validate, gong_v2, gong;
 
 EXPORT as_headers := module
 
@@ -34,7 +34,7 @@ EXPORT as_headers := module
   end;
 
 	export person_header_gong_recs := project(files.file_Gong_History(did>0),map_to_person_header(left));
-
+/*
 	export fGong_As_Business_Header := function
 		return Gong.fGong_As_Business_Header(Files.File_History_Full_Prepped_for_Keys(bdid!=0));
 	end;
@@ -91,6 +91,6 @@ EXPORT as_headers := module
 	export As_Business_Linking := function
 		return Gong_v2.As_Business_Linking(Files.File_History_Full_Prepped_for_Keys, true);											
 	end;	
-
+*/
 
 END;

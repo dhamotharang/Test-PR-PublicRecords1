@@ -94,7 +94,9 @@ functionmacro
   #uniquename(CURRENT_RESULT              )
   #uniquename(PARSED_RESULT               )
   #uniquename(OUTPUT_NAME_RAW             )
+  #uniquename(OUTPUT_NAME_OUT             )
   #uniquename(OUTPUT_NAME                 )
+  #uniquename(OUTPUT_NAME_                )
   #uniquename(OUTPUT_NAME_LEN             )
   #uniquename(OUTPUT_NAME_TABS            )
   #uniquename(OUTPUT_RESULT               )
@@ -108,10 +110,13 @@ functionmacro
   #uniquename(COUNT_SET_NAME_CALCULATIONS )
   #uniquename(STOP_CONDITION_POP_OUTPUTS  )
   
+  #uniquename(CODE_GET_LOCAL              )
+
   #SET(FILLER_TABS    ,'\t\t\t\t')
   #SET (CODE_PREPEND  ,'MODULE\n\n' )
 
   #SET(STOP_CONDITION_POP_OUTPUTS ,'')
+  #SET(CODE_GET_LOCAL     ,''         )
   #SET(CODE_BODY1     ,''         )
   #SET(CODE_BODY2     ,''         )
   #SET(EMAIL_OUTPUTS  ,'  export email_outputs := \n'         )
@@ -122,7 +127,8 @@ functionmacro
     #APPEND(OUTPUT_RESULTS ,'    ,output(\'------------------------------------------------------------------------------\',named(\'_____________________\'),overwrite)\n'        )
     #SET   (DS_RESULTS ,'  export ds_results := dataset([\n'         )
   #ELSE
-    #SET(OUTPUT_RESULTS ,'  export output_results := parallel(STD.System.Debug.Sleep(1));\n'         )
+    #SET   (OUTPUT_RESULTS ,'  export output_results := parallel(\n'  )
+    #APPEND(OUTPUT_RESULTS ,'     STD.System.Debug.Sleep(1)\n'        )
     #SET   (DS_RESULTS ,'  export ds_results := dataset([],WorkMan.Layouts.lay_results);\n'         )
 
   #END
@@ -133,12 +139,15 @@ functionmacro
     // #SET    (CODE_APPEND    ,'\n  export stopcondition := if(trim(pwuid) not in [\'\',\'[undefined]\']  ,' + %'STOP_CONDITION'% + ' ,false);\n\n')
     #SET    (CODE_APPEND    ,'\n  export stopcondition := if(trim(pwuid) not in [\'\',\'[undefined]\']  ')//,' + %'STOP_CONDITION'% + ' ,false);\n\n')
 
+    #SET    (CODE_GET_LOCAL    ,'\n  export stopcondition_ := if(trim(workman.get_Scalar_Result(workunit,\'StopCondition\',WorkMan    .    _config    .    LocalEsp)) = \'true\' ,true ,false);\n ')
+
     #SET(GET_BOOLEANS ,regexreplace('([[:alnum:]_]+)[[:space:]]*(!=|<>|=)[[:space:]]*(true|false)'  ,%'STOP_CONDITION'%   ,'$1,' ,nocase))
     #SET(GET_BOOLEANS ,regexreplace('(true|false)[[:space:]]*(!=|<>|=)[[:space:]]*([[:alnum:]_]+)'  ,%'GET_BOOLEANS'%     ,'$3,' ,nocase))
     #SET(GET_BOOLEANS ,regexreplace('.*?([[:alnum:]_]+,)'                                           ,%'GET_BOOLEANS'%     ,'$1,' ,nocase))
     #SET(GET_BOOLEANS ,',' + %'GET_BOOLEANS'%)
   #ELSE
     #SET    (CODE_APPEND    ,'\n  export stopcondition := false;\n\n')
+    #SET    (CODE_GET_LOCAL ,'\n  export stopcondition_ := false;\n\n')  
   #END
 
   #LOOP
@@ -162,6 +171,8 @@ functionmacro
  
     #SET(OUTPUT_NAME      ,std.str.extract(%'PARSED_RESULT'%,1) )
     #SET(OUTPUT_NAME_RAW  ,%'OUTPUT_NAME'% + '_raw' )
+    #SET(OUTPUT_NAME_OUT  ,%'OUTPUT_NAME'% + '_out' )
+    #SET(OUTPUT_NAME_     ,%'OUTPUT_NAME'% + '_' )
  
     #IF(trim(pStopCondition) != '')
       #IF(regexfind(',' + trim(%'OUTPUT_NAME'%) + ',',%'GET_BOOLEANS'%,nocase))
@@ -178,6 +189,11 @@ functionmacro
  
     #APPEND(CODE_BODY1 ,'  export ' + %'OUTPUT_NAME_RAW'% + ' := WorkMan.get_Result(pWuid,\'' + trim(pSetResults[%CNTR%]) + '\',' + #TEXT(pEsp) + ',50);\n')
     #APPEND(CODE_BODY2 ,'  export ' + %'OUTPUT_NAME'%     + ' := ' + %'OUTPUT_TYPE'% + %'OUTPUT_NAME_RAW'% + ';\n')
+
+
+    #APPEND(CODE_GET_LOCAL ,'  export ' + %'OUTPUT_NAME_OUT'%     + ' := workman.get_Scalar_Result(workunit,\'' + %'OUTPUT_NAME'% + '\',' + #TEXT(pEsp) + ');\n')
+    #APPEND(CODE_GET_LOCAL ,'  export ' + %'OUTPUT_NAME_'%        + ' := ' + %'OUTPUT_TYPE'% + %'OUTPUT_NAME_OUT'% + ';\n')
+
 
     #SET(OUTPUT_NAME      ,std.str.extract(%'PARSED_RESULT'%,1) )
     #SET(OUTPUT_NAME_LEN  ,length(trim(%'OUTPUT_NAME'%)))
@@ -231,8 +247,10 @@ functionmacro
     #ELSE
       #SET(OUTPUT_NAME  ,'Calculation_' + trim(%'CNTR'%)  )
     #END
-    
+    #SET(OUTPUT_NAME_     ,%'OUTPUT_NAME'% + '_' )
+
     #APPEND(CODE_BODY3 ,'  export ' + %'OUTPUT_NAME'% + ' := ' + %SET_CALCULATIONS%[%CNTR%] + ';\n')
+    #APPEND(CODE_GET_LOCAL ,'  export ' + %'OUTPUT_NAME_'%     + ' := (typeof(' + %'OUTPUT_NAME'% + '))workman.get_Scalar_Result(workunit,\'' + %'OUTPUT_NAME'% + '\',' + #TEXT(pEsp) + ');\n')
 
     #SET(OUTPUT_NAME_LEN  ,length(trim(%'OUTPUT_NAME'%)))
     #IF(%OUTPUT_NAME_LEN% <= 8)
@@ -275,12 +293,18 @@ functionmacro
   #END
 
 
+  #APPEND(OUTPUT_RESULTS ,'    ,output( ds_results      ,named(\'Results_Output\'),overwrite)\n')
+  #APPEND(OUTPUT_RESULTS ,'    ,output( email_outputs   ,named(\'Email_Outputs\'),overwrite)\n')
+  #APPEND(OUTPUT_RESULTS    ,');\n')
+
   #IF(count(pSetResults) != 0)
-    #APPEND(OUTPUT_RESULTS    ,');\n')
     #APPEND(DS_RESULTS  ,  '  ],WorkMan.Layouts.lay_results);\n')
   #END
   
-  #SET(OUTPUT_RESULT  ,'return ' + %'CODE_PREPEND'% + %'CODE_BODY1'% + %'CODE_BODY2'% + %'CODE_BODY3'% + %'CODE_APPEND'% + %'EMAIL_OUTPUTS'% + %'OUTPUT_RESULTS'% + %'DS_RESULTS'% + 'end;\n')
+  #APPEND(CODE_GET_LOCAL ,'  export email_outputs_out := workman.get_Scalar_Result(workunit,\'Email_Outputs\',' + #TEXT(pEsp) + ') + \'\\n\' ;\n')
+  #APPEND(CODE_GET_LOCAL ,'  export ds_results_out    := workman.get_ds_Result    (workunit,\'Results_Output\',WorkMan.Layouts.lay_results,' + #TEXT(pEsp) + ');\n\n')
+
+  #SET(OUTPUT_RESULT  ,'return ' + %'CODE_PREPEND'% + %'CODE_BODY1'% + %'CODE_BODY2'% + %'CODE_BODY3'% + %'CODE_APPEND'% + %'CODE_GET_LOCAL'% + %'EMAIL_OUTPUTS'%  + %'DS_RESULTS'% + %'OUTPUT_RESULTS'% + 'end;\n')
   
 	#if(pOutputEcl = true)
 		return %'OUTPUT_RESULT'%[8..];

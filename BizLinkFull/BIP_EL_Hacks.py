@@ -206,6 +206,99 @@ def dRemoveRcidJoinCondition():
 	return [
 			('Process_Biz_Layouts', ' AND \(LEFT\.rcid \= 0 AND LEFT\.proxid\<\>0 OR LEFT\.rcid \= RIGHT\.rcid\)','HACK24','/*HACK24*/','Remove RCID join condition in Fetch_Stream')
 		]
+		
+##---------------------------------------------------------------------------
+##HACK25
+##Add CNPNAME_SLIM logic to Key_BizHead_L_CNPNAME. New key to speed up 
+##company name searches
+##---------------------------------------------------------------------------
+def dCnpNameOptimizations():
+	return [
+			('Key_BizHead_L_CNPNAME', '(HACK07\*\/)', 'HACK25a', '\g<1>\nEXPORT SlimKeyName := BizLinkFull.Filename_keys.L_CNPNAME_SLIM; /*HACK25a*/', 'Added Slim Index Logic'),
+			('Key_BizHead_L_CNPNAME', '(EXPORT Key := INDEX.*?;)','HACK25b','\g<1>\n\nEXPORT slimIndLay := {unsigned4 gss_hash, unsigned8 gss_bloom, h.fallback_value, h.ultid, h.orgid, h.seleid, h.proxid, unsigned2 gss_word_weight := 0}; /*HACK25b*/','Added Slim Index Logic'),
+			('Key_BizHead_L_CNPNAME', '(HACK25b\*\/)','HACK25c','\g<1>\nSlimKeyData := dedup(project(DataForKey, slimIndLay), record, all); /*HACK25c*/','Added Slim Index Logic'),
+			('Key_BizHead_L_CNPNAME', '(HACK25c\*\/)','HACK25d','\g<1>\nEXPORT SlimKey := INDEX(SlimKeyData,{SlimKeyData},{},SlimKeyName); /*HACK25d*/','Added Slim Index Logic'),
+			('Key_BizHead_L_CNPNAME', '(HACK25d\*\/)','HACK25e','\g<1>\nSHARED SlimKeyRec := recordof(SlimKey); /*HACK25e*/','Added Slim Index Logic'),
+			('Key_BizHead_L_CNPNAME', '(doIndexRead\(UNSIGNED4 search,UNSIGNED2 spc\) :=) .*?;','HACK25f','''\g<1> STEPPED(LIMIT(SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
+                                                                      AND KEYED(GSS_Bloom = BloomF)
+                                                                      AND Keyed(fallback_value >= param_fallback_value)
+                                                                      
+                                                                  ),
+                                                                  Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,
+                                                                  ONFAIL(TRANSFORM(SlimKeyRec, 
+                                                                                   SELF := ROW([],SlimKeyRec))),
+                                                                  keyed),
+                                                           ultid,
+                                                           orgid,
+                                                           seleid,
+                                                           proxid,
+                                                           PRIORITY(40-spc)); /*HACK25f*/''','Change the index lookup code for Roxie'),
+			('Key_BizHead_L_CNPNAME', '(res := JOIN\(.*?steppedmatches, Key,).*?;','HACK25g','''\g<1>
+                KEYED(RIGHT.GSS_Hash = wds[1].hsh) 
+                AND KEYED(RIGHT.fallback_value >= param_fallback_value) 
+                AND KEYED(LEFT.proxid = RIGHT.proxid 
+                      AND LEFT.seleid = RIGHT.seleid 
+                      AND LEFT.orgid = RIGHT.orgid 
+                      AND LEFT.ultid = RIGHT.ultid)
+                AND ((param_prim_name = (TYPEOF(RIGHT.prim_name))'' 
+                  OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
+                  OR (RIGHT.prim_name = param_prim_name) 
+                  OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
+                AND ((param_city = (TYPEOF(RIGHT.city))'' 
+                  OR RIGHT.city = (TYPEOF(RIGHT.city))'') 
+                  OR (RIGHT.city = param_city) 
+                  OR ( (metaphonelib.DMetaPhone1(RIGHT.city)=metaphonelib.DMetaPhone1(param_city))  
+                  OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,param_city,param_city_len,2, 0)))),
+                TRANSFORM(indexOutputRecord,
+                          SELF.gss_word_weight := LEFT.gss_word_weight,
+                          SELF := RIGHT)); /*HACK25g*/''','Change the join in rawfetch_server code for Roxie'),
+			('Key_BizHead_L_CNPNAME', '(Returnable(.*?))<>.( OR.*?;)','HACK25h','\g<1>>1\g<3> /*HACK25h*/','Change fallback logic to actually work'),
+		]		
+		
+##---------------------------------------------------------------------------
+##HACK26
+##Change layout of CNPNAME_FUZZY to move the fallback_value up to second
+##from the top. This helps cut back on seeks against the index.
+##---------------------------------------------------------------------------		
+def dCnpNameFuzzyFallbackValueChanges():
+	return [
+		('Key_BizHead_L_CNPNAME_FUZZY', 'h.fallback_value; // Populate the fallback field', 'HACK26a', '// Moved fallback_value up in layout to decrease number of seeks against index /*HACK26a*/', 'Remove field from previous position'),
+		('Key_BizHead_L_CNPNAME_FUZZY', '(h.company_name_prefix;)', 'HACK26b', '\g<1>\n  h.fallback_value; // Populate the fallback field /*HACK26b*/', 'Add field to new position'),
+		('Key_BizHead_L_CNPNAME_FUZZY', '\n(.*?)AND KEYED\(fallback_value >= param_fallback_value\)\n', 'HACK26c', '\g<1>', 'Remove old placement of fallback value in index lookup'),
+		('Key_BizHead_L_CNPNAME_FUZZY', '(KEYED\(\(company_name_prefix = param_company_name_prefix\)\))', 'HACK26d', '\g<1>\n      AND KEYED(fallback_value >= param_fallback_value) /*HACK26d*/', 'Add new placement of fallback value in index lookup')
+	]
+
+##---------------------------------------------------------------------------
+##HACK27
+##Change limits and block sizes for CNPNAME_ZIP, CNPNAME_ST, CNPNAME_FUZZY
+##in BizLinkFull.Config
+##---------------------------------------------------------------------------		
+def dChangeConfigLimits():
+    return[
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27a*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27b*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27c*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27d*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27e*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27f*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=10000;', 'HACK27g', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27g*/', 'Increased limit to 250K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/', 'Increased limit to 250K from 10K')
+    ]
+
+##---------------------------------------------------------------------------
+##HACK28
+##Add limits to L_CNPNAME_ST and L_CNPNAME_ZIP for Roxie. Don't exists since
+##company name is using BOW
+##---------------------------------------------------------------------------		
+def dAddLimitsForBOW():
+    return[
+        ('Key_BizHead_L_CNPNAME_ST', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ST', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ST', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback')
+    ]    
 
 getHacks = 	dAppendForce() + \
 			dUpdateKeynames() + \
@@ -217,4 +310,10 @@ getHacks = 	dAppendForce() + \
 			dRemoveParallel() + \
 			dGSSCnpNameWeight() + \
 			dExtFileDisableForceOn() + \
-			dRemoveRcidJoinCondition()
+			dRemoveRcidJoinCondition() + \
+			dCnpNameOptimizations() + \
+			dCnpNameFuzzyFallbackValueChanges() + \
+            dChangeConfigLimits() + \
+            dAddLimitsForBOW()
+			
+

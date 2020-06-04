@@ -1,4 +1,4 @@
-﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY;
+﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY,BIPV2_Crosswalk,BIPV2_Segmentation;
 
 EXPORT keynames(
 
@@ -34,6 +34,10 @@ module
 
 	export biz_preferred             := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::biz_preferred'                               ,pversion    );
 
+  export highRiskIndustriesPhone   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_phone'                  ,pversion    );
+  export highRiskIndustriesAddr    := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_addr'                   ,pversion    );
+  export highRiskIndustriesCodes   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries'                        ,pversion    );
+
   export BIPV2FullKeys := 
     (
       linkids                 .dall_filenames
@@ -44,7 +48,11 @@ module
     + status                  .dall_filenames
     + aml_addr                .dall_filenames
     + biz_preferred           .dall_filenames
+    + highRiskIndustriesPhone .dall_filenames
+    + highRiskIndustriesAddr  .dall_filenames
+    + highRiskIndustriesCodes .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
@@ -58,6 +66,7 @@ module
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
+    + BIPV2_Segmentation.keynames     (pversion,pUseOtherEnvironment).dall_filenames
     )
     (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
     ;
@@ -73,6 +82,9 @@ module
     // + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
       // ;
+  export BIPV2AlphaKeys := 
+      BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+      ;
 
 	export dall_filenames := 
       BIPV2FullKeys

@@ -1,4 +1,5 @@
 ﻿import BIPV2;
+import Doxie;
 
 export IdAppendRoxie(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
@@ -8,6 +9,10 @@ export IdAppendRoxie(
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
 		,string svcAppendUrl = ''
+		,unsigned soapTimeout = 30
+		,unsigned soapTimeLimit = 0
+		,unsigned soapRetries = 3
+		,boolean segmentation = true
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -17,7 +22,8 @@ export IdAppendRoxie(
 			,scoreThreshold := scoreThreshold
 			,weightThreshold := weightThreshold
 			,disableSaltForce := not primForce
-			,reAppend := reAppend);
+			,reAppend := reAppend
+			,segmentation := segmentation);
 	#END
 
 	shared remoteAppend := BIPV2.IdAppendRoxieRemote(
@@ -26,7 +32,12 @@ export IdAppendRoxie(
 			,weightThreshold := weightThreshold
 			,primForce := primForce
 			,reAppend := reAppend
-			,svcAppendUrl := svcAppendUrl);
+			,svcAppendUrl := svcAppendUrl
+			,soapTimeout := soapTimeout
+			,soapTimeLimit := soapTimeLimit
+			,soapRetries := soapRetries
+			,segmentation := segmentation
+			);
 
 	export IdsOnly() := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -39,14 +50,19 @@ export IdAppendRoxie(
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
-	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false,
-	                boolean isMarketing = false) := function
+	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
+
+	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false
+	                ,boolean isMarketing = false
+					,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
-			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest,
-			                                       isMarketing := isMarketing);
+			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest
+			                                       ,isMarketing := isMarketing
+												   ,mod_access := mod_access);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendOutput, self := left, self := []));
 		#ELSE
-			res := remoteAppend.WithBest(fetchLevel := fetchLevel, allBest := allBest);
+			res := remoteAppend.WithBest(fetchLevel := fetchLevel, allBest := allBest
+			                            ,mod_access := mod_access);
 		#END
 
 		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
@@ -54,12 +70,14 @@ export IdAppendRoxie(
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
-	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean dnbFullRemove = false) := function
+	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                   ,boolean dnbFullRemove = false
+					   ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
-			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove);
+			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove, mod_access := mod_access);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 		#ELSE
-			res := remoteAppend.WithRecords(fetchLevel := fetchLevel);
+			res := remoteAppend.WithRecords(fetchLevel := fetchLevel, mod_access := mod_access);
 		#END
 		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
 			res,

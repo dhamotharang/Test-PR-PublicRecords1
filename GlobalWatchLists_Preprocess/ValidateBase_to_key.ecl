@@ -1,10 +1,10 @@
-IMPORT GlobalWatchLists;
+﻿IMPORT GlobalWatchLists;
 
 ds := GlobalWatchLists.File_GlobalWatchLists;
 
 dist := distribute(ds,hash(pty_key));
 
-ds1 := GlobalWatchLists.Key_GlobalWatchLists_Key();
+ds1 := distribute(pull(GlobalWatchLists.Key_GlobalWatchLists_Key()),hash(pty_key));
 
 j1 := join (dist,ds1,
            left.pty_key=right.pty_key AND

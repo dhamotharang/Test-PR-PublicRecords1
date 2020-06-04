@@ -1,6 +1,6 @@
-import scrubs,Scrubs_Phonesplus_v2_Base, ut, std, tools;
+﻿import scrubs,Scrubs_Phonesplus_v2_Base, ut, std, tools;
 
-EXPORT Fn_Invoke_scrubs (dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in, string version, string emailList='' ) := function
+EXPORT Fn_Invoke_scrubs (dataset(recordof(Phonesplus_v2.Layout_PhonesPlus_Base)) phplus_in, string version, string emailList='' ) := function
 
 
 recordsToScrub := phplus_in;

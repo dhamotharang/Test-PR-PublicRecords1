@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.0';
+  EXPORT salt_VERSION := 'V3.11.9';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -344,10 +344,6 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'RECORDTYPE:prior_rec_before_proc:CONDITION(prior_recording_date,<,process_date):VALID(prior_recording_date,process_date)\n'
     + 'RECORDTYPE:cert_before_proc:CONDITION(certification_date,<,process_date):VALID(certification_date,process_date)\n'
     + 'RECORDTYPE:cut_before_proc:CONDITION(tape_cut_date,<,process_date):VALID(tape_cut_date,process_date)\n'
-    + 'RECORDTYPE:AssImp_Eq_AssTot:CONDITION(assessed_improvement_value,<,assessed_total_value):VALID(assessed_improvement_value,assessed_total_value) \n'
-    + 'RECORDTYPE:MarImp_Eq_MarTot:CONDITION(market_improvement_value,<,market_total_value):VALID(market_improvement_value,market_total_value)\n'
-    + 'RECORDTYPE:AssLnd_Eq_AssTot:CONDITION(assessed_land_value,<=,assessed_total_value):VALID(assessed_land_value,assessed_total_value) \n'
-    + 'RECORDTYPE:MarLnd_Eq_MarTot:CONDITION(market_land_value,<=,market_total_value):VALID(market_land_value,market_total_value)\n'
     + 'RECORDTYPE:tax_less_than_total_assessed:TAG(assessed_total_value,\'\'):NOTAG:CONDITION(tax_amount,<=,assessed_total_value):VALID(tax_amount,assessed_total_value)\n'
     ;
  

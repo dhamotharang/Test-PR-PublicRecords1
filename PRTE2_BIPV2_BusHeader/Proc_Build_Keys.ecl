@@ -42,7 +42,7 @@ function
 	resurnBuildKeys := sequential(
 												parallel(
 												    Build_lgid3_matches
-													,	Build_strnbr
+													 ,Build_strnbr
 													 ,Build_license_linkids
 													 ,Build_industry_linkids
 													 ,Build_linkids
@@ -54,8 +54,7 @@ function
 													 ,Build_Proxid_rel_assoc
 													 ,Build_AML_Addr
 													 ,Build_biz_preferred	
-													 ,copy_seeds(pversion)
-													)
+													 )
 											);
 											
 	return resurnBuildKeys;

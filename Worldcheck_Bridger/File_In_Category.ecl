@@ -1,6 +1,6 @@
 ﻿export file_in_category := dataset([
 	{'1','Bank','','2'},
-	{'2','Blacklisted','','2'},
+	//{'2','Blacklisted','1','2'},
 	{'3','Country','','2'},
 	{'4','Corporate','','2'},
 	//{'10','Crime - Associated','1','2'},
@@ -21,7 +21,7 @@
 	{'18','Political Individual','','2'},
 	{'19','Political Party','','2'},
 	{'20','Religion','','2'},
-	{'21','Terrorism','','2'},
+	//{'21','Terrorism','1','2'},
 	{'22','Trade Union','','2'},
 	{'23','Port','','2'},
 	{'24','Vessel','','2'}

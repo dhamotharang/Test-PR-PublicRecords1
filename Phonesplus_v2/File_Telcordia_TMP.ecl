@@ -1,11 +1,11 @@
-import ut;
+﻿import data_services;
 export File_Telcordia_TMP := module
 
-export File_Telcordia_In_TMP 	:= dataset(ut.foreign_prod + 'thor_200::in::telcordia::tmp', Layout_Telcordia_TMP.Layout_In_TMP, thor);
+export File_Telcordia_In_TMP 	:= dataset(data_services.foreign_prod + 'thor_200::in::telcordia::tmp', Layout_Telcordia_TMP.Layout_In_TMP, thor);
 
-export File_Telcordia_In_OCN 	:= dataset(ut.foreign_prod + 'thor_200::in::telcordia::ocn', Layout_Telcordia_TMP.Layout_In_OCN, thor);
+export File_Telcordia_In_OCN 	:= dataset(data_services.foreign_prod + 'thor_200::in::telcordia::ocn', Layout_Telcordia_TMP.Layout_In_OCN, thor);
 
-export File_Telcordia_In_PLNAME := dataset(ut.foreign_prod + 'thor_200::in::telcordia::plname', Layout_Telcordia_TMP.Layout_In_PLNAME, thor);
+export File_Telcordia_In_PLNAME := dataset(data_services.foreign_prod + 'thor_200::in::telcordia::plname', Layout_Telcordia_TMP.Layout_In_PLNAME, thor);
 
 tmp_ocn := join(File_Telcordia_In_TMP, 
 				File_Telcordia_In_OCN,

@@ -17,15 +17,15 @@
 		E114 = 114,				// Invalid/Missing DOB Type Code
 		E115 = 115,				// Invalid/Missing Eligibility Indicator Code
 		E116 = 116,				// Invalid/Missing Eligibility Effective Date
-		E117 = 117,				// Invalid/Missing Eligibility Period Type Code
-		E118 = 118,				// Invalid/Missing Eligibility Start Date/Month
-		E119 = 119,				// Invalid/Missing Eligibility End Date/Month
-		E120 = 120,				// Invalid/Missing Update Type Code
-		E121 = 121,				// Invalid/Missing Matched State Code
-		E122 = 122,				// Invalid/Missing Matched Client Identifier
-		E123 = 123,				// Missing Related Client Record
-		E124 = 124,				// Missing Related Case Record
-		E125 = 125				// Invalid/Missing Matched Group Id
+		E117 = 117,				// Invalid/Missing Eligibility Start Date/Month
+		E118 = 118,				// Invalid/Missing Eligibility End Date/Month
+		E119 = 119,				// Invalid/Missing Update Type Code
+		E120 = 120,				// Invalid/Missing Matched State Code
+		E121 = 121,				// Invalid/Missing Matched Client Identifier
+		E122 = 122,				// Missing Related Client Record
+		E123 = 123,				// Missing Related Case Record
+		E124 = 124,				// Invalid/Missing Matched Group Id
+		E125 = 125				// Missing Contact Information
 	);
 
 
@@ -78,7 +78,8 @@
 		{errcodes.E121,'E121','F','2051','Invalid/Missing Matched Client Identifier'},
 		{errcodes.E122,'E122','R','3004','Missing Related Client Record'},
 		{errcodes.E123,'E123','R','3003','Missing Related Case Record'},
-		{errcodes.E124,'E124','F','2052','Invalid/Missing Matched Group Id'}
+		{errcodes.E124,'E124','F','2052','Invalid/Missing Matched Group Id'},
+		{errcodes.E125,'E125','F','2043','Missing Contact Information'}
 	], rCodeTable);
 
 	EXPORT warningcodes := ENUM(
@@ -134,34 +135,34 @@
 		{'1099',	'Errors'},
 		{'2001',	'Program State'},
 		{'2002',	'Program Code'},
-		{'2003',	'Case_Benefit_Month'},
-		{'2004',	'Case_Identifier'},
-		{'2005',	'MonthlyAllotment'},
-		{'2006',	'County_Parish_Code'},
-		{'2007',	'County_Parish_Name'},
+		{'2003',	'Case Benefit Month'},
+		{'2004',	'Case Identifier'},
+		{'2005',	'Monthly Allotment'},
+		{'2006',	'County Parish Code'},
+		{'2007',	'County Parish Name'},
 		{'2008',	'Phone_1'},
 		{'2009',	'Phone_2'},
 		{'2010',	'Email'},
-		{'2011',	'Client_Identifier'},
-		{fcLastName,	'Client_Last_Name'},
-		{fcFirstName,	'Client_First_Name'},
-		{fcMiddleName,	'Client_Middle_Name'},
+		{'2011',	'Client Identifier'},
+		{fcLastName,	'Client Last Name'},
+		{fcFirstName,	'Client First Name'},
+		{fcMiddleName,	'Client Middle Name'},
 		{fcSuffixName,	'Client Name Suffix'},
-		{'2016',	'Client_Gender'},
-		{'2017',	'Client_Race'},
-		{'2018',	'Client_Ethnicity'},
-		{'2019',	'Client_SSN'},
-		{'2020',	'Client_SSN_Type_Indicator'},
-		{'2021',	'Client_DOB'},
-		{'2022',	'Client_DOB_Type_Indicator'},
-		{'2023',	'Client_Eligible_Status_Indicator'},
-		{'2024',	'Client_Eligible_Status_Date'},
+		{'2016',	'Client Gender'},
+		{'2017',	'Client Race'},
+		{'2018',	'Client Ethnicity'},
+		{'2019',	'Client SSN'},
+		{'2020',	'Client SSN Type Indicator'},
+		{'2021',	'Client DOB'},
+		{'2022',	'Client DOB Type Indicator'},
+		{'2023',	'Client Eligible Status Indicator'},
+		{'2024',	'Client Eligible Status Date'},
 		{'2025',	'Period Type'},
 		{'2026',	'Start Date'},
 		{'2027',	'End Date'},
-		{'2028',	'HHIndicator'},
+		{'2028',	'HH Indicator'},
 		{'2029',	'Relationship'},
-		{'2030',	'ABAWDIndicator'},
+		{'2030',	'ABAWD Indicator'},
 		{'2031',	'Historical Benefit Count'},
 		{'2032',	'Street 1'},
 		{'2033',	'Street 2'},
@@ -170,10 +171,11 @@
 		{'2036',	'Zip Code'},
 		{'2037',	'Address Type'},
 		{'2038',	'Address Category'},
-		{'2039',	'State_Contact_Name'},
-		{'2040',	'State_Contact_Phone'},
-		{'2041',	'State_Contact_Phone_Extension'},
-		{'2042',	'State_Contact_Email'},
+		{'2039',	'State Contact Name'},
+		{'2040',	'State Contact Phone'},
+		{'2041',	'State Contact Phone Extension'},
+		{'2042',	'State Contact Email'},
+		{'2043',  'State Contact Name/Phone/Email'},
 		{'2050',	'Matched State Code'},
 		{'2051',	'Matched Client Identifier'},
 		{'2052',	'Matched GroupId'},

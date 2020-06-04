@@ -1,4 +1,4 @@
-// CTS0850 / Connecticut Dept of Consumer Protection / Multiple Professions //
+﻿// CTS0850 / Connecticut Dept of Consumer Protection / Multiple Professions //
 EXPORT files_CTS0850 := MODULE
 
 	SHARED code 								:= 'CTS0850';
@@ -14,15 +14,15 @@ EXPORT files_CTS0850 := MODULE
 	EXPORT brokers		 					:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_brokers, 
 																					Prof_License_Mari.layout_CTS0850.layout_broker,
 																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r'])));
-	EXPORT provisional_apprs		:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_provisional_apprs, 
+	EXPORT provisional_apprs		:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_general_apprs, 
 																					Prof_License_Mari.layout_CTS0850.layout_appraiser,
-																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r'])));
-	EXPORT appraisers						:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_general_apprs, 
-																					Prof_License_Mari.layout_CTS0850.layout_salesperson,
 																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r']))) +
 																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_residential_apprs, 
+																					Prof_License_Mari.layout_CTS0850.layout_appraiser,
+																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r'])));				
+	EXPORT appraisers						:= dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_provisional_apprs, 
 																					Prof_License_Mari.layout_CTS0850.layout_salesperson,
-																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r']))) +	
+																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r']))) +
 																 dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + working_dir + '::' + file_salespersons, 
 																					Prof_License_Mari.layout_CTS0850.layout_salesperson,
 																					CSV(SEPARATOR(','),heading(1),quote('\"'),TERMINATOR(['\n','\r\n','\n\r'])));				

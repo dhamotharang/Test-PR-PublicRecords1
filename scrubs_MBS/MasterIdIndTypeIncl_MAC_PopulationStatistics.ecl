@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT MasterIdIndTypeIncl_MAC_PopulationStatistics(infile,Ref='',Input_fdn_ind_type_gc_id_inclusion = '',Input_fdn_file_info_id = '',Input_ind_type = '',Input_inclusion_id = '',Input_inclusion_type = '',Input_status = '',Input_date_added = '',Input_user_added = '',Input_date_changed = '',Input_user_changed = '',OutFile) := MACRO
-  IMPORT SALT39,Scrubs_MBS;
+  IMPORT SALT311,Scrubs_MBS;
   #uniquename(of)
   %of% := RECORD
-    SALT39.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

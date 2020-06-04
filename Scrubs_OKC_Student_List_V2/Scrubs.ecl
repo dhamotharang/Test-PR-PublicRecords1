@@ -55,6 +55,107 @@ EXPORT Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Layout_OKC_Student_List)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Layout_OKC_Student_List)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'cleanaddr1:invalid_address:ALLOW'
+          ,'cleanaddr2:invalid_address:ALLOW'
+          ,'cleancity:invalid_city:ALLOW'
+          ,'cleanstate:invalid_state:ALLOW','cleanstate:invalid_state:LENGTHS'
+          ,'cleandob:invalid_date:ALLOW','cleandob:invalid_date:LENGTHS'
+          ,'cleanupdatedte:invalid_date:ALLOW','cleanupdatedte:invalid_date:LENGTHS'
+          ,'cleanemail:invalid_email:ALLOW'
+          ,'cleanfirstname:invalid_name:ALLOW','cleanfirstname:invalid_name:LENGTHS'
+          ,'cleanmidname:invalid_name:ALLOW','cleanmidname:invalid_name:LENGTHS'
+          ,'cleanlastname:invalid_name:ALLOW','cleanlastname:invalid_name:LENGTHS'
+          ,'cleansuffixname:invalid_name:ALLOW','cleansuffixname:invalid_name:LENGTHS'
+          ,'cleanphone:invalid_phone:ALLOW','cleanphone:invalid_phone:LENGTHS'
+          ,'process_date:invalid_date:ALLOW','process_date:invalid_date:LENGTHS'
+          ,'date_first_seen:invalid_date:ALLOW','date_first_seen:invalid_date:LENGTHS'
+          ,'date_last_seen:invalid_date:ALLOW','date_last_seen:invalid_date:LENGTHS'
+          ,'date_vendor_first_reported:invalid_date:ALLOW','date_vendor_first_reported:invalid_date:LENGTHS'
+          ,'date_vendor_last_reported:invalid_date:ALLOW','date_vendor_last_reported:invalid_date:LENGTHS'
+          ,'dateadded:invalid_date:ALLOW','dateadded:invalid_date:LENGTHS'
+          ,'dateupdated:invalid_date:ALLOW','dateupdated:invalid_date:LENGTHS'
+          ,'studentid:nums:ALLOW'
+          ,'dartid:nums:ALLOW'
+          ,'college:invalid_college:ALLOW'
+          ,'semester:invalid_semester:ENUM','semester:invalid_semester:LENGTHS'
+          ,'year:nums:ALLOW'
+          ,'dateofbirth:invalid_date:ALLOW','dateofbirth:invalid_date:LENGTHS'
+          ,'dob_formatted:invalid_date:ALLOW','dob_formatted:invalid_date:LENGTHS'
+          ,'addresstype:invalid_addresstype:ENUM'
+          ,'phonetyp:invalid_phonetyp:ENUM'
+          ,'name_suffix:invalid_suffix:ALLOW'
+          ,'prim_range:invalid_address:ALLOW'
+          ,'predir:invalid_address:ALLOW'
+          ,'prim_name:invalid_address:ALLOW'
+          ,'addr_suffix:invalid_address:ALLOW'
+          ,'postdir:invalid_address:ALLOW'
+          ,'unit_desig:invalid_address:ALLOW'
+          ,'sec_range:invalid_address:ALLOW'
+          ,'p_city_name:invalid_city:ALLOW'
+          ,'v_city_name:invalid_city:ALLOW'
+          ,'telephone:invalid_phone:ALLOW','telephone:invalid_phone:LENGTHS'
+          ,'college_major:invalid_MajorCode:ALLOW'
+          ,'new_college_major:invalid_NewMajorCode:CUSTOM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Fields.InvalidMessage_cleanaddr1(1)
+          ,Fields.InvalidMessage_cleanaddr2(1)
+          ,Fields.InvalidMessage_cleancity(1)
+          ,Fields.InvalidMessage_cleanstate(1),Fields.InvalidMessage_cleanstate(2)
+          ,Fields.InvalidMessage_cleandob(1),Fields.InvalidMessage_cleandob(2)
+          ,Fields.InvalidMessage_cleanupdatedte(1),Fields.InvalidMessage_cleanupdatedte(2)
+          ,Fields.InvalidMessage_cleanemail(1)
+          ,Fields.InvalidMessage_cleanfirstname(1),Fields.InvalidMessage_cleanfirstname(2)
+          ,Fields.InvalidMessage_cleanmidname(1),Fields.InvalidMessage_cleanmidname(2)
+          ,Fields.InvalidMessage_cleanlastname(1),Fields.InvalidMessage_cleanlastname(2)
+          ,Fields.InvalidMessage_cleansuffixname(1),Fields.InvalidMessage_cleansuffixname(2)
+          ,Fields.InvalidMessage_cleanphone(1),Fields.InvalidMessage_cleanphone(2)
+          ,Fields.InvalidMessage_process_date(1),Fields.InvalidMessage_process_date(2)
+          ,Fields.InvalidMessage_date_first_seen(1),Fields.InvalidMessage_date_first_seen(2)
+          ,Fields.InvalidMessage_date_last_seen(1),Fields.InvalidMessage_date_last_seen(2)
+          ,Fields.InvalidMessage_date_vendor_first_reported(1),Fields.InvalidMessage_date_vendor_first_reported(2)
+          ,Fields.InvalidMessage_date_vendor_last_reported(1),Fields.InvalidMessage_date_vendor_last_reported(2)
+          ,Fields.InvalidMessage_dateadded(1),Fields.InvalidMessage_dateadded(2)
+          ,Fields.InvalidMessage_dateupdated(1),Fields.InvalidMessage_dateupdated(2)
+          ,Fields.InvalidMessage_studentid(1)
+          ,Fields.InvalidMessage_dartid(1)
+          ,Fields.InvalidMessage_college(1)
+          ,Fields.InvalidMessage_semester(1),Fields.InvalidMessage_semester(2)
+          ,Fields.InvalidMessage_year(1)
+          ,Fields.InvalidMessage_dateofbirth(1),Fields.InvalidMessage_dateofbirth(2)
+          ,Fields.InvalidMessage_dob_formatted(1),Fields.InvalidMessage_dob_formatted(2)
+          ,Fields.InvalidMessage_addresstype(1)
+          ,Fields.InvalidMessage_phonetyp(1)
+          ,Fields.InvalidMessage_name_suffix(1)
+          ,Fields.InvalidMessage_prim_range(1)
+          ,Fields.InvalidMessage_predir(1)
+          ,Fields.InvalidMessage_prim_name(1)
+          ,Fields.InvalidMessage_addr_suffix(1)
+          ,Fields.InvalidMessage_postdir(1)
+          ,Fields.InvalidMessage_unit_desig(1)
+          ,Fields.InvalidMessage_sec_range(1)
+          ,Fields.InvalidMessage_p_city_name(1)
+          ,Fields.InvalidMessage_v_city_name(1)
+          ,Fields.InvalidMessage_telephone(1),Fields.InvalidMessage_telephone(2)
+          ,Fields.InvalidMessage_college_major(1)
+          ,Fields.InvalidMessage_new_college_major(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(Layout_OKC_Student_List) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.cleanaddr1_Invalid := Fields.InValid_cleanaddr1((SALT311.StrType)le.cleanaddr1);
@@ -107,6 +208,19 @@ EXPORT FromNone(DATASET(Layout_OKC_Student_List) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -324,104 +438,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := le.cleancollegeid;
-      SELF.ruledesc := CHOOSE(c
-          ,'cleanaddr1:invalid_address:ALLOW'
-          ,'cleanaddr2:invalid_address:ALLOW'
-          ,'cleancity:invalid_city:ALLOW'
-          ,'cleanstate:invalid_state:ALLOW','cleanstate:invalid_state:LENGTHS'
-          ,'cleandob:invalid_date:ALLOW','cleandob:invalid_date:LENGTHS'
-          ,'cleanupdatedte:invalid_date:ALLOW','cleanupdatedte:invalid_date:LENGTHS'
-          ,'cleanemail:invalid_email:ALLOW'
-          ,'cleanfirstname:invalid_name:ALLOW','cleanfirstname:invalid_name:LENGTHS'
-          ,'cleanmidname:invalid_name:ALLOW','cleanmidname:invalid_name:LENGTHS'
-          ,'cleanlastname:invalid_name:ALLOW','cleanlastname:invalid_name:LENGTHS'
-          ,'cleansuffixname:invalid_name:ALLOW','cleansuffixname:invalid_name:LENGTHS'
-          ,'cleanphone:invalid_phone:ALLOW','cleanphone:invalid_phone:LENGTHS'
-          ,'process_date:invalid_date:ALLOW','process_date:invalid_date:LENGTHS'
-          ,'date_first_seen:invalid_date:ALLOW','date_first_seen:invalid_date:LENGTHS'
-          ,'date_last_seen:invalid_date:ALLOW','date_last_seen:invalid_date:LENGTHS'
-          ,'date_vendor_first_reported:invalid_date:ALLOW','date_vendor_first_reported:invalid_date:LENGTHS'
-          ,'date_vendor_last_reported:invalid_date:ALLOW','date_vendor_last_reported:invalid_date:LENGTHS'
-          ,'dateadded:invalid_date:ALLOW','dateadded:invalid_date:LENGTHS'
-          ,'dateupdated:invalid_date:ALLOW','dateupdated:invalid_date:LENGTHS'
-          ,'studentid:nums:ALLOW'
-          ,'dartid:nums:ALLOW'
-          ,'college:invalid_college:ALLOW'
-          ,'semester:invalid_semester:ENUM','semester:invalid_semester:LENGTHS'
-          ,'year:nums:ALLOW'
-          ,'dateofbirth:invalid_date:ALLOW','dateofbirth:invalid_date:LENGTHS'
-          ,'dob_formatted:invalid_date:ALLOW','dob_formatted:invalid_date:LENGTHS'
-          ,'addresstype:invalid_addresstype:ENUM'
-          ,'phonetyp:invalid_phonetyp:ENUM'
-          ,'name_suffix:invalid_suffix:ALLOW'
-          ,'prim_range:invalid_address:ALLOW'
-          ,'predir:invalid_address:ALLOW'
-          ,'prim_name:invalid_address:ALLOW'
-          ,'addr_suffix:invalid_address:ALLOW'
-          ,'postdir:invalid_address:ALLOW'
-          ,'unit_desig:invalid_address:ALLOW'
-          ,'sec_range:invalid_address:ALLOW'
-          ,'p_city_name:invalid_city:ALLOW'
-          ,'v_city_name:invalid_city:ALLOW'
-          ,'telephone:invalid_phone:ALLOW','telephone:invalid_phone:LENGTHS'
-          ,'college_major:invalid_MajorCode:ALLOW'
-          ,'new_college_major:invalid_NewMajorCode:CUSTOM'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Fields.InvalidMessage_cleanaddr1(1)
-          ,Fields.InvalidMessage_cleanaddr2(1)
-          ,Fields.InvalidMessage_cleancity(1)
-          ,Fields.InvalidMessage_cleanstate(1),Fields.InvalidMessage_cleanstate(2)
-          ,Fields.InvalidMessage_cleandob(1),Fields.InvalidMessage_cleandob(2)
-          ,Fields.InvalidMessage_cleanupdatedte(1),Fields.InvalidMessage_cleanupdatedte(2)
-          ,Fields.InvalidMessage_cleanemail(1)
-          ,Fields.InvalidMessage_cleanfirstname(1),Fields.InvalidMessage_cleanfirstname(2)
-          ,Fields.InvalidMessage_cleanmidname(1),Fields.InvalidMessage_cleanmidname(2)
-          ,Fields.InvalidMessage_cleanlastname(1),Fields.InvalidMessage_cleanlastname(2)
-          ,Fields.InvalidMessage_cleansuffixname(1),Fields.InvalidMessage_cleansuffixname(2)
-          ,Fields.InvalidMessage_cleanphone(1),Fields.InvalidMessage_cleanphone(2)
-          ,Fields.InvalidMessage_process_date(1),Fields.InvalidMessage_process_date(2)
-          ,Fields.InvalidMessage_date_first_seen(1),Fields.InvalidMessage_date_first_seen(2)
-          ,Fields.InvalidMessage_date_last_seen(1),Fields.InvalidMessage_date_last_seen(2)
-          ,Fields.InvalidMessage_date_vendor_first_reported(1),Fields.InvalidMessage_date_vendor_first_reported(2)
-          ,Fields.InvalidMessage_date_vendor_last_reported(1),Fields.InvalidMessage_date_vendor_last_reported(2)
-          ,Fields.InvalidMessage_dateadded(1),Fields.InvalidMessage_dateadded(2)
-          ,Fields.InvalidMessage_dateupdated(1),Fields.InvalidMessage_dateupdated(2)
-          ,Fields.InvalidMessage_studentid(1)
-          ,Fields.InvalidMessage_dartid(1)
-          ,Fields.InvalidMessage_college(1)
-          ,Fields.InvalidMessage_semester(1),Fields.InvalidMessage_semester(2)
-          ,Fields.InvalidMessage_year(1)
-          ,Fields.InvalidMessage_dateofbirth(1),Fields.InvalidMessage_dateofbirth(2)
-          ,Fields.InvalidMessage_dob_formatted(1),Fields.InvalidMessage_dob_formatted(2)
-          ,Fields.InvalidMessage_addresstype(1)
-          ,Fields.InvalidMessage_phonetyp(1)
-          ,Fields.InvalidMessage_name_suffix(1)
-          ,Fields.InvalidMessage_prim_range(1)
-          ,Fields.InvalidMessage_predir(1)
-          ,Fields.InvalidMessage_prim_name(1)
-          ,Fields.InvalidMessage_addr_suffix(1)
-          ,Fields.InvalidMessage_postdir(1)
-          ,Fields.InvalidMessage_unit_desig(1)
-          ,Fields.InvalidMessage_sec_range(1)
-          ,Fields.InvalidMessage_p_city_name(1)
-          ,Fields.InvalidMessage_v_city_name(1)
-          ,Fields.InvalidMessage_telephone(1),Fields.InvalidMessage_telephone(2)
-          ,Fields.InvalidMessage_college_major(1)
-          ,Fields.InvalidMessage_new_college_major(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.cleanaddr1_ALLOW_ErrorCount
           ,le.cleanaddr2_ALLOW_ErrorCount

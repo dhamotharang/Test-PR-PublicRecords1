@@ -1,11 +1,11 @@
-﻿import ut;
+﻿import ut, data_services;
 
 string_rec := record
 	emerges.layout_ccw_out;
   unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-ds_ccw := emerges.Prep_Build.ConCarry('~thor_data400::base::emerges_ccw_building', string_rec);
+ds_ccw := emerges.Prep_Build.ConCarry(data_services.data_location.prefix()+'thor_data400::base::emerges_ccw_building', string_rec);
 
 layout_supress_phone	:= record
 	emerges.layout_ccw_out;

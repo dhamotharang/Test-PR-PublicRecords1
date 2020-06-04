@@ -48,7 +48,7 @@ EXPORT key_ecrash8	:= INDEX(FILES.ds_ecrash8, {string40 l_acc_nbr := accident_nb
 // Use File_KeybuildV2.out file
 EXPORT key_ecrashv2_bdid 		:= INDEX(dedup(file_keybuildV2.out(b_did <> '',b_did <> '0'),all), {unsigned6 l_bdid := (integer)b_did}, {accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::bdid');
 	
-EXPORT key_ecrashv2_did 		:= INDEX(dedup(file_keybuildV2.out(did <> '',did <> '0'),all), {unsigned6 l_did := (integer)did},{accident_nbr,vin,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::did');
+EXPORT key_ecrashv2_did 		:= INDEX(dedup(sort(file_keybuildV2.out(did <> '',did <> '0'),did),record), {unsigned6 l_did := (integer)did},{accident_nbr,vin,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::did');
 
 EXPORT key_ecrashv2_dlnbr 	:= INDEX(file_keybuildV2.out(driver_license_nbr<>''), {l_dlnbr := driver_license_nbr},{accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::dlnbr');
 

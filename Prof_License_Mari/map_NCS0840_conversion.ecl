@@ -110,6 +110,11 @@ EXPORT map_NCS0840_conversion(STRING pVersion) := FUNCTION
 		tempFax        				:= stringlib.stringfindreplace(pInput.fax,'+1','');
 		SELF.PHN_FAX_1 				:= StringLib.StringFilter(tempFax,'0123456789');
 		SELF.PHN_MARI_FAX_1  	:= SELF.PHN_FAX_1;
+		
+		//phone
+		TrimPhone           := TRIM(StringLib.StringFilter(pInput.PHONE,'0123456789'),LEFT,RIGHT);
+		SELF.PHN_MARI_1			:= ut.CleanPhone(TrimPhone);
+		SELF.PHN_PHONE_1    := ut.CleanPhone(TrimPhone);
 	
 		// Prepping ORG_NAME to handle various conditions 
 		// 1.) Replacing D/B/A with  '|' to separate ORG_NAME & DBA

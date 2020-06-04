@@ -20,6 +20,8 @@ EXPORT layouts := MODULE
   EXPORT i_rid_src := RECORD
     unsigned6 rid;
     i_source;
+    head.global_sid;
+    head.record_sid;
   END;
 
   // wild_FnameSmall
@@ -271,6 +273,8 @@ end;
     string18 county_name;
     head.RawAID;
     unsigned6 uid;
+    head.global_sid;
+    head.record_sid;
   END;
 
 
@@ -375,6 +379,8 @@ end;
     head.zip4;
     head.county;
     head.geo_blk;
+    head.global_sid;
+    head.record_sid;
   END;
 
   EXPORT i_dts_address := RECORD //out_rec in key_header_DTS_address.ecl
@@ -520,6 +526,8 @@ end;
     head.dob;
     head.dt_first_seen;
     head.dt_last_seen;
+    head.global_sid;
+    head.record_sid;
   END;
 
   EXPORT i_addr_hist := RECORD //hierarchy_layout in header/proc_address_hist
@@ -560,6 +568,46 @@ end;
     head.lname;
     head.did;
     integer8 cnt;
+  END;
+
+  EXPORT i_addr_ind_full := RECORD
+    unsigned8 did;
+    string10 prim_range;
+    string2 predir;
+    string28 prim_name;
+    string4 addr_suffix;
+    string2 postdir;
+    string8 sec_range;
+    string25 city;
+    string2 st;
+    string5 zip;
+    string2 addr_ind;
+    string1 best_addr_ind;
+    string2 best_addr_rank;
+    unsigned3 dt_first_seen;
+    unsigned3 dt_first_seen_pr;
+    unsigned3 dt_last_seen;
+    unsigned3 dt_last_seen_pr;
+    unsigned3 dt_vendor_first_reported;
+    unsigned3 dt_vendor_first_reported_pr;
+    unsigned3 dt_vendor_last_reported;
+    unsigned3 dt_vendor_last_reported_pr;
+    unsigned4 apt_cnt;
+    unsigned4 src_cnt;
+    unsigned4 insurance_src_cnt;
+    unsigned4 bureau_src_cnt;
+    unsigned4 property_src_cnt;
+    unsigned4 utility_src_cnt;
+    unsigned4 vehicle_src_cnt;
+    unsigned4 dl_src_cnt;
+    unsigned4 voter_src_cnt;
+    string5   addressstatus;
+    string3   addresstype;
+  END;
+
+  EXPORT i_first_ingest := RECORD
+    unsigned6 rid;
+    unsigned4 first_ingest_date;
   END;
 
 END;

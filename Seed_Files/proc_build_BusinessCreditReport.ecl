@@ -8,11 +8,11 @@ EXPORT proc_build_BusinessCreditReport(string filedate) := FUNCTION
 	build_keys 		:= Seed_Files.Proc_Build_BusinessCreditReport_Keys(filedate).allkeys;
 
 	//update DOPs
-	Email_Recipients := 'John.Freibaum@lexisnexis.com, Darren.Knowles@lexisnexis.com';
+	Email_Recipients := 'Amila.De@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com, Darren.Knowles@lexisnexis.com';
 	update_dops		:= RoxieKeyBuild.updateversion('TestseedBusCRReportKeys',filedate,Email_Recipients,,'N');
 
 	//Email
-	SHARED email_list := 'cathy.tio@lexisnexis.com, john.freibaum@lexisnexis.com, Darren.Knowles@lexisnexis.com';
+	SHARED email_list := 'Amila.De@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com, Darren.Knowles@lexisnexis.com';
 	SucessSubject := 'SUCESS: Business Credit Report Test Seed  Build ' + filedate + ' Completed on ' + _Control.ThisEnvironment.Name;
 	FailureSubject:= 'FAILURE: Business Credit Report Test Seed  Build ' + filedate + ' failed on ' + _Control.ThisEnvironment.Name;
 	SuccessBody		:=  'Business Credit Report Test Seed  Build ' + filedate + ' Completed and is ready for Cert Roxie deployment.';

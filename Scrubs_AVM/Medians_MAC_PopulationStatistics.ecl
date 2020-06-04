@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT Medians_MAC_PopulationStatistics(infile,Ref='',Input_history_date = '',Input_fips_geo_12 = '',Input_median_valuation = '',Input_history_history_date = '',Input_history_median_valuation = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_AVM;
+  IMPORT SALT311,Scrubs_AVM;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

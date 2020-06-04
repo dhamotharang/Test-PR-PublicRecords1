@@ -6,7 +6,9 @@ EXPORT proc_build_base(string filedate) := function
         
         SELF.valid_dob:='',     SELF.hhid:=0,           SELF.county_name:='',
         SELF.listed_name:='',   SELF.listed_phone:='',  SELF.dod:=0,
-        SELF.death_code:='',    SELF.lookup_did:=0,     SELF:=LEFT                  ));
+        SELF.death_code:='',    SELF.lookup_did:=0,   
+				SELF.global_sid := 0,   SELF.record_sid := 0,
+				SELF:=LEFT                  ));
 
         #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
         i_as_h := infutor.infutor_best(,h_as_i);

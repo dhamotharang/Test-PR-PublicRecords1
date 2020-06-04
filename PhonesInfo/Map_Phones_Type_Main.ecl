@@ -1,15 +1,16 @@
-﻿IMPORT DeltabaseGateway, dx_PhonesInfo, Lib_date, Ut;
+﻿IMPORT _control, MDR, DeltabaseGateway, dx_PhonesInfo, Lib_date, Std, Ut;
 
 //DF-24397: Create Dx-Prefixed Keys
+//DF-26977: Remove LIDB Carrier Info Append Process (LIDB is historical)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Map Phone Base Files to Phone Type Layout - Append Serv/Line/Carrier Names from Carrier Reference Table///////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	dsICPort		:= PhonesInfo.File_iConectiv.Main(transaction_code<>'PD');																																										//Source = PK; iConectiv Ported Phone Base File
-	dsLIDB 			:= PhonesInfo.File_LIDB.Response_Processed;																																																						//Source = PB; LIDB - AT&T Gateway Base File
-	dsLIDBDelt	:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Source = PB; Deltabase Gateway File (LIDB) - Pull Only Good Records
-	dsL6Phones	:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), dx_PhonesInfo.Layouts.Phones_Type_Main);	
-	dsCarrRef		:= PhonesInfo.File_Source_Reference.Main;																																																							//Carrier Reference Base File
+	dsICPort					:= PhonesInfo.File_iConectiv.Main(transaction_code<>'PD');																																										//Source = PK; iConectiv Ported Phone Base File
+	srcLidb						:= PhonesInfo.File_LIDB.Response_Processed_CR_Append_PType;																																													//Historical LIDB File w/ Carrier Reference Info Appended			
+	srcLidbDelt				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_LIDB_Results_CR_Append_PType;																																		//Historical LIDB Gateway File w/ Carrier Reference Info Appended						
+	dsL6Phones				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), dx_PhonesInfo.Layouts.Phones_Type_Main);	
+	dsCarrRef					:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);																																																			//Carrier Reference Base File
 
 	//////////////////////////////////////////////	
 	//iConectiv Ported Phone File - Join by SPID//
@@ -121,150 +122,43 @@
 	/////////////////////////////////////////////////////////	
 	//LIDB File - Join by Account Owner & Carrier Name///////
 	/////////////////////////////////////////////////////////
-	
-	//Append Name Field to LIDB File
-	nameLayout := record
-		dx_PhonesInfo.Layouts.Phones_Type_Main;
-		string 		name;
-	end;
-	
-	nameLayout nameTr(dsLIDB l):= transform
-		self.source											:= 'PB';
-		self.vendor_first_reported_dt		:= l.dt_first_reported;
-		self.vendor_first_reported_time := '';
-		self.vendor_last_reported_dt 		:= l.dt_last_reported;
-		self.vendor_last_reported_time	:= '';
-		self.global_sid									:= 0;	//CCPA Requirement
-		self.record_sid									:= 0;	//CCPA Requirement
-		self.name 											:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
-		self 														:= l;
-	end;
-	
-	addLIDBName := project(dsLIDB, nameTr(left));
-	
-	//Append Serv, Line, High Risk Indicator, Prepaid, & Operator Full Name
-	sortLIDB					:= sort(distribute(addLIDBName, hash(account_owner, name)), account_owner, name, local);
-	sortCRef					:= sort(distribute(dsCarrRef, hash(ocn, name)), ocn, name, local);
-	
-	//Join the LIDB Response File and the Carrier Reference File to Populate Service and Line Types
-	nameLayout appF(sortLIDB l, sortCRef r):= transform
-		self.serv												:= r.serv;
-		self.line												:= r.line;
-		self.spid												:= r.spid;
-		self.operator_fullname					:= r.operator_full_name;
-		self.high_risk_indicator				:= r.high_risk_indicator;
-		self.prepaid										:= r.prepaid;
-		self 														:= l;
-	end;
-	
-	joinFields 				:= join(sortLIDB, sortCRef,
-														left.account_owner = right.ocn and 
-														left.name = right.name,
-														appF(left, right), left outer, nosort, local);
-	
-	dedupFields				:= dedup(sort(distribute(joinFields, hash(carrier_name)), record, local), record, local);
-	
-	srt_concatFiles		:= sort(distribute(dedupFields, hash(phone)), phone, reference_id, name, account_owner, serv, line, high_risk_indicator, prepaid, -vendor_last_reported_dt, local);
 
-	nameLayout rollupDate(srt_concatFiles l, srt_concatFiles r) := transform
-			
-		minDate		:= lib_date.earliestdate((integer) l.vendor_first_reported_dt, (integer) r.vendor_first_reported_dt);
-		maxDate		:= lib_date.latestdate((integer)l.vendor_last_reported_dt, (integer)r.vendor_last_reported_dt);
-		
-		self.vendor_first_reported_dt		:= minDate;
-		self.vendor_last_reported_dt 		:= maxDate;
-		self.global_sid									:= 0;	//CCPA Requirement
-		self.record_sid									:= 0;	//CCPA Requirement
-		self 														:= l;
-	end;
-
-	applyDates				:= rollup(srt_concatFiles, 
-															left.phone = right.phone and
-															left.reference_id = right.reference_id and
-															left.name = right.name and
-															left.account_owner = right.account_owner and
-															left.serv = right.serv and
-															left.line = right.line and
-															left.high_risk_indicator = right.high_risk_indicator and
-															left.prepaid = right.prepaid,
-															rollupDate(left, right), local);	
-	
-	//////////////////////////////////////////////////////////////////////////////////////////	
-	//LIDB Deltabase Gateway File - Join by Ocn & Carrier_Name////////////////////////////////	
-	//////////////////////////////////////////////////////////////////////////////////////////
-		
-	//Prep Returned LIDB Response File
-	compNameRespLayout := record
-		dsLIDBDelt;
-		string    name;
-	end;
-
-	compNameRespLayout fixN(dsLIDBDelt l):= transform		
-		self.name												:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
-		self 														:= l;
-	end;
-	
-	fixCarrier 								:= project(dsLIDBDelt, fixN(left));
-	sort_carrier 							:= sort(distribute(fixCarrier, hash(carrier_ocn, name)), carrier_ocn, name, local);		
-	
-	//Prep Carrier Reference File w/ Service & Line Types
-	sort_name									:= sort(distribute(dsCarrRef, hash(ocn, name)), ocn, name, local);
-
-	//Join the Returned LIDB Response File with the Source File to Populate Service and Line Types
-	dx_PhonesInfo.Layouts.Phones_Type_Main appDeltaSL(sort_carrier l, sort_name r):= transform
-		dt_added := stringlib.stringfilter(l.date_added, '0123456789')[1..14];	
-		self.reference_id								:= (string)(hash32(l.submitted_phonenumber));
-		self.source											:= 'PB';
-		self.phone											:= l.submitted_phonenumber;
-		self.local_routing_number				:= l.lrn;
-		self.account_owner							:= l.carrier_ocn;
-		self.local_area_transport_area	:= l.lata;
-		self.vendor_first_reported_dt		:= if(dt_added not in ['','0'], 
-																					(integer)dt_added[1..8],
-																					(integer)l.date_file_loaded);
-		self.vendor_first_reported_time	:= dt_added[9..];
-		self.vendor_last_reported_dt		:= if(dt_added not in ['','0'],
-																					(integer)dt_added[1..8],
-																					(integer)l.date_file_loaded);
-		self.vendor_last_reported_time	:= dt_added[9..];
-		self.serv												:= r.serv;
-		self.line												:= r.line;
-		self.spid												:= r.spid;
-		self.operator_fullname					:= PhonesInfo._Functions.fn_CarrierName(r.operator_full_name);
-		self.high_risk_indicator				:= r.high_risk_indicator;
-		self.prepaid										:= r.prepaid;
-		self.global_sid									:= 0;	//CCPA Requirement
-		self.record_sid									:= 0;	//CCPA Requirement
-		self 														:= l;
-	end;
-
-	joinLidbDeltFields:= join(sort_carrier, sort_name,
-														left.carrier_ocn = right.ocn and
-														left.name = right.name,
-														appDeltaSL(left, right), left outer, local);
-	
-	srcLidbDelt				:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
-	
 	//Concat LIDB Records
+	concatLIDB				:= srcLidb + srcLidbDelt;
 	
-	concatLIDB				:= project(applyDates, dx_PhonesInfo.Layouts.Phones_Type_Main) + srcLidbDelt;	
-
+	dx_PhonesInfo.Layouts.Phones_Type_Main fixLIDB(concatLIDB l):= transform
+		self.global_sid									:= 0;	//CCPA Requirement
+		self.record_sid									:= 0;	//CCPA Requirement
+		self														:= l;
+	end;
+	
+	reformatLIDB			:= project(concatLIDB, fixLIDB(left));	
+	
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Concat All Records//////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	
-	allFiles					:= applyiConDates + concatLIDB 	 + dsL6Phones;	
+	allFiles					:= applyiConDates + reformatLIDB + dsL6Phones;	
 	
+	//////////////////////////////////////////////////////////////////////////////////////////	
+	//Append Global_SID///////////////////////////////////////////////////////////////////////	
+	//////////////////////////////////////////////////////////////////////////////////////////	
+	
+	//Add Global_SID 
+  addGlobalSID      := MDR.macGetGlobalSID(allFiles,'PhonesMetadata_Virtual','','global_sid'); //CCPA-799
+		
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Append Record_SID///////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	
 	//Add Record_SID to All Records
-	dx_PhonesInfo.Layouts.Phones_Type_Main trID(allFiles l):= transform
+	dx_PhonesInfo.Layouts.Phones_Type_Main trID(addGlobalSID l):= transform
 		self.record_sid := hash64(l.phone + l.source + l.account_owner + l.carrier_name + l.vendor_first_reported_dt + l.vendor_first_reported_time + l.spid + l.operator_fullname + l.serv + l.line + l.high_risk_indicator + l.prepaid + l.reference_id) + (integer)l.phone;	
+		//self.serv				:= if(l.serv='', '3', l.serv); //DF-27012
+		//self.line				:= if(l.line='', '3', l.line); //DF-27012	
 		self 						:= l;
 	end;
 	
-	idAll						:= project(allFiles, trID(left));
+	idAll							:= project(addGlobalSID, trID(left));
 
 EXPORT Map_Phones_Type_Main := idAll;

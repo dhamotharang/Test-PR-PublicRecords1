@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import UCCV2,mdr,business_header,ut,address,business_headerv2,mdr,lib_stringlib,_Validate;
 
 export As_Business_Linking (dataset(Layout_UCC_Common.Layout_Party_With_AID) 
@@ -9,8 +9,8 @@ export As_Business_Linking (dataset(Layout_UCC_Common.Layout_Party_With_AID)
 		  self.source                     := MDr.sourceTools.src_UCCV2;
 			self.dt_first_seen  				    := if(_validate.date.fIsValid((string)l.dt_first_seen + '01'),(unsigned4)l.dt_first_seen,0);
 		  self.dt_last_seen  					    := if(_validate.date.fIsValid((string)l.dt_last_seen + '01'),(unsigned4)l.dt_last_seen,0);
-		  self.dt_vendor_first_reported   := if(_validate.date.fIsValid((string)l.dt_vendor_first_reported + '01'),(unsigned4)l.dt_vendor_first_reported,0);
-		  self.dt_vendor_last_reported    := if(_validate.date.fIsValid((string)l.dt_vendor_last_reported + '01'),(unsigned4)l.dt_vendor_last_reported,0);
+		  self.dt_vendor_first_reported   := if(_validate.date.fIsValid((string)l.dt_vendor_first_reported),(unsigned4)l.dt_vendor_first_reported,0); 
+		  self.dt_vendor_last_reported    := if(_validate.date.fIsValid((string)l.dt_vendor_last_reported),(unsigned4)l.dt_vendor_last_reported,0); 
 			self.rcid 										  := 0; //Not available
 			self.company_bdid               := l.bdid;	
 			self.company_name							  := l.company_name;

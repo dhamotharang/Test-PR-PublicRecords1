@@ -11,8 +11,18 @@ EXPORT active_enterprise_number_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
-EXPORT active_domestic_corp_key_ChildRec := RECORD
-  TYPEOF(l.active_domestic_corp_key) active_domestic_corp_key;
+EXPORT company_inc_state_ChildRec := RECORD
+  TYPEOF(l.company_inc_state) company_inc_state;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT company_charter_number_ChildRec := RECORD
+  TYPEOF(l.company_charter_number) company_charter_number;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT sbfe_id_ChildRec := RECORD
+  TYPEOF(l.sbfe_id) sbfe_id;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
@@ -26,18 +36,8 @@ EXPORT hist_duns_number_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
-EXPORT hist_domestic_corp_key_ChildRec := RECORD
-  TYPEOF(l.hist_domestic_corp_key) hist_domestic_corp_key;
-  UNSIGNED8 cnt;
-  UNSIGNED4 id;
-END;
-EXPORT foreign_corp_key_ChildRec := RECORD
-  TYPEOF(l.foreign_corp_key) foreign_corp_key;
-  UNSIGNED8 cnt;
-  UNSIGNED4 id;
-END;
-EXPORT unk_corp_key_ChildRec := RECORD
-  TYPEOF(l.unk_corp_key) unk_corp_key;
+EXPORT hist_corp_key_ChildRec := RECORD
+  TYPEOF(l.hist_corp_key) hist_corp_key;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
@@ -48,6 +48,11 @@ EXPORT ebr_file_number_ChildRec := RECORD
 END;
 EXPORT company_fein_ChildRec := RECORD
   TYPEOF(l.company_fein) company_fein;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT cnp_name_phonetic_ChildRec := RECORD
+  TYPEOF(l.cnp_name_phonetic) cnp_name_phonetic;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
@@ -136,7 +141,7 @@ EXPORT SrcRidVlid_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
-EXPORT ForeignCorpkey_ChildRec := RECORD
+EXPORT ActiveCorpKeys_ChildRec := RECORD
   SALT311.StrType Basis;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
@@ -171,10 +176,18 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 active_enterprise_number_switch;
   REAL4 active_enterprise_number_maximum;
   DATASET(active_enterprise_number_ChildRec) nulls_active_enterprise_number {MAXCOUNT(100)};
-  REAL4 active_domestic_corp_key_specificity;
-  REAL4 active_domestic_corp_key_switch;
-  REAL4 active_domestic_corp_key_maximum;
-  DATASET(active_domestic_corp_key_ChildRec) nulls_active_domestic_corp_key {MAXCOUNT(100)};
+  REAL4 company_inc_state_specificity;
+  REAL4 company_inc_state_switch;
+  REAL4 company_inc_state_maximum;
+  DATASET(company_inc_state_ChildRec) nulls_company_inc_state {MAXCOUNT(100)};
+  REAL4 company_charter_number_specificity;
+  REAL4 company_charter_number_switch;
+  REAL4 company_charter_number_maximum;
+  DATASET(company_charter_number_ChildRec) nulls_company_charter_number {MAXCOUNT(100)};
+  REAL4 sbfe_id_specificity;
+  REAL4 sbfe_id_switch;
+  REAL4 sbfe_id_maximum;
+  DATASET(sbfe_id_ChildRec) nulls_sbfe_id {MAXCOUNT(100)};
   REAL4 hist_enterprise_number_specificity;
   REAL4 hist_enterprise_number_switch;
   REAL4 hist_enterprise_number_maximum;
@@ -183,18 +196,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 hist_duns_number_switch;
   REAL4 hist_duns_number_maximum;
   DATASET(hist_duns_number_ChildRec) nulls_hist_duns_number {MAXCOUNT(100)};
-  REAL4 hist_domestic_corp_key_specificity;
-  REAL4 hist_domestic_corp_key_switch;
-  REAL4 hist_domestic_corp_key_maximum;
-  DATASET(hist_domestic_corp_key_ChildRec) nulls_hist_domestic_corp_key {MAXCOUNT(100)};
-  REAL4 foreign_corp_key_specificity;
-  REAL4 foreign_corp_key_switch;
-  REAL4 foreign_corp_key_maximum;
-  DATASET(foreign_corp_key_ChildRec) nulls_foreign_corp_key {MAXCOUNT(100)};
-  REAL4 unk_corp_key_specificity;
-  REAL4 unk_corp_key_switch;
-  REAL4 unk_corp_key_maximum;
-  DATASET(unk_corp_key_ChildRec) nulls_unk_corp_key {MAXCOUNT(100)};
+  REAL4 hist_corp_key_specificity;
+  REAL4 hist_corp_key_switch;
+  REAL4 hist_corp_key_maximum;
+  DATASET(hist_corp_key_ChildRec) nulls_hist_corp_key {MAXCOUNT(100)};
   REAL4 ebr_file_number_specificity;
   REAL4 ebr_file_number_switch;
   REAL4 ebr_file_number_maximum;
@@ -203,6 +208,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 company_fein_switch;
   REAL4 company_fein_maximum;
   DATASET(company_fein_ChildRec) nulls_company_fein {MAXCOUNT(100)};
+  REAL4 cnp_name_phonetic_specificity;
+  REAL4 cnp_name_phonetic_switch;
+  REAL4 cnp_name_phonetic_maximum;
+  DATASET(cnp_name_phonetic_ChildRec) nulls_cnp_name_phonetic {MAXCOUNT(100)};
   REAL4 cnp_name_specificity;
   REAL4 cnp_name_switch;
   REAL4 cnp_name_maximum;
@@ -271,10 +280,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 SrcRidVlid_switch;
   REAL4 SrcRidVlid_maximum;
   DATASET(SrcRidVlid_ChildRec) nulls_SrcRidVlid {MAXCOUNT(100)};
-  REAL4 ForeignCorpkey_specificity;
-  REAL4 ForeignCorpkey_switch;
-  REAL4 ForeignCorpkey_maximum;
-  DATASET(ForeignCorpkey_ChildRec) nulls_ForeignCorpkey {MAXCOUNT(100)};
+  REAL4 ActiveCorpKeys_specificity;
+  REAL4 ActiveCorpKeys_switch;
+  REAL4 ActiveCorpKeys_maximum;
+  DATASET(ActiveCorpKeys_ChildRec) nulls_ActiveCorpKeys {MAXCOUNT(100)};
   REAL4 RAAddresses_specificity;
   REAL4 RAAddresses_switch;
   REAL4 RAAddresses_maximum;

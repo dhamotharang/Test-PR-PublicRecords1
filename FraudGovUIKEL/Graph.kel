@@ -1,0 +1,2146 @@
+﻿#OPTION(persistexpire, 30)
+#OPTION(codegen, 'nosmartjoins')
+#OPTION(codegen, 'nolookupjoins')
+
+// Defining the ERA to allow for ASOF functionality
+ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
+ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
+FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
+FUNCTION: IsNonIntegerStr(STRING s) <= ECL(REGEXFIND('[^0-9]', s)) RETURNS BOOLEAN;
+
+
+
+Legal :=   ENTITY
+(FLAT(UID(seleid),
+  STRING bestultcompanyname,
+  STRING bestultfein,
+  STRING bestultprimaryrange,
+  STRING bestultpredirectional,
+  STRING bestultprimaryname,
+  STRING bestultaddresssuffix,
+  STRING bestultpostdirectional,
+  STRING bestultunitdesignation,
+  STRING bestultsecondaryrange,
+  STRING bestultpostalcity,
+  STRING bestultvanitycity,
+  STRING bestultstate,
+  STRING bestultzip,
+  STRING bestultzip4,
+  STRING bestultcounty,
+  STRING bestultphone,
+  INTEGER bestultdatefirstseen,
+  INTEGER bestultdatelastseen,
+  INTEGER bestultincorporationdate,
+  STRING bestultsic,
+  STRING bestultnaics,
+  STRING bestselecompanyname,
+  STRING bestselefein,
+  STRING bestseleprimaryrange,
+  STRING bestselepredirectional,
+  STRING bestseleprimaryname,
+  STRING bestseleaddresssuffix,
+  STRING bestselepostdirectional,
+  STRING bestseleunitdesignation,
+  STRING bestselesecondaryrange,
+  STRING bestselepostalcity,
+  STRING bestselevanitycity,
+  STRING bestselestate,
+  STRING bestselezip,
+  STRING bestselezip4,
+  STRING bestselecounty,
+  STRING bestselephone,
+  DATE bestseledatefirstseen,
+  DATE bestseledatelastseen,
+  DATE bestseleincorporationdate,
+  STRING bestselesic,
+  STRING bestselenaics,
+  BOOLEAN bestseleisactive,
+  BOOLEAN bestseleisdefunct,
+	STRING biscorporatestatus,
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER dotid,
+  INTEGER empid,
+  INTEGER score,
+  INTEGER weight, 
+	INTEGER uacctno),
+	MODEL(
+	  UID,
+	  AccountNumbers{uacctno},
+    bestultcompanyname,
+    bestultfein,
+    bestultprimaryrange,
+    bestultpredirectional,
+    bestultprimaryname,
+    bestultaddresssuffix,
+    bestultpostdirectional,
+    bestultunitdesignation,
+    bestultsecondaryrange,
+    bestultpostalcity,
+    bestultvanitycity,
+    bestultstate,
+    bestultzip,
+    bestultzip4,
+    bestultcounty,
+    bestultphone,
+    bestultdatefirstseen,
+    bestultdatelastseen,
+    bestultincorporationdate,
+    bestultsic,
+    bestultnaics,
+    bestselecompanyname,
+    bestselefein,
+    bestseleprimaryrange,
+    bestselepredirectional,
+    bestseleprimaryname,
+    bestseleaddresssuffix,
+    bestselepostdirectional,
+    bestseleunitdesignation,
+    bestselesecondaryrange,
+    bestselepostalcity,
+    bestselevanitycity,
+    bestselestate,
+    bestselezip,
+    bestselezip4,
+    bestselecounty,
+    bestselephone,
+    bestseledatefirstseen,
+    bestseledatelastseen,
+    bestseleincorporationdate,
+    bestselesic,
+    bestselenaics,
+    bestseleisactive,
+    bestseleisdefunct,
+	  biscorporatestatus,
+    ultid,
+    orgid,
+    seleid,
+    proxid,
+    powid,
+    dotid,
+    empid,
+    score,
+    weight));
+
+
+
+
+Employer :=   ENTITY
+(FLAT(UID(uacctno),
+	Legal rLegal=UID(seleid),
+  STRING dummycode,
+  INTEGER uacctno, // claim_sep_emp_no in claims
+  STRING checkdigit,
+  STRING fedno,
+  STRING cocd,
+  STRING areacd,
+  STRING status,
+  STRING liabcd,
+  DATE datefirstemp,
+  DATE dateliabest,
+  STRING compyr,
+  STRING timelapsecd,
+  STRING ownershipcd,
+  STRING reinstatedate,
+  STRING unitaddeddate,
+  DATE liabtermdate,
+  STRING dateacquired,
+  STRING bkstopcode,
+  STRING bankruptcydate,
+  STRING legalactioncd,
+  STRING letofassessment,
+  DATE statusreceiptdate,
+  STRING acquiredbyacctno,
+  STRING unpaidbalcd,
+  STRING warrantsissued,
+  STRING datewarrantissued,
+  STRING auditdate,
+  STRING fieldrepcd,
+  STRING datepurged,
+  STRING numownssn,
+  STRING ownername1,
+  STRING ownerssn1,
+  STRING ownername2,
+  STRING ownerssn2,
+  STRING ownername3,
+  STRING ownerssn3,
+  STRING reconamt,
+  STRING unpdbalamt,
+  STRING prevchrgamt,
+  STRING ownername,
+  STRING phonenumber,
+  STRING mno,
+  STRING mnosic6,
+  STRING mnoavgwages,
+  STRING flempname,
+  STRING slempname,
+  STRING fltradename,
+  STRING sltradename,
+  STRING flstreetaddr,
+  STRING slstreetaddr,
+  STRING attnof,
+  STRING citystate,
+  STRING zip,
+  STRING altzipcode,
+  STRING country,
+  STRING leaseclientind,
+  STRING aggregateleasingno,
+
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER dotid,
+  INTEGER empid,
+  INTEGER score,
+  INTEGER weight,
+	
+	CleanAddress rCleanAddr=UID(physicaladdresscleanedaddress),
+	// STRING physicaladdresscleanedaddress,
+  STRING physicaladdressstate,
+  STRING physicaladdressrecordtype
+	
+	/*
+  STRING leasesic6,
+  STRING leaseavgwages,
+  STRING keyaccount,
+  STRING relatedaccount,
+  STRING accounttype,
+  STRING percent,
+  STRING ratecode,
+  STRING sutacode,
+  STRING transferdate,
+  STRING employertype,
+  STRING annchgadjamt,
+  STRING annpremadjamt,
+  STRING newsic6,
+  STRING sutadumpingind,
+  STRING sutainfractiondate,
+  STRING sutapenaltyenddate,
+  STRING sutabeginyyq,
+  STRING sutaendyyq,
+  STRING oldcumcontrib,
+  STRING cumcontribpaid,
+  STRING cumbenchg,
+  STRING mostcurrtaxpay,
+  STRING annyear,
+  STRING anntaxwages,
+  STRING anncontribpd,
+  STRING annbenchg,
+  STRING reserveratio,
+  STRING rrcode,
+  STRING annyear2,
+  STRING anntaxwages2,
+  STRING anncontribpd2,
+  STRING annbenchg2,
+  STRING reserveratio2,
+  STRING rrcode2,
+  STRING annyear3,
+  STRING anntaxwages3,
+  STRING anncontribpd3,
+  STRING annbenchg3,
+  STRING reserveratio3,
+  STRING rrcode3,
+  STRING annyear4,
+  STRING anntaxwages4,
+  STRING anncontribpd4,
+  STRING annbenchg4,
+  STRING reserveratio4,
+  STRING rrcode4,
+  STRING annyear5,
+  STRING anntaxwages5,
+  STRING anncontribpd5,
+  STRING annbenchg5,
+  STRING reserveratio5,
+  STRING rrcode5,
+  STRING annyear6,
+  STRING anntaxwages6,
+  STRING anncontribpd6,
+  STRING annbenchg6,
+  STRING reserveratio6,
+  STRING rrcode6,
+  STRING qtrsonfile,
+  STRING qtryr,
+  STRING ratecodeqtrinfo,
+  STRING solvencyrate,
+  STRING totalwages,
+  STRING taxablewages,
+  STRING contribdue,
+  STRING duedate,
+  STRING fmoemp,
+  STRING smoemp,
+  STRING tmoemp,
+  STRING penaltycd,
+  STRING nopayrollcd,
+  STRING qtrlyunpdcd,
+  STRING qtrlymagtapecd,
+  STRING jsataxineffect,
+  STRING qtrlyrptind,
+  STRING qtrlysutadumpind,
+  STRING qtrrtnmarker,
+  STRING totchg,
+  STRING delqcode,
+  STRING trans014,
+  STRING qtryr2,
+  STRING ratecodeqtrinfo2,
+  STRING solvencyrate2,
+  STRING totalwages2,
+  STRING taxablewages2,
+  STRING contribdue2,
+  STRING duedate2,
+  STRING fmoemp2,
+  STRING smoemp2,
+  STRING tmoemp2,
+  STRING penaltycd2,
+  STRING nopayrollcd2,
+  STRING qtrlyunpdcd2,
+  STRING qtrlymagtapecd2,
+  STRING jsataxineffect2,
+  STRING qtrlyrptind2,
+  STRING qtrlysutadumpind2,
+  STRING qtrrtnmarker2,
+  STRING totchg2,
+  STRING delqcode2,
+  STRING trans0142,
+  STRING qtryr3,
+  STRING ratecodeqtrinfo3,
+  STRING solvencyrate3,
+  STRING totalwages3,
+  STRING taxablewages3,
+  STRING contribdue3,
+  STRING duedate3,
+  STRING fmoemp3,
+  STRING smoemp3,
+  STRING tmoemp3,
+  STRING penaltycd3,
+  STRING nopayrollcd3,
+  STRING qtrlyunpdcd3,
+  STRING qtrlymagtapecd3,
+  STRING jsataxineffect3,
+  STRING qtrlyrptind3,
+  STRING qtrlysutadumpind3,
+  STRING qtrrtnmarker3,
+  STRING totchg3,
+  STRING delqcode3,
+  STRING trans0143,
+  STRING qtryr4,
+  STRING ratecodeqtrinfo4,
+  STRING solvencyrate4,
+  STRING totalwages4,
+  STRING taxablewages4,
+  STRING contribdue4,
+  STRING duedate4,
+  STRING fmoemp4,
+  STRING smoemp4,
+  STRING tmoemp4,
+  STRING penaltycd4,
+  STRING nopayrollcd4,
+  STRING qtrlyunpdcd4,
+  STRING qtrlymagtapecd4,
+  STRING jsataxineffect4,
+  STRING qtrlyrptind4,
+  STRING qtrlysutadumpind4,
+  STRING qtrrtnmarker4,
+  STRING totchg4,
+  STRING delqcode4,
+  STRING trans0144,
+  STRING qtryr5,
+  STRING ratecodeqtrinfo5,
+  STRING solvencyrate5,
+  STRING totalwages5,
+  STRING taxablewages5,
+  STRING contribdue5,
+  STRING duedate5,
+  STRING fmoemp5,
+  STRING smoemp5,
+  STRING tmoemp5,
+  STRING penaltycd5,
+  STRING nopayrollcd5,
+  STRING qtrlyunpdcd5,
+  STRING qtrlymagtapecd5,
+  STRING jsataxineffect5,
+  STRING qtrlyrptind5,
+  STRING qtrlysutadumpind5,
+  STRING qtrrtnmarker5,
+  STRING totchg5,
+  STRING delqcode5,
+  STRING trans0145,
+  STRING qtryr6,
+  STRING ratecodeqtrinfo6,
+  STRING solvencyrate6,
+  STRING totalwages6,
+  STRING taxablewages6,
+  STRING contribdue6,
+  STRING duedate6,
+  STRING fmoemp6,
+  STRING smoemp6,
+  STRING tmoemp6,
+  STRING penaltycd6,
+  STRING nopayrollcd6,
+  STRING qtrlyunpdcd6,
+  STRING qtrlymagtapecd6,
+  STRING jsataxineffect6,
+  STRING qtrlyrptind6,
+  STRING qtrlysutadumpind6,
+  STRING qtrrtnmarker6,
+  STRING totchg6,
+  STRING delqcode6,
+  STRING trans0146,
+  STRING qtryr7,
+  STRING ratecodeqtrinfo7,
+  STRING solvencyrate7,
+  STRING totalwages7,
+  STRING taxablewages7,
+  STRING contribdue7,
+  STRING duedate7,
+  STRING fmoemp7,
+  STRING smoemp7,
+  STRING tmoemp7,
+  STRING penaltycd7,
+  STRING nopayrollcd7,
+  STRING qtrlyunpdcd7,
+  STRING qtrlymagtapecd7,
+  STRING jsataxineffect7,
+  STRING qtrlyrptind7,
+  STRING qtrlysutadumpind7,
+  STRING qtrrtnmarker7,
+  STRING totchg7,
+  STRING delqcode7,
+  STRING trans0147,
+  STRING qtryr8,
+  STRING ratecodeqtrinfo8,
+  STRING solvencyrate8,
+  STRING totalwages8,
+  STRING taxablewages8,
+  STRING contribdue8,
+  STRING duedate8,
+  STRING fmoemp8,
+  STRING smoemp8,
+  STRING tmoemp8,
+  STRING penaltycd8,
+  STRING nopayrollcd8,
+  STRING qtrlyunpdcd8,
+  STRING qtrlymagtapecd8,
+  STRING jsataxineffect8,
+  STRING qtrlyrptind8,
+  STRING qtrlysutadumpind8,
+  STRING qtrrtnmarker8,
+  STRING totchg8,
+  STRING delqcode8,
+  STRING trans0148,
+  STRING qtryr9,
+  STRING ratecodeqtrinfo9,
+  STRING solvencyrate9,
+  STRING totalwages9,
+  STRING taxablewages9,
+  STRING contribdue9,
+  STRING duedate9,
+  STRING fmoemp9,
+  STRING smoemp9,
+  STRING tmoemp9,
+  STRING penaltycd9,
+  STRING nopayrollcd9,
+  STRING qtrlyunpdcd9,
+  STRING qtrlymagtapecd9,
+  STRING jsataxineffect9,
+  STRING qtrlyrptind9,
+  STRING qtrlysutadumpind9,
+  STRING qtrrtnmarker9,
+  STRING totchg9,
+  STRING delqcode9,
+  STRING trans0149,
+  STRING qtryr10,
+  STRING ratecodeqtrinfo10,
+  STRING solvencyrate10,
+  STRING totalwages10,
+  STRING taxablewages10,
+  STRING contribdue10,
+  STRING duedate10,
+  STRING fmoemp10,
+  STRING smoemp10,
+  STRING tmoemp10,
+  STRING penaltycd10,
+  STRING nopayrollcd10,
+  STRING qtrlyunpdcd10,
+  STRING qtrlymagtapecd10,
+  STRING jsataxineffect10,
+  STRING qtrlyrptind10,
+  STRING qtrlysutadumpind10,
+  STRING qtrrtnmarker10,
+  STRING totchg10,
+  STRING delqcode10,
+  STRING trans01410,
+  STRING qtryr11,
+  STRING ratecodeqtrinfo11,
+  STRING solvencyrate11,
+  STRING totalwages11,
+  STRING taxablewages11,
+  STRING contribdue11,
+  STRING duedate11,
+  STRING fmoemp11,
+  STRING smoemp11,
+  STRING tmoemp11,
+  STRING penaltycd11,
+  STRING nopayrollcd11,
+  STRING qtrlyunpdcd11,
+  STRING qtrlymagtapecd11,
+  STRING jsataxineffect11,
+  STRING qtrlyrptind11,
+  STRING qtrlysutadumpind11,
+  STRING qtrrtnmarker11,
+  STRING totchg11,
+  STRING delqcode11,
+  STRING trans01411,
+  STRING qtryr12,
+  STRING ratecodeqtrinfo12,
+  STRING solvencyrate12,
+  STRING totalwages12,
+  STRING taxablewages12,
+  STRING contribdue12,
+  STRING duedate12,
+  STRING fmoemp12,
+  STRING smoemp12,
+  STRING tmoemp12,
+  STRING penaltycd12,
+  STRING nopayrollcd12,
+  STRING qtrlyunpdcd12,
+  STRING qtrlymagtapecd12,
+  STRING jsataxineffect12,
+  STRING qtrlyrptind12,
+  STRING qtrlysutadumpind12,
+  STRING qtrrtnmarker12,
+  STRING totchg12,
+  STRING delqcode12,
+  STRING trans01412,
+  STRING qtryr13,
+  STRING ratecodeqtrinfo13,
+  STRING solvencyrate13,
+  STRING totalwages13,
+  STRING taxablewages13,
+  STRING contribdue13,
+  STRING duedate13,
+  STRING fmoemp13,
+  STRING smoemp13,
+  STRING tmoemp13,
+  STRING penaltycd13,
+  STRING nopayrollcd13,
+  STRING qtrlyunpdcd13,
+  STRING qtrlymagtapecd13,
+  STRING jsataxineffect13,
+  STRING qtrlyrptind13,
+  STRING qtrlysutadumpind13,
+  STRING qtrrtnmarker13,
+  STRING totchg13,
+  STRING delqcode13,
+  STRING trans01413,
+  STRING qtryr14,
+  STRING ratecodeqtrinfo14,
+  STRING solvencyrate14,
+  STRING totalwages14,
+  STRING taxablewages14,
+  STRING contribdue14,
+  STRING duedate14,
+  STRING fmoemp14,
+  STRING smoemp14,
+  STRING tmoemp14,
+  STRING penaltycd14,
+  STRING nopayrollcd14,
+  STRING qtrlyunpdcd14,
+  STRING qtrlymagtapecd14,
+  STRING jsataxineffect14,
+  STRING qtrlyrptind14,
+  STRING qtrlysutadumpind14,
+  STRING qtrrtnmarker14,
+  STRING totchg14,
+  STRING delqcode14,
+  STRING trans01414,
+  STRING qtryr15,
+  STRING ratecodeqtrinfo15,
+  STRING solvencyrate15,
+  STRING totalwages15,
+  STRING taxablewages15,
+  STRING contribdue15,
+  STRING duedate15,
+  STRING fmoemp15,
+  STRING smoemp15,
+  STRING tmoemp15,
+  STRING penaltycd15,
+  STRING nopayrollcd15,
+  STRING qtrlyunpdcd15,
+  STRING qtrlymagtapecd15,
+  STRING jsataxineffect15,
+  STRING qtrlyrptind15,
+  STRING qtrlysutadumpind15,
+  STRING qtrrtnmarker15,
+  STRING totchg15,
+  STRING delqcode15,
+  STRING trans01415,
+  STRING qtryr16,
+  STRING ratecodeqtrinfo16,
+  STRING solvencyrate16,
+  STRING totalwages16,
+  STRING taxablewages16,
+  STRING contribdue16,
+  STRING duedate16,
+  STRING fmoemp16,
+  STRING smoemp16,
+  STRING tmoemp16,
+  STRING penaltycd16,
+  STRING nopayrollcd16,
+  STRING qtrlyunpdcd16,
+  STRING qtrlymagtapecd16,
+  STRING jsataxineffect16,
+  STRING qtrlyrptind16,
+  STRING qtrlysutadumpind16,
+  STRING qtrrtnmarker16,
+  STRING totchg16,
+  STRING delqcode16,
+  STRING trans01616,
+  STRING qtryr17,
+  STRING ratecodeqtrinfo17,
+  STRING solvencyrate17,
+  STRING totalwages17,
+  STRING taxablewages17,
+  STRING contribdue17,
+  STRING duedate17,
+  STRING fmoemp17,
+  STRING smoemp17,
+  STRING tmoemp17,
+  STRING penaltycd17,
+  STRING nopayrollcd17,
+  STRING qtrlyunpdcd17,
+  STRING qtrlymagtapecd17,
+  STRING jsataxineffect17,
+  STRING qtrlyrptind17,
+  STRING qtrlysutadumpind17,
+  STRING qtrrtnmarker17,
+  STRING totchg17,
+  STRING delqcode17,
+  STRING trans01417,
+  STRING qtryr18,
+  STRING ratecodeqtrinfo18,
+  STRING solvencyrate18,
+  STRING totalwages18,
+  STRING taxablewages18,
+  STRING contribdue18,
+  STRING duedate18,
+  STRING fmoemp18,
+  STRING smoemp18,
+  STRING tmoemp18,
+  STRING penaltycd18,
+  STRING nopayrollcd18,
+  STRING qtrlyunpdcd18,
+  STRING qtrlymagtapecd18,
+  STRING jsataxineffect18,
+  STRING qtrlyrptind18,
+  STRING qtrlysutadumpind18,
+  STRING qtrrtnmarker18,
+  STRING totchg18,
+  STRING delqcode18,
+  STRING trans01418,
+  STRING qtryr19,
+  STRING ratecodeqtrinfo19,
+  STRING solvencyrate19,
+  STRING totalwages19,
+  STRING taxablewages19,
+  STRING contribdue19,
+  STRING duedate19,
+  STRING fmoemp19,
+  STRING smoemp19,
+  STRING tmoemp19,
+  STRING penaltycd19,
+  STRING nopayrollcd19,
+  STRING qtrlyunpdcd19,
+  STRING qtrlymagtapecd19,
+  STRING jsataxineffect19,
+  STRING qtrlyrptind19,
+  STRING qtrlysutadumpind19,
+  STRING qtrrtnmarker19,
+  STRING totchg19,
+  STRING delqcode19,
+  STRING trans01419,
+  STRING qtryr20,
+  STRING ratecodeqtrinfo20,
+  STRING solvencyrate20,
+  STRING totalwages20,
+  STRING taxablewages20,
+  STRING contribdue20,
+  STRING duedate20,
+  STRING fmoemp20,
+  STRING smoemp20,
+  STRING tmoemp20,
+  STRING penaltycd20,
+  STRING nopayrollcd20,
+  STRING qtrlyunpdcd20,
+  STRING qtrlymagtapecd20,
+  STRING jsataxineffect20,
+  STRING qtrlyrptind20,
+  STRING qtrlysutadumpind20,
+  STRING qtrrtnmarker20,
+  STRING totchg20,
+  STRING delqcode20,
+  STRING trans01420,
+  STRING citystatezipconcatenated,
+  STRING physicaladdressprimaryrange,
+  STRING physicaladdresspredirectional,
+  STRING physicaladdressprimaryname,
+  STRING physicaladdressaddresssuffix,
+  STRING physicaladdresspostdirectional,
+  STRING physicaladdressunitdesignation,
+  STRING physicaladdresssecondaryrange,
+  STRING physicaladdresspostalcity,
+  STRING physicaladdressvanitycity,
+  STRING physicaladdressstate,
+  STRING physicaladdresszip,
+  STRING physicaladdresszip4,
+  STRING physicaladdressdbpc,
+  STRING physicaladdresscheckdigit,
+  STRING physicaladdressrecordtype,
+  STRING physicaladdresscounty,
+  STRING physicaladdresslatitude,
+  STRING physicaladdresslongitude,
+  STRING physicaladdressmsa,
+  STRING physicaladdressgeoblock,
+  STRING physicaladdressgeomatchcode,
+  STRING physicaladdresserrorstatus,
+  BOOLEAN physicaladdresscachehit,
+  BOOLEAN physicaladdresscleanerhit,
+  STRING physicaladdresscleanedaddress
+  STRING physicaladdressinputaddress,
+  BOOLEAN physicaladdressnoaddressinput,
+  BOOLEAN physicaladdressnoaddresscleanererror,
+  STRING physicaladdresserrorcodedescription,
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER dotid,
+  INTEGER empid,
+  INTEGER score,
+  INTEGER weight,
+  INTEGER businessisultinput,
+  INTEGER businessisseleinput,
+  INTEGER businessisproxinput,
+  STRING bestultcompanyname,
+  STRING bestultfein,
+  STRING bestultprimaryrange,
+  STRING bestultpredirectional,
+  STRING bestultprimaryname,
+  STRING bestultaddresssuffix,
+  STRING bestultpostdirectional,
+  STRING bestultunitdesignation,
+  STRING bestultsecondaryrange,
+  STRING bestultpostalcity,
+  STRING bestultvanitycity,
+  STRING bestultstate,
+  STRING bestultzip,
+  STRING bestultzip4,
+  STRING bestultcounty,
+  STRING bestultphone,
+  INTEGER bestultdatefirstseen,
+  INTEGER bestultdatelastseen,
+  INTEGER bestultincorporationdate,
+  STRING bestultsic,
+  STRING bestultnaics,
+  STRING bestselecompanyname,
+  STRING bestselefein,
+  STRING bestseleprimaryrange,
+  STRING bestselepredirectional,
+  STRING bestseleprimaryname,
+  STRING bestseleaddresssuffix,
+  STRING bestselepostdirectional,
+  STRING bestseleunitdesignation,
+  STRING bestselesecondaryrange,
+  STRING bestselepostalcity,
+  STRING bestselevanitycity,
+  STRING bestselestate,
+  STRING bestselezip,
+  STRING bestselezip4,
+  STRING bestselecounty,
+  STRING bestselephone,
+  INTEGER bestseledatefirstseen,
+  INTEGER bestseledatelastseen,
+  INTEGER bestseleincorporationdate,
+  STRING bestselesic,
+  STRING bestselenaics,
+  BOOLEAN bestseleisactive,
+  BOOLEAN bestseleisdefunct,
+  STRING bestproxcompanyname,
+  STRING bestproxfein,
+  STRING bestproxprimaryrange,
+  STRING bestproxpredirectional,
+  STRING bestproxprimaryname,
+  STRING bestproxaddresssuffix,
+  STRING bestproxpostdirectional,
+  STRING bestproxunitdesignation,
+  STRING bestproxsecondaryrange,
+  STRING bestproxpostalcity,
+  STRING bestproxvanitycity,
+  STRING bestproxstate,
+  STRING bestproxzip,
+  STRING bestproxzip4,
+  STRING bestproxcounty,
+  STRING bestproxphone,
+  INTEGER bestproxdatefirstseen,
+  INTEGER bestproxdatelastseen,
+  INTEGER bestproxincorporationdate,
+  STRING bestproxsic,
+  STRING bestproxnaics,
+  STRING mappininfo,
+  INTEGER bipattributesisnew,
+  INTEGER bipattributesinactive,
+  INTEGER bipattributeshierarchysize,
+  STRING ultentitycontextuid,
+  STRING seleentitycontextuid,
+  STRING proxentitycontextuid,
+  INTEGER bizrecid,
+  STRING advohitflag,
+  STRING advovacancyindicator,
+  STRING advothrowbackindicator,
+  STRING advoseasonaldeliveryindicator,
+  STRING advoseasonalsuppressionstartdate,
+  STRING advoseasonalsuppressionenddate,
+  STRING advodonotdeliverindicator,
+  STRING advocollegeindicator,
+  STRING advocollegesuppressionstartdate,
+  STRING advocollegesuppressionenddate,
+  STRING advoaddressstyle,
+  STRING advosimplifyaddresscount,
+  STRING advodropindicator,
+  STRING advoresidentialorbusinessindicator,
+  STRING advoonlywaytogetmailindicator,
+  STRING advorecordtypecode,
+  STRING advoaddresstype,
+  STRING advoaddressusagetype,
+  STRING advofirstseendate,
+  STRING advolastseendate,
+  STRING advovendorfirstreporteddate,
+  STRING advovendorlastreporteddate,
+  STRING advovacationbegindate,
+  STRING advovacationenddate,
+  STRING advonumberofcurrentvacationmonths,
+  STRING advomaxvacationmonths,
+  STRING advovacationperiodscount,
+  INTEGER isnotvacantbusinessflag,
+  INTEGER ispoboxflag,
+  STRING advoresidentialorbusinessindicatordescription,
+  STRING biscorporatekey,
+  STRING biscorporatestate,
+  STRING biscorporateprocessdate,
+  STRING bislegalname,
+  STRING biscorporatefilingdescription,
+  STRING biscorporatestatus,
+  STRING biscorporatestatusdate,
+  STRING biscorporatestatuscomment,
+  STRING biscorporateincorporationdate,
+  STRING biscorporateincorporationstate,
+  STRING biscorporatefederaltaxid,
+  STRING bisorganizationstructuredescription,
+  STRING bisprofitindicator,
+  STRING bisregisteredagentname,
+  STRING bisbiplevel,
+  STRING bisenterprisenumber,
+  STRING bisbusinessdescription,
+  STRING biscompanytype,
+  INTEGER bisnumberofemployees,
+  STRING bissalesorrevenue,
+  INTEGER bissales,
+  INTEGER bisearnings,
+  INTEGER bisnetworth,
+  INTEGER bisassets,
+  INTEGER bisliabilities,
+  STRING bisupdatedate,
+  STRING selestreetaddressconcatenated,
+  STRING selestreetaddresscityconcatenated,
+  STRING bestseleaddressconcatenated,
+  STRING proxstreetaddressconcatenated,
+  STRING proxstreetaddresscityconcatenated,
+  STRING bestproxaddressconcatenated,
+  INTEGER bisgsahasgsa,
+  STRING bisgsabiplevel,
+  INTEGER selegsaflag,
+  INTEGER proxgsaflag
+   */
+		),
+	MODEL(
+UID,rLegal,dummycode,uacctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight,rCleanAddr,physicaladdressstate,physicaladdressrecordtype));
+
+
+  
+Claim :=   ENTITY
+(FLAT(UID(bizrecid),
+  Employer rEmployer=UID(uacctno),
+  Claimant rClaimant=UID(application_id),
+	Legal rLegal=UID(seleid),
+  STRING claim_status,
+   /*
+  STRING col_monetary_determination_id,
+  INTEGER claim_bye_ccyymmdd,
+  INTEGER claim_eff_ccyymmdd,
+  STRING claim_prog_type,
+  STRING claim_claim_type,
+  INTEGER claim_submit_ccyymmdd,
+  STRING claim_submit_method,
+  STRING claim_init_add,
+  REAL claim_mba,
+  REAL claim_wba,
+  REAL claim_max_earn_allowed,
+  INTEGER claim_weeks,
+  */
+  INTEGER uacctno, // claim_sep_emp_no in claims
+  STRING claim_sep_emp_name,
+  INTEGER claim_sep_emp_no,
+	INTEGER bizrecid,// this joins to trum,
+  DATE claim_submit_ccyymmdd
+	/*
+  STRING claim_decision_code,
+  STRING application_id,
+  INTEGER seperation_date,
+  STRING seperation_reason,
+  STRING col_dba,
+  STRING col_company,
+  STRING col_address1,
+  STRING col_address2,
+  STRING col_city,
+  STRING col_state,
+  STRING col_zip,
+  STRING col_mailingaddress1,
+  STRING col_mailingaddress2,
+  STRING col_mailingcity,
+  STRING col_mailingstate,
+  STRING col_mailingzip,
+  STRING col_data_source,
+  STRING claim_type,
+  STRING physicaladdressprimaryrange,
+  STRING physicaladdresspredirectional,
+  STRING physicaladdressprimaryname,
+  STRING physicaladdressaddresssuffix,
+  STRING physicaladdresspostdirectional,
+  STRING physicaladdressunitdesignation,
+  STRING physicaladdresssecondaryrange,
+  STRING physicaladdresspostalcity,
+  STRING physicaladdressvanitycity,
+  STRING physicaladdressstate,
+  STRING physicaladdresszip,
+  STRING physicaladdresszip4,
+  STRING physicaladdressdbpc,
+  STRING physicaladdresscheckdigit,
+  STRING physicaladdressrecordtype,
+  STRING physicaladdresscounty,
+  STRING physicaladdresslatitude,
+  STRING physicaladdresslongitude,
+  STRING physicaladdressmsa,
+  STRING physicaladdressgeoblock,
+  STRING physicaladdressgeomatchcode,
+  STRING physicaladdresserrorstatus,
+  BOOLEAN physicaladdresscachehit,
+  BOOLEAN physicaladdresscleanerhit,
+  STRING physicaladdresscleanedaddress,
+  STRING physicaladdressinputaddress,
+  BOOLEAN physicaladdressnoaddressinput,
+  BOOLEAN physicaladdressnoaddresscleanererror,
+  STRING physicaladdresserrorcodedescription,
+  STRING mailingaddressprimaryrange,
+  STRING mailingaddresspredirectional,
+  STRING mailingaddressprimaryname,
+  STRING mailingaddressaddresssuffix,
+  STRING mailingaddresspostdirectional,
+  STRING mailingaddressunitdesignation,
+  STRING mailingaddresssecondaryrange,
+  STRING mailingaddresspostalcity,
+  STRING mailingaddressvanitycity,
+  STRING mailingaddressstate,
+  STRING mailingaddresszip,
+  STRING mailingaddresszip4,
+  STRING mailingaddressdbpc,
+  STRING mailingaddresscheckdigit,
+  STRING mailingaddressrecordtype,
+  STRING mailingaddresscounty,
+  STRING mailingaddresslatitude,
+  STRING mailingaddresslongitude,
+  STRING mailingaddressmsa,
+  STRING mailingaddressgeoblock,
+  STRING mailingaddressgeomatchcode,
+  STRING mailingaddresserrorstatus,
+  BOOLEAN mailingaddresscachehit,
+  BOOLEAN mailingaddresscleanerhit,
+  STRING mailingaddresscleanedaddress,
+  STRING mailingaddressinputaddress,
+  BOOLEAN mailingaddressnoaddressinput,
+  BOOLEAN mailingaddressnoaddresscleanererror,
+  STRING mailingaddresserrorcodedescription,
+  INTEGER legalphysicalultid,
+  INTEGER legalphysicalorgid,
+  INTEGER legalphysicalseleid,
+  INTEGER legalphysicalproxid,
+  INTEGER legalphysicalpowid,
+  INTEGER legalphysicaldotid,
+  INTEGER legalphysicalempid,
+  INTEGER legalphysicalscore,
+  INTEGER legalphysicalweight,
+  INTEGER legalmailingultid,
+  INTEGER legalmailingorgid,
+  INTEGER legalmailingseleid,
+  INTEGER legalmailingproxid,
+  INTEGER legalmailingpowid,
+  INTEGER legalmailingdotid,
+  INTEGER legalmailingempid,
+  INTEGER legalmailingscore,
+  INTEGER legalmailingweight,
+  INTEGER dbaphysicalultid,
+  INTEGER dbaphysicalorgid,
+  INTEGER dbaphysicalseleid,
+  INTEGER dbaphysicalproxid,
+  INTEGER dbaphysicalpowid,
+  INTEGER dbaphysicaldotid,
+  INTEGER dbaphysicalempid,
+  INTEGER dbaphysicalscore,
+  INTEGER dbaphysicalweight,
+  INTEGER dbamailingultid,
+  INTEGER dbamailingorgid,
+  INTEGER dbamailingseleid,
+  INTEGER dbamailingproxid,
+  INTEGER dbamailingpowid,
+  INTEGER dbamailingdotid,
+  INTEGER dbamailingempid,
+  INTEGER dbamailingscore,
+  INTEGER dbamailingweight,
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER empid,
+  INTEGER dotid,
+  INTEGER score,
+  INTEGER weight,
+  INTEGER businessisultinput,
+  INTEGER businessisseleinput,
+  INTEGER businessisproxinput,
+  STRING bestultcompanyname,
+  STRING bestultfein,
+  STRING bestultprimaryrange,
+  STRING bestultpredirectional,
+  STRING bestultprimaryname,
+  STRING bestultaddresssuffix,
+  STRING bestultpostdirectional,
+  STRING bestultunitdesignation,
+  STRING bestultsecondaryrange,
+  STRING bestultpostalcity,
+  STRING bestultvanitycity,
+  STRING bestultstate,
+  STRING bestultzip,
+  STRING bestultzip4,
+  STRING bestultcounty,
+  STRING bestultphone,
+  INTEGER bestultdatefirstseen,
+  INTEGER bestultdatelastseen,
+  INTEGER bestultincorporationdate,
+  STRING bestultsic,
+  STRING bestultnaics,
+  STRING bestselecompanyname,
+  STRING bestselefein,
+  STRING bestseleprimaryrange,
+  STRING bestselepredirectional,
+  STRING bestseleprimaryname,
+  STRING bestseleaddresssuffix,
+  STRING bestselepostdirectional,
+  STRING bestseleunitdesignation,
+  STRING bestselesecondaryrange,
+  STRING bestselepostalcity,
+  STRING bestselevanitycity,
+  STRING bestselestate,
+  STRING bestselezip,
+  STRING bestselezip4,
+  STRING bestselecounty,
+  STRING bestselephone,
+  INTEGER bestseledatefirstseen,
+  INTEGER bestseledatelastseen,
+  INTEGER bestseleincorporationdate,
+  STRING bestselesic,
+  STRING bestselenaics,
+  BOOLEAN bestseleisactive,
+  BOOLEAN bestseleisdefunct,
+  STRING bestproxcompanyname,
+  STRING bestproxfein,
+  STRING bestproxprimaryrange,
+  STRING bestproxpredirectional,
+  STRING bestproxprimaryname,
+  STRING bestproxaddresssuffix,
+  STRING bestproxpostdirectional,
+  STRING bestproxunitdesignation,
+  STRING bestproxsecondaryrange,
+  STRING bestproxpostalcity,
+  STRING bestproxvanitycity,
+  STRING bestproxstate,
+  STRING bestproxzip,
+  STRING bestproxzip4,
+  STRING bestproxcounty,
+  STRING bestproxphone,
+  INTEGER bestproxdatefirstseen,
+  INTEGER bestproxdatelastseen,
+  INTEGER bestproxincorporationdate,
+  STRING bestproxsic,
+  STRING bestproxnaics,
+  STRING mappininfo,
+  INTEGER bipattributesisnew,
+  INTEGER bipattributesinactive,
+  INTEGER bipattributeshierarchysize,
+  STRING ultentitycontextuid,
+  STRING seleentitycontextuid,
+  STRING proxentitycontextuid,
+  INTEGER bizrecid,
+  STRING advohitflag,
+  STRING advovacancyindicator,
+  STRING advothrowbackindicator,
+  STRING advoseasonaldeliveryindicator,
+  STRING advoseasonalsuppressionstartdate,
+  STRING advoseasonalsuppressionenddate,
+  STRING advodonotdeliverindicator,
+  STRING advocollegeindicator,
+  STRING advocollegesuppressionstartdate,
+  STRING advocollegesuppressionenddate,
+  STRING advoaddressstyle,
+  STRING advosimplifyaddresscount,
+  STRING advodropindicator,
+  STRING advoresidentialorbusinessindicator,
+  STRING advoonlywaytogetmailindicator,
+  STRING advorecordtypecode,
+  STRING advoaddresstype,
+  STRING advoaddressusagetype,
+  STRING advofirstseendate,
+  STRING advolastseendate,
+  STRING advovendorfirstreporteddate,
+  STRING advovendorlastreporteddate,
+  STRING advovacationbegindate,
+  STRING advovacationenddate,
+  STRING advonumberofcurrentvacationmonths,
+  STRING advomaxvacationmonths,
+  STRING advovacationperiodscount,
+  INTEGER isnotvacantbusinessflag,
+  INTEGER ispoboxflag,
+  STRING advoresidentialorbusinessindicatordescription,
+  STRING biscorporatekey,
+  STRING biscorporatestate,
+  STRING biscorporateprocessdate,
+  STRING bislegalname,
+  STRING biscorporatefilingdescription,
+  STRING biscorporatestatus,
+  STRING biscorporatestatusdate,
+  STRING biscorporatestatuscomment,
+  STRING biscorporateincorporationdate,
+  STRING biscorporateincorporationstate,
+  STRING biscorporatefederaltaxid,
+  STRING bisorganizationstructuredescription,
+  STRING bisprofitindicator,
+  STRING bisregisteredagentname,
+  STRING bisbiplevel,
+  STRING bisenterprisenumber,
+  STRING bisbusinessdescription,
+  STRING biscompanytype,
+  INTEGER bisnumberofemployees,
+  STRING bissalesorrevenue,
+  INTEGER bissales,
+  INTEGER bisearnings,
+  INTEGER bisnetworth,
+  INTEGER bisassets,
+  INTEGER bisliabilities,
+  STRING bisupdatedate,
+  STRING selestreetaddressconcatenated,
+  STRING selestreetaddresscityconcatenated,
+  STRING bestseleaddressconcatenated,
+  STRING proxstreetaddressconcatenated,
+  STRING proxstreetaddresscityconcatenated,
+  STRING bestproxaddressconcatenated,
+  INTEGER bisgsahasgsa,
+  STRING bisgsabiplevel,
+  INTEGER selegsaflag,
+  INTEGER proxgsaflag*/
+		),
+	MODEL(UID, rEmployer, rClaimant, rLegal, claim_status, claim_submit_ccyymmdd, bizrecid, uacctno,claim_sep_emp_name, claim_sep_emp_no));
+
+
+
+Person :=  ENTITY
+(FLAT(UID(employeelexid),
+	STRING employeelexid,
+	STRING firstname,
+	STRING middleinit,
+	STRING lastname
+), MODEL(UID, employeelexid, firstname, middleinit, lastname));
+
+
+Claimant :=   ENTITY
+(FLAT(UID(application_id),
+	STRING claimant_ssn,
+	INTEGER claimantlexid),
+	MODEL(UID, claimant_ssn, claimantlexid));
+
+
+CleanAddress :=  ENTITY
+(FLAT(UID(physicaladdresscleanedaddress),
+	STRING addr=physicaladdresscleanedaddress),
+	MODEL(UID, addr));
+/*Define associations between entities
+*/
+
+
+LegalEmployer :=   ASSOCIATION
+(FLAT(
+    Legal rLegal=UID(seleid),
+    Employer rEmployer=UID(uacctno)
+    //DATE claim_submit_ccyymmdd
+   ));
+
+
+EmployerClaim :=   ASSOCIATION
+(FLAT(
+    Employer rEmployer=UID(uacctno),
+		Claim rClaim=UID(bizrecid)
+    //DATE claim_submit_ccyymmdd
+   ));
+
+
+LegalClaim :=   ASSOCIATION
+(FLAT(
+    Legal rLegal=UID(seleid),
+		Claim rClaim=UID(bizrecid)
+    //DATE claim_submit_ccyymmdd
+   ));
+
+
+EmployerAddr :=  ASSOCIATION
+(FLAT(
+		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
+    Employer rEmployer=UID(uacctno)
+	));
+
+	
+LegalAddr :=  ASSOCIATION
+(FLAT(
+		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
+    Legal rLegal=UID(seleid)
+	));
+
+	
+LegalPersonWages :=  ASSOCIATION
+(FLAT(
+		Legal rLegal=UID(seleid),
+		INTEGER wageyearqtr,
+		REAL wageamt,
+		Person rPerson=UID(employeelexid)));
+
+/*
+SeleSeleEmployees :=  ASSOCIATION
+(FLAT(
+		Fromultid,
+		Toultid,
+		Legal rFromLegal=UID(FromSeleID),
+		Legal rToLegal=UID(ToSeleID),
+		// Employer rEmployer=UID(uacctno),
+		Employer rFromEmployer=UID(FromEmpNum),
+		Employer rToEmployer=UID(ToEmpNum),
+    INTEGER fromstartwageyearqtr,
+    INTEGER fromendwageyearqtr,
+    INTEGER tostartwageyearqtr,
+    INTEGER toendwageyearqtr,
+		Person rPerson=UID(employeelexid)
+		));
+*/ 
+FromEmployerEmployees := ASSOCIATION
+                (FLAT(Employer rFromEmployer=UID(FromEmpNum),
+                      Employer rToEmployer=UID(ToEmpNum),
+											INTEGER fromstartwageyearqtr,
+											INTEGER fromendwageyearqtr,
+											INTEGER tostartwageyearqtr,
+											INTEGER toendwageyearqtr,
+											STRING fromstarttaxrate,
+											STRING fromendtaxrate,
+											STRING tostarttaxrate,
+											STRING toendtaxrate,
+											BOOLEAN CleanMovementFlag,
+                      Person rPerson=UID(employeelexid)
+                                ));
+
+ToEmployerEmployees := ASSOCIATION
+                (FLAT(Employer rToEmployer=UID(ToEmpNum),
+                      Employer rFromEmployer=UID(FromEmpNum),
+											INTEGER fromstartwageyearqtr,
+											INTEGER fromendwageyearqtr,
+											INTEGER tostartwageyearqtr,
+											INTEGER toendwageyearqtr,
+											STRING fromstarttaxrate,
+											STRING fromendtaxrate,
+											STRING tostarttaxrate,
+											STRING toendtaxrate,
+											BOOLEAN CleanMovementFlag,
+                      Person rPerson=UID(employeelexid)
+                                ));
+                
+  
+USE FraudgovUIKEL.Files.WagesAssociations(FLAT,
+		ToEmployerEmployees(FILTER((UNSIGNED)employeelexid != 0 AND FromEmpNum != 0 AND ToEmpNum != 0)),
+		FromEmployerEmployees(FILTER((UNSIGNED)employeelexid != 0 AND FromEmpNum != 0 AND ToEmpNum != 0)));
+USE FraudGovUIKel.Files.Wages(FLAT,
+		Person(FILTER((UNSIGNED)employeelexid != 0)),
+		Legal,	
+    Employer(FILTER((UNSIGNED)empnum != 0), 
+      physicaladdresscleanedaddress=addresscleanedaddress,
+		  uacctno=empnum),
+		LegalPersonWages(FILTER((UNSIGNED)employeelexid != 0)));
+USE FRAUDGovUIKEL.Files.Employer(FLAT,
+    Employer(FILTER((UNSIGNED)uacctno != 0)),
+	  Legal(FILTER((UNSIGNED)uacctno != 0)),
+		LegalEmployer(FILTER((UNSIGNED)uacctno != 0)),
+		LegalAddr(FILTER((UNSIGNED)uacctno != 0)),
+		CleanAddress(FILTER((UNSIGNED)uacctno != 0)),
+		EmployerAddr(FILTER((UNSIGNED)uacctno != 0))
+	);
+USE FraudGovUIKEL.Files.Claims(FLAT, 
+  Claim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
+	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
+	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
+	);
+USE FraudGovUIKEL.Files.Claimant(FLAT,
+  Claimant(FILTER((UNSIGNED)application_id != 0)));
+                        
+
+
+// Address Fields
+CleanAddress: => VelBusAcctPerAddrInProgCnt := MAP(COUNT(EmployerAddr.rEmployer(BusAcctUIDEcho>0)) = 0 => -99998, // No Employers using this address with a BusAcctUIDEcho
+																									 MIN(COUNT(EmployerAddr.rEmployer(BusAcctUIDEcho>0)), 9999));
+/*Define attributes for the Legal entity
+*/
+Legal: => AccountNumberCount := COUNT(AccountNumbers);
+Legal: => ClaimCount := COUNT(LegalClaim);
+Legal: => BusNewestRecordDt := 20190701;
+ // fixme. Need updated when new iterations of data come in
+Legal: => NewestUnemClmDt := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, // No valid claim dates
+																 INTEGER(MAX(LegalClaim.rClaim, claim_submit_ccyymmdd)));
+Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, // No valid claim dates
+																 INTEGER(MIN(LegalClaim.rClaim, claim_submit_ccyymmdd)));
+Legal: => NewestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null) => -99998,
+                                    ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(liabtermdate)) => -99998, // No valid liabtermdate
+																    INTEGER(MAX(LegalEmployer.rEmployer, liabtermdate)));
+Legal: => OldestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null) => -99998,
+                                    ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(liabtermdate)) => -99998, // No valid liabtermdate
+																    INTEGER(MIN(LegalEmployer.rEmployer, liabtermdate)));
+Legal: => NewestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null) => -99998,
+                                      ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(dateliabest)) => -99998, // No valid dateliabest
+																      INTEGER(MAX(LegalEmployer.rEmployer, dateliabest)));
+Legal: => OldestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null) => -99998,
+                                      ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(dateliabest)) => -99998, // No valid dateliabest
+																 INTEGER(MIN(LegalEmployer.rEmployer, dateliabest)));
+Legal: => TaxLiabOngoingFlag := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
+																				 ALL(LegalEmployer.rEmployer, NOT liabtermdate:Null) OR (NewestTaxLiabStartDt < NewestTaxLiabEndDt) => 0,
+																				 1);
+Legal: => IncorpDt := MAP(NOT ISVALIDDATE(bestseleincorporationdate) OR bestseleincorporationdate:Null => -99997, // SOS incorp date is invalid
+													INTEGER(bestseleincorporationdate));
+ // I believe this is the SOS incorporation date
+Legal: => IncorpStatusType := MAP(biscorporatestatus:Null => -99997,
+																	biscorporatestatus);
+Legal: => UnemClaimCurrActiveCount := MAP(ClaimCount=0 => -99998,
+                                          ALL(LegalClaim.rClaim, claim_status:Null OR claim_status='' ) => -99997,
+																					COUNT(LegalClaim.rClaim(claim_status = 'Regular Active')));
+Legal: => UnemClaimFiledCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge != -99998)));
+Legal: => UnemClaimFiledCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365)));
+Legal: => UnemClaimFiledCnt120D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120)));
+Legal: => UnemClaimFiledCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90)));
+Legal: => UnemClaimFiledCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30)));
+Legal: => UnemClaimApprvCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge != -99998)));
+Legal: => UnemClaimApprvCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 365)));
+Legal: => UnemClaimApprvCnt120D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 120)));
+Legal: => UnemClaimApprvCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 90)));
+Legal: => UnemClaimApprvCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge:Null) => 0,
+                                     ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 30)));
+Legal: => OldestAcctOpenDt := MAP(ALL(LegalEmployer.rEmployer, statusreceiptdate:Null OR (NOT ISVALIDDATE(statusreceiptdate))) => -99998, // No valid statusreceiptdate
+																 INTEGER(MIN(LegalEmployer.rEmployer, statusreceiptdate)));
+Legal: => NewestAcctOpenDt := MAP(ALL(LegalEmployer.rEmployer, statusreceiptdate:Null OR (NOT ISVALIDDATE(statusreceiptdate))) => -99998, // No valid statusreceiptdate
+																 INTEGER(MAX(LegalEmployer.rEmployer, statusreceiptdate)));
+Legal: => OldestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
+																 INTEGER(MIN(LegalEmployer.rEmployer, datefirstemp)));
+Legal: => NewestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
+																 INTEGER(MAX(LegalEmployer.rEmployer, datefirstemp)));
+Legal: => BusOldestEmpBegantoAcctOpenSpan := MAP(OldestEmployerBeganDt=-99998 OR OldestAcctOpenDt=-99998 => -99998,
+																								    MAX(MIN(MONTHSBETWEEN(DATE(OldestEmployerBeganDt),DATE(OldestAcctOpenDt)), 999), -999));
+Legal: => BusOldestLiabStartToAcctOpenSpan := MAP(OldestTaxLiabStartDt=-99998 OR OldestAcctOpenDt=-99998 => -99998,
+																								    MAX(MIN(MONTHSBETWEEN(DATE(OldestTaxLiabStartDt),DATE(OldestAcctOpenDt)), 999), -999));
+Legal: => BusIncorpToOldestAcctOpenSpan := MAP(OldestAcctOpenDt=-99998 OR IncorpDt =-99998 => -99998,
+																								  MAX(MIN(MONTHSBETWEEN(DATE(IncorpDt),DATE(OldestAcctOpenDt)), 999), -999));
+
+//Legal Fictitious Business attributes															 
+Legal: => BusAcctPerBusLegalEntCnt := COUNT(LegalEmployer{rEmployer});
+Legal: => UnemClmAfterOldestOpenCnt30D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
+																							COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 30)));
+Legal: => UnemClmAfterOldestOpenCnt60D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998)=> -99998,
+																							COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 60)));
+Legal: => UnemClmAfterOldestOpenCnt90D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
+																						  COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 90)));
+Legal: => UnemClmAfterOldestOpenCnt120D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                               ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                               ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
+																							 COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 120)));
+Legal: => EmpBeganToAcctOpenLT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=12)));
+Legal: => EmpBeganToAcctOpenLT6MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=6)));
+Legal: => EmpBeganToAcctOpenGT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>12)));
+ 
+
+
+
+
+
+
+// Legal claim history attributes
+// Count the number of unique claimant ids with claims having a "regular active" status
+Legal: => BusUnemClmAcctCurrActiveCnt := MAP(ClaimCount=0 => -99998, // No unemployment claims 
+																					  ALL(LegalClaim.rClaim, claim_status:Null) => -99997,
+																					  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim(UPCASE(rClaim.claim_status)='REGULAR ACTIVE').rClaim.rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+
+
+// first batch
+// Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
+Legal: => BusUnemClmAcctFiledCntEv := MAP(ClaimCount=0 => -99998, 
+																				  ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
+																					ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997,
+																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																						ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 			
+																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
+																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+
+
+// second batch
+// Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
+Legal: => BusUnemClmLexIDFiledCntEv := MAP(ClaimCount=0 => -99998, 
+																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
+																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																						 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																						 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
+																						ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt30D := MAP(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0 => -99998, // There are no claims within 30 days
+																						ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+
+
+// third batch
+// Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt
+Legal: => BusLexIDMultiUnemClmCntEv := MAP(ClaimCount=0 => -99998, 
+																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																							 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Legal: => BusLexIDMultiUnemClmCnt1Y := MAP( ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
+																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																							 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Legal: => BusLexIDMultiUnemClmCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Legal: => BusLexIDMultiUnemClmCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998,
+																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Legal: => BusLexIDMultiUnemClmCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
+																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+
+
+// Fictitious business attributes
+Legal: => BusOldestAcctOpenDtMsince := MAP(OldestAcctOpenDt=-99998 => -99998,
+																					 MAX(MIN(MONTHSBETWEEN(DATE(OldestAcctOpenDt), DATE(BusNewestRecordDt)), 999), 0));
+Legal: => BusOldestLiabStartToOpenGT5MFlag := MAP(BusOldestLiabStartToAcctOpenSpan=-99998 => -99998,
+																									BusOldestLiabStartToAcctOpenSpan < 0 => -99997,
+																									BusOldestLiabStartToAcctOpenSpan < 5 => 0,
+																									1);
+ // >= 5 condition
+Legal: => BusAcctPerBusOwnerNotPopCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctOwnerNotPopFlag=-99997) => -99997,
+																						 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctOwnerNotPopFlag=1)), 999), 0));
+Legal: => BusOwnerNotPopFlag := MAP(BusAcctPerBusOwnerNotPopCnt=-99997 => -99997,
+																		BusAcctPerBusOwnerNotPopCnt=0 => 0,
+																		1);
+ // > 0
+Legal: => BusAcctPerBusNotInProgAreaCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctStateNotInProgAreaFlag IN [-99999, -99998]) => -99998,
+																							 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctStateNotInProgAreaFlag=1)), 9999), 0));
+Legal: => BusAcctPerBusNotInProgAreaFlag := MAP(BusAcctPerBusNotInProgAreaCnt=-99998 => -99998,
+																								BusAcctPerBusNotInProgAreaCnt=0 => 0,
+																								1);
+Legal: => BusAcctPerBusAddressPOBoxCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctAddressPOBoxFlag IN [-99999, -99998]) => -99998,
+																							MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctAddressPOBoxFlag=1)), 9999), 0));
+Legal: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctPerBusAddressPOBoxCnt=-99998 => -99998,
+																							 BusAcctPerBusAddressPOBoxCnt=0 => 0, 
+																							 1);
+Legal: => BusAcctPerBusLegActLienCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctLegalActionTypeEcho=-99997) => -99998, // todo fixme remember this requires unique BusAcctUIDEcho
+																						MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctLegalActionTypeEcho = 1)), 9999), 0));
+Legal: => BusAcctPerBusLegalActOtherCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctLegalActionTypeEcho=-99997) => -99998, // todo fixme remember this requires unique BusAcctUIDEcho
+																						 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctLegalActionTypeEcho = 2)), 9999), 0));
+Legal: => BusAcctPerBusLegalActPaymCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctLegalActionTypeEcho=-99997) => -99998, // todo fixme remember this requires unique BusAcctUIDEcho
+																						 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctLegalActionTypeEcho IN [3,4])), 9999), 0));
+Legal: => BusLegalActionFlag := MAP(ALL(LegalEmployer.rEmployer, BusAcctLegalActionTypeEcho=-99997) => -99998,
+																		BusAcctPerBusLegActLienCnt>0 OR BusAcctPerBusLegalActOtherCnt>0 => 1,
+																		0);
+Legal: => BusWarrantIssuedSum := MAP(ALL(LegalEmployer.rEmployer, BusAcctWarrantIssuedCntEcho IN [-99998, -99997]) => -99998,
+																			MAX(MIN(SUM(LegalEmployer.rEmployer(BusAcctWarrantIssuedCntEcho >= 0), BusAcctWarrantIssuedCntEcho),9999),0));
+	// Remove special values
+Legal: => BusAcctPerBusWithWarrantCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctWarrantIssuedCntEcho IN [-99998, -99997]) => -99998,
+																						 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctWarrantIssuedFlag=1)), 9999), 0));
+Legal: => BusWarrantIssuedFlag := MAP(BusAcctPerBusWithWarrantCnt=-99998 => -99998,
+																			BusAcctPerBusWithWarrantCnt=0 => 0,
+																			1);
+Legal: => BusAcctPerBusTaxLiabBlceDebCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=2)), 9999), 0));
+Legal: => BusAcctPerBusTaxLiabBlceCredCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=1)), 9999), 0));
+Legal: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=3)), 9999), 0));
+Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 => -99998,
+																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0,
+																				 BusAcctPerBusTaxLiabBlceDebCnt > 0 => 1);
+Legal: => dsVelBusAcctPerAddrInBusLegEnt := LegalEmployer.rEmployer(BusAcctUIDEcho > 0);
+  
+
+// New legal attributes
+// Legal: => FirstMoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND rFromLegal.seleid != 0)); // need to include associations where there is no prior wage reported.
+// Legal: => MoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0));
+// Legal: => MoveSameSeleDiffEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum));
+// Legal: => MoveSameSeleDiffEmp :=SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum);
+// Legal: => MoveSameUltDiffSeleEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid));
+// Legal: => MoveSameUltDiffSeleEmp := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
+// Legal: => MoveTos := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0){rFromLegal.seleid, rToLegal.seleid, rPerson.employeelexid};
+// Legal: => SameUltDiffSeleEmployeeCount := COUNT(SeleSeleEmployees(fromwageyearqtr = towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid){rPerson});
+// Legal: => TestWagesTotal := SUM(LegalPersonWages, wageamt);
+
+
+																		
+																				 
+// Claim Attributes
+Claim: => ClaimAge := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
+													rEmployer:Null => -99997,
+                          DAYSBETWEEN(claim_submit_ccyymmdd,  DATE(rEmployer.BusAcctNewestRecordDt)));
+Claim: => EmpAgeAtClaim := MAP(rEmployer.BusAcctNewestRecordDt=-99999 => -99999,
+                          claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
+                          DAYSBETWEEN(DATE(rEmployer.BusAcctOpenDtEcho),claim_submit_ccyymmdd));
+Claim: => BusAgeAtClaim := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
+                          DAYSBETWEEN(DATE(rLegal.OldestEmployerBeganDt),claim_submit_ccyymmdd));
+Claim: => DateCheck := rLegal.OldestEmployerBeganDt;
+
+
+
+// Claimant Attributes
+Claimant: => ID := claimant_ssn;
+Claimant: => LexID := claimantlexid;
+
+
+// Employer attributes
+Employer: => ClaimCount := COUNT(EmployerClaim);
+
+// Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
+// Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
+Employer: => BusAcctUIDEcho := MAP((fltradename:Null OR flstreetaddr:Null OR zip:Null) AND (fltradename:Null OR flstreetaddr:Null OR citystate:Null) => -99999,
+                                   uacctno);
+Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 ultid:Null => -99998,
+																			 ultid);
+Employer: => BusAcctOrgIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																				orgid:Null => -99998,
+																				orgid);
+Employer: => BusAcctSeleIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			  seleid:Null => -99998,
+																			  seleid);
+Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 proxid:Null => -99998,
+																			 proxid);
+Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 powid:Null => -99998,
+																			 powid);
+/*This section is Nate's attributes. Keeping these separate to prevent code merging issues.
+
+*/
+Employer: => BusAcctNewestUpdateMasterDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								20190701);
+ // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
+Employer: => BusNewestRecordDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																			rLegal.BusNewestRecordDt);
+ // fixme
+Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							 ISVALIDDATE(datefirstemp) => INTEGER(datefirstemp), // In YYYYMMDD format
+																							 -99998);
+Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							 ISVALIDDATE(liabtermdate) => INTEGER(liabtermdate), // In YYYYMMDD format
+																							 -99998);
+Employer: => BusNewestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					  rLegal.NewestTaxLiabStartDt);
+ // possible fixme?
+Employer: => BusNewestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					rLegal.NewestTaxLiabEndDt);
+// possible fixme?
+Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							BusAcctTaxLiabStartDtEcho=-99998 => -99998,
+																							BusAcctTaxLiabStartDtEcho > BusAcctNewestRecordDt => -99997,
+																							MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho), DATE(BusAcctNewestRecordDt)), 999), 0));
+Employer: => BusOldestTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																								BusOldestTaxLiabStartDt=-99998 => -99998,
+																								BusOldestTaxLiabStartDt > BusNewestRecordDt => -99997,
+																								MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt), DATE(BusNewestRecordDt)), 999), 0));
+Employer: => BusAcctOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					 ClaimCount=0 => -99998,
+																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
+																					 INTEGER(MIN(EmployerClaim.rClaim, claim_submit_ccyymmdd)));
+Employer: => BusOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																			 rLegal.ClaimCount=0 => -99998,
+																			 rLegal.OldestUnemClmDt);
+ // Will have -99997 if no dates
+Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                rLegal.IncorpDt > BusNewestRecordDt => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
+                                rLegal.IncorpDt);
+Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																		BusIncorpDt=-99997 => -99997, // Or unable to calculate
+																		DAYSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)) < 0 => -99998,
+																		MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999), 0));
+
+	
+// Claim History Attributes
+// fixme - verify that claim fields BusAcctUnemClmAcctCurrActiveCnt and BusAcctUnemClaimCurrActiveCnt match up on -99998
+Employer: => BusAcctUnemClmAcctCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									 ClaimCount=0 => -99998, // No unemployment claims 
+																									 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
+																									 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE').rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+
+
+// Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
+Employer: => BusAcctUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Employer: => BusAcctUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, // There are no claims within 1 year
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Employer: => BusAcctUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Employer: => BusAcctUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Employer: => BusAcctUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+
+
+
+// Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt 
+Employer: => BusAcctUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Employer: => BusAcctUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Employer: => BusAcctUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Employer: => BusAcctUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Employer: => BusAcctUnemClmLexIDFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
+																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+
+
+// Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt
+Employer: => BusAcctLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								  ClaimCount=0 => -99998, 
+																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								  MAX(MIN(COUNT(EmployerClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Employer: => BusAcctLexIDMultiUnemClmCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
+																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								  MAX(MIN(COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Employer: => BusAcctLexIDMultiUnemClmCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
+																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								  MAX(MIN(COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Employer: => BusAcctLexIDMultiUnemClmCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
+																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								  MAX(MIN(COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+Employer: => BusAcctLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
+																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								  MAX(MIN(COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
+
+
+
+// The same attributes as before, just on the legal business entitiy instead of the actual business.			
+Employer: => BusUnemClmAcctCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 rLegal.BusUnemClmAcctCurrActiveCnt);
+	
+
+// Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
+Employer: => BusUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																						 rLegal.BusUnemClmAcctFiledCntEv);
+Employer: => BusUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																						 rLegal.BusUnemClmAcctFiledCnt1Y);
+Employer: => BusUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 rLegal.BusUnemClmAcctFiledCnt120D);
+Employer: => BusUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							rLegal.BusUnemClmAcctFiledCnt90D);
+Employer: => BusUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							rLegal.BusUnemClmAcctFiledCnt30D);
+	
+
+// Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
+Employer: => BusUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							rLegal.BusUnemClmLexIDFiledCntEv);
+Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							rLegal.BusUnemClmLexIDFiledCnt1Y);
+Employer: => BusUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																								rLegal.BusUnemClmLexIDFiledCnt120D);
+Employer: => BusUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 rLegal.BusUnemClmLexIDFiledCnt90D);
+Employer: => BusUnemClmLexIDFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 rLegal.BusUnemClmLexIDFiledCnt30D);
+
+																			
+// Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt																		
+Employer: => BusLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																									rLegal.BusLexIDMultiUnemClmCntEv);
+Employer: => BusLexIDMultiUnemClmCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																									rLegal.BusLexIDMultiUnemClmCnt1Y);
+Employer: => BusLexIDMultiUnemClmCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999, 
+																										rLegal.BusLexIDMultiUnemClmCnt120D);
+Employer: => BusLexIDMultiUnemClmCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																									 rLegal.BusLexIDMultiUnemClmCnt90D);
+Employer: => BusLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																									 rLegal.BusLexIDMultiUnemClmCnt30D);
+
+
+
+// Fictitious Business attributes
+Employer: => BusAcctOpenDtMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BusAcctOpenDtEcho=-99998 => -99998,
+																				MAX(MIN(MONTHSBETWEEN(DATE(BusAcctOpenDtEcho), DATE(BusAcctNewestRecordDt)),999), 0));
+Employer: => BusOldestAcctOpenDtMsince := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																							rLegal.BusOldestAcctOpenDtMsince);
+Employer: => BusAcctLiabStartToOpenGT5MFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									 BusAcctLiabStartToOpenDtSpan=-99998 => -99998,
+																									 BusAcctLiabStartToOpenDtSpan < 0 => -99997,
+																									 BusAcctLiabStartToOpenDtSpan < 5 => 0,
+																									 1);
+	// >= 5 condition
+Employer: => BusOldestLiabStartToOpenGT5MFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																										 rLegal.BusOldestLiabStartToOpenGT5MFlag);
+Employer: => BusAcctOwnerCntEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				numownssn:Null OR numownssn='' => -99998,
+																				IsNonIntegerStr(numownssn) => -99997,
+																				INTEGER(numownssn));
+Employer: => BusAcctOwnerName1Pop := MAP(ownername1:Null OR ownername1='' => 0, 1);
+Employer: => BusAcctOwnerSSN1Pop := MAP(LENGTH(ownerssn1) < 9 => -99997,
+																				ownerssn1:Null OR ownerssn1='' OR (INTEGER(ownerssn1)=0) => 0,1);
+Employer: => BusAcctOwnerName2Pop := MAP(ownername2:Null OR ownername2='' => 0, 1);
+Employer: => BusAcctOwnerSSN2Pop := MAP(LENGTH(ownerssn2) < 9 => -99997,
+																				ownerssn2:Null OR ownerssn2='' OR (INTEGER(ownerssn2)=0) => 0,1);
+Employer: => BusAcctOwnerName3Pop := MAP(ownername3:Null OR ownername3='' => 0, 1);
+Employer: => BusAcctOwnerSSN3Pop := MAP(LENGTH(ownerssn3) < 9 => -99997,
+																				ownerssn3:Null OR ownerssn3='' OR (INTEGER(ownerssn3)=0)=> 0,1);
+Employer: => BusAcctOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					 // -99997 unable to calculate
+																					 BusAcctOwnerCntEcho > 0 OR (BusAcctOwnerName1Pop=1 AND BusAcctOwnerSSN1Pop=1) OR 
+																							(BusAcctOwnerName2Pop=1 AND BusAcctOwnerSSN2Pop=1) OR 
+																							(BusAcctOwnerName3Pop=1 AND BusAcctOwnerSSN3Pop=1) => 0,
+																					 BusAcctOwnerCntEcho = 0 AND (BusAcctOwnerName1Pop=0 OR BusAcctOwnerSSN1Pop=0) AND 
+																							(BusAcctOwnerName2Pop=0 OR BusAcctOwnerSSN2Pop=0) AND 
+																							(BusAcctOwnerName3Pop=0 OR BusAcctOwnerSSN3Pop=0) => 1,
+																					 -99997);
+Employer: => BusAcctPerBusOwnerNotPopCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																								rLegal.BusAcctPerBusOwnerNotPopCnt);
+Employer: => BusOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																			 rLegal.BusOwnerNotPopFlag);
+Employer: => BusAcctFullAddressCleanPop := MAP((flstreetaddr:Null OR citystate:Null OR zip:Null) => -99999, // (Street+City+State) OR(Street+Zip) not met. Demorgan'd out 														,							 
+																							rCleanAddr:Null OR rCleanAddr.addr='' => 0,
+																							1);
+ //populated
+Employer: => BusAcctStateClean := MAP(BusAcctFullAddressCleanPop=-99999 OR BusAcctFullAddressCleanPop=0 => -99999,
+																			physicaladdressstate:Null OR physicaladdressstate='' => -99998,
+																			physicaladdressstate);
+Employer: => ProgramStateEcho := 'TN';
+ // todo fixme when the data ingest is upgraded
+Employer: => BusAcctStateNotInProgAreaFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctFullAddressCleanPop IN [-99999, 0] => -99999,
+																									BusAcctStateClean=-99998 OR ProgramStateEcho=-99998 => -99998,
+																									UPCASE(BusAcctStateClean)=UPCASE(ProgramStateEcho) => 0,
+																									1);
+ // states don't match
+Employer: => BusAcctPerBusNotInProgAreaCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									rLegal.BusAcctPerBusNotInProgAreaCnt);
+Employer: => BusAcctPerBusNotInProgAreaFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									 rLegal.BusAcctPerBusNotInProgAreaFlag);
+Employer: => BusAcctAddressTypeClean := MAP(BusAcctFullAddressCleanPop IN [-99999,0] => -99999,
+																						physicaladdressrecordtype:Null OR physicaladdressrecordtype='' => -99998,
+																						physicaladdressrecordtype);
+Employer: => BusAcctAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctFullAddressCleanPop IN [-99999, 0] => -99999,
+																						BusAcctAddressTypeClean=-99998 => -99998,
+																						UPCASE(BusAcctAddressTypeClean) = 'P' => 1, // a code of 'P' indicates post office
+																						0);
+Employer: => BusAcctPerBusAddressPOBoxCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																								 rLegal.BusAcctPerBusAddressPOBoxCnt);
+Employer: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									rLegal.BusAcctPerBusAddressPOBoxFlag);
+Employer: => VelBusAcctPerAddrInProgCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - Need to use latest master record for each business when coded
+																							 rCleanAddr.VelBusAcctPerAddrInProgCnt);
+Employer: => VelBusAcctPerAddrInBusLegEntCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - need to use latest master record
+																										BusAcctSeleIDAppend=-99998 => -99998,
+																										MIN(COUNT(rLegal.dsVelBusAcctPerAddrInBusLegEnt(
+																																		rCleanAddr=Employer.rCleanAddr)), 9999));
+Employer: => BusAcctLegalActionTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							legalactioncd:Null OR legalactioncd='' => -99998,
+																							UPCASE(legalactioncd) = 'A' => 1,
+																							UPCASE(legalactioncd) = 'L' => 2,
+																							UPCASE(legalactioncd) = 'P' => 3,
+																							UPCASE(legalactioncd) = 'I' => 4,
+																							-99997);
+Employer: => BusAcctLegalActionFlag:= MAP(BusAcctUIDEcho=-99999 => -99999,
+																				 BusAcctLegalActionTypeEcho=-99997 => -99997,
+																				 BusAcctLegalActionTypeEcho IN [-99998, 3, 4] => 0,
+																				 BusAcctLegalActionTypeEcho IN [1,2] => 1);
+Employer: => BusAcctPerBusLegActLienCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,					
+																							 rLegal.BusAcctPerBusLegActLienCnt);
+Employer: => BusAcctPerBusLegalActOtherCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,					
+																							    rLegal.BusAcctPerBusLegalActOtherCnt);
+Employer: => BusAcctPerBusLegalActPaymCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,					
+																							 rLegal.BusAcctPerBusLegalActPaymCnt);
+Employer: => BusLegalActionFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																			 rLegal.BusLegalActionFlag);
+Employer: => BusAcctWarrantIssuedCntEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								warrantsissued:Null OR warrantsissued='' => -99998,
+																								IsNonIntegerStr(warrantsissued) => -99997,
+																								MAX(MIN(INTEGER(warrantsissued), 999), 0));
+Employer: => BusAcctWarrantIssuedDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							 ISVALIDDATE(DATE(datewarrantissued)) => datewarrantissued,
+																							 -99998);
+Employer: => BusAcctWarrantIssuedFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																						 BusAcctWarrantIssuedCntEcho=-99998 => -99998,
+																						 BusAcctWarrantIssuedCntEcho=-99997 => -99997,
+																						 BusAcctWarrantIssuedCntEcho=0 => 0,
+																						 1);
+Employer: => BusWarrantIssuedSum := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																				 rLegal.BusWarrantIssuedSum);
+Employer: => BusAcctPerBusWithWarrantCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																								rLegal.BusAcctPerBusWithWarrantCnt);
+Employer: => BusWarrantIssuedFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																				 rLegal.BusWarrantIssuedFlag);
+Employer: => BusAcctTaxLiabBlceStatusEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 unpaidbalcd:Null OR unpaidbalcd='' => -99998,
+																								 UPCASE(unpaidbalcd)='C' => 1,
+																								 UPCASE(unpaidbalcd)='D' => 2,
+																								 UPCASE(unpaidbalcd)='O' => 3,
+																								 -99997);
+Employer: => BusAcctTaxLiabBlceDebitFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								BusAcctTaxLiabBlceStatusEcho=-99997 => -99997,
+																								BusAcctTaxLiabBlceStatusEcho IN [-99998, 1, 3] => 0,
+																								BusAcctTaxLiabBlceStatusEcho=2 => 1);
+Employer: => BusAcctPerBusTaxLiabBlceDebCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									 rLegal.BusAcctPerBusTaxLiabBlceDebCnt);
+Employer: => BusAcctPerBusTaxLiabBlceCredCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									  rLegal.BusAcctPerBusTaxLiabBlceCredCnt);
+Employer: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									 rLegal.BusAcctPerBusTaxLiabBlceOthCnt);
+Employer: => BusTaxLiabBlceDebitFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																						rLegal.BusTaxLiabBlceDebitFlag);
+/*This section is Nicole's attributes. Keeping these separate to prevent code merging issues.
+
+*/
+Employer: => BusAcctNewestRecordDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					20190701);
+Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					status:Null OR status='' => -99998,
+																					status);
+ // fixme. Need status from most recent master record																																			
+Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
+																							-99998);
+Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					  rLegal.OldestTaxLiabStartDt);
+Employer: => BusOldestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					rLegal.OldestTaxLiabEndDt);
+Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					rLegal.TaxLiabOngoingFlag);
+Employer: => BusAcctTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					  BusAcctTaxLiabEndDtEcho=-99998 => -99998,
+																						BusAcctTaxLiabEndDtEcho > BusAcctNewestRecordDt => -99997,
+																						MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabEndDtEcho),DATE(BusAcctNewestRecordDt)), 999), 0));
+Employer: => BusNewestTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																					    BusNewestTaxLiabEndDt=-99998 => -99998,
+																							BusNewestTaxLiabEndDt > BusNewestRecordDt => -99997,
+																						  MAX(MIN(MONTHSBETWEEN(DATE(BusNewestTaxLiabEndDt),DATE(BusNewestRecordDt)), 999), 0));
+ // Needs BusNewestTaxLiabEndDt to work
+Employer: => BusAcctNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					 ClaimCount=0 => -99998,
+																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
+																					 INTEGER(MAX(EmployerClaim.rClaim, claim_submit_ccyymmdd)));
+Employer: => BusNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																			 rLegal.ClaimCount=0 => -99998,
+																			 rLegal.NewestUnemClmDt);
+ // Will have -99997 if no valid dates																
+Employer: => BusIncorpStatusType := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                        DAYSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestRecordDt))<0 => -99998,
+																				rLegal.IncorpStatusType);
+/*unem claim history pt 1 attributes */
+Employer: => BusAcctLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOldestUnemClmDt=-99998 => -99998,
+																									 BusAcctTaxLiabStartDtEcho=-99997 OR BusAcctOldestUnemClmDt=-99997 => -99997,
+																									 MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOldestUnemClmDt)), 999), -999));
+Employer: => BusAcctLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctNewestUnemClmDt=-99998 => -99998,
+																									 BusAcctTaxLiabStartDtEcho=-99997 OR BusAcctNewestUnemClmDt=-99997 => -99997,
+																									 MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctNewestUnemClmDt)), 999), -999));
+Employer: => BusIncorpToLiabSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																			  BusIncorpDt=-99998 OR BusOldestTaxLiabStartDt=-99998 => -99998,
+																			  BusIncorpDt=-99997 OR BusOldestTaxLiabStartDt=-99997 => -99997,
+																				MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestTaxLiabStartDt)), 999), -999));
+Employer: => BusIncorpToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																								 BusIncorpDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
+																								 BusIncorpDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
+																								 MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)), 999), -999));
+Employer: => BusIncorpToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																								 BusIncorpDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
+																								 BusIncorpDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
+																								 MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)), 999), -999));
+Employer: => BusLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 BusOldestTaxLiabStartDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
+																							 BusOldestTaxLiabStartDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
+																							 MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestUnemClmDt)), 999), -999));
+Employer: => BusLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																							 BusOldestTaxLiabStartDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
+																							 BusOldestTaxLiabStartDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
+																							 MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusNewestUnemClmDt)), 999), -999));
+Employer: => BusAcctUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									ClaimCount=0 => -99998,
+																									ALL(EmployerClaim.rClaim, claim_status:Null ) => -99997,
+																									COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active')));
+Employer: => BusAcctUnemClaimFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge != -99998)));
+Employer: => BusAcctUnemClaimFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365)));
+Employer: => BusAcctUnemClaimFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120)));
+Employer: => BusAcctUnemClaimFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90)));
+Employer: => BusAcctUnemClaimFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30)));
+Employer: => BusAcctUnemClaimApprvCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active')));
+Employer: => BusAcctUnemClaimApprvCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 365)));
+Employer: => BusAcctUnemClaimApprvCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 120)));
+Employer: => BusAcctUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 90)));
+Employer: => BusAcctUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge:Null) => 0,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 30)));
+Employer: => BusUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimCurrActiveCount);
+Employer: => BusUnemClaimFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCntEv);
+Employer: => BusUnemClaimFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt1Y);
+Employer: => BusUnemClaimFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt120D);
+Employer: => BusUnemClaimFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt90D);
+Employer: => BusUnemClaimFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt30D);
+Employer: => BusUnemClaimApprvCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCntEv);
+Employer: => BusUnemClaimApprvCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt1Y);
+Employer: => BusUnemClaimApprvCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt120D);
+Employer: => BusUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt90D);
+Employer: => BusUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt30D);
+/*bus backdating attributes */
+Employer: => BusAcctOpenDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                      NOT ISVALIDDATE(statusreceiptdate) OR statusreceiptdate:Null => -99998,
+																		  INTEGER(statusreceiptdate));
+Employer: => BusAcctEmpBeganToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                BusAcctDtEmployerBeganEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
+																								MAX(MIN(MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho)),999),-999));
+Employer: => BusAcctLiabStartToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
+																								MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho)),999),-999));
+Employer: => BusOldestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.OldestAcctOpenDt);
+Employer: => BusNewestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.NewestAcctOpenDt);
+Employer: => BusOldestEmployerBeganDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.OldestEmployerBeganDt);
+Employer: => BusNewestEmployerBeganDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.NewestEmployerBeganDt);
+Employer: => BusOldestEmpBeganToAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																										rLegal.BusOldestEmpBegantoAcctOpenSpan);
+Employer: => BusOldestLiabStartToAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																										 rLegal.BusOldestLiabStartToAcctOpenSpan);
+Employer: => BusIncorpToOldestAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+																									rLegal.BusIncorpToOldestAcctOpenSpan);
+
+
+//Bus SasFlags attributes
+Employer: => BusAcctPerBusLegalEntCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                             rLegal.BusAcctPerBusLegalEntCnt);
+Employer: => BusEmpBeganToAcctOpenLT12MCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT12MCnt);
+Employer: => BusEmpBeganToAcctOpenLT6MCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT6MCnt);
+Employer: => BusEmpBeganToAcctOpenGT12MCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenGT12MCnt);
+Employer: => BusAcctUnemClmAfterOpenCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
+																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
+																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 30)));
+Employer: => BusAcctUnemClmAfterOpenCnt60D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
+																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
+																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 60)));
+Employer: => BusAcctUnemClmAfterOpenCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,                                                  
+																									ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
+																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
+																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 90)));
+Employer: => BusAcctUnemClmAfterOpenCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0, 
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
+																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
+																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 120)));
+Employer: => BusUnemClmAfterOldestOpenCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																									  BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									  rLegal.UnemClmAfterOldestOpenCnt30D);
+Employer: => BusUnemClmAfterOldestOpenCnt60D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																									  BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									  rLegal.UnemClmAfterOldestOpenCnt60D);
+Employer: => BusUnemClmAfterOldestOpenCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																									  BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									  rLegal.UnemClmAfterOldestOpenCnt90D);
+Employer: => BusUnemClmAfterOldestOpenCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																									  BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									  rLegal.UnemClmAfterOldestOpenCnt120D);
+Employer: => BusAcctUnemClmLT60DAfterOpenFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BusAcctOpenDtEcho=-99998 OR BusAcctUnemClmAfterOpenCnt60D=-99998 => -99998, 
+																										 BusAcctOpenDtEcho=BusAcctNewestRecordDt => -99997,
+																										 IF(BusAcctUnemClmAfterOpenCnt60D > 0,1,0));
+Employer: => BusAcctUnemClm60To120DAftOpFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BusAcctOpenDtEcho=-99998 OR BusAcctUnemClmAfterOpenCnt60D=-99998 => -99998, 
+																										 BusAcctOpenDtEcho=BusAcctNewestRecordDt => -99997,
+																										 IF(BusAcctUnemClmAfterOpenCnt120D - BusAcctUnemClmAfterOpenCnt60D > 0,1,0));
+Employer: => BusUnemClmLT60DAfterOpenFlag :=  MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                  BusUnemClmAfterOldestOpenCnt60D=-99998 OR BusOldestAcctOpenDt=-99998 => -99998,
+																									BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									IF(BusUnemClmAfterOldestOpenCnt60D > 0,1,0));
+Employer: => BusUnemClm60To120DAfterOpenFlag :=  MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                  BusUnemClmAfterOldestOpenCnt60D=-99998 OR BusOldestAcctOpenDt=-99998 => -99998,
+																									BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
+																									IF(BusUnemClmAfterOldestOpenCnt120D - BusUnemClmAfterOldestOpenCnt60D > 0,1,0));
+
+																									
+// New Employer Attributes
+Employer: => MoveTos := ToEmployerEmployees(rFromEmployer != rToEmployer AND fromstartwageyearqtr < tostartwageyearqtr){rFromEmployer, rToEmployer, FromUltID, ToUltID, rPerson};
+Employer: => MoveToCount := COUNT(MoveTos);
+Employer: => MoveFromSameUltCount := COUNT(MoveTos(FromUltID=ToUltID));
+
+FromEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
+FromEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
+FromEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
+FromEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
+
+ToEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
+ToEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
+ToEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
+ToEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
+
+// Claim: => EmployerClaimCount := rEmployer.ClaimCount;
+QUERY: showEmployers <= Employer;
+QUERY: showLegal <= Legal;
+QUERY: showClaims <= Claim;
+QUERY: showEmployerClaims <= EmployerClaim;
+QUERY: showEmployerAddr <= EmployerAddr;
+QUERY: showLegalClaimsClaim <= LegalClaim.rClaim;
+QUERY: showClaimant <= Claimant;
+QUERY: showPerson <= Person;
+QUERY: showLegalPersonWages <= LegalPersonWages;
+QUERY: showFromEmployerEmployees <= FromEmployerEmployees;
+QUERY: showToEmployerEmployees <= ToEmployerEmployees;
+// QUERY: showSeleSeleEmployees <= SeleSeleEmployees;

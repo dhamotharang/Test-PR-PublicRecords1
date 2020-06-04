@@ -1,4 +1,4 @@
-IMPORT PRTE2_Bankruptcy;
+﻿IMPORT PRTE2_Bankruptcy;
 
 EXPORT Constants	:= MODULE
 		
@@ -20,5 +20,14 @@ EXPORT Constants	:= MODULE
 						// B in this set to skip ALL Business data
 
 		EXPORT ak_typeStr := 'AK';
+		
+		// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys
+			// thor_data400::key::bankruptcyv3::fcra::main::tmsid_qa
+		export main_tmsid								:= 'assets,complaint_deadline,confheardate,datereclosed,liabilities,planconfdate';
+		// thor_data400::key::bankruptcyv3::fcra::search::tmsid_linkids_qa																				
+		export search_tmsid_linkids	:= 'delete_flag,holdcase,tax_id';
+
+		// thor_data400::key::bankruptcy::autokey::fcra::payload_qa																				
+		export autokey_payload	:= 'tax_id';
 	
 END;

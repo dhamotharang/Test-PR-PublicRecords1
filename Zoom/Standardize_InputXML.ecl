@@ -1,4 +1,4 @@
-import Ut, address, lib_stringlib, _Control, idl_header,STD;
+﻿import _control, MDR, Ut, address, lib_stringlib, _Control, idl_header,STD;
 
 export Standardize_InputXML := module
 
@@ -67,14 +67,15 @@ export Standardize_InputXML := module
 			self.clean_ref_last_date                := if(length(trim(l.reference_lastdate,left,right)) >= 10, StringLib.StringFilter(l.reference_lastdate[1..10],'0123456789'), '');
 			self.clean_ref_valid_date               := if(length(trim(l.reference_validdate,left,right)) >= 10, StringLib.StringFilter(l.reference_validdate[1..10],'0123456789'), '');
 			self.clean_valid_date                   := vdate;
-
 			self.rawfields													:= l					              ;
 		end;
 		
 		dStandardizeFields := project(pRawFileInput, tStandardizeFields(left));
 		
+		addGlobalSID := MDR.macGetGlobalSid(dStandardizeFields, 'Zoom', '', 'global_sid'); //DF-25333: Populate Global_SIDs
+		
 		//** Flipping the names that are wrongly cleaned by name cleaner.
-		ut.mac_flipnames(dStandardizeFields, clean_contact_name.fname, clean_contact_name.mname, clean_contact_name.lname, dStandardizeFields_flipnames)
+		ut.mac_flipnames(addGlobalSID, clean_contact_name.fname, clean_contact_name.mname, clean_contact_name.lname, dStandardizeFields_flipnames)
 	    
 	  return dStandardizeFields_flipnames;
 	end;

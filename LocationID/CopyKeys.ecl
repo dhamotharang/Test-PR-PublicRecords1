@@ -19,7 +19,7 @@ export CopyKeys(boolean onProd = _Control.ThisEnvironment.Name='Prod_Thor') := f
 	ridKey       := project(pull(LocationID_xLink.Process_LocationID_Layouts.ForeignKeyIDHistory(daliAddress)), ridKeyRec);
 
 	update_dopsV2  := dops.updateversion('LocationIDKeys',trim(LocationID_xLink.KeyInfix,left,right),LocationID_Build.email_list,,'N') : INDEPENDENT;
-	orbitUpdate    := Orbit3.proc_Orbit3_CreateBuild('LocationID',trim(LocationID_xLink.KeyInfix,left,right),'N') : INDEPENDENT;
+	orbitUpdate    := Orbit3.proc_Orbit3_CreateBuild('LocationIDKeys',trim(LocationID_xLink.KeyInfix,left,right),'N') : INDEPENDENT;
 		
      buildKeys := parallel(
 		build(LocationID_xLink.Key_LocationId_STATECITY.BuildKey(stateCityKey), overwrite)

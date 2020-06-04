@@ -593,7 +593,8 @@ end;
 										,LOCAL);
 
 		all_addr	:= c_base_a + h_base_a;
-		sort_addr	:= fn_rollup(all_addr);
+		all_addr1	:= dedup(sort(all_addr, record, local), record, local);
+		sort_addr	:= fn_rollup(all_addr1);
 
 		dob_file	:= sort(distribute(enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key)), group_key, local);
 		base_d	:= JOIN(sort(distribute(sort_addr, hash(group_key)), group_key, local), dob_file
@@ -605,7 +606,8 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 		all_dob	:= base_d;
-		sort_dob	:= fn_rollup(all_dob);
+		all_dob1	:= dedup(sort(base_d, record, local), record, local);
+		sort_dob	:= fn_rollup(all_dob1);
 
 		ssn_file	:= sort(distribute(enclarity.Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key)), group_key, local);
 		base_s	:= JOIN(sort(distribute(sort_dob, hash(group_key)), group_key, local), ssn_file
@@ -617,7 +619,8 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 		all_ssn	:= base_s;
-		sort_ssn	:= fn_rollup(all_ssn);
+		all_ssn1	:= dedup(sort(base_s, record, local), record, local);
+		sort_ssn	:= fn_rollup(all_ssn1);
 
 		c_sort_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and lic_num = ''));
 		h_sort_ssn	:= sort_ssn(record_type = 'H' and lic_num <> '');
@@ -658,7 +661,8 @@ end;
 										,LOCAL);
 								
 		all_lic	:= c_base_l + h_base_l;
-		sort_lic	:= fn_rollup(all_lic);
+		all_lic1	:= dedup(sort(all_lic, record, local), record, local);
+		sort_lic	:= fn_rollup(all_lic1);
 		
 		c_sort_lic	:= sort_lic(record_type <> 'H' or(record_type = 'H' and dea_num = ''));
 		h_sort_lic	:= sort_lic(record_type = 'H' and dea_num <> '');
@@ -689,7 +693,8 @@ end;
 										,LOCAL);
 
 		all_dea := c_base_e + h_base_e;
-		sort_dea	:= fn_rollup(all_dea);
+		all_dea1	:= dedup(sort(all_dea, record, local), record, local);
+		sort_dea	:= fn_rollup(all_dea1);
 		
 		c_sort_dea	:= sort_dea(record_type <> 'H' or (record_type = 'H' and npi_num = ''));
 		h_sort_dea	:= sort_dea(record_type = 'H' and npi_num <> '');
@@ -724,7 +729,8 @@ end;
 										,LOCAL);
 
 		all_npi	:= c_base_n + h_base_n;
-		sort_npi	:= fn_rollup(all_npi);
+		all_npi1	:= dedup(sort(all_npi, record, local), record, local);
+		sort_npi	:= fn_rollup(all_npi1);
 
 		sanc_file	:= sort(distribute(enclarity.Files().sanction_base.built, hash(group_key)), group_key, local);
 		base_z	:= JOIN(sort(distribute(sort_npi, hash(group_key)), group_key, local), sanc_file
@@ -740,7 +746,8 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 		all_sanc	:= base_z;
-		sort_sanc	:= fn_rollup(all_sanc);
+		all_sanc1	:= dedup(sort(all_sanc, record, local), record, local);
+		sort_sanc	:= fn_rollup(all_sanc1);
 		
 		track_ancillaries GetSourceRID(base_z L)	:= TRANSFORM
 			SELF.source_rid 					:= HASH64(hashmd5(
@@ -806,7 +813,8 @@ end;
 		END;
 		
 		d_rid	:= PROJECT(sort_sanc, GetSourceRID(left));
-		sort_rid	:= fn_rollup(d_rid);
+		d_rid1	:= dedup(sort(d_rid, record, local), record, local);
+		sort_rid	:= fn_rollup(d_rid1);
 		needs_did	:= sort_rid; // Product wants all records re-appended each build
 		
 		dedup_needs_did	:= dedup(sort(distribute(needs_did, hash(clean_ssn, clean_dob, fname, mname, lname, name_suffix,
@@ -863,7 +871,8 @@ end;
 					,LOCAL);		
 
 		all_did	:= rejoin_did;
-		sort_did	:= fn_rollup(all_did);
+		all_did1	:= dedup(sort(all_did, record, local), record, local);
+		sort_did	:= fn_rollup(all_did1);
 
 		did_add.MAC_Add_SSN_By_DID(sort_did,did,best_ssn,d_ssn);
 	
@@ -951,7 +960,8 @@ end;
 					,LOCAL);		
 			
 		all_bdid	:= has_bdid + rejoin_bdid;
-		sort_bdid	:= fn_rollup(all_bdid);
+		all_bdid1	:= dedup(sort(all_bdid, record, local), record, local);
+		sort_bdid	:= fn_rollup(all_bdid1);
 				
 		needs_lnpid	:= dedup(sort(distribute(sort_bdid, hash(fname, mname, lname, name_suffix, prim_range, prim_name,
 												sec_range, v_city_name, st, zip, clean_ssn, clean_dob, phone1, lic_state, lic_num_in, dea_num, group_key,
@@ -1032,7 +1042,8 @@ end;
 					,LOCAL);					
 		
 		all_lnpid	:= rejoin_lnpid;
-		sort_lnpid	:= fn_rollup(all_lnpid);
+		all_lnpid1	:= dedup(sort(all_lnpid, record, local), record, local);
+		sort_lnpid	:= fn_rollup(all_lnpid1);
 		
 		pre_final_base	:= project(sort_lnpid, enclarity.Layouts.individual_base);		
 		get_historical_mo_provs	:= pre_final_base(lic_state = 'MO' and record_type = 'H');
@@ -1050,14 +1061,36 @@ end;
 																	self							:= left));
 																	
 		recombined_provs	:= non_historical_provs + non_mo_historical + non_mo_apn + clear_exp_stat;
+		sort_recomb_provs := sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num_in, lic_num, local);
+		
+		get_exceptions	:= join(sort_recomb_provs, exception_lu, 
+							left.group_key		= right.group_key	
+					and left.lic_state		= right.lic_state
+					and left.lic_num_in		= right.lic_num_in
+					and left.lic_num			= right.lic_num
+			,TRANSFORM(enclarity.Layouts.individual_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.lic_state = right.lic_state) and (left.lic_num_in = right.lic_num_in) and (left.lic_num = right.lic_num)),'D', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
+		keep_out := get_exceptions(record_type = 'D'):persist('~thor_data400::persist::enclarity::individual_excluded');
+		good_recs	:= get_exceptions(record_type <> 'D');
+		Enclarity.Layouts.individual_base add_sid(good_recs L) := TRANSFORM
+			SELF.global_sid								:= 24201;
+			SELF.record_sid								:= L.source_rid;
+			SELF						 							:= L;
+		END;
+	
+		with_ccpa := distribute(project(good_recs, add_sid (left)));
 
-		RETURN recombined_provs;
+		RETURN with_ccpa;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION
 		hist_base0	:= Mark_history(Enclarity.Files(filedate,pUseProd).associate_base.built, layouts.associate_base);
 		
-		hist_base		:= dedup(hist_base0, all):persist('thor_data400::persist::enclarity::associate_dedup_hist');
+		hist_base		:= dedup(sort(hist_base0, record, local), record, local):persist('thor_data400::persist::enclarity::associate_dedup_hist');
 
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Associate;
 		
@@ -1068,7 +1101,7 @@ end;
 
 		cleanAdd_a0	:= Clean_addr(cleanNames, Enclarity.layouts.associate_base):PERSIST('~thor_data400::persist::enclarity::associate_addr');
 		
-		cleanAdd_a	:= dedup(cleanAdd_a0, all);
+		cleanAdd_a	:= dedup(sort(cleanAdd_a0, record, local), record, local);
 
 		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).associate_lBaseTemplate_built)) = 0
 												 ,cleanAdd_a
@@ -1120,7 +1153,7 @@ fn_rollup(dataset(enclarity.layouts.associate_base) d) := function
 										,t_rollup(LEFT,RIGHT),LOCAL);
 			return base_n;
 end;
-		new_base_d0	:= dedup(base_and_update, all);
+		new_base_d0	:= dedup(sort(base_and_update, record, local), record, local);
 		new_base_d := DISTRIBUTE(new_base_d0, HASH(group_key, addr_key, record_type));
 		
 		c_base_d	:= new_base_d(record_type <> 'H' or (record_type = 'H' and clean_dob =''));
@@ -1150,7 +1183,7 @@ end;
 										);
 							
 		all_dob	:= c_dob_d + h_dob_d;
-		dedup_all_dob	:= dedup(all_dob, all);
+		dedup_all_dob	:= dedup(sort(all_dob, record, local), record, local);
 		sort_dob	:= fn_rollup(dedup_all_dob);
 		c_all_dob	:= sort_dob(record_type <> 'H' or (record_type = 'H' and clean_ssn = ''));
 		h_all_dob	:= sort_dob(record_type = 'H' and clean_ssn <> '');
@@ -1177,7 +1210,7 @@ end;
 										);
 										
 		all_ssn := c_base_s + h_base_s;
-		dedup_all_ssn := dedup(all_ssn, all);
+		dedup_all_ssn := dedup(sort(all_ssn, record, local), record, local);
 		sort_ssn	:= fn_rollup(dedup_all_ssn);
 	
 		fac_file	:= distribute(Enclarity.Files().facility_base.built, hash(group_key));
@@ -1193,7 +1226,7 @@ end;
 										,LOCAL
 										);
 		
-		dedup_base_f := dedup(base_f, all);
+		dedup_base_f := dedup(sort(base_f, record, local), record, local);
 		sort_sloc	:= fn_rollup(dedup_base_f);
 	
 		base_f1	:= JOIN(sort(distribute(sort_sloc, hash(billing_group_key)), billing_group_key, local), fac_file_dedup
@@ -1206,7 +1239,7 @@ end;
 										,LOCAL
 										);
 		
-		dedup_base_f1 := dedup(base_f1, all);
+		dedup_base_f1 := dedup(sort(base_f1, record, local), record, local);
 		sort_bill	:= fn_rollup(dedup_base_f1);
 		dist_bill	:= distribute(sort_bill, hash(group_key, prepped_name, addr_key, prepped_addr1, prepped_addr2, normed_name_rec_type, addr_phone, sloc_phone, sloc_group_key, billing_group_key));		
 		
@@ -1242,9 +1275,10 @@ end;
 		END;
 			
 		d_rid	:= PROJECT(dist_bill, GetSourceRID(left));
-		sort_rid	:= fn_rollup(d_rid);
+		sort_rid0	:= dedup(sort(d_rid, record, local), record, local);
+		sort_rid	:= fn_rollup(sort_rid0);
 		// needs_did	:= sort_rid;	// Product wants to re-append with each build
-		needs_did	:= dedup(sort_rid, all);	// Product wants to re-append with each build
+		needs_did	:= dedup(sort(sort_rid, record, local), record, local);	// Product wants to re-append with each build
 		dedup_needs_did	:= dedup(sort(distribute(needs_did, hash(clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone)), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone, local), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
@@ -1299,14 +1333,14 @@ end;
 					,LOCAL);		
 
 		all_did	:= rejoin_did;
-		dedup_all_did := dedup(all_did, all);
+		dedup_all_did := dedup(sort(all_did, record, local), record, local);
 		sort_did	:= fn_rollup(dedup_all_did);
 		has_best	:= sort_did(best_ssn <>'' and best_ssn <> '0');
 		needs_best	:= sort_did(best_ssn = '' or best_ssn = '0');
 		
 		did_add.MAC_Add_SSN_By_DID(needs_best,did,best_ssn,d_ssn);
 		all_best	:= has_best + d_ssn;
-		dedup_all_best := dedup(all_best, all);
+		dedup_all_best := dedup(sort(all_best, record, local), record, local);
 		has_bestbd	:= dedup_all_best(best_dob > 0);
 		needs_bestbd	:= dedup_all_best(best_dob = 0);
 
@@ -1394,7 +1428,8 @@ end;
 					,LOCAL);		
 			
 		all_bdid	:= has_bdid + rejoin_bdid;
-		sort_bdid	:= fn_rollup(all_bdid);
+		all_bdid1	:= dedup(sort(all_bdid, record, local), record, local);
+		sort_bdid	:= fn_rollup(all_bdid1);
 			
 		dedup_needs_lnpid	:= dedup(sort(distribute(sort_bdid, hash(fname, mname, lname, name_suffix, prim_range, prim_name, sec_range, v_city_name, st, zip,
 				clean_ssn, clean_dob, clean_phone, bill_tin, group_key, did, bdid)), fname, lname, name_suffix, prim_range, prim_name,
@@ -1467,11 +1502,21 @@ end;
 					,LOCAL);		
 
 		endfile	:= rejoin_lnpid;
-		// rolled_end:=fn_rollup(endfile);
-		rolled_end:=dedup(endfile, all);
-		RETURN rolled_end;
-	END;
+		dedup_end	:= dedup(sort(endfile, record, local), record, local);
+		rolled_end:=fn_rollup(dedup_end);
+		// rolled_end:=dedup(endfile, all);
+		
+		Enclarity.Layouts.associate_base add_sid(rolled_end L) := TRANSFORM
+			SELF.global_sid								:= 24201;
+			SELF.record_sid								:= L.source_rid;
+			SELF						 							:= L;
+		END;
 	
+		with_ccpa := project(rolled_end, add_sid (left));
+
+		RETURN with_ccpa;
+	END;
+		
  	EXPORT Address_Base := FUNCTION
    		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).address_base.built, Enclarity.layouts.address_base);
    
@@ -1690,7 +1735,7 @@ end;
 	END;
 	
 	EXPORT License_Base := FUNCTION
-		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).license_base.built, Enclarity.layouts.license_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).license_base.built(record_type <> 'D'), Enclarity.layouts.license_base);
 	
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).License;
 
@@ -1896,72 +1941,24 @@ end;
 			,result,false,38
 			);
 
-		RETURN result;
+		sort_result := sort(distribute(result, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num_in, lic_num, local);
+		
+		get_exceptions	:= join(sort_result, exception_lu, 
+							left.group_key		= right.group_key	
+					and left.lic_state		= right.lic_state
+					and left.lic_num_in		= right.lic_num_in
+					and left.lic_num			= right.lic_num
+			,TRANSFORM(enclarity.Layouts.license_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.lic_state = right.lic_state) and (left.lic_num_in = right.lic_num_in) and (left.lic_num = right.lic_num)),'D', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
+		dedup_get_exceptions := dedup(sort(get_exceptions, record, local), record, local);
+		keep_out := dedup_get_exceptions(record_type = 'D'):persist('~thor_data400::persist::enclarity::license_excluded');
+		RETURN dedup_get_exceptions(record_type <> 'D');
 	END;
-	
-	EXPORT Modified_License_Base	:= FUNCTION
-		orig_lic_base		:= Enclarity.Files(filedate,pUseProd).license_base.built;
-		mo_only					:= orig_lic_base(lic_state = 'MO');
-		no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
-		npi_base				:= Enclarity.Files(filedate,pUseProd).npi_base.built;
 		
-		lic_base_w_tax	:= record
-			Enclarity.Layouts.license_base;
-			Enclarity.Layouts.npi_base.npi_num;
-			Enclarity.Layouts.npi_base.taxonomy;
-		end;
-		
-		joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
-												sort(distribute(npi_base, hash(group_key)), group_key, local),
-													left.group_key = right.group_key,
-													transform({lic_base_w_tax},
-														self.npi_num	:= right.npi_num,
-														self.taxonomy	:= trim(right.taxonomy,all),
-														self					:= left),
-													left outer, local);
-	
-		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
-										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
-		
-		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
-										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
-		
-		clear_exp_stat	:= project(mo_apn, 
-																transform(enclarity.Layouts.license_base,
-																	old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)filedate, true, false);
-																	self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
-																	self.lic_status					:= if(old_rec,'',left.lic_status),
-																	self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
-																	self										:= left));
-																	
-		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
-															group_key, lic_state, lic_num, lic_begin_date, local);
-
-		Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
-			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
-		END;
-
-		roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
-										LEFT.group_key 			= RIGHT.group_key 			AND 
-										LEFT.lic_state 			= RIGHT.lic_state				AND				
-										LEFT.lic_num				= RIGHT.lic_num					AND						
-										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
-										// LEFT.lic_status			= RIGHT.lic_status		  AND
-										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
-										LEFT.record_type		= RIGHT.record_type,
-										t_rollup(LEFT,RIGHT),LOCAL);
-									
-		recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
-		
-		dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
-																	group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
-										persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
-										
-		RETURN dedup_recombined_provs;
-	END;
-	
 	EXPORT Taxonomy_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).taxonomy_base.built, Enclarity.layouts.taxonomy_base);
 		
@@ -2450,7 +2447,7 @@ end;
 								,self:=left
 								));
 		
-		lic_t  :=enclarity.Files(,true).license_base.qa;
+		lic_t  :=enclarity.Files(,true).license_base.qa(record_type <> 'D');
 		base_u1	:= distribute(base_u,hash(group_key));
 		lic_u1	:= distribute(lic_t,hash(group_key));
 		
@@ -2639,8 +2636,21 @@ end;
 										LEFT.sanc1_desc			  = RIGHT.sanc1_desc,
 										last_rollup(LEFT,RIGHT)
 										,LOCAL);	
+		
+		sort_final_set	:= sort(distribute(final_set, hash(group_key, sanc1_state, sanc1_lic_num)), group_key, sanc1_state,  sanc1_lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num, local);
+		
+		get_exceptions	:= join(sort_final_set, exception_lu, 
+							left.group_key				= right.group_key	
+					and left.sanc1_state			= right.lic_state
+					and left.sanc1_lic_num		= right.lic_num
+			,TRANSFORM(enclarity.Layouts.sanction_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.sanc1_state = right.lic_state) and (left.sanc1_lic_num = right.lic_num)),'D', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
 
-		RETURN final_set;
+		RETURN get_exceptions(record_type <> 'D');
 	END;
 	
 	EXPORT Collapse_Base := FUNCTION

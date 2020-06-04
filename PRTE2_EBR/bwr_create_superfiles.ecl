@@ -1,15 +1,22 @@
-import promotesupers, roxiekeybuild, std,ebr;
-
+﻿import promotesupers, roxiekeybuild, std,ebr;
 
 STD.File.CreateSuperFile('~prte::in::ebr::0010_header',,1);
 STD.File.CreateSuperFile('~prte::in::ebr::5600_demographic_data',,1);
 STD.File.CreateSuperFile('~prte::in::ebr::5610_demographic_data',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::execsummary',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::tradepmttot',,1);
 
+STD.File.CreateSuperFile('~prte::in::ebr::0010_header_ins',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::5600_demographic_data_ins',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::5610_demographic_data_ins',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::execsummaryins',,1);
+STD.File.CreateSuperFile('~prte::in::ebr::tradepmttotins',,1);
 
-promotesupers.mac_create_superfiles('~prte::base::ebr::0010_header');
-promotesupers.mac_create_superfiles('~prte::base::ebr::5600_demographic_data');
-promotesupers.mac_create_superfiles('~prte::base::ebr::5610_demographic_data');
-
+ promotesupers.mac_create_superfiles('~prte::base::ebr::0010_header');
+ promotesupers.mac_create_superfiles('~prte::base::ebr::5600_demographic_data');
+ promotesupers.mac_create_superfiles('~prte::base::ebr::5610_demographic_data');
+ promotesupers.mac_create_superfiles('~prte::base::ebr::executive_summary_data');
+ promotesupers.mac_create_superfiles('~prte::base::ebr::trade_payment_tot_data');
  
 // roxiekeybuild.mac_create_superkey_files('~prte', '::key::ebr_autokey', 'address');
 // roxiekeybuild.mac_create_superkey_files('~prte', '::key::ebr_autokey', 'addressb');

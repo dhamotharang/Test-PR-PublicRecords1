@@ -32,12 +32,13 @@ module
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate :=(unsigned)fn[6];
 		self.FileTime :=fn[7];
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));		
 		self.ind_type 	:= functions.ind_type_fn(fn[4]);
-		self.file_type := 1 ;		
+		self.file_type := 1 ;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification:
+		self.RIN_Source := map(
+														regexfind('KnownRisk',filename,nocase) => 2, //knownrisk
+														regexfind('Safelist',filename,nocase) => 3, //safelist
+														l.RIN_Source);  // NAC
 		self:=l;
 		self:=[];
 	end;
@@ -69,7 +70,8 @@ module
 			or (_Validate.Date.fIsValid(reported_date) = false  or (unsigned)reported_date > (unsigned)(STRING8)Std.Date.Today())
 			or 	reported_time = ''
 			or 	reported_by = ''
-			or source = ''
+			or  source = ''
+			or  event_type_1 = ''
 		);
 
 	shared fn_dedup(inputs):=FUNCTIONMACRO
@@ -110,8 +112,7 @@ module
 		LOOKUP);
 																															
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);	
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);	
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
 
 	input_file_1 := fn_dedup(KnownFraud_Sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 

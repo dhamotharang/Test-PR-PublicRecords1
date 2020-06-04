@@ -1,7 +1,7 @@
 ﻿/*2014-10-03T23:55:34Z (ananth_p venkatachalam)
 Move to new module
 */
-import lib_workunitservices,STD,ut, dops;
+import lib_workunitservices,STD,ut, dops,_Control;
 EXPORT PrepForYogurt(string location, string environment, string last_wuid = '') := module
 
 	shared filedate := thorbackup.constants.yogurt().enddate+thorbackup.constants.yogurt().l_time : independent;
@@ -16,9 +16,11 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 
 	//export maxWU := max(ReadFileList,wuid);
 	
-	export maxWU := if (last_wuid <> '', last_wuid, if(count(ReadFileList) > 0, max(ReadFileList,wuid), thorbackup.Constants.Yogurt().startwudaysbehind));
+	export maxWU := if (last_wuid <> '', last_wuid, if(count(ReadFileList) > 0, sort(ReadFileList(max(ReadFileList,modified) = modified),wuid)[1].wuid, thorbackup.Constants.Yogurt().startwudaysbehind));
 
-	export getMaxWU := if (maxWU > thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
+	export getMaxWU := thorbackup.Constants.Yogurt().startwudaysbehind;//if (maxWU > thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
+
+	export maxModified := regexreplace('[^0-9]',max(ReadFileList,modified),'');
 
 	export GetFilesInWorkunit(string wid) := function
 		InRecord := record
@@ -74,7 +76,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('hpccinternal',files,nocase)
 																				or regexfind('spill',files,nocase)
 																				or regexfind('persist',files,nocase)
-																				//or regexfind('::key::',files,nocase)
+																				or regexfind('::key::',files,nocase)
 																				or regexfind('yogurt',files,nocase)
 																				// or regexfind('foreign',files,nocase)
 																				or regexfind(':: ',files,nocase)
@@ -122,12 +124,13 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	export GetYogurtWUIDs := function
 	
 		wulist := lib_workunitservices.WorkunitServices.workunitlist
-														(lowwuid := getMaxWU // get the WU that is 20 days old from now (OR)
+														(lowwuid := trim(getMaxWU) // get the WU that is 20 days old from now (OR)
 																									// if the WU in the list from file is older than 20 days
 																									// whichever is older
 															, highwuid := thorbackup.constants.yogurt().endwu)
 															(regexfind('yogurt',stringlib.StringToLowerCase(job)) and 
-																~( job = 'Prep Yogurt Copy' 
+																~( job = STD.System.Job.Name() 
+																	
 																	//or wuid = maxWU 
 																	or state in ['running','blocked'] ));
 																	/*and
@@ -139,11 +142,11 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	
 	
 		lib_workunitservices.wsworkunitrecord getmodified(wulist l) := transform
-			self.modified := thorbackup.GetWUModified(thorbackup.Constants.esp.bocaprodthor,l.wuid);
+			self.modified := regexreplace('[-:ZT]',STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = '')[1].time,'');
 			self := l;
 		end;
 		
-		return project(wulist,getmodified(left))(regexreplace('[^0-9]',modified,'') >= regexreplace('[^0-9]',MaxWU,''));
+		return project(wulist,getmodified(left))(regexreplace('[^0-9]',modified,'') >= maxModified);
 	end;
 
 	export GetFileList(string wuid = '',boolean ignoreforeign = false) := function
@@ -366,8 +369,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																	);
 																
 	export SendFileListToYogurtThor := sequential(
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess).copyfilecmd),
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete).copyfilecmd)
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess,true).copyfilecmd),
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete,true).copyfilecmd)
 																					);
 	
 	export ReSubmit() := function
@@ -390,7 +393,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 											
 											output(getMaxWU,named('Start_WUID')),
 											output(thorbackup.constants.yogurt().endwu,named('End_WUID')),
-											output(MaxWU,named('Last_Captured_WUID')),
+											output(maxModified,named('Last_Captured_Modified_Time')),
 											output(dataset([],{string1 dummy}),,'~yogurt::job::running'),
 											if (count(GetFileList()(~issuper)) > 0,
 												sequential(
@@ -410,7 +413,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 													fileservices.deletelogicalfile('~yogurt::job::running'),
 													ReSubmit(),
 													fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			environment + ' ' + location + ' Yogurt Prep Process failed on http://prod_esp:8010 - ' + filedate,
+			environment + ' ' + location + ' Yogurt Prep Process failed on http://'+_Control.Config.LocalEsp+':8010 - ' + filedate,
 			'workunit: ' + workunit + '\n re-scheduled'+ '\r\n' + failmessage
 																	,
 																	,

@@ -1,0 +1,23 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FirstData
+FILENAME:FirstData
+
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_RecordType:ENUM(D|T)
+FIELDTYPE:Invalid_ActionType:ENUM(I|0|)
+FIELDTYPE:Invalid_ConsID:ALLOW(0123456789 ):LENGTHS(0,9)
+FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2)
+FIELDTYPE:Invalid_LexID:ALLOW(0123456789)
+
+
+FIELD:process_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:filedate:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:record_type:LIKE(Invalid_RecordType):TYPE(STRING1):0,0
+FIELD:action_code:LIKE(Invalid_ActionType):TYPE(STRING1):0,0
+FIELD:cons_id:LIKE(Invalid_ConsID):TYPE(STRING9):0,0
+FIELD:dl_state:LIKE(Invalid_State):TYPE(STRING2):0,0
+FIELD:dl_id:TYPE(STRING50):0,0
+FIELD:first_seen_date_true:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:last_seen_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:dispute_status:TYPE(STRING1):0,0
+FIELD:lex_id:LIKE(Invalid_LexID):TYPE(STRING15):0,0

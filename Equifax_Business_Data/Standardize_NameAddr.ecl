@@ -1,5 +1,4 @@
-﻿
-IMPORT AID, ut, NID, codes, Address, _validate, std;
+﻿IMPORT AID, ut, NID, codes, Address, _validate, std;
 
 EXPORT Standardize_NameAddr := MODULE	
 
@@ -74,6 +73,16 @@ EXPORT Standardize_NameAddr := MODULE
 			date_first_seen := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.Record_Update_Refresh_Date);
  		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
+      SELF.EFX_PRIMSIC					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_PRIMSIC) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMSIC),'');      
+			SELF.EFX_SECSIC1					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC1),'');			
+			SELF.EFX_SECSIC2					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC2),'');
+			SELF.EFX_SECSIC3					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC3),'');
+			SELF.EFX_SECSIC4					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC4),'');
+			SELF.EFX_PRIMNAICSCODE			:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_PRIMNAICSCODE) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMNAICSCODE),'');
+			SELF.EFX_SECNAICS1					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS1),'');
+			SELF.EFX_SECNAICS2					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS2),'');
+			SELF.EFX_SECNAICS3					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS3),'');
+			SELF.EFX_SECNAICS4					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS4),'');			
 			SELF								  := L;			
 		END;
 	
@@ -189,7 +198,7 @@ EXPORT Standardize_NameAddr := MODULE
 
   	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile);			 
 								 
-		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : PERSIST(pPersistname);		
+		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName);		
 		
 		RETURN dStandardizeAddr;
 	

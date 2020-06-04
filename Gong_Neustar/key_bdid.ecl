@@ -1,3 +1,6 @@
+//######################################################
+//## This Key is no longer in GongKeys 2/26/2020      ##
+//######################################################
 import Data_Services, doxie; 
 
 export key_bdid := index(File_BDID_Gong(bdid<>0),

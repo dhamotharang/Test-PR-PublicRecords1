@@ -1,7 +1,6 @@
 ﻿IMPORT BizLinkFull,SALT311,std;
 EXPORT Key_BizHead_L_CNPNAME:= MODULE
  
-//cnp_name:?:prim_name:st:city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:zip
 EXPORT KeyName := PRTE2_BIPV2_BusHeader.Filename_keys.L_CNPNAME; /*HACK07*/
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
@@ -14,9 +13,9 @@ layout := RECORD // project out required fields
   h.seleid; // Parent #1
   h.proxid; // The ID field
   h.prim_name;
-  h.st;
   h.city;
 // Extra credit fields
+  h.st;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -40,15 +39,16 @@ layout := RECORD // project out required fields
   h.city_len;
   h.prim_range_len;
   h.sec_range_len;
-	h.EFR_BMap;
+// external files bitmap; Indicates whether proxid has records in the external file Ext_Layouts.ID_XXX; bit:= 1<<(ID_XXX-1)
+  h.EFR_BMap;
 //Scores for various field components
   h.prim_name_weight100 ; // Contains 100x the specificity
   h.prim_name_e1_Weight100;
-  h.st_weight100 ; // Contains 100x the specificity
   h.city_weight100 ; // Contains 100x the specificity
   INTEGER2 city_p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
   INTEGER2 city_e2_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
   INTEGER2 city_e2p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
+  h.st_weight100 ; // Contains 100x the specificity
   h.company_sic_code1_weight100 ; // Contains 100x the specificity
   h.cnp_number_weight100 ; // Contains 100x the specificity
   h.cnp_btype_weight100 ; // Contains 100x the specificity

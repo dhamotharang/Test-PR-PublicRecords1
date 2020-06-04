@@ -1,4 +1,4 @@
-import RoxieKeyBuild;
+﻿import RoxieKeyBuild;
 
 export Proc_Build_FraudPoint_Keys(string filedate) := function
 
@@ -13,7 +13,7 @@ export Proc_Build_FraudPoint_Keys(string filedate) := function
 	roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::fdattributes','Q',a2);
 	roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::fraudpoint','Q',b2);
 
-	dops_update := Roxiekeybuild.updateversion('FraudpointseedKeys',filedate,'avenkatachalam@seisint.com,kevin.devore@lexisnexis.com',,'N');
+	dops_update := Roxiekeybuild.updateversion('FraudpointseedKeys',filedate,'amila.de@lexisnexisrisk.com,matthew.ludewig@lexisnexisrisk.com',,'N');
 
 	retval := sequential(a,a1,a2,b,b1,b2,dops_update);
 

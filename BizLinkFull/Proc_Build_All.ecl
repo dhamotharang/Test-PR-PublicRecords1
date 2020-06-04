@@ -18,6 +18,7 @@ function
 //  Buildrefs                      := tools.macf_writeindex('Key_BizHead_.Key                ,knames.refs                     .new'      );  
 //  Buildwords                     := tools.macf_writeindex('Key_BizHead_.ValueKey           ,knames.words                    .new'      );
   Buildrefs_l_cnpname            := tools.macf_writeindex('Key_BizHead_L_CNPNAME.Key       ,knames.refs_l_cnpname           .new'      );
+  Buildrefs_l_cnpname_slim       := tools.macf_writeindex('Key_BizHead_L_CNPNAME.SlimKey   ,knames.refs_l_cnpname_slim      .new'      );
   Buildrefs_l_cnpname_zip        := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ZIP.Key   ,knames.refs_l_cnpname_zip       .new'      );
   Buildrefs_l_cnpname_st         := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ST.Key    ,knames.refs_l_cnpname_st        .new'      );
   Buildrefs_l_cnpname_fuzzy      := tools.macf_writeindex('Key_BizHead_L_CNPNAME_FUZZY.Key ,knames.refs_l_cnpname_fuzzy     .new'      );
@@ -52,6 +53,7 @@ function
           // ,Buildrefs                    
           // ,Buildwords                   
           ,Buildrefs_l_cnpname    
+          ,Buildrefs_l_cnpname_slim    
           ,Buildrefs_l_cnpname_zip
           ,Buildrefs_l_cnpname_st       
           ,Buildrefs_l_cnpname_fuzzy    

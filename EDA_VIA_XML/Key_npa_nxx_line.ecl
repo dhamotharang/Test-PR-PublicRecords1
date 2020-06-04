@@ -1,6 +1,7 @@
-import gong_Neustar, doxie, ut;
+﻿import gong_Neustar, doxie, ut;
+//DF-26180 Need to include did in this key
 ds := PROJECT(gong_Neustar.File_Gong_Full_Prepped_For_Keys(TRIM(phone10)<>''), 
-								recordof(gong_Neustar.File_Gong_Full_Prepped_For_Keys) - did);
+								recordof(gong_Neustar.File_Gong_Full_Prepped_For_Keys));
 
 export Key_npa_nxx_line :=  
        index(ds,

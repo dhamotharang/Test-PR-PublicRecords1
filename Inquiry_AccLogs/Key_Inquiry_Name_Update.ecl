@@ -1,4 +1,4 @@
-﻿import doxie,Data_Services,UT;
+﻿import doxie,Data_Services,UT, MDR, STD, _control;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.update(bus_intel.industry <> '' and  
 						trim(person_q.lname) <> '' and  trim(person_q.fname) <> '' and 
@@ -12,7 +12,8 @@ slim := record
 	inquiry_acclogs.layout.ccpaLayout ccpa;
 end;
 
-p := project(df, transform(slim, self := left));
+p_ := project(df, transform(slim, self := left));
+p  := MDR.macGetGlobalSid(p_,'InquiryTracking_Virtual','', 'ccpa.global_sid');
 
 export Key_Inquiry_name_update := INDEX(p, {person_q.fname,person_q.mname,person_q.lname}, {p},
 					Data_Services.Data_location.Prefix('Inquiry') + 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::name_update');

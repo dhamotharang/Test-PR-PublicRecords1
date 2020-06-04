@@ -132,7 +132,7 @@ END;
 
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator(ntype,0,
 						IF(ntype='P',Address.NameTester.genderEx(self._fname,self._mname),''),
-						IF(ntype='P',Length(trim(self._fname))=1,false));
+						false);
 		
 #if(_cleanBiznames=true)
 		self._cname := case(ntype,
@@ -172,7 +172,7 @@ END;
 				PROJECT(DISTRIBUTE(inFile(Field='')),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;
-							self._name_ind := Nid.NameIndicators.Blank;
+							self._name_ind := Nid.NameIndicators.NameTypes.Blank;
 							SELF := LEFT;
 							));
 
@@ -198,7 +198,7 @@ END;
 
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator('P',c,
 					Address.NameTester.GenderEx(SELF._fname,SELF._mname),
-					LENGTH(TRIM(SELF._fname))=1);
+					false);
 
 		SELF := L;
 	

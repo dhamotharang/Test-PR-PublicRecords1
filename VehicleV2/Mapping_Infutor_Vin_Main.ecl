@@ -1,4 +1,4 @@
-import ut,VehicleV2,VehicleCodes/*,CODES,vehlic*/;
+﻿import ut,VehicleV2,VehicleCodes/*,CODES,vehlic*/;
 
 //---------------------------------------------------------------------------
 //-------MAP to BASE MAIN FORMAT LAYOUT
@@ -26,7 +26,7 @@ string1 Infutor_Vehicle_Type_Mapping(string class_code) :=
 						 'U');
 
 // Map to the base vehiclev2 main layout
-VehicleV2.Layout_Base_Main	tReformat2Main(dInfutorVinTempMain	pInput)	:=
+VehicleV2.Layout_Base_Main tReformat2Main(dInfutorVinTempMain	pInput)	:=
 transform
 	
 	self.State_BitMAP_Flag 					:=	0; //update later
@@ -60,6 +60,9 @@ transform
 	                                       pInput.vina_body_style_desc,
 																				 pInput.body_style_description);
 	
+	//Added for CCPA-103
+	// self.global_sid                 := 0;
+	// self.record_sid                 := 0;
 	self														:=	pInput;
 	self														:=	[];
 end;

@@ -37,6 +37,7 @@ EXPORT BusinessCreditReports_files := MODULE
 									'TopBusContacts'      => file_prefix + '::base::' + middle_name + 'topbuscontacts',
 									'TopBusFinal'         		=> file_prefix + '::base::' + middle_name + 'topbusactivity',
 									'MatchInfo'      => file_prefix + '::base::' + middle_name + 'crmatch',
+									'CorteraB2B'      => file_prefix + '::base::' + middle_name + 'corterab2b',
 									'' );
 		if( fn='', FAIL('Unknown Section') );
 		return fn;
@@ -196,4 +197,11 @@ EXPORT BusinessCreditReports_files := MODULE
 				BusinessCredit_Services.Layouts.MatchInfo, 
 				CSV (heading(1), separator(','), QUOTE('"'), maxlength (max10k)));
 
+//=======================================================
+//===  Cortera B2B         Section 21                  ===
+//=======================================================
+	export Section21 := dataset(get_filename('CorteraB2B'), 
+				BusinessCredit_Services.Layouts.CorteraB2B, 
+				CSV (heading(1), separator(','), QUOTE('"'), maxlength (max10k)));
+				
 END;

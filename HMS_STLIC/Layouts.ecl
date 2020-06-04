@@ -1,4 +1,7 @@
-﻿IMPORT Address, BIPV2, AID, HMS_STLIC;
+﻿/*2019-06-19T17:11:54Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-260
+*/
+IMPORT Address, BIPV2, AID, HMS_STLIC;
 
 EXPORT layouts := MODULE
 
@@ -30,6 +33,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT address_layout_new := RECORD ,MAXLENGTH(max_size)
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100		ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -53,7 +59,7 @@ EXPORT layouts := MODULE
 				string20 		fax1;
 				string20 		fax2;
 				string20 		fax3;	
-				// string20 other_phone1; // dropped
+				string20 other_phone1; // dropped previously and now back?
 		END;		
 			
 		EXPORT csr_layout := RECORD
@@ -107,6 +113,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT dea_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -131,6 +140,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT disciplinaryact_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -159,6 +171,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT education_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -192,8 +207,8 @@ EXPORT layouts := MODULE
 		
 		EXPORT entity_layout_new := RECORD
 				string12		load_id;
-				string10		load_source_data_date;
-				string10		load_qa_approval_date;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -225,6 +240,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT language_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -260,6 +278,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT license_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -304,6 +325,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT npi_layout_new := RECORD
+				string15		load_id;
+				// string10		load_source_data_date;
+				// string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -324,6 +348,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT phone_layout_new := RECORD
+			string15	load_id;
+			// string10	load_source_data_date;
+			// string10	load_qa_approval_date;
 			phone_layout;
 		END;
 		
@@ -338,6 +365,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT specialty_layout_new	:= RECORD
+			string15	load_id;
+			// string10	load_source_data_date;
+			// string10	load_qa_approval_date;
 			specialty_layout;
 		END;
 		
@@ -357,6 +387,23 @@ EXPORT layouts := MODULE
 		
 		EXPORT stliclookup_layout_new := RECORD
 				stliclookup_layout;
+		END;
+		
+		EXPORT stliclookup_layout_from_alpha := RECORD
+			string load_id;
+			string lic_state;
+			string lic_class_type;
+			string lic_subtype;
+			string lic_status;
+			string lic_substatus;
+			string lic_qualifier1;
+			string lic_qualifier2;
+			string mapped_class;
+			string mapped_status;
+			string mapped_qualifier1;
+			string mapped_qualifier2;
+			string mapped_pdma;
+			string mapped_pract_type;
 		END;
 		
 		EXPORT statelicense_layout := RECORD
@@ -777,6 +824,8 @@ EXPORT layouts := MODULE
 			string50 	source_code;
 			string15 	taxonomy_code;
 			string 		file_date;
+			unsigned4 								global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
+			unsigned8 								record_sid; 
 		END;
 		
 		EXPORT autokey_common	:= RECORD

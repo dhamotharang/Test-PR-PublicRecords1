@@ -8,7 +8,7 @@ Build	  -- build the file of shelters
 Filter  -- filter records with the address of a shelter
 
 ***/
-import Std, _Control, address;
+import Mdr, Std, _Control, address;
 srcdir := '/data/projects/domesticviolence/';
 filename := 'adminoffices.csv';
 
@@ -166,7 +166,8 @@ EXPORT DomesticViolence := MODULE
 		unfiltered := JOIN(hdr, addresses, left.zip=right.zip AND left.st=right.st AND left.predir=right.predir AND left.prim_name=right.prim_name
 															and left.prim_range=right.prim_range AND left.sec_range=right.sec_range,
 										TRANSFORM(recordof(hdr), self := left;), LEFT ONLY, LOCAL, LOOKUP);
-		return unfiltered;
+		addGlobalSID := mdr.macGetGlobalSID(unfiltered,'Infutor','','global_sid'); //DF-26401: Populate Global_SID Field
+		return addGlobalSID;
 	END;
 				
 	export Shelters := dataset(lfnShelters, rShelters, thor);

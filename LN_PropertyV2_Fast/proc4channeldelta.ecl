@@ -68,7 +68,7 @@ k12	:= LN_PropertyV2_Fast.key_search_fid(false,isFast);		 	s12 := 'search.fid';	
 k11	:= LN_PropertyV2_Fast.key_search_bdid(isFast);		 			s11 := 'search.bdid';
 //Build BIPv2 LinkIds key
 k26	:= LN_PropertyV2_Fast.key_LinkIds.Key(isFast);		 			s26 := 'search.linkids';
-k27	:= LN_PropertyV2_Fast.key_search_fid_LinkIds(isFast);	 	s27 := 'search.fid_linkids';	
+//k27	:= LN_PropertyV2_Fast.key_search_fid_LinkIds(isFast);	 	s27 := 'search.fid_linkids';	
 
 // Key build call-out
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(k14,SuperKeyName+s14, BaseKeyName + '::'+s14,key14);
@@ -81,7 +81,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k10,SuperKeyName+s10, BaseKeyName + '
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k12,SuperKeyName+s12, BaseKeyName + '::' +s12,key12);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k11,SuperKeyName+s11, BaseKeyName + '::' +s11,key11);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k26,SuperKeyName+s26, BaseKeyName + '::' +s26,key26);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k27,SuperKeyName+s27, BaseKeyName + '::' +s27,key27);
+//RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k27,SuperKeyName+s27, BaseKeyName + '::' +s27,key27); //Deprecated key Jira DF-26972
 
 // Build FCRA keys
 
@@ -100,7 +100,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k23f,SuperKeyName_fcra+s23, BaseKeyNa
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(k24f,SuperKeyName_fcra+s24, BaseKeyName_fcra + '::' +s24,key24_fcra);
 
 Keys_fcra	:=	parallel(	key14			,key3			,key4			,key5			,key13			,key7			,key10,
-												key12, key11, key26, key27,
+												key12, key11, key26, /*key27,*/
 
 												key14_fcra,key3_fcra,key4_fcra,key5_fcra,key13_fcra	,key7_fcra,key10_fcra, 
 												key12_fcra, key16_fcra,  key18_fcra, key20_fcra, key23_fcra, key24_fcra
@@ -144,7 +144,7 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.did',   		
 Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.fid', 				BaseKeyName+'::search.fid', 				mv12);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.bdid', 				BaseKeyName+'::search.bdid', 				mv11);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.linkids', 		BaseKeyName+'::search.linkids', 		mv26);
-Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.fid_linkids',	BaseKeyName+'::search.fid_linkids',	mv27);
+//Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName+'@version@::search.fid_linkids',	BaseKeyName+'::search.fid_linkids',	mv27);
 
 
 // Move FCRA keys
@@ -172,7 +172,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2(SuperKeyName_fcra+'@version@::ownership_ad
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2(SuperKeyName_fcra+'@version@::ownership.did',   		BaseKeyName_fcra+'::ownership.did',   mv24_fcra);
 
 
-Move_keys_new	:=	parallel(mv3, mv4, mv5, mv7, mv10, mv11, mv12, mv13, mv14, mv26, mv27,
+Move_keys_new	:=	parallel(mv3, mv4, mv5, mv7, mv10, mv11, mv12, mv13, mv14, mv26, /*mv27,*/
 													mv3_fcra, mv4_fcra, mv5_fcra, mv7_fcra, mv10_fcra,
 													 mv12_fcra, mv13_fcra, mv14_fcra,
 													mv16_fcra,  mv18_fcra,
@@ -215,7 +215,7 @@ Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.did',   			'Q',mv10
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid', 				'Q',mv12_qa,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.bdid', 			'Q',mv11_qa,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.linkids', 		'Q',mv26_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_linkids','Q',mv27_qa,2);
+//Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_linkids','Q',mv27_qa,2);
 //Move FCRA Keys to QA
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addr_search.fid',	  'Q',mv14_qa_fcra,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addllegal.fid',		  'Q',mv3_qa_fcra,2);
@@ -234,7 +234,7 @@ Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::ownership_addr', 		'Q
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::ownership.did', 			'Q',mv24_qa_fcra,2);
 
 To_qa_fcra	:=	parallel(	mv14_qa, mv3_qa, mv4_qa, mv5_qa, mv13_qa, mv7_qa, mv10_qa,
-													mv12_qa, mv11_qa, mv26_qa, mv27_qa, 
+													mv12_qa, mv11_qa, mv26_qa, /*mv27_qa,*/ 
 													
 													mv14_qa_fcra,mv3_qa_fcra, mv4_qa_fcra, mv5_qa_fcra, mv13_qa_fcra,
 													mv7_qa_fcra, mv10_qa_fcra,mv12_qa_fcra, /*mv11_qa_fcra,*/

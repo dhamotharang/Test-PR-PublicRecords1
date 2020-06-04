@@ -1,4 +1,4 @@
-//****************Maps intrado to a common layout********************
+﻿//****************Maps intrado to a common layout********************
 import Cellphone, ut, _validate, mdr;
 phone_file := CellPhone.Intrado_DID;
 
@@ -35,6 +35,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.orig_phone					:= Fn_Clean_Phone10(input.phone10);
 	self.npa						:= self.orig_phone[..3];
 	self.phone7						:= self.orig_phone[4..];
+	self.source				:= mdr.sourceTools.src_Intrado; //DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784	
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

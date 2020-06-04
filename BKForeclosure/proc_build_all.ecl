@@ -31,11 +31,10 @@ EXPORT proc_build_all (STRING filedate)	:= FUNCTION
 													,ReoPopulationStats
 													);												
 
-	// orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure NOD',filedate,'N')
-														// ,Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure REO',filedate,'N')
-														// );
-	
-	BuildAll	:= SEQUENTIAL(Nodbuilt, Reobuilt/*, orbit_update*/);
+	orbit_update := sequential(Orbit3.Proc_Orbit3_CreateBuild_npf('Black Knight Foreclosures',filedate)
+														);
+
+	BuildAll	:= SEQUENTIAL(Nodbuilt, Reobuilt, orbit_update);
 	
 RETURN BuildAll;
 

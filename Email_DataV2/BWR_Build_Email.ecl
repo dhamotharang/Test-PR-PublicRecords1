@@ -43,8 +43,8 @@ zDoPopulationVendorStats:=Strata_Stat_Vendor(version,Files.Email_Base);
 dops_update :=  sequential(DOPS.updateversion('EmailDataV2Keys',(string)version,emailList,,'N'));
 													//,DOPS.updateversion('FCRA_EmailDataV2Keys',(string)version,emailList,,'F')); //currently not available
 
-orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email DataV2',(string)version,'N')
-														//,Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA Email DataV2',(string)version,'F') /currently not available
+orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2',(string)version,'N')
+														//,Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA Email Data V2',(string)version,'F') /currently not available
 														);
 
 

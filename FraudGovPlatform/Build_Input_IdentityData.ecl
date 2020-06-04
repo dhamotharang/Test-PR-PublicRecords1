@@ -41,12 +41,11 @@ module
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate := (unsigned)fn[6];
 		self.FileTime := fn[7];
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
 		self.ind_type := functions.ind_type_fn(fn[4]);
 		self.file_type := 3 ;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification: 
+		self.RIN_Source := map(	l.RIN_Source = 0 => 1, //identity
+								l.RIN_Source); // NAC or RDP							
 		self:=l;
 		self:=[];
 	end;
@@ -59,8 +58,15 @@ module
 
 	shared d_source_rec_id := distribute(f1_source_rec_id);
 	
+	shared customer_mappings := FraudGovPlatform.MBS_Mappings; 
+
+	shared Append_Customer_Mappings := 
+		join(d_source_rec_id, customer_mappings,
+			left.customer_id = right.contribution_gc_id and right.contribution_source = 'RDP' and left.reason_description = 'APPLICANT ACTIVITY VIA LEXISNEXIS',
+			transform(Layouts.Input.IdentityData, SELF.customer_id := if(left.customer_id = right.contribution_gc_id, (string20)right.customer_id, left.customer_id); SELF:=LEFT), LEFT OUTER, lookup);
+	
 	shared append_source := join( 
-		d_source_rec_id,
+		Append_Customer_Mappings,
 		MBS_Sprayed(status = 1 and regexfind('DELTA', fdn_file_code, nocase) = false),
 		left.Customer_Id =(string)right.gc_id and
 		left.customer_State = right.Customer_State and
@@ -115,8 +121,7 @@ module
 		LOOKUP);
 
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);
 	
 	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
 

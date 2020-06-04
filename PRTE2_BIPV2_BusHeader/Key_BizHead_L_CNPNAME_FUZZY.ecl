@@ -1,23 +1,23 @@
 ﻿IMPORT BizLinkFull,SALT311,std;
 EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
  
-//company_name_prefix:?:cnp_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 EXPORT KeyName := PRTE2_BIPV2_BusHeader.Filename_keys.L_CNPNAME_FUZZY; /*HACK07*/
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
 // Compulsory fields
   h.company_name_prefix;
+  h.fallback_value; // Populate the fallback field /*HACK26b*/
 // Optional fields
-  h.zip;
   h.st;
-  h.fallback_value; // Populate the fallback field
+  h.zip;
+  // Moved fallback_value up in layout to decrease number of seeks against index /*HACK26a*/
   h.ultid; // Parent #3
   h.orgid; // Parent #2
   h.seleid; // Parent #1
   h.proxid; // The ID field
   h.cnp_name;
-  h.city;
 // Extra credit fields
+  h.city;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -35,17 +35,18 @@ layout := RECORD // project out required fields
   h.city_len;
   h.prim_range_len;
   h.sec_range_len;
-	h.EFR_BMap;
+// external files bitmap; Indicates whether proxid has records in the external file Ext_Layouts.ID_XXX; bit:= 1<<(ID_XXX-1)
+  h.EFR_BMap;
 //Scores for various field components
   h.company_name_prefix_weight100 ; // Contains 100x the specificity
   h.cnp_name_weight100 ; // Contains 100x the specificity
   h.cnp_name_initial_char_weight100 ; // Contains 100x the specificity
+  h.st_weight100 ; // Contains 100x the specificity
   h.zip_weight100 ; // Contains 100x the specificity
   h.city_weight100 ; // Contains 100x the specificity
   INTEGER2 city_p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
   INTEGER2 city_e2_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
   INTEGER2 city_e2p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
-  h.st_weight100 ; // Contains 100x the specificity
   h.company_sic_code1_weight100 ; // Contains 100x the specificity
   h.cnp_number_weight100 ; // Contains 100x the specificity
   h.cnp_btype_weight100 ; // Contains 100x the specificity

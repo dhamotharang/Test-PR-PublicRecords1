@@ -1,4 +1,4 @@
-import Business_Header, VersionControl;
+﻿import Business_Header, VersionControl,mdr,ut,NID,_control,tools,STD;
 
 export Proc_Build_Business_Contacts_Base_Files (
 
@@ -11,7 +11,7 @@ module
 
 	shared names := filenames(pversion).base;
 	
-	shared dBC_All_Recs := pBC_Base;
+	shared dBC_All_Recs := mdr.macGetGlobalSID(pBC_Base, 'BusinessHeader', 'source', 'global_sid');
 	
 	VersionControl.macBuildNewLogicalFile( names.contacts.new						,dBC_All_Recs		,Build_Contacts			);
 	VersionControl.macBuildNewLogicalFile( names.contactsPlus.new				,dBC_All_Recs		,Build_ContactsPlus	);

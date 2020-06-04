@@ -7,11 +7,13 @@
 //when the name+address from the main file
 //equal a name+address found in the search file
 
+EXPORT property_search2(unsigned1 mode, STRING sVersion) := FUNCTION
+
     candidate := reunion.property_search1(did=0);
 not_candidate := reunion.property_search1(did>0);
 
 candidate_dist := distribute(candidate,              hash(fname,mname,lname,name_suffix,pro_prim_range,pro_prim_name,pro_sec_range,pro_zip));
-appends_dist   := distribute(reunion.various_appends,hash(fname,mname,lname,name_suffix,    prim_range,    prim_name,    sec_range,    zip));
+appends_dist   := distribute(reunion.various_appends(mode, sVersion).all,hash(fname,mname,lname,name_suffix,    prim_range,    prim_name,    sec_range,    zip));
 
 recordof(candidate_dist) t1(candidate_dist le, appends_dist ri) := transform
  self.did := ri.did;
@@ -35,4 +37,6 @@ j1 := join(candidate_dist,appends_dist,
 
 concat := not_candidate+j1;
 
-export property_search2 := concat;
+return concat;
+
+END;

@@ -1,13 +1,14 @@
 ﻿// This is/will be the code to merge various watchdog keys into a single key that has a binary flag
 // field that will determine who can see the various records.
-IMPORT $,doxie, Roxiekeybuild, dx_BestRecords;
+IMPORT $,doxie, Roxiekeybuild, dx_BestRecords,VersionControl,Watchdog_V2;
 
 EXPORT Proc_Build_Merged_Key(STRING pversion) := FUNCTION
 
 	wd := $.fn_build_merged;
-
+	
   lfn := '~thor_data400::key::watchdog::' + pversion + '::univesal';
 	sf := '~thor_data400::key::watchdog';
+	
 	Roxiekeybuild.Mac_SK_BuildProcess_v3_local(dx_BestRecords.key_watchdog(),
 																					wd,
 																					sf,
@@ -19,12 +20,19 @@ EXPORT Proc_Build_Merged_Key(STRING pversion) := FUNCTION
 																		 move_to_built
 																		 );
   Roxiekeybuild.Mac_SK_Move_V2(sf, 'Q', move_to_qa);
-
+	
   merge_key := SEQUENTIAL(
 													build_key,
 													move_to_built,
-													move_to_qa);
+													move_to_qa,
+												  Watchdog_V2.fn_Watchdog_Slim(pversion).full_build						
+												
+														);
 
   RETURN merge_key;
 
 END;
+
+
+
+

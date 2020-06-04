@@ -1,6 +1,12 @@
-every_10_min := '*/10 0-23 * * *';
+﻿every_10_min := '*/10 0-23 * * *';
 IP:='_Control.IPAddress.edata10';
 RootDir := '/data_build_4/nac/';
+ 
+
+STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+STRING AlertRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Devs&NOC','');
+
+
 
 lECL1 :=
  'wuname := \'NAC Contributory Input Prep\';\n'
@@ -9,7 +15,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',11);\n'
 +'#OPTION(\'AllowedClusters\',\'thor400_30 ,thor400_20 ,thor400_92\');\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'jose.bello@lexisnexis.com\'\n'
++'   \'' + ProcessRecipient +     '\'\n'
 +' 	 ,\'NAC Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
@@ -55,7 +61,7 @@ ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor50_dev01','thor400_30
 d:=FileServices.RemoteDirectory(_Control.IPAddress.edata10, RootDir+'ready/', '*.dat');
 if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
 			: WHEN(CRON(every_10_min))
-			,FAILURE(fileservices.sendemail(NAC.Mailing_List('').Dev1
+			,FAILURE(fileservices.sendemail(AlertRecipient
 																			,'NAC Input Prep SCHEDULE failure'
 																			,NOC_MSG
 																			));

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT E_Customer,E_Person FROM KELOtto;

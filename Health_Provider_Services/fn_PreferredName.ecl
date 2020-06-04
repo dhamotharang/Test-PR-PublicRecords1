@@ -1,1 +1,3 @@
-export fn_PreferredName(string s) := DataLib.PreferredFirstNew(trim(s), true);
+﻿IMPORT NID;
+
+EXPORT fn_PreferredName(STRING s) := NID.PreferredFirstNew(trim(s), TRUE);

@@ -11,10 +11,10 @@ export Foreclosure_as_Source(dataset(Property.Layout_Fares_Foreclosure_v2) pFore
 	src_rec := header.layouts_SeqdSrc.FR_src_rec;
 
 	//Core Logic Records - FR
-	header.Mac_Set_Header_Source(dSourceData(trim(deed_category)='U' and source = 'FR'),Property.Layout_Fares_Foreclosure,src_rec,'FR',withUID1_fr);
+	header.Mac_Set_Header_Source(dSourceData(trim(deed_category) in ['U','Q','F','T','G'] and source = 'FR'),Property.Layout_Fares_Foreclosure,src_rec,'FR',withUID1_fr);
     
     //BlackKnight Records - FR
-	header.Mac_Set_Header_Source(dSourceData(trim(deed_category)='U' and source = 'I5'),Property.Layout_Fares_Foreclosure,src_rec,'I5',withUID2_fr);
+	header.Mac_Set_Header_Source(dSourceData(trim(deed_category) in ['U','Q','F','T','G'] and source = 'I5'),Property.Layout_Fares_Foreclosure,src_rec,'I5',withUID2_fr);
     
     withUID := withUID1_fr + withUID2_fr;
 

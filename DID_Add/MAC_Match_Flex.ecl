@@ -567,7 +567,7 @@ end;
 %hasCity_field% := false;
 // output(%hasCity_field%, named('hascity'));
 #uniquename(roxprep)
-didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := transform
+didville.Layout_DID_InBatch_v2 %roxprep%(%pre_infile_id% l) := transform
 	#if('S' in matchset or '4' in matchset)
 		self.ssn := (qSTRING9)l.ssn_field;
 	#else
@@ -639,7 +639,7 @@ end;
 #end
 '';
 #uniquename(roxout)
-did_add.MAC_Match_Roxie(%roxin%, %roxout%, %opts%)
+did_add.MAC_Match_Roxie_V2(%roxin%, %roxout%, %opts%)
 
 
 //** Reappend the full rec

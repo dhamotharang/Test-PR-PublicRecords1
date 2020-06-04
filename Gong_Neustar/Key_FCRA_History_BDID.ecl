@@ -1,3 +1,6 @@
+//######################################################
+//## This Key is no longer in FCRA_GongKeys 2/26/2020 ##
+//######################################################
 Import Data_Services, doxie, ut, _Control, gong;
 
 hist_in := File_History_Full_Prepped_for_FCRA_Keys(bdid != 0);

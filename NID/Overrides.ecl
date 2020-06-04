@@ -31,7 +31,12 @@ OverrideData := DATASET([
    {'B','TERRA FIRMA'},
    {'P','CEDILLOS, JOSE FELIX DEL CID', '', '', '', '', 'MR', 'JOSE', 'FELIX DEL CID', 'CEDILLOS'},
    {'P','ALEXANDER WILDERNESS, SR','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', 'SR'},
-   {'P','ALEXANDER WILDERNESS','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', ''}
+   {'P','ALEXANDER WILDERNESS','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', ''},
+   {'P','VIVIAN IRLAS JR','', '', '', '', 'MR', 'VIVIAN', '', 'IRLAS', 'JR'},
+   {'P','VIVIAN IRLAS, JR','', '', '', '', 'MR', 'VIVIAN', '', 'IRLAS', 'JR'},
+   {'P','','VIVIAN', '', 'IRLAS', 'JR', 'MR', 'VIVIAN', '', 'IRLAS', 'JR'},
+   {'P','JAMES E GIANCARLO','', '', '', '', 'MR', 'GIANCARLO', 'E', 'JAMES', ''},
+   {'P','','JAMES', 'E', 'GIANCARLO', 'JR', 'MR', 'GIANCARLO', 'E', 'JAMES', ''}
 	], layout_Override);
 
 EXPORT Overrides(boolean fullname=true) := DISTRIBUTE(PROJECT(OverrideData, TRANSFORM(Layout_Repository,

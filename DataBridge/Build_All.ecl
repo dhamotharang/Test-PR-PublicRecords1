@@ -1,4 +1,4 @@
-﻿import tools, _control, ut, std, Scrubs, Scrubs_DataBridge;
+﻿import tools, _control, ut, std, Scrubs, Scrubs_DataBridge, Orbit3, dops;
 						
 export Build_All(
 	 string															pversion
@@ -18,12 +18,14 @@ function
 		 Create_Supers
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
 		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
-		//,Build_Keys (pversion).all   **DOPs package has not been created yet
-		,Scrubs.ScrubsPlus('DataBridge','Scrubs_DataBridge','Scrubs_DataBridge_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,Build_Keys (pversion).all   
+		,Scrubs.ScrubsPlus('DataBridge','Scrubs_DataBridge','Scrubs_DataBridge', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
+	  ,dops.updateversion('DataBridgeKeys',pversion,DataBridge.Email_Notification_Lists().BuildSuccess,,'N')
+		,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	

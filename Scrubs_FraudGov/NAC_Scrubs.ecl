@@ -1,6 +1,6 @@
 ﻿IMPORT SALT39,STD;
 EXPORT NAC_Scrubs := MODULE
- 
+
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 32;
   EXPORT NumRulesFromFieldType := 32;
@@ -368,7 +368,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
- 
+
     // field population stats
     mod_hygiene := NAC_hygiene(PROJECT(h, NAC_Layout_NAC));
     hygiene_summaryStats := mod_hygiene.Summary('');
@@ -440,7 +440,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := '';
     END;
     FieldPopStats := NORMALIZE(hygiene_summaryStats,18,xNormHygieneStats(LEFT,COUNTER,'POP'));
- 
+
   // record count stats
     SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
@@ -452,7 +452,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := 0;
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
- 
+
     mod_Delta := NAC_Delta(prevDS, PROJECT(h, NAC_Layout_NAC));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),18,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
@@ -461,23 +461,23 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
     DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
     DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
- 
+
     RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
 END;
- 
+
 EXPORT StandardStats(DATASET(NAC_Layout_NAC) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
- 
+
   SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_FraudGov, NAC_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
- 
+
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
   tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
- 
+
   scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
                                                DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
@@ -487,7 +487,7 @@ EXPORT StandardStats(DATASET(NAC_Layout_NAC) inFile, BOOLEAN doErrorOverall = TR
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
   scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
- 
+
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;

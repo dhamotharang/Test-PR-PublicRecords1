@@ -212,7 +212,7 @@ j1 := join(distribute(NoTtee,hash(did)),hdr_val_ssn
 
 fixed_dates := header.fn_fix_dates(j1,,filedate);
 
-DoBuild := distribute(fixed_dates,hash(did));
+DoBuild := distribute(fixed_dates,hash(did)):persist('~thor_data00::persist::TNTS',expire(3),REFRESH(false));
 
 pre1 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::tucs_did_BUILDING')>0,
     output('Nothing added to Base::tucs_did_BUILDING'),

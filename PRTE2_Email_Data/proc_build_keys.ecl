@@ -38,10 +38,11 @@ cnt_email_data_fcra := OUTPUT(strata.macf_pops(Keys.key_did(true),,,,,,FALSE,['o
 
 //---------- making DOPS optional and only in PROD build -------------------------------													
 		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
-		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
-		updatedops   		 		:= PRTE.UpdateVersion('EmailDataKeys',filedate,notifyEmail,'B','N','N');
-		updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_EmailDataKeys',filedate,notifyEmail,'B','F','N');
-		PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');		
+   	updatedops   		 		:= PRTE.UpdateVersion('EmailDataKeys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean:='N');
+		updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_EmailDataKeys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='F',l_includeboolean:='N');
+			
+  	PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
 //--------------------------------------------------------------------------------------
 
 

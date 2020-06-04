@@ -1,4 +1,4 @@
-// spray USS0645 - HUD (Housing & Urban Development) Mortgage Lenders  
+﻿// spray USS0645 - HUD (Housing & Urban Development) Mortgage Lenders  
 IMPORT ut
 	   ,_control
        ,Prof_License_Mari
@@ -9,17 +9,18 @@ IMPORT ut
 //Files for S0645 are Located  //
 EXPORT spray_USS0645(STRING filedate) := MODULE
 
-#workunit('name','Spray USS0645');
+#workunit('name','Yogurt:Spray USS0645 ' + filedate);
+SHARED STRING7 code		:= 'USS0645';
 SHARED filepath		    :=	'/data/data_build_5_2/MARI/in/USS0645/' + filedate +'/';
 SHARED sourcepath			:=	'/data/data_build_5_2/MARI/';
 SHARED group_name			:=	Common_Prof_Lic_Mari.group_name;
 SHARED maxRecordSize	:=	8192;
 SHARED destination := Common_Prof_Lic_Mari.SourcesFolder + 'USS0645::' + filedate + '::';
-SHARED superfile_lender := '~thor_data400::in::proflic_mari::USS0645::using::lenders';
-SHARED superfile_re := '~thor_data400::in::proflic_mari::USS0645::using::reference_company ';
+SHARED superfile_lender := '~thor_data400::in::proflic_mari::USS0645::using::lender';
+SHARED superfile_branch := '~thor_data400::in::proflic_mari::USS0645::using::branch';
 
 	   
-clear_super_lender
+clear_super_le
 	:=
 		IF(FileServices.SuperFileExists(superfile_lender)
 			,FileServices.ClearSuperFile(superfile_lender)
@@ -27,56 +28,38 @@ clear_super_lender
 			);		 
 
 
-clear_super_re
+clear_super_br
 	:=
-		IF(FileServices.SuperFileExists(superfile_re)
-			,FileServices.ClearSuperFile(superfile_re)
-			,FileServices.CreateSuperFile(superfile_re)
+		IF(FileServices.SuperFileExists(superfile_branch)
+			,FileServices.ClearSuperFile(superfile_branch)
+			,FileServices.CreateSuperFile(superfile_branch)
 			);		
 			
-SprayFile(STRING filename, STRING delim) := FUNCTION
-	n := StringLib.StringFind(filename, '.',1);
-	newname := filename[1..(n-1)];
-	RETURN 	FileServices.SprayVariable(Common_Prof_Lic_Mari.sourceIP, 
-																		 filepath + filename, 
-																		 maxRecordSize,
-																		 If(delim = 'tab','\t',''),'\n','',
-																		 group_name, 
-																		 destination + StringLib.StringToLowerCase(newname) + '.raw',
-																			,
-																				,
-																					,
-																						TRUE,
-																							,
-																								FALSE); 																									
-END;
-
-
 
 TransformFile_Lender(STRING filename) := FUNCTION
 	n := StringLib.StringFind(filename, '.',1);
 	newname := filename[1..(n-1)];
 	dsraw := DATASET(destination + StringLib.StringToLowerCase(newname) + '.raw',
-										Prof_License_Mari.Layout_USS0645.FOIA,CSV(SEPARATOR(','),QUOTE('"')));
+										Prof_License_Mari.Layout_USS0645.lender,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\n','\r','\r\n'])));
 					
-	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_USS0645.COMMON, SELF := LEFT; SELF :=[]));
+	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_USS0645.COMMON, SELF.BRANCH_FLAG := 'N',SELF := LEFT; SELF :=[]));
 	
 	RETURN ds;
 	
 END;		
 
 
-// TransformFile_Reference(STRING filename) := FUNCTION
-	// n := StringLib.StringFind(filename, '.',1);
-	// newname := filename[1..(n-1)];
-	// dsraw := DATASET(destination + StringLib.StringToLowerCase(newname) + '.raw',
-										// Prof_License_Mari.Layout_USS0645.reference,CSV(SEPARATOR(','),QUOTE('"')));
+TransformFile_Branch(STRING filename) := FUNCTION
+	n := StringLib.StringFind(filename, '.',1);
+	newname := filename[1..(n-1)];
+	dsraw := DATASET(destination + StringLib.StringToLowerCase(newname) + '.raw',
+										Prof_License_Mari.Layout_USS0645.branch,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\n','\r','\r\n'])));
 					
-	// ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_USS0645.COMMON, SELF := LEFT; SELF :=[]));
+	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_USS0645.COMMON, SELF.BRANCH_FLAG := 'Y',SELF := LEFT; SELF :=[]));
 	
-	// RETURN ds;
+	RETURN ds;
 	
-// END;		
+END;		
 
 
 AddToSuperfile_lender(STRING filename) := FUNCTION
@@ -85,27 +68,25 @@ AddToSuperfile_lender(STRING filename) := FUNCTION
 
 END;		
 
-// AddToSuperfile_reference(STRING filename) := FUNCTION
-	// RETURN 	
-			// FileServices.AddSuperFile(superfile_re, destination + filename);
+AddTosuperfile_branch(STRING filename) := FUNCTION
+	RETURN 	
+			FileServices.AddSuperFile(superfile_branch, destination + filename);
 
-// END;	
+END;	
 
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		SprayFile('FOIA.csv','\\,'), 	 
-		// SprayFile('reference.csv','\\,') 
-		
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'branches.csv','comma'),
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Lenders.csv','comma')
 	);
 
 
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_Lender('FOIA.csv'),, destination + 'FOIA.csv', CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR('\n')), OVERWRITE),
-							// OUTPUT(TransformFile_Reference('reference.csv'),, destination + 'reference.csv', CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR('\n')), OVERWRITE)	
-
+							OUTPUT(TransformFile_Branch('branches.csv'),, destination + 'branches.csv', CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR('\n')), OVERWRITE),
+							OUTPUT(TransformFile_Lender('Lenders.csv'),, destination + 'Lenders.csv', CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR('\n')), OVERWRITE)	
 	);	
 
 
@@ -114,22 +95,22 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile_lender('FOIA.csv'),
-		// AddToSuperfile_reference('reference.csv'),
+		AddToSuperfile_Branch('branches.csv'),
+		AddTosuperfile_Lender('Lenders.csv'),
 		FileServices.FinishSuperFileTransaction()
 	);
 
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + 'foia.raw'),
-							 // FileServices.DeleteLogicalFile(destination +  '::reference.raw'),
+							 FileServices.DeleteLogicalFile(destination + 'branches.raw'),
+							 FileServices.DeleteLogicalFile(destination + 'Lenders.raw'),
 							 );
 
 //  Spray All Files
 EXPORT S0645_SprayFiles := SEQUENTIAL(
-																			clear_super_lender
-																			,clear_super_re
+																			clear_super_le
+																			,clear_super_br
 																		  ,spray_all
 																			,xform_all
 																			,super_all

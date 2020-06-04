@@ -8,6 +8,18 @@ IMPORT Watercraft, PRTE2_Watercraft;
 
 EXPORT Layouts := MODULE
 	
+EXPORT Incoming_Boca	:= RECORD
+		Watercraft.Layout_Scrubs.Main_Base - [global_sid, record_sid];
+		Watercraft.Layout_Watercraft_Search_Base - [watercraft_key,	sequence_key,	state_origin, source_code, history_flag, persistent_record_id, global_sid, record_sid];
+		Watercraft.Layout_Watercraft_Coastguard_Base - [watercraft_key,	sequence_key,	state_origin, source_code, persistent_record_id, global_sid, record_sid];
+		STRING10	bug_num;
+		STRING20	cust_name;
+		STRING8		link_inc_date;
+		STRING9		link_fein;
+		STRING8		link_dob;
+		STRING9		link_ssn;
+	END;	
+	
 	EXPORT Base_Boca	:= RECORD
 		Watercraft.Layout_Scrubs.Main_Base;
 		Watercraft.Layout_Watercraft_Search_Base - [watercraft_key,	sequence_key,	state_origin, source_code, history_flag, persistent_record_id];

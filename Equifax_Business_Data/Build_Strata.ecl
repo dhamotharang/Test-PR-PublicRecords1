@@ -20,12 +20,12 @@ EXPORT Build_Strata(
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'Clean_State'	,'Uniques'		,,pIsTesting,pOverwrite);
 	
 	full_build := PARALLEL(
-		 BuildInputNoGrouping_Strata			
+		 BuildInputNoGrouping_Strata 			
 		,BuildInputUniqueNoGrouping_Strata
 		,BuildNoGrouping_Strata								
 		,BuildCleanAddressState_Strata				
 		,BuildUniqueNoGrouping_Strata					
-		,BuildUniqueCleanAddressState_Strata);
+		,BuildUniqueCleanAddressState_Strata) : INDEPENDENT;
 
 	RETURN IF(tools.fun_IsValidVersion(pversion)
 		       ,full_build		

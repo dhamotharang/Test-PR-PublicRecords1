@@ -1,4 +1,4 @@
-/*2005-05-26T17:10:28Z (Dave QI)
+﻿/*2005-05-26T17:10:28Z (Dave QI)
 layout change
 */
 export Layout_Patriot := 
@@ -83,4 +83,8 @@ RECORD
 	STRING7 geo_blk;
 	STRING1 geo_match;
 	STRING4 err_stat;
+	//Added for CCPA-393
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
+	UNSIGNED6 did;
 END;

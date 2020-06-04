@@ -1,4 +1,4 @@
-/*2017-05-24T18:45:57Z (Srilatha Katukuri)
+﻿/*2017-05-24T18:45:57Z (Srilatha Katukuri)
 ECH-4987 - Production bug Fix - to account for Suppressed TF reports
 
 */
@@ -12,7 +12,7 @@ DFF-16695 Final Check in
 DFF- 16695 - Coplogic DataIngestion2
 */
 /*2016-03-04T02:36:53Z (Srilatha Katukuri)
-â€“ Bug: 201048  -- fixed the page count issue for supplemetal reports
+Ã¢â‚¬â€œ Bug: 201048  -- fixed the page count issue for supplemetal reports
 */
 /*2015-10-13T00:45:04Z (Srilatha Katukuri)
 #181860 - accesing agency QC file
@@ -32,11 +32,11 @@ DFF- 16695 - Coplogic DataIngestion2
 /*2015-05-15T19:55:59Z (Srilatha Katukuri)
 Bug# 180852 - PIR 4710 Coplogic Data ingestion
 */
-import ut; 
+import STD; 
 export BuildSuppmentalReports := module 
 agency     := FLAccidents_Ecrash.Infiles.agency	  ;																		
-tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all)		;										
-tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all)		;	
+tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all,local)		;										
+tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all,local)		;	
 tIncident := FLAccidents_Ecrash.IncidentsAfterSuppression;
 
 //keep all incidents and flag updated or duplicate version of reports
@@ -154,11 +154,10 @@ allrecs := dedup(sort(distribute(jrecs2 + jrecsOthersPerson+Jperson,hash(inciden
 
 suppressAgencies := agency(drivers_exchange_flag ='0');
 
-updtdAllrecs:= join(allrecs,distribute(suppressAgencies(agency_id!=''),hash(agency_id)),
-							trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and trim(left.report_type_id,left,right) ='DE',
-							many lookup , left only );	
-
-//end
+updtdAllrecs:= join(allrecs, suppressAgencies(agency_id!=''),
+							      trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and 
+										trim(left.report_type_id,left,right) ='DE',
+							      many lookup , left only);
 					
 // Supress reports
  
@@ -170,7 +169,7 @@ allrecsSupressed  := join(allrecsSupressed1 (incident_id not in FLAccidents_Ecra
 												 trim(left.State_Report_Number,left,right) = trim(right.State_Report_Number,left,right) and 
 												 trim(left.Source_ID ,left,right)          = trim(right.Source_ID ,left,right)and 
 												 trim(left.Loss_State_Abbr,left,right)     = trim(right.Loss_State_Abbr,left,right) and 
-												 stringlib.stringfilterout(trim(right.Crash_Date,left,right),'-') = stringlib.stringfilterout(trim(right.Crash_Date,left,right),'-') and 
+												 STD.Str.FilterOut(trim(right.Crash_Date,left,right),'-') = STD.Str.FilterOut(trim(right.Crash_Date,left,right),'-') and 
 												 trim(left.Agency_ID,left,right)           = trim(right.Agency_ID,left,right) and 
 												 trim(left.Work_Type_ID ,left,right)       = trim(right.Work_Type_ID,left,right) /*and 
 												 trim(left.report_Type_ID ,left,right)       = trim(right.report_Type_ID,left,right)*/, many lookup , left only ); 
@@ -178,33 +177,33 @@ allrecsSupressed  := join(allrecsSupressed1 (incident_id not in FLAccidents_Ecra
 
  tref0 := project(allrecsSupressed ,transform( FLAccidents_Ecrash.Layouts.slim_layout ,
   
-  self.loss_street              := StringLib.StringCleanSpaces ( if (trim(left.loss_street,left,right) ='NULL', '',trim(left.loss_street,left,right)));
-  self.loss_cross_street        := StringLib.StringCleanSpaces ( if (trim(left.loss_cross_street,left,right) ='NULL', '',trim(left.loss_cross_street,left,right)));
-  self.hash_key                 := StringLib.StringCleanSpaces ( if (trim(left.hash_key,left,right) ='NULL', '',trim(left.hash_key,left,right)));
-  self.last_name                := StringLib.StringCleanSpaces ( if (trim(left.last_name,left,right) ='NULL', '',trim(left.last_name,left,right)));
-  self.first_name               := StringLib.StringCleanSpaces ( if (trim(left.first_name,left,right) ='NULL', '',trim(left.first_name,left,right)));
-  self.middle_name              := StringLib.StringCleanSpaces ( if (trim(left.middle_name,left,right) ='NULL', '',trim(left.middle_name,left,right)));
-  self.address                  := StringLib.StringCleanSpaces ( if (trim(left.address ,left,right) ='NULL', '',trim(left.address,left,right)));
-  self.city                     := StringLib.StringCleanSpaces ( if (trim(left.city,left,right) ='NULL', '',trim(left.city,left,right)));
-  self.state                    := StringLib.StringCleanSpaces ( if (trim(left.state,left,right) ='NU', '',trim(left.state,left,right)));
-  self.zip_code                 := StringLib.StringCleanSpaces ( if (trim(left.zip_code,left,right) ='NULL', '',trim(left.zip_code,left,right)));
-  self.Drivers_License_Number   := StringLib.StringCleanSpaces ( if (trim(left.Drivers_License_Number,left,right) ='NULL', '',trim(left.Drivers_License_Number,left,right)));
-  self.License_Plate            := StringLib.StringCleanSpaces ( if (trim(left.License_Plate,left,right) ='NULL', '',trim(left.License_Plate,left,right)));
-  self.vin                      := StringLib.StringCleanSpaces ( if (trim(left.vin ,left,right) ='NULL', '',trim(left.vin,left,right))); 
-  self.Make                     := StringLib.StringCleanSpaces ( if (trim(left.Make,left,right) ='NULL', '',trim(left.Make,left,right)));
-  self.Model_Yr                 := StringLib.StringCleanSpaces ( if (trim(left.Model_Yr,left,right) ='NULL', '',trim(left.Model_Yr,left,right)));
-  self.Model                    := StringLib.StringCleanSpaces ( if (trim(left.Model,left,right) ='NULL', '',trim(left.Model,left,right)));
+  self.loss_street              := STD.Str.CleanSpaces ( if (trim(left.loss_street,left,right) ='NULL', '',trim(left.loss_street,left,right)));
+  self.loss_cross_street        := STD.Str.CleanSpaces ( if (trim(left.loss_cross_street,left,right) ='NULL', '',trim(left.loss_cross_street,left,right)));
+  self.hash_key                 := STD.Str.CleanSpaces ( if (trim(left.hash_key,left,right) ='NULL', '',trim(left.hash_key,left,right)));
+  self.last_name                := STD.Str.CleanSpaces ( if (trim(left.last_name,left,right) ='NULL', '',trim(left.last_name,left,right)));
+  self.first_name               := STD.Str.CleanSpaces ( if (trim(left.first_name,left,right) ='NULL', '',trim(left.first_name,left,right)));
+  self.middle_name              := STD.Str.CleanSpaces ( if (trim(left.middle_name,left,right) ='NULL', '',trim(left.middle_name,left,right)));
+  self.address                  := STD.Str.CleanSpaces ( if (trim(left.address ,left,right) ='NULL', '',trim(left.address,left,right)));
+  self.city                     := STD.Str.CleanSpaces ( if (trim(left.city,left,right) ='NULL', '',trim(left.city,left,right)));
+  self.state                    := STD.Str.CleanSpaces ( if (trim(left.state,left,right) ='NU', '',trim(left.state,left,right)));
+  self.zip_code                 := STD.Str.CleanSpaces ( if (trim(left.zip_code,left,right) ='NULL', '',trim(left.zip_code,left,right)));
+  self.Drivers_License_Number   := STD.Str.CleanSpaces ( if (trim(left.Drivers_License_Number,left,right) ='NULL', '',trim(left.Drivers_License_Number,left,right)));
+  self.License_Plate            := STD.Str.CleanSpaces ( if (trim(left.License_Plate,left,right) ='NULL', '',trim(left.License_Plate,left,right)));
+  self.vin                      := STD.Str.CleanSpaces ( if (trim(left.vin ,left,right) ='NULL', '',trim(left.vin,left,right))); 
+  self.Make                     := STD.Str.CleanSpaces ( if (trim(left.Make,left,right) ='NULL', '',trim(left.Make,left,right)));
+  self.Model_Yr                 := STD.Str.CleanSpaces ( if (trim(left.Model_Yr,left,right) ='NULL', '',trim(left.Model_Yr,left,right)));
+  self.Model                    := STD.Str.CleanSpaces ( if (trim(left.Model,left,right) ='NULL', '',trim(left.Model,left,right)));
   
 // Map TF rules in EA and use same logic  overwriting case_id and crash date 
 
   self.case_identifier 					:= if(left.source_id in ['TF','TM'],Left.state_report_number, Left.case_identifier);
-  self.crash_date               := if (left.source_id in ['TF','TM'],'',stringlib.stringfilterout(trim(Left.crash_date,left,right),'-'));
+  self.crash_date               := if (left.source_id in ['TF','TM'],'',STD.Str.FilterOut(trim(Left.crash_date,left,right),'-'));
   self.source_id                := if (left.source_id in ['TF','TM'],'TF','EA');
   // should match with payload key 
 	self.report_code              := left.source_id;
-	self.accident_date            := stringlib.stringfilterout(trim(Left.crash_date,left,right),'-');
+	self.accident_date            := STD.Str.FilterOut(trim(Left.crash_date,left,right),'-');
 	t_accident_nbr 			          := if(left.source_id in ['TF','TM'],Left.state_report_number, Left.case_identifier);
-  t_scrub                       := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+  t_scrub                       := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
   self.accident_nbr             := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+left.incident_id,t_scrub);  
   self.orig_accnbr              := t_accident_nbr; 
   self.addl_report_number			  := if(left.source_id in ['TF','TM'],Left.case_identifier,Left.state_report_number);
@@ -231,7 +230,7 @@ shared jdropMetadata := join( IyetekMeta,IyetekFull, left.state_report_number = 
 
 // Create extract for TM's which are recieved after TF 
 
-export TMafterTF := dedup(join( IyetekMeta(is_available_for_public ='1' and stringlib.stringtouppercase(report_status) = 'COMPLETED'),IyetekFull, left.state_report_number = right.State_Report_Number and 
+export TMafterTF := dedup(join( IyetekMeta(is_available_for_public ='1' and STD.Str.ToUpperCase(report_status) = 'COMPLETED'),IyetekFull, left.state_report_number = right.State_Report_Number and 
                                         left.ORI_Number = right.ORI_Number and 
 																				left.loss_state_abbr = right.loss_state_abbr and 
 																				left.report_type_id  = right.report_type_id and
@@ -370,14 +369,15 @@ cmbnd_drollup_report_versionkey := drollup_report_versionkey_c + drollup_report_
 		
 		self 								          := l.hash_[c];
 		self.super_report_id	        := l.super_report_id;
-		self.jurisdiction             := if(stringlib.stringtouppercase(trim(L.agency_name,left,right))='NULL','',stringlib.stringtouppercase(L.agency_name));
-		self.orig_accnbr              := if(stringlib.stringtouppercase(trim(L.orig_accnbr,left,right))='NULL','',stringlib.stringtouppercase(L.orig_accnbr));
-		self.addl_report_number       := if(stringlib.stringtouppercase(trim(L.addl_report_number,left,right))='NULL','',stringlib.stringtouppercase(L.addl_report_number));
-		self.jurisdiction_state       := if(stringlib.stringtouppercase(trim(L.loss_state_abbr,left,right))='NULL','',stringlib.stringtouppercase(L.loss_state_abbr));
-		self.work_type_id             := if(stringlib.stringtouppercase(trim(L.work_type_id,left,right))='NULL','',stringlib.stringtouppercase(L.work_type_id));
-		self.agency_ori               := if(stringlib.stringtouppercase(trim(L.ori_number,left,right))='NULL','',stringlib.stringtouppercase(L.ori_number));
+		self.jurisdiction             := if(STD.Str.ToUpperCase(trim(L.agency_name,left,right))='NULL','',STD.Str.ToUpperCase(L.agency_name));
+		self.orig_accnbr              := if(STD.Str.ToUpperCase(trim(L.orig_accnbr,left,right))='NULL','',STD.Str.ToUpperCase(L.orig_accnbr));
+		self.addl_report_number       := if(STD.Str.ToUpperCase(trim(L.addl_report_number,left,right))='NULL','',STD.Str.ToUpperCase(L.addl_report_number));
+		self.jurisdiction_state       := if(STD.Str.ToUpperCase(trim(L.loss_state_abbr,left,right))='NULL','',STD.Str.ToUpperCase(L.loss_state_abbr));
+		self.work_type_id             := if(STD.Str.ToUpperCase(trim(L.work_type_id,left,right))='NULL','',STD.Str.ToUpperCase(L.work_type_id));
+		self.agency_ori               := if(STD.Str.ToUpperCase(trim(L.ori_number,left,right))='NULL','',STD.Str.ToUpperCase(L.ori_number));
 		self.super_report_id_orig     := l.super_report_id;
 		self:=l;
+		self:=[];
 	end;
 
 	hash_key :=  normalize(hashTable, 

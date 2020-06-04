@@ -1,0 +1,65 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_PAW
+FILENAME:PAW
+NAMESCOPE:Base
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_county:CUSTOM(Scrubs.Functions.fn_numeric_optional > 0,3)
+FIELDTYPE:invalid_dead_flag:ENUM(0|1)
+FIELDTYPE:invalid_direction:ENUM(E|N|S|W|NE|NW|SE|SW|)
+FIELDTYPE:invalid_from_hdr:ENUM(Y|N)
+FIELDTYPE:invalid_geo:CUSTOM(Scrubs.Functions.fn_geo_coord > 0)
+FIELDTYPE:invalid_glb:ENUM(Y|N)
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_msa:CUSTOM(Scrubs.Functions.fn_numeric_optional > 0,4)
+FIELDTYPE:invalid_name:CUSTOM(Scrubs_PAW.Functions.fn_invalid_name > 0)
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
+FIELDTYPE:invalid_numeric_or_blank:CUSTOM(Scrubs.Functions.fn_numeric_optional > 0)
+FIELDTYPE:invalid_phone:CUSTOM(Scrubs_PAW.Functions.fn_verify_optional_phone>0)
+FIELDTYPE:invalid_phone_flag:ENUM(Y|N)
+FIELDTYPE:invalid_record_type:ENUM(C|H)
+FIELDTYPE:invalid_reformated_date:CUSTOM(Scrubs.Functions.fn_valid_GeneralDate > 0)
+FIELDTYPE:invalid_st:CUSTOM(Scrubs.Functions.fn_Valid_StateAbbrev>0)
+FIELDTYPE:invalid_zip5:CUSTOM(Scrubs.Functions.fn_valid_zip>0)
+FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_PAW.Functions.fn_verify_zip4>0)
+
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB 
+//---------------------------------------------------------------
+FIELD:contact_id:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:company_phone:TYPE(STRING10):LIKE(invalid_phone):0,0
+FIELD:company_name:TYPE(STRING120):LIKE(invalid_name):0,0
+FIELD:active_phone_flag:TYPE(STRING1):LIKE(invalid_phone_flag):0,0
+FIELD:source_count:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:source:TYPE(STRING2):LIKE(invalid_mandatory):0,0
+FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
+FIELD:record_sid:TYPE(UNSIGNED8):LIKE(invalid_numeric_or_blank):0,0
+FIELD:global_sid:TYPE(UNSIGNED4):LIKE(invalid_numeric_or_blank):0,00
+FIELD:GLB:TYPE(STRING1):LIKE(invalid_glb):0,0
+FIELD:lname:TYPE(STRING20):LIKE(invalid_name):0,0
+FIELD:fname:TYPE(STRING20):LIKE(invalid_name):0,0
+FIELD:dt_last_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
+FIELD:dt_first_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
+FIELD:RawAid:TYPE(UNSIGNED8):LIKE(invalid_numeric):0,0
+FIELD:zip:TYPE(STRING5):LIKE(invalid_zip5):0,0
+FIELD:state:TYPE(STRING2):LIKE(invalid_st):0,0 
+FIELD:bdid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+FIELD:zip4:TYPE(STRING4):LIKE(invalid_zip4):0,0
+FIELD:geo_long:TYPE(STRING11):LIKE(invalid_geo):0,0
+FIELD:geo_lat:TYPE(STRING10):LIKE(invalid_geo):0,0
+FIELD:county:TYPE(STRING3):LIKE(invalid_county):0,0
+FIELD:company_zip:TYPE(STRING5):LIKE(invalid_zip5):0,0
+FIELD:company_state:TYPE(STRING2):LIKE(invalid_st):0,0
+FIELD:Company_RawAid:TYPE(UNSIGNED8):LIKE(invalid_numeric):0,0
+FIELD:company_zip4:TYPE(STRING4):LIKE(invalid_zip4):0,0
+FIELD:msa:TYPE(STRING4):LIKE(invalid_msa):0,0
+FIELD:did:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+FIELD:ssn:TYPE(STRING9):LIKE(invalid_numeric_or_blank):0,0
+FIELD:phone:TYPE(STRING10):LIKE(invalid_phone):0,0
+FIELD:predir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:company_predir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:company_postdir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:postdir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:from_hdr:TYPE(STRING1):LIKE(invalid_from_hdr):0,0
+FIELD:dead_flag:TYPE(UNSIGNED1):LIKE(invalid_dead_flag):0,0

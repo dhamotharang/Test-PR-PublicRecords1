@@ -2,7 +2,7 @@
 export BWR_Build_All_Moxie_Files := function
 #workunit('name','Official Records Build All' );
 
-leMailTarget := 'jtao@seisint.com;skasavajjala@seisint.com';
+leMailTarget := 'jtao@seisint.com;skasavajjala@seisint.com;jason.allerdings@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)
  := lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);

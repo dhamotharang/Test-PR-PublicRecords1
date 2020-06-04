@@ -1,8 +1,8 @@
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_CNSMR_SSN = '',Input_DOB = '',Input_CNSMR_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_TAX_ID = '',Input_BILLING_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_BILLING_NPI_NUMBER = '',Input_UPIN = '',Input_DID = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_RID = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',OutFile) := MACRO
-  IMPORT SALT29,Health_Provider_Services;
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_UPIN = '',Input_DID = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',OutFile) := MACRO
+  IMPORT SALT28,Health_Provider_Services;
   #uniquename(of)
   %of% := RECORD
-    SALT29.Str512Type fields;
+    SALT28.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -67,20 +67,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',
     #ELSE
         IF( le.Input_SSN = (TYPEOF(le.Input_SSN))'','',':SSN')
     #END
-+    #IF( #TEXT(Input_CNSMR_SSN)='' )
-      '' 
-    #ELSE
-        IF( le.Input_CNSMR_SSN = (TYPEOF(le.Input_CNSMR_SSN))'','',':CNSMR_SSN')
-    #END
 +    #IF( #TEXT(Input_DOB)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_DOB = 0,'', ':DOB(' + SALT29.fn_date_valid_as_text((unsigned)le.Input_DOB) + ')' )
-    #END
-+    #IF( #TEXT(Input_CNSMR_DOB)='' )
-      '' 
-    #ELSE
-        IF( (unsigned)le.Input_CNSMR_DOB = 0,'', ':CNSMR_DOB(' + SALT29.fn_date_valid_as_text((unsigned)le.Input_CNSMR_DOB) + ')' )
+        IF( (unsigned)le.Input_DOB = 0,'', ':DOB(' + SALT28.fn_date_valid_as_text((unsigned)le.Input_DOB) + ')' )
     #END
 +    #IF( #TEXT(Input_PHONE)='' )
       '' 
@@ -102,11 +92,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',
     #ELSE
         IF( le.Input_TAX_ID = (TYPEOF(le.Input_TAX_ID))'','',':TAX_ID')
     #END
-+    #IF( #TEXT(Input_BILLING_TAX_ID)='' )
-      '' 
-    #ELSE
-        IF( le.Input_BILLING_TAX_ID = (TYPEOF(le.Input_BILLING_TAX_ID))'','',':BILLING_TAX_ID')
-    #END
 +    #IF( #TEXT(Input_DEA_NUMBER)='' )
       '' 
     #ELSE
@@ -121,11 +106,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',
       '' 
     #ELSE
         IF( le.Input_NPI_NUMBER = (TYPEOF(le.Input_NPI_NUMBER))'','',':NPI_NUMBER')
-    #END
-+    #IF( #TEXT(Input_BILLING_NPI_NUMBER)='' )
-      '' 
-    #ELSE
-        IF( le.Input_BILLING_NPI_NUMBER = (TYPEOF(le.Input_BILLING_NPI_NUMBER))'','',':BILLING_NPI_NUMBER')
     #END
 +    #IF( #TEXT(Input_UPIN)='' )
       '' 
@@ -151,11 +131,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_FNAME = '',Input_MNAME = '',
       '' 
     #ELSE
         IF( le.Input_SOURCE_RID = (TYPEOF(le.Input_SOURCE_RID))'','',':SOURCE_RID')
-    #END
-+    #IF( #TEXT(Input_RID)='' )
-      '' 
-    #ELSE
-        IF( le.Input_RID = (TYPEOF(le.Input_RID))'','',':RID')
     #END
 +    #IF( #TEXT(Input_MAINNAME)='' )
       '' 

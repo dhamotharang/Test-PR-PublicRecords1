@@ -1,16 +1,15 @@
-﻿import _Control, Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, AID_Build, ProfileBooster;
+﻿import _Control, Risk_Indicators, dx_header, RiskWise, InfutorCID, Gong, header_quick, MDR, ut, address, AID_Build, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
-EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell, boolean onThor_original) := FUNCTION
+EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell) := FUNCTION
 
-	isFCRA := false;
 	nines	 := 9999999;
 
 infutorcid_key := InfutorCID.Key_Infutor_DID;
 gonghistorydid_key := gong.key_history_did;
-header_key := Doxie.Key_Header;
+header_key := dx_header.key_header();
 quickheader_key := header_quick.key_DID;
-address_rank_key := header.key_addr_hist(isFCRA);
+address_rank_key := dx_header.key_addr_hist();
 
 
 //search Infutor by DID to verify input name, address, phone

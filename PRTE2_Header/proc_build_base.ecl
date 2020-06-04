@@ -2,7 +2,7 @@
 
         EXPORT proc_build_base(string filedate) := function
         
-        old_file := project(PRTE2_Header.files.file_old_ptre_header_in,{recordof(left)-uid});
+        old_file := project(PRTE2_Header.file_old_prte_header_in,{recordof(left)-uid});
         oNMNHR   := project(prte2_header.new_header_records(did<>0)   ,{recordof(left)-uid});
         
         ut.MAC_Sequence_Records(oNMNHR,rid,outfile1); // assign rids every time

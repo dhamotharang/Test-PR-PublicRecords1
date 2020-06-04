@@ -1,5 +1,4 @@
-//export BWR_Watchdog_Roxie_Marketing := 'todo';
-
+﻿export BWR_Watchdog_Roxie_Marketing ( string filedate)  := function
 import watchdog, ut,lib_keylib,lib_fileservices,RoxieKeybuild,Suppress;
 
 //fileservices.createsuperfile('~thor_data400::key::watchdog_marketing.did_built');
@@ -14,9 +13,8 @@ import watchdog, ut,lib_keylib,lib_fileservices,RoxieKeybuild,Suppress;
 
 leMailTarget := 'rvanheusen@seisint.com';
 
-// Get filedate from the watchdog check file
-fd := dataset('~thor_data400::in::watchdog_check2',{string8 fdate},thor);
-string8 filedate := fd[1].fdate : stored('filedate');
+
+
 
 
 fSendMail(string pSubject, string pBody)
@@ -64,5 +62,5 @@ email_failure := fileservices.sendemail(
 
 	
 								
-export BWR_Watchdog_Roxie_Marketing := sequential(build_keys,move_to_built,move_keys,email_success) :
-			failure(email_failure);
+return sequential(build_keys,move_to_built,move_keys,email_success);
+end;

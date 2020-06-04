@@ -2,6 +2,8 @@
        ,acf,diversity_certification,govdata,gsa,insurance_certification,martindale_hubbell
 			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa
 			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress, Address;
+import BIPV2_Contacts;
+
 EXPORT key_contact_linkids :=
 module
 													 //BIPV2.File_Business_Sources(source not in [mdr.sourcetools.src_Dunn_Bradstreet,mdr.sourcetools.src_zoom])
@@ -59,6 +61,7 @@ module
 		  self:=[]));
   // Same Append as done in BIPV2_Build.proc_ingest
   append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
+  // append := ds;//this can get skewed, so add distribute
 
   shared contacts_sources_w_append := join(contacts_sources_with_id, append, 
     left.rcid=right.rcid, 
@@ -76,11 +79,14 @@ module
 		//boolean executive_ind:='';
 		boolean executive_ind:=False;
 		integer executive_ind_order:=0;
+		unsigned4 global_sid:=0;
+		unsigned8 record_sid:=0;
   end;
   
   shared ds1 := contacts_sources_w_append;
   
-  shared ds_add_ids := project(ds1,r1);
+  shared ds_add_ids1 := project(ds1,r1);
+	shared ds_add_ids  := mdr.macGetGlobalSID(ds_add_ids1, 'BIPV2', 'source', 'global_sid');
   shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_built(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
     ,self                              := left  
     ,self.company_address.prim_range	 := left.prim_range	
@@ -118,46 +124,7 @@ module
     ,self.contact_name.name_score	     := left.name_score	
     ,self                              := []
   
-  ))
- /* +project(BIPV2_Files.tools_dotid().Convert_Vanity_To_Regular(bipv2.commonbase.ds_base),transform(r1
-    ,self                              := left 
-    ,self.company_address.prim_range	 := left.prim_range	
-    ,self.company_address.predir			 := left.predir			
-    ,self.company_address.prim_name		 := left.prim_name		
-    ,self.company_address.addr_suffix	 := left.addr_suffix	
-    ,self.company_address.postdir			 := left.postdir			
-    ,self.company_address.unit_desig	 := left.unit_desig	
-    ,self.company_address.sec_range		 := left.sec_range		
-    ,self.company_address.p_city_name	 := left.p_city_name	
-    ,self.company_address.v_city_name	 := left.v_city_name	
-    ,self.company_address.st					 := left.st					
-    ,self.company_address.zip					 := left.zip					
-    ,self.company_address.zip4				 := left.zip4				
-    ,self.company_address.cart				 := left.cart				
-    ,self.company_address.cr_sort_sz	 := left.cr_sort_sz	
-    ,self.company_address.lot					 := left.lot					
-    ,self.company_address.lot_order		 := left.lot_order		
-    ,self.company_address.dbpc				 := left.dbpc				
-    ,self.company_address.chk_digit		 := left.chk_digit		
-    ,self.company_address.rec_type		 := left.rec_type		
-    ,self.company_address.fips_state	 := left.fips_state	
-    ,self.company_address.fips_county	 := left.fips_county	
-    ,self.company_address.geo_lat			 := left.geo_lat			
-    ,self.company_address.geo_long		 := left.geo_long		
-    ,self.company_address.msa					 := left.msa					
-    ,self.company_address.geo_blk			 := left.geo_blk			
-    ,self.company_address.geo_match		 := left.geo_match		
-    ,self.company_address.err_stat		 := left.err_stat		
-    ,self.contact_name.title			     := left.title			
-    ,self.contact_name.fname			     := left.fname			
-    ,self.contact_name.mname			     := left.mname			
-    ,self.contact_name.lname			     := left.lname			
-    ,self.contact_name.name_suffix     := left.name_suffix
-    ,self.contact_name.name_score	     := left.name_score	
-    ,self                              := []
-  
-  ))*/
-  ;
+  ));
   
   shared contacts_records             := ds_add_ids(contact_name.fname<>'' and contact_name.lname<>'');
   shared contacts_records_commonbase  := ds_add_ids_commonbase(contact_name.fname<>'' and contact_name.lname<>'');
@@ -183,7 +150,7 @@ module
   ut.MAC_Sequence_Records(j_add_exec_ind,rid,add_rid);
  
 shared dDataset       := add_rid;
-shared layoutOrigFile	:= recordof(contacts_records) - rid;
+shared layoutOrigFile	:= {recordof(contacts_records) - rid};
 shared layoutSeqFile	:= recordof(dDataset);
 shared bdidSlimLayout	:=
 record
@@ -392,53 +359,26 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   export contacts_bipd_dst          :=   dataset('~thor400_20::persist::bip_contacts',layoutOrigFile,flat);
   // DEFINE THE INDEX
   shared superfile_name := keynames(, tools._Constants.IsDataland).contact_linkids.QA;
-	//shared superfile_name := keynames().contact_linkids.QA;  //////Temp use only!!!!?????
 		
   export dkeybuild      := Suppress.applyRegulatory.applyContactBIPV2(contacts_bipd_pst);
   
-  BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
-  export Key := k;
+  export Key := BIPV2_Contacts.key_contact_linkids.Key(project(dkeybuild, BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile), superfile_name);
   
   // -- ensure easy access to different logical and super versions of the key
-  export keyvs(string pversion = '',boolean penvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('Key' ,keynames(pversion,penvironment).contact_linkids);
-  export keybuilt       := keyvs().built      ;
-  export keyQA          := keyvs().qa         ;
-  export keyfather      := keyvs().father     ;
-  export keygrandfather := keyvs().grandfather;
+  export keyvs := BIPV2_Contacts.key_contact_linkids.keyvs;
+  export keybuilt       := BIPV2_Contacts.key_contact_linkids.keybuilt;
+  export keyQA          := BIPV2_Contacts.key_contact_linkids.keyQA;
+  export keyfather      := BIPV2_Contacts.key_contact_linkids.keyfather;
+  export keygrandfather := BIPV2_Contacts.key_contact_linkids.keygrandfather;
   
-	 export kfetch_layout :={Key};
+  // export kfetch_layout :={Key};
+  export kfetch_layout := BIPV2_Contacts.key_contact_linkids.kfetch_layout;
 	
   //DEFINE THE INDEX ACCESS
-  export kFetch(
-                  dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
-                  ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
-                  ,unsigned2 ScoreThreshold = 0
-									,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
-									,JoinLimit=25000
-									,boolean includeDMI=false
-                  ) :=
-  function
-                  BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level, JoinLimit);
-									ds_restricted :=out(BIPV2.mod_sources.isPermitted(in_mod,includeDMI).bySource(source, vl_id) );							
-									BIPV2_Suppression.mac_contacts(ds_restricted, ds_suppressed_clean, ds_suppressed_dirty)
-                  return ds_suppressed_clean;
-									
-  end;
+  export kFetch      := BIPV2_Contacts.key_contact_linkids.kFetch;
 	
 	//DEFINE THE INDEX ACCESS
-  export kFetchMarketing(
-                  dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
-                  ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
-                  ,unsigned2 ScoreThreshold = 0
-                  ,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
-                  ,JoinLimit=25000
-                  ,boolean includeDMI=false
-                  ) :=
-  function   
-    kFetched := kfetch(inputs, Level, ScoreThreshold, in_mod, JoinLimit, includeDMI);
-		  allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
-			 marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
-    return marketingSuppressed;						
-  end;
+  export kFetchMarketing      := BIPV2_Contacts.key_contact_linkids.kFetchMarketing;
+
   
 end;

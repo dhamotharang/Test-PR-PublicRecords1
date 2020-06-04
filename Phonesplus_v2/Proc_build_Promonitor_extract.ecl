@@ -16,7 +16,7 @@ string v_process_date := ut.GetDate[1..8];
 
 //thor_data400::base::phonesplusv2_20100809
 //thor_data400::base::phonesplusv2_20100816
-phones_plus_file    := dataset('~thor_data400::base::phonesplusv2', phonesplus_v2.Layout_Phonesplus_Base, thor);
+phones_plus_file    := dataset(PhonesPlus_V2.Names.phonesplusv2_base, phonesplus_v2.Layout_Phonesplus_Base, thor);
  // phones_plus_file    := dataset(ut.foreign_prod+ '~thor_data400::base::phonesplusv2_20111128', phonesplus_v2.Layout_Phonesplus_Base, thor);
 //phones_plus_file    := dataset(ut.foreign_prod+ '~thor_data400::base::phonesplusv2_20111204', phonesplus_v2.Layout_Phonesplus_Base, thor);
 

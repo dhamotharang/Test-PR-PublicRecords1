@@ -1,4 +1,4 @@
-import versioncontrol, business_header_ss, risk_indicators, Business_HeaderV2, statistics;
+﻿import versioncontrol, business_header_ss, risk_indicators, Business_HeaderV2, statistics;
 
 export Files(
 
@@ -15,5 +15,5 @@ module
 	VersionControl.macBuildFileVersions(basenames.HRIAddressSicCodeFCRA	,Layout_HRI_Address_Sic			,HRIAddressSicCodeFCRA	,built);
 	VersionControl.macBuildFileVersions(basenames.AddressSicCode				,Layouts.AddressSicCode			,AddressSicCode					,built);
 	VersionControl.macBuildFileVersions(basenames.SicLookup							,Layouts.SicLookup					,SicLookup							,built);
-
+  EXPORT NaicLookup := DATASET('~thor_data400::lookup::naic::codes_lookup',Layouts.NaicLookup,THOR);
 end;

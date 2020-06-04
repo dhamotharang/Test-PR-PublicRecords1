@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_NH_Event
 FILENAME:In_NH
 //Uncomment up to NINES for internal or external adl
@@ -14,7 +14,7 @@ FILENAME:In_NH
 //FUZZY can be used to create new types of FUZZY linking
 
 //FIELDTYPE DEFINITIONS
-FIELDTYPE:invalid_corp_key:ALLOW(-0123456789):LENGTHS(4..)
+FIELDTYPE:invalid_corp_key:ALLOW(-0123456789ABT):LENGTHS(4..)
 FIELDTYPE:invalid_corp_vendor:ENUM(33)
 FIELDTYPE:invalid_state_origin:ENUM(NH)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)

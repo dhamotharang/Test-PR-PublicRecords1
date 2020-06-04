@@ -1,10 +1,22 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, TopBusiness_Services, ut;
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, ut, std, suppress;
 
 EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inmod, 
 																DATASET(doxie.layout_references) ds_individualOwnerOnlyDids,
-																boolean buzCreditAccess = FALSE) := FUNCTION
-	
-	OwnrGuarRecs_raw 	:= Business_Credit.Key_TradelineGuarantor().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
+																boolean buzCreditAccess = FALSE
+																) := FUNCTION
+
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := inmod.glbpurpose;
+    EXPORT unsigned1 dppa := inmod.dppapurpose;
+    EXPORT string DataPermissionMask := inmod.DataPermissionMask;
+    EXPORT string DataRestrictionMask := inmod.DataRestrictionMask;
+    EXPORT string32 application_type := inmod.ApplicationType;
+    EXPORT string ssn_mask := inmod.ssnmask;
+		//TODO: the input is not supposed to include untranslated value for dob-mask
+    EXPORT unsigned1 dob_mask := suppress.date_mask_math.MaskIndicator (inmod.dobmask);
+  END;
+
+	OwnrGuarRecs_raw 	:= Business_Credit.Key_TradelineGuarantor().kFetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel,,BusinessCredit_Services.Constants.JOIN_LIMIT);
 
 	BIPV2.IDlayouts.l_xlink_ids2 trans(BIPV2.IDlayouts.l_xlink_ids R) := TRANSFORM
 		SELF := R;
@@ -16,7 +28,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																					#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids())),  
 																		#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
 
-	ds_busOwnerGuarRecs_raw	:= Business_Credit.Key_BusinessOwnerInformation().Kfetch2(ds_BusOwnrGuarRecs_slim_dedup, inmod.FetchLevel,,inmod.DataPermissionMask, , BusinessCredit_Services.Constants.JOIN_LIMIT);
+	ds_busOwnerGuarRecs_raw	:= Business_Credit.Key_BusinessOwnerInformation().Kfetch2(ds_BusOwnrGuarRecs_slim_dedup, mod_access, inmod.FetchLevel,,, BusinessCredit_Services.Constants.JOIN_LIMIT);
 
 	ds_busOwnerGuarLinkID	:= PROJECT(ds_BusOwnrGuarRecs_slim_dedup ,
 														TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
@@ -25,7 +37,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 															SELF.SeleID := LEFT.SeleID,
 															SELF := []));
 	//bip best
-	busOwnerGuarRecs_Best 	 		:= BIPV2_Best.Key_LinkIds.Kfetch2(ds_busOwnerGuarLinkID, inmod.FetchLevel,,,false,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
+	busOwnerGuarRecs_Best 	 		:= BIPV2_Best.Key_LinkIds.Kfetch2(ds_busOwnerGuarLinkID, inmod.FetchLevel,,,false,BusinessCredit_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
 	busOwnerGuarRecs_Best_proj	:= PROJECT(busOwnerGuarRecs_Best, TRANSFORM(BIPV2_Best.layouts.key, 
 																																		SELF := LEFT,
 																																		SELF := []));
@@ -58,7 +70,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		SELF.BusinessCreditIndicator:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
 																																														L.OrgID,
 																																														L.SeleID,
-																																														inmod.DataPermissionMask,
+																																														mod_access,
 																																														buzCreditAccess);
 		SELF := [];		
 	END;
@@ -80,7 +92,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																			TRANSFORM(RIGHT) , 
 																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
 
-	ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup));
+	ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup, modAccess := mod_access));
 
 	iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor trans_preFinalIndi(ds_IndOwnerGuarRecs_raw L , doxie.layout_best R) := TRANSFORM
     street_addr := Address.Addr1FromComponents(R.prim_range, R.predir, R.prim_name, R.suffix,
@@ -129,7 +141,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 	// -------------------------------------------------------------------- Starting the Y Calculation --------------------------------------------------------------------
 	// ----- Entity Y is owned by Entity X and must be listed as a guarantor in SBFE 
 
-	y_bus_owner 				:=	Business_Credit.Key_BusinessOwnerInformation().Kfetch2(x_owners_linkids_dedup, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT)(Guarantor_Owner_Indicator IN ['001' , '003']);
+	y_bus_owner 				:=	Business_Credit.Key_BusinessOwnerInformation().Kfetch2(x_owners_linkids_dedup, mod_access, inmod.FetchLevel,, BusinessCredit_Services.Constants.JOIN_LIMIT)(Guarantor_Owner_Indicator IN ['001' , '003']);
 	y_bus_owner_Dedup 	:= 	DEDUP(SORT(y_bus_owner , 
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
 													#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
@@ -167,7 +179,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
 													cycle_end_date);
 	
-	y_trades_HistoryRecsFiltered := y_trades_HistoryRecs(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ut.GetDate[1..6]);
+	y_trades_HistoryRecsFiltered := y_trades_HistoryRecs(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ((STRING8)Std.Date.Today())[1..6]);
 
 	iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory trans_y_paymenthistory (y_trades_HistoryRecs L ) := TRANSFORM
 
@@ -209,7 +221,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		SELF.AccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
 																																																							L.OrgID,
 																																																							L.SeleID,
-																																																							inmod.DataPermissionMask,
+																																																							mod_access,
 																																																							buzCreditAccess);
 		SELF.AccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(y_trades_HistoryRecsFiltered (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
 																																																		Contract_Account_Number = L.Contract_Account_Number AND
@@ -252,7 +264,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																			#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids())), 
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
 																
-	z_guarantors_recs :=	Business_Credit.Key_BusinessOwnerInformation().Kfetch2(z_guarantors_linkids_dedup,inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT)(Guarantor_Owner_Indicator IN ['002']);
+	z_guarantors_recs :=	Business_Credit.Key_BusinessOwnerInformation().Kfetch2(z_guarantors_linkids_dedup, mod_access, inmod.FetchLevel,, BusinessCredit_Services.Constants.JOIN_LIMIT)(Guarantor_Owner_Indicator IN ['002']);
 
 	z_slim_rec := RECORD
 		UNSIGNED6 UltID;
@@ -282,7 +294,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 										#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 
 	z_trades_HistoryRecs := DEDUP(SORT(z_trades , UltID, OrgID, SeleID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
-														cycle_end_date)(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ut.GetDate[1..6]);
+														cycle_end_date)(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ((STRING8)Std.Date.Today())[1..6]);
 
 	Z_AccDetail_temp  := RECORD
 		iesp.businesscreditreport.t_BusinessCreditAccountDetails RelatedAccountDetails;
@@ -320,7 +332,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		SELF.RelatedAccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
 																																																											L.OrgID,
 																																																											L.SeleID,
-																																																											inmod.DataPermissionMask,
+																																																											mod_access,
 																																																											buzCreditAccess); 
 		SELF.RelatedAccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(z_trades_HistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
 																																																		Contract_Account_Number = L.Contract_Account_Number AND

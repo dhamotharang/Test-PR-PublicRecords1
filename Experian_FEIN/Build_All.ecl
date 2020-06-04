@@ -46,7 +46,8 @@ EXPORT Build_All(
 		Build_Strata(pVersion,pOverwrite,,,pIsTesting),
 		Promote().Inputfiles.using2used,
 		Promote().Buildfiles.Built2QA,
-		QA_Records()
+		QA_Records(),
+		fDOPSGrowthCheck(pversion).GrowthCheck
 	): SUCCESS(Send_Emails(pAddresses, pVersion).BuildSuccess), FAILURE(Send_Emails(pAddresses, pVersion).BuildFailure);
 	
 	RETURN

@@ -155,7 +155,7 @@ myTest2 := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20140710-1
 output(myTest2, named('OtherWU2__html'));
 
 This also works!  I'm guessing any link here would work
-output('<a href="http://prod_esp.br.seisint.com:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20140710-132017">W20140710-132017<\a>'
+output('<a href="http://uspr-prod-thor-esp.risk.regn.net:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20140710-132017">W20140710-132017<\a>'
 ,named('OtherWU3__html'));
 
 

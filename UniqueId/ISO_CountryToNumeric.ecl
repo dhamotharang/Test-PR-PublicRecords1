@@ -273,4 +273,5 @@ U'SÃO TOMÉ AND PRÍNCIPE' => 678,
 'YEMEN'	 => 887,
 'ZAMBIA'	 => 894,
 'CRIMEA'	 => 900,
+'SINT MAARTEN'	 => 901,
 FAIL(integer, 'No Country Code for ' + (string)name));

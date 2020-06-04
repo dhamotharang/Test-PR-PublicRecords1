@@ -238,6 +238,7 @@ export boolean MatchPattern(string s) := MAP(
 		REGEXFIND('^[A-Z]+ [A-Z] [A-Z] [A-Z] [A-Z]$',s) => true, 	// SUNTRUST B A N K
 		REGEXFIND('^[A-Z]+ +[A-Z]+ *( AND |&) *[A-Z]+ +(MD(S)?|DDS|DPM|ATTY|CPA|VETERINARIANS)?$',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
 		REGEXFIND('\\bA (GUY|LOCK|WING) *( AND |&) *A (GIRL|SAFE|PRAYER)\\b',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
+		REGEXFIND('\\b(CARPET|RUG|GOLF|SNOW|NEWS|TAX|SPA|DIESEL|SALES|MOBILE|TRAILER|HOME|LIMO|TRUCKING) +SERVICE\\b', s) => true,
 		REGEXFIND(rgxHoa,s) => true,
 		false
 	);
@@ -576,6 +577,8 @@ string1 GetNameClass(string nm) :=
 string3 GetNameTypes(string s) :=
 		GetNameClass(REGEXFIND(rgxFirm, s, 1)) +
 			GetNameClass(REGEXFIND(rgxFirm, s, 2)) + GetNameClass(REGEXFIND(rgxFirm, s, 4));
+			
+NonFirmNames := ['JR','SR','II','III','MC'];
 
 boolean LikelyFirmName(string s) := FUNCTION
 	//t := GetNameTypes(s);
@@ -590,7 +593,9 @@ boolean LikelyFirmName(string s) := FUNCTION
 		REGEXFIND(rgxFirm1, s) => true,
 		REGEXFIND('^([A-Z]+) +(\\1+) *(&| AND ) *([A-Z]+)[.,/\\\']?$',s) => true,		// MORGAN MORGAN AND JONES
 		KnownFirmName(s) => true,
-		Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => false,
+		REGEXFIND(rgxFirm, s, 1) IN NonFirmNames OR REGEXFIND(rgxFirm, s, 2) IN NonFirmNames OR
+							REGEXFIND(rgxFirm, s, 4) IN NonFirmNames => false,
+		NOT Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
 		//t[2] = 'F' OR t[3] = 'F' => false,
 		//t IN ['LFF','LBF','LFB','LBB','BLF','FLF','FLB'] => false,
 		//t in ['LBL','BBL','BLL','BLB','LLL','LXL','LLX'] => true,
@@ -834,6 +839,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		REGEXFIND(rgxCaseNum, s) => MatchType.Inv,
 		REGEXFIND('^CREDIT[A-Z ]+APPLICANT$', s) => MatchType.Inv,
 		REGEXFIND(rgxStreet,s) => MatchType.Inv,
+		REGEXFIND('^CEO +[A-Z]+$', TRIM(s)) => MatchType.Inv,
 		IsInvalidTaxpayer(s) => MatchType.Inv,
 		REGEXFIND('^[0-9]+ +(PERCENT|PER CENT)$', s) => MatchType.Inv,
 		//***** UNKNOWN
@@ -875,7 +881,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsSaintWord(REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS|FIRST|LIFE) +[A-Z ]+ +([A-Z]+)\\b', s, 2))
 										=> MatchType.Business,
 		REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS) +[A-Z]+ *( AND |&) *[A-Z]+', s) => MatchType.Business,
-		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) => MatchType.Business, 
+		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) 
+				OR CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, name, 1), preferBiz)=> MatchType.Business, 
 		
 		StringLib.StringFind(s, 'CORPORATION', 1) > 0 OR
 		StringLib.StringFind(s, 'MORTGAGE', 1) > 0 OR
@@ -919,8 +926,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsGeo(s) => MatchType.Business,
 		IsGeo(name) => MatchType.Business,
 		
-		// other unclassified names
-		REGEXFIND('^DIVORCED +[A-Z]+$', s) => MatchType.Inv,		//MatchType.Unclass,
+		// other invalid names
+		REGEXFIND('^DIVORCED +[A-Z]+$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
+		REGEXFIND('^ETUX +[A-Z]+ +[A-Z]$', TRIM(s)) => MatchType.Inv,		//MatchType.Unclass,
 		REGEXFIND('^ P O A$', s) => MatchType.Inv,		//MatchType.Unclass,
 //$		SpecialNames.IsCityState(s) => MatchType.Unclass,
 		// final checks before person
@@ -936,7 +944,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// match personal name
 		BreakUpName(s) => MatchType.Business,
 
-		REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|MDN) ',s) => MatchType.Inv,		//MatchType.Unclass,
+		//REGEXFIND('^(TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Inv,		//MatchType.Unclass,
 		//REGEXFIND('^(EST|TRT|ITF|MDN|MRMRS|MMS|A/K/A) ',s) => MatchType.Trust,		//MatchType.Unclass,
 		//REGEXFIND('\\b(LT|FT)$',s) => MatchType.Inv,		//MatchType.Unclass,
 //		SpecialNames.IsAbbreviation(tokens[NumTokens]) => MatchType.Inv,		//MatchType.Unclass,
@@ -957,9 +966,11 @@ MatchType MatchX(string str, string options) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
+		NameTester.IsAmbiguousWord(REGEXFIND('\\b([A-Z]+) +SERVICE\\b', TRIM(name), 1)) => MatchType.Business,
+		Persons.IsDualName(name) => MatchType.Dual,
+		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		IsFirmName(s, name) => MatchType.Business,
 		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
-		Persons.IsDualName(name) => MatchType.Dual,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,
 		NameTester.IsAmbiguousWord(REGEXFIND('^[A-Z]+ *& *[A-Z]+ +([A-Z]+)$',s,1)) => MatchType.Business,
 		// from Gong

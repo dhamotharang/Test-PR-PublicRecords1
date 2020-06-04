@@ -1,12 +1,12 @@
-#workunit('name','Phonesplus v2: '+ Phonesplus.version+': Phonesplus / Qsent')
+﻿#workunit('name','Phonesplus v2: '+ Phonesplus.version+': Phonesplus / Qsent')
 
 
 import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild,infutorcid, phonesplus_v2;
 
-e_mail_success := FileServices.sendemail('john.freibaum@lexisnexis.com;fernando.henao@lexisnexis.com;julie.gardner@lexisnexis.com;qualityassurance@seisint.com;joseph.lezcano@lexisnexis.com;charleen.thompson@lexisnexis.com;aherzberg@lexisnexis.com','PHONESPLUS/QSENT '+ Phonesplus.version+' weekly sample available ','at ' + thorlib.WUID());
-e_mail_failure := FileServices.sendemail('john.freibaum@lexisnexis.com;fernando.henao@lexisnexis.com;julie.gardner@lexisnexis.com;joseph.lezcano@lexisnexis.com;charleen.thompson@lexisnexis.com; aherzberg@lexisnexis.com','Phonesplus/Qsent Build Failure',failmessage+'at ' + thorlib.WUID());
+e_mail_success := FileServices.sendemail('jason.allerdings@lexisnexisrisk.com;fernando.henao@lexisnexisrisk.com;julie.gardner@lexisnexisrisk.com;qualityassurance@seisint.com;joseph.lezcano@lexisnexisrisk.com;charleen.thompson@lexisnexisrisk.com;aherzberg@lexisnexis.com','PHONESPLUS/QSENT '+ Phonesplus.version+' weekly sample available ','at ' + thorlib.WUID());
+e_mail_failure := FileServices.sendemail('jason.allerdings@lexisnexisrisk.com;fernando.henao@lexisnexisrisk.com;julie.gardner@lexisnexisrisk.com;joseph.lezcano@lexisnexisrisk.com;charleen.thompson@lexisnexisrisk.com; aherzberg@lexisnexis.com','Phonesplus/Qsent Build Failure',failmessage+'at ' + thorlib.WUID());
 
-phonesplus_dops_update := sequential(RoxieKeybuild.updateversion('PhonesPlusKeys',Phonesplus.version,'jlezcano@seisint.com;john.freibaum@lexisnexis.com',,'N'),
+phonesplus_dops_update := sequential(RoxieKeybuild.updateversion('PhonesPlusKeys',Phonesplus.version,'jlezcano@seisint.com;jason.allerdings@lexisnexisrisk.com',,'N'),
 																													 RoxieKeybuild.updateversion('QsentKeys',Phonesplus.version,'jlezcano@seisint.com',,'N'));
 
 addHeaderKeyBuilding := if(fileservices.getsuperfilesubcount('~thor_data400::Base::HeaderKey_Building')>0,

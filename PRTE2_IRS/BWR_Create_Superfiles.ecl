@@ -1,7 +1,8 @@
-import promotesupers, roxiekeybuild, std;
+﻿import promotesupers, roxiekeybuild, std;
 
+FileServices.CreateSuperFile ('~PRTE::IN::irskeys::boca');
+FileServices.CreateSuperFile ('~PRTE::IN::irskeys::alpha');
 
-STD.File.CreateSuperFile('~prte::in::irs5500',,1);
 promotesupers.mac_create_superfiles('~prte::base::irs5500');
 
 //custom keys

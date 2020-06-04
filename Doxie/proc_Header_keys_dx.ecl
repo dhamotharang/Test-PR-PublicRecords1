@@ -14,13 +14,13 @@ name_rid := prefix + 'rid_header';
 //TODO: find out if "pFastHeader" and "combo" parameters are needed
 RoxieKeybuild.MAC_build_logical (dx_Header.key_rid(0, pFastHeader, FALSE), header.data_key_rid (pFastHeader, FALSE), 
                                  dx_Header.names('').i_rid, name_rid, rid_only);
-RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_rid, name_rid, mv_rid, , , TRUE);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_rid + IF (pFastHeader, '_fheader', '_header'), name_rid, mv_rid);
 
 name_rid_src := prefix + 'rid_srid_header';
 //TODO: find out if "pFastHeader" and "combo" parameters are needed
 RoxieKeybuild.MAC_build_logical (dx_Header.key_Rid_SrcID(0, pFastHeader, FALSE), header.data_key_rid_SrcID (pFastHeader, FALSE),
                                  dx_Header.names('').i_rid_src, name_rid_src, bld_rid_srid_key);
-RoxieKeybuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_rid_src, name_rid_src, mv_rid_srid_key, , , TRUE);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_rid_src + IF (pFastHeader, '_fheader', '_header'), name_rid_src, mv_rid_srid_key);
 
 
 //Build Header Wildcard Keys
@@ -30,8 +30,6 @@ bld_wildcard := doxie_build.proc_build_header_wild_keys_dx (filedate);
 hhid_did := doxie_build.Proc_HHID_BuildKeys_dx (filedate);
 
 PromoteSupers.Mac_SF_BuildProcess(doxie.lookups,'~thor_data400::base::doxie_lookups',lookup_pre,2,,pCompress:=true,pVersion:=filedate)
-
-question_key := lssi.Proc_BuildKey(filedate);
 
 //Build keys
 name_zip_did := prefix + 'zip_did';
@@ -104,8 +102,6 @@ name_SSN5 := prefix + 'ssn5.did';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_SSN5(), header.data_key_SSN5, dx_Header.names('').i_ssn5, name_SSN5, ssn5_did);
 name_header_address := prefix + 'address';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_header_address(), header.data_key_header_address, dx_Header.names('').i_header_address, name_header_address, address_payload);
-name_ParentLnames := prefix + 'parentlnames';
-RoxieKeybuild.MAC_build_logical (dx_Header.key_ParentLnames(), header.data_key_ParentLnames, dx_Header.names('').i_ParentLnames, name_ParentLnames, parentlnames);
 name_ZipPRLName := prefix + 'zipprlname';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_ZipPRLName(), header.data_key_ZipPRLName, dx_Header.names('').i_auto_ZipPRLName, name_ZipPRLName, zipprlname);
 name_minors := prefix + 'minors';
@@ -180,7 +176,6 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_DTS_FnameSmall, nam
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ssn4, name_ssn4, mv_ssn4);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ssn5, name_ssn5, mv_ssn5);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_header_address, name_header_address, mv_address_payload);
-RoxieKeybuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ParentLnames, name_ParentLnames, mv_parentlnames);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_auto_ZipPRLName, name_ZipPRLName, mv_zipprlname);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_minors, name_minors, mv_minors);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_DOBName, name_DOBName, mv_dobname);
@@ -201,124 +196,121 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_DMV_restricted, nam
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::insuranceheader_xlink::did','~thor_data400::key::insuranceheader_xlink::'+filedate+'::did',mv_ins_did);
 
 header_key_builds := sequential(
-														lookup_pre,
-														parallel(
-																rid_only
-																,bld_rid_srid_key
-																,bld_wildcard
-																,hhid_did
-																,zip_did
-																,zip_did_full
-																,ssn_did
-																,phone_only
-																,zip_lname_fname
-																,lname_fname
-																,lname_fname_alt
-																,st_fname_lname
-																,da_key
-																,addr_key
-																,street_key
-																,st_city_fname_lname
-   															,question_key
-																,lookup_me
-																,nbours
-																,nbr
-																,nbr_uid
-																,rid_did
-																,rid_did2
-																,ssn_date
-																,county_name
-																,fname_small
-																,apt_blg
-																,addr_rsch
-																,ssn_address
-																,phonetic_lname_key
-																,dts_addr
-																,dts_street
-																,dts_fsmall
-																,ssn4_did
-																,ssn5_did
-																,parentlnames
-																,zipprlname
-																,minors
-																,dob_name
-			  												,bld_percent
-				  											,addrrisk_geolink
-																,ins_did
-																)
-														,head_data
-														,address_payload
-														,max_dt_last_seen
-														,ssn4_v2
-									  				,rawaid
-														,dob_fname
-														,dob_pfname
-														,piz_lname_fname
-														,minors_Hash
-														,legacy_ssn
-														,TUCH_dob
-														,rid_did_split
-														,address_rank
-														,DMV_restricted
-														,parallel(
-																mv_rid
-																,mv_rid_srid_key
-                                        // place holder: wildcard
-                                        // place holder: hhid
-																,mv_zip
-																,mv_zipf
-																,mv_ssn
-																,mv_phone
-																,mv_zip_name
-																,mv_name
-																,mv_name_alt
-																,mv_st_name
-																,mv_da
-																,mv_addr
-																,mv_street
-																,mv_st_city
-                                        // place holder: question key
-																,mv_lookup
-																,mv_nbr
-																,mv_nbr2
-																,mv_nbr_uid
-																,mv_rid_did
-																,mv_rid2
-																,mv_did_ssn
-																,mv_cnty
-																,mv_fname_small
-																,mv_apt
-																,mv_addr_rsch
-																,mv_ssn_addr
-																,mv_phonetic_lname_key
-																,mv_dts_addr
-																,mv_dts_street
-																,mv_dts_fsmall
-																,mv_ssn4
-																,mv_ssn5
-  															,mv_parentlnames
-																,mv_zipprlname
-																,mv_minors
-																,mv_dobname
-																,mv_percent
-	  														,mv_addrrisk_geolink
-     														,mv_ins_did
-																,mv_data
-																,mv_address_payload
-																,mv_max_dt_last_seen
-																,mv_ssn4_v2
-																,mv_rawaid
-																,mv_dob_fname
-																,mv_dob_pfname
-																,mv_piz_lname_fname
-																,mv_minors_Hash
-																,mv_legacy_ssn
-																,mv_TUCH_dob
-																,mv_rid_did_split
-																,mv_address_rank
-																,mv_DMV_restricted
-																)
-														);
+						lookup_pre,
+						parallel(
+								rid_only
+								,bld_rid_srid_key
+								,bld_wildcard
+								,hhid_did
+								,zip_did
+								,zip_did_full
+								,ssn_did
+								,phone_only
+								,zip_lname_fname
+								,lname_fname
+								,lname_fname_alt
+								,st_fname_lname
+								,da_key
+								,addr_key
+								,street_key
+								,st_city_fname_lname
+								,lookup_me
+								,nbours
+								,nbr
+								,nbr_uid
+								,rid_did
+								,rid_did2
+								,ssn_date
+								,county_name
+								,fname_small
+								,apt_blg
+								,addr_rsch
+								,ssn_address
+								,phonetic_lname_key
+								,dts_addr
+								,dts_street
+								,dts_fsmall
+								,ssn4_did
+								,ssn5_did
+								,zipprlname
+								,minors
+								,dob_name
+								,bld_percent
+								,addrrisk_geolink
+								,ins_did
+								)
+						,head_data
+						,address_payload
+						,max_dt_last_seen
+						,ssn4_v2
+						,rawaid
+						,dob_fname
+						,dob_pfname
+						,piz_lname_fname
+						,minors_Hash
+						,legacy_ssn
+						,TUCH_dob
+						,rid_did_split
+						,address_rank
+						,DMV_restricted
+						,parallel(
+								mv_rid
+								,mv_rid_srid_key
+		// place holder: wildcard
+		// place holder: hhid
+								,mv_zip
+								,mv_zipf
+								,mv_ssn
+								,mv_phone
+								,mv_zip_name
+								,mv_name
+								,mv_name_alt
+								,mv_st_name
+								,mv_da
+								,mv_addr
+								,mv_street
+								,mv_st_city
+		// place holder: question key
+								,mv_lookup
+								,mv_nbr
+								,mv_nbr2
+								,mv_nbr_uid
+								,mv_rid_did
+								,mv_rid2
+								,mv_did_ssn
+								,mv_cnty
+								,mv_fname_small
+								,mv_apt
+								,mv_addr_rsch
+								,mv_ssn_addr
+								,mv_phonetic_lname_key
+								,mv_dts_addr
+								,mv_dts_street
+								,mv_dts_fsmall
+								,mv_ssn4
+								,mv_ssn5
+								,mv_zipprlname
+								,mv_minors
+								,mv_dobname
+								,mv_percent
+								,mv_addrrisk_geolink
+								,mv_ins_did
+								,mv_data
+								,mv_address_payload
+								,mv_max_dt_last_seen
+								,mv_ssn4_v2
+								,mv_rawaid
+								,mv_dob_fname
+								,mv_dob_pfname
+								,mv_piz_lname_fname
+								,mv_minors_Hash
+								,mv_legacy_ssn
+								,mv_TUCH_dob
+								,mv_rid_did_split
+								,mv_address_rank
+								,mv_DMV_restricted
+								)
+					);
 
   RETURN IF (~pFastHeader AND fileservices.getsuperfilesubname('~thor_data400::Base::HeaderKey_Built',1)=fileservices.getsuperfilesubname('~thor_data400::Base::Header',1),
                                           OUTPUT('No Header keys were built.'),

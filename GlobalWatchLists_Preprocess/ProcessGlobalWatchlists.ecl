@@ -1,4 +1,4 @@
-IMPORT GlobalWatchLists, GlobalWatchLists_Preprocess, ut, std;
+﻿IMPORT _control, GlobalWatchLists, GlobalWatchLists_Preprocess, mdr, ut, std;
 #option('multiplePersistInstances',FALSE);
 
 	allsrcs := GlobalWatchLists_Preprocess.ProcessBankOfEngland + 
@@ -774,13 +774,17 @@ EXPORT ProcessGlobalWatchlists(string filedate) := FUNCTION
 	pSourceCombined	:= SORT(PROJECT(pCleanNameAddr, xformFinalLayout(left)),pty_key)(orig_pty_name <> '' or orig_vessel_name <> '');
 	
 	//srt history files for append
-	dsSrtFIN_GWL := SORT(GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsFIN_GWL, pty_key);
+	dsSrtFIN_GWL 		:= SORT(GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsFIN_GWL, pty_key);
 	//dsSrtCFT	:= SORT(GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsCFT, pty_key); //New update file received
 	
 	//OFAC file output is not used in this graph
-
-	dsGWLFinalOut	:= output(pSourceCombined + dsSrtFIN_GWL,,'~thor_data400::in::globalwatchlists_'+filedate,overwrite);
+	concatFiles			:= pSourceCombined + dsSrtFIN_GWL;	
+	
+	//DF-26191: Append Global_SIDs
+	addGlobalSID		:= mdr.macGetGlobalSID(concatFiles, 'GlobalWatchList', 'source', 'global_sid');
+	
+	dsGWLFinalOut	:= output(addGlobalSID,,'~thor_data400::in::globalwatchlists_'+filedate,overwrite);
 	
 	RETURN dsGWLFinalOut;
-	
+
 END;

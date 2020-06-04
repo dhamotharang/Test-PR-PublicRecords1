@@ -1,8 +1,8 @@
-﻿import BIPV2_Files, BIPV2, ut, BIPV2_Company_Names, MDR, _Control, Advo, Data_Services, BIPV2_Tools; 
+﻿import BIPV2_Files, BIPV2, ut, BIPV2_Company_Names, MDR, _Control, Advo, Data_Services, BIPV2_Tools, LocationID_XLink,STD; 
 l_as_linking := BIPV2_Files.layout_ingest;
 EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking)) := module
-	shared l_dot := BIPV2.CommonBase.Layout;
-	
+	shared l_dot := BIPV2.CommonBase.Layout;	                           
+	                           
 	export l_dot flatten(l_as_linking L, unsigned C) := transform
 		self.rcid									:= C; // NOTE: Assigning rcid is the responsibility of Ingest, but BIPV2_Company_Names needs a placeholder
 		self.DOTid								:= 0;
@@ -77,6 +77,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		self.geo_blk			:= L.company_address.geo_blk;
 		self.geo_match		:= L.company_address.geo_match;
 		self.err_stat			:= L.company_address.err_stat;
+		self.locid        := 0;
 		
 		// flatten contact_name
 		self.isContact		:= if(L.contact_name.fname<>'' or L.contact_name.mname<>'' or L.contact_name.lname<>'', 'T', 'F');
@@ -92,33 +93,92 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		self.vl_id						:= if(MDR.sourceTools.SourceIsBusiness_Registration(L.source), '', L.vl_id);
 		
 		// we'll catch these later
-		self.cnp_number								:= ''; // SetCompanyFields
-		self.cnp_store_number					:= ''; // SetCompanyFields
-		self.cnp_btype								:= ''; // SetCompanyFields
-		self.cnp_lowv									:= ''; // SetCompanyFields
-		self.cnp_translated						:= false; // SetCompanyFields
-		self.cnp_classid							:= 0; // SetCompanyFields
-		self.isCorp										:= ''; // SetCompanyFields
-		self.cnp_hasNumber						:= ''; // SetCompanyFields
-		self.cnp_name									:= ''; // SetCompanyFields
-		self.cnp_component_code				:= ''; // SetCompanyFields
-		self.corp_legal_name					:= ''; // SetCompanyFields
-		self.dba_name									:= ''; // SetCompanyFields
-		self.active_duns_number				:= ''; // SetDuns
-		self.hist_duns_number					:= ''; // SetDuns
-		self.deleted_key		  := ''; // SetDuns
-		self.deleted_fein		  := ''; // SetDuns
-		self.active_enterprise_number	:= ''; // SetEnterprise
-		self.hist_enterprise_number		:= ''; // SetEnterprise
-		self.active_domestic_corp_key	:= ''; // SetSOS
-		self.hist_domestic_corp_key		:= ''; // SetSOS
-		self.foreign_corp_key					:= ''; // SetSOS
-		self.unk_corp_key							:= ''; // SetSOS
-		self.ingest_status						:= ''; // runIngest
-		self.vanity_owner_did         := 0 ; // Set_Vanity_Owner_Did
-    self.address_type_derived     := ''; // SetAddrType
-    self.prim_range_derived       := ''; // SetPrimRangeDerived
-    self.is_vanity_name_derived   := false; // Set_Vanity_Owner_Did
+		self.cnp_number								    := ''; // SetCompanyFields
+		self.cnp_store_number					    := ''; // SetCompanyFields
+		self.cnp_btype								    := ''; // SetCompanyFields
+		self.cnp_lowv									    := ''; // SetCompanyFields
+		self.cnp_translated						    := false; // SetCompanyFields
+		self.cnp_classid							    := 0; // SetCompanyFields
+		self.isCorp										    := ''; // SetCompanyFields
+		self.cnp_hasNumber						    := ''; // SetCompanyFields
+		self.cnp_name									    := ''; // SetCompanyFields
+		self.cnp_component_code				    := ''; // SetCompanyFields
+		self.corp_legal_name					    := ''; // SetCompanyFields
+		self.dba_name									    := ''; // SetCompanyFields
+		self.active_duns_number				    := ''; // SetDuns
+		self.hist_duns_number					    := ''; // SetDuns
+		self.deleted_key		              := ''; // SetDuns
+		self.deleted_fein		              := ''; // SetDuns
+		self.active_enterprise_number	    := ''; // SetEnterprise
+		self.hist_enterprise_number		    := ''; // SetEnterprise
+		self.active_domestic_corp_key	    := ''; // SetSOS
+		self.hist_domestic_corp_key		    := ''; // SetSOS
+		self.foreign_corp_key					    := ''; // SetSOS
+		self.unk_corp_key							    := ''; // SetSOS
+		self.ingest_status						    := ''; // runIngest
+		self.vanity_owner_did             := 0 ; // Set_Vanity_Owner_Did
+    self.address_type_derived         := ''; // SetAddrType
+    self.prim_range_derived           := ''; // SetPrimRangeDerived
+    self.is_vanity_name_derived       := false; // Set_Vanity_Owner_Did	
+
+		unsigned4 tempRevIndex            := STD.Str.Find(L.revenue_org_raw,'-',1) + 1;
+		unsigned6 highValue               := (unsigned6) L.revenue_org_raw[tempRevIndex..];
+		unsigned4 tempRevIndexLocal       := STD.Str.Find(L.revenue_local_raw,'-',1) + 1;
+		unsigned6 highValueLocal          := (unsigned6) L.revenue_local_raw[tempRevIndexLocal..];
+
+		unsigned4 tempEmpIndex            := STD.Str.Find(L.employee_count_org_raw,'-',1) + 1;
+		unsigned6 highEmpValue            := (unsigned6) L.employee_count_org_raw[tempEmpIndex..];
+		unsigned4 tempEmpIndexLocal       := STD.Str.Find(L.employee_count_local_raw,'-',1) + 1;
+		unsigned6 highEmpValueLocal       := (unsigned6) L.employee_count_local_raw[tempEmpIndexLocal..];
+
+		unsigned6 temp_emp_count          := map(
+				                                   L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.employee_count_org_raw,'-',1)=0                            => highEmpValue
+																					,L.source=MDR.sourceTools.src_Business_Registration and length(trim(STD.Str.FilterOut(L.employee_count_org_raw,'0123456789')))>0  => 0
+		                                      ,L.source in [MDR.sourceTools.src_Equifax_Business_Data
+																					             ,MDR.sourceTools.src_Cortera
+																					             ,MDR.sourcetools.src_Experian_CRDB
+																					             ,MDR.sourcetools.src_DCA
+																					             ,MDR.sourcetools.src_EBR
+																					             ,MDR.sourceTools.src_Equifax_Business_Data
+																											 ]                                                                                                                   => (unsigned6) L.employee_count_org_raw
+                                           ,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1..4]='Over'                                                   => 0				
+																					 ,L.source=MDR.sourceTools.src_infutor_narb                                                                                      => (unsigned6) STD.Str.Filter(L.employee_count_org_raw[6..],'1234567890')
+																					,0
+		                                    );
+		unsigned6 temp_emp_count_local    := map(
+		                                       L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.employee_count_local_raw,'-',1)=0                            => highEmpValueLocal
+																					,L.source=MDR.sourceTools.src_Business_Registration and length(trim(STD.Str.FilterOut(L.employee_count_local_raw,'0123456789')))>0  => 0
+		                                      ,L.source in [MDR.sourceTools.src_Equifax_Business_Data
+																					             ,MDR.sourceTools.src_Cortera
+																					             ,MDR.sourcetools.src_Experian_CRDB
+																					             ,MDR.sourcetools.src_DCA
+																					             ,MDR.sourcetools.src_EBR
+																					             ,MDR.sourceTools.src_Equifax_Business_Data
+																											 ]                                                                                                                      => (unsigned6) L.employee_count_local_raw
+																					,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1..4]='Over'                                                       => 0
+																					,L.source=MDR.sourceTools.src_infutor_narb                                                                                          => (unsigned6) STD.Str.Filter(L.employee_count_local_raw[6..],'1234567890')
+																					,0
+		                                  );
+    unsigned6 temp_revenue            := map(
+                                             L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1..5]='Under'                                                => (unsigned6) STD.Str.FilterOut(L.revenue_org_raw[8..],',')
+																			      ,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1]='$'                                                       => (unsigned6) STD.Str.Filter(L.revenue_org_raw[13..],'1234567890')
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_org_raw,'-',1)=0                               => (unsigned6) L.revenue_org_raw * 1000
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data                                                                           => (unsigned6) highValue
+																			      ,L.source in [MDR.sourceTools.src_DCA, MDR.sourceTools.src_Cortera,MDR.sourcetools.src_Experian_CRDB,MDR.sourceTools.src_EBR] => (unsigned6) L.revenue_org_raw
+																			      ,0
+																			 );
+    unsigned6 temp_revenue_local      := map(
+                                             L.source=MDR.sourceTools.src_infutor_narb and L.revenue_local_raw[1..5]='Under'                                              => (unsigned6) STD.Str.FilterOut(L.revenue_local_raw[8..],',')
+																			      ,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_local_raw[1]='$'                                                     => (unsigned6) STD.Str.Filter(L.revenue_local_raw[13..],'1234567890')
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_local_raw,'-',1)=0                             => (unsigned6) L.revenue_local_raw * 1000
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data                                                                           => highValueLocal
+																						,L.source in [MDR.sourceTools.src_DCA, MDR.sourceTools.src_Cortera,MDR.sourcetools.src_Experian_CRDB,MDR.sourceTools.src_EBR] => (unsigned6) L.revenue_local_raw
+																			      ,0
+																			 );
+    self.revenue_org_derived           := if(L.revenue_org_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_revenue);
+    self.revenue_local_derived         := if(L.revenue_local_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_revenue_local);
+    self.employee_count_local_derived  := if(L.employee_count_local_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_emp_count_local);
+	  self.employee_count_org_derived    := if(L.employee_count_org_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_emp_count);
 		self := L; 
 	end;
 	
@@ -190,13 +250,13 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		shared pnExcluded := ['MOVED NO FORWARDING ADDRESS']; // Excluded prim_name values
 		export result		:= ds_in(
 			trim(cnp_name) NOT IN ['','ACCOUNTS PAYABLE'],
-			prim_name<>'' or active_duns_number<>'' or active_enterprise_number<>'' or mdr.sourcetools.SourceIsBusiness_Credit(source),
+			prim_name<>'' or active_duns_number<>'' or active_enterprise_number<>'' or MDR.sourcetools.SourceIsBusiness_Credit(source),
 			prim_name not in pnExcluded,
 			source_record_id<>0);
 		export err_rec	:= project(ds_in, transform(l_err_rec, 
 			self.remedy:='REJECT', self.reason:=map(
 				trim(left.cnp_name) NOT IN ['','ACCOUNTS PAYABLE']																														=> 'cnp_name is blank',
-				left.prim_name='' and left.active_duns_number='' and left.active_enterprise_number=''	and not mdr.sourcetools.SourceIsBusiness_Credit(left.source)=> 'prim_name is blank',
+				left.prim_name='' and left.active_duns_number='' and left.active_enterprise_number=''	and not MDR.sourcetools.SourceIsBusiness_Credit(left.source)=> 'prim_name is blank',
 				left.prim_name in pnExcluded																								=> 'prim_name is excluded',
 				left.source_record_id=0																											=> 'source_record_id is blank',
 				skip),
@@ -298,7 +358,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 	import BIPV2_Tools,bipv2;
   export Set_Duns := BIPV2_Tools.SetDuns;
 
-	shared dataset(l_dot) SetEnterprise(dataset(l_dot) ds_in) := function
+	export dataset(l_dot) SetEnterprise(dataset(l_dot) ds_in) := function
 		l_dot toEnt(l_dot L, ds_active_entnum R) := transform
 			self.active_enterprise_number	:= if(R.enterprise_num != '', R.enterprise_num, '');
 			self.hist_enterprise_number		:= if(R.enterprise_num = '' and MDR.sourceTools.SourceIsDCA(L.source), L.vl_id, '');
@@ -452,6 +512,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
   // -------
 	export dataset(l_dot) SetPrimRangeDerived(
     dataset(l_dot) ds_in
+    ,string pPersistname = ''
   ) := 
   function
     import BIPV2;
@@ -498,7 +559,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         self:= left
       )
       ,limit(1000, skip)
-    ) : persist('~persist::BIPV2_Files::tools_dotid.jprd0', expire(7));
+    ) : persist('~persist::BIPV2_Files::tools_dotid.jprd0' + trim(pPersistname), expire(7));
     //if a prim_range matches to more than one derived prim_range, then dont let it derive
     jprd0d := dedup(jprd0, all);
     jprd :=
@@ -549,6 +610,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
      dataset(l_dot                  ) ds_in
     // ,dataset(header.Layout_Header_v2) pHeaders = Header.File_Headers
     ,boolean pDebugOutputs  = true
+    ,string  pPersistUnique = ''
   
   ) := 
   function
@@ -568,7 +630,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ds_joinback := join(ds_setaddr_res,ds_setaddr_res_clean,left.cnp_name = right.cnp_name,transform({recordof(left)/*,Address.Layout_Clean_Name clean_cname*/},self := right,self := left),hash);
     ds_joinback_rid := project(ds_joinback,transform({unsigned6 rid,string coname,recordof(left)},self.rid := counter,self.coname := left.cnp_name,self := left)); 
     CompanyNameAnalysis.Mac_isVanityName(ds_joinback_rid,coname,outvanity,outvanity2,rid,,pDebugOutputs);
-    outvanity_persist := outvanity(vanity = true)  : persist('~persist::BIPV2_Files::tools_dotid.Set_Vanity_Owner_Did.outvanity_persist');
+    outvanity_persist := outvanity(vanity = true)  : persist('~persist::BIPV2_Files::tools_dotid.Set_Vanity_Owner_Did.outvanity_persist' + pPersistUnique);
     outvanity_clean := project(dedup(outvanity_persist,full_name,all)  ,transform({recordof(left),Address.Layout_Clean_Name clean_cname},self.clean_cname := Address.CleanPersonFML73_fields(left.full_name).CleanNameRecord,self := left));
     ds_joinback4addr := join(ds_residential,outvanity_clean,left.cnp_name = right.full_name,transform({recordof(left),string20 owner_fname,string20 owner_mname,string20 owner_lname,string5 owner_name_suffix}
     ,self.owner_fname := right.clean_cname.fname
@@ -610,8 +672,8 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 
     import BIPV2;
     
-		isDunns(string src) := (mdr.sourcetools.sourceisDunn_Bradstreet(src) or 
-                            mdr.sourcetools.SourceIsDunn_Bradstreet_Fein(src));
+		isDunns(string src) := (MDR.sourcetools.sourceisDunn_Bradstreet(src) or 
+                            MDR.sourcetools.SourceIsDunn_Bradstreet_Fein(src));
 															
     ds_updates_with_fein    := pDs_Fein(company_fein != '');
     ds_updates_without_fein := pDs_Fein(company_fein  = '');
@@ -683,7 +745,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     [{
        count(pDs_Fein)
       ,count(ds_result  )
-      ,count(ds_as_linking(company_fein != ''))
+      ,count(pDs_Fein   (company_fein != ''))
       ,count(ds_result  (company_fein != ''))
       // ,count(ds_as_linking(deleted_fein != ''))
       ,count(ds_result  (deleted_fein != ''))
@@ -735,7 +797,20 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		
 		export outCounts := parallel(output(count(ds_in),named('cnt_total')), output(count(ds_tops),named('cnt_tops')), output(count(ds_good),named('cnt_good')));
 		
-		export result		:= project(ds_good, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
+		ds_CCPA := MDR.macGetGlobalSID(ds_good, 'BIPV2', 'source', 'global_sid');
+    LocationID_xLink.Append(ds_CCPA, 
+                            prim_range, 
+                            predir, 
+                            prim_name, 
+                            addr_suffix, 
+                            postdir, 
+                            sec_range, 
+                            v_city_name, 
+                            st, 
+                            zip, 
+                            ds_with_locid); 			
+		
+		export result		:= project(ds_with_locid, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
 		export err_rec	:= mod_bct.err_rec + mod_filt.err_rec;
 		export err_summary := sort(table(err_rec, {string60 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source),source,remedy,reason,unsigned cnt:=count(group)}, source,remedy,reason, merge), record);
 		
@@ -768,18 +843,45 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		end;
 		return project(ds_in, toNull(left));
 	end;
+	export boolean isgoodsic(string psic,string2 psource) := 
+      (
+        (     mdr.sourceTools.SourceIsDunn_Bradstreet     (psource) 
+          or  mdr.sourceTools.SourceIsInfutor_NARB        (psource) 
+          or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(psource)
+        ) 
+        and length(trim(psic)) in [4,8]
+      )
+      or length(trim(psic)) = 4
+      ;
 	
+	export dataset(l_dot) SetSICNAICS(dataset(l_dot) ds_in) := function
+		l_dot tCleanSIC(l_dot L) := transform
+			self.company_sic_code1							:= if (trim(l.company_sic_code1  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code1  ) = 1 and isgoodsic   (l.company_sic_code1    ,l.source ) = true, trim(l.company_sic_code1   )   ,'');
+			self.company_sic_code2							:= if (trim(l.company_sic_code2  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code2  ) = 1 and isgoodsic   (l.company_sic_code2    ,l.source ) = true, trim(l.company_sic_code2   )   ,'');
+			self.company_sic_code3							:= if (trim(l.company_sic_code3  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code3  ) = 1 and isgoodsic   (l.company_sic_code3    ,l.source ) = true, trim(l.company_sic_code3   )   ,'');
+			self.company_sic_code4							:= if (trim(l.company_sic_code4  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code4  ) = 1 and isgoodsic   (l.company_sic_code4    ,l.source ) = true, trim(l.company_sic_code4   )   ,'');
+			self.company_sic_code5							:= if (trim(l.company_sic_code5  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code5  ) = 1 and isgoodsic   (l.company_sic_code5    ,l.source ) = true, trim(l.company_sic_code5   )   ,'');
+			self.company_naics_code1						:= if (trim(l.company_naics_code1) != '' and ut.fn_valid_NAICSCode(l.company_naics_code1) = 1 and length(trim (l.company_naics_code1)           ) = 6   , trim(l.company_naics_code1 )   ,'');
+			self.company_naics_code2						:= if (trim(l.company_naics_code2) != '' and ut.fn_valid_NAICSCode(l.company_naics_code2) = 1 and length(trim (l.company_naics_code2)           ) = 6   , trim(l.company_naics_code2 )   ,'');
+			self.company_naics_code3						:= if (trim(l.company_naics_code3) != '' and ut.fn_valid_NAICSCode(l.company_naics_code3) = 1 and length(trim (l.company_naics_code3)           ) = 6   , trim(l.company_naics_code3 )   ,'');
+			self.company_naics_code4						:= if (trim(l.company_naics_code4) != '' and ut.fn_valid_NAICSCode(l.company_naics_code4) = 1 and length(trim (l.company_naics_code4)           ) = 6   , trim(l.company_naics_code4 )   ,'');
+			self.company_naics_code5						:= if (trim(l.company_naics_code5) != '' and ut.fn_valid_NAICSCode(l.company_naics_code5) = 1 and length(trim (l.company_naics_code5)           ) = 6   , trim(l.company_naics_code5 )   ,'');
+			self := L;
+		end;
+		return project(ds_in, tCleanSIC(left));
+	end;
 	// rerun selected routines on an existing DOT file
 	export dataset(l_dot) reclean(dataset(l_dot) ds_in) := function
 		ds_cnp	:= SetCompanyFields     (ds_in    );
-		ds_duns	:= Set_Duns              (ds_cnp   ,true,,'reclean');
+		ds_duns	:= Set_Duns             (ds_cnp   ,false,,'reclean',pDebug_Outputs := false);
 		ds_ent	:= SetEnterprise        (ds_duns  );
 		ds_sos	:= SetSOS               (ds_ent   );
 		ds_pn		:= SetPrimNameDerived   (ds_sos   );
-    ds_pr		:= SetPrimRangeDerived  (ds_pn    );
+    ds_pr		:= SetPrimRangeDerived  (ds_pn    ,'reclean');
     ds_at   := SetAddrType          (ds_pr    );
-    ds_owner:= Set_Vanity_Owner_Did (ds_at    );
-		return ds_owner;
+    ds_owner:= Set_Vanity_Owner_Did (ds_at    ,false,'reclean');
+    ds_sic  := SetSICNAICS          (ds_owner    );
+		return ds_sic;
 	end;
 	
 	export city_samp(ds_in, st_field, city_field) := functionmacro
@@ -884,7 +986,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
       ,self.contact_ssn       := left.contact_ssn //keep orig ssn the same for now
       ,self                   := left
     ));
-    import tools,aid,address,mdr,Business_Header_SS,business_header,DID_Add,business_headerv2;
+    import tools,aid,address,MDR,Business_Header_SS,business_header,DID_Add,business_headerv2;
     import tools,
 			address,
 			idl_header,

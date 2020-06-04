@@ -14,7 +14,7 @@ b06* - should have been 0522. Not sure why 628 moved in. Probably due to buildin
 */
 import header;
 #workunit('name','PersonHeader: '+header.version_build+' - Adjust_header_raw_superfiles'); 
-step := 				 'Adjust_header_raw_superfiles';
+step := 'Adjust_header_raw_superfiles';
 #stored ('buildname', 'PersonHeader'   ); 
 #stored ('version'  , header.version_build); 
 #stored ('emailList', 'gabriel.marcan@lexisnexis.com,debendra.kumar@lexisnexis.com'    ); 
@@ -31,10 +31,13 @@ oftv := get_version('~thor_data400::base::header_raw_father');
 oprv := get_version('~thor_data400::base::header_raw_prod');
 orwv := get_version('~thor_data400::base::header_raw');
 
-supers := dataset([ {rw+'_grandfather',oftv},{rw+'_father',oprv},
-										{rw+'_prod'				,oprv},{rw					,orwv},
-									  {rw+'_built'			,''	 },{rw+'_built1',''	 }
-								],{string sname, string after_change});
+supers := dataset([ {rw+'_grandfather',oftv},
+					{rw+'_father'     ,oprv},
+					{rw+'_prod'	      ,oprv},
+					{rw				  ,orwv},
+					{rw+'_built'	  ,''},
+					{rw+'_built1'     ,''}
+				  ],{string sname, string after_change});
 
 report_before := apply(supers,output(dataset([{sname,fileservices.SuperFileContents(sname),after_change}],
 																			{string supername, dataset({string name}) subfiles, string after_change}),named('Before'),extend));
@@ -45,8 +48,8 @@ report_after := apply(supers,output(dataset([{sname,fileservices.SuperFileConten
 run := sequential( 
 	header.LogBuild.single('Started :'+step)
 	,report_before
-	,fileservices.removesuperfile(rw+'_grandfather',rw+'_'+ogfv   ) /**/ ,fileservices.   addsuperfile(rw+'_grandfather',rw+'_'+oftv   )
-	,fileservices.removesuperfile(rw+'_father'     ,rw+'_'+oftv   ) /**/ ,fileservices.   addsuperfile(rw+'_father'     ,rw+'_'+oprv   )
+	,fileservices.removesuperfile(rw+'_grandfather',rw+'_'+ogfv   ) /**/ ,fileservices.addsuperfile(rw+'_grandfather',rw+'_'+oftv   )
+	,fileservices.removesuperfile(rw+'_father'     ,rw+'_'+oftv   ) /**/ ,fileservices.addsuperfile(rw+'_father'     ,rw+'_'+oprv   )
 	// REVIEW, DO NOT JUST UNCOMMENT ,fileservices.removesuperfile(rw+''            ,rw+'_xxxxxxxx') /**/ ,fileservices.   addsuperfile(rw+''            ,rw+'_xxxxxxxx')
 	,fileservices.removesuperfile(rw+'_built'      ,rw+'_'+orwv   )
 	,fileservices.clearsuperfile(rw+'_built1')
@@ -63,6 +66,7 @@ run; 					// first run the _report_before.       Once satisfied, run "run" on he
 
 // Previous Runs
 // ---------------
+// 20191128 W20191230-101312
 // 20181023 W20181029-104229
 // 20180926 W20181001-072456
 // 20180821 W20180823-211441

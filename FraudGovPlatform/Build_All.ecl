@@ -1,43 +1,41 @@
-﻿/**************************************************************************************************************************************************/
+﻿﻿/**************************************************************************************************************************************************/
 /* PROJECT: RISK INTELLIGENCE NETWORK - AKA: RIN, OTTO, FraudGov
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
 /* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
 /**************************************************************************************************************************************************/
-import tools, _control, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
+import tools, FraudShared, FraudGovPlatform_Validation, STD,_control;
 
 export Build_All(
 	 string version 	
 ) :=
 module
+
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
-ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
+ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.Shell_ThorName_Dev,	FraudGovPlatform_Validation.Constants.Shell_ThorName_Prod);
 
-GenerateDashboards := 
- 'import ut,FraudGovPlatform_Analytics;\n'
-+'wuname := \'FraudGov Cert Dashboards Refresh\';\n'
-+'#WORKUNIT(\'name\', wuname);\n'
+Build_BocaShell_Ecl := 
+ 'import tools, FraudGovPlatform, FraudGovPlatform_Validation, STD;\n'
++'#CONSTANT(\'Platform\',\'FraudGov\');\n'
++'#OPTION(\'multiplePersistInstances\',FALSE);\n'
++'wuname := \'FraudGov BocaShell Build\';\n'
 +'#WORKUNIT(\'protect\', true);\n'
-+'email(string msg):=fileservices.sendemail(\n'
-+'   FraudGovPlatform_Validation.Mailing_List().Analytics\n'
-+' 	 ,\'FraudGov Cert Dashboards Refresh\'\n'
-+' 	 ,msg\n'
-+' 	 +\'Build wuid \'+workunit\n'
-+' 	 );\n\n'
-+'FraudGovPlatform_Analytics.GenerateDashboards(False,True):failure(email(\'Cert dashboards failed\'));\n'
-;
-
-BuildStatusReport := 
- 'import ut,FraudGovPlatform,FraudGovPlatform_Validation;\n'
-+'wuname := \'FraudGov Build Status Report\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
-+'#WORKUNIT(\'protect\', true);\n'
++'#WORKUNIT(\'priority\',\'high\');\n'
++'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
-+' 	 ,\'FraudGov Build Status Report\'\n'
++' 	 ,\'FraudGov BocaShell Build\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'FraudGovPlatform.Build_Summary(\''+version+'\').send:failure(email(\'Build Status Report failed\'));\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
++'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
++'d_wu := d[1].wuid;\n'
++'active_workunit :=  exists(d);\n'
++'if(active_workunit\n'
++'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
++'		,FraudGovPlatform.Build_BocaShell(\''+version+'\').All\n'
++'	):failure(email(\'FraudGov BocaShell Build failed\'));\n'
 ;
 
 	export build_all := sequential(
@@ -52,12 +50,8 @@ BuildStatusReport :=
 					FraudShared.Build_AutoKeys(version),
 					FraudGovPlatform.Promote().Clear_DemoData,
 					FraudGovPlatform.Build_Base_Pii(version).All,
-					FraudGovPlatform.Build_Kel(version).All,
-					FraudGovPlatform.Promote(version).promote_keys,
-					Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',version),
-					_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName),
-					_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName),
-					FraudGovPlatform.Send_Emails(version).Roxie),
+					_Control.fSubmitNewWorkunit(Build_BocaShell_Ecl,ECLThorName)
+				),
 				FAIL('Unit Test Failed'))
 	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
 

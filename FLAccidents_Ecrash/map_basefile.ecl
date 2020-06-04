@@ -1,6 +1,6 @@
 ﻿export map_basefile(string filedate) := function
 
-import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid,PromoteSupers;
+import FLAccidents, Address, ut, did_add, header_slimsort, driversv2, lib_StringLib, STD, AID, scrubs,scrubs_ecrash,nid,PromoteSupers;
 
  d      := FLAccidents_Ecrash.Infiles.cmbnd;
  vina	:= DISTRIBUTE(FLAccidents.File_VINA, HASH32(Vin_Input));
@@ -18,8 +18,8 @@ temp_layout := record
 end;
 
 temp_layout trecs(d L) := transform
-  self.temp_addr1 := lib_StringLib.StringLib.StringCleanSpaces(trim(L.Address,left,right));
-  self.temp_addr2 := lib_StringLib.StringLib.StringCleanSpaces(trim(L.CITY,left,right)+ if(trim(L.CITY,left,right) <> '',', ',' ')+trim(L.STATE,left,right)+' '+trim(L.ZIP_code,left,right)[1..5]);
+  self.temp_addr1 := STD.Str.CleanSpaces(trim(L.Address,left,right));
+  self.temp_addr2 := STD.Str.CleanSpaces(trim(L.CITY,left,right)+ if(trim(L.CITY,left,right) <> '',', ',' ')+trim(L.STATE,left,right)+' '+trim(L.ZIP_code,left,right)[1..5]);
   self := L;
 end;
  precs := project(d,trecs(left));
@@ -39,41 +39,36 @@ end;
 
   FLAccidents_Ecrash.Layout_BaseFile trecs2(fPreclean L, dvina R) := transform
 
-  string8     fSlashedMDYtoCYMD(string pDateIn) 
-               :=          intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-                     +     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-                     +     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
   self.date_vendor_first_reported  := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
-																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
+																				,STD.Str.FilterOut(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
   self.date_vendor_last_reported   := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
-																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
+																				,STD.Str.FilterOut(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
   self.crash_date							     := if(trim(L.crash_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.crash_date,left,right),'-')
+																	      ,STD.Str.FilterOut(trim(L.crash_date,left,right),'-')
 																				,'');
   self.dt_first_seen					     := self.crash_date;
   self.dt_last_seen						     := self.crash_date;
   self.creation_date					     := if(trim(L.creation_date,left,right)[1..10] !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.creation_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.creation_date,left,right)[1..10],'-')
 																				,'');
-  self.date_of_birth					     := map(regexfind('-',L.date_of_birth) and trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
-																					=> stringlib.stringfilterout(trim(L.date_of_birth,left,right),'-'),
-																	     regexfind('/',L.date_of_birth)=> fSlashedMDYtoCYMD(L.date_of_birth),'');
+  self.date_of_birth					     := if(trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
+																	      ,Functions.dateconv(L.date_of_birth)
+																				,'');
   self.officer_report_date		     := if(trim(L.officer_report_date,left,right)[1..10] !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.officer_report_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.officer_report_date,left,right)[1..10],'-')
 																				,'');																				
   self.ems_notified_date		       := if(trim(L.ems_notified_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.ems_notified_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.ems_notified_date,left,right)[1..10],'-')
 																				,'');																				
   self.ems_arrival_date		         := if(trim(L.ems_arrival_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.ems_arrival_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.ems_arrival_date,left,right)[1..10],'-')
 																				,'');
   self.death_date		      			   := if(trim(L.death_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.death_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.death_date,left,right)[1..10],'-')
 																				,'');
-  self.home_phone									 := stringlib.stringfilter(L.home_phone,'0123456789');
+  self.home_phone									 := STD.Str.Filter(L.home_phone,'0123456789');
   set_ptype                        := ['P1','P2','P3','P4','P5','P6','P7','P8','P9'];
   self.person_type 						     := if(L.person_type in set_ptype,'PASSENGER', L.person_type);
   self.passenger_number						 := if(L.passenger_number != '0', L.passenger_number, '');
@@ -86,7 +81,7 @@ end;
   self.cru_sequence_nbr						 := if(L.cru_sequence_nbr != '0', L.cru_sequence_nbr, '');
   self.city_code									 := if(L.city_code != '00', L.city_code, '');
   self.other_unit_vehicle_damage_amount 
-																   := L.other_unit_vehicle_damage_amount[1..stringlib.stringfind(L.other_unit_vehicle_damage_amount,'.',1)-1] + '00';
+																   := L.other_unit_vehicle_damage_amount[1..STD.Str.Find(L.other_unit_vehicle_damage_amount,'.',1)-1] + '00';
   self.report_code						     := map(L.source_id ='TF'=>'TF', l.source_id ='TM' => 'TM', 'EA');
   self.report_category				     := CASE(L.report_type_id
 									                     ,'A'=>'Auto Report'
@@ -245,42 +240,37 @@ end;
 
 FLAccidents_Ecrash.Layout_BaseFile trecs3(fPreclean L) := transform
 
-string8     fSlashedMDYtoCYMD(string pDateIn) 
-:=    intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-  self.date_vendor_first_reported := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
-																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
+ self.date_vendor_first_reported := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
+																				,STD.Str.FilterOut(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
   self.date_vendor_last_reported  := if(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10] !='0000-00-00'
-																				,stringlib.stringfilterout(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
+																				,STD.Str.FilterOut(trim(L.Sent_to_HPCC_DateTime,left,right)[1..10],'-')
 																				,'');
   self.crash_date							    := if(trim(L.crash_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.crash_date,left,right),'-')
+																	      ,STD.Str.FilterOut(trim(L.crash_date,left,right),'-')
 																				,'');
   self.dt_first_seen					    := self.crash_date;
   self.dt_last_seen						    := self.crash_date;
   self.creation_date					    := if(trim(L.creation_date,left,right)[1..10] !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.creation_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.creation_date,left,right)[1..10],'-')
 																				,'');
 
-  self.date_of_birth					    := map(regexfind('-',L.date_of_birth) and trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
-																					=> stringlib.stringfilterout(trim(L.date_of_birth,left,right),'-'),
-																	     regexfind('/',L.date_of_birth)=> fSlashedMDYtoCYMD(L.date_of_birth),'');
+  self.date_of_birth					    := if(trim(L.date_of_birth,left,right)[1..10] !='0000-00-00'
+																	      ,Functions.dateconv(L.date_of_birth)
+																				,'');
   self.officer_report_date		    := if(trim(L.officer_report_date,left,right)[1..10] !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.officer_report_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.officer_report_date,left,right)[1..10],'-')
 																				,'');																				
   self.ems_notified_date		      := if(trim(L.ems_notified_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.ems_notified_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.ems_notified_date,left,right)[1..10],'-')
 																				,'');																				
   self.ems_arrival_date		        := if(trim(L.ems_arrival_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.ems_arrival_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.ems_arrival_date,left,right)[1..10],'-')
 																				,'');
   self.death_date		      			  := if(trim(L.death_date,left,right) !='0000-00-00'
-																	      ,stringlib.stringfilterout(trim(L.death_date,left,right)[1..10],'-')
+																	      ,STD.Str.FilterOut(trim(L.death_date,left,right)[1..10],'-')
 																				,'');
-  self.home_phone									:= stringlib.stringfilter(L.home_phone,'0123456789');
+  self.home_phone									:= STD.Str.Filter(L.home_phone,'0123456789');
 
   set_ptype                       := ['P1','P2','P3','P4','P5','P6','P7','P8','P9'];
   self.person_type 						    := if(L.person_type in set_ptype,'PASSENGER', L.person_type);
@@ -294,7 +284,7 @@ string8     fSlashedMDYtoCYMD(string pDateIn)
   self.cru_sequence_nbr						:= if(L.cru_sequence_nbr != '0', L.cru_sequence_nbr, '');
   self.city_code									:= if(L.city_code != '00', L.city_code, '');
   self.other_unit_vehicle_damage_amount 
-																  := L.other_unit_vehicle_damage_amount[1..stringlib.stringfind(L.other_unit_vehicle_damage_amount,'.',1)-1] + '00';
+																  := L.other_unit_vehicle_damage_amount[1..STD.Str.Find(L.other_unit_vehicle_damage_amount,'.',1)-1] + '00';
 
   self.report_code						     := map(L.source_id ='TF'=>'TF', l.source_id ='TM' => 'TM', 'EA');
   self.report_category				     := CASE(L.report_type_id
@@ -555,9 +545,25 @@ end;
 																						,
 																						,'sudhir.kasavajjala@lexisnexis.com');	
   //append bitmap to base
-  dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile);
+  dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile) :persist('~thor_data400::persist::ecrash_base');
 
+  //Insurance eCrashSlim Base file
+  FLAccidents_Ecrash.Layout_InseCrashSlim t_eCrashSlim(dbuildbase l) := transform
+	  //fabricated
+		self.accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+		self.accident_date := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
+		self.impact_location := if (l.report_code ='TM' ,
+                            if(l.initial_point_of_contact[1..25] !='','Damaged_Area_1: ' + l.initial_point_of_contact[1..25],'')
+														+ if(l.initial_point_of_contact[25..] !='','Damaged_Area_2: ' + l.initial_point_of_contact[25..],''),
+														if(l.damaged_areas_derived1 !='','Damaged_Area_1: ' + l.damaged_areas_derived1,'')
+														+ if(l.damaged_areas_derived2 !='','Damaged_Area_2: ' + l.damaged_areas_derived2,''));
+		self := l;
+	end;
+	p_InseCrashSlim := project(dbuildbase, t_eCrashSlim(left)) : persist('~thor_data400::persist::InseCrashSlim_base', SINGLE);
+
+		
  	PromoteSupers.Mac_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
+ 	PromoteSupers.Mac_SF_BuildProcess(p_InseCrashSlim,'~thor_data400::base::InseCrashSlim',buildInseCrashSlimBase,,,true);
   PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
 	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
 	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
@@ -572,13 +578,15 @@ return sequential(  buildsuppBase
 		                ,output(Scrubs_report_with_examples, all, named('ScrubsReportWithExamples'))
 		                //Send Alerts if Scrubs exceeds threholds
 		                ,if(count(Scrubs_alert) > 1, mailfile, output('No_Scrubs_Alerts'))	 
-                    ,buildBase  
+                    ,buildBase
+										,buildInseCrashSlimBase
 										,buildDocumentBase
 										,buildBaseTMafterTF
 										,buildAgencyCmbndBase
 									);
 
 end;
+
 
 
 

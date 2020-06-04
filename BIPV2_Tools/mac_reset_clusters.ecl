@@ -10,6 +10,7 @@
   ,pDs_Full_file                = 'BIPV2.CommonBase.DS_BASE'
   ,pReturnFullPatchedDataset    = 'false'
   ,pTurnOffAgg                  = 'false'
+  ,pPersistUnique2              = '\'\''
 ) :=
 functionmacro
 
@@ -17,7 +18,7 @@ functionmacro
   ds_proxid_candidate_records_reset := project(pProxidRecords2Reset                                                                                              ,transform({recordof(left),unsigned6 old_proxid,unsigned6 old_seleid},self.old_proxid := left.proxid,self.proxid := left.dotid ,self.lgid3  := 0,self.seleid := 0,self := left,,self.old_seleid := left.seleid)) ;
   ds_seleid_candidate_records_reset := join(pSeleidRecords2Reset  ,table(pProxidRecords2Reset,{proxid},proxid,merge) ,left.proxid = right.proxid ,transform({recordof(left),unsigned6 old_proxid,unsigned6 old_seleid},self.old_proxid := left.proxid,self.old_seleid := left.seleid,self.lgid3  := left.proxid,self.seleid := self.lgid3/*test*/,self := left,self := []) ,left only ,hash);
   
-  ds_concat_candidate_records := ds_proxid_candidate_records_reset + ds_seleid_candidate_records_reset  : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_concat_candidate_records');
+  ds_concat_candidate_records := ds_proxid_candidate_records_reset + ds_seleid_candidate_records_reset  : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_concat_candidate_records' + trim(pPersistUnique2));
   
   ds_base_patched             := project(ds_concat_candidate_records  ,bipv2.commonbase.layout);
   
@@ -37,16 +38,16 @@ functionmacro
   // -- reform reset proxid clusters
   ds_proxid_reform_prep  := table(ds_proxid_candidate_records_reset  ,{dotid,old_proxid,cnp_name},dotid,old_proxid,cnp_name,merge);
   ds_reform_proxid       := BIPV2_Tools.mac_reform_clusters(ds_proxid_reform_prep ,dotid  ,cnp_name,20,old_proxid)
-                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_proxid');
+                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_proxid' + trim(pPersistUnique2));
   ds_patch_proxid        := join(ds_concat_candidate_records  ,table(ds_reform_proxid,{dotid,unsigned6 lowest_dotid := min(group,lowest_dotid)},dotid,merge) ,left.dotid = right.dotid  ,transform(recordof(left),self.proxid := if(right.dotid != 0,right.lowest_dotid,left.proxid),self := left),left outer,hash)
-                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_proxid');
+                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_proxid' + trim(pPersistUnique2));
   
   // -- reform reset seleid clusters
   ds_seleid_reform_prep  := table(ds_patch_proxid                   ,{proxid,old_seleid,cnp_name},proxid,old_seleid,cnp_name,merge);
   ds_reform_seleid       := BIPV2_Tools.mac_reform_clusters(ds_seleid_reform_prep ,proxid  ,cnp_name,20,old_seleid)
-                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_seleid');
+                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_seleid' + trim(pPersistUnique2));
   ds_patch_seleid        := join(ds_patch_proxid              ,table(ds_reform_seleid,{proxid,unsigned6 lowest_proxid := min(group,lowest_proxid)},proxid,merge) ,left.proxid = right.proxid  ,transform(recordof(left),self.lgid3 := if(right.proxid != 0,right.lowest_proxid,left.lgid3),self := left),left outer,hash)
-                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_seleid');
+                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_seleid' + trim(pPersistUnique2));
 
   ds_full_patched_reformed := project(ds_patch_seleid ,bipv2.commonbase.layout) + ds_base_not_patched;
   
@@ -78,7 +79,7 @@ functionmacro
   ],{string stat  ,unsigned value});
     
   do_reset_reform := sequential(
-     output(ds_candidates_stats           ,named('ds_candidates_stats'),extend,all)
+     output(ds_candidates_stats           ,named('BIPV2_Tools_mac_reset_clusters_ds_candidates_stats'),extend,all)
 #IF(trim(pNewDotid_Filename) != '')
     ,output(ds_concat_candidate_records  ,,pNewDotid_Filename ,overwrite,compressed)  // not full file because we want to run iterations on top of this sample set to see what happens
     ,if(pAdd2Superfile = true
@@ -93,7 +94,7 @@ functionmacro
          output(ds_full_patched_reformed  ,,pPatchedFullFileName ,overwrite,compressed)  // full file
       )
     )
-    ,output(ds_stats ,named('ds_stats'))
+    ,output(ds_stats ,named('BIPV2_Tools_mac_reset_clusters_ds_stats'),extend)
   );
   
 #IF(pTurnOffAgg = false)  

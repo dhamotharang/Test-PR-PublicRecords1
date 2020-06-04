@@ -45,30 +45,30 @@ function
         parallel(
            //BuildSpecs                   
 					 Buildmeow                    
-          ,Buildsup_proxid              
-          ,Buildsup_seleid              
-          ,Buildsup_orgid   
-          ,Buildsup_rcid
-          ,Buildrefs                    
-          ,Buildwords                   
+           ,Buildsup_proxid              
+           ,Buildsup_seleid              
+           ,Buildsup_orgid   
+           ,Buildsup_rcid
+           ,Buildrefs                    
+           ,Buildwords                   
           ,Buildrefs_l_cnpname    
           ,Buildrefs_l_cnpname_zip
           ,Buildrefs_l_cnpname_st       
           ,Buildrefs_l_cnpname_fuzzy    
-          ,Buildrefs_l_address1         
-          ,Buildrefs_l_address2         
-          ,Buildrefs_l_address3         
-          ,Buildrefs_l_phone  
-          ,Buildrefs_l_sic
-          ,Buildrefs_l_fein             
-          ,Buildrefs_l_contact          
-          ,Buildrefs_l_url              
-          ,Buildrefs_l_email            
-          ,Buildrefs_l_contact_did      
-          ,Buildrefs_l_contact_ssn      
-          ,Buildrefs_l_source           
-          ,Buildword_cnp_name           
-          ,Buildword_company_url  
+           ,Buildrefs_l_address1         
+           ,Buildrefs_l_address2         
+           ,Buildrefs_l_address3         
+           ,Buildrefs_l_phone  
+           ,Buildrefs_l_sic
+           ,Buildrefs_l_fein             
+           ,Buildrefs_l_contact          
+           ,Buildrefs_l_url              
+           ,Buildrefs_l_email            
+           ,Buildrefs_l_contact_did      
+           ,Buildrefs_l_contact_ssn      
+           ,Buildrefs_l_source           
+           ,Buildword_cnp_name           
+           ,Buildword_company_url  
           ,sequential(
              Buildwheel_city_clean  
             ,Buildwheel_quick_city_clean 

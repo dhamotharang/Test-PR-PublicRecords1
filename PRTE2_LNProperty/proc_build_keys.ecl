@@ -1,7 +1,10 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_LNProperty, doxie;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_LNProperty, doxie, prte, strata, _control, prte2_common, prte2, dops, orbit3;
 
-EXPORT proc_build_keys(string filedate) := FUNCTION
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 
+	is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
+	doDOPS 									:= is_running_in_prod AND NOT skipDOPS;
+		
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_ownership_did2(FALSE),
 		Constants.KeyName_ln_propertyv2 + '@version@::ownership.did',
 		Constants.KeyName_ln_propertyv2 + filedate + '::ownership.did', build_key_ln_propertyv2_ownership_did2);
@@ -99,10 +102,6 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 		Constants.KeyName_ln_propertyv2 + '@version@::search.bdid',
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.bdid', build_key_ln_propertyv2_search_bdid);
 
-
-	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_search_fid_linkids,
-		Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids',
-		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_linkids', build_key_ln_propertyv2_search_fid_linkids);
 
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.Key_LinkIds.Key,
 		Constants.KeyName_ln_propertyv2 + '@version@::search.linkids',
@@ -234,10 +233,6 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.fid_county', 
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_county',
 		move_built_key_ln_propertyv2_search_fid_county);
-
-	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids', 
-		Constants.KeyName_ln_propertyv2 + filedate + '::search.fid_linkids',
-		move_built_key_ln_propertyv2_search_fid_linkids);
 
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_ln_propertyv2 + '@version@::search.linkids', 
 		Constants.KeyName_ln_propertyv2 + filedate + '::search.linkids',
@@ -375,10 +370,6 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 		'Q', 
 		move_qa_key_ln_propertyv2_search_fid_county);
 
-	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_ln_propertyv2 + '@version@::search.fid_linkids', 
-		'Q', 
-		move_qa_key_ln_propertyv2_search_fid_linkids);
-
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_ln_propertyv2 + '@version@::search.linkids', 
 		'Q', 
 		move_qa_key_ln_propertyv2_search_linkids);
@@ -453,7 +444,124 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 	AutoKeyB2.MAC_AcceptSK_to_QA(constants.ak_keyname, mymove,, constants.skip_set) 
 
 	retval := 	sequential(outaction,mymove); 
+	
+//Verifying FCRA Depreciation Keys	
+cnt_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_assessor(false),,,,,,FALSE,
+																								['air_conditioning_code','air_conditioning_type_code','amenities1_code','amenities2_code',
+																									'amenities2_code1','amenities2_code2','amenities2_code3','amenities2_code4','amenities2_code5',
+																									'amenities3_code','amenities4_code','amenities5_code','assessee_name_indicator',
+																									'assessee_phone_number','basement_code','building_area4','building_area4_indicator',
+																									'building_area5','building_area5_indicator','building_area6','building_area6_indicator',
+																									'building_area7','building_area7_indicator','building_class_code','building_condition_code',
+																									'building_quality_code','census_tract','certification_date','comments',
+																									'condo_project_or_building_name','contract_owner','duplicate_apn_multiple_address_id',
+																									'effective_year_built','elevator','exterior_walls_code','extra_features1_area',
+																									'extra_features1_indicator','extra_features2_area','extra_features2_indicator',
+																									'extra_features3_area','extra_features3_indicator','extra_features4_area',
+																									'extra_features4_indicator','fireplace_indicator','fireplace_number','floor_cover_code',
+																									'heating_code','heating_fuel_type_code','interior_walls_code','land_dimensions',
+																									'land_square_footage','legal_assessor_map_ref','legal_block','legal_brief_description',
+																									'legal_city_municipality_township','legal_district','legal_land_lot','legal_land_lot',
+																									'legal_lot_code','legal_lot_code','legal_lot_number','legal_lot_number','legal_phase_number',
+																									'legal_phase_number','legal_sec_twn_rng_mer','legal_sec_twn_rng_mer','legal_section',
+																									'legal_section','legal_subdivision_name','legal_subdivision_name','legal_tract_number',
+																									'legal_tract_number','legal_unit','legal_unit','lot_size_depth_feet','lot_size_frontage_feet',
+																									'mail_care_of_name_indicator','mortgage_lender_type_code','mortgage_loan_amount',
+																									'mortgage_loan_type_code','neighborhood_code','new_record_type_code','no_of_plumbing_fixtures',
+																									'other_buildings1_code','other_buildings2_code','other_buildings3_code',
+																									'other_buildings4_code','other_buildings5_code','other_impr_building_area1',
+																									'other_impr_building_area2','other_impr_building_area3','other_impr_building_area4',
+																									'other_impr_building_area5','other_impr_building1_indicator','other_impr_building2_indicator',
+																									'other_impr_building3_indicator','other_impr_building4_indicator',
+																									'other_impr_building5_indicator','other_rooms_indicator','ownership_type_code',
+																									'parking_no_of_cars','prior_recording_date','prior_transfer_date','proc_date',
+																									'property_address_code','record_type_code','sale_date','school_tax_district2',
+																									'school_tax_district2_indicator','school_tax_district3','school_tax_district3_indicator',
+																									'second_assessee_name_indicator','sewer_code','site_influence1_code','site_influence2_code',
+																									'site_influence3_code','site_influence4_code','site_influence5_code','state_code',
+																									'state_land_use_code','tax_delinquent_year','tax_exemption1_code','tax_exemption2_code',
+																									'tax_exemption3_code','tax_exemption4_code','tax_rate_code_area','timeshare_code',
+																									'topograpy_code','transfer_date','water_code']));
+																									
+	cnt_deed_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_deed(false),,,,,,FALSE,
+																								['addendum_flag','adjustable_rate_index','adjustable_rate_rider','arm_reset_date','assumability_rider','balloon_rider','biweekly_payment_rider',
+																									'change_index','city_transfer_tax','condominium_rider','county_transfer_tax','excise_tax_number','filler_except_hawaii','fixed_step_rate_rider',
+																								 'graduated_payment_rider','hawaii_condo_cpr_code','hawaii_condo_name','hawaii_tct','legal_block','legal_city_municipality_township','legal_district',
+																								 'legal_land_lot','legal_lot_code','legal_lot_number','legal_phase_number','legal_sec_twn_rng_mer','legal_section','legal_subdivision_name',
+																								 'legal_tract_number','legal_unit','lender_address_citystatezip','lender_address_unit_number','lender_dba_aka_name','lender_full_street_address',
+																								 'lender_name_id','loan_term_months','loan_term_years','mailing_address_cd','multi_apn_flag','one_four_family_rider','partial_interest_transferred',
+																								 'planned_unit_development_rider','prepayment_rider','property_address_code','rate_improvement_rider','second_home_rider',
+																								 'second_td_lender_type_code','second_td_loan_amount','seller_addendum_flag','tax_id_number','timeshare_flag','total_transfer_tax']));
+	
+cnt_fcra_assessor_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_assessor(true),,,,,,FALSE,
+																								['air_conditioning_code','air_conditioning_type_code','amenities1_code','amenities2_code',
+																									'amenities2_code1','amenities2_code2','amenities2_code3','amenities2_code4','amenities2_code5',
+																									'amenities3_code','amenities4_code','amenities5_code','assessee_name_indicator',
+																									'assessee_phone_number','basement_code','building_area4','building_area4_indicator',
+																									'building_area5','building_area5_indicator','building_area6','building_area6_indicator',
+																									'building_area7','building_area7_indicator','building_class_code','building_condition_code',
+																									'building_quality_code','census_tract','certification_date','comments',
+																									'condo_project_or_building_name','contract_owner','duplicate_apn_multiple_address_id',
+																									'effective_year_built','elevator','exterior_walls_code','extra_features1_area',
+																									'extra_features1_indicator','extra_features2_area','extra_features2_indicator',
+																									'extra_features3_area','extra_features3_indicator','extra_features4_area',
+																									'extra_features4_indicator','fireplace_indicator','fireplace_number','floor_cover_code',
+																									'heating_code','heating_fuel_type_code','interior_walls_code','land_dimensions',
+																									'land_square_footage','legal_assessor_map_ref','legal_block','legal_brief_description',
+																									'legal_city_municipality_township','legal_district','legal_land_lot','legal_land_lot',
+																									'legal_lot_code','legal_lot_code','legal_lot_number','legal_lot_number','legal_phase_number',
+																									'legal_phase_number','legal_sec_twn_rng_mer','legal_sec_twn_rng_mer','legal_section',
+																									'legal_section','legal_subdivision_name','legal_subdivision_name','legal_tract_number',
+																									'legal_tract_number','legal_unit','legal_unit','lot_size_depth_feet','lot_size_frontage_feet',
+																									'mail_care_of_name_indicator','mortgage_lender_type_code','mortgage_loan_amount',
+																									'mortgage_loan_type_code','neighborhood_code','new_record_type_code','no_of_plumbing_fixtures',
+																									'other_buildings1_code','other_buildings2_code','other_buildings3_code',
+																									'other_buildings4_code','other_buildings5_code','other_impr_building_area1',
+																									'other_impr_building_area2','other_impr_building_area3','other_impr_building_area4',
+																									'other_impr_building_area5','other_impr_building1_indicator','other_impr_building2_indicator',
+																									'other_impr_building3_indicator','other_impr_building4_indicator',
+																									'other_impr_building5_indicator','other_rooms_indicator','ownership_type_code',
+																									'parking_no_of_cars','prior_recording_date','prior_transfer_date','proc_date',
+																									'property_address_code','record_type_code','sale_date','school_tax_district2',
+																									'school_tax_district2_indicator','school_tax_district3','school_tax_district3_indicator',
+																									'second_assessee_name_indicator','sewer_code','site_influence1_code','site_influence2_code',
+																									'site_influence3_code','site_influence4_code','site_influence5_code','state_code',
+																									'state_land_use_code','tax_delinquent_year','tax_exemption1_code','tax_exemption2_code',
+																									'tax_exemption3_code','tax_exemption4_code','tax_rate_code_area','timeshare_code',
+																									'topograpy_code','transfer_date','water_code']));
+																									
+	//DF-21968 Verify followings fields are cleared in thor_data400::key::ln_propertyv2::fcra::qa::deed.fid
+	cnt_fcra_deed_fid := OUTPUT(strata.macf_pops(prte2_lnproperty.keys.key_deed(true),,,,,,FALSE,
+																								['addendum_flag','adjustable_rate_index','adjustable_rate_rider','arm_reset_date','assumability_rider','balloon_rider','biweekly_payment_rider',
+																									'change_index','city_transfer_tax','condominium_rider','county_transfer_tax','excise_tax_number','filler_except_hawaii','fixed_step_rate_rider',
+																								 'graduated_payment_rider','hawaii_condo_cpr_code','hawaii_condo_name','hawaii_tct','legal_block','legal_city_municipality_township','legal_district',
+																								 'legal_land_lot','legal_lot_code','legal_lot_number','legal_phase_number','legal_sec_twn_rng_mer','legal_section','legal_subdivision_name',
+																								 'legal_tract_number','legal_unit','lender_address_citystatezip','lender_address_unit_number','lender_dba_aka_name','lender_full_street_address',
+																								 'lender_name_id','loan_term_months','loan_term_years','mailing_address_cd','multi_apn_flag','one_four_family_rider','partial_interest_transferred',
+																								 'planned_unit_development_rider','prepayment_rider','property_address_code','rate_improvement_rider','second_home_rider',
+																								 'second_td_lender_type_code','second_td_loan_amount','seller_addendum_flag','tax_id_number','timeshare_flag','total_transfer_tax']));
+	
+	
+	//---------- making DOPS optional and only in PROD build -------------------------------													
+		notifyEmail 	 	 			:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 				 			:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 			:= PRTE.UpdateVersion('LNPropertyV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+		updatedops_full	 			:= PRTE.UpdateVersion('LNPropertyV2FullKeys ',filedate,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+		updatedops_fcra  			:= PRTE.UpdateVersion('FCRA_LNPropertyV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
+		updatedops_full_fcra  := PRTE.UpdateVersion('FCRA_LNPropertyV2FullKeys ',filedate,notifyEmail,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
+		
+		PerformUpdateOrNot := IF(doDOPS,parallel(updatedops,updatedops_full, updatedops_fcra,updatedops_full_fcra),NoUpdate);
+		//--------------------------------------------------------------------------------------
 
+	
+	
+	key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                   output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
+
+create_orbit_build := parallel(
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - LNPropertyV2', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - LNPropertyV2', filedate, 'F', true, true, false,  _control.MyInfo.EmailAddressNormal),
+															);	
 	RETURN 		sequential(		
 				build_key_ln_propertyv2fcra_addllegal_fid, 
 				build_key_ln_propertyv2fcra_addlnames_fid, 
@@ -477,7 +585,6 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 				build_key_ln_propertyv2_search_did, 
 				build_key_ln_propertyv2_search_fid, 
 				build_key_ln_propertyv2_search_fid_county, 
-				build_key_ln_propertyv2_search_fid_linkids, 
 				build_key_ln_propertyv2_search_linkids, 
 				build_key_ln_propertyv2_addr_full_v4, 
 				build_key_ln_propertyv2_addr_full_v4_no_fares, 
@@ -489,7 +596,7 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 				build_key_ln_propertyv2_ownership_did2, 
 				build_key_ln_propertyv2_tax_summary, 
 				build_key_ln_propertyv2fcra_addr_full_v4, 
-				build_key_ln_propertyv2fcra_did_ownership_v4, 
+				build_key_ln_propertyv2fcra_did_ownership_v4,
 				move_built_key_ln_propertyv2fcra_addllegal_fid, 
 				move_built_key_ln_propertyv2fcra_addlnames_fid, 
 				move_built_key_ln_propertyv2fcra_addr_search_fid, 
@@ -512,8 +619,7 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 				move_built_key_ln_propertyv2_search_did, 
 				move_built_key_ln_propertyv2_search_fid, 
 				move_built_key_ln_propertyv2_search_fid_county, 
-				move_built_key_ln_propertyv2_search_fid_linkids, 
-				move_built_key_ln_propertyv2_search_linkids, 
+			 	move_built_key_ln_propertyv2_search_linkids, 
 				move_built_key_ln_propertyv2_addr_full_v4, 
 				move_built_key_ln_propertyv2_addr_full_v4_no_fares, 
 				move_built_key_ln_propertyv2_deedzip_avg_sales_price, 
@@ -550,7 +656,6 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 				move_qa_key_ln_propertyv2_search_did, 
 				move_qa_key_ln_propertyv2_search_fid, 
 				move_qa_key_ln_propertyv2_search_fid_county, 
-				move_qa_key_ln_propertyv2_search_fid_linkids, 
 				move_qa_key_ln_propertyv2_search_linkids,
 				move_qa_key_ln_propertyv2_addr_full_v4, 
 				move_qa_key_ln_propertyv2_addr_full_v4_no_fares, 
@@ -562,7 +667,12 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 				move_qa_key_ln_propertyv2_ownership_addr, 
 				move_qa_key_ln_propertyv2_tax_summary, 
 				move_qa_key_ln_propertyv2fcra_addr_full_v4, 
-				move_qa_key_ln_propertyv2fcra_did_ownership_v4	
-				,retval );
+				move_qa_key_ln_propertyv2fcra_did_ownership_v4,	
+				retval,
+				parallel(cnt_assessor_fid, cnt_deed_fid, cnt_fcra_assessor_fid,cnt_fcra_deed_fid),
+				PerformUpdateOrNot,
+				key_validations,
+				create_orbit_build
+				);
 
 END;

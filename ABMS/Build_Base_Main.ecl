@@ -1,4 +1,4 @@
-IMPORT Address, NID, tools, ut, _Validate;
+﻿IMPORT Address, NID, tools, ut, _Validate;
 
 EXPORT Build_Base_Main(STRING 																 pversion,
 											 DATASET(Layouts.Base.Main) 						 inMainBase,
@@ -180,16 +180,14 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 	combinedMainAID := Append_IDs.fAll(combinedMain);
 
  	combinedMain_dist := DISTRIBUTE(combinedMainAID, HASH(biog_number));
-  combinedMain_sort := SORT(combinedMain_dist,
-   														biog_number, (UNSIGNED)address_id, (UNSIGNED)address_occurrence_number,
-   														   (UNSIGNED)contact_occurrence_number, (UNSIGNED)moc_cert_id, record_type,
-   															 -dt_vendor_last_reported, RECORD,
-   														LOCAL);
+  combinedMain_sort := DEDUP(SORT(combinedMain_dist, RECORD, LOCAL), RECORD, LOCAL);
    	
-   	Layouts.Base.Main rollupMain(Layouts.Base.Main L, Layouts.Base.Main R) := TRANSFORM
+   	ABMS.Layouts.Base.Main rollupMain(ABMS.Layouts.Base.Main L, ABMS.Layouts.Base.Main R) := TRANSFORM
       SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
       SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-   		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+			source_rec_id_to_use					:= IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+   		SELF.source_rec_id            := source_rec_id_to_use;
+   		SELF.record_sid		            := source_rec_id_to_use;
    		// If there's a case where the records change gender to U or null, we keep the last known gender.
    		// Regardless, it'll keep the most recent gender that's a definied gender of M or F.
    		SELF.gender										:= IF(L.gender NOT IN ['M', 'F'], R.gender, L.gender);   
@@ -238,9 +236,89 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 	
  	// Add source record id
   ut.MAC_Append_Rcid(baseMainPlusDescriptions, source_rec_id, baseMainPlusSourceRid);
+	
+	baseMainPlusSourceRid_sort	:= dedup(sort(baseMainPlusSourceRid, record, local), record, local);
+	   	
+  baseMain_roll := ROLLUP(baseMainPlusSourceRid_sort,
+   										 rollupMain(LEFT, RIGHT),
+											 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
+   										 moc_cert_id, RECORD,
+											 except
+											 dt_vendor_first_reported
+											,dt_vendor_last_reported
+											,bdid_score
+											,gender
+											,record_type
+											,source_rec_id
+											,ultscore
+											,orgscore
+											,selescore
+											,proxscore
+											,powscore
+											,empscore
+											,dotscore
+											,ultweight
+											,orgweight
+											,seleweight
+											,proxweight
+											,powweight
+											,empweight
+											,dotweight,LOCAL);	
+	
+	// Add global_sid and record_sid for CCPA
+	ABMS.Layouts.Base.Main add_sid(baseMain_roll L) := TRANSFORM
+			SELF.global_sid								:= 23941;
+			SELF.record_sid								:= L.source_rec_id;
+			SELF						 							:= L;
+		END;
+	
+	with_ccpa := project(baseMain_roll, add_sid (left));
+
+	sort_with_ccpa:=dedup(sort(distribute(with_ccpa, hash(biog_number)), record, local), record, local);
+   	
+	ABMS.Layouts.Base.Main rollupLast(ABMS.Layouts.Base.Main L, ABMS.Layouts.Base.Main R) := TRANSFORM
+      SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+      SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			source_rec_id_to_use					:= IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+   		SELF.source_rec_id            := source_rec_id_to_use;
+   		SELF.record_sid		            := source_rec_id_to_use;
+   		// If there's a case where the records change gender to U or null, we keep the last known gender.
+   		// Regardless, it'll keep the most recent gender that's a definied gender of M or F.
+   		SELF.gender										:= IF(L.gender NOT IN ['M', 'F'], R.gender, L.gender);   
+   	  self.record_type							:= if(l.record_type = 'C' or r.record_type = 'C', 'C', 'H');
+			SELF 													:= L;
+	END;
+   	
+	baseMain_last := ROLLUP(sort_with_ccpa,
+   										 rollupLast(LEFT, RIGHT),
+											 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
+   										 moc_cert_id, 
+											 RECORD,
+											 except
+											 dt_vendor_first_reported
+											,dt_vendor_last_reported
+											,bdid_score
+											,gender
+											,record_type
+											,source_rec_id
+											,record_sid
+											,ultscore
+											,orgscore
+											,selescore
+											,proxscore
+											,powscore
+											,empscore
+											,dotscore
+											,ultweight
+											,orgweight
+											,seleweight
+											,proxweight
+											,powweight
+											,empweight
+											,dotweight,LOCAL);
 
 	// Return
-	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMainPlusSourceRid, Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMain_last, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
 			                            Promote(pversion).buildfiles.New2Built);

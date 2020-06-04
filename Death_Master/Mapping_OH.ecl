@@ -13,24 +13,27 @@ TRANSFORM
 	END;
 	clean_address						:=	fnCleanAddressField(pInput.res_addr);
 	clean_city							:=	fnCleanAddressField(pInput.res_city);
+	clean_state             :=  fnCleanAddressField(pInput.res_state);
 	clean_zip								:=	fnCleanAddressField(pInput.res_zip);
 
 	STRING76 orig_address1	:= 	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(clean_address));
 	STRING76 orig_address2	:= 	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(
-																IF(	clean_address<>'' AND clean_zip<>'',
-																		clean_city+', ',
-																		clean_city
-																)+clean_zip
+																IF(	TRIM(clean_city)<>'' AND (clean_state<>'' OR TRIM(clean_zip,LEFT,RIGHT)<>''),
+																		TRIM(clean_city)+', ',
+																		TRIM(clean_city)
+																)+clean_state+' '+TRIM(clean_zip,LEFT,RIGHT)
 															));
-
+	
 	// Convert the DOB and DOD to a common format and calculate AGE
 	fmtsin := [
 		'%m/%d/%Y',
-		'%Y-%m-%d'
+		'%Y-%m-%d',
+		'%m%d%Y'
 	];
 	fmtout									:=	'%Y%m%d';
 	STRING8 	clean_dob 		:=	Std.date.ConvertDateFormatMultiple(pInput.dob,fmtsin,fmtout);
 	STRING8 	clean_dod 		:=	Std.date.ConvertDateFormatMultiple(pInput.dod,fmtsin,fmtout);
+	STRING8 	clean_filed_date		:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.filedate,8,1),fmtsin,fmtout);
 	UNSIGNED1	clean_age 		:=	ut.Age((INTEGER) clean_dob,(INTEGER) clean_dod);		
 
 	SELF.source_state  			:=	'OH';
@@ -47,6 +50,7 @@ TRANSFORM
 	SELF.mname							:=	TRIM(pInput.mname);
 	SELF.lname							:=	TRIM(pInput.lname);
 	SELF.name_suffix  			:=	TRIM(pInput.name_suffix);
+	SELF.filed_date					:=	clean_filed_date;
 	SELF.county_residence 	:= 	IF(pInput.res_county IN ['*'],'',StringLib.StringToUpperCase(TRIM(pInput.res_county)));
 	SELF.orig_address1			:=	TRIM(orig_address1);
 	SELF.orig_address2			:=	TRIM(orig_address2);

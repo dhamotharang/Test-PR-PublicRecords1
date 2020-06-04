@@ -79,6 +79,7 @@ export layouts:= Module
 		string8					date_of_death; 
 		string1					gender;	
 		string6					upin;
+		string1					cpa_optout;
 	end;
 	// Provider Status 
 	//		D  = Provider confirmed deceased (only used when SSN is populated on input)
@@ -476,6 +477,8 @@ export layouts:= Module
 			string9		clean_ssn;
 			string9		best_ssn;
 			BIPV2.IDlayouts.l_xlink_ids;
+			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
+			unsigned8 								record_sid; 
 		end;
 		
 	export license_base	:= RECORD
@@ -640,7 +643,7 @@ export layouts:= Module
 	end;
 
 	export individual_base	:= RECORD
-			individual_input;
+			individual_input - [cpa_optout];
 			src_and_date;
 			UNSIGNED6 did	:= 0;
 			UNSIGNED2 did_score		:= 0;
@@ -704,9 +707,18 @@ export layouts:= Module
 			Sanction_input.sanc1_lic_num;
 			Sanction_input.sanc1_rein_date;
 
-			BIPV2.IDlayouts.l_xlink_ids;
+			BIPV2.IDlayouts.l_xlink_ids;					// pushing opt out flag to dotid to avoid layout change 
+			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
+			unsigned8 								record_sid; 
 	END;
-
+	
+	EXPORT individual_exception_base := record
+			string38        group_key;
+			License_input.lic_state	;
+			License_input.lic_num_in;
+			License_input.lic_num;
+	END;
+			
 	EXPORT autokey_common	:= RECORD
 			individual_base - 
 				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];

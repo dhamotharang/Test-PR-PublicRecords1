@@ -59,6 +59,19 @@ export mod_sources := module
     MDR.sourceTools.SourceIsInfutor_Watercraft(src)   => code.WC_INFUTOR,
 		code.UNRESTRICTED);
 		
+	export unsigned exclusiveSrc2code_Thor(string2 src, boolean isDaytonVlid) := map(
+		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
+		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
+		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
+		MDR.sourceTools.SourceIsExperian_CRDB(src)				=> code.EBR,
+		MDR.sourceTools.SourceIsFBNV2_Experian_Direct(src) => code.EBR,
+		MDR.sourceTools.SourceIsLnPropV2_Fares_Asrs(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
+		MDR.sourceTools.SourceIsLnPropV2_Fares_Deeds(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
+		MDR.sourceTools.SourceIsProperty(src)							=> if(isDaytonVlid, code.PROP_DAYTON, code.PROP_FIDELITY),
+    MDR.sourceTools.SourceIsInfutor_All_Veh(src)      => code.MV_INFUTOR,
+    MDR.sourceTools.SourceIsInfutor_Watercraft(src)   => code.WC_INFUTOR,
+		code.UNRESTRICTED);
+		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
  export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Sources, code2bmap(code.MARKETING_UNRESTRICTED), 0);
@@ -84,22 +97,24 @@ export mod_sources := module
 	
 	export iParams := interface(
 		AutoStandardI.DataRestrictionI.params,
+		AutoStandardI.DataPermissionI.params,  
 		AutoStandardI.PermissionI_Tools.params,
 		AutoStandardI.InterfaceTranslator.ln_branded_value.params)
 	end;
 	
-	export in_mod_values(iParams in_mod, boolean dnbWillMask=false) := module
+	export in_mod_values(iParams in_mod, boolean dnbPermitted=false) := module
 		export DRM				:= AutoStandardI.DataRestrictionI.val(in_mod);
+		export DPM				:= AutoStandardI.DataPermissionI.val(in_mod);
 		export GLB				:= AutoStandardI.PermissionI_Tools.val(in_mod).GLB;
 		export DPPA				:= AutoStandardI.PermissionI_Tools.val(in_mod).DPPA;
 		export AllowAll		:= AutoStandardI.PermissionI_Tools.val(in_mod).AllowAll_value;
 		export LnBranded	:= AutoStandardI.InterfaceTranslator.ln_branded_value.val(in_mod);
-		
+    
 		// Potential issue...
 		// - Is it OK that we're not using DPPA.state_ok? We don't know the source in aggregates like best.
 		export my_bmap 		:= code2bmap_multi(
 			[code.UNRESTRICTED]
-			+ if(AllowAll OR dnbWillMask, [code.DNB], [])
+			+ if((DPM.use_DnB or AllowAll) and dnbPermitted, [code.DNB], [])
 			+ if(~DRM.EBR, [code.EBR], [])
 			+ if(DPPA.ok(DPPA.stored_value), [code.DPPA], [])
 			+ if(~DRM.FARES, [code.PROP_FARES], [])
@@ -110,10 +125,16 @@ export mod_sources := module
 		);
 	end;
 
-	// When caller sets dnbWillMask=true, he must also apply DNB masking to the resulting records!
-	export isPermitted(iParams in_mod, boolean dnbWillMask=false) := module
+	// When DNB is being returned, the caller should also apply masking to the resulting records! 
+  
+	// Before addition of AutoStandardI.DataPermissionsI.useDnB, the 2nd parameter formerly called 
+ // "willMaskDnb" controlled whether or not DnB data was permitted. Those interfaces relying on 
+ // the default value will not be getting DNB regardless of the value of AutoStandardI.DataPermissionsI.useDnB.
+ // Interfaces requiring DnB control through the new AutoStandardI.DataPermissionsI.useDnB will 
+ // need to pass TRUE for the 2nd argument dnbPermitted.
+export isPermitted(iParams in_mod, boolean dnbPermitted=false) := module
 	
-		shared ivals := in_mod_values(in_mod, dnbWillMask);
+		shared ivals := in_mod_values(in_mod, dnbPermitted);
 		
 		// inspired by TopBusiness_Services.Functions
 		export boolean bySource(string2 src, string34 vl_id='',unsigned4 dt_first_seen=0) := function
@@ -123,7 +144,7 @@ export mod_sources := module
       boolean other_restrictions := case(
                                           exclusiveSrc2code(src,vl_id),
                                           code.DPPA						=> ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(src),ivals.DPPA.stored_value,,src),
-                                          code.DNB						=> ivals.AllowAll OR dnbWillMask,
+                                          code.DNB						=> (ivals.DPM.use_DnB OR ivals.AllowAll) and dnbPermitted,
                                           code.EBR						=> ~ivals.DRM.EBR,
                                           code.PROP_FARES			=> ~ivals.DRM.FARES,
                                           code.PROP_FIDELITY	=> ~ivals.DRM.Fidelity,
@@ -142,6 +163,45 @@ export mod_sources := module
 		end;
 		
 	end;
+	
+	export isPermitted_Thor(in_mod, inDs, dnbPermitted) := functionmacro
+          ivals := BIPV2.mod_sources.in_mod_values(in_mod, dnbPermitted);
+
+          PermittedThorRec := record
+               string2 source;
+               boolean isDaytonVlid;
+          end;
+     
+           slimDs     := project(inDs, 
+                                 transform(PermittedThorRec, 
+                                           self := left, 
+                                           self.isDaytonVlid := BIPV2.mod_sources.isDayton_vlid(left.vl_id)
+                                           )
+                                 );
+                      
+           allSources    := dedup(slimDs, source, isDaytonVlid, all, hash);
+           
+           allSourcesPermitted := allSources(
+                                             case(
+                                          BIPV2.mod_sources.exclusiveSrc2code_Thor(source,isDaytonVlid),
+                                          BIPV2.mod_sources.code.DPPA          => ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(source),ivals.DPPA.stored_value,,source),
+                                          BIPV2.mod_sources.code.DNB           => (ivals.DPM.use_DnB OR ivals.AllowAll) and dnbPermitted,
+                                          BIPV2.mod_sources.code.EBR           => ~ivals.DRM.EBR,
+                                          BIPV2.mod_sources.code.PROP_FARES    => ~ivals.DRM.FARES,
+                                          BIPV2.mod_sources.code.PROP_FIDELITY => ~ivals.DRM.Fidelity,
+                                          BIPV2.mod_sources.code.PROP_DAYTON   => ivals.LnBranded AND ~ivals.DRM.Fidelity,
+                                          BIPV2.mod_sources.code.MV_INFUTOR    => ~ivals.DRM.InfutorMV AND ivals.DPPA.ok(ivals.DPPA.stored_value),
+                                          BIPV2.mod_sources.code.WC_INFUTOR    => ~ivals.DRM.InfutorWC AND ivals.DPPA.ok(ivals.DPPA.stored_value),
+                                          true)                                        
+                                            );
+           
+           getPermittedRecs := join(inDs, allSourcesPermitted,
+                                    left.source = right.source and
+                                    BIPV2.mod_sources.isDayton_vlid(left.vl_id) = right.isDaytonVlid,
+                                    transform(left), lookup);
+
+            return getPermittedRecs(ivals.GLB.ok(in_mod.GLBPurpose) OR ivals.GLB.HeaderIsPreGLB(0,dt_first_seen,source));
+     endmacro;
 	
 	// Set a field if it exists -- useful in transforms with indeterminate layouts
 	EXPORT setField(ds,rec,fld,fld_exclude='') := MACRO
@@ -194,8 +254,20 @@ export mod_sources := module
 			BIPV2.mod_sources.setField(ds,L,sele_Proxid);
 			BIPV2.mod_sources.setField(ds,L,parent_Proxid);
 			BIPV2.mod_sources.setField(ds,L,org_Proxid);		
-      BIPv2.mod_sources.setField(ds,L,sources); // this will allow source information to be seen.
-			
+			BIPv2.mod_sources.setField(ds,L,sources); // this will allow source information to be seen.
+   
+			BIPv2.mod_sources.setField(ds,L,company_sic_code1); // retain SIC codes.
+			BIPv2.mod_sources.setField(ds,L,company_sic_code2); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code3); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code4); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code5);
+      
+			BIPv2.mod_sources.setField(ds,L,company_naics_code1); // retain NAICS codes.
+			BIPv2.mod_sources.setField(ds,L,company_naics_code2); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code3); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code4); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code5);
+   
 			BIPV2.mod_sources.setField(ds,L,company_name_data_permits);
 			BIPV2.mod_sources.setField(ds,L,company_name_method);
 			BIPV2.mod_sources.setField(ds,L,company_address_data_permits);
@@ -544,4 +616,50 @@ export mod_sources := module
 	
 	export string1 codeType(string2 code) := srcType(code2src1(code));
 
+
+     // Source Type Functions
+     export isPublicRecordFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsIRS_5500(source) or
+                MDR.sourceTools.SourceIsLiens_v2(source) or
+                MDR.sourceTools.SourceIsDCA(source) or
+                MDR.sourceTools.SourceIsCorpV2(source) or
+                MDR.sourceTools.SourceIsTXBUS(source) or
+                MDR.sourceTools.SourceIsUCCV2(source) or
+                MDR.sourceTools.SourceIsBankruptcy(source) or
+                MDR.sourceTools.SourceIsCredit_Unions(source) or
+                MDR.sourceTools.SourceIsDea(source) or
+                MDR.sourceTools.SourceIsFAA(source) or
+                MDR.sourceTools.SourceIsFDIC(source) or
+                MDR.sourceTools.SourceIsIRS_Non_Profit(source) or
+                MDR.sourceTools.SourceIsVehicle(source) or
+                MDR.sourceTools.SourceIsOSHAIR(source) or
+                MDR.sourceTools.SourceIsLnPropertyV2(source) or
+                MDR.sourceTools.SourceIsCA_Sales_Tax(source) or
+                MDR.sourceTools.SourceIsWC(source) or
+                MDR.sourceTools.SourceIsWorkers_Compensation(source);
+      end;	
+	
+      export isDirectoryFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsFBNV2(source) or
+                source in MDR.sourceTools.set_Business_Registration or
+                MDR.sourceTools.SourceIsFrandx(source) or
+                MDR.sourceTools.SourceIsBBB(source) or
+                MDR.sourceTools.SourceIsCClue(source) or
+                MDR.sourceTools.SourceIsINFOUSA_ABIUS_USABIZ(source) or
+                source in MDR.sourceTools.set_Infutor_NARB;
+      end;	
+ 
+      export isBureauFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsDunn_Bradstreet(source) or
+                MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(source) or
+                MDR.sourceTools.SourceIsEBR(source) or
+                MDR.sourceTools.SourceIsExperian_CRDB(source) or
+                MDR.sourceTools.SourceIsExperian_FEIN(source) or
+                MDR.sourceTools.SourceIsBusiness_Credit(source) or
+                MDR.sourceTools.SourceIsCortera(source);
+      end;
+														
+      export isTelephoneFn(string2 source) := function
+        return MDR.sourceTools.SourceIsYellow_Pages(source);
+      end;
 end;

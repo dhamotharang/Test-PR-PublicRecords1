@@ -1,4 +1,4 @@
-/*
+﻿/*
 	-- mac_LayoutSALTTOOLS30 macro
 	Gives you the layout passed in with the fields from pFieldFilter removed
 	
@@ -101,7 +101,6 @@ functionmacro
 				#END
 			
 			#END
-
 		#END
 	#END
 	

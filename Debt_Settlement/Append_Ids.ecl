@@ -1,4 +1,4 @@
-//Assigns DIDs and BDIDs on the passed records
+﻿//Assigns DIDs and BDIDs on the passed records
 import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,watchdog,Business_HeaderV2;
 
@@ -27,12 +27,12 @@ module
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		// -- Slim record for Diding
+		// Only the recs from RSIH have names, so filter out none RSIH source records
 		//////////////////////////////////////////////////////////////////////////////////////
 		Layouts.Temporary.DidSlim tSlimForDiding(Layouts.Temporary.UniqueId l) :=
-		transform
-			
-			// Only the recs from RSIH have names, so filter out recs with RSIH as the source
-				self.fname				:= if (l.rawfields.source = '',l.clean_attorney_name.fname,SKIP);
+		transform, skip(trim(l.rawfields.source) <> 'RSIH' or trim(l.clean_attorney_name.lname) = '')
+						
+				self.fname				:= l.clean_attorney_name.fname;
 				self.mname				:= l.clean_attorney_name.mname;
 				self.lname				:= l.clean_attorney_name.lname;
 				self.name_suffix	:= l.clean_attorney_name.name_suffix;

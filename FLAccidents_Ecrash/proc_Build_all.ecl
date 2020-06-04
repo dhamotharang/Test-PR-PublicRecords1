@@ -1,21 +1,21 @@
 ﻿//ECrash Morning deployments
 // The following flags to be set to Y
 // isprodready is set to Y and Autopkg is set to Y only on Sunday.
-import RoxieKeybuild,ut,orbit_report,Orbit3,Orbit3Insurance;
+import ut,orbit_report,Orbit3,Orbit3Insurance,dops;
 export Proc_Build_all(string filedate,string morning = 'no',string issunday = 'N'):= function 
-updatedops := map(morning = 'yes' and issunday = 'N' => RoxieKeyBuild.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com',,'N',,'Y'),
-                   morning = 'yes' and issunday = 'Y' => RoxieKeyBuild.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com; BocaRoxiePackageTeam@lexisnexis.com','Y','N',,'Y'),
-									 Sequential(RoxieKeyBuild.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com',,'N'),RoxieKeyBuild.updateversion('EcrashCruDeltaKeys',filedate,'skasavajjala@seisint.com',,'N',,,'A')));
+updatedops := map(morning = 'yes' and issunday = 'N' => dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N',,'Y'),
+                   morning = 'yes' and issunday = 'Y' => dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, BocaRoxiePackageTeam@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com','Y','N',,'Y'),
+									 Sequential(dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N'),dops.updateversion('EcrashCruDeltaKeys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N',,,'A')));
 
 
 
-Email_list := 'Sai.Nagula@lexisnexis.com; hari.velappan@lexisnexis.com; Sudhir.Kasavajjala@lexisnexis.com';
+Email_list := 'Sai.Nagula@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
 
-Spray_ECrash := Sequential(FLAccidents_Ecrash.Spray_In(false)/*, FLAccidents_Ecrash.Spray_In_Iyetek(false)*/): success( Sequential(FileServices.sendemail('DataReceiving@lexisnexis.com; sudhir.kasavajjala@lexisnexis.com; john.freibaum@lexisnexis','ECrash File Status' + filedate, 'Please archive ECrash files on LZ /super_credit/ecrash/build/'+ filedate))), failure(FileServices.sendemail(Email_list, '	ECrash Spray failure', failmessage));
+Spray_ECrash := Sequential(FLAccidents_Ecrash.Spray_In(false)/*, FLAccidents_Ecrash.Spray_In_Iyetek(false)*/): success( Sequential(FileServices.sendemail('DataReceiving@lexisnexis.com, sudhir.kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com','ECrash File Status' + filedate, 'Please archive ECrash files on LZ /super_credit/ecrash/build/'+ filedate))), failure(FileServices.sendemail(Email_list, '	ECrash Spray failure', failmessage));
 
 orbit_report.facc_Stats(getretval); 
 
-string timestamp := ut.gettime() : independent;
+string timestamp := FLAccidents_Ecrash.mod_Utilities.StrSysSeconds : independent;
 
 verify_dops := if ( count(Sample_data.agency_data) <> 0, updatedops,Output('No_DopsUpdate_As_EA_Updates_Not_Processed'));
 

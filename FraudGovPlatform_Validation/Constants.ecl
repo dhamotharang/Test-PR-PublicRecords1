@@ -1,4 +1,4 @@
-﻿import _control;
+﻿﻿import _control;
 export	Constants	:=
 module
 	export	string		LandingZoneServer_prod		:=	_control.IPAddress.bctlpedata10;
@@ -12,19 +12,25 @@ module
 	export	string		DeltaLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 	export	string		DeltaLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 
+	export	string		RDPLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
+	export	string		RDPLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
+
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
 	
 	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	
-	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/prod';
-	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';
+	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in';
+	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in';
 
 	export string		ThorName_Dev					:= 'thor400_dev_eclcc';
-	export string		ThorName_Prod				:= 'thor400_44_eclcc';
+	export string		ThorName_Prod				:= 'thor400_36_eclcc';
 
 	export string		hthor_Dev						:= 'hthor_dev_eclcc';
 	export string		hthor_Prod					:= 'hthor_eclcc';
+	
+	export string		Shell_ThorName_Dev		:= 'thor50_dev_eclcc';
+	export string		Shell_ThorName_Prod		:= 'pound_option_thor_eclcc';
 	
 	export string		ContributoryDirectory_dev	:= '/data/otto/in/';
 	export string		ContributoryDirectory_prod	:= '/data/otto/in/';

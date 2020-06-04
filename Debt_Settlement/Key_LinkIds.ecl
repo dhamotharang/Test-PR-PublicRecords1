@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2, doxie;
 
 EXPORT Key_LinkIds := MODULE
 
@@ -11,8 +11,10 @@ EXPORT Key_LinkIds := MODULE
 	export Key := k;
 
 	//DEFINE THE INDEX ACCESS
+	// Jira# CCPA-358, Modified kfetch as a part of CCPA project.
 	export kFetch(
-		dataset(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+		dataset(BIPV2.IDlayouts.l_xlink_ids) inputs,
+		doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
 		string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																								//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																								//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -20,7 +22,8 @@ EXPORT Key_LinkIds := MODULE
 		) :=
 	FUNCTION
 
-		BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level)
+		BIPV2.IDmacros.mac_IndexFetch(inputs, Key, fetched, Level)
+		Debt_Settlement.mac_check_access(fetched, out, mod_access);
 		return out;																					
 
 	END;

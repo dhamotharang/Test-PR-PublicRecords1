@@ -1,4 +1,4 @@
-﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS, ut;
+﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS, ut, STD;
 
 export SprayMBSFiles(
 	 string pversion
@@ -12,7 +12,7 @@ function
 	pFilenameMBSmarketAppend := '*fdn_market*txt';
 	yesterday_date := (unsigned) ut.date_math(pVersion[1..8], -1);
 	pFilenameMBSFdnCCID := 'mbsi_fdn_accounts_' + (string)yesterday_date + '*';
-	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.csv';
+	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.txt';
 	pGroupName := thorlib.group();
 	pIsTesting := false;
 	pOverwrite :=  true;
@@ -70,7 +70,7 @@ function
 		outAttr := DATASET([
 
 			{pMBSFDNServerIP
-			,pMBSFDNDirectory
+			,pMBSFDNDirectory + '/mbs/prod'
 			,pRemoteFilename
 			,0
 			,pLocalFilename.Template
@@ -102,6 +102,8 @@ function
 		, if(not FraudShared._Flags.FileExists.Input.MBSmarketAppend or pOverwrite , SprayTheFile(FilesToSprayMBSmarketAppend ))
 		, if(not FraudShared._Flags.FileExists.Input.MBSFdnCCID or pOverwrite , SprayTheFile(FilesToSprayMBSFdnCCID ))
 		, if(not FraudShared._Flags.FileExists.Input.MBSFdnHHID or pOverwrite , SprayTheFile(FilesToSprayMBSFdnHHID ))
+		, if(~STD.File.FileExists(FraudShared.Filenames(pversion).Input.MBSFdnHHID.new(pversion)),STD.File.SwapSuperFile(fraudshared.filenames().input.MBSFdnHHID.used,fraudshared.filenames().input.MBSFdnHHID.sprayed))
+		, if(~STD.File.FileExists(FraudShared.Filenames(pversion).Input.MBSmarketAppend.new(pversion)),STD.File.SwapSuperFile(fraudshared.filenames().input.MBSmarketAppend.used,fraudshared.filenames().input.MBSmarketAppend.sprayed))
 		, If(FraudGovPlatform._Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl)
 		);
 

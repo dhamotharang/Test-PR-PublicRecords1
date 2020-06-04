@@ -109,7 +109,7 @@ END;
 
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator(ntype,0,
 						IF(ntype='P',Address.NameTester.genderEx(self._fname,self._mname),''),
-						IF(ntype='P',Length(trim(self._fname))=1,false));
+						true);
 		
 		self := L;
 	END;	
@@ -168,7 +168,7 @@ END;
 				PROJECT(inFile(TRIM(firstname + middlename + lastname)=''),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;
-							self._name_ind := Nid.NameIndicators.Blank;
+							self._name_ind := Nid.NameIndicators.NameTypes.Blank;
 							SELF := LEFT;
 							))
 				: INDEPENDENT;
@@ -194,7 +194,7 @@ END;
 		
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator('P',c,
 					Address.NameTester.GenderEx(SELF._fname,SELF._mname),
-					LENGTH(TRIM(SELF._fname))=1);
+					true);
 				
 		SELF := L;
 	

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT E_Customer FROM KELOtto;
@@ -11,13 +11,13 @@ EXPORT E_Drivers_License := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
-    KEL.typ.nint Otto_Drivers_License_Id_;
+    KEL.typ.nstr Otto_Drivers_License_Id_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),licensenumber(License_Number_:\'\'),state(State_:\'\'),ottodriverslicenseid(Otto_Drivers_License_Id_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),licensenumber(License_Number_:\'\'),state(State_:\'\'),ottodriverslicenseid(Otto_Drivers_License_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -29,7 +29,7 @@ EXPORT E_Drivers_License := MODULE
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Drivers_License::UidLookup',EXPIRE(7));
@@ -38,7 +38,7 @@ EXPORT E_Drivers_License := MODULE
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
   EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),drivers_license(License_Number_:\'\'),drivers_license_state(State_:\'\'),ottodriverslicenseid(Otto_Drivers_License_Id_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),drivers_license(License_Number_:\'\'),drivers_license_state(State_:\'\'),ottodriverslicenseid(Otto_Drivers_License_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Out := RECORD
     RECORDOF(KELOtto.fraudgovshared);
     KEL.typ.uid UID := 0;
@@ -60,7 +60,7 @@ EXPORT E_Drivers_License := MODULE
     KEL.typ.ndataset(Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
-    KEL.typ.nint Otto_Drivers_License_Id_;
+    KEL.typ.nstr Otto_Drivers_License_Id_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;

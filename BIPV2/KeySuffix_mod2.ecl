@@ -80,7 +80,19 @@ end;
 // export constant_ThisBuild_versionDate := '20190401'; // S69 BH-556
 // export constant_ThisBuild_versionDate := '20190401a'; // S69a BH-661
 // export constant_ThisBuild_versionDate := '20190501'; // S70 BH-557
-export constant_ThisBuild_versionDate := '20190601'; // S71 BH-558
+// export constant_ThisBuild_versionDate := '20190601'; // S71 BH-558
+// export constant_ThisBuild_versionDate := '20190701'; // S72 BH-559
+// export constant_ThisBuild_versionDate := '20190801'; // S73 BH-560
+// export constant_ThisBuild_versionDate := '20190904'; // S74 BH-561
+// export constant_ThisBuild_versionDate := '20191002'; // S75 BH-562
+// export constant_ThisBuild_versionDate := '20191104'; // S76 BH-563
+// export constant_ThisBuild_versionDate := '20191127'; // S77 BH-564
+// export constant_ThisBuild_versionDate := '20200108'; // S78 BH-755
+// export constant_ThisBuild_versionDate := '20200203'; // S79 BH-756
+// export constant_ThisBuild_versionDate := '20200303'; // S80 BH-757
+// export constant_ThisBuild_versionDate := '20200403'; // S81 BH-758
+// export constant_ThisBuild_versionDate := '20200501'; // S82 BH-759
+export constant_ThisBuild_versionDate := '20200601'; // S83 BH-760
 
 
 export ds :=
@@ -168,6 +180,19 @@ dataset([
 ,{  69, 'a',  '20190401a', '20190401', '', '',         '',         'RR-15293, DF-25024 , BH-661 -- BIP Build 69a - April 2019'}
 ,{  70, '' ,  '20190501',  '20190501', '', '',         '',         'Ingested S69 base, applied LNK-2666 & LNK-2670 patches, BH-642,BH-637,BH-537,BH-644,BH-616,BH-641,LNK-2667,LNK-2671 . BH-557 -- BIP Build 70 - May 2019'}
 ,{  71, '' ,  '20190601',  '20190601', '', '',         '',         'Ingested S70 base, applied BH-664 patch, BH-495,BH-662, BH-647,BH-643,BH-664,BH-650,BH-659,BH-660,LNK-2261,LNK-2567 . BH-558 -- BIP Build 71 - June 2019'}
+,{  71, 'a',  '20190601a', '20190601', '', '',         '',         'RR-15834  ,BH-639, BH-656,CCPA-634.   BH-678 -- BIP Build 71a - June 2019'}
+,{  72, '' ,  '20190701',  '20190701', '', '',         '',         'Ingested S71 base, applied BH-667 patch, BH-655,BH-656, BH-639,BH-668 . BH-559 -- BIP Build 72 - July 2019'}
+,{  73, '' ,  '20190801',  '20190801', '', '',         '',         'Ingested S72 base, applied BH-677 patch, BH-685,BH-663 . BH-560 -- BIP Build 73 - August 2019'}
+,{  74, '' ,  '20190904',  '20190904', '', '',         '',         'Ingested S73 base. BH-694,BH-686, BH-573 . BH-561 -- BIP Build 74 - September 2019'}
+,{  75, '' ,  '20191002',  '20191002', '', '',         '',         'Ingested S74 base, applied  BH-706 ND Corps Corpkey patching.   BH-714,BH-716,BH-721,BH-688,BH-697,BH-720. BH-562 -- BIP Build 75 - October 2019'}
+,{  76, '' ,  '20191104',  '20191104', '', '',         '',         'Ingested S75 base, applied  BH-727 & BH-738.   BH-655,DF-26308,BH-726,BH-739,BH-715,BH-687. BH-563 -- BIP Build 76 - November 2019'}
+,{  77, '' ,  '20191127',  '20191127', '', '',         '',         'Ingested S76 base, applied  BH-749. KS-4782, BH-687, BH-747,BH-749,BH-753,BH-738  . BH-564 -- BIP Build 77 - December 2019'}
+,{  78, '' ,  '20200108',  '20200108', '', '',         '',         'Ingested S77 base, applied  BH-738 & BH-754. BH-743, BH-789. BH-755 -- BIP Build 78 - January 2020'}
+,{  79, '' ,  '20200203',  '20200203', '', '',         '',         'Ingested S78 base, applied  BH-742 & DF-25635.  BH-756 -- BIP Build 79 - February 2020'}
+,{  80, '' ,  '20200303',  '20200303', '', '',         '',         'Ingested S79 base, applied  BH-819.  BH-757 -- BIP Build 80 - March 2020'}
+,{  81, '' ,  '20200403',  '20200403', '', '',         '',         'Ingested S80 base, BH-758 -- BIP Build 81 - April 2020'}
+,{  82, '' ,  '20200501',  '20200501', '', '',         '',         'Ingested S81 base,applied LNK-4137 ,BH-832, BH-828, BH-759 -- BIP Build 82 - May 2020'}
+,{  83, '' ,  '20200601',  '20200601', '', '',         '',         'Ingested S82 base , BH-823 -- Fix Data Fill Rates of DataCard Report , BH-760 -- BIP Build 83 - June 2020'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

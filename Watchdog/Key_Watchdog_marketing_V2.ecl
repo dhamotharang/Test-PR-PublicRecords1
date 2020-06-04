@@ -1,7 +1,10 @@
-import doxie,data_services; 
-//See key_Prep_Watchdog...
-export Key_Watchdog_marketing_V2 :=	INDEX(file_best_marketing
+﻿import doxie,data_services,Watchdog_V2; 
 
-		,watchdog.Layout_best_flags
-		,Data_services.Data_location.Prefix('Watchdog_Best')
-			+'thor_data400::key::watchdog_marketing_noneq.did_'+doxie.Version_SuperKey);
+Parms := Module(Watchdog_V2.UniversalKeyInterface)
+EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.marketing_preglb;
+END;
+
+export Key_Watchdog_marketing_V2 := Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
+
+
+

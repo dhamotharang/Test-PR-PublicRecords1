@@ -1,4 +1,4 @@
-IMPORT SALT33,ut;
+﻿IMPORT SALT33,ut;
 EXPORT BasicMatch(DATASET(layout_POWID) ih) := MODULE// An extremely tight pre-match designed to quickly eliminate high volume duplicates
  
 SHARED  h00 := Specificities(ih).input_file;
@@ -11,11 +11,17 @@ SHARED  h00 := Specificities(ih).input_file;
     SALT33.UIDType POWID2;
   END;
 // It is important that this is an EQUIVALENCE relationship - it allows us to form an implicit transitive closure
-  h01 := SORT(h00_match,SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip,POWID);
-  h02 := DEDUP(h01,SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip,LOCAL); // ,LOCAL ok - we don't need a perfect dedup - this is an optimization
+  // h01 := SORT(h00_match,SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip,POWID);
+  // h02 := DEDUP(h01,SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip,LOCAL); // ,LOCAL ok - we don't need a perfect dedup - this is an optimization
+
+  h02 := table(h00_match,{SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip,unsigned6 POWID := min(group,powid)}
+                         ,SALT_Partition,RID_If_Big_Biz,company_name,cnp_name,cnp_number,prim_range,prim_name,zip                                   ,merge);
+
+
   Match := JOIN(h02,MatchCands,LEFT.RID_If_Big_Biz = RIGHT.RID_If_Big_Biz AND LEFT.company_name = RIGHT.company_name AND LEFT.cnp_name = RIGHT.cnp_name AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_range = RIGHT.prim_range
        AND LEFT.prim_name = RIGHT.prim_name AND LEFT.zip = RIGHT.zip AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition ) AND LEFT.POWID < RIGHT.POWID,TRANSFORM(Rec,SELF.POWID2 := LEFT.POWID,SELF.POWID1 := RIGHT.POWID), HASH);
-SHARED PickOne := DEDUP( SORT( DISTRIBUTE( Match,HASH(POWID1) ), POWID1, POWID2, LOCAL), POWID1, LOCAL); // Lowest collector ID for each singleton
+// SHARED PickOne := DEDUP( SORT( DISTRIBUTE( Match,HASH(POWID1) ), POWID1, POWID2, LOCAL), POWID1, LOCAL); // Lowest collector ID for each singleton
+SHARED PickOne := table( Match  ,{POWID1  ,unsigned6 POWID2 := min(group,POWID2)}, POWID1, merge);/*HACKBasicMatch02*/ // Lowest collector ID for each singleton
 EXPORT patch_file := PickOne;
   ut.MAC_Patch_Id(h00,POWID,PickOne,POWID1,POWID2,o1); // Patch the input file
 EXPORT input_file := o1 : INDEPENDENT;

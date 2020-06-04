@@ -1,4 +1,4 @@
-import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes;
+﻿import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes;
 
 string1	lNameType_Owner				:=	'1';
 string1	lNameType_Lessor			:=	'2';

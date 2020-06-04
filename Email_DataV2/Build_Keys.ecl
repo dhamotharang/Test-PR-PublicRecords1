@@ -1,13 +1,19 @@
-﻿IMPORT dx_Email, roxiekeybuild, autokey, doxie, strata, dops, DOPSGrowthCheck;
+﻿﻿IMPORT dx_Email, roxiekeybuild, autokey, doxie, strata, dops, DOPSGrowthCheck;
 
 EXPORT Build_Keys (filedate) := FUNCTION
 
 // build index files
-RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Did(),																//index
+RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Did(),																      //index
 																					Email_DataV2.Files.DID_File,															//dataset
 																					'~thor_200::key::email_datav2::@version@::did', 					//superfile 
 																					'~thor_200::key::email_datav2::'+(string)filedate+'::did', //key logical file      
 																					email_data_did_key);
+
+RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_LinkIDs.Key,
+																					 Email_DataV2.Files.Email_Base(ultid <> 0),
+																					 '~thor_200::key::email_datav2::@version@::LinkIDs',
+																					 '~thor_200::key::email_datav2::'+(string)filedate+'::LinkIDs',
+																					 email_data_LinkIDs_key);  
 																					
 RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Email_Address(),
 																					 Email_DataV2.Files.Email_Address_File, 
@@ -33,11 +39,14 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_email_payload(TRUE),
 																					 '~thor_200::key::email_dataV2::fcra::'+(string)filedate + '::payload',
 																					 fcra_payload_key);
 
-
 // Move keys to build
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_200::key::email_datav2::@version@::did'
 																			,'~thor_200::key::email_datav2::'+(string)filedate+'::did'
 																			,mv_email_data_did_key);
+																			
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_200::key::email_datav2::@version@::LinkIDs'
+																			,'~thor_200::key::email_datav2::'+(string)filedate+'::LinkIDs'
+																			,mv_email_data_LinkIDs_key);
 
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_200::key::email_datav2::@version@::email_addresses'
 																			,'~thor_200::key::email_datav2::'+filedate+'::email_addresses'
@@ -54,17 +63,20 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_200::key::email_dataV2::fcra::@vers
 
 // Move keys to QA
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::did', 'Q', mv_email_data_did_key_qa);
+RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::LinkIDs', 'Q', mv_email_data_LinkIDs_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::email_addresses', 'Q', mv_email_data_email_address_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::payload', 'Q', mv_email_data_payload_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::fcra::@version@::did', 'Q', mv_email_data_fcra_did_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::fcra::@version@::payload', 'Q', mv_fcra_payload_key_qa);
 
 build_keys := sequential(email_data_did_key,
+                         email_data_LinkIDs_key,
 												 email_data_email_address_key,
 												 email_data_payload_key,
 												 fcra_did_key,
 												 fcra_payload_key,
 												 mv_email_data_did_key,
+												 mv_email_data_LinkIDs_key,
 												 mv_email_data_email_address_key,
 												 mv_email_data_payload_key,
 												 mv_fcra_did_key,

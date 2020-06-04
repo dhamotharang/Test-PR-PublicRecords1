@@ -8,7 +8,7 @@ fcra_all				:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit);
 //Remove FCRA related information from non-updating sources
 	hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory removeInfo(fcra_filtered l):= transform
 	  self.fcra_offense_key 							:= '';
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
@@ -252,8 +252,12 @@ self.offense_Category := r.offense_category;
 self := l;
 end;
 
-j_arrest_offense := join( arrest_offense, fcra_arrest,
-                    left.arr_off_desc_1 = right.arr_off_desc_1,Joincopycategory2(left,right),skew(0.167693));
+//j_arrest_offense := join( arrest_offense, fcra_arrest,
+//                    left.arr_off_desc_1 = right.arr_off_desc_1,Joincopycategory2(left,right),skew(0.167693));
+
+j_arrest_offense := join(distribute(arrest_offense,HASH32(arr_off_desc_1)), fcra_arrest,
+                        left.arr_off_desc_1 = right.arr_off_desc_1,Joincopycategory2(left,right),lookup);	
+
 										
 fcra_v1_as_v1 :=j_court_offense + j_arrest_offense;
 

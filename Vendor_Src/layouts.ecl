@@ -17,6 +17,7 @@ EXPORT layouts := MODULE
 	
 	EXPORT Bank_Court	:= RECORD
 	  STRING    lncourtcode;
+		STRING    county_text;
 		STRING		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -29,6 +30,7 @@ EXPORT layouts := MODULE
 	
 	EXPORT Lien_Court	:= RECORD
 	  STRING    lncourtcode;
+		STRING    county_text;
 		STRING 		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -97,7 +99,8 @@ EXPORT layouts := MODULE
 
 	EXPORT MergedSrc_Base	:= RECORD
 																				// Bank/Lien Court Match				// Riskview/FFD
-		STRING		item_source;							//  court_code 		(col A)				//	item_source_code			
+		STRING		item_source;							//  court_code 		(col A)				//	item_source_code		
+		STRING    county_text;
 		STRING75	source_code;							//	court_code 		(col A)				//	item_source_code			
 		STRING		display_name;							//	court_name 		(col B)				//	source_name							
 		STRING		description;							//	court_name 		(col B)				//	item_description			
@@ -182,13 +185,26 @@ EXPORT Orbit := RECORD
 		string    unused_contact_email          := ''; // xpath('d[k="723"]/v')};       // Contact Info 
 end;
 
-EXPORT InputRecord := record
-		string   token {xpath('token')}           := Orbit3SOA.GetToken('Prod');
-		integer  offset {xpath('offset')}         := 0;
-		integer  count {xpath('count')}           := 1000000; 
-		string   reportName {xpath('reportName')} := 'Dataset';
-		string   viewType {xpath('viewName')}     := 'FFD No Filters';
-		
-END;
+Export SuccOrFail:=record
+string Result {xpath('d[k="819"]/v')}
+end;
+ InputRecord := record
+		//string   token {xpath('token')}           := Orbit3SOA.GetToken().GetLoginToken();
+		string   reportName {xpath('ReportName')} := 'Dataset';
+		string   viewType {xpath('ViewName')}     := 'FFD No Filters';
+		integer  count {xpath('Count')}           := 1000000;
+		integer  offset {xpath('Offset')}         := 0;
+		end;
+rReceivings := record
+		InputRecord		RecordRequestGetDataViewData	{xpath('RecordRequestGetDataViewData') };
+	end;
+	rorbRequest := record
+		string 				LoginToken											{xpath('Token'),				maxlength(36)}		:=	Orbit3SOA.GetToken().GetLoginToken();
+		rReceivings		OrbRequest											{xpath('Request')};
+	end;
+	Export rRequestCapsule	:= record
+		rorbRequest		Request													{xpath('request')};
+	end;		
+
    			 
 END;

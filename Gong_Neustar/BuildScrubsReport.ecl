@@ -17,7 +17,7 @@ EXPORT BuildScrubsReport(DATASET(gong_neustar.Layout_Neustar) F, string version)
 
 		orbitStats := U.OrbitStats();			// : persist('~persist::gong::scrubs_prt');
 
-		submitStats:=Scrubs.OrbitProfileStats('Scrubs_gong_neustar_in','ScrubsAlerts',orbitStats,version,'Gong').SubmitStats;
+		submitStats:=Scrubs.OrbitProfileStatsPost310('Scrubs_gong_neustar_in','ScrubsAlerts',orbitStats,version,'Gong').SubmitStats;
 
 		return SEQUENTIAL(
 				ErrorSummary,

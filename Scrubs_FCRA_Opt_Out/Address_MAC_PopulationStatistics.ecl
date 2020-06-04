@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT Address_MAC_PopulationStatistics(infile,Ref='',Input_z5 = '',Input_prim_range = '',Input_prim_name = '',Input_sec_range = '',Input_ssn = '',Input_did = '',Input_source_flag = '',Input_julian_date = '',Input_inname_first = '',Input_inname_last = '',Input_address = '',Input_city = '',Input_state = '',Input_zip5 = '',Input_did_score = '',Input_ssn_append = '',Input_permanent_flag = '',Input_opt_back_in = '',Input_date_yyyymmdd = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_FCRA_Opt_Out;
+  IMPORT SALT311,Scrubs_FCRA_Opt_Out;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

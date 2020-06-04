@@ -2,15 +2,21 @@
 
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
+Archive(varstring ilfn) := NOTHOR(IF(STD.File.FindSuperFileSubName($.Superfile_List.sfNCF2,ilfn)=0,
+													STD.File.AddSuperFile($.Superfile_List.sfNCF2,ilfn)));
+/**
+  dataDir			has incoming and ougoing subdirectories
+	maintenance	has spraying, done, error subdirectories
+*/
+EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string maintenance, string version) := function
 
-
-EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string maintenance, string version) := function
-
-		ready    := rootDir+'incoming/';
+		ready    := dataDir + 'incoming/';
 		done     := maintenance+'done/';
 		err      := maintenance+'error/';
 		spraying := maintenance+'spraying/';
-		outgoing := rootDir+'outgoing/';
+		outgoing := dataDir+'outgoing/';
+		
+		
 		
 		ilfn := '~nac::uber::in::'+lfn;
 
@@ -25,7 +31,7 @@ EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string mai
 							 IP
 							,spraying + lfn
 							,,,,
-							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_36_02')
+							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_44')
 							,ilfn
 							,
 							,
@@ -40,14 +46,14 @@ EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string mai
 		
 		processed := $.PreprocessNCF2(ilfn);
 		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
-		reports := $.GetReports(ModifyFileName(ilfn, 'nac2'));
-		err_rate := reports.RejectedCount/reports.TotalRecords;
-		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
+		reports := $.GetReports(processed, lfn);		//ModifyFileName(ilfn, 'nac2'));
+		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
-																,MoveSprayingToError
-																,MoveSprayingToDone
-															);
+												,MoveSprayingToError
+												,MoveSprayingToDone
+											);
+
 		
 		out_NCF_reports := PARALLEL(
 					OUTPUT(reports.dsNcr2,,ModifyFileName(ilfn, 'ncr2'), COMPRESSED, OVERWRITE, named('ncr2')),
@@ -62,25 +68,26 @@ EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string mai
 		end;		
 		
 		doit := sequential(
-											MoveReadyToSpraying
-											,SprayIt										
-											,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
-											,OUTPUT(reports.TotalRecords, named('total_records'))
-											,OUTPUT(reports.ErrorCount, named('Error_Count'))
-											//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
-											//,OUTPUT(err_rate, named('err_rate'))
-											,MoveToTempOrReject
-											,out_NCF_reports
-											,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
-											,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
-											,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
-											,NOTHOR(Std.File.AddSuperFIle($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
-											,despray_NCF_reports('ncx2')
-											,despray_NCF_reports('ncd2')
-											,despray_NCF_reports('ncr2')
-											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
-
-						);
+				MoveReadyToSpraying
+				,SprayIt
+				,Archive(ilfn)
+				,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
+				,OUTPUT(reports.TotalRecords, named('total_records'))
+				,OUTPUT(reports.ErrorCount, named('Error_Count'))
+				//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
+				//,OUTPUT(err_rate, named('err_rate'))
+				,MoveToTempOrReject
+				,out_NCF_reports
+				,IF(EXISTS(reports.dsContacts(errors=0)), fn_ProcessContactRecord(reports.dsContacts(errors=0)))
+				,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
+				,IF(NOT ExcessiveInvalidRecordsFound,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE))
+				//,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
+				,IF(NOT ExcessiveInvalidRecordsFound,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2'))))
+				,despray_NCF_reports('ncx2')
+				,despray_NCF_reports('ncd2')
+				,despray_NCF_reports('ncr2')
+				,$.Send_Email(fn := ModifyFileName(ilfn, 'ncr2'), groupid := lfn[6..9]).FileValidationReport
+				 );
 
 	return doit;
 END;

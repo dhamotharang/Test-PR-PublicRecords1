@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT E_Customer FROM KELOtto;
@@ -11,7 +11,7 @@ EXPORT E_Address := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -44,7 +44,7 @@ EXPORT E_Address := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),addresspobox(_addresspobox_),addresscmra(_addresscmra_),ottoaddressid(Otto_Address_Id_:0),primaryrange(Primary_Range_),predirectional(Predirectional_),primaryname(Primary_Name_),suffix(Suffix_),postdirectional(Postdirectional_),unitdesignation(Unit_Designation_),secondaryrange(Secondary_Range_),postalcity(Postal_City_),vanitycity(Vanity_City_),state(State_),zip(Zip_),zip4(Zip4_),carrierroutenumber(Carrier_Route_Number_),carrierroutesortationatzip(Carrier_Route_Sortation_At_Z_I_P_),lineoftravel(Line_Of_Travel_),lineoftravelorder(Line_Of_Travel_Order_),deliverypointbarcode(Delivery_Point_Barcode_),deliverypointbarcodecheckdigit(Delivery_Point_Barcode_Check_Digit_),typecode(Type_Code_),county(County_),latitude(Latitude_),longitude(Longitude_),metropolitanstatisticalarea(Metropolitan_Statistical_Area_),geoblock(Geo_Block_),geomatch(Geo_Match_),acecleanererrorcode(A_C_E_Cleaner_Error_Code_),isadditional(_is_Additional_),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),addresspobox(_addresspobox_),addresscmra(_addresscmra_),ottoaddressid(Otto_Address_Id_:\'\'),primaryrange(Primary_Range_),predirectional(Predirectional_),primaryname(Primary_Name_),suffix(Suffix_),postdirectional(Postdirectional_),unitdesignation(Unit_Designation_),secondaryrange(Secondary_Range_),postalcity(Postal_City_),vanitycity(Vanity_City_),state(State_),zip(Zip_),zip4(Zip4_),carrierroutenumber(Carrier_Route_Number_),carrierroutesortationatzip(Carrier_Route_Sortation_At_Z_I_P_),lineoftravel(Line_Of_Travel_),lineoftravelorder(Line_Of_Travel_Order_),deliverypointbarcode(Delivery_Point_Barcode_),deliverypointbarcodecheckdigit(Delivery_Point_Barcode_Check_Digit_),typecode(Type_Code_),county(County_),latitude(Latitude_),longitude(Longitude_),metropolitanstatisticalarea(Metropolitan_Statistical_Area_),geoblock(Geo_Block_),geomatch(Geo_Match_),acecleanererrorcode(A_C_E_Cleaner_Error_Code_),isadditional(_is_Additional_),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -56,7 +56,7 @@ EXPORT E_Address := MODULE
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Address::UidLookup',EXPIRE(7));
@@ -65,7 +65,7 @@ EXPORT E_Address := MODULE
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
   EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),addresspobox(_addresspobox_),addresscmra(_addresscmra_),ottoaddressid(Otto_Address_Id_:0),clean_address.prim_range(Primary_Range_),clean_address.predir(Predirectional_),clean_address.prim_name(Primary_Name_),clean_address.addr_suffix(Suffix_),clean_address.postdir(Postdirectional_),clean_address.unit_desig(Unit_Designation_),clean_address.sec_range(Secondary_Range_),clean_address.p_city_name(Postal_City_),clean_address.v_city_name(Vanity_City_),clean_address.st(State_),clean_address.zip(Zip_),clean_address.zip4(Zip4_),clean_address.cart(Carrier_Route_Number_),clean_address.cr_sort_sz(Carrier_Route_Sortation_At_Z_I_P_),clean_address.lot(Line_Of_Travel_),clean_address.lot_order(Line_Of_Travel_Order_),clean_address.dbpc(Delivery_Point_Barcode_),clean_address.chk_digit(Delivery_Point_Barcode_Check_Digit_),clean_address.rec_type(Type_Code_),clean_address.fips_county(County_),clean_address.geo_lat(Latitude_),clean_address.geo_long(Longitude_),clean_address.msa(Metropolitan_Statistical_Area_),clean_address.geo_blk(Geo_Block_),clean_address.geo_match(Geo_Match_),clean_address.err_stat(A_C_E_Cleaner_Error_Code_),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),addresspobox(_addresspobox_),addresscmra(_addresscmra_),ottoaddressid(Otto_Address_Id_:\'\'),clean_address.prim_range(Primary_Range_),clean_address.predir(Predirectional_),clean_address.prim_name(Primary_Name_),clean_address.addr_suffix(Suffix_),clean_address.postdir(Postdirectional_),clean_address.unit_desig(Unit_Designation_),clean_address.sec_range(Secondary_Range_),clean_address.p_city_name(Postal_City_),clean_address.v_city_name(Vanity_City_),clean_address.st(State_),clean_address.zip(Zip_),clean_address.zip4(Zip4_),clean_address.cart(Carrier_Route_Number_),clean_address.cr_sort_sz(Carrier_Route_Sortation_At_Z_I_P_),clean_address.lot(Line_Of_Travel_),clean_address.lot_order(Line_Of_Travel_Order_),clean_address.dbpc(Delivery_Point_Barcode_),clean_address.chk_digit(Delivery_Point_Barcode_Check_Digit_),clean_address.rec_type(Type_Code_),clean_address.fips_county(County_),clean_address.geo_lat(Latitude_),clean_address.geo_long(Longitude_),clean_address.msa(Metropolitan_Statistical_Area_),clean_address.geo_blk(Geo_Block_),clean_address.geo_match(Geo_Match_),clean_address.err_stat(A_C_E_Cleaner_Error_Code_),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF._is_Additional_ := __CN(FALSE);
     SELF := __r;
@@ -91,7 +91,7 @@ EXPORT E_Address := MODULE
     KEL.typ.ndataset(Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;

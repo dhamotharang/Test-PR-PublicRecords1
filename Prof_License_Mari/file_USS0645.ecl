@@ -1,10 +1,13 @@
-// Federal Deposit Insurance Corporation
+﻿// Federal Deposit Insurance Corporation
 IMPORT _control, Prof_License_Mari;
 
 
 EXPORT file_USS0645 := MODULE
-		EXPORT FOIA          := DATASET(Common_Prof_Lic_Mari.SourcesFolder + 'USS0645' + '::' + 'using' + '::' + 'lenders',
+		EXPORT lender          := DATASET(Common_Prof_Lic_Mari.SourcesFolder + 'USS0645' + '::' + 'using' + '::' + 'lender',
 															 Prof_License_Mari.layout_USS0645.COMMON,
-															 CSV(SEPARATOR(','),heading(1),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))); 	 
-
+															 CSV(SEPARATOR(','),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))); 	 
+		EXPORT branch          := DATASET(Common_Prof_Lic_Mari.SourcesFolder + 'USS0645' + '::' + 'using' + '::' + 'branch',
+															 Prof_License_Mari.layout_USS0645.COMMON,
+															 CSV(SEPARATOR(','),quote('"'),TERMINATOR(['\n','\r\n','\n\r']))); 
 END;
+

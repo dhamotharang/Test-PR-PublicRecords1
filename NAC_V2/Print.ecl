@@ -38,7 +38,8 @@ LF := '\n';
 
 EXPORT Print := MODULE
 	export dRow := RECORD
-		string		text;
+		string130		text;
+		string1			eol := LF;
 	END;
 	
 	shared dNcrRow := RECORD
@@ -129,14 +130,18 @@ EXPORT Print := MODULE
 							& Legend;
 				return ds;
 	END;
-	
+	dText := RECORD
+		string			text;
+	END;	
 	export string NCR2_to_Text(string lfn) := FUNCTION
 			dNcr2 := dataset(lfn, dRow, thor);
-			dRow	tText(dRow l, dRow r)	:= 
+			ds := PROJECT(dNcr2, TRANSFORM(dText,
+								self.Text := TRIM(left.Text);));
+			dText	tText(dText l, dText r)	:= 
 				transform
 					self.Text	:=	trim(l.Text) + LF + trim(r.Text);
 				end;
-		toText		:=	rollup(dNcr2, true, tText(left, right));
+		toText		:=	rollup(ds, true, tText(left, right));
 		return toText[1].Text;
 	END;
 		

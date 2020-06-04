@@ -36,12 +36,12 @@ IMPORT ProfileBooster;
 
 #CONSTANT('ExtraPrefix','');      
 
-STRING8   version 	  := '20180915';
+STRING8   version 	  := '20200315';
 string    dali        := 'Prod';
 unsigned1 ProcToRun 	:= 1;
 
 #workunit('name', 'profile booster Copies');
 //#workunit('cluster', 'hthor_eclcc');
 ProfileBooster.Proc_Copy_ProfileBooster_FromAlpha(Version,dali,ProcToRun)
-			: SUCCESS(fileservices.SendEMail(ProfileBooster.Constants.TeamEmailList, 'ProfileBooster Copies Completed- ' + workunit, workunit)),
-	    FAILURE(fileservices.SendEMail(ProfileBooster.Constants.TeamEmailList, 'ProfileBooster Copies Failure- ' + workunit, workunit + '\n' + FAILMESSAGE));
+			: SUCCESS(fileservices.SendEMail(ProfileBooster.Constants.QC_email_target, 'ProfileBooster Copies Completed- ' + workunit, workunit)),
+	          FAILURE(fileservices.SendEMail(ProfileBooster.Constants.QC_email_target, 'ProfileBooster Copies Failure- ' + workunit, workunit + '\n' + FAILMESSAGE));

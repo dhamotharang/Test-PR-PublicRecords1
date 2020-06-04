@@ -1,6 +1,6 @@
-//--------Funtion to transform to old layout and to eliminate duplications
+﻿//--------Funtion to transform to old layout and to eliminate duplications
 import phonesplus;
-export Fn_Transform_to_Old_Layout(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
+export Fn_Transform_to_Old_Layout(dataset(recordof(Phonesplus_v2.Layout_PhonesPlus_Base/*DF-25784*/)) phplus_in) := function
 //----Transform to a v1 layout
 phonesplus.layoutCommonOut t_reformat(phplus_in le) := transform
 eq_src 			 :=  phonesplus_v2.Translation_Codes.fGet_eq_sources_from_bitmap(le.src_all);
@@ -19,8 +19,8 @@ other_src        :=  phonesplus_v2.Translation_Codes.fGet_other_sources_from_bit
 	
 	//self.StateOrigin := '';
 	self.SourceFile 			:= if(other_src <> '', 
-								   Translation_Codes.source_file(other_src[..2]), 
-								   Translation_Codes.source_file('HD'));
+								   PhonesPlus_V2.Translation_Codes.source_file(other_src[..2]), 
+								   PhonesPlus_V2.Translation_Codes.source_file('HD'));
 	self.src				    := if(other_src <> '', '',
 									  if(other_header_src <> '', other_header_src[..2],eq_src));			
 
@@ -33,7 +33,7 @@ other_src        :=  phonesplus_v2.Translation_Codes.fGet_other_sources_from_bit
 	self.HomePhone 				:= '';
 	self.CellPhone 				:= le.npa + le.Phone7;
 	self.ListingType 			:= StringLib.StringFindReplace(le.orig_listing_type[..2], ',', '');
-	self.PublishCode			:= if(Translation_Codes.fFlagIsOn(le.rules, Translation_Codes.rules_bitmap_code('Non-pub')), 'N', '');
+	self.PublishCode			:= if(PhonesPlus_V2.Translation_Codes.fFlagIsOn(le.rules, PhonesPlus_V2.Translation_Codes.rules_bitmap_code('Non-pub')), 'N', '');
 	self.OrigTitle 				:= '';
  	self.RegistrationDate 		:= le.orig_phone_reg_dt;
 	//---using field to store phone type

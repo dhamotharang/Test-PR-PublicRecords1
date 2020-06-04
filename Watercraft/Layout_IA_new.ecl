@@ -1,4 +1,4 @@
-EXPORT Layout_IA_new := 
+﻿EXPORT Layout_IA_new := 
 record
 string3		stateabrev;
 string22	reg_num;
@@ -22,22 +22,22 @@ string2		state;
 string10	zip;
 string50	county;
 string5		fips;
-string9		title_number;
+string10		title_number;
 string8		issue_date;
-string15	Record_status;        
-string9		Reg_Type;              
-string12	Reg_Status;
+string1	Record_status;
+string3   Reg_Status;        
+string2		Reg_Type;              
 string8		Expiration_date;
 string8		Bonding_Date;
-string24	Model;                
-string18	Color;                
-string13	Owner_Type;           
-string10	Customer_ID;          
-string6		Name2;                 
-string39	Cust_Email;           
-string12	Boat_Width;           
-string9		Bw_feet;               
-string11	Bw_inches;     
-string11	Boat_Type;                                
+string20	Model;                
+string19	Color;                
+//string13	Owner_Type;           
+string9	Customer_ID;          
+//string6		Name2;                 
+string38	Cust_Email;           
+//string12	Boat_Width;           
+string2		Bw_feet;               
+string2	Bw_inches;     
+string4	HorsePower;                                
 string2		crlf;         
 end;

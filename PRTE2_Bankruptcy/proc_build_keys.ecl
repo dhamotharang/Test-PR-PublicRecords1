@@ -1,4 +1,4 @@
-IMPORT PRTE, PRTE2_Common, PRTE2_Bankruptcy, roxiekeybuild, ut, autokey, VersionControl, _control;
+﻿IMPORT PRTE, PRTE2_Common, PRTE2_Bankruptcy, roxiekeybuild, ut, autokey, VersionControl, _control, strata;
 
 EXPORT proc_build_keys (string filedate) := FUNCTION
 
@@ -123,13 +123,27 @@ EXPORT proc_build_keys (string filedate) := FUNCTION
 	RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + 'bankruptcyv3::fcra::@version@::case_number','Q', mv_v3_case_number_QA_fcra);
 	RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + 'bankruptcyv3::fcra::@version@::ssn','Q', mv_v3_ssn_QA_fcra);
 	RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + 'bankruptcyv3::fcra::@version@::withdrawnstatus','Q',mv_v3_withdrawnstatus_QA_fcra);
-		
+	
+	
+	//FCRA Depreciation Stats
+		//DF-21108 Verify followings fields are cleared in thor_data400::key::bankruptcyv3::fcra::main::tmsid_qa
+	cnt_fcra_main_tmsid := OUTPUT(strata.macf_pops(prte2_bankruptcy.keys.key_bankruptcyv3_main_tmsid(true),,,,,,FALSE,
+																														['assets','complaint_deadline','confheardate','datereclosed',
+																														 'liabilities','planconfdate']));
+	//DF-21108 Verify followings fields are cleared in thor_data400::key::bankruptcyv3::fcra::search::tmsid_qa
+	cnt_fcra_srch_tmsid := OUTPUT(strata.macf_pops(prte2_bankruptcy.keys.key_bankruptcyv3_search_tmsid(true),,,,,,FALSE,
+																														['delete_flag','holdcase','tax_id']));
+	//DF-21108 Verify followings fields are cleared in thor_data400::key::bankruptcyv3::fcra::search::tmsid_linkids_qa
+	cnt_fcra_srch_tmsid_linkids := OUTPUT(strata.macf_pops(prte2_bankruptcy.keys.key_bankruptcyv3_search_tmsid_linkids(true),,,,,,FALSE,
+																														['delete_flag','holdcase','tax_id']));
+	//DF-21108 Verify followings fields are cleared in thor_data400::key::bankruptcy::autokey::fcra::payload_qa
+	// cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(,,,,,,FALSE,['tax_id']));
 	
 	//---------- making DOPS optional and only in PROD build -------------------------------
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
-	updatedops					:= PRTE.UpdateVersion('BankruptcyV2Keys', filedate, _control.MyInfo.EmailAddressNormal,'B','N','N');
-	updatedops_fcra			:= PRTE.UpdateVersion('FCRA_BankruptcyKeys', filedate, _control.MyInfo.EmailAddressNormal,'B','F','N');
+	updatedops					:= PRTE.UpdateVersion('BankruptcyV2Keys', filedate, _control.MyInfo.EmailAddressNormal, l_inloc:='B',  l_inenvment:='N',l_includeboolean := 'N' );
+	updatedops_fcra			:= PRTE.UpdateVersion('FCRA_BankruptcyKeys', filedate, _control.MyInfo.EmailAddressNormal,l_inloc:='B',  l_inenvment:='F',l_includeboolean := 'N');
 	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
 	
 	build_keys := SEQUENTIAL(
@@ -157,7 +171,8 @@ EXPORT proc_build_keys (string filedate) := FUNCTION
 													//Build Autokeys
 													PRTE2_Bankruptcy.Keys.bld_autokeys(filedate,),
 													PRTE2_Bankruptcy.Keys.bld_autokeys(filedate,TRUE),
-													PerformUpdateOrNot
+													PerformUpdateOrNot,
+													parallel(cnt_fcra_main_tmsid, cnt_fcra_srch_tmsid, cnt_fcra_srch_tmsid_linkids)
 												 );
 RETURN build_keys;
 

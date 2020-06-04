@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT ColValDesc_MAC_PopulationStatistics(infile,Ref='',Input_column_value_desc_id = '',Input_table_column_id = '',Input_desc_value = '',Input_status = '',Input_description = '',OutFile) := MACRO
-  IMPORT SALT39,Scrubs_MBS;
+  IMPORT SALT311,Scrubs_MBS;
   #uniquename(of)
   %of% := RECORD
-    SALT39.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

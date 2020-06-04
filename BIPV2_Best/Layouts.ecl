@@ -9,7 +9,7 @@ import BIPV2;
 EXPORT Layouts := MODULE
 EXPORT In_Base_with_flags := record
 recordof(BIPV2.Files.business_header_building);
-string48 source_for_votes := '';
+string49 source_for_votes := '';
 string1 company_name_flag := '';
 string1 company_fein_flag := '';
 string1 company_phone_flag := '';

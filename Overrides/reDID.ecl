@@ -1,4 +1,4 @@
-import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services;
+﻿import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services;
 EXPORT reDID(string filedate, boolean runondev = false ) := module
 
 	export ReDID_Wrapper(filetype
@@ -8,7 +8,8 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 											,sortfield
 											,usedatalandfiles = 'false'
 											,getretval
-											,replacerecords = 'true') := macro
+											,replacerecords = 'true'
+											,isxml = 'false') := macro
 		
 		#uniquename(basefilename)
 		%basefilename% := if (_Control.ThisEnvironment.Name = 'Prod_Thor'
@@ -23,12 +24,15 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		#uniquename(recordwithvirtual)
 		%recordwithvirtual% := record
 			baselayout;
-			string255  OriginalFileName{virtual(LogicalFileName)};
+			//string255  OriginalFileName{virtual(LogicalFileName)};
 		end;
 
 	
 		#uniquename(l_dataset)
-		%l_dataset% := dataset(regexreplace('@version@',%basefilename%,'qa'),%recordwithvirtual%,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+		%l_dataset% := if (~isxml
+											,dataset(regexreplace('@version@',%basefilename%,'qa'),%recordwithvirtual%,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt)
+											,dataset(regexreplace('@version@',%basefilename%,'qa'),%recordwithvirtual%,xml(trim(Overrides.dictXMLTags(filetype).headtag)+'/'+trim(Overrides.dictXMLTags(filetype).rowtag)),opt)
+											);
 										
 		
 		#uniquename(recordwithphysical)
@@ -37,7 +41,7 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 			unsigned6 olddid := 0;
 			unsigned6 newdid := 0;
 			boolean ischanged := false;
-			string255  OriginalFileName;
+			string255  OriginalFileName := '';
 		end;
 	
 		#uniquename(withfilename)
@@ -107,13 +111,19 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 															sequential
 																(
 																	output(count(%l_dataset%),named(filetype+'_old_count'))
-																	,sequential(
+																	,if (~isxml
+																			,sequential(
 																				output(%tooriginal%,,regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile,filedate),csv(separator('\t'),quote('\"'),terminator('\r\n')),overwrite)
-																				,output(%fulldataset%,,regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile+'_withfilename',filedate),csv(separator('\t'),quote('\"'),terminator('\r\n')),overwrite)
-																			)
+																				//,output(%fulldataset%,,regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile+'_withfilename',filedate),csv(separator('\t'),quote('\"'),terminator('\r\n')),overwrite)
+																				)
+																			,sequential(
+																				output(%tooriginal%,,regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile,filedate),XML(trim(Overrides.dictXMLTags(filetype).rowtag),heading('<'+trim(Overrides.dictXMLTags(filetype).headtag)+'>','</'+trim(Overrides.dictXMLTags(filetype).headtag)+'>')),overwrite)
+																				//,output(%fulldataset%,,regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile+'_withfilename',filedate),XML(trim(Overrides.dictXMLTags(filetype).rowtag),heading('<'+trim(Overrides.dictXMLTags(filetype).headtag)+'>','</'+trim(Overrides.dictXMLTags(filetype).headtag)+'>')),overwrite)
+																				)
+																		)
 																	,%mvretval%
-																	,%mvretvalwithfilename%
-																	,output(count(%fulldataset%),named(filetype+'_new_count'))
+																/*	,%mvretvalwithfilename%*/
+																	,output(count(%tooriginal%),named(filetype+'_new_count'))
 																	),
 															output(regexreplace('@version@',Overrides.getfilename(filetype,environment).basefile,filedate) + ' exists, no action taken')
 															);
@@ -141,12 +151,12 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('flag','fcra',FCRA.Layout_Override_Flag_In,did,flag_file_id,,flagredid,false);
 		ReDID_Wrapper('header','fcra',FCRA.Layout_Override_Header_In, head.did, head.persistent_record_ID,,headerredid);
 		ReDID_Wrapper('pcr','fcra',FCRA.Layout_Override_PCR_In,did,uid,,pcrredid);
-		ReDID_Wrapper('bankrupt_main','fcra',FCRA.layout_main_ffid_v3,did,flag_file_id,,bankrupt_mainredid);
-		ReDID_Wrapper('bankrupt_search','fcra',FCRA.layout_search_ffid_v3,did,flag_file_id,,bankrupt_searchredid);
+		ReDID_Wrapper('bankrupt_main','fcra',FCRA.layout_main_ffid_v3,did,flag_file_id,,bankrupt_mainredid,isxml := true);
+		ReDID_Wrapper('bankrupt_search','fcra',FCRA.layout_search_ffid_v3,did,flag_file_id,,bankrupt_searchredid,isxml := true);
 		ReDID_Wrapper('crim_offender','fcra',fcra.layout_override_crim_offender,did,flag_file_id,,crim_offenderredid);
 		ReDID_Wrapper('offenders','fcra',fcra.key_override_crim.offenders_rec,did,flag_file_id,,offendersredid);
 		ReDID_Wrapper('offenders_plus','fcra',fcra.key_override_crim.offenders_rec,did,flag_file_id,,offenders_plusredid);
-		ReDID_Wrapper('liensv2_party','fcra',FCRA.Layout_Override_Liens_Party_In,did,flag_file_id,,liensv2_partyredid);
+		ReDID_Wrapper('liensv2_party','fcra',FCRA.Layout_Override_Liens_Party_In,did,flag_file_id,,liensv2_partyredid,isxml := true);
 		ReDID_Wrapper('aircraft','fcra',fcra.layout_override_aircraft,did_out,flag_file_id,,aircraftredid);
 		ReDID_Wrapper('watercraft','fcra',fcra.key_override_watercraft.sid_rec,did,flag_file_id,,watercraftredid);
 		ReDID_Wrapper('proflic','fcra',fcra.layout_override_proflic,did,flag_file_id,,proflicredid);
@@ -161,7 +171,7 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('alloy','fcra',FCRA.Layout_Override_Alloy_In,did,flag_file_id,,alloyredid);
 		ReDID_Wrapper('american_student_new','fcra',FCRA.Layout_Override_Student_New_In,did,flag_file_id,,american_student_newredid);
 		ReDID_Wrapper('ibehavior_consumer','fcra',FCRA.key_override_ibehavior.consumer_rec,did,flag_file_id,,ibehaviorredid);
-		//ReDID_Wrapper('aircraft','fcra',FCRA.key_override_faa.aircraft_rec,did_out ,,aircraftredid);
+		///////ReDID_Wrapper('aircraft','fcra',FCRA.key_override_faa.aircraft_rec,did_out ,,aircraftredid);
 		ReDID_Wrapper('pilot_registration','fcra',FCRA.key_override_faa.airmen_rec,did_out ,flag_file_id,,pilotregredid);
 		ReDID_Wrapper('concealed_weapons','fcra',FCRA.key_override_ccw.ccw_rec,did_out ,flag_file_id,,cwredid);
 		ReDID_Wrapper('hunting_fishing','fcra',FCRA.key_override_hunting_fishing.hunt_rec,did_out ,flag_file_id,,hfredid);
@@ -172,7 +182,7 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('ucc_party','fcra',FCRA.key_override_ucc.party_rec,did,flag_file_id,,uccpartyredid);
 		ReDID_Wrapper('consumerstatement_lexid','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,cslexidredid);
 		ReDID_Wrapper('consumerstatement_ssn','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,csssnredid);
-		ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.proflic_mari_rec,did,flag_file_id,,mariredid);
+		ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.Layout_Override_Proflic_Mari,did,flag_file_id,,mariredid);
 		ReDID_Wrapper('thrive','fcra',FCRA.Layout_Override_thrive,did,flag_file_id,,thriveredid);	
 		ReDID_Wrapper('address_data','fcra',AVM_V2.layouts.Layout_Override_AVM_Address,did,flag_file_id,,addressdataredid);	
 		ReDID_Wrapper('did_death','fcra',FCRA.key_override_death_master.Death_rec,did,flag_file_id,,deathredid);

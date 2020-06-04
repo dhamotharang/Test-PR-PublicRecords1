@@ -1,219 +1,219 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 EXPORT Base_hygiene(dataset(Base_layout_AVM) h) := MODULE
  
 //A simple summary record
-EXPORT Summary(SALT38.Str30Type  txt) := FUNCTION
+EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
     populated_history_date_cnt := COUNT(GROUP,h.history_date <> (TYPEOF(h.history_date))'');
     populated_history_date_pcnt := AVE(GROUP,IF(h.history_date = (TYPEOF(h.history_date))'',0,100));
-    maxlength_history_date := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_date)));
-    avelength_history_date := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_date)),h.history_date<>(typeof(h.history_date))'');
+    maxlength_history_date := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_date)));
+    avelength_history_date := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_date)),h.history_date<>(typeof(h.history_date))'');
     populated_ln_fares_id_ta_cnt := COUNT(GROUP,h.ln_fares_id_ta <> (TYPEOF(h.ln_fares_id_ta))'');
     populated_ln_fares_id_ta_pcnt := AVE(GROUP,IF(h.ln_fares_id_ta = (TYPEOF(h.ln_fares_id_ta))'',0,100));
-    maxlength_ln_fares_id_ta := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.ln_fares_id_ta)));
-    avelength_ln_fares_id_ta := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.ln_fares_id_ta)),h.ln_fares_id_ta<>(typeof(h.ln_fares_id_ta))'');
+    maxlength_ln_fares_id_ta := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ln_fares_id_ta)));
+    avelength_ln_fares_id_ta := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ln_fares_id_ta)),h.ln_fares_id_ta<>(typeof(h.ln_fares_id_ta))'');
     populated_ln_fares_id_pi_cnt := COUNT(GROUP,h.ln_fares_id_pi <> (TYPEOF(h.ln_fares_id_pi))'');
     populated_ln_fares_id_pi_pcnt := AVE(GROUP,IF(h.ln_fares_id_pi = (TYPEOF(h.ln_fares_id_pi))'',0,100));
-    maxlength_ln_fares_id_pi := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.ln_fares_id_pi)));
-    avelength_ln_fares_id_pi := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.ln_fares_id_pi)),h.ln_fares_id_pi<>(typeof(h.ln_fares_id_pi))'');
+    maxlength_ln_fares_id_pi := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ln_fares_id_pi)));
+    avelength_ln_fares_id_pi := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ln_fares_id_pi)),h.ln_fares_id_pi<>(typeof(h.ln_fares_id_pi))'');
     populated_unformatted_apn_cnt := COUNT(GROUP,h.unformatted_apn <> (TYPEOF(h.unformatted_apn))'');
     populated_unformatted_apn_pcnt := AVE(GROUP,IF(h.unformatted_apn = (TYPEOF(h.unformatted_apn))'',0,100));
-    maxlength_unformatted_apn := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.unformatted_apn)));
-    avelength_unformatted_apn := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.unformatted_apn)),h.unformatted_apn<>(typeof(h.unformatted_apn))'');
+    maxlength_unformatted_apn := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.unformatted_apn)));
+    avelength_unformatted_apn := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.unformatted_apn)),h.unformatted_apn<>(typeof(h.unformatted_apn))'');
     populated_prim_range_cnt := COUNT(GROUP,h.prim_range <> (TYPEOF(h.prim_range))'');
     populated_prim_range_pcnt := AVE(GROUP,IF(h.prim_range = (TYPEOF(h.prim_range))'',0,100));
-    maxlength_prim_range := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.prim_range)));
-    avelength_prim_range := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.prim_range)),h.prim_range<>(typeof(h.prim_range))'');
+    maxlength_prim_range := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_range)));
+    avelength_prim_range := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_range)),h.prim_range<>(typeof(h.prim_range))'');
     populated_predir_cnt := COUNT(GROUP,h.predir <> (TYPEOF(h.predir))'');
     populated_predir_pcnt := AVE(GROUP,IF(h.predir = (TYPEOF(h.predir))'',0,100));
-    maxlength_predir := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.predir)));
-    avelength_predir := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.predir)),h.predir<>(typeof(h.predir))'');
+    maxlength_predir := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.predir)));
+    avelength_predir := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.predir)),h.predir<>(typeof(h.predir))'');
     populated_prim_name_cnt := COUNT(GROUP,h.prim_name <> (TYPEOF(h.prim_name))'');
     populated_prim_name_pcnt := AVE(GROUP,IF(h.prim_name = (TYPEOF(h.prim_name))'',0,100));
-    maxlength_prim_name := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.prim_name)));
-    avelength_prim_name := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.prim_name)),h.prim_name<>(typeof(h.prim_name))'');
+    maxlength_prim_name := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_name)));
+    avelength_prim_name := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_name)),h.prim_name<>(typeof(h.prim_name))'');
     populated_suffix_cnt := COUNT(GROUP,h.suffix <> (TYPEOF(h.suffix))'');
     populated_suffix_pcnt := AVE(GROUP,IF(h.suffix = (TYPEOF(h.suffix))'',0,100));
-    maxlength_suffix := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.suffix)));
-    avelength_suffix := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.suffix)),h.suffix<>(typeof(h.suffix))'');
+    maxlength_suffix := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.suffix)));
+    avelength_suffix := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.suffix)),h.suffix<>(typeof(h.suffix))'');
     populated_postdir_cnt := COUNT(GROUP,h.postdir <> (TYPEOF(h.postdir))'');
     populated_postdir_pcnt := AVE(GROUP,IF(h.postdir = (TYPEOF(h.postdir))'',0,100));
-    maxlength_postdir := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.postdir)));
-    avelength_postdir := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.postdir)),h.postdir<>(typeof(h.postdir))'');
+    maxlength_postdir := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.postdir)));
+    avelength_postdir := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.postdir)),h.postdir<>(typeof(h.postdir))'');
     populated_unit_desig_cnt := COUNT(GROUP,h.unit_desig <> (TYPEOF(h.unit_desig))'');
     populated_unit_desig_pcnt := AVE(GROUP,IF(h.unit_desig = (TYPEOF(h.unit_desig))'',0,100));
-    maxlength_unit_desig := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.unit_desig)));
-    avelength_unit_desig := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.unit_desig)),h.unit_desig<>(typeof(h.unit_desig))'');
+    maxlength_unit_desig := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.unit_desig)));
+    avelength_unit_desig := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.unit_desig)),h.unit_desig<>(typeof(h.unit_desig))'');
     populated_sec_range_cnt := COUNT(GROUP,h.sec_range <> (TYPEOF(h.sec_range))'');
     populated_sec_range_pcnt := AVE(GROUP,IF(h.sec_range = (TYPEOF(h.sec_range))'',0,100));
-    maxlength_sec_range := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.sec_range)));
-    avelength_sec_range := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.sec_range)),h.sec_range<>(typeof(h.sec_range))'');
+    maxlength_sec_range := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sec_range)));
+    avelength_sec_range := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sec_range)),h.sec_range<>(typeof(h.sec_range))'');
     populated_p_city_name_cnt := COUNT(GROUP,h.p_city_name <> (TYPEOF(h.p_city_name))'');
     populated_p_city_name_pcnt := AVE(GROUP,IF(h.p_city_name = (TYPEOF(h.p_city_name))'',0,100));
-    maxlength_p_city_name := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.p_city_name)));
-    avelength_p_city_name := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.p_city_name)),h.p_city_name<>(typeof(h.p_city_name))'');
+    maxlength_p_city_name := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.p_city_name)));
+    avelength_p_city_name := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.p_city_name)),h.p_city_name<>(typeof(h.p_city_name))'');
     populated_st_cnt := COUNT(GROUP,h.st <> (TYPEOF(h.st))'');
     populated_st_pcnt := AVE(GROUP,IF(h.st = (TYPEOF(h.st))'',0,100));
-    maxlength_st := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.st)));
-    avelength_st := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.st)),h.st<>(typeof(h.st))'');
+    maxlength_st := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.st)));
+    avelength_st := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.st)),h.st<>(typeof(h.st))'');
     populated_zip_cnt := COUNT(GROUP,h.zip <> (TYPEOF(h.zip))'');
     populated_zip_pcnt := AVE(GROUP,IF(h.zip = (TYPEOF(h.zip))'',0,100));
-    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.zip)));
-    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
+    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)));
+    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
     populated_zip4_cnt := COUNT(GROUP,h.zip4 <> (TYPEOF(h.zip4))'');
     populated_zip4_pcnt := AVE(GROUP,IF(h.zip4 = (TYPEOF(h.zip4))'',0,100));
-    maxlength_zip4 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.zip4)));
-    avelength_zip4 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.zip4)),h.zip4<>(typeof(h.zip4))'');
+    maxlength_zip4 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip4)));
+    avelength_zip4 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip4)),h.zip4<>(typeof(h.zip4))'');
     populated_lat_cnt := COUNT(GROUP,h.lat <> (TYPEOF(h.lat))'');
     populated_lat_pcnt := AVE(GROUP,IF(h.lat = (TYPEOF(h.lat))'',0,100));
-    maxlength_lat := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.lat)));
-    avelength_lat := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.lat)),h.lat<>(typeof(h.lat))'');
+    maxlength_lat := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.lat)));
+    avelength_lat := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.lat)),h.lat<>(typeof(h.lat))'');
     populated_long_cnt := COUNT(GROUP,h.long <> (TYPEOF(h.long))'');
     populated_long_pcnt := AVE(GROUP,IF(h.long = (TYPEOF(h.long))'',0,100));
-    maxlength_long := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.long)));
-    avelength_long := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.long)),h.long<>(typeof(h.long))'');
+    maxlength_long := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.long)));
+    avelength_long := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.long)),h.long<>(typeof(h.long))'');
     populated_geo_blk_cnt := COUNT(GROUP,h.geo_blk <> (TYPEOF(h.geo_blk))'');
     populated_geo_blk_pcnt := AVE(GROUP,IF(h.geo_blk = (TYPEOF(h.geo_blk))'',0,100));
-    maxlength_geo_blk := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.geo_blk)));
-    avelength_geo_blk := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.geo_blk)),h.geo_blk<>(typeof(h.geo_blk))'');
+    maxlength_geo_blk := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.geo_blk)));
+    avelength_geo_blk := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.geo_blk)),h.geo_blk<>(typeof(h.geo_blk))'');
     populated_fips_code_cnt := COUNT(GROUP,h.fips_code <> (TYPEOF(h.fips_code))'');
     populated_fips_code_pcnt := AVE(GROUP,IF(h.fips_code = (TYPEOF(h.fips_code))'',0,100));
-    maxlength_fips_code := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.fips_code)));
-    avelength_fips_code := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.fips_code)),h.fips_code<>(typeof(h.fips_code))'');
+    maxlength_fips_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fips_code)));
+    avelength_fips_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fips_code)),h.fips_code<>(typeof(h.fips_code))'');
     populated_land_use_cnt := COUNT(GROUP,h.land_use <> (TYPEOF(h.land_use))'');
     populated_land_use_pcnt := AVE(GROUP,IF(h.land_use = (TYPEOF(h.land_use))'',0,100));
-    maxlength_land_use := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.land_use)));
-    avelength_land_use := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.land_use)),h.land_use<>(typeof(h.land_use))'');
+    maxlength_land_use := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.land_use)));
+    avelength_land_use := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.land_use)),h.land_use<>(typeof(h.land_use))'');
     populated_recording_date_cnt := COUNT(GROUP,h.recording_date <> (TYPEOF(h.recording_date))'');
     populated_recording_date_pcnt := AVE(GROUP,IF(h.recording_date = (TYPEOF(h.recording_date))'',0,100));
-    maxlength_recording_date := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.recording_date)));
-    avelength_recording_date := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.recording_date)),h.recording_date<>(typeof(h.recording_date))'');
+    maxlength_recording_date := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.recording_date)));
+    avelength_recording_date := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.recording_date)),h.recording_date<>(typeof(h.recording_date))'');
     populated_assessed_value_year_cnt := COUNT(GROUP,h.assessed_value_year <> (TYPEOF(h.assessed_value_year))'');
     populated_assessed_value_year_pcnt := AVE(GROUP,IF(h.assessed_value_year = (TYPEOF(h.assessed_value_year))'',0,100));
-    maxlength_assessed_value_year := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.assessed_value_year)));
-    avelength_assessed_value_year := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.assessed_value_year)),h.assessed_value_year<>(typeof(h.assessed_value_year))'');
+    maxlength_assessed_value_year := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.assessed_value_year)));
+    avelength_assessed_value_year := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.assessed_value_year)),h.assessed_value_year<>(typeof(h.assessed_value_year))'');
     populated_sales_price_cnt := COUNT(GROUP,h.sales_price <> (TYPEOF(h.sales_price))'');
     populated_sales_price_pcnt := AVE(GROUP,IF(h.sales_price = (TYPEOF(h.sales_price))'',0,100));
-    maxlength_sales_price := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.sales_price)));
-    avelength_sales_price := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.sales_price)),h.sales_price<>(typeof(h.sales_price))'');
+    maxlength_sales_price := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sales_price)));
+    avelength_sales_price := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sales_price)),h.sales_price<>(typeof(h.sales_price))'');
     populated_assessed_total_value_cnt := COUNT(GROUP,h.assessed_total_value <> (TYPEOF(h.assessed_total_value))'');
     populated_assessed_total_value_pcnt := AVE(GROUP,IF(h.assessed_total_value = (TYPEOF(h.assessed_total_value))'',0,100));
-    maxlength_assessed_total_value := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.assessed_total_value)));
-    avelength_assessed_total_value := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.assessed_total_value)),h.assessed_total_value<>(typeof(h.assessed_total_value))'');
+    maxlength_assessed_total_value := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.assessed_total_value)));
+    avelength_assessed_total_value := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.assessed_total_value)),h.assessed_total_value<>(typeof(h.assessed_total_value))'');
     populated_market_total_value_cnt := COUNT(GROUP,h.market_total_value <> (TYPEOF(h.market_total_value))'');
     populated_market_total_value_pcnt := AVE(GROUP,IF(h.market_total_value = (TYPEOF(h.market_total_value))'',0,100));
-    maxlength_market_total_value := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.market_total_value)));
-    avelength_market_total_value := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.market_total_value)),h.market_total_value<>(typeof(h.market_total_value))'');
+    maxlength_market_total_value := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.market_total_value)));
+    avelength_market_total_value := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.market_total_value)),h.market_total_value<>(typeof(h.market_total_value))'');
     populated_tax_assessment_valuation_cnt := COUNT(GROUP,h.tax_assessment_valuation <> (TYPEOF(h.tax_assessment_valuation))'');
     populated_tax_assessment_valuation_pcnt := AVE(GROUP,IF(h.tax_assessment_valuation = (TYPEOF(h.tax_assessment_valuation))'',0,100));
-    maxlength_tax_assessment_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.tax_assessment_valuation)));
-    avelength_tax_assessment_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.tax_assessment_valuation)),h.tax_assessment_valuation<>(typeof(h.tax_assessment_valuation))'');
+    maxlength_tax_assessment_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.tax_assessment_valuation)));
+    avelength_tax_assessment_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.tax_assessment_valuation)),h.tax_assessment_valuation<>(typeof(h.tax_assessment_valuation))'');
     populated_price_index_valuation_cnt := COUNT(GROUP,h.price_index_valuation <> (TYPEOF(h.price_index_valuation))'');
     populated_price_index_valuation_pcnt := AVE(GROUP,IF(h.price_index_valuation = (TYPEOF(h.price_index_valuation))'',0,100));
-    maxlength_price_index_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.price_index_valuation)));
-    avelength_price_index_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.price_index_valuation)),h.price_index_valuation<>(typeof(h.price_index_valuation))'');
+    maxlength_price_index_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.price_index_valuation)));
+    avelength_price_index_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.price_index_valuation)),h.price_index_valuation<>(typeof(h.price_index_valuation))'');
     populated_hedonic_valuation_cnt := COUNT(GROUP,h.hedonic_valuation <> (TYPEOF(h.hedonic_valuation))'');
     populated_hedonic_valuation_pcnt := AVE(GROUP,IF(h.hedonic_valuation = (TYPEOF(h.hedonic_valuation))'',0,100));
-    maxlength_hedonic_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.hedonic_valuation)));
-    avelength_hedonic_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.hedonic_valuation)),h.hedonic_valuation<>(typeof(h.hedonic_valuation))'');
+    maxlength_hedonic_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.hedonic_valuation)));
+    avelength_hedonic_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.hedonic_valuation)),h.hedonic_valuation<>(typeof(h.hedonic_valuation))'');
     populated_automated_valuation_cnt := COUNT(GROUP,h.automated_valuation <> (TYPEOF(h.automated_valuation))'');
     populated_automated_valuation_pcnt := AVE(GROUP,IF(h.automated_valuation = (TYPEOF(h.automated_valuation))'',0,100));
-    maxlength_automated_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.automated_valuation)));
-    avelength_automated_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.automated_valuation)),h.automated_valuation<>(typeof(h.automated_valuation))'');
+    maxlength_automated_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.automated_valuation)));
+    avelength_automated_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.automated_valuation)),h.automated_valuation<>(typeof(h.automated_valuation))'');
     populated_confidence_score_cnt := COUNT(GROUP,h.confidence_score <> (TYPEOF(h.confidence_score))'');
     populated_confidence_score_pcnt := AVE(GROUP,IF(h.confidence_score = (TYPEOF(h.confidence_score))'',0,100));
-    maxlength_confidence_score := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.confidence_score)));
-    avelength_confidence_score := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.confidence_score)),h.confidence_score<>(typeof(h.confidence_score))'');
+    maxlength_confidence_score := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.confidence_score)));
+    avelength_confidence_score := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.confidence_score)),h.confidence_score<>(typeof(h.confidence_score))'');
     populated_comp1_cnt := COUNT(GROUP,h.comp1 <> (TYPEOF(h.comp1))'');
     populated_comp1_pcnt := AVE(GROUP,IF(h.comp1 = (TYPEOF(h.comp1))'',0,100));
-    maxlength_comp1 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp1)));
-    avelength_comp1 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp1)),h.comp1<>(typeof(h.comp1))'');
+    maxlength_comp1 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp1)));
+    avelength_comp1 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp1)),h.comp1<>(typeof(h.comp1))'');
     populated_comp2_cnt := COUNT(GROUP,h.comp2 <> (TYPEOF(h.comp2))'');
     populated_comp2_pcnt := AVE(GROUP,IF(h.comp2 = (TYPEOF(h.comp2))'',0,100));
-    maxlength_comp2 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp2)));
-    avelength_comp2 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp2)),h.comp2<>(typeof(h.comp2))'');
+    maxlength_comp2 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp2)));
+    avelength_comp2 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp2)),h.comp2<>(typeof(h.comp2))'');
     populated_comp3_cnt := COUNT(GROUP,h.comp3 <> (TYPEOF(h.comp3))'');
     populated_comp3_pcnt := AVE(GROUP,IF(h.comp3 = (TYPEOF(h.comp3))'',0,100));
-    maxlength_comp3 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp3)));
-    avelength_comp3 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp3)),h.comp3<>(typeof(h.comp3))'');
+    maxlength_comp3 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp3)));
+    avelength_comp3 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp3)),h.comp3<>(typeof(h.comp3))'');
     populated_comp4_cnt := COUNT(GROUP,h.comp4 <> (TYPEOF(h.comp4))'');
     populated_comp4_pcnt := AVE(GROUP,IF(h.comp4 = (TYPEOF(h.comp4))'',0,100));
-    maxlength_comp4 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp4)));
-    avelength_comp4 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp4)),h.comp4<>(typeof(h.comp4))'');
+    maxlength_comp4 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp4)));
+    avelength_comp4 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp4)),h.comp4<>(typeof(h.comp4))'');
     populated_comp5_cnt := COUNT(GROUP,h.comp5 <> (TYPEOF(h.comp5))'');
     populated_comp5_pcnt := AVE(GROUP,IF(h.comp5 = (TYPEOF(h.comp5))'',0,100));
-    maxlength_comp5 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp5)));
-    avelength_comp5 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.comp5)),h.comp5<>(typeof(h.comp5))'');
+    maxlength_comp5 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp5)));
+    avelength_comp5 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.comp5)),h.comp5<>(typeof(h.comp5))'');
     populated_nearby1_cnt := COUNT(GROUP,h.nearby1 <> (TYPEOF(h.nearby1))'');
     populated_nearby1_pcnt := AVE(GROUP,IF(h.nearby1 = (TYPEOF(h.nearby1))'',0,100));
-    maxlength_nearby1 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby1)));
-    avelength_nearby1 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby1)),h.nearby1<>(typeof(h.nearby1))'');
+    maxlength_nearby1 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby1)));
+    avelength_nearby1 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby1)),h.nearby1<>(typeof(h.nearby1))'');
     populated_nearby2_cnt := COUNT(GROUP,h.nearby2 <> (TYPEOF(h.nearby2))'');
     populated_nearby2_pcnt := AVE(GROUP,IF(h.nearby2 = (TYPEOF(h.nearby2))'',0,100));
-    maxlength_nearby2 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby2)));
-    avelength_nearby2 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby2)),h.nearby2<>(typeof(h.nearby2))'');
+    maxlength_nearby2 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby2)));
+    avelength_nearby2 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby2)),h.nearby2<>(typeof(h.nearby2))'');
     populated_nearby3_cnt := COUNT(GROUP,h.nearby3 <> (TYPEOF(h.nearby3))'');
     populated_nearby3_pcnt := AVE(GROUP,IF(h.nearby3 = (TYPEOF(h.nearby3))'',0,100));
-    maxlength_nearby3 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby3)));
-    avelength_nearby3 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby3)),h.nearby3<>(typeof(h.nearby3))'');
+    maxlength_nearby3 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby3)));
+    avelength_nearby3 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby3)),h.nearby3<>(typeof(h.nearby3))'');
     populated_nearby4_cnt := COUNT(GROUP,h.nearby4 <> (TYPEOF(h.nearby4))'');
     populated_nearby4_pcnt := AVE(GROUP,IF(h.nearby4 = (TYPEOF(h.nearby4))'',0,100));
-    maxlength_nearby4 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby4)));
-    avelength_nearby4 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby4)),h.nearby4<>(typeof(h.nearby4))'');
+    maxlength_nearby4 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby4)));
+    avelength_nearby4 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby4)),h.nearby4<>(typeof(h.nearby4))'');
     populated_nearby5_cnt := COUNT(GROUP,h.nearby5 <> (TYPEOF(h.nearby5))'');
     populated_nearby5_pcnt := AVE(GROUP,IF(h.nearby5 = (TYPEOF(h.nearby5))'',0,100));
-    maxlength_nearby5 := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby5)));
-    avelength_nearby5 := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.nearby5)),h.nearby5<>(typeof(h.nearby5))'');
+    maxlength_nearby5 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby5)));
+    avelength_nearby5 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nearby5)),h.nearby5<>(typeof(h.nearby5))'');
     populated_history_history_date_cnt := COUNT(GROUP,h.history_history_date <> (TYPEOF(h.history_history_date))'');
     populated_history_history_date_pcnt := AVE(GROUP,IF(h.history_history_date = (TYPEOF(h.history_history_date))'',0,100));
-    maxlength_history_history_date := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_history_date)));
-    avelength_history_history_date := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_history_date)),h.history_history_date<>(typeof(h.history_history_date))'');
+    maxlength_history_history_date := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_history_date)));
+    avelength_history_history_date := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_history_date)),h.history_history_date<>(typeof(h.history_history_date))'');
     populated_history_land_use_cnt := COUNT(GROUP,h.history_land_use <> (TYPEOF(h.history_land_use))'');
     populated_history_land_use_pcnt := AVE(GROUP,IF(h.history_land_use = (TYPEOF(h.history_land_use))'',0,100));
-    maxlength_history_land_use := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_land_use)));
-    avelength_history_land_use := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_land_use)),h.history_land_use<>(typeof(h.history_land_use))'');
+    maxlength_history_land_use := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_land_use)));
+    avelength_history_land_use := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_land_use)),h.history_land_use<>(typeof(h.history_land_use))'');
     populated_history_recording_date_cnt := COUNT(GROUP,h.history_recording_date <> (TYPEOF(h.history_recording_date))'');
     populated_history_recording_date_pcnt := AVE(GROUP,IF(h.history_recording_date = (TYPEOF(h.history_recording_date))'',0,100));
-    maxlength_history_recording_date := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_recording_date)));
-    avelength_history_recording_date := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_recording_date)),h.history_recording_date<>(typeof(h.history_recording_date))'');
+    maxlength_history_recording_date := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_recording_date)));
+    avelength_history_recording_date := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_recording_date)),h.history_recording_date<>(typeof(h.history_recording_date))'');
     populated_history_assessed_value_year_cnt := COUNT(GROUP,h.history_assessed_value_year <> (TYPEOF(h.history_assessed_value_year))'');
     populated_history_assessed_value_year_pcnt := AVE(GROUP,IF(h.history_assessed_value_year = (TYPEOF(h.history_assessed_value_year))'',0,100));
-    maxlength_history_assessed_value_year := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_assessed_value_year)));
-    avelength_history_assessed_value_year := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_assessed_value_year)),h.history_assessed_value_year<>(typeof(h.history_assessed_value_year))'');
+    maxlength_history_assessed_value_year := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_assessed_value_year)));
+    avelength_history_assessed_value_year := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_assessed_value_year)),h.history_assessed_value_year<>(typeof(h.history_assessed_value_year))'');
     populated_history_sales_price_cnt := COUNT(GROUP,h.history_sales_price <> (TYPEOF(h.history_sales_price))'');
     populated_history_sales_price_pcnt := AVE(GROUP,IF(h.history_sales_price = (TYPEOF(h.history_sales_price))'',0,100));
-    maxlength_history_sales_price := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_sales_price)));
-    avelength_history_sales_price := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_sales_price)),h.history_sales_price<>(typeof(h.history_sales_price))'');
+    maxlength_history_sales_price := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_sales_price)));
+    avelength_history_sales_price := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_sales_price)),h.history_sales_price<>(typeof(h.history_sales_price))'');
     populated_history_assessed_total_value_cnt := COUNT(GROUP,h.history_assessed_total_value <> (TYPEOF(h.history_assessed_total_value))'');
     populated_history_assessed_total_value_pcnt := AVE(GROUP,IF(h.history_assessed_total_value = (TYPEOF(h.history_assessed_total_value))'',0,100));
-    maxlength_history_assessed_total_value := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_assessed_total_value)));
-    avelength_history_assessed_total_value := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_assessed_total_value)),h.history_assessed_total_value<>(typeof(h.history_assessed_total_value))'');
+    maxlength_history_assessed_total_value := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_assessed_total_value)));
+    avelength_history_assessed_total_value := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_assessed_total_value)),h.history_assessed_total_value<>(typeof(h.history_assessed_total_value))'');
     populated_history_market_total_value_cnt := COUNT(GROUP,h.history_market_total_value <> (TYPEOF(h.history_market_total_value))'');
     populated_history_market_total_value_pcnt := AVE(GROUP,IF(h.history_market_total_value = (TYPEOF(h.history_market_total_value))'',0,100));
-    maxlength_history_market_total_value := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_market_total_value)));
-    avelength_history_market_total_value := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_market_total_value)),h.history_market_total_value<>(typeof(h.history_market_total_value))'');
+    maxlength_history_market_total_value := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_market_total_value)));
+    avelength_history_market_total_value := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_market_total_value)),h.history_market_total_value<>(typeof(h.history_market_total_value))'');
     populated_history_tax_assessment_valuation_cnt := COUNT(GROUP,h.history_tax_assessment_valuation <> (TYPEOF(h.history_tax_assessment_valuation))'');
     populated_history_tax_assessment_valuation_pcnt := AVE(GROUP,IF(h.history_tax_assessment_valuation = (TYPEOF(h.history_tax_assessment_valuation))'',0,100));
-    maxlength_history_tax_assessment_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_tax_assessment_valuation)));
-    avelength_history_tax_assessment_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_tax_assessment_valuation)),h.history_tax_assessment_valuation<>(typeof(h.history_tax_assessment_valuation))'');
+    maxlength_history_tax_assessment_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_tax_assessment_valuation)));
+    avelength_history_tax_assessment_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_tax_assessment_valuation)),h.history_tax_assessment_valuation<>(typeof(h.history_tax_assessment_valuation))'');
     populated_history_price_index_valuation_cnt := COUNT(GROUP,h.history_price_index_valuation <> (TYPEOF(h.history_price_index_valuation))'');
     populated_history_price_index_valuation_pcnt := AVE(GROUP,IF(h.history_price_index_valuation = (TYPEOF(h.history_price_index_valuation))'',0,100));
-    maxlength_history_price_index_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_price_index_valuation)));
-    avelength_history_price_index_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_price_index_valuation)),h.history_price_index_valuation<>(typeof(h.history_price_index_valuation))'');
+    maxlength_history_price_index_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_price_index_valuation)));
+    avelength_history_price_index_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_price_index_valuation)),h.history_price_index_valuation<>(typeof(h.history_price_index_valuation))'');
     populated_history_hedonic_valuation_cnt := COUNT(GROUP,h.history_hedonic_valuation <> (TYPEOF(h.history_hedonic_valuation))'');
     populated_history_hedonic_valuation_pcnt := AVE(GROUP,IF(h.history_hedonic_valuation = (TYPEOF(h.history_hedonic_valuation))'',0,100));
-    maxlength_history_hedonic_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_hedonic_valuation)));
-    avelength_history_hedonic_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_hedonic_valuation)),h.history_hedonic_valuation<>(typeof(h.history_hedonic_valuation))'');
+    maxlength_history_hedonic_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_hedonic_valuation)));
+    avelength_history_hedonic_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_hedonic_valuation)),h.history_hedonic_valuation<>(typeof(h.history_hedonic_valuation))'');
     populated_history_automated_valuation_cnt := COUNT(GROUP,h.history_automated_valuation <> (TYPEOF(h.history_automated_valuation))'');
     populated_history_automated_valuation_pcnt := AVE(GROUP,IF(h.history_automated_valuation = (TYPEOF(h.history_automated_valuation))'',0,100));
-    maxlength_history_automated_valuation := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_automated_valuation)));
-    avelength_history_automated_valuation := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_automated_valuation)),h.history_automated_valuation<>(typeof(h.history_automated_valuation))'');
+    maxlength_history_automated_valuation := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_automated_valuation)));
+    avelength_history_automated_valuation := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_automated_valuation)),h.history_automated_valuation<>(typeof(h.history_automated_valuation))'');
     populated_history_confidence_score_cnt := COUNT(GROUP,h.history_confidence_score <> (TYPEOF(h.history_confidence_score))'');
     populated_history_confidence_score_pcnt := AVE(GROUP,IF(h.history_confidence_score = (TYPEOF(h.history_confidence_score))'',0,100));
-    maxlength_history_confidence_score := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_confidence_score)));
-    avelength_history_confidence_score := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.history_confidence_score)),h.history_confidence_score<>(typeof(h.history_confidence_score))'');
+    maxlength_history_confidence_score := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_confidence_score)));
+    avelength_history_confidence_score := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.history_confidence_score)),h.history_confidence_score<>(typeof(h.history_confidence_score))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -226,7 +226,7 @@ END;
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
-  SALT38.StrType FieldName;
+  SALT311.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -243,17 +243,17 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 52, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT38.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT38.StrType)le.history_date),TRIM((SALT38.StrType)le.ln_fares_id_ta),TRIM((SALT38.StrType)le.ln_fares_id_pi),TRIM((SALT38.StrType)le.unformatted_apn),TRIM((SALT38.StrType)le.prim_range),TRIM((SALT38.StrType)le.predir),TRIM((SALT38.StrType)le.prim_name),TRIM((SALT38.StrType)le.suffix),TRIM((SALT38.StrType)le.postdir),TRIM((SALT38.StrType)le.unit_desig),TRIM((SALT38.StrType)le.sec_range),TRIM((SALT38.StrType)le.p_city_name),TRIM((SALT38.StrType)le.st),TRIM((SALT38.StrType)le.zip),TRIM((SALT38.StrType)le.zip4),TRIM((SALT38.StrType)le.lat),TRIM((SALT38.StrType)le.long),TRIM((SALT38.StrType)le.geo_blk),TRIM((SALT38.StrType)le.fips_code),TRIM((SALT38.StrType)le.land_use),TRIM((SALT38.StrType)le.recording_date),TRIM((SALT38.StrType)le.assessed_value_year),TRIM((SALT38.StrType)le.sales_price),TRIM((SALT38.StrType)le.assessed_total_value),TRIM((SALT38.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT38.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT38.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT38.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT38.StrType)le.confidence_score), ''),TRIM((SALT38.StrType)le.comp1),TRIM((SALT38.StrType)le.comp2),TRIM((SALT38.StrType)le.comp3),TRIM((SALT38.StrType)le.comp4),TRIM((SALT38.StrType)le.comp5),TRIM((SALT38.StrType)le.nearby1),TRIM((SALT38.StrType)le.nearby2),TRIM((SALT38.StrType)le.nearby3),TRIM((SALT38.StrType)le.nearby4),TRIM((SALT38.StrType)le.nearby5),TRIM((SALT38.StrType)le.history_history_date),TRIM((SALT38.StrType)le.history_land_use),TRIM((SALT38.StrType)le.history_recording_date),TRIM((SALT38.StrType)le.history_assessed_value_year),TRIM((SALT38.StrType)le.history_sales_price),TRIM((SALT38.StrType)le.history_assessed_total_value),TRIM((SALT38.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT38.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT38.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT38.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT38.StrType)le.history_confidence_score), '')));
+SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.history_date),TRIM((SALT311.StrType)le.ln_fares_id_ta),TRIM((SALT311.StrType)le.ln_fares_id_pi),TRIM((SALT311.StrType)le.unformatted_apn),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.unit_desig),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.p_city_name),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.zip4),TRIM((SALT311.StrType)le.lat),TRIM((SALT311.StrType)le.long),TRIM((SALT311.StrType)le.geo_blk),TRIM((SALT311.StrType)le.fips_code),TRIM((SALT311.StrType)le.land_use),TRIM((SALT311.StrType)le.recording_date),TRIM((SALT311.StrType)le.assessed_value_year),TRIM((SALT311.StrType)le.sales_price),TRIM((SALT311.StrType)le.assessed_total_value),TRIM((SALT311.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT311.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT311.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT311.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT311.StrType)le.confidence_score), ''),TRIM((SALT311.StrType)le.comp1),TRIM((SALT311.StrType)le.comp2),TRIM((SALT311.StrType)le.comp3),TRIM((SALT311.StrType)le.comp4),TRIM((SALT311.StrType)le.comp5),TRIM((SALT311.StrType)le.nearby1),TRIM((SALT311.StrType)le.nearby2),TRIM((SALT311.StrType)le.nearby3),TRIM((SALT311.StrType)le.nearby4),TRIM((SALT311.StrType)le.nearby5),TRIM((SALT311.StrType)le.history_history_date),TRIM((SALT311.StrType)le.history_land_use),TRIM((SALT311.StrType)le.history_recording_date),TRIM((SALT311.StrType)le.history_assessed_value_year),TRIM((SALT311.StrType)le.history_sales_price),TRIM((SALT311.StrType)le.history_assessed_total_value),TRIM((SALT311.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT311.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT311.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT311.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT311.StrType)le.history_confidence_score), '')));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,52,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT38.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 52);
   SELF.FldNo2 := 1 + (C % 52);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT38.StrType)le.history_date),TRIM((SALT38.StrType)le.ln_fares_id_ta),TRIM((SALT38.StrType)le.ln_fares_id_pi),TRIM((SALT38.StrType)le.unformatted_apn),TRIM((SALT38.StrType)le.prim_range),TRIM((SALT38.StrType)le.predir),TRIM((SALT38.StrType)le.prim_name),TRIM((SALT38.StrType)le.suffix),TRIM((SALT38.StrType)le.postdir),TRIM((SALT38.StrType)le.unit_desig),TRIM((SALT38.StrType)le.sec_range),TRIM((SALT38.StrType)le.p_city_name),TRIM((SALT38.StrType)le.st),TRIM((SALT38.StrType)le.zip),TRIM((SALT38.StrType)le.zip4),TRIM((SALT38.StrType)le.lat),TRIM((SALT38.StrType)le.long),TRIM((SALT38.StrType)le.geo_blk),TRIM((SALT38.StrType)le.fips_code),TRIM((SALT38.StrType)le.land_use),TRIM((SALT38.StrType)le.recording_date),TRIM((SALT38.StrType)le.assessed_value_year),TRIM((SALT38.StrType)le.sales_price),TRIM((SALT38.StrType)le.assessed_total_value),TRIM((SALT38.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT38.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT38.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT38.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT38.StrType)le.confidence_score), ''),TRIM((SALT38.StrType)le.comp1),TRIM((SALT38.StrType)le.comp2),TRIM((SALT38.StrType)le.comp3),TRIM((SALT38.StrType)le.comp4),TRIM((SALT38.StrType)le.comp5),TRIM((SALT38.StrType)le.nearby1),TRIM((SALT38.StrType)le.nearby2),TRIM((SALT38.StrType)le.nearby3),TRIM((SALT38.StrType)le.nearby4),TRIM((SALT38.StrType)le.nearby5),TRIM((SALT38.StrType)le.history_history_date),TRIM((SALT38.StrType)le.history_land_use),TRIM((SALT38.StrType)le.history_recording_date),TRIM((SALT38.StrType)le.history_assessed_value_year),TRIM((SALT38.StrType)le.history_sales_price),TRIM((SALT38.StrType)le.history_assessed_total_value),TRIM((SALT38.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT38.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT38.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT38.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT38.StrType)le.history_confidence_score), '')));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT38.StrType)le.history_date),TRIM((SALT38.StrType)le.ln_fares_id_ta),TRIM((SALT38.StrType)le.ln_fares_id_pi),TRIM((SALT38.StrType)le.unformatted_apn),TRIM((SALT38.StrType)le.prim_range),TRIM((SALT38.StrType)le.predir),TRIM((SALT38.StrType)le.prim_name),TRIM((SALT38.StrType)le.suffix),TRIM((SALT38.StrType)le.postdir),TRIM((SALT38.StrType)le.unit_desig),TRIM((SALT38.StrType)le.sec_range),TRIM((SALT38.StrType)le.p_city_name),TRIM((SALT38.StrType)le.st),TRIM((SALT38.StrType)le.zip),TRIM((SALT38.StrType)le.zip4),TRIM((SALT38.StrType)le.lat),TRIM((SALT38.StrType)le.long),TRIM((SALT38.StrType)le.geo_blk),TRIM((SALT38.StrType)le.fips_code),TRIM((SALT38.StrType)le.land_use),TRIM((SALT38.StrType)le.recording_date),TRIM((SALT38.StrType)le.assessed_value_year),TRIM((SALT38.StrType)le.sales_price),TRIM((SALT38.StrType)le.assessed_total_value),TRIM((SALT38.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT38.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT38.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT38.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT38.StrType)le.confidence_score), ''),TRIM((SALT38.StrType)le.comp1),TRIM((SALT38.StrType)le.comp2),TRIM((SALT38.StrType)le.comp3),TRIM((SALT38.StrType)le.comp4),TRIM((SALT38.StrType)le.comp5),TRIM((SALT38.StrType)le.nearby1),TRIM((SALT38.StrType)le.nearby2),TRIM((SALT38.StrType)le.nearby3),TRIM((SALT38.StrType)le.nearby4),TRIM((SALT38.StrType)le.nearby5),TRIM((SALT38.StrType)le.history_history_date),TRIM((SALT38.StrType)le.history_land_use),TRIM((SALT38.StrType)le.history_recording_date),TRIM((SALT38.StrType)le.history_assessed_value_year),TRIM((SALT38.StrType)le.history_sales_price),TRIM((SALT38.StrType)le.history_assessed_total_value),TRIM((SALT38.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT38.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT38.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT38.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT38.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT38.StrType)le.history_confidence_score), '')));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.history_date),TRIM((SALT311.StrType)le.ln_fares_id_ta),TRIM((SALT311.StrType)le.ln_fares_id_pi),TRIM((SALT311.StrType)le.unformatted_apn),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.unit_desig),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.p_city_name),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.zip4),TRIM((SALT311.StrType)le.lat),TRIM((SALT311.StrType)le.long),TRIM((SALT311.StrType)le.geo_blk),TRIM((SALT311.StrType)le.fips_code),TRIM((SALT311.StrType)le.land_use),TRIM((SALT311.StrType)le.recording_date),TRIM((SALT311.StrType)le.assessed_value_year),TRIM((SALT311.StrType)le.sales_price),TRIM((SALT311.StrType)le.assessed_total_value),TRIM((SALT311.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT311.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT311.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT311.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT311.StrType)le.confidence_score), ''),TRIM((SALT311.StrType)le.comp1),TRIM((SALT311.StrType)le.comp2),TRIM((SALT311.StrType)le.comp3),TRIM((SALT311.StrType)le.comp4),TRIM((SALT311.StrType)le.comp5),TRIM((SALT311.StrType)le.nearby1),TRIM((SALT311.StrType)le.nearby2),TRIM((SALT311.StrType)le.nearby3),TRIM((SALT311.StrType)le.nearby4),TRIM((SALT311.StrType)le.nearby5),TRIM((SALT311.StrType)le.history_history_date),TRIM((SALT311.StrType)le.history_land_use),TRIM((SALT311.StrType)le.history_recording_date),TRIM((SALT311.StrType)le.history_assessed_value_year),TRIM((SALT311.StrType)le.history_sales_price),TRIM((SALT311.StrType)le.history_assessed_total_value),TRIM((SALT311.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT311.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT311.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT311.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT311.StrType)le.history_confidence_score), '')));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.history_date),TRIM((SALT311.StrType)le.ln_fares_id_ta),TRIM((SALT311.StrType)le.ln_fares_id_pi),TRIM((SALT311.StrType)le.unformatted_apn),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.unit_desig),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.p_city_name),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.zip4),TRIM((SALT311.StrType)le.lat),TRIM((SALT311.StrType)le.long),TRIM((SALT311.StrType)le.geo_blk),TRIM((SALT311.StrType)le.fips_code),TRIM((SALT311.StrType)le.land_use),TRIM((SALT311.StrType)le.recording_date),TRIM((SALT311.StrType)le.assessed_value_year),TRIM((SALT311.StrType)le.sales_price),TRIM((SALT311.StrType)le.assessed_total_value),TRIM((SALT311.StrType)le.market_total_value),IF (le.tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.tax_assessment_valuation), ''),IF (le.price_index_valuation <> 0,TRIM((SALT311.StrType)le.price_index_valuation), ''),IF (le.hedonic_valuation <> 0,TRIM((SALT311.StrType)le.hedonic_valuation), ''),IF (le.automated_valuation <> 0,TRIM((SALT311.StrType)le.automated_valuation), ''),IF (le.confidence_score <> 0,TRIM((SALT311.StrType)le.confidence_score), ''),TRIM((SALT311.StrType)le.comp1),TRIM((SALT311.StrType)le.comp2),TRIM((SALT311.StrType)le.comp3),TRIM((SALT311.StrType)le.comp4),TRIM((SALT311.StrType)le.comp5),TRIM((SALT311.StrType)le.nearby1),TRIM((SALT311.StrType)le.nearby2),TRIM((SALT311.StrType)le.nearby3),TRIM((SALT311.StrType)le.nearby4),TRIM((SALT311.StrType)le.nearby5),TRIM((SALT311.StrType)le.history_history_date),TRIM((SALT311.StrType)le.history_land_use),TRIM((SALT311.StrType)le.history_recording_date),TRIM((SALT311.StrType)le.history_assessed_value_year),TRIM((SALT311.StrType)le.history_sales_price),TRIM((SALT311.StrType)le.history_assessed_total_value),TRIM((SALT311.StrType)le.history_market_total_value),IF (le.history_tax_assessment_valuation <> 0,TRIM((SALT311.StrType)le.history_tax_assessment_valuation), ''),IF (le.history_price_index_valuation <> 0,TRIM((SALT311.StrType)le.history_price_index_valuation), ''),IF (le.history_hedonic_valuation <> 0,TRIM((SALT311.StrType)le.history_hedonic_valuation), ''),IF (le.history_automated_valuation <> 0,TRIM((SALT311.StrType)le.history_automated_valuation), ''),IF (le.history_confidence_score <> 0,TRIM((SALT311.StrType)le.history_confidence_score), '')));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),52*52,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'history_date'}
@@ -307,12 +307,12 @@ SHARED FldIds := DATASET([{1,'history_date'}
       ,{49,'history_price_index_valuation'}
       ,{50,'history_hedonic_valuation'}
       ,{51,'history_automated_valuation'}
-      ,{52,'history_confidence_score'}],SALT38.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT38.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+      ,{52,'history_confidence_score'}],SALT311.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
-EXPORT SrcProfiles := SALT38.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
  
-EXPORT Correlations := SALT38.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+EXPORT Correlations := SALT311.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
  
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
@@ -320,58 +320,58 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    Base_Fields.InValid_history_date((SALT38.StrType)le.history_date),
-    Base_Fields.InValid_ln_fares_id_ta((SALT38.StrType)le.ln_fares_id_ta),
-    Base_Fields.InValid_ln_fares_id_pi((SALT38.StrType)le.ln_fares_id_pi),
-    Base_Fields.InValid_unformatted_apn((SALT38.StrType)le.unformatted_apn),
-    Base_Fields.InValid_prim_range((SALT38.StrType)le.prim_range),
-    Base_Fields.InValid_predir((SALT38.StrType)le.predir),
-    Base_Fields.InValid_prim_name((SALT38.StrType)le.prim_name),
-    Base_Fields.InValid_suffix((SALT38.StrType)le.suffix),
-    Base_Fields.InValid_postdir((SALT38.StrType)le.postdir),
-    Base_Fields.InValid_unit_desig((SALT38.StrType)le.unit_desig),
-    Base_Fields.InValid_sec_range((SALT38.StrType)le.sec_range),
-    Base_Fields.InValid_p_city_name((SALT38.StrType)le.p_city_name),
-    Base_Fields.InValid_st((SALT38.StrType)le.st),
-    Base_Fields.InValid_zip((SALT38.StrType)le.zip),
-    Base_Fields.InValid_zip4((SALT38.StrType)le.zip4),
-    Base_Fields.InValid_lat((SALT38.StrType)le.lat),
-    Base_Fields.InValid_long((SALT38.StrType)le.long),
-    Base_Fields.InValid_geo_blk((SALT38.StrType)le.geo_blk),
-    Base_Fields.InValid_fips_code((SALT38.StrType)le.fips_code),
-    Base_Fields.InValid_land_use((SALT38.StrType)le.land_use),
-    Base_Fields.InValid_recording_date((SALT38.StrType)le.recording_date),
-    Base_Fields.InValid_assessed_value_year((SALT38.StrType)le.assessed_value_year),
-    Base_Fields.InValid_sales_price((SALT38.StrType)le.sales_price),
-    Base_Fields.InValid_assessed_total_value((SALT38.StrType)le.assessed_total_value),
-    Base_Fields.InValid_market_total_value((SALT38.StrType)le.market_total_value),
-    Base_Fields.InValid_tax_assessment_valuation((SALT38.StrType)le.tax_assessment_valuation),
-    Base_Fields.InValid_price_index_valuation((SALT38.StrType)le.price_index_valuation),
-    Base_Fields.InValid_hedonic_valuation((SALT38.StrType)le.hedonic_valuation),
-    Base_Fields.InValid_automated_valuation((SALT38.StrType)le.automated_valuation),
-    Base_Fields.InValid_confidence_score((SALT38.StrType)le.confidence_score),
-    Base_Fields.InValid_comp1((SALT38.StrType)le.comp1),
-    Base_Fields.InValid_comp2((SALT38.StrType)le.comp2),
-    Base_Fields.InValid_comp3((SALT38.StrType)le.comp3),
-    Base_Fields.InValid_comp4((SALT38.StrType)le.comp4),
-    Base_Fields.InValid_comp5((SALT38.StrType)le.comp5),
-    Base_Fields.InValid_nearby1((SALT38.StrType)le.nearby1),
-    Base_Fields.InValid_nearby2((SALT38.StrType)le.nearby2),
-    Base_Fields.InValid_nearby3((SALT38.StrType)le.nearby3),
-    Base_Fields.InValid_nearby4((SALT38.StrType)le.nearby4),
-    Base_Fields.InValid_nearby5((SALT38.StrType)le.nearby5),
-    Base_Fields.InValid_history_history_date((SALT38.StrType)le.history_history_date),
-    Base_Fields.InValid_history_land_use((SALT38.StrType)le.history_land_use),
-    Base_Fields.InValid_history_recording_date((SALT38.StrType)le.history_recording_date),
-    Base_Fields.InValid_history_assessed_value_year((SALT38.StrType)le.history_assessed_value_year),
-    Base_Fields.InValid_history_sales_price((SALT38.StrType)le.history_sales_price),
-    Base_Fields.InValid_history_assessed_total_value((SALT38.StrType)le.history_assessed_total_value),
-    Base_Fields.InValid_history_market_total_value((SALT38.StrType)le.history_market_total_value),
-    Base_Fields.InValid_history_tax_assessment_valuation((SALT38.StrType)le.history_tax_assessment_valuation),
-    Base_Fields.InValid_history_price_index_valuation((SALT38.StrType)le.history_price_index_valuation),
-    Base_Fields.InValid_history_hedonic_valuation((SALT38.StrType)le.history_hedonic_valuation),
-    Base_Fields.InValid_history_automated_valuation((SALT38.StrType)le.history_automated_valuation),
-    Base_Fields.InValid_history_confidence_score((SALT38.StrType)le.history_confidence_score),
+    Base_Fields.InValid_history_date((SALT311.StrType)le.history_date),
+    Base_Fields.InValid_ln_fares_id_ta((SALT311.StrType)le.ln_fares_id_ta),
+    Base_Fields.InValid_ln_fares_id_pi((SALT311.StrType)le.ln_fares_id_pi),
+    Base_Fields.InValid_unformatted_apn((SALT311.StrType)le.unformatted_apn),
+    Base_Fields.InValid_prim_range((SALT311.StrType)le.prim_range),
+    Base_Fields.InValid_predir((SALT311.StrType)le.predir),
+    Base_Fields.InValid_prim_name((SALT311.StrType)le.prim_name),
+    Base_Fields.InValid_suffix((SALT311.StrType)le.suffix),
+    Base_Fields.InValid_postdir((SALT311.StrType)le.postdir),
+    Base_Fields.InValid_unit_desig((SALT311.StrType)le.unit_desig),
+    Base_Fields.InValid_sec_range((SALT311.StrType)le.sec_range),
+    Base_Fields.InValid_p_city_name((SALT311.StrType)le.p_city_name),
+    Base_Fields.InValid_st((SALT311.StrType)le.st),
+    Base_Fields.InValid_zip((SALT311.StrType)le.zip),
+    Base_Fields.InValid_zip4((SALT311.StrType)le.zip4),
+    Base_Fields.InValid_lat((SALT311.StrType)le.lat),
+    Base_Fields.InValid_long((SALT311.StrType)le.long),
+    Base_Fields.InValid_geo_blk((SALT311.StrType)le.geo_blk),
+    Base_Fields.InValid_fips_code((SALT311.StrType)le.fips_code),
+    Base_Fields.InValid_land_use((SALT311.StrType)le.land_use),
+    Base_Fields.InValid_recording_date((SALT311.StrType)le.recording_date),
+    Base_Fields.InValid_assessed_value_year((SALT311.StrType)le.assessed_value_year),
+    Base_Fields.InValid_sales_price((SALT311.StrType)le.sales_price),
+    Base_Fields.InValid_assessed_total_value((SALT311.StrType)le.assessed_total_value),
+    Base_Fields.InValid_market_total_value((SALT311.StrType)le.market_total_value),
+    Base_Fields.InValid_tax_assessment_valuation((SALT311.StrType)le.tax_assessment_valuation),
+    Base_Fields.InValid_price_index_valuation((SALT311.StrType)le.price_index_valuation),
+    Base_Fields.InValid_hedonic_valuation((SALT311.StrType)le.hedonic_valuation),
+    Base_Fields.InValid_automated_valuation((SALT311.StrType)le.automated_valuation),
+    Base_Fields.InValid_confidence_score((SALT311.StrType)le.confidence_score),
+    Base_Fields.InValid_comp1((SALT311.StrType)le.comp1),
+    Base_Fields.InValid_comp2((SALT311.StrType)le.comp2),
+    Base_Fields.InValid_comp3((SALT311.StrType)le.comp3),
+    Base_Fields.InValid_comp4((SALT311.StrType)le.comp4),
+    Base_Fields.InValid_comp5((SALT311.StrType)le.comp5),
+    Base_Fields.InValid_nearby1((SALT311.StrType)le.nearby1),
+    Base_Fields.InValid_nearby2((SALT311.StrType)le.nearby2),
+    Base_Fields.InValid_nearby3((SALT311.StrType)le.nearby3),
+    Base_Fields.InValid_nearby4((SALT311.StrType)le.nearby4),
+    Base_Fields.InValid_nearby5((SALT311.StrType)le.nearby5),
+    Base_Fields.InValid_history_history_date((SALT311.StrType)le.history_history_date),
+    Base_Fields.InValid_history_land_use((SALT311.StrType)le.history_land_use),
+    Base_Fields.InValid_history_recording_date((SALT311.StrType)le.history_recording_date),
+    Base_Fields.InValid_history_assessed_value_year((SALT311.StrType)le.history_assessed_value_year),
+    Base_Fields.InValid_history_sales_price((SALT311.StrType)le.history_sales_price),
+    Base_Fields.InValid_history_assessed_total_value((SALT311.StrType)le.history_assessed_total_value),
+    Base_Fields.InValid_history_market_total_value((SALT311.StrType)le.history_market_total_value),
+    Base_Fields.InValid_history_tax_assessment_valuation((SALT311.StrType)le.history_tax_assessment_valuation),
+    Base_Fields.InValid_history_price_index_valuation((SALT311.StrType)le.history_price_index_valuation),
+    Base_Fields.InValid_history_hedonic_valuation((SALT311.StrType)le.history_hedonic_valuation),
+    Base_Fields.InValid_history_automated_valuation((SALT311.StrType)le.history_automated_valuation),
+    Base_Fields.InValid_history_confidence_score((SALT311.StrType)le.history_confidence_score),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -391,14 +391,14 @@ END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
  
-  SALT38.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_AVM, Base_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_AVM, Base_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
  
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
-  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT38.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
-  allProfiles_Standard := IF(doAllProfiles, SALT38.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT311.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
  
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;

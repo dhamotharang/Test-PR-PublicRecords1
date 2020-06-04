@@ -1,4 +1,4 @@
-﻿import did_add,header_slimsort,address,ut,didville,death_master,Obituaries,mdr,header ,RoxieKeyBuild, OKC_Probate;
+﻿import _control, MDR, did_add,header_slimsort,address,ut,didville,death_master,Obituaries,mdr,header ,RoxieKeyBuild, OKC_Probate, Std;
 
 export proc_deathmaster_buildfile(string	filedate)	:= function
 //	Force the build to link DIDs on THOR
@@ -312,7 +312,10 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 																;
 
 	
-	ut.CleanFields(dCombineDeathMasterDIDV3,dDeathMasterDIDV3CleanFields);
+//Add Global_SIDs
+	addGlobalSID	:= MDR.macGetGlobalSid(dCombineDeathMasterDIDV3, 'DeathMaster', 'src', 'global_sid');
+	
+	ut.CleanFields(addGlobalSID,dDeathMasterDIDV3CleanFields);
 
 	// Compare records to what is in Watchdog
   dValidSSNDeathMasterDIDV3				:=	death_master.fnValidateSSNs(dDeathMasterDIDV3CleanFields);

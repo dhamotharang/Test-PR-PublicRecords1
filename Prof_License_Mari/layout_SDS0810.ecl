@@ -1,10 +1,12 @@
-// SDS0810 / South Dakota Revenue and Regulation / Real Estate Appraisers //
+﻿// SDS0810 / South Dakota Revenue and Regulation / Real Estate Appraisers //
 EXPORT layout_SDS0810 := RECORD
+
 	STRING100  ORG_NAME;
-	STRING30   ISSUEDT;
-	STRING30   LIC_NO;	
-	STRING30   LIC_TYPE;
+	// STRING30   ISSUEDT;
+	STRING30   LIC_NO;				//Credential Number and Type
+	// STRING30   LIC_TYPE; 	
 	STRING30   PHONE;
+	STRING100	 EMAIL;
 	STRING100  ADDRESS;
 	STRING50   CITY;
 	STRING10   STATE;

@@ -4809,7 +4809,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.nvpp_make_code					:= '';																																	//62
 		SELF.nvpp_make_abbreviation	:= '';  //TRIM(SELF.match_make);																				//63
 		SELF.nvpp_series_model			:= '';																																	//64
-		SELF.nvpp_series_name				:= '';																																	//65																	
+		SELF.nvpp_series_name				:= SELF.series_name;	//DF-25834																																//65																	
 		SELF.segmentation_code			:= cleanDesc(L.SEGMENTATION_CD);																				//66
 		// SELF.segmentation_code			:= IF(temp_veh_typ_cd IN ['C','M'] or SELF.proactive_vin='Y','',cleanDesc(L.SEGMENTATION_CD));																				//66
 		SELF.country_of_origin			:= MAP(cleanDesc(L.PLNT_CNTRY_NM) IN ['','UNKNOWN'] 	            			//67
@@ -5407,17 +5407,18 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																			 ut.CleanSpacesAndUpper(L.ENG_ASP_VVTL_CD)='YES'
 																			 => 'Y',
 																			 '');
-		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['N','NO'] 					//157 iso_liability-Y,N		
+		//DF-27656
+		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['N','NO'] 					//157 iso_liability-Y,N		
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL)) +
-																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['N','NO']	
+																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL_2018)) +
+																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['N','NO']	
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL)) +
-																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND)='Y','R','');
+																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL_2018)) +
+																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND_2018)='Y','R','');
 		SELF.series_name_condensed	:= temp_series_name;																										//158 series_name_condensed
 		SELF.aces_data							:= stringlib.stringtouppercase(L.ACES_VEHICLE_ID) +																	//159 aces_data-all blank
 																	 stringlib.stringtouppercase(L.ACES_BASE_VEHICLE)  +															//    ACES_VEHICLE_ID(235)
@@ -5483,9 +5484,9 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.nvpp_series_model 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.nvpp_series_model,''),
 		                                 R.nvpp_series_model);
-		SELF.nvpp_series_name 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
+		/*SELF.nvpp_series_name 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.nvpp_series_name,''),
-		                                 R.nvpp_series_name);
+		                                 R.nvpp_series_name); DF-25834*/
 		SELF.complete_prefix_file_id:= IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.complete_prefix_file_id,''),
 		                                 R.complete_prefix_file_id);

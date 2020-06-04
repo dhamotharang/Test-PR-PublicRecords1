@@ -1,39 +1,59 @@
 ﻿#stored('did_add_force', 'thor');
-import Nac, dops, ut;
+IMPORT NAC,std,ut,dops;
+
+
 export fn_Base2_from_Base1(string version) := FUNCTION
-b1 := nac.Files().Base;
-base2 := dataset($.Superfile_List.sfNCF2Base, nac_V2.layout_Base2, thor);
-b2 := nac_v2.fn_Base1ToBase2(b1) + base2 : INDEPENDENT;
-lfn_base := Nac_V2.Superfile_List.sfBase2 + '::' + workunit;
+	rawbase2 := Nac_V2.Files2.dsNCF2Base;
+	newdata := Nac_V2.Files2.dsProcessing;
 
-collisions := NAC_V2.Mod_Collisions2(b2).AllCollisions;
-lfn_collisions := Nac_V2.Superfile_List.sfCollisions + '::' + workunit;
+	base2 := IFF(EXISTS(newdata),
+							NAC_V2.fn_MergeWithBase(newdata, rawbase2) , // update base2
+							rawbase2) : INDEPENDENT;
+	// convert base1 to baes2
+	base1 := nac_v2.fn_Base1ToBase2(NAC_V2.fn_filterBase1(nac_V2.Files.Base, base2)) : INDEPENDENT;
+	newbase := base1 + base2;
+	
+	lfn_base := Nac_V2.Superfile_List.sfBase2 + '::' + workunit;  		// includes base 1
+	lfn_base2 := Nac_V2.Superfile_List.sfNCF2Base + '::' + workunit;	// just ncf2 data
+	 
+	collisions := NAC_V2.Mod_Collisions2(newbase).AllCollisions;
+	lfn_collisions := Nac_V2.Superfile_List.sfCollisions + '::' + workunit;
 
-c1 := DATASET('~nac::out::collisions2::father', nac_v2.Layout_Collisions2.Layout_Collisions, thor);
-c2 := DATASET(lfn_collisions, nac_v2.Layout_Collisions2.Layout_Collisions, thor);
-alertList := NAC_v2.Mailing_List('').Dev2;
+	c1 := DATASET('~nac::out::collisions2::father', nac_v2.Layout_Collisions2.Layout_Collisions, thor);
+	c2 :=DATASET(lfn_collisions, nac_v2.Layout_Collisions2.Layout_Collisions, thor);
+	//alertList := NAC_v2.Mailing_List('').Dev2;
+	alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
-version1 := NAC_V2.fn_Base1_Version;
+	version1 := NAC_V2.fn_Base1_Version;
 
-doit := SEQUENTIAL(
-	OUTPUT(IF(version=version1, 'Versions Match', 'Outdated Base1: ' + version1)),
-	OUTPUT(b2,,lfn_base, COMPRESSED),
-	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
-	nac_V2.BuildPayload(b2, version),
-	nac_v2.Build_keys(version),
-	OUTPUT(collisions,,lfn_collisions,COMPRESSED,OVERWRITE),
-	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfCollisions, lfn_collisions),
-	OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE),
-	OUTPUT(NAC_V2.GetSampleRecords(version), named('v2_samples')),
-	//RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N'),
-	if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'
-										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'Y','N',l_isprodready:='Y')
-										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'N','N')
-			),
-	if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
-							Nac_v2.CreateOrbitEntry(version)),
-	Nac.fn_Strata(version)
-);
+	doit := SEQUENTIAL(
+		OUTPUT(IF(version=version1, 'Versions Match', 'Outdated Base1: ' + version1)),
+		nac_v2.Superfile_List.MoveReadyToProcessing,
+		OUTPUT(nac_v2.files2.dsProcessing, named('new_samples')),
+		
+		OUTPUT(newbase,,lfn_base, COMPRESSED),
+		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
+		OUTPUT(base2,,lfn_base2, COMPRESSED),
+		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfNCF2Base, lfn_base2),
+		nac_v2.Superfile_List.MoveProcessingToProcessed,
+		
+		nac_V2.BuildPayload(newbase, version),
+		nac_v2.Build_keys(version),
+		OUTPUT(collisions,,lfn_collisions,COMPRESSED,OVERWRITE, named('collisions')),
+		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfCollisions, lfn_collisions),
+		OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE,
+											named('new_collisions')),
+		std.file.AddSuperfile(nac_v2.superfile_list.sfNewCollisions, '~nac::v2::newcollisions::' + version),
+		OUTPUT(NAC_V2.GetSampleRecords(version), named('v2_samples')),
+		//RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N'),
+		if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'
+											,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'Y','N',l_isprodready:='Y')
+											,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'N','N')
+				),
+		if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
+								Nac_v2.CreateOrbitEntry(version)),
+		Nac.fn_Strata(version)
+	);
 
-return doit;
+	return doit;
 END;

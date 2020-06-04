@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 
 IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD;
 
@@ -44,12 +44,12 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	
 	oldOkcAssmntNd:= if(isFast,LN_PropertyV2_Fast.Files.oldIn.LNAssessment(process_date>startProcessDate),
 														 LN_PropertyV2_Fast.Files.oldIn.LNAssessment)(~(regexfind('^[Pp][1-9]$',new_record_type_code)));//bug 169557
-	oldOkcAssmntN := dedup(oldOkcAssmntNd,all); // Jira DF-18076
+	oldOkcAssmntN := dedup(distribute(oldOkcAssmntNd),all,local); // Jira DF-18076
 	oldOkcAssmntR	:= if(isFast,LN_PropertyV2_Fast.Files.oldIn.LNAssessmentRepl(process_date>startProcessDate),
 														 LN_PropertyV2_Fast.Files.oldIn.LNAssessmentRepl)(~(regexfind('^[Pp][1-9]$',new_record_type_code)));//bug 169557
 	oldOkcDeedMrN1:= if(isFast,LN_PropertyV2_Fast.Files.oldIn.LNDeed(process_date>startProcessDate),
 														 LN_PropertyV2_Fast.Files.oldIn.LNDeed);
-	oldOkcDeedMrN2:= dedup(oldOkcDeedMrN1,all); // Jira DF-18076
+	oldOkcDeedMrN2:= dedup(distribute(oldOkcDeedMrN1),all,local); // Jira DF-18076
 	oldOkcDeedMrN := dedup(distribute(oldOkcDeedMrN2,hash(ln_fares_id)),ln_fares_id,local); // Jira DF-18076
 	oldOkcDeedMrR	:= if(isFast,LN_PropertyV2_Fast.Files.oldIn.LNDeedRepl(process_date>startProcessDate),
 														 LN_PropertyV2_Fast.Files.oldIn.LNDeedRepl);

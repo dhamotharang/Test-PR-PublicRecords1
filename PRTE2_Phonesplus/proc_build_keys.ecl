@@ -1,4 +1,4 @@
-IMPORT PRTE2_PhonesPlus, roxiekeybuild, ut, VersionControl, PRTE2_Common, _control, PRTE, AutoKey;
+﻿IMPORT PRTE2_PhonesPlus, roxiekeybuild, ut, VersionControl, PRTE2_Common, _control, PRTE, AutoKey;
 
 //Variables for DOPS and email are used in current PRTE process
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
@@ -52,9 +52,9 @@ RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + 'phonesplus_scoring::@versio
 		PerformUpdate := 		PRTE.UpdateVersion('PhonesPlusV2Keys',					//	Package name
 																						 filedate,									//	Package version
 																						 notifyEmail,								//	Who to email with specifics
-																						 'B',												//	B = Boca, A = Alpharetta
-																						 'N',												//	N = Non-FCRA, F = FCRA
-																						 'N'												//	N = Do not also include boolean, Y = Include boolean, too
+																						 l_inloc:='B',							//	B = Boca, A = Alpharetta
+																						 l_inenvment:='N',					//	N = Non-FCRA, F = FCRA
+																						 l_includeboolean :='N'		  //	N = Do not also include boolean, Y = Include boolean, too
 																						);
 		PerformUpdateOrNot := IF(doDOPS,PerformUpdate,NoUpdate);
 		//--------------------------------------------------------------------------------------

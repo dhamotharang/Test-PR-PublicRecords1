@@ -1,5 +1,5 @@
 ﻿//****************Function to append flags/indicators when matching to Gong***************
-import Gong_Neustar, ut;
+import Gong_Neustar, ut, std;
 export Fn_Append_Gong(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
 // VC - Using newer file DF-23004. As per Charles file_gongmaster should not be used for anything
@@ -17,7 +17,7 @@ phplus_in_d1:=  distribute(phplus_in, hash(npa+phone7));
 
 recordof(phplus_in) t_match_gong1(phplus_in_d1 le, gong_d1 ri) := transform
 	self.eda_match 	 	 := if(ri.phone10 <> '', le.eda_match | 1b,le.eda_match |0b);
-	self.eda_phone_dt	 := if(ri.phone10 <> '', (unsigned)ut.GetDate , 0);
+	self.eda_phone_dt	 := if(ri.phone10 <> '', (unsigned)(STRING8)Std.Date.Today() , 0);
 	self:= le;
 end;
 
@@ -35,7 +35,7 @@ phplus_in_d2:=  distribute(match_gong1(did > 0), hash(did));
 recordof(phplus_in) t_match_gong2a(phplus_in_d2 le, gong_d2 ri) := transform
 	self.eda_active_flag := if((ri.did > 0 and le.pdid = 0) or le.eda_active_flag, true, false);
 	self.eda_match 		 := if(ri.did > 0 and le.pdid = 0, le.eda_match | 10b, le.eda_match |0b);
-	self.eda_did_dt		 := if(ri.did > 0 and le.pdid = 0, (unsigned)ut.GetDate , 0);
+	self.eda_did_dt		 := if(ri.did > 0 and le.pdid = 0, (unsigned)(STRING8)Std.Date.Today() , 0);
 	self:= le;
 end;
 
@@ -52,7 +52,7 @@ match_gong2a := join(phplus_in_d2,
 //----Flag for Match to gong by did only - a match will indicate individual has a phone active in eda
 recordof(phplus_in) t_match_gong2b(match_gong2a le, gong_d2 ri) := transform
 	self.eda_match 	:= if(ri.did > 0 and le.pdid = 0, le.eda_match | 100b, le.eda_match |0b);
-	self.eda_did_dt	:= if(ri.did > 0 and le.pdid = 0, (unsigned)ut.GetDate , 0);
+	self.eda_did_dt	:= if(ri.did > 0 and le.pdid = 0, (unsigned)(STRING8)Std.Date.Today() , 0);
 	self.append_indiv_has_active_eda_phone_flag := if(ri.did > 0 and le.pdid = 0, true, false);
 	self:= le;
 end;
@@ -72,7 +72,7 @@ phplus_in_d3:=  distribute(match_gong2b_all(trim(prim_range + prim_name + sec_ra
 recordof(phplus_in) t_match_gong3a(phplus_in_d3 le, gong_d3 ri) := transform
 	self.eda_active_flag := if(ri.name_last <> '' or le.eda_active_flag, true, false);
 	self.eda_match 		 := if(ri.name_last <> '', le.eda_match | 1000b, le.eda_match |0b);
-	self.eda_nm_addr_dt  := if(ri.name_last <> '' , (unsigned)ut.GetDate  ,0);
+	self.eda_nm_addr_dt  := if(ri.name_last <> '' , (unsigned)(STRING8)Std.Date.Today()  ,0);
 	self:= le;
 end;
 

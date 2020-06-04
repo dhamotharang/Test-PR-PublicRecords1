@@ -1,4 +1,4 @@
-import header,doxie,RoxieKeybuild,DriversV2,vehicleV2,LN_Property,ln_mortgage,liensv2,ExperianCred,TransunionCred;
+import header,doxie,RoxieKeybuild,DriversV2,vehicleV2,LN_Property,ln_mortgage,liensv2,ExperianCred,TransunionCred,dx_header;
 
 export build_source_key_prep(string filedate='00000000') := function
 
@@ -11,8 +11,8 @@ end;
 rid1:=project(index(doxie.key_Header_rid(true,false),'~thor_data400::key::header::'+filedate+'::rid_fheader'),rid_rec);
 rid2:=project(index(doxie.key_Header_rid(false,false),'~thor_data400::key::header.rid_header_qa'),rid_rec);
 
-Srid1:=project(index(header.Key_Rid_SrcID_Prep(true,false),'~thor_data400::key::header::'+filedate+'::rid_srid_fheader'),header.Layout_RID_SrcID);
-Srid2:=project(index(header.Key_Rid_SrcID_Prep(false,false),'~thor_data400::key::header_rid_srid_header_qa'),header.Layout_RID_SrcID);
+Srid1:=project(index(dx_header.Key_Rid_SrcID(,true,false),'~thor_data400::key::header::'+filedate+'::rid_srid_fheader'),dx_Header.layouts.i_rid_src);
+Srid2:=project(index(dx_header.Key_Rid_SrcID(,false,false),'~thor_data400::key::header_rid_srid_header_qa'),dx_Header.layouts.i_rid_src);
 
 Header.Mac_key_src_read(header.Key_Src_DLv2(true,false),       DriversV2.Layout_DL,                                dl_child,       'dl_src_building', '~thor_data400::key::header::'+filedate+'::dlv2_src_fheader',      DLsrcbuilding);
 Header.Mac_key_src_read(header.Key_Src_EQ(true,false),         header.layout_eq_src,                               eq_child,       'eq_src_building', '~thor_data400::key::header::'+filedate+'::eq_src_fheader',        EQsrcbuilding);
@@ -36,7 +36,10 @@ Header.Mac_key_src_read(header.Key_Src_TN(false,false),         TransunionCred.L
 
 
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_Header_rid(,true,rid1 + rid2),'~thor_data400::key::header.rid','~thor_data400::key::header::'+filedate+'::rid',rid_only);
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(header.Key_Rid_SrcID_Prep(,true,Srid1 + Srid2),'~thor_data400::key::header_rid_srid','~thor_data400::key::header::'+filedate+'::rid_srid',bld_rid_srid_key);
+
+RoxieKeybuild.MAC_build_logical (dx_header.Key_Rid_SrcID(,false,false), header.Key_Rid_SrcID_Prep(,true,Srid1 + Srid2),
+								'~thor_data400::key::header_rid_srid', '~thor_data400::key::header::'+filedate+'::rid_srid', bld_rid_srid_key);
+
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(header.Key_Src_DLv2(,true,DLsrcbuilding + DLsrcbuilt),'~thor_data400::key::dlv2_src_index',      '~thor_data400::key::header::'+filedate+'::dlv2_src',       bld_dl);
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(header.Key_Src_EQ(,true,EQsrcbuilding + EQsrcbuilt),'~thor_data400::key::eq_src_index',        '~thor_data400::key::header::'+filedate+'::eq_src',         bld_eq);
 RoxieKeybuild.MAC_SK_BuildProcess_v2_Local(header.Key_Src_Vehv2(,true,VHsrcbuilding + VHsrcbuilt),'~thor_data400::key::veh_v2_src_index',    '~thor_data400::key::header::'+filedate+'::veh_v2_src',     bld_veh_v2);

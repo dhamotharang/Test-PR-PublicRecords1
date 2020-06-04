@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Scrubs - Checking field validity in a file - SALT V3.11.3');
+#workunit('name','BIPV2_ProxID.BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
 IMPORT BIPV2_ProxID,SALT311;
 infile := BIPV2_ProxID.In_DOT_Base;
 mod_scrubs := BIPV2_ProxID.Scrubs;

@@ -1,4 +1,4 @@
-import POE,mdr;
+﻿import POE,mdr;
 
 export As_POE(
 
@@ -38,6 +38,7 @@ function
 		self.company_fein					 			:= 0																			;
 		self.company_rawaid				 			:= l.raw_aid															;
 		self.company_aceaid				 			:= l.ace_aid															;
+		self.global_sid									:= l.global_sid														;
 	
 	end;
 

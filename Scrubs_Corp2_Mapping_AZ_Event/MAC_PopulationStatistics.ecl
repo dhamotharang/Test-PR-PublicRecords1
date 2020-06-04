@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_sos_charter_nbr = '',Input_event_date_type_cd = '',OutFile) := MACRO
-  IMPORT SALT32,Scrubs_Corp2_Mapping_AZ_Event;
+  IMPORT SALT311,Scrubs_Corp2_Mapping_AZ_Event;
   #uniquename(of)
   %of% := RECORD
-    SALT32.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

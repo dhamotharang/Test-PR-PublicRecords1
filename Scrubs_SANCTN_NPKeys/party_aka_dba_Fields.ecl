@@ -1,66 +1,89 @@
-IMPORT ut,SALT33;
+﻿IMPORT SALT311;
 EXPORT party_aka_dba_Fields := MODULE
+ 
+EXPORT NumFields := 10;
+ 
 // Processing for each FieldType
-EXPORT SALT33.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Batch','Invalid_DBCode','Invalid_NameType','Invalid_Num');
-EXPORT FieldTypeNum(SALT33.StrType fn) := CASE(fn,'Invalid_Batch' => 1,'Invalid_DBCode' => 2,'Invalid_NameType' => 3,'Invalid_Num' => 4,0);
-EXPORT MakeFT_Invalid_Batch(SALT33.StrType s0) := FUNCTION
-  s1 := SALT33.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'); // Only allow valid symbols
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Batch','Invalid_DBCode','Invalid_NameType','Invalid_Num');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_Batch' => 1,'Invalid_DBCode' => 2,'Invalid_NameType' => 3,'Invalid_Num' => 4,0);
+ 
+EXPORT MakeFT_Invalid_Batch(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Batch(SALT33.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT33.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_Invalid_Batch(UNSIGNED1 wh) := CHOOSE(wh,SALT33.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'),SALT33.HygieneErrors.NotLength('1..'),SALT33.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_DBCode(SALT33.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Batch(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_Invalid_Batch(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_DBCode(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_DBCode(SALT33.StrType s) := WHICH(((SALT33.StrType) s) NOT IN ['N','F']);
-EXPORT InValidMessageFT_Invalid_DBCode(UNSIGNED1 wh) := CHOOSE(wh,SALT33.HygieneErrors.NotInEnum('N|F'),SALT33.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_NameType(SALT33.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_DBCode(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['N','F','P']);
+EXPORT InValidMessageFT_Invalid_DBCode(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('N|F|P'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_NameType(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_NameType(SALT33.StrType s) := WHICH(((SALT33.StrType) s) NOT IN ['D','A']);
-EXPORT InValidMessageFT_Invalid_NameType(UNSIGNED1 wh) := CHOOSE(wh,SALT33.HygieneErrors.NotInEnum('D|A'),SALT33.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Num(SALT33.StrType s0) := FUNCTION
-  s1 := SALT33.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_NameType(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['D','A']);
+EXPORT InValidMessageFT_Invalid_NameType(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('D|A'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Num(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num(SALT33.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT33.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT33.HygieneErrors.NotInChars('0123456789'),SALT33.HygieneErrors.Good);
-EXPORT SALT33.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'batch','dbcode','incident_num','party_num','name_type','first_name','middle_name','last_name','aka_dba_text','party_key');
-EXPORT FieldNum(SALT33.StrType fn) := CASE(fn,'batch' => 0,'dbcode' => 1,'incident_num' => 2,'party_num' => 3,'name_type' => 4,'first_name' => 5,'middle_name' => 6,'last_name' => 7,'aka_dba_text' => 8,'party_key' => 9,0);
+EXPORT InValidFT_Invalid_Num(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+ 
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'batch','dbcode','incident_num','party_num','name_type','first_name','middle_name','last_name','aka_dba_text','party_key');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'batch','dbcode','incident_num','party_num','name_type','first_name','middle_name','last_name','aka_dba_text','party_key');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'batch' => 0,'dbcode' => 1,'incident_num' => 2,'party_num' => 3,'name_type' => 4,'first_name' => 5,'middle_name' => 6,'last_name' => 7,'aka_dba_text' => 8,'party_key' => 9,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['ENUM'],['ALLOW'],['ALLOW'],['ENUM'],[],[],[],[],['ALLOW'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+ 
 //Individual field level validation
-EXPORT Make_batch(SALT33.StrType s0) := MakeFT_Invalid_Batch(s0);
-EXPORT InValid_batch(SALT33.StrType s) := InValidFT_Invalid_Batch(s);
+ 
+EXPORT Make_batch(SALT311.StrType s0) := MakeFT_Invalid_Batch(s0);
+EXPORT InValid_batch(SALT311.StrType s) := InValidFT_Invalid_Batch(s);
 EXPORT InValidMessage_batch(UNSIGNED1 wh) := InValidMessageFT_Invalid_Batch(wh);
-EXPORT Make_dbcode(SALT33.StrType s0) := MakeFT_Invalid_DBCode(s0);
-EXPORT InValid_dbcode(SALT33.StrType s) := InValidFT_Invalid_DBCode(s);
+ 
+EXPORT Make_dbcode(SALT311.StrType s0) := MakeFT_Invalid_DBCode(s0);
+EXPORT InValid_dbcode(SALT311.StrType s) := InValidFT_Invalid_DBCode(s);
 EXPORT InValidMessage_dbcode(UNSIGNED1 wh) := InValidMessageFT_Invalid_DBCode(wh);
-EXPORT Make_incident_num(SALT33.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_incident_num(SALT33.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_incident_num(SALT311.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_incident_num(SALT311.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_incident_num(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
-EXPORT Make_party_num(SALT33.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_party_num(SALT33.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_party_num(SALT311.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_party_num(SALT311.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_party_num(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
-EXPORT Make_name_type(SALT33.StrType s0) := MakeFT_Invalid_NameType(s0);
-EXPORT InValid_name_type(SALT33.StrType s) := InValidFT_Invalid_NameType(s);
+ 
+EXPORT Make_name_type(SALT311.StrType s0) := MakeFT_Invalid_NameType(s0);
+EXPORT InValid_name_type(SALT311.StrType s) := InValidFT_Invalid_NameType(s);
 EXPORT InValidMessage_name_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_NameType(wh);
-EXPORT Make_first_name(SALT33.StrType s0) := s0;
-EXPORT InValid_first_name(SALT33.StrType s) := FALSE;
+ 
+EXPORT Make_first_name(SALT311.StrType s0) := s0;
+EXPORT InValid_first_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_first_name(UNSIGNED1 wh) := '';
-EXPORT Make_middle_name(SALT33.StrType s0) := s0;
-EXPORT InValid_middle_name(SALT33.StrType s) := FALSE;
+ 
+EXPORT Make_middle_name(SALT311.StrType s0) := s0;
+EXPORT InValid_middle_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_middle_name(UNSIGNED1 wh) := '';
-EXPORT Make_last_name(SALT33.StrType s0) := s0;
-EXPORT InValid_last_name(SALT33.StrType s) := FALSE;
+ 
+EXPORT Make_last_name(SALT311.StrType s0) := s0;
+EXPORT InValid_last_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_last_name(UNSIGNED1 wh) := '';
-EXPORT Make_aka_dba_text(SALT33.StrType s0) := s0;
-EXPORT InValid_aka_dba_text(SALT33.StrType s) := FALSE;
+ 
+EXPORT Make_aka_dba_text(SALT311.StrType s0) := s0;
+EXPORT InValid_aka_dba_text(SALT311.StrType s) := 0;
 EXPORT InValidMessage_aka_dba_text(UNSIGNED1 wh) := '';
-EXPORT Make_party_key(SALT33.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_party_key(SALT33.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_party_key(SALT311.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_party_key(SALT311.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_party_key(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT33,Scrubs_SANCTN_NPKeys;
+  IMPORT SALT311,Scrubs_SANCTN_NPKeys;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -89,9 +112,9 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_last_name;
     BOOLEAN Diff_aka_dba_text;
     BOOLEAN Diff_party_key;
-    SALT33.StrType SourceField {MAXLENGTH(30)};
+    SALT311.StrType SourceField {MAXLENGTH(30)};
     UNSIGNED Num_Diffs;
-    SALT33.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -105,7 +128,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_last_name := le.last_name <> ri.last_name;
     SELF.Diff_aka_dba_text := le.aka_dba_text <> ri.aka_dba_text;
     SELF.Diff_party_key := le.party_key <> ri.party_key;
-    SELF.Val := (SALT33.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.dbcode;
     SELF.Num_Diffs := 0+ IF( SELF.Diff_batch,1,0)+ IF( SELF.Diff_dbcode,1,0)+ IF( SELF.Diff_incident_num,1,0)+ IF( SELF.Diff_party_num,1,0)+ IF( SELF.Diff_name_type,1,0)+ IF( SELF.Diff_first_name,1,0)+ IF( SELF.Diff_middle_name,1,0)+ IF( SELF.Diff_last_name,1,0)+ IF( SELF.Diff_aka_dba_text,1,0)+ IF( SELF.Diff_party_key,1,0);
   END;

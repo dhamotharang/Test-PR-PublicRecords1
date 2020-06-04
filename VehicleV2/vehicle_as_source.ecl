@@ -1,15 +1,15 @@
 import header,ut,vehlic,Data_Services,Std;
 
 export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	dataset([],VehicleV2.Layout_Base_Main),
-														dataset(VehicleV2.Layout_Base.Party_bip)	pVehicleSearch	=	dataset([],VehicleV2.Layout_Base.Party_bip),
+														dataset(VehicleV2.Layout_Base.Party_CCPA)	pVehicleSearch	=	dataset([],VehicleV2.Layout_Base.Party_CCPA),
 														boolean pForHeaderBuild=false,
 														boolean pFastHeader = false
 													)
 	:=
   function
 	lc := Data_Services.Data_location.prefix('VehicleV2');
-	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(lc+'thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_bip,flat)
-																		,pFastHeader => dataset(lc+'thor_data400::base::vehicles_v2_party_Quickheader_building',VehicleV2.Layout_Base.Party_bip,flat)
+	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(lc+'thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_CCPA,flat)
+																		,pFastHeader => dataset(lc+'thor_data400::base::vehicles_v2_party_Quickheader_building',VehicleV2.Layout_Base.Party_CCPA,flat)
 														,pvehicleSearch(append_did<999999000000)
 													),VehicleV2.Layout_Base.Party)
 													(lname<>'' and fname<>'' and ace_prim_name<>'')

@@ -102,8 +102,9 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF := [];
 END;
 
-t_mappend_f := PROJECT(domain_d, t_map_to_common(left));
+t_mappend_f 	:= PROJECT(domain_d, t_map_to_common(left));
 
+addGlobalSID 	:= mdr.macGetGlobalSID(t_mappend_f,'EmailDataV2','email_src','global_sid'); //DF-25302: Populate Global_SID
 
-RETURN t_mappend_f;//(~Entiera.fn_profanity(clean_email));
+RETURN addGlobalSID;//(~Entiera.fn_profanity(clean_email));
 END;

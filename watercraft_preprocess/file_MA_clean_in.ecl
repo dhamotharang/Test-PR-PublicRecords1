@@ -1,9 +1,9 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.MA;
 
 //Trim and uppercase fields prior to mapping
-Watercraft.Layout_MA CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.Layout_MA_new CleanTrimRaw(fIn_raw L) := TRANSFORM
 self.STATEABREV	:= ut.CleanSpacesAndUpper(L.STATEABREV);
 self.REG_NUM	:= ut.CleanSpacesAndUpper(L.REG_NUM);
 self.HULL_ID	:= ut.CleanSpacesAndUpper(L.HULL_ID);

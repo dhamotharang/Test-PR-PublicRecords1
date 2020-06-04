@@ -1,10 +1,11 @@
-IMPORT _Control,PRTE2_Prof_License_Mari;
+﻿IMPORT _Control,PRTE2_Prof_License_Mari;
 
 EXPORT Constants := MODULE
 
 		EXPORT in_prefix_name           := '~prte::in::ebr::';
     EXPORT base_prefix_name         := '~prte::base::ebr::';
 		EXPORT qaVersion              	:= '::qa::';
+		Export dops_name                :='EBRKeys';
 		
 		
 		//roxie keys

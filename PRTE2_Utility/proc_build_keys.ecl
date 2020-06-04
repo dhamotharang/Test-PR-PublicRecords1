@@ -1,6 +1,9 @@
-﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,Doxie,AutoStandardI,AutoKeyB2, UtilFile, Autokey, ut, AutokeyB,PRTE2_Common;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,Doxie,AutoStandardI,AutoKeyB2, UtilFile, Autokey, ut, AutokeyB,PRTE2_Common, dops, orbit3;
 
-EXPORT proc_build_keys(string filedate) := function
+EXPORT proc_build_keys (string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
+
+is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
+doDOPS 								:= is_running_in_prod AND NOT skipDOPS;
 
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Keys.address,			Constants.SuperKeyName_util +'utility_address', Constants.key_prefix+filedate+'::address',key_addr);
@@ -56,20 +59,24 @@ return retval;
 
 end;
 
+//---------- making DOPS optional and only in PROD build -------------------------------													
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('UtilityDailyKeys',filedate,notifyEmail,'B','N','N');
+    PerformUpdateOrNot 	:= IF(doDOPS,sequential(updatedops),NoUpdate);
+		
+		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
 
-// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
-DOPS_Comment		 := OUTPUT('Skipping DOPS process');
-updatedops   		 := PRTE.UpdateVersion('UtilityDailyKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra	 := PRTE.UpdateVersion('FCRA_UtilityDailyKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
-											 
-// -- Actions
+    updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE - Utility', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
+
 buildKey	:=	ordered(
 											build_roxie_keys
 											,to_qa
 											,build_autokeys(filedate)
-										,if(not is_running_in_prod, DOPS_Comment, parallel(updatedops,updatedops_fcra))
-											);
+											,updatedops
+											,key_validation
+											,updateorbit
+									  	);
 													
 return	buildKey;
 											 

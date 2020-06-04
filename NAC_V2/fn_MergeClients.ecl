@@ -79,6 +79,16 @@ Let’s say there’s some case reorganization or something else that causes a n
 */
 // update with new client fields
 $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
+//**** Case fields
+	self.case_Monthly_Allotment := newbase.case_Monthly_Allotment;
+	self.RegionCode := newbase.RegionCode;
+	self.CountyCode := newbase.CountyCode;
+	self.CountyName := newbase.CountyName;
+	self.case_Phone1 := newbase.case_Phone1;
+	self.case_Phone2 := newbase.case_Phone2;
+	self.case_Email := newbase.case_Email;
+								
+//**** Client fields
 	self.StartDate 	:=	newbase.StartDate;
 	self.EndDate		:=	newbase.EndDate;
 	self.StartDate_Raw		:=	newbase.StartDate_Raw;
@@ -121,26 +131,33 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 	self.name_suffix		:=	newbase.name_suffix;
 	
 	self.updated := newbase.created;
+	self.filename := newbase.filename;
+	self.NCF_FileDate := newbase.NCF_FileDate;
+	self.NCF_FileTime := newbase.NCF_FileTime;
 
 	self := base;
 
 END;
 
 EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
-	clients := DISTRIBUTE(newbase, HASH32(ProgramState, ProgramCode, CaseID, ClientId));
+	c1 := DISTRIBUTE(newbase, HASH32(ClientId)); 
+	clients := DEDUP(SORT(c1, ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate,-$.fn_lfnversion(filename), local),
+									ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate, local);
 	
-	current := DISTRIBUTE(base,HASH32(ProgramState, ProgramCode, CaseId, ClientId));
+	current := DISTRIBUTE(base,HASH32(ClientId));
 	
 	// find unchanged records
 	unchanged := JOIN(current, clients,
-					left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId and left.ClientId=right.ClientId,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId,
 					TRANSFORM($.Layout_Base2,
 						self := left;), left only, local);
 
 	newClients := JOIN(current, clients,
-					left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId and left.ClientId=right.ClientId,
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId,
 					TRANSFORM($.Layout_Base2,
 							self.Created := RIGHT.Created;
 							self := right;
@@ -153,8 +170,9 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 	// do direct updates first with no change to eligibility
 	// TO DO: add historical record for a name change
 	directUpdates := JOIN(candidates, updates,
-					left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId and left.ClientId=right.ClientId
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
 					and left.StartDate=right.StartDate and left.EndDate=right.EndDate
 					and left.eligibility_status_indicator=right.eligibility_status_indicator,
 					xForm(RIGHT, LEFT),
@@ -164,8 +182,9 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 	// handle change to start date
 	// handle change to end date
 	remaining := JOIN(candidates, updates,		// temp for testing direct updates first
-					left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId and left.ClientId=right.ClientId
+					left.ClientId=right.ClientId and left.caseId=right.CaseId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and left.GroupId=right.GroupId
 					and (left.StartDate<>right.StartDate OR left.EndDate<>right.EndDate
 					or left.eligibility_status_indicator<>right.eligibility_status_indicator),
 					xForm(RIGHT, LEFT),

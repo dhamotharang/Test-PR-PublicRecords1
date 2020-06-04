@@ -119,9 +119,9 @@ build_autokeys_airmen	:= Keys.autokeys_airmen(filedate);
 
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
 is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
-DOPS_Comment		 					:= OUTPUT('Skipping DOPS process');
-updatedops   		 				:= PRTE.UpdateVersion('FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra  			:= PRTE.UpdateVersion('FCRA_FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
+updatedops   		 		:= PRTE.UpdateVersion('FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
 
 
 

@@ -1,4 +1,4 @@
-IMPORT Lib_THORLIB;
+﻿IMPORT Lib_THORLIB;
 LocalEntry_Limit := 5000000;
 
 EXPORT Nominalization_Module(BOOLEAN incremental, Filename_Info info, 
@@ -109,8 +109,8 @@ EXPORT Nominalization_Module(BOOLEAN incremental, Filename_Info info,
 	// determine Local (local replicants) versus Global entries
 	NodeLimit := RECORD
 		INTEGER2		nodes;
-		INTEGER4		words := 1;
-		INTEGER4		cummulative := 0;
+		INTEGER5		words := 1;
+		INTEGER5		cummulative := 0;
 	END;
 	t0:=DISTRIBUTED(PROJECT(nominal_assigned,TRANSFORM(NodeLimit,SELF.nodes:=LEFT.nodeCount)));
 	

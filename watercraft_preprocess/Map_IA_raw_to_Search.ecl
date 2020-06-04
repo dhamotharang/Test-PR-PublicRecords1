@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // translates ia_phase01_update.mp Ab intio graph into ECL
 
@@ -21,7 +21,7 @@ Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(hull
 	self.state_origin				:=	'IA';
 	self.source_code				:=	'AW';
 	self.dppa_flag					:=	'';
-	self.orig_name					:=	choose(C,L.NAME, L.NAME2);
+	self.orig_name					:= L.NAME;
 	self.orig_name_type_code		:=	'O';
 	self.orig_name_type_description	:=	'OWNER';
 	self.orig_name_first			:=	choose(C,L.FIRST_NAME, '');

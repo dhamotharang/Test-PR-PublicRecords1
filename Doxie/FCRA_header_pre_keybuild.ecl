@@ -162,8 +162,8 @@ TRANSFORM
 	self := le;
 END;
 
-
-with_segmented := JOIN(with_appends,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::fcra_header_pre_keybuild');
+with_appends_ccpa_compliant := header.fn_suppress_ccpa(with_appends,true);
+with_segmented := JOIN(with_appends_ccpa_compliant,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::fcra_header_pre_keybuild');
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
 export FCRA_header_pre_keybuild := project(PRTE2_Header.pre_keys.header_FCRA_pre_keybuild,{xHead_Layout});

@@ -142,7 +142,7 @@ IMPORT InsuranceHeader_xLink, ut;
 	InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId, ,SNAME, fname, mname, lname, derived_gender, 
 																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP,																
 																SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
-																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);																
+																SRC, SOURCE_RID, fname2, lname2, %res_out%, %asIndex%, , , disableForce);
 
 	#UNIQUENAME(result_trim)
 	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, reference);

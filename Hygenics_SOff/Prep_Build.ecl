@@ -5,23 +5,23 @@
 EXPORT Prep_Build := Module
 
 		EXPORT PB_Sex_Offender_Main(ds) := functionmacro
-				Import Suppress;
-				// thor_data400::base::sex_offender_main'+ doxie_build.buildstate + '_BUILDING'
-				return(Suppress.applyRegulatory.apply_SO_Offender_Main(ds));				
+				import Hygenics_SOff;
+				
+				return(Hygenics_SOff.Regulatory.apply_SO_Offender_Main(ds));				
 		endmacro;
 
 		EXPORT PB_Sex_Offender_Offense(ds) := functionmacro
-				Import Suppress;
-				// thor_data400::base::sex_offender_main'+ doxie_build.buildstate + '_BUILDING'
-				return(Suppress.applyRegulatory.apply_SO_Offender_Offense(ds));				
+				import Hygenics_SOff;
+
+				return(Hygenics_SOff.Regulatory.apply_SO_Offender_Offense(ds));				
 		endmacro;
 
 // not sure how this will be used
 		EXPORT PB_sex_offender_enh_fdid(ds) := functionmacro
-				Import Suppress;
+				import Hygenics_SOff;
 				// 'persist::SexOffender_Temp'
 				// 'persist::sex_offender_enh_fdids'
-				return(Suppress.applyRegulatory.apply_SO_enh_fdid(ds));				
+				return(Hygenics_SOff.Regulatory.apply_SO_enh_fdid(ds));				
 		endmacro;
 
 end;

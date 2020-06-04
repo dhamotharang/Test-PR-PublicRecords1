@@ -10,7 +10,7 @@ import NeustarWireless, ut, _validate;
 phone_f := NeustarWireless.Files.Base.Main(current_rec=true);
 
 //map to a common layout
-Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Transform
+	PhonesPlus_V2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Transform
 	self.npa := input.phone [1..3];
 	self.phone7 := input.phone [4..10];
 	self.cellphone := input.phone;
@@ -38,8 +38,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.glb_dppa_flag := '';
 	self.glb_dppa_all := '';
 	self.vendor := input.source; //"N2"
-	self.src := '';
-	self.src_all := translation_codes.source_bitmap_code(input.source);
+	self.source := input.source; //DF-25784
+	self.src_all := PhonesPlus_V2.translation_codes.source_bitmap_code(input.source);
 	self.append_avg_source_conf := 0;
 	self.append_max_source_conf := 0;
 	self.append_min_source_conf := 0;
@@ -110,6 +110,10 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.rawaid := input.rawaid;
 	self.cleanaid := input.aceaid;
 	//nuestar only rules
+	self.activity_status := input.activity_status; 	//DF-25784
+	self.prepaid := input.prepaid; 									//DF-25784
+	self.verified := input.verified; 								//DF-25784
+	self.cord_cutter:= input.cord_cutter; 					//DF-25784
 	activity_status_rule := MAP
 													(	input.activity_status= 'A1' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A1'),
 														input.activity_status= 'A2' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A2'),

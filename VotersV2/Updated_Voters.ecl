@@ -35,6 +35,12 @@ Sort_Cleaned_Patched_file := sort(date_fix,RECORD,
 								  file_acquired_date,local);
 
 Layout_outfile  rollupXform(Layout_outfile l, Layout_outfile r) := transform
+//Mapped vendor name fields to base name fields
+  self.title := l.prefix_title;
+	self.fname := l.first_name;
+	self.mname := l.middle_name;
+	self.lname := l.last_name;
+	self.name_suffix := l.name_suffix_in;
 	self.Process_Date    := if(l.Process_Date > r.Process_Date, l.Process_Date, r.Process_Date);
 	self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
 	self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);

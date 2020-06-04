@@ -1,0 +1,1 @@
+﻿{ unsigned8 lnpid => string8 biog_number, unsigned8 __internal_fpos__ };

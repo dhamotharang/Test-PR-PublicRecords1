@@ -1,4 +1,4 @@
-import versioncontrol,tools;
+﻿import versioncontrol,tools;
 
 export Filenames(string pversion = '', boolean pUseProd = false) := module
   export collapse_lBaseTemplate_built				:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::collapse::built';
@@ -143,6 +143,9 @@ export Filenames(string pversion = '', boolean pUseProd = false) := module
 
 	export gk_to_provID_lBaseTemplate					:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::gk_to_provID::@version@';
 	export gk_to_provID_Base									:= tools.mod_FilenamesBuild(gk_to_provID_lBaseTemplate, pversion);
+	
+	export individual_exceptions_lBaseTemplate	:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::individual_exceptions::@version@';
+	export individual_exceptions								:= tools.mod_FilenamesBuild(individual_exceptions_lBaseTemplate, pversion);
 	
 end;
 

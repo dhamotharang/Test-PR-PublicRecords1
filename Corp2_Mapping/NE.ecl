@@ -68,12 +68,12 @@ EXPORT NE  := MODULE;
 			self.corp_ra_dt_first_seen								:=(integer)fileDate;
 			self.corp_ra_dt_last_seen									:=(integer)fileDate;
 			self.corp_process_date										:= fileDate;    	
-			self.corp_key					    		  					:= state_fips +'-'+ corp2.t2u(input.AcctNumber);		
+			self.corp_key                             := state_fips +'-'+ corp2.t2u(input.AcctNumber);
 			self.corp_vendor													:= state_fips;		
 			self.corp_state_origin										:= state_origin;
 			self.corp_inc_state 										  := state_origin; 
 			self.corp_orig_sos_charter_nbr						:= corp2.t2u(input.AcctNumber);				
-			self.corp_legal_name											:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.CorpStateName).BusinessName;
+			self.corp_legal_name											:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.CorpStateName).BusinessName;				
 			self.corp_home_state_name									:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.forgncorpname).BusinessName;
 			self.corp_ln_name_type_cd									:= corp2_Raw_NE.Functions.NameTypeCode(input.CorpTypeCode);						
 			self.corp_ln_name_type_desc								:= map(self.corp_ln_name_type_cd = '01'=>'LEGAL',
@@ -233,13 +233,12 @@ EXPORT NE  := MODULE;
 			self.corp_ra_dt_first_seen			 			:= (integer)fileDate;
 			self.corp_ra_dt_last_seen				 			:= (integer)fileDate;	
 			self.corp_process_date				  			:= fileDate; 
-			self.corp_key													:= state_fips +'-'+corp2.t2u(input.AcctNumber);
-			self.corp_vendor											:= state_fips ;
+			self.corp_key													:= state_fips +'-'+corp2.t2u(input.AcctNumber);self.corp_vendor											:= state_fips ;
 			self.corp_state_origin								:= state_origin;				
 			self.corp_inc_state 									:= state_origin; 
 			self.corp_orig_sos_charter_nbr				:= corp2.t2u(input.AcctNumber);		
 			self.corp_legal_name									:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.CorpStateName).BusinessName;	
-			self.Cont_full_name               		:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.name).BusinessName;	
+      self.Cont_full_name               		:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.name).BusinessName;	
 			self.cont_type_cd											:= 'O/I';
 			self.cont_type_desc										:= 'OWNER/APPLICANT';
 			self.cont_address_line1								:= corp2_mapping.fCleanAddress(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode).AddressLine1;
@@ -283,7 +282,7 @@ EXPORT NE  := MODULE;
 			self.corp_inc_state 									:= state_origin ; 
 			self.corp_orig_sos_charter_nbr				:= corp2.t2u(input.AcctNumber);	
 			self.corp_legal_name									:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.CorpStateName).BusinessName;
-			self.Cont_full_name               		:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.FirstName + ' ' +input.MiddleName + ' ' + input.LastName).BusinessName;
+      self.Cont_full_name               		:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.FirstName + ' ' +input.MiddleName + ' ' + input.LastName).BusinessName;
 			self.cont_address_line1								:= corp2_mapping.fCleanAddress(State_origin,State_desc,input.OfcrStreetAddress1,input.OfcrStreetAddress2,input.OfcrCity,input.OfcrState,input.OfcrZipcode).AddressLine1;
 			self.cont_address_line2								:= corp2_mapping.fCleanAddress(State_origin,State_desc,input.OfcrStreetAddress1,input.OfcrStreetAddress2,input.OfcrCity,input.OfcrState,input.OfcrZipcode).AddressLine2;
 			self.cont_address_line3								:= corp2_mapping.fCleanAddress(State_origin,State_desc,input.OfcrStreetAddress1,input.OfcrStreetAddress2,input.OfcrCity,input.OfcrState,input.OfcrZipcode).AddressLine3;
@@ -333,8 +332,7 @@ EXPORT NE  := MODULE;
 					 (integer)(input.DocumentNumber)= 0 and trim(input.FilingTypeDescription)= '' and corp2_mapping.fValidateDate(input.FilingDateTime[1..10],'CCYY-MM-DD').PastDate='' 
 					 )
 				 
-			self.corp_key								:= state_fips +'-'+corp2.t2u(input.AcctNumber);
-			self.corp_vendor						:= state_fips ;
+			self.corp_key								:= state_fips +'-'+corp2.t2u(input.AcctNumber);self.corp_vendor						:= state_fips ;
 			self.corp_state_origin			:= state_origin ;
 			self.corp_process_date			:= fileDate;		
 			self.corp_sos_charter_nbr 	:= corp2.t2u(input.AcctNumber);	
@@ -365,8 +363,7 @@ EXPORT NE  := MODULE;
 		       (integer)(input.DocumentNumber)= 0 and corp2.t2u(input.FilingTypeDescription) = '' and corp2_mapping.fValidateDate(input.FilingDateTime[1..10],'CCYY-MM-DD').PastDate='' and
 				   corp2_mapping.fValidateDate(input.EffectiveDate[1..10],'CCYY-MM-DD').GeneralDate=''
 				   )
-      self.corp_key										:= state_fips+'-' + corp2.t2u(input.AcctNumber);
-			self.corp_vendor								:= state_fips ;
+      self.corp_key										:= state_fips+'-' + corp2.t2u(input.AcctNumber);self.corp_vendor								:= state_fips ;
 			self.corp_state_origin					:= state_origin ;
 			self.corp_process_date					:= fileDate;
 			self.corp_sos_charter_nbr 			:= corp2.t2u(input.AcctNumber);	
@@ -435,7 +432,7 @@ EXPORT NE  := MODULE;
 																									corp_vendor_Invalid 														<> 0 or
 																									corp_state_origin_Invalid 											<> 0 or
 																									corp_process_date_Invalid 											<> 0 or
-																									corp_orig_sos_charter_nbr_Invalid 							<> 0 or
+																									corp_orig_sos_charter_nbr_Invalid 						  <> 0 or
 																									corp_legal_name_Invalid 												<> 0 or
 																									corp_ln_name_type_cd_Invalid 										<> 0 or
 																									corp_filing_date_Invalid 												<> 0 or
@@ -464,7 +461,7 @@ EXPORT NE  := MODULE;
 																									corp_vendor_Invalid 														= 0 and
 																									corp_state_origin_Invalid 											= 0 and
 																									corp_process_date_Invalid 											= 0 and
-																									corp_orig_sos_charter_nbr_Invalid 							= 0 and
+																									corp_orig_sos_charter_nbr_Invalid								= 0 and
 																									corp_legal_name_Invalid 												= 0 and
 																									corp_ln_name_type_cd_Invalid 									  = 0 and
 																									corp_filing_date_Invalid 												= 0 and

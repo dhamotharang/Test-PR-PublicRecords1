@@ -1,4 +1,4 @@
-IMPORT PRTE2_Header,infutor,header,_CONTROL, doxie;
+﻿IMPORT PRTE2_Header,infutor,header,_CONTROL, doxie;
 EXPORT files := module
 
 
@@ -23,13 +23,15 @@ EXPORT files := module
 						   ,SELF.pfname             :=left.fname
 						   ,SELF.yob                :=left.dob div 10000
 						   ,SELF.minit              :=left.mname[1]
-
-						   ,SELF:=LEFT));
+ 
+						   ,SELF:=LEFT
+							 ,SELF := []));
 
 	EXPORT Header_Infutor_Knowx         := dedup(project(prte_infutor, {Infutor.Key_Header_Infutor_Knowx}),record,all);
 	EXPORT Teaser_cnsmr_did             := dedup(project(prte_infutor, {Header.Key_Teaser_cnsmr_did}),record,all);
 	EXPORT Infutor_Key_Teaser_cnsmr_did := dedup(project(prte_infutor, {Header.Key_Teaser_cnsmr_search}),record,all);
 	EXPORT Infutor_Header			          := project(prte_infutor, {recordof(doxie.header_pre_keybuild)- Infutor.layout_header_exclusions});
-	EXPORT infutor_best_did			        := dataset('~prte::base::infutor_best_did',{infutor.layout_best.lbest},thor,opt);
+	EXPORT infutor_best_did_base			  := dataset('~prte::base::infutor_best_did',{infutor.layout_best.lbest},thor,opt);
+	EXPORT infutor_best_did			        := project(infutor_best_did_base, transform(infutor.Layout_infutor_best_DID, self := left, self := []));
 
 END;

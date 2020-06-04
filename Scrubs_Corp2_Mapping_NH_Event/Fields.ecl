@@ -1,207 +1,212 @@
-IMPORT ut,SALT34;
+﻿IMPORT SALT311;
 IMPORT Scrubs,Scrubs_Corp2_Mapping_NH_Event; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
+EXPORT NumFields := 29;
+ 
 // Processing for each FieldType
-EXPORT SALT34.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_future_date','invalid_charter_nbr','invalid_event_filing_reference_nbr','invalid_event_desc','invalid_event_date_type_cd','invalid_event_date_type_desc');
-EXPORT FieldTypeNum(SALT34.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_future_date' => 6,'invalid_charter_nbr' => 7,'invalid_event_filing_reference_nbr' => 8,'invalid_event_desc' => 9,'invalid_event_date_type_cd' => 10,'invalid_event_date_type_desc' => 11,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_future_date','invalid_charter_nbr','invalid_event_filing_reference_nbr','invalid_event_desc','invalid_event_date_type_cd','invalid_event_date_type_desc');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_future_date' => 6,'invalid_charter_nbr' => 7,'invalid_event_filing_reference_nbr' => 8,'invalid_event_desc' => 9,'invalid_event_date_type_cd' => 10,'invalid_event_date_type_desc' => 11,0);
  
-EXPORT MakeFT_invalid_corp_key(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'-0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_corp_key(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'-0123456789ABT'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_corp_key(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'-0123456789'))),~(LENGTH(TRIM(s)) >= 4));
-EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('-0123456789'),SALT34.HygieneErrors.NotLength('4..'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_key(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'-0123456789ABT'))),~(LENGTH(TRIM(s)) >= 4));
+EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('-0123456789ABT'),SALT311.HygieneErrors.NotLength('4..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corp_vendor(SALT34.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corp_vendor(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corp_vendor(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['33']);
-EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('33'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_vendor(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['33']);
+EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('33'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_state_origin(SALT34.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_state_origin(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_state_origin(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['NH']);
-EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('NH'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_state_origin(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['NH']);
+EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('NH'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mandatory(SALT34.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mandatory(SALT34.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotLength('1..'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mandatory(SALT311.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_date(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0);
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('0123456789'),SALT34.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0);
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_future_date(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_future_date(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_future_date(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_GeneralDate(s)>0);
-EXPORT InValidMessageFT_invalid_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('0123456789'),SALT34.HygieneErrors.CustomFail('Scrubs.fn_valid_GeneralDate'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_future_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_GeneralDate(s)>0);
+EXPORT InValidMessageFT_invalid_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_GeneralDate'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_charter_nbr(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_charter_nbr(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_charter_nbr(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),SALT34.HygieneErrors.NotLength('1..'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_charter_nbr(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_event_filing_reference_nbr(SALT34.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_event_filing_reference_nbr(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_event_filing_reference_nbr(SALT34.StrType s) := WHICH(~Scrubs_Corp2_Mapping_NH_Event.Functions.valid_documentid(s)>0);
-EXPORT InValidMessageFT_invalid_event_filing_reference_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_NH_Event.Functions.valid_documentid'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_event_filing_reference_nbr(SALT311.StrType s) := WHICH(~Scrubs_Corp2_Mapping_NH_Event.Functions.valid_documentid(s)>0);
+EXPORT InValidMessageFT_invalid_event_filing_reference_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_NH_Event.Functions.valid_documentid'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_event_desc(SALT34.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_event_desc(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_event_desc(SALT34.StrType s) := WHICH(~Scrubs_Corp2_Mapping_NH_Event.Functions.valid_document_type_desc(s)>0);
-EXPORT InValidMessageFT_invalid_event_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_NH_Event.Functions.valid_document_type_desc'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_event_desc(SALT311.StrType s) := WHICH(~Scrubs_Corp2_Mapping_NH_Event.Functions.valid_document_type_desc(s)>0);
+EXPORT InValidMessageFT_invalid_event_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_NH_Event.Functions.valid_document_type_desc'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_event_date_type_cd(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'EFIL'); // Only allow valid symbols
+EXPORT MakeFT_invalid_event_date_type_cd(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'EFIL'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_event_date_type_cd(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'EFIL'))));
-EXPORT InValidMessageFT_invalid_event_date_type_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('EFIL'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_event_date_type_cd(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'EFIL'))));
+EXPORT InValidMessageFT_invalid_event_date_type_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('EFIL'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_event_date_type_desc(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,'CEFGILNTV '); // Only allow valid symbols
+EXPORT MakeFT_invalid_event_date_type_desc(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'CEFGILNTV '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_event_date_type_desc(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'CEFGILNTV '))));
-EXPORT InValidMessageFT_invalid_event_date_type_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('CEFGILNTV '),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_event_date_type_desc(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'CEFGILNTV '))));
+EXPORT InValidMessageFT_invalid_event_date_type_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('CEFGILNTV '),SALT311.HygieneErrors.Good);
  
-EXPORT SALT34.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_reference_nbr','event_amendment_nbr','event_filing_date','event_date_type_cd','event_date_type_desc','event_filing_cd','event_filing_desc','event_corp_nbr','event_corp_nbr_cd','event_corp_nbr_desc','event_roll','event_frame','event_start','event_end','event_microfilm_nbr','event_desc','event_revocation_comment1','event_revocation_comment2','event_book_nbr','event_page_nbr','event_certification_nbr');
-EXPORT FieldNum(SALT34.StrType fn) := CASE(fn,'corp_key' => 0,'corp_supp_key' => 1,'corp_vendor' => 2,'corp_vendor_county' => 3,'corp_vendor_subcode' => 4,'corp_state_origin' => 5,'corp_process_date' => 6,'corp_sos_charter_nbr' => 7,'event_filing_reference_nbr' => 8,'event_amendment_nbr' => 9,'event_filing_date' => 10,'event_date_type_cd' => 11,'event_date_type_desc' => 12,'event_filing_cd' => 13,'event_filing_desc' => 14,'event_corp_nbr' => 15,'event_corp_nbr_cd' => 16,'event_corp_nbr_desc' => 17,'event_roll' => 18,'event_frame' => 19,'event_start' => 20,'event_end' => 21,'event_microfilm_nbr' => 22,'event_desc' => 23,'event_revocation_comment1' => 24,'event_revocation_comment2' => 25,'event_book_nbr' => 26,'event_page_nbr' => 27,'event_certification_nbr' => 28,0);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_reference_nbr','event_amendment_nbr','event_filing_date','event_date_type_cd','event_date_type_desc','event_filing_cd','event_filing_desc','event_corp_nbr','event_corp_nbr_cd','event_corp_nbr_desc','event_roll','event_frame','event_start','event_end','event_microfilm_nbr','event_desc','event_revocation_comment1','event_revocation_comment2','event_book_nbr','event_page_nbr','event_certification_nbr');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_reference_nbr','event_amendment_nbr','event_filing_date','event_date_type_cd','event_date_type_desc','event_filing_cd','event_filing_desc','event_corp_nbr','event_corp_nbr_cd','event_corp_nbr_desc','event_roll','event_frame','event_start','event_end','event_microfilm_nbr','event_desc','event_revocation_comment1','event_revocation_comment2','event_book_nbr','event_page_nbr','event_certification_nbr');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'corp_key' => 0,'corp_supp_key' => 1,'corp_vendor' => 2,'corp_vendor_county' => 3,'corp_vendor_subcode' => 4,'corp_state_origin' => 5,'corp_process_date' => 6,'corp_sos_charter_nbr' => 7,'event_filing_reference_nbr' => 8,'event_amendment_nbr' => 9,'event_filing_date' => 10,'event_date_type_cd' => 11,'event_date_type_desc' => 12,'event_filing_cd' => 13,'event_filing_desc' => 14,'event_corp_nbr' => 15,'event_corp_nbr_cd' => 16,'event_corp_nbr_desc' => 17,'event_roll' => 18,'event_frame' => 19,'event_start' => 20,'event_end' => 21,'event_microfilm_nbr' => 22,'event_desc' => 23,'event_revocation_comment1' => 24,'event_revocation_comment2' => 25,'event_book_nbr' => 26,'event_page_nbr' => 27,'event_certification_nbr' => 28,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],[],['ENUM'],[],[],['ENUM'],['ALLOW','CUSTOM'],['ALLOW','LENGTHS'],['CUSTOM'],[],['ALLOW','CUSTOM'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_corp_key(SALT34.StrType s0) := MakeFT_invalid_corp_key(s0);
-EXPORT InValid_corp_key(SALT34.StrType s) := InValidFT_invalid_corp_key(s);
+EXPORT Make_corp_key(SALT311.StrType s0) := MakeFT_invalid_corp_key(s0);
+EXPORT InValid_corp_key(SALT311.StrType s) := InValidFT_invalid_corp_key(s);
 EXPORT InValidMessage_corp_key(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_key(wh);
  
-EXPORT Make_corp_supp_key(SALT34.StrType s0) := s0;
-EXPORT InValid_corp_supp_key(SALT34.StrType s) := FALSE;
+EXPORT Make_corp_supp_key(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_supp_key(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_supp_key(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_vendor(SALT34.StrType s0) := MakeFT_invalid_corp_vendor(s0);
-EXPORT InValid_corp_vendor(SALT34.StrType s) := InValidFT_invalid_corp_vendor(s);
+EXPORT Make_corp_vendor(SALT311.StrType s0) := MakeFT_invalid_corp_vendor(s0);
+EXPORT InValid_corp_vendor(SALT311.StrType s) := InValidFT_invalid_corp_vendor(s);
 EXPORT InValidMessage_corp_vendor(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_vendor(wh);
  
-EXPORT Make_corp_vendor_county(SALT34.StrType s0) := s0;
-EXPORT InValid_corp_vendor_county(SALT34.StrType s) := FALSE;
+EXPORT Make_corp_vendor_county(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_vendor_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_vendor_subcode(SALT34.StrType s0) := s0;
-EXPORT InValid_corp_vendor_subcode(SALT34.StrType s) := FALSE;
+EXPORT Make_corp_vendor_subcode(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_vendor_subcode(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_subcode(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_state_origin(SALT34.StrType s0) := MakeFT_invalid_state_origin(s0);
-EXPORT InValid_corp_state_origin(SALT34.StrType s) := InValidFT_invalid_state_origin(s);
+EXPORT Make_corp_state_origin(SALT311.StrType s0) := MakeFT_invalid_state_origin(s0);
+EXPORT InValid_corp_state_origin(SALT311.StrType s) := InValidFT_invalid_state_origin(s);
 EXPORT InValidMessage_corp_state_origin(UNSIGNED1 wh) := InValidMessageFT_invalid_state_origin(wh);
  
-EXPORT Make_corp_process_date(SALT34.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_process_date(SALT34.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_process_date(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_process_date(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_sos_charter_nbr(SALT34.StrType s0) := MakeFT_invalid_charter_nbr(s0);
-EXPORT InValid_corp_sos_charter_nbr(SALT34.StrType s) := InValidFT_invalid_charter_nbr(s);
+EXPORT Make_corp_sos_charter_nbr(SALT311.StrType s0) := MakeFT_invalid_charter_nbr(s0);
+EXPORT InValid_corp_sos_charter_nbr(SALT311.StrType s) := InValidFT_invalid_charter_nbr(s);
 EXPORT InValidMessage_corp_sos_charter_nbr(UNSIGNED1 wh) := InValidMessageFT_invalid_charter_nbr(wh);
  
-EXPORT Make_event_filing_reference_nbr(SALT34.StrType s0) := MakeFT_invalid_event_filing_reference_nbr(s0);
-EXPORT InValid_event_filing_reference_nbr(SALT34.StrType s) := InValidFT_invalid_event_filing_reference_nbr(s);
+EXPORT Make_event_filing_reference_nbr(SALT311.StrType s0) := MakeFT_invalid_event_filing_reference_nbr(s0);
+EXPORT InValid_event_filing_reference_nbr(SALT311.StrType s) := InValidFT_invalid_event_filing_reference_nbr(s);
 EXPORT InValidMessage_event_filing_reference_nbr(UNSIGNED1 wh) := InValidMessageFT_invalid_event_filing_reference_nbr(wh);
  
-EXPORT Make_event_amendment_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_amendment_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_amendment_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_amendment_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_amendment_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_filing_date(SALT34.StrType s0) := MakeFT_invalid_future_date(s0);
-EXPORT InValid_event_filing_date(SALT34.StrType s) := InValidFT_invalid_future_date(s);
+EXPORT Make_event_filing_date(SALT311.StrType s0) := MakeFT_invalid_future_date(s0);
+EXPORT InValid_event_filing_date(SALT311.StrType s) := InValidFT_invalid_future_date(s);
 EXPORT InValidMessage_event_filing_date(UNSIGNED1 wh) := InValidMessageFT_invalid_future_date(wh);
  
-EXPORT Make_event_date_type_cd(SALT34.StrType s0) := MakeFT_invalid_event_date_type_cd(s0);
-EXPORT InValid_event_date_type_cd(SALT34.StrType s) := InValidFT_invalid_event_date_type_cd(s);
+EXPORT Make_event_date_type_cd(SALT311.StrType s0) := MakeFT_invalid_event_date_type_cd(s0);
+EXPORT InValid_event_date_type_cd(SALT311.StrType s) := InValidFT_invalid_event_date_type_cd(s);
 EXPORT InValidMessage_event_date_type_cd(UNSIGNED1 wh) := InValidMessageFT_invalid_event_date_type_cd(wh);
  
-EXPORT Make_event_date_type_desc(SALT34.StrType s0) := MakeFT_invalid_event_date_type_desc(s0);
-EXPORT InValid_event_date_type_desc(SALT34.StrType s) := InValidFT_invalid_event_date_type_desc(s);
+EXPORT Make_event_date_type_desc(SALT311.StrType s0) := MakeFT_invalid_event_date_type_desc(s0);
+EXPORT InValid_event_date_type_desc(SALT311.StrType s) := InValidFT_invalid_event_date_type_desc(s);
 EXPORT InValidMessage_event_date_type_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_event_date_type_desc(wh);
  
-EXPORT Make_event_filing_cd(SALT34.StrType s0) := s0;
-EXPORT InValid_event_filing_cd(SALT34.StrType s) := FALSE;
+EXPORT Make_event_filing_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_event_filing_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_filing_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_filing_desc(SALT34.StrType s0) := s0;
-EXPORT InValid_event_filing_desc(SALT34.StrType s) := FALSE;
+EXPORT Make_event_filing_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_event_filing_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_filing_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_corp_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_corp_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_corp_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_corp_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_corp_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_corp_nbr_cd(SALT34.StrType s0) := s0;
-EXPORT InValid_event_corp_nbr_cd(SALT34.StrType s) := FALSE;
+EXPORT Make_event_corp_nbr_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_event_corp_nbr_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_corp_nbr_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_corp_nbr_desc(SALT34.StrType s0) := s0;
-EXPORT InValid_event_corp_nbr_desc(SALT34.StrType s) := FALSE;
+EXPORT Make_event_corp_nbr_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_event_corp_nbr_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_corp_nbr_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_roll(SALT34.StrType s0) := s0;
-EXPORT InValid_event_roll(SALT34.StrType s) := FALSE;
+EXPORT Make_event_roll(SALT311.StrType s0) := s0;
+EXPORT InValid_event_roll(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_roll(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_frame(SALT34.StrType s0) := s0;
-EXPORT InValid_event_frame(SALT34.StrType s) := FALSE;
+EXPORT Make_event_frame(SALT311.StrType s0) := s0;
+EXPORT InValid_event_frame(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_frame(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_start(SALT34.StrType s0) := s0;
-EXPORT InValid_event_start(SALT34.StrType s) := FALSE;
+EXPORT Make_event_start(SALT311.StrType s0) := s0;
+EXPORT InValid_event_start(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_start(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_end(SALT34.StrType s0) := s0;
-EXPORT InValid_event_end(SALT34.StrType s) := FALSE;
+EXPORT Make_event_end(SALT311.StrType s0) := s0;
+EXPORT InValid_event_end(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_end(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_microfilm_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_microfilm_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_microfilm_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_microfilm_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_microfilm_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_desc(SALT34.StrType s0) := MakeFT_invalid_event_desc(s0);
-EXPORT InValid_event_desc(SALT34.StrType s) := InValidFT_invalid_event_desc(s);
+EXPORT Make_event_desc(SALT311.StrType s0) := MakeFT_invalid_event_desc(s0);
+EXPORT InValid_event_desc(SALT311.StrType s) := InValidFT_invalid_event_desc(s);
 EXPORT InValidMessage_event_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_event_desc(wh);
  
-EXPORT Make_event_revocation_comment1(SALT34.StrType s0) := s0;
-EXPORT InValid_event_revocation_comment1(SALT34.StrType s) := FALSE;
+EXPORT Make_event_revocation_comment1(SALT311.StrType s0) := s0;
+EXPORT InValid_event_revocation_comment1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_revocation_comment1(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_revocation_comment2(SALT34.StrType s0) := s0;
-EXPORT InValid_event_revocation_comment2(SALT34.StrType s) := FALSE;
+EXPORT Make_event_revocation_comment2(SALT311.StrType s0) := s0;
+EXPORT InValid_event_revocation_comment2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_revocation_comment2(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_book_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_book_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_book_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_book_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_book_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_page_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_page_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_page_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_page_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_page_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_event_certification_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_event_certification_nbr(SALT34.StrType s) := FALSE;
+EXPORT Make_event_certification_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_event_certification_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_event_certification_nbr(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT34,Scrubs_Corp2_Mapping_NH_Event;
+  IMPORT SALT311,Scrubs_Corp2_Mapping_NH_Event;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -250,7 +255,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_event_page_nbr;
     BOOLEAN Diff_event_certification_nbr;
     UNSIGNED Num_Diffs;
-    SALT34.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -283,7 +288,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_event_book_nbr := le.event_book_nbr <> ri.event_book_nbr;
     SELF.Diff_event_page_nbr := le.event_page_nbr <> ri.event_page_nbr;
     SELF.Diff_event_certification_nbr := le.event_certification_nbr <> ri.event_certification_nbr;
-    SELF.Val := (SALT34.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_corp_key,1,0)+ IF( SELF.Diff_corp_supp_key,1,0)+ IF( SELF.Diff_corp_vendor,1,0)+ IF( SELF.Diff_corp_vendor_county,1,0)+ IF( SELF.Diff_corp_vendor_subcode,1,0)+ IF( SELF.Diff_corp_state_origin,1,0)+ IF( SELF.Diff_corp_process_date,1,0)+ IF( SELF.Diff_corp_sos_charter_nbr,1,0)+ IF( SELF.Diff_event_filing_reference_nbr,1,0)+ IF( SELF.Diff_event_amendment_nbr,1,0)+ IF( SELF.Diff_event_filing_date,1,0)+ IF( SELF.Diff_event_date_type_cd,1,0)+ IF( SELF.Diff_event_date_type_desc,1,0)+ IF( SELF.Diff_event_filing_cd,1,0)+ IF( SELF.Diff_event_filing_desc,1,0)+ IF( SELF.Diff_event_corp_nbr,1,0)+ IF( SELF.Diff_event_corp_nbr_cd,1,0)+ IF( SELF.Diff_event_corp_nbr_desc,1,0)+ IF( SELF.Diff_event_roll,1,0)+ IF( SELF.Diff_event_frame,1,0)+ IF( SELF.Diff_event_start,1,0)+ IF( SELF.Diff_event_end,1,0)+ IF( SELF.Diff_event_microfilm_nbr,1,0)+ IF( SELF.Diff_event_desc,1,0)+ IF( SELF.Diff_event_revocation_comment1,1,0)+ IF( SELF.Diff_event_revocation_comment2,1,0)+ IF( SELF.Diff_event_book_nbr,1,0)+ IF( SELF.Diff_event_page_nbr,1,0)+ IF( SELF.Diff_event_certification_nbr,1,0);
   END;
 // Now need to remove bad pivots from comparison

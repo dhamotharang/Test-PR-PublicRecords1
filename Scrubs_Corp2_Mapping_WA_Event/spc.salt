@@ -1,0 +1,58 @@
+﻿OPTIONS:-gh 
+MODULE:Scrubs_Corp2_Mapping_WA_Event
+FILENAME:In_WA
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+  
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(10,11,12)
+FIELDTYPE:invalid_charter_nbr:ALLOW(0123456789):LENGTHS(7,8,9)
+FIELDTYPE:invalid_corp_vendor:ENUM(53|53)
+FIELDTYPE:invalid_state_origin:ENUM(WA|WA)
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastDate>0)
+FIELDTYPE:invalid_event_desc:ALLOW( \(\),-ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789)
+
+//FIELD DEFINITIONS
+FIELD:corp_key:TYPE(STRING30):LIKE(invalid_corp_key):0,0
+FIELD:corp_supp_key:TYPE(STRING30):0,0
+FIELD:corp_vendor:TYPE(STRING2):LIKE(invalid_corp_vendor):0,0
+FIELD:corp_vendor_county:TYPE(STRING3):0,0
+FIELD:corp_vendor_subcode:TYPE(STRING5):0,0
+FIELD:corp_state_origin:TYPE(STRING2):LIKE(invalid_state_origin):0,0
+FIELD:corp_process_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:corp_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter_nbr):0,0
+FIELD:event_filing_reference_nbr:TYPE(STRING30):0,0
+FIELD:event_amendment_nbr:TYPE(STRING3):0,0
+FIELD:event_filing_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:event_date_type_cd:TYPE(STRING3):0,0
+FIELD:event_date_type_desc:TYPE(STRING30):0,0
+FIELD:event_filing_cd:TYPE(STRING8):0,0
+FIELD:event_filing_desc:TYPE(STRING60):0,0
+FIELD:event_corp_nbr:TYPE(STRING32):0,0
+FIELD:event_corp_nbr_cd:TYPE(STRING1):0,0
+FIELD:event_corp_nbr_desc:TYPE(STRING30):0,0
+FIELD:event_roll:TYPE(STRING10):0,0
+FIELD:event_frame:TYPE(STRING10):0,0
+FIELD:event_start:TYPE(STRING8):0,0
+FIELD:event_end:TYPE(STRING8):0,0
+FIELD:event_microfilm_nbr:TYPE(STRING10):0,0
+FIELD:event_desc:TYPE(STRING500):LIKE(invalid_event_desc):0,0
+FIELD:event_revocation_comment1:TYPE(STRING250):0,0
+FIELD:event_revocation_comment2:TYPE(STRING250):0,0
+FIELD:event_book_nbr:TYPE(STRING9):0,0
+FIELD:event_page_nbr:TYPE(STRING9):0,0
+FIELD:event_certification_nbr:TYPE(STRING9):0,0
+//CONCEPT statements should be used to group together interellated fields; such as address
+//RELATIONSHIP is used to find non-obvious relationships between the clusters
+//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+//LINKPATH is used to define access paths for external linking

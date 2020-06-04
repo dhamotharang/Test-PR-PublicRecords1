@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata,dops;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
 
@@ -21,6 +21,10 @@ doDOPS 								:= is_running_in_prod AND NOT skipDOPS;
    Constants.key_prefix + '@version@::payload',
 	 Constants.key_prefix + filedate + '::payload',build_key_payload);
 	 
+RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_linkids,
+   Constants.key_prefix + '@version@::linkids',
+	 Constants.key_prefix + filedate + '::linkids',build_key_linkids);
+
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
    Constants.key_FCRA_prefix + '@version@::payload',
 	 Constants.key_FCRA_prefix + filedate + '::payload',build_key_payload_FCRA);
@@ -39,7 +43,11 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.key_prefix + '@version@::payload', 
 	 Constants.key_prefix + filedate + '::payload',move_built_key_payload);
 	 
- 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.key_FCRA_prefix + '@version@::payload', 
+ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.key_prefix + '@version@::linkids', 
+	 Constants.key_prefix + filedate + '::linkids',move_built_key_linkids);
+	 
+ 
+ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.key_FCRA_prefix + '@version@::payload', 
 	 Constants.key_FCRA_prefix + filedate + '::payload',move_built_key_payload_FCRA);
 	 
 	 			
@@ -59,6 +67,10 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
 	'Q', 
 	move_qa_key_payload);
 	
+	RoxieKeyBuild.MAC_SK_Move_v2(Constants.key_prefix + '@version@::linkids', 
+	'Q', 
+	move_qa_key_linkids);
+	
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.key_FCRA_prefix + '@version@::payload', 
 	'Q', 
 	move_qa_key_payload_FCRA);
@@ -74,26 +86,16 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
 		PerformUpdateOrNot 	:= IF(doDOPS,sequential(updatedops),NoUpdate);
 //--------------------------------------------------------------------------------------
 
+	key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+	
 	buildKey	:=	sequential(
-												build_key_did,
-												build_key_FCRA_did,
-												build_key_email_address,
-												build_key_payload,
-												build_key_payload_FCRA,
-												move_built_key_did,
-												move_built_key_FCRA_did,
-												move_built_key_email_address,
-												move_built_key_payload,
-												move_built_key_payload_FCRA,
-												move_qa_key_did,
-												move_qa_key_FCRA_did,
-												move_qa_key_email_address,
-												move_qa_key_payload,
-												move_qa_key_payload_FCRA,
-												build_autokeys,
-												Remove_auto_payload,
-												PerformUpdateOrNot
-												);	
+	                        Parallel(build_key_did,build_key_FCRA_did,build_key_email_address,build_key_payload, build_key_linkids,build_key_payload_FCRA),
+												  Parallel(move_built_key_did,move_built_key_FCRA_did,move_built_key_email_address,move_built_key_payload,move_built_key_linkids,move_built_key_payload_FCRA),
+												  Parallel(move_qa_key_did,move_qa_key_FCRA_did,move_qa_key_email_address,move_qa_key_payload,move_qa_key_linkids,move_qa_key_payload_FCRA),
+							          	build_autokeys,
+								          Remove_auto_payload,
+								          PerformUpdateOrNot,
+													key_validation);	
 
 return	buildKey;
 end;

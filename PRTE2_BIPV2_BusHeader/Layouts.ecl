@@ -1,4 +1,4 @@
-﻿import SALT311,BIPV2_LGID3, BIPV2,BIPV2_Best, Business_Header, TopBusiness_BIPV2,BIPV2_ProxID;
+﻿import SALT311,BIPV2_LGID3, BIPV2,BIPV2_Best, Business_Header, TopBusiness_BIPV2,BIPV2_ProxID,Prte2;
 
 export Layouts := module
 
@@ -99,6 +99,112 @@ Export Layout_Matches:=RECORD,maxlength(32000)
   string source_id;
 END;
 
+ rec_source_layout := record
+   string2 source;
+	 string50 source_docid;
+   unsigned8 source_rec_id; 
+  end;
+
+  rec_industry_section_fields := record
+   string8 siccode; 
+   string4 siccode_plus := ''; 
+   string6 naics; 
+   string350 industry_description;
+   string1502 business_description;
+  end;
+ 
+ rec_industry_combined_layout := record
+	BIPV2.IDlayouts.l_key_ids;
+	unsigned6 bdid;
+  unsigned1 bdid_score;
+	rec_source_layout;
+	rec_industry_section_fields;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  unsigned4 dt_vendor_first_reported;
+  unsigned4 dt_vendor_last_reported;
+  string1   record_type;
+  unsigned4 record_date;
+ end; 
+ 
+ export rec_other_directories_layout := record
+  string1 rec_type;//(I)ndustry or (C)ontacts
+	BIPV2.IDlayouts.l_key_ids;
+  rec_industry_combined_layout - BIPV2.IDlayouts.l_key_ids industry_fields;
+	BIPV2.Layout_Business_Linking_Full - employee_count_org_raw - revenue_org_raw  - employee_count_local_raw  - revenue_local_raw contacts_fields;
+  Prte2.Layouts.DEFLT_CPA;  
+	end;
+ 
+ Export cnpname:=RECORD
+  unsigned4 gss_hash;
+  unsigned1 fallback_value;
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  string28 prim_name;
+  string25 city;
+  string2 st;
+  string8 company_sic_code1;
+  string30 cnp_number;
+  string10 cnp_btype;
+  string20 cnp_lowv;
+  string10 prim_range;
+  string8 sec_range;
+  unsigned6 parent_proxid;
+  unsigned6 sele_proxid;
+  unsigned6 org_proxid;
+  unsigned6 ultimate_proxid;
+  string1 sele_flag;
+  string1 org_flag;
+  string1 ult_flag;
+  string5 zip;
+  unsigned6 powid;
+  unsigned2 gss_word_weight;
+  string240 cnp_name;
+  unsigned8 gss_bloom;
+  unsigned1 prim_name_len;
+  unsigned1 city_len;
+  unsigned1 prim_range_len;
+  unsigned1 sec_range_len;
+  unsigned4 efr_bmap;
+  integer2 prim_name_weight100;
+  integer2 prim_name_e1_weight100;
+  integer2 city_weight100;
+  integer2 city_p_weight100;
+  integer2 city_e2_weight100;
+  integer2 city_e2p_weight100;
+  integer2 st_weight100;
+  integer2 company_sic_code1_weight100;
+  integer2 cnp_number_weight100;
+  integer2 cnp_btype_weight100;
+  integer2 cnp_lowv_weight100;
+  integer2 prim_range_weight100;
+  integer2 prim_range_e1_weight100;
+  integer2 sec_range_weight100;
+  integer2 sec_range_e1_weight100;
+  integer2 parent_proxid_weight100;
+  integer2 sele_proxid_weight100;
+  integer2 org_proxid_weight100;
+  integer2 ultimate_proxid_weight100;
+  integer2 sele_flag_weight100;
+  integer2 org_flag_weight100;
+  integer2 ult_flag_weight100;
+  integer2 zip_weight100;
+  unsigned8 __internal_fpos__;
+  END;
+
+Export cnpname_slim:=RECORD
+  unsigned4 gss_hash;
+  unsigned8 gss_bloom;
+  unsigned1 fallback_value;
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned2 gss_word_weight;
+  unsigned8 __internal_fpos__;
+ END;
 
 	////////////////////////////////////////////////////////////////////////
 	// -- Temporary Layouts for processing
@@ -160,10 +266,13 @@ END;
 		export Layout_Contacts := 
 		record
 			BIPV2.IDlayouts.l_xlink_ids; 
-			BIPV2.Layout_Business_Linking_Full;
+    	BIPV2.Layout_Business_Linking_Full - employee_count_org_raw - revenue_org_raw  - employee_count_local_raw  - revenue_local_raw;
+			
+
 			boolean executive_ind := false;
 			integer executive_ind_order:=0;
-		end;
+			Prte2.Layouts.DEFLT_CPA;  
+			end;
 
 		export Layout_Best := 
 		record
@@ -208,23 +317,12 @@ END;
 	// -- Key Layouts
 	////////////////////////////////////////////////////////////////////////
 	export lKey := module
-	/*
-		export Layout_Proxid_Matches := RECORD//in this module for because of ,foward bug
-			UNSIGNED2 Rule;
-			INTEGER2 Conf := 0;
-			INTEGER2 DateOverlap := 0; // Number of months of overlap, -ve to show distance of non-overlap
-			INTEGER2 Conf_Prop := 0; // Confidence provided by propogated fields
-			SALT30.UIDType Proxid1;
-			SALT30.UIDType Proxid2;
-			SALT30.UIDType rcid1 := 0;
-			SALT30.UIDType rcid2 := 0;
-		end;
 		
-		export Layout_Proxid_Attr_Matches := RECORD(Layout_Proxid_Matches),MAXLENGTH(32000)
-			SALT30.StrType source_id;
-			UNSIGNED2 support_cnp_name := 0; // External support for cnp_name
-		end;
-		*/
+		// export Layout_Proxid_Attr_Matches := RECORD(Layout_Proxid_Matches),MAXLENGTH(32000)
+			// SALT30.StrType source_id;
+			// UNSIGNED2 support_cnp_name := 0; // External support for cnp_name
+		// end;
+//		*/
 		export Layout_Proxid_Attr_matches := record
 			BIPV2_ProxID.match_candidates(DATASET([],BIPV2_ProxID.layout_DOT_Base)).Layout_Attribute_Matches;
 		end;
@@ -236,7 +334,6 @@ END;
 		export Layout_Proxid_Specificities := record
 			BIPV2_ProxID.Layout_Specificities.r;
 		end;
-		
 		
 	end;
 	

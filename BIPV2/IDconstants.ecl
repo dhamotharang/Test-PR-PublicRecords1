@@ -46,5 +46,6 @@ export APPEND_WEIGHT_THRESHOLD_ROXIE := 44;
 export URL_ROXIE_DEV := 'dev155vip.hpcc.risk.regn.net:9876'; // useful for testing and devlopment
 export URL_ROXIE_CERT := _control.RoxieEnv.boca_certvip; // useful for testing and development
 export URL_ROXIE_PROD := _control.RoxieEnv.boca_prodvip;
+export URL_ROXIETHOR_PROD := 'roxiethorvip.hpcc.risk.regn.net:9856';
 
 END;

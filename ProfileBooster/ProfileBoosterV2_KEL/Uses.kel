@@ -1,0 +1,25 @@
+﻿IMPORT ProfileBooster.ProfileBoosterV2_KEL.Entities;
+
+IMPORT ProfileBooster.ProfileBoosterV2_KEL.UsesNonFCRA;
+
+// The Relatives File can be used in both FCRA and NonFCRA 
+// USE ProfileBooster.ProfileBoosterV2_KEL.Files.FCRAAndNonFCRA.Relationship__Key_Relatives_V3(FLAT, 
+	// FirstDegreeAssociations(
+		// DateFirstSeen = rel_dt_first_seen, // Contains information for ASOF
+		// DateLastSeen = rel_dt_last_seen, // Contains information for ASOF
+		// Subject = did1, 
+		// FirstDegreeAssociation = did2, 
+		// Title = title,
+		// RelationshipType = type,
+		// RelationshipConfidence = confidence,
+		// RelationshipScore = total_score,
+		// Generation = generation,
+		// RelationshipDateFirstSeen = rel_dt_first_seen,
+		// RelationshipDateLastSeen = rel_dt_last_seen),
+	// PERMITS(DPMBitmap));
+
+// USE ProfileBooster.ProfileBoosterV2_KEL.Files.FCRAAndNonFCRA.Header__Key_ADL_Segmentation(FLAT,
+	// Person(
+		// UID = did,
+		// LexIDSegment = ind1),
+	// PERMITS(DPMBitmap));

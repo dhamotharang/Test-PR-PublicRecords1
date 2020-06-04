@@ -2,7 +2,7 @@
 export BWR_Build_GSA(string version) := function
 // #workunit('name','GSA Build - ' + version);
 
-mailTarget := 'john.freibaum@lexisnexis.com,deborah.torhanova@lexisnexis.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com';
+mailTarget := 'Christopher.Brodeur@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com';
 
 send_mail (string pSubject, string pBody) := lib_fileservices.FileServices.sendemail(mailTarget, pSubject, pBody);
 
@@ -22,7 +22,7 @@ build_Keys      := GSA.proc_Build_Keys(version) :
 
 build_stats := GSA.out_STRATA_population_stats(version);
 
-dops_update := Roxiekeybuild.updateversion('GSAKeys',version,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com,john.freibaum@lexisnexis.com,deborah.torhanova@lexisnexis.com',,'N');
+dops_update := Roxiekeybuild.updateversion('GSAKeys',version,'Christopher.Brodeur@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N');
 
 orbit_update := Orbit3.proc_Orbit3_CreateBuild ('GSA',version,'N');
 

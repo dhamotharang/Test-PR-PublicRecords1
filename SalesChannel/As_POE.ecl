@@ -62,10 +62,10 @@ function
 		self.company_address.zip					:= l.clean_address.zip										;
 		self.company_address.zip4					:= l.clean_address.zip4										;
 		self.company_phone								:= (unsigned5)regexreplace('[-]',l.rawfields.Phone_Number,'');				;	// pull company info from EDA using work phone
-		self.company_fein					 				:= 0															;
-		self.company_rawaid				 				:= l.RawAID															;
-		self.company_aceaid				 				:= l.ACEAID															;
-	
+		self.company_fein					 				:= 0																			;
+		self.company_rawaid				 				:= l.RawAID																;
+		self.company_aceaid				 				:= l.ACEAID																;
+		self.global_sid										:= l.global_sid														;
 	end;
 
 	dMappedToPOE := project(pDataset	,tMapToPOE(left));

@@ -10,9 +10,13 @@ EXPORT CopyFiles(string srcesp
 								,string dstSubNameSuffix = ''
 								,string uniquearbitrarystring = 'uniquenameforthisjob' // this string will be used in filename
 																																	// to uniquely represent the filename CopyFileList_FileName
+								,boolean copywithsoap = false
+								,boolean usecredentials = false
 								):= module
 
-	// File names 
+	// File names
+	shared dUserCreds := dataset('~hpccinternal::'+STD.System.Job.User()+'::userinfo'
+																,{string username, string password},thor);
 	export mFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::missinglogicals::'+uniquearbitrarystring;
 	export cFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::copiedlogicals::'+uniquearbitrarystring;
 	export aFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::alllogicals::'+uniquearbitrarystring;
@@ -130,7 +134,11 @@ EXPORT CopyFiles(string srcesp
 									+ ' nosplit=1 '
 									+ 'wrap=1 '
 									+ 'srcdali=' + srcdali + ' '
-									+ if (l.iscompressed,' compress=1',' compress=0');
+									+ if (l.iscompressed,' compress=1',' compress=0')
+									+ if (usecredentials
+											,' username=' + dUserCreds[1].username + ' password='+ dUserCreds[1].password
+											,''
+											);
 
 			self := l;
 		end;
@@ -294,12 +302,28 @@ EXPORT CopyFiles(string srcesp
 										WriteAllFiles
 										// copy only missing files in dest
 										,if (GetCount('missing') > 0
-											,apply(GetFilesDataset('missing')
-												,sequential(
+											,if ( (GetCount('missing') < 6 and copywithsoap) or ~copywithsoap
+												,apply(GetFilesDataset('missing')
+													,sequential(
 														output('Copying file ' + (string)cnt + ' of ' + (string)GetCount('missing') + ' from ' + srcdali + ' to ' + destdali + ':' + destcluster,named('Copy_Status'))
-														,STD.File.DfuPlusExec(cmd)
+														,if (~copywithsoap
+																,STD.File.DfuPlusExec(cmd)
+																,output(dops.FileModule(destesp,'8010').fSoapCopy(
+																					pSourceLogical := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,7),'=')[2]
+																					,pDestGroup := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,5),'=')[2]
+																					,pDestLogical := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,6),'=')[2]
+																					,pSourceDali := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,10),'=')[2]
+																					,pOverwrite := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,2),'=')[2]
+																					,pReplicate := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,3),'=')[2]
+																					,pNoSplit := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,8),'=')[2]
+																					,pNoWrap := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,9),'=')[2]
+																					,pCompress := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,11),'=')[2]
+																					))
+																	)
 															)
-													)
+														)
+													,fail('File to copy file count is > 6, cannot copy with soapcall, usecredentials')
+												)
 												,output('nothing to copy')
 												)
 											)

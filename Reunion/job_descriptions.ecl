@@ -1,6 +1,6 @@
-IMPORT prof_licensev2;
+IMPORT prof_licensev2, D2C_Customers;
 
-dProfLic:=prof_licensev2.File_ProfLic_Base((UNSIGNED6)did>0 AND (license_type<>'' OR profession_or_board<>''));
+dProfLic:=prof_licensev2.File_ProfLic_Base((UNSIGNED6)did>0 AND (license_type<>'' OR profession_or_board<>'') AND D2C_Customers.SRC_Allowed.Check(17, vendor));
 
 lJobDesc:=RECORD
  UNSIGNED6 did;

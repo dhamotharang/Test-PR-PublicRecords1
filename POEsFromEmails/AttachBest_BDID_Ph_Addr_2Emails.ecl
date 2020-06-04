@@ -1,5 +1,5 @@
-// AttachBest_BDID_Ph_Addr_2Emails.ecl
-import Email_Data, Address, business_header, ut, mdr,Business_Header_SS, BIPV2;
+﻿// AttachBest_BDID_Ph_Addr_2Emails.ecl
+import Email_Data, Address, business_header, ut, mdr, Business_Header_SS, BIPV2;
 #option('maxLength', 1310720); 				// have to increase for the remote directory child datasets
 
 export AttachBest_BDID_Ph_Addr_2Emails (
@@ -15,7 +15,7 @@ export AttachBest_BDID_Ph_Addr_2Emails (
 
   /*========================================================================================================
     Step1:
-    Use Â‘email_rec_keyÂ’ to get clean_address.geo_lat & geo_long (if these donÂ’t exists, use orig_zip
+    Use Ã‚â€˜email_rec_keyÃ‚â€™ to get clean_address.geo_lat & geo_long (if these donÃ‚â€™t exists, use orig_zip
     & orig_zip4 to calculate person_addr_geo_lat and person_addr_geo_lat) for each email.
   ----------------------------------------------------------------------------------------------------------*/
   LatLonRec := RECORD
@@ -274,7 +274,7 @@ AllDataForAllBdidsOfAllGroups :=
 
   /*========================================================================================================
     Step7:
-    For each email/DID, D, calculate the distance between D and every BDID in its domainÂ’s BDID super group.
+    For each email/DID, D, calculate the distance between D and every BDID in its domainÃ‚â€™s BDID super group.
   ----------------------------------------------------------------------------------------------------------*/
   AllDataForAllBdidsOfAllGroups_withdids := 
      join( 
@@ -442,6 +442,8 @@ Business_Header_SS.MAC_Add_BDID_Flex(
       );                              			
 
 dReturnBdidset_w_linkids		:= project(dreturnbdidset,transform(Layouts.base,self := left));
+
+addGlobalSID								:=  MDR.macGetGlobalSID(dReturnBdidset_w_linkids,'POEsFromEmails_Virtual','','global_sid'); //DF-26532: Populate Global_SID
 			
 dEmailsWithDomainRegistrantBDID1							:= EmailsWithDomainRegistrantBDID1((did = 427717391) or (bdid in [35546914/*lexisnexis*/,15962941/*harcourt*/,13144]) or (regexfind('rob',pname.fname,nocase) and regexfind('holp',pname.lname,nocase)));
 ddeduped_domains 															:= deduped_domains(bdid in [35546914/*lexisnexis*/,15962941/*harcourt*/,13144]);
@@ -513,7 +515,7 @@ return parallel(
 	,output(ddreturndataset 														 	,named('ddreturndataset'															),all)
 );
 */
-  return dReturnBdidset_w_linkids;
+  return addGlobalSID;
 end;
 
 //========================================================================================================

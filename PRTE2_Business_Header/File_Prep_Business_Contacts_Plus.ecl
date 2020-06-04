@@ -1,4 +1,4 @@
-import business_header, header_services, mdr, ut;
+﻿import business_header, header_services, mdr, ut;
 
 /////////////////////////////////////////////////////////////////////////
 in_hdr := File_Prep_BC_CleanAddr_KeyBuild;
@@ -26,7 +26,7 @@ end;
 
 dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
 
-business_header.Layout_Business_Contact_Plus_orig tSuppress(dHeader_withMD5 l) := transform
+business_header.Layout_Business_Contact_Plus tSuppress(dHeader_withMD5 l) := transform
  self := l;
 end;
 
@@ -54,7 +54,7 @@ rFullOut_HashBDID := record
  rHashBDID;
 end;
 
-rFullOut_HashBDID tHashBDID(Business_Header.Layout_Business_Contact_Plus_orig l) := transform                            
+rFullOut_HashBDID tHashBDID(Business_Header.Layout_Business_Contact_Plus l) := transform                             
  self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1));
  self := l;
 end;
@@ -98,7 +98,7 @@ end;
 
 dContactHeader_withMD5 := project(contact_all_full_out_suppress, tHashBDIDDID(left));
 
-Business_Header.Layout_Business_Contact_Plus_orig tContactSuppress(dContactHeader_withMD5 l) := transform
+Business_Header.Layout_Business_Contact_Plus tContactSuppress(dContactHeader_withMD5 l) := transform
  self := l;
 end;
 
@@ -128,14 +128,14 @@ BCbytitle_withHash := RECORD
 	rHashVal;
 end;
 
-BCbytitle_withHash addBCHash(Business_Header.Layout_Business_Contact_Plus_Orig l) := transform                            
+BCbytitle_withHash addBCHash(Business_Header.Layout_Business_Contact_Plus l) := transform                               
  self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), (string35)l.company_title, (string20)l.lname, (string20)l.fname);
  self := l;
 end;
 
 BC_withTitleHash := project(contact_full_out_suppress, addBCHash(left));
 
-Business_Header.Layout_Business_Contact_Plus_orig removeHash(BC_withTitleHash l) := transform
+Business_Header.Layout_Business_Contact_Plus removeHash(BC_withTitleHash l) := transform
  self := l;
 end;
 

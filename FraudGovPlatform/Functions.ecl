@@ -40,7 +40,7 @@ EXPORT Functions :=  MODULE
 			self.classification_Entity.Entity_sub_type_id := 0;
 			self.classification_Entity.role_id := 0;
 			self.classification_Entity.Evidence_id := 0;	
-			self.classification_source.source_type := FraudGovPlatform.Mod_MbsContext((unsigned6) left.Customer_ID,left.Source).FileType; 
+			self.classification_source.source_type := ''; 
 			self.classification_source.Primary_source_Entity := FraudGovPlatform.Mod_MbsContext((unsigned6) left.Customer_ID,left.Source).PrimarySrcEntity; 
 			self.classification_source.Expectation_of_Victim_Entities := FraudGovPlatform.Mod_MbsContext((unsigned6) left.Customer_ID,left.Source).ExpOfVicEntities;
 			self.classification_source.Industry_segment := ''; 
@@ -71,7 +71,6 @@ EXPORT Functions :=  MODULE
 		left.Customer_ID = right.Customer_ID
 		and  left.Source = right.Source,
 								transform (FraudShared.Layouts.Base.Main ,
-										self.classification_source.source_type := right.classification_source.source_type;										
 										self.classification_source.Primary_source_Entity := right.classification_source.Primary_source_Entity; 
 										self.classification_source.Expectation_of_Victim_Entities := right.classification_source.Expectation_of_Victim_Entities; 
 										self.classification_source.Industry_segment := right.classification_source.Industry_segment; 
@@ -102,47 +101,61 @@ EXPORT Functions :=  MODULE
 		JMbs  := join (JCVD , MBS(status = 1) , 
 		left.source = right.fdn_file_code and 
 		left.Customer_ID = (string)right.gc_id,
-					transform (FraudShared.Layouts.Base.Main , 								 
+										transform (FraudShared.Layouts.Base.Main,
+										v_deceitful_confidence_id := if( regexfind('DELTA', left.source, nocase),left.classification_Activity.confidence_that_activity_was_deceitful_id, right.confidence_that_activity_was_deceitful);
+										v_deceitful_confidence_desc := MAP(	
+													v_deceitful_confidence_id=1=>'PROBABLE',
+													v_deceitful_confidence_id=2=>'POTENTIAL',
+													v_deceitful_confidence_id=3=>'KNOWN GOOD',
+													v_deceitful_confidence_id=4=>'NEUTRAL',
+													v_deceitful_confidence_id=5=>'PROVEN',
+													'');
 
-										v_deceitful_confidence_id		:=	if( regexfind('DELTA', left.source, nocase),left.classification_Activity.confidence_that_activity_was_deceitful_id, right.confidence_that_activity_was_deceitful);
-										self.classification_Activity.Confidence_that_activity_was_deceitful_id 								:= v_deceitful_confidence_id;
-										self.classification_Activity.Confidence_that_activity_was_deceitful										:= MAP(	v_deceitful_confidence_id=1=>'PROBABLE',
-																																																									v_deceitful_confidence_id=2=>'POTENTIAL',
-																																																									v_deceitful_confidence_id=3=>'KNOWN GOOD',
-																																																									v_deceitful_confidence_id=4=>'NEUTRAL',
-																																																									v_deceitful_confidence_id=5=>'PROVEN',
-																																																									'');
-										self.classification_Permissible_use_access.file_type 			  													:= right.file_type;
-										self.classification_Permissible_use_access.fdn_file_info_id														:= right.fdn_file_info_id ; 
-										self.classification_Permissible_use_access.fdn_file_code															:= StringLib.StringToUppercase(right.fdn_file_code) ; 
-										self.classification_Permissible_use_access.gc_id																			:= right.gc_id ; 										
-										self.classification_Permissible_use_access.description																:= StringLib.StringToUppercase(right.description) ; 
-										self.classification_Permissible_use_access.primary_source_entity 											:= right.primary_source_entity; 
-										self.classification_Permissible_use_access.Ind_type                                   := right.Ind_type; 
-										self.classification_Permissible_use_access.update_freq                                := right.update_freq;
-										self.classification_Permissible_use_access.Expiration_days                            := right.Expiration_days;
-										self.classification_Permissible_use_access.post_contract_expiration_days              := right.post_contract_expiration_days ; 
-										self.classification_Permissible_use_access.status                                     := right.status; 
-										self.classification_Permissible_use_access.product_include                            := right.product_include ; 
-										self.classification_Permissible_use_access.date_added                                 := StringLib.StringToUppercase(right.date_added) ; 
-										self.classification_Permissible_use_access.user_added                                 := StringLib.StringToUppercase(right.user_added ); 
-										self.classification_Permissible_use_access.date_changed                               := StringLib.StringToUppercase(right.date_changed)  ; 
-										self.classification_Permissible_use_access.user_changed                               := StringLib.StringToUppercase(right.user_changed); 
-										self.classification_Permissible_use_access.p_industry_segment                         := '' ;
-										self.classification_Permissible_use_access.usage_term                                 := '';
-										self.classification_source.Source_type_id											  := right.file_type;
-										self.classification_source.Primary_source_Entity_id                                   := right.Primary_source_Entity;
-										self.classification_source.Expectation_of_Victim_Entities_id                          := right.Expectation_of_Victim_Entities;
-										self.classification_Activity.Suspected_Discrepancy_id                                 := right.Suspected_Discrepancy;
-										self.classification_Activity.workflow_stage_committed_id                              := right.workflow_stage_committed;
-										self.classification_Activity.workflow_stage_detected_id                               := right.workflow_stage_detected;
-										self.classification_Activity.Channels_id                                              := right.Channels;
-										self.classification_Activity.Threat_id                                                := right.Threat;
-										self.classification_Activity.Alert_level_id                                           := right.Alert_level;
-										self.classification_Entity.Entity_type_id                                             := right.Entity_type;
-										self.classification_Entity.Entity_sub_type_id                                         := right.Entity_sub_type;
-										self.classification_Entity.role_id                                                    := right.role;
-										self.classification_Entity.Evidence_id                                                := right.Evidence;
+										v_file_type_id :=	if( regexfind('DELTA', left.source, nocase),left.classification_Permissible_use_access.file_type, right.file_type);
+										v_file_type_desc := MAP(	
+												v_file_type_id=1=>'EVENT OUTCOMES',
+												v_file_type_id=2=>'APPLICABLE PUBLIC RECORDS',
+												v_file_type_id=3=>'TRANSACTIONS',
+												v_file_type_id=4=>'REL. ANALYTICS',
+												v_file_type_id=5=>'STATUS UPDATE',
+												'');
+
+										// Start RIN Customizations
+										self.classification_Permissible_use_access.file_type := v_file_type_id;
+										self.classification_source.Source_type_id := v_file_type_id;
+										self.classification_source.source_type := v_file_type_desc;
+										self.classification_Activity.Confidence_that_activity_was_deceitful_id := v_deceitful_confidence_id;
+										self.classification_Activity.Confidence_that_activity_was_deceitful := v_deceitful_confidence_desc;	
+										// End RIN Customizations
+										self.classification_Permissible_use_access.fdn_file_info_id := right.fdn_file_info_id ; 
+										self.classification_Permissible_use_access.fdn_file_code := StringLib.StringToUppercase(right.fdn_file_code) ; 
+										self.classification_Permissible_use_access.gc_id := right.gc_id ; 										
+										self.classification_Permissible_use_access.description := StringLib.StringToUppercase(right.description) ; 
+										self.classification_Permissible_use_access.primary_source_entity := right.primary_source_entity; 
+										self.classification_Permissible_use_access.Ind_type := right.Ind_type; 
+										self.classification_Permissible_use_access.update_freq := right.update_freq;
+										self.classification_Permissible_use_access.Expiration_days := right.Expiration_days;
+										self.classification_Permissible_use_access.post_contract_expiration_days := right.post_contract_expiration_days ; 
+										self.classification_Permissible_use_access.status := right.status; 
+										self.classification_Permissible_use_access.product_include := right.product_include ; 
+										self.classification_Permissible_use_access.date_added := StringLib.StringToUppercase(right.date_added) ; 
+										self.classification_Permissible_use_access.user_added := StringLib.StringToUppercase(right.user_added ); 
+										self.classification_Permissible_use_access.date_changed := StringLib.StringToUppercase(right.date_changed)  ; 
+										self.classification_Permissible_use_access.user_changed := StringLib.StringToUppercase(right.user_changed); 
+										self.classification_Permissible_use_access.p_industry_segment := '' ;
+										self.classification_Permissible_use_access.usage_term := '';
+										self.classification_source.Primary_source_Entity_id := right.Primary_source_Entity;
+										self.classification_source.Expectation_of_Victim_Entities_id := right.Expectation_of_Victim_Entities;
+										self.classification_Activity.Suspected_Discrepancy_id := right.Suspected_Discrepancy;
+										self.classification_Activity.workflow_stage_committed_id := right.workflow_stage_committed;
+										self.classification_Activity.workflow_stage_detected_id := right.workflow_stage_detected;
+										self.classification_Activity.Channels_id := right.Channels;
+										self.classification_Activity.Threat_id := right.Threat;
+										self.classification_Activity.Alert_level_id := right.Alert_level;
+										self.classification_Entity.Entity_type_id := right.Entity_type;
+										self.classification_Entity.Entity_sub_type_id := right.Entity_sub_type;
+										self.classification_Entity.role_id := right.role;
+										self.classification_Entity.Evidence_id := right.Evidence;
 										self:= left ) , left outer , lookup );
 		 
 		return JMbs;

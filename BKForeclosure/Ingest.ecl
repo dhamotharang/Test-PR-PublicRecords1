@@ -2,7 +2,7 @@
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_BKForeclosure) Delta = DATASET([],Layout_BKForeclosure)
 , DATASET(Layout_BKForeclosure) dsBase = In_BKForeclosure // Change IN_BKForeclosure to change input to ingest process
-, DATASET(RECORDOF(BKForeclosure.REO_prep_ingest_file))  infile = BKForeclosure.REO_prep_ingest_file
+, DATASET(RECORDOF(BKForeclosure.NOD_prep_ingest_file))  infile = BKForeclosure.NOD_prep_ingest_file
 ) := MODULE
   SHARED NullFile := DATASET([],Layout_BKForeclosure); // Use to replace files you wish to remove
  
@@ -49,6 +49,10 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.ln_filedate < (UNSIGNED)ri.ln_filedate => ri.ln_filedate, // Want the highest value
                      le.ln_filedate);
     SELF.bk_infile_type := ri.bk_infile_type; // Derived(NEW)
+    SELF.sam_pid := ri.sam_pid; // Derived(NEW)
+    SELF.deed_pid := ri.deed_pid; // Derived(NEW)
+    SELF.lps_internal_pid := ri.lps_internal_pid; // Derived(NEW)
+    SELF.nod_source := ri.nod_source; // Derived(NEW)
     SELF.name1_nid := ri.name1_nid; // Derived(NEW)
     SELF.name1_prefix := ri.name1_prefix; // Derived(NEW)
     SELF.name1_first := ri.name1_first; // Derived(NEW)
@@ -333,27 +337,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.situs1_geo_blk := ri.situs1_geo_blk; // Derived(NEW)
     SELF.situs1_geo_match := ri.situs1_geo_match; // Derived(NEW)
     SELF.situs1_err_stat := ri.situs1_err_stat; // Derived(NEW)
-    SELF.dotid := ri.dotid; // Derived(NEW)
-    SELF.dotscore := ri.dotscore; // Derived(NEW)
-    SELF.dotweight := ri.dotweight; // Derived(NEW)
-    SELF.empid := ri.empid; // Derived(NEW)
-    SELF.empscore := ri.empscore; // Derived(NEW)
-    SELF.empweight := ri.empweight; // Derived(NEW)
-    SELF.powid := ri.powid; // Derived(NEW)
-    SELF.powscore := ri.powscore; // Derived(NEW)
-    SELF.powweight := ri.powweight; // Derived(NEW)
-    SELF.proxid := ri.proxid; // Derived(NEW)
-    SELF.proxscore := ri.proxscore; // Derived(NEW)
-    SELF.proxweight := ri.proxweight; // Derived(NEW)
-    SELF.seleid := ri.seleid; // Derived(NEW)
-    SELF.selescore := ri.selescore; // Derived(NEW)
-    SELF.seleweight := ri.seleweight; // Derived(NEW)
-    SELF.orgid := ri.orgid; // Derived(NEW)
-    SELF.orgscore := ri.orgscore; // Derived(NEW)
-    SELF.orgweight := ri.orgweight; // Derived(NEW)
-    SELF.ultid := ri.ultid; // Derived(NEW)
-    SELF.ultscore := ri.ultscore; // Derived(NEW)
-    SELF.ultweight := ri.ultweight; // Derived(NEW)
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
@@ -364,92 +347,76 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Ingest Files: Rollup to get unique new records
-  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag));
-  SortIngest0 := SORT(DistIngest0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe, record_id, LOCAL);
-  GroupIngest0 := GROUP(SortIngest0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, LOCAL, ORDERED, STABLE);
+  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn));
+  SortIngest0 := SORT(DistIngest0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe, record_id, LOCAL);
+  GroupIngest0 := GROUP(SortIngest0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
-  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag));
-  SortBase0 := SORT(DistBase0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe, record_id, LOCAL);
-  GroupBase0 := GROUP(SortBase0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, LOCAL, ORDERED, STABLE);
+  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn));
+  SortBase0 := SORT(DistBase0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe, record_id, LOCAL);
+  GroupBase0 := GROUP(SortBase0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe,record_id,LOCAL);
-  Group0 := GROUP(Sort0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
-             ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
-             ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
-             ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
-             ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
-             ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
-             ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
-             ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag,LOCAL, ORDERED, STABLE);
+  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe,record_id,LOCAL);
+  Group0 := GROUP(Sort0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
+             ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
+             ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
+             ,trustee_mail_unit,trustee_mail_city,trustee_mail_state,trustee_mail_zip5,trustee_mail_zip4,trustee_telephone,borrower1_fname,borrower1_lname,borrower1_id_cd,borrower2_fname
+             ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
+             ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
+             ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records

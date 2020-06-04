@@ -1,4 +1,4 @@
-IMPORT dx_Header, header, Roxiekeybuild;
+﻿IMPORT dx_Header, header, Roxiekeybuild;
 
 dsname := dx_Header.Constants.DataSetName;
 
@@ -10,9 +10,9 @@ prefix := '~thor_data400::key::header_wild::' + filedate + '::';
 
 //ssn key
 name_ssn := prefix + 'ssn.did';
-Roxiekeybuild.MAC_build_logical (dx_Header.key_wild_ssn(), header.data_key_wild_SSN,
+Roxiekeybuild.MAC_build_logical (dx_Header.key_wild_ssn(), header.data_key_wild_SSN(),
                                             dx_Header.names('').i_wild_ssn, name_ssn, bld_ssn_key);
-			
+                                            			
 Roxiekeybuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_wild_ssn, name_ssn, mv_ssn_key);
 
 //ssn en key

@@ -71,6 +71,7 @@ layout_aks0376_plus tx(ds_AK_OccLic L) := TRANSFORM
 															 L.lic_type_desc='Registered Trainee' => 'T',
 															 L.lic_type_desc='Registered Associate Home Inspector' => 'A',
 															 L.lic_type_desc='Registered Home Inspector' => 'I',
+															 L.lic_type_desc='Appraisal Management Company Registration' => 'M',
 															 trimLicNbr[4]);
 	SELF.name_flag				:= IF(REGEXFIND(bus_name_pattern, trimOwnerName),	'B', 'P');	
 	ParsedName 						:= IF(SELF.name_flag='P',Address.CleanPersonFML73(REGEXREPLACE('(ILLA WALLING|CHIEF MANAGER)',trimOwnerName,'')),'');

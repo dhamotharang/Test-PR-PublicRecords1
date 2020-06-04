@@ -36,11 +36,11 @@ EXPORT As_Business_Linking (
 				                                         'P' => 'PARENT COMPANY',
 																								 'T' => 'TRADENAME',
 																								 '');
-				self.company_sic_code1           := l.sic1;
-				self.company_sic_code2           := l.sic2;
-				self.company_sic_code3           := l.sic3;
-				self.company_sic_code4           := l.sic4;
-				self.company_sic_code5           := l.sic5;
+				self.company_sic_code1           := l.sic1[1..4];
+				self.company_sic_code2           := l.sic2[1..4];
+				self.company_sic_code3           := l.sic3[1..4];
+				self.company_sic_code4           := l.sic4[1..4];
+				self.company_sic_code5           := l.sic5[1..4];
 				self.company_org_structure_raw   := map(l.government = 'Y' and l.small = 'Y' => 'GOVERNMENT-SMALL_BUSINESS',
 																							  l.government = 'Y'   								 => 'GOVERNMENT',
 																								l.small = 'Y' 											 => 'SMALL_BUSINESS',
@@ -86,6 +86,31 @@ EXPORT As_Business_Linking (
 				self.contact_email							 := l.email;
 				self.contact_email_username			 := email_data.fn_clean_email_username(l.email);
 				self.contact_email_domain				 := email_data.fn_clean_email_domain(l.email);
+				string temp_employee_count       := case(l.employee_code,
+																								 'A' => '1 to 4',
+				                                         'B' => '5 to 9',
+																								 'C' => '10 to 19',
+																								 'D' => '20 to 49',
+				                                         'E' => '50 to 99',
+																								 'F' => '100 to 249',
+																								 'G' => '250 to 499',
+				                                         'H' => '500 to 999',
+																								 'I' => 'Over 1000',
+																								 '');
+				string temp_revenue              := case(l.sales_code,
+																								 'A' => 'Under $500,000',
+				                                         'B' => '$500,000 to $999,999',
+																								 'C' => '$1,000,000 to $4,999,999',
+																								 'D' => '$5,000,000 to $9,999,999',
+				                                         'E' => '$10,000,000 to $24,999,999',
+																								 'F' => '$25,000,000 to $74,999,999',
+																								 'G' => '$75,000,000 to $199,999,999',
+				                                         'H' => '$200,000,000 to $499,999,999',
+																								 'I' => '$500,000,000 to $999,999,999',
+																								 'J' => 'Over $1,000,000,000',
+																								 '');
+		    self.employee_count_local_raw    := temp_employee_count;
+		    self.revenue_local_raw           := temp_revenue;
 				self 							   						 := l;
 				self 							   						 := [];
 		end;

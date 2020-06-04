@@ -12,7 +12,7 @@ EXPORT _Test_Ingest(
 ) :=
 functionmacro
 
-  import ut, business_header,business_header_ss, address, BIPV2;
+  import ut, business_header,business_header_ss, address, BIPV2,BIPV2_Files;
 
   #OPTION('multiplePersistInstances',true);
 
@@ -20,7 +20,7 @@ functionmacro
   ds_as_linking_filtered    := ds_as_linking      (count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources)  : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_as_linking_filtered');
 
 
-  ds_base_Filtered          := pBase_File(count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources) : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_base_Filtered');
+  ds_base_Filtered          := BIPV2_Files.tools_dotid().reclean(pBase_File(count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources)) : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_base_Filtered');
 
   // --
   // ds_base_blank_above_lgid3 := project(BIPV2_Tools.idIntegrity().blank_above_lgid3(ds_base_Filtered),transform(BIPV2.CommonBase.Layout,self := left,self := []));
@@ -110,7 +110,7 @@ functionmacro
     // ,[BIPV2.IDconstants.xlink_version_BIP_dev]
     ,[BIPV2.IDconstants.xlink_version_BIP]
     ,												//pURL										=	''
-    email_address,									
+    ,//email_address									
     ,v_city_name						//pCity									= ''	
     ,fname	
     ,mname												//pContact_mname					= ''

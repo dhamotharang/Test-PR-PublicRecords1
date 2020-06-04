@@ -1,10 +1,10 @@
 ﻿import tools;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Promote(
-	 boolean       pDaily      =  true
-	,boolean       pFCRA       =  true
+	 boolean       				pDaily      		=  true
+	,boolean       				pFCRA       		=  true
 	,string								pVersion				= 	''
-	,boolean							pUseProd			 = 	false
+	,boolean							pUseProd			 	= 	false
 	,string								pFilter					= 	''
 	,boolean							pDelete					= 	false
 	,boolean							pisTesting			= 	false

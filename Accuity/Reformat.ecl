@@ -81,7 +81,8 @@ end;
 //////////////////////////////////////////////////////////////////
 //reFormat Entity Parent Records
 export Parent := module
-	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+//	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02']),normalizd.gwl.Supplemental);
 	export MSB:= 	Accuity.Functions.mapEntity(Inputs.msb,normalizd.msb.Supplemental);
 	export OFAC:= 	Accuity.Functions.mapEntity(Inputs.ofac,normalizd.ofac.Supplemental); 
 	export GEO:= 	Accuity.Functions.mapEntity(Inputs.gwl(type IN ['01', '02']),normalizd.gwl.Supplemental);
@@ -201,13 +202,13 @@ export source_DB_1088   := allsources(accuityDataSource='DB 1088');   //GERMAN F
 export source_DNB_1090  := allsources(accuityDataSource='DNB 1090'); //DUTCH BANK
 export source_DTC_1030  := allsources(accuityDataSource='DTC 1030'); //Defense Trade Controls
 //export source_ECO_1144  := allsources(accuityDataSource='ECO 1144'); //EXPORT CONTROL ORGANISATION UK - IRAN LIST
-export source_ES_1014   := allsources(accuityDataSource='ES 1014');  //Spain
+//export source_ES_1014   := allsources(accuityDataSource='ES 1014');  //Spain
 export source_ESE_1158  := allsources(accuityDataSource='ESE 1158'); //EGYPT FINANCIAL SUPERVISORY AUTHORITY
 export source_EU_33     := allsources(accuityDataSource='EU 33');    //European Union List
 export source_EUE_1170  := allsources(accuityDataSource='EUE 1170'); //European Union Enhancements List
 export source_FBI_35    := allsources(accuityDataSource='FBI 35');   //FBI Most Wanted
 export source_FDJ_1152  := allsources(accuityDataSource='FDJ 1152'); //FATF Deficient Jurisdictions List
-export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
+//export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
 export source_FR_1010   := allsources(accuityDataSource='FR 1010');  //France
 export source_GO_36     := allsources(accuityDataSource='GO 36');    //World Government Officials List
 export source_HK_37     := allsources(accuityDataSource='HK 37');    //Hong Kong Monetary Authority List

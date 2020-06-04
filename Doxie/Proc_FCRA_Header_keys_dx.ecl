@@ -18,6 +18,7 @@ name_max_dt_last_seen := prefix + 'max_dt_last_seen';
 name_legacy_ssn := prefix + 'legacy_ssn';
 name_did_ssn := prefix + 'did.ssn.date';
 name_addr_hist := prefix + 'address_rank';
+name_ssn := '~thor_data400::key::fcra::header_wild::'+ filedate + '::ssn.did';
 
 //Build keys
 RoxieKeybuild.MAC_build_logical(dx_Header.key_header(data_class), header.data_key_header_fcra, dx_Header.names('').i_header_fcra, name_header, fcra_head_data);
@@ -28,6 +29,7 @@ RoxieKeybuild.MAC_build_logical(dx_Header.key_max_dt_last_seen(data_class), head
 RoxieKeybuild.MAC_build_logical(dx_Header.key_legacy_ssn(data_class), header.data_key_legacy_ssn_fcra, dx_Header.names('').i_legacy_ssn_fcra, name_legacy_ssn, fcra_legacy_ssn);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_DID_SSN_date(data_class), header.data_key_DID_SSN_date(data_class), dx_Header.names('').i_did_ssn_date_fcra, name_did_ssn, fcra_ssn_date);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_addr_hist(data_class), header.data_key_addr_hist(data_class), dx_Header.names('').i_addr_hist_fcra, name_addr_hist, fcra_address_rank);
+RoxieKeybuild.MAC_build_logical(dx_Header.key_wild_ssn(data_class), header.data_key_wild_SSN(data_class), dx_Header.names('').i_wild_ssn_fcra, name_ssn, fcra_ssn);
 
 //Move to Built
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_header_fcra, name_header, mv_fcra_data);
@@ -38,28 +40,30 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_max_date_fcra, name_
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_legacy_ssn_fcra, name_legacy_ssn, mv_fcra_legacy_ssn);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_did_ssn_date_fcra, name_did_ssn, mv_fcra_did_ssn);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_addr_hist_fcra, name_addr_hist, mv_fcra_address_rank);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('').i_wild_ssn_fcra, name_ssn, mv_fcra_ssn);
 
 header_key_builds := SEQUENTIAL(
-																fcra_head_data
-																,fcra_apt_blg
-																,fcra_en_apt_blg
-																,fcra_address_payload
-																,fcra_max_dt_last_seen
-																,fcra_legacy_ssn
-																,fcra_ssn_date
-                                ,fcra_address_rank
-																,PARALLEL(
-																		mv_fcra_data
-																		,mv_fcra_apt
-																		,mv_fcra_en_apt
-																		,mv_fcra_address_payload
-																		,mv_fcra_max_dt_last_seen
-																		,mv_fcra_legacy_ssn
-																		,mv_fcra_did_ssn
-                                    ,mv_fcra_address_rank
-																		)
-																);
-
+						fcra_head_data
+						,fcra_apt_blg
+						,fcra_en_apt_blg
+						,fcra_address_payload
+						,fcra_max_dt_last_seen
+						,fcra_legacy_ssn
+						,fcra_ssn_date
+                    	,fcra_address_rank
+						,fcra_ssn
+						,PARALLEL(
+							mv_fcra_data
+							,mv_fcra_apt
+							,mv_fcra_en_apt
+							,mv_fcra_address_payload
+							,mv_fcra_max_dt_last_seen
+							,mv_fcra_legacy_ssn
+							,mv_fcra_did_ssn
+							,mv_fcra_address_rank
+							,mv_fcra_ssn
+							)
+						);
 
 RETURN header_key_builds;
 

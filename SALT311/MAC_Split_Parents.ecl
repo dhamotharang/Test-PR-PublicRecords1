@@ -9,10 +9,8 @@ EXPORT MAC_Split_Parents(infile,patchfile,did_name,pid_name,o) := MACRO
 	#uniquename(pids)
 	#uniquename(infile_null)
 	#uniquename(infile_nonnull)
-
 	%infile_null%    := infile(pid_name=0);
 	%infile_nonnull% := infile(pid_name<>0);
-
 	%pids% := JOIN(
 		%infile_nonnull%, patchfile,
 		LEFT.did_name=RIGHT.did_name AND LEFT.pid_name<>0,

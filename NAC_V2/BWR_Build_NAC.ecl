@@ -1,4 +1,4 @@
-import Roxiekeybuild,ut;
+﻿import Roxiekeybuild,ut;
 export BWR_Build_NAC (string version,string ip,string rootDir) := function
 
 NewInput:=
@@ -19,7 +19,8 @@ CollisionSummary :=output(NAC.Mod_stats.colPerState(),named('All_Collisions_Coun
 StateBenefitMonth:=output(NAC.Mod_stats.BenefitMonthCnt(),named('State_Benefit_Month_Record_Count'),all);
 zDoPopulationStats := Strata(version);
 
-alertList:=NAC.Mailing_List('').Dev2;
+alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
+
 
 return if(NewInput
 			,sequential(DoBuild
@@ -33,7 +34,7 @@ return if(NewInput
 										)
 								,zDoPopulationStats
 								)
-			,sequential(NAC.Send_Email().Drupal
+			,sequential(alertList
 								,output('No NAC Contributory Files Received.  No Collisions report will be produced.'
 												,named('No_NAC_Contributory_Files_Received'))
 								)

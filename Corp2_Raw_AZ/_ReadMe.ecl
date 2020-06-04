@@ -1,25 +1,24 @@
-/*
-	Source(s)		Arizona Corporation Commission				 									
-	Update Frequency		Monthly														
-	Update Type		Updates Only														
-	Expected Volume of Data																
-	Data Description		"Arizona has two places to register business entities:  the Arizona Secretary of 
-											State's Office and the Arizona Corporation Commission.  LN is only purchasing content 
-											from the Corporation Commission.
+﻿/*
 
-The Arizona Corporation Commission accepts registrations for entity types: corporation, nonprofit corporation,
-limited liability companies, trusts and cooperatives.  The commission requires that some articles of
-incorporation have to be published in a newspaper; this is the reason for references to "publication" in the
-record layout.
+Source:							Arizona - Department of State		
+					
+Update Frequency:		Monthly							
+Update Type:				Full Database Extract 							
 
-Arizona is unique in that the Arizona Secretary of State does not register corporations or limited liability 
-companies (LLCs).   They do register trade names, limited partnerships, foreign limited partnerships, 
-limited liability partnerships, reserved names and trademarks. LN is not receiving any of these datatypes.
+Expected Volume:		Approximately 1 million COREXT records, 3.4 million OFFEXT records,
+													      3.5 million FLMEXT records, and 170,000 CHGEXT records
 
-	Source Structure																
-	Source Notes		The vendor data consists of 4 record layouts:  CORPORATE MASTER( COREXT.TXT), 
-									CHANGE LAYOUT (CHGEXT.TXT), FILING/HISTORY LAYOUT (FLMEXT.TXT) AND OFFICER LAYOUT (OFFEXT.TXT).
-									One Master Record exists for each account number (COREXTM.MMDDYY).  The Record Id, Compacted 
-									Corp Name and File Number are used to link CORE, CHGE and FLM.  File Number is used to link OFF.														
-	Loading Notes																
+Data Description:		Business filings from the state of Arizona 	
+						
+Source Structure:		Four Excel comma-separated files: 
+										COREXT - Corporation data
+										OFFEXT - Officer (Contacts) data
+										FLMEXT - Annual Report and Events data
+										CHGEXT - Events data						
+
+Target Tables: 			Corp Main, Contacts, Events, Annual Report							
+
+Data Location: 			\\Tapeload02b\k\corporations\az_(en)\		
+
 */
+

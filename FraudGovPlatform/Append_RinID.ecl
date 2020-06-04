@@ -2,6 +2,7 @@
 //1.Send main dataset to append lexid
 EXPORT Append_RinID(
 	dataset(FraudShared.Layouts.Base.Main) FileBase
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
 ) := FUNCTION
 
 	FirstRinID := FraudGovPlatform.Constants().FirstRinID;
@@ -9,13 +10,28 @@ EXPORT Append_RinID(
 
 	// 2.Take new records w/o a lexid and join them to previous main file (AKA rinid, flexid, no match id)
 	
-	dFileBase := distribute(pull(FileBase), hash32(record_id));
+	previous_base := distribute(pull(Previous_Build), hash32(record_id)) ;
+	building_base := distribute(pull(FileBase), hash32(record_id));
 
-	without_did 	:= dFileBase(DID=0);	
-	with_lexid 		:= dFileBase(DID > 0 and DID < FirstRinID);
-	with_rinid 		:= dFileBase(DID >= FirstRinID);
+	// 3.Where there is a match in #2 transfer the previous RinID over to the record w/o a lexid
+	
+	J_previous_did := join (
+		previous_base,
+		building_base,
+		left.record_id = right.record_id,
+		transform(FraudShared.Layouts.Base.Main,
+			self.did:= if(left.record_id=right.record_id, left.did, right.did);
+			self.did_score:= if(left.record_id=right.record_id, left.did_score, right.did_score);
+			self := right),
+		RIGHT OUTER,
+		LOCAL
+	);	
 
-	with_pii := without_did
+	without_did 	:= J_previous_did(DID=0);	
+	with_lexid 		:= J_previous_did(DID > 0 and DID < FirstRinID);
+	with_rinid 	:= J_previous_did(DID >= FirstRinID);
+
+	shared with_pii := without_did
 		(   
 			(raw_first_name !='' and raw_last_name !='' and 
 				_Validate.Date.fIsValid(dob) and (unsigned)dob <= (unsigned)(STRING8)Std.Date.Today() and	dob != '' and dob != '00000000' and

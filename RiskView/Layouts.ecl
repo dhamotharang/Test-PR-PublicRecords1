@@ -490,6 +490,7 @@ export layout_riskview5LITE_search_results := record
 	string3   Custom100_score;
 	layout_riskview_attributes_5_slimList;
   layout_riskview5_alerts;
+	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
 
 export Layout_Riskview_Batch_In := RECORD
@@ -557,6 +558,30 @@ export layout_riskview_input := record
 	Layout_Custom_Inputs;
 	Layout_Riskview_Batch_In;
 end;
+
+export layout_checkingindicators := record
+  string2 CheckProfileIndex;
+  string3 CheckTimeOldest;
+  string3 CheckTimeNewest;
+  string2 CheckNegTimeOldest;
+  string2 CheckNegRiskDecTimeNewest;
+  string2 CheckNegPaidTimeNewest;
+  string4 CheckCountTotal;
+  string7 CheckAmountTotal;
+  string7 CheckAmountTotalSinceNegPaid;
+  string7 CheckAmountTotal03Month;
+end;
+
+export layout_FIS_custom_attributes := RECORD
+  STRING1 rv3ConfirmationSubjectFound;
+  STRING3 rv3AddrChangeCount60Month;
+  STRING3 rv3AddrChangeCount12Month;
+  STRING3 rv3AddrInputTimeOldest;
+  STRING3 rv3SourceNonDerogCount;
+  STRING3 rv3AssetPropCurrentCount;
+  STRING2 rv3SSNDeceased;
+  STRING2 rv3AssetIndex;
+END;
 
 export layout_riskview_attributes_5 := record
 	string3 Attribute_Index  := '0'; // for now, only 0 is valid attribute index, in the future we can default this.
@@ -749,8 +774,8 @@ export layout_riskview_attributes_5 := record
 	string3	PhoneInputSubjectCount	;
 	string2	PhoneInputMobile 	;
 	string1	AlertRegulatoryCondition	;
-	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 end;
+
 
 //FCRA List Gen - Will use a slim version
 export layout_riskview5 := record
@@ -847,6 +872,9 @@ export layout_riskview5 := record
 	string3 Custom5_reason5;
 	
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	
 	string4 Alert1;
 	string4 Alert2;
@@ -861,7 +889,7 @@ export layout_riskview5 := record
 	
 	string2000 ConsumerStatementText;
 end;
-
+  
 //FCRA List Gen - Will use a slim version
 export layout_riskview5_search_results := record
 	unsigned4 seq;
@@ -881,6 +909,7 @@ export layout_riskview5_search_results := record
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	string3	 Billing_Index2 := '';
 	Risk_Indicators.Layouts_Derog_Info.LJ_Records;
+  boolean FDGatewayCalled;
 end;
 
 
@@ -896,19 +925,21 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Liens,
-							'string30 Liens' + %'cntLiens'% + '_Seq;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
-							'string50 Liens' + %'cntLiens'% + '_LienType;' +
-							'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
-							'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
-							'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
-							'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
-							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
-							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
-							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
-							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
-							'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;');										
+                'string30 Liens' + %'cntLiens'% + '_Seq;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
+                'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
+                'string50 Liens' + %'cntLiens'% + '_LienType;' +
+                'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
+                'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
+                'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
+                'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
+                'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+                'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
+                'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
+                'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
+                'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;' +
+                'string10 Liens' + %'cntLiens'% + '_orig_rmsid;');							
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -926,23 +957,26 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Jgmts,
-						'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
-						'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
-						'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
-						'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
-						'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
-						'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
-						'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
-						'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
-						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
-						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
-						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
-						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +
-						'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;');											
+                'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
+                'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
+                'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
+                'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
+                'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
+                'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
+                'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
+                'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
+                'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+                'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
+                'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
+                'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;' +
+                'string10 Jgmts' + %'cntJgmts'% + '_orig_rmsid;');
+									
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END
@@ -952,6 +986,47 @@ export layout_riskview_lnj_batch := record
 	%Jgmts%
 end;
 
+// Flattened version of iesp.riskview2.t_Rv2ReportSummaryRecord
+export layout_riskview5_batch_consumer_summary := record
+	//iesp.share.t_Name
+	string62 Full;
+	string20 First;
+	string20 Middle;
+	string20 Last;
+	string5 Suffix;
+	string3 Prefix;
+	//iesp.share.t_Address;
+	string10 StreetNumber;
+	string2 StreetPreDirection;
+	string28 StreetName;
+	string4 StreetSuffix;
+	string2 StreetPostDirection;
+	string10 UnitDesignation;
+	string8 UnitNumber;
+	string60 StreetAddress1;
+	string60 StreetAddress2;
+	string25 City;
+	string2 State;
+	string5 Zip5;
+	string4 Zip4;
+	string18 County;
+	string9 PostalCode;
+	string50 StateCityZip;
+	string9 SSN;
+	string10 Phone;
+	//iesp.share.t_MaskableDate;
+	string4 Year;
+	string2 Month;
+	string2 Day;
+	string12 UniqueId;
+	string1 AddressStability;
+	string1 InquiriesRestricted;
+	string1 SSNMismatch;
+	string1 DOBMismatch;
+	string1 AddressMismatch;
+	string1 PhoneMismatch;
+	string1 UniqueIDMismatch;
+end;
 
 export layout_riskview5_batch_response := record
 	string30 acctno;
@@ -959,7 +1034,8 @@ export layout_riskview5_batch_response := record
   string5  Exception_code := '';
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
-	
+	STRING12 inquiry_lexid := '';
+	layout_riskview5_batch_consumer_summary;
 end;
 
 export attributes_internal_layout := record
@@ -967,6 +1043,9 @@ export attributes_internal_layout := record
 	unsigned seq;
 	unsigned did;
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+  Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_Attributes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets;
 end;
@@ -1068,8 +1147,9 @@ export layout_RV5capOneBatch_searchResults := record
 	string30  AcctNo;
 	string12  LexID;
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
-	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes; //CapOne is not running Juli so remove from output
+	layout_riskview_attributes_5; 
   layout_riskview5_alerts-ConsumerStatementText;
+  STRING12 inquiry_lexid := '';
 end;
 
 end;

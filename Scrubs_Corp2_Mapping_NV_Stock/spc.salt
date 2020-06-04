@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_NV_Stock
 FILENAME:In_NV
 //Uncomment up to NINES for internal or external adl
@@ -15,10 +15,10 @@ FILENAME:In_NV
 
 //FIELDTYPE DEFINITIONS
 FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(4..)
-FIELDTYPE:invalid_corp_vendor:ENUM(32)
-FIELDTYPE:invalid_state_origin:ENUM(NV)
+FIELDTYPE:invalid_corp_vendor:ENUM(32|32)
+FIELDTYPE:invalid_state_origin:ENUM(NV|NV)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
-FIELDTYPE:invalid_charter_nbr:ALLOW(-.ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
+FIELDTYPE:invalid_charter_nbr:ALLOW(-,.ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_stock_authorized_nbr:ALLOW(,.0123456789)
 FIELDTYPE:invalid_stock_par_value:ALLOW(,.0123456789)

@@ -18,9 +18,9 @@ shared rgxLastOrInitial := '(DI |DA |DEL |DES |DE LA |DE LOS |DE |DELA |DELLA |D
 shared rgxGen := '(JR|SR|I|II|III|IV|V|VI|VII|VIII|IX|2ND|3RD|THRD|03|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
 shared rgxSureGen := '(JR|SR|II|III|IV|VI|VII|VIII|IX|2ND|3RD|THRD|03|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
 shared rgxHonor := 
- '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|LN|DO|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|AS|NP|FNP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|MA|PT|SJ|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CRNA|MBBS|PNP|RNP|CNS)';
+ '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|LN|DO|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|AS|NP|FNP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|MA|PT|SJ|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CRNA|MBBS|PNP|RNP|CNS|CMS|CMRS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO|RD|RDN|DPT|RPH|PHARMD)';
 shared rgxSureHonor := 	// no oriental names
- '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|LN|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|NP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|PT|SJ|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CRNA|MBBS|PNP|RNP|CNS)';
+ '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|LN|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|NP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|PT|SJ|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CRNA|MBBS|PNP|RNP|CNS|CMS|CMRS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO|RD|RDN|DPT|RPH|PHARMD)';
 shared rgxSuffix := '(' + rgxGen + '|' + rgxHonor + ')';
 shared rgxSureSuffix := '(' + rgxSureGen + '|' + rgxSureHonor + ')';
 shared rgxTitles := '(MR|MRS|MISS|MS|DR|REV|SHRF|SIR)';
@@ -1269,7 +1269,9 @@ shared string1 GetNameOrderFML(string rgx, string s, integer2 posf1, integer2 po
 				segs IN ['LFF','LFB','LFL','LFX','LBF','LBB','LBL','LBX','LXX','LXF','LXB','BFF','BBF','XBX','XFX','XFB','XXF','XFF','XBF','XBB'] => 'L',
 				segs in ['LLF','XLF','BLF','LLB'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posm1)), 'L', 'U'),
 				segs in ['XFL','XBL'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posl1)), 'L', 'F'),
-				segs in ['BFB'] => if(clue in ['l','L'], 'L', 'F'),
+				segs in ['BLB'] => IF(nameTester.IsHiPctFirstName(REGEXFIND(rgx, s, posl1)),
+														'U','F'),
+				segs in ['BFB'] => 'F',
 				clue in ['l','L'] => 'L',
 				'F'
 				//GetNameOrder(rgx, s, posf1, posf2, posl1, posl2, clue, posm1, posm2)
@@ -1486,7 +1488,7 @@ shared string GenToAlpha(string suffix) :=
 			'2ND' => 'II',
 			'ND' => 'II',
 			'3RD' => 'III',
-			'RD' => 'III',
+			//'RD' => 'III',
 			'THRD' => 'III',
 			'4TH' => 'IV',
 			'5TH' => 'V',
@@ -2222,7 +2224,7 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 END;
 
 shared titles :=
- '\\b(MR|MRS|MS|MMS|MISS|DR|REV|RABBI|REVEREND|MSGR|PROF|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|MAJ|SFC|SRTA|APCO|CAPT|CPT|SGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
+ '\\b(MR|MRS|MS|MISS|DR|REV|RABBI|REVEREND|MSGR|PROF|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|MAJ|SFC|SRTA|APCO|CAPT|CPT|SGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
 export string Title (string s, NameFormat n, string1 clue='U', string fullname='') := FUNCTION
 	clnname := FormatName(s, n);
 	return MAP(

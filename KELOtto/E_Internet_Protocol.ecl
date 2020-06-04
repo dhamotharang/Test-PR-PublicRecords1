@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT E_Customer FROM KELOtto;
@@ -10,7 +10,7 @@ EXPORT E_Internet_Protocol := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -84,7 +84,7 @@ EXPORT E_Internet_Protocol := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),ip_address(Ip_Address_:\'\'|_ip__address_:\'\'),ottoipaddressid(Otto_Ip_Address_Id_:0),host(_host_:\'\'),alias(_alias_:\'\'),location(_location_:\'\'),ip_address_date(_ip__address__date_:\'\'),version(_version_:\'\'),class(_class_:\'\'),subnet_mask(_subnet__mask_:\'\'),reserved(_reserved_:\'\'),isp(_isp_:\'\'),v2_validationipproblems(_v2__validationipproblems_:0),v2_ipstate(_v2__ipstate_:\'\'),v2_ipcountry(_v2__ipcountry_:\'\'),v2_ipcontinent(_v2__ipcontinent_:\'\'),iprngbeg(_iprngbeg_:\'\'),iprngend(_iprngend_:\'\'),edgecountry(_edgecountry_:\'\'),edgeregion(_edgeregion_:\'\'),edgecity(_edgecity_:\'\'),edgeconnspeed(_edgeconnspeed_:\'\'),edgemetrocode(_edgemetrocode_:\'\'),edgelatitude(_edgelatitude_:\'\'),edgelongitude(_edgelongitude_:\'\'),edgepostalcode(_edgepostalcode_:\'\'),edgecountrycode(_edgecountrycode_:\'\'),edgeregioncode(_edgeregioncode_:\'\'),edgecitycode(_edgecitycode_:\'\'),edgecontinentcode(_edgecontinentcode_:\'\'),edgetwolettercountry(_edgetwolettercountry_:\'\'),edgeinternalcode(_edgeinternalcode_:\'\'),edgeareacodes(_edgeareacodes_:\'\'),edgecountryconf(_edgecountryconf_:\'\'),edgeregionconf(_edgeregionconf_:\'\'),edgecitycong(_edgecitycong_:\'\'),edgepostalconf(_edgepostalconf_:\'\'),edgegmtoffset(_edgegmtoffset_:\'\'),edgeindst(_edgeindst_:\'\'),siccode(_siccode_:\'\'),domainname(_domainname_:\'\'),ispname(_ispname_:\'\'),homebiztype(_homebiztype_:\'\'),asn(_asn_:\'\'),asnname(_asnname_:\'\'),primarylang(_primarylang_:\'\'),secondarylang(_secondarylang_:\'\'),proxytype(_proxytype_:\'\'),proxydescription(_proxydescription_:\'\'),isanisp(_isanisp_:\'\'),companyname(_companyname_:\'\'),ranks(_ranks_:\'\'),households(_households_:\'\'),women(_women_:\'\'),women18to34(_women18to34_:\'\'),women35to49(_women35to49_:\'\'),men(_men_:\'\'),men18to34(_men18to34_:\'\'),men35to49(_men35to49_:\'\'),teens(_teens_:\'\'),kids(_kids_:\'\'),naicscode(_naicscode_:\'\'),cbsacode(_cbsacode_:\'\'),cbsatitle(_cbsatitle_:\'\'),cbsatype(_cbsatype_:\'\'),csacode(_csacode_:\'\'),csatitle(_csatitle_:\'\'),mdcode(_mdcode_:\'\'),mdtitle(_mdtitle_:\'\'),organizationname(_organizationname_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),ip_address(Ip_Address_:\'\'|_ip__address_:\'\'),ottoipaddressid(Otto_Ip_Address_Id_:\'\'),host(_host_:\'\'),alias(_alias_:\'\'),location(_location_:\'\'),ip_address_date(_ip__address__date_:\'\'),version(_version_:\'\'),class(_class_:\'\'),subnet_mask(_subnet__mask_:\'\'),reserved(_reserved_:\'\'),isp(_isp_:\'\'),v2_validationipproblems(_v2__validationipproblems_:0),v2_ipstate(_v2__ipstate_:\'\'),v2_ipcountry(_v2__ipcountry_:\'\'),v2_ipcontinent(_v2__ipcontinent_:\'\'),iprngbeg(_iprngbeg_:\'\'),iprngend(_iprngend_:\'\'),edgecountry(_edgecountry_:\'\'),edgeregion(_edgeregion_:\'\'),edgecity(_edgecity_:\'\'),edgeconnspeed(_edgeconnspeed_:\'\'),edgemetrocode(_edgemetrocode_:\'\'),edgelatitude(_edgelatitude_:\'\'),edgelongitude(_edgelongitude_:\'\'),edgepostalcode(_edgepostalcode_:\'\'),edgecountrycode(_edgecountrycode_:\'\'),edgeregioncode(_edgeregioncode_:\'\'),edgecitycode(_edgecitycode_:\'\'),edgecontinentcode(_edgecontinentcode_:\'\'),edgetwolettercountry(_edgetwolettercountry_:\'\'),edgeinternalcode(_edgeinternalcode_:\'\'),edgeareacodes(_edgeareacodes_:\'\'),edgecountryconf(_edgecountryconf_:\'\'),edgeregionconf(_edgeregionconf_:\'\'),edgecitycong(_edgecitycong_:\'\'),edgepostalconf(_edgepostalconf_:\'\'),edgegmtoffset(_edgegmtoffset_:\'\'),edgeindst(_edgeindst_:\'\'),siccode(_siccode_:\'\'),domainname(_domainname_:\'\'),ispname(_ispname_:\'\'),homebiztype(_homebiztype_:\'\'),asn(_asn_:\'\'),asnname(_asnname_:\'\'),primarylang(_primarylang_:\'\'),secondarylang(_secondarylang_:\'\'),proxytype(_proxytype_:\'\'),proxydescription(_proxydescription_:\'\'),isanisp(_isanisp_:\'\'),companyname(_companyname_:\'\'),ranks(_ranks_:\'\'),households(_households_:\'\'),women(_women_:\'\'),women18to34(_women18to34_:\'\'),women35to49(_women35to49_:\'\'),men(_men_:\'\'),men18to34(_men18to34_:\'\'),men35to49(_men35to49_:\'\'),teens(_teens_:\'\'),kids(_kids_:\'\'),naicscode(_naicscode_:\'\'),cbsacode(_cbsacode_:\'\'),cbsatitle(_cbsatitle_:\'\'),cbsatype(_cbsatype_:\'\'),csacode(_csacode_:\'\'),csatitle(_csatitle_:\'\'),mdcode(_mdcode_:\'\'),mdtitle(_mdtitle_:\'\'),organizationname(_organizationname_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -96,7 +96,7 @@ EXPORT E_Internet_Protocol := MODULE
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Internet_Protocol::UidLookup',EXPIRE(7));
@@ -125,7 +125,7 @@ EXPORT E_Internet_Protocol := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;

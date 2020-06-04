@@ -1,4 +1,4 @@
-IMPORT PersonContext;
+﻿IMPORT PersonContext;
 
 EXPORT ServiceGetPersonContext() := FUNCTION
 // Query: ServiceGetPersonContext
@@ -6,7 +6,7 @@ EXPORT ServiceGetPersonContext() := FUNCTION
 
 	PCRequestIn := DATASET([], PersonContext.Layouts.Layout_PCRequest) : STORED('PersonContextRequest'); 
 	PCRequest  	:= PCRequestIn[1];
-	PCResponse	:= PersonContext.GetPersonContext(PCRequest);
+	PCResponse	:= PersonContext.GetPersonContext(PCRequest, FALSE);
 	RETURN OUTPUT(PCResponse, NAMED('PersonContextResponse'));
 
 END;

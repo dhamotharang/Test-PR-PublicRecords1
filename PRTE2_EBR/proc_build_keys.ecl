@@ -1,6 +1,8 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,AutoKeyB,Doxie,AutoStandardI,AutoKeyB2;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,AutoKeyB,Doxie,AutoStandardI,AutoKeyB2,PRTE2_Common,dops,Orbit3;
 
-EXPORT proc_build_keys(string filedate) := function
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
+is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
+doDOPS 								:= is_running_in_prod AND NOT skipDOPS;
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_0010_Header_BDID, 																Constants.key_prefix + '0010_header::bdid',																		Constants.key_prefix+filedate+ '::0010_header::bdid',																	k1);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_0010_Header_FILE_NUMBER, 													Constants.key_prefix + '0010_header::file_number',														Constants.key_prefix+filedate+ '::0010_header::file_number',													k2);
@@ -9,7 +11,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_1000_Executive_Summary_BDID,
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_1000_Executive_Summary_FILE_NUMBER,								Constants.key_prefix + '1000_executive_summary::file_number',									Constants.key_prefix+filedate+ '::1000_executive_summary::file_number',								k4);
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_2000_Trade_FILE_NUMBER, 													Constants.key_prefix + '2000_Trade::file_number',															Constants.key_prefix+filedate+ '::2000_Trade::file_number',														k5);
+
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_2015_Trade_Payment_Totals_FILE_NUMBER, 						Constants.key_prefix + '2015_Trade_Payment_Totals::file_number',							Constants.key_prefix+filedate+ '::2015_Trade_Payment_Totals::file_number',						k6);
+
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_2020_Trade_Payment_Trends_FILE_NUMBER, 						Constants.key_prefix + '2020_Trade_Payment_Trends::file_number',							Constants.key_prefix+filedate+ '::2020_Trade_Payment_Trends::file_number',						k7);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER, 				Constants.key_prefix + '2025_Trade_Quarterly_Averages::file_number',					Constants.key_prefix+filedate+ '::2025_Trade_Quarterly_Averages::file_number',					k8);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.Key_4010_Bankruptcy_FILE_NUMBER, 											Constants.key_prefix + '4010_Bankruptcy::file_number',												Constants.key_prefix+filedate+ '::4010_Bankruptcy::file_number',											k9);
@@ -34,7 +38,6 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.Key_0010_Header_linkids.Key,				
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.Key_5600_Demographic_Data_linkids.Key,								Constants.key_prefix +'5600_Demographic_data::linkids',												Constants.key_prefix+filedate+'::5600_Demographic_data::linkids',											k23);
 
 build_roxie_keys	:=	parallel(	k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16, k17, k18, k19, k20, k21, k22, K23);
-
 
 // -- Move Keys to Built
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(Constants.SuperKeyName + '0010_header::bdid',																		Constants.key_prefix+filedate+'::0010_header::bdid',																	mv1);
@@ -67,7 +70,6 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2(Constants.SuperKeyName + '0010_header::lin
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(Constants.SuperKeyName + '5600_Demographic_data::linkids',											Constants.key_prefix+filedate+ '::5600_Demographic_data::linkids',										mv23);
 
 Move_keys	:=	parallel(	mv1, mv2, mv3, mv4, mv5, mv6, mv7, mv8, mv9, mv10, mv11, mv12, mv13, mv14, mv15, mv16, mv17, mv18, mv19, mv20, mv21, mv22, mv23);
-
 
 //-- Move Keys to QA
 RoxieKeyBuild.MAC_SK_Move_V2(Constants.SuperKeyName	+'0010_header::bdid',		                       	'Q',mv1_qa,2);
@@ -103,6 +105,15 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 									 mv11_qa, mv12_qa, mv13_qa, mv14_qa, mv15_qa, mv16_qa, mv17_qa, mv18_qa, mv19_qa, mv20_qa,
 									 mv21_qa, mv22_qa, mv23_qa);
 
+//---------- making DOPS optional and only in PROD build -------------------------------													
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('EBRKeys',filedate,notifyEmail,'B','N','N');
+    PerformUpdateOrNot 	:= IF(doDOPS,sequential(updatedops),NoUpdate);
+		
+		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+
+    updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE - EBR', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
 
 
 build_autokeys(string filedate) := function
@@ -160,17 +171,16 @@ return retval;
 
 end;
 
-// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-updatedops   		 := PRTE.UpdateVersion('EBRKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-
 
 // -- Actions
-buildKey	:=	ordered(
+buildKey	:=	sequential(
 											build_roxie_keys
 											,Move_keys
 											,to_qa
 											,build_autokeys(filedate)
 											,updatedops
+											,key_validation
+											,updateorbit
 											);
 													
 return	buildKey;

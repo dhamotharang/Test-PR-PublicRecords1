@@ -121,7 +121,7 @@ STRATA.createXMLStats(basestrata_Reo,
                       'BKForeclosure_Reo',
 					            'data',
 					            filedate,
-					            BKForeclosure.Roxie_Email_List,
+					            '',
 					            strataresults
 					           );
 return strataresults;

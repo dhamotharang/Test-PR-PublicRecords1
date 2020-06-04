@@ -1,40 +1,93 @@
-﻿IMPORT _Control,tools,STD,NAC,FraudGovPlatform,inql_v2, ut;
+﻿IMPORT _Control,tools,STD,FraudGovPlatform, ut;
 
 EXPORT SprayAndQualifyRDP(
-	string pversion )
-:= FUNCTION
+	STRING pVersion,
+	STRING ip	= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10),
+	STRING pRDPRootDir = IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.RDPLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.RDPLandingZonePathBase_prod)
+) := FUNCTION
+
 	DateSearch := pVersion[1..8];
+
+	dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pRDPRootDir + DateSearch, '*.dat')):INDEPENDENT;
+	dsFileListSorted := SORT(dsFileList,modified);
+	fname_temp	:=dsFileListSorted[1].Name:independent;
+	fname	:= fname_temp;
+
+	UpSt:='';
+	UpType := 'RDP';
+
+	FileFound:=EXISTS(dsFileListSorted);
+	ReportFileFound:=IF(FileFound
+						,OUTPUT('Found File To Spray',NAMED('RDP_Found_File_To_Spray'))
+						,OUTPUT('No File To Spray',NAMED('RDP_No_File_To_Spray'))
+						);
+
+	IsEmptyFile:=dsFileListSorted[1].size = 0;
+
+	FileSprayed 	:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
+	RDP_Passed		:= FraudGovPlatform.Filenames().Sprayed._RDPPassed;
+	RDP_Rejected	:= FraudGovPlatform.Filenames().Sprayed._RDPRejected;
+
+	ClearFiles	:= SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		STD.File.RemoveSuperFile( RDP_Passed, FileSprayed , true ),
+		STD.File.RemoveSuperFile( RDP_Rejected, FileSprayed, true ),
+		STD.File.FinishSuperFileTransaction()
+	);
+		
+
+	SprayIt:=SEQUENTIAL(
+							OUTPUT('Spraying: '+ ip + pRDPRootDir + DateSearch + '/' + fname_temp + ' -> ' + FileSprayed) 
+							,NOTHOR(ClearFiles)
+							,NOTHOR(FileServices.SprayVariable(
+								 IP //sourceIP 
+								,pRDPRootDir + DateSearch + '/' + fname_temp //sourcepath 
+								,//maxrecordsize 
+								,//srcCSVseparator 
+								,'|\n,\n'//srcCSVterminator 
+								,//srcCSVquote 
+								,thorlib.group() //destinationgroup
+								,FileSprayed //destinationlogicalname 
+								, //timeout 
+								,//espserverIPport 
+								,//maxConnections 
+								,TRUE //allowoverwrite 
+								,TRUE //replicate 
+								,TRUE //compress 
+								))
+							);	
+	
 
 	Customer_Settings := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
 
 	billingID_list := SET(Customer_Settings,contribution_billing_id);
 
-	rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::'+DateSearch+'::sba_acclogs',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
+		
+	MoveToPass :=
+		SEQUENTIAL(	OUTPUT('File '+fname+' content accepted',NAMED('Deltabase_File_content_accepted')),
+							fileservices.AddSuperfile(RDP_Passed,FileSprayed));
+															
+	MoveToReject := 
+		SEQUENTIAL(	OUTPUT('File '+fname+' contains fatal errors.  File will be rejected',NAMED('Deltabase_File_content_rejected')),
+							fileservices.AddSuperfile(RDP_Rejected,FileSprayed));	
 
-	RDP_Logs := rdp_file(
-			 company_id in billingID_list,
-			 function_name = 'VERIFICATION'
-		);
+	ReportEmptyFile := 
+		SEQUENTIAL (	OUTPUT('File '+ip+pRDPRootDir + DateSearch +'/'+ fname_temp+' empty',NAMED('Deltabase_File_empty')),
+							Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert);
+	outputwork
+			:=
+				IF(fname=''
+						,OUTPUT('No new contributory files to process')
+						,SEQUENTIAL(	ReportFileFound,
+											IF(FileFound,
+														IF (	IsEmptyFile,
+																SEQUENTIAL( ReportEmptyFile, MoveToReject),
+																SEQUENTIAL(	SprayIt, MoveToPass	)),
+														Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileErrorAlert
+											)
+						)
+				):FAILURE(Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FraudGov_Input_Prep_failure)
+				 ;
 
-	FileSprayed := (string)(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ Customer_Settings[1].Customer_Account_Number + '_' + Customer_Settings[1].Customer_State + '_' + Customer_Settings[1].Customer_Agency_Vertical_Type + '_' + Customer_Settings[1].Customer_Program + '_' + trim(Customer_Settings[1].Contribution_Source) + '_' + DateSearch + '_' + Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S')):independent ;
-	
-	RDP_Sprayed := FraudGovPlatform.Filenames().Sprayed.RDP;
-	
-	tools.mac_WriteFile(FileSprayed,
-									RDP_Logs,
-									Build_Input_File,
-									pCompress	:= true,
-									pHeading := false,
-									pCsvout := true,
-									pSeparator := '~~',
-									pOverwrite := true,
-									pTerminator := '\n',
-									pQuote:= '');
-
-	outputwork  := sequential(
-								  Build_Input_File
-								, nothor(fileservices.AddSuperfile(RDP_Sprayed,FileSprayed))
-							);
-	
-	RETURN outputwork;							
+	RETURN outputwork;
 END;	

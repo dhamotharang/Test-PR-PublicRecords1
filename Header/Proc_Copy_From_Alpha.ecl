@@ -1,12 +1,11 @@
 ﻿IMPORT STD,header,ut,_control,wk_ut;
 
-EXPORT Proc_Copy_From_Alpha(string8 pBldVer = '') := module
+EXPORT Proc_Copy_From_Alpha(string pBldVer = '') := module
 
 SHARED filedate:=if(pBldVer <> '', pBldVer, header.version_build);
 
-SHARED linking_keys := dataset ( [  //13 keys
+SHARED linking_keys := dataset ( [  //12 keys
 
-                            {'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind','thor_data400::key::insuranceheader_segmentation::did_ind_qa'},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::address',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dln',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dob',''},
@@ -63,27 +62,28 @@ SHARED copy_files(string nm, string src_name, string dest_clstr,string src_alpha
 end;
 // ************************************************************************************************************************************
 
+inspr(string spr, string newLogical):=FUNCTION
+    spr_cntns:=STD.File.SuperFileContents(spr);
+    RETURN (newLogical in set(spr_cntns,name));
+END;
+
 SHARED update_supers(string spr0, string newLogical) := function
 
     spr:='~'+ case( spr0, 'thor_data400::key::header::qa::relatives_v3'=>
-                         'thor_data400::key::relatives_v3_qa',
-                         'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
-                         'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
-                         'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
-                         'thor400_44::key::insuranceheader_segmentation::did_ind_built',
-                         'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
-                  ,spr0);
-    return sequential(
-        output(dataset([{spr,'~'+newLogical}],{string super, string new_logical}),named('cp_built_update'),extend)
-        ,std.file.RemoveOwnedSubFiles(spr,TRUE)
-        ,std.file.clearsuperfile     (spr)
-        ,if(std.file.SuperFileExists('~'+newLogical)
+                         'thor_data400::key::relatives_v3_qa'
+                   ,spr0);
+    
+    return if(~inspr(spr,newLogical)
+          ,sequential(
+            output(dataset([{spr,'~'+newLogical,'Updating'}],{string super, string new_logical,string comment}),named('cp_built_update'),extend)
+           ,std.file.RemoveOwnedSubFiles(spr,TRUE)
+           ,std.file.clearsuperfile     (spr)
+           ,if(std.file.SuperFileExists('~'+newLogical)
              ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
-             ,std.file.addsuperfile       (spr   , '~'+newLogical       ));
-    );
+             ,std.file.addsuperfile       (spr   , '~'+newLogical       )
+             );)
+          ,output(dataset([{spr,'~'+newLogical,'Already up-to-date'}],{string super, string new_logical, string comment}),named('cp_built_update'),extend)
+          );
 end;
 // ************************************************************************************************************************************
 
@@ -126,8 +126,7 @@ Get_DFUInfo(string filename, string pesp = wk_ut._constants.LocalEsp,string dfu_
 end;
 generateDFUinfo(string filedate):=
 sequential(
-output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filedate+'::did_ind'),named('file_copy_log'),extend)
-,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'),named('file_copy_log'),extend)
+ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dln'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dob'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::lfz'),named('file_copy_log'),extend)
@@ -164,23 +163,26 @@ EXPORT copyOthers := sequential(
        ,nothor(apply(additional_keys    ,update_supers  (ver(nm,'built', 'thor_data400')   , ver(nm,filedate))    ))
 );
 // ************************************************************************************************************************************
-ld :='thor_data400::key::insuranceheader_xlink::<<version>>::did';
+
+ld := dataset ( [
+    {'thor_data400::key::insuranceheader_xlink::<<version>>::did',''}
+     ] , {string nm,string src_name});
+     
 reltv_n_othr:=base_relative + additional_keys;
 ikb_ver:=header._info.get_version_link_qa_inc:INDEPENDENT;
-EXPORT MoveToQA :=sequential(
+EXPORT MoveToQA :=nothor(sequential(
      output(ikb_ver,named('current_ikb_version')) // get the ikb version ahead of the update, so that we can ensure it is re-instated after the move of the full lab keys
-    ,nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
-    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) ))
-    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor400_36'  )) ))
-    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400')) ))
-    ,nothor(apply(reltv_n_othr, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')) ))
-    // This keey is built in Doxie.Proc_Header_Keys (not copied like the rest)
-    ,                           update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400'))
-    ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
-    ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
-    ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver)) // Restore the incremental keys into the qa superfiles
-    ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
-);
-// ************************************************************************************************************************************
+    ,apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )))
+    ,apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) )
+    ,apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor400_36'  )))
+    ,apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400') ))
+    ,apply(reltv_n_othr, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')) )
+    ,apply(ld,           update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')))
+    ,apply(ld,           update_supers(  ver(nm,'qa'    ,'thor400_44'  ), ver(nm,filedate,'thor_data400')))
+    ,apply(ld,           update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor_data400')))
+    ,Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver) // Restore the incremental keys into the qa superfiles
+    ));
 
 END;
+
+// ************************************************************************************************************************************

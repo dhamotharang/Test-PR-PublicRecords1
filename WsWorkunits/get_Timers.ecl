@@ -7,7 +7,7 @@ EXPORT get_Timers(
 ) :=
 function
 
-  ds_wuinfo := WsWorkunits.soapcall_WUInfo(pwuid);
+  ds_wuinfo := WsWorkunits.soapcall_WUInfo(pwuid,pesp);
   ds_norm   := normalize(ds_wuinfo,left.Timers    ,transform(recordof(left.Timers    ),self := right));  //i get these
 
   return ds_norm;

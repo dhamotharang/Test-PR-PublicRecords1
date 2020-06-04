@@ -1,4 +1,4 @@
-export Layout_history := record
+﻿export Layout_history := record
 	gong.layout_bscurrent_raw;
 	unsigned6 did;
 	unsigned6 hhid;
@@ -10,4 +10,7 @@ export Layout_history := record
 	unsigned2 disc_cnt6 := 0;
 	unsigned2 disc_cnt12 := 0;
 	unsigned2 disc_cnt18 := 0;
+	//CCPA-22 CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;

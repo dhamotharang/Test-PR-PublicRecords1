@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -9,13 +9,16 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT Corporation      	 	:= tools.mod_FilenamesInput(Template('corporation::nh'), pversion);
 		EXPORT Address        			:= tools.mod_FilenamesInput(Template('address::nh'), pversion);
 		EXPORT Filing  							:= tools.mod_FilenamesInput(Template('filing::nh'), pversion);
-		EXPORT Merger       				:= tools.mod_FilenamesInput(Template('merger::nh'), pversion);
-		EXPORT CorporationName   		:= tools.mod_FilenamesInput(Template('name::nh'), pversion);
-		EXPORT Officer        			:= tools.mod_FilenamesInput(Template('officer::nh'), pversion);
+		EXPORT RegAgent      				:= tools.mod_FilenamesInput(Template('reg_agent::nh'), pversion);
+		EXPORT PrevNames      		  := tools.mod_FilenamesInput(Template('prev_names::nh'), pversion);
+		EXPORT Principals        		:= tools.mod_FilenamesInput(Template('principals::nh'), pversion);
+		EXPORT PrinPurp         		:= tools.mod_FilenamesInput(Template('prin_purpose::nh'), pversion);
 		EXPORT Stock        				:= tools.mod_FilenamesInput(Template('stock::nh'), pversion);
 
 	END;
 
+ // Base files are no longer being used
+ /*
 	EXPORT Base := MODULE
 		SHARED Template(STRING tag) := Corp2_Raw_NH._Dataset(pUseOtherEnvironment).FileTemplate + tag;
 		
@@ -44,5 +47,5 @@ EXPORT Filenames(STRING  pversion = '',
 																		 Base.dAll_CorporationName  	+
 																		 Base.dAll_Office  						+
 																		 Base.dAll_Stock;
-	  
+	  */
 END;

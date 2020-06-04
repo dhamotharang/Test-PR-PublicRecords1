@@ -1,4 +1,4 @@
-import lib_fileservices;
+﻿import lib_fileservices;
 export Layout_SuperFilenames :=
 module
 	export InputLayout :=
@@ -14,6 +14,8 @@ module
 		string newname;
 		DATASET(Layout_Names						)	dSuperkeyContainers					;
 		unsigned4													NumSuperKeycontainers	:= 0	;
+    boolean                           exists_new_name;
+    boolean                           will_rename     ;
 	end;
 	export OutputLayout :=
 	record, maxlength(10000)

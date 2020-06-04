@@ -1,306 +1,161 @@
-IMPORT corp2, corp2_raw_az, ut;
+﻿IMPORT corp2, corp2_raw_az, ut;
 
 EXPORT Functions := Module
 	
-	
-	EXPORT FixStreet(string s) := FUNCTION
-	// Street address info sometimes begins with a percent (%) followed by a company name.
-	// When this is the case, we want to blank out that street field.  This also strips % signs.
-    		
-		street := corp2.t2u(s);
+  //**************************************************************************************************
+	// FixAddrField - Address fields sometimes begins with a percent (%) which we want to blank out.
+	//                Also, sometimes address fields contain only Xs, like 'XXXXX', 'XX', etc. so we 
+	//                also want to blank those invalid values.
+	//**************************************************************************************************
+	EXPORT FixAddrField(string s) := FUNCTION    		
+
+		ucS := corp2.t2u(s);
+		stripPct := corp2.t2u(StringLib.StringFindReplace(ucS,'%',''));
 		
-		RETURN  if (street[1] = '%' and LENGTH(stringlib.stringfilter(street,'1234567890')) < 1
-							 ,'' ,StringLib.StringFindReplace(street,'%','')); 
+		RETURN  if (LENGTH(stringlib.stringfilterout(corp2.t2u(stripPct),'X')) < 1
+                 ,'' ,corp2.t2u(stripPct));
   END;
-		
-	EXPORT GetStatusCode(string code) 
-	        := map(corp2.t2u(code) in ['1','01'] => '01',
-								 corp2.t2u(code) in ['2','02'] => '02',
-								 corp2.t2u(code) in ['3','03'] => '03',
-								 corp2.t2u(code) in ['4','04'] => '04',
-								 corp2.t2u(code) in ['5','05'] => '05',
-								 corp2.t2u(code) in ['6','06'] => '06',
-								 corp2.t2u(code) in ['7','07'] => '07',
-								 corp2.t2u(code) in ['8','08'] => '08',
-							 	 corp2.t2u(code) in ['9','09'] => '09',
-							 	 corp2.t2u(code) = ''          => 'ACT',
-							 	 corp2.t2u(code));
-								 
-	EXPORT GetStatusDesc(string code) 
-				 := map(corp2.t2u(code) in ['1','01'] => 'REVOKED-FILE ANNUAL REPORT',
-								corp2.t2u(code) in ['2','02'] => 'REVOKED NON-PAYMENT',
-								corp2.t2u(code) in ['3','03'] => 'REVOKED-MAINTAIN STATUTORY AGENT',
-								corp2.t2u(code) in ['4','04'] => 'REVOKED-PUBLISH & FILE AFFIDAVIT',
-								corp2.t2u(code) in ['5','05'] => 'REVOKED-FILE CERT./DISCLOSURE',
-								corp2.t2u(code) in ['6','06'] => 'REVOKED-OTHER',
-								corp2.t2u(code) in ['7','07'] => 'ADMINISTRATIVELY CANCELLED',
-								corp2.t2u(code) in ['8','08'] => 'AD-DISSOLVED-FILE ANNUAL REPORT',
-								corp2.t2u(code) in ['9','09'] => 'AD-DISSOLVED NON-PAYMENT',
-								corp2.t2u(code) = '10'        => 'AD-DISSOLVED-MAINTAIN STAT AGENT',
-								corp2.t2u(code) = '11'        => 'AD-DISSOLVED-PUB/FILE AFFIDAVIT',
-								corp2.t2u(code) = '12'        => 'AD-DISSOLVED - FILE CERT/DISCLOSURE',
-								corp2.t2u(code) = '13'        => 'AD-DISSOLVED - OTHER',
-								corp2.t2u(code) = '14'        => 'AD-DISSOLVED - CORP LIFE EXPIRED',
-								corp2.t2u(code) = '15'        => 'AUTHORITY SUSPENDED BY COURT ORDER',
-								corp2.t2u(code) = '16'        => 'AD-DISSOLVED-UNDELIVERABLE ADDRESS',
-								corp2.t2u(code) = '17'        => 'REVOKED - UNDELIVERABLE ADDRESS',
-								corp2.t2u(code) = '18'        => 'AD-DISSOLVED-INCOMPLETE DISSOLUTION/WITHDRAWAL',
-								corp2.t2u(code) = '19'        => 'REVOKED - INCOMPLETE DISSOLUTION/WITHDRAWAL',
-								corp2.t2u(code) = '20'        => 'ADMINISTRATIVELY FROZEN',																						
-								corp2.t2u(code) = 'A'         => 'MERGED WITH OTHER CORPORATION',
-								corp2.t2u(code) = 'B'         => 'DIVIDED TO OTHER ENTITY',
-								corp2.t2u(code) = 'C'         => 'DELINQUENT NON-PAYMENT',
-								corp2.t2u(code) = 'D'         => 'DELINQUENT UNDELIVERABLE ADDRESS',
-								corp2.t2u(code) = 'E'         => 'DOMESTICATED TO OTHER ENTITY',
-								corp2.t2u(code) = 'H'         => 'CORPORATE LIFE EXPIRED',
-								corp2.t2u(code) = 'I'         => 'DELINQUENT ANNUAL REPORT',
-								corp2.t2u(code) = 'J'         => 'DELINQUENT STATUTORY AGENT',
-								corp2.t2u(code) = 'K'         => 'DELINQUENT PUBLICATION',
-								corp2.t2u(code) = 'L'         => 'DELINQUENT AMENDMENT PUBLICATION',
-								corp2.t2u(code) = 'O'         => 'DELINQUENT MERGER PUBLICATION',
-								corp2.t2u(code) = 'P'         => 'DELINQUENT DISCLOSURE',
-								corp2.t2u(code) = 'Q'         => 'DELINQUENT CORP LIFE EXPIRED',
-								corp2.t2u(code) = 'R'         => 'REINSTATEMENT',
-								corp2.t2u(code) = 'S'         => 'SET-ASIDE',
-								corp2.t2u(code) = 'T'         => 'DOMESTICATED SEE COMMENTS',
-								corp2.t2u(code) = 'U'         => 'DELINQUENT INCOMPLETE DISSOLUTION/WITHDRAWAL',
-								corp2.t2u(code) = 'V'         => 'CONVERTED TO OTHER ENTITY',
-								corp2.t2u(code) = 'W'         => 'DELINQUENT - OTHER',
-								corp2.t2u(code) = 'ACT'       => 'ACTIVE',
-								'');							 
 	
-	EXPORT GetOrgStrucDesc(string code) 
-				:= case(corp2.t2u(code),
-							'A' => 'CLOSE CORPORATION',
-							'B' => 'BUSINESS',
-							'C' => 'CO-OP',
-							'F' => 'BENEFIT CORPORATION',
-							'G' => 'PROFESSIONAL BENEFIT CORPORATION',
-							'I' => 'NON-FILING INSURANCE',
-							'L' => 'LOAN',
-							'N' => 'NON-PROFIT',
-							'P' => 'PROFIT',
-							'R' => 'PROFESSIONAL',
-							'S' => 'CORPORATION SOLE',
-							'T' => 'TRUST',
-							'U' => 'NON-FILING CREDIT UNION',
-							'W' => 'DOMESTIC L.L.C.',
-							'X' => 'FOREIGN L.L.C.',
-							'Y' => 'PROFESSIONAL L.L.C.',
-							'');
-							 
-	EXPORT GetMonth(string code)
-	      := case(corp2.t2u(code),
-							'01'=>'JANUARY',
-							'02'=>'FEBRUARY',
-							'03'=>'MARCH',
-							'04'=>'APRIL',
-							'05'=>'MAY',
-							'06'=>'JUNE',
-							'07'=>'JULY',
-							'08'=>'AUGUST',
-							'09'=>'SEPTEMBER',
-							'10'=>'OCTOBER',
-							'11'=>'NOVEMBER',
-							'12'=>'DECEMBER',
-							'');	
 	
-   EXPORT GetContTitleDesc(string code)
-	       := case(corp2.t2u(code),
-							'C' =>'CHAIRMAN',
-							'CE'=>'CHIEF EXECUTIVE OFFICER',
-							'D' =>'DIRECTOR',
-							'DC'=>'DIRECTOR/CHAIRMAN',
-							'H' =>'PRINCIPAL SHAREHOLDER',
-							'I' =>'INVESTOR',
-							'M' =>'MANAGER',
-							'MB'=>'MEMBER',
-							'O' =>'OTHER OFFICER',
-							'P' =>'PRESIDENT/CEO',
-							'PR'=>'PRESIDENT',
-							'R' =>'RESIGNED',
-							'SE'=>'SECRETARY',
-							'T' =>'TREASURER',
-						  'TR'=>'TRUSTEE',
-							'V' =>'VICE-PRESIDENT',
-							'');
-	
-	 EXPORT GetStateDesc(string code)
-		     := case(corp2.t2u(code),	
-							'AA'   =>  'ARMED FORCES AMERICAS EXCEPT CANADA',
-							'AB'   =>  'ALBERTA',
-							'AC'   =>  'ASCENSION ISLAND',
-							'AE'   =>  'ARMED FORCES EUROPE',
-							'AK'   =>  'ALASKA',
-							'AL'   =>  'ALABAMA',
-							'ALB'  =>  'ALBERTA',
-							'AN'   =>  'NETHERLANDS ANTILLES',
-							'AP'   =>  'ARMED FORCES PACIFIC',
-							'AR'   =>  'ARKANSAS',
-							'AS'   =>  'AMERICAN SAMOA',
-							'AUS'  =>  'AUSTRALIA',
-							'AZ'   =>  'ARIZONA',
-							'BAR'  =>  'BARBADOS',
-							'BC'   =>  'BRITISH COLUMBIA',
-							'BCB'  =>  'BRITISH COLUMBIA',
-							'BE'   =>  'BELGIUM',
-							'BEL'  =>  'BELGIUM',
-							'BER'  =>  'BERMUDA',
-							'BI'   =>  'BAHAMA ISLANDS',
-							'BM'   =>  'BERMUDA',
-							'BRZ'  =>  'BRAZIL',
-							'BWI'  =>  'BRITISH WEST INDIES',
-							'CA'   =>  'CALIFORNIA',
-							'CAN'  =>  'CANADA',
-							'CD'   =>  'CANADA',
-							'CG'   =>  'CONGO',
-							'CHI'  =>  'CHANNEL ISLANDS',
-							'CI'   =>  'CAYMAN ISLANDS',
-							'CN'   =>  'CHINA',
-							'CO'   =>  'COLORADO',
-							'CR'   =>  'COSTA RICA',
-							'CT'   =>  'CONNECTICUT',
-							'CUB'  =>  'CUBA',
-							'CZ'   =>  'CANAL ZONE', 					            
-							'DC'   =>  'DISTRICT OF COLUMBIA',
-							'DE'   =>  'DELAWARE',
-							'EN'   =>  'ENGLAND',
-							'ENG'  =>  'ENGLAND',
-							'EU'   =>  'EUROPEAN UNION',
-							'FIN'  =>  'FINLAND',
-							'FL'   =>  'FLORIDA',
-							'FM'   =>  'FEDERATED STATES OF MICRONESIA',
-							'FRA'  =>  'FRANCE',
-							'GA'   =>  'GEORGIA',
-							'GB'   =>  'UNITED KINGDOM',
-							'GE'   =>  'GEORGIA',
-							'GER'  =>  'GERMANY',
-							'GU'   =>  'GUAM',
-							'HI'   =>  'HAWAII',
-							'HK'   =>  'HONG KONG',
-							'HUN'  =>  'HUNGARY',
-							'IA'   =>  'IOWA',
-							'ID'   =>  'IDAHO',
-							'IL'   =>  'ILLINOIS',
-							'IN'   =>  'INDIANA',
-							'IND'  =>  'INDIA',
-							'IR'   =>  'IRAN',
-							'IRE'  =>  'IRELAND',
-							'IS'   =>  'ICELAND',
-							'ISR'  =>  'ISRAEL',
-							'IT'   =>  'ITALY',
-							'JO'   =>  'JORDAN',
-							'JPN'  =>  'JAPAN',
-							'KR'   =>  'KOREA REPUBLIC OF',
-							'KS'   =>  'KANSAS',
-							'KY'   =>  'KENTUCKY',
-							'LA'   =>  'LOUISIANA',
-							'LIE'  =>  'PRIN. OF LIECHTENSTEIN',
-							'LX'   =>  'LUXEMBOURG',
-							'MA'   =>  'MASSACHUSETTS',
-							'MAN'  =>  'MANITOBA',
-							'MB'   =>  'MANITOBA',
-							'MD'   =>  'MARYLAND',
-							'ME'   =>  'MAINE',
-							'MEX'  =>  'MEXICO',
-							'MH'   =>  'MARSHALL ISLANDS',
-							'MI'   =>  'MICHIGAN',
-							'MN'   =>  'MINNESOTA',
-							'MO'   =>  'MISSOURI',
-							'MP'   =>  'NORTHERN MARINA ISLANDS',
-							'MS'   =>  'MISSISSIPPI',
-							'MT'   =>  'MONTANA',
-							'MX'   =>  'MEXICO',
-							'MZ'   =>  'MOZAMBIQUE',
-							'NAN'  =>  'NETHERLANDS ANTILLES',
-							'NB'   =>  'NEW BRUNSWICK',
-							'NC'   =>  'NORTH CAROLINA',
-							'ND'   =>  'NORTH DAKOTA',
-							'NE'   =>  'NEBRASKA',
-							'NET'  =>  'THE NETHERLANDS',
-							'NFL'  =>  'NEWFOUNDLAND',
-							'NG'   =>  'NIGERIA',
-							'NH'   =>  'NEW HAMPSHIRE',
-							'NJ'   =>  'NEW JERSEY',
-							'NL'   =>  'NEWFOUNDLAND AND LABRADOR',
-							'NM'   =>  'NEW MEXICO',
-							'NOR'  =>  'NORWAY',
-							'NS'   =>  'NOVA SCOTIA',
-							'NT'   =>  'NORTHWEST TERRITORIES',
-							'NU'   =>  'NUNAVUT',
-							'NV'   =>  'NEVADA',
-							'NY'   =>  'NEW YORK',
-							'NZ'   =>  'NEW ZEALAND',
-							'OH'   =>  'OHIO',
-							'OK'   =>  'OKLAHOMA',
-							'ON'   =>  'ONTARIO',
-							'ONT'  =>  'ONTARIO',
-							'OR'   =>  'OREGON',
-							'PA'   =>  'PENNSYLVANIA',
-							'PAN'  =>  'PANAMA',
-							'PE'   =>  'PRINCE EDWARD ISLAND',
-							'PEI'  =>  'PRINCE EDWARD ISLAND',
-							'PN'   =>  'PITCAIRN',
-							'POL'  =>  'POLAND',
-							'PQ'   =>  'QUEBEC',
-							'PR'   =>  'PUERTO RICO',
-							'PRC'  =>  'PEOPLES REPUBLIC OF CHINA',
-							'PW'   =>  'PALAU',
-							'QC'   =>  'QUEBEC',
-							'RI'   =>  'RHODE ISLAND',
-							'RS'   =>  'SERBIA',
-							'SC'   =>  'SOUTH CAROLINA',
-							'SCT'  =>  'SCOTLAND',
-							'SD'   =>  'SOUTH DAKOTA',
-							'SI'   =>  'SLOVENIA',
-							'SJR'  =>  'STATES OF JERSEY',
-							'SK'   =>  'SASKATCHEWAN',
-							'SO'   =>  'SOMALIA',
-							'SP'   =>  'SPAIN',
-							'SW'   =>  'SWEDEN',
-							'SZ'   =>  'SWITZERLAND',
-							'TH'   =>  'THAILAND',
-							'TN'   =>  'TENNESSEE',
-							'TX'   =>  'TEXAS',
-							'UK'   =>  'UNITED KINGDOM',
-							'USA'  =>  'US',
-							'UT'   =>  'UTAH',
-							'UY'   =>  'URUGUAY',
-							'VA'   =>  'VIRGINIA',
-							'VI'   =>  'VIRGIN ISLANDS',
-							'VT'   =>  'VERMONT',
-							'WA'   =>  'WASHINGTON',
-							'WG'   =>  'WEST GERMANY',
-							'WI'   =>  'WISCONSIN',
-							'WV'   =>  'WEST VIRGINIA',
-							'WY'   =>  'WYOMING',
-							'YE'   =>  'YEMEN',
-							'YT'   =>  'YUKON TERRITORY',
-							'85'   =>  '', //Per Rosemary
-							'BD'   =>  '', //Per Rosemary
-							'BG'   =>  '', //Per Rosemary
-							'BU'   =>  '', //Per Rosemary
-							'CQ'   =>  '', //Per Rosemary
-							'D'    =>  '', //Per Rosemary
-							'DR'   =>  '', //Per Rosemary
-							'IC'   =>  '', //Per Rosemary
-							'IE'   =>  '', //Per Rosemary
-							'II'   =>  '', //Per Rosemary
-							'IX'   =>  '', //Per Rosemary
-							'JA'   =>  '', //Per Rosemary
-							'JN'   =>  '', //Per Rosemary
-							'N/A'  =>  '', //Per Rosemary
-							'NN'   =>  '', //Per Rosemary
-							'PI'   =>  '', //Per Rosemary
-							'PU'   =>  '', //Per Rosemary
-							'WD'   =>  '', //Per Rosemary
-							'YK'   =>  '', //Per Rosemary
-							'XX'   =>  '', //Per Rosemary
-							''     =>  '',
-							'**|' + corp2.t2u(code));
+	//**************************************************************************************************
+	// GetOrgStrucDesc: Returns org structure description (CORP_ORIG_ORG_STRUCTURE_DESC)
+	// 
+	// ** Note ** If a new type is added, add it to GetForProfit -AND- also check coding of 
+	//                         corp_foreign_domestic_ind to be sure it doesn't need changed
+	//
+	//**************************************************************************************************
+	EXPORT GetOrgStrucDesc(string s) 
+							 := map(s in ['DOMESTIC BENEFIT CORPORATION',
+														'DOMESTIC BUSINESS TRUST',
+														'DOMESTIC CLOSE CORPORATION',
+														'DOMESTIC COOPERATIVE MARKETING ASSOCIATION NONPROFIT',
+														'DOMESTIC CORPORATION SOLE',
+														'DOMESTIC CREDIT UNION',
+														'DOMESTIC FOR-PROFIT (BUSINESS) CORPORATION',
+														'DOMESTIC LLC',
+														'DOMESTIC NONPROFIT CORPORATION',
+														'DOMESTIC PROFESSIONAL BENEFIT CORPORATION',
+														'DOMESTIC PROFESSIONAL CORPORATION',
+														'DOMESTIC PROFESSIONAL LLC',
+														'FOREIGN BENEFIT CORPORATION',
+														'FOREIGN BUSINESS TRUST',
+														'FOREIGN CLOSE CORPORATION',
+														'FOREIGN COOPERATIVE MARKETING ASSOCIATION NONPROFIT',
+  													'FOREIGN CORPORATION SOLE',
+														'FOREIGN CREDIT UNION',
+														'FOREIGN FOR-PROFIT (BUSINESS) CORPORATION',
+														'FOREIGN LLC',
+														'FOREIGN NONPROFIT CORPORATION',
+														'FOREIGN PROFESSIONAL CORPORATION',
+														'FOREIGN PROFESSIONAL LLC',
+														'FOREIGN SERIES LLC'] 		                                                => s,
+														s = 'DOMESTIC ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORPORATION'      => 'DOMESTIC ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORP',      //shorten to fit in 60-chars
+														s = 'FOREIGN ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORPORATION'       => 'FOREIGN ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORP',       //shorten to fit in 60-chars
+														s = 'DOMESTIC NONPROFIT ELECTRIC GENERATION AND TRANSMISSION COOPERATIVE' => 'DOMESTIC NONPROFIT ELECTRIC GENERATION AND TRANSMISSION COOP', //shorten to fit in 60-chars
+														'**|' + s); // Scrub for new or invalid types							
+								
+	//**************************************************************************************************
+	// GetForProfit: Returns Y or N (CORP_FOR_PROFIT_IND)
+	//**************************************************************************************************
+	EXPORT GetForProfit(string s) 
+							 := map(s in ['DOMESTIC COOPERATIVE MARKETING ASSOCIATION NONPROFIT',
+														'DOMESTIC ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORPORATION',
+														'DOMESTIC NONPROFIT CORPORATION',
+														'DOMESTIC NONPROFIT ELECTRIC GENERATION AND TRANSMISSION COOPERATIVE',
+														'FOREIGN COOPERATIVE MARKETING ASSOCIATION NONPROFIT',
+														'FOREIGN ELECTRIC COOPERATIVE NONPROFIT MEMBERSHIP CORPORATION',
+														'FOREIGN NONPROFIT CORPORATION'] 		            => 'N',
+											s in ['DOMESTIC FOR-PROFIT (BUSINESS) CORPORATION',
+														'FOREIGN FOR-PROFIT (BUSINESS) CORPORATION']    => 'Y',
+											'');
+
+
+	 //**************************************************************************************************
+	 // GetStateCode: Returns state code (CORP_FORGN_STATE_CD)
+	 //**************************************************************************************************
+	 EXPORT GetStateCode(string s)
+		        := case(corp2.t2u(s),	
+				          ''                      => '', 
+				 					'ARIZONA' 							=> '',   // Blank for ARIZONA 
+									'ALABAMA' 							=> 'AL',
+									'ALASKA' 								=> 'AK',
+									'AMERICAN SAMOA' 				=> 'AS',
+									'ARKANSAS' 							=> 'AR',
+									'CALIFORNIA' 						=> 'CA',
+									'COLORADO' 							=> 'CO',
+									'CONNECTICUT' 					=> 'CT',
+									'DELAWARE' 							=> 'DE',
+									'DISTRICT OF COLUMBIA' 	=> 'DC',
+									'FLORIDA' 							=> 'FL',
+									'GEORGIA' 							=> 'GA',
+									'GUAM' 									=> 'GU',
+									'HAWAII' 								=> 'HI',
+									'IDAHO' 								=> 'ID',
+									'ILLINOIS' 							=> 'IL',
+									'INDIANA' 							=> 'IN',
+									'IOWA' 									=> 'IA',
+									'KANSAS' 								=> 'KS',
+									'KENTUCKY' 							=> 'KY',
+									'LOUISIANA' 						=> 'LA',
+									'MAINE' 								=> 'ME',
+									'MARYLAND' 							=> 'MD',
+									'MASSACHUSETTS' 				=> 'MA',
+									'MICHIGAN' 							=> 'MI',
+									'MINNESOTA' 						=> 'MN',
+									'MISSISSIPPI' 					=> 'MS',
+									'MISSOURI' 							=> 'MO',
+									'MONTANA' 							=> 'MT',
+									'NEBRASKA' 							=> 'NE',
+									'NEVADA' 								=> 'NV',
+									'NEW HAMPSHIRE' 				=> 'NH',
+									'NEW JERSEY' 						=> 'NJ',
+									'NEW MEXICO' 						=> 'NM',
+									'NEW YORK' 							=> 'NY',
+									'NORTH CAROLINA' 				=> 'NC',
+									'NORTH DAKOTA' 					=> 'ND',
+									'OHIO' 									=> 'OH',
+									'OKLAHOMA' 							=> 'OK',
+									'OREGON' 								=> 'OR',
+									'PENNSYLVANIA' 					=> 'PA',
+									'PUERTO RICO' 					=> 'PR',
+									'RHODE ISLAND' 					=> 'RI',
+									'SOUTH CAROLINA' 				=> 'SC',
+									'SOUTH DAKOTA' 					=> 'SD',
+									'TENNESSEE' 						=> 'TN',
+									'TEXAS' 								=> 'TX',
+									'U.S. VIRGIN ISLANDS' 	=> 'VI',
+									'UTAH' 									=> 'UT',
+									'VERMONT' 							=> 'VT',
+									'VIRGINIA' 							=> 'VA',
+									'WASHINGTON' 						=> 'WA',
+									'WEST VIRGINIA' 				=> 'WV',
+									'WISCONSIN' 						=> 'WI',
+									'WYOMING' 							=> 'WY',
+									'');
+
+	 //**************************************************************************************************
+	 // GetStateDesc: Returns state description (CORP_FORGN_STATE_DESC)
+	 //**************************************************************************************************
+	 EXPORT GetStateDesc(string s)
+		     := map(corp2.t2u(s) in ['','ARIZONA'] 	  					   					                      => '', // Blank for ARIZONA
+				        corp2.t2u(s) in ['ALABAMA', 				'ALASKA', 						'AMERICAN SAMOA',
+																 'ARKANSAS', 				'CALIFORNIA', 				'COLORADO',
+																 'CONNECTICUT', 		'DELAWARE', 					'DISTRICT OF COLUMBIA',
+																 'FLORIDA', 				'GEORGIA', 						'GUAM',
+																 'HAWAII', 					'IDAHO', 							'ILLINOIS', 
+																 'INDIANA', 				'IOWA',	 							'KANSAS', 
+																 'KENTUCKY', 				'LOUISIANA', 					'MAINE',
+																 'MARYLAND', 				'MASSACHUSETTS', 			'MICHIGAN', 
+																 'MINNESOTA', 			'MISSISSIPPI', 				'MISSOURI', 
+																 'MONTANA', 				'NEBRASKA', 					'NEVADA',
+																 'NEW HAMPSHIRE',		'NEW JERSEY', 				'NEW MEXICO', 
+																 'NEW YORK', 				'NORTH CAROLINA', 		'NORTH DAKOTA',
+																 'OHIO', 						'OKLAHOMA', 					'OREGON',
+																 'PENNSYLVANIA',		'PUERTO RICO',				'RHODE ISLAND',
+																 'SOUTH CAROLINA',	'SOUTH DAKOTA',				'TENNESSEE',
+																 'TEXAS', 					'U.S. VIRGIN ISLANDS','UTAH',
+																 'VERMONT',					'VIRGINIA', 					'WASHINGTON',
+																 'WEST VIRGINIA',		'WISCONSIN',					'WYOMING'] 					=> corp2.t2u(s),
+								'**|' + corp2.t2u(s));
 
 END;
-
-
-
-

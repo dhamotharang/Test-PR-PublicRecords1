@@ -1,4 +1,4 @@
-﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header;
+﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header, DriversV2, suppress;
 
 EXPORT proc_build_quick_hdr(
 	STRING filedate, 
@@ -60,30 +60,7 @@ EXPORT proc_build_quick_hdr(
 
 	a := PROJECT(a0,header.Layout_Header);
 
-	Suppression_Layout := header_services.Supplemental_Data.layout_in;
-	header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
-	DL_Suppression_In := dl_supp_ds_func();
-	DLSuppressedIn := PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
-
-	HashDLShort := header_services.Supplemental_Data.layout_out;
-
-	shortHashrec := RECORD
-		header.layout_header;
-		HashDLShort;
-	END;
-
-	shortHashrec HashDID_DLnumber(header.Layout_Header l) := TRANSFORM
-		self.hval := hashmd5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));
-		self := l;
-	END;
-
-	hdr_withMD5 := PROJECT(a, HashDID_DLnumber(left));
-
-	header.layout_header shortSuppress(hdr_withMD5 l, DLSuppressedIn r) := TRANSFORM
-	 self := l;
-	END;
-
-	full_ShortSuppress := JOIN(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
+	full_ShortSuppress := DriversV2.Regulatory.applyDriversLicenseSup_DIDVend(a);
 
 	addr1 := header.File_Headers(header.isPreGLB(header.File_Headers));
 	addr2 := addr1(not mdr.Source_is_DPPA(src));
@@ -93,6 +70,7 @@ EXPORT proc_build_quick_hdr(
 	header.mac_despray(full_ShortSuppress, b, full_out)
 
 	//***//***//***//*** INSERT SUPPRESSION TEXT CNG 20070417***//***//***//***//
+	Suppression_Layout := suppress.ApplyRegulatory.layout_in;
 	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
 
 	Suppression_In := supp_ds_func();
@@ -231,12 +209,12 @@ EXPORT proc_build_quick_hdr(
 	);
 
 	RETURN SEQUENTIAL(
-		weekly_handling,
-		roxie_keys,
-		Proc_Accept_SRC_toQA(filedate),
-		proc_build_ssn_suppression(filedate),
-		proc_build_current_wa_residents_file,
-		SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, weekly_handling, 610),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, roxie_keys, 620),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.Proc_Accept_SRC_toQA(filedate), 630),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_ssn_suppression(filedate), 640),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_current_wa_residents_file, 650),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
 		//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 		DeltaCommands
 	);

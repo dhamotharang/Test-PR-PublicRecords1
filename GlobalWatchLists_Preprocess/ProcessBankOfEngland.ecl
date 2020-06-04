@@ -263,7 +263,7 @@ ReformatToCommonlayout(DATASET(GlobalWatchlists_Preprocess.IntermediaryLayoutBan
 		self.source 						:= L.source;
 		self.orig_pty_name 			:= L.lstd_entity;
 		self.orig_vessel_name 	:= '';
-		self.country 						:= TRIM(L.Country, left, right);
+		self.country 						:= STD.Str.FilterOut  ( TRIM(L.Country, left, right),'0123456789') ; 
 		self.name_type 					:= if(STD.Str.Find(STD.Str.ToUpperCase(L.alias_type),'PRIME', 1) = 0, TRIM(L.alias_type, left, right), '');
 		self.addr_1 						:= TRIM(TRIM(L.Address_1, left, right) + ' ' + TRIM(L.Address_2, left, right));
 		self.addr_2 						:= TRIM(TRIM(L.Address_3, left, right) + ' ' + TRIM(L.Address_4, left, right));

@@ -1,4 +1,4 @@
-IMPORT PRTE2_ATF, ATF, ut, PromoteSupers, NID, Address, BIPV2, STD, MDR, AID, AID_Support, PRTE2;
+﻿IMPORT PRTE2_ATF, ATF, ut, PromoteSupers, NID, Address, BIPV2, STD, MDR, AID, AID_Support, PRTE2;
 #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
@@ -78,14 +78,26 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
     PRTE2_ATF.Layouts.Base_ext	xformBase(dNewRecordsAddrClean L) := 
     TRANSFORM																	
         //Name Cleaning
-        clean_name	:= Address.Clean_n_Validate_Name(L.License_Name, 'L').CleanNameRecord;
+				clean_name := Address.Clean_n_Validate_Name(L.License_Name, 'L').CleanNameRecord;
+        v_lname := trim(L.License_Name[1..STD.Str.Find(L.License_Name, ',', 1) -1], right);
+        v_fmid := trim(std.str.filterout(trim(L.License_Name[STD.Str.Find(L.License_Name, ',', 1)..], right),','), left,right);
+        v_fname := trim(v_fmid[1..STD.Str.Find(v_fmid, ' ', 1) -1], right);
+        v_mname := trim(v_fmid[length(v_fname)+1..], left,right);
+        SELF.license1_title := clean_name.title;
+        SELF.license1_fname := if(clean_name.fname = v_fname, clean_name.fname, v_fname); 
+        SELF.license1_mname := if(clean_name.mname = v_mname, clean_name.mname, v_mname); 
+        SELF.license1_lname := if(clean_name.lname = v_lname, clean_name.lname, v_lname);
+        SELF.license1_name_suffix := clean_name.name_suffix;
+        SELF.license1_score := clean_name.name_score;
+
+        // clean_name	:= Address.Clean_n_Validate_Name(L.License_Name, 'L').CleanNameRecord;
         
-        SELF.license1_title				:= clean_name.title;
-        SELF.license1_fname	      := clean_name.fname;      
-        SELF.license1_mname	      := clean_name.mname;      
-        SELF.license1_lname	      := clean_name.lname;
-        SELF.license1_name_suffix	:= clean_name.name_suffix;
-        SELF.license1_score	  := clean_name.name_score;
+        // SELF.license1_title				:= clean_name.title;
+        // SELF.license1_fname	      := clean_name.fname;      
+        // SELF.license1_mname	      := clean_name.mname;      
+        // SELF.license1_lname	      := clean_name.lname;
+        // SELF.license1_name_suffix	:= clean_name.name_suffix;
+        // SELF.license1_score	  := clean_name.name_score;
 
         //Addresses
         SELF.premise_prim_range       :=  L.premise_address.prim_range;
@@ -161,7 +173,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
     //Concatenating Original & New Records
     dFinal := dNewRecordsClean + dExistingRecords;
 
-    PromoteSupers.Mac_SF_BuildProcess(pBase_out, Constants.BASE_ATF, writefile,,,,filedate);
+    PromoteSupers.Mac_SF_BuildProcess(dFinal, Constants.BASE_ATF, writefile,,,,filedate);
 
     RETURN writefile;
 

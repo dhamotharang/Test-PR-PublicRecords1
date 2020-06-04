@@ -41,7 +41,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 																																			SELF.clean_cname				:=  IF(LEFT.nametype IN business_flags OR (LEFT.nametype = 'U' AND NOT IsName),
 																																																		STD.Str.CleanSpaces(LEFT.FirstName+' '+LEFT.LastName), '');
 																																			SELF := LEFT));
-																										
+		
 		//AID process
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 	
@@ -166,14 +166,14 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 																			,																			// use prod version of superfiles
 																			,														 					// default is to hit prod from dataland, and on prod hit prod.	
 																			,[BIPV2.IDconstants.xlink_version_BIP]// create BIP keys only
-																			,URL																	// url
+																			,																			// url
 																			,EmailAddress													// email 
 																			,v_city_name													// city
 																			,																			// fname
 																			,																			// mname
 																			,																			// lname
 																			,																			// contact ssn
-																			,																			// Source  MDR.sourceTools
+																			,																			// Source MDR.sourceTools
 																			,rcid																	// Source_Record_Id
 																			,																			// Src_Matching_is_priorty
 																			);

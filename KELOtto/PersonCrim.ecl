@@ -1,4 +1,4 @@
-﻿IMPORT KELOtto, FraudGovPlatform;
+﻿IMPORT KELOtto, FraudGovPlatform,doxie,Suppress;
 RunKelDemo :=false:stored('RunKelDemo');
 
 FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Crim.built
@@ -24,5 +24,9 @@ PersonCrimPrep := PROJECT(PersonCrimPrep1,
           => 1, 0), 
           SELF := LEFT));
 
-EXPORT PersonCrim  := PersonCrimPrep;
+// Supress CCPA
+mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+Supress_CCPA := Suppress.MAC_SuppressSource(PersonCrimPrep, mod_access, did_orig, NULL,TRUE);	
+
+EXPORT PersonCrim  := Supress_CCPA;
 //EXPORT PersonCrim  := JOIN(KELOtto.CustomerLexId, PersonCrimPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));

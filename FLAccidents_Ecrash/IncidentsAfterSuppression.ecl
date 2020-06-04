@@ -1,4 +1,4 @@
-IMPORT Data_Services;
+﻿IMPORT Data_Services, STD;
 
 	ToSupressSet := set(FLAccidents_Ecrash.Infiles.suppress_incidents,Incident_ID);
 	Incidents  		:= dedup(FLAccidents_Ecrash.Infiles.tincident	,all);
@@ -13,7 +13,7 @@ IMPORT Data_Services;
 																												trim(left.State_Report_Number,left,right) = trim(right.State_Report_Number,left,right) and 
 																												trim(left.Source_ID ,left,right)= trim(right.Source_ID ,left,right)and 
 																												trim(left.Loss_State_Abbr,left,right) = trim(right.Loss_State_Abbr,left,right) and 
-																												trim(left.Crash_Date,left,right) = stringlib.stringfilterout(trim(right.Crash_Date,left,right),'-') and 
+																												trim(left.Crash_Date,left,right) = STD.Str.FilterOut(trim(right.Crash_Date,left,right),'-') and 
 																												trim(left.Agency_ID,left,right) = trim(right.Agency_ID,left,right) and 
 																												trim(left.Work_Type_ID ,left,right)= trim(right.Work_Type_ID,left,right)  , many lookup , left only ):persist('~thor_data::persist::eCrash_IncidentsAfterSuppression');
 

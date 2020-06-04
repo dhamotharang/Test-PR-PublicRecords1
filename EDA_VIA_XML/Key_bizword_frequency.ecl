@@ -1,4 +1,4 @@
-Import gong, doxie, prte2_gong, Prte2_Business_Header;
+﻿Import gong, doxie, prte2_gong, Prte2_Business_Header;
 
 #IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
 input_recs := prte2_gong.files.Gong_Raw((listing_type_bus = 'B') AND (TRIM(listed_name)<>''));
@@ -11,7 +11,7 @@ Layout_extra := RECORD
 	UNSIGNED8	freq;
 END;
 
-Layout_extra addWords(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra addWords(input_recs l, integer c) := TRANSFORM
 	SELF.word := Stringlib.StringExtract(Stringlib.StringFindReplace(TRIM(l.listed_name),' ',','), c);
 	SELF.freq := 1;
 END;

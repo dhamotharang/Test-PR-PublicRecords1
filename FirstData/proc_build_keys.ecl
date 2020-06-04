@@ -1,23 +1,26 @@
 ﻿import dx_FirstData,Orbit3,RoxieKeyBuild,FirstData;
 EXPORT proc_build_keys (STRING	pVersion):=function
 
-	prefix := '~thor_data400::key::FirstData::FCRA::' + pVersion + '::';
+	FCRAprefix := '~thor_data400::key::FirstData::FCRA::' + pVersion + '::';
+	prefix := '~thor_data400::key::FirstData::' + pVersion + '::';
 	
-	name_did := prefix + 'did';
+	name_did := FCRAprefix + 'did';
+	name_driverslicense:= prefix + 'driverslicense';
 
-	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID(),FirstData.data_key_did_fcra(trim(lex_id,left,right)<>''),dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
+	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID(),FirstData.data_key_did_fcra,dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
 	
-	RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_FirstData.names('').i_did_FCRA,name_did,ma_fcra_first_data_key);
+	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_driverslicense(),FirstData.data_key_driverslicense,dx_FirstData.names('').i_driverslicense,name_driverslicense,first_data_driverslicense_key);
 	
-	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::did','Q',ma_fcra_first_data_key_to_qa,pVersion,2);
+	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::@version@::did','D',ma_fcra_first_data_key_to_qa,pVersion,2);
+	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::@version@::driverslicense','D',ma_first_data_driverslicense_key_to_qa,pVersion,2);
 
-	// create_build := Orbit3.proc_Orbit3_CreateBuild ('First Data',filedate,'F');
 	
-	build_fcra_keys := sequential(
+	build_keys := sequential(
 																fcra_first_data_key,
-																ma_fcra_first_data_key,
-																ma_fcra_first_data_key_to_qa
+																first_data_driverslicense_key,
+																ma_fcra_first_data_key_to_qa,
+																ma_first_data_driverslicense_key_to_qa
 																);
 																
-return build_fcra_keys;
+return build_keys;
 end;

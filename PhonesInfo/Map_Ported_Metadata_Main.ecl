@@ -1,14 +1,16 @@
 ﻿import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
 	
 //DF-24394: Filtering for complete L6 records (account_owner/serv/line types populated)
+//DF-26977: Remove TCPA & LIDB Carrier Info Append Process (TCPA was completely removed; LIDB is historical)
 	
 	portFile 					:= PhonesInfo.File_Phones.Ported_Current; 																																																						//Port File
-	lidbFile					:= PhonesInfo.File_LIDB.Response_Processed;																																																						//LIDB File
 	discFile					:= PhonesInfo.File_Deact.Main_Current2;																																																								//Deact File
 	discGHFile				:= PhonesInfo.File_Deact_GH.Main_Current;																																																							//Deact Gong History File
-	lidbDelt					:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Deltabase Gateway File
 	l6UpdPhone				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), PhonesInfo.Layout_Common.portedMetadata_Main);						//Lerg6 Updated Phones	
 	srcRef						:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE); 																																														//Source Reference Table
+	
+	srcLidb						:= PhonesInfo.File_LIDB.Response_Processed_CR_Append;																																																	//Historical LIDB File w/ Carrier Reference Info Appended			
+	srcLidbDelt				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_LIDB_Results_CR_Append;																																						//Historical LIDB Gateway File w/ Carrier Reference Info Appended																																												
 	
 //////////////////////////////////////////////////////////////////////////////////////////
 //Map Ported Base to Common Layout - Append Serv/Line/Carrier Names from Reference Table//
@@ -69,113 +71,7 @@
 	//Concat Appended OCN/Carrier Name Results
 	ddiConAddFields 	:= dedup(sort(distribute(addiOCN_match(account_owner<>'')+addiCRem, hash(phone)), record, local), record, local);
 	
-	/////////////////////////////	
-	//TCPA File - Join by Phone//
-	/////////////////////////////
-	
-	//Append Serv, Line, High Risk Indicator, Prepaid, & Operator Full Name
-	sortTCPAPh				:= sort(distribute(portFile(source='PJ' and vendor_first_reported_dt<=20150308), hash(phone)), phone, local);
-	sortiConPh 				:= sort(distribute(ddiConAddFields, hash(phone)), phone, porting_dt, local);//pull the earliest, since these records are historical
-
-	PhonesInfo.Layout_Common.portedMetadata_Main addTCPASL(sortTCPAPh l, ddiConAddFields r):= transform
-		self.account_owner			:= r.account_owner;
-		self.carrier_name				:= r.carrier_name;
-		self.serv 							:= r.serv;
-		self.line								:= r.line;
-		self.spid								:= r.spid;
-		self.operator_fullname 	:= PhonesInfo._Functions.fn_CarrierName(r.operator_fullname);
-		self.high_risk_indicator:= r.high_risk_indicator;
-		self.prepaid						:= r.prepaid;	
-		self 										:= l;
-	end;
-
-	addTCPAON 				:= join(sortTCPAPh, ddiConAddFields,
-														trim(left.phone, left, right) = trim(right.phone, left, right),	
-														addTCPASL(left, right), left outer, local, keep(1));
-	
-	ddTCPAFields 			:= dedup(sort(distribute(addTCPAON, hash(phone)), record, local), record, local);	
-	
-	cmnPort 					:= ddiConAddFields + ddTCPAFields;
-
-//////////////////////////////////////////////////////////////////////////////////////////	
-//Map LIDB Base to Common Layout//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////	
-	srcApp := record
-		PhonesInfo.Layout_Common.portedMetadata_Main;
-		string name							:= '';
-		string src 							:= '';
-	end;
-	
-	srcApp trLidb(lidbFile l):= transform
-		self.source 									:= 'PB';
-		self.name											:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
-		self.vendor_first_reported_dt	:= l.dt_first_reported;
-		self.vendor_last_reported_dt	:= l.dt_last_reported;
-		self.point_code								:= trim(l.point_code, left, right);
-		self.operator_fullname				:= PhonesInfo._Functions.fn_CarrierName(l.operator_fullname);
-		self.src											:= PhonesInfo._Functions.fn_keyCarrier(l.carrier_name);
-		self 													:= l;
-	end;
-	
-	srcLidb						:= project(lidbFile, trLidb(left));																//Append Translated Carrier Name
-	cmnLidb 					:= project(srcLidb, PhonesInfo.Layout_Common.portedMetadata_Main);//Common Layout
-	
-//////////////////////////////////////////////////////////////////////////////////////////	
-//Map LIDB Deltabase to Common Layout/////////////////////////////////////////////////////	
-//////////////////////////////////////////////////////////////////////////////////////////
-		
-	//Prep Returned LIDB Response File
-	compNameRespLayout := record
-		lidbDelt;
-		unsigned8 dt_first_reported;
-		unsigned8	dt_last_reported;
-		string    name;
-		string 	  src;
-	end;
-
-	compNameRespLayout fixN(lidbDelt l):= transform		
-		self.dt_first_reported	:= (integer)l.date_file_loaded;	
-		self.dt_last_reported		:= (integer)l.date_file_loaded;
-		self.name								:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
-		self.src 								:= PhonesInfo._Functions.fn_keyCarrier(l.carrier_name);
-		self 										:= l;
-	end;
-	
-	fixCarrier 								:= project(lidbDelt, fixN(left));
-	sort_carrier 							:= sort(distribute(fixCarrier, hash(name)), name, carrier_ocn, local);		
-	
-	//Prep Carrier Reference File w/ Service & Line Types
-	sort_name									:= sort(distribute(srcRef, hash(name)), name, ocn, local);
-
-	//Join the Returned LIDB Response File with the Source File to Populate Service and Line Types
-	srcApp appDeltaSL(sort_carrier l, sort_name r):= transform
-		dt_added := stringlib.stringfilter(l.date_added, '0123456789')[1..14];	
-		self.reference_id								:= (string)(hash32(l.submitted_phonenumber));
-		self.source											:= 'PB';
-		self.phone											:= l.submitted_phonenumber;
-		self.local_routing_number				:= l.lrn;
-		self.account_owner							:= l.carrier_ocn;
-		self.local_area_transport_area	:= l.lata;
-		self.vendor_first_reported_dt		:= (integer)dt_added[1..8];
-		self.vendor_first_reported_time	:= dt_added[9..];
-		self.vendor_last_reported_dt		:= (integer)dt_added[1..8];
-		self.vendor_last_reported_time	:= dt_added[9..];
-		self.serv												:= r.serv;
-		self.line												:= r.line;
-		self.spid												:= r.spid;
-		self.operator_fullname					:= PhonesInfo._Functions.fn_CarrierName(r.operator_full_name);
-		self.high_risk_indicator				:= r.high_risk_indicator;
-		self.prepaid										:= r.prepaid;
-		self 														:= l;
-	end;
-
-	joinLidbDeltFields:= join(sort_carrier, sort_name,
-														left.name = right.name and
-														left.carrier_ocn = right.ocn,
-														appDeltaSL(left, right), left outer, local);
-	
-	srcLidbDelt				:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
-	cmnLidbDelt				:= project(srcLidbDelt, PhonesInfo.Layout_Common.portedMetadata_Main);
+	cmnPort 					:= ddiConAddFields;
 
 //////////////////////////////////////////////////////////////////////////////////////////	
 //Map Disconnect Base to Common Layout////////////////////////////////////////////////////	
@@ -250,14 +146,12 @@
 	cmndiscGH 				:= dedup(sort(distribute(addLidbdiscGHFields, hash(phone)), record, local), record, local);
 
 //////////////////////////////////////////////////////////////////////////////////////////
-//Map Lerg6 Updated Phone Base to Common Layout///////////////////////////////////////////
+//Map LIDB, LIDB Deltabase Gateway, & Lerg6 Updated Base Files to Common Layout///////////
 //////////////////////////////////////////////////////////////////////////////////////////
 	
-	PhonesInfo.Layout_Common.portedMetadata_Main trL6(l6UpdPhone l):= transform
-		self 										:= l;
-	end;
-	
-	cmnL6UpdPh				:= project(l6UpdPhone, trL6(left));
+	cmnLidb						:= project(srcLidb, 		PhonesInfo.Layout_Common.portedMetadata_Main);
+	cmnLidbDelt				:= project(srcLidbDelt, PhonesInfo.Layout_Common.portedMetadata_Main);
+	cmnL6UpdPh				:= project(l6UpdPhone, 	PhonesInfo.Layout_Common.portedMetadata_Main);
 	
 //////////////////////////////////////////////////////////////////////////////////////////
 //Concat Reformatted Files////////////////////////////////////////////////////////////////

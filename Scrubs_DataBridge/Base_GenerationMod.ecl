@@ -22,7 +22,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'DataBridge';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,record_type,clean_company_name,clean_telephone_num,state,zip,mail_score,name_gender,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,database_site_id,database_individual_id,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,record_type,clean_company_name,clean_telephone_num,state,zip_code5,mail_score,name_gender,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,database_site_id,database_individual_id,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -120,8 +120,8 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// FIELD:city:TYPE(STRING20):0,0\n'
     + 'FIELD:state:TYPE(STRING2):LIKE(invalid_st):0,0\n'
     + '// FIELD:scf:TYPE(STRING3):0,0\n'
-    + 'FIELD:zip:TYPE(STRING5):LIKE(invalid_zip5):0,0\n'
-    + '// FIELD:zip4:TYPE(STRING4):0,0\n'
+    + 'FIELD:zip_code5:TYPE(STRING5):LIKE(invalid_zip5):0,0\n'
+    + '// FIELD:zip_code4:TYPE(STRING4):0,0\n'
     + 'FIELD:mail_score:TYPE(STRING1):LIKE(invalid_mail_score):0,0\n'
     + '// FIELD:area_code:TYPE(STRING3):0,0\n'
     + '// FIELD:telephone_number:TYPE(STRING10):0,0\n'
@@ -187,6 +187,8 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// FIELD:p_city_name:TYPE(STRING25):0,0\n'
     + '// FIELD:v_city_name:TYPE(STRING25):0,0\n'
     + '// FIELD:st:TYPE(STRING2):0,0\n'
+    + '// FIELD:zip:TYPE(STRING5):0,0\n'
+    + '// FIELD:zip4:TYPE(STRING4):0,0\n'
     + '// FIELD:cart:TYPE(STRING4):0,0\n'
     + '// FIELD:cr_sort_sz:TYPE(STRING1):0,0\n'
     + '// FIELD:lot:TYPE(STRING4):0,0\n'

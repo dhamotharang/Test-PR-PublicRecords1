@@ -1,4 +1,4 @@
-IMPORT STRATA, UT,Risk_Reporting;
+﻿IMPORT STRATA, UT,Risk_Reporting;
 	
 EXPORT proc_buildstrata(STRING version = ut.GetDate) := FUNCTION
 	
@@ -82,7 +82,7 @@ strata.createXMLStats(nonFCRA_loginID_stats,'ScoringLogsOutcome','NonFCRA_LoginI
 	FCRA_loginID_stats := SORT(TABLE(FCRA_transactionID,layout_fcra, product, few), StringLib.StringToUpperCase(Product));
 strata.createXMLStats(FCRA_loginID_stats,'ScoringLogsOutcome','FCRA_LoginID',version,'wenhong.ma@lexisnexisrisk.com',strataResults_FCRA_loginID);
 	
-Emailnotification := 'John.Freibaum@lexisnexisrisk.com; Sudhir.Kasavajjala@lexisnexisrisk.com; Darren.knowles@lexisnexisrisk.com; Wenhong.Ma@lexisnexisrisk.com; valerie.minnis@lexisnexisrisk.com; hamid.kahvazadeh@lexisnexisrisk.com';  
+Emailnotification := 'Jason.Allerdings@lexisnexisrisk.com; Sudhir.Kasavajjala@lexisnexisrisk.com; Darren.knowles@lexisnexisrisk.com; Wenhong.Ma@lexisnexisrisk.com; valerie.minnis@lexisnexisrisk.com; hamid.kahvazadeh@lexisnexisrisk.com';  
 	
 	pValidate_nonFCRA:= if(count(nonFCRA_transactiondate_stats((unsigned)RecordCountValid_Login_ID < score_logs.alert_monitor_constants.nonfcra_count)) > 0, FileServices.SendEmail(Emailnotification,'SAOT BUILD failed '+ Version ,'nonFCRA stats has 0 count per transaction date' + failmessage)); 
 

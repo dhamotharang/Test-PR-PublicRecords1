@@ -303,9 +303,13 @@ export fnCleanFunctions := module
 		return stringlib.stringfindreplace(clean_yr + clean_mn + clean_dy, '00000000', '');
 	end;
 
-	export repflag(string function_description, string orig_lname, string orig_full_name)
-		:=  map(function_description = 'BUSINESS INSTANT ID' and (orig_lname <> '' or orig_full_name <> '') => 'Y', '');
+	// export repflag(string function_description, string orig_lname, string orig_full_name)
+		// :=  map(function_description = 'BUSINESS INSTANT ID' and (orig_lname <> '' or orig_full_name <> '') => 'Y', '');
 
+  export repflag(string orig_function_name, string orig_lname, string orig_full_name) :=  
+			map(regexfind('SMLLBUSANALYTICS|SMBUSAN|RELIDENTSEARCH|CPRELIDENTRPT|VERIFICATION|AUTHENTICATION|BUSINSID'
+										,stringlib.stringtouppercase(orig_function_name))	and (orig_lname <> '' or orig_full_name <> '') => 'Y', '');
+  
 	export fraudback(string function_description, string orig_ip_address)
 		:= map(stringlib.stringfind(function_description, 'CHARGEBACK',1) > 0
 				or stringlib.stringfind(function_description, 'FRAUDPOINT',1) > 0 => ORIG_IP_ADDRESS, ''); // for PERSON_ORIG_IP_ADDRESS1

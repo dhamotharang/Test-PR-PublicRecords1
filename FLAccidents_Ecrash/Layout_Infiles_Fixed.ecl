@@ -469,6 +469,16 @@
 		STRING10 Dispatch_Date;
 		STRING10 Drug_Involvement;
 		STRING7 Alcohol_Involved;
+		//Data Ingestion CR-1273
+		STRING64 Geo_Coded_Latitude;
+		STRING64 Geo_Coded_Longitude;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
+	END;
+	
+	EXPORT incident_ori := RECORD
+	  incident;
+	  STRING11 agency_ori;
 	END;
 	
 	EXPORT persn := RECORD
@@ -659,6 +669,8 @@
 		STRING10 Dui_Suspected;
 		//Data Ingestion New Enum fields
 		STRING Drug_Test_Result;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
 	END;
 
 	EXPORT vehicl := RECORD
@@ -891,6 +903,8 @@
 		STRING Report_Vehicle_Body_Type;
 		//PRtCC new Enum fields
 		STRING Report_Road_Condition;
+		//Data Ingestion CR-1262 
+    STRING Event_Sequence;
 	END;
 
 	EXPORT cmbnd := RECORD 
@@ -991,6 +1005,8 @@
 		STRING4 Work_Type_ID;
 		STRING11 Report_ID;
 		STRING11 Agency_ID;
+		STRING100 Agency_Name;
+		STRING11 Agency_ori;
 		STRING19 Sent_to_HPCC_DateTime;
 		STRING4 Corrected_Incident;
 		STRING9 CRU_Order_ID;
@@ -1140,7 +1156,6 @@
 		
 		STRING20 Photographer_ID;
 		STRING50 Photography_Agency_Name;
-		STRING100 Agency_Name;
 		STRING30 Judicial_District;
 		STRING30 Precinct;
 		STRING20 Beat;
@@ -1741,6 +1756,14 @@
 		STRING10 Dui_Suspected;
 		//Data Ingestion New Enum fields
 		STRING Drug_Test_Result;
+		//Data Ingestion CR-1273
+		STRING64 Geo_Coded_Latitude;
+		STRING64 Geo_Coded_Longitude;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
+		STRING Event_Sequence;
 	END;
 	
 	EXPORT property_damage := RECORD

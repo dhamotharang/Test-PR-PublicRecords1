@@ -194,6 +194,14 @@ EXPORT TestSeed_Function(
 		self.attributes.version1.PPCurrOwnedAutoSeries			:= ri.PPCurrOwnedAutoSeries;
 		self.attributes.version1.PPCurrOwnedAutoType			:= ri.PPCurrOwnedAutoType;	
 		
+    self.attributes.version1.score1 := ri.score1;
+    self.attributes.version1.scorename1 := ri.scorename1;
+    self.attributes.version1.reason1 := ri.reason1;
+    self.attributes.version1.reason2 := ri.reason2;
+    self.attributes.version1.reason3 := ri.reason3;
+    self.attributes.version1.reason4 := ri.reason4;
+    self.attributes.version1.reason5 := ri.reason5;
+    self.attributes.version1.reason6 := ri.reason6;
 	END;
 	
 	ProfileBooster_rec := JOIN(inData, Seed_Files.Key_ProfileBooster, 
@@ -203,3 +211,4 @@ EXPORT TestSeed_Function(
 		create_output(LEFT,RIGHT), LEFT OUTER, ATMOST(100),KEEP(1));
 	RETURN ProfileBooster_rec;
 END;
+

@@ -1,4 +1,4 @@
-﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_PhoneFraud,PRTE2_Common, PRTE;
+﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_PhoneFraud,PRTE2_Common, PRTE, dops, prte2;
 
 EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	
@@ -34,12 +34,16 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 		move_qa_key_spoofing);
 
 		
-	//---------- making DOPS optional and only in PROD build -------------------------------
+//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,'B','N','N');
-
+	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+	
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
+//---------------------------------------------------------------------------------------
+
+//Key Validation
+	key_validation :=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
 
 	RETURN 		sequential(			
 				build_key_otp, 
@@ -48,6 +52,7 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				move_built_key_spoofing, 
 				move_qa_key_otp, 
 				move_qa_key_spoofing, 
-				PerformUpdateOrNot);
+				PerformUpdateOrNot,
+				key_validation);
 
 END;

@@ -1,5 +1,6 @@
 ﻿import LocationID_xLink;
 import AID;
+import Address;
 
 export CleanAndAppend(inDs, 
                       line1_field,
@@ -11,18 +12,16 @@ export CleanAndAppend(inDs,
    #uniquename(InputRec)
    %InputRec% := record
       unsigned6 ref_clean;
-      string line1;
-      string line2;
-      unsigned8 RawAID;
+      inDs;
    end;
 
    #uniquename(resolveInputA)
    %resolveInputA% := project(inDs,
                               transform(%InputRec%,
-                              self.ref_clean   := ((counter - 1) * thorlib.nodes()) + thorlib.node(),
-                              self.line1       := left.line1_field,
-                              self.line2       := left.line2_field,
-                              self.RawAID      := left.rawaid_field), local);
+                              self.ref_clean         := ((counter - 1) * thorlib.nodes()) + thorlib.node(),
+                              self.line1_field       := Address.fn_addr_clean_prep(left.line1_field, 'first'),
+                              self.line2_field       := Address.fn_addr_clean_prep(left.line2_field, 'last'),
+                              self                   := left), local);
 
    #uniquename(lFlags)
    unsigned4   %lFlags% := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
@@ -45,23 +44,6 @@ export CleanAndAppend(inDs,
                            ,aidwork_acecache.st
                            ,aidwork_acecache.zip5
                            ,%appendOutput%);
-
-   #uniquename(FlatRec)
-   %FlatRec% := record
-      %resolveOutput%.results.locid;
-      %resolveOutput%.results.weight;
-      %resolveOutput%.results.reference;
-      %resolveOutput%.resolved;
-   end;
-
-   #uniquename(flattenDs)
-   %flattenDs% := normalize(%resolveOutput%, left.results, 
-                            transform(%FlatRec%,
-                                      self := left,
-                                      self := right));
-
-   #uniquename(resolvedDs)
-   %resolvedDs% := dedup(%flattenDs%(resolved), reference);
    
    #uniquename(OutputRecA)
    %OutputRecA% := record
@@ -110,11 +92,11 @@ export CleanAndAppend(inDs,
    
    #uniquename(addBackData)
    %addBackData%  := join(inDs, %createOutput%,
-                          left.line1_field = right.line1 and
-                          left.line2_field = right.line2,
-                          transform(%OutputRec%, self := left,  self := right), left outer, hash);
+                          Address.fn_addr_clean_prep(left.line1_field, 'first') = right.line1 and
+                          Address.fn_addr_clean_prep(left.line2_field, 'last')  = right.line2,
+                          transform(%OutputRec%, self.locid := right.locid, self.rawaid := right.rawaid, self := left,  self := right), left outer, hash);
 	
-   output(%resolvedDs%);
-   outDs          := %addBackData%;
+
+  	outDs          := %addBackData%;
 
 endmacro;

@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Promote(
 	 string								pversion				    = 	''
@@ -10,5 +10,6 @@ export Promote(
 	,boolean              pMove2DeleteSuper   = false //used for when moving a logical file into the built superfile(mod_Promote.fNew2Built). will place previous logical file into delete superfile.
   ,boolean              pIncludeBuiltDelete = false
 	,string								pCleanupFilter			= ''
+	,unsigned1            pnGenerations			  = 3
 ) :=
-	tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting,,,,pMove2DeleteSuper,pIncludeBuiltDelete,pCleanupFilter);
+	tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting,pnGenerations,,,pMove2DeleteSuper,pIncludeBuiltDelete,pCleanupFilter);

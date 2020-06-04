@@ -1,6 +1,26 @@
 ﻿import header,address,AID,Tools, STD;
 export Layouts := MODULE
 
+
+EXPORT rlInternalEmailFile := RECORD
+
+ integer2 recordid;
+  string100 eventtype;
+  string50 groupid;
+  string emailaddress;
+  string1 isrecipientinactive;
+  string8 createdate;
+
+END;
+
+
+EXPORT rlEmailValidation := RECORD
+	STRING EmailAddress;
+END;
+
+
+
+
 	export load := RECORD
 		string2	Case_State_Abbreviation
 		,string1	Case_Benefit_Type
@@ -520,43 +540,43 @@ export MSH:=record
 		string4		QueryStatus;
 		string70	QueryStatusMessage;
 		
-		string4		NacGroupId;
-		string2		ProgramState;
-		string1		ProgramCode;
+		string4		CaseNacGroupId;
+		string2		CaseProgramState;
+		string1		CaseProgramCode;
 		
 		string20	CaseID;
 		string30	CaseLastName;
 		string25	CaseFirstName;
 		string25	CaseMiddleName;
-		string25	CaseSuffixName;
+		string5		CaseSuffixName;
 		
 		string10	CaseMonthlyAllotment;
-		string3		RegiondCode;
-		string3		CaseCountParishCode;		// FIPS code
+		string3		CaseRegionCode;
+		string3		CaseCountyParishCode;		// FIPS code
 		string25	CaseCountyParishName;
 		
 		string10	CasePhone1;
 		string10	CasePhone2;
 		string256	CaseEmail;
 		
-		string1		AddressPhysicalCategory;
-		string70	AddressPhysicalStreet1;
-		string70	AddressPhysicalStreet2;
-		string30	AddressPhysicalCity;
-		string2		AddressPhysicalState;
-		string9		AddressPhysicalZip;
-		
-		string1		AddressMailCategory;
-		string70	AddressMailStreet1;
-		string70	AddressMailStreet2;
-		string30	AddressMailCity;
-		string2		AddressMailState;
-		string9		AddressMailZip;
+		string1		PhysicalAddressCategory;
+		string70	PhysicalAddressStreet1;
+		string70	PhysicalAddressStreet2;
+		string30	PhysicalAddressCity;
+		string2		PhysicalAddressState;
+		string9		PhysicalAddressZip;
+
+		string1		MailAddressCategory;
+		string70	MailAddressStreet1;
+		string70	MailAddressStreet2;
+		string30	MailAddressCity;
+		string2		MailAddressState;
+		string9		MailAddressZip;
 		
 		string20	ClientID;									// or individual ID
-		string1		HOHIndicator;
-		string1		ABAWDIndicator;
-		string1		RelationshipIndicator;
+		string1		ClientHOHIndicator;
+		string1		ClientABAWDIndicator;
+		string1		ClientHoHRelationshipIndicator;
 		
 		string30	ClientLastName;
 		string25	ClientFirstName;
@@ -571,13 +591,15 @@ export MSH:=record
 		string8		ClientDOB;						//YYYYMMDD
 		string1		ClientDOBType;
 		
-		string20	ClientCertificateType;
+		string20	ClientCertificateID;
 		string10	ClientMonthlyAllotment;
 		
-		string1		ClientEligibilityIndicator;
-		string8		ClientEligibilityEffectiveDate;		//YYYYMMDD
-		string8		ClientEligibilityStartDate;
-		string8		ClientEligibilityEndDate;
+		string1		ClientEligibilityStatus;
+		string8		ClientEligibilityDate;		//YYYYMMDD
+		string1		ClientEligibilityPeriodType;
+		string5		ClientEligibilityPeriodCount;
+		string8		ClientEligibilityPeriodStart;
+		string8		ClientEligibilityPeriodEnd;
 		
 		string10	ClientPhone;
 		string256	ClientEmail;
@@ -594,9 +616,9 @@ export MSH:=record
 		
 		string3		ExceptionReasonCode;
 		string50	ExceptionComments;
-		string84	EligibilityPeriodsHistory;
+		string200	EligibilityPeriodsHistory;
 		string4		SequenceNumber;
-		//string1		LF;
+		string1		LF;
 	end;
 
 
@@ -690,7 +712,7 @@ export MSH:=record
 	
 	export MRF2	:=
 	record
-		string20	RequestRecodrID;
+		string20	RequestRecordID;
 		string20	SearchCaseId;
 		string20	SearchClientId;
 		string1		SearchprogramCode;
@@ -804,6 +826,91 @@ export MSH:=record
 		
 		string1		IncludeEligibilityHistory;
 		string1		IncludeInterstateAllPrograms;
+		string1   LineFeed := '\n';
+	end;
+
+	export	MSH2	:=
+	record
+		MSX2 -[LineFeed];
+		string4		CaseNACGroupID;
+		string2		CaseState;
+		string1		CaseProgramCode;
+		string20	CaseID;
+		string30	CaseLastName;
+		string25	CaseFirstName;
+		string25	CaseMiddleName;
+		string5		CaseSuffixName;
+		string10	CaseMonthlyAllotment;
+		string3		CaseRegionCode;
+		string3		CaseCountyParishCode;
+		string25	CaseCountyParishName;
+		string10	CasePhone1;
+		string10	CasePhone2;
+		string256	CaseEmail;
+		string1		PhysicalAddressCategory;
+		string70	PhysicalAddressStreet1;
+		string70	PhysicalAddressStreet2;
+		string30	PhysicalAddressCity;
+		string2		PhysicalAddressState;
+		string9		PhysicalAddressZip;
+		string1		MailAddressCategory;
+		string70	MailAddressStreet1;
+		string70	MailAddressStreet2;
+		string30	MailAddressCity;
+		string2		MailAddressState;
+		string9		MailAddressZip;
+		string20	ClientID;
+		string1		ClientHoHIndicator;
+		string1		ClientABAWDIndicator;
+		string1		ClientHoHRelationshipIndicator;
+		string30	ClientLastName;
+		string25	ClientFirstName;
+		string25	ClientMiddleName;
+		string5		ClientSuffixName;
+		string1		ClientGender;
+		string1		ClientRace;
+		string1		ClientEthnicity;
+		string9		ClientSSN;
+		string1		ClientSSNType;
+		string8		ClientDOB;
+		string1		ClientDOBType;
+		string20	ClientCertificateID;
+		string10	ClientMonthlyAllotment;
+		string1		ClientEligibilityStatus;
+		string8		ClientEligibilityDate;
+		string1		ClientEligibilityPeriodType;
+		string5		ClientEligibilityPeriodCount;
+		string8		ClientEligibilityPeriodStart;
+		string8		ClientEligibilityPeriodEnd;
+		string10	ClientPhone;
+		string256	ClientEmail;
+		string50	StateContactName;
+		string10	StateContactPhone;
+		string10	StateContactPhoneExtension;
+		string256	StateContactEmail;
+		string3		LexIdScore;
+		string10	MatchCodes;
+		string5		TotalEligiblePeriodsDays;
+		string4		TotalEligiblePeriodsMonths;
+		string3		ExceptionReasonCode;
+		string50	ExceptionComments;
+		string200	EligibilityPeriodsHistory;
+		string4		SequenceNumber;
+		string1   LineFeed := '\n';
+	end;
+
+	export	MSX2PlusInternal	:=
+	record
+		string4		TargetNACGroupID;						// Internal
+		string2		SourceState;								// Internal
+		string30	ServiceName;								// Internal
+		MSX2 -[LineFeed];
+	end;
+
+	export	MSH2PlusInternal :=
+	record
+		MSX2PlusInternal;
+		MSH2 -[LineFeed];
 	end;
 		
-END;
+end;

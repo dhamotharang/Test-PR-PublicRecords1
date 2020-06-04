@@ -4,7 +4,7 @@ export Build_Base(
 
 	 string														pversion
 	,boolean													pIsTesting		 = false
-	,dataset(Layouts.Sprayed_Input	)	pSprayedFile 	 = Files().Input.Sprayed
+	,dataset(Layouts.Sprayed_Input	)	pSprayedFile 	 = Files(,true).Input.Sprayed
 	,dataset(Layouts.Base           ) pBaseFile      = Files().base.qa
 	,dataset(Layouts.Base         	)	pNewBaseFile	 = Update_Base(pversion,pSprayedFile,pBaseFile)
 	,boolean													pWriteFileOnly = false

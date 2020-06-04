@@ -1,4 +1,4 @@
-import doxie,bipv2,ut,Data_Services,autokeyb2,domains;
+﻿import doxie,bipv2,ut,Data_Services,autokeyb2,domains;
 
 EXPORT keys := module
 
@@ -68,7 +68,7 @@ EXPORT keys := module
             constants.KeyName_WhoIs + doxie.Version_SuperKey + '::domain');
 
   EXPORT Key_Whois_LinkIds := MODULE
-    SHARED  base_recs 						:= files.file_base;
+    SHARED  base_recs 						:= files.file_key_linkids_whois;
     EXPORT  out_superfileKeyName  := constants.KeyName_WhoIs+'qa::linkids'; // linkids Key Super FileName
 
     BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_superfileKeyName);

@@ -35,6 +35,7 @@ EXPORT Filenames := MODULE
 	EXPORT Prefix_dsBase    	      := Prefix_Base + 'full::';
 	//EXPORT Prefix_dsBase    	      :=ut.foreign_prod+'thor_data400::base::insuranceheader_incremental::full::';
 	EXPORT Prefix_FCRA							:= Prefix_Base + 'fcra::';
+	EXPORT Prefix_Minors						:= '~thor_data400::base::insuranceheader_incremental::minors::';
 	// superfile names
 	EXPORT IncSuppression_SF		:= InsuranceHeader.mod_FileNames(Prefix_IncSuppression);
 	EXPORT IncCorrection_SF			:= InsuranceHeader.mod_FileNames(Prefix_IncCorrection);
@@ -57,6 +58,7 @@ EXPORT Filenames := MODULE
 	EXPORT StatsIncBase_SF	    := InsuranceHeader.mod_FileNames(Prefix_StatsIncBase);
 	EXPORT dsBase_SF	          := InsuranceHeader.mod_FileNames(Prefix_dsBase);
 	EXPORT FCRA_SF							:= InsuranceHeader.mod_FileNames(Prefix_FCRA);
+	EXPORT Minors_SF						:= InsuranceHeader.mod_FileNames(Prefix_Minors);
 		
 	// logical file names
 	EXPORT IncSuppression_LF(STRING version, STRING wu)						:= InsuranceHeader.mod_FileNames(Prefix_IncSuppression).logical(version, wu);
@@ -75,6 +77,7 @@ EXPORT Filenames := MODULE
 	EXPORT IncHierarchy_LF(STRING version, STRING wu)							:= InsuranceHeader.mod_FileNames(Prefix_IncHierarchy).logical(version, wu);
 	EXPORT BEST_LF(STRING version, STRING wu)											:= InsuranceHeader.mod_FileNames(Prefix_best).logical(version, wu);
 	EXPORT FCRA_LF(STRING version, STRING wu)											:= InsuranceHeader.mod_FileNames(Prefix_FCRA).logical(version, wu);
+	EXPORT Minors_LF(STRING version, STRING wu)										:= InsuranceHeader.mod_FileNames(Prefix_Minors).logical(version, wu);
 
 	EXPORT StatsIngest_LF(STRING version, STRING wu)							:= InsuranceHeader.mod_FileNames(Prefix_StatsIngest).logical(version, wu);
 	EXPORT StatsNewOnly_LF(STRING version, STRING wu)							:= InsuranceHeader.mod_FileNames(Prefix_StatsNewOnly).logical(version, wu);

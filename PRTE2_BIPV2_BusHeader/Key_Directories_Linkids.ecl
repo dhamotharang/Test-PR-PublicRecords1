@@ -8,21 +8,21 @@ module
   shared ds_contactsbuilt  := PRTE2_BIPV2_BusHeader.Key_Contact_Linkids.keybuilt;
   shared ds_industrybuilt  := PRTE2_BIPV2_BusHeader.key_industry_linkids.keybuilt;
 
-
   shared fmakecommon(
      dataset(recordof(ds_contacts))  pcontacts
     ,dataset(recordof(ds_industry))  pindustry
   ) := 
   function
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_contacts(ds_contacts le) := transform
-     self.rec_type        := 'C';
+  
+	layouts.rec_other_directories_layout xform_contacts(ds_contacts le) := transform
+	   self.rec_type        := 'C';
      self.contacts_fields := le;
      self                 := le;
      self                 := [];//for the industry fields
     end;
 
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_industry(ds_industry le) := transform
-     self.rec_type        := 'I';
+    layouts.rec_other_directories_layout xform_industry(ds_industry le) := transform
+		 self.rec_type        := 'I';
      self.industry_fields := le;
      self                 := le;
      self                 := [];//for the contacts fields

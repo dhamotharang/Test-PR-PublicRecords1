@@ -18,10 +18,15 @@ shared BSVersion	:= 50;
 
 shared h_full := doxie_build.file_header_building(~risk_indicators.iid_constants.filtered_source(src, st, BSVersion));
 shared h_quick := project(header_quick.file_header_quick(~risk_indicators.iid_constants.filtered_source(src, st, BSVersion)), transform(header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), self := left));
-shared header_base := ungroup(h_full + h_quick);
-shared gh := gong.File_Gong_History_Full;
-shared wp := Targus.File_targus_key_building;
-shared ir := InfutorCID.File_InfutorCID_Base;
+shared header_base_before_suppress := ungroup(h_full + h_quick);
+shared header_base := risk_indicators.fn_suppress_ccpa(header_base_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
+shared gh_before_suppress := gong.File_Gong_History_Full;
+shared gh := risk_indicators.fn_suppress_ccpa(gh_before_suppress, FALSE, 'Gong_Virtual', '', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
+shared wp_before_suppress := Targus.File_targus_key_building;
+shared mod_access := MODULE(doxie.IDataAccess) END; // CCPA-795: OptOut Prefilter Data Layer, needed for the suppress macro below
+shared wp := Suppress.MAC_SuppressSource(wp_before_suppress, mod_access, , , TRUE); // CCPA-795: OptOut Prefilter Data Layer
+shared ir_before_suppress := InfutorCID.File_InfutorCID_Base;
+shared ir := Suppress.MAC_SuppressSource(ir_before_suppress, mod_access, , , TRUE); // CCPA-795: OptOut Prefilter Data Layer
 shared u := UtilFile.file_util.full_base;
 
 // shared sample_size := 100;// for use in testing small sample only

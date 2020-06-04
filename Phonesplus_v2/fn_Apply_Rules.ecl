@@ -1,5 +1,5 @@
-//**********Funtion to flag rules
-import ut, mdr;
+﻿//**********Funtion to flag rules
+import ut, mdr, std;
 export fn_Apply_Rules (dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
 celltype := Translation_Codes.cellphone_types;
@@ -44,18 +44,18 @@ recordof(phplus_in) t_flag_rules(append_inq_info le) := transform
 	//Gong History with subsequent disconnect
 	gongh_discon_rule := if(Translation_Codes.fFlagIsOn(le.src_all,Translation_Codes.source_bitmap_code('GO')) and
 													le.append_phone_type not in ['CELL' , 'LNDLN PRTD TO CELL'] and
-													((unsigned)le.eda_did_dt[..6] > le.datelastseen or 
-													(unsigned)le.eda_hist_did_dt[..6] > le.datelastseen or 
+													((unsigned)((string)le.eda_did_dt)[..6] > le.datelastseen or 
+													(unsigned)((string)le.eda_hist_did_dt)[..6] > le.datelastseen or 
 													le.eda_did_dt >  le.eda_hist_did_dt or
-													(le.datelastseen = (unsigned)le.eda_hist_did_dt[..6] and le.eda_hist_did_dt [..6 ] = le.eda_hist_phone_dt [..6 ] and le.eda_hist_did_dt > le.eda_hist_phone_dt ) or
-													(le.datelastseen = (unsigned)le.eda_did_dt[..6] and le.eda_did_dt [..6 ] = le.eda_phone_dt [..6 ] and le.eda_did_dt > le.eda_phone_dt ))
+													(le.datelastseen = (unsigned)((string)le.eda_hist_did_dt)[..6] and ((string)le.eda_hist_did_dt)[..6 ] = ((string)le.eda_hist_phone_dt) [..6 ] and le.eda_hist_did_dt > le.eda_hist_phone_dt ) or
+													(le.datelastseen = (unsigned)((string)le.eda_did_dt)[..6] and ((string)le.eda_did_dt)[..6 ] = ((string)le.eda_phone_dt)[..6 ] and le.eda_did_dt > le.eda_phone_dt ))
 											,true,false);
 
 gongh_discon_caption:= if(gongh_discon_rule,
 								 Translation_Codes.rules_bitmap_code('Gongh-Disconnect'), 0b );
 
 //consortium discon
-consortium_discon_rule := le.append_feedback_phone = '4' and ut.DaysApart(ut.GetDate,(string)le.append_feedback_phone_dt)  <= 365	;							 
+consortium_discon_rule := le.append_feedback_phone = '4' and ut.DaysApart((STRING8)Std.Date.Today(),(string)le.append_feedback_phone_dt)  <= 365	;							 
 
 consortium_discon_caption:= if(consortium_discon_rule,
 								 Translation_Codes.rules_bitmap_code('Consortium-Disconnect'), 0b );		
@@ -141,8 +141,8 @@ ported_best_no_active_rule := le.append_portability_indicator = '1' and
 							  le.append_indiv_has_active_eda_phone_flag = false and 
 							  le.append_latest_phone_owner_flag and 
 							  le.append_best_addr_match_flag and 
-							  (((string)le.DateLastSeen  [..4] >= '2001' and
-							  ut.DaysApart((string)le.DateLastSeen , ut.GetDate) >= 90) or
+							  ((((string)le.DateLastSeen)[..4] >= '2001' and
+							  ut.DaysApart((string)le.DateLastSeen , (STRING8)Std.Date.Today()) >= 90) or
 							  le.DateLastSeen  = 0) and
 							  Translation_Codes.fFlagIsOn(le.rules, Translation_Codes.rules_bitmap_code('Disconnected-EDA'));
 
@@ -153,8 +153,8 @@ ported_best_no_active_caption:= if(ported_best_no_active_rule,
 ported_cell_rule 		 := le.append_portability_indicator = '1' and 
 							le.append_phone_type[..4] = 'CELL' and
 							le.append_latest_phone_owner_flag and
-						    (((string)le.DateLastSeen  [..4] >= '2001' and
-							ut.DaysApart((string)le.DateLastSeen , ut.GetDate) >= 90) or
+						    ((((string)le.DateLastSeen)[..4] >= '2001' and
+							ut.DaysApart((string)le.DateLastSeen , (STRING8)Std.Date.Today()) >= 90) or
 							le.DateLastSeen  = 0) and
 							Translation_Codes.fFlagIsOn(le.rules, Translation_Codes.rules_bitmap_code('Disconnected-EDA'));
 
@@ -164,8 +164,8 @@ ported_cell_caption 	 := if(ported_cell_rule,
 //----------Consortium RPC
 consortium_rpc_rule := (le.append_feedback_phone7_did in ['1', '2'] or
 											 le.append_feedback_phone7_nm_addr in ['1', '2']) and
-											 (ut.DaysApart(ut.GetDate, (string)le.append_feedback_phone7_did_dt) <= 365  or
-											 ut.DaysApart(ut.GetDate, (string)le.append_feedback_phone7_nm_addr_dt) <= 365 );
+											 (ut.DaysApart((STRING8)Std.Date.Today(), (string)le.append_feedback_phone7_did_dt) <= 365  or
+											 ut.DaysApart((STRING8)Std.Date.Today(), (string)le.append_feedback_phone7_nm_addr_dt) <= 365 );
 
 consortium_rpc_caption := if(consortium_rpc_rule,
 							               Translation_Codes.rules_bitmap_code('Consortium-RPC'), 0b);							

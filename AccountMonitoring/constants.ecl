@@ -51,6 +51,7 @@ EXPORT constants := MODULE
 	EXPORT UNSIGNED8 PM_AIRCRAFT				:= AccountMonitoring.types.productMask.aircraft;
 	EXPORT UNSIGNED8 PM_WATERCRAFT			:= AccountMonitoring.types.productMask.watercraft;
 	EXPORT UNSIGNED8 PM_PERSONHEADER			:= AccountMonitoring.types.productMask.personheader;
+	EXPORT UNSIGNED8 PM_EMAIL     			:= AccountMonitoring.types.productMask.email;
 	
 	// This special value provides the user with a shortcut for utilities to say ALL.
 	EXPORT UNSIGNED8 PM_ALL        := -1;

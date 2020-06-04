@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 import nid, Address;
@@ -102,8 +102,8 @@ clean_orig_pty_name_10 :=
                regexfind('(.*)(\\(a.k.a.)(.*)(\\))(, also d.b.a.)(.*)',clean_orig_pty_name_9) 
                => regexreplace('(.*)(\\(a.k.a.)(.*)(\\))(, also d.b.a.)(.*)', clean_orig_pty_name_9,'$1~$3~$6'), 	
 							
-							 regexfind('(.*)(d/b/a)( Groupe SystÃ¨mes et Solutions DÂ’entreprise, ESS Group)(,)( Enterprise Systems and Solutions Group)',clean_orig_pty_name_9) 
-               => regexreplace('(.*)(d/b/a)( Groupe SystÃ¨mes et Solutions DÂ’entreprise, ESS Group)(,)( Enterprise Systems and Solutions Group)', clean_orig_pty_name_9,'$1~$3~$5'),
+							 regexfind('(.*)(d/b/a)( Groupe SystÃƒÂ¨mes et Solutions DÃ‚â€™entreprise, ESS Group)(,)( Enterprise Systems and Solutions Group)',clean_orig_pty_name_9) 
+               => regexreplace('(.*)(d/b/a)( Groupe SystÃƒÂ¨mes et Solutions DÃ‚â€™entreprise, ESS Group)(,)( Enterprise Systems and Solutions Group)', clean_orig_pty_name_9,'$1~$3~$5'),
 						 
 						   regexfind('(.*)(as the successor or assign to)(.*)',clean_orig_pty_name_9) 
                => regexreplace('(.*)(as the successor or assign to)(.*)', clean_orig_pty_name_9,'$1~$3'),
@@ -169,11 +169,11 @@ self.remarks_5 := map(remarks_4 <> '' => remarks_5, '');
 						// 'FAUSTO ALEJANDRO LOPEZ CIFUENTES',                                                                                                                                                                                                                                                                                                   
 						// 'DAVID KALISILIRA',                                                                                                                                                                                                                                                                                                                                         
 						// 'ALFREDO ECHALAR FRANCO',                                                                                                                                                                                                                                                                                                                                            
-						// 'SAMUEL CÃRDENAS COLQUE',                                                                                                                                                                                                                                                                                                               
+						// 'SAMUEL CÃƒÂRDENAS COLQUE',                                                                                                                                                                                                                                                                                                               
 						// 'LAXMINARAYAN MALLICK',                                                                                                                                                                                                                                                                                                            
 						// 'ANGELO ALBERTO NAPANGA GARCIA',                                                                                                                                                                                                                                                                                                                                     
 						// 'LEHYLA VIRGINIA FARFAN AGUIRRE',                                                                                                                                                                                                                                                                                                                  
-						// 'RENÃ‰ SANDOVAL SOLIZ',                                                                                                                                                                                                                                                                                                            
+						// 'RENÃƒâ€° SANDOVAL SOLIZ',                                                                                                                                                                                                                                                                                                            
 						// 'SANJAY GUPTA',                                                                                                                                                                                                                                                                                                                                  
 						// 'ZAKIR HOSSAIN',                                                                                                                                                                                                                                                                                                                                                     
 						// 'NICOLE BURDA ',                                                                                                                                                                                                                                                                                                                                      

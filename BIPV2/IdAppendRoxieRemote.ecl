@@ -1,5 +1,6 @@
 ﻿import _Control;
 import BIPV2;
+import Doxie;
 
 export IdAppendRoxieRemote(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
@@ -11,23 +12,33 @@ export IdAppendRoxieRemote(
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,string svcAppendUrl = ''
+		,string svcName = ''
+        ,unsigned soapTimeout = 30
+        ,unsigned soapTimeLimit = 0
+        ,unsigned soapRetries = 3
+				,boolean segmentation = true
 	) := module
 
 	shared disableSaltForce := not primForce;
+	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
 
 	prodUrl := 'http://' + IdConstants.URL_ROXIE_PROD;
 	inputUrl := if(svcAppendUrl[1..4] = 'http', svcAppendUrl, 'http://' + svcAppendUrl);
 	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
 
-	shared serviceName := 'bizlinkfull.svcappend';
+	shared serviceName := if(svcName = '', 'bizlinkfull.svcappend', svcName);
 
 	shared soapInput(boolean includeBest = false
 			,string fetchLevel = ''
 			,boolean allBest = false
 			,boolean includeRecords = false
 			,boolean isMarketing = false
-			,boolean dnbFullRemove = false) :=
-		dataset(row(
+			,boolean dnbFullRemove = false
+			,Doxie.IDataAccess mod_access = defaultDataAccess) := function
+		
+		defaultPermissions := row({''}, IdAppendLayouts.permissions);
+
+		soapDs := dataset(row(
 			transform(IdAppendLayouts.SoapRequest,
 				self.append_input := inputDs,
 				self.re_append := reAppend,
@@ -44,11 +55,17 @@ export IdAppendRoxieRemote(
 				self.include_records := includeRecords,
 				self.is_marketing := isMarketing,
 				self.dnb_full_remove := dnbFullRemove,
-				self := row({''}, IdAppendLayouts.permissions),
+				self.data_access_glb := mod_access.glb,
+				self.data_access_dppa := mod_access.dppa,
+				self.data_access_lexid_source_optout := mod_access.lexid_source_optout,
+				self.do_segmentation := segmentation,
+				self := defaultPermissions,
 			))
 		);
+		return soapDs;
+	end;
 
-	shared BIPV2.IDAppendLayouts.AppendOutput setError(IdAppendLayouts.SoapRequest l) := transform
+	shared BIPV2.IDAppendLayouts.AppendOutputDebug setError(IdAppendLayouts.SoapRequest l) := transform
 		self.error_code := FAILCODE;
 		self.error_msg := FAILMESSAGE;
 		self := L;
@@ -56,17 +73,19 @@ export IdAppendRoxieRemote(
 	end;
 
 
-	shared IdsAndBest(boolean includeBest, string fetchLevel = BIPV2.IdConstants.fetch_level_proxid,
-	                  boolean allBest = false, boolean isMarketing = false) := function
-		soapInputDs := soapInput(includeBest := includeBest, fetchLevel := fetchLevel,
-		                         allBest := allBest, includeRecords := false);
+	shared IdsAndBest(boolean includeBest, string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                  ,boolean allBest = false, boolean isMarketing = false
+					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
+		soapInputDs := soapInput(includeBest := includeBest, fetchLevel := fetchLevel
+		                         ,allBest := allBest, includeRecords := false
+								 ,mod_access := mod_access);
 		soapResult := soapcall(
 			soapInputDs
 			,urlBipAppend, servicename, {soapInputDs}
-			,dataset(BIPV2.IDAppendLayouts.AppendOutput)
+			,dataset(BIPV2.IDAppendLayouts.AppendOutputDebug)
 			,xpath(servicename + 'Response/Results/Result/Dataset[1]/Row')
 			,onfail(setError(left)), parallel(1)
-			,merge(1), timeout(30)
+			,merge(1), timeout(soapTimeout), timelimit(soapTimeLimit), retry(soapRetries)
 		);
 
 		// If soapcall fails, there will only be 1 record in soapresult so need to add error info to all records.
@@ -80,9 +99,11 @@ export IdAppendRoxieRemote(
 	end;
 
 	export IdsOnly() := IdsAndBest(includeBest := false);
-	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid,
-	                boolean allBest = false, boolean isMarketing = false)
-		:= IdsAndBest(includeBest := true, fetchLevel := fetchLevel, allBest := allBest, isMarketing := isMarketing);
+	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                ,boolean allBest = false, boolean isMarketing = false
+					,Doxie.IDataAccess mod_access = defaultDataAccess)
+		:= IdsAndBest(includeBest := true, fetchLevel := fetchLevel, allBest := allBest
+		              ,isMarketing := isMarketing, mod_access := mod_access);
 
 	shared BIPV2.IDAppendLayouts.AppendWithRecsOutput setErrorRecs(IdAppendLayouts.SoapRequest l) := transform
 		self.error_code := FAILCODE;
@@ -91,16 +112,19 @@ export IdAppendRoxieRemote(
 		self := [];
 	end;
 
-	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean dnbFullRemove = false) := function
-		soapInputDs := soapInput(includeBest := false, includeRecords := true, 
-		                         fetchLevel := fetchLevel, dnbFullRemove := dnbFullRemove);
+	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                   ,boolean dnbFullRemove = false
+					   ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
+		soapInputDs := soapInput(includeBest := false, includeRecords := true
+		                         ,fetchLevel := fetchLevel, dnbFullRemove := dnbFullRemove
+								 ,mod_access := mod_access);
 		soapResult := soapcall(
 			soapInputDs
 			,urlBipAppend, servicename, {soapInputDs}
 			,dataset(BIPV2.IDAppendLayouts.AppendWithRecsOutput)
 			,xpath(servicename + 'Response/Results/Result/Dataset[2]/Row')
 			,onfail(setErrorRecs(left)), parallel(1)
-			,merge(1), timeout(30)
+			,merge(1), timeout(soapTimeout), timelimit(soapTimeLimit), retry(soapRetries)
 		);
 
 		// If soapcall fails, there will only be 1 record in soapresult so need to add error info to all records.

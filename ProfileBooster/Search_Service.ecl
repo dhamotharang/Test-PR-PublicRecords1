@@ -7,7 +7,7 @@
  </message>
 */
 
-IMPORT iesp, Risk_indicators, Riskwise, address;
+IMPORT iesp, Risk_indicators, Riskwise, address,std;
 
 EXPORT Search_Service := MACRO
 
@@ -18,6 +18,8 @@ EXPORT Search_Service := MACRO
 	userIn 			:= GLOBAL(firstRow.user);
 	search 			:= GLOBAL(firstRow.SearchBy);
 	
+  BOOLEAN DEBUG := False;
+  
 	/* **********************************************
 		 *  Fields needed for improved Scout Logging  *
 		 **********************************************/
@@ -37,18 +39,14 @@ EXPORT Search_Service := MACRO
 		BOOLEAN ExcludeDMVPII           := userIn.ExcludeDMVPII;
 		BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 		BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
-
+    
 		//Look up the industry by the company ID.
 		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.ProfileBooster__Search_Service);
 	/* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
 	HistoryDateYYYYMM 						:= StringLib.StringToUpperCase(optionsIn.HistoryDateYYYYMM);
-	todaysdate										:= ut.GetDate;
 	HistoryDateInput							:= if(HistoryDateYYYYMM <> '', HistoryDateYYYYMM, outOfBandHistoryDate);	
-	HistoryDateFull								:= HistoryDateInput+'01';
-	validdate := Doxie.DOBTools((integer)HistoryDateFull).IsValidDOB;	
-	historydate 									:= if(validdate, (integer)HistoryDateInput, (integer)todaysdate[1..6]); 
 	
 	STRING50 outOfBandDataRestriction   := AutoStandardI.GlobalModule().DataRestrictionMask;
 	// Check to see if the default from GlobalModule() is used, if so overwrite it to our default data restriction.  Our default doesn't include spaces.
@@ -94,7 +92,7 @@ EXPORT Search_Service := MACRO
 	boolean InputOption1	:= NameCheck and AddrCheck and ZipCheck;
 	boolean InputOption2	:= NameCheck and SSNCheck;
 	boolean InputValid 		:= InputOption1 or InputOption2;
-
+  
 	boolean RequestValid 	:= attributesVersion in ProfileBooster.Constants.setValidAttributeVersions;  //version 1 is the initial version
 
 	if(~InputValid and ~TestDataEnabled, FAIL( 'Please input the minimum required fields'));
@@ -106,9 +104,14 @@ EXPORT Search_Service := MACRO
 	end;
 	wseq := project( requestIn, transform( layout_acctseq, self.seq := counter, self := left ) );
 
+  setvalidmodels :=['PB1708_1'];
+  ModelNames := optionsIn.IncludeModels.Names;
+  custommodel_in := std.str.touppercase(Trim(ModelNames[1].value, ALL));
+  domodel := custommodel_in IN setvalidmodels;
+
 	ProfileBooster.Layouts.Layout_PB_In into(wseq l) := TRANSFORM
 		self.seq 									:= l.seq;
-		self.HistoryDate 					:= HistoryDate;
+		self.HistoryDate 					:= if((unsigned)HistoryDateInput=0, risk_indicators.iid_constants.default_history_date, (unsigned)HistoryDateInput);
 		self.ssn 									:= l.SearchBy.ssn;
 		self.dob 									:= l.SearchBy.dob.year + intformat((integer1)l.SearchBy.dob.month, 2, 1) + intformat((integer1)l.SearchBy.dob.day, 2, 1);
 		self.Name_Full 						:= fullname;
@@ -135,7 +138,7 @@ EXPORT Search_Service := MACRO
 	
 	PB_Input := PROJECT(wseq, into(left));	
 
-	Risk_Indicators.Layout_Input intoLayoutInput(ut.ds_oneRecord le, INTEGER c) := TRANSFORM
+	Risk_Indicators.Layout_Input intoLayoutInput(Risk_Indicators.iid_constants.ds_Record le, INTEGER c) := TRANSFORM
 		SELF.seq 				:= c;
 		SELF.fname 			:= trim(stringlib.stringtouppercase(fname));
 		SELF.lname 			:= trim(stringlib.stringtouppercase(lname));
@@ -145,15 +148,21 @@ EXPORT Search_Service := MACRO
 		SELF 						:= [];
 	END;
 
-	packagedTestseedInput := PROJECT(ut.ds_oneRecord, intoLayoutInput(LEFT, COUNTER));	
+	packagedTestseedInput := PROJECT(Risk_Indicators.iid_constants.ds_Record, intoLayoutInput(LEFT, COUNTER));	
 
+#IF(DEBUG)
+  // temporary for testing on dev roxie when new key isn't available
+  searchResults := ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, false, domodel, custommodel_in); // Realtime Values
+  PBResults := searchResults;
+  
+#ELSE
 	searchResults := IF(TestDataEnabled, 
 											ProfileBooster.TestSeed_Function(packagedTestseedInput, TestDataTableName), // TestSeed Values
-											ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion) // Realtime Values
+											ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, domodel, custommodel_in) // Realtime Values
 										 );	
+										   
 										 
-										 // temporary for testing on dev roxie when new key isn't available
-// searchResults := ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion); // Realtime Values
+
 										
 
 iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
@@ -547,13 +556,33 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 			self.AttributesGroup.Name := attributesVersion;  
 			SELF.AttributesGroup.attributes :=  IndIndex;
 			self.UniqueId := (string)ri.LexID;
+      	self.Models := project(ri, 
+								transform(iesp.ProfileBoosterAttributes.t_ProfileBoosterModelHRI, 
+								self.Name := custommodel_in; 
+								self.scores := project(left,
+                transform (iesp.ProfileBoosterAttributes.t_ProfileBoosterScoreHRI,
+                self.value := (integer)left.attributes.version1.score1;
+                // self.scorename1 := project(left,
+                // transform (iesp.ProfileBoosterAttributes.t_ProfileBoosterScoreHRI,
+                // self.type := (integer)left.attributes.version1.scorename1;
+								
+                
+                self := [];  // RemoteLocations & ServiceLocations that we don't care about;//hidden[internal]
+								))));
+      
+      
 		  self := le;
 			self := [];
 	END;
-	
+
+  
+  
+  
 	PBResults := join(wseq, searchResults,
 	                     right.seq = left.seq,
 											 IntoResults(LEFT, RIGHT));
+
+
 
 	//Log to Deltabase
 	Deltabase_Logging_prep := project(PBResults, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -572,11 +601,17 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
 																									 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																									 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                   self.glb := (Integer)userIn.GLBPurpose,
+                                                   self.dppa := (Integer)userIn.DLPurpose,
 																									 self.data_restriction_mask := DataRestriction,
 																									 self.data_permission_mask := DataPermission,
 																									 self.industry := Industry_Search[1].Industry,
 																									 self.i_attributes_name := attributesVersion,
 																									 self.i_ssn := search.SSN,
+                                                   self.i_dob := Search.dob.year +
+                                                                 intformat((integer1)Search.dob.month, 2, 1) +
+                                                                 intformat((integer1)Search.dob.day, 2, 1),
+                                                   self.i_name_full := search.Name.Full,
 																									 self.i_name_first := search.Name.First,
 																									 self.i_name_last := search.Name.Last,
 																									 self.i_lexid := (Integer)search.UniqueId,
@@ -584,10 +619,9 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.i_city := search.address.City,
 																									 self.i_state := search.address.State,
 																									 self.i_zip := search.address.Zip5,
-																									 // ProfileBooster does not have any models at the moment.
-																									 // This will have to be updated if that happens.
-																									 // self.i_model_name_1 := in_modelname,
-																									 self.o_score_1    := (Integer)left.Models[1].Scores[1].Value,
+                                                   self.i_home_phone := search.phone,
+																									 self.i_model_name_1 := custommodel_in,
+																									 self.o_score_1    := IF(custommodel_in != '', (String)left.Models[1].Scores[1].Value, ''),
 																									 self.o_reason_1_1 := left.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																									 self.o_reason_1_2 := left.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																									 self.o_reason_1_3 := left.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
@@ -601,10 +635,13 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 	// #stored('Deltabase_Log', Deltabase_Logging);
 
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
+#END
 // output(historydate, NAMED('historydate'));
-output(PBResults, NAMED('Results'));
+ //output(searchresults, NAMED('searchresults'));
+// output(historydate, NAMED('historydate'));
+  output(PBResults, NAMED('Results'));
 
 ENDMACRO;
 

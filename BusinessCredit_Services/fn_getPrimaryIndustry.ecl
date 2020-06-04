@@ -1,12 +1,17 @@
-﻿IMPORT AutoStandardI, BIPV2, Business_Credit, iesp, ut, MDR, BusinessCredit_Services;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, BusinessCredit_Services, doxie, iesp, MDR, ut;
 
+// efficiency here in last 2 params being defaulted
 EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids, 
-																	String DatapermissionMask, 
-																	Boolean IncludeBusinessCredit = FALSE //data team always pass in IncludeBusinessCredit = TRUE for this.
-																	) := MODULE
+                             doxie.IDataAccess mod_access, 
+                             Boolean IncludeBusinessCredit = FALSE, //data team always pass in IncludeBusinessCredit = TRUE for this.
+                             STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID																
+                             ) := MODULE
+                             // note:  in addition to this module being called from BusinessCredit_Services.CreditReport_Records
+                             // Business_Credit_Scoring.fn_GetDBTAverage calls this BusinessCredit_Services.fn_getPrimaryIndustry from thor side
+                             // thus last 2 params defaulted purposely.
 																	
 	// we need to select primary industry code from BIP unless Business is an SBFE Singleton, In which case use SBFE.
-	BOOLEAN buzCreditAccess	:= BusinessCredit_Services.Functions.fn_useBusinessCredit(DatapermissionMask ,IncludeBusinessCredit);	
+	BOOLEAN buzCreditAccess	:= BusinessCredit_Services.Functions.fn_useBusinessCredit(mod_access.DatapermissionMask ,IncludeBusinessCredit);	
 
 	slim_layout := RECORD
 		iesp.share.t_BusinessIdentity;
@@ -19,10 +24,10 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 		UNSIGNED2 RecordCount := 1;
 	END;
 	
-	//Fetching Business Header Records.
-	ds_busHeaderRecs 		:= BIPV2.Key_BH_Linking_Ids.kfetch2(Linkids,BIPV2.IDconstants.Fetch_Level_SELEID,,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,TRUE); //We wanted to fetch all the records for Se level. 
-	ds_busHeaderRecsSlim := ds_busHeaderRecs(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC);	
-	ds_sbfeLinkRecs 		:= Business_Credit.Key_LinkIds().kfetch2(Linkids , BIPV2.IDconstants.Fetch_Level_SELEID,,DatapermissionMask);
+	//Fetching Business Header Records. //  efficiency remove additional kfetch here.
+	ds_busHeaderRecsSlim := BusinessCredit_Services.Functions.BipKfetch(Linkids,mod_access,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).bipbusHeaderRecsSlim;
+	
+	ds_sbfeLinkRecs 		:=   BusinessCredit_Services.Functions.BipKfetch(Linkids,mod_access,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).BusCreditHeaderRecs;  
 
 	ds_sbfeSICNAICSRecs	:= JOIN(ds_sbfeLinkRecs , Business_Credit.Key_BusinessClassification(), 
 																			BusinessCredit_Services.Macros.mac_JoinBusAccounts(),  
@@ -62,16 +67,22 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 	
 	slim_layout rollSICNAICSource(slim_layout L, slim_layout R) := TRANSFORM
 		SELF.dt_first_seen	:=	ut.min2((INTEGER)L.dt_first_seen ,(INTEGER)R.dt_first_seen);
-		SELF.dt_last_seen		:=	ut.max2((INTEGER)L.dt_last_seen, (INTEGER)R.dt_last_seen);
+		SELF.dt_last_seen		:=	Max((INTEGER)L.dt_last_seen, (INTEGER)R.dt_last_seen);
 		SELF.RecordCount		:=	L.RecordCount + 1;
 		SELF								:=	L;
 	END;
 
 	recs_rollup := ROLLUP(SORT(Recs((INTEGER)Best_Code > 0 AND Source <> ''), #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), Source, best_code),
 												BIPV2.IDmacros.mac_JoinTop3Linkids() AND LEFT.Best_Code = RIGHT.Best_Code, rollSICNAICSource(LEFT, RIGHT));
-	
-	EXPORT recs_rollup_sort := SORT(recs_rollup, 
+
+    // output(ds_SicNaicsRecsToUse, named('ds_SicNaicsRecsToUse'));
+	// output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));												
+	//output(choosen(ds_BIPSICNAICSRecs, named('ds_BIPSICNAICSRecs'));
+		
+    EXPORT  recs_rollup_sort  := SORT(recs_rollup, 
 																		#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), 
+																		-(Source = MDR.Sourcetools.src_Equifax_business_data),
+																		-(Source = MDR.SourceTools.src_Cortera),
 																		-(Source = MDR.sourceTools.str_convert_DL), 
 																		-(Source = MDR.sourceTools.src_EBR), 
 																		-(Source = MDR.sourceTools.src_Yellow_Pages), 
@@ -83,12 +94,10 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 																		-dt_last_seen, 
 																		-dt_first_seen, 
 																		RecordCount,
-																		RECORD);
-	
+																		RECORD);		
+																		
+
 	EXPORT bestIndustryCode := DEDUP(recs_rollup_sort,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
-	// output(ds_SicNaicsRecsToUse, named('ds_SicNaicsRecsToUse'));
-	// output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
-	// output(ds_BIPSICNAICSRecs, named('ds_BIPSICNAICSRecs'));
 	
   //return (recs_rollup_sort);
 END;

@@ -1,14 +1,14 @@
-IMPORT PhoneMart, tools, _control, std;
+﻿IMPORT PhoneMart, tools, _control, std;
 
   DaliIp           := std.system.Thorlib.DaliServer();
-  GroupName 			 := map(DaliIp = '10.241.12.201:7070' => 'thor400_dev01', // Dataland
-                          DaliIp = '10.241.20.205:7070' => 'thor400_20',   	// Boca Production   
-                          'thor50_dev01');                              
+  GroupName 			 		:= map(DaliIp = '10.241.12.201:7070' => 'thor400_dev01', // Dataland
+																	 DaliIp = '10.241.20.205:7070' => 'thor400_36',   	// Boca Production   
+																	 'thor400_36');                              
 
 EXPORT spray_files(
 	STRING		pVersionDate		=	''
-	,STRING		pServerIP				=	_control.IPAddress.edata12
-	,STRING		pDirectory			= '/hds_2/phonemart_ln/'
+	,STRING		pServerIP				=	_control.IPAddress.bctlpedata11
+	,STRING		pDirectory			= '/data/hds_2/phonemart_ln/'
 	,STRING		pGroupName			=	GroupName															
 	,BOOLEAN	pIsTesting			=	FALSE
 	,BOOLEAN	pOverwrite			=	TRUE

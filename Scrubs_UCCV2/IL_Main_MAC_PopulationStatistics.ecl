@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT IL_Main_MAC_PopulationStatistics(infile,Ref='',Input_tmsid = '',Input_rmsid = '',Input_process_date = '',Input_static_value = '',Input_date_vendor_removed = '',Input_date_vendor_changed = '',Input_filing_jurisdiction = '',Input_orig_filing_number = '',Input_orig_filing_type = '',Input_orig_filing_date = '',Input_orig_filing_time = '',Input_filing_number = '',Input_filing_number_indc = '',Input_filing_type = '',Input_filing_date = '',Input_filing_time = '',Input_filing_status = '',Input_status_type = '',Input_page = '',Input_expiration_date = '',Input_contract_type = '',Input_vendor_entry_date = '',Input_vendor_upd_date = '',Input_statements_filed = '',Input_continuious_expiration = '',Input_microfilm_number = '',Input_amount = '',Input_irs_serial_number = '',Input_effective_date = '',Input_signer_name = '',Input_title = '',Input_filing_agency = '',Input_address = '',Input_city = '',Input_state = '',Input_county = '',Input_zip = '',Input_duns_number = '',Input_cmnt_effective_date = '',Input_description = '',Input_collateral_desc = '',Input_prim_machine = '',Input_sec_machine = '',Input_manufacturer_code = '',Input_manufacturer_name = '',Input_model = '',Input_model_year = '',Input_model_desc = '',Input_collateral_count = '',Input_manufactured_year = '',Input_new_used = '',Input_serial_number = '',Input_property_desc = '',Input_borough = '',Input_block = '',Input_lot = '',Input_collateral_address = '',Input_air_rights_indc = '',Input_subterranean_rights_indc = '',Input_easment_indc = '',Input_volume = '',Input_persistent_record_id = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_UCCV2;
+  IMPORT SALT311,Scrubs_UCCV2;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

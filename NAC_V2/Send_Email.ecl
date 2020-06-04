@@ -1,33 +1,37 @@
-﻿import Std;
+﻿IMPORT Std;
 
-export Send_Email(string filedate='',string st='',string fn='') := MODULE
+EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 	
 	
-	shared UpSt:=stringlib.stringtouppercase(st);
-	//shared nacfilesupport:='nacfilesupport@lexisnexis.com';
-	shared def := 'charles.salvo@lexisnexisrisk.com';
-	
-	shared SendMail(string sendto, string subject, string body) := 
+ 
+
+
+//SHARED NotificationList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid);
+ 
+ 
+ 
+	 
+	SHARED SendMail(string sendto, string subject, string body) := 
 						STD.System.Email.SendEmail(sendto, subject, body);
 
-	export build_success :=
+	EXPORT build_success :=
 						SendMail(
-								$.DistributionLists.SuccessList
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Success', '')
 								,'NAC2 Build Succeeded ' + filedate
 								,'Sample records are in WUID:' + workunit
 								);
 
-	export build_failure
+	EXPORT build_failure
 						:= SendMail(
-								$.DistributionLists.FailureList
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Failure', '')
 								,'NAC2 '+filedate+' Build FAILED'
 								,workunit+ ' ' + FAILMESSAGE
 								);
 
 
-	export NAC_Input_Prep_failure
+	EXPORT NAC_Input_Prep_failure
 						:= SendMail(
-								def
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
 								,'*** ALERT **** NCF2 Contributory File Prep FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'\n\n'
@@ -38,9 +42,9 @@ export Send_Email(string filedate='',string st='',string fn='') := MODULE
 								+'********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********\n'
 							);
 
-	export FileEmptyErrorAlert
+	EXPORT FileEmptyErrorAlert
 						:= SendMail(
-								def
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
 								,'*** ALERT **** NCF2 Contributory File Validation FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
@@ -49,9 +53,9 @@ export Send_Email(string filedate='',string st='',string fn='') := MODULE
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
 							);
 
-	export FileRecorLengthErrorAlert
+	EXPORT FileRecorLengthErrorAlert
 						:= SendMail(
-								def
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
 								,'*** ALERT **** NCF2 Contributory File Validation FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
@@ -60,19 +64,24 @@ export Send_Email(string filedate='',string st='',string fn='') := MODULE
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
 							);
 
-	export FileErrorAlert
+	EXPORT FileErrorAlert
 						:= SendMail(
-								def
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', '')
 								,'*** ALERT **** NAC Contributory File Validation FAILURE'
 								,'File not found -> '+fn
 							);
 
-	export FileValidationReport
+	EXPORT FileValidationReport
 						:= SendMail(
-								def
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
 								,'NCF2 Contributory File Validation Report'
 								,$.Print.NCR2_to_Text(fn)
 							);
 
 
-end;
+END; 
+
+
+
+
+

@@ -1,4 +1,4 @@
-﻿IMPORT  address, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers;
+﻿IMPORT  _control, address, MDR, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers, Std;
 
 dBusinessInputs := ungroup(Mapping_FBN_FL_Business)+
 				                         ungroup(Mapping_FBN_CA_San_Diego_Business)+				 
@@ -327,9 +327,27 @@ rolledup_recs := rollup(ds_bdid_match, rolluprecs(left,right),
                         RECORD, except dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,source_rec_id, local);
 
 /*** appending the source record ids for the newer records.  */                                                                                                                                                 
-ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);                                                                                    
+ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);  
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Apply Global_SIDs
+///////////////////////////////////////////////////////////////////////////////////////
+
+//Apply Global_SID - TMSID[1..3]
+addGlobalSID 		:= MDR.macGetGlobalSid(out_file, 'Fbn2', 'tmsid[1..3]', 'global_sid'); 
+
+withGSIDs				:= addGlobalSID(global_sid<>0);	//Global_SIDs Populated
+remainRec				:= addGlobalSID(global_sid=0);	//No Global_SIDs Populated
+
+//Apply Global_SID - TMSID[1..2]
+addGlobalSID2		:= MDR.macGetGlobalSid(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');
+
+//Concat All Results
+concatRecs			:= withGSIDs + addGlobalSID2;
+
+///////////////////////////////////////////////////////////////////////////////////////                                                                                  
 										 
-dPostDIDandBDIDPersist	:=	out_file:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Business');
+dPostDIDandBDIDPersist	:=	concatRecs:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Business');
 					
 PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Business',Out, 3,pCompress:=true);
 

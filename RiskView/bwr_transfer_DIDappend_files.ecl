@@ -20,10 +20,11 @@ filestocopyds := dataset([
 ,{'thor_data400::key::watchdog_best_nonen.did_qa','','',''}
 			]
 															,rampscopy.layouts.filestocopy);
+
 															
 dops.xFerRoxieFiles(filestocopyds
-											,'prod_esp.br.seisint.com'  // prod thor ESP
-											,'prod_dali.br.seisint.com'  // prod dali
+											,'uspr-prod-thor-esp.risk.regn.net'  // prod thor ESP
+											,'uspr-prod-thor-dali.risk.regn.net'  // prod dali
 											,'thor400_44'  // different cluster
 											,'8010' 
 											,'dev' // prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile

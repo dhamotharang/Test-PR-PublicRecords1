@@ -1,4 +1,4 @@
-export DateCleaner := MODULE
+﻿export DateCleaner := MODULE
 
 import lib_date;
 import lib_stringlib, ut;
@@ -28,6 +28,12 @@ END;
 export ISOToUS(string date) := FUNCTION
 	d := StringLib.StringFilterOut(date, '-');
 	return IF(date='', '', d[5..6] + '/' + d[7..8] + '/' + d[1..4]);
+END;
+
+// convert ISO (mm-dd-yyyy) to US (mm/dd/yyyy)
+export FromISOToUS(string date) := FUNCTION
+	d := StringLib.StringFilterOut(date, '-');
+	return IF(date='', '', d[1..2] + '/' + d[3..4] + '/' + d[5..8]);
 END;
 
 // converts from dd-MMM-yy

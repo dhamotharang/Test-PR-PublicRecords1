@@ -1,3 +1,13 @@
-IMPORT ut, std, prte2;
+﻿IMPORT prte2;
 
-EXPORT fSpray := prte2.SprayFiles.Spray_Raw_Data('IRSKeys','','irs5500');
+EXPORT fspray := FUNCTION
+
+RETURN Sequential(
+       prte2.SprayFiles.Spray_Raw_Data('irskeys__boca__', 'boca', 'irskeys'),
+
+       prte2.SprayFiles.Spray_Raw_Data('irskeys__alpha__', 'alpha', 'irskeys')
+       ); 
+					
+END;
+
+

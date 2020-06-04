@@ -1,4 +1,4 @@
-Import paw,BIPV2;
+﻿Import paw,BIPV2;
 EXPORT files := module
 
 	EXPORT paw_basefile := DATASET('~PRTE::BASE::paw', Layouts.Layout_Base, FLAT );
@@ -86,7 +86,7 @@ EXPORT files := module
 								Layouts.Employment_Out_BIPv2,
 								self	:= left;
 							));
-	File_To_Process_To_Key_	:= file_keybuild(contact_id > 0);
+	File_To_Process_To_Key_	:= dbaseBIP(contact_id > 0);
 	File_To_Process_To_Key 	:= project(File_To_Process_To_Key_, {recordof(File_To_Process_To_Key_), BIPV2.IDlayouts.l_xlink_ids});
 
 	recordof(File_To_Process_To_Key) JoinForLinkIds	(File_To_Process_To_Key l, dbaseBip r)	:=	transform

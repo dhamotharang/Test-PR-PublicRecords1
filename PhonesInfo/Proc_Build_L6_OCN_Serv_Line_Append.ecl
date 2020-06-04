@@ -42,7 +42,7 @@ EXPORT Proc_Build_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	
 	emailTarget						:= _control.MyInfo.EmailAddressNotify + emailDev;
 	emailBuildNotice 			:= if(count(PhonesInfo.File_Lerg.Lerg6UpdPhone(phone<>'')) > 0
-																		,fileservices.SendEmail(emailTarget, 'Phones Info: Lerg6 OCN/Serv/Line Append File', 'Phones Info: Lerg6 OCN/Serv/Line Append File Is Now Available.  Please see: ' + 'http://prod_esp.br.seisint.com:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																		,fileservices.SendEmail(emailTarget, 'Phones Info: Lerg6 OCN/Serv/Line Append File', 'Phones Info: Lerg6 OCN/Serv/Line Append File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																		,fileservices.SendEmail(emailTarget, 'Phones Info: Lerg6 OCN/Serv/Line Append File', 'There Were No Lerg6 OCN/Serv/Line Append Records In This Build')
 																		);		
 	

@@ -1,4 +1,4 @@
-﻿IMPORT AID, ut, NID, codes, Address;
+﻿IMPORT AID, ut, NID, codes, Address, Scrubs;
 
 EXPORT Standardize_NameAddr := MODULE	
 
@@ -12,25 +12,25 @@ EXPORT Standardize_NameAddr := MODULE
 		sendRecs		:= pPreProcessInput(trim(first_name + middle_name + surname) <> '');
 		notSendRecs := pPreProcessInput(trim(first_name + middle_name + surname) = '');
 
+
 		NID.Mac_CleanParsedNames(PROJECT(sendRecs, Infutor_NARB.Layouts.Base) 
 																		,NID_output
-																		,first_name ,middle_name ,surname,suffix);	
-		
+																		,first_name ,middle_name ,surname,suffix);
+																		
 		Infutor_NARB.Layouts.Base tCleanPers(NID_output L) := TRANSFORM
 			SELF.title		    := if(L.nameType in ['P','D'], L.cln_title,  '');
 			SELF.fname	      := if(L.nameType in ['P','D'], L.cln_fname,  '');
 			SELF.mname	      := if(L.nameType in ['P','D'], L.cln_mname,  '');
 			SELF.lname		    := if(L.nameType in ['P','D'], L.cln_lname,  '');
 			SELF.name_suffix	:= if(L.nameType in ['P','D'], L.cln_suffix, '');
-			SELF										            := L;			
+			SELF							:= L;			
 		END;
 		
-		dStandardizedPerson := project(NID_output, tCleanPers(LEFT)) + notSendRecs : INDEPENDENT;
-	
+		dStandardizedPerson := project(NID_output, tCleanPers(LEFT)) + notSendRecs : INDEPENDENT;	
 		
 		// -- Mapping Clean company name and clean phone numbers
-  	Infutor_NARB.Layouts.Base tMapCleanCompanyName(dStandardizedPerson L) := TRANSFORM
-   	  
+	  // -- Validates Sic Codes, if invalid the field is set to null
+  	Infutor_NARB.Layouts.Base tMapCleanCompanyName(dStandardizedPerson L) := TRANSFORM   	  
 			InvalidNames  := '\\| NONE$|\\| N/A$|\\|$|\\| $';
 			SELF.clean_company_name := REGEXREPLACE(InvalidNames,ut.CleanSpacesAndUpper(L.normCompany_Name),'');
 			
@@ -42,11 +42,16 @@ EXPORT Standardize_NameAddr := MODULE
 																					 '6666666','6666666666','7777777','7777777777',
 																					 '8888888','8888888888','9999999','9999999999']
 																		,ut.CleanPhone(L.normCompany_Phone) ,'');
-			SELF								  := L;			
+			SELF.SIC1					      := If(Scrubs.fn_valid_SicCode(l.SIC1) = 1,ut.CleanSpacesAndUpper(l.SIC1),'');
+			SELF.SIC2					      := If(Scrubs.fn_valid_SicCode(l.SIC2) = 1,ut.CleanSpacesAndUpper(l.SIC2),'');
+			SELF.SIC3					      := If(Scrubs.fn_valid_SicCode(l.SIC3) = 1,ut.CleanSpacesAndUpper(l.SIC3),'');
+			SELF.SIC4					      := If(Scrubs.fn_valid_SicCode(l.SIC4) = 1,ut.CleanSpacesAndUpper(l.SIC4),'');
+			SELF.SIC5					      := If(Scrubs.fn_valid_SicCode(l.SIC5) = 1,ut.CleanSpacesAndUpper(l.SIC5),'');
+			SELF								    := L;			
 		END;
 		
 		dStandardizedNames := project(dStandardizedPerson, tMapCleanCompanyName(LEFT))(REGEXFIND('\\|', clean_company_name) = false) : INDEPENDENT;
-			
+		
 		RETURN dStandardizedNames;
 
 	END;  //End fStandardizeNamesPhone
@@ -148,9 +153,9 @@ EXPORT Standardize_NameAddr := MODULE
 							,STRING pversion
 							,STRING pPersistname = Infutor_NARB.Persistnames().StandardizeNameAddr) := FUNCTION
 
-  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile);			 
+  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile) : PERSIST(pPersistname +'::standard::name', REFRESH(TRUE), SINGLE);			 
 								 
-		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : PERSIST(pPersistname);		
+		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : PERSIST(pPersistname, REFRESH(TRUE), SINGLE);		
 		
 		RETURN dStandardizeAddr;
 	

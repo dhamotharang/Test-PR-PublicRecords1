@@ -21,10 +21,10 @@ recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 											   trim(le.append_prior_area_code, all)	 + ', ' + trim(ri.append_prior_area_code, all)	);
 	
 	self.DateFirstSeen					:= ut.EarliestDate(le.DateFirstSeen, ri.DateFirstSeen);
-	self.DateLastSeen					:= ut.LatestDate(le.DateLastSeen, ri.DateLastSeen);
-	self.DateVendorLastReported		:= ut.LatestDate(le.DateVendorLastReported, ri.DateVendorLastReported);
+	self.DateLastSeen					:= MAX(le.DateLastSeen, ri.DateLastSeen);
+	self.DateVendorLastReported		:= MAX(le.DateVendorLastReported, ri.DateVendorLastReported);
 	self.DateVendorFirstReported		:= ut.EarliestDate(le.DateVendorFirstReported, ri.DateVendorFirstReported);
-	self.dt_nonglb_last_seen			:= ut.LatestDate(le.dt_nonglb_last_seen, ri.dt_nonglb_last_seen);
+	self.dt_nonglb_last_seen			:= MAX(le.dt_nonglb_last_seen, ri.dt_nonglb_last_seen);
 	//glb_dppa_flag     G=GLB, D=DPPA, B=Both, ''=Neither, 'U'=Utility	
 	self.glb_dppa_flag					:= if(glb_priority(le.glb_dppa_flag) < glb_priority(ri.glb_dppa_flag), le.glb_dppa_flag,ri.glb_dppa_flag);
 	self.glb_dppa_all					:= if(stringlib.stringContains(trim(le.glb_dppa_all, all), trim(ri.glb_dppa_flag, all),  true), trim(le.glb_dppa_all, all),  trim(le.glb_dppa_all + ri.glb_dppa_flag, all));
@@ -32,7 +32,7 @@ recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 	//If the source is different add 1 to the counter
 	self.src_cnt						:= if(le.src_all | ri.src_all  = le.src_all, le.src_cnt, le.src_cnt + ri.src_cnt);
 	self.append_total_source_conf       := if(le.src_all | ri.src_all  = le.src_all, le.append_total_source_conf, le.append_total_source_conf+ ri.append_total_source_conf);
-	self.append_npa_effective_dt		:= ut.LatestDate(le.append_npa_effective_dt, ri.append_npa_effective_dt);
+	self.append_npa_effective_dt		:= MAX(le.append_npa_effective_dt, ri.append_npa_effective_dt);
 	self.npa							:= if(self.append_npa_effective_dt = le.append_npa_effective_dt, le.npa, ri.npa);
 	self.append_npa_last_change_dt		:= if(self.npa = le.npa, le.append_npa_last_change_dt, ri.append_npa_last_change_dt);
 	self.append_dialable_ind			:= if(self.npa = le.npa, le.append_dialable_ind, ri.append_dialable_ind);
@@ -52,10 +52,10 @@ recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 	self.orig_phone_usage				:= if(stringlib.stringContains(trim(le.orig_phone_usage, all), trim(ri.orig_phone_usage, all), true) ,trim(le.orig_phone_usage, all), trim(le.orig_phone_usage + ri.orig_phone_usage, all));
 	self.orig_conf_score				:= if(stringlib.stringContains(trim(le.orig_conf_score, all),  trim(ri.orig_conf_score, all), true), trim(le.orig_conf_score, all),  trim(le.orig_conf_score + ri.orig_conf_score, all));	
 	self.min_orig_conf_score 			:= ut.Min2(le.min_orig_conf_score, ri.min_orig_conf_score);
-	self.max_orig_conf_score 			:= ut.Max2(le.max_orig_conf_score, ri.max_orig_conf_score);
-	self.cur_orig_conf_score			:= ut.Max2(le.cur_orig_conf_score, ri.cur_orig_conf_score);
+	self.max_orig_conf_score 			:= MAX(le.max_orig_conf_score, ri.max_orig_conf_score);
+	self.cur_orig_conf_score			:= MAX(le.cur_orig_conf_score, ri.cur_orig_conf_score);
 	self.append_min_source_conf			:= ut.Min2(le.append_min_source_conf, ri.append_min_source_conf);
-	self.append_max_source_conf 		:= ut.Max2(le.append_max_source_conf , ri.append_max_source_conf );
+	self.append_max_source_conf 		:= MAX(le.append_max_source_conf , ri.append_max_source_conf );
 	self.rules := le.rules | ri.rules;
 	self := le;
 end;

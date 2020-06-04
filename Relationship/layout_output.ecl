@@ -51,16 +51,16 @@ export iter := RECORD
   integer2 comarriagedivorce_cnt;
   integer2 coucc_score;
   integer2 coucc_cnt;
-  integer2 coclue_score;
-  integer2 coclue_cnt;
-  integer2 cocc_score;
-  integer2 cocc_cnt;
+	integer2 coclue_score;
+	integer2 coclue_cnt;
+	integer2 cocc_score;
+	integer2 cocc_cnt;
   integer2 lname_score;
   integer2 phone_score;
   integer2 dl_nbr_score;
   unsigned2 total_cnt;
   integer2 total_score;
- END;
+ end;
  
 export final := record
 	 string15 type;
@@ -86,10 +86,10 @@ export final := record
 	 string9   ssn2;
 	 unsigned4 dob1;
 	 unsigned4 dob2;
-	 string28 current_lname1,
-	 string28 current_lname2,
-	 string28 early_lname1,
-	 string28 early_lname2,
+	 string28 current_lname1;
+	 string28 current_lname2;
+	 string28 early_lname1;
+	 string28 early_lname2;
 	 string2 addr_ind1;
 	 string2 addr_ind2;
 	 unsigned6 r2rdid;
@@ -103,13 +103,16 @@ export final := record
  
 export titled := record
    final;
-	 unsigned1 title,
+	 unsigned1 title;
+	 /*----CCPA Fields------*/
+	 unsigned4 GLOBAL_SID;
+	 unsigned8 RECORD_SID;
  end;
  
 export relTypeRec := record
 		string rel_type;
 		integer2 score;
-		integer2 cnt
+		integer2 cnt;
  end;
 
 export normedRelTypeRec := record
@@ -159,7 +162,10 @@ export key := record
 	boolean Personal;
 	boolean Business;
 	boolean Other;
-	unsigned1 title
+	unsigned1 title;
+	/*----CCPA Fields------*/
+	unsigned4 GLOBAL_SID;
+	unsigned8 RECORD_SID;
  end;
  
  END;

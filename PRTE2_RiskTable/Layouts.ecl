@@ -1,4 +1,4 @@
-import header;
+﻿import header, PRTE2;
 EXPORT Layouts := module
 
 	EXPORT layout_counts := RECORD
@@ -24,6 +24,7 @@ EXPORT Layouts := module
 		integer confidence_score;
 	end;
 
+//Append CCPA fields
 	export layout_addr_risk := record
 		string10 prim_range;
 		string2 predir;
@@ -37,6 +38,7 @@ EXPORT Layouts := module
 		layout_counts en;
 		layout_counts tn;
 		layout_avm;
+		PRTE2.Layouts.DEFLT_CPA;
 	end;
 
 	EXPORT common_adl_risk := RECORD
@@ -120,7 +122,8 @@ EXPORT Layouts := module
 		string20 decs_first;
 		unsigned6 deathDid;
 	END;
-
+	
+//Append CCPA fields
 	export final_rec := RECORD
 		STRING9 ssn;
 		unsigned3 official_first_seen;
@@ -134,6 +137,7 @@ EXPORT Layouts := module
 		common_rec eq;
 		common_rec en;
 		common_rec tn;
+		PRTE2.Layouts.DEFLT_CPA;
 	END;
 
 	common_rec := RECORD
@@ -159,6 +163,7 @@ EXPORT Layouts := module
 		lname_var lname4;
 	END;
 
+//Append CCPA fields
 	export final_rec_v4 := RECORD
 		STRING9 ssn;
 		unsigned3 official_first_seen;
@@ -179,6 +184,7 @@ EXPORT Layouts := module
 		common_rec eq;
 		common_rec en;
 		common_rec tn;
+		PRTE2.Layouts.DEFLT_CPA;
 	END;
 
 

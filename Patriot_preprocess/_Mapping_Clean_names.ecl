@@ -1,5 +1,5 @@
-
-import nid, patriot, address, std;
+﻿
+import _control, mdr, nid, patriot, address, std;
 
 EXPORT _Mapping_Clean_names(string filedate) := FUNCTION
 
@@ -191,7 +191,9 @@ end;
 
 remove_entity_flag := PROJECT(a,tr_remove_entity_flag(left));
 
-ds_out := output(remove_entity_flag,,'~thor_data400::in::patriot_file_' + filedate,overwrite);
+addGlobalSID			 := mdr.macGetGlobalSID(remove_entity_flag, 'Patriot', 'source', 'global_sid'); //DF-26190: Populate Global_SID
+
+ds_out := output(addGlobalSID,,'~thor_data400::in::patriot_file_' + filedate,overwrite);
 
 RETURN  ds_out; 
 

@@ -1,10 +1,12 @@
 ﻿EXPORT Layout_VehIncidents := MODULE
 
 	EXPORT SlimIncidents := record
-		STRING40		accident_nbr;
-	 STRING11 		vehicle_incident_id;
+	 STRING40		accident_nbr;
+	 STRING14 		vehicle_incident_id;
 	 STRING8 		Sent_to_HPCC_DateTime;
 	 STRING11 		agency_id;
+	 //PR Recon COPPR-49
+	 BOOLEAN is_Terminated_Agency;
 	 STRING4 		report_code;
 	 STRING11 		Report_ID;
 	 STRING4 		jurisdiction_state;
@@ -13,31 +15,24 @@
 	 STRING4 		report_type_id;
 	 STRING4 		Work_Type_ID;
 	 STRING9 		CRU_Order_ID;
-		STRING11 		vehicle_incident_id_latest;
-		STRING11 		jurisdiction_nbr;
-		STRING9 		ORI_Number;
-		STRING50 		Crash_City;
-		STRING100 	Loss_Street;
-		STRING100 	Loss_Cross_Street;
+	 STRING14 		vehicle_incident_id_latest;
+	 STRING11 		jurisdiction_nbr;
+	 STRING9 		ORI_Number;
+	 STRING50 		Crash_City;
+	 STRING100 	Loss_Street;
+	 STRING100 	Loss_Cross_Street;
 	END;
-
-	EXPORT CmbndLayout := record
-		SlimIncidents;
-		STRING30 		vin;
-		STRING12 		tag_nbr;
-		STRING20 		fname;
-	 STRING20 		mname;
-	 STRING20 		lname;
-		STRING100 	Person_Type;
-		STRING10 		Date_of_Birth;
-		STRING3 		Unit_Number;
-	END;
+	
+	enum_code_desc := RECORD
+   STRING50 code;
+   STRING50 description;
+  END;
 
 	EXPORT MeowLayout := RECORD
 		UNSIGNED6 	idfield;
 		UNSIGNED6 	rid;
-		STRING2				report_code;
-		STRING11 			vehicle_incident_id;
+		STRING4				report_code;
+		STRING14 			vehicle_incident_id;
 		STRING1 			vehicle_status;
 		STRING100 		accident_street;
 		STRING100 		accident_cross_street;
@@ -112,6 +107,52 @@
 		//CrashLogic Release4
     STRING1 releasable;
     BOOLEAN flag_for_delete;
+		//PRtCC new fields
+		STRING7 citation_issued;
+		STRING7 citation_type;
+		STRING100 citation_detail1;		
+	  //CR-1237
+	  STRING64 citation_status; 		
+		STRING60 violation_code1;
+		STRING60 violation_code2;
+		STRING60 violation_code3;
+		STRING60 violation_code4;
+		STRING1 photographs_taken;
+		STRING100 photographed_by;
+		STRING100 photograph_type;
+		STRING10 posted_satutory_speed_limit;
+		STRING25 safety_equipment_available_or_used;
+		STRING20 ejection;
+		STRING40 safety_equipment_helmet;
+		STRING60 transported_to;
+		STRING20 dispatch_time;
+		STRING1 ready_to_sell_data;
+		//PRtcc enum fields
+		DATASET(enum_code_desc) report_weather_condition;
+		DATASET(enum_code_desc) report_road_condition;
+		DATASET(enum_code_desc) report_injury_status;
+		DATASET(enum_code_desc) report_contributing_circumstances_v;
+	  DATASET(enum_code_desc) Alcohol_Drug_Use;
+		DATASET(enum_code_desc) alcohol_drug_test_given;
+		DATASET(enum_code_desc) alcohol_test_status;
+		DATASET(enum_code_desc) alcohol_test_type;
+		DATASET(enum_code_desc) alcohol_drug_test_type;
+		DATASET(enum_code_desc) drug_test_type;
+		DATASET(enum_code_desc) driver_distracted_by;
+		DATASET(enum_code_desc) safety_equipment_restraint1;
+		DATASET(enum_code_desc) condition_at_time_of_crash;
+		DATASET(enum_code_desc) drug_use_suspected;
+		DATASET(enum_code_desc) alcohol_use_suspected;
+		DATASET(enum_code_desc) drug_test_status;
+		DATASET(enum_code_desc) report_contributing_circumstances_p;
+		DATASET(enum_code_desc) driver_actions_at_time_of_crash;
+		DATASET(enum_code_desc) prior_nonmotorist_action;
+		DATASET(enum_code_desc) non_motorist_actions_at_time_of_crash;
+		DATASET(enum_code_desc) pedestrian_actions_at_time_of_crash;
+		DATASET(enum_code_desc) pedalcyclist_actions_at_time_of_crash;
+		DATASET(enum_code_desc) passenger_actions_at_time_of_crash;
+	  //CR-1237		
+	  DATASET(enum_code_desc) marijuana_use_suspected;
 		UNSIGNED8 	__internal_fpos__;
 	END;
 

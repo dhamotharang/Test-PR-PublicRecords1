@@ -1,4 +1,4 @@
-import Business_Header_SS,Business_Header,ut,BIPV2_Files;
+﻿import Business_Header_SS,Business_Header,ut,BIPV2_Files,BizLinkFull;
 
 EXPORT mod_XLink := 
 MODULE
@@ -53,7 +53,6 @@ if(
 
 
 // ******* START BIP
-
 Business_Header_SS.MAC_Match_Flex
 (
 	 ds
@@ -85,7 +84,7 @@ Business_Header_SS.MAC_Match_Flex
 	,lname			
 	,												//,contact_ssn					  = ''
 	,src/*change to sub_source when available!*/												//,source					        = ''
-	,src_rcid												//,source_record_id				= ''
+	// ,src_rcid												//,source_record_id				= ''
 )
 
 outfile_v2_p := outfile_v2_0 ;//: persist('~thor_data400::cemtemp::outfile_v2');

@@ -1,11 +1,17 @@
-﻿import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra, BIPV2;
+﻿import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra, BIPV2; 
 
 export Key_rmsid_party (boolean  IsFCRA = false) := function
 
 		KeyName       := cluster.cluster_out+'Key::ucc::';
 		
 		dMain					:= dedup(sort(distribute(File_UCC_Main_Base_FCRA,hash(tmsid,rmsid)),tmsid,rmsid,local),tmsid,rmsid,local);
-		dPartyDist		:= distribute(UCCV2.File_UCC_Party_Base_FCRA.Party_Base_AID,hash(tmsid,rmsid));
+		dPartyDist		:= project(distribute(UCCV2.File_UCC_Party_Base_FCRA.Party_Base_AID,hash(tmsid,rmsid)),
+																				transform(Layout_UCC_Common.Layout_Party_With_AID,
+																									self.dt_vendor_last_reported  := (unsigned6)(string)left.dt_vendor_last_reported[1..6];
+																									self.dt_vendor_first_reported := (unsigned6)(string)left.dt_vendor_first_reported[1..6];
+																									self := left;
+																									self := [];
+																									));
 		
 		Layout_Party_linkids := record
 		uccv2.Layout_UCC_Common.Layout_Party_with_aid-source_rec_id-prep_addr_line1-prep_addr_last_line-rawaid-aceaid;

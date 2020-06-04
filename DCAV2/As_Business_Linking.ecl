@@ -1,9 +1,10 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 IMPORT Business_Header, ut, address,mdr,_Validate;
 
 export As_Business_Linking(boolean pUseOtherEnviron = _Constants().IsDataland
 	,dataset(layouts.Base.contacts)	 pContactBase		= files(,pUseOtherEnviron).base.contacts.qa
 	,dataset(layouts.Base.companies) pCompaniesBase	= files(,pUseOtherEnviron).base.companies.qa
+	,boolean isPersist = true
 			   ):= function			 
 
 	//*************************************************************************
@@ -208,6 +209,10 @@ export As_Business_Linking(boolean pUseOtherEnviron = _Constants().IsDataland
 		self.match_branch_city 					 			:= ''; //Not available
 		self.match_geo_city							 			:= ''; //Not available	
 		self.rcid 											      := 0;	 //Not available	
+		string temp_emp_count                 := if(trim(l.rawfields.emp_num) = '0','',trim(l.rawfields.emp_num));
+		string temp_revenue                   := if(trim(l.rawfields.sales) = '0','',trim(l.rawfields.sales));
+    self.employee_count_local_raw         := temp_emp_count;
+		self.revenue_local_raw                := temp_revenue;
 		self																	:= l;
 		self																	:= [];
 	END;
@@ -346,9 +351,18 @@ export As_Business_Linking(boolean pUseOtherEnviron = _Constants().IsDataland
 						left.contact_name.lname=right.contact_name.lname,x9(left,right),local);
 	 
 	 concat      := j1+j2;
-	 concat_dupd := dedup(project(concat(company_name<>''),Business_Header.Layout_Business_Linking.Linking_Interface),
+	 // concat_dupd := dedup(project(concat(company_name<>''),Business_Header.Layout_Business_Linking.Linking_Interface),
+											// except contact_name.name_score,company_rawaid,all)
+										 // : persist(dcav2.persistnames().root + 'As_Business_Linking');
+										 
+	 concat_persist := dedup(project(concat(company_name<>''),Business_Header.Layout_Business_Linking.Linking_Interface),
 											except contact_name.name_score,company_rawaid,all)
 										 : persist(dcav2.persistnames().root + 'As_Business_Linking');
+										 
+	 concat_nopersist := dedup(project(concat(company_name<>''),Business_Header.Layout_Business_Linking.Linking_Interface),
+											except contact_name.name_score,company_rawaid,all);								 
+								
+   concat_dupd := if(isPersist, concat_persist, concat_nopersist);								
 								
 	return concat_dupd;
 	

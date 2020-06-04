@@ -1,8 +1,11 @@
 // based on chuckjensen.Key_Nbr_Address_UID
 
-import doxie,Data_Services, dx_Header;
+import doxie,Data_Services, dx_Header,header;
 
-export data_key_nbr_headers_uid := PROJECT (doxie.nbr_headers, dx_Header.layouts.i_nbr_uid);
+nbr_pre_ccpa_compliance := PROJECT (doxie.nbr_headers, TRANSFORM(dx_Header.layouts.i_nbr_uid,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
+nbr_wth_ccpa_compliance := header.fn_suppress_ccpa(nbr_pre_ccpa_compliance,true);
+
+export data_key_nbr_headers_uid := nbr_wth_ccpa_compliance;
 // index(
 // 	doxie.nbr_headers,																												// baserecset
 // 	{zip,prim_name,suffix,predir,postdir,uid},																// keys

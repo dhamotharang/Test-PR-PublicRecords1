@@ -1,8 +1,9 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
 EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDataland
 														,dataset(layouts.Base) pBase 	= files().base.qa(company_name<>'')
+	                          ,boolean IsPersist = true
 													  ) := function
 			//COMPANY MAPPING
 		business_header.layout_business_linking.linking_interface	trfMapBLInterface(layouts.Base l,unsigned8 ctr):= transform	,skip(ctr=2 and trim(l.Clean_DBA_Name)='')
@@ -43,12 +44,12 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 				self.company_address.msa         := l.msa;
 				self.company_address.geo_lat     := l.geo_lat;
 				self.company_address.geo_long    := l.geo_long;
-				self.company_url								 := trim(l.url,left,right);
-				self.dt_first_seen               := (unsigned4)l.dt_first_seen;
-				self.dt_last_seen                := (unsigned4)l.dt_last_seen;
+				self.company_url								 := trim(l.url,left,right);								 
+				self.dt_first_seen               := (unsigned4)l.Last_Experian_Inquiry_Date;				
+				self.dt_last_seen                := (unsigned4)l.Last_Experian_Inquiry_Date;
 				self.dt_vendor_first_reported    := (unsigned4)l.dt_vendor_first_reported;
 				self.dt_vendor_last_reported     := (unsigned4)l.dt_vendor_last_reported;			
-				self.contact_job_title_raw			 := l.Executive_Title; //Raw vendor data or vendorÂ’s field name - Examples: CHIEF EXECUTIVE
+				self.contact_job_title_raw			 := l.Executive_Title; //Raw vendor data or vendors field name - Examples: CHIEF EXECUTIVE
 				self.contact_name.title          := l.title;
 				self.contact_name.fname          := l.fname;
 				self.contact_name.mname          := l.mname;
@@ -57,6 +58,10 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 				self.contact_name.name_score     := Business_Header.CleanName(l.fname, l.mname, l.lname, l.name_suffix)[142];
 				self.current					           := true;
 				self.dppa						             := false;
+				string temp_employees            := if(trim(l.estimated_number_of_employees) != '0',trim(l.estimated_number_of_employees),'');
+				string sales_sign                := if(trim(l.estimated_annual_sales_amount_sign) = '-',trim(l.estimated_annual_sales_amount_sign),'');
+		    self.employee_count_local_raw    := if(temp_employees != '0', temp_employees, '');
+				self.revenue_local_raw           := if((STRING)((INTEGER)(l.estimated_annual_sales_amount)) != '0',sales_sign + trim(l.estimated_annual_sales_amount),'');
 				self 							   						 := l;
 				self 							   						 := [];
 		end;											
@@ -76,7 +81,7 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 			self 													:= l;			
 	  end;
 		
-		from_Experian_CRDB_rollup    := rollup(from_Experian_CRDB_sort,
+		from_Experian_CRDB_rollup_persist    := rollup(from_Experian_CRDB_sort,
 																							    left.vl_id 							  				= right.vl_id
 																			and         left.company_name	  						  = right.company_name
 																			and(  (     left.company_address.zip			    =	right.company_address.zip 
@@ -97,5 +102,32 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 																					     and left.contact_name.lname   				= right.contact_name.lname
 																					     and left.contact_job_title_raw 			= right.contact_job_title_raw
 														              ),x4(left,right),local)	: persist(Experian_CRDB.persistnames().root + '::As_Business_Linking');
+																					
+		
+		from_Experian_CRDB_rollup_nopersist    := rollup(from_Experian_CRDB_sort,
+																							    left.vl_id 							  				= right.vl_id
+																			and         left.company_name	  						  = right.company_name
+																			and(  (     left.company_address.zip			    =	right.company_address.zip 
+																							and left.company_address.prim_name    =	right.company_address.prim_name 
+																							and left.company_address.prim_range   = right.company_address.prim_range
+																							and left.company_address.v_city_name  = right.company_address.v_city_name
+																							and left.company_address.st           = right.company_address.st
+																						 )      		OR 
+																						 (     right.company_address.zip				='' 
+																						   and right.company_address.prim_name  ='' 
+																							 and right.company_address.prim_range	='' 
+																							 and right.company_address.v_city_name='' 
+																							 and right.company_address.st					=''
+																						  )
+											                    )
+																	 	   and(        left.contact_name.fname					= right.contact_name.fname
+																					     and left.contact_name.mname    			= right.contact_name.mname
+																					     and left.contact_name.lname   				= right.contact_name.lname
+																					     and left.contact_job_title_raw 			= right.contact_job_title_raw
+														              ),x4(left,right),local);	
+																					
+		from_Experian_CRDB_rollup := if(IsPersist, from_Experian_CRDB_rollup_persist, from_Experian_CRDB_rollup_nopersist);																			
+																					
 		return from_Experian_CRDB_rollup;
+		
 end;

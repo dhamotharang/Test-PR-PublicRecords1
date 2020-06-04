@@ -1,4 +1,4 @@
-import Worldcheck_Bridger, ut;
+﻿import Worldcheck_Bridger, ut;
 
 Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp 
 					xForm_Entity(Layouts.rEntities src) := TRANSFORM
@@ -28,8 +28,8 @@ dXgNamed := JOIN(dXg, DowJones.ExtractNames(NameType='Primary Name'), LEFT.id = 
 		self := LEFT;),
 								LEFT OUTER, NOSORT, KEEP(1), LOCAL);
 							
-
-dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
+akanames := $.Functions.RollupNames;
+dXg1 := JOIN(dXgNamed, akanames, LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.aka_list.aka := RIGHT.aka;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
@@ -53,7 +53,8 @@ dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
 						self.additional_info_list.additionalinfo := RIGHT.additionalinfo;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
 
-	dXg3 := JOIN(dXg2, DowJones.Functions.GetIdsAsIdlist,LEFT.id = RIGHT.ID,
+	IdList := $.Functions.GetIdsAsIdlist;
+	dXg3 := JOIN(dXg2, IdList,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.identification_list.identification := RIGHT.identification;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
@@ -84,4 +85,12 @@ dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
 						self.reason_listed := RIGHT.description;
 						SELF := LEFT;), INNER, LOCAL);		
 
-EXPORT MakeEntities := dXg6;
+// limit child datasets to 256 entries
+maxn := 256;
+maxAka := 255;		// because the primary name is part of the count
+EXPORT MakeEntities := PROJECT(dXg6, TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
+						self.aka_list.aka := CHOOSEN(left.aka_list.aka, maxAka);
+						self.additional_info_list.additionalinfo := CHOOSEN(left.additional_info_list.additionalinfo,maxn);
+						self.identification_list.identification := CHOOSEN(left.identification_list.identification,maxn);
+						self.address_list.address := CHOOSEN(left.address_list.address,maxn);
+						self := Left;));

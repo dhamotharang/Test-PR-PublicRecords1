@@ -229,5 +229,6 @@ export file_in_defendant
 	:= remove_companies((StateCode not in ['AZ','AK', 'OR']) or 
 								(StateCode in ['AZ','AK'] and defendantstatus in ['','DEFENDANT'] and (trim(lastname, left, right)<>'PARKING' and regexfind('[0-9][0-9]+', trim(firstname, left, right)[1..2], 0)='')) or 
 								(StateCode in ['OR'] and regexfind('DEFENDANT', defendantstatus, 0)<>'' and sourcename='OREGON_ADMINISTRATOR_OF_THE_COURTS_APPELLATE_CASE_MANAGEMENT_SYSTEM') or 
-								(StateCode in ['OR'] and defendantstatus ='' and sourcename='OREGON_ADMINISTRATOR_OF_THE_COURTS')
+								(StateCode in ['OR'] and defendantstatus ='' and sourcename='OREGON_ADMINISTRATOR_OF_THE_COURTS') or
+								(StateCode in ['OR'] and sourcename='OR ADMINISTRATIVE OFFICE OF COURTS (OECI)_IE')  // added by tp
 								):persist('~thor200_144::persist::in::crim::aoc_defendant_filtered');/*(StateCode in _include_states and defendantstatus='DEFENDANT')*//*(sourcetype in _control.keep_sourcetypes and sourcename not in _control.discard_sourcenames)*/;

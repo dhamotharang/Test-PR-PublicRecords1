@@ -23,7 +23,7 @@ fcra_all					:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit
 /////////////////////////////////////////////////////////////
 	
 	fcra_filtered removeInfo(fcra_filtered l):= transform
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
@@ -368,8 +368,12 @@ corrections.layout_offender RemF(dCrimOffender2FixedReady l):= transform
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-  PromoteSupers.MAC_SF_BuildProcess(NonFCRA_records_dedup,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);
-	PromoteSupers.MAC_SF_BuildProcess(FCRA_records_dedup,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);			 
+  deduped_NonFCRAPID := dedup(sort(distribute(NonFCRA_records_dedup,HASH(offender_persistent_id)),offender_persistent_id,-src_upload_date,local),offender_persistent_id,local);
+  deduped_FCRAPID :=    dedup(sort(distribute(FCRA_records_dedup,HASH(offender_persistent_id)),offender_persistent_id,-src_upload_date,local),offender_persistent_id,local);
+  
+
+  PromoteSupers.MAC_SF_BuildProcess(deduped_NonFCRAPID,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);
+	PromoteSupers.MAC_SF_BuildProcess(deduped_FCRAPID,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);			 
 	PromoteSupers.MAC_SF_BuildProcess(hygenics_crim.File_AddressCacheInput,'~thor_data400::base::crim::address_cache_' + doxie_build.buildstate, outOffnd3, 2,,TRUE);
 							 
 export Out_Offender := sequential(

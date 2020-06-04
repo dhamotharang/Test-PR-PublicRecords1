@@ -50,6 +50,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.addr_suffix				:= input.suffix;
 	self.ace_fips_county			:= input.county;
   self.Dob                   := (string8)input.dob;
+	self.source				:= input.src; //DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784	
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

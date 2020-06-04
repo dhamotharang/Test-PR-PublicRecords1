@@ -5,11 +5,10 @@ Base := Infutor_NARB.Files().base.qa;
 Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
 Industry_Layout	MapIndustry (Base L, INTEGER C)	:=	TRANSFORM,
-SKIP((C = 2 AND L.sic2[1..4] in ['',L.sic1[1..4] ])                           OR
-     (C = 3 AND L.sic3[1..4] in ['',L.sic1[1..4],L.sic2[1..4] ])              OR
-     (C = 4 AND L.sic4[1..4] in ['',L.sic1[1..4],L.sic2[1..4],L.sic3[1..4] ]) OR
-     (C = 5 AND L.sic5[1..4] in ['',L.sic1[1..4],L.sic2[1..4],L.sic3[1..4],L.sic4[1..4] ]))
-	
+SKIP((C = 2 AND L.sic2 in ['',L.sic1 ])                           OR
+     (C = 3 AND L.sic3 in ['',L.sic1,L.sic2 ])              OR
+     (C = 4 AND L.sic4 in ['',L.sic1,L.sic2,L.sic3 ]) OR
+     (C = 5 AND L.sic5 in ['',L.sic1,L.sic2,L.sic3,L.sic4 ]))	
   SELF.bdid 										:=	0;
 	SELF.bdid_score								:=	0;
 	SELF.UltID										:=	L.UltID;
@@ -42,7 +41,7 @@ SKIP((C = 2 AND L.sic2[1..4] in ['',L.sic1[1..4] ])                           OR
 	SELF.source       						:=	mdr.sourcetools.src_infutor_narb;
 	SELF.source_docid  						:=	trim(L.pid) + trim(L.record_id);
 	SELF.source_rec_id            :=  L.rcid;
-	SELF.siccode       						:=	CHOOSE(C, L.sic1[1..4], L.sic2[1..4], L.sic3[1..4], L.sic4[1..4], L.sic5[1..4]);
+	SELF.siccode       						:=	CHOOSE(C, L.sic1, L.sic2, L.sic3, L.sic4, L.sic5);
 	SELF.industry_description 		:=	CHOOSE(C, L.heading1, L.heading2, L.heading3, L.heading4, L.heading5);
 	SELF.naics        						:=	'';
 	SELF.business_description 		:=	'';

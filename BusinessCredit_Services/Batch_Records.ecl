@@ -1,9 +1,12 @@
-IMPORT BIPV2,BIPV2_Best,BIPV2_Best_SBFE,Business_Credit,
-       BusinessCredit_Services,Business_Risk_BIP,Codes;
+﻿IMPORT BIPV2,BIPV2_Best,BIPV2_Best_SBFE,Business_Credit,
+       BusinessCredit_Services,Business_Risk_BIP,Codes,doxie;
 
 EXPORT Batch_Records( DATASET(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed) ds_BatchIn,
 															BusinessCredit_Services.Iparam.BatchParams inMod) :=
 FUNCTION
+
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
+  
   // Get links ids for the search criteria
   // Format to BIP search layout
   BIPV2.IDfunctions.rec_SearchInput tFormat2SearchInput(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed pInput) := TRANSFORM
@@ -44,11 +47,8 @@ FUNCTION
 	// Dedup within acctno
 	ds_linkidsMaskedDedup := DEDUP(SORT(ds_linkidsMasked,acctno,#expand(BIPV2.IDmacros.mac_ListAllLinkids())),acctno,#expand(BIPV2.IDmacros.mac_ListAllLinkids()));
 	
-	// Restrict max records from search per acctno
-	ds_linkidsPerAcct := UNGROUP(TOPN(GROUP(SORT(ds_linkidsMaskedDedup,acctno,-weight,RECORD),acctno),inMod.MaxSearchResultsPerAcct,acctno));
-	
 	// Project to xlink_ids2 format and dedup accross all acctno
- 	ds_linkidsCombined := DEDUP(PROJECT(ds_linkidsPerAcct,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,SELF := LEFT)),ALL);
+  ds_linkidsCombined := DEDUP(PROJECT(ds_linkidsMaskedDedup,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,SELF := LEFT)),ALL);
 
 	// Get SBFE Best Info, The best has records with proxid of zero which is used when fetch level is u,o or S. 
 	// It also contains non zero proxid records which will be used when p(proxid) fetch level is set.
@@ -75,7 +75,7 @@ FUNCTION
 													,#expand(BIPV2.IDmacros.mac_ListAllLinkids())),
 											ds_SBFEBestRecs);
 											
-	ds_BestRecs_Mask := PROJECT(ds_BestRecs,TRANSFORM(BusinessCredit_Services.Batch_layouts.Batch_Output,
+  ds_BestRecs_Mask := PROJECT(ds_BestRecs,TRANSFORM(BusinessCredit_Services.Batch_layouts.Batch_Output,
 															SELF.UltID := LEFT.UltID,
 															SELF.OrgID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_OrgID_And_Down,  LEFT.OrgID, 0),
 															SELF.SeleID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_SELEID_And_Down, LEFT.SeleID, 0),
@@ -112,22 +112,28 @@ FUNCTION
 															SELF := LEFT,
 															SELF := []));
 	
-	//Get SBFE Header Records, NOTE only keep Account Base Records
-	ds_SBFEAcctRecs	:= Business_Credit.Key_LinkIds().kFetch2(ds_linkidsCombined, inmod.BIPFetchLevel,,inmod.DataPermissionMask)(record_type='AB');
-
-	ds_TradeRecs := BusinessCredit_Services.Batch_Functions.getTradelineInfo(ds_SBFEAcctRecs,inMod);
-	
-	ds_CreditScore := BusinessCredit_Services.Batch_Functions.getCreditScore(ds_linkidsCombined,inMod);
-	
-	// Join to input ids to attach acctno
-  ds_final_best := JOIN(ds_linkidsPerAcct,ds_BestRecs_Mask,
+		// Join to input ids to attach acctno
+  ds_final_best := JOIN(ds_linkidsMaskedDedup,ds_BestRecs_Mask,
 												BIPV2.IDmacros.mac_JoinAllLinkids(),
 												TRANSFORM(BusinessCredit_Services.Batch_layouts.Batch_Output,
 																	SELF := LEFT,
 																	SELF := RIGHT));
 	
-	// Add trade info to output
-  ds_final_trade := JOIN(ds_final_best,ds_TradeRecs,
+	// Restrict max records from search per acctno
+	ds_bestLinkidsPerAcct := UNGROUP(TOPN(GROUP(SORT(ds_final_best,acctno,source,-weight,RECORD),acctno),inMod.MaxSearchResultsPerAcct,acctno));
+	
+  // TOPN recs to kfetch layout for gleaning sbfe data
+  ds_bestLinkidsPerAcct_kfetchLayout := PROJECT(ds_bestLinkidsPerAcct,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,SELF := LEFT)); 
+  
+  //Get SBFE Header Records, NOTE only keep Account Base Records
+	ds_SBFEAcctRecs	:= Business_Credit.Key_LinkIds().kFetch2(ds_bestLinkidsPerAcct_kfetchLayout, mod_access, inmod.BIPFetchLevel)(record_type='AB');
+
+	ds_TradeRecs := BusinessCredit_Services.Batch_Functions.getTradelineInfo(ds_SBFEAcctRecs,inMod);
+	
+	ds_CreditScore := BusinessCredit_Services.Batch_Functions.getCreditScore(ds_bestLinkidsPerAcct_kfetchLayout,inMod);
+	
+  // Add trade info to output
+  ds_final_trade := JOIN(ds_bestLinkidsPerAcct,ds_TradeRecs,
 												BIPV2.IDmacros.mac_JoinAllLinkids(),
 												TRANSFORM(BusinessCredit_Services.Batch_layouts.Batch_Output,
 															SELF := RIGHT,

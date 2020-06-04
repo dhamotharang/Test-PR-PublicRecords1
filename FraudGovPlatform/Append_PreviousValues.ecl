@@ -41,6 +41,8 @@ EXPORT Append_PreviousValues (
 			SELF.clean_address.geo_blk					:= if(left.record_id=right.record_id, LEFT.clean_address.geo_blk,			RIGHT.clean_address.geo_blk);
 			SELF.clean_address.geo_match				:= if(left.record_id=right.record_id, LEFT.clean_address.geo_match,		RIGHT.clean_address.geo_match);
 			SELF.clean_address.err_stat					:= if(left.record_id=right.record_id, LEFT.clean_address.err_stat,		RIGHT.clean_address.err_stat);
+			SELF.address_1								:= if(left.record_id=right.record_id, LEFT.address_1, RIGHT.address_1);
+			SELF.address_2								:= if(left.record_id=right.record_id, LEFT.address_2, RIGHT.address_2);
 
 			SELF.additional_address.clean_address.prim_range	:= if(left.record_id=right.record_id, LEFT.additional_address.clean_address.prim_range,		RIGHT.additional_address.clean_address.prim_range); //prim_range
 			SELF.additional_address.clean_address.predir			:= if(left.record_id=right.record_id, LEFT.additional_address.clean_address.predir,				RIGHT.additional_address.clean_address.predir); //predir
@@ -69,6 +71,8 @@ EXPORT Append_PreviousValues (
 			SELF.additional_address.clean_address.geo_blk			:= if(left.record_id=right.record_id, LEFT.additional_address.clean_address.geo_blk,			RIGHT.additional_address.clean_address.geo_blk); //geo_blk
 			SELF.additional_address.clean_address.geo_match		:= if(left.record_id=right.record_id, LEFT.additional_address.clean_address.geo_match,		RIGHT.additional_address.clean_address.geo_match); //geo_match
 			SELF.additional_address.clean_address.err_stat		:= if(left.record_id=right.record_id, LEFT.additional_address.clean_address.err_stat,			RIGHT.additional_address.clean_address.err_stat); //err_stat		
+			SELF.additional_address.address_1					:= if(left.record_id=right.record_id, LEFT.address_1, RIGHT.address_1);
+			SELF.additional_address.address_2					:= if(left.record_id=right.record_id, LEFT.address_2, RIGHT.address_2);
 			
 			// Pull Previous DID's
 			SELF.did														:= if(left.record_id=right.record_id, LEFT.did, 			RIGHT.did);

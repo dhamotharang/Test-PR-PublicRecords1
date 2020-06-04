@@ -39,6 +39,7 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionRecord) inrec) := FUN
 								self.SourceProgramState := IF(RIGHT.SourceProgramState='',LEFT.SourceProgramState,RIGHT.SourceProgramState);
 								self.SourceProgramCode := IF(RIGHT.SourceProgramState='',LEFT.SourceProgramCode,RIGHT.SourceProgramCode);
 								self.SourceClientId := IF(RIGHT.SourceProgramState='',LEFT.SourceClientId,RIGHT.SourceClientId);
+								self.SourceGroupId := IF(RIGHT.SourceGroupId='',LEFT.SourceGroupId,RIGHT.SourceGroupId);
 								self.MatchedState := IF(RIGHT.SourceProgramState='',LEFT.MatchedState,RIGHT.MatchedState);
 								self.MatchedProgramCode := IF(RIGHT.SourceProgramState='',LEFT.MatchedProgramCode,RIGHT.MatchedProgramCode);
 								self.MatchedClientID := IF(RIGHT.SourceProgramState='',LEFT.MatchedClientID,RIGHT.MatchedClientID);
@@ -54,8 +55,8 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionRecord) inrec) := FUN
 								self.Updated := IF(RIGHT.SourceProgramState='',LEFT.Updated,Std.Date.Today());
 								self.Replaced := 0;
 								
-								self.Errors := IF(RIGHT.SourceProgramState='',LEFT.Errors,RIGHT.Errors);
-								self.Warnings := IF(RIGHT.SourceProgramState='',LEFT.Warnings,RIGHT.Warnings);
+								//self.Errors := IF(RIGHT.SourceProgramState='',LEFT.Errors,RIGHT.Errors);
+								//self.Warnings := IF(RIGHT.SourceProgramState='',LEFT.Warnings,RIGHT.Warnings);
 									
 							),
 							LEFT OUTER, KEEP(1), MANY LOOKUP),

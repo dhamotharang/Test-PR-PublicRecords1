@@ -9,6 +9,10 @@ export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt =
 									).retcode;
 									
 	
+	get_build   := Orbit3.GetBuildInstance(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode;
 									
 	Update_build := Orbit3.UpdateBuildInstance(buildname,
 									Buildvs,
@@ -23,6 +27,7 @@ sendemail(string keyword = '',string status = '') := function
 		description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
 		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
 		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
+						keyword = 'UPDATE' and  status = 'ABORT' => 'Update_aborted_as_build_has_been_assigned_to_QA',
 						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
@@ -44,7 +49,7 @@ sendemail(string keyword = '',string status = '') := function
 												'---------------------'+'\n'+
 												'Build Workunit:'+wuid);
 												
-		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
+		verifystatus := if ( status not in [  'FAIL' , 'ABORT' ] , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
 																					          )
 							);
@@ -70,9 +75,12 @@ sendemail(string keyword = '',string status = '') := function
 													if ( skipupdatebuild ,
 																				sendemail('UPDATE','SKIP')	,
 												
-													              if ( Update_build.Status = 'Success', 
-													                 sendemail('UPDATE','SUCCESS'),
-																					 sendemail('UPDATE','FAIL')
+													              if (  get_build.Status =  'Success' and get_build.BuildInstanceStatus = 'BUILD_IN_PROGRESS',
+																	                                                                                                                                                                                  if ( Update_build.Status = 'Success', 
+													                                                                                                                                                                                                               sendemail('UPDATE','SUCCESS'),
+																					                                                                                                                                                                      sendemail('UPDATE','FAIL')
+																																																			 ),
+																																																			sendemail('UPDATE','ABORT')
 																					 )
 														)
 											),

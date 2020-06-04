@@ -1,0 +1,52 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Thrive
+FILENAME:Thrive
+NAMESCOPE:Input_PD
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_fname:CUSTOM(Scrubs_Thrive.Functions.fn_chk_blank_names >0,orig_fname,orig_mname,orig_lname)
+FIELDTYPE:invalid_mname:CUSTOM(Scrubs_Thrive.Functions.fn_chk_blank_names >0,orig_fname,orig_mname,orig_lname)
+FIELDTYPE:invalid_lname:CUSTOM(Scrubs_Thrive.Functions.fn_chk_blank_names >0,orig_fname,orig_mname,orig_lname)
+FIELDTYPE:invalid_addr:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_addr >0)
+FIELDTYPE:invalid_city:CUSTOM(Scrubs_Thrive.Functions.fn_chk_city >0)
+FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_Valid_StateAbbrev>0)
+FIELDTYPE:invalid_zip5:CUSTOM(Scrubs.Functions.fn_valid_zip >0)
+FIELDTYPE:invalid_zip4:CUSTOM(Scrubs.Functions.fn_numeric_optional >0)
+FIELDTYPE:invalid_hmphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
+FIELDTYPE:invalid_cellphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
+FIELDTYPE:invalid_wrkphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
+FIELDTYPE:invalid_email:CUSTOM(Scrubs_Thrive.Functions.fn_chk_email >0)
+FIELDTYPE:invalid_dob:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)
+FIELDTYPE:invalid_employer:CUSTOM(Scrubs_Thrive.Functions.fn_chk_employer>0)
+FIELDTYPE:invalid_date:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB -- Commented out fields are not being scrubbed
+//---------------------------------------------------------------
+FIELD:orig_fname:TYPE(STRING):LIKE(invalid_fname):0,0
+FIELD:orig_mname:TYPE(STRING):LIKE(invalid_mname):0,0
+FIELD:orig_lname:TYPE(STRING):LIKE(invalid_lname):0,0
+FIELD:orig_addr:TYPE(STRING):LIKE(invalid_addr):0,0
+FIELD:orig_city:TYPE(STRING):LIKE(invalid_city):0,0
+FIELD:orig_state:TYPE(STRING):LIKE(invalid_state):0,0
+FIELD:orig_zip5:TYPE(STRING):LIKE(invalid_zip5):0,0
+FIELD:orig_zip4:TYPE(STRING):LIKE(invalid_zip4):0,0
+FIELD:phone_home:TYPE(STRING):LIKE(invalid_hmphone):0,0
+FIELD:phone_cell:TYPE(STRING):LIKE(invalid_cellphone):0,0
+FIELD:phone_work:TYPE(STRING):LIKE(invalid_wrkphone):0,0
+FIELD:email:TYPE(STRING):LIKE(invalid_email):0,0
+FIELD:dob:TYPE(STRING):LIKE(invalid_dob):0,0
+//FIELD:own_home:TYPE(STRING):0,0
+//FIELD:dr:TYPE(STRING):0,0
+//FIELD:is_military:TYPE(STRING):0,0
+FIELD:employer:TYPE(STRING):LIKE(invalid_employer):0,0
+// FIELD:pay_frequency:TYPE(STRING):0,0
+// FIELD:income_monthly:TYPE(STRING):0,0
+// FIELD:months_employed:TYPE(STRING):0,0
+// FIELD:months_at_bank:TYPE(STRING):0,0
+// FIELD:ip:TYPE(STRING):0,0
+FIELD:dt:TYPE(STRING):LIKE(invalid_date):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

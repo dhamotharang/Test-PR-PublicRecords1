@@ -1,4 +1,4 @@
-import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools;
+﻿import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools,doxie;
 
 export key_directories_linkids :=
 module
@@ -14,14 +14,14 @@ module
     ,dataset(recordof(ds_industry))  pindustry
   ) := 
   function
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_contacts(ds_contacts le) := transform
+    BIPV2_Build.Layout_Directories_Linkids_key xform_contacts(ds_contacts le) := transform
      self.rec_type        := 'C';
      self.contacts_fields := le;
      self                 := le;
      self                 := [];//for the industry fields
     end;
 
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_industry(ds_industry le) := transform
+    BIPV2_Build.Layout_Directories_Linkids_key xform_industry(ds_industry le) := transform
      self.rec_type        := 'I';
      self.industry_fields := le;
      self                 := le;
@@ -48,10 +48,10 @@ module
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(concat_thembuilt, kb, superfile_name)  //for use inside BIP build since keys haven't been promoted to qa yet.
   export kbuilt := kb;
   
-  export keyvs := tools.macf_FilesIndex('Key' ,keynames().directories_linkids);
-  export keybuilt := keyvs.built;
-  export keyfather := keyvs.father;
-  export keygrandfather := keyvs.grandfather;
+  export keyvs(string pversion = '',boolean penvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('Key' ,keynames(pversion,penvironment).directories_linkids);
+  export keybuilt := keyvs().built;
+  export keyfather := keyvs().father;
+  export keygrandfather := keyvs().grandfather;
 
   //DEFINE THE INDEX ACCESS
   export kFetch(
@@ -60,6 +60,7 @@ module
                   ,unsigned2 ScoreThreshold = 0
 									,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
 									JoinLimit=25000
+                  ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
                   ) :=
   function
 
@@ -69,7 +70,10 @@ module
     ds_restricted := out(isperm.bySource(industry_fields.source, contacts_fields.vl_id)
     and isperm.bySource(contacts_fields.source, contacts_fields.vl_id)
     );
-    return ds_restricted;
+    
+    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false);
+    
+    return ds_restricted_out;
 									
   end;
   

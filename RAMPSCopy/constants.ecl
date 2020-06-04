@@ -14,8 +14,8 @@ EXPORT constants(string destenv) := module
 	export rampsfileds := dataset('~'+rampsfile,rampscopy.layouts.filestocopy,thor,opt);
 	
 	export boca := module	
-		export srcesp := 'prod_esp.br.seisint.com';
-		export srcdali := 'prod_dali.br.seisint.com';
+		export srcesp := _Control.Config.Localesp;
+		export srcdali := _Control.Config.prod_dali;
 		export srcclusters := [//'thor400_20'
 																										//	,'thor400_30'
 																											//,'thor400_31_store'

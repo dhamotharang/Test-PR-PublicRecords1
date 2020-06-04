@@ -90,7 +90,7 @@ validate_doc := if(count(File_Miami_dade_Document_check) > count(File_Miami_dade
 doc_Father_SFile := lib_fileservices.FileServices.GetSuperFileSubname('~thor_200::base::official_records_fl_miami_dade_document_father',1);
 
 
-doc_Fthdate := lib_stringlib.StringLib.StringFind(doc_Father_SFile,'201',1);
+doc_Fthdate := lib_stringlib.StringLib.StringFind(doc_Father_SFile,'202',1);
 
 validate_Fatherfile := if( ut.DaysApart((STRING8)Std.Date.Today(),doc_Father_SFile[doc_Fthdate..doc_Fthdate+8]) > 22, fail('Abort:  DOCUMENT_FATHER_BASE_FILE_IS_NOT_CURRENT'),OUTPUT('DOCUMENT_FATHER_BASE_FILE_IS_CURRENT'));
 

@@ -25,7 +25,7 @@
 
   
   //exclude high frequence clusters.
-  SHARED tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);
+  EXPORT tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);
   
   //KELOtto.KelFiles.FullCluster
   topstuff := tempFullCluster((cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1 OR cl_high_risk_pattern3_flag_ = 1 OR cl_high_risk_pattern4_flag_ = 1 OR cl_high_risk_pattern5_flag_ = 1) AND cl_identity_count_ < 51 AND tree_uid_=entity_context_uid_);
@@ -33,6 +33,7 @@
 
   topnormalstuff := topn(GROUP(SORT(tempFullCluster((cl_high_risk_pattern1_flag_ = 0 AND (cl_high_risk_pattern2_flag_ = 1 OR cl_high_risk_pattern3_flag_ = 1 OR cl_high_risk_pattern4_flag_ = 1 OR cl_high_risk_pattern5_flag_ = 1)) AND tree_uid_=entity_context_uid_), customer_id_, industry_type_, SKEW(1)), customer_id_, industry_type_, SKEW(1)), 30000, -cl_impact_weight_, SKEW(1));
   //count(topnormalstuff);
+  topnormalstuff2 := topn(GROUP(SORT(tempFullCluster(tree_uid_=entity_context_uid_ and entity_type_ = 1), customer_id_, industry_type_, SKEW(1)), customer_id_, industry_type_, SKEW(1)), 30000, -cl_impact_weight_, SKEW(1));
 
   ts1 := topstuff((cl_high_risk_pattern1_flag_ = 1 AND cl_high_risk_pattern2_flag_ = 1 AND cl_high_risk_pattern3_flag_ = 1 ));
   //count(ts1);
@@ -46,7 +47,7 @@
   ts4 := topn(GROUP(SORT(topstuff((cl_high_risk_pattern3_flag_ = 0 AND (cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1) )), customer_id_, industry_type_, SKEW(1)), customer_id_, industry_type_, SKEW(1)), 5000, -cl_impact_weight_, SKEW(1));
   //count(ts4);
 
-  EXPORT MainClustersPrep1 := DEDUP(SORT(topnormalstuff + ts1 + ts2 + ts3 + ts4, customer_id_, industry_type_, entity_context_uid_), customer_id_, industry_type_, entity_context_uid_);
+  EXPORT MainClustersPrep1 := DEDUP(SORT(topnormalstuff + topnormalstuff2 + ts1 + ts2 + ts3 + ts4, customer_id_, industry_type_, entity_context_uid_), customer_id_, industry_type_, entity_context_uid_);
   //count(MainClustersPrep1);
 
   EXPORT MainClustersPrep2_1 := JOIN(MainClustersPrep1, tempFullCluster, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_ and LEFT.entity_context_uid_ != RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.entity_context_uid_, SELF := LEFT), HASH);

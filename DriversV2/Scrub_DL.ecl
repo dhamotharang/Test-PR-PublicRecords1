@@ -7,24 +7,24 @@
 EXPORT Scrub_DL(STRING pversion) := MODULE
 
 	SHARED MAC_Scrubs_Report(BuildDate,myFolder,myFile,datasetName)	:=	FUNCTIONMACRO
-		folder						:=	#EXPAND(myFolder);
-		inFile						:=	folder.#EXPAND(myFile)(BuildDate);
-		scrubs_name				:=	'Scrubs';
-		myEmail						:=	_Control.MyInfo.EmailAddressNotify;
+		folder						    :=	#EXPAND(myFolder);
+		inFile						    :=	folder.#EXPAND(myFile)(BuildDate);
+		scrubs_name				    :=	'Scrubs';
+		myEmail						    :=	_Control.MyInfo.EmailAddressNotify;
 		
-		F	:=	inFile;																				//	Records to scrub
-		S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
-		N	:=	S.FromNone(F);																//	Generate the error flags
-		U :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
+		F	                    :=	inFile;																				//	Records to scrub
+		S	                    :=	folder.#EXPAND(scrubs_name);									//	My scrubs module
+		N	                    :=	S.FromNone(F);																//	Generate the error flags
+		U                     :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
 		
-		ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED('ErrorSummary'+datasetName));										//	Show errors by field and type
-		EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED('EyeballSomeErrors'+datasetName));		//	Just eyeball some errors
-		SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED('SomeErrorValues'+datasetName));			//	See my error field values
+		ErrorSummary			    :=	OUTPUT(U.SummaryStats, NAMED('ErrorSummary'+datasetName));										//	Show errors by field and type
+		EyeballSomeErrors	    :=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED('EyeballSomeErrors'+datasetName));		//	Just eyeball some errors
+		SomeErrorValues		    :=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED('SomeErrorValues'+datasetName));			//	See my error field values
 
-		persist_name				:=	'~persist::'+myFolder+'_orbit_stats';
-		Orbit_stats					:=	U.OrbitStats():PERSIST(persist_name);
-		OrbitReport					:=	OUTPUT(Orbit_stats,ALL,NAMED('OrbitReport'+datasetName));
-		OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,ALL,NAMED('OrbitReportSummary'+datasetName));
+		persist_name				  :=	'~persist::'+myFolder+'_orbit_stats';
+		Orbit_stats					  :=	U.OrbitStats():PERSIST(persist_name);
+		OrbitReport					  :=	OUTPUT(Orbit_stats,ALL,NAMED('OrbitReport'+datasetName));
+		OrbitReportSummary	  :=	OUTPUT(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,ALL,NAMED('OrbitReportSummary'+datasetName));
 
 		//Submits Profile's stats to Orbit
 		SubmitStats						:=	Scrubs.OrbitProfileStats(myFolder,'ScrubsAlerts',Orbit_stats,BuildDate,datasetName).SubmitStats;
@@ -65,7 +65,7 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
     RETURN OUTPUT('NO SCRUBS REPORT READY FOR THIS STATE');
   END;
 
-  EXPORT CT          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_CT',         'In_CT',         'DL_CT');
+  EXPORT CT          := Scrubs.ScrubsPlus('CT(pversion)','Scrubs_DL_CT','Scrubs_DL_CT', '', pversion,DriversV2.Email_Notification_Lists.Stats,false);
   EXPORT FL          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_FL',         'In_FL',         'DL_FL');
   EXPORT LA          := Temp_NoReport();
   EXPORT MA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MA',         'In_MA',         'DL_MA');

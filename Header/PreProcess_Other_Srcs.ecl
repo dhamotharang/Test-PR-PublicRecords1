@@ -1,9 +1,9 @@
-import header, ut, mdr, address, NID;
+import header, ut, mdr, address, NID,dx_header;
 //Get new header records for sources other than EQ
 inNHR := header.New_Header_Records(true) : persist ('~thor400::new_fheader_records');
 NHRin := distribute(inNHR,hash(prim_name,zip,lname));
 
-inPHR:=file_header_raw(header.Blocked_data_new()) + Header.File_TN_did;
+inPHR:=file_header_raw(header.Blocked_data_new()) + projecT(Header.File_TN_did,dx_header.layout_header);
 PHin  := distribute(inPHR,hash(prim_name,zip,lname));
 
 //Did is persisted in "as_header" for fast header 

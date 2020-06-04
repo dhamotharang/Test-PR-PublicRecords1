@@ -1,10 +1,10 @@
-import header, votersV2, mdr;
+﻿import header, votersV2, mdr;
 
 /* CODE TAKEN FROM VOTERS V2 AS HEADER AND AS SOURCE */
 
 Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
-
-	state_set := ['AK','AL','AR','CO','CT','DC','DE','DL','FL','LA','MA','MI','MS','NC','NV','NY','OH','OK','RI','UT','WI']; // bug 78034
+//DF-26350: Remove MS from the state set
+	state_set := ['AK','AL','AR','CO','CT','DC','DE','DL','FL','LA','MA','MI','NC','NV','NY','OH','OK','RI','UT','WI']; // bug 78034
 	dSourceData	:=	distribute(VotersV2.File_Voters_Base(source_state in state_set and did > 0), hash(did));
 
 	src_rec := record

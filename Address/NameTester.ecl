@@ -363,7 +363,7 @@ rgxStreet := '^[0-9]+.+ (ROAD|RD|STREET|ST|AVE|AVENUE|DRIVE|DR|PLACE|PATH|LANE|L
 export boolean InvalidNameFormat(string name) := 
 	REGEXFIND('^[A-Z]+ +(JR|SR|NMN|NMI|II|III|IV)$', name)	OR	// NAME JR
 	REGEXFIND('^[A-Z] +[A-Z] +(JR|SR|I|II|III|IV|V)$', name) OR	// A B JR
-	REGEXFIND('^(JR|SR|MC|ST|NMN|NMI|ATTN) +[A-Z]+$', name)	OR	// JR NAME
+	REGEXFIND('^(JR|SR|MC|ST|NMN|NMI|ATTN|CEO) +[A-Z]+$', name)	OR	// JR NAME
 	REGEXFIND('^[A-Z]+[, ]+(JR|SR|II|III|IV|MC|ST|NMN|NMI|ATTN)$', name)	OR	// NAME, JR
 	REGEXFIND('\\b(JR|SR|II|III|IV|VI|VII|[0-9]) +(JR|SR|II|III|IV|VI|VII|[0-9])\\b', name)	OR	// JR JR
 	REGEXFIND('^[A-Z]+\\b(JR|SR|II|III|IV) +[A-Z]+\\b(JR|SR|II|III|IV)$', name)	OR	// namd JR name JR

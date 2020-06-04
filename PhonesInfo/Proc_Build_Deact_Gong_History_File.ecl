@@ -29,7 +29,7 @@ EXPORT Proc_Build_Deact_Gong_History_File(string version) := FUNCTION
 	
 	emailTarget								:= _control.MyInfo.EmailAddressNotify + emailDev;
 	emailBuildNotice 					:= if(count(PhonesInfo.File_Deact_GH.Main(phone<>'')) > 0
-																				,fileservices.SendEmail(emailTarget, 'Phones Metadata: Deact Gong History File', 'Phones Metadata: Deact Gong History File Is Now Available.  Please see: ' + 'http://prod_esp.br.seisint.com:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																				,fileservices.SendEmail(emailTarget, 'Phones Metadata: Deact Gong History File', 'Phones Metadata: Deact Gong History File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																				,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Deact Gong History File', 'There Were No Deact Gong History Records In This Build')
 																				);	
 																				

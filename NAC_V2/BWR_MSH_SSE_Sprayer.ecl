@@ -1,5 +1,5 @@
-import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
-
+﻿import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
+ 
 // ------------------------------------------------------------------------------------------------
 string		gLandingZoneServer		:=	'edata10.br.seisint.com';//'edata12.br.seisint.com'					:	stored('LandingZoneServer');
 string		gLandingZonePathBase	:=	'/data_build_4/nac';//'/hds_180/nac'										:	stored('LandingZonePathBase');
@@ -12,6 +12,11 @@ string		gSubDirectoryDone			:=	'done';
 // ------------------------------------------------------------------------------------------------
 string		fFullRemotePathFromTokens(string pPathBase, string pFileTypeBase, string pFileName = '') :=	pPathBase + '/' + pFileTypeBAse + if(pFileName <> '', '/', '') + pFileName;
 string		fEarliestFileName(dataset(lib_FileServices.FsFilenameRecord) pRemoteDirectoryList)	:=	sort(pRemoteDirectoryList, Modified)[1].Name;
+
+
+STRING AlertRecipients := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
+
 
 // ------------------------------------------------------------------------------------------------
 					fMoveFileToSpraying(string pDirectorySource, string pDirectoryTarget, string pFileName)	:=	lib_FileServices.FileServices.MoveExternalFile(gLandingZoneServer, fFullRemotePathFromTokens(gLandingZonePathBase, pDirectorySource, pFileName), fFullRemotePathFromTokens(gLandingZonePathBase, pDirectoryTarget + '/' + gSubDirectorySpraying, pFileName));
@@ -63,5 +68,5 @@ if(gSSE.EarliestFile <> '',
 								gSSE.fMoveToDone
 							),
 	 output('No SSE Files')
-	) : when(cron('0-59/15 * * * *')), failure(lib_FileServices.FileServices.SendEmail('tony.kirk@lexisnexis.com', 'NAC_MSH_SSE_Sprayer Failed', 'NAC_MSH_SSE_Sprayer Failed'));
+	) : when(cron('0-59/15 * * * *')), failure(lib_FileServices.FileServices.SendEmail(AlertRecipients, 'NAC_MSH_SSE_Sprayer Failed', 'NAC_MSH_SSE_Sprayer Failed'));
 /////////////////////////////////////////

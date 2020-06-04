@@ -1,121 +1,93 @@
-IMPORT ut,SALT34;
-IMPORT Scrubs,Scrubs_DL_CT; // Import modules for FieldTypes attribute definitions
+﻿IMPORT SALT311,STD;
+IMPORT Scrubs_DL_CT; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT  Expanded_Layout := RECORD(Layout_In_CT)
+  EXPORT NumRules := 33;
+  EXPORT NumRulesFromFieldType := 33;
+  EXPORT NumRulesFromRecordType := 0;
+  EXPORT NumFieldsWithRules := 33;
+  EXPORT NumFieldsWithPossibleEdits := 0;
+  EXPORT NumRulesWithPossibleEdits := 0;
+  EXPORT Expanded_Layout := RECORD(Layout_In_CT)
     UNSIGNED1 append_process_date_Invalid;
-    UNSIGNED1 orig_dlstate_Invalid;
-    UNSIGNED1 orig_dlnumber_Invalid;
-    UNSIGNED1 orig_name_Invalid;
-    UNSIGNED1 orig_dob_Invalid;
-    UNSIGNED1 orig_sex_Invalid;
-    UNSIGNED1 orig_height1_Invalid;
-    UNSIGNED1 orig_height2_Invalid;
-    UNSIGNED1 orig_eye_color_Invalid;
-    UNSIGNED1 orig_mailaddress_Invalid;
-    UNSIGNED1 orig_classification_Invalid;
-    UNSIGNED1 orig_issue_date_Invalid;
-    UNSIGNED1 orig_issue_date_dd_Invalid;
-    UNSIGNED1 orig_expire_date_Invalid;
-    UNSIGNED1 orig_expire_date_dd_Invalid;
-    UNSIGNED1 orig_noncdlstatus_Invalid;
-    UNSIGNED1 orig_cdlstatus_Invalid;
-    UNSIGNED1 orig_restrictions_Invalid;
-    UNSIGNED1 orig_origdate_Invalid;
-    UNSIGNED1 orig_origcdldate_Invalid;
-    UNSIGNED1 orig_cancelst_Invalid;
-    UNSIGNED1 orig_canceldate_Invalid;
+    UNSIGNED1 credentialstate_Invalid;
+    UNSIGNED1 credentialnumber_Invalid;
+    UNSIGNED1 lastname_Invalid;
+    UNSIGNED1 gender_Invalid;
+    UNSIGNED1 height_Invalid;
+    UNSIGNED1 eyecolor_Invalid;
+    UNSIGNED1 date_birth_Invalid;
+    UNSIGNED1 resiaddrstreet_Invalid;
+    UNSIGNED1 residencycity_Invalid;
+    UNSIGNED1 residencystate_Invalid;
+    UNSIGNED1 residencyzip_Invalid;
+    UNSIGNED1 mailaddrstreet_Invalid;
+    UNSIGNED1 mailingcity_Invalid;
+    UNSIGNED1 mailingstate_Invalid;
+    UNSIGNED1 mailingzip_Invalid;
+    UNSIGNED1 credentialtype_Invalid;
+    UNSIGNED1 credential_class_Invalid;
+    UNSIGNED1 endorsements_Invalid;
+    UNSIGNED1 restrictions_Invalid;
+    UNSIGNED1 expdate_Invalid;
+    UNSIGNED1 lastissuerenewaldate_Invalid;
+    UNSIGNED1 date_noncdl_Invalid;
+    UNSIGNED1 originaldate_cdl_Invalid;
+    UNSIGNED1 statusnoncdl_Invalid;
+    UNSIGNED1 licensestatuscdl_Invalid;
+    UNSIGNED1 originaldate_lp_Invalid;
+    UNSIGNED1 originaldate_id_Invalid;
+    UNSIGNED1 cancelstate_Invalid;
+    UNSIGNED1 canceldate_Invalid;
+    UNSIGNED1 cdlmedicertissuedate_Invalid;
+    UNSIGNED1 cdlmedicertexpdate_Invalid;
     UNSIGNED1 clean_name_last_Invalid;
-    UNSIGNED1 clean_prim_range_Invalid;
-    UNSIGNED1 clean_predir_Invalid;
-    UNSIGNED1 clean_prim_name_Invalid;
-    UNSIGNED1 clean_addr_suffix_Invalid;
-    UNSIGNED1 clean_postdir_Invalid;
-    UNSIGNED1 clean_unit_desig_Invalid;
-    UNSIGNED1 clean_sec_range_Invalid;
-    UNSIGNED1 clean_p_city_name_Invalid;
-    UNSIGNED1 clean_v_city_name_Invalid;
-    UNSIGNED1 clean_st_Invalid;
-    UNSIGNED1 clean_zip_Invalid;
-    UNSIGNED1 clean_zip4_Invalid;
-    UNSIGNED1 clean_cart_Invalid;
-    UNSIGNED1 clean_cr_sort_sz_Invalid;
-    UNSIGNED1 clean_lot_Invalid;
-    UNSIGNED1 clean_lot_order_Invalid;
-    UNSIGNED1 clean_dpbc_Invalid;
-    UNSIGNED1 clean_chk_digit_Invalid;
-    UNSIGNED1 clean_record_type_Invalid;
-    UNSIGNED1 clean_ace_fips_st_Invalid;
-    UNSIGNED1 clean_fipscounty_Invalid;
-    UNSIGNED1 clean_geo_lat_Invalid;
-    UNSIGNED1 clean_geo_long_Invalid;
-    UNSIGNED1 clean_msa_Invalid;
-    UNSIGNED1 clean_geo_blk_Invalid;
-    UNSIGNED1 clean_geo_match_Invalid;
-    UNSIGNED1 clean_err_stat_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_In_CT)
     UNSIGNED8 ScrubsBits1;
   END;
 EXPORT FromNone(DATASET(Layout_In_CT) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.append_process_date_Invalid := Fields.InValid_append_process_date((SALT34.StrType)le.append_process_date);
-    SELF.orig_dlstate_Invalid := Fields.InValid_orig_dlstate((SALT34.StrType)le.orig_dlstate);
-    SELF.orig_dlnumber_Invalid := Fields.InValid_orig_dlnumber((SALT34.StrType)le.orig_dlnumber);
-    SELF.orig_name_Invalid := Fields.InValid_orig_name((SALT34.StrType)le.orig_name);
-    SELF.orig_dob_Invalid := Fields.InValid_orig_dob((SALT34.StrType)le.orig_dob);
-    SELF.orig_sex_Invalid := Fields.InValid_orig_sex((SALT34.StrType)le.orig_sex);
-    SELF.orig_height1_Invalid := Fields.InValid_orig_height1((SALT34.StrType)le.orig_height1,(SALT34.StrType)le.orig_height2);
-    SELF.orig_height2_Invalid := Fields.InValid_orig_height2((SALT34.StrType)le.orig_height2);
-    SELF.orig_eye_color_Invalid := Fields.InValid_orig_eye_color((SALT34.StrType)le.orig_eye_color);
-    SELF.orig_mailaddress_Invalid := Fields.InValid_orig_mailaddress((SALT34.StrType)le.orig_mailaddress);
-    SELF.orig_classification_Invalid := Fields.InValid_orig_classification((SALT34.StrType)le.orig_classification);
-    SELF.orig_issue_date_Invalid := Fields.InValid_orig_issue_date((SALT34.StrType)le.orig_issue_date,(SALT34.StrType)le.orig_issue_date_dd);
-    SELF.orig_issue_date_dd_Invalid := Fields.InValid_orig_issue_date_dd((SALT34.StrType)le.orig_issue_date_dd);
-    SELF.orig_expire_date_Invalid := Fields.InValid_orig_expire_date((SALT34.StrType)le.orig_expire_date,(SALT34.StrType)le.orig_expire_date_dd);
-    SELF.orig_expire_date_dd_Invalid := Fields.InValid_orig_expire_date_dd((SALT34.StrType)le.orig_expire_date_dd);
-    SELF.orig_noncdlstatus_Invalid := Fields.InValid_orig_noncdlstatus((SALT34.StrType)le.orig_noncdlstatus);
-    SELF.orig_cdlstatus_Invalid := Fields.InValid_orig_cdlstatus((SALT34.StrType)le.orig_cdlstatus);
-    SELF.orig_restrictions_Invalid := Fields.InValid_orig_restrictions((SALT34.StrType)le.orig_restrictions);
-    SELF.orig_origdate_Invalid := Fields.InValid_orig_origdate((SALT34.StrType)le.orig_origdate);
-    SELF.orig_origcdldate_Invalid := Fields.InValid_orig_origcdldate((SALT34.StrType)le.orig_origcdldate);
-    SELF.orig_cancelst_Invalid := Fields.InValid_orig_cancelst((SALT34.StrType)le.orig_cancelst);
-    SELF.orig_canceldate_Invalid := Fields.InValid_orig_canceldate((SALT34.StrType)le.orig_canceldate);
-    SELF.clean_name_last_Invalid := Fields.InValid_clean_name_last((SALT34.StrType)le.clean_name_last,(SALT34.StrType)le.clean_name_first,(SALT34.StrType)le.clean_name_middle);
-    SELF.clean_prim_range_Invalid := Fields.InValid_clean_prim_range((SALT34.StrType)le.clean_prim_range);
-    SELF.clean_predir_Invalid := Fields.InValid_clean_predir((SALT34.StrType)le.clean_predir);
-    SELF.clean_prim_name_Invalid := Fields.InValid_clean_prim_name((SALT34.StrType)le.clean_prim_name);
-    SELF.clean_addr_suffix_Invalid := Fields.InValid_clean_addr_suffix((SALT34.StrType)le.clean_addr_suffix);
-    SELF.clean_postdir_Invalid := Fields.InValid_clean_postdir((SALT34.StrType)le.clean_postdir);
-    SELF.clean_unit_desig_Invalid := Fields.InValid_clean_unit_desig((SALT34.StrType)le.clean_unit_desig);
-    SELF.clean_sec_range_Invalid := Fields.InValid_clean_sec_range((SALT34.StrType)le.clean_sec_range);
-    SELF.clean_p_city_name_Invalid := Fields.InValid_clean_p_city_name((SALT34.StrType)le.clean_p_city_name);
-    SELF.clean_v_city_name_Invalid := Fields.InValid_clean_v_city_name((SALT34.StrType)le.clean_v_city_name);
-    SELF.clean_st_Invalid := Fields.InValid_clean_st((SALT34.StrType)le.clean_st);
-    SELF.clean_zip_Invalid := Fields.InValid_clean_zip((SALT34.StrType)le.clean_zip);
-    SELF.clean_zip4_Invalid := Fields.InValid_clean_zip4((SALT34.StrType)le.clean_zip4);
-    SELF.clean_cart_Invalid := Fields.InValid_clean_cart((SALT34.StrType)le.clean_cart);
-    SELF.clean_cr_sort_sz_Invalid := Fields.InValid_clean_cr_sort_sz((SALT34.StrType)le.clean_cr_sort_sz);
-    SELF.clean_lot_Invalid := Fields.InValid_clean_lot((SALT34.StrType)le.clean_lot);
-    SELF.clean_lot_order_Invalid := Fields.InValid_clean_lot_order((SALT34.StrType)le.clean_lot_order);
-    SELF.clean_dpbc_Invalid := Fields.InValid_clean_dpbc((SALT34.StrType)le.clean_dpbc);
-    SELF.clean_chk_digit_Invalid := Fields.InValid_clean_chk_digit((SALT34.StrType)le.clean_chk_digit);
-    SELF.clean_record_type_Invalid := Fields.InValid_clean_record_type((SALT34.StrType)le.clean_record_type);
-    SELF.clean_ace_fips_st_Invalid := Fields.InValid_clean_ace_fips_st((SALT34.StrType)le.clean_ace_fips_st);
-    SELF.clean_fipscounty_Invalid := Fields.InValid_clean_fipscounty((SALT34.StrType)le.clean_fipscounty);
-    SELF.clean_geo_lat_Invalid := Fields.InValid_clean_geo_lat((SALT34.StrType)le.clean_geo_lat);
-    SELF.clean_geo_long_Invalid := Fields.InValid_clean_geo_long((SALT34.StrType)le.clean_geo_long);
-    SELF.clean_msa_Invalid := Fields.InValid_clean_msa((SALT34.StrType)le.clean_msa);
-    SELF.clean_geo_blk_Invalid := Fields.InValid_clean_geo_blk((SALT34.StrType)le.clean_geo_blk);
-    SELF.clean_geo_match_Invalid := Fields.InValid_clean_geo_match((SALT34.StrType)le.clean_geo_match);
-    SELF.clean_err_stat_Invalid := Fields.InValid_clean_err_stat((SALT34.StrType)le.clean_err_stat);
+    SELF.append_process_date_Invalid := Fields.InValid_append_process_date((SALT311.StrType)le.append_process_date);
+    SELF.credentialstate_Invalid := Fields.InValid_credentialstate((SALT311.StrType)le.credentialstate);
+    SELF.credentialnumber_Invalid := Fields.InValid_credentialnumber((SALT311.StrType)le.credentialnumber);
+    SELF.lastname_Invalid := Fields.InValid_lastname((SALT311.StrType)le.lastname,(SALT311.StrType)le.firstname,(SALT311.StrType)le.middleinitial);
+    SELF.gender_Invalid := Fields.InValid_gender((SALT311.StrType)le.gender);
+    SELF.height_Invalid := Fields.InValid_height((SALT311.StrType)le.height);
+    SELF.eyecolor_Invalid := Fields.InValid_eyecolor((SALT311.StrType)le.eyecolor);
+    SELF.date_birth_Invalid := Fields.InValid_date_birth((SALT311.StrType)le.date_birth);
+    SELF.resiaddrstreet_Invalid := Fields.InValid_resiaddrstreet((SALT311.StrType)le.resiaddrstreet);
+    SELF.residencycity_Invalid := Fields.InValid_residencycity((SALT311.StrType)le.residencycity);
+    SELF.residencystate_Invalid := Fields.InValid_residencystate((SALT311.StrType)le.residencystate);
+    SELF.residencyzip_Invalid := Fields.InValid_residencyzip((SALT311.StrType)le.residencyzip);
+    SELF.mailaddrstreet_Invalid := Fields.InValid_mailaddrstreet((SALT311.StrType)le.mailaddrstreet);
+    SELF.mailingcity_Invalid := Fields.InValid_mailingcity((SALT311.StrType)le.mailingcity);
+    SELF.mailingstate_Invalid := Fields.InValid_mailingstate((SALT311.StrType)le.mailingstate);
+    SELF.mailingzip_Invalid := Fields.InValid_mailingzip((SALT311.StrType)le.mailingzip);
+    SELF.credentialtype_Invalid := Fields.InValid_credentialtype((SALT311.StrType)le.credentialtype);
+    SELF.credential_class_Invalid := Fields.InValid_credential_class((SALT311.StrType)le.credential_class);
+    SELF.endorsements_Invalid := Fields.InValid_endorsements((SALT311.StrType)le.endorsements);
+    SELF.restrictions_Invalid := Fields.InValid_restrictions((SALT311.StrType)le.restrictions);
+    SELF.expdate_Invalid := Fields.InValid_expdate((SALT311.StrType)le.expdate);
+    SELF.lastissuerenewaldate_Invalid := Fields.InValid_lastissuerenewaldate((SALT311.StrType)le.lastissuerenewaldate);
+    SELF.date_noncdl_Invalid := Fields.InValid_date_noncdl((SALT311.StrType)le.date_noncdl);
+    SELF.originaldate_cdl_Invalid := Fields.InValid_originaldate_cdl((SALT311.StrType)le.originaldate_cdl);
+    SELF.statusnoncdl_Invalid := Fields.InValid_statusnoncdl((SALT311.StrType)le.statusnoncdl);
+    SELF.licensestatuscdl_Invalid := Fields.InValid_licensestatuscdl((SALT311.StrType)le.licensestatuscdl);
+    SELF.originaldate_lp_Invalid := Fields.InValid_originaldate_lp((SALT311.StrType)le.originaldate_lp);
+    SELF.originaldate_id_Invalid := Fields.InValid_originaldate_id((SALT311.StrType)le.originaldate_id);
+    SELF.cancelstate_Invalid := Fields.InValid_cancelstate((SALT311.StrType)le.cancelstate);
+    SELF.canceldate_Invalid := Fields.InValid_canceldate((SALT311.StrType)le.canceldate);
+    SELF.cdlmedicertissuedate_Invalid := Fields.InValid_cdlmedicertissuedate((SALT311.StrType)le.cdlmedicertissuedate);
+    SELF.cdlmedicertexpdate_Invalid := Fields.InValid_cdlmedicertexpdate((SALT311.StrType)le.cdlmedicertexpdate);
+    SELF.clean_name_last_Invalid := Fields.InValid_clean_name_last((SALT311.StrType)le.clean_name_last,(SALT311.StrType)le.clean_name_first,(SALT311.StrType)le.clean_name_middle);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_In_CT);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.append_process_date_Invalid << 0 ) + ( le.orig_dlstate_Invalid << 2 ) + ( le.orig_dlnumber_Invalid << 3 ) + ( le.orig_name_Invalid << 5 ) + ( le.orig_dob_Invalid << 7 ) + ( le.orig_sex_Invalid << 9 ) + ( le.orig_height1_Invalid << 10 ) + ( le.orig_height2_Invalid << 11 ) + ( le.orig_eye_color_Invalid << 12 ) + ( le.orig_mailaddress_Invalid << 13 ) + ( le.orig_classification_Invalid << 15 ) + ( le.orig_issue_date_Invalid << 16 ) + ( le.orig_issue_date_dd_Invalid << 18 ) + ( le.orig_expire_date_Invalid << 19 ) + ( le.orig_expire_date_dd_Invalid << 21 ) + ( le.orig_noncdlstatus_Invalid << 22 ) + ( le.orig_cdlstatus_Invalid << 23 ) + ( le.orig_restrictions_Invalid << 24 ) + ( le.orig_origdate_Invalid << 25 ) + ( le.orig_origcdldate_Invalid << 27 ) + ( le.orig_cancelst_Invalid << 29 ) + ( le.orig_canceldate_Invalid << 31 ) + ( le.clean_name_last_Invalid << 33 ) + ( le.clean_prim_range_Invalid << 35 ) + ( le.clean_predir_Invalid << 36 ) + ( le.clean_prim_name_Invalid << 37 ) + ( le.clean_addr_suffix_Invalid << 38 ) + ( le.clean_postdir_Invalid << 39 ) + ( le.clean_unit_desig_Invalid << 40 ) + ( le.clean_sec_range_Invalid << 41 ) + ( le.clean_p_city_name_Invalid << 42 ) + ( le.clean_v_city_name_Invalid << 43 ) + ( le.clean_st_Invalid << 44 ) + ( le.clean_zip_Invalid << 45 ) + ( le.clean_zip4_Invalid << 46 ) + ( le.clean_cart_Invalid << 47 ) + ( le.clean_cr_sort_sz_Invalid << 48 ) + ( le.clean_lot_Invalid << 49 ) + ( le.clean_lot_order_Invalid << 50 ) + ( le.clean_dpbc_Invalid << 51 ) + ( le.clean_chk_digit_Invalid << 52 ) + ( le.clean_record_type_Invalid << 53 ) + ( le.clean_ace_fips_st_Invalid << 54 ) + ( le.clean_fipscounty_Invalid << 55 ) + ( le.clean_geo_lat_Invalid << 56 ) + ( le.clean_geo_long_Invalid << 57 ) + ( le.clean_msa_Invalid << 58 ) + ( le.clean_geo_blk_Invalid << 59 ) + ( le.clean_geo_match_Invalid << 60 ) + ( le.clean_err_stat_Invalid << 61 );
+    SELF.ScrubsBits1 := ( le.append_process_date_Invalid << 0 ) + ( le.credentialstate_Invalid << 1 ) + ( le.credentialnumber_Invalid << 2 ) + ( le.lastname_Invalid << 3 ) + ( le.gender_Invalid << 4 ) + ( le.height_Invalid << 5 ) + ( le.eyecolor_Invalid << 6 ) + ( le.date_birth_Invalid << 7 ) + ( le.resiaddrstreet_Invalid << 8 ) + ( le.residencycity_Invalid << 9 ) + ( le.residencystate_Invalid << 10 ) + ( le.residencyzip_Invalid << 11 ) + ( le.mailaddrstreet_Invalid << 12 ) + ( le.mailingcity_Invalid << 13 ) + ( le.mailingstate_Invalid << 14 ) + ( le.mailingzip_Invalid << 15 ) + ( le.credentialtype_Invalid << 16 ) + ( le.credential_class_Invalid << 17 ) + ( le.endorsements_Invalid << 18 ) + ( le.restrictions_Invalid << 19 ) + ( le.expdate_Invalid << 20 ) + ( le.lastissuerenewaldate_Invalid << 21 ) + ( le.date_noncdl_Invalid << 22 ) + ( le.originaldate_cdl_Invalid << 23 ) + ( le.statusnoncdl_Invalid << 24 ) + ( le.licensestatuscdl_Invalid << 25 ) + ( le.originaldate_lp_Invalid << 26 ) + ( le.originaldate_id_Invalid << 27 ) + ( le.cancelstate_Invalid << 28 ) + ( le.canceldate_Invalid << 29 ) + ( le.cdlmedicertissuedate_Invalid << 30 ) + ( le.cdlmedicertexpdate_Invalid << 31 ) + ( le.clean_name_last_Invalid << 32 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -124,56 +96,39 @@ END;
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Layout_In_CT);
   Expanded_Layout into(h le) := TRANSFORM
-    SELF.append_process_date_Invalid := (le.ScrubsBits1 >> 0) & 3;
-    SELF.orig_dlstate_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.orig_dlnumber_Invalid := (le.ScrubsBits1 >> 3) & 3;
-    SELF.orig_name_Invalid := (le.ScrubsBits1 >> 5) & 3;
-    SELF.orig_dob_Invalid := (le.ScrubsBits1 >> 7) & 3;
-    SELF.orig_sex_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.orig_height1_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.orig_height2_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.orig_eye_color_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.orig_mailaddress_Invalid := (le.ScrubsBits1 >> 13) & 3;
-    SELF.orig_classification_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.orig_issue_date_Invalid := (le.ScrubsBits1 >> 16) & 3;
-    SELF.orig_issue_date_dd_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.orig_expire_date_Invalid := (le.ScrubsBits1 >> 19) & 3;
-    SELF.orig_expire_date_dd_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.orig_noncdlstatus_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.orig_cdlstatus_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.orig_restrictions_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.orig_origdate_Invalid := (le.ScrubsBits1 >> 25) & 3;
-    SELF.orig_origcdldate_Invalid := (le.ScrubsBits1 >> 27) & 3;
-    SELF.orig_cancelst_Invalid := (le.ScrubsBits1 >> 29) & 3;
-    SELF.orig_canceldate_Invalid := (le.ScrubsBits1 >> 31) & 3;
-    SELF.clean_name_last_Invalid := (le.ScrubsBits1 >> 33) & 3;
-    SELF.clean_prim_range_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.clean_predir_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.clean_prim_name_Invalid := (le.ScrubsBits1 >> 37) & 1;
-    SELF.clean_addr_suffix_Invalid := (le.ScrubsBits1 >> 38) & 1;
-    SELF.clean_postdir_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.clean_unit_desig_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.clean_sec_range_Invalid := (le.ScrubsBits1 >> 41) & 1;
-    SELF.clean_p_city_name_Invalid := (le.ScrubsBits1 >> 42) & 1;
-    SELF.clean_v_city_name_Invalid := (le.ScrubsBits1 >> 43) & 1;
-    SELF.clean_st_Invalid := (le.ScrubsBits1 >> 44) & 1;
-    SELF.clean_zip_Invalid := (le.ScrubsBits1 >> 45) & 1;
-    SELF.clean_zip4_Invalid := (le.ScrubsBits1 >> 46) & 1;
-    SELF.clean_cart_Invalid := (le.ScrubsBits1 >> 47) & 1;
-    SELF.clean_cr_sort_sz_Invalid := (le.ScrubsBits1 >> 48) & 1;
-    SELF.clean_lot_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.clean_lot_order_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.clean_dpbc_Invalid := (le.ScrubsBits1 >> 51) & 1;
-    SELF.clean_chk_digit_Invalid := (le.ScrubsBits1 >> 52) & 1;
-    SELF.clean_record_type_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.clean_ace_fips_st_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.clean_fipscounty_Invalid := (le.ScrubsBits1 >> 55) & 1;
-    SELF.clean_geo_lat_Invalid := (le.ScrubsBits1 >> 56) & 1;
-    SELF.clean_geo_long_Invalid := (le.ScrubsBits1 >> 57) & 1;
-    SELF.clean_msa_Invalid := (le.ScrubsBits1 >> 58) & 1;
-    SELF.clean_geo_blk_Invalid := (le.ScrubsBits1 >> 59) & 1;
-    SELF.clean_geo_match_Invalid := (le.ScrubsBits1 >> 60) & 1;
-    SELF.clean_err_stat_Invalid := (le.ScrubsBits1 >> 61) & 1;
+    SELF.append_process_date_Invalid := (le.ScrubsBits1 >> 0) & 1;
+    SELF.credentialstate_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.credentialnumber_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.lastname_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.gender_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.height_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.eyecolor_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.date_birth_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.resiaddrstreet_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.residencycity_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.residencystate_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.residencyzip_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.mailaddrstreet_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.mailingcity_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.mailingstate_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.mailingzip_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.credentialtype_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.credential_class_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.endorsements_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.restrictions_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.expdate_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.lastissuerenewaldate_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.date_noncdl_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.originaldate_cdl_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.statusnoncdl_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.licensestatuscdl_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.originaldate_lp_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.originaldate_id_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.cancelstate_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.canceldate_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.cdlmedicertissuedate_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.cdlmedicertexpdate_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.clean_name_last_Invalid := (le.ScrubsBits1 >> 32) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -183,380 +138,481 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
     append_process_date_CUSTOM_ErrorCount := COUNT(GROUP,h.append_process_date_Invalid=1);
-    append_process_date_LENGTH_ErrorCount := COUNT(GROUP,h.append_process_date_Invalid=2);
-    append_process_date_Total_ErrorCount := COUNT(GROUP,h.append_process_date_Invalid>0);
-    orig_dlstate_ENUM_ErrorCount := COUNT(GROUP,h.orig_dlstate_Invalid=1);
-    orig_dlnumber_ALLOW_ErrorCount := COUNT(GROUP,h.orig_dlnumber_Invalid=1);
-    orig_dlnumber_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_dlnumber_Invalid=2);
-    orig_dlnumber_LENGTH_ErrorCount := COUNT(GROUP,h.orig_dlnumber_Invalid=3);
-    orig_dlnumber_Total_ErrorCount := COUNT(GROUP,h.orig_dlnumber_Invalid>0);
-    orig_name_ALLOW_ErrorCount := COUNT(GROUP,h.orig_name_Invalid=1);
-    orig_name_LENGTH_ErrorCount := COUNT(GROUP,h.orig_name_Invalid=2);
-    orig_name_Total_ErrorCount := COUNT(GROUP,h.orig_name_Invalid>0);
-    orig_dob_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_dob_Invalid=1);
-    orig_dob_LENGTH_ErrorCount := COUNT(GROUP,h.orig_dob_Invalid=2);
-    orig_dob_Total_ErrorCount := COUNT(GROUP,h.orig_dob_Invalid>0);
-    orig_sex_ENUM_ErrorCount := COUNT(GROUP,h.orig_sex_Invalid=1);
-    orig_height1_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_height1_Invalid=1);
-    orig_height2_ENUM_ErrorCount := COUNT(GROUP,h.orig_height2_Invalid=1);
-    orig_eye_color_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_eye_color_Invalid=1);
-    orig_mailaddress_CAPS_ErrorCount := COUNT(GROUP,h.orig_mailaddress_Invalid=1);
-    orig_mailaddress_ALLOW_ErrorCount := COUNT(GROUP,h.orig_mailaddress_Invalid=2);
-    orig_mailaddress_Total_ErrorCount := COUNT(GROUP,h.orig_mailaddress_Invalid>0);
-    orig_classification_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_classification_Invalid=1);
-    orig_issue_date_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_issue_date_Invalid=1);
-    orig_issue_date_LENGTH_ErrorCount := COUNT(GROUP,h.orig_issue_date_Invalid=2);
-    orig_issue_date_Total_ErrorCount := COUNT(GROUP,h.orig_issue_date_Invalid>0);
-    orig_issue_date_dd_ENUM_ErrorCount := COUNT(GROUP,h.orig_issue_date_dd_Invalid=1);
-    orig_expire_date_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_expire_date_Invalid=1);
-    orig_expire_date_LENGTH_ErrorCount := COUNT(GROUP,h.orig_expire_date_Invalid=2);
-    orig_expire_date_Total_ErrorCount := COUNT(GROUP,h.orig_expire_date_Invalid>0);
-    orig_expire_date_dd_ENUM_ErrorCount := COUNT(GROUP,h.orig_expire_date_dd_Invalid=1);
-    orig_noncdlstatus_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_noncdlstatus_Invalid=1);
-    orig_cdlstatus_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_cdlstatus_Invalid=1);
-    orig_restrictions_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_restrictions_Invalid=1);
-    orig_origdate_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_origdate_Invalid=1);
-    orig_origdate_LENGTH_ErrorCount := COUNT(GROUP,h.orig_origdate_Invalid=2);
-    orig_origdate_Total_ErrorCount := COUNT(GROUP,h.orig_origdate_Invalid>0);
-    orig_origcdldate_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_origcdldate_Invalid=1);
-    orig_origcdldate_LENGTH_ErrorCount := COUNT(GROUP,h.orig_origcdldate_Invalid=2);
-    orig_origcdldate_Total_ErrorCount := COUNT(GROUP,h.orig_origcdldate_Invalid>0);
-    orig_cancelst_ALLOW_ErrorCount := COUNT(GROUP,h.orig_cancelst_Invalid=1);
-    orig_cancelst_LENGTH_ErrorCount := COUNT(GROUP,h.orig_cancelst_Invalid=2);
-    orig_cancelst_Total_ErrorCount := COUNT(GROUP,h.orig_cancelst_Invalid>0);
-    orig_canceldate_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_canceldate_Invalid=1);
-    orig_canceldate_LENGTH_ErrorCount := COUNT(GROUP,h.orig_canceldate_Invalid=2);
-    orig_canceldate_Total_ErrorCount := COUNT(GROUP,h.orig_canceldate_Invalid>0);
-    clean_name_last_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_last_Invalid=1);
-    clean_name_last_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_name_last_Invalid=2);
-    clean_name_last_Total_ErrorCount := COUNT(GROUP,h.clean_name_last_Invalid>0);
-    clean_prim_range_LENGTH_ErrorCount := COUNT(GROUP,h.clean_prim_range_Invalid=1);
-    clean_predir_LENGTH_ErrorCount := COUNT(GROUP,h.clean_predir_Invalid=1);
-    clean_prim_name_LENGTH_ErrorCount := COUNT(GROUP,h.clean_prim_name_Invalid=1);
-    clean_addr_suffix_LENGTH_ErrorCount := COUNT(GROUP,h.clean_addr_suffix_Invalid=1);
-    clean_postdir_LENGTH_ErrorCount := COUNT(GROUP,h.clean_postdir_Invalid=1);
-    clean_unit_desig_LENGTH_ErrorCount := COUNT(GROUP,h.clean_unit_desig_Invalid=1);
-    clean_sec_range_LENGTH_ErrorCount := COUNT(GROUP,h.clean_sec_range_Invalid=1);
-    clean_p_city_name_LENGTH_ErrorCount := COUNT(GROUP,h.clean_p_city_name_Invalid=1);
-    clean_v_city_name_LENGTH_ErrorCount := COUNT(GROUP,h.clean_v_city_name_Invalid=1);
-    clean_st_LENGTH_ErrorCount := COUNT(GROUP,h.clean_st_Invalid=1);
-    clean_zip_LENGTH_ErrorCount := COUNT(GROUP,h.clean_zip_Invalid=1);
-    clean_zip4_LENGTH_ErrorCount := COUNT(GROUP,h.clean_zip4_Invalid=1);
-    clean_cart_LENGTH_ErrorCount := COUNT(GROUP,h.clean_cart_Invalid=1);
-    clean_cr_sort_sz_LENGTH_ErrorCount := COUNT(GROUP,h.clean_cr_sort_sz_Invalid=1);
-    clean_lot_LENGTH_ErrorCount := COUNT(GROUP,h.clean_lot_Invalid=1);
-    clean_lot_order_LENGTH_ErrorCount := COUNT(GROUP,h.clean_lot_order_Invalid=1);
-    clean_dpbc_LENGTH_ErrorCount := COUNT(GROUP,h.clean_dpbc_Invalid=1);
-    clean_chk_digit_LENGTH_ErrorCount := COUNT(GROUP,h.clean_chk_digit_Invalid=1);
-    clean_record_type_LENGTH_ErrorCount := COUNT(GROUP,h.clean_record_type_Invalid=1);
-    clean_ace_fips_st_LENGTH_ErrorCount := COUNT(GROUP,h.clean_ace_fips_st_Invalid=1);
-    clean_fipscounty_LENGTH_ErrorCount := COUNT(GROUP,h.clean_fipscounty_Invalid=1);
-    clean_geo_lat_LENGTH_ErrorCount := COUNT(GROUP,h.clean_geo_lat_Invalid=1);
-    clean_geo_long_LENGTH_ErrorCount := COUNT(GROUP,h.clean_geo_long_Invalid=1);
-    clean_msa_LENGTH_ErrorCount := COUNT(GROUP,h.clean_msa_Invalid=1);
-    clean_geo_blk_LENGTH_ErrorCount := COUNT(GROUP,h.clean_geo_blk_Invalid=1);
-    clean_geo_match_LENGTH_ErrorCount := COUNT(GROUP,h.clean_geo_match_Invalid=1);
-    clean_err_stat_LENGTH_ErrorCount := COUNT(GROUP,h.clean_err_stat_Invalid=1);
+    credentialstate_ENUM_ErrorCount := COUNT(GROUP,h.credentialstate_Invalid=1);
+    credentialnumber_CUSTOM_ErrorCount := COUNT(GROUP,h.credentialnumber_Invalid=1);
+    lastname_CUSTOM_ErrorCount := COUNT(GROUP,h.lastname_Invalid=1);
+    gender_ENUM_ErrorCount := COUNT(GROUP,h.gender_Invalid=1);
+    height_CUSTOM_ErrorCount := COUNT(GROUP,h.height_Invalid=1);
+    eyecolor_CUSTOM_ErrorCount := COUNT(GROUP,h.eyecolor_Invalid=1);
+    date_birth_CUSTOM_ErrorCount := COUNT(GROUP,h.date_birth_Invalid=1);
+    resiaddrstreet_ALLOW_ErrorCount := COUNT(GROUP,h.resiaddrstreet_Invalid=1);
+    residencycity_ALLOW_ErrorCount := COUNT(GROUP,h.residencycity_Invalid=1);
+    residencystate_CUSTOM_ErrorCount := COUNT(GROUP,h.residencystate_Invalid=1);
+    residencyzip_CUSTOM_ErrorCount := COUNT(GROUP,h.residencyzip_Invalid=1);
+    mailaddrstreet_ALLOW_ErrorCount := COUNT(GROUP,h.mailaddrstreet_Invalid=1);
+    mailingcity_ALLOW_ErrorCount := COUNT(GROUP,h.mailingcity_Invalid=1);
+    mailingstate_CUSTOM_ErrorCount := COUNT(GROUP,h.mailingstate_Invalid=1);
+    mailingzip_CUSTOM_ErrorCount := COUNT(GROUP,h.mailingzip_Invalid=1);
+    credentialtype_ENUM_ErrorCount := COUNT(GROUP,h.credentialtype_Invalid=1);
+    credential_class_CUSTOM_ErrorCount := COUNT(GROUP,h.credential_class_Invalid=1);
+    endorsements_ALLOW_ErrorCount := COUNT(GROUP,h.endorsements_Invalid=1);
+    restrictions_ALLOW_ErrorCount := COUNT(GROUP,h.restrictions_Invalid=1);
+    expdate_CUSTOM_ErrorCount := COUNT(GROUP,h.expdate_Invalid=1);
+    lastissuerenewaldate_CUSTOM_ErrorCount := COUNT(GROUP,h.lastissuerenewaldate_Invalid=1);
+    date_noncdl_CUSTOM_ErrorCount := COUNT(GROUP,h.date_noncdl_Invalid=1);
+    originaldate_cdl_CUSTOM_ErrorCount := COUNT(GROUP,h.originaldate_cdl_Invalid=1);
+    statusnoncdl_CUSTOM_ErrorCount := COUNT(GROUP,h.statusnoncdl_Invalid=1);
+    licensestatuscdl_CUSTOM_ErrorCount := COUNT(GROUP,h.licensestatuscdl_Invalid=1);
+    originaldate_lp_CUSTOM_ErrorCount := COUNT(GROUP,h.originaldate_lp_Invalid=1);
+    originaldate_id_CUSTOM_ErrorCount := COUNT(GROUP,h.originaldate_id_Invalid=1);
+    cancelstate_CUSTOM_ErrorCount := COUNT(GROUP,h.cancelstate_Invalid=1);
+    canceldate_CUSTOM_ErrorCount := COUNT(GROUP,h.canceldate_Invalid=1);
+    cdlmedicertissuedate_CUSTOM_ErrorCount := COUNT(GROUP,h.cdlmedicertissuedate_Invalid=1);
+    cdlmedicertexpdate_CUSTOM_ErrorCount := COUNT(GROUP,h.cdlmedicertexpdate_Invalid=1);
+    clean_name_last_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_name_last_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.append_process_date_Invalid > 0 OR h.credentialstate_Invalid > 0 OR h.credentialnumber_Invalid > 0 OR h.lastname_Invalid > 0 OR h.gender_Invalid > 0 OR h.height_Invalid > 0 OR h.eyecolor_Invalid > 0 OR h.date_birth_Invalid > 0 OR h.resiaddrstreet_Invalid > 0 OR h.residencycity_Invalid > 0 OR h.residencystate_Invalid > 0 OR h.residencyzip_Invalid > 0 OR h.mailaddrstreet_Invalid > 0 OR h.mailingcity_Invalid > 0 OR h.mailingstate_Invalid > 0 OR h.mailingzip_Invalid > 0 OR h.credentialtype_Invalid > 0 OR h.credential_class_Invalid > 0 OR h.endorsements_Invalid > 0 OR h.restrictions_Invalid > 0 OR h.expdate_Invalid > 0 OR h.lastissuerenewaldate_Invalid > 0 OR h.date_noncdl_Invalid > 0 OR h.originaldate_cdl_Invalid > 0 OR h.statusnoncdl_Invalid > 0 OR h.licensestatuscdl_Invalid > 0 OR h.originaldate_lp_Invalid > 0 OR h.originaldate_id_Invalid > 0 OR h.cancelstate_Invalid > 0 OR h.canceldate_Invalid > 0 OR h.cdlmedicertissuedate_Invalid > 0 OR h.cdlmedicertexpdate_Invalid > 0 OR h.clean_name_last_Invalid > 0);
+    FieldsChecked_WithErrors := 0;
+    FieldsChecked_NoErrors := 0;
+    Rules_WithErrors := 0;
+    Rules_NoErrors := 0;
   END;
-  EXPORT SummaryStats := TABLE(h,r);
+  SummaryStats0 := TABLE(h,r);
+  SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
+    SELF.FieldsChecked_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.credentialstate_ENUM_ErrorCount > 0, 1, 0) + IF(le.credentialnumber_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lastname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.height_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eyecolor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.resiaddrstreet_ALLOW_ErrorCount > 0, 1, 0) + IF(le.residencycity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.residencystate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.residencyzip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailaddrstreet_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailingzip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.credentialtype_ENUM_ErrorCount > 0, 1, 0) + IF(le.credential_class_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.endorsements_ALLOW_ErrorCount > 0, 1, 0) + IF(le.restrictions_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lastissuerenewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_noncdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_cdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statusnoncdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.licensestatuscdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_lp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cancelstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.canceldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cdlmedicertissuedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cdlmedicertexpdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_last_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
+    SELF.Rules_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.credentialstate_ENUM_ErrorCount > 0, 1, 0) + IF(le.credentialnumber_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lastname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.height_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eyecolor_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_birth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.resiaddrstreet_ALLOW_ErrorCount > 0, 1, 0) + IF(le.residencycity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.residencystate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.residencyzip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailaddrstreet_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingcity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailingstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailingzip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.credentialtype_ENUM_ErrorCount > 0, 1, 0) + IF(le.credential_class_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.endorsements_ALLOW_ErrorCount > 0, 1, 0) + IF(le.restrictions_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lastissuerenewaldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_noncdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_cdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statusnoncdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.licensestatuscdl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_lp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.originaldate_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cancelstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.canceldate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cdlmedicertissuedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cdlmedicertexpdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_last_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF := le;
+  END;
+  EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
   r := RECORD
     STRING10 Src;
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT34.StrType ErrorMessage;
-    SALT34.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.append_process_date_Invalid,le.orig_dlstate_Invalid,le.orig_dlnumber_Invalid,le.orig_name_Invalid,le.orig_dob_Invalid,le.orig_sex_Invalid,le.orig_height1_Invalid,le.orig_height2_Invalid,le.orig_eye_color_Invalid,le.orig_mailaddress_Invalid,le.orig_classification_Invalid,le.orig_issue_date_Invalid,le.orig_issue_date_dd_Invalid,le.orig_expire_date_Invalid,le.orig_expire_date_dd_Invalid,le.orig_noncdlstatus_Invalid,le.orig_cdlstatus_Invalid,le.orig_restrictions_Invalid,le.orig_origdate_Invalid,le.orig_origcdldate_Invalid,le.orig_cancelst_Invalid,le.orig_canceldate_Invalid,le.clean_name_last_Invalid,le.clean_prim_range_Invalid,le.clean_predir_Invalid,le.clean_prim_name_Invalid,le.clean_addr_suffix_Invalid,le.clean_postdir_Invalid,le.clean_unit_desig_Invalid,le.clean_sec_range_Invalid,le.clean_p_city_name_Invalid,le.clean_v_city_name_Invalid,le.clean_st_Invalid,le.clean_zip_Invalid,le.clean_zip4_Invalid,le.clean_cart_Invalid,le.clean_cr_sort_sz_Invalid,le.clean_lot_Invalid,le.clean_lot_order_Invalid,le.clean_dpbc_Invalid,le.clean_chk_digit_Invalid,le.clean_record_type_Invalid,le.clean_ace_fips_st_Invalid,le.clean_fipscounty_Invalid,le.clean_geo_lat_Invalid,le.clean_geo_long_Invalid,le.clean_msa_Invalid,le.clean_geo_blk_Invalid,le.clean_geo_match_Invalid,le.clean_err_stat_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_append_process_date(le.append_process_date_Invalid),Fields.InvalidMessage_orig_dlstate(le.orig_dlstate_Invalid),Fields.InvalidMessage_orig_dlnumber(le.orig_dlnumber_Invalid),Fields.InvalidMessage_orig_name(le.orig_name_Invalid),Fields.InvalidMessage_orig_dob(le.orig_dob_Invalid),Fields.InvalidMessage_orig_sex(le.orig_sex_Invalid),Fields.InvalidMessage_orig_height1(le.orig_height1_Invalid),Fields.InvalidMessage_orig_height2(le.orig_height2_Invalid),Fields.InvalidMessage_orig_eye_color(le.orig_eye_color_Invalid),Fields.InvalidMessage_orig_mailaddress(le.orig_mailaddress_Invalid),Fields.InvalidMessage_orig_classification(le.orig_classification_Invalid),Fields.InvalidMessage_orig_issue_date(le.orig_issue_date_Invalid),Fields.InvalidMessage_orig_issue_date_dd(le.orig_issue_date_dd_Invalid),Fields.InvalidMessage_orig_expire_date(le.orig_expire_date_Invalid),Fields.InvalidMessage_orig_expire_date_dd(le.orig_expire_date_dd_Invalid),Fields.InvalidMessage_orig_noncdlstatus(le.orig_noncdlstatus_Invalid),Fields.InvalidMessage_orig_cdlstatus(le.orig_cdlstatus_Invalid),Fields.InvalidMessage_orig_restrictions(le.orig_restrictions_Invalid),Fields.InvalidMessage_orig_origdate(le.orig_origdate_Invalid),Fields.InvalidMessage_orig_origcdldate(le.orig_origcdldate_Invalid),Fields.InvalidMessage_orig_cancelst(le.orig_cancelst_Invalid),Fields.InvalidMessage_orig_canceldate(le.orig_canceldate_Invalid),Fields.InvalidMessage_clean_name_last(le.clean_name_last_Invalid),Fields.InvalidMessage_clean_prim_range(le.clean_prim_range_Invalid),Fields.InvalidMessage_clean_predir(le.clean_predir_Invalid),Fields.InvalidMessage_clean_prim_name(le.clean_prim_name_Invalid),Fields.InvalidMessage_clean_addr_suffix(le.clean_addr_suffix_Invalid),Fields.InvalidMessage_clean_postdir(le.clean_postdir_Invalid),Fields.InvalidMessage_clean_unit_desig(le.clean_unit_desig_Invalid),Fields.InvalidMessage_clean_sec_range(le.clean_sec_range_Invalid),Fields.InvalidMessage_clean_p_city_name(le.clean_p_city_name_Invalid),Fields.InvalidMessage_clean_v_city_name(le.clean_v_city_name_Invalid),Fields.InvalidMessage_clean_st(le.clean_st_Invalid),Fields.InvalidMessage_clean_zip(le.clean_zip_Invalid),Fields.InvalidMessage_clean_zip4(le.clean_zip4_Invalid),Fields.InvalidMessage_clean_cart(le.clean_cart_Invalid),Fields.InvalidMessage_clean_cr_sort_sz(le.clean_cr_sort_sz_Invalid),Fields.InvalidMessage_clean_lot(le.clean_lot_Invalid),Fields.InvalidMessage_clean_lot_order(le.clean_lot_order_Invalid),Fields.InvalidMessage_clean_dpbc(le.clean_dpbc_Invalid),Fields.InvalidMessage_clean_chk_digit(le.clean_chk_digit_Invalid),Fields.InvalidMessage_clean_record_type(le.clean_record_type_Invalid),Fields.InvalidMessage_clean_ace_fips_st(le.clean_ace_fips_st_Invalid),Fields.InvalidMessage_clean_fipscounty(le.clean_fipscounty_Invalid),Fields.InvalidMessage_clean_geo_lat(le.clean_geo_lat_Invalid),Fields.InvalidMessage_clean_geo_long(le.clean_geo_long_Invalid),Fields.InvalidMessage_clean_msa(le.clean_msa_Invalid),Fields.InvalidMessage_clean_geo_blk(le.clean_geo_blk_Invalid),Fields.InvalidMessage_clean_geo_match(le.clean_geo_match_Invalid),Fields.InvalidMessage_clean_err_stat(le.clean_err_stat_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.append_process_date_Invalid,le.credentialstate_Invalid,le.credentialnumber_Invalid,le.lastname_Invalid,le.gender_Invalid,le.height_Invalid,le.eyecolor_Invalid,le.date_birth_Invalid,le.resiaddrstreet_Invalid,le.residencycity_Invalid,le.residencystate_Invalid,le.residencyzip_Invalid,le.mailaddrstreet_Invalid,le.mailingcity_Invalid,le.mailingstate_Invalid,le.mailingzip_Invalid,le.credentialtype_Invalid,le.credential_class_Invalid,le.endorsements_Invalid,le.restrictions_Invalid,le.expdate_Invalid,le.lastissuerenewaldate_Invalid,le.date_noncdl_Invalid,le.originaldate_cdl_Invalid,le.statusnoncdl_Invalid,le.licensestatuscdl_Invalid,le.originaldate_lp_Invalid,le.originaldate_id_Invalid,le.cancelstate_Invalid,le.canceldate_Invalid,le.cdlmedicertissuedate_Invalid,le.cdlmedicertexpdate_Invalid,le.clean_name_last_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_append_process_date(le.append_process_date_Invalid),Fields.InvalidMessage_credentialstate(le.credentialstate_Invalid),Fields.InvalidMessage_credentialnumber(le.credentialnumber_Invalid),Fields.InvalidMessage_lastname(le.lastname_Invalid),Fields.InvalidMessage_gender(le.gender_Invalid),Fields.InvalidMessage_height(le.height_Invalid),Fields.InvalidMessage_eyecolor(le.eyecolor_Invalid),Fields.InvalidMessage_date_birth(le.date_birth_Invalid),Fields.InvalidMessage_resiaddrstreet(le.resiaddrstreet_Invalid),Fields.InvalidMessage_residencycity(le.residencycity_Invalid),Fields.InvalidMessage_residencystate(le.residencystate_Invalid),Fields.InvalidMessage_residencyzip(le.residencyzip_Invalid),Fields.InvalidMessage_mailaddrstreet(le.mailaddrstreet_Invalid),Fields.InvalidMessage_mailingcity(le.mailingcity_Invalid),Fields.InvalidMessage_mailingstate(le.mailingstate_Invalid),Fields.InvalidMessage_mailingzip(le.mailingzip_Invalid),Fields.InvalidMessage_credentialtype(le.credentialtype_Invalid),Fields.InvalidMessage_credential_class(le.credential_class_Invalid),Fields.InvalidMessage_endorsements(le.endorsements_Invalid),Fields.InvalidMessage_restrictions(le.restrictions_Invalid),Fields.InvalidMessage_expdate(le.expdate_Invalid),Fields.InvalidMessage_lastissuerenewaldate(le.lastissuerenewaldate_Invalid),Fields.InvalidMessage_date_noncdl(le.date_noncdl_Invalid),Fields.InvalidMessage_originaldate_cdl(le.originaldate_cdl_Invalid),Fields.InvalidMessage_statusnoncdl(le.statusnoncdl_Invalid),Fields.InvalidMessage_licensestatuscdl(le.licensestatuscdl_Invalid),Fields.InvalidMessage_originaldate_lp(le.originaldate_lp_Invalid),Fields.InvalidMessage_originaldate_id(le.originaldate_id_Invalid),Fields.InvalidMessage_cancelstate(le.cancelstate_Invalid),Fields.InvalidMessage_canceldate(le.canceldate_Invalid),Fields.InvalidMessage_cdlmedicertissuedate(le.cdlmedicertissuedate_Invalid),Fields.InvalidMessage_cdlmedicertexpdate(le.cdlmedicertexpdate_Invalid),Fields.InvalidMessage_clean_name_last(le.clean_name_last_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.append_process_date_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_dlstate_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.orig_dlnumber_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_name_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_dob_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_sex_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.orig_height1_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_height2_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.orig_eye_color_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_mailaddress_Invalid,'CAPS','ALLOW','UNKNOWN')
-          ,CHOOSE(le.orig_classification_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_issue_date_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_issue_date_dd_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.orig_expire_date_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_expire_date_dd_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.orig_noncdlstatus_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_cdlstatus_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_restrictions_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_origdate_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_origcdldate_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_cancelst_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.orig_canceldate_Invalid,'CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_name_last_Invalid,'ALLOW','CUSTOM','UNKNOWN')
-          ,CHOOSE(le.clean_prim_range_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_predir_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_prim_name_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_addr_suffix_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_postdir_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_unit_desig_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_sec_range_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_p_city_name_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_v_city_name_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_st_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_zip_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_zip4_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_cart_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_cr_sort_sz_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_lot_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_lot_order_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_dpbc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_chk_digit_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_record_type_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_ace_fips_st_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_fipscounty_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_geo_lat_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_geo_long_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_msa_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_geo_blk_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_geo_match_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.clean_err_stat_Invalid,'LENGTH','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'append_process_date','orig_dlstate','orig_dlnumber','orig_name','orig_dob','orig_sex','orig_height1','orig_height2','orig_eye_color','orig_mailaddress','orig_classification','orig_issue_date','orig_issue_date_dd','orig_expire_date','orig_expire_date_dd','orig_noncdlstatus','orig_cdlstatus','orig_restrictions','orig_origdate','orig_origcdldate','orig_cancelst','orig_canceldate','clean_name_last','clean_prim_range','clean_predir','clean_prim_name','clean_addr_suffix','clean_postdir','clean_unit_desig','clean_sec_range','clean_p_city_name','clean_v_city_name','clean_st','clean_zip','clean_zip4','clean_cart','clean_cr_sort_sz','clean_lot','clean_lot_order','clean_dpbc','clean_chk_digit','clean_record_type','clean_ace_fips_st','clean_fipscounty','clean_geo_lat','clean_geo_long','clean_msa','clean_geo_blk','clean_geo_match','clean_err_stat','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_8pastdate','invalid_orig_dlstate','invalid_orig_dlnumber','invalid_orig_name','invalid_8pastdate','invalid_orig_sex','invalid_orig_height','invalid_inches','invalid_orig_eye_color','invalid_wordbag','invalid_orig_classification','invalid_orig_issue_date','invalid_day','invalid_orig_expire_date','invalid_day','invalid_orig_status','invalid_orig_status','invalid_orig_restrictions','invalid_08pastdate','invalid_08pastdate','invalid_state','invalid_08pastdate','invalid_clean_name','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT34.StrType)le.append_process_date,(SALT34.StrType)le.orig_dlstate,(SALT34.StrType)le.orig_dlnumber,(SALT34.StrType)le.orig_name,(SALT34.StrType)le.orig_dob,(SALT34.StrType)le.orig_sex,(SALT34.StrType)le.orig_height1,(SALT34.StrType)le.orig_height2,(SALT34.StrType)le.orig_eye_color,(SALT34.StrType)le.orig_mailaddress,(SALT34.StrType)le.orig_classification,(SALT34.StrType)le.orig_issue_date,(SALT34.StrType)le.orig_issue_date_dd,(SALT34.StrType)le.orig_expire_date,(SALT34.StrType)le.orig_expire_date_dd,(SALT34.StrType)le.orig_noncdlstatus,(SALT34.StrType)le.orig_cdlstatus,(SALT34.StrType)le.orig_restrictions,(SALT34.StrType)le.orig_origdate,(SALT34.StrType)le.orig_origcdldate,(SALT34.StrType)le.orig_cancelst,(SALT34.StrType)le.orig_canceldate,(SALT34.StrType)le.clean_name_last,(SALT34.StrType)le.clean_prim_range,(SALT34.StrType)le.clean_predir,(SALT34.StrType)le.clean_prim_name,(SALT34.StrType)le.clean_addr_suffix,(SALT34.StrType)le.clean_postdir,(SALT34.StrType)le.clean_unit_desig,(SALT34.StrType)le.clean_sec_range,(SALT34.StrType)le.clean_p_city_name,(SALT34.StrType)le.clean_v_city_name,(SALT34.StrType)le.clean_st,(SALT34.StrType)le.clean_zip,(SALT34.StrType)le.clean_zip4,(SALT34.StrType)le.clean_cart,(SALT34.StrType)le.clean_cr_sort_sz,(SALT34.StrType)le.clean_lot,(SALT34.StrType)le.clean_lot_order,(SALT34.StrType)le.clean_dpbc,(SALT34.StrType)le.clean_chk_digit,(SALT34.StrType)le.clean_record_type,(SALT34.StrType)le.clean_ace_fips_st,(SALT34.StrType)le.clean_fipscounty,(SALT34.StrType)le.clean_geo_lat,(SALT34.StrType)le.clean_geo_long,(SALT34.StrType)le.clean_msa,(SALT34.StrType)le.clean_geo_blk,(SALT34.StrType)le.clean_geo_match,(SALT34.StrType)le.clean_err_stat,'***SALTBUG***');
+          ,CHOOSE(le.append_process_date_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.credentialstate_Invalid,'ENUM','UNKNOWN')
+          ,CHOOSE(le.credentialnumber_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.lastname_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.gender_Invalid,'ENUM','UNKNOWN')
+          ,CHOOSE(le.height_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.eyecolor_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.date_birth_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.resiaddrstreet_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.residencycity_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.residencystate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.residencyzip_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.mailaddrstreet_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.mailingcity_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.mailingstate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.mailingzip_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.credentialtype_Invalid,'ENUM','UNKNOWN')
+          ,CHOOSE(le.credential_class_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.endorsements_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.restrictions_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.expdate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.lastissuerenewaldate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.date_noncdl_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.originaldate_cdl_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.statusnoncdl_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.licensestatuscdl_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.originaldate_lp_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.originaldate_id_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.cancelstate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.canceldate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.cdlmedicertissuedate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.cdlmedicertexpdate_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.clean_name_last_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'append_process_date','credentialstate','credentialnumber','lastname','gender','height','eyecolor','date_birth','resiaddrstreet','residencycity','residencystate','residencyzip','mailaddrstreet','mailingcity','mailingstate','mailingzip','credentialtype','credential_class','endorsements','restrictions','expdate','lastissuerenewaldate','date_noncdl','originaldate_cdl','statusnoncdl','licensestatuscdl','originaldate_lp','originaldate_id','cancelstate','canceldate','cdlmedicertissuedate','cdlmedicertexpdate','clean_name_last','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_past_date','invalid_credentialstate','invalid_credentialnumber','invalid_name','invalid_sex','invalid_height','invalid_eye_color','invalid_past_date','invalid_street','invalid_city','invalid_state','invalid_zip','invalid_street','invalid_city','invalid_state','invalid_zip','invalid_credentialtype','invalid_class','invalid_endorsements','invalid_restrictions','invalid_general_date','invalid_past_date','invalid_past_date','invalid_past_date','invalid_status','invalid_status_cdl','invalid_past_date','invalid_past_date','invalid_state','invalid_past_date','invalid_past_date','invalid_general_date','invalid_clean_name','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.append_process_date,(SALT311.StrType)le.credentialstate,(SALT311.StrType)le.credentialnumber,(SALT311.StrType)le.lastname,(SALT311.StrType)le.gender,(SALT311.StrType)le.height,(SALT311.StrType)le.eyecolor,(SALT311.StrType)le.date_birth,(SALT311.StrType)le.resiaddrstreet,(SALT311.StrType)le.residencycity,(SALT311.StrType)le.residencystate,(SALT311.StrType)le.residencyzip,(SALT311.StrType)le.mailaddrstreet,(SALT311.StrType)le.mailingcity,(SALT311.StrType)le.mailingstate,(SALT311.StrType)le.mailingzip,(SALT311.StrType)le.credentialtype,(SALT311.StrType)le.credential_class,(SALT311.StrType)le.endorsements,(SALT311.StrType)le.restrictions,(SALT311.StrType)le.expdate,(SALT311.StrType)le.lastissuerenewaldate,(SALT311.StrType)le.date_noncdl,(SALT311.StrType)le.originaldate_cdl,(SALT311.StrType)le.statusnoncdl,(SALT311.StrType)le.licensestatuscdl,(SALT311.StrType)le.originaldate_lp,(SALT311.StrType)le.originaldate_id,(SALT311.StrType)le.cancelstate,(SALT311.StrType)le.canceldate,(SALT311.StrType)le.cdlmedicertissuedate,(SALT311.StrType)le.cdlmedicertexpdate,(SALT311.StrType)le.clean_name_last,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,50,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,33,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT34.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_In_CT) prevDS = DATASET([], Layout_In_CT), STRING10 Src='UNK'):= FUNCTION
+  // field error stats
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'append_process_date:invalid_8pastdate:CUSTOM','append_process_date:invalid_8pastdate:LENGTH'
-          ,'orig_dlstate:invalid_orig_dlstate:ENUM'
-          ,'orig_dlnumber:invalid_orig_dlnumber:ALLOW','orig_dlnumber:invalid_orig_dlnumber:CUSTOM','orig_dlnumber:invalid_orig_dlnumber:LENGTH'
-          ,'orig_name:invalid_orig_name:ALLOW','orig_name:invalid_orig_name:LENGTH'
-          ,'orig_dob:invalid_8pastdate:CUSTOM','orig_dob:invalid_8pastdate:LENGTH'
-          ,'orig_sex:invalid_orig_sex:ENUM'
-          ,'orig_height1:invalid_orig_height:CUSTOM'
-          ,'orig_height2:invalid_inches:ENUM'
-          ,'orig_eye_color:invalid_orig_eye_color:CUSTOM'
-          ,'orig_mailaddress:invalid_wordbag:CAPS','orig_mailaddress:invalid_wordbag:ALLOW'
-          ,'orig_classification:invalid_orig_classification:CUSTOM'
-          ,'orig_issue_date:invalid_orig_issue_date:CUSTOM','orig_issue_date:invalid_orig_issue_date:LENGTH'
-          ,'orig_issue_date_dd:invalid_day:ENUM'
-          ,'orig_expire_date:invalid_orig_expire_date:CUSTOM','orig_expire_date:invalid_orig_expire_date:LENGTH'
-          ,'orig_expire_date_dd:invalid_day:ENUM'
-          ,'orig_noncdlstatus:invalid_orig_status:CUSTOM'
-          ,'orig_cdlstatus:invalid_orig_status:CUSTOM'
-          ,'orig_restrictions:invalid_orig_restrictions:CUSTOM'
-          ,'orig_origdate:invalid_08pastdate:CUSTOM','orig_origdate:invalid_08pastdate:LENGTH'
-          ,'orig_origcdldate:invalid_08pastdate:CUSTOM','orig_origcdldate:invalid_08pastdate:LENGTH'
-          ,'orig_cancelst:invalid_state:ALLOW','orig_cancelst:invalid_state:LENGTH'
-          ,'orig_canceldate:invalid_08pastdate:CUSTOM','orig_canceldate:invalid_08pastdate:LENGTH'
-          ,'clean_name_last:invalid_clean_name:ALLOW','clean_name_last:invalid_clean_name:CUSTOM'
-          ,'clean_prim_range:invalid_empty:LENGTH'
-          ,'clean_predir:invalid_empty:LENGTH'
-          ,'clean_prim_name:invalid_empty:LENGTH'
-          ,'clean_addr_suffix:invalid_empty:LENGTH'
-          ,'clean_postdir:invalid_empty:LENGTH'
-          ,'clean_unit_desig:invalid_empty:LENGTH'
-          ,'clean_sec_range:invalid_empty:LENGTH'
-          ,'clean_p_city_name:invalid_empty:LENGTH'
-          ,'clean_v_city_name:invalid_empty:LENGTH'
-          ,'clean_st:invalid_empty:LENGTH'
-          ,'clean_zip:invalid_empty:LENGTH'
-          ,'clean_zip4:invalid_empty:LENGTH'
-          ,'clean_cart:invalid_empty:LENGTH'
-          ,'clean_cr_sort_sz:invalid_empty:LENGTH'
-          ,'clean_lot:invalid_empty:LENGTH'
-          ,'clean_lot_order:invalid_empty:LENGTH'
-          ,'clean_dpbc:invalid_empty:LENGTH'
-          ,'clean_chk_digit:invalid_empty:LENGTH'
-          ,'clean_record_type:invalid_empty:LENGTH'
-          ,'clean_ace_fips_st:invalid_empty:LENGTH'
-          ,'clean_fipscounty:invalid_empty:LENGTH'
-          ,'clean_geo_lat:invalid_empty:LENGTH'
-          ,'clean_geo_long:invalid_empty:LENGTH'
-          ,'clean_msa:invalid_empty:LENGTH'
-          ,'clean_geo_blk:invalid_empty:LENGTH'
-          ,'clean_geo_match:invalid_empty:LENGTH'
-          ,'clean_err_stat:invalid_empty:LENGTH','UNKNOWN');
+          ,'append_process_date:invalid_past_date:CUSTOM'
+          ,'credentialstate:invalid_credentialstate:ENUM'
+          ,'credentialnumber:invalid_credentialnumber:CUSTOM'
+          ,'lastname:invalid_name:CUSTOM'
+          ,'gender:invalid_sex:ENUM'
+          ,'height:invalid_height:CUSTOM'
+          ,'eyecolor:invalid_eye_color:CUSTOM'
+          ,'date_birth:invalid_past_date:CUSTOM'
+          ,'resiaddrstreet:invalid_street:ALLOW'
+          ,'residencycity:invalid_city:ALLOW'
+          ,'residencystate:invalid_state:CUSTOM'
+          ,'residencyzip:invalid_zip:CUSTOM'
+          ,'mailaddrstreet:invalid_street:ALLOW'
+          ,'mailingcity:invalid_city:ALLOW'
+          ,'mailingstate:invalid_state:CUSTOM'
+          ,'mailingzip:invalid_zip:CUSTOM'
+          ,'credentialtype:invalid_credentialtype:ENUM'
+          ,'credential_class:invalid_class:CUSTOM'
+          ,'endorsements:invalid_endorsements:ALLOW'
+          ,'restrictions:invalid_restrictions:ALLOW'
+          ,'expdate:invalid_general_date:CUSTOM'
+          ,'lastissuerenewaldate:invalid_past_date:CUSTOM'
+          ,'date_noncdl:invalid_past_date:CUSTOM'
+          ,'originaldate_cdl:invalid_past_date:CUSTOM'
+          ,'statusnoncdl:invalid_status:CUSTOM'
+          ,'licensestatuscdl:invalid_status_cdl:CUSTOM'
+          ,'originaldate_lp:invalid_past_date:CUSTOM'
+          ,'originaldate_id:invalid_past_date:CUSTOM'
+          ,'cancelstate:invalid_state:CUSTOM'
+          ,'canceldate:invalid_past_date:CUSTOM'
+          ,'cdlmedicertissuedate:invalid_past_date:CUSTOM'
+          ,'cdlmedicertexpdate:invalid_general_date:CUSTOM'
+          ,'clean_name_last:invalid_clean_name:CUSTOM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
-          ,Fields.InvalidMessage_append_process_date(1),Fields.InvalidMessage_append_process_date(2)
-          ,Fields.InvalidMessage_orig_dlstate(1)
-          ,Fields.InvalidMessage_orig_dlnumber(1),Fields.InvalidMessage_orig_dlnumber(2),Fields.InvalidMessage_orig_dlnumber(3)
-          ,Fields.InvalidMessage_orig_name(1),Fields.InvalidMessage_orig_name(2)
-          ,Fields.InvalidMessage_orig_dob(1),Fields.InvalidMessage_orig_dob(2)
-          ,Fields.InvalidMessage_orig_sex(1)
-          ,Fields.InvalidMessage_orig_height1(1)
-          ,Fields.InvalidMessage_orig_height2(1)
-          ,Fields.InvalidMessage_orig_eye_color(1)
-          ,Fields.InvalidMessage_orig_mailaddress(1),Fields.InvalidMessage_orig_mailaddress(2)
-          ,Fields.InvalidMessage_orig_classification(1)
-          ,Fields.InvalidMessage_orig_issue_date(1),Fields.InvalidMessage_orig_issue_date(2)
-          ,Fields.InvalidMessage_orig_issue_date_dd(1)
-          ,Fields.InvalidMessage_orig_expire_date(1),Fields.InvalidMessage_orig_expire_date(2)
-          ,Fields.InvalidMessage_orig_expire_date_dd(1)
-          ,Fields.InvalidMessage_orig_noncdlstatus(1)
-          ,Fields.InvalidMessage_orig_cdlstatus(1)
-          ,Fields.InvalidMessage_orig_restrictions(1)
-          ,Fields.InvalidMessage_orig_origdate(1),Fields.InvalidMessage_orig_origdate(2)
-          ,Fields.InvalidMessage_orig_origcdldate(1),Fields.InvalidMessage_orig_origcdldate(2)
-          ,Fields.InvalidMessage_orig_cancelst(1),Fields.InvalidMessage_orig_cancelst(2)
-          ,Fields.InvalidMessage_orig_canceldate(1),Fields.InvalidMessage_orig_canceldate(2)
-          ,Fields.InvalidMessage_clean_name_last(1),Fields.InvalidMessage_clean_name_last(2)
-          ,Fields.InvalidMessage_clean_prim_range(1)
-          ,Fields.InvalidMessage_clean_predir(1)
-          ,Fields.InvalidMessage_clean_prim_name(1)
-          ,Fields.InvalidMessage_clean_addr_suffix(1)
-          ,Fields.InvalidMessage_clean_postdir(1)
-          ,Fields.InvalidMessage_clean_unit_desig(1)
-          ,Fields.InvalidMessage_clean_sec_range(1)
-          ,Fields.InvalidMessage_clean_p_city_name(1)
-          ,Fields.InvalidMessage_clean_v_city_name(1)
-          ,Fields.InvalidMessage_clean_st(1)
-          ,Fields.InvalidMessage_clean_zip(1)
-          ,Fields.InvalidMessage_clean_zip4(1)
-          ,Fields.InvalidMessage_clean_cart(1)
-          ,Fields.InvalidMessage_clean_cr_sort_sz(1)
-          ,Fields.InvalidMessage_clean_lot(1)
-          ,Fields.InvalidMessage_clean_lot_order(1)
-          ,Fields.InvalidMessage_clean_dpbc(1)
-          ,Fields.InvalidMessage_clean_chk_digit(1)
-          ,Fields.InvalidMessage_clean_record_type(1)
-          ,Fields.InvalidMessage_clean_ace_fips_st(1)
-          ,Fields.InvalidMessage_clean_fipscounty(1)
-          ,Fields.InvalidMessage_clean_geo_lat(1)
-          ,Fields.InvalidMessage_clean_geo_long(1)
-          ,Fields.InvalidMessage_clean_msa(1)
-          ,Fields.InvalidMessage_clean_geo_blk(1)
-          ,Fields.InvalidMessage_clean_geo_match(1)
-          ,Fields.InvalidMessage_clean_err_stat(1),'UNKNOWN');
+          ,Fields.InvalidMessage_append_process_date(1)
+          ,Fields.InvalidMessage_credentialstate(1)
+          ,Fields.InvalidMessage_credentialnumber(1)
+          ,Fields.InvalidMessage_lastname(1)
+          ,Fields.InvalidMessage_gender(1)
+          ,Fields.InvalidMessage_height(1)
+          ,Fields.InvalidMessage_eyecolor(1)
+          ,Fields.InvalidMessage_date_birth(1)
+          ,Fields.InvalidMessage_resiaddrstreet(1)
+          ,Fields.InvalidMessage_residencycity(1)
+          ,Fields.InvalidMessage_residencystate(1)
+          ,Fields.InvalidMessage_residencyzip(1)
+          ,Fields.InvalidMessage_mailaddrstreet(1)
+          ,Fields.InvalidMessage_mailingcity(1)
+          ,Fields.InvalidMessage_mailingstate(1)
+          ,Fields.InvalidMessage_mailingzip(1)
+          ,Fields.InvalidMessage_credentialtype(1)
+          ,Fields.InvalidMessage_credential_class(1)
+          ,Fields.InvalidMessage_endorsements(1)
+          ,Fields.InvalidMessage_restrictions(1)
+          ,Fields.InvalidMessage_expdate(1)
+          ,Fields.InvalidMessage_lastissuerenewaldate(1)
+          ,Fields.InvalidMessage_date_noncdl(1)
+          ,Fields.InvalidMessage_originaldate_cdl(1)
+          ,Fields.InvalidMessage_statusnoncdl(1)
+          ,Fields.InvalidMessage_licensestatuscdl(1)
+          ,Fields.InvalidMessage_originaldate_lp(1)
+          ,Fields.InvalidMessage_originaldate_id(1)
+          ,Fields.InvalidMessage_cancelstate(1)
+          ,Fields.InvalidMessage_canceldate(1)
+          ,Fields.InvalidMessage_cdlmedicertissuedate(1)
+          ,Fields.InvalidMessage_cdlmedicertexpdate(1)
+          ,Fields.InvalidMessage_clean_name_last(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.append_process_date_CUSTOM_ErrorCount,le.append_process_date_LENGTH_ErrorCount
-          ,le.orig_dlstate_ENUM_ErrorCount
-          ,le.orig_dlnumber_ALLOW_ErrorCount,le.orig_dlnumber_CUSTOM_ErrorCount,le.orig_dlnumber_LENGTH_ErrorCount
-          ,le.orig_name_ALLOW_ErrorCount,le.orig_name_LENGTH_ErrorCount
-          ,le.orig_dob_CUSTOM_ErrorCount,le.orig_dob_LENGTH_ErrorCount
-          ,le.orig_sex_ENUM_ErrorCount
-          ,le.orig_height1_CUSTOM_ErrorCount
-          ,le.orig_height2_ENUM_ErrorCount
-          ,le.orig_eye_color_CUSTOM_ErrorCount
-          ,le.orig_mailaddress_CAPS_ErrorCount,le.orig_mailaddress_ALLOW_ErrorCount
-          ,le.orig_classification_CUSTOM_ErrorCount
-          ,le.orig_issue_date_CUSTOM_ErrorCount,le.orig_issue_date_LENGTH_ErrorCount
-          ,le.orig_issue_date_dd_ENUM_ErrorCount
-          ,le.orig_expire_date_CUSTOM_ErrorCount,le.orig_expire_date_LENGTH_ErrorCount
-          ,le.orig_expire_date_dd_ENUM_ErrorCount
-          ,le.orig_noncdlstatus_CUSTOM_ErrorCount
-          ,le.orig_cdlstatus_CUSTOM_ErrorCount
-          ,le.orig_restrictions_CUSTOM_ErrorCount
-          ,le.orig_origdate_CUSTOM_ErrorCount,le.orig_origdate_LENGTH_ErrorCount
-          ,le.orig_origcdldate_CUSTOM_ErrorCount,le.orig_origcdldate_LENGTH_ErrorCount
-          ,le.orig_cancelst_ALLOW_ErrorCount,le.orig_cancelst_LENGTH_ErrorCount
-          ,le.orig_canceldate_CUSTOM_ErrorCount,le.orig_canceldate_LENGTH_ErrorCount
-          ,le.clean_name_last_ALLOW_ErrorCount,le.clean_name_last_CUSTOM_ErrorCount
-          ,le.clean_prim_range_LENGTH_ErrorCount
-          ,le.clean_predir_LENGTH_ErrorCount
-          ,le.clean_prim_name_LENGTH_ErrorCount
-          ,le.clean_addr_suffix_LENGTH_ErrorCount
-          ,le.clean_postdir_LENGTH_ErrorCount
-          ,le.clean_unit_desig_LENGTH_ErrorCount
-          ,le.clean_sec_range_LENGTH_ErrorCount
-          ,le.clean_p_city_name_LENGTH_ErrorCount
-          ,le.clean_v_city_name_LENGTH_ErrorCount
-          ,le.clean_st_LENGTH_ErrorCount
-          ,le.clean_zip_LENGTH_ErrorCount
-          ,le.clean_zip4_LENGTH_ErrorCount
-          ,le.clean_cart_LENGTH_ErrorCount
-          ,le.clean_cr_sort_sz_LENGTH_ErrorCount
-          ,le.clean_lot_LENGTH_ErrorCount
-          ,le.clean_lot_order_LENGTH_ErrorCount
-          ,le.clean_dpbc_LENGTH_ErrorCount
-          ,le.clean_chk_digit_LENGTH_ErrorCount
-          ,le.clean_record_type_LENGTH_ErrorCount
-          ,le.clean_ace_fips_st_LENGTH_ErrorCount
-          ,le.clean_fipscounty_LENGTH_ErrorCount
-          ,le.clean_geo_lat_LENGTH_ErrorCount
-          ,le.clean_geo_long_LENGTH_ErrorCount
-          ,le.clean_msa_LENGTH_ErrorCount
-          ,le.clean_geo_blk_LENGTH_ErrorCount
-          ,le.clean_geo_match_LENGTH_ErrorCount
-          ,le.clean_err_stat_LENGTH_ErrorCount,0);
-      SELF.rulepcnt := 100 * CHOOSE(c
-          ,le.append_process_date_CUSTOM_ErrorCount,le.append_process_date_LENGTH_ErrorCount
-          ,le.orig_dlstate_ENUM_ErrorCount
-          ,le.orig_dlnumber_ALLOW_ErrorCount,le.orig_dlnumber_CUSTOM_ErrorCount,le.orig_dlnumber_LENGTH_ErrorCount
-          ,le.orig_name_ALLOW_ErrorCount,le.orig_name_LENGTH_ErrorCount
-          ,le.orig_dob_CUSTOM_ErrorCount,le.orig_dob_LENGTH_ErrorCount
-          ,le.orig_sex_ENUM_ErrorCount
-          ,le.orig_height1_CUSTOM_ErrorCount
-          ,le.orig_height2_ENUM_ErrorCount
-          ,le.orig_eye_color_CUSTOM_ErrorCount
-          ,le.orig_mailaddress_CAPS_ErrorCount,le.orig_mailaddress_ALLOW_ErrorCount
-          ,le.orig_classification_CUSTOM_ErrorCount
-          ,le.orig_issue_date_CUSTOM_ErrorCount,le.orig_issue_date_LENGTH_ErrorCount
-          ,le.orig_issue_date_dd_ENUM_ErrorCount
-          ,le.orig_expire_date_CUSTOM_ErrorCount,le.orig_expire_date_LENGTH_ErrorCount
-          ,le.orig_expire_date_dd_ENUM_ErrorCount
-          ,le.orig_noncdlstatus_CUSTOM_ErrorCount
-          ,le.orig_cdlstatus_CUSTOM_ErrorCount
-          ,le.orig_restrictions_CUSTOM_ErrorCount
-          ,le.orig_origdate_CUSTOM_ErrorCount,le.orig_origdate_LENGTH_ErrorCount
-          ,le.orig_origcdldate_CUSTOM_ErrorCount,le.orig_origcdldate_LENGTH_ErrorCount
-          ,le.orig_cancelst_ALLOW_ErrorCount,le.orig_cancelst_LENGTH_ErrorCount
-          ,le.orig_canceldate_CUSTOM_ErrorCount,le.orig_canceldate_LENGTH_ErrorCount
-          ,le.clean_name_last_ALLOW_ErrorCount,le.clean_name_last_CUSTOM_ErrorCount
-          ,le.clean_prim_range_LENGTH_ErrorCount
-          ,le.clean_predir_LENGTH_ErrorCount
-          ,le.clean_prim_name_LENGTH_ErrorCount
-          ,le.clean_addr_suffix_LENGTH_ErrorCount
-          ,le.clean_postdir_LENGTH_ErrorCount
-          ,le.clean_unit_desig_LENGTH_ErrorCount
-          ,le.clean_sec_range_LENGTH_ErrorCount
-          ,le.clean_p_city_name_LENGTH_ErrorCount
-          ,le.clean_v_city_name_LENGTH_ErrorCount
-          ,le.clean_st_LENGTH_ErrorCount
-          ,le.clean_zip_LENGTH_ErrorCount
-          ,le.clean_zip4_LENGTH_ErrorCount
-          ,le.clean_cart_LENGTH_ErrorCount
-          ,le.clean_cr_sort_sz_LENGTH_ErrorCount
-          ,le.clean_lot_LENGTH_ErrorCount
-          ,le.clean_lot_order_LENGTH_ErrorCount
-          ,le.clean_dpbc_LENGTH_ErrorCount
-          ,le.clean_chk_digit_LENGTH_ErrorCount
-          ,le.clean_record_type_LENGTH_ErrorCount
-          ,le.clean_ace_fips_st_LENGTH_ErrorCount
-          ,le.clean_fipscounty_LENGTH_ErrorCount
-          ,le.clean_geo_lat_LENGTH_ErrorCount
-          ,le.clean_geo_long_LENGTH_ErrorCount
-          ,le.clean_msa_LENGTH_ErrorCount
-          ,le.clean_geo_blk_LENGTH_ErrorCount
-          ,le.clean_geo_match_LENGTH_ErrorCount
-          ,le.clean_err_stat_LENGTH_ErrorCount,0) / le.TotalCnt + 0.5;
+          ,le.append_process_date_CUSTOM_ErrorCount
+          ,le.credentialstate_ENUM_ErrorCount
+          ,le.credentialnumber_CUSTOM_ErrorCount
+          ,le.lastname_CUSTOM_ErrorCount
+          ,le.gender_ENUM_ErrorCount
+          ,le.height_CUSTOM_ErrorCount
+          ,le.eyecolor_CUSTOM_ErrorCount
+          ,le.date_birth_CUSTOM_ErrorCount
+          ,le.resiaddrstreet_ALLOW_ErrorCount
+          ,le.residencycity_ALLOW_ErrorCount
+          ,le.residencystate_CUSTOM_ErrorCount
+          ,le.residencyzip_CUSTOM_ErrorCount
+          ,le.mailaddrstreet_ALLOW_ErrorCount
+          ,le.mailingcity_ALLOW_ErrorCount
+          ,le.mailingstate_CUSTOM_ErrorCount
+          ,le.mailingzip_CUSTOM_ErrorCount
+          ,le.credentialtype_ENUM_ErrorCount
+          ,le.credential_class_CUSTOM_ErrorCount
+          ,le.endorsements_ALLOW_ErrorCount
+          ,le.restrictions_ALLOW_ErrorCount
+          ,le.expdate_CUSTOM_ErrorCount
+          ,le.lastissuerenewaldate_CUSTOM_ErrorCount
+          ,le.date_noncdl_CUSTOM_ErrorCount
+          ,le.originaldate_cdl_CUSTOM_ErrorCount
+          ,le.statusnoncdl_CUSTOM_ErrorCount
+          ,le.licensestatuscdl_CUSTOM_ErrorCount
+          ,le.originaldate_lp_CUSTOM_ErrorCount
+          ,le.originaldate_id_CUSTOM_ErrorCount
+          ,le.cancelstate_CUSTOM_ErrorCount
+          ,le.canceldate_CUSTOM_ErrorCount
+          ,le.cdlmedicertissuedate_CUSTOM_ErrorCount
+          ,le.cdlmedicertexpdate_CUSTOM_ErrorCount
+          ,le.clean_name_last_CUSTOM_ErrorCount
+          ,le.FieldsChecked_WithErrors
+          ,le.FieldsChecked_NoErrors
+          ,le.Rules_WithErrors
+          ,le.Rules_NoErrors
+          ,NumRulesWithPossibleEdits
+          ,le.AnyRule_WithErrorsCount
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+      SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
+          ,le.append_process_date_CUSTOM_ErrorCount
+          ,le.credentialstate_ENUM_ErrorCount
+          ,le.credentialnumber_CUSTOM_ErrorCount
+          ,le.lastname_CUSTOM_ErrorCount
+          ,le.gender_ENUM_ErrorCount
+          ,le.height_CUSTOM_ErrorCount
+          ,le.eyecolor_CUSTOM_ErrorCount
+          ,le.date_birth_CUSTOM_ErrorCount
+          ,le.resiaddrstreet_ALLOW_ErrorCount
+          ,le.residencycity_ALLOW_ErrorCount
+          ,le.residencystate_CUSTOM_ErrorCount
+          ,le.residencyzip_CUSTOM_ErrorCount
+          ,le.mailaddrstreet_ALLOW_ErrorCount
+          ,le.mailingcity_ALLOW_ErrorCount
+          ,le.mailingstate_CUSTOM_ErrorCount
+          ,le.mailingzip_CUSTOM_ErrorCount
+          ,le.credentialtype_ENUM_ErrorCount
+          ,le.credential_class_CUSTOM_ErrorCount
+          ,le.endorsements_ALLOW_ErrorCount
+          ,le.restrictions_ALLOW_ErrorCount
+          ,le.expdate_CUSTOM_ErrorCount
+          ,le.lastissuerenewaldate_CUSTOM_ErrorCount
+          ,le.date_noncdl_CUSTOM_ErrorCount
+          ,le.originaldate_cdl_CUSTOM_ErrorCount
+          ,le.statusnoncdl_CUSTOM_ErrorCount
+          ,le.licensestatuscdl_CUSTOM_ErrorCount
+          ,le.originaldate_lp_CUSTOM_ErrorCount
+          ,le.originaldate_id_CUSTOM_ErrorCount
+          ,le.cancelstate_CUSTOM_ErrorCount
+          ,le.canceldate_CUSTOM_ErrorCount
+          ,le.cdlmedicertissuedate_CUSTOM_ErrorCount
+          ,le.cdlmedicertexpdate_CUSTOM_ErrorCount
+          ,le.clean_name_last_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
+          ,0
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,63,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT34.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT34.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
     END;
-    j := JOIN(SummaryInfo,gt,LEFT.SourceCode=RIGHT.SRC AND LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
-    RETURN IF(examples>0,j,SummaryInfo);
+    j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
+    FieldErrorStats := IF(examples>0,j,SummaryInfo);
+ 
+    // field population stats
+    mod_hygiene := hygiene(PROJECT(h, Layout_In_CT));
+    hygiene_summaryStats := mod_hygiene.Summary('');
+    getFieldTypeText(infield) := FUNCTIONMACRO
+      isNumField := (STRING)((TYPEOF(infield))'') = '0';
+      RETURN IF(isNumField, 'nonzero', 'nonblank');
+    ENDMACRO;
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := CHOOSE(c
+          ,'append_process_date:' + getFieldTypeText(h.append_process_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'credentialstate:' + getFieldTypeText(h.credentialstate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'credentialnumber:' + getFieldTypeText(h.credentialnumber) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lastname:' + getFieldTypeText(h.lastname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'firstname:' + getFieldTypeText(h.firstname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'middleinitial:' + getFieldTypeText(h.middleinitial) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'gender:' + getFieldTypeText(h.gender) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'height:' + getFieldTypeText(h.height) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'eyecolor:' + getFieldTypeText(h.eyecolor) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_birth:' + getFieldTypeText(h.date_birth) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'resiaddrstreet:' + getFieldTypeText(h.resiaddrstreet) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'residencycity:' + getFieldTypeText(h.residencycity) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'residencystate:' + getFieldTypeText(h.residencystate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'residencyzip:' + getFieldTypeText(h.residencyzip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mailaddrstreet:' + getFieldTypeText(h.mailaddrstreet) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mailingcity:' + getFieldTypeText(h.mailingcity) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mailingstate:' + getFieldTypeText(h.mailingstate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mailingzip:' + getFieldTypeText(h.mailingzip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'credentialtype:' + getFieldTypeText(h.credentialtype) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'credential_class:' + getFieldTypeText(h.credential_class) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'endorsements:' + getFieldTypeText(h.endorsements) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'restrictions:' + getFieldTypeText(h.restrictions) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'expdate:' + getFieldTypeText(h.expdate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lastissuerenewaldate:' + getFieldTypeText(h.lastissuerenewaldate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_noncdl:' + getFieldTypeText(h.date_noncdl) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'originaldate_cdl:' + getFieldTypeText(h.originaldate_cdl) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'statusnoncdl:' + getFieldTypeText(h.statusnoncdl) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'licensestatuscdl:' + getFieldTypeText(h.licensestatuscdl) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'originaldate_lp:' + getFieldTypeText(h.originaldate_lp) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'originaldate_id:' + getFieldTypeText(h.originaldate_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cancelstate:' + getFieldTypeText(h.cancelstate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'canceldate:' + getFieldTypeText(h.canceldate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cdlmedicertissuedate:' + getFieldTypeText(h.cdlmedicertissuedate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cdlmedicertexpdate:' + getFieldTypeText(h.cdlmedicertexpdate) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_prefix:' + getFieldTypeText(h.clean_name_prefix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_first:' + getFieldTypeText(h.clean_name_first) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_middle:' + getFieldTypeText(h.clean_name_middle) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_last:' + getFieldTypeText(h.clean_name_last) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_suffix:' + getFieldTypeText(h.clean_name_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'clean_name_score:' + getFieldTypeText(h.clean_name_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+      SELF.rulecnt := CHOOSE(c
+          ,le.populated_append_process_date_cnt
+          ,le.populated_credentialstate_cnt
+          ,le.populated_credentialnumber_cnt
+          ,le.populated_lastname_cnt
+          ,le.populated_firstname_cnt
+          ,le.populated_middleinitial_cnt
+          ,le.populated_gender_cnt
+          ,le.populated_height_cnt
+          ,le.populated_eyecolor_cnt
+          ,le.populated_date_birth_cnt
+          ,le.populated_resiaddrstreet_cnt
+          ,le.populated_residencycity_cnt
+          ,le.populated_residencystate_cnt
+          ,le.populated_residencyzip_cnt
+          ,le.populated_mailaddrstreet_cnt
+          ,le.populated_mailingcity_cnt
+          ,le.populated_mailingstate_cnt
+          ,le.populated_mailingzip_cnt
+          ,le.populated_credentialtype_cnt
+          ,le.populated_credential_class_cnt
+          ,le.populated_endorsements_cnt
+          ,le.populated_restrictions_cnt
+          ,le.populated_expdate_cnt
+          ,le.populated_lastissuerenewaldate_cnt
+          ,le.populated_date_noncdl_cnt
+          ,le.populated_originaldate_cdl_cnt
+          ,le.populated_statusnoncdl_cnt
+          ,le.populated_licensestatuscdl_cnt
+          ,le.populated_originaldate_lp_cnt
+          ,le.populated_originaldate_id_cnt
+          ,le.populated_cancelstate_cnt
+          ,le.populated_canceldate_cnt
+          ,le.populated_cdlmedicertissuedate_cnt
+          ,le.populated_cdlmedicertexpdate_cnt
+          ,le.populated_clean_name_prefix_cnt
+          ,le.populated_clean_name_first_cnt
+          ,le.populated_clean_name_middle_cnt
+          ,le.populated_clean_name_last_cnt
+          ,le.populated_clean_name_suffix_cnt
+          ,le.populated_clean_name_score_cnt,0);
+      SELF.rulepcnt := CHOOSE(c
+          ,le.populated_append_process_date_pcnt
+          ,le.populated_credentialstate_pcnt
+          ,le.populated_credentialnumber_pcnt
+          ,le.populated_lastname_pcnt
+          ,le.populated_firstname_pcnt
+          ,le.populated_middleinitial_pcnt
+          ,le.populated_gender_pcnt
+          ,le.populated_height_pcnt
+          ,le.populated_eyecolor_pcnt
+          ,le.populated_date_birth_pcnt
+          ,le.populated_resiaddrstreet_pcnt
+          ,le.populated_residencycity_pcnt
+          ,le.populated_residencystate_pcnt
+          ,le.populated_residencyzip_pcnt
+          ,le.populated_mailaddrstreet_pcnt
+          ,le.populated_mailingcity_pcnt
+          ,le.populated_mailingstate_pcnt
+          ,le.populated_mailingzip_pcnt
+          ,le.populated_credentialtype_pcnt
+          ,le.populated_credential_class_pcnt
+          ,le.populated_endorsements_pcnt
+          ,le.populated_restrictions_pcnt
+          ,le.populated_expdate_pcnt
+          ,le.populated_lastissuerenewaldate_pcnt
+          ,le.populated_date_noncdl_pcnt
+          ,le.populated_originaldate_cdl_pcnt
+          ,le.populated_statusnoncdl_pcnt
+          ,le.populated_licensestatuscdl_pcnt
+          ,le.populated_originaldate_lp_pcnt
+          ,le.populated_originaldate_id_pcnt
+          ,le.populated_cancelstate_pcnt
+          ,le.populated_canceldate_pcnt
+          ,le.populated_cdlmedicertissuedate_pcnt
+          ,le.populated_cdlmedicertexpdate_pcnt
+          ,le.populated_clean_name_prefix_pcnt
+          ,le.populated_clean_name_first_pcnt
+          ,le.populated_clean_name_middle_pcnt
+          ,le.populated_clean_name_last_pcnt
+          ,le.populated_clean_name_suffix_pcnt
+          ,le.populated_clean_name_score_pcnt,0);
+      SELF.ErrorMessage := '';
+    END;
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,40,xNormHygieneStats(LEFT,COUNTER,'POP'));
+ 
+  // record count stats
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := inRuleDesc;
+      SELF.ErrorMessage := '';
+      SELF.rulecnt := le.NumberOfRecords;
+      SELF.rulepcnt := 0;
+    END;
+    TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
+ 
+    mod_Delta := Delta(prevDS, PROJECT(h, Layout_In_CT));
+    deltaHygieneSummary := mod_Delta.DifferenceSummary;
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),40,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
+                                      'Updates:count_Updates:DELTA',
+                                      TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
+    DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
+    DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
+ 
+    RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
+END;
+ 
+EXPORT StandardStats(DATASET(Layout_In_CT) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  expandedFile := FromNone(inFile).ExpandedInfile;
+  mod_fromexpandedOverall := FromExpanded(expandedFile);
+  scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
+ 
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_DL_CT, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
+ 
+  allErrsOverall := mod_fromexpandedOverall.AllErrors;
+  tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
+ 
+  scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
+                                               DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
+  	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
+  	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
+  	                                                       TRANSFORM(RECORDOF(LEFT),
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
+  	                                                       SELF := LEFT),
+  	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+ 
+  RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;

@@ -1,6 +1,6 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools;
+import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk,BIPV2_Segmentation;
 
 EXPORT BIPV2FullKeys_Package(
 
@@ -25,6 +25,7 @@ module
   shared bestknames       := BIPV2_Best.Keynames            (pversion,puseotherenvironment);
   // shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
   shared Seleidrelknames  := BIPV2_Seleid_Relative.keynames (pversion,puseotherenvironment);
+  shared segknames        := BIPV2_Segmentation.keynames    (pversion,puseotherenvironment);
 
   //key definitions
   export strnbr                         := BIPV2_Company_Names.files.StrNbr_SF_DS;  //file, not key, but it is in the package file
@@ -50,6 +51,7 @@ module
   // export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
   // export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );
+  export Xlinkrefs_l_cnpname_slim       := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.SlimKey      ' ,bizknames.refs_l_cnpname_slim     );  
   export Xlinkrefs_l_cnpname_st         := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ST.Key       ' ,bizknames.refs_l_cnpname_st       );
   export Xlinkrefs_l_cnpname_zip        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.Key      ' ,bizknames.refs_l_cnpname_zip      );
   export Xlinkrefs_l_cnpname_fuzzy      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.Key    ' ,bizknames.refs_l_cnpname_fuzzy    );
@@ -80,11 +82,13 @@ module
   export biz_preferred                  := tools.macf_FilesIndex('BIPV2_Company_Names.key_preferred             ' ,keynames(pversion,puseotherenvironment).biz_preferred   );
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key             ' ,bizknames.refs_l_sic               );
 
-  // export AML_Addr                       := index(Address_Attributes.key_AML_addr                   ,keynames(pversion).aml_addr.logical     );
-  // export biz_preferred                  := index(BIPV2_Company_Names.key_preferred                 ,keynames(pversion).biz_preferred.logical     );
-  // export Xlinkrefs_l_sic                := index(BizLinkFull.Key_BizHead_L_SIC.Key                 ,bizknames.refs_l_sic             .logical);
+  export bip2ConsumerKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).bipToConsumer;
+  export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBip;
+  export seg_linkids                    := tools.macf_FilesIndex('BIPV2_Segmentation.Key_LinkIds().key                   ' ,segknames.seg_linkids                    );
 
-
+  export highRiskIndustriesPhone        := key_high_risk_industries.keyvs_phone(pversion,puseotherenvironment);
+  export highRiskIndustriesAddr         := key_high_risk_industries.keyvs_addr(pversion,puseotherenvironment);
+  export highRiskIndustriesCode         := key_high_risk_industries.keyvs_code(pversion,puseotherenvironment);
 
   export outputpackage := 
   sequential(
@@ -113,33 +117,40 @@ module
     // ,if(pKey in [0 ,17] ,sequential(output(17 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs                    .logical ,100),named('Xlinkrefs'                     ))))
     // ,if(pKey in [0 ,18] ,sequential(output(18 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwords                   .logical ,100),named('Xlinkwords'                    ))))
     ,if(pKey in [0 ,19] ,sequential(output(19 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname          .logical ,100),named('Xlinkrefs_l_cnpname'           ))))
-    ,if(pKey in [0 ,20] ,sequential(output(20 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_st       .logical ,100),named('Xlinkrefs_l_cnpname_st'        ))))
-    ,if(pKey in [0 ,21] ,sequential(output(21 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_zip      .logical ,100),named('Xlinkrefs_l_cnpname_zip'       ))))
-    ,if(pKey in [0 ,22] ,sequential(output(22 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_fuzzy    .logical ,100),named('Xlinkrefs_l_cnpname_fuzzy'     ))))
-    ,if(pKey in [0 ,23] ,sequential(output(23 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address1         .logical ,100),named('Xlinkrefs_l_address1'          ))))
-    ,if(pKey in [0 ,24] ,sequential(output(24 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address2         .logical ,100),named('Xlinkrefs_l_address2'          ))))
-    ,if(pKey in [0 ,25] ,sequential(output(25 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address3         .logical ,100),named('Xlinkrefs_l_address3'          ))))
-    ,if(pKey in [0 ,26] ,sequential(output(26 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_phone            .logical ,100),named('Xlinkrefs_l_phone'             ))))
-    ,if(pKey in [0 ,27] ,sequential(output(27 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_fein             .logical ,100),named('Xlinkrefs_l_fein'              ))))
-    ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact          .logical ,100),named('Xlinkrefs_l_contact'           ))))
-    ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_url              .logical ,100),named('Xlinkrefs_l_url'               ))))
-    ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_email            .logical ,100),named('Xlinkrefs_l_email'             ))))
-    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_did      .logical ,100),named('Xlinkrefs_l_contact_did'       ))))
-    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_ssn      .logical ,100),named('Xlinkrefs_l_contact_ssn'       ))))
-    ,if(pKey in [0 ,33] ,sequential(output(33 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_source           .logical ,100),named('Xlinkrefs_l_source'            ))))
-    ,if(pKey in [0 ,34] ,sequential(output(34 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_city_clean        .logical ,100),named('Xlinkwheel_city_clean'         ))))
-    ,if(pKey in [0 ,35] ,sequential(output(35 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_quick_city_clean  .logical ,100),named('Xlinkwheel_quick_city_clean'   ))))
-    ,if(pKey in [0 ,36] ,sequential(output(36 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_cnp_name           .logical ,100),named('Xlinkword_cnp_name'            ))))
-    ,if(pKey in [0 ,37] ,sequential(output(37 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_company_url        .logical ,100),named('Xlinkword_company_url'         ))))
-    ,if(pKey in [0 ,38] ,sequential(output(38 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_proxid              .logical ,100),named('Xlinksup_proxid'               ))))
-    ,if(pKey in [0 ,39] ,sequential(output(39 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_seleid              .logical ,100),named('Xlinksup_seleid'               ))))
-    ,if(pKey in [0 ,40] ,sequential(output(40 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))))
-    ,if(pKey in [0 ,41] ,sequential(output(41 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))))
-    ,if(pKey in [0 ,42] ,sequential(output(42 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyProxid                  .logical ,100),named('HrchyProxid'                   ))))
-    ,if(pKey in [0 ,43] ,sequential(output(43 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyLgid                    .logical ,100),named('HrchyLgid'                     ))))
-    ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
-    ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
-    ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+    ,if(pKey in [0 ,20] ,sequential(output(20 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_slim     .logical ,100),named('Xlinkrefs_l_cnpname_slim'      ))))
+    ,if(pKey in [0 ,21] ,sequential(output(21 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_st       .logical ,100),named('Xlinkrefs_l_cnpname_st'        ))))
+    ,if(pKey in [0 ,22] ,sequential(output(22 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_zip      .logical ,100),named('Xlinkrefs_l_cnpname_zip'       ))))
+    ,if(pKey in [0 ,23] ,sequential(output(23 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname_fuzzy    .logical ,100),named('Xlinkrefs_l_cnpname_fuzzy'     ))))
+    ,if(pKey in [0 ,24] ,sequential(output(24 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address1         .logical ,100),named('Xlinkrefs_l_address1'          ))))
+    ,if(pKey in [0 ,25] ,sequential(output(25 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address2         .logical ,100),named('Xlinkrefs_l_address2'          ))))
+    ,if(pKey in [0 ,26] ,sequential(output(26 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address3         .logical ,100),named('Xlinkrefs_l_address3'          ))))
+    ,if(pKey in [0 ,27] ,sequential(output(27 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_phone            .logical ,100),named('Xlinkrefs_l_phone'             ))))
+    ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_fein             .logical ,100),named('Xlinkrefs_l_fein'              ))))
+    ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact          .logical ,100),named('Xlinkrefs_l_contact'           ))))
+    ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_url              .logical ,100),named('Xlinkrefs_l_url'               ))))
+    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_email            .logical ,100),named('Xlinkrefs_l_email'             ))))
+    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_did      .logical ,100),named('Xlinkrefs_l_contact_did'       ))))
+    ,if(pKey in [0 ,33] ,sequential(output(33 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_ssn      .logical ,100),named('Xlinkrefs_l_contact_ssn'       ))))
+    ,if(pKey in [0 ,34] ,sequential(output(34 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_source           .logical ,100),named('Xlinkrefs_l_source'            ))))
+    ,if(pKey in [0 ,35] ,sequential(output(35 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_city_clean        .logical ,100),named('Xlinkwheel_city_clean'         ))))
+    ,if(pKey in [0 ,36] ,sequential(output(36 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_quick_city_clean  .logical ,100),named('Xlinkwheel_quick_city_clean'   ))))
+    ,if(pKey in [0 ,37] ,sequential(output(37 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_cnp_name           .logical ,100),named('Xlinkword_cnp_name'            ))))
+    ,if(pKey in [0 ,38] ,sequential(output(38 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_company_url        .logical ,100),named('Xlinkword_company_url'         ))))
+    ,if(pKey in [0 ,39] ,sequential(output(39 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_proxid              .logical ,100),named('Xlinksup_proxid'               ))))
+    ,if(pKey in [0 ,40] ,sequential(output(40 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_seleid              .logical ,100),named('Xlinksup_seleid'               ))))
+    ,if(pKey in [0 ,41] ,sequential(output(41 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))))
+    ,if(pKey in [0 ,42] ,sequential(output(42 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))))
+    ,if(pKey in [0 ,43] ,sequential(output(43 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyProxid                  .logical ,100),named('HrchyProxid'                   ))))
+    ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyLgid                    .logical ,100),named('HrchyLgid'                     ))))
+    ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
+    ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
+    ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+    ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
+    ,if(pKey in [0 ,49] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
+    ,if(pKey in [0 ,50] ,sequential(output(50 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
+    ,if(pKey in [0 ,51] ,sequential(output(51 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesPhone      .logical ,100),named('highRiskIndustriesPhone'       ))))
+    ,if(pKey in [0 ,52] ,sequential(output(52 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesAddr       .logical ,100),named('highRiskIndustriesAddr'        ))))
+    ,if(pKey in [0 ,53] ,sequential(output(53 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesCode       .logical ,100),named('highRiskIndustriesCode'        ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;

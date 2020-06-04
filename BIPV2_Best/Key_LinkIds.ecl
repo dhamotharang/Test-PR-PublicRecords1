@@ -29,8 +29,8 @@ EXPORT Key_LinkIds := MODULE
   export key_       (string pversion = '',boolean pUseOtherEnvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('key'        ,keynames(pversion,pUseOtherEnvironment).LinkIds);
   export key_static_(string pversion = '',boolean pUseOtherEnvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('Key_static' ,keynames(pversion,pUseOtherEnvironment).LinkIds);
 	// Apply restrictions -- may or may not filter the "sources" child dataset, depending on inputs
-	shared restrict(ds, in_mod, permits, ds_src='', dnbWillMask=false, isDateFirstSeenExists=false) := functionmacro
-		ds_filt := ds(BIPV2.mod_sources.isPermitted(in_mod,dnbWillMask).byBmap(permits));
+	shared restrict(ds, in_mod, permits, ds_src='', dnbPermitted=false, isDateFirstSeenExists=false) := functionmacro
+		ds_filt := ds(BIPV2.mod_sources.isPermitted(in_mod,dnbPermitted).byBmap(permits));
 		#IF(#TEXT(ds_src)='')
 			return ds_filt;
 		#ELSE
@@ -41,7 +41,7 @@ EXPORT Key_LinkIds := MODULE
         #ELSE
           unsigned4 dt_first_seen := 0;
         #END
-        ds_src_filt := L.ds_src (BIPV2.mod_sources.isPermitted(in_mod,dnbWillMask).bySource(source,vl_id,dt_first_seen));
+        ds_src_filt := L.ds_src (BIPV2.mod_sources.isPermitted(in_mod,dnbPermitted).bySource(source,vl_id,dt_first_seen));
         ds_filt xTransform := transform, skip (~exists(ds_src_filt))
   				self.ds_src := ds_src_filt;
 	  			self := L;
@@ -98,14 +98,16 @@ FUNCTION
 	// apply restrictions in child datasets
 	{ds_fetched, string50 company_status_derived := ''} apply_restrict(ds_fetched L) := transform
 		// NOTE: These filter the "sources" child dataset when applicable, but not all sections have that
-		self.company_name			:= mask(restrict(L.company_name, in_mod, company_name_data_permits, sources, true, true), in_mod, company_name_data_permits);
-		self.company_address	:= mask(restrict(L.company_address, in_mod, company_address_data_permits,, true), in_mod, company_address_data_permits);
-		self.company_phone		:= restrict(L.company_phone, in_mod, company_phone_data_permits,, true); // no mask required
-		self.company_fein			:= restrict(L.company_fein, in_mod, company_fein_data_permits, sources);
-		self.company_url			:= restrict(L.company_url, in_mod, company_url_data_permits);
-		self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources);
-		self.dba_name      := mask(restrict(L.dba_name, in_mod, dba_name_data_permits, , true), in_mod, dba_name_data_permits);
-		self := L;
+  self.company_name    :=       mask(restrict(L.company_name,               in_mod, company_name_data_permits,          sources, true, true), in_mod, company_name_data_permits);
+  self.company_address :=       mask(restrict(L.company_address,            in_mod, company_address_data_permits,              , true, false),in_mod, company_address_data_permits);
+  self.company_phone   :=            restrict(L.company_phone,              in_mod, company_phone_data_permits,                , true, false); 
+  self.company_fein    :=            restrict(L.company_fein,               in_mod, company_fein_data_permits,          sources, false,false);
+  self.company_url     :=            restrict(L.company_url,                in_mod, company_url_data_permits,                  , false,false);
+  self.duns_number     :=            restrict(L.duns_number,                in_mod, duns_number_data_permits,                  , false,false);
+  self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources, false,false);
+  self.dba_name        :=            restrict(L.dba_name,                   in_mod, dba_name_data_permits,                     , true, false);
+  // SIC and NAICS are allways permitted and not filterd by restrict()
+  self := L;
 	end;
 	ds_restricted := project(ds_fetched, apply_restrict(left));
 	ds_wstatus := project(ds_restricted,transform(recordof(left),self.company_status_derived := '',self := left));//BIPV2.mac_AddStatus(ds_restricted);
@@ -157,4 +159,11 @@ FUNCTION
 	
 END;
 export kFetchOutRec := recordof(kFetch(dataset([],BIPV2.IDlayouts.l_xlink_ids)));
+
+export kFetch_thor() :=
+FUNCTION
+  ds_key := pull(Key);
+  return ds_key;
+END;
+
 END;

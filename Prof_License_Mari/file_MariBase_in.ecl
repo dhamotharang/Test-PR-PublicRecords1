@@ -1,13 +1,13 @@
-﻿import ut, Prof_License_Mari, lib_stringlib;
+﻿import _control, MDR, Data_services, lib_stringlib, Prof_License_Mari, Std, Ut;
 
-FileName	:=	'~thor_data400::in::proflic_mari::';
+FileName	:=	data_services.foreign_prod+'thor_data400::in::proflic_mari::';
 
-concatenated_basefiles := 
-															PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mari.layout_base_in,thor),					// ** FullDump
+fixS0900	:= 	PROJECT(dataset(FileName + 'S0900',	Prof_License_Mari.layout_base_in, thor),													// ** NMLS
+															TRANSFORM(Prof_License_Mari.layouts.base, SELF.global_sid:=0; SELF.record_sid:=0, SELF:=LEFT));
+
+concatenated_basefiles :=  PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mari.layout_base_in,thor),							// ** FullDump
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 + PROJECT(dataset(FileName + 'cmrflat_test',Prof_License_Mari.layout_base_in,thor),		// ** Test Records
-																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                    + PROJECT(dataset(FileName + 'S0900',	Prof_License_Mari.layout_base_in,thor),						// ** NMLS
+													 + PROJECT(dataset(FileName + 'cmrflat_test',Prof_License_Mari.layout_base_in,thor),			// ** Test Records
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0812',	Prof_License_Mari.layout_base_in,thor),						// ** Alabama Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
@@ -83,15 +83,15 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0833',	Prof_License_Mari.layout_base_in,thor),						// ** Louisana Real Estate Appraiser Board
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-	                         + PROJECT(dataset(FileName + 'S0832',	Prof_License_Mari.layout_base_in,thor),		// ** Louisana Real Estate Commission
+	                         + PROJECT(dataset(FileName + 'S0832',	Prof_License_Mari.layout_base_in,thor),						// ** Louisana Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0838',	Prof_License_Mari.layout_base_in,thor),						// ** Maine Board of Real Estate Appraisers
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                           + PROJECT(dataset(FileName + 'S0888',	Prof_License_Mari.layout_base_in,thor),	// ** Maine Board of Real Estate Appraisers
+                           + PROJECT(dataset(FileName + 'S0888',	Prof_License_Mari.layout_base_in,thor),						// ** Maine Board of Real Estate Appraisers
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0834',	Prof_License_Mari.layout_base_in,thor),						// ** Maryland Commssion of Real Estate Appraiser & Home Inspection
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 // + PROJECT(dataset(FileName + 'S0836',	Prof_License_Mari.layout_base_in,thor),						// ** Maryland Real Estate Commission 
+													 // + PROJECT(dataset(FileName + 'S0836',	Prof_License_Mari.layout_base_in,thor),					// ** Maryland Real Estate Commission 
 													 + PROJECT(dataset(FileName + 'S0021',	Prof_License_Mari.layout_base_in,thor),						// ** Massachussetts, Commonwealth of (Development)
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0298',	Prof_License_Mari.layout_base_in,thor),						// ** Michigan Department of Consumer & Industry Service
@@ -124,9 +124,9 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0822',	Prof_License_Mari.layout_base_in,thor),						// ** New Mexico Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                           + PROJECT(dataset(FileName + 'S0843',	Prof_License_Mari.layout_base_in,thor),	// ** New Mexico Real Estate Appraiser Board
+                           + PROJECT(dataset(FileName + 'S0843',	Prof_License_Mari.layout_base_in,thor),						// ** New Mexico Real Estate Appraiser Board
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 + PROJECT(dataset(FileName + 'S0828',  Prof_License_Mari.layout_base_in,thor),  				// ** New Your Appraisers
+													 + PROJECT(dataset(FileName + 'S0828',  Prof_License_Mari.layout_base_in,thor),  					// ** New Your Appraisers
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0840',	Prof_License_Mari.layout_base_in,thor) ,					// ** North Carolina Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
@@ -140,7 +140,7 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 												   + PROJECT(dataset(FileName + 'S0839',	Prof_License_Mari.layout_base_in,thor),						// ** Oregon Real Estate Agency
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 + PROJECT(dataset(FileName + 'S0818',  Prof_License_Mari.layout_base_in,thor),					// ** Oregon Real Estate Appraisers
+													 + PROJECT(dataset(FileName + 'S0818',  Prof_License_Mari.layout_base_in,thor),						// ** Oregon Real Estate Appraisers
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0868',	Prof_License_Mari.layout_base_in,thor),						// ** Pennsylvania, Commonwealth of - Professional Licenses
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
@@ -152,13 +152,13 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0853',	Prof_License_Mari.layout_base_in,thor),						// ** South Carolina Real Estate Appraiser Board
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                           + PROJECT(dataset(FileName + 'S0810',	Prof_License_Mari.layout_base_in,thor),	// ** South Dakota Revenue & Regulation
+                           + PROJECT(dataset(FileName + 'S0810',	Prof_License_Mari.layout_base_in,thor),						// ** South Dakota Revenue & Regulation
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                           + PROJECT(dataset(FileName + 'S0844',	Prof_License_Mari.layout_base_in,thor),	// ** South Dakota Real Estate Commission
+                           + PROJECT(dataset(FileName + 'S0844',	Prof_License_Mari.layout_base_in,thor),						// ** South Dakota Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0513',	Prof_License_Mari.layout_base_in,thor),						// ** Tennessee Regulation Board & Commission Commerce & Insurance
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-                           + PROJECT(dataset(FileName + 'S0636',	Prof_License_Mari.layout_base_in,thor),	// ** Texas Office of Consumer Credit Commissioner 
+                           + PROJECT(dataset(FileName + 'S0636',	Prof_License_Mari.layout_base_in,thor),						// ** Texas Office of Consumer Credit Commissioner 
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0819',	Prof_License_Mari.layout_base_in,thor),						// ** Texas Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
@@ -170,15 +170,17 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0356',	Prof_License_Mari.layout_base_in,thor),						// ** Vermont, Office of the Secretary of State
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 + PROJECT(dataset(FileName + 'S0849',  Prof_License_Mari.layout_base_in,thor),					// ** Virginia Department of Professional/Occupational Regulation
+													 + PROJECT(dataset(FileName + 'S0849',  Prof_License_Mari.layout_base_in,thor),						// ** Virginia Department of Professional/Occupational Regulation
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0816',	Prof_License_Mari.layout_base_in,thor),						// ** West Virginia Real Estate Appraisal License & Certification Board
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0854',	Prof_License_Mari.layout_base_in,thor),						// ** Wisconsin Department of Regulation and Licensing
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0858',	Prof_License_Mari.layout_base_in,thor),						// ** Wyoming Real Estate Commission
-																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT));
-													 // + PROJECT(dataset(FileName + 'S0690',	Prof_License_Mari.layout_base_in,thor)	// ** Wyoming Division of Banking
+																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
+													 + MDR.macGetGlobalSid(fixS0900, 'Mari', 'std_source_upd', 'global_sid');								// ** NMLS
+													 
+													 // + PROJECT(dataset(FileName + 'S0690',	Prof_License_Mari.layout_base_in,thor)					// ** Wyoming Division of Banking
 													 
 											 
 export file_Maribase_in := concatenated_basefiles; 

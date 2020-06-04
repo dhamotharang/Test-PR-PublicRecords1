@@ -1,4 +1,4 @@
-import Standard;
+﻿import Standard;
 
 export Layout_Base_Party
  :=
@@ -70,7 +70,12 @@ export Layout_Base_Party
 	string1			Ttl_Odometer_Status_Code;
 	string42		Ttl_Odometer_Status_Desc;
 	string8			Ttl_Odometer_Date;
-	string8	SRC_FIRST_DATE	:= '';	//New fields added for Infutor batch project - bug #155364
-	string8	SRC_LAST_DATE	:= '';		//New fields added for Infutor batch project
+	string8	    SRC_FIRST_DATE	:= '';	//New fields added for Infutor batch project - bug #155364
+	string8	    SRC_LAST_DATE	:= '';		//New fields added for Infutor batch project
+	//Added for CCPA-103 
+	unsigned4   global_sid := 0;
+	unsigned8   record_sid := 0;
+	//Added for DF-25578
+	string30    raw_name := '';
   end
  ;

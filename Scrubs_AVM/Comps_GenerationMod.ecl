@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT Comps_GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT Comps_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_AVM';
   EXPORT spc_NAMESCOPE := 'Comps';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'AVM';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,seq,ln_fares_id,unformatted_apn,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,p_city_name,st,zip,zip4,lat,long,geo_blk,fips_code,land_use_code,sales_price,sales_price_code,recording_date,assessed_value_year,assessed_total_value,market_total_value,lot_size,building_area,year_built,no_of_stories,no_of_rooms,no_of_bedrooms,no_of_baths';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -23,9 +45,9 @@ EXPORT Comps_GenerationMod := MODULE
     + '\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'
-    + 'FIELDTYPE:Invalid_Chars:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .+)\n'
+    + 'FIELDTYPE:Invalid_Chars:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .+/)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)\n'
-    + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789)\n'
+    + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789 .)\n'
     + 'FIELDTYPE:Invalid_Comps:ALLOW(0123456789OAD)\n'
     + 'FIELDTYPE:Invalid_SalesPriceCode:ENUM(A|Q|U|F|Z|D|C|P|X|)\n'
     + 'FIELDTYPE:Invalid_LandUseCode:ENUM(1|2|)\n'
@@ -70,3 +92,4 @@ EXPORT Comps_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

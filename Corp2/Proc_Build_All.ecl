@@ -1,4 +1,4 @@
-﻿import VersionControl,orbit_report, RoxieKeyBuild, _control;
+﻿import VersionControl,orbit_report, RoxieKeyBuild, _control, Orbit3;
 
 export Proc_Build_All(
 	 
@@ -32,12 +32,15 @@ module
 							,DOPSGrowthCheck	
 						) : success(Send_Email(pversion).Roxie), failure(Send_Email(pversion).BuildFailure);
 						
+	orbit_update := Orbit3.proc_Orbit3_CreateBuild('Corporations (SOS)',pversion, 'N|B');	
+						
 	export All :=
 	sequential( corp2keys
 							,Coverage
 							,NewRecs4QA
 							,Cleanup
 							,dops
+							,orbit_update
 							// ,fileservices.ClearSuperFile('~thor_data400::spraylogs::corp2')						
 						) : success(Send_Email(pversion).buildsuccess), failure(Send_Email(pversion).BuildFailure);
 

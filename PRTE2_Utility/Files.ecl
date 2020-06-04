@@ -2,8 +2,10 @@
 
 EXPORT Files := module
 
-	export infile		:= dataset(constants.in_prefix_name, layouts.incoming,CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-
+	
+	export infile1		:= dataset(constants.in_prefix_name, layouts.incoming,CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  export inIns:=   dataset(constants.in_ins, layouts.incoming,CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+	export infile    :=infile1 + inIns;
 //base files
 	export basefile	:= dataset(constants.base_prefix_name, layouts.base, thor);
 	export misc2b		:= dataset([], layouts.misc);
@@ -11,7 +13,14 @@ EXPORT Files := module
 	
 //Files for Indexes
 utilfile.mac_convert_util_type(basefile, full_did_out);
-export full_did_for_index := full_did_out(did!='0');
+
+shared full_did_out2:=full_did_out;
+
+export full_did_for_index := full_did_out2(did!='0');
+
+export full_did_for_index_bdid := full_did_out2(did='0');
+
+export full_did_for_index_address := full_did_out2;
 
 
 layouts.did_out t(full_did_for_index le, unsigned6 i) :=

@@ -1,4 +1,4 @@
-import ut, std;
+﻿import ut, std;
 
 rgxLF := U'^(\\p{L}+),\\p{Zs}*(\\p{L}+)$';			// L, F
 rgxLFM := U'^(\\p{L}+),\\p{Zs}*(\\p{L}+)\\p{Zs}+(\\p{L}+)$';			// L, F M
@@ -62,7 +62,7 @@ END;
 	self.Ent_ID := infile.ParentId;
 	//self.Type := 'AKA';
 	self.Type := IF (infile.EntryType = 'Individual', 'AKA', 'DBA');
-	self.category := '';
+	self.category := IF(Std.Uni.Find(infile.Positions, 'Weak Aka', 1) > 0, 'Weak', '');
 	//self.full_name := infile.Name;
   self.full_name := IF(infile.EntryType='Individual',
 											TRIM(Std.uni.CleanSpaces(infile.firstname+' '+infile.lastname+' '+infile.suffix)),

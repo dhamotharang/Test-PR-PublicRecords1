@@ -1,4 +1,4 @@
-import STD;
+import _control, Mdr, STD;
 		
 				
 EXPORT ProcessDailyFile(dataset(layout_gongMaster) mstr,	dataset(layout_Neustar) daily, string rundate) := FUNCTION
@@ -12,6 +12,8 @@ EXPORT ProcessDailyFile(dataset(layout_gongMaster) mstr,	dataset(layout_Neustar)
 		m2 := ApplyAddsToMaster(adds, m1);
 
 		m3 := IF(RelinkGong, proc_LinkUp(m2), m2);
+
+		addGlobalSID := mdr.macGetGlobalSID(m3,'Gong','bell_id','global_sid');// DF-26340: Populate Global_SID
 		
-		return m3;
+		return addGlobalSID;
 END;

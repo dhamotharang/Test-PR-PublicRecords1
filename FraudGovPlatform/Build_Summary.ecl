@@ -59,7 +59,7 @@ EXPORT Build_Summary(string pversion) := MODULE
 	);
 
 	knownrisk := join ( Data_Loaded, bkf, 
-	left.classification_Permissible_use_access.file_type = 1 and ~regexfind('Safe',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	left.classification_Permissible_use_access.file_type = 1 and ~regexfind('Safe|Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source; self.FileName := right.FileName)
 	);
 
@@ -69,7 +69,7 @@ EXPORT Build_Summary(string pversion) := MODULE
 	);
 
 	deltabase := join ( Data_Loaded, bdb, 
-	left.classification_Permissible_use_access.file_type = 3 and regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source; self.FileName := right.FileName)
 	);
 
@@ -365,7 +365,7 @@ EXPORT Build_Summary(string pversion) := MODULE
 
 	export Send_Email := fileservices.SendEmailAttachText( 
 			FraudGovPlatform_Validation.Mailing_List().RinNetwork, 
-			'RIN Data Build' + pversion,
+			'RIN Data Build ' + pversion,
       msg,
 			html,
       'text/plain; charset=ISO-8859-3',  

@@ -2,7 +2,7 @@
 // file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='U');
 //FC_ids := ['058118BANKOFAMERICA', '058118ESCOBARCARLOSG', '1079290090820TRUCAPREOCORP', '1079290090820TRUCAPGRANTORTRUST2010-1'];
 FC_ids(boolean isFCRA=false) := dops.SuppressID('foreclosure').GetIDsAsSet(isFCRA);
-file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='U' and Trim(foreclosure_id, left, right) not in FC_ids());
+file_in := Property.File_Foreclosure_Normalized(trim(deed_category)IN ['U','F','T','Q','G'] and Trim(foreclosure_id, left, right) not in FC_ids());
 
 Autokey_layout:=record
 	string70		foreclosure_id;

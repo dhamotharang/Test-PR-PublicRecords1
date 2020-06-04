@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add, AID, Address, idl_header;
+import _control, ut, Business_Header, Business_Header_SS, did_add, AID, Address, idl_header, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -135,6 +135,9 @@ transform
 	self := l;
 end;
 
+projectBase  := project(BDID_Append, tLayout_6510_Government_Debarred_Contractor_Base(left));
 
-export BDID_6510_Government_Debarred_Contractor := project(BDID_Append, tLayout_6510_Government_Debarred_Contractor_Base(left))
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export BDID_6510_Government_Debarred_Contractor := addGlobalSID
 	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

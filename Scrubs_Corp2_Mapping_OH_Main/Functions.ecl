@@ -1,4 +1,4 @@
-IMPORT corp2,ut;
+﻿IMPORT corp2,ut;
 	
 EXPORT Functions := MODULE
 
@@ -43,8 +43,8 @@ EXPORT Functions := MODULE
 				
 	  //Below table needs to be updated when we see new Org_Struc codes in Raw updates!
 		EXPORT set_org_structure_cd := [ '00','01','02','03','04','05','06','07','08','09','10','11','12','13','14',
-																		 '15','16','17','18','19','20','21','22','23','BT','CF','CH','CN','CP','CV',
-																		 'FP','GL','LF','LL','LP','PR','RC','RT','UN',''];
+																		 '15','16','17','18','19','20','21','22','23','24','BT','CF','CH','CN','CP',
+																		 'CV','FP','GL','LF','LL','LP','PR','RC','RT','UN',''];
 																		
 
 																		

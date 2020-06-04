@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.IA;
 
@@ -26,7 +26,7 @@ self.STATE	:= ut.CleanSpacesAndUpper(L.STATE);
 self.COUNTY	:= ut.CleanSpacesAndUpper(L.COUNTY);
 self.MODEL	:= ut.CleanSpacesAndUpper(REGEXREPLACE('^\'',L.MODEL,''));
 self.COLOR	:= ut.CleanSpacesAndUpper(L.COLOR);
-self.NAME2	:= ut.CleanSpacesAndUpper(L.NAME2); //currently blank
+//self.NAME2	:= ut.CleanSpacesAndUpper(L.NAME2); //currently blank
 self.CUST_EMAIL	:= ut.CleanSpacesAndUpper(L.CUST_EMAIL);
 self	:= L;
 END;

@@ -1,6 +1,6 @@
-import doxie,Data_Services;
+import doxie,Data_Services,header;
 
-d:=Header.Prep_NLR_key;
+d:=header.fn_suppress_ccpa(Header.Prep_NLR_key,true);
 
 layout:=record
 	d.pflag1;

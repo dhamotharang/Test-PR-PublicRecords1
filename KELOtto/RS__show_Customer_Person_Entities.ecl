@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL011 AS KEL;
 IMPORT RQ__show_Customer_Person_Entities FROM KELOtto;

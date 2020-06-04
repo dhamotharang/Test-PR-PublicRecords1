@@ -2,6 +2,7 @@
 import BIPV2_Best;
 import BIPV2_Files;
 import BIPV2_Build;
+import BIPV2_Contacts;
 import MDR;
 import BIPV2_PostProcess;
 import InsuranceHeader_PostProcess;
@@ -9,10 +10,10 @@ import tools;
 
 
 export BuildSegmentationFile(
-                               string   pVersion                 = BIPV2.KeySuffix_mod2.MostRecentWithIngestVersionDate
+                               string   pVersion                 = BIPV2.KeySuffix
 				        ) := function
 
-     outputFileName := BIPV2_Segmentation.Files(trim(pVersion),false).FILE_LOGICAL;
+     outputFileName := BIPV2_Segmentation.Files(trim(pVersion)).FILE_LOGICAL;
 		
      //Current Build Version of Contacts Key
 	contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.keybuilt), hash32(seleid));
@@ -21,14 +22,16 @@ export BuildSegmentationFile(
      bestRecs       := BIPV2_Best.Files().base.built;	
 
      //Current Build CommonBase Header
-	headerRecs     := BIPV2.CommonBase.DS_Built;
+	headerRecs     := BIPV2.CommonBase.DS_Clean;  //this is the "built" version of the base file cleaned, no need to further clean it.  should be faster
 
 	
      //Current Consumer Header Segmentation	
      seg_key := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 
-     header_clean := distribute(BIPV2.CommonBase.clean(headerRecs), hash32(seleid));
+     header_clean := distribute(headerRecs, hash32(seleid));
 
+     nonResidentAddress := dedup(table(header_clean(address_type_derived!='R'), {prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name, st, zip, zip4}), all, hash);
+							  
      Layouts.TallyLayout tallyTransform(Layouts.SlimLayout l, dataset(Layouts.SlimLayout) allrows) := transform
           self.dt_first_seen := min(allRows(dt_first_seen<>0), dt_first_seen);
           self.dt_last_seen  := max(allRows, dt_last_seen);
@@ -36,7 +39,6 @@ export BuildSegmentationFile(
           self.addr_state_cnt:= count(table(allrows(trim(st)<>''), {st}, st)) ;
           self.record_cnt    := count(allrows) ;
           self.has_SOS       := exists(allrows(MDR.sourcetools.SourceIsCorpV2(source)));     
-          self.org_structure := project(table(allrows(company_org_structure_derived<>''), {company_org_structure_derived, cnt := count(group)}, company_org_structure_derived), Layouts.OrgStructureLayout);
           self:=l;
      end;
 
@@ -51,7 +53,7 @@ export BuildSegmentationFile(
                                self.category := right.category;
                                self.subcategory := right.subCategory;
                                self:=left;
-                               self:=[]), left outer, keep(1), local);
+                               self:=[]), left outer, keep(1), hash);
 
      withBest := join(withSeg, bestRecs(proxid=0), 
                       left.seleid = right.seleid, 
@@ -79,18 +81,75 @@ export BuildSegmentationFile(
                                      self.company_incorporation_date := right.company_incorporation_date[1].company_incorporation_date;
                                      self.company_sic_code1          := right.sic_code[1].company_sic_code1;
                                      self.company_naics_code1        := right.naics_code[1].company_naics_code1;               
-                                     self:=left), left outer, keep(1), local);           
+                                     self:=left), left outer, keep(1), hash);           
                                      
-     contactInfo := ExtractContacts.extractContactInfo(contactKeyDs, seg_key);
-
+     contactInfo        := ExtractContacts(contactKeyDs, seg_key);
+     sourceGroupInfo    := ExtractSourceGroups(header_clean);
+     allAddressTypeInfo := ExtractAllAddressType(header_clean);
+     parentSeleIDInfo   := ExtractParentSeleidInfo(header_clean);
+	orgStructureInfo   := ExtractCompanyOrgStructure(header_clean);
+	
      withContacts := join(withBest, contactInfo, 
 	                     left.seleid = right.seleid, 
                           transform(Layouts.SegmentationLayout,
-                                    self.contacts := right.contacts;
-                                    self:=left), keep(1), left outer, local);
-                                                                                                                                                                               
+                                    self.best_contact_did       := right.best_contact_did;
+                                    self.best_contact_job_title := right.best_contact_job_title;
+                                    self.best_contact_seg_ind   := right.best_contact_seg_ind;
+                                    self                        := left), keep(1), left outer, hash);
+
+	  
+     withSourceGroupInfo := join(withContacts, sourceGroupInfo,
+	                            left.seleid = right.seleid,
+						   transform(Layouts.SegmentationLayout,
+						             self.sourceGroups := map(right.hasPublicRecords and right.hasDirectory and right.hasBureau => 'PBD',
+								                            right.hasPublicRecords and right.hasBureau                        => 'PB',
+								                            right.hasPublicRecords and right.hasDirectory                     => 'PD',
+								                            right.hasBureau        and right.hasDirectory                     => 'BD',
+								                            right.hasPublicRecords                                            => 'P',
+								                            right.hasDirectory                                                => 'D',
+								                            right.hasBureau                                                   => 'B',
+								                            right.hasTelephone                                                => 'T',
+													   'U'
+								                           ),
+								   self := left), left outer, hash);
+
+     withAllAddressTypeInfo := join(withSourceGroupInfo, allAddressTypeInfo,
+	                               left.seleid = right.seleid,
+						      transform(Layouts.SegmentationLayout,
+						                self.all_address_type := right.all_address_type,
+								      self := left), left outer, hash);
+								   
+     withParentSeleidInfo  := join(withAllAddressTypeInfo, parentSeleIDInfo,
+	                              left.seleid = right.seleid,
+						     transform(Layouts.SegmentationLayout,
+						               self.parent_seleid := right.seleid,
+								     self := left), left outer, hash);
+
+     withOrgStructInfo     := join(withParentSeleidInfo, orgStructureInfo,
+	                              left.seleid = right.seleid,
+						     transform(Layouts.SegmentationLayout,
+						               self.org_structure     := right.org_structure,
+						               self.org_sub_structure := right.org_sub_structure,
+								     self := left), left outer, hash);
+		
+     withBestAddrInfo      := join(withOrgStructInfo, nonResidentAddress,
+	                                  left.company_prim_range  = right.prim_range
+	                              and left.company_predir      = right.predir
+	                              and left.company_prim_name   = right.prim_name
+	                              and left.company_addr_suffix = right.addr_suffix
+	                              and left.company_postdir     = right.postdir
+	                              and left.company_unit_desig  = right.unit_desig
+	                              and left.company_sec_range   = right.sec_range
+	                              and left.company_p_city_name = right.p_city_name
+	                              and left.company_st          = right.st
+	                              and left.company_zip5        = right.zip
+	                              and left.company_zip4        = right.zip4,
+						     transform(Layouts.SegmentationLayout,
+						               self.best_address_type := if(right.st!='','B','R'),
+								     self := left), left outer, hash);
+								   
      go := sequential(
-	     output(withContacts,,outputFileName,overwrite,compressed) 
+	     output(withBestAddrInfo,,outputFileName,overwrite,compressed) 
 	    ,evaluate(BIPV2_Segmentation.Files(trim(pVersion),false).updateSuperFiles(outputFileName))
 	);
 	

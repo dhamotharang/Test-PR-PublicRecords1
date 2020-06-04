@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 DeniedPersons	:= 	DATASET('~thor::in::globalwatchlists::denied_persons', 

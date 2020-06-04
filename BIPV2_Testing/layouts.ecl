@@ -1,4 +1,4 @@
-import BIPV2;
+﻿import BIPV2;
 
 EXPORT layouts := module
 
@@ -30,6 +30,7 @@ export xlink := record
 end;
 
 export xlink6:={xlink AND NOT [sub_src]};
+export xlink5:={xlink6 AND NOT [src_rcid]};
 
 
 end;

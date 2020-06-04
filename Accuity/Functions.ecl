@@ -1,4 +1,4 @@
-Import Worldcheck_Bridger,ut,Std;
+﻿Import Worldcheck_Bridger,ut,Std;
 
 export Functions := module
 
@@ -126,7 +126,8 @@ ChangeToOther := ['OtherInformation', 'Organization','AltAddress','LanguagesSpok
 					'DocumentOfCompliance','EffectiveDate','ExpirationDate',
 					'GroupBeneficialOwner','Legal_Basis','Manager','Operator',
 					'Org_PID','Organizatin','PlaceofIncorporation','Relationship',
-					'TechnicalManager','Typeofdenial'
+					'TechnicalManager','Typeofdenial',
+					'SubCategory', 'OwnershipPercent','SourceLink'
 					];
 
 export normAddl(dataset(Accuity.Layouts.input.rEntity) infile) := function
@@ -436,18 +437,18 @@ string FixMonth(string s) := FUNCTION
 	outmon := CASE(stringlib.stringtolowercase(inmon),
 		'janvier' => 'January',
 		'fevrier' => 'February',
-		'fÃ©vrier' => 'February',
+		'fÃƒÂ©vrier' => 'February',
 		'mars' => 'March',
 		'avril' => 'April',
 		'mai' => 'May',
 		'juin' => 'June',
 		'aout' => 'August',
-		'aoÃ»t' => 'August',
+		'aoÃƒÂ»t' => 'August',
 		'septembre' => 'September',
 		'octobre' => 'October',
 		'novembre' => 'November',
 		'dccembre' => 'December',
-		'dÃ©cembre' => 'December',
+		'dÃƒÂ©cembre' => 'December',
 		'sept' => 'September',
 		'sept.' => 'September',
 		'');

@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -7,7 +7,7 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_address1_type_cd(STRING code) := FUNCTION
 					 uc_code								:= corp2.t2u(code);
-					 isValidCD			 		  	:= map(uc_code in ['A','B','L','M','O','PM','PP','PU','Q','U','W',''] => true,false);
+					 isValidCD			 		  	:= map(uc_code in ['B','M',''] => true,false);
 					 RETURN if(isValidCD,1,0);
 		END;
 		
@@ -16,11 +16,8 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_address1_type_desc(STRING code) := FUNCTION
 					 uc_code								:= corp2.t2u(code);
-					 isValidDesc		 		  	:= map(uc_code in ['ANNUAL REPORT','BUSINESS','LISTING'] 	=> true,
-																				 uc_code in ['MAILING','OTHER','PREVIOUS MAILING'] 	=> true,
-																				 uc_code in ['PREVIOUS BUSINESS','PREVIOUS UCC'] 		=> true,
-																				 uc_code in ['QUICK ACCOUNT','UCC','WITHDRAWAL'] 		=> true,
-																				 uc_code in [''] 																		=> true,
+					 isValidDesc		 		  	:= map(uc_code in ['BUSINESS','MAILING'] 	=> true,
+																				 uc_code in [''] 										=> true,
 																				 false
 																				);
 					 RETURN if(isValidDesc,1,0);
@@ -31,7 +28,7 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_ra_address_type_cd(STRING code) := FUNCTION
 					 uc_code								:= corp2.t2u(code);
-					 isValidCD			 		  	:= map(uc_code in ['PR','PRM','R',''] => true,false);
+					 isValidCD			 		  	:= map(uc_code in ['R','M',''] => true,false);
 					 RETURN if(isValidCD,1,0);
 		END;
 		
@@ -41,8 +38,7 @@ EXPORT Functions := MODULE
 		EXPORT valid_ra_address_type_desc(STRING code) := FUNCTION
 					 uc_code								:= corp2.t2u(code);
 					 isValidDesc				  	:= map(uc_code in ['REGISTERED OFFICE'] 						=> true,
-																				 uc_code in ['PREVIOUS REGISTERED MAILING'] 	=> true,
-																				 uc_code in ['PREVIOUS REGISTERED OFFICE'] 		=> true,
+																				 uc_code in ['MAILING ADDRESS'] 	            => true,
 																				 uc_code in [''] 															=> true,
 																				 false
 																				);
@@ -71,15 +67,6 @@ EXPORT Functions := MODULE
 		END;			
 
 		//****************************************************************************
-		//valid_addresstypeid: returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT valid_addresstypeid(STRING code) := FUNCTION
-					 uc_code								:= corp2.t2u(code);
-					 isValidCD			 		  	:= map(uc_code in ['1','6','7','8','9','10','11','14','15','16','17','18','19','24',''] => true,false);
-					 RETURN if(isValidCD,1,0);
-		END;
-
-		//****************************************************************************
 		//valid_address_type_cd: returns true or false based upon the incoming code.
 		//****************************************************************************
 		EXPORT valid_address_type_cd(STRING code) := FUNCTION
@@ -93,23 +80,9 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_address_type_desc(STRING s) := FUNCTION
 					 uc_s 									:= corp2.t2u(s);
-					 isValidDesc			 		  := map(uc_s in ['BUSINESS','CONTACT','MAILING','PREVIOUS REGISTERED MAILING',
-																									'PREVIOUS REGISTERED OFFICE','REGISTERED OFFICE',
-																									''] => true,false
+					 isValidDesc			 		  := map(uc_s in ['BUSINESS','MAILING','REGISTERED OFFICE',''] => true,false
 																				);
 						RETURN if(isValidDesc,1,0);
-		END;
-		
-		//****************************************************************************
-		//valid_corp_status_cd: returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT valid_corp_status_cd(STRING code) := FUNCTION
-					 uc_code 						 := corp2.t2u(code);
-					 isValidCD			 		 := map(uc_code in ['1','2','3','4','5','7','8','9','11','24',
-																									'25','26','27','28','29','30','31','33','34',
-																									'35','36','37','38','39','40','41','42',''] => true,false
-																		 );
-						RETURN if(isValidCD,1,0);
 		END;
 		
 		//****************************************************************************
@@ -117,44 +90,37 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_corp_status_desc(STRING s) := FUNCTION
 					 uc_s 						 	 := corp2.t2u(s);
-					 isValidDesc			 	 := map(uc_s in ['ABANDONED','ACCEPTANCE INACTIVE','ACTIVE','ADMIN DISS LLP-CC-NP',
-																							 'ADMIN DISSOLUTION','ADMIN. SUSPENSION','CONSOLIDATED INACTIVE',
-																							 'CREATION INACTIVE','CONVERTED','DISSOLVED','DOMESTICATED','EXPIRED',
-																							 'FORFEITED','GOOD STANDING','IN PROCESS','INACTIVE','MERGED',
-																							 'NON-QUALIFIED','NOT IN GOOD STANDING','OBJECTION','PARENT/OWNER DISSOLVED',
-																							 'PENDING','RESERVED NAME','SURRENDERED','TRANSACTION INACTIVE',
-																							 'WITHDRAWN','WITHDRAWN BY MERGER',''] => true,false
+					 isValidDesc			 	 := map(uc_s in ['ACCEPTANCE INACTIVE','ACTIVE','ADMIN DISS LLP-CC-NP','ADMINISTRATIVE DISSOLUTION',
+																							 'ADMINISTRATIVE DISSOLUTION LLP-CC-NP','ADMIN. SUSPENSION','ADMINISTRATIVE SUSPENSION',
+																							 'ADMINISTRATIVELY DISSOLVED NAME PROTECTION','ADMINISTRATIVELY SUSPENDED',
+																							 'ADMINISTRATIVELY SUSPENDED NAME','CONSOLIDATED INACTIVE','CONVERTED','CREATION INACTIVE',
+																							 'DISSOLVED','DISSOLVED NAME PROTECTED','DOMESTIC BANK','DOMESTIC FOUNDATION','EXPIRED',
+																							 'EXPIRED PENDING','FOREIGN BANK','FORFEITED','FUTURE EFFECTIVE','GOOD STANDING','HOLD',
+																							 'INACTIVE','MERGED','NON-QUALIFIED','NOT IN GOOD STANDING','PARENT/OWNER DISSOLVED',
+                                               'PENDING DISSOLUTION','REJECTED','REJECTION NAME PROTECTED','RESERVED NAME',
+																							 'RESERVED NAME CANCELLED','RESERVED NAME EXPIRED','TRANSACTION INACTIVE','WITHDRAWN',
+																							 'WITHDRAWN BY MERGER',''] => true,false
 																		 );
 						RETURN if(isValidDesc,1,0);
 		END;
 		
-		//****************************************************************************
-		//valid_corp_type_cd: returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT valid_corp_type_cd(STRING code) := FUNCTION
-					 uc_code 						 := corp2.t2u(code);
-					 isValidCD			 		 := map(uc_code in ['12','16','18','19','20','25','26','58',
-																									'63','71','72','73','74','75','76','77',
-																									'78','79','80','82','83','84','87','88',''] => true,false
-																		 );
-
-						RETURN if(isValidCD,1,0);
-		END;
 		
 		//****************************************************************************
 		//valid_corp_type_desc: returns true or false based upon the incoming code.
 		//****************************************************************************
 		EXPORT valid_corp_type_desc(STRING s) := FUNCTION
 					 uc_s			  						:= corp2.t2u(s);
-					 isValidDesc			 		  := map(uc_s in ['AGRICULTURAL COOP','BANK','BUILDING AND LOAN (BANK)',
-																									'CONSUMER COOPERATIVES','CORPORATION','FEDERALLY CHARTERED',
-																									'FOREIGN BUSINESS TRUST','FOREIGN CORP REGISTERED NAME', 
-																									'GUARANTY SAVINGS','INSURANCE COMPANY','LIMITED LIABILITY COMPANY', 
-																									'LIMITED LIABILITY PARTNERSHIP','LIMITED PARTNERSHIP','MERCHANT BANK',
-																									'MUTUAL HOLDING COMPANY','NH INVESTMENT TRUSTS','NON-PROFIT CORPORATION',
-																									'PARTNERSHIP','PROFESSIONAL ASSOCIATION','PROFESSIONAL LIMITED LIABILITY COMPANY',
-																									'PROFESSIONAL LIMITED LIABILITY PARTNERSHIP','STATE CHARTERED (LEGISLATIVE)',
-																									'TRADE NAME','TRUST COMPANY',''] => true,false
+					 isValidDesc			 		  := map(uc_s in ['DOMESTIC LIMITED LIABILITY COMPANY','FOREIGN PROFIT CORPORATION',
+																								  'FOREIGN LIMITED LIABILITY COMPANY','DOMESTIC PROFIT CORPORATION',
+																								  'DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY',
+																								  'DOMESTIC PROFESSIONAL PROFIT CORPORATION',
+																								  'DOMESTIC NONPROFIT CORPORATION','DOMESTIC LIMITED LIABILITY PARTNERSHIP',
+																								  'FOREIGN LIMITED PARTNERSHIP','FOREIGN PROFESSIONAL PROFIT CORPORATION',
+																								  'FOREIGN NONPROFIT CORPORATION','FOREIGN LIMITED LIABILITY PARTNERSHIP',
+																								  'DOMESTIC LIMITED PARTNERSHIP','DOMESTIC CONSUMER COOPERATIVE',
+																								  'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY',
+																								  'DOMESTIC BENEFIT CORPORATION','CORRESPONDENCE',
+																									'FORCED DBA','TRADE NAME','FOREIGN REGISTERED CORPORATE NAME',''] => true,false
 																				);
 						RETURN if(isValidDesc,1,0);
 		END;
@@ -308,7 +274,7 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_name_type_cd(STRING code) := FUNCTION
 					 uc_code								:= corp2.t2u(code);
-					 isValidCD			 		  	:= map(uc_code in ['P','01','03','04','07',''] => true,false);
+					 isValidCD			 		  	:= map(uc_code in ['P','01','03','05','10','11',''] => true,false);
 
 					 RETURN if(isValidCD,1,0);
 		END;
@@ -318,40 +284,10 @@ EXPORT Functions := MODULE
 		//****************************************************************************
 		EXPORT valid_name_type_desc(STRING s) := FUNCTION
 					 uc_s 									:= corp2.t2u(s);
-					 isValidDesc			 		  := map(uc_s in ['HOME STATE','LEGAL','PREV HOME STATE','PREV LEGAL',
-																									'PREV TRADE NAME','RESERVED','TRADE NAME',''] => true,false
+					 isValidDesc			 		  := map(uc_s in ['HOME STATE','LEGAL','DBA','PRIOR',
+																									'TRADENAME','FOREIGN REGISTERED NAME',''] => true,false
 																				);
 						RETURN if(isValidDesc,1,0);
 		END;	
-
-		//****************************************************************************
-		//valid_party_type_cd: returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT valid_party_type_cd(STRING code) := FUNCTION
-					 uc_code								:= corp2.t2u(code);
-					 isValidCD			 		  	:= map(uc_code in ['1000','1001','1007','1021','1022','1023',
-																										'1024','1025','1027','1030','2000','2001',
-																										'2002','2003','2004','2005','2008','2009',
-																										'3000','3001','3002','3003','3004',''] => true,false
-																				);
-					 RETURN if(isValidCD,1,0);
-		END;
-
-
-		//****************************************************************************
-		//valid_party_type_desc: returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT valid_party_type_desc(STRING s) := FUNCTION
-					 uc_s 									:= corp2.t2u(s);
-					 isValidDesc			 		  := map(uc_s in ['ASSISTANT SECRETARY','ASSISTANT TREASURER','ATTORNEY-IN-FACT',
-																									'AUTHORIZED PARTY','CHAIRMAN OF THE BOARD OF DIRECTORS',
-																									'COURT-APPOINTED FIDUCIARY','DIRECTOR ONLY','DIRECTOR NAME',
-																									'INCORPORATOR NAME','MANAGER NAME','MEMBER NAME','ORGANIZER',
-																									'OTHER','OTHER FIDUCIARY','GENERAL PARTNER','PARTNER NAME',
-																									'PRESIDENT','REGISTERED AGENT WITH POWER OF ATTORNEY','REGISTRANT',
-																									'SECRETARY','TREASURER','TRUSTEE','VICE PRESIDENT',''] => true,false
-																				);
-						RETURN if(isValidDesc,1,0);
-		END;
 
 END;

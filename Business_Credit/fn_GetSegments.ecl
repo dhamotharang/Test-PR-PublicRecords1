@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	ut;
+IMPORT	Business_Credit, MDR, ut;
 EXPORT	fn_GetSegments	:=	MODULE
 
 	SHARED	dValidRecords	:=	Business_Credit.Files().active;
@@ -94,7 +94,9 @@ EXPORT	fn_GetSegments	:=	MODULE
 
 		dBusinessOwner	:=	NORMALIZE(dValidRecords(COUNT(businessOwner)>0),COUNT(LEFT.businessOwner),tBusinessOwner(LEFT,COUNTER));
 
-		RETURN	dBusinessOwner;
+		addGlobalSID 	:=  	MDR.macGetGlobalSID(dBusinessOwner,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
+
+		RETURN	addGlobalSID;
 	END;
 
 	EXPORT	collateral	:=	FUNCTION
@@ -154,7 +156,9 @@ EXPORT	fn_GetSegments	:=	MODULE
 
 		dIndividualOwner	:=	NORMALIZE(dValidRecords(COUNT(individualOwner)>0),COUNT(LEFT.individualOwner),tIndividualOwner(LEFT,COUNTER));
 
-		RETURN	dIndividualOwner;
+		addGlobalSID 		:=  	MDR.macGetGlobalSID(dIndividualOwner,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
+
+		RETURN	addGlobalSID;
 	END;
 
 	EXPORT	masterAccount	:=	FUNCTION

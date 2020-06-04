@@ -1,8 +1,12 @@
 ﻿Import ut, Gong, NID,didville, mdr,Gong_Neustar,Std;
 EXPORT files := module
 	
-	EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_history, FLAT );
-	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_history, FLAT );
+	// EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_base, FLAT );
+	// EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_base, FLAT );
+	
+	EXPORT file_Gong_History := DATASET('~prte::base::gong_history_20190814', Layouts.Layout_base, FLAT );
+	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly_20190814', Layouts.Layout_base, FLAT );
+	
 	EXPORT DS_Gong_History_IN := DATASET('~PRTE::IN::Gong_History', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Weekly_IN := DATASET('~PRTE::IN::Gong_Weekly', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Santander_IN :=  DATASET('~PRTE::IN::Gong_Santander', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
@@ -49,15 +53,15 @@ EXPORT files := module
 	END;
 	f_cn_norm := normalize(f_cn,length(left.cn_all)/10,normCN(left,counter));
 	EXPORT f_cn_norm_dep := dedup(sort(f_cn_norm, record), record);
-	export File_History_Full_Prepped_for_Keys := Project(file_Gong_History, Layouts.layout_historyaid);
-	export File_Weekly_Full_Prepped_for_Keys := Project(file_Gong_Weekly, Layouts.layout_historyaid);
+	export File_History_Full_Prepped_for_Keys := Project(file_Gong_History, Layouts.layout_historyaid_clean);
+	export File_Weekly_Full_Prepped_for_Keys := Project(file_Gong_Weekly, Layouts.layout_historyaid_clean);
 	//DS_gong_cn_to_company
 		hist_in := File_Weekly_Full_Prepped_for_Keys((unsigned)phone10<>0, listing_type_bus<>'', listed_name<>'', current_record_flag<>'');
 		gong.mac_hist_full_slim_dep(hist_in, hist_out);
 	EXPORT DS_gong_cn_to_company := hist_out;
 	EXPORT DS_gong_did := Project(file_Gong_Weekly, Layouts.Layout_Gong_DID);
 	EXPORT DS_gong_eda_npa_nxx_line := dedup(PROJECT(File_Weekly_Full_Prepped_for_Keys(TRIM(phone10)<>''), 
-									Layouts.Layout_Gong_DID - [did]), record, all);
+									Layouts.Layout_Gong_DID), record, all);
 	/////DS_gong_eda_st_bizword_city////
 		layouts.Layout_extra addOrig(recordof(DS_gong_did) l) := TRANSFORM
 			SELF.word := '';
@@ -243,7 +247,11 @@ EXPORT files := module
 				and left.prim_name=right.prim_name
 				and left.prim_range=right.prim_range
 				and left.name_last=right.name_last,
-			transform(Layouts.layout_span, self.span_first_seen:=right.dt_first_seen, self:=left),
+			transform(Layouts.layout_span, 
+								self.global_sid := 0,
+								self.record_sid := 0,
+								self.span_first_seen:=right.dt_first_seen, 
+								self:=left),
 			keep(1), left outer, hash
 		);
 		gong_span_fl_wdtg := join(

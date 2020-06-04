@@ -57,9 +57,9 @@ export rClient := RECORD
 	string20		CaseID;
 	string20		ClientId;
 	string1			HHIndicator;			// head of household indicator Y or N
+	string1			ABAWDIndicator := 'U';		// Yes, No, Unavailable
 	string1			Relationship;			// H - Head of Household, P - Parent,  M - Mother, F - Father,
 																// G - Guardian,  T - Grandparent,  A - Aunt, U - Uncle, C - Cousin, D - Child, O - Other (etc versus Y/N)
-	string1			ABAWDIndicator := 'U';		// Yes, No, Unavailable
 	string30		LastName;
 	string25		FirstName;
 	string25		MiddleName;
@@ -216,6 +216,7 @@ END;
 	
 	export rExceptionEx := RECORD
 		rException;
+		string4			SourceGroupId;
 		rCommonEx;
 	END;
 	
@@ -247,12 +248,21 @@ EXPORT rNac2Ex := RECORD
 END;	
 
 EXPORT rExceptionRecord := RECORD
-		rException - RecordCode;
-		unsigned4 created;
-		unsigned4 updated;
-		unsigned4 replaced;
-		unsigned4 errors;
-		unsigned4 warnings;
+		string1			UpdateType;			// U = Add/Update, D = Delete
+		string2			SourceProgramState;
+		string1			SourceProgramCode;
+		string20		SourceClientId;
+		string4			SourceGroupId;
+		string2			MatchedState;
+		string1			MatchedProgramCode;
+		string20		MatchedClientId;
+		string4			MatchedGroupId;
+		string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
+		string50		Comments;
+		unsigned4 	created;
+		unsigned4 	updated;
+		unsigned4 	replaced;
+		string32		filename := '';
 END;		
 
 END;

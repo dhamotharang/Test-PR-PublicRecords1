@@ -31,16 +31,16 @@ EXPORT CommonBase := MODULE
 	// Files and datasets
 	EXPORT filePrefix				:= 'thor_data400::bipv2::internal_linking::';
 	
-	EXPORT FILE_LOCAL_BUILT	      := '~' + filePrefix + 'built'    ;
-	EXPORT FILE_LOCAL				      := '~' + filePrefix + 'base'        ;
+	EXPORT FILE_LOCAL_BUILT	      := '~' + filePrefix + 'built'       ;
+	EXPORT FILE_LOCAL				      := '~' + filePrefix + 'qa'          ;
 	EXPORT FILE_FATHER_LOCAL      := '~' + filePrefix + 'father'      ;
 	EXPORT FILE_GRANDFATHER_LOCAL	:= '~' + filePrefix + 'grandfather' ;
 
-	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'     ;
-	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'base'         ;
-	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'       ;
-	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather'  ;
-	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'base'         ;
+	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'       ;
+	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'qa'          ;
+	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'      ;
+	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather' ;
+	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'qa'          ;
   
 	EXPORT FILE_BUILT				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL_BUILT         ,FILE_PROD_BUILT        );
 	EXPORT FILE_BASE				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL               ,FILE_PROD              );
@@ -78,7 +78,13 @@ EXPORT CommonBase := MODULE
 		RETURN ds_reg;
 	ENDMACRO;
   
-	EXPORT DS_CLEAN                 := clean(DS_BUILT         );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+  
+  export Clean_Common_Base        (string pversion = '',boolean	pUseOtherEnvironment	= false) := tools.macf_FilesBase(BIPV2.Filenames(pversion,pUseOtherEnvironment).Clean_Common_Base ,Layout       );
+  
+  shared clean_built_filename := BIPV2.Filenames().Clean_Common_Base.built;
+	EXPORT DS_CLEAN_old             := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout_S40_old         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+	EXPORT DS_CLEAN                 := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+	// EXPORT DS_CLEAN                 := clean(DS_BUILT         );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	EXPORT DS_CLEAN_BASE            := clean(DS_BASE          );//USED OUTSIDE OF THE BUILD  
 	EXPORT DS_FATHER_CLEAN          := clean(DS_FATHER        );
 	EXPORT DS_FATHER_STATIC_CLEAN   := clean(DS_FATHER_STATIC );
@@ -123,8 +129,8 @@ EXPORT CommonBase := MODULE
 		
 		LOCAL ver := CASE(
 			StringLib.StringToLowerCase(#TEXT(in_ver)),
-			''						=> 'base',
-			'base'				=> 'base',
+			''						=> 'qa',
+			'base'				=> 'qa',
 			'father'			=> 'father',
 			'grandfather'	=> 'grandfather',
 			ERROR('BIPV2.CommonBase.DS_OMNI -- bad version'));

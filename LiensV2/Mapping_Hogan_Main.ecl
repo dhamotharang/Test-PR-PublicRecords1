@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////////////
 // Attribute 	: MAPPING_HOGAN_MAIN
 
 // DEPENDENT ON : liensv2.layout_liens_main_temp,
@@ -111,7 +111,18 @@ Hogan_main_out := rollup(full_sort, tmsid +rmsid+record_code+date_vendor_removed
 							  filing_book+filing_page+release_date+amount+eviction+satisifaction_type+judg_satisfied_date+judg_vacated_date+tax_code+irs_serial_number+effective_date+
 							  lapse_date+accident_date+sherrif_indc+expiration_date+agency+agency_city+agency_state+agency_county+legal_lot+legal_block+legal_borough+certificate_number, tmakechildren(left, right), local);
 
-RETURN Hogan_main_out;
+
+full_sort2 := sort(Hogan_main_out,tmsid, rmsid, -process_date, record_code, date_vendor_removed,  filing_jurisdiction, filing_state, orig_filing_number, orig_filing_type,  
+                orig_filing_date, orig_filing_time ,  case_number, filing_number, filing_type_desc,  filing_date ,  filing_time,  vendor_entry_date, judge, case_title,  
+							  filing_book, filing_page, release_date, amount, eviction, satisifaction_type, judg_satisfied_date, judg_vacated_date, tax_code, irs_serial_number, effective_date, 
+							  lapse_date, accident_date, sherrif_indc, expiration_date, agencyID, agency_state, agency_county, legal_lot, legal_block, legal_borough, certificate_number, orig_filing_time,local);
+
+deduprecords := dedup(full_sort2,tmsid, rmsid, record_code, date_vendor_removed,  filing_jurisdiction, filing_state, orig_filing_number, orig_filing_type,  
+                orig_filing_date, orig_filing_time ,  case_number, filing_number, filing_type_desc,  filing_date ,  filing_time,  vendor_entry_date, judge, case_title,  
+							  filing_book, filing_page, release_date, amount, eviction, satisifaction_type, judg_satisfied_date, judg_vacated_date, tax_code, irs_serial_number, effective_date, 
+							  lapse_date, accident_date, sherrif_indc, expiration_date, agencyID, agency_state, agency_county, legal_lot, legal_block, legal_borough, certificate_number,local);
+
+RETURN deduprecords;
 
 END;
 

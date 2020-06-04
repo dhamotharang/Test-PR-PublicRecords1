@@ -1,4 +1,4 @@
-//****************Maps Neustar verified file to a common layout ********************
+﻿//****************Maps Neustar verified file to a common layout ********************
 //BUG 162654
 import ut, _validate, VersionControl, mdr, AlloyMediaConsumer;
 phone_file:= Phonesplus_v2.File_NVerification.DIDED;
@@ -121,7 +121,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := TRAN
 	self.orig_phone_type				:= CASE(input.Phone_Type_Indicator, 'W' => 'W', 'L' => 'L', 'O');
 
 	self.did_score 							:= (string) input.did_score;
-
+	self.source									:= temp_src; //DF-25784
+	self.cellphone 							:= self.npa + self.phone7; //DF-25784		
 	self 												:= input; 
 
 	//Populate keys

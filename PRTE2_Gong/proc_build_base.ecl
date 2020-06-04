@@ -27,7 +27,7 @@ gong_combined_new_clean_address := PRTE2.AddressCleaner(		gong_combined_addr_rdy
 																													['zip'],										 			// Set of fields containing zip
 																													['clean_address'],		 			// Target fields for Address.Layout_Clean182_fips	
 																													['admin_rawaid']) ;	   			// Target fields for rawaids
-layouts.Layout_history  or {string typ} xform_clean(gong_combined_new_clean_address l) := transform
+layouts.layout_base  or {string typ} xform_clean(gong_combined_new_clean_address l) := transform
 			clean_name := if (	l.listing_type_res != '',
 													Address.CleanPersonFML73(STD.Str.CleanSpaces(trim(l.listed_name))),
 													'');
@@ -64,7 +64,11 @@ layouts.Layout_history  or {string typ} xform_clean(gong_combined_new_clean_addr
 			self.bell_id := if (l.bell_id ='', 
 															'NEU', 
 															l.bell_id),
+			self.global_sid := 0;
+			self.record_sid	:= 0;
+			self.rawaid			:= l.admin_rawaid;
 			self	:= l;
+			self 	:= [];
 end;
 //merge in hhid
 
@@ -74,15 +78,18 @@ gong_hist_new_clean := Project(gong_combined_new_clean_address,xform_clean(left)
 didville.MAC_HHID_Append(gong_hist_new_clean, 
 									'BEST_HHID', 
 									gong_hist_new_clean_hhid);
-df_gong_hist_old := PROJECT(gong_hist_old, TRANSFORM(layouts.Layout_history, 
+df_gong_hist_old := PROJECT(gong_hist_old, TRANSFORM(layouts.Layout_base, 
 											self.bell_id := if (left.bell_id ='', 
 															'NEU', 
 															left.bell_id), 
-											self := left));
+											self.global_sid := 0;
+											self.record_sid	:= 0;				
+											self := left;
+											self := []));
 
-gong_hist_new_rdy :=  project(gong_hist_new_clean_hhid(typ = 'hist'), layouts.Layout_history);
-gong_week_new_rdy :=  project(gong_hist_new_clean_hhid(typ = 'week'), layouts.Layout_history);
-gong_weekly_old 		:= 	project(gong_week_clean_filt(cust_name = ''), layouts.Layout_history);
+gong_hist_new_rdy :=  project(gong_hist_new_clean_hhid(typ = 'hist'), layouts.Layout_base);
+gong_week_new_rdy :=  project(gong_hist_new_clean_hhid(typ = 'week'), layouts.Layout_base);
+gong_weekly_old 		:= 	project(gong_week_clean_filt(cust_name = ''), transform(layouts.Layout_base, self := left, self := []));
 gong_week_dedup := dedup(gong_weekly_old + gong_week_new_rdy , record, all);
 gong_hist_dedup := dedup(df_gong_hist_old + gong_hist_new_rdy + gong_week_dedup, record, all);
 PromoteSupers.MAC_SF_BuildProcess(gong_hist_dedup,'~PRTE::BASE::Gong_History', writefile_gong1);

@@ -1,0 +1,85 @@
+﻿// Begin code to generate cleave points
+IMPORT SALT30,ut,std;
+EXPORT Cleave(DATASET(layout_DOT_Base) ih,layout_specificities.R s = Specificities(ih).specificities[1],BOOLEAN RoxieService=FALSE) := MODULE
+  h00 := BasicMatch(ih).input_file;
+SHARED h := IF(RoxieService,Specificities(ih).input_file_np,h00);
+// Cleave points for cnp_number
+  bse := DISTRIBUTE(TABLE(h,{Proxid,cnp_number}),HASH(Proxid));
+// Simple counts of all the unique combinations of the basis
+EXPORT  Tallied_cnp_number := TABLE(bse,{ UNSIGNED2 Position := 0, UNSIGNED Cnt := COUNT(GROUP), Proxid,cnp_number}, Proxid,cnp_number,LOCAL);
+EXPORT FullTallied_cnp_number := Tallied_cnp_number(cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number));// Only 'full' values for cleave-determination
+  TYPEOF(FullTallied_cnp_number) tally(FullTallied_cnp_number le,FullTallied_cnp_number ri) := TRANSFORM
+    SELF.Position := IF ( le.Proxid = ri.Proxid, le.Position+1, 1 );
+    SELF := ri;
+  END;
+// FullTallied_cnp_number sorted by Proxid by previous TABLE statement
+  enumerated := ITERATE(FullTallied_cnp_number,tally(LEFT,RIGHT),LOCAL);
+  cleavecandidate := RECORD
+    TYPEOF(enumerated.cnp_number) left_cnp_number;
+    TYPEOF(enumerated.cnp_number) right_cnp_number;
+    UNSIGNED2 left_pos;
+    UNSIGNED2 right_pos;
+    UNSIGNED Cnt;
+    SALT30.UIDType Proxid;
+  END;
+  cleavecandidate make_cand(enumerated le,enumerated ri) := TRANSFORM
+    SELF.left_cnp_number := le.cnp_number;
+    SELF.right_cnp_number := ri.cnp_number;
+    SELF.left_pos := le.position;
+    SELF.right_pos := ri.position;
+    SELF.Cnt := le.cnt+ri.cnt;
+    SELF.Proxid := le.Proxid;
+  END;
+// Find those sets of values that completely disagree
+ // All the pairs of values that completely dis-agree - they could be cleave points IF nothiing joins them
+EXPORT Possibles_cnp_number_ni := JOIN( enumerated(cnt>=1), enumerated(cnt>=1), LEFT.Proxid = RIGHT.Proxid
+       AND NOT LEFT.cnp_number = RIGHT.cnp_number,make_cand(LEFT,RIGHT),LOCAL);
+EXPORT Candidates_cnp_number_ni := DEDUP( SORT( Possibles_cnp_number_ni, Proxid, -cnt, LOCAL ), Proxid, LOCAL );
+SHARED Candidates_cnp_number := Candidates_cnp_number_ni : PERSIST('~temp::Proxid::BIPV2_ProxID_Platform::Cleave::Candidates_cnp_number',EXPIRE(Config.PersistExpire));
+EXPORT Candidates_cnp_numberKeyName := '~'+'key::BIPV2_ProxID_Platform::Proxid::Candidates_cnp_number';
+EXPORT Candidates_cnp_number_Idx := INDEX(Candidates_cnp_number,{Proxid},{Candidates_cnp_number},Candidates_cnp_numberKeyName);
+SHARED Possibles_cnp_number := Possibles_cnp_number_ni : PERSIST('~temp::Proxid::BIPV2_ProxID_Platform::Cleave::Possibles_cnp_number',EXPIRE(Config.PersistExpire));
+EXPORT Possibles_cnp_numberKeyName := '~'+'key::BIPV2_ProxID_Platform::Proxid::Possibles_cnp_number';
+EXPORT Possibles_cnp_number_Idx := INDEX(Possibles_cnp_number,{Proxid},{Possibles_cnp_number},Possibles_cnp_numberKeyName);
+// Now construct a function that will perform the cleaves
+EXPORT CleaveBy_cnp_number(DATASET(RECORDOF(h)) inp) := FUNCTION
+  K := IF(RoxieService, Candidates_cnp_number_ni, Candidates_cnp_number);
+  R := RECORD
+    inp;
+    SALT30.UIDType __Shadow; // Track old during processing
+    INTEGER1 __Cluster := -1; // -1<no-cleave>, 0 <none>, 1<left>, 2<right>
+  END;
+  R TakeCleave(inp le,k ri) := TRANSFORM
+    BOOLEAN left_match := ri.left_cnp_number = le.cnp_number AND le.cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number);
+    BOOLEAN right_match := ri.right_cnp_number = le.cnp_number AND le.cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number);
+    SELF.__Cluster := MAP ( ri.Proxid = 0 => -1, left_match => 1, right_match => 2, 0 );
+    SELF.__Shadow := le.Proxid;
+    SELF := le;
+  END;
+  J0 := JOIN(inp,k,LEFT.Proxid=RIGHT.Proxid,TakeCleave(LEFT,RIGHT),LOOKUP,LEFT OUTER);
+  J1 := JOIN(inp,k,LEFT.Proxid=RIGHT.Proxid,TakeCleave(LEFT,RIGHT),LEFT OUTER); // Debug/roxie version
+  J2 := IF ( COUNT(inp) < 100, J1, J0 );
+  R ResetDids(R le, R ri) := TRANSFORM
+    SELF.Proxid := MAP ( ri.__Cluster = -1 => ri.Proxid, // untouched cluster
+                     le.__shadow <> ri.__shadow => ri.rcid, // Starting to process a changed Proxid
+                     le.__Cluster = ri.__Cluster => le.Proxid,
+                     ri.rcid);
+    SELF := ri;
+  END;
+  I := ITERATE( SORT( J2, __shadow, -__Cluster, rcid, LOCAL), ResetDids(LEFT,RIGHT),LOCAL);
+  RETURN PROJECT(I,TRANSFORM(RECORDOF(inp), SELF := LEFT));
+END;
+EXPORT PossiblesCounts := DATASET([{COUNT(Possibles_cnp_number)}],{UNSIGNED count_Possibles_cnp_number});
+EXPORT CandidatesCounts := DATASET([{COUNT(Candidates_cnp_number)}],{UNSIGNED count_Candidates_cnp_number});
+  converted0 := CleaveBy_cnp_number(h);
+  converted1 := converted0;
+SHARED input_file_np := IF(Config.ByPassCleave,h,converted1);
+EXPORT input_file := input_file_np : PERSIST('~temp::Proxid::BIPV2_ProxID_Platform::Cleave::input_file',EXPIRE(Config.PersistExpire));
+// Now create a 'patch' file to be used elsewhere
+// Find 'what changed' in the input file
+EXPORT patch_file_np := JOIN( TABLE( input_file_np, { Proxid, rcid }),h, LEFT.Proxid=RIGHT.Proxid AND LEFT.rcid=RIGHT.rcid,TRANSFORM(LEFT),LEFT ONLY,HASH);
+EXPORT patch_file := patch_file_np : PERSIST('~temp::Proxid::BIPV2_ProxID_Platform::Cleave::patch_file',EXPIRE(Config.PersistExpire));
+EXPORT patch_count := COUNT(DEDUP(patch_file,Proxid,ALL)); // Number of new Proxid created
+EXPORT Stats := PARALLEL(OUTPUT(PossiblesCounts,NAMED('PossibleCleaves')),OUTPUT(CandidatesCounts,NAMED('CandidateCleaves')),OUTPUT(patch_count,NAMED('ProxidsCreatedByCleave')));
+EXPORT BuildAll := SEQUENTIAL(PARALLEL(BUILDINDEX(Candidates_cnp_number_Idx, OVERWRITE),BUILDINDEX(Possibles_cnp_number_Idx, OVERWRITE)),Stats);
+END;

@@ -4,12 +4,21 @@ export IdAppendThor(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
 		,unsigned weightThreshold = 0
-		,boolean primForce = false
+		,boolean primForce = true
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
 		,string svcAppendUrl = ''
+		,boolean useFuzzy = false
+		,boolean doZipExpansion = false
+		,boolean segmentation = true
+		,unsigned soapTimeout = 300
+		,unsigned soapTimeLimit = 0
+		,unsigned soapRetries = 0
+		,unsigned remoteBatchSize = 100
+		,boolean allowHighErrorRate = false
+		,unsigned keepCount = 1
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -25,10 +34,10 @@ export IdAppendThor(
 		,phone10 // phone_field
 		,fein // fein_field
 		,BDID_field
-		,BIPV2.IdAppendLayouts.IdsOnly // outrec
+		,BIPV2.IdAppendLayouts.IdsOnlyDebug // outrec
 		,true // bool_outrec_has_score
 		,BDID_Score_field
-		,//keep_count := '1'
+		,keepCount //keep_count := '1'
 		,scoreThreshold //score_threshold := '75'
 		,url // pURL = ''
 		,email // pEmail = ''
@@ -39,6 +48,11 @@ export IdAppendThor(
 		,contact_ssn // pContact_ssn = ''
 		,source // pSource = ''
 		,source_record_id // pSource_record_id = ''
+		,useFuzzy := useFuzzy
+		,weightThreshold := weightThreshold
+		,disableSaltForce := not primForce
+		,segmentation := segmentation
+		,reAppend := reAppend
 	);
 	#END
 
@@ -47,9 +61,18 @@ export IdAppendThor(
 			,scoreThreshold := scoreThreshold
 			,weightThreshold := weightThreshold
 			,disableSaltForce := not primForce
+			,useFuzzy := useFuzzy
+			,doZipExpansion := doZipExpansion
 			,reAppend := reAppend
 			,mimicRoxie := mimicRoxie
-			,svcAppendUrl := svcAppendUrl);
+			,svcAppendUrl := svcAppendUrl
+			,segmentation := segmentation
+			,soapTimeout := soapTimeout
+			,soapTimeLimit := soapTimeLimit
+			,soapRetries := soapRetries
+			,remoteBatchSize := remoteBatchSize
+			,allowHighErrorRate := allowHighErrorRate
+			);
 
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
@@ -57,10 +80,10 @@ export IdAppendThor(
 			resLocal := project(localAppend, transform(BIPV2.IdAppendLayouts.IdsOnlyOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -72,10 +95,10 @@ export IdAppendThor(
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
@@ -85,12 +108,12 @@ export IdAppendThor(
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel);
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
-			res := resRemote;
+			res := resLocal;
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
+		return if(scoreThreshold > 50 or allowInvalidResults,
 			res,
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;

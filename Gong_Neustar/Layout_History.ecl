@@ -1,4 +1,4 @@
-EXPORT Layout_History := RECORD
+﻿EXPORT Layout_History := RECORD
 	layout_bscurrent_raw;
 	unsigned6 did;
 	unsigned6 hhid;
@@ -39,4 +39,7 @@ EXPORT Layout_History := RECORD
   unsigned6 ultid;
   unsigned2 ultscore;
   unsigned2 ultweight;
+  //CCPA-22 CCPA new fields
+  UNSIGNED4 global_sid := 0;
+  UNSIGNED8 record_sid := 0;
  END;

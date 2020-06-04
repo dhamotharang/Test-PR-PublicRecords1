@@ -41,7 +41,7 @@ good_to_process_a_new_build :=  build_version = cert_version;
 
 header_version := (string) nothor(tools.fun_GetFilenameVersion ('~thor_data400::base::header_prod'));
 
-statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com,michael.gould@lexisnexisrisk.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
+statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
 
 ds := dataset('~thor_data400::watchdog::header_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
@@ -52,7 +52,7 @@ LaunchJobs := map(    count(ds(wtype = 'glb' and hdr_version = build_date and is
                      count(ds(wtype = 'glb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_nonen_noneq','nonfcra'), _Control.Config.GroupName('36'))),
                      count(ds(wtype = 'glb_nonen_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_nonutility','nonfcra'),_Control.Config.GroupName('36'))),
                      count(ds(wtype = 'nonglb_nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonutility','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompletd = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
                      count(ds(wtype = 'nonglb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('supplemental','nonfcra'), _Control.Config.GroupName('36'))),
                      count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1  => Sequential(_control.fSubmitNewWorkunit(ECL1('glb','nonfcra'), _Control.Config.GroupName('36'))),
 										 count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL2, _Control.Config.GroupName('36'))),

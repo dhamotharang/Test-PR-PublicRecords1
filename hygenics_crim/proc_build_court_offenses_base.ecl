@@ -34,7 +34,7 @@ layout_j_final := record
 	//string100 SexOffenderRegistryNumber;
 
 	//from charge
-	string40	CaseID						:= '';
+	string100	CaseID						:= '';
 	string20	WarrantNumber				:= '';
 	//string8	WarrantDate					:= '';
 	string200	WarrantDesc					:= '';
@@ -588,7 +588,11 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																				                              trim(l.offenseclass) in ['NON CRIMINAL'] => 'TNC',
 																																			l.casetype = 'TRAFFIC' and 
 																				                              trim(l.offenseclass) in ['PETTY OFFENSE'] => 'TP',
-																				                              l.offenseclass[1..1]
+
+																										                  trim(l.offensetype, left, right) = 'TRAFFIC' => 'T',      // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR' => 'M',  // added by tp
+	
+	                                                                    l.offenseclass[1..1]
 																																			),
 												                l.statecode in ['AK', 'AR'] and trim(l.offensetype) = 'PROBATION REVOCATION' => '',  
 																				l.statecode in ['AK'] => l.offenseclass[1..1],	
@@ -631,7 +635,16 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			regexfind('(I)(NFRACTION) ([A-Z])',l.offensedegree) =>regexreplace('(I)(INFRACTION) ([A-Z])',l.offensedegree,'$1$3'),
 																																			regexfind('(V)(IOLATION)',l.offensedegree) =>regexreplace('(V)(IOLATION)',l.offensedegree,'$1'),
 																																			regexfind('([A-Z])',l.offensedegree) => regexreplace('([A-Z])',l.offensedegree,'$1'),
-																																			'')),	
+										
+																																			trim(l.offensetype, left, right) = 'FELONY'               =>'F',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS A'       =>'FA',  // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS B'       =>'FB',  // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'       =>'FC',  // added by tp
+																																			trim(l.offensetype, left, right) = 'INFRACTION'           =>'I',   // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'          =>'M',   // added by tp
+																																			trim(l.offensetype, left, right) = 'TRAFFIC'              =>'T',   // added by tp
+
+										                                                  '')),	
 																				l.statecode in ['IA'] => (map(trim(l.offensedegree, left, right)='FELONY A'   => 'FA',//copy this to actual mapping
 																																			trim(l.offensedegree, left, right)='FELONY B'   => 'FB',
 																																			trim(l.offensedegree, left, right)='FELONY C'   => 'FC',
@@ -657,7 +670,29 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			regexfind('(M)(ISD[EMEANOR]*) ([A-Z])',l.offensedegree) => regexreplace('(M)(ISD[EMEANOR]*) ([A-Z])',l.offensedegree,'$1$3'),
 																																			regexfind('(F)(EL[ONY]*) ([A-Z])',l.offensedegree) =>  regexreplace('(F)(EL[ONY]*) ([A-Z])',l.offensedegree,'$1$3'),
 																																			regexfind('(I)(NFRACTION) ([A-Z])',l.offensedegree) =>regexreplace('(I)(INFRACTION) ([A-Z])',l.offensedegree,'$1$3'),
-																																			'')),	
+
+                                                                      trim(l.offensetype, left, right) = 'TRAFFIC'                     =>'T',   // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS C'         =>'MC',   // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS B'         =>'MB',   // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS A'         =>'MA',   // added by tp
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'                 =>'M',   // added by tp
+																																			trim(l.offensetype, left, right) = 'INFRACTION'                  =>'I',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY SIXTH DEGREE'         =>'F6',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 6'              =>'F6',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 5'              =>'F5',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 4'              =>'F4',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 3'              =>'F3',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 2'              =>'F2',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY LEVEL 1'              =>'F1',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY FOURTH DEGREE'        =>'F4',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS D'              =>'FD',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'              =>'FC',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS B'              =>'FB',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS A'              =>'FA',   // added by tp
+																																			trim(l.offensetype, left, right) = 'FELONY'                      =>'F',    // added by tp																																				
+																																			trim(l.offensetype, left, right) = 'LOCAL ORDINANCE VIOLATION'   =>'ORD',  // added by tp	
+							
+							                                                        '')),	
                                         l.statecode in ['IL'] 	=> (MAP(regexfind('(CLASS) ([A-Z0-9]) (M)(ISD[EMEANOR]*)',l.offenseclass) => regexreplace('(CLASS) ([A-Z0-9]) (M)(ISD[EMEANOR]*)',l.offenseclass,'$3$2'),
 																																			  regexfind('(CLASS) ([A-Z0-9]) (F)(EL[ONY]*)'     ,l.offenseclass) => regexreplace('(CLASS) ([A-Z0-9]) (F)(EL[ONY]*)'     ,l.offenseclass,'$3$2'),
 																																			  regexfind('(CLASS) ([A-Z0-9]) (I)(NFRACTION)'    ,l.offenseclass) => regexreplace('(CLASS) ([A-Z0-9]) (I)(NFRACTION)'    ,l.offenseclass,'$3$2'),
@@ -702,7 +737,19 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
                                         																																	 
 																				   
 																				l.statecode in ['MN'] => trim(l.offensedegree[1..1]),		
-																				l.statecode in ['MO'] => (MAP(regexfind('(M)(ISD[EMEANOR]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype) => regexreplace('(M)(ISD[EMEANOR]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype,'$1$3'),
+																				l.statecode in ['MO'] => (MAP(
+																				
+																															  	    trim(l.offensetype, left, right) = 'FELONY CLASS A'                     =>'FA',   // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS B'                     =>'FB',   // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'                     =>'FC',   // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS D'                     =>'FD',   // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS E'                     =>'FE',   // added by tp                                                                          
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS A'                =>'MA',   // added by tp                                                                                 
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS B'                =>'MB',   // added by tp                                                                                 
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS C'                =>'MC',   // added by tp                                                                                 
+  																																		trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS D'                =>'MD',   // added by tp                                                                                
+																				                              
+																																			regexfind('(M)(ISD[EMEANOR]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype) => regexreplace('(M)(ISD[EMEANOR]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype,'$1$3'),
 																																			regexfind('(F)(EL[ONY]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype) => regexreplace('(F)(EL[ONY]*) ([A-Z]) (RSMO: [A-Z0-9/. ]*)',l.offensetype,'$1$3'),
 																																			regexfind('(I)(NFRACTION) (RSMO: [A-Z0-9/. ]*)',l.offensetype) => regexreplace('(I)(NFRACTION) (RSMO: [A-Z0-9/. ]*)',l.offensetype,'$1'),
 																																			regexfind('(M)(ISD[EMEANOR]*)',l.offensetype) => 'M',
@@ -710,6 +757,12 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			regexfind('(I)(NFRACTION)',l.offensetype) => 'I',
 																																			regexfind('(M)(ISD[EMEANOR]*)',l.offensetype) => 'M',
 																																			regexfind('(F)(EL[ONY]*)',l.offensetype) => 'F',
+																																			
+																																	    trim(l.offensetype, left, right) = 'MUNICIPAL'                          =>'MU',   // added by tp                                                                                              
+																																			trim(l.offensetype, left, right) = 'MUNICIPAL ORDINANCE'                =>'ORD',   // added by tp                                                                                    
+																																			trim(l.offensetype, left, right) = 'ORDINANCE'                          =>'ORD',   // added by tp                                                                        
+																																			trim(l.offensetype, left, right) = 'TRAFFIC'                            =>'T',     // added by tp 																																			
+																																			
 																																			'')),	
 																				l.statecode in ['NC'] => 	(map(trim(l.casetype)='FELONY' => 'F',
 																																			 trim(l.casetype)='INFRACTION' => 'I',
@@ -741,10 +794,36 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			trim(l.offensetype, left, right) IN ['NON-MOVING VIOLATION' ,'MOVING VIOLATION','DOT']=>'T',                                                                               
 																																			'')),
 																																			
-																				l.statecode in ['NM'] => trim(l.offenseclass),
+																				l.statecode in ['NM'] => (
+																				                              map(trim(l.offensetype, left, right) = 'FELONY'                        =>'F',     // added by tp                                                                                                 
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'                    =>'FC',     // added by tp                                                                                           	
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS D'                    =>'FD',     // added by tp                                                                                           
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS E'                    =>'FE',     // added by tp                                                                                          
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS F'                    =>'FF',     // added by tp                                                                                           
+																																			trim(l.offensetype, left, right) = 'FELONY FIFTH DEGREE'               =>'F5',     // added by tp                                                                                      	
+																																			trim(l.offensetype, left, right) = 'FELONY FIRST DEGREE'               =>'F1',     // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'FELONY FOURTH DEGREE'              =>'F4',     // added by tp                                                                                     	
+																																			trim(l.offensetype, left, right) = 'FELONY SECOND DEGREE'              =>'F2',     // added by tp                                                                                     	
+																																			trim(l.offensetype, left, right) = 'FELONY THIRD DEGREE'               =>'F3',     // added by tp                                                                                      
+																																			trim(l.offensetype, left, right) = 'INFRACTION'                        =>'I',     // added by tp                                                                                               
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'                       =>'M',     // added by tp                                                                                              	
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS D'               =>'MD',     // added by tp                                                                                      	
+																																			trim(l.offensetype, left, right) = 'TRAFFIC'                           =>'T',     // added by tp                                                                                                  
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS A'                    =>'FA',     // added by tp                                                                            
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR FOURTH DEGREE'         =>'M4',     // added by tp                                                                                
+																																			trim(l.offensetype, left, right) = 'TRAFFIC'                           =>'T',      // added by tp 
+																				
+				                                                              trim(l.offenseclass))),
+
+
 																				l.statecode in ['OK'] => (map(trim(l.offenseclass, left, right) in ['CRIMINAL FELONY','FELONY'] => 'F',
 																																			trim(l.offenseclass, left, right) in ['CRIMINAL MISDEMEANOR','MISDEMEANOR'] => 'M',
 																																			trim(l.offenseclass, left, right) in ['TRAFFIC'] => 'T',
+
+																																			trim(l.offensetype, left, right) = 'FELONY'                             =>'F',      // added by tp                                                                            
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'                        =>'M',      // added by tp                                                                                
+																																			trim(l.offensetype, left, right) = 'TRAFFIC'                            =>'T',      // added by tp 
+
 																																			'')),
 																				l.statecode in ['OR'] 	=> (map(trim(l.offensedegree, left, right) in ['FE','FELONY'] and trim(l.offenseclass, left, right) = '' => 'F',	
 																																			trim(l.offensedegree, left, right) in ['FE','FELONY'] and trim(l.offenseclass, left, right) = 'A' => 'FA',
@@ -772,6 +851,18 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'C' => 'VC',
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'D' => 'VD',
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'U' => 'VU',
+
+																																			trim(l.offensetype, left, right) = 'INFRACTION'           =>'I',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'          =>'M',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS A'  =>'MA',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS B'  =>'MB',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS C'  =>'MC',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY'               =>'F',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS E'       =>'FE',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'       =>'FC',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS B'       =>'FB',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS A'       =>'FA',      // added by tp  
+																																			
 																																			'')),
 																				l.statecode in ['PA'] 	=> (map(trim(l.offensedegree, left, right)='1ST DEGREE FELONY' => 'F1',
 																																			trim(l.offensedegree, left, right)='2ND DEGREE FELONY' => 'F2',
@@ -888,11 +979,37 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			trim(l.offensetype, left, right) IN ['MISD. U','MISDEMEANOR (CLASS NOT KNOWN)'] =>'MU',                                                                                             
 																																			trim(l.offensetype, left, right) IN ['MISDEMEANOR']                         =>'M',                                                                                        
 																													      			l.casetype ='CRIMINAL TRAFFIC' => 'CT',
+
+																																			trim(l.offensetype, left, right) = 'FORFEITURE A'                            =>'TA',     // added by tp                                                                                         
+																																			trim(l.offensetype, left, right) = 'FORFEITURE B'                            =>'TB',     // added by tp                                                                                         
+																																			trim(l.offensetype, left, right) = 'FORFEITURE C'                            =>'TC',     // added by tp                                                                                        
+																																			trim(l.offensetype, left, right) = 'FORFEITURE CLASS A'                      =>'TA',     // added by tp                                                                                   
+																																			trim(l.offensetype, left, right) = 'FORFEITURE CLASS B'                      =>'TB',     // added by tp                                                                                   
+																																			trim(l.offensetype, left, right) = 'FORFEITURE CLASS C'                      =>'TC',     // added by tp                                                                                   
+																																			trim(l.offensetype, left, right) = 'FORFEITURE CLASS D'                      =>'TD',     // added by tp                                                                                   
+																																			trim(l.offensetype, left, right) = 'FORFEITURE CLASS E'                      =>'TE',     // added by tp                                                                                   
+																																			trim(l.offensetype, left, right) = 'FORFEITURE D'                            =>'TD',     // added by tp                                                                                         
+																																			trim(l.offensetype, left, right) = 'FORFEITURE U'                            =>'TU',     // added by tp 
+
 																																			'')),	
 																				l.statecode in ['WV'] => 	(map(trim(l.casetype)='FELONY' => 'F',
 																																			trim(l.casetype)='INFRACTION' => 'I',
 																																			trim(l.casetype)='MISDEMEANOR' => 'M',
-																																			'')),																
+																																			'')),		
+																																			
+																				l.statecode in ['DC'] => 	(map(trim(l.offensetype, left, right) = 'FELONY FIRST DEGREE'       =>'F1',	 // added by tp														
+																																			 trim(l.offensetype, left, right) = 'FELONY SECOND DEGREE'      =>'F2',  // added by tp
+																																			 trim(l.offensetype, left, right) = 'TRAFFIC'                   =>'T',   // added by tp 
+																																			 trim(l.offensetype, left, right) = 'MISDEMEANOR'               =>'M',   // added by tp
+																																			 trim(l.offensetype, left, right) = 'FELONY'                    =>'F',   // added by tp
+																																			  '')),                                                                  // added by tp
+																																			 
+																																			 
+																				l.statecode in ['GU'] => 	(map(trim(l.offensetype, left, right) = 'FELONY SECOND DEGREE'      =>'F2',	 // added by tp														
+																																			 trim(l.offensetype, left, right) = 'FELONY THIRD DEGREE'       =>'F3',  // added by tp
+																																			 trim(l.offensetype, left, right) = 'MISDEMEANOR'               =>'M',   // added by tp
+																																			  '')),     
+																																				
 																				trim(l.offensetype[1..1]+l.offenseclass[1..1],left,right));																	
 
 
@@ -1079,6 +1196,9 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
   self.court_disp_desc_2		    := Map(l.ln_vendor = 'NF' => l.dispositionstatus,
 	                                     l.trialtype <> '' =>l.trialtype,
 																			 l.casestatus <> '' and stringlib.stringfind(l.casestatus,':',1) = 0 => trim('Status:'+ trim(l.casestatus) + ' '+ l.casestatusdate), 
+
+                                       l.casestatus <> '' and stringlib.stringfind(l.casestatus,':',1) > 0 => trim(l.casestatus),     // added by tp																			 
+																			 
                                        '');
   self.sent_date				    := MAP(l.SentenceDate <> '' => l.SentenceDate,
 											// l.SentenceBeginDate <> '' and l.SentenceEndDate <> '' => 'Start Date: '+ trim(l.SentenceBeginDate) + ' End Date: '+trim(l.SentenceEndDate),
@@ -1166,6 +1286,10 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 											
   self.sent_addl_prov_code	     := '';                                                                                                                                      
 
+
+  addl_prov_desc_I0101      :=  trim(map(vVendor = 'I0101' and regexfind('COMMUNITY SERVICE',l.casecomments) and l.sentenceadditionalinfo = ''  
+							                                       => regexreplace('ADDITIONAL CASE INFORMATION: ',l.casecomments,''),''));		// added by tp
+
 	self.sent_addl_prov_desc_1 		 := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2'),
                                       	trim(l.ln_vendor) IN ['I0001','I0003'] => l.casestatus,
 	                                      l.ln_vendor = 'RB' and Maxsent <> '' and Minsent <> '' => trim(trim(l.sentencetype) + ' Max: '+Maxsent+ ' Min: '+Minsent,left,right),
@@ -1175,9 +1299,16 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																				l.ln_vendor IN ['W0003','I0009','I0010','I0011'] and l.sentenceadditionalinfo <> '' => trim(l.sentenceadditionalinfo),
 																				l.ln_vendor = 'TA' => l.sentencestatus,
 																				trim(l.ln_vendor) ='I0008' =>l.sentenceadditionalinfo,
+
+                                        vVendor IN ['I0101'] => addl_prov_desc_I0101,   // added by tp
+																				//trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo, // added by tp 
+																				
 																				'');
   self.sent_addl_prov_desc_2	    := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2')[41..],
-                                      	
+  
+	                                   vVendor IN ['I0101'] => addl_prov_desc_I0101[41..],   // added by tp
+                                     //    trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo[41..], // added by tp 	
+	
 	                                      '');
   self.sent_consec				        := MAP(trim(l.sentenceadditionalinfo) = 'CONSECUTIVE' => 'CS',
 											               trim(l.sentenceadditionalinfo) = 'CONCURRENT' => 'CS',
@@ -1275,7 +1406,10 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																							regexfind('([A-Z ]+)(COUNTY.*)',l.courtname)					  => regexreplace('([A-Z ]+)(COUNTY.*)',l.courtname,'$1'),
 																																							regexfind('([A-Z ]+)(CO COURT.*)',l.courtname)   			  => regexreplace('([A-Z ]+)(CO COURT.*)',l.courtname,'$1')																								
 																																							,''),
-									regexfind('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo) => 	regexreplace('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo,'$1')																													
+									regexfind('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo) => 	regexreplace('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo,'$1'),																													
+
+                  regexfind('COUNTY: ',l.caseinfo) and regexfind('MAGISTRATE|CIRCUIT|MUNICIPAL|DO NOT USE|MUNI COURT',l.caseinfo) = false => regexreplace('COUNTY: ',l.caseinfo,'')     // added by tp
+
 									,'');
 										
 											

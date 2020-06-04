@@ -1,31 +1,40 @@
-﻿Import Dops,Orbit3,std,FraudGovPlatform_Analytics;
+﻿Import Dops,Orbit3,std,FraudGovPlatform_Analytics,_control,FraudGovPlatform_Validation;
+ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_36');
+//Refresh ProdDashVersion flag file
+Superfilename					:= FraudGovPlatform.FileNames().Flags.RefreshProdDashVersion;
+Logicalfilename				:= Superfilename +'::'+(STRING8)STD.Date.Today();
 
-RIN_CERT_Version:= Dops.GetBuildVersion('FraudGovKeys','B','N','C');
-RIN_PROD_Version:= Dops.GetBuildVersion('FraudGovKeys','B','N','P');
-string currentBuildVersion := RIN_CERT_Version;
+RefreshVersion				:= dataset([{true}], {boolean RefreshVersion});
+UpdateRefreshVersion	:= OUTPUT(RefreshVersion,, Logicalfilename,cluster(ThorName), compressed,overwrite);
 
-ptoken := orbit3.GetToken();
-orbitbuildstatus := GetBuildInstance('FraudGov',currentbuildversion,ptoken).retcode.buildstatus;
+CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(Superfilename)), STD.File.CreateSuperFile(Superfilename),output('DashboardVer Refresh Superfile already exists. Skipping creating superfile.')),
+															STD.File.ClearSuperfile(Superfilename,true)
+														);
+														
+fsuperadd	:= STD.File.AddSuperfile(Superfilename, Logicalfilename);
 
-filename :='~fraudgov::base::'+currentBuildVersion+'::rindashboardbuildversion';
-supername := '~fraudgov::base::rindashboardbuildversion';
+ECLHThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		
+	FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
 
-fname := std.file.SuperFileContents(supername)[1].name;
+BuildCoverageDates := 
+ 'import ut,FraudGovPlatform;\n'
++'wuname := \'FraudGov Build Coverage Dates\';\n'
++'#WORKUNIT(\'name\', wuname);\n'
++'#WORKUNIT(\'protect\', true);\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
++'email(string msg):=fileservices.sendemail(\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
++' 	 ,\'FraudGov Build Coverage Dates\'\n'
++' 	 ,msg\n'
++' 	 +\'Build wuid \'+workunit\n'
++' 	 );\n\n'
++'FraudGovPlatform.Build_CoverageDates_Push.push:failure(email(\'Build Coverage Dates failed\'));\n'
+;
 
-Dashboard_Build_version := Std.Str.SplitWords(fname,'::')[3];
+RunDashboards:=  SEQUENTIAL(	FraudGovPlatform_Analytics.GenerateDashboards(true,true),
+								CreateSuper,
+								UpdateRefreshVersion,
+								fsuperadd,
+								_Control.fSubmitNewWorkunit(BuildCoverageDates,ECLHThorName));
 
-dUpdateBuildVersion := dataset([{currentBuildVersion}], {string DashboardBuildVersion});
-updateDashboardBuildVersion := OUTPUT(dUpdateBuildVersion,, filename, compressed,overwrite);
-
-fsuperadd	:= Sequential(STD.File.StartSuperFileTransaction()
-											 ,STD.File.Clearsuperfile(supername)
-									     ,STD.File.AddSuperfile(supername, filename)	
-											 ,STD.File.FinishSuperFileTransaction()
-												);
-
-RunDashboards:=  SEQUENTIAL(FraudGovPlatform_Analytics.GenerateDashboards(true,true), updateDashboardBuildVersion,fsuperadd);
-
-EXPORT GenerateProdDashboards := If((RIN_CERT_Version=RIN_PROD_Version and Orbitbuildstatus='PRODUCTION' and RIN_CERT_Version <> Dashboard_Build_version)
-																	,RunDashboards
-																	,output('Prod Dashboards are upto date')
-																	);
+EXPORT GenerateProdDashboards := RunDashboards;

@@ -3,7 +3,7 @@
 EXPORT Layouts := module
 //Incoming Layouts	
   export In_0010_Header := record
-		EBR.Layout_0010_Header_Base_slim;
+		EBR.Layout_0010_Header_Base_slim - [global_sid, record_sid];
 		string50     cust_name;
 		string10			bug_name;
 		string9       link_FEIN;
@@ -13,7 +13,7 @@ EXPORT Layouts := module
 	
 	
 	export In_5600_Demographic := record
-		EBR.Layout_5600_demographic_data_Base_slim;
+		EBR.Layout_5600_demographic_data_Base_slim - [global_sid, record_sid];
 		string50     cust_name;
 		string10		 bug_name;
 		string9      link_FEIN;
@@ -23,7 +23,7 @@ EXPORT Layouts := module
 
 	export IN_5610_Demographic := record
     string10	FILE_NUMBER;	
-		EBR.Layout_5610_demographic_data_Base_slim - [file_number];
+		EBR.Layout_5610_demographic_data_Base_slim - [file_number, global_sid, record_sid];
 		string50  cust_name;
 		string10	bug_name;
 		string8   link_dob;
@@ -63,6 +63,12 @@ EXPORT Layouts := module
 	
 	export File_1000_Executive_Summary := record
 		EBR.Layout_1000_Executive_Summary_Base;
+		string10 cust_name;
+    string bug_num;
+    string9 link_ssn;
+    string8 link_dob;
+    string9 link_fein;
+    string8 link_inc_date;
 	end;
 	
 	export File_2000_Trade := record
@@ -71,6 +77,11 @@ EXPORT Layouts := module
 	
 	export File_2015_Trade_Payment_Totals := record
 		EBR.Layout_2015_Trade_Payment_Totals_Base;
+		string cust_name;
+    string bug_num;
+    string9 link_ssn;
+    string8 link_dob;
+		string9 link_fein;
 	end;
 	
 	export File_2020_Trade_Payment_Trends := record
@@ -222,6 +233,102 @@ EXPORT Layouts := module
 		unsigned5 business_phone_number;
 		BIPV2.IDlayouts.l_xlink_ids;
 end;
+
+Export Executive_In:=Record
+unsigned6 BDID;
+string8 date_first_seen;
+string8 date_last_seen;
+unsigned4 process_date_first_seen;
+unsigned4 process_date_last_seen;
+string record_type;
+   string8     process_date;
+   string10    FILE_NUMBER;
+   string4     SEGMENT_CODE;
+   string5     SEQUENCE_NUMBER;
+   string3     CURRENT_DBT;
+   string3     PREDICTED_DBT;
+   string3     CONF_PERCENT;
+   string1     CONF_SLOPE;
+   string6     orig_PREDICTED_DBT_DATE_MMDDYY;
+   string3     AVERAGE_INDUSTRY_DBT;
+   string3     AVERAGE_ALL_INDUSTRIES_DBT;
+   string8     LOW_BALANCE;
+   string8     HIGH_BALANCE;
+   string8     CURRENT_ACCOUNT_BALANCE;
+   string8     HIGH_CREDIT_EXTENDED;
+   string8     MEDIAN_CREDIT_EXTENDED;
+   string1     PAYMENT_PERFORMANCE;
+   string1     PAYMENT_TREND;
+   string20    INDUSTRY_DESCRIPTION;
+   string8     predicted_dbt_date;
+   string1     lf;
+string10 cust_name;
+string bug_num;
+string9 link_ssn;
+string8 link_dob;
+string9 link_fein;
+string8 link_inc_date;
+End;
+
+Export Trade_Pay_Tot_In:=Record
+unsigned6 bdid;
+string date_first_seen;
+string date_last_seen;
+unsigned4 process_date_first_seen;
+unsigned4 process_date_last_seen;
+string record_type;
+string8 process_date;
+   string10 FILE_NUMBER;
+   string4 SEGMENT_CODE;
+   string5 SEQUENCE_NUMBER;
+   string3 TRADE_COUNT1;
+   string3 DEBT1;
+   string1 HIGH_CREDIT_MASK1;
+   string8 RECENT_HIGH_CREDIT1;
+   string1 ACCOUNT_BALANCE_MASK1;
+   string8 MASKED_ACCOUNT_BALANCE1;
+   string3 CURRENT_BALANCE_PERCENT1;
+   string3 DEBT_01_30_PERCENT1;
+   string3 DEBT_31_60_PERCENT1;
+   string3 DEBT_61_90_PERCENT1;
+   string3 DEBT_91_PLUS_PERCENT1;
+   string3 TRADE_COUNT2;
+   string3 DEBT2;
+   string1 HIGH_CREDIT_MASK2;
+   string8 RECENT_HIGH_CREDIT2;
+   string1 ACCOUNT_BALANCE_MASK2;
+   string8 MASKED_ACCOUNT_BALANCE2;
+   string3 CURRENT_BALANCE_PERCENT2;
+   string3 DEBT_01_30_PERCENT2;
+   string3 DEBT_31_60_PERCENT2;
+   string3 DEBT_61_90_PERCENT2;
+   string3 DEBT_91_PLUS_PERCENT2;
+   string3 TRADE_COUNT3;
+   string3 DEBT3;
+   string1 HIGH_CREDIT_MASK3;
+   string8 RECENT_HIGH_CREDIT3;
+   string1 ACCOUNT_BALANCE_MASK3;
+   string8 MASKED_ACCOUNT_BALANCE3;
+   string3 CURRENT_BALANCE_PERCENT3;
+   string3 DEBT_01_30_PERCENT3;
+   string3 DEBT_31_60_PERCENT3;
+   string3 DEBT_61_90_PERCENT3;
+   string3 DEBT_91_PLUS_PERCENT3;
+   string8 HIGHEST_CREDIT_MEDIAN;
+   string8 orig_ACCOUNT_BALANCE_REGULAR_TRADELINES;
+   string8 orig_ACCOUNT_BALANCE_NEW;
+   string8 orig_ACCOUNT_BALANCE_COMBINED;
+   string3 AGED_TRADES_COUNT;
+   string8 account_balance_regular_tradelines;
+   string8 account_balance_new;
+   string8 account_balance_combined;
+   string1 lf;
+string cust_name;
+string bug_num;
+string9 link_ssn;
+string8 link_dob;
+string9 link_fein;
+End;
 	
 end;
 	

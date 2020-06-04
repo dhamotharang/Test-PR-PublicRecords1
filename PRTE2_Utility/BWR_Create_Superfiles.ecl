@@ -1,7 +1,9 @@
-import promotesupers, roxiekeybuild, std;
+﻿import promotesupers, roxiekeybuild, std;
 
 
-STD.File.CreateSuperFile('~prte::in::utility_file',,1);
+STD.File.CreateSuperFile('~prte::in::utility::utilitydaily',,1);
+STD.File.CreateSuperFile('~prte::in::utility::utilitydailyins',,1);
+
 promotesupers.mac_create_superfiles('~prte::base::utility_file');
 
 //custom keys

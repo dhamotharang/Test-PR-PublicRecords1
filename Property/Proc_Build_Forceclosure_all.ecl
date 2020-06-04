@@ -1,24 +1,38 @@
-﻿import _Control, Property, Orbit3;
+﻿IMPORT _Control, Property, Orbit3, STD;
 
-#option('skipfileformatcrccheck',1);
-export Proc_Build_Forceclosure_all(string filedate) := function
+#OPTION('skipfileformatcrccheck',1);
+EXPORT Proc_Build_Forceclosure_all(
+	STRING  pVersion,
+	STRING  pHostname,
+	STRING  pSource,
+	STRING  pGroup = STD.System.Thorlib.Group(),
+	BOOLEAN pSpray = TRUE,
+	STRING  pGlob  = 'REOOut.txt'
+) := FUNCTION
 
-doSpray := Property.spray_Foreclosure_Raw(filedate
-																					,filedate
-																					,'thor400_44'
-																					,'/data/thor_back5/fares/foreclosure/weekly_files/REOOut.txt');
+	doSpray := Property.spray_Foreclosure_Raw(
+		pVersion,
+		pHostname,
+		pVersion,
+		pGroup,
+		pSource + '/' + pGlob
+	);
 
-doKeyBuild := Property.Foreclosure_Keys(filedate);
+	doKeyBuild := Property.Foreclosure_Keys(pVersion);
 
-doOrbitStat := Property.scrubs_foreclosure_raw(filedate);
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Foreclosures',(filedate),'N'); 
+	doOrbitStat := Property.scrubs_foreclosure_raw(pVersion);
+	orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem(
+		'Foreclosures',
+		(pVersion),
+		'N'
+	);
 
+	retval := SEQUENTIAL(
+		IF(pSpray, doSpray),
+		doOrbitStat,
+		doKeyBuild,
+		orbit_update
+	); 
 
-retval := sequential(doSpray
-										,doOrbitStat
-										,doKeyBuild
-										,orbit_update
-										); 
-
-return retval;
-end;
+	RETURN retval;
+END;

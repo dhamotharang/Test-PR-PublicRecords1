@@ -7,6 +7,10 @@ EXPORT Layouts := module
  //the production keys instead of these.
 
 EXPORT Input := RECORD, maxlength(5800)
+string8		dt_first_seen;
+string8		dt_last_seen;
+string8		date_vendor_first_reported;
+string8		date_vendor_last_reported;
 string40	l_accnbr;
 string2		report_code;
 string2		jurisdiction_state;
@@ -21,8 +25,7 @@ unsigned1 did_score;
 string8		dob,
 string12	b_did,
 string1		rec_type_4;
-string8		dt_first_seen;
-string8		dt_last_seen;
+
 string150	orig_street_address1;
 string100	orig_street_address2;
 
@@ -60,7 +63,7 @@ string5   title,
 string20  fname,
 string20  mname,
 string20  lname,
-// string5   suffix,
+string5   suffix,
 string3   score,
 string25  cname,
 	
@@ -220,7 +223,6 @@ string60	orig_mname;
 string150	orig_full_name;
 string12	cru_order_id;
 string2		cru_sequence_nbr;
-string8		date_vendor_last_reported;
 string3		report_type_id;
 string70	tif_image_hash;
 string11	super_report_id;
@@ -356,7 +358,7 @@ string8		link_inc_date;
 END;
 
 //Base Layouts
-EXPORT Base := RECORD 
+EXPORT Base := RECORD
 FLAccidents_Ecrash.Layout_Basefile; 
 BIPV2.IDlayouts.l_xlink_ids;
 string2		jurisdiction_state;
@@ -371,24 +373,36 @@ END;
 
 
 export Base_FLCrash0 := RECORD
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.Layout_FLCrash0;
 string2		jurisdiction_state;
 string100	jurisdiction;
 END;
 
 export Base_FLCrash1 := RECORD
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.Layout_FLCrash1;
 string2		jurisdiction_state;
 string100	jurisdiction;
 END;
 
 export Base_FLCrash3v := RECORD
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.Layout_FLCrash3v;
 string2		jurisdiction_state;
 string100	jurisdiction;
 END;
 
 export Base_FLCrash8 := RECORD
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.Layout_FLCrash8;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -396,6 +410,11 @@ END;
 
 
 export Base_flcrash2v := record
+STRING2 	report_code;
+STRING25 	report_category;
+STRING65 	report_code_desc;
+string50	vehicle_incident_city;
+string2		vehicle_incident_st;
 FLAccidents.aid_layouts.flcrash2v;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -408,6 +427,9 @@ string8		link_inc_date;
 end;
 
 export Base_flcrash4 := record
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.aid_layouts.flcrash4;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -420,6 +442,9 @@ string8		link_inc_date;
 end;
 
 export Base_flcrash5 := record
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.aid_layouts.flcrash5;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -432,6 +457,9 @@ string8		link_inc_date;
 end;
 
 export Base_flcrash6 := record
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.aid_layouts.flcrash6;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -442,6 +470,9 @@ string9		link_ssn;
 end;
 
 export Base_flcrash7 := record
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.aid_layouts.flcrash7;
 string2		jurisdiction_state;
 string100	jurisdiction;
@@ -454,6 +485,9 @@ string8		link_inc_date;
 end;
 
 export Base_flcrash9 := record
+STRING2 report_code;
+STRING25 report_category;
+STRING65 report_code_desc;
 FLAccidents.aid_layouts.flcrash9;
 string2		jurisdiction_state;
 string100	jurisdiction;

@@ -1,4 +1,4 @@
-import irs5500, BIPV2;
+﻿import irs5500, BIPV2;
 
 EXPORT Layouts := module
 		
@@ -178,8 +178,14 @@ EXPORT Layouts := module
 				QSTRING20 spons_sign_lname;
 				QSTRING5  spons_sign_suffix;
 				UNSIGNED1 spons_sign_name_score;
-				string10 customer_name;
-				string10 bug_num;
+				string10 cust_name;
+        string10 bug_num;
+        string9  link_fein;
+        string8 link_inc_date;
+				unsigned6 bdid;
+        string9 link_ssn;
+        string8 link_dob;
+				unsigned6 did;
 			end;
 			
 		
@@ -187,9 +193,13 @@ EXPORT Layouts := module
 				IRS5500.Layout_IRS5500_Base;
 				UNSIGNED8 source_rec_id	:=  0; 
 				BIPV2.IDlayouts.l_xlink_ids;
-				string10 customer_name;
-				string10 bug_num;
-		end;
+				string10 cust_name;
+        string10 bug_num;
+        string9  link_fein;
+        string8 link_inc_date;
+        string9 link_ssn;
+        string8 link_dob;
+				end;
 		
 	
 		export Slim_Base := record

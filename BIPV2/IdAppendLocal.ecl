@@ -3,13 +3,17 @@ import BIPV2;
 import BIPV2_Best;
 import BIPV2_Build;
 import BIPV2_Company_Names;
+import BIPV2_Contacts;
 import doxie;
 import ut;
 
 export IdAppendLocal := module
 
-	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel,
-	                  boolean allBest, boolean isMarketing = false) := function
+	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
+
+	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend, string fetchLevel
+	                  ,boolean allBest, boolean isMarketing = false
+					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
 		preBest :=
 			project(withAppend(proxid != 0 or (isSeleBest and seleid != 0)),
@@ -25,7 +29,7 @@ export IdAppendLocal := module
 			join(withAppend, withBest(allBest or (isSeleBest and proxid = 0) or (not isSeleBest and proxid != 0)),
 				left.request_id = right.uniqueid
 					and (right.proxid = 0 or left.proxid = right.proxid or allBest),
-				transform(BIPV2.IDAppendLayouts.svcAppendOut,
+				transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 					hasMatch := right.proxid != 0 or right.seleid != 0;
 					sameProx := left.proxid = right.proxid or (not allBest and isSeleBest);
 					self.proxid := if(sameProx or not hasMatch, left.proxid, right.proxid),
@@ -75,7 +79,8 @@ export IdAppendLocal := module
 				keep(1), left outer);
 
 		preContact := preBest;
-		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel);
+		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel, mod_access := mod_access);
+
 		withContact :=
 			join(withBType, getContact,
 				left.request_id = right.uniqueid
@@ -83,6 +88,7 @@ export IdAppendLocal := module
 				transform(recordof(withBType),
 					self.contact_did := right.contact_title[1].contact_did,
 					self.contact_job_title := trim(right.contact_title[1].contact_job_title_derived),
+					self.is_suppressed := right.is_suppressed,
 					self := left),
 				left outer, keep(1));
 
@@ -104,9 +110,10 @@ export IdAppendLocal := module
 
 	end;
 
-	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
-	                    string fetchLevel = BIPV2.IdConstants.fetch_level_proxid,
-	                    boolean dnbFullRemove = false) := function
+	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend
+	                    ,string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                    ,boolean dnbFullRemove = false
+						,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 
 		isProxLevel := fetchlevel = BIPV2.IdConstants.fetch_level_proxid;
 
@@ -115,7 +122,9 @@ export IdAppendLocal := module
 				transform(BIPV2.IdLayouts.l_xlink_ids2,
 					self.uniqueid := left.request_id,
 					self := left));
-		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel, dnbFullRemove := dnbFullRemove);
+		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel
+		                 ,dnbFullRemove := dnbFullRemove
+						 ,mod_access := mod_access);
 			
 		postHeader := 
 			join(withAppend, headerFetch,
@@ -127,8 +136,10 @@ export IdAppendLocal := module
 					self.powid := if(right.powid != 0, right.powid, left.powid);
 					self.powScore := if(isProxLevel or left.powid = right.powid, left.powScore, 0),
 					self.powWeight := if(isProxLevel or left.powid = right.powid, left.powWeight, 0),
+					self.parent_proxid := right.parent_proxid,
 					self := left,
-					self := right),
+					self := right,
+					self := []),
 				left outer);
 
 		return postHeader;

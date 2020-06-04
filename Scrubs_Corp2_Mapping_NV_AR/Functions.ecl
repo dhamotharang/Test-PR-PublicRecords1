@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -82,6 +82,7 @@ EXPORT Functions := MODULE
 							'MERGE IN'                                          => TRUE, 
 							'CANCELLATION'                                     	=> TRUE,  
 							'REGISTERED AGENT ADDRESS CHANGE' 									=> TRUE,
+							''                                                  => TRUE,
 							 FALSE); 
 				RETURN if(isValidActionType,1,0);			 
 		END;

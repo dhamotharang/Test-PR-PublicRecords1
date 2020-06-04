@@ -1,4 +1,4 @@
-﻿IMPORT header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
+﻿IMPORT header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers, DriversV2, suppress;
 
 EXPORT FN_KeyBuild(
 	DATASET(header.Layout_Header) header_in0, 
@@ -14,13 +14,12 @@ EXPORT FN_KeyBuild(
 
 	header_in := PROJECT(header_in0,t_set_src(left));
 
-	Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
+	Suppression_Layout := suppress.ApplyRegulatory.layout_in;
 	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
  
 	Suppression_In := supp_ds_func();
 
-	dSuppressedIn := PROJECT(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+	dSuppressedInOut := PROJECT(Suppression_In, suppress.Applyregulatory.in_to_out(left));
 
 	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
@@ -49,64 +48,18 @@ EXPORT FN_KeyBuild(
 
 dHeader_withMD5 := PROJECT(header_in, tHashDIDAddress(left));
 
-header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedIn r) := TRANSFORM
+header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedInOut r) := TRANSFORM
 	self := l;
 END;
 
-full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
+full_out_suppress := join(dHeader_withMD5,dSuppressedInOut,
                           left.hval=right.hval,
 						  tSuppress(left,right),
 						  left only,lookup);
 
-///%%%
-header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
-DL_Suppression_In 	:= dl_supp_ds_func();
-DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
+full_ShortSuppress := DriversV2.Regulatory.applyDriversLicenseSup_DIDVend(full_out_suppress);
 
-HashDLShort := header_services.Supplemental_Data.layout_out;
-
-shortHashrec := record
- header.layout_header;
- HashDLShort;
-end;
-
-shortHashrec HashDID_DLnumber(header.Layout_Header l) := transform                            
-	self.hval := hashmd5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));
-	self := l;
-end;
-
-hdr_withMD5 := project(full_out_suppress, HashDID_DLnumber(left));
-
-header.layout_header shortSuppress(hdr_withMD5 l, DLSuppressedIn r) := transform
-self := l;
-end;
-
-full_ShortSuppress := join(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
-
-header_services.Supplemental_Data.mac_verify('driverslicenseall_sup.txt',Suppression_Layout,dl_supp_ALL_ds_func);																					
- 
-DL_Supp_All_In := dl_supp_ALL_ds_func();
-DLSuppressAllIn := PROJECT(	DL_Supp_All_In, header_services.Supplemental_Data.in_to_out(left));
-
-HashDLLong := header_services.Supplemental_Data.layout_out;
-
-longHashrec := record
- header.layout_header;
- HashDLLong;
-end;
-
-longHashrec HashALL(header.Layout_Header l) := transform                            
- self.hval := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));
- self := l;
-end;
-
-hdrFull_withMD5 := project(full_ShortSuppress, HashALL(left));
-
-header.layout_header longSuppress(hdrFull_withMD5 l, DLSuppressAllIn r) := transform
- self := l;
-end;
-
-j1 := join(	hdrFull_withMD5,DLSuppressAllIn,left.hval=right.hval,longSuppress(left,right),left only,lookup);
+j1 := DriversV2.Regulatory.applyDriversLicenseAllSup_DIDVendDOBSSN(full_ShortSuppress);
 
 string_header_layout := {
 			string15  did;
@@ -243,20 +196,19 @@ PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',         
 Roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::headerquick::fraud_flag::@version@::eq','Q',MQ5,filedate);
 
 RETURN SEQUENTIAL(
-		build_source_key(filedate),
-		build_qh_base,
-		header_quick.proc_build_fraud_flag_eq(filedate),
-		notify('QuickHeader BaseFile Complete','*'),
-		build_rid_srid_keys(filedate),
-		PARALLEL(
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.build_source_key(filedate),611),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, build_qh_base, 612),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.proc_build_fraud_flag_eq(filedate), 613),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, build_rid_srid_keys(filedate), 614),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, PARALLEL(
 			autoKeys,
 			SEQUENTIAL(B1,M1,MQ1),
 			SEQUENTIAL(B2,M2,MQ2),
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-		)
-		,build_source_key_prep(filedate)
+																		), 615),
+		build_source_key_prep(filedate)
 	);
 
 END;

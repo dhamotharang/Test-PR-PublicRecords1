@@ -1,4 +1,4 @@
-import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr;
+﻿import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr, Std;
 
 export Address_Table_v4(boolean isFCRA) := function
 	
@@ -8,15 +8,17 @@ h_quick := project( header_quick.file_header_quick(trim(prim_name)<>'' and lengt
 headerprod_building := ungroup(h_full + h_quick);
 
 valid_header_uncorrected := if(isFCRA, headerprod_building(~fcra.Restricted_Header_Src(src, vendor_id[1]) AND
-																			((src='BA' AND FCRA.bankrupt_is_ok(ut.getDate,(string)dt_first_seen)) OR
-																				(src='L2' AND FCRA.lien_is_ok(ut.GetDate,(string)dt_first_seen)) OR src NOT IN ['BA','L2'])),
+																			((src='BA' AND FCRA.bankrupt_is_ok((STRING8)Std.Date.Today(),(string)dt_first_seen)) OR
+																				(src='L2' AND FCRA.lien_is_ok((STRING8)Std.Date.Today(),(string)dt_first_seen)) OR src NOT IN ['BA','L2'])),
 																	headerprod_building);
 /* ****************************************************
  *                  Apply Corrections                 *
  ****************************************************** */
 valid_header_corrected := Risk_Indicators.Header_Corrections_Function(valid_header_uncorrected);
 
-valid_header := IF(isFCRA, valid_header_corrected, valid_header_uncorrected);
+valid_header_before_suppress := IF(isFCRA, valid_header_corrected, valid_header_uncorrected);
+
+valid_header := fn_suppress_ccpa(valid_header_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
 
 /* ****************************************************
  * Corrections have been applied - Continue as normal *
@@ -62,6 +64,9 @@ layout_addr_risk := record
 	layout_counts en;
 	layout_counts tn;
 	layout_avm;
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;
 
 // join combo to eq
@@ -151,7 +156,9 @@ addr_rsk_tbl := join(addr_table_eqenTN, avm_distr, left.zip=right.zip and left.p
 														self := left), 
 											left outer, keep(1), local) : persist(persist_name);
 											
-return addr_rsk_tbl;
+addGlobalSID := mdr.macGetGlobalSID(addr_rsk_tbl,'RiskTable_Virtual','','global_sid'); //DF-26530: Populate Global_SID Field
+
+return addGlobalSID;
 
 end;
 											

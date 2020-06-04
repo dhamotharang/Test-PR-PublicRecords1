@@ -75,28 +75,28 @@ fn_MergeClientAddresses(DATASET($.Layout_Base2) clientAddr, DATASET($.Layout_Bas
 		Do not process records that have previously been replaced
 	*/
 	unchanged := JOIN(current, clientAddr,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId
-										AND LEFT.ClientId = RIGHT.ClientId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
 								
-	newAddress := JOIN(current, clientAddr,
+/*	newAddress := JOIN(current, clientAddr,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId
-										AND LEFT.ClientId = RIGHT.ClientId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								xForm(RIGHT, LEFT),
-								RIGHT ONLY, LOCAL);
+								RIGHT ONLY, LOCAL);*/
 
 	updatedAddress := JOIN(current, clientAddr,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId
-										AND LEFT.ClientId = RIGHT.ClientId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
 
 
-	return unchanged + newAddress + updatedAddress;
+	return unchanged + updatedAddress;
 
 END;
 
@@ -107,25 +107,28 @@ fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) 
 		Do not process records that have previously been replaced
 	*/
 	unchanged := JOIN(current, caseAddr,
+							LEFT.CaseId = RIGHT.CaseId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
 								
-	newAddress := JOIN(current, caseAddr,
+/*	newAddress := JOIN(current, caseAddr,
+							LEFT.CaseId = RIGHT.CaseId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								xForm(RIGHT, LEFT),
-								RIGHT ONLY, LOCAL);
+								RIGHT ONLY, LOCAL);*/
 
 	updatedAddress := JOIN(current, caseAddr,
+							LEFT.CaseId = RIGHT.CaseId AND
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-										and LEFT.CaseId = RIGHT.CaseId,
+							and LEFT.GroupId = RIGHT.GroupId,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
 
 
-	return unchanged + newAddress + updatedAddress;
+	return unchanged + updatedAddress;
 
 
 END;
@@ -133,15 +136,15 @@ END;
 EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 	
 	// addresses that apply to cases, not clients (ClientId='')
-	caseAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId=''), HASH32(ProgramState, ProgramCode, CaseID));
+	caseAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId=''), HASH32(CaseID));
 
-	current := DISTRIBUTE(base,HASH32(ProgramState, ProgramCode, CaseID)); 
+	current := DISTRIBUTE(base,HASH32(CaseID)); 
 	
 	CaseAddressesUpdated := IF(EXISTS(caseAddr), fn_MergeCaseAddresses(caseAddr, current), current);
 	
 													
 	// addresses that apply to clients (ClientId<>'')
-	clientAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId<>''), HASH32(ProgramState, ProgramCode, CaseID));
+	clientAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId<>''), HASH32(CaseID));
 		
 	ClientAddressesUpdated := IF(EXISTS(clientAddr), fn_MergeClientAddresses(clientAddr, CaseAddressesUpdated), CaseAddressesUpdated);
 	

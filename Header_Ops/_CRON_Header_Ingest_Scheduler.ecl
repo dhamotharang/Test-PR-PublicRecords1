@@ -43,13 +43,12 @@ isMonthly := the_eq_file_for_this_month_is_available AND not(the_full_ingest_for
 sf_name := '~thor_data400::out::header_ingest_status_' + if(isMonthly, 'mon', 'inc');
 ver    := Header.LogBuildStatus(sf_name).Read[1].version;
 status := Header.LogBuildStatus(sf_name).Read[1].status;
-build_version := if(status <> 0, ver, today); // 0 -> Completed
+build_version := if(status <> 9, ver, today); // 9 -> Completed
 
 incremental := if(isMonthly, 'false', 'true');
 ingestType := if(isMonthly, 'monthly', 'incremental');
 
-days := ut.DaysApart(today, ver);
-norun := days <= 5 and status = 0;
+norun := build_version = ver and status = 9;
 
 ECL := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
@@ -65,9 +64,9 @@ ECL := '\n'
 +'#OPTION (\'implicitGroupSubSort\',FALSE);\n\n'
 
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
-+'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 0, ' RECOVER ', '') + '\');\n\n'
++'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 9, ' RECOVER ', '') + '\');\n\n'
 
-+ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n');
++ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + if(status = 9, 0, status) + ');\n');
 
 THOR := 'thor400_44_eclcc';
 

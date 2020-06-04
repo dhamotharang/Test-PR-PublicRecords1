@@ -1,9 +1,243 @@
-﻿import American_Student_list, prte2;
+﻿import prte2,AID;
 
 EXPORT Layouts := module
+EXPORT layout_american_student_list_address_matches := record
+string50        LN_COLLEGE_NAME;
+string ModASLName;
+string ModListName;
+string ListName;
+unsigned Score; 
+string Control_of_Institution;
+string Sector_of_Institution;
+string Institution_size_category;
+string Institution_entity_name;
+string Address;
+string City;
+string state;
+string origzip;
+string admissions_web_address;
+string telephone;
+string institution_web_address;
+string10        prim_range;
+string2         predir;
+string28        prim_name;
+string4         addr_suffix;
+string2         postdir;
+string10        unit_desig;
+string8         sec_range;
+string25        p_city_name;
+string25        v_city_name;
+string2         st;
+string5         zip;
+string4         zip4;
+string4         cart;
+string1         cr_sort_sz;
+string4         lot;
+string1         lot_order;
+string2         dbpc;
+string1         chk_digit;
+string2         rec_type;
+string5         county;
+string10        geo_lat;
+string11        geo_long;
+string4         msa;
+string7         geo_blk;
+string1         geo_match;
+string4         err_stat;
+AID.Common.xAID	RawAID;
+end;
+export layout_american_student_base := record
+
+	integer8        KEY;
+	string9					SSN;
+	unsigned6       DID;
+	string8         PROCESS_DATE;
+	string8         DATE_FIRST_SEEN;
+	string8         DATE_LAST_SEEN;
+	string8         DATE_VENDOR_FIRST_REPORTED;
+	string8         DATE_VENDOR_LAST_REPORTED;
+	string1					HISTORICAL_FLAG;
+	string40        FULL_NAME;
+	string20        FIRST_NAME;
+	string20        LAST_NAME;
+	string30        ADDRESS_1;
+	string30        ADDRESS_2;
+	string16        CITY;
+	string2         STATE;
+	string5         ZIP;
+	string4         ZIP_4;
+	string4         CRRT_CODE;
+	string2         DELIVERY_POINT_BARCODE;
+	string1         ZIP4_CHECK_DIGIT;
+	string1         ADDRESS_TYPE_CODE;
+	string30        ADDRESS_TYPE;
+	string3         COUNTY_NUMBER;
+	string9         COUNTY_NAME;
+	string1         GENDER_CODE;
+	string6					GENDER;
+	string2         AGE;
+	string6         BIRTH_DATE;
+	string8					DOB_FORMATTED;
+	string10        TELEPHONE;
+	string2         CLASS;
+	string2         COLLEGE_CLASS;
+	string50        COLLEGE_NAME;
+	string1					COLLEGE_MAJOR;
+	string1         COLLEGE_CODE;
+	string20  			COLLEGE_CODE_EXPLODED;
+	string1         COLLEGE_TYPE;
+	string25				COLLEGE_TYPE_EXPLODED;
+	string11        HEAD_OF_HOUSEHOLD_FIRST_NAME;
+	string1         HEAD_OF_HOUSEHOLD_GENDER_CODE;
+	string6					HEAD_OF_HOUSEHOLD_GENDER;
+	string1         INCOME_LEVEL_CODE;
+	string20				INCOME_LEVEL;
+	string1         FILE_TYPE;
+	string5 				title;
+	string20 				fname;
+	string20 				mname;
+	string20 				lname;
+	string5 				name_suffix;
+	string3 				name_score;
+	string10  			prim_range;
+	string2   			predir;
+	string28  			prim_name;
+	string4   			addr_suffix;
+	string2   			postdir;
+	string10  			unit_desig;
+	string8   			sec_range;
+	string25  			p_city_name;
+	string25  			v_city_name;
+	string2   			st;
+	string5   			z5;
+	string4   			zip4;
+	string4   			cart;
+	string1   			cr_sort_sz;
+	string4   			lot;
+	string1   			lot_order;
+	string2   			dpbc;
+	string1   			chk_digit;
+	string2   			rec_type;
+	string2   			ace_fips_st;
+	string3					fips_county;
+	string10  			geo_lat;
+	string11  			geo_long;
+	string4   			msa;
+	string7   			geo_blk;
+	string1   			geo_match;
+	string4   			err_stat;
+	//Added for OKC Student List 7/10/17
+	STRING5					CollegeID := '';
+	STRING4					CollegeUpdate := '';
+	string2					source := '';
+
+end;
+
+shared layout_american_student_base_v2 := record
+
+	integer8        KEY;
+	string9					SSN;
+	unsigned6       DID;
+	string8         PROCESS_DATE;
+	string8         DATE_FIRST_SEEN;
+	string8         DATE_LAST_SEEN;
+	string8         DATE_VENDOR_FIRST_REPORTED;
+	string8         DATE_VENDOR_LAST_REPORTED;
+	string1					HISTORICAL_FLAG;
+	string60        FULL_NAME;
+	string25        FIRST_NAME;
+	string25        LAST_NAME;
+	string64        ADDRESS_1;
+	string64        ADDRESS_2;
+	string26        CITY;
+	string2         STATE;
+	string5         ZIP;
+	string4         ZIP_4;
+	string4         CRRT_CODE;
+	string2         DELIVERY_POINT_BARCODE;
+	string1         ZIP4_CHECK_DIGIT;
+	string1         ADDRESS_TYPE_CODE;
+	string30        ADDRESS_TYPE;
+	string3         COUNTY_NUMBER;
+	string26        COUNTY_NAME;
+	string1         GENDER_CODE;
+	string10				GENDER;
+	string2         AGE;
+	string6         BIRTH_DATE;
+	string8					DOB_FORMATTED;
+	string10        TELEPHONE;
+	string2         CLASS;
+	string2         COLLEGE_CLASS;
+	string50        COLLEGE_NAME;
+	string50        LN_COLLEGE_NAME;
+	string1					COLLEGE_MAJOR;
+	string4					NEW_COLLEGE_MAJOR;
+	string1         COLLEGE_CODE;
+	string20  			COLLEGE_CODE_EXPLODED;
+	string1         COLLEGE_TYPE;
+	string25				COLLEGE_TYPE_EXPLODED;
+	string40        HEAD_OF_HOUSEHOLD_FIRST_NAME;
+	string1         HEAD_OF_HOUSEHOLD_GENDER_CODE;
+	string10				HEAD_OF_HOUSEHOLD_GENDER;
+	string1         INCOME_LEVEL_CODE;
+	string20				INCOME_LEVEL;
+	string1         NEW_INCOME_LEVEL_CODE;
+	string20				NEW_INCOME_LEVEL;
+	string1         FILE_TYPE;
+
+	string1					tier;
+	string1					school_size_code;
+	string1					competitive_code;
+	string1					tuition_code;
+	
+	string5 				title;
+	string20 				fname;
+	string20 				mname;
+	string20 				lname;
+	string5 				name_suffix;
+	string3 				name_score;
+	AID.Common.xAID	RawAID;
+	string10  			prim_range;
+	string2   			predir;
+	string28  			prim_name;
+	string4   			addr_suffix;
+	string2   			postdir;
+	string10  			unit_desig;
+	string8   			sec_range;
+	string25  			p_city_name;
+	string25  			v_city_name;
+	string2   			st;
+	string5   			z5;
+	string4   			zip4;
+	string4   			cart;
+	string1   			cr_sort_sz;
+	string4   			lot;
+	string1   			lot_order;
+	string2   			dpbc;
+	string1   			chk_digit;
+	string2   			rec_type;
+	string5 				county;
+	string2   			ace_fips_st;
+	string3					fips_county;
+	string10  			geo_lat;
+	string11  			geo_long;
+	string4   			msa;
+	string7   			geo_blk;
+	string1   			geo_match;
+	string4   			err_stat;
+	//Added for Shell 5.0 project 6/3/13
+	STRING5					tier2;
+	//Added for OKC Student List 7/10/17 DF-19691
+	STRING5					CollegeID := '';
+	STRING4					CollegeUpdate := '';
+	string2					source := '';
+	//CCPA-7 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
+end;
 
   export incoming := record
-     American_Student_List.layout_american_student_base_v2 and not [global_sid, record_sid];
+     layout_american_student_base_v2 and not [global_sid, record_sid];
      string10  cust_name;
      string10  bug_num;
      string8   link_dob;
@@ -11,7 +245,7 @@ EXPORT Layouts := module
   end;
   
   export base  := record
-     American_Student_List.layout_american_student_base_v2;
+     layout_american_student_base_v2;
      string10  cust_name;
      string10  bug_num;
      string8   link_dob;
@@ -19,14 +253,14 @@ EXPORT Layouts := module
   end;
 
   export ASL_Key_Layout	:=RECORD
-			American_student_list.layout_american_student_base and not [HISTORICAL_FLAG,source];
+			layout_american_student_base and not [HISTORICAL_FLAG,source];
 		END;
 
-  export american_student_base_v2  :=  American_student_list.layout_american_student_base_v2;
-  export american_student_list_address_matches  := American_student_list.layout_american_student_list_address_matches;
+  export american_student_base_v2  :=  layout_american_student_base_v2;
+  export american_student_list_address_matches  := layout_american_student_list_address_matches;
   
   export ASL_Autokey := RECORD
-    American_student_list.layout_american_student_base_v2;
+    layout_american_student_base_v2;
     unsigned1 zero := 0;
     string1		blank	:=	'';
     end;

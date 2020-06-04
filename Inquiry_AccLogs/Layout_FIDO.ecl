@@ -22,7 +22,7 @@ export extract_in := RECORD
   string50 abstracted_vertical_market;
   string100 subaccount_name;
   integer8 bip_prox_id;
-  string50 inquiry_tracking_industry;
+  //string50 inquiry_tracking_industry;
   string4 ranked_sic_code;
   string100 industry;
   string30 use;

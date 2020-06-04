@@ -1,4 +1,4 @@
-EXPORT File_Scoring := module
+﻿EXPORT File_Scoring := module
 
 pplus := File_Phonesplus_Base;
 
@@ -29,7 +29,10 @@ pplus.did;
 pplus.ListingType;
 pplus.confidencescore;
 pplus.glb_dppa_flag;
+//CCPA-718
+pplus.global_sid;
+pplus.record_sid;
 end;
 
-export base := dataset('~thor_data400::base::phonesplusv2_scoring', layout, thor);
+export base := dataset(Phonesplus_V2.Names.phonesplusv2_scoring, layout, thor);
 end;

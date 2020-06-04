@@ -1,4 +1,4 @@
-import SalesChannel, address, ut,emailservice, mdr, _validate, Entiera, lib_StringLib;
+﻿import SalesChannel, address, ut,emailservice, mdr, _validate, Entiera, lib_StringLib;
 export Map_SalesChannel_As_Email(version) := function
 
 with_email := SalesChannel.Files().base.qa(length(trim(rawfields.email,left, right)) > 4 and StringLib.StringFindCount(rawfields.email,  '@') > 0);
@@ -17,16 +17,16 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d pInput) := transform
 	self.did_type         					:= '';
 	self.orig_pmghousehold_id  			:= '';
 	self.orig_pmgindividual_id  		:= '';
-	self.orig_First_Name  					:= stringlib.stringtouppercase(TRIM(pInput.rawfields.First_Name,RIGHT,LEFT));
-	self.orig_Last_Name  						:= stringlib.stringtouppercase(TRIM(pInput.rawfields.Last_Name,RIGHT,LEFT));
-	self.Orig_Address  							:= stringlib.stringtouppercase(TRIM(StringLib.StringCleanSpaces(pInput.rawfields.address + ' ' + pInput.rawfields.address1), LEFT, RIGHT));
-	self.Orig_City  								:= pInput.rawfields.city;
-	self.Orig_State  								:= pInput.rawfields.state;
-	self.orig_ZIP  									:= pInput.rawfields.zip_code;
+	self.orig_First_Name  					:= stringlib.stringtouppercase(TRIM(ut.fn_KeepPrintableChars(pInput.rawfields.First_Name),RIGHT,LEFT));
+	self.orig_Last_Name  						:= stringlib.stringtouppercase(TRIM(ut.fn_KeepPrintableChars(pInput.rawfields.Last_Name),RIGHT,LEFT));
+	self.Orig_Address  							:= stringlib.stringtouppercase(TRIM(StringLib.StringCleanSpaces(ut.fn_KeepPrintableChars(pInput.rawfields.address) + ' ' + ut.fn_KeepPrintableChars(pInput.rawfields.address1)),LEFT,RIGHT));
+	self.Orig_City  								:= ut.fn_KeepPrintableChars(pInput.rawfields.city);
+	self.Orig_State  								:= ut.fn_KeepPrintableChars(pInput.rawfields.state);
+	self.orig_ZIP  									:= ut.fn_KeepPrintableChars(pInput.rawfields.zip_code);
 	self.orig_zip4  								:= '';
-	self.orig_email 								:= stringlib.stringtouppercase(TRIM(pInput.rawfields.email, RIGHT,LEFT));
+	self.orig_email 								:= stringlib.stringtouppercase(TRIM(ut.fn_KeepPrintableChars(pInput.rawfields.email), RIGHT,LEFT));
 	self.orig_ip  									:= '';
-	self.orig_site  								:= stringlib.stringtouppercase(TRIM(pInput.rawfields.Web_Address, RIGHT,LEFT));
+	self.orig_site  								:= stringlib.stringtouppercase(TRIM(ut.fn_KeepPrintableChars(pInput.rawfields.Web_Address), RIGHT,LEFT));
 	self.orig_e360_id  							:= '';
 	self.orig_teramedia_id  				:= '';
 	self.clean_name.title  					:= '';

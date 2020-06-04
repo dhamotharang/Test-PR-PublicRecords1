@@ -4,7 +4,7 @@ EXPORT Files := MODULE
 
 	EXPORT dsBankOfEngland		:= 	DATASET(GlobalWatchLists_Preprocess.root+'bank_of_england', GlobalWatchLists_Preprocess.Layouts.rInputBOE, CSV(separator(';'),heading(2),quote('"'),TERMINATOR(['\n', '\r\n'])));	
 	EXPORT dsOFAC							:=	DATASET(GlobalWatchLists_Preprocess.root+'ofac', GlobalWatchLists_Preprocess.Layouts.rInputOFAC, CSV(HEADING(0),SEPARATOR(''),TERMINATOR(['\n', '\r\n']),QUOTE('"')));
-	EXPORT dsDebarredParties 	:= 	DATASET(GlobalWatchLists_Preprocess.root+'debarred_parties', GlobalWatchLists_Preprocess.Layouts.rDebarredParties, CSV(separator('\t'),heading(1),quote('"'),TERMINATOR(['\n', '\r\n'])));
+	EXPORT dsDebarredParties 	:= 	DATASET(GlobalWatchLists_Preprocess.root+'debarred_parties', GlobalWatchLists_Preprocess.Layouts.rDebarredParties, CSV(separator(','),heading(1),quote('"'),TERMINATOR(['\n', '\r\n'])));
 	DeniedEntity				 			:= 	DATASET(GlobalWatchLists_Preprocess.root+'denied_entity', GlobalWatchLists_Preprocess.Layouts.rDeniedEntity, CSV(separator('|'),heading(1),quote('"'),TERMINATOR(['\n', '\r\n'])));
 	
 	EXPORT dsDeniedEntity 		:= DeniedEntity(Extract_Date <> '' and Extract_Vendor_Code <> '' and Data_Type <> ''

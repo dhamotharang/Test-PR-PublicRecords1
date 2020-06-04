@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, inquiry_Acclogs, Data_services, doxie, BIPV2,Inquiry_AccLogs_Append;
+﻿IMPORT BIPV2, inquiry_Acclogs, Data_services, doxie, BIPV2,Inquiry_AccLogs_Append, MDR, STD, _control;
 
 EXPORT Key_Inquiry_LinkIds := MODULE
 
@@ -17,7 +17,8 @@ EXPORT Key_Inquiry_LinkIds := MODULE
 			Inquiry_AccLogs.Layout.ccpaLayout ccpa;
 	end;
 	
-	shared Base := project(BaseNoCCPA, transform(r,self:=left));
+	shared BaseCCPA := project(BaseNoCCPA, transform(r,self:=left));
+	shared Base     := MDR.macGetGlobalSid(BaseCCPA,'InquiryTracking_Virtual','', 'ccpa.global_sid');
 		
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;

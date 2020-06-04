@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 /////////////////////////////////////////////////////////////////////
 //TCPA Main//////////////////////////////////////////////////////////
@@ -11,9 +11,9 @@ import ut;
 	PhonesInfo.Layout_TCPA.Main rollupDate(sortUpdate l, sortUpdate r) := transform
 				
 				minDate	:= ut.min2((unsigned)l.vendor_first_reported_dt, 	(unsigned)r.vendor_first_reported_dt);
-				maxDate	:= ut.max2((unsigned)l.vendor_last_reported_dt, 	(unsigned)r.vendor_last_reported_dt);
+				maxDate	:= max((unsigned)l.vendor_last_reported_dt, 	(unsigned)r.vendor_last_reported_dt);
 				minStart:= ut.min2((unsigned)l.port_start_dt, 						(unsigned)r.port_start_dt);
-				maxEnd	:= ut.max2((unsigned)l.port_end_dt, 							(unsigned)r.port_end_dt);
+				maxEnd	:= max((unsigned)l.port_end_dt, 							(unsigned)r.port_end_dt);
 			
 				self.vendor_first_reported_dt 	:= minDate;
 				self.vendor_last_reported_dt 		:= maxDate;
@@ -62,9 +62,9 @@ import ut;
 		rllUpdate newDate(rllUpdate l, rllUpdate r) := transform
 				
 				minDate	:= ut.min2((unsigned)l.vendor_first_reported_dt, 	(unsigned)r.vendor_first_reported_dt);
-				maxDate	:= ut.max2((unsigned)l.vendor_last_reported_dt, 	(unsigned)r.vendor_last_reported_dt);
+				maxDate	:= max((unsigned)l.vendor_last_reported_dt, 	(unsigned)r.vendor_last_reported_dt);
 				minStart:= ut.min2((unsigned)l.port_start_dt, 						(unsigned)r.port_start_dt);
-				maxEnd	:= ut.max2((unsigned)l.port_end_dt, 							(unsigned)r.port_end_dt);
+				maxEnd	:= max((unsigned)l.port_end_dt, 							(unsigned)r.port_end_dt);
 
 			self.vendor_first_reported_dt 	:= (string)minDate;
 			self.vendor_last_reported_dt  	:= (string)maxDate;
@@ -108,6 +108,6 @@ import ut;
 	iConectComm := project(applyRollupDates, iConectM(left));
 
 //Concat Files//////////////////////////////////////////////////////
-	concatComm 	:= tcpaComm + iConectComm;
+	concatComm 	:= /*tcpaComm +*/ iConectComm;
 
 EXPORT Map_Common_Port_Main := dedup(sort(concatComm, record, local), record, local);

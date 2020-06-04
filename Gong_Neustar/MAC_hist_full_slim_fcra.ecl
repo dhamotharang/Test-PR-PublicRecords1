@@ -1,4 +1,4 @@
-import mdr;
+﻿import mdr;
 export MAC_hist_full_slim_fcra(in_file, out_file) := macro
 
 #uniquename(in_slim_rec)
@@ -71,7 +71,10 @@ export MAC_hist_full_slim_fcra(in_file, out_file) := macro
       in_file.disc_cnt6;
       in_file.disc_cnt12;
       in_file.disc_cnt18;
-			in_file.persistent_record_id;
+				in_file.persistent_record_id;
+				//CCPA-22
+				in_file.global_sid;
+				in_file.record_sid;
 end;
 
 #uniquename(in_slim)

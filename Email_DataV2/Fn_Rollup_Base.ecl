@@ -10,6 +10,8 @@ fix_dates := PROJECT(email_in, TRANSFORM(Layouts.Base_BIP,
 															 SELF.date_vendor_last_reported 	:= IF(LEFT.date_vendor_last_reported[..8] NOT BETWEEN '197001' AND (string8)STD.Date.Today(), '', LEFT.date_vendor_last_reported),
 															 //DF-16472
 															 SELF.orig_email := REGEXREPLACE('[\n|\r]',LEFT.orig_email,'');
+															 //EMAIL-152 - remove special characters
+															 SELF.orig_site := ut.fn_RemoveSpecialChars(left.orig_site);
 															 SELF := LEFT));
 															 
 	//Previous incremental base -  Reset current record flag to false																															

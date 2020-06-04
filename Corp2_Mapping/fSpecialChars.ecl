@@ -1,22 +1,36 @@
 ﻿import corp2;
 
 //"fSpecialChars" function returns "FOUND" verbiage when passed parameter consists below list of foreign characters
-EXPORT fSpecialChars(string C) := function
+//Capitalizing foreign letters not working with corp2.t2u(S) function,including both sets of foreign letters !!
+EXPorT fSpecialChars(string C) := function
 
-	S            := corp2.t2u(c);  
-	ForeignChars := if( REGEXFIND('Ý', S) OR REGEXFIND('Ü', S) OR REGEXFIND('Û', S) OR REGEXFIND('Ú', S) OR 
-											REGEXFIND('Ù', S) OR REGEXFIND('Ö',	S) OR REGEXFIND('Õ', S) OR REGEXFIND('Ô', S) OR
-											REGEXFIND('Ó', S) OR REGEXFIND('Ò',	S) OR REGEXFIND('Ñ', S) OR REGEXFIND('Ï', S) OR
-											REGEXFIND('Î', S) OR REGEXFIND('Í',	S) OR REGEXFIND('Ì', S) OR REGEXFIND('Ë', S) OR
-											REGEXFIND('Ê', S) OR REGEXFIND('É',	S) OR REGEXFIND('È', S) OR REGEXFIND('Å', S) OR
-											REGEXFIND('Ä', S) OR REGEXFIND('Ã',	S) OR REGEXFIND('Â', S) OR REGEXFIND('Á', S) OR
-											REGEXFIND('À', S) OR REGEXFIND('À', S) OR REGEXFIND('Á', S) OR REGEXFIND('Â', S) OR				
-											REGEXFIND('Ã', S) OR REGEXFIND('Ä', S) OR REGEXFIND('Å', S) OR REGEXFIND('È', S) OR 
-											REGEXFIND('É', S) OR REGEXFIND('Ê', S) OR REGEXFIND('Ë', S) OR REGEXFIND('Ì', S) OR 
-											REGEXFIND('Í', S) OR REGEXFIND('Î', S) OR REGEXFIND('Ï', S) OR REGEXFIND('Ñ', S) OR 
-											REGEXFIND('Ò', S) OR REGEXFIND('Ó', S) OR REGEXFIND('Ô', S) OR REGEXFIND('Õ', S) OR 
-											REGEXFIND('Ö', S) OR REGEXFIND('Ù', S) OR REGEXFIND('Ú', S) OR REGEXFIND('Û', S) OR 
-											REGEXFIND('Ü', S) OR REGEXFIND('Ý', S), 'FOUND', 'NOTFOUND'
+  S            := corp2.t2u(C);
+	ForeignChars := if( regexfind('Ý', S) or regexfind('Ü', S) or regexfind('Û', S) or regexfind('Ú', S) or 
+											regexfind('Ù', S) or regexfind('Ö',	S) or regexfind('Õ', S) or regexfind('Ô', S) or
+											regexfind('Ó', S) or regexfind('Ò',	S) or regexfind('Ñ', S) or regexfind('Ï', S) or
+											regexfind('Î', S) or regexfind('Í',	S) or regexfind('Ì', S) or regexfind('Ë', S) or
+											regexfind('Ê', S) or regexfind('É',	S) or regexfind('È', S) or regexfind('Å', S) or
+											regexfind('Ä', S) or regexfind('Ã',	S) or regexfind('Â', S) or regexfind('Á', S) or
+											regexfind('À', S) or regexfind('À', S) or regexfind('Á', S) or regexfind('Â', S) or				
+											regexfind('Ã', S) or regexfind('Ä', S) or regexfind('Å', S) or regexfind('È', S) or 
+											regexfind('É', S) or regexfind('Ê', S) or regexfind('Ë', S) or regexfind('Ì', S) or 
+											regexfind('Í', S) or regexfind('Î', S) or regexfind('Ï', S) or regexfind('Ñ', S) or 
+											regexfind('Ò', S) or regexfind('Ó', S) or regexfind('Ô', S) or regexfind('Õ', S) or 
+											regexfind('Ö', S) or regexfind('Ù', S) or regexfind('Ú', S) or regexfind('Û', S) or 
+											regexfind('Ü', S) or regexfind('Ý', S) or											
+											regexfind('ý', S) or regexfind('ü', S) or regexfind('û', S) or regexfind('ú', S) or 
+											regexfind('ù', S) or regexfind('ö',	S) or regexfind('õ', S) or regexfind('ô', S) or
+											regexfind('ó', S) or regexfind('ò',	S) or regexfind('ñ', S) or regexfind('ï', S) or
+											regexfind('î', S) or regexfind('í',	S) or regexfind('ì', S) or regexfind('ë', S) or
+											regexfind('ê', S) or regexfind('é',	S) or regexfind('è', S) or regexfind('å', S) or
+											regexfind('ä', S) or regexfind('ã',	S) or regexfind('â', S) or regexfind('á', S) or
+											regexfind('à', S) or regexfind('à', S) or regexfind('á', S) or regexfind('â', S) or				
+											regexfind('ã', S) or regexfind('ä', S) or regexfind('å', S) or regexfind('è', S) or 
+											regexfind('é', S) or regexfind('ê', S) or regexfind('ë', S) or regexfind('ì', S) or 
+											regexfind('í', S) or regexfind('î', S) or regexfind('ï', S) or regexfind('ñ', S) or 
+											regexfind('ò', S) or regexfind('ó', S) or regexfind('ô', S) or regexfind('õ', S) or 
+											regexfind('ö', S) or regexfind('ù', S) or regexfind('ú', S) or regexfind('û', S) or 
+											regexfind('ü', S) or regexfind('ý', S),'FOUND', 'NOTFOUND'
 									 );
 
 	return ForeignChars;

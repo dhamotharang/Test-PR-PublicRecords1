@@ -108,10 +108,18 @@ o2 defCategory(o2 l):= transform
 						'750.356A3 - BREAKING & ENTERING - A VEHICLE WITH DAMAGE TO VEHICLE|'+
 						'ENTRY INTO/ONTO BLDG/CONSTRUC.SITE/ROOM|'+
             'TRESSPASS 1-AUTO-W/INTENT TO COMMIT CRIME|'+
+
+						'CRIMINAL TREPASS|'+
+						'CRIMINAL TRSPSS 1ST/PRPS SXL MTVTN|'+
+						'CRIMINAL TREPASS|'+
+						'CRIMINAL TREPSASS|'+
+						
+						'CRIMIANL TRESSPASS|'+
+
+
 						'CRIMINAL TRESSPASS'
-
-
-						,
+						
+  					,
 						trim(l.offense_description, left, right),
 						0)<>'' => 'BUR',//BURGLARY
 
@@ -768,6 +776,9 @@ o2 defCategory(o2 l):= transform
 
             'DESIGNATED A TIER LEVEL 3 BY NV|'+
 						'DESIGNATED TIER III IN MISSISSIPPI|'+
+            'DESIGNATED LEVEL III IN WA|'+
+						
+						
              'DESIGNATED A TIER LEVEL 3 IN NV'
 
 						,
@@ -1675,6 +1686,9 @@ o2 defCategory(o2 l):= transform
 						'ATTEMPTED USE F MINRS FR BSENE PURPSES|'+
 						'INDESCENT LIBERTIES WITH A MINR|'+
 						'UNDER/16 MIAMI DADE FL;|'+
+						
+						'INDICENT LIBERTIES|'+
+            'ATT_INDEC_LIBERTIES|'+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -1759,6 +1773,9 @@ o2 defCategory(o2 l):= transform
 						'TRAVELING T MEET MINR T CMMIT|'+
             'ATTEMPT T TRANSPRT MINR ACRSS STATE LINES|'+
             'TRAVELING T MEET A MINR|'+
+						
+						'TRAVEL.|'+
+
 
             'OFFENDER AND ACCOMPLICES HELD VICTIMS (TWO ADULT MALES) AGAINST THEIR WILL AND TRANSPORTED THEM TO A',
 
@@ -2055,6 +2072,8 @@ o2 defCategory(o2 l):= transform
 						'SDMY-K|'+
 
             'RAPR|'+
+          
+					  'ARMED S0D0MY \\(\\)|'+
 
 
             'RAP-1129-F9'  
@@ -2614,6 +2633,10 @@ o2 defCategory(o2 l):= transform
             'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
 					          
 						'PRED CRM SX ASSL|'+
+						
+						'DEPENDENT ADULT ABUSE|'+
+            'ASSULT SIMPLE|'+
+						'AGG CRIM SX AB|'+
 
 						
 						'SAC-ATTEMPT'
@@ -3207,7 +3230,58 @@ o2 defCategory(o2 l):= transform
 						'MANUF/DELIVER AMPHETAMINE \\(<=3G\\)|'+
 						'ATTEMPTED \\(ATTEMPTED\\)|'+
 						
+						'03-095-FTA|'+
+						'21 11 A 2 \\(\\)|'+
+						'22 021 A1 B \\(\\)|'+
+						'318-B:26,III\\(A\\), CNTRL DRUG:CNTRL PREMISES WHERE DRUGS KEPT|'+
+						'794.0118C|'+
+						'ASSAU LT DV|'+
+						'ATTACHMENT|'+
+						'BAD CHECK \\(1000.00 -10000.00\\)|'+
+						'D U I|'+
+						'DE1111110000FF \\(\\)|'+
+						'DELIVER/SELL MARIJUANA|'+
+						'DISTRIBUTE CERTAIN SUBSTANCES IN 65-4105\\(H\\)|'+
+						'DRAG RACING|'+
+						'DRIVNG UNDER INFLUENCE|'+
+						'DRUG PARA|'+
+						'DRUG PARAPHANALIA|'+
+						'DRUGS- SCHE IV \\(MFG, SELL, DELIVER, ETC\\) DEPRESS|'+						
+						'DUI 1ST|'+
+						'DUI 2ND|'+
+						'DUI 2ND 31390-11|'+
+						'DUI 4TH|'+
+						'DUI--2ND|'+
+						'DUI-DRUGS|'+
+						'DWL S/R/C|'+
+						'DWLS|'+
+						'DWLSCR|'+
+						'DWSRC|'+
+						'FTA TR17-02173 FTA|'+
+						'FTV 18-3-412.6|'+
+						'INV PRSNL PRIV 1|'+
+						'KNIFE \\(KNIFE\\)|'+
+						'LICENSE REQUIRED|'+
+						'LICENSE REQUIRED 55-50-301 C/M|'+
+						'LICENSE, DRIVERS LICENSE REQUIRED|'+
+						'MITTIMUS\\(DRIV SUSP LIC\\)|'+
+						'MN 609-343-1\\(C\\) MN|'+
+						'NEW JERSEY|'+
+						'PASSING BAD CHECKS 500/LESS|'+
+						'PRESENTMENT|'+
+						'RECKLESS BURNING|'+
+						'SELL AND DELIVERY SCH 3|'+
+						'SELL SCH II X2|'+
+						'SPEEDING|'+
+						'TRAFFIC - SPEEDING|'+	
 						
+
+						'1203.4 PC DISMISSAL|'+	
+						'SUSPENDED LICENSE|'+	
+						'HIT AND RUN|'+	
+						'SUSPENDED D L|'+	
+						'SUSPENDED DL|'+	
+						'LEGEND DRUGS|'+	
 						
 						'16-6-4-\\(B\\)'						
 						,						
@@ -3250,6 +3324,51 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'UNKNOWN' 									=> 'OTH',
 					trim(l.offense_description, left, right) = 'WYOMING' 									=> 'OTH',
           trim(l.offense_description, left, right) = 'A'     => 'OTH',					
+
+          trim(l.offense_description, left, right) = 'AK' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'AR' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'AZ' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'CT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'FL' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'FTA' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'FTD' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'IA' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'ID' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'IL' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'IN' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'KS' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'KY' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'MI' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'MN' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'MT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NB' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NC' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'ND' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'NM' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NV' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NY' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'PA' 									=> 'OTH',		
+          trim(l.offense_description, left, right) = 'PI' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'TX' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'UT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'VT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WA' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WI' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WY' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'DUI' 									=> 'OTH',		
+					
+					
+					trim(l.offense_description, left, right) = '16-6-22.1_6/19/2019 12:00:00 AM' => 'OTH',		
+					trim(l.offense_description, left, right) = '36055_6/19/2019 12:00:00 AM'    => 'OTH',		
+					trim(l.offense_description, left, right) = '16-6-1_6/19/2019 12:00:00 AM' 	=> 'OTH',	
+					trim(l.offense_description, left, right) = 'ATTEMPT_6/19/2019 12:00:00 AM' 	=> 'OTH',	
+					trim(l.offense_description, left, right) = 'NC_6/19/2019 12:00:00 AM' 			=> 'OTH',	
+					trim(l.offense_description, left, right) = '_6/19/2019 12:00:00 AM' 				=> 'OTH',		
+					trim(l.offense_description, left, right) = '0000_6/19/2019 12:00:00 AM' 		=> 'OTH',	
+					trim(l.offense_description, left, right) = 'MATERIAL' 						=> 'OTH',		
+          trim(l.offense_description, left, right) = 'INHALENTS' 						=> 'OTH',		
+          trim(l.offense_description, left, right) = 'THREATENING:' 				=> 'OTH',		
+
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',
 						'BONALP197550716020130225','BROCHR199250917020121214','BROCHR199250917220121214','BROKEN196750916320121114','BROMAR197351015020000717',

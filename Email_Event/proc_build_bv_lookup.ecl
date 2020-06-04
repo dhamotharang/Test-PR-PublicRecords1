@@ -19,7 +19,7 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 		SELF.role_address				:= STD.Str.ToUpperCase(L.role_address);
 		SELF.error_code					:= STD.Str.FindReplace(STD.Str.ToUpperCase(L.error_code),'(NULL)','');
 		SELF.error_desc					:= STD.Str.FindReplace(STD.Str.ToUpperCase(L.error_desc),'(NULL)','');
-		SELF.source							:= STD.Str.ToUpperCase(L.source);
+		SELF.source							:= MDR.sourceTools.src_BrightVerify_email;
 		StdDatestamp						:= STD.Date.ConvertDateFormatMultiple(L.date_added,fmtsin,fmtout);
 		SELF.date_added					:= StdDatestamp;
 		SELF.process_date				:= thorlib.wuid()[2..9];
@@ -94,8 +94,8 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 										 ,build_table
 										 ,build_key
 										 ,zDoPopulationStats
-										 ,dops_update
-										 ,orbit_update
+										 // ,dops_update
+										 // ,orbit_update
 										);	
 	
 END;

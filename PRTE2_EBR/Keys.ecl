@@ -6,7 +6,6 @@ EXPORT Keys := module
 export Key_0010_Header_BDID 									:= index(Files.ds_0010_Header_Base(bdid <> 0),{bdid},{Files.ds_0010_Header_Base}, Constants.key_prefix + doxie.Version_SuperKey + '::0010_header::bdid');
 export Key_0010_Header_FILE_NUMBER 						:= index(Files.ds_0010_Header_Base(file_number <> ''),{file_number},{Files.ds_0010_Header_Base},Constants.key_prefix + doxie.Version_SuperKey + '::0010_header::file_number');
 
-//1000_Executive_Summary
 shared File_1000_Executive_Summary	:= project(Files.BASE_1000_Executive_Summary, Layouts.Slim_1000_executive_summary_base);
 export Key_1000_Executive_Summary_BDID 			  := index(File_1000_Executive_Summary(bdid <> 0),{bdid},{File_1000_Executive_Summary},Constants.key_prefix + doxie.Version_SuperKey + '::1000_executive_summary::bdid');
 export Key_1000_Executive_Summary_FILE_NUMBER := index(File_1000_Executive_Summary(file_number <> ''),{FILE_NUMBER},{File_1000_Executive_Summary},Constants.key_prefix + doxie.Version_SuperKey + '::1000_executive_summary::file_number');

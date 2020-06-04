@@ -17,17 +17,14 @@
 
 EXPORT Proc_ProfileBoosterAppend(string infile,string prt = '') := function
 
-IMPORT risk_indicators, profilebooster, address, data_services;
+IMPORT risk_indicators, profilebooster, address, data_services, _Control;
 
-#option('embeddedWarningsAsErrors', 0);
-
-
-onThor := true;  
+onThor := _Control.Environment.OnThor;
 // onThor := false; // after March 5, 2019, also toggle the _control.Environment.OnThor variable to match this
 
-// #workunit('name', 'profile booster ' + 	if(onThor, 'thor ', 'roxie ') );
+#workunit('name', 'profilebooster Append ' + 	if(onThor, 'thor ', 'roxie ') );
 
-
+#option('embeddedWarningsAsErrors', 0);
 #stored('did_add_force', if(onThor, 'thor', 'roxi') );  // this option is the stored parameter used inside the DID append macro to determine which version of the macro to use
 #OPTION('multiplePersistInstances', FALSE); // doesn't rename the persist files for each job
 
@@ -105,7 +102,7 @@ ds_in := dataset (test_file_name, layout_file_input, csv(heading(single), quote(
 																	self.street_addr := street_address;
 																	self := left ) );
 																		
-	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, onThor);  
+	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,,,prt);  
 	PBSearch := output(choosen(attributes, eyeball_count), named('Search_Function_attributes_' + prt));
 		 
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform

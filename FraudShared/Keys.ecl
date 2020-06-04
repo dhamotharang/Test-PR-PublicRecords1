@@ -27,15 +27,15 @@ export Keys(
 					unsigned1	octet4;
 					end;										
 	
-	shared BaseMain           						:= Project(pFileKeybuild, Transform(Layouts_key.Main
+	shared BaseMain           						:= Project(pFileKeybuild, Transform({record,maxlength(60000) Layouts_key.Main,unsigned8 __internal_fpos__:=0 end}
 																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
 																									,self					:=left)
 																									);
 																									
 	Shared BaseMain_HostUser 							:= Project(BaseMain
 																						,Transform(layout_hostuser 
-																							,self.hash64_host		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,2))),0)
-																							,self.hash64_user		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,1))),0)
+																							,self.hash64_host		:=if(regexfind('(.*)@(.*)$',left.email_address,2)<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,2))),0)
+																							,self.hash64_user		:=if(regexfind('(.*)@(.*)$',left.email_address,1)<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,1))),0)
 																							,self:=left)
 																							);
 																																								

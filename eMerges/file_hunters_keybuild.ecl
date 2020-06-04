@@ -1,11 +1,11 @@
-﻿import ut;
+﻿import ut, data_services;
 
 string_rec := record
 	emerges.layout_hunters_out;
   unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-ds_hunt := emerges.Prep_Build.hunt_fish('~thor_data400::base::emerges_hunt_building', string_rec);
+ds_hunt := emerges.Prep_Build.hunt_fish(data_services.data_location.prefix()+'thor_data400::base::emerges_hunt_building', string_rec);
 
 // Function for zero filling
 string9	fZeroFill(string pString)	:=	function

@@ -1,1 +1,1 @@
-﻿EXPORT File_OptOut_Base_FCRA := DATASET('~thor::base::new_suppression::opt_out_fcra',Suppress.Layout_OptOut,THOR,OPT);
+﻿EXPORT File_OptOut_Base_FCRA := DATASET('~thor::base::new_suppression::opt_out_fcra',Suppress.Layout_OptOut_Base,THOR,OPT);

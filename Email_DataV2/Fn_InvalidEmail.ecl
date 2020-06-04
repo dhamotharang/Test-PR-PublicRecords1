@@ -12,20 +12,20 @@ BadEmails	:= ['123@US.HSBC.COM','BESTBUY@BESTBUY.COM','DOES NOT HAVE@NONE.COM','
 								'NOTHANKS@AOL.COM','NOTHANKS@GMAIL.COM','NOTHANKS@YAHOO.COM','REFUSE@EMAIL.COM','REFUSED','REFUSED@CITI.COM',
 								'RFSD','SEARS@SEARS.COM','TEMP@TEMP.COM','YAHOO@YAHOO.COM']; //Exact matches that were confirmed invalid
 
-InvalidDomain := ['AAA.COM','AAA.NET','BBY.COM','BBY.NET','DEEPDISCOUNTCD.COM','DEEPDISCOUNTCD.NET','DEEPDISCOUNTCD.ORG','DELIAINC.COM','DELIAINC.NET',
-									'DELIAINC.ORG','EMAIL.ORG','FAKEEMAIL.COM','HAVE.COM','HAVE.ORG','LANE.COM','N.COM','N.NET','N.ORG','NO.COM','NO.NO.COM','NO.NO.NET',
-									'NO.NO.ORG','NO2NO54541NO.COM','NOEMAIL.COM','NOEMAIL.NET','NOMAIL.COM','NON.COM','NONAME.COM','NONAME.NET','OPT.COM','OPT.NET',
-									'OPT.ORG','REFUSED.COM','TEST.COM','UPDATEMELATER.COM','UPDATEMELATER.NET','UPDATEMELATER.ORG','WORLDNIC.COM','WORLDNIC.NET'];
+// InvalidDomain := ['AAA.COM','AAA.NET','BBY.COM','BBY.NET','DEEPDISCOUNTCD.COM','DEEPDISCOUNTCD.NET','DEEPDISCOUNTCD.ORG','DELIAINC.COM','DELIAINC.NET',
+									// 'DELIAINC.ORG','EMAIL.ORG','FAKEEMAIL.COM','HAVE.COM','HAVE.ORG','LANE.COM','N.COM','N.NET','N.ORG','NO.COM','NO.NO.COM','NO.NO.NET',
+									// 'NO.NO.ORG','NO2NO54541NO.COM','NOEMAIL.COM','NOEMAIL.NET','NOMAIL.COM','NON.COM','NONAME.COM','NONAME.NET','OPT.COM','OPT.NET',
+									// 'OPT.ORG','REFUSED.COM','TEST.COM','UPDATEMELATER.COM','UPDATEMELATER.NET','UPDATEMELATER.ORG','WORLDNIC.COM','WORLDNIC.NET'];
 
 EXPORT Fn_InvalidEmail (DATASET(RECORDOF(Layouts.temp_Validate)) email_in) := FUNCTION
 
 	Layouts.temp_Validate SetValidRule(email_in L) := TRANSFORM
 	//Redundant, but some historical builds did not have uppercase applied
 		string100 CleanName		:= STD.Str.CleanSpaces(STD.Str.ToUpperCase(L.clean_email));
-		string100 CleanDomain	:= STD.Str.CleanSpaces(STD.Str.ToUpperCase(L.append_domain));
+		// string100 CleanDomain	:= STD.Str.CleanSpaces(STD.Str.ToUpperCase(L.append_domain));
 	//(REGEXFIND('^[0-9A-Z]{1}@',CleanName), TRUE, FALSE); //Removing this condition until further discussion	
 		SELF.InValidEmail		:= IF(CleanName in BadEmails, TRUE, FALSE);
-		SELF.InValidDomain	:= IF(CleanDomain in InvalidDomain, TRUE, FALSE);
+		// SELF.InValidDomain	:= IF(CleanDomain in InvalidDomain, TRUE, FALSE);
 		SELF	:= L;
 	END;
 	

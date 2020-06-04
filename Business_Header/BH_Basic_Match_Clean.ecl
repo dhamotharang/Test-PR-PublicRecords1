@@ -1,10 +1,10 @@
-import gong,mdr,address;
+﻿import gong,Gong_Neustar,mdr,address;
 // Initialize match file
 
 EXPORT BH_Basic_Match_Clean(
 
 	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_SALT			= BH_Basic_Match_SALT	()
-	,dataset(Gong.layout_History				)	pGong_File_History				= Gong.File_History
+	,dataset(Gong_Neustar.layout_History)	pGong_File_History				= Gong.File_History
 	,string																pPersistname							= persistnames().BHBasicMatchClean													
 	,boolean															pShouldRecalculatePersist	= true													
 	,dataset(Layout_Business_Header_Temp)	pPersist									= persists().BHBasicMatchClean

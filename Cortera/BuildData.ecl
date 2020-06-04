@@ -1,32 +1,29 @@
 ﻿EXPORT BuildData(string version) := FUNCTION
 
-		hdrin := cortera.File_Header_In;
+		hdrin := cortera.Files.File_Header_In;
 
 		ds := Cortera.proc_processHeader(hdrin, version) : INDEPENDENT;
 		exec := Cortera.proc_createExecutives(ds) : INDEPENDENT;
-		bizlinking := Cortera.As_Business_Linking(exec(country='US'));
-		industry := Cortera.As_Industry(exec(country='US'));
-		attr := Cortera.proc_processAttributes(ds, Cortera.File_Attributes_In, version);
+		linkid := Cortera.proc_createExecLinkID(ds) : INDEPENDENT;
+		attr := Cortera.proc_processAttributes(ds, Cortera.Files.File_Attributes_In, version);
 
 		lfnHdr := Cortera.Constants.sfCorteraHdr + '::' + version;
 		lfnexecutives := Cortera.Constants.sfExecutives + '::' + version;
-		lfnLinking := Cortera.Constants.sfLinking + '::' + version;
-		lfnIndustry := Cortera.Constants.sfIndustry + '::' + version;
+		lfnexeclinkid := Cortera.Constants.sfExecLinkID + '::' + version;
 		lfnAttributes := Cortera.Constants.sfAttributes + '::' + version;
 
 		return SEQUENTIAL(
 			PARALLEL(
-				OUTPUT(ds,,lfnHdr, COMPRESSED, OVERWRITE),
+				OUTPUT(ds,,lfnHdr, COMPRESSED, OVERWRITE),				
 				OUTPUT(exec,,lfnexecutives, COMPRESSED, OVERWRITE),
-				OUTPUT(bizlinking,,lfnLinking, COMPRESSED, OVERWRITE),
-				OUTPUT(industry,,lfnIndustry, COMPRESSED, OVERWRITE),
+				OUTPUT(linkid,,lfnexeclinkid, COMPRESSED, OVERWRITE),
 				OUTPUT(attr,,lfnAttributes, COMPRESSED, OVERWRITE)
-			),
+			)
+			,
 			PARALLEL(
 				Cortera.Promote().CorteraHeader(lfnHdr),
 				Cortera.Promote().Executives(lfnexecutives),
-				Cortera.Promote().CorteraAsLinking(lfnLinking),
-				Cortera.Promote().industry(lfnIndustry),
+				Cortera.Promote().Execlinkid(lfnexeclinkid),
 				Cortera.Promote().Attributes(lfnAttributes)
 			)
 		);

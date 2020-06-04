@@ -14,14 +14,14 @@ NAMESCOPE:NAC
 // BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
 // FUZZY can be used to create new types of FUZZY linking
 FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(0,4..):ONFAIL(BLANK)
-FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='`!+&,./#()_)
+FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='`!+&,.:;/#()_)
 FIELDTYPE:invalid_email:ALLOW(-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
 FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,8):ONFAIL(BLANK)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)
-FIELDTYPE:invalid_zip:ALLOW(-0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,5..):ONFAIL(BLANK)
+FIELDTYPE:invalid_zip:ALLOW(-0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,1,5..):ONFAIL(BLANK)
 FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)
 FIELDTYPE:invalid_ssn:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,9):ONFAIL(BLANK)
-FIELDTYPE:invalid_phone:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,10..):ONFAIL(BLANK)
+FIELDTYPE:invalid_phone:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,1,10..):ONFAIL(BLANK)
 FIELDTYPE:invalid_ip:ALLOW(.0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:ONFAIL(BLANK)
 FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( <>{}[]-^='`!+&,./#()_)
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.

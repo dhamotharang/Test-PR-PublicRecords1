@@ -1,5 +1,5 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform;
+	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
 	datasetName	:=	'FraudGov';
@@ -22,7 +22,9 @@
 
 	Orbit_stats :=	U.OrbitStats():PERSIST(persist_name);
 	OrbitReport :=	OUTPUT(Orbit_stats,ALL,NAMED(scopename+'_OrbitReport'));
-	OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,ALL,NAMED(scopename+'_OrbitReportSummary'));
+	prj_Orbit_stats := project(Orbit_stats, transform(Salt35.ScrubsOrbitLayout, self:=left));
+
+	OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,prj_Orbit_stats).SummaryStats,ALL,NAMED(scopename+'_OrbitReportSummary'));
 	
 	NumRules :=	Count(Orbit_stats);
 	NumFailedRules := Count(Orbit_Stats(rulecnt>0));
@@ -103,14 +105,14 @@
 		'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 		'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 
-	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,BuildDate,profilename).SubmitStats;
+	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',prj_Orbit_stats,BuildDate,profilename).SubmitStats;
 	//Submits Profile's stats to Orbit
 	
 	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::log';
-	Super_Log_File := SuperFile + '::scrubs_fraudgov';
+	Super_Log_File := SuperFile + '::' + scopename;
 	SuperFile_Entries := dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
-	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
+	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp_'+scopename,thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
 		STD.File.StartSuperFileTransaction(),
 		STD.File.RemoveSuperFile(SuperFile,Super_Log_File,true),
 		STD.File.FinishSuperFileTransaction());
@@ -119,7 +121,7 @@
 	publish:=sequential(
 		Create_New_File,
 		nothor(global(sequential(fileservices.deleteLogicalFile(Super_Log_File),
-		fileservices.renameLogicalFile(Super_Log_File+'_temp',Super_Log_File),
+		fileservices.renameLogicalFile(Super_Log_File+'_temp_'+scopename,Super_Log_File),
 		STD.File.StartSuperFileTransaction(),
 		STD.File.AddSuperFile(SuperFile,Super_Log_File),
 		STD.File.FinishSuperFileTransaction()))));

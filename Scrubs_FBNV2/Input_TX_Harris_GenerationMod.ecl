@@ -22,7 +22,7 @@ EXPORT Input_TX_Harris_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'FBNV2';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,FILE_NUMBER,NAME1,NAME2,prep_addr1_line1,prep_addr1_line_last,prep_addr2_line1,prep_addr2_line_last';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,FILE_NUMBER,DATE_FILED,NAME1,NAME2,prep_addr1_line1,prep_addr1_line_last,prep_addr2_line1,prep_addr2_line_last';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -53,6 +53,7 @@ EXPORT Input_TX_Harris_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '//---------------------------------------------------------------\n'
     + '// FIELD:process_date:TYPE(STRING):0,0\n'
     + 'FIELD:FILE_NUMBER:TYPE(STRING20):LIKE(invalid_mandatory):0,0\n'
+    + 'FIELD:DATE_FILED:TYPE(STRING8):LIKE(invalid_past_date):0,0\n'
     + '// FIELD:RECORD_TYPE:TYPE(STRING):0,0\n'
     + 'FIELD:NAME1:TYPE(STRING192):LIKE(invalid_mandatory):0,0\n'
     + '// FIELD:STREET_ADD1:TYPE(STRING):0,0\t\n'

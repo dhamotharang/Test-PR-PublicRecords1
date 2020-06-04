@@ -1,4 +1,4 @@
-import ut, header_services, doxie,_Control,header,NID,data_services,PRTE2_Header,PRTE2_Watchdog;
+﻿import ut, header_services, doxie,_Control,header,NID,data_services,PRTE2_Header,PRTE2_Watchdog;
 
 EXPORT Key_Prep_Watchdog_nonglb (boolean exclude_EQ = true ) := FUNCTION
 				//compare to glb data and set flags
@@ -25,95 +25,13 @@ EXPORT Key_Prep_Watchdog_nonglb (boolean exclude_EQ = true ) := FUNCTION
 					unsigned8 filepos := 0;
 				end;
 
-				Drop_Header_Layout := 
-				record
-					string15    did := '0';
-					string10    phone := '';
-					string9     ssn := '';
-					string10     dob := '0';
-					string5     title := '';
-					string20    fname := '';
-					string20    mname := '';
-					string20    lname := '';
-					string5     name_suffix := '';
-					string10    prim_range := '';
-					string2      predir := '';
-					string28    prim_name := '';
-					string4     suffix := '';
-					string2      postdir := '';
-					string10    unit_desig := '';
-					string8     sec_range := '';
-					string25    city_name := '';
-					string2      st := '';
-					string5     zip := '';
-					string4     zip4 := '';
-					string8    addr_dt_last_seen := '0';
-					string8	 DOD := '';
-					string17    Prpty_deed_id := '';
-					string22    Vehicle_vehnum := '';
-					string22  	 Bkrupt_CrtCode_CaseNo := '';
-					string10     main_count := '0';
-					string10     search_count := '0';
-					string15	 DL_number := '';
-					string15     bdid := '';
-					string10     run_date := '0';
-					string10	 total_records := '0';
-					string20 RawAID := '0';
-					string8 addr_dt_first_seen := '0';
-					string10 ind := '';
-					string2      EOR := '';
-				end;
-
-				header_services.Supplemental_Data.mac_verify('file_bestv2_inj.txt', drop_header_layout, attr);
-
-				Base_File_Append_In := attr();
-
-				string_rec reformat_layout(Base_File_Append_In L) := 
-				 transform
-					self.did := (unsigned6) L.did;
-					self.dob := (integer4) L.dob;
-					self.title  := trim(l.title ,left,right);
-					self.fname  := trim(l.fname ,left,right);
-					self.mname  := trim(l.mname ,left,right);
-					self.lname  := trim(l.lname ,left,right);
-					self.name_suffix  := trim(l.name_suffix ,left,right);
-					self.prim_range  := trim(l.prim_range ,left,right);
-					self.predir  := trim(l.predir ,left,right);
-					self.prim_name  := trim(l.prim_name ,left,right);
-					self.suffix  := trim(l.suffix ,left,right);
-					self.postdir  := trim(l.postdir ,left,right);
-					self.unit_desig  := trim(l.unit_desig ,left,right);
-					self.sec_range  := trim(l.sec_range ,left,right);
-					self.city_name  := trim(l.city_name ,left,right);
-					self.addr_dt_last_seen := (unsigned3) L.addr_dt_last_seen;
-					self.main_count := (integer4) L.main_count;
-					self.search_count := (integer4) L.search_count;
-					self.run_date := (integer4) L.run_date;
-					self.total_records := (integer4) L.total_records;
-					self.rawaid := (unsigned) l.rawaid;
-					self.addr_dt_first_seen := (unsigned3) L.addr_dt_first_seen;
-					self := L;
-				end;
-
-
-				Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left)); 
-
-				//append ADL indicator
-				watchdog.mac_append_ADL_ind(base_file_append_out, Base_File_Append); 
-
 				glb := watchdog.File_Best;
 				non_glb0 := if(exclude_EQ,watchdog.File_Best_nonglb_nonEquiFax,watchdog.File_Best_nonglb);
 				non_glb := non_glb0;
 
 				set_Flags := join(glb,non_glb,left.did=right.did,flags(left,right),local);
 
-				t0 := join(set_Flags,
-									Base_File_Append,
-									left.did = right.did,
-									left only,
-									lookup);
-
-				wdog := t0 + Base_File_Append;
+				wdog := watchdog.prep_build.prep(set_flags);
 
 				candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
 				not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));

@@ -1,4 +1,4 @@
-IMPORT fcra, header, prte2_gong, ut, doxie_build, header_quick, ADVO, mdr,risk_indicators,PRTE2_Header;
+﻿IMPORT fcra, header, prte2_gong, ut, doxie_build, header_quick, ADVO, mdr,risk_indicators,PRTE2_Header, prte2;
 
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 
@@ -36,6 +36,7 @@ EXPORT ADL_Risk_Table_v4(BOOLEAN isFCRA) := FUNCTION
 		common_adl_risk eq;  		// equifax table
 		common_adl_risk en;			// experian table
 		common_adl_risk tn;			// transunion table
+		PRTE2.Layouts.DEFLT_CPA;
 	END;
 
 	j := JOIN(all_bureaus, 

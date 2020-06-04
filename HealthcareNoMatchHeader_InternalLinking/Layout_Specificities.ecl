@@ -1,0 +1,223 @@
+﻿IMPORT SALT311;
+EXPORT Layout_Specificities := MODULE
+SHARED L := Layout_HEADER;
+EXPORT SSN_ChildRec := RECORD
+  TYPEOF(l.SSN) SSN;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT DOB_year_ChildRec := RECORD
+  UNSIGNED2 DOB_year;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT DOB_month_ChildRec := RECORD
+  UNSIGNED2 DOB_month;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT DOB_day_ChildRec := RECORD
+  UNSIGNED2 DOB_day;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT LEXID_ChildRec := RECORD
+  TYPEOF(l.LEXID) LEXID;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT SUFFIX_ChildRec := RECORD
+  TYPEOF(l.SUFFIX) SUFFIX;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT FNAME_ChildRec := RECORD
+  TYPEOF(l.FNAME) FNAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT MNAME_ChildRec := RECORD
+  TYPEOF(l.MNAME) MNAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT LNAME_ChildRec := RECORD
+  TYPEOF(l.LNAME) LNAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT GENDER_ChildRec := RECORD
+  TYPEOF(l.GENDER) GENDER;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT PRIM_NAME_ChildRec := RECORD
+  TYPEOF(l.PRIM_NAME) PRIM_NAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT PRIM_RANGE_ChildRec := RECORD
+  TYPEOF(l.PRIM_RANGE) PRIM_RANGE;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT SEC_RANGE_ChildRec := RECORD
+  TYPEOF(l.SEC_RANGE) SEC_RANGE;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT CITY_NAME_ChildRec := RECORD
+  TYPEOF(l.CITY_NAME) CITY_NAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT ST_ChildRec := RECORD
+  TYPEOF(l.ST) ST;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT ZIP_ChildRec := RECORD
+  TYPEOF(l.ZIP) ZIP;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT DT_FIRST_SEEN_ChildRec := RECORD
+  TYPEOF(l.DT_FIRST_SEEN) DT_FIRST_SEEN;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT DT_LAST_SEEN_ChildRec := RECORD
+  TYPEOF(l.DT_LAST_SEEN) DT_LAST_SEEN;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT MAINNAME_ChildRec := RECORD
+  UNSIGNED4 MAINNAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT ADDR1_ChildRec := RECORD
+  UNSIGNED4 ADDR1;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT LOCALE_ChildRec := RECORD
+  UNSIGNED4 LOCALE;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT ADDRESS_ChildRec := RECORD
+  UNSIGNED4 ADDRESS;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT FULLNAME_ChildRec := RECORD
+  UNSIGNED4 FULLNAME;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT Uber_ChildRec := RECORD
+  SALT311.Str30Type word;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT R := RECORD,MAXLENGTH(32000)
+ UNSIGNED1 dummy;
+  REAL4 SSN_specificity;
+  REAL4 SSN_switch;
+  REAL4 SSN_maximum;
+  DATASET(SSN_ChildRec) nulls_SSN {MAXCOUNT(100)};
+  REAL4 DOB_year_specificity;
+  REAL4 DOB_year_switch;
+  REAL4 DOB_year_maximum;
+  DATASET(DOB_year_ChildRec) nulls_DOB_year {MAXCOUNT(100)};
+  REAL4 DOB_month_specificity;
+  REAL4 DOB_month_switch;
+  REAL4 DOB_month_maximum;
+  DATASET(DOB_month_ChildRec) nulls_DOB_month {MAXCOUNT(100)};
+  REAL4 DOB_day_specificity;
+  REAL4 DOB_day_switch;
+  REAL4 DOB_day_maximum;
+  DATASET(DOB_day_ChildRec) nulls_DOB_day {MAXCOUNT(100)};
+  REAL4 LEXID_specificity;
+  REAL4 LEXID_switch;
+  REAL4 LEXID_maximum;
+  DATASET(LEXID_ChildRec) nulls_LEXID {MAXCOUNT(100)};
+  REAL4 SUFFIX_specificity;
+  REAL4 SUFFIX_switch;
+  REAL4 SUFFIX_maximum;
+  DATASET(SUFFIX_ChildRec) nulls_SUFFIX {MAXCOUNT(100)};
+  REAL4 FNAME_specificity;
+  REAL4 FNAME_switch;
+  REAL4 FNAME_maximum;
+  DATASET(FNAME_ChildRec) nulls_FNAME {MAXCOUNT(100)};
+  REAL4 MNAME_specificity;
+  REAL4 MNAME_switch;
+  REAL4 MNAME_maximum;
+  DATASET(MNAME_ChildRec) nulls_MNAME {MAXCOUNT(100)};
+  REAL4 LNAME_specificity;
+  REAL4 LNAME_switch;
+  REAL4 LNAME_maximum;
+  DATASET(LNAME_ChildRec) nulls_LNAME {MAXCOUNT(100)};
+  REAL4 GENDER_specificity;
+  REAL4 GENDER_switch;
+  REAL4 GENDER_maximum;
+  DATASET(GENDER_ChildRec) nulls_GENDER {MAXCOUNT(100)};
+  REAL4 PRIM_NAME_specificity;
+  REAL4 PRIM_NAME_switch;
+  REAL4 PRIM_NAME_maximum;
+  DATASET(PRIM_NAME_ChildRec) nulls_PRIM_NAME {MAXCOUNT(100)};
+  REAL4 PRIM_RANGE_specificity;
+  REAL4 PRIM_RANGE_switch;
+  REAL4 PRIM_RANGE_maximum;
+  DATASET(PRIM_RANGE_ChildRec) nulls_PRIM_RANGE {MAXCOUNT(100)};
+  REAL4 SEC_RANGE_specificity;
+  REAL4 SEC_RANGE_switch;
+  REAL4 SEC_RANGE_maximum;
+  DATASET(SEC_RANGE_ChildRec) nulls_SEC_RANGE {MAXCOUNT(100)};
+  REAL4 CITY_NAME_specificity;
+  REAL4 CITY_NAME_switch;
+  REAL4 CITY_NAME_maximum;
+  DATASET(CITY_NAME_ChildRec) nulls_CITY_NAME {MAXCOUNT(100)};
+  REAL4 ST_specificity;
+  REAL4 ST_switch;
+  REAL4 ST_maximum;
+  DATASET(ST_ChildRec) nulls_ST {MAXCOUNT(100)};
+  REAL4 ZIP_specificity;
+  REAL4 ZIP_switch;
+  REAL4 ZIP_maximum;
+  DATASET(ZIP_ChildRec) nulls_ZIP {MAXCOUNT(100)};
+  REAL4 DT_FIRST_SEEN_specificity;
+  REAL4 DT_FIRST_SEEN_switch;
+  REAL4 DT_FIRST_SEEN_maximum;
+  DATASET(DT_FIRST_SEEN_ChildRec) nulls_DT_FIRST_SEEN {MAXCOUNT(100)};
+  REAL4 DT_LAST_SEEN_specificity;
+  REAL4 DT_LAST_SEEN_switch;
+  REAL4 DT_LAST_SEEN_maximum;
+  DATASET(DT_LAST_SEEN_ChildRec) nulls_DT_LAST_SEEN {MAXCOUNT(100)};
+  REAL4 MAINNAME_specificity;
+  REAL4 MAINNAME_switch;
+  REAL4 MAINNAME_maximum;
+  DATASET(MAINNAME_ChildRec) nulls_MAINNAME {MAXCOUNT(100)};
+  REAL4 ADDR1_specificity;
+  REAL4 ADDR1_switch;
+  REAL4 ADDR1_maximum;
+  DATASET(ADDR1_ChildRec) nulls_ADDR1 {MAXCOUNT(100)};
+  REAL4 LOCALE_specificity;
+  REAL4 LOCALE_switch;
+  REAL4 LOCALE_maximum;
+  DATASET(LOCALE_ChildRec) nulls_LOCALE {MAXCOUNT(100)};
+  REAL4 ADDRESS_specificity;
+  REAL4 ADDRESS_switch;
+  REAL4 ADDRESS_maximum;
+  DATASET(ADDRESS_ChildRec) nulls_ADDRESS {MAXCOUNT(100)};
+  REAL4 FULLNAME_specificity;
+  REAL4 FULLNAME_switch;
+  REAL4 FULLNAME_maximum;
+  DATASET(FULLNAME_ChildRec) nulls_FULLNAME {MAXCOUNT(100)};
+  REAL4 uber_specificity;
+  REAL4 uber_switch;
+  REAL4 uber_maximum;
+  DATASET(Uber_ChildRec) nulls_uber {MAXCOUNT(100)};
+END;
+END;

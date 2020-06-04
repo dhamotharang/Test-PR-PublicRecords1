@@ -87,22 +87,6 @@ function
 			self.tmp_join_id_contact					:= STD.Str.CleanSpaces(l.link_fein) + STD.Str.CleanSpaces(l.link_inc_date);
 			self.dt_first_seen_contact				:= (unsigned4)l.dt_first_seen;
 			self.dt_last_seen_contact					:= (unsigned4)l.dt_last_seen;
-			//self.source								:= l.src;
-			//self.company_name 				:= l.bus_name;
-			//self.company_prim_range		:= l.company_clean_addr.prim_range;
-			//self.company_predir				:= l.company_clean_addr.predir;
-			//self.company_prim_name		:= l.company_clean_addr.prim_name;
-			//self.company_addr_suffix	:= l.company_clean_addr.addr_suffix;
-			//self.company_postdir			:= l.company_clean_addr.postdir;
-			//self.company_unit_desig		:= l.company_clean_addr.unit_desig;
-			//self.company_sec_range		:= l.company_clean_addr.sec_range;
-			//self.company_city					:= l.company_clean_addr.p_city_name;
-			//self.company_state				:= l.company_clean_addr.st;
-			//self.company_zip					:= (unsigned3)l.company_clean_addr.zip;
-			//self.company_zip4					:= (unsigned2)l.company_clean_addr.zip4;
-			//self.company_phone				:= (unsigned6)l.bus_phone;
-			//self.company_fein 				:= (unsigned4)l.orig_fein;
-			
 			self.contact_did 									:= l.did;
 			self.contact_ssn									:= l.contact_ssn;
 			self.contact_dob									:= (unsigned4)l.contact_dob;
@@ -379,7 +363,8 @@ function
 			self.ultid_status_public						:= '';
 			self.address_type_derived						:= '';
 			self.is_vanity_name_derived					:= false;
-			self 																:= l;			
+			self 																:= l;	
+			self := [];
 	end;
 	
 	ds_BH_base_out := project(ds_BH_result_w_cnp, trfMap_To_BH_base(left)) : persist('~prte::persist::PRTE2_BIPV2_BusHeader::BH_Init_Final');

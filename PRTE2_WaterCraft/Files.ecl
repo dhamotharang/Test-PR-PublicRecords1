@@ -16,7 +16,7 @@ EXPORT Files := MODULE
 	EXPORT Alpha_Base			:= DATASET(PRTE2_Watercraft.Constants.BASE_PREFIX + '::qa::alldata_alpha', PRTE2_Watercraft.Layouts.Base_new - [bug_num, cust_name, link_inc_date, link_fein, link_dob, link_ssn, global_sid,record_sid], THOR);
 
 // Boca Input file
-	EXPORT Boca_in				:= DATASET(PRTE2_Watercraft.Constants.IN_PREFIX + '::boca', PRTE2_Watercraft.Layouts.Base_Boca, CSV(HEADING(2), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));										
+	EXPORT Boca_in				:= DATASET(PRTE2_Watercraft.Constants.IN_PREFIX + '::boca', PRTE2_Watercraft.Layouts.Incoming_Boca, CSV(HEADING(2), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));										
 	
 // These are the final master files that will hold all the data in a unified format. 
 		EXPORT Boca_Base		:= DATASET(PRTE2_Watercraft.Constants.BASE_PREFIX + '::qa::boca', PRTE2_Watercraft.Layouts.Base_new, THOR);

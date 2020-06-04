@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr, PRTE2_LNProperty,BIPV2,AutoStandardI;
+﻿IMPORT  doxie,mdr, PRTE2_LNProperty,BIPV2,AutoStandardI, ut;
 
 EXPORT keys := MODULE
 
@@ -15,25 +15,35 @@ EXPORT key_addlnames(boolean IsFCRA)  := INDEX(
 		Constants.KeyName_ln_propertyv2  + IF(IsFCRA, 'fcra::', '') + doxie.Version_SuperKey + '::addlnames.fid');
 
 EXPORT key_addr_search(boolean IsFCRA) := INDEX(
-		if (IsFCRA,FILES.KEY_ADDR_FID_PREP(ln_fares_id[1] !='R'),FILES.KEY_ADDR_FID_PREP) ,  
+		if (IsFCRA,FILES.KEY_ADDR_FID_PREP(ln_fares_id[1] !='R'),FILES.KEY_ADDR_FID_PREP),  
 		{prim_name,prim_range,zip,predir,postdir,suffix,sec_range,string1 source_code_2 := source_code[2],LN_owner,owner,nofares_owner, 
 					string1 source_code_1 := source_code[1]},
 		{ln_fares_id, lname, fname, name_suffix}, 
 		Constants.KeyName_ln_propertyv2  + IF(IsFCRA, 'fcra::', '') + doxie.Version_SuperKey + '::addr_search.fid');
 
-EXPORT key_assessor(boolean IsFCRA):= INDEX(
-		if(isFCRA,FILES.ln_propertyv2_tax(ln_fares_id[1] !='R'),FILES.ln_propertyv2_tax),
-		{ln_fares_id, unsigned6 proc_date := (unsigned)(IF(recording_date[1..6]!='',
-												recording_date[1..6],sale_date[1..6]))},  
-		{FILES.ln_propertyv2_tax } - [ln_fares_id],
+EXPORT key_assessor(boolean IsFCRA):= function
+dsTax := if(isFCRA,FILES.ln_propertyv2_tax(ln_fares_id[1] !='R',trim(ln_fares_id) != ''),FILES.ln_propertyv2_tax(trim(ln_fares_id) != ''));  
+ut.MAC_CLEAR_FIELDS(dsTax, file_tax_cleared, prte2_lnproperty.Constants.field_to_clear_assessor_fid);
+keyfile_tax := if(IsFCRA, file_tax_cleared, dsTax);
+RETURN INDEX(keyfile_tax,
+// if(isFCRA, keyfile_tax(ln_fares_id[1] !='R'),keyfile_tax),
+		{ln_fares_id, unsigned6 proc_date := IF(IsFCRA,0,(unsigned)(IF(recording_date[1..6]!='',
+		recording_date[1..6],sale_date[1..6])))},  
+		{keyfile_tax} - [ln_fares_id],
 		Constants.KeyName_ln_propertyv2  + IF(IsFCRA, 'fcra::', '') + doxie.Version_SuperKey + '::assessor.fid');
+END;
 
-
-EXPORT key_deed(boolean IsFCRA) := INDEX(
-		if (IsFCRA, Files.ln_propertyv2_deed(ln_fares_id[1] !='R' and trim(ln_fares_id) != ''),Files.ln_propertyv2_deed(trim(ln_fares_id) != '')), 
-		{ln_fares_id, unsigned6 proc_date := (unsigned)(recording_date[1..6])},  
-		{Files.ln_propertyv2_deed} - [ln_fares_id], 
+EXPORT key_deed(boolean IsFCRA) := function
+dsFile := if(isFCRA,Files.ln_propertyv2_deed(ln_fares_id[1] !='R' and trim(ln_fares_id) != ''),Files.ln_propertyv2_deed(trim(ln_fares_id) != ''));
+ut.MAC_CLEAR_FIELDS(dsFile, file_deed_cleared, prte2_lnproperty.Constants.field_to_clear_deed_fid);
+keyfile_deed := if(IsFCRA, file_deed_cleared, dsFile);
+RETURN INDEX(keyfile_deed,
+// if(IsFCRA, keyfile_deed(ln_fares_id[1] !='R' and trim(ln_fares_id) != ''),keyfile_deed(trim(ln_fares_id) != '')), 
+		{ln_fares_id, unsigned6 proc_date := if(isFCRA, 0,(unsigned)(recording_date[1..6]))},  
+		{keyfile_deed} - [ln_fares_id], 
 		Constants.KeyName_ln_propertyv2 + IF(IsFCRA, 'fcra::', '') + doxie.Version_SuperKey + '::deed.fid');
+END;		
+	
 
 EXPORT key_search_did(boolean IsFCRA) := INDEX(
 		if (IsFCRA, FILES.file_search_building_dedup((unsigned)did > 0 and ln_fares_id[1] !='R'),FILES.file_search_building_dedup((unsigned)did > 0)), 
@@ -78,7 +88,6 @@ EXPORT key_deed_parcelnum := INDEX(
 		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::deed.parcelnum');
 
 
-
 EXPORT key_deed_zip_loanamt := INDEX(	
 		Files.dZipLoanAmt,
 		{zip,loan_amount,loan_date},
@@ -93,12 +102,6 @@ EXPORT Key_Search_BDID := INDEX(
 		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::search.bdid');
 													
 				
-EXPORT key_search_fid_linkids := INDEX(
-		FILES.file_search_fid_linkid(ln_fares_id <> ''),  
-		{ln_fares_id, which_orig, source_code_2 := source_code[2], source_code_1 := source_code[1]},  
-		{FILES.file_search_fid_linkid}, 
-		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::search.fid_linkids');
-
 EXPORT Key_LinkIds := MODULE
 	shared superfile_name		:= '~prte::key::ln_propertyv2::' + doxie.Version_SuperKey + '::search.linkids';
 	shared Base				:= Files.file_search_fid_linkid;

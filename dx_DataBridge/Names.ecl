@@ -1,5 +1,5 @@
 ﻿import $, tools;
-
+  
 export Names(
 	 string		pversion							= ''
 	,boolean	pUseOtherEnvironment	= false
@@ -10,6 +10,8 @@ module
  
 	export LinkIds	      := tools.mod_FilenamesBuild(lkeyTemplate  + 'linkIds'  ,pversion);
 	
-	export dAll_filenames := LinkIds.dAll_filenames;
-
+	export DID            := tools.mod_FilenamesBuild(lkeyTemplate  + 'did'  ,pversion);
+	
+	export dAll_filenames := LinkIds.dAll_filenames +
+	                         DID.dAll_filenames ;
 end;

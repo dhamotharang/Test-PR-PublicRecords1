@@ -1,8 +1,10 @@
-IMPORT prte2,PRTE;
+﻿IMPORT prte2,PRTE;
 EXPORT file_relatives := function
 
-phr := PRTE2_Header.files.personrecs;
-phi := PRTE2_Header.files.file_old_ptre_header_in;
+// phr := PRTE2_Header.files.personrecs;
+phr := PRTE2_Header.file_personrecs;
+// phi := PRTE2_Header.files.file_old_ptre_header_in;
+phi := PRTE2_Header.file_old_prte_header_in;
 
 titlesSet := [2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,16,17,18,19,20,21,
               22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,

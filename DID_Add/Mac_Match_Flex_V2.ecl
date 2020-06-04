@@ -9,6 +9,8 @@
 					 '4' = ssn4 matching (last 4 digits of ssn)
 					 'G' = age matching
 					 'Z' = zip code matching
+					 'R' = relative names
+					 'L' = drivers License
 */
 /*
 
@@ -20,7 +22,7 @@
 		unsigned2  xadl2_distance 
 		string20   xadl2_matches // Indicator of what fields contributed to the DID match.
 
-*/
+*/ 
 /*
 	The last parameter bool_switch_priority when true follows xadl2 and source
 	match.  If false it performs source and then xadl2.
@@ -41,7 +43,8 @@ EXPORT Mac_Match_Flex_V2
 	 bool_outrec_has_indiv_scores='false', score_n_field = 'score_n',// appENDs individual match scores
 	 bool_clean_addr = 'false', // re-cleans addresses before trying match. 
 	 predir_field = 'predir',addr_suffix_field = 'addr_suffix',postdir_field = 'postdir',
-	 udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', bool_switch_priority = 'false', weight_threshold=30, distance=3, segmentation=true) 
+	 udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', bool_switch_priority = 'false', weight_threshold=30, distance=3, segmentation=true, 
+	 fname2_field='rel_fname', lname2_field='rel_lname', dl_nbr='dl_nbr', dl_state='dl_state') 
 	:= MACRO	
  import InsuranceHeader_xLink, IDLExternalLinking, Did_Add;
  
@@ -403,7 +406,7 @@ EXPORT Mac_Match_Flex_V2
 		//****** 		ROXIE route
 		//*********************				
 		#UNIQUENAME(roxprep)
-		didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := TRANSFORM
+		didville.Layout_DID_InBatch_v2 %roxprep%(%pre_infile_id% l) := TRANSFORM
 			#IF('S' in matchset or '4' in matchset)
 				SELF.ssn := (qSTRING9)l.ssn_field;
 			#ELSE
@@ -449,6 +452,20 @@ EXPORT Mac_Match_Flex_V2
 			#ELSE
 				SELF.phone10 := '';
 			#END
+			#IF('R' in matchset)
+				SELF.relative_fname := l.fname2_field;
+				SELF.relative_lname := l.lname2_field;
+			#ELSE
+				SELF.relative_fname := '';
+				SELF.relative_lname := '';
+			#END;
+			#IF('L' in matchset)
+				self.dl_nbr := l.dl_nbr;
+				self.dl_state := l.dl_state;
+			#ELSE
+				self.dl_nbr := '';
+				self.dl_state := '';
+			#END;
 			SELF.seq := l.temp_id;
 			SELF.fname := (qSTRING20)l.fname_field;
 			SELF.mname := (qSTRING20)l.mname_field;
@@ -474,7 +491,7 @@ EXPORT Mac_Match_Flex_V2
 			#END
 			'';
 		#UNIQUENAME(roxout)
-		did_add.MAC_Match_Roxie(%roxin%, %roxout%, %opts%)
+		did_add.MAC_Match_Roxie_v2(%roxin%, %roxout%, %opts%)
 
 
 		//** ReappEND the full rec
@@ -544,6 +561,20 @@ EXPORT Mac_Match_Flex_V2
 					#ELSE
 						SELF.dob := '';
 					#END
+					#IF('R' in matchset)
+						SELF.relative_fname := left.fname2_field;
+						SELF.relative_lname := left.lname2_field;
+					#ELSE
+						SELF.relative_fname := '';
+						SELF.relative_lname := '';
+					#END;
+					#IF('L' in matchset)
+						self.dl_nbr := left.dl_nbr;
+						self.dl_state := left.dl_state;
+					#ELSE
+						self.dl_nbr := '';
+						self.dl_state := '';
+					#END;
 					SELF.did    := 0,
 					SELF := left,  
 					SELF := []));
@@ -555,8 +586,8 @@ EXPORT Mac_Match_Flex_V2
 	IDLExternalLinking.mac_xlinking_on_thor_Boca(%infile_xadl2%, 	
 	did, name_suffix, fname, mname, lname, , 
 															 , prim_name, prim_range, sec_range, city, 
-															 state, zip, ssn, dob, phone, ,, 
-														%outfile_ADL2%, weight_threshold, distance, segmentation);
+															 state, zip, ssn, dob, phone, dl_state, dl_nbr, 
+														%outfile_ADL2%, weight_threshold, distance, segmentation, , relative_fname, relative_lname);
 		
 		// DID_Add.mac_match_flex_ADL2(%infile_xadl2%, %outfile_ADL2%)
 		//-------------		

@@ -1,7 +1,7 @@
-﻿#workunit('name','Weekly NonFCRA Inquiry Tracking Keys');
+﻿//#workunit('name','Weekly NonFCRA Inquiry Tracking Keys');
 import ut, aid, lib_stringlib, address, did_add, Data_Services, Business_Header_SS,standard, header_slimsort, didville, business_header,watchdog, mdr, header,data_services;
-import autokeyb2, zz_cemtemp, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
-
+import autokeyb2, /*zz_cemtemp,*/ doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
+import inql_v2;
 
 export ProcBuildHistoryKeys := function
  
@@ -11,11 +11,12 @@ export ProcBuildHistoryKeys := function
 
 vKBase:=  sc[findex..findex+7]:INDEPENDENT;
 
-		scl 			:= nothor(fileservices.superfilecontents(Data_Services.foreign_logs+'thor100_21::out::inquiry_tracking::weekly_historical')[1].name);
+//		scl 			:= nothor(fileservices.superfilecontents(Data_Services.foreign_logs+'thor100_21::out::inquiry_tracking::weekly_historical')[1].name);
+		scl 			:= nothor(fileservices.superfilecontents(inql_v2.Filenames(,false,false).Inql_base.qa)[1].name);
 		findexl 	:= stringlib.stringfind(scl, '::', 5)+2;
 		
 
-vBase:=  scl[findexl..findexl+7]:INDEPENDENT;
+vBase:=  inql_v2._versions.nonfcra_history_base:INDEPENDENT;
 
 	  sc2 			:= nothor(fileservices.superfilecontents('~thor_data400::key::inquiry_table::did_qa')[1].name);
     findex2 	:= stringlib.stringfind(sc2, '::', 3)+2;
@@ -68,13 +69,13 @@ BuildKeys :=	sequential(
 											IF(vBase=vK , Output('No update since last weekly release'),
 											   sequential(
 											   IF(vKbase>vK, OUTPUT('Key Base file is aleady existing'),Inquiry_AccLogs.fnMapBaseAppendsJennyNew(,vBase).Do_Appends),
-											   parallel(bk_did, bk_trans,bk_phone, bk_addr, bk_ssn,  bk_name, bk_ipaddr,bk_bgroup, bk_email, bk_linkids,bk_fein);   
-											   parallel(mv_addr,mv_trans, mv_did, mv_phone, mv_ssn, mv_email, mv_name, mv_ipaddr, mv_bgroup, mv_LinkIds, mv_fein);
-											   parallel(mv2qa_addr,mv2qa_trans, mv2qa_did, mv2qa_phone, mv2qa_ssn, mv2qa_email,mv2qa_name, mv2qa_ipaddr, mv2qa_bgroup, mv2qa_LinkIds,mv2qa_fein);				 
-											   Inquiry_AccLogs.STRATA_Inquiry_Weekly_Tracking(vBase);
-											   output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.appended_adl > 0 and search_info.datetime[1..8]>vk),100), named('Sample_Archive_Records'));
-											   output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.Email_Address <> ''and search_info.datetime[1..8]>vk), 5), named('Sample_Archive_Email_Records'));
-											   RoxieKeybuild.updateversion('InquiryTableKeys',vBase,'john.freibaum@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com,Sudhir.Kasavajjala@lexisnexis.com, cecelie.guyton@lexisnexis.com, Wenhong.Ma@lexisnexis.com',,'N')
+											   parallel(/*bk_did,*/ bk_trans,bk_phone, bk_addr, bk_ssn,  bk_name, bk_ipaddr,bk_bgroup, bk_email, bk_linkids,bk_fein);   
+											   // parallel(mv_addr,mv_trans, mv_did, mv_phone, mv_ssn, mv_email, mv_name, mv_ipaddr, mv_bgroup, mv_LinkIds, mv_fein);
+											   // parallel(mv2qa_addr,mv2qa_trans, mv2qa_did, mv2qa_phone, mv2qa_ssn, mv2qa_email,mv2qa_name, mv2qa_ipaddr, mv2qa_bgroup, mv2qa_LinkIds,mv2qa_fein);				 
+											   // Inquiry_AccLogs.STRATA_Inquiry_Weekly_Tracking(vBase);
+											   // output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.appended_adl > 0 and search_info.datetime[1..8]>vk),100), named('Sample_Archive_Records'));
+											   // output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.Email_Address <> ''and search_info.datetime[1..8]>vk), 5), named('Sample_Archive_Email_Records'));
+											   //RoxieKeybuild.updateversion('InquiryTableKeys',vBase,'john.freibaum@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com,Sudhir.Kasavajjala@lexisnexis.com, cecelie.guyton@lexisnexis.com, Wenhong.Ma@lexisnexis.com',,'N')
 											))):FAILURE(FileServices.SendEmail('john.freibaum@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com,Sudhir.Kasavajjala@lexisnexis.com, cecelie.guyton@lexisnexis.com, Wenhong.Ma@lexisnexis.com', 'NonFCRA Weekly Inquiry Table Keys Failure ' + vKbase, thorlib.wuid() + ' on Boca Prod\n' + FAILMESSAGE));
 		
 		return BuildKeys;

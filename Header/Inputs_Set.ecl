@@ -132,6 +132,10 @@ voters_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::Voters_H
 output('Nothing added to Base::Voters_Header_Building'),
 fileservices.addsuperfile('~thor_data400::Base::Voters_Header_Building','~thor_data400::Base::Voters_Reg',,true));
 
+UM_Census_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::base::Census_Header_Building')>0,
+output('Nothing added to base::Census_Header_Building'),
+fileservices.addsuperfile('~thor_data400::base::Census_Header_Building','~thor_data400::Base::MA_Census',,true));
+
 certegy_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::certegyHeader_Building')>0,
 output('Nothing added to Base::certegyHeader_Building'),
 fileservices.addsuperfile('~thor_data400::Base::certegyHeader_Building','~thor_data400::base::certegy',,true));
@@ -203,6 +207,7 @@ add_super := sequential(
                                             ,asl_file
                                             ,osl_file
                                             ,voters_v2
+                                            ,UM_Census_v2
                                             ,certegy_file
                                             ,tucs_file
                                             ,experian_file

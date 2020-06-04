@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Inql_fcra_Accurint.BWR_Scrubs - Checking field validity in a file - SALT V3.9.0');
+#workunit('name','Scrubs_Inql_fcra_Accurint.BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
 IMPORT Scrubs_Inql_fcra_Accurint,SALT39;
 infile := Scrubs_Inql_fcra_Accurint.In_FILE;
 mod_scrubs := Scrubs_Inql_fcra_Accurint.Scrubs;

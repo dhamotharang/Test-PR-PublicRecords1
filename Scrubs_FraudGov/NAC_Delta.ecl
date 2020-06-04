@@ -8,7 +8,8 @@ EXPORT NAC_Delta(DATASET(NAC_Layout_NAC)old_s, DATASET(NAC_Layout_NAC) new_s) :=
     hygieneDiffOverall := DifferenceSummary;
     SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FraudGov, NAC_Fields, 'RECORDOF(hygieneDiffOverall)', FALSE);
     hygieneDiffOverall_Standard := IF(doHygieneSummaryGlobal, NORMALIZE(hygieneDiffOverall, COUNT(inFieldList) * 6, xSummary(LEFT, COUNTER, myTimeStamp, LEFT.txt + '_all', LEFT.txt + '_all')));
- 
+
+
     RETURN hygieneDiffOverall_Standard;
   END;
 END;

@@ -1,4 +1,4 @@
-import aid;
+﻿import aid;
 
 EXPORT	Layout_Prep	:=
 module
@@ -900,6 +900,11 @@ module
 		export	Search	:=
 		record(LN_Propertyv2.Layout_Deed_Mortgage_Property_Search)
 			string1	Append_ReplRecordInd;
+		end;
+		
+		export AddlNameInfo	:= 
+			record(LN_Propertyv2.layout_addl_name_info)
+			string1 Append_ReplRecordInd;
 		end;
 	end;
 	/*

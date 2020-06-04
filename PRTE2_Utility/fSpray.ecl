@@ -1,4 +1,13 @@
-IMPORT ut, std, prte2;
+﻿IMPORT ut, std, prte2;
 
-EXPORT fSpray := prte2.SprayFiles.Spray_Raw_Data('UtilityDailyKeys','','utility_file');
+EXPORT fSpray := FUNCTION
+
+RETURN PARALLEL(
+                  prte2.SprayFiles.Spray_Raw_Data('UtilityDailyKeys__','utilitydaily','utility');
+								  prte2.SprayFiles.Spray_Raw_Data('UtilityDailyKeysIns__','utilitydailyins','utility');
+									);
+								
+END;
+
+
 

@@ -26,8 +26,10 @@ EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(ClnUnprintable);
 
 	//Filtering out BAD RECORDS
-	ValidLicenseType				:= ClnUnprintable(TRIM(LIC_TYPE) IN Valid_License_Type);
-	GoodNameRec							:= ValidLicenseType(TRIM(ORG_NAME + LIC_NO) != '');
+	ValidLicenseType 				:= ClnUnprintable(REGEXFIND('[0-9]', StringLib.StringToUpperCase(LIC_NO))); 
+	GoodNameRec 						:= ValidLicenseType(TRIM(ORG_NAME + LIC_NO) != '');
+	// ValidLicenseType			:= ClnUnprintable(TRIM(LIC_TYPE) IN Valid_License_Type);
+	// GoodNameRec					:= ClnUnprintable(TRIM(ORG_NAME + LIC_NO) != '');
 
 	//Real Estate License to common MARIBASE layout
 	Prof_License_Mari.layout_base_in			xformToCommon(GoodNameRec pInput) := TRANSFORM
@@ -57,9 +59,16 @@ EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
 		SELF.LICENSE_NBR	  	:= TrimSLNUM;
 		GetOriginCd						:= REGEXFIND('^([0-9A-Za-z][^\\-]+)[\\-]([0-9]{4})([A-Z])?',TrimSLNUM,3);
 		SELF.ORIGIN_CD				:= GetOriginCd;
-		SELF.RAW_LICENSE_TYPE	:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
-		SELF.STD_LICENSE_TYPE := SELF.RAW_LICENSE_TYPE;
-
+		// SELF.RAW_LICENSE_TYPE	:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
+		trimLic_Type					:= REGEXFIND('[0-9]([A-Z]{2})(-[A-Z])?',TrimSLNUM,1);
+		SELF.RAW_LICENSE_TYPE	:= trimLic_Type;
+		SELF.STD_LICENSE_TYPE := trimLic_Type;
+		SELF.STD_LICENSE_desc := MAP(trimLic_Type='CG' => 'STATE-CERTIFIED GENERAL APPRAISER',
+																 trimLic_Type='CR' => 'STATE-CERTIFIED RESIDENTIAL APPRAISER',
+																 trimLic_Type='SL' => 'STATE-LICENSED APPRAISER',
+																 trimLic_Type='SR' => 'STATE-REGISTERED',
+																 '');
+															 
 		//Clean individual name
 		SELF.NAME_FORMAT			:= IF(pVersion>'20130731','L','F');
 		tempNick 							:= Prof_License_Mari.fGetNickname(TrimNAME_ORG,'nick');
@@ -83,7 +92,8 @@ EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
 		
 		//Reformatting date to YYYYMMDD
 		SELF.ORIG_ISSUE_DTE		:= '17530101';
-		SELF.CURR_ISSUE_DTE		:= IF(pInput.ISSUEDT != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ISSUEDT),'17530101');
+		SELF.CURR_ISSUE_DTE		:= '17530101';
+		// SELF.CURR_ISSUE_DTE		:= IF(pInput.ISSUEDT != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ISSUEDT),'17530101');
 		SELF.EXPIRE_DTE				:= IF(TrimSLNUM != '',
 																//license expires on 0930 of the issue year, unless it is issued after the first week of July.
 																MAP(SELF.CURR_ISSUE_DTE[1..4]='2012' AND SELF.CURR_ISSUE_DTE[5..8]>'0707'=> '20130930',

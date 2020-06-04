@@ -1,6 +1,6 @@
 ﻿import FraudGovPlatform,FraudGovPlatform_Validation,_Control,ut;
 
-EVERY_DAY_AT_9AM := '0 13 * * *';
+EVERY_DAY_AT_2PM := '0 18 * * *';
 IP:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',_control.IPAddress.bctlpedata12,_control.IPAddress.bctlpedata10);
 RootDir:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',Constants.MBSLandingZonePathBase_dev,Constants.MBSLandingZonePathBase_prod);
 ThorName:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',Constants.ThorName_Dev,Constants.ThorName_Prod);
@@ -39,7 +39,7 @@ Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray MBS Skipped\');\n' );
 
 d:=FileServices.RemoteDirectory(IP, RootDir+version+'/', '*.dat');
 if(exists(d),_Control.fSubmitNewWorkunit(Run_ECL, ThorName ),'NO FILES TO SPRAY' )
-			: WHEN(CRON(EVERY_DAY_AT_9AM))
+			: WHEN(CRON(EVERY_DAY_AT_2PM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov MBS Input Prep Schedule failure'
 																			,Constants.NOC_MSG

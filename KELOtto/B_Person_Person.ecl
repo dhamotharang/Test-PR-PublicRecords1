@@ -1,10 +1,10 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
-IMPORT E_Customer,E_Person,E_Person_Person FROM KELOtto;
+IMPORT E_Address,E_Customer,E_Person,E_Person_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Person := MODULE
-  SHARED __EE832417 := E_Person_Person.__Result;
-  SHARED __IDX_Person_Person_From_Person__Filtered := __EE832417(__NN(__EE832417.From_Person_));
+  SHARED __EE3315937 := E_Person_Person.__Result;
+  SHARED __IDX_Person_Person_From_Person__Filtered := __EE3315937(__NN(__EE3315937.From_Person_));
   SHARED IDX_Person_Person_From_Person__Layout := RECORD
     E_Person.Typ From_Person_;
     __IDX_Person_Person_From_Person__Filtered._r_Customer_;
@@ -36,9 +36,10 @@ EXPORT B_Person_Person := MODULE
     __IDX_Person_Person_From_Person__Filtered.__RecordCount;
   END;
   SHARED IDX_Person_Person_From_Person__Projected := PROJECT(__IDX_Person_Person_From_Person__Filtered,TRANSFORM(IDX_Person_Person_From_Person__Layout,SELF.From_Person_:=__T(LEFT.From_Person_),SELF:=LEFT));
-  EXPORT IDX_Person_Person_From_Person_ := INDEX(IDX_Person_Person_From_Person__Projected,{From_Person_},{IDX_Person_Person_From_Person__Projected},'~key::KEL::KELOtto::Person_Person::From_Person_');
+  EXPORT IDX_Person_Person_From_Person__Name := '~key::KEL::KELOtto::Person_Person::From_Person_';
+  EXPORT IDX_Person_Person_From_Person_ := INDEX(IDX_Person_Person_From_Person__Projected,{From_Person_},{IDX_Person_Person_From_Person__Projected},IDX_Person_Person_From_Person__Name);
   EXPORT IDX_Person_Person_From_Person__Build := BUILD(IDX_Person_Person_From_Person_,OVERWRITE);
-  EXPORT __ST832419_Layout := RECORDOF(IDX_Person_Person_From_Person_);
+  EXPORT __ST3315939_Layout := RECORDOF(IDX_Person_Person_From_Person_);
   EXPORT IDX_Person_Person_From_Person__Wrapped := PROJECT(IDX_Person_Person_From_Person_,TRANSFORM(E_Person_Person.Layout,SELF.From_Person_ := __CN(LEFT.From_Person_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Person_From_Person__Build);
 END;

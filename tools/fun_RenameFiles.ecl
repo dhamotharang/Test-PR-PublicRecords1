@@ -1,4 +1,4 @@
-import doxie, lib_fileservices;
+﻿import doxie, lib_fileservices,std;
 ///////////////////////////////////////////////////////////////////////////
 // -- Renames the logical keys contained in the superkeys passed in the dataset
 // -- Finds all superkeys.
@@ -62,6 +62,8 @@ FUNCTION
 			self.newname								:= newname							;
 			self.dSuperkeyContainers		:= dSuperkeyContainers	;
 			self.NumSuperKeycontainers	:= NumSuperKeycontainers;
+      self.exists_new_name        := std.file.fileexists(self.newname);
+      self.will_rename            := not self.exists_new_name;
 			     
 		end;
 		
@@ -107,6 +109,7 @@ FUNCTION
 	filterdups := 		loldname																								!= lnewname 
 								and mySuperkeycontents.dRenamingInfo.newname								!= '' 
 								and mySuperkeycontents.dRenamingInfo.NumSuperKeycontainers	!= 0
+                and mySuperkeycontents.dRenamingInfo.will_rename            = true
 								;
 	
 	Convert2NewNamingconvention := 

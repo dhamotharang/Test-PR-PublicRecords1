@@ -1,5 +1,5 @@
-import DID_Add,header_slimsort,ut,didville,fair_isaac,_Control,risk_indicators,header;
-import header,gong_neustar,header_quick,gong_v2, std;
+﻿import DID_Add,header_slimsort,ut,didville,fair_isaac,_Control,risk_indicators,header;
+import _control, header, gong_neustar, header_quick, gong_v2, mdr, std;
 
 //Slim the gong file
 gng_out := gong_neustar.File_Gong_Full_Prepped_For_Keys;
@@ -24,7 +24,10 @@ header.Mac_Apply_Title(gng_out, name_prefix, name_first, name_middle, apply_titl
 // #55136 Add gong lift (cjs) ***/
 gong_v2.Macro_GongLift(apply_title, apply_title_lift, true, false);
 // /*** end gong lift ***/
-propADL := gong_Neustar.fnPropagateADLs(,,apply_title_lift).base;
+
+addGlobalSID := mdr.macGetGlobalSID(apply_title_lift,'Gong','bell_id','global_sid');// DF-26340: Populate Global_SID
+
+propADL := gong_Neustar.fnPropagateADLs(,,addGlobalSID).base;
 //propADL := gong.fnPropagateADLs(,,apply_title).base;
 
 tmp := SEQUENTIAL(

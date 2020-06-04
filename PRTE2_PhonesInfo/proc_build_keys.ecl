@@ -1,4 +1,4 @@
-﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_PhonesInfo ,PRTE2_Common, PRTE;
+﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_PhonesInfo ,PRTE2_Common, PRTE, prte2, dops;
 
 EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	
@@ -50,26 +50,23 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyN
 
 
 
-		//---------- making DOPS optional and only in PROD build -------------------------------
+//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,'B','N','N');
+	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
 		
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
-
-	RETURN 		sequential(			
-				build_key_phones_ported_metadata, 
-				move_built_key_phones_ported_metadata, 
-				move_qa_key_phones_ported_metadata, 
-				
-				build_key_carrier_reference, 
-				move_built_key_carrier_reference, 
-				move_qa_key_carrier_reference, 	
-				
-				build_key_lerg6, 
-				move_built_key_lerg6, 
-				move_qa_key_lerg6, 
-			  copy_seeds(file_date),
-			 	PerformUpdateOrNot);
+//---------------------------------------------------------------------------------------
+  
+//Key Validation
+	key_validation :=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+	
+	RETURN 		sequential(parallel(build_key_phones_ported_metadata, build_key_carrier_reference,build_key_lerg6), 
+											 parallel(move_built_key_phones_ported_metadata, move_built_key_carrier_reference, move_built_key_lerg6),
+											 parallel(move_qa_key_phones_ported_metadata,move_qa_key_carrier_reference,move_qa_key_lerg6),   
+											 copy_seeds(file_date),
+											 PerformUpdateOrNot,
+											 key_validation
+											 );
 
 END;

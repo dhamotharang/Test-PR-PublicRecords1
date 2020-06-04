@@ -1,4 +1,4 @@
-IMPORT ut,VersionControl,RoxieKeyBuild,AutokeyB2,promotesupers, PRTE2_Common, _control, PRTE;
+﻿IMPORT ut,VersionControl,RoxieKeyBuild,AutokeyB2,promotesupers, PRTE2_Common, _control, PRTE;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -74,7 +74,7 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
     is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;  
  		notifyEmail					:= _control.MyInfo.EmailAddressNormal;
     NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
-		updatedops					:=	PRTE.UpdateVersion('WhoisKeys', filedate, notifyEmail,'B','N','N');
+		updatedops					:=	PRTE.UpdateVersion('WhoisKeys', filedate, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
 		
 		PerformUpdateOrNot	:= IF(is_running_in_prod,updatedops,NoUpdate);
  

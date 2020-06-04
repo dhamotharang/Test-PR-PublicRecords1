@@ -15,8 +15,9 @@ EXPORT MediaOne_src := Map_MediaOne_as_Email(version);
 EXPORT entiera_src := Map_Entiera_as_Email(version);
 EXPORT Impulse_src := Map_Impulse_as_Email(version);
 EXPORT WiredAssets_src := Map_WiredAssets_as_Email(version);
+EXPORT DunnData_src:= Map_DunnData_AS_Email(version);
 
-EXPORT email_sources := RealSource_src +
+ email_sources := RealSource_src +
 												AcquireWeb_src +
 												AcquireWeb_Plus_src +
 												Anchor_src	+
@@ -28,6 +29,7 @@ EXPORT email_sources := RealSource_src +
 												MediaOne_src +
 												entiera_src +
 												Impulse_src +
+												DunnData_src +
 												WiredAssets_src;
 
 //Set Filtering Rules

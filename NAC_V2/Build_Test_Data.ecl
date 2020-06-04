@@ -1,8 +1,8 @@
 ﻿import Std, RoxieKeybuild, dops;
 
-alertList := NAC_v2.Mailing_List('').Dev2;
+alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
-
+ 
 EXPORT Build_Test_Data(string version = (string8)Std.Date.Today()) := function
 
 	RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Key_Test_Data,'~thor::NAC2::key::test_data','~thor::NAC2::key::'+version+'::test_data',B1);

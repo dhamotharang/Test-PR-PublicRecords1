@@ -1,4 +1,4 @@
-﻿IMPORT  _Control,Orbit3Insurance;
+﻿IMPORT  _Control,Orbit3Insurance,STD;
 EXPORT Orbit3IConstants(string product,string emailme = '') := module
 	export datasetname := case(
 															product, 															
@@ -59,7 +59,7 @@ EXPORT Orbit3IConstants(string product,string emailme = '') := module
 														);
 	export componentfilename(string pdate) := case(
 															product, 
-															'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitcomponentpathprefix + 'delta_cc_attributes\\\\process\\\\' + pdate + '\\\\' + stringlib.stringtolowercase(orbitfilename),
+															'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitcomponentpathprefix + 'delta_cc_attributes\\\\process\\\\' + pdate + '\\\\' + STD.Str.ToLowerCase(orbitfilename),
 															'NA'	
 														);
 														

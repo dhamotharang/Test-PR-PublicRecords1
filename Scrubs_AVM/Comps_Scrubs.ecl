@@ -1,4 +1,4 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Comps_Scrubs := MODULE
  
@@ -35,29 +35,90 @@ EXPORT Comps_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Comps_Layout_AVM)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Comps_Layout_AVM)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'seq:Invalid_Num:ALLOW'
+          ,'ln_fares_id:Invalid_Comps:ALLOW'
+          ,'unformatted_apn:Invalid_AlphaNum:ALLOW'
+          ,'st:Invalid_Alpha:ALLOW'
+          ,'zip:Invalid_Num:ALLOW'
+          ,'zip4:Invalid_Num:ALLOW'
+          ,'fips_code:Invalid_Num:ALLOW'
+          ,'land_use_code:Invalid_LandUseCode:ENUM'
+          ,'sales_price:Invalid_Num:ALLOW'
+          ,'sales_price_code:Invalid_SalesPriceCode:ENUM'
+          ,'recording_date:Invalid_Date:CUSTOM'
+          ,'assessed_value_year:Invalid_Num:ALLOW'
+          ,'assessed_total_value:Invalid_Num:ALLOW'
+          ,'market_total_value:Invalid_Num:ALLOW'
+          ,'lot_size:Invalid_Chars:ALLOW'
+          ,'building_area:Invalid_Num:ALLOW'
+          ,'year_built:Invalid_Num:ALLOW'
+          ,'no_of_stories:Invalid_Chars:ALLOW'
+          ,'no_of_rooms:Invalid_Num:ALLOW'
+          ,'no_of_bedrooms:Invalid_Num:ALLOW'
+          ,'no_of_baths:Invalid_Num:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Comps_Fields.InvalidMessage_seq(1)
+          ,Comps_Fields.InvalidMessage_ln_fares_id(1)
+          ,Comps_Fields.InvalidMessage_unformatted_apn(1)
+          ,Comps_Fields.InvalidMessage_st(1)
+          ,Comps_Fields.InvalidMessage_zip(1)
+          ,Comps_Fields.InvalidMessage_zip4(1)
+          ,Comps_Fields.InvalidMessage_fips_code(1)
+          ,Comps_Fields.InvalidMessage_land_use_code(1)
+          ,Comps_Fields.InvalidMessage_sales_price(1)
+          ,Comps_Fields.InvalidMessage_sales_price_code(1)
+          ,Comps_Fields.InvalidMessage_recording_date(1)
+          ,Comps_Fields.InvalidMessage_assessed_value_year(1)
+          ,Comps_Fields.InvalidMessage_assessed_total_value(1)
+          ,Comps_Fields.InvalidMessage_market_total_value(1)
+          ,Comps_Fields.InvalidMessage_lot_size(1)
+          ,Comps_Fields.InvalidMessage_building_area(1)
+          ,Comps_Fields.InvalidMessage_year_built(1)
+          ,Comps_Fields.InvalidMessage_no_of_stories(1)
+          ,Comps_Fields.InvalidMessage_no_of_rooms(1)
+          ,Comps_Fields.InvalidMessage_no_of_bedrooms(1)
+          ,Comps_Fields.InvalidMessage_no_of_baths(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(Comps_Layout_AVM) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.seq_Invalid := Comps_Fields.InValid_seq((SALT38.StrType)le.seq);
-    SELF.ln_fares_id_Invalid := Comps_Fields.InValid_ln_fares_id((SALT38.StrType)le.ln_fares_id);
-    SELF.unformatted_apn_Invalid := Comps_Fields.InValid_unformatted_apn((SALT38.StrType)le.unformatted_apn);
-    SELF.st_Invalid := Comps_Fields.InValid_st((SALT38.StrType)le.st);
-    SELF.zip_Invalid := Comps_Fields.InValid_zip((SALT38.StrType)le.zip);
-    SELF.zip4_Invalid := Comps_Fields.InValid_zip4((SALT38.StrType)le.zip4);
-    SELF.fips_code_Invalid := Comps_Fields.InValid_fips_code((SALT38.StrType)le.fips_code);
-    SELF.land_use_code_Invalid := Comps_Fields.InValid_land_use_code((SALT38.StrType)le.land_use_code);
-    SELF.sales_price_Invalid := Comps_Fields.InValid_sales_price((SALT38.StrType)le.sales_price);
-    SELF.sales_price_code_Invalid := Comps_Fields.InValid_sales_price_code((SALT38.StrType)le.sales_price_code);
-    SELF.recording_date_Invalid := Comps_Fields.InValid_recording_date((SALT38.StrType)le.recording_date);
-    SELF.assessed_value_year_Invalid := Comps_Fields.InValid_assessed_value_year((SALT38.StrType)le.assessed_value_year);
-    SELF.assessed_total_value_Invalid := Comps_Fields.InValid_assessed_total_value((SALT38.StrType)le.assessed_total_value);
-    SELF.market_total_value_Invalid := Comps_Fields.InValid_market_total_value((SALT38.StrType)le.market_total_value);
-    SELF.lot_size_Invalid := Comps_Fields.InValid_lot_size((SALT38.StrType)le.lot_size);
-    SELF.building_area_Invalid := Comps_Fields.InValid_building_area((SALT38.StrType)le.building_area);
-    SELF.year_built_Invalid := Comps_Fields.InValid_year_built((SALT38.StrType)le.year_built);
-    SELF.no_of_stories_Invalid := Comps_Fields.InValid_no_of_stories((SALT38.StrType)le.no_of_stories);
-    SELF.no_of_rooms_Invalid := Comps_Fields.InValid_no_of_rooms((SALT38.StrType)le.no_of_rooms);
-    SELF.no_of_bedrooms_Invalid := Comps_Fields.InValid_no_of_bedrooms((SALT38.StrType)le.no_of_bedrooms);
-    SELF.no_of_baths_Invalid := Comps_Fields.InValid_no_of_baths((SALT38.StrType)le.no_of_baths);
+    SELF.seq_Invalid := Comps_Fields.InValid_seq((SALT311.StrType)le.seq);
+    SELF.ln_fares_id_Invalid := Comps_Fields.InValid_ln_fares_id((SALT311.StrType)le.ln_fares_id);
+    SELF.unformatted_apn_Invalid := Comps_Fields.InValid_unformatted_apn((SALT311.StrType)le.unformatted_apn);
+    SELF.st_Invalid := Comps_Fields.InValid_st((SALT311.StrType)le.st);
+    SELF.zip_Invalid := Comps_Fields.InValid_zip((SALT311.StrType)le.zip);
+    SELF.zip4_Invalid := Comps_Fields.InValid_zip4((SALT311.StrType)le.zip4);
+    SELF.fips_code_Invalid := Comps_Fields.InValid_fips_code((SALT311.StrType)le.fips_code);
+    SELF.land_use_code_Invalid := Comps_Fields.InValid_land_use_code((SALT311.StrType)le.land_use_code);
+    SELF.sales_price_Invalid := Comps_Fields.InValid_sales_price((SALT311.StrType)le.sales_price);
+    SELF.sales_price_code_Invalid := Comps_Fields.InValid_sales_price_code((SALT311.StrType)le.sales_price_code);
+    SELF.recording_date_Invalid := Comps_Fields.InValid_recording_date((SALT311.StrType)le.recording_date);
+    SELF.assessed_value_year_Invalid := Comps_Fields.InValid_assessed_value_year((SALT311.StrType)le.assessed_value_year);
+    SELF.assessed_total_value_Invalid := Comps_Fields.InValid_assessed_total_value((SALT311.StrType)le.assessed_total_value);
+    SELF.market_total_value_Invalid := Comps_Fields.InValid_market_total_value((SALT311.StrType)le.market_total_value);
+    SELF.lot_size_Invalid := Comps_Fields.InValid_lot_size((SALT311.StrType)le.lot_size);
+    SELF.building_area_Invalid := Comps_Fields.InValid_building_area((SALT311.StrType)le.building_area);
+    SELF.year_built_Invalid := Comps_Fields.InValid_year_built((SALT311.StrType)le.year_built);
+    SELF.no_of_stories_Invalid := Comps_Fields.InValid_no_of_stories((SALT311.StrType)le.no_of_stories);
+    SELF.no_of_rooms_Invalid := Comps_Fields.InValid_no_of_rooms((SALT311.StrType)le.no_of_rooms);
+    SELF.no_of_bedrooms_Invalid := Comps_Fields.InValid_no_of_bedrooms((SALT311.StrType)le.no_of_bedrooms);
+    SELF.no_of_baths_Invalid := Comps_Fields.InValid_no_of_baths((SALT311.StrType)le.no_of_baths);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -67,6 +128,19 @@ EXPORT FromNone(DATASET(Comps_Layout_AVM) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -142,8 +216,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -173,7 +247,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.no_of_baths_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'seq','ln_fares_id','unformatted_apn','st','zip','zip4','fips_code','land_use_code','sales_price','sales_price_code','recording_date','assessed_value_year','assessed_total_value','market_total_value','lot_size','building_area','year_built','no_of_stories','no_of_rooms','no_of_bedrooms','no_of_baths','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_Num','Invalid_Comps','Invalid_AlphaNum','Invalid_Alpha','Invalid_Num','Invalid_Num','Invalid_Num','Invalid_LandUseCode','Invalid_Num','Invalid_SalesPriceCode','Invalid_Date','Invalid_Num','Invalid_Num','Invalid_Num','Invalid_Chars','Invalid_Num','Invalid_Num','Invalid_Chars','Invalid_Num','Invalid_Num','Invalid_Num','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.seq,(SALT38.StrType)le.ln_fares_id,(SALT38.StrType)le.unformatted_apn,(SALT38.StrType)le.st,(SALT38.StrType)le.zip,(SALT38.StrType)le.zip4,(SALT38.StrType)le.fips_code,(SALT38.StrType)le.land_use_code,(SALT38.StrType)le.sales_price,(SALT38.StrType)le.sales_price_code,(SALT38.StrType)le.recording_date,(SALT38.StrType)le.assessed_value_year,(SALT38.StrType)le.assessed_total_value,(SALT38.StrType)le.market_total_value,(SALT38.StrType)le.lot_size,(SALT38.StrType)le.building_area,(SALT38.StrType)le.year_built,(SALT38.StrType)le.no_of_stories,(SALT38.StrType)le.no_of_rooms,(SALT38.StrType)le.no_of_bedrooms,(SALT38.StrType)le.no_of_baths,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.seq,(SALT311.StrType)le.ln_fares_id,(SALT311.StrType)le.unformatted_apn,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.fips_code,(SALT311.StrType)le.land_use_code,(SALT311.StrType)le.sales_price,(SALT311.StrType)le.sales_price_code,(SALT311.StrType)le.recording_date,(SALT311.StrType)le.assessed_value_year,(SALT311.StrType)le.assessed_total_value,(SALT311.StrType)le.market_total_value,(SALT311.StrType)le.lot_size,(SALT311.StrType)le.building_area,(SALT311.StrType)le.year_built,(SALT311.StrType)le.no_of_stories,(SALT311.StrType)le.no_of_rooms,(SALT311.StrType)le.no_of_bedrooms,(SALT311.StrType)le.no_of_baths,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,21,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -181,68 +255,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Comps_Layout_AVM) prevDS = DATASET([], Comps_Layout_AVM), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'seq:Invalid_Num:ALLOW'
-          ,'ln_fares_id:Invalid_Comps:ALLOW'
-          ,'unformatted_apn:Invalid_AlphaNum:ALLOW'
-          ,'st:Invalid_Alpha:ALLOW'
-          ,'zip:Invalid_Num:ALLOW'
-          ,'zip4:Invalid_Num:ALLOW'
-          ,'fips_code:Invalid_Num:ALLOW'
-          ,'land_use_code:Invalid_LandUseCode:ENUM'
-          ,'sales_price:Invalid_Num:ALLOW'
-          ,'sales_price_code:Invalid_SalesPriceCode:ENUM'
-          ,'recording_date:Invalid_Date:CUSTOM'
-          ,'assessed_value_year:Invalid_Num:ALLOW'
-          ,'assessed_total_value:Invalid_Num:ALLOW'
-          ,'market_total_value:Invalid_Num:ALLOW'
-          ,'lot_size:Invalid_Chars:ALLOW'
-          ,'building_area:Invalid_Num:ALLOW'
-          ,'year_built:Invalid_Num:ALLOW'
-          ,'no_of_stories:Invalid_Chars:ALLOW'
-          ,'no_of_rooms:Invalid_Num:ALLOW'
-          ,'no_of_bedrooms:Invalid_Num:ALLOW'
-          ,'no_of_baths:Invalid_Num:ALLOW'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Comps_Fields.InvalidMessage_seq(1)
-          ,Comps_Fields.InvalidMessage_ln_fares_id(1)
-          ,Comps_Fields.InvalidMessage_unformatted_apn(1)
-          ,Comps_Fields.InvalidMessage_st(1)
-          ,Comps_Fields.InvalidMessage_zip(1)
-          ,Comps_Fields.InvalidMessage_zip4(1)
-          ,Comps_Fields.InvalidMessage_fips_code(1)
-          ,Comps_Fields.InvalidMessage_land_use_code(1)
-          ,Comps_Fields.InvalidMessage_sales_price(1)
-          ,Comps_Fields.InvalidMessage_sales_price_code(1)
-          ,Comps_Fields.InvalidMessage_recording_date(1)
-          ,Comps_Fields.InvalidMessage_assessed_value_year(1)
-          ,Comps_Fields.InvalidMessage_assessed_total_value(1)
-          ,Comps_Fields.InvalidMessage_market_total_value(1)
-          ,Comps_Fields.InvalidMessage_lot_size(1)
-          ,Comps_Fields.InvalidMessage_building_area(1)
-          ,Comps_Fields.InvalidMessage_year_built(1)
-          ,Comps_Fields.InvalidMessage_no_of_stories(1)
-          ,Comps_Fields.InvalidMessage_no_of_rooms(1)
-          ,Comps_Fields.InvalidMessage_no_of_bedrooms(1)
-          ,Comps_Fields.InvalidMessage_no_of_baths(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.seq_ALLOW_ErrorCount
           ,le.ln_fares_id_ALLOW_ErrorCount
@@ -293,7 +311,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.no_of_stories_ALLOW_ErrorCount
           ,le.no_of_rooms_ALLOW_ErrorCount
           ,le.no_of_bedrooms_ALLOW_ErrorCount
-          ,le.no_of_baths_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.no_of_baths_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -307,12 +325,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -327,7 +345,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -435,7 +453,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,32,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -460,12 +478,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(Comps_Layout_AVM) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_AVM, Comps_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_AVM, Comps_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -476,10 +494,10 @@ EXPORT StandardStats(DATASET(Comps_Layout_AVM) inFile, BOOLEAN doErrorOverall = 
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

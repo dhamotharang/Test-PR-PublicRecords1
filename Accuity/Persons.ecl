@@ -1,4 +1,4 @@
-export Persons := MODULE
+﻿export Persons := MODULE
 
 shared rgxBasic := '([A-Z]+)';
 shared rgxBasicX := '([A-Z-]+)';
@@ -27,6 +27,8 @@ shared rgxLcFMNick	:=
 '^' + rgxLast + ' *, *' + rgxBasicX + ' +([A-Z-]+ +\\([A-Z -]+\\))$';
 shared rgxLScF	:=
 '^' + rgxLast + ' +' + rgxSuffix + ' *, *' + rgxBasic + '$';
+shared rgxLJrcF	:=
+'^' + rgxLast + ' +' + '(JUNIOR)' + ' *, *' + rgxBasic + '$';
 shared rgxLScFM	:=
 '^' + rgxLast + ' +' + rgxSuffix + ' *, *' + rgxBasic + ' +' + rgxBasicX + '$';
 shared rgxLcFhF	:=
@@ -85,7 +87,7 @@ export NameFormat := ENUM(integer2, NoName=0,
 		LcFMM, LcFMMM, LcFMMMM, LcFMcS,LcFMS, LcScF, LcScFM,
 		LLcF, LLcFM, LLcFMM, LLcFMMM, LLcFMMMM,
 		IcF, IcFM, L, LP, LA, FLA, LcFAM, LcFMA,
-		LAcF, LAcFM, LAcFMS, Invalid
+		LAcF, LAcFM, LAcFMS, LJrcF, Invalid
 		);
 
 export GetNameFormat(string s) := 
@@ -96,6 +98,7 @@ export GetNameFormat(string s) :=
 		REGEXFIND(rgxFMML, s) => NameFormat.FMML,
 		REGEXFIND(rgxL, s) => NameFormat.L,
 		//REGEXFIND(rgxLP, s) => NameFormat.LP,
+		REGEXFIND(rgxLJrcF, s) => NameFormat.LJrcF,
 		REGEXFIND(rgxLScF, s) => NameFormat.LScF,
 		REGEXFIND(rgxLScFM, s) => NameFormat.LScFM,
 		REGEXFIND(rgxLcF, s) => NameFormat.LcF,
@@ -131,7 +134,49 @@ export GetNameFormat(string s) :=
 		NameFormat.NoName
 	);
 
-
+export GetNameFormatName(string s) := 
+	MAP(
+		REGEXFIND(rgxFL, s) => 'NameFormat.FL',
+		REGEXFIND(rgxFML, s) => 'NameFormat.FML',
+		REGEXFIND(rgxFLNick, s) => 'NameFormat.FLNick',
+		REGEXFIND(rgxFMML, s) => 'NameFormat.FMML',
+		REGEXFIND(rgxL, s) => 'NameFormat.L',
+		//REGEXFIND(rgxLP, s) => 'NameFormat.LP',
+		REGEXFIND(rgxLJrcF, s) => 'NameFormat.LJrcF',
+		REGEXFIND(rgxLScF, s) => 'NameFormat.LScF',
+		REGEXFIND(rgxLScFM, s) => 'NameFormat.LScFM',
+		REGEXFIND(rgxLcF, s) => 'NameFormat.LcF',
+		REGEXFIND(rgxLcFS, s) => 'NameFormat.LcFS',
+		REGEXFIND(rgxLcFNick, s) => 'NameFormat.LcFNick',
+		REGEXFIND(rgxLcFMNick, s) => 'NameFormat.LcFMNick',
+		REGEXFIND(rgxLcFhF, s) => 'NameFormat.LcFhF',
+		REGEXFIND(rgxLcFBen, s) => 	'NameFormat.LcFBen',
+		REGEXFIND(rgxLcFMBen, s) => 	'NameFormat.LcFMBen',
+		REGEXFIND(rgxLcFMS, s) => 'NameFormat.LcFMS',
+		REGEXFIND(rgxLcFMcS, s) => 'NameFormat.LcFMcS',
+		REGEXFIND(rgxLcScF, s) => 'NameFormat.LcScF',
+		REGEXFIND(rgxLcScFM, s) => 'NameFormat.LcScFM',
+		REGEXFIND(rgxLcFM, s) => 'NameFormat.LcFM',
+		REGEXFIND(rgxLcFMM, s) => 'NameFormat.LcFMM',
+		REGEXFIND(rgxLcFMMM, s) => 'NameFormat.LcFMMM',
+		REGEXFIND(rgxLcFMMMM, s) => 'NameFormat.LcFMMMM',
+		REGEXFIND(rgxFLA, s) => 'NameFormat.FLA',
+		REGEXFIND(rgxLA, s) => 'NameFormat.LA',
+		REGEXFIND(rgxLAcF, s) => 'NameFormat.LAcF',
+		REGEXFIND(rgxLAcFM, s) => 'NameFormat.LAcFM',
+		REGEXFIND(rgxLAcFMS, s) => 'NameFormat.LAcFMS',
+		REGEXFIND(rgxLcFAM, s) => 'NameFormat.LcFAM',
+		REGEXFIND(rgxLcFMA, s) => 'NameFormat.LcFMA',
+		REGEXFIND(rgxLLcF, s) => 'NameFormat.LLcF',
+		REGEXFIND(rgxLLcFM, s) => 'NameFormat.LLcFM',
+		REGEXFIND(rgxLLcFMM, s) => 'NameFormat.LLcFMM',
+		REGEXFIND(rgxLLcFMMM, s) => 'NameFormat.LLcFMMM',
+		REGEXFIND(rgxLLcFMMMM, s) => 'NameFormat.LLcFMMMM',
+		REGEXFIND(rgxIcF, s) => 'NameFormat.IcF',
+		REGEXFIND(rgxIcFM, s) => 'NameFormat.IcFM',
+		REGEXFIND('[0-9]', s) => 'NameFormat.Invalid',
+		'NameFormat.NoName'
+	);
 
 shared string50 blank20 := ' ';
 shared string6 blank5 := ' ';
@@ -181,7 +226,7 @@ shared string155 FormatNameLS(string rgx, string name, integer lnm, integer sfx)
 	(string6)REGEXFIND(rgx, name, sfx);
 
 cleanupsfx(string s) := MAP(
-	REGEXFIND('\\(SENIOR\\)', s) => REGEXREPLACE('(\\(SENIOR\\))', s, 'SR'),
+	REGEXFIND('\\(?SENIOR\\)?', s) => REGEXREPLACE('(\\(?SENIOR\\)?)', s, 'SR'),
 	REGEXFIND('\\(JUNIOR\\)', s) => REGEXREPLACE('(\\(JUNIOR\\))', s, 'JR'),
 	REGEXFIND('\\(SR\\)', s) => REGEXREPLACE('(\\(SR\\))', s, 'SR'),
 	REGEXFIND('\\(JR\\)', s) => REGEXREPLACE('(\\(JR\\))', s, 'JR'),
@@ -213,6 +258,7 @@ export string161 CleanName(string rawname) := FUNCTION
 			NameFormat.LcScF => 	FormatNameFLS(rgxLcScF, s, 5, 1, 4),
 			NameFormat.LcScFM => FormatNameFMLS(rgxLcScFM, s, 5, 6, 1, 4),
 			NameFormat.LcFMcS => FormatNameFMLS(rgxLcFMcS, s, 4, 5, 1, 6),
+			NameFormat.LJrcF => 	FormatNameFML(rgxLJrcF, s, 5, 1, 4),
 			NameFormat.LScF => 	FormatNameFLS(rgxLScF, s, 5, 1, 4),
 			NameFormat.LScFM => 	FormatNameFMLS(rgxLScFM, s, 5, 6, 1, 4),
 			NameFormat.LcF => 	FormatNameFL(rgxLcF, s, 4, 1),
@@ -297,5 +343,4 @@ export string LastName(string name) := MAP(
 	;
 export string FullName(string name) := '';
 	
-
 END;

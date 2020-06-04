@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add;
+import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -59,5 +59,9 @@ transform
 	self := l;
 end;
 
-export BDID_2025_Trade_Quarterly_Averages := project(BDID_Append, tLayout_2025_Trade_Quarterly_Averages_Base(left))
+projectBase  := project(BDID_Append, tLayout_2025_Trade_Quarterly_Averages_Base(left));
+
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export BDID_2025_Trade_Quarterly_Averages := addGlobalSID
 	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

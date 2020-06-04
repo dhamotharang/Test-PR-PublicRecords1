@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 
 punctAtEnd := '[ .,+;?_*:#%"/\\x00]$';		// random punctuation at end
 
@@ -74,7 +74,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 			'ND' => 'II',
 			'3D' => 'III',
 			'3RD' => 'III',
-			'RD' => 'III',
+			//'RD' => 'III',
 			'3 D' => 'III',
 			'3 I' => '',
 			'4TH' => 'IV',

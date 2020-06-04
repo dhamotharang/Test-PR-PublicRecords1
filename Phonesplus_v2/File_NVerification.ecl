@@ -1,5 +1,5 @@
-// file run through Neustar's phone verificaton process
-import address, aid, nid, ut, DID_Add, header_slimsort,  didville;
+﻿// file run through Neustar's phone verificaton process
+import address, aid, nid, DID_Add, header_slimsort,  didville, data_services;
 EXPORT File_NVerification := module
 
 EXPORT Layout_in := RECORD
@@ -34,7 +34,7 @@ EXPORT Layout_Out := RECORD
 	unsigned did_score := 0;
 END;
 
-EXPORT Input := project(DATASET(ut.foreign_prod + 'thor_data400::in::cell_test_20140606_OUT',Layout_In,
+EXPORT Input := project(DATASET(data_services.foreign_prod + 'thor_data400::in::cell_test_20140606_OUT',Layout_In,
 										CSV(HEADING(1), SEPARATOR(','), QUOTE('"'), MAXLENGTH(100000))) (EID_3261STRING in ['2', '3', '4'] ),
 										transform({Layout_in, string file_dt}, self.file_dt := '20140606', self := left));
 										

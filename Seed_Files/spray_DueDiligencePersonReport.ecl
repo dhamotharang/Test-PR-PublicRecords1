@@ -1,18 +1,22 @@
 ﻿/*******************************************************************************************************************
- Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/duediligence_report_test_seed/filedate
+ Spray 20 test seed data files onto THOR from CargoDayton /data/testseed_prod/filedate
 ********************************************************************************************************************/
 IMPORT Versioncontrol, _Control, tools, STD;
 
 
-EXPORT spray_DueDiligencePersonReport(string filedate,
-                                      boolean	pIsTesting	= false,
-                                      string		pServer			= _Control.IPAddress.bctlpedata12,
-                                      string		pDir				= '/data/hds_2/duediligence_report_test_seed/'+filedate+'/',
-                                      string 	pGroupName 	= STD.System.Thorlib.Group()) := FUNCTION
+EXPORT spray_DueDiligencePersonReport(STRING filedate,
+                                      BOOLEAN pIsTesting = FALSE,
+                                      STRING pServer = _Control.IPAddress.CargoDayton,
+                                      STRING pDir = '/data/testseed_prod/'+filedate+'/',
+                                      STRING pGroupName = STD.System.Thorlib.Group()) := FUNCTION
+
+
+  SHARED baseFileLocation := '~thor_data400::base::dueDiligencePersonReport_testseed_';
+
 
 	setupSuperFiles(STRING keyname) := FUNCTION
 
-		sfile := '~thor_data400::base::dueDiligencePersonReport_testseed_' + keyname;
+		sfile := baseFileLocation + keyname;
 		RETURN SEQUENTIAL(
 							FileServices.StartSuperFileTransaction(),
 							IF(FileServices.FileExists(sfile),FileServices.ClearSuperFile(sfile,true),FileServices.CreateSuperFile(sfile)),
@@ -20,8 +24,8 @@ EXPORT spray_DueDiligencePersonReport(string filedate,
 							);
 	END;
 	
-	flfile(string pkeyword) := '~thor_data400::in::testseed::' + filedate + '::duediligencepersonreport::' + pkeyword;
-  fsfile(string pkeyword) := '~thor_data400::base::dueDiligencePersonReport_testseed_' + pkeyword;
+  flfile(STRING pkeyword) := '~thor_data400::in::testseed::' + filedate + '::duediligencepersonreport::' + pkeyword;
+  fsfile(STRING pkeyword) := baseFileLocation + pkeyword;
 	
 	spry_raw:=DATASET([
 		 {pServer,pDir,'DueDiligencePersonReport_testseeds_BestInfo.csv'							,0 ,flfile('BestInfo'			),[{fsfile('BestInfo'			)}],pGroupName,filedate,'','VARIABLE'}

@@ -23,4 +23,7 @@ EXPORT Constants	:= MODULE
 	
 	EXPORT fields_to_clear_main_id_fcra 	:=  LiensV2.Constants.fields_to_clear_main_id_fcra;
 	EXPORT fields_to_clear_party_id_fcra 	:= LiensV2.Constants.fields_to_clear_party_id_fcra;
+	
+	export dops_name                    :='LiensV2Keys';
+ export fcra_dops_name                :='FCRA_LiensV2Keys';
 END;

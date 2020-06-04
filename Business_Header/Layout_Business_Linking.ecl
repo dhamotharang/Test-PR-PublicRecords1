@@ -86,6 +86,10 @@ export Company_ := record
  string25		match_geo_city:='';
  string9   	duns_number 	:=	'';
  string100 	source_docid	:=	'';
+ string10      employee_count_org_raw := '';
+ string28      revenue_org_raw        := '';
+ string10      employee_count_local_raw := '';
+ string28      revenue_local_raw        := '';
 end;
 
 export Contact := record

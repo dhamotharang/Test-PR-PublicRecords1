@@ -24,13 +24,15 @@ EXPORT WorkunitTimingDetails(string esp
 		string state;
 		string starttime := '';
 		string endtime := '';
-		integer totaltime := 0;
-		integer totalthortime := 0;
-		integer totalprocesstime := 0;
-		integer totaldfutime := 0;
+		unsigned8 totalcompiletime := 0;
+		unsigned8 totaltime := 0;
+		unsigned8 totalthortime := 0;
+		unsigned8 totalprocesstime := 0;
+		unsigned8 totaldfutime := 0;
 		string dfujobid := '';
-		dataset(lib_workunitservices.WsTiming) wutimings;
-		dataset(lib_workunitservices.WsTimeStamp) wutimestamp;
+		integer cnt := 0;
+		dataset(lib_workunitservices.WsStatistic) dfuids;
+		//dataset(lib_workunitservices.WsTimeStamp) wutimestamp;
 	end;
 	
 	export rDataVizInfo := record, maxlength(20000)
@@ -53,7 +55,7 @@ EXPORT WorkunitTimingDetails(string esp
 		
 	end;
 	
-	export GetWUList() := sort(lib_workunitservices.WorkunitServices.workunitlist
+	export GetWUList() := sort(STD.System.Workunit.workunitlist
 														(lowwuid := startwu 
 															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states and job <> ''), wuid);
 	
@@ -62,30 +64,10 @@ EXPORT WorkunitTimingDetails(string esp
 	export GetDetails() := function
 	
 		dGetWUList := GetWUList();
-		
+		// DUS-519
 		rWUTimingDetails xConvertToLocalLayout(dGetWUList l) := transform
-			
-			self.wuid := l.wuid;
-			self.clustername := l.cluster;
-			self.wutimings := sort(lib_workunitservices.workunitServices.WorkunitTimings(trim(l.wuid,left,right)),name,-duration);
-			self.wutimestamp := lib_workunitservices.WorkunitServices.WorkunitTimeStamps(trim(l.wuid,left,right));
-			self := l;
-		end;
-		
-		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left));
-		
-		rWUTimingDetails xGetDFUWUIDs(dWUTimingDetails l,lib_workunitservices.WsTiming r) := transform
-			self.dfujobid := if (regexfind('SPRAY',std.str.touppercase(trim(r.name,left,right)),nocase)
-														,STD.Str.SplitWords(r.name,'(')[1]
-														,'');
-			self := l;
-		end;
-		
-		dGetDFUWUIDs := dedup(sort(normalize(dWUTimingDetails,left.wutimings,xGetDFUWUIDs(left,right)),wuid), record);
-		
-		rDataVizInfo xCaptureTimings(dGetDFUWUIDs l,integer c) := transform
-			s_time := l.wutimestamp(trim(id,left,right) = 'Created')[1].time;
-			e_time := sort(l.wutimestamp(trim(id,left,right) = 'QueryFinished'),-time)[1].time;
+			s_time := min(STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Created' and application = ''),time);
+			e_time := max(STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = ''),time);
 			startseconds := if (s_time <> '',STD.Date.SecondsFromParts((integer)s_time[1..4]
 																												,(integer)s_time[6..7]
 																												,(integer)s_time[9..10]
@@ -102,11 +84,12 @@ EXPORT WorkunitTimingDetails(string esp
 																												,(integer)e_time[18..19]
 																												,true)
 																						,0);
-			thortime := (unsigned8)(l.wutimings(trim(name,left,right) = 'Total thor time' or trim(name,left,right) = 'Total cluster time')[1].duration / 1000);
-			processtime := (unsigned8)(l.wutimings(trim(name,left,right) = 'Process')[1].duration / 1000);
-			compiletime := (unsigned8)(l.wutimings(trim(name,left,right) = 'compile')[1].duration / 1000);
+			thortime := (unsigned8)(SUM(STD.System.Workunit.WorkunitStatistics(trim(l.wuid),false,'nested[0],stype[graph],stat[TimeElapsed]'),value) / 1000000000);
+			processtime := (unsigned8)(SUM(STD.System.Workunit.WorkunitStatistics(trim(l.wuid),false,'nested[0],stat[TimeTotalExecute]')(scope = 'Process'),value) / 1000000000);
+			compiletime := (unsigned8)(SUM(STD.System.Workunit.WorkunitStatistics(trim(l.wuid),false,'nested[0],scope[compile],stat[TimeElapsed]'),value) / 1000000000);
 			totaltime := if (endseconds > startseconds, endseconds - startseconds, startseconds - endseconds);
-			dfutime := (unsigned8)(SUM(l.wutimings(regexfind('SPRAY',std.str.touppercase(trim(name,left,right)),nocase)),duration) / 1000);
+			dfutime := (unsigned8)(SUM(STD.System.Workunit.WorkunitStatistics(trim(l.wuid),false,'nested[0],stat[TimeElapsed]')(scopetype = 'dfu'),value) / 1000000000);
+			
 			self.starttime := s_time;
 			self.endtime := e_time;
 			self.totaltime := totaltime;
@@ -114,6 +97,30 @@ EXPORT WorkunitTimingDetails(string esp
 			self.totalprocesstime :=  processtime;
 			self.totaldfutime := dfutime;
 			self.totalcompiletime := compiletime;
+			self.wuid := l.wuid;
+			self.clustername := l.cluster;
+			// self.wutimings := STD.System.Workunit.WorkunitStatistics(trim(l.wuid,left,right));
+			// self.wutimestamp := STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right));
+			self.dfuids := STD.System.Workunit.WorkunitStatistics(trim(l.wuid),false,'nested[0],stat[TimeElapsed]')(scopetype = 'dfu');
+			self := l;
+		end;
+		
+		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left)) : independent;
+		
+		rWUTimingDetails xGetDFUWUIDs(dWUTimingDetails l,lib_workunitservices.WsStatistic r) := transform
+			getcount := STD.Str.CountWords(r.scope,'-');
+			self.dfujobid := STD.Str.SplitWords(r.scope,'-')[getcount-1]+'-'+STD.Str.SplitWords(r.scope,'-')[getcount];
+			self.cnt := getcount;
+			self := l;
+		end;
+		
+		dGetDFUWUIDs_temp := dedup(sort(normalize(dWUTimingDetails(count(dfuids) > 0),left.dfuids,xGetDFUWUIDs(left,right)),wuid), record);
+		dGetDFUWUIDs := dGetDFUWUIDs_temp + dWUTimingDetails(count(dfuids) = 0);
+		// dGetDFUWUIDs := normalize(dWUTimingDetails,left.dfuids,xGetDFUWUIDs(left,right));
+		
+		rDataVizInfo xCaptureTimings(dGetDFUWUIDs l,integer c) := transform
+			
+			
 			self.cnt := c;
 			self.job := regexreplace('[\'â]',l.job,'');
 			self := l;

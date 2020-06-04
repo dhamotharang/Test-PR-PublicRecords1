@@ -9,7 +9,7 @@ cfna_base                        := files().base.cfna.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(cfna_base, cfna_base_idl);
 
-dist_cfna                        := DISTRIBUTE(cfna_base_idl, hash(Application_ID));
+dist_cfna                        := DISTRIBUTE(cfna_base_idl, hash32(Application_ID));
 
 
 //#########################################################################################################################################
@@ -19,7 +19,7 @@ erie_base                        := files().base.erie.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(erie_base, erie_base_idl);
 
-dist_erie                        := DISTRIBUTE(erie_base_idl, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));
+dist_erie                        := DISTRIBUTE(erie_base_idl, hash32(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));
 
 //#########################################################################################################################################
 //------------------------------------------------------- ERIE WatchList -------------------------------------------------------------------------
@@ -28,7 +28,7 @@ erieWL_base                        := files().base.ErieWatchList.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(erieWL_base, erieWL_base_idl);
 
-dist_erieWL                        := DISTRIBUTE(erieWL_base_idl, hash(alertnumber, firstname, lastname, business_name, ssn,  dob, validstartDate, entity ));
+dist_erieWL                        := DISTRIBUTE(erieWL_base_idl, hash32(alertnumber, firstname, lastname, business_name, ssn,  dob, validstartDate, entity ));
 
 //#########################################################################################################################################
 //------------------------------------------------------- GLB5 -------------------------------------------------------------------------
@@ -37,7 +37,7 @@ glb5_base                        := files().base.glb5.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(glb5_base, glb5_base_idl);
 
-dist_glb5                        := DISTRIBUTE(glb5_base_idl, hash(transaction_id));
+dist_glb5                        := DISTRIBUTE(glb5_base_idl, hash32(orig_company_id));
 
 //#########################################################################################################################################
 //------------------------------------------------------- OIG -------------------------------------------------------------------------
@@ -46,7 +46,7 @@ oig_base                        := files().base.oig.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(oig_base, oig_base_idl);
 
-dist_oig                        := DISTRIBUTE(oig_base_idl, hash64(did, bdid));
+dist_oig                        := DISTRIBUTE(oig_base_idl, hash32(did, bdid));
 
 //#########################################################################################################################################
 //------------------------------------------------------- TextMinedCrim -------------------------------------------------------------------------
@@ -55,7 +55,7 @@ TextMinedCrim_base                        := files().base.TextMinedCrim.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(TextMinedCrim_base, TextMinedCrim_base_idl);
 
-dist_TextMinedCrim                        := DISTRIBUTE(TextMinedCrim_base_idl, hash(did));
+dist_TextMinedCrim                        := DISTRIBUTE(TextMinedCrim_base_idl, hash32(did));
 
 //#########################################################################################################################################
 //------------------------------------------------------- TIGER -------------------------------------------------------------------------
@@ -64,7 +64,7 @@ tiger_base                        := files().base.tiger.qa;
 
 FraudDefenseNetwork.Mac_LexidAppend(tiger_base, tiger_base_idl);
 
-dist_tiger                        := DISTRIBUTE(tiger_base_idl, hash(did));
+dist_tiger                        := DISTRIBUTE(tiger_base_idl, hash32(did));
 
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_cfna, FileNames().Fdn_Prefix, 'CFNA', pversion, cfna_base_out, 3, false, true);
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_erie, FileNames().Fdn_Prefix, 'ERIE', pversion, erie_base_out, 3, false, true);

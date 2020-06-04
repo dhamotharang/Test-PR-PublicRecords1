@@ -12,3 +12,6 @@
 	//****** Push infile through transform above
 	RETURN ITERATE(infile,%tra%(LEFT,RIGHT),LOCAL);
 ENDMACRO;
+ 
+ 
+

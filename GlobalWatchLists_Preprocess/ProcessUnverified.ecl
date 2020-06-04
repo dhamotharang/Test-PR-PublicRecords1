@@ -1,4 +1,4 @@
-import std, address, bo_address, ut;
+﻿import std, address, bo_address, ut;
 
 EXPORT ProcessUnverified := FUNCTION
 
@@ -22,10 +22,13 @@ EXPORT ProcessUnverified := FUNCTION
 	PATTERN Number		:=	PATTERN('[0-9]');
 	PATTERN Numbers 	:=	Number+;
 	PATTERN Comma			:=	[','];
+	PATTERN Slash			:=	['/'];
 	PATTERN	Month			:=	['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
 	PATTERN	FR				:=	['FR'];
 	PATTERN	Citation	:=	Number Number ws FR ws Numbers;
-	PATTERN	Dates			:=	Month ws Numbers Comma ws Numbers;
+	PATTERN	Date1			:=	Month ws Numbers Comma ws Numbers;
+	PATTERN Date2			:=	Numbers Slash Numbers Slash Numbers;
+	PATTERN Dates			:=	(Date1|Date2);
 	RULE		CitationDate	:=	Citation ws+ Dates ws*;
 
 	l_parse	:=	RECORD

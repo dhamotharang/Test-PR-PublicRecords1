@@ -1,206 +1,160 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
-	export CorporationLayoutIn 							:= Record
-			string 		corporationid;
-			string 		entityid;
-			string 		corporationtypeid;
-			string 		corporationstatusid;
-			string 		corporationnumber;
-			string 		citizenship;
-			string 		dateformed;
-			string 		dissolvedate;
-			string 		duration;
-			string 		countyofincorporation;
-			string 		stateofincorporation;
-			string 		countryofincorporation;
-			string 		purpose;
-			string 		profession;
-			string 		registeredagentname;
-			string 		lf;
+  	export CorporationLayoutIn 							:= Record
+			string 		Businessid;                             
+			string 		BusinessName;                           
+			string    HomeStateName;                         
+			string    BusinessStatus;                         
+			string    BusinessType;                           
+			string    CreationDate;                           
+			string 		DateInJurisdiction;                     
+			string 		Duration;                               
+			string    ManagementStyle;                        
+			string 		FiscalYearDate;                         
+			string    CitizenStateOfInc;                      
+			string    LastBenefitRptYear;                     
+			string    NextBenefitRptYear;                     
+			string    LastAnnRptYear;                         
+			string    NextAnnRptYear;                         
+			string    BusinessEmail;                          
+			string 		NotificationEmail;                      
+			string 		PhoneNumber;                            
+		//	string 		lf;
 	end;
 	
-	export CorporationLayoutBase 						:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			CorporationLayoutIn;
-	end; 
-
 	export AddressLayoutIn 									:= Record
-			string 		addressid;
-			string 		corporationid;
-			string 		addresstypeid;
-			string 		address1;
-			string 		address2;
-			string 		address3;
-			string 		city;
-			string 		state;
-			string 		zip;
-			string 		county;
-			string 		country;
+			string 		Businessid;                             
+			string 		PrinOfficeAddress;                      
+			string 		PrinOfficeAddress2;                     
+			string 		PrinOfficeCity;                         
+			string 		PrinOfficeState;                        
+			string 		PrinOfficeZip;                          
+			string 		PrinOfficeCounty;                       
+			string 		PrinOfficeCountry;                      
+			string 		MailingAddress;                         
+			string 		MailingAddress2;                        
+			string 		MailingCity;                            
+			string 		MailingState;                           
+			string 		MailingZip;                             
+			string 		MailingCounty;                          
+			string 		MailingCountry;                         
 			string 		lf;
 	end;
 		
-	export AddressLayoutBase 								:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			AddressLayoutIn;
-	end;
-
-	export FilingLayoutIn 									:= Record
-			string 		filingid;
-			string 		corporationid;
-			string 		documentid;
-			string 		documenttypeid;
-			string 		filingdate;
-			string 		effectivedate;
+	export FilingLayoutIn 						  		:= Record
+			string 		Businessid;                             
+			string 		FilingDateTime;                         
+			string 		EffectiveDateTime;                          
+			string 		FilingType;                             
+			string 		FilingNumber;                          
 			string 		lf;
 	end;
 		
-	export FilingLayoutBase 								:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			FilingLayoutIn;
-	end;
-
-	export MergerLayoutIn 									:= Record
-			string 		mergerid;
-			string 		survivorcorporationid;
-			string 		mergedcorporationid;
-			string 		mergerdate;
-			string 		lf;
-		END;
-
-	export MergerLayoutBase 								:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			MergerLayoutIn;
-	end;
-	
-	export CorporationNameLayoutIn 					:= Record
-			string 		mergerid;
-			string 		corporationid;
-			string 		corpname;
-			string 		nametypeid;
-			string 		title;
-			string 		salutation;
-			string 		prefix;
-			string 		lastname;
-			string 		middlename;
-			string 		firstname;
-			string 		suffix;
-			string 		lf;
-	end;
-		
-	export CorporationNameLayoutBase 				:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			CorporationNameLayoutIn;
-	end;
-
-	export OfficerLayoutIn 									:= Record
-			string 		officerid;
-			string 		corporationid;
-			string 		officertitle;
-			string 		salutation;
-			string 		name;
-			string 		address1;
-			string 		address2;
-			string 		address3;
-			string 		city;
-			string 		state;
-			string 		zip;
-			string 		countryname;
-			string 		ownerpercentage;
-			string 		transferrealestate;
-			string 		foreignaddress;
-			string 		lf;
-	end;
-
-	export OfficerLayoutBase 								:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			OfficerLayoutIn;
-	end;
-	
-	export StockLayoutIn 										:= Record
-			string 		stockid;
-			string 		corporationid;
-			string 		stockclassid;
-			string 		authorizedshares;
-			string 		issuedshares;
-			string 		series;
-			string 		npvflag;
-			string 		parvalue;
+	export PrevNamesLayoutIn 			  		:= Record
+			string 		Businessid;                             
+			string 		PreviousName;                           
+			string 		PreviousNameType;                       
 			string 		lf;
 	end;
 	
-	export StockLayoutBase 									:= Record
-			string1		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			StockLayoutIn;
+	export PrincipalsLayoutIn 						 	:= Record
+			string 		Businessid;                             
+			string 		PrincipalName;                          
+			string 		PrincipalTitle;                         
+			string 		PrincipalAddress;                       
+			string 		PrincipalAddress2;                      
+			string 		PrincipalCity;                          
+			string 		PrincipalState;                         
+			string 		PrincipalZip;                           
+			string 		PrincipalCounty;                        
+			string 		PrincipalCountry;                       
+			string 		lf;
+	end;
+
+	export PrinPurposeLayoutIn 			  		    := Record
+			string 		Businessid;                             
+			string 		NAICSCode;                              
+			string 		NAICSSubCode;                           
+			string    Profession;                             
+			string 		lf;
 	end;
 	
-	//Lookup Tables	
-	export TableLayoutIn										:= Record
-			string 		tablecode;
-			string 		tabledesc;
+	export RegAgentLayoutIn 			  	      := Record
+			string 		BusinessID;                             
+			string 		RegAgentName;                           
+			string 		RegAgentType;                          
+			string 		RAPrinOfficeAddress;                      
+			string 		RAPrinOfficeAddress2;                     
+			string 		RAPrinOfficeCity;                         
+			string 		RAPrinOfficeState;                        
+			string 		RAPrinOfficeZip;                          
+			string 		RAPrinOfficeCounty;                       
+			string 		RAPrinOfficeCountry;                      
+			string 		RAMailingAddress;                         
+			string 		RAMailingAddress2;                        
+			string 		RAMailingCity;                            
+			string 		RAMailingState;                           
+			string 		RAMailingZip;                             
+			string 		RAMailingCounty;                         
+			string 		RAMailingCountry;                         
+			string 		lf;
 	end;
 	
-	export OffPartyTypeTableLayoutIn				:= Record
-			string 		offpartytypeid;
-			string 		offid;
-			string 		partytypeid;
+	export StockLayoutIn 						  		:= Record
+			string 		Businessid;                             
+			string 		ShareClass;                             
+			string 		NumberOfShares;                         
+			string 		ParValue;                               
+			string 		Note;                                   
+//			string 		lf;
 	end;
 	
-	//Temporary Layouts
-	export TempCorporationLayoutIn					:= Record
+	/////////////////////
+	//TEMPORARY LAYOUTS
+	/////////////////////
+	export TempCorporationLayoutIn				:= Record
 		CorporationLayoutIn;
-		AddressLayoutIn 				- [corporationid, lf];
-		CorporationNameLayoutIn - [corporationid, lf];
-		string 		corptypecode;
-		string		corptypedesc;
-		string 		nametypecode;
-		string		nametypedesc;
-		string 		statuscode;
-		string		statusdesc;
-		string 		survivor_mergerid;
-		string 		survivor_survivorcorporationid;
-		string 		survivor_mergedcorporationid;
-		string 		survivor_mergerdate;
-		string 		nonsurvivor_mergerid;
-		string 		nonsurvivor_survivorcorporationid;
-		string 		nonsurvivor_mergedcorporationid;
-		string 		nonsurvivor_mergerdate;
+		AddressLayoutIn 				- [Businessid, lf];
+		PrincipalsLayoutIn 		  - [Businessid, lf];
+    PrinPurposeLayoutIn 		- [Businessid, lf];
+		//RegAgentLayoutIn        - [Businessid, lf];
+    string    NormBusinessName;
+		string    NormBusinessTypeCode;
+		string    NormFilingCode;
+		string    NormDateInJurisdiction;
+		string    NormRAName;
+		string    NormRAType;
+    string    NormRAAddressType;		
+		string 		NormRAAddress;                      
+		string 		NormRAAddress2;                     
+		string 		NormRACity;                         
+		string 		NormRAState;                        
+		string 		NormRAZip;                          
+    string 		NormRACountry; 
+		string 		NormRACounty; 
+		string    NormRAPrinCounty;
+		string    NormRAPrinCountry;
 	end;
 
-	export TempFilingWithCorpLayoutIn				:= Record
+  export TempFilingWithCorpLayoutIn				:= Record
 		CorporationLayoutIn;	
-		FilingLayoutIn					- [corporationid, lf];
-		string 		docidcode;
-		string		dociddesc;			
+		FilingLayoutIn					- [Businessid, lf];
+		string10 FilingDate;
 	end;
-
-	export TempStockWithCorpLayoutIn				:= Record
-		CorporationLayoutIn;
-		StockLayoutIn 					- [corporationid, lf];
-		string 		stockclasscode;
-		string		stockclassdesc;			
+  
+		export TempRALayoutIn				:= Record
+		string    Businessid;
+		string    NormRAName;
+		string    NormRAType;
+    string    NormRAAddressType;		
+		string 		NormRAAddress;                      
+		string 		NormRAAddress2;                     
+		string 		NormRACity;                         
+		string 		NormRAState;                        
+		string 		NormRAZip;                          
+    string 		NormRACountry; 
+		string 		NormRACounty; 
+		string    NormRAPrinCounty;
+		string    NormRAPrinCountry;
 	end;
-
-	export TempContactsLayoutIn							:= Record
-		CorporationLayoutIn;
-		CorporationNameLayoutIn	- [corporationid, lf];
-		OfficerLayoutIn					- [corporationid, lf];
-		OffPartyTypeTableLayoutIn;
-		string 		partytypecode;
-		string 		partytypedesc;		
-	end;
-
 end;

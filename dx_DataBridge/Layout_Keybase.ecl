@@ -1,5 +1,5 @@
 ﻿IMPORT Address, AID, BIPV2;
-
+            
 //KeyBase includes all fields except for web_address and email. 
 //The parsed web_address and email (if present and valid) are included
   EXPORT Layout_Keybase := RECORD
@@ -46,8 +46,8 @@
 		string20	city;
 		string2	  state;
 		string3	  scf;
-		string5	  zip;
-		string4	  zip4;
+		string5	  zip_code5;
+		string4	  zip_code4;
 		string1	  mail_score;
 		string3	  area_code;
 		string10	telephone_number;

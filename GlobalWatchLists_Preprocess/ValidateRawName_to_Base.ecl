@@ -13,8 +13,8 @@ ProdBase := dataset('~thor_data400::base::globalwatchlists',Globalwatchlists.Lay
 //1==========================================================================================
 // US Bureau of Industry and Security - Denied Person List
 
-DeniedPersonsraw := GlobalWatchLists_Preprocess.Files.dsDeniedPersons; //raw
-DeniedPersonsbase:= ProdBase(source = 'US Bureau of Industry and Security - Denied Person List');
+DeniedPersonsraw := GlobalWatchLists_Preprocess.Files.dsDeniedPersons(TRIM(name,all) <> ''); //raw
+DeniedPersonsbase:= ProdBase(source = 'US Bureau of Industry and Security - Denied Person List' AND TRIM(orig_pty_name,ALL) <> '');
 
 jDP := join(DeniedPersonsraw,DeniedPersonsbase,
             STD.Str.FindReplace(if(length(TRIM(left.Name, left, right)) > 54 and STD.Str.Find(TRIM(left.Name, left, right), ',', 1) > 1
@@ -30,8 +30,8 @@ jDP_out	:= IF(MissingDP > 0, FAIL(MissingDP + ' DeniedPerson_InRaw_notbase'));
 output(jdp,named('DeniedPerson_InRaw_notbase'));
 //2==========================================================================================
 // Office of the Comptroller of the Currency Alerts
-InnovativeSysOCCraw     := GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsOCC;
-InnovativeSysOCCBase := ProdBase(source = 'Office of the Comptroller of the Currency Alerts ');			
+InnovativeSysOCCraw     := GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsOCC(TRIM(serial_number,all) <> '');
+InnovativeSysOCCBase := ProdBase(source = 'Office of the Comptroller of the Currency Alerts ' AND TRIM(entity_id,ALL) <> '');			
 
 jISOCC := join(InnovativeSysOCCraw,InnovativeSysOCCBase,
             trim(left.application_code)+trim(left.serial_number) = right.entity_id,
@@ -46,7 +46,7 @@ output(jISOCC,named('InnovativeSysOCC_InRaw_notbase'));
 // State Department Terrorist Exclusions 
 StDeptTerroristsraw     := GlobalWatchLists_Preprocess.Files.dsStDeptTerroristExcl(~REGEXFIND('(^Loading |^Orignal |^Number |^Author |^Writing |^Minrow=0 |Extract Date)(.*)',Organization)
 																																	and trim(Organization,all) <> '');
-StDeptTerroristsBase    := ProdBase(source = 'State Department Terrorist Exclusions');			
+StDeptTerroristsBase    := ProdBase(source = 'State Department Terrorist Exclusions' AND TRIM(orig_pty_name,ALL) <> '');			
 
 jSDT := join(StDeptTerroristsraw,StDeptTerroristsBase,
              ut.CleanSpacesAndUpper(STD.Str.FilterOut(REGEXREPLACE('\\((.*)\\)',left.organization,''),'"')) = right.orig_pty_name,
@@ -60,7 +60,7 @@ output(jSDT,named('StDeptTerroristExclusions_InRaw_notbase'));
 //4=========================================================================================
 // European Union Designated Terrorist Individuals
 EUDTIraw   := GlobalWatchLists_Preprocess.Files.dsEUterroristListPerson;
-EUDTIBase  := ProdBase (source = 'European Union Designated Terrorist Individuals');
+EUDTIBase  := ProdBase (source = 'European Union Designated Terrorist Individuals' AND TRIM(pty_key,ALL) <> '');
 
 ds_person	:= EUDTIraw(~REGEXFIND('(^Loading |^Orignal |^Number |^Author |^Writing |^Minrow=0 |Extract Date)(.*)',Sflag) and trim(Line,all) <> '');
 
@@ -76,7 +76,7 @@ output(jEUDTI,named('EU_Designated_Terrorist_Indiv_InRaw_notbase'));
 //5===========================================================================================
 // European Union Designated Terrorist Groups 			
    EUDTGRaw   := GlobalWatchLists_Preprocess.Files.dsEUterroristListGroup;
-   EUDTGBase  := ProdBase(source = 'European Union Designated Terrorist Groups');		
+   EUDTGBase  := ProdBase(source = 'European Union Designated Terrorist Groups' AND TRIM(pty_key,ALL) <> '');		
 	
 	ds_group	:= EUDTGRaw(~REGEXFIND('(^Loading |^Orignal |^Number |^Author |^Writing |^Minrow=0 |Extract Date)(.*)',Sflag) and trim(Unparsed_Data,all) <> '');
 	
@@ -92,10 +92,8 @@ output(jEUDTG,named('EU_Designated_Terrorist_Grps_InRaw_notbase'));
 //6=============================================================================================
 // Foreign Agents Registration Act 
 
-	dFAPrincipalsraw	   := GlobalWatchLists_Preprocess.Files.dsFAFP;
-	dFARegistrantsraw	 := GlobalWatchLists_Preprocess.Files.dsFARE;
-	dFAShortFormRegsraw := GlobalWatchLists_Preprocess.Files.dsFASRE;
-  FARABase  := ProdBase(source = 'Foreign Agents Registration Act');
+	dFARegistrantsraw	 := GlobalWatchLists_Preprocess.Files.dsFARE(TRIM(registrant,ALL) <> '');
+  FARABase  := ProdBase(source = 'Foreign Agents Registration Act' AND TRIM(orig_pty_name,ALL) <> '');
 
 	//Registrant file is the main file that all others are joined to so only need to check that
 	jFARA_registrant := join(dFARegistrantsraw,FARABase,
@@ -111,7 +109,7 @@ output(jEUDTG,named('EU_Designated_Terrorist_Grps_InRaw_notbase'));
 //7============================================================================================
 // United Nations Named Terrorists 
   UNNTRaw   := GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsUNS(ut.fn_KeepPrintableChars((string)line_data_1) <> '' and STD.Str.Filter((string)line_data_1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') <> '');
-  UNNTBase  := ProdBase(source = 'United Nations Named Terrorists');
+  UNNTBase  := ProdBase(source = 'United Nations Named Terrorists' AND TRIM(entity_id,ALL) <> '');
 	
 	jUNNT := join(UNNTRaw,UNNTBase,
              (string)STD.Uni.ToUpperCase(TRIM(left.Location) + left.Serial_Number) = right.entity_id,
@@ -124,8 +122,8 @@ jUNNT_out := IF(MissingUNNT > 0, FAIL(MissingUNNT + ' UNNamedTerrorist_InRaw_not
 output(jUNNT,named('UNNamedTerrorist_InRaw_notbase'));	
 //8============================================================================================
 // Politically Exposed Persons 
-  PEPRaw   := GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsPEP;
-  PEPBase  := ProdBase(source = 'Politically Exposed Persons');	
+  PEPRaw   := GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsPEP(TRIM(serial_number,ALL)<> '');
+  PEPBase  := ProdBase(source = 'Politically Exposed Persons' AND TRIM(entity_id,ALL) <> '');	
 	
 		jPEP:= join(PEPRaw,PEPBase,
                  ut.CleanSpacesAndUpper(left.Application_Code + left.Serial_Number) = trim(right.entity_id,left,right),
@@ -138,19 +136,24 @@ jPEP_out := IF(MissingPEP > 0,FAIL(MissingPEP + ' PoliticallyExposedPersons_InRa
 output(jPEP,named('PoliticallyExposedPersons_InRaw_notbase'));
 //9============================================================================================
 // World Bank Ineligible Firms 
-  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank( (regexfind('^[Name|  ] ', TRIM(orig_firm_name, left, right) )   ));
-  WBIFBase  := ProdBase(source = 'World Bank Ineligible Firms');	
+  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank(~REGEXFIND('^(Name: |SortFirm Name|Downloaded)',orig_firm_name)
+																															AND address <> 'Address'
+																															AND TRIM(orig_firm_name) <> '') ;
+  WBIFBase  := ProdBase(source = 'World Bank Ineligible Firms' AND TRIM(orig_pty_name,ALL) <> '');	
 	
 	ClnRawName(string InName)	:= FUNCTION
-	  StdAKA							:= IF(REGEXFIND('also known as',InName), REGEXREPLACE('also known as ',InName,'AKA '),InName);
+	  StdAKA							:= STD.Str.CleanSpaces(REGEXREPLACE('\\*[0-9]+',REGEXREPLACE('ALSO KNOWN AS ',ut.CleanSpacesAndUpper(InName),'AKA '),''));
 		ClnName							:= IF(STD.Str.Find(StdAKA,'*',1) >0, REGEXREPLACE('(.*)[\\*](.*)',StdAKA,'$1'),StdAKA);
-		TempName						:= REGEXREPLACE('^DBA ',STD.Str.FilterOut(ClnName, '",*'),'');
+		TempName						:= STD.Str.FilterOut(ClnName, '",*');
 		ParseEntity			 		:= IF(REGEXFIND('(.*)(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,NOCASE),
 															REGEXFIND('(.*)(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,1,NOCASE),
 															TempName);
-		FinalClean					:= ut.CleanSpacesAndUpper(REGEXREPLACE('(\\([?]+\\))',
-																													REGEXREPLACE(' \\(CURRENTLY$| \\($',trim(ParseEntity,left,right),'',NOCASE),
-																													''));
+		RmvAKA							:= IF(REGEXFIND('^(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,NOCASE),
+															REGEXFIND('^(AKA |A.K.A.|A/K/A|F/K/A|FKA |DBA |D/B/A)(.*)',TempName,2,NOCASE),
+															ParseEntity);
+		FinalClean					:= STD.Str.CleanSpaces(REGEXREPLACE('(\\([?]+\\))',
+																									REGEXREPLACE(' \\(CURRENTLY$| \\($',trim(RmvAKA,left,right),'',NOCASE),
+																									''));
 		RETURN FinalClean;
 	END;
 	
@@ -202,7 +205,7 @@ output(jWBIF,named('World_Bank_Ineligible_Firms_InRaw_notbase'));
 																							STD.Uni.Find(row_data, u'One name aliases are not included', 1) = 0 and
 																							STD.Uni.Find(row_data, u'2 In Arabic ', 1) = 0 and
 																							STD.Uni.Find(row_data, u'7.03 Abdul Manan Agha Title', 1) = 0);
-  OSFIBase  := ProdBase(source = 'OSFI - Canada Individuals');			
+  OSFIBase  := ProdBase(source = 'OSFI - Canada Individuals' AND TRIM(entity_id,ALL) <> '');			
 	
 	jOSFI:= join(OSFIRaw,OSFIBase,
              (string)left.row_data[1..STD.Uni.Find(left.row_data, u'\t',1) - 1] = right.entity_id,
@@ -215,8 +218,8 @@ jOSFI_out := IF(MissingOSFI > 0, FAIL(MissingOSFI + ' Cnt_OSFICanadaIndividuals_
 output(jOSFI,named('Cnt_OSFICanadaIndividuals_InRaw_notBase'));
 //11============================================================================================
 // Bank of England Sanctions		
-  BOERaw   := GlobalWatchlists_Preprocess.Files.dsBankOfEngland;
-  BOEBase  := ProdBase(source = 'Bank of England Sanctions');			
+  BOERaw   := GlobalWatchlists_Preprocess.Files.dsBankOfEngland(TRIM(group_id,ALL) <> '');
+  BOEBase  := ProdBase(source = 'Bank of England Sanctions' AND TRIM(pty_key,ALL) <> '');			
 	
 	jBOE:= join(BOERaw,BOEBase,
 	            'BES' + TRIM(left.Group_ID, left, right) = right.pty_key ,
@@ -230,8 +233,8 @@ output(jBOE,named('BankofEnglandSanctions_NAME_InRaw_notBase'));
 //12============================================================================================
 // Interpol Most Wanted - Red Notice
 
-  IMWRNRaw   := GlobalWatchLists_Preprocess.Files.dsInterpolMostWantedINT;
-  IMWRNBase  := ProdBase(source = 'Interpol Most Wanted - Red Notice');			
+  IMWRNRaw   := GlobalWatchLists_Preprocess.Files.dsInterpolMostWantedINT(TRIM(serial_number,ALL) <> '');
+  IMWRNBase  := ProdBase(source = 'Interpol Most Wanted - Red Notice' AND TRIM(pty_key,ALL) <> '');			
 	
 	jIMWRN:= join(IMWRNRaw,IMWRNBase,
              'INT' + (string)((integer)regexreplace('^92', left.Serial_Number, '')) = right.pty_key,
@@ -244,8 +247,8 @@ jIMWRN_out := IF(MissingIMWRN > 0, FAIL(MissingIMWRN + ' Interpol_Most_Wanted_RE
 output(jIMWRN,named('Interpol_Most_Wanted_REDN_InRaw_notbase'));
 //13============================================================================================
 // Interpol Most Wanted 
-  IMWRaw   := GlobalWatchLists_Preprocess.Files.dsInterpolMostWanted;
-  IMWBase  := ProdBase(source = 'Interpol Most Wanted');		
+  IMWRaw   := GlobalWatchLists_Preprocess.Files.dsInterpolMostWanted(TRIM(FamilyName,ALL) <> '');
+  IMWBase  := ProdBase(source = 'Interpol Most Wanted' AND TRIM(entity_id,ALL) <> '');		
 	
 	jIMW:= join(IMWRaw,IMWBase,
               if(STD.Str.Find(left.ID, '/', 1) > 0
@@ -265,8 +268,8 @@ output(jIMW,named('Interpol_Most_Wanted_InRaw_notbase'));
 //15============================================================================================
 // Office of Foreign Asset Control
 
-  OFACRaw  := GlobalWatchLists_Preprocess.Files.dsOFACPrimary;
-  OFACBase  := ProdBase(source = 'Office of Foreign Asset Control');				
+  OFACRaw  := GlobalWatchLists_Preprocess.Files.dsOFACPrimary(TRIM(sdn_id,ALL)<> '');
+  OFACBase  := ProdBase(source = 'Office of Foreign Asset Control' AND TRIM(pty_key,ALL) <> '');				
 	
 	jOFAC:= join(OFACRaw,OFACBase,
               'OFAC' + left.sdn_id = right.pty_key,
@@ -280,7 +283,7 @@ output(jOFAC,named('Office_Foreign_Asset_Control_InRaw_notbase'));
 //16============================================================================================
 // OFAC - Palestinian Legislative Council
  OFACPLCRaw	:= DATASET(GlobalWatchLists_Preprocess.root+'ofac::new_plc',GlobalWatchLists_Preprocess.Layouts.rInputOFAC,CSV(HEADING(0),SEPARATOR(''),TERMINATOR(['\n', '\r\n']),QUOTE('"')));
- OFACPLCBase  := ProdBase(source = 'OFAC - Palestinian Legislative Council');			
+ OFACPLCBase  := ProdBase(source = 'OFAC - Palestinian Legislative Council' AND TRIM(pty_key,ALL) <> '');			
 		
 	jOFACPLC:= join(OFACPLCRaw,OFACPLCBase,
                   'OFAC'+left.row_data[STD.Str.Find(left.row_data, '|', 1) + 1..STD.Str.Find(left.row_data, '|', 2) - 1] = right.pty_key,
@@ -295,7 +298,7 @@ output(jOFACPLC,named('US_OFAC_PLC_InRaw_notbase'));
 // State Department Foreign Terrorist Organizations
  SDFTORaw   := GlobalWatchLists_Preprocess.Files.dsStDeptTerrorist(~REGEXFIND('(^Loading |^Orignal |^Number |^Author |^Writing |^Minrow=0 |Extract Date)(.*)',Organization)
 																																	and trim(Organization,all) <> '');
- SDFTOBase  := ProdBase(source = 'State Department Foreign Terrorist Organizations');		
+ SDFTOBase  := ProdBase(source = 'State Department Foreign Terrorist Organizations' AND TRIM(orig_pty_name,ALL) <> '');		
 	
 	jSDFTO:= join(SDFTORaw,SDFTOBase,
              stringlib.stringtouppercase(left.organization) = right.orig_pty_name,
@@ -308,10 +311,10 @@ jSDFTO_out := IF(MissingSDFTO > 0, FAIL(MissingSDFTO + ' St_Dept_Foreign_Terrori
 output(jSDFTO,named('St_Dept_Foreign_Terrorist_InRaw_notbase'));
 //18============================================================================================
 // Defense Trade Controls (DTC)Debarred Parties
-  DTCRaw   := GlobalWatchLists_Preprocess.Files.dsDebarredParties;
-  DTCBase  := ProdBase(source = 'Defense Trade Controls (DTC)Debarred Parties');			
+  DTCRaw   := GlobalWatchLists_Preprocess.Files.dsDebarredParties(TRIM(name_info,ALL)<> '');
+  DTCBase  := ProdBase(source = 'Defense Trade Controls (DTC)Debarred Parties' AND TRIM(orig_pty_name,ALL) <> '');			
 	
-	jDTC:= join(GlobalWatchLists_Preprocess.Files.dsDebarredParties,
+	jDTC:= join(DTCRaw,
 							DTCBase,
              ut.CleanSpacesAndUpper(regexreplace('(.*) [(](.*)',left.name_info,'$1')) = regexreplace('(.*) [(](.*)',right.orig_pty_name,'$1'),
              left only);
@@ -323,8 +326,8 @@ jDTC_out := IF(MissingDTC > 0, FAIL(MissingDTC + ' Defense_Trade_Controls_InRaw_
 output(jDTC,named('Defense_Trade_Controls_InRaw_notbase'));
 //19============================================================================================
 // US Bureau of Industry and Security - Denied Entity List
-  UBISDERaw   := GlobalWatchLists_Preprocess.Files.dsDeniedEntity;
-  UBISDEBase  := ProdBase(source = 'US Bureau of Industry and Security - Denied Entity List');			
+  UBISDERaw   := GlobalWatchLists_Preprocess.Files.dsDeniedEntity(TRIM(entities,ALL)<> '');
+  UBISDEBase  := ProdBase(source = 'US Bureau of Industry and Security - Denied Entity List' AND TRIM(orig_pty_name,ALL) <> '');			
 
 	CleanPrimaryName(string name)	:= FUNCTION
 		clnName				:= REGEXREPLACE('A.K.A.|A.K.A|F.K.A.',ut.CleanSpacesAndUpper(REGEXREPLACE('^,|^-|^\\((A.K.A|F.K.A)',TRIM(name,left,right),'',NOCASE)),'AKA');
@@ -347,8 +350,8 @@ jUBISDE_out := IF(MissingUBISDE > 0, FAIL(MissingUBISDE + ' US_BureauofIndustrya
 output(jUBISDE,named('US_BureauofIndustryandSecurity_InRaw_notbaseDE'));
 //20============================================================================================
 // US Bureau of Industry and Security Unverified Entity List
-  UBISUERaw   := GlobalWatchLists_Preprocess.Files.dsUnverified(trim(lstd_entity_address) <> '');
-  UBISUEBase  := ProdBase(source = 'US Bureau of Industry and Security Unverified Entity List');			
+  UBISUERaw   := GlobalWatchLists_Preprocess.Files.dsUnverified(trim(lstd_entity_address,ALL) <> '');
+  UBISUEBase  := ProdBase(source = 'US Bureau of Industry and Security Unverified Entity List' AND TRIM(orig_pty_name,ALL) <> '');			
 	
 parse_names(string plstd_entity_address) := function
 		ClnEntity					:= IF(STD.Str.Find(plstd_entity_address, ', Inc.',1) > 0
@@ -356,11 +359,11 @@ parse_names(string plstd_entity_address) := function
 													,IF(STD.Str.Find(plstd_entity_address, ', Ltd.',1) > 0
 														,STD.Str.FindReplace(plstd_entity_address, ', Ltd.',' Ltd.'),plstd_entity_address));
 		lstd_entity 	:= ut.CleanSpacesAndUpper(ClnEntity[1..STD.Str.Find(ClnEntity,',',1) - 1]);
-		return(lstd_entity);
+		return(lstd_entity[1..60]);
 end;
 		
 	jUBISUE:= join(UBISUERaw,UBISUEBase,
-                 parse_names(left.lstd_entity_address) = right.orig_pty_name,
+                 parse_names(left.lstd_entity_address) = right.orig_pty_name[1..60],
                  left only);
 								 
 // output(count(UBISUERaw()),named('CntUS_BureauofIndustryandSecurityUNVerified_raw')); 
@@ -370,8 +373,8 @@ jUBISUE_out := IF(MissingUBISUE > 0, FAIL(MissingUBISUE + ' US_BureauofIndustrya
 output(jUBISUE,named('US_BureauofIndustryandSecurityUNVerified_InRaw_notbase'));
 //21============================================================================================
 // OFAC Sanctioned Countries
-  OFACSCRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsOSC;
-  OFACSCBase  := ProdBase(source = 'OFAC Sanctioned Countries');			
+  OFACSCRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsOSC(TRIM(original_primary_name_01,ALL)<> '');
+  OFACSCBase  := ProdBase(source = 'OFAC Sanctioned Countries' AND TRIM(orig_pty_name,ALL) <> '');			
 	
 		
 	jOFACSC:= join(OFACSCRaw,OFACSCBase,
@@ -385,8 +388,8 @@ jOFACSC_out := IF(MissingOFACSC > 0, FAIL(MissingOFACSC + ' US_OFAC_SanctionedCo
 output(jOFACSC,named('US_OFAC_SanctionedCountries_InRaw_notbase'));
 //22============================================================================================
 // FBI Fugitives 10 Most Wanted  
-  FBIMWRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsFBI;
-  FBIMWBase := ProdBase(source = 'FBI Fugitives 10 Most Wanted');			
+  FBIMWRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsFBI(TRIM(serial_number,ALL)<> '');
+  FBIMWBase := ProdBase(source = 'FBI Fugitives 10 Most Wanted' AND TRIM(entity_id,ALL) <> '');			
 	
 		
 	jFBIMW:= join(FBIMWRaw,FBIMWBase,
@@ -400,8 +403,8 @@ jFBIMW_out := IF(MissingFBIMW > 0, FAIL(MissingFBIMW + ' US_FBIFugitives_InRaw_n
 output(jFBIMW,named('US_FBIFugitives_InRaw_notbase'));
 //23============================================================================================
 // Cmmdty. Fut. Trad. Commission Lst. of Reg. & Self-Reg. Auth  
-  CFTRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsCFT;
-  CFTBase := ProdBase(source = 'Cmmdty. Fut. Trad. Commission Lst. of Reg. & Self-Reg. Auth.');			
+  CFTRaw	:= GlobalWatchLists_Preprocess.Files.dsInnovativeSystemsCFT(TRIM(serial_number,ALL)<> '');
+  CFTBase := ProdBase(source = 'Cmmdty. Fut. Trad. Commission Lst. of Reg. & Self-Reg. Auth.' AND TRIM(entity_id,ALL) <> '');			
 		
 	jCFT:= join(CFTRaw,CFTBase,
                  left.Application_Code + left.Serial_Number = trim(right.entity_id,left,right),
@@ -435,7 +438,7 @@ output(jCFT,named('CmmdtyFutTradeCommission_InRaw_notbase'));
    																						STD.Uni.Find(row_data, u'Acts as passed by Parliament', 1) = 0 and
    																						STD.Uni.Find(row_data, u'of the Privy Council and published', 1) = 0 and
    																						STD.Uni.Find(row_data, u'Links to the United Nations Act', 1) = 0);
-  OSFICEBase := ProdBase(source = 'OSFI - Canada Entities');			
+  OSFICEBase := ProdBase(source = 'OSFI - Canada Entities' AND TRIM(entity_id,ALL) <> '');			
 	
 		
 	jOSFICE:= join(OSFICERaw,OSFICEBase,

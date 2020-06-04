@@ -2,7 +2,8 @@
 
 //DF-24689: Create PhoneMart Phone Key
 
-dPhoneMart_base 			:= PhoneMart.Files.base;
+dPhoneMart_base 			:= PhoneMart.Prep_Build.applyRegulatoryPhoneMart(PhoneMart.Files.base);
+
 
 	//remore scrub data
 	layout_key_base := record

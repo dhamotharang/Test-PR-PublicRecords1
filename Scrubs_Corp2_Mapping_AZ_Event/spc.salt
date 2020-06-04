@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_AZ_Event
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -16,7 +16,7 @@ FILENAME:in_file
 //FIELDTYPE DEFINITIONS
 FIELDTYPE:invalid_corp_key:ALLOW(0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(4..12)
 FIELDTYPE:invalid_charter:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(1..9)
-FIELDTYPE:invalid_cd:ENUM(C|D|M|N|O|V|X|FIL| )
+FIELDTYPE:invalid_cd:ENUM(C|D|M|N|O|V|FIL| )
  
 //FIELD DEFINITIONS for Fields being scrubbed
 FIELD:corp_key:TYPE(STRING30):LIKE(invalid_corp_key):0,0

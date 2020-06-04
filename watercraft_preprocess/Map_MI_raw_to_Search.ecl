@@ -1,11 +1,11 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // translates mi_phase01_update.mp Ab intio graph into ECL
 
 fIn_clean_raw := watercraft_preprocess.file_MI_clean_in;
 process_date := (string8)STD.Date.Today();
 
-Watercraft.Macro_Clean_Hull_ID(fIn_clean_raw, Watercraft.Layout_mi,hull_clean_in)
+Watercraft.Macro_Clean_Hull_ID(fIn_clean_raw, Watercraft.Layout_mi_new,hull_clean_in)
 
 Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(hull_clean_in L):= TRANSFORM
 	IsValidRegDate						:=	STD.DATE.IsValidDate((integer)L.REG_DATE);

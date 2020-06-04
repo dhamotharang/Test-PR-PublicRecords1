@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Equifax_Business_Data; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs_Equifax_Business_Data,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist

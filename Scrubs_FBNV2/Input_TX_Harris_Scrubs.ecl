@@ -3,14 +3,15 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Input_TX_Harris_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 7;
-  EXPORT NumRulesFromFieldType := 7;
+  EXPORT NumRules := 8;
+  EXPORT NumRulesFromFieldType := 8;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 7;
+  EXPORT NumFieldsWithRules := 8;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Input_TX_Harris_Layout_FBNV2)
     UNSIGNED1 FILE_NUMBER_Invalid;
+    UNSIGNED1 DATE_FILED_Invalid;
     UNSIGNED1 NAME1_Invalid;
     UNSIGNED1 NAME2_Invalid;
     UNSIGNED1 prep_addr1_line1_Invalid;
@@ -24,6 +25,7 @@ EXPORT Input_TX_Harris_Scrubs := MODULE
 EXPORT FromNone(DATASET(Input_TX_Harris_Layout_FBNV2) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.FILE_NUMBER_Invalid := Input_TX_Harris_Fields.InValid_FILE_NUMBER((SALT311.StrType)le.FILE_NUMBER);
+    SELF.DATE_FILED_Invalid := Input_TX_Harris_Fields.InValid_DATE_FILED((SALT311.StrType)le.DATE_FILED);
     SELF.NAME1_Invalid := Input_TX_Harris_Fields.InValid_NAME1((SALT311.StrType)le.NAME1);
     SELF.NAME2_Invalid := Input_TX_Harris_Fields.InValid_NAME2((SALT311.StrType)le.NAME2);
     SELF.prep_addr1_line1_Invalid := Input_TX_Harris_Fields.InValid_prep_addr1_line1((SALT311.StrType)le.prep_addr1_line1);
@@ -35,7 +37,7 @@ EXPORT FromNone(DATASET(Input_TX_Harris_Layout_FBNV2) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_TX_Harris_Layout_FBNV2);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.FILE_NUMBER_Invalid << 0 ) + ( le.NAME1_Invalid << 1 ) + ( le.NAME2_Invalid << 2 ) + ( le.prep_addr1_line1_Invalid << 3 ) + ( le.prep_addr1_line_last_Invalid << 4 ) + ( le.prep_addr2_line1_Invalid << 5 ) + ( le.prep_addr2_line_last_Invalid << 6 );
+    SELF.ScrubsBits1 := ( le.FILE_NUMBER_Invalid << 0 ) + ( le.DATE_FILED_Invalid << 1 ) + ( le.NAME1_Invalid << 2 ) + ( le.NAME2_Invalid << 3 ) + ( le.prep_addr1_line1_Invalid << 4 ) + ( le.prep_addr1_line_last_Invalid << 5 ) + ( le.prep_addr2_line1_Invalid << 6 ) + ( le.prep_addr2_line_last_Invalid << 7 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -45,12 +47,13 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Input_TX_Harris_Layout_FBNV2);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.FILE_NUMBER_Invalid := (le.ScrubsBits1 >> 0) & 1;
-    SELF.NAME1_Invalid := (le.ScrubsBits1 >> 1) & 1;
-    SELF.NAME2_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.prep_addr1_line1_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.prep_addr1_line_last_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.prep_addr2_line1_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.prep_addr2_line_last_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.DATE_FILED_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.NAME1_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.NAME2_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.prep_addr1_line1_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.prep_addr1_line_last_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.prep_addr2_line1_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.prep_addr2_line_last_Invalid := (le.ScrubsBits1 >> 7) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -60,13 +63,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
     FILE_NUMBER_LENGTHS_ErrorCount := COUNT(GROUP,h.FILE_NUMBER_Invalid=1);
+    DATE_FILED_CUSTOM_ErrorCount := COUNT(GROUP,h.DATE_FILED_Invalid=1);
     NAME1_LENGTHS_ErrorCount := COUNT(GROUP,h.NAME1_Invalid=1);
     NAME2_LENGTHS_ErrorCount := COUNT(GROUP,h.NAME2_Invalid=1);
     prep_addr1_line1_LENGTHS_ErrorCount := COUNT(GROUP,h.prep_addr1_line1_Invalid=1);
     prep_addr1_line_last_LENGTHS_ErrorCount := COUNT(GROUP,h.prep_addr1_line_last_Invalid=1);
     prep_addr2_line1_LENGTHS_ErrorCount := COUNT(GROUP,h.prep_addr2_line1_Invalid=1);
     prep_addr2_line_last_LENGTHS_ErrorCount := COUNT(GROUP,h.prep_addr2_line_last_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.FILE_NUMBER_Invalid > 0 OR h.NAME1_Invalid > 0 OR h.NAME2_Invalid > 0 OR h.prep_addr1_line1_Invalid > 0 OR h.prep_addr1_line_last_Invalid > 0 OR h.prep_addr2_line1_Invalid > 0 OR h.prep_addr2_line_last_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.FILE_NUMBER_Invalid > 0 OR h.DATE_FILED_Invalid > 0 OR h.NAME1_Invalid > 0 OR h.NAME2_Invalid > 0 OR h.prep_addr1_line1_Invalid > 0 OR h.prep_addr1_line_last_Invalid > 0 OR h.prep_addr2_line1_Invalid > 0 OR h.prep_addr2_line_last_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -74,9 +78,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.FILE_NUMBER_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line_last_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line_last_LENGTHS_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.FILE_NUMBER_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.DATE_FILED_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.NAME1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line_last_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line_last_LENGTHS_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.FILE_NUMBER_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line_last_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line_last_LENGTHS_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.FILE_NUMBER_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.DATE_FILED_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.NAME1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.NAME2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr1_line_last_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prep_addr2_line_last_LENGTHS_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -91,21 +95,22 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.FILE_NUMBER_Invalid,le.NAME1_Invalid,le.NAME2_Invalid,le.prep_addr1_line1_Invalid,le.prep_addr1_line_last_Invalid,le.prep_addr2_line1_Invalid,le.prep_addr2_line_last_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_TX_Harris_Fields.InvalidMessage_FILE_NUMBER(le.FILE_NUMBER_Invalid),Input_TX_Harris_Fields.InvalidMessage_NAME1(le.NAME1_Invalid),Input_TX_Harris_Fields.InvalidMessage_NAME2(le.NAME2_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr1_line1(le.prep_addr1_line1_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr1_line_last(le.prep_addr1_line_last_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr2_line1(le.prep_addr2_line1_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr2_line_last(le.prep_addr2_line_last_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.FILE_NUMBER_Invalid,le.DATE_FILED_Invalid,le.NAME1_Invalid,le.NAME2_Invalid,le.prep_addr1_line1_Invalid,le.prep_addr1_line_last_Invalid,le.prep_addr2_line1_Invalid,le.prep_addr2_line_last_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_TX_Harris_Fields.InvalidMessage_FILE_NUMBER(le.FILE_NUMBER_Invalid),Input_TX_Harris_Fields.InvalidMessage_DATE_FILED(le.DATE_FILED_Invalid),Input_TX_Harris_Fields.InvalidMessage_NAME1(le.NAME1_Invalid),Input_TX_Harris_Fields.InvalidMessage_NAME2(le.NAME2_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr1_line1(le.prep_addr1_line1_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr1_line_last(le.prep_addr1_line_last_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr2_line1(le.prep_addr2_line1_Invalid),Input_TX_Harris_Fields.InvalidMessage_prep_addr2_line_last(le.prep_addr2_line_last_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.FILE_NUMBER_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.DATE_FILED_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.NAME1_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.NAME2_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.prep_addr1_line1_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.prep_addr1_line_last_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.prep_addr2_line1_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.prep_addr2_line_last_Invalid,'LENGTHS','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'FILE_NUMBER','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.FILE_NUMBER,(SALT311.StrType)le.NAME1,(SALT311.StrType)le.NAME2,(SALT311.StrType)le.prep_addr1_line1,(SALT311.StrType)le.prep_addr1_line_last,(SALT311.StrType)le.prep_addr2_line1,(SALT311.StrType)le.prep_addr2_line_last,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'FILE_NUMBER','DATE_FILED','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_past_date','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.FILE_NUMBER,(SALT311.StrType)le.DATE_FILED,(SALT311.StrType)le.NAME1,(SALT311.StrType)le.NAME2,(SALT311.StrType)le.prep_addr1_line1,(SALT311.StrType)le.prep_addr1_line_last,(SALT311.StrType)le.prep_addr2_line1,(SALT311.StrType)le.prep_addr2_line_last,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,7,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,8,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -117,6 +122,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
           ,'FILE_NUMBER:invalid_mandatory:LENGTHS'
+          ,'DATE_FILED:invalid_past_date:CUSTOM'
           ,'NAME1:invalid_mandatory:LENGTHS'
           ,'NAME2:invalid_mandatory:LENGTHS'
           ,'prep_addr1_line1:invalid_mandatory:LENGTHS'
@@ -132,6 +138,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,Input_TX_Harris_Fields.InvalidMessage_FILE_NUMBER(1)
+          ,Input_TX_Harris_Fields.InvalidMessage_DATE_FILED(1)
           ,Input_TX_Harris_Fields.InvalidMessage_NAME1(1)
           ,Input_TX_Harris_Fields.InvalidMessage_NAME2(1)
           ,Input_TX_Harris_Fields.InvalidMessage_prep_addr1_line1(1)
@@ -147,6 +154,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.FILE_NUMBER_LENGTHS_ErrorCount
+          ,le.DATE_FILED_CUSTOM_ErrorCount
           ,le.NAME1_LENGTHS_ErrorCount
           ,le.NAME2_LENGTHS_ErrorCount
           ,le.prep_addr1_line1_LENGTHS_ErrorCount
@@ -162,6 +170,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.FILE_NUMBER_LENGTHS_ErrorCount
+          ,le.DATE_FILED_CUSTOM_ErrorCount
           ,le.NAME1_LENGTHS_ErrorCount
           ,le.NAME2_LENGTHS_ErrorCount
           ,le.prep_addr1_line1_LENGTHS_ErrorCount
@@ -207,6 +216,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
           ,'FILE_NUMBER:' + getFieldTypeText(h.FILE_NUMBER) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'DATE_FILED:' + getFieldTypeText(h.DATE_FILED) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'NAME1:' + getFieldTypeText(h.NAME1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'NAME2:' + getFieldTypeText(h.NAME2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'prep_addr1_line1:' + getFieldTypeText(h.prep_addr1_line1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -215,6 +225,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'prep_addr2_line_last:' + getFieldTypeText(h.prep_addr2_line_last) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_FILE_NUMBER_cnt
+          ,le.populated_DATE_FILED_cnt
           ,le.populated_NAME1_cnt
           ,le.populated_NAME2_cnt
           ,le.populated_prep_addr1_line1_cnt
@@ -223,6 +234,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_prep_addr2_line_last_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_FILE_NUMBER_pcnt
+          ,le.populated_DATE_FILED_pcnt
           ,le.populated_NAME1_pcnt
           ,le.populated_NAME2_pcnt
           ,le.populated_prep_addr1_line1_pcnt
@@ -231,7 +243,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_prep_addr2_line_last_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,7,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,8,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -247,7 +259,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Input_TX_Harris_Delta(prevDS, PROJECT(h, Input_TX_Harris_Layout_FBNV2));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),7,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),8,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

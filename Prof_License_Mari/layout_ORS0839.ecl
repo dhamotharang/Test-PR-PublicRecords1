@@ -1,4 +1,4 @@
-// ORS0839 / Oregon Real Estate Agency / Real Estate //
+﻿// ORS0839 / Oregon Real Estate Agency / Real Estate //
 
 export layout_ORS0839 := MODULE
 
@@ -68,8 +68,9 @@ export layout_ORS0839 := MODULE
 				string20   PHONE;
 				STRING1		 FILLER6;	
 				string30   LIC_NUMBER;
-				string30   LIC_ISSUE_DATE;
-				string30   LIC_EXP_DATE;
+				STRING1		 FILLER7;	
+				// string30   LIC_ISSUE_DATE;
+				// string30   LIC_EXP_DATE;
 		END;
 		//Used for 20140102 and before
 		// export business := RECORD

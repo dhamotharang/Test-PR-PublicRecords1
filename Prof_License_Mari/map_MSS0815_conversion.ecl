@@ -126,7 +126,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 		
 		tmpLastName						  := REGEXFIND('(.*),(.*)', TrimFullName, 1);
 		tmpFirstName						:= REGEXFIND('(.*),(.*)', TrimFullName, 2);
-		trimOrgName						:= STD.Str.CleanSpaces(tmpFirstName + ' ' + tmpLastName);
+		trimOrgName							:= STD.Str.CleanSpaces(tmpFirstName + ' ' + tmpLastName);
 		
 		ClnOrgName						:= MAP(REGEXFIND('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',TrimFullName)=>  
 																   REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',TrimFullName,''),
@@ -259,12 +259,15 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 		SELF.CURR_ISSUE_DTE 	:= IF(TRIM(L.EFF_DATE) = ' ','17530101',(STRING) tempCurIssueDt);
 		
 		// tmpExpireDate			  	:= REGEXFIND('([0-9/]+)[ |$]',L.EXP_DATE,1);
-		tmpExpireDate		  	:= IF(REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE)),
-																REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE),1),
-																TRIM(L.EXP_DATE));											
+		// tmpExpireDate		  	:= IF(REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE)),
+																// REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE),1),
+																// TRIM(L.EXP_DATE));						
 																
-		SELF.EXPIRE_DTE				:= IF(TRIM(L.EXP_DATE) = '','17530101',
-																Prof_License_Mari.DateCleaner.ToYYYYMMDD(tmpExpireDate));
+		tmpExpireDate 						:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(L.EXP_DATE);
+		SELF.EXPIRE_DTE 					:= IF(tmpExpireDate < '20000101','20' + tmpExpireDate[3..],tmpExpireDate);
+																
+		// SELF.EXPIRE_DTE				:= IF(TRIM(L.EXP_DATE) = '','17530101',
+																// Prof_License_Mari.DateCleaner.ToYYYYMMDD(tmpExpireDate));
 		tmpInactiveDate				:= REGEXFIND('([0-9/]+)[ |$]',L.RENEW_DATE,1);
 		tmpInactiveDate1			:= IF(LENGTH(REGEXFIND('[0-9]+/[0-9]+/([0-9]+)',tmpInactiveDate,1))=2,
 																Prof_License_Mari.DateCleaner.fix_date(tmpInactiveDate,'/'),

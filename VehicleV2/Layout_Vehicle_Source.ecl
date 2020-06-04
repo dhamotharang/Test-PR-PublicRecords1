@@ -1,4 +1,4 @@
-export Layout_Vehicle_Source := record
+﻿export Layout_Vehicle_Source := record
 
  	string25		Orig_VIN;
 	string4			Orig_Year;
@@ -71,6 +71,6 @@ export Layout_Vehicle_Source := record
 	string4			Best_Model_Year;
 	string3			Best_Major_Color_Code;
 	string3			Best_Minor_Color_Code;
-	VehicleV2.Layout_Base_Party -[SRC_FIRST_DATE, SRC_LAST_DATE];
+	VehicleV2.Layout_Base_Party -[SRC_FIRST_DATE, SRC_LAST_DATE,global_sid,record_sid,raw_name];
   end
  ;

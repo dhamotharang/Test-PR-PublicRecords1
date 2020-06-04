@@ -1,4 +1,4 @@
-import	header,ut;
+﻿import	header,ut;
 //---------------------------------------------------------------------------
 //-------ROLLUP OH PARTY FILE
 //---------------------------------------------------------------------------
@@ -6,7 +6,7 @@ import	header,ut;
 // OH temporary party file
 dOHTempParty	:=	VehicleV2.Mapping_OH_Temp_Party(orig_name	!=	'');
 
-// dOHTempParty	:=	dataset('~thor_data400::persist::vehicleV2::OH_temp_party',VehicleV2.Layout_Base.Party_BIP,thor)(orig_name	!=	'');
+// dOHTempParty	:=	dataset('~thor_data400::persist::vehicleV2::OH_temp_party',VehicleV2.Layout_Base.Party_CCPA,thor)(orig_name	!=	'');
 
 dOHTempPartyDist	:=	distribute(dOHTempParty,hash(vehicle_key,iteration_key));
 
@@ -35,7 +35,7 @@ dOHTempPartySort	:=	sort(	dOHTempPartyDist,
 															local
 														);
 
-VehicleV2.Layout_Base.Party_BIP	trollup(dOHTempPartySort	le,dOHTempPartySort	ri)	:=
+VehicleV2.Layout_Base.Party_CCPA	trollup(dOHTempPartySort	le,dOHTempPartySort	ri)	:=
 transform
 	self.Reg_Earliest_Effective_Date	:=	VehicleV2.validate_date.fEarliestNonZeroDate(le.REGISTRATION_EFFECTIVE_DATE,ri.REGISTRATION_EFFECTIVE_DATE);
 	self.Reg_Latest_Effective_Date		:=	VehicleV2.validate_date.fLatestNonZeroDate(le.REGISTRATION_EFFECTIVE_DATE,ri.REGISTRATION_EFFECTIVE_DATE);
@@ -48,6 +48,11 @@ transform
 	self.Reg_License_Plate						:=	if(le.Reg_License_Plate	<>	'',le.Reg_License_Plate,ri.Reg_License_Plate);
 	self.Reg_True_License_Plate				:=	if(le.Reg_True_License_Plate	<>	'',le.Reg_True_License_Plate,ri.Reg_True_License_Plate);
 	self.source_rec_id								:=  if(le.source_rec_id<>0,if(le.source_rec_id<ri.source_rec_id,le.source_rec_id,ri.source_rec_id),0);
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 
 	self															:=	le;
 
@@ -82,7 +87,7 @@ dOHPartyRollup	:=	rollup(	dOHTempPartySort,
 //-------GENERATE SEQUENCE KEY
 //---------------------------------------------------------------------------
 
-VehicleV2.Layout_Base.Party_BIP	tdate(dOHPartyRollup	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tdate(dOHPartyRollup	pInput)	:=
 transform
 	self.Ttl_Earliest_Issue_Date			:=	pInput.TITLE_ISSUE_DATE;
 	self.Ttl_Latest_Issue_Date				:=	pInput.TITLE_ISSUE_DATE;

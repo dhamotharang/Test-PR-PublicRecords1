@@ -1,4 +1,4 @@
-//****************Maps Pcnsr to a common layout********************
+﻿//****************Maps Pcnsr to a common layout********************
 import ut, _validate, VersionControl, mdr;
 phone_file := Phonesplus_v2.Norm_Pcnsr;
 
@@ -7,7 +7,7 @@ phonesplus_v2.Mac_Filter_Bad_Phones (phone_file,phone,,,phone_f);
 
 //map to a common layout
 phonesplus_v2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Transform
-	DateLastReported := VersionControl.fGetFilenameVersion('~thor_data400::base::daybatch_pcnsr')[1..6] : stored('DateLastReported');
+	DateLastReported := ((string)VersionControl.fGetFilenameVersion('~thor_data400::base::daybatch_pcnsr'))[1..6] : stored('DateLastReported');
 	tempFirstSeen		:= IF((integer)input.refresh_date > 0 and (integer)input.telephone_acquisition_date > 0 and (integer)input.refresh_date <> (integer)input.telephone_acquisition_date and
 												(integer)input.refresh_date < (integer)input.telephone_acquisition_date, input.refresh_date,
 											IF((integer)input.refresh_date = 0 and (integer)input.telephone_acquisition_date > 0 and (integer)input.recency_date > 0 and
@@ -61,6 +61,8 @@ phonesplus_v2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f 
 	self.ace_fips_st		:= input.county[1..2];
 	self.ace_fips_county	:= input.county[3..5];
 	self.did_score 				:= (string) input.did_score;
+	self.source						:= mdr.sourceTools.src_Pcnsr;	//DF-25784
+	self.cellphone 				:= self.npa + self.phone7; //DF-25784	
 	self 									:= input; 
 	self.CellPhoneIDKey   := hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

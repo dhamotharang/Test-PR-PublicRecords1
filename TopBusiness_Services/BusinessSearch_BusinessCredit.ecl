@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Best, BIPV2_Best_SBFE, BusinessCredit_Services, iesp;
+﻿IMPORT BIPV2, BIPV2_Best, BIPV2_Best_SBFE, BusinessCredit_Services, doxie, iesp;
 
 EXPORT BusinessSearch_BusinessCredit := 
   MODULE
@@ -7,10 +7,15 @@ EXPORT BusinessSearch_BusinessCredit :=
     EXPORT fn_addBusinessCreditSingletons ( DATASET(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
                                             DATASET(iesp.topbusinessSearch.t_TopBusinessSearchRecord) ds_HeaderRecs,
                                             DATASET(TopBusiness_Services.BusinessSearch_Layouts.TopBizSearchBizIdsWithWeightRec) ds_BipRecWeights, 
-                                            STRING DataPermissionMask
+                                            STRING inDataPermissionMask
                                           ) :=
       FUNCTION
-        
+
+        mod_access := 
+          MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+            EXPORT STRING DataPermissionMask := inDataPermissionMask;
+          END;    
+          
         // the following key fetch to the SBFE Best key returns ONLY SBFE/Business Credit records
         ds_BusinessCredit_IDs_All   := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(InputSearch).uid_results_w_acct;
         ds_BusinessCredit_IDs_dedup := DEDUP(SORT(ds_BusinessCredit_IDs_All, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
@@ -22,17 +27,17 @@ EXPORT BusinessSearch_BusinessCredit :=
                              SELF := []
 														 ));
         
-        ds_BusinessCredit_Recs_raw     := BIPV2_Best_SBFE.Key_LinkIds().KFetch2(ds_BizCreditIDsDedup_BipIds,BIPV2.IDconstants.Fetch_Level_SELEID, 0, DataPermissionMask,TopBusiness_Services.Constants.defaultJoinLimit);
+        ds_BusinessCredit_Recs_raw     := BIPV2_Best_SBFE.Key_LinkIds().KFetch2(ds_BizCreditIDsDedup_BipIds,BIPV2.IDconstants.Fetch_Level_SELEID, 0, inDataPermissionMask,TopBusiness_Services.Constants.defaultJoinLimit);
         ds_BusinessCredit_Recs_deduped := DEDUP(SORT(ds_BusinessCredit_Recs_raw, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), ProxID), #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
       
 				// Set Business credit indicator.
 				ds_HeaderRecsWithBizCredInd := PROJECT(ds_HeaderRecs,TRANSFORM( iesp.topbusinessSearch.t_TopBusinessSearchRecord, 
 															SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator(LEFT.BusinessIds.ultId, 
-																																																	LEFT.BusinessIds.OrgID,
-																																																	LEFT.BusinessIds.SeleID,
-																																																	DataPermissionMask,
-																																																	TRUE);
+                                                                                                                      LEFT.BusinessIds.OrgID,
+                                                                                                                      LEFT.BusinessIds.SeleID,
+                                                                                                                      mod_access,
+                                                                                                                      TRUE);
 															SELF                         := LEFT));
 													 
         // Filter out D&B only records - 
@@ -85,9 +90,9 @@ EXPORT BusinessSearch_BusinessCredit :=
           END;        
 
         // per BIP requirements:
-        // â€œwe are not supposed to run a report if search results yield a singleton tag as per BIp 
-        // requirements. So that canâ€™t be changed at all.â€ 
-        // The SBFE/Business Credit singletons will always display FALSE for the â€˜displayReportLinkâ€™ field.  
+        // we are not supposed to run a report if search results yield a singleton tag as per BIP 
+        // requirements. So that can be changed at all.
+        // The SBFE/Business Credit singletons will always display FALSE for the displayReportLink field.  
         // Since these records are singletons, only the best section can be populated.
         ds_BusinessCredit_singletonRecsWithWeight := 
           JOIN( ds_BusinessCreditSingleton_Recs, ds_BusinessCredit_IDs_dedup,

@@ -1,13 +1,13 @@
 ﻿/*******************************************************************************************************************
- Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/citizenship_test_seed/filedate
+ Spray 20 test seed data files onto THOR from CargoDayton /data/testseed_prod/filedate
 ********************************************************************************************************************/
 IMPORT _Control, STD, tools, Versioncontrol;
 
 
 EXPORT spray_Citizenship(STRING filedate,
                           BOOLEAN	pIsTesting = FALSE,
-                          STRING pServer = _Control.IPAddress.bctlpedata12,
-                          STRING pDir = '/data/hds_2/citizenship_test_seed/'+filedate+'/',
+                          STRING pServer = _Control.IPAddress.CargoDayton,
+                          STRING pDir = '/data/testseed_prod/'+filedate+'/',
                           STRING pGroupName = STD.System.Thorlib.Group()) := FUNCTION
                                       
                                       

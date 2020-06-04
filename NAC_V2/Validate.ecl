@@ -93,7 +93,7 @@ EXPORT Validate := MODULE
 						IF(warnings & warningCodes.W101<>0, 	'\nW101: Invalid/Missing Race Value, Set to "U"', '')
 						+ IF(warnings & warningCodes.W102<>0, '\nW102: Invalid/Missing Gender Value, Set to "U"', '')
 						+ IF(warnings & warningCodes.W103<>0, '\nW103: Invalid/Missing Ethnicity Value, Set to "U"', '')
-						+ IF(warnings & warningCodes.W104<>0, '\nW105: Invalid/Missing ABAWD Value, Set to "U"', '')
+						+ IF(warnings & warningCodes.W104<>0, '\nW104: Invalid/Missing ABAWD Value, Set to "U"', '')
 						+ IF(warnings & warningCodes.W105<>0, '\nW105: Invalid Character in Name, Changed to "?"', '')
 						+ IF(warnings & warningCodes.W106<>0, '\nW106: Invalid Relationship Indicator, Changed to "O"', '')
 						+ IF(warnings & warningCodes.W107<>0, '\nW107: Invalid Character in Address, Changed to "?"', '')

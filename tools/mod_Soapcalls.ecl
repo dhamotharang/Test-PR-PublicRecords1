@@ -56,7 +56,7 @@ module
 		,string		pAttributeName	= ''
 		,string		pEsp						= if(_Constants.IsDataland
 																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.3.242'
-																	,'prod_esp.br.seisint.com:8145'
+																	,'uspr-prod-thor-esp.risk.regn.net:8145'
 																)
 		,string		pUserName     	= ''
 		,string		pPattern      	= ''
@@ -185,7 +185,7 @@ module
 		,string		pattributenameRegex	= ''
 		,string		pEsp								= if(_Constants.IsDataland
 																		,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
-																		,'prod_esp.br.seisint.com:8145'
+																		,'uspr-prod-thor-esp.risk.regn.net:8145'
 																	)
 		,boolean	pGetText   					= true
 		,boolean	pIsSandbox    			= false
@@ -247,7 +247,7 @@ module
 		,string		pText					 	= ''
 		,string		pEsp						= if(_Constants.IsDataland
 																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
-																	,'prod_esp.br.seisint.com:8145'
+																	,'uspr-prod-thor-esp.risk.regn.net:8145'
 																)
 		,string		pFlags     			= ''
 		,string		pResultType    	= ''
@@ -322,7 +322,7 @@ module
 		,string		pNewAttributeName	  = ''
 		,string		pEsp						    = if(_Constants.IsDataland
                                       ,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
-                                      ,'prod_esp.br.seisint.com:8145'
+                                      ,'uspr-prod-thor-esp.risk.regn.net:8145'
                                     )
 	
 	) := 
@@ -391,7 +391,7 @@ module
 		,string		pAttributeName	= ''
 		,string		pEsp						= if(_Constants.IsDataland
 																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
-																	,'prod_esp.br.seisint.com:8145'
+																	,'uspr-prod-thor-esp.risk.regn.net:8145'
 																)
 	
 	) := 

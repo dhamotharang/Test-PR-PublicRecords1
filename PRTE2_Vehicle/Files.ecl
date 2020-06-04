@@ -1,6 +1,8 @@
-import std, NID, ut, prte2_vehicle, VehicleV2, standard, BIPV2;
+﻿import std, NID, ut, prte2_vehicle, VehicleV2, standard, BIPV2,VINA, Data_Services;
 
 EXPORT Files := module
+
+EXPORT file_vina_base := DATASET(data_services.foreign_prod + 'thor_data400::base::vintelligence',VINA.layout_base_vintelligence,THOR);
 
 //incoming files
 export in_main		:= dataset(constants.in_prefix_name + 'main', layouts.in_main,CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
@@ -8,7 +10,9 @@ export in_party		:= dataset(constants.in_prefix_name + 'party', layouts.in_party
 
 //bse files
 export main_base	:= dataset(constants.base_prefix_name + 'main', layouts.Base_Main, thor);
+
 export party_bip	:= dataset(constants.base_prefix_name + 'party', layouts.Base_Party_BIP, thor);
+
 export main_slim	:= project(main_base, {main_base} - [cust_name, bug_num]);
 
 //Blank Files

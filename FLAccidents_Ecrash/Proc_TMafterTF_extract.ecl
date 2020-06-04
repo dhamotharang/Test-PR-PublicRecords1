@@ -1,4 +1,4 @@
-import ut; 
+﻿import ut; 
 
 EXPORT Proc_TMafterTF_extract(string filedate , string timestamp) := function 
 
@@ -55,19 +55,12 @@ getupdatedTM := Join(distribute(TMrolled,hash(case_identifier)) , distribute(TFr
 
 
   createfile := sequential(output(refrTM,,'~thor_data400::out::ecrash::'+filedate+'::tmaftertf'
-												,csv(terminator('\n')
-												,separator(','),quote('"'))
-												,overwrite),
-                        fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::tmaftertf'
-												,'alalppnc115.choicepoint.net'//'alalqpnc070.choicepoint.net'// '10.48.72.194'//, 'alaldpnc074.choicepoint.net'
-												, '/ap/ecrash/data/tmconvert/incoming/hpcc_'+filedate+'_'+timestamp+'.csv'),
-												
-												fileservices.sendemail(
-													'Ayeesha.kayttala@lexisnexis.com;Sudhir.Kasavajjala@lexisnexis.com;Hari.velappan@lexisnexis.com;Rey.Zalamea@lexisnexis.com',
-													'TM after TF extract generated ',
-													'TM after TF extract file is desprayed to LZ /ap/ecrash/data/tmconvert/incoming/HPCC_'+filedate+'_'+timestamp+'.csv wuid'+workunit ));
+																	,csv(terminator('\n')
+																	,separator(','),quote('"'))
+																	,overwrite)
+													,output('TM after TF THOR file generated in this build'));
 
-despray := if(count(j) > 0 ,createfile,output('TM after TF extract not generated in this build'));  
+despray := if(count(j) > 0 ,createfile,output('TM after TF THOR file not generated in this build'));  
 
 return despray ; 
 

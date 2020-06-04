@@ -1,4 +1,4 @@
-//****************Maps TargusWP to a common layout********************
+﻿//****************Maps TargusWP to a common layout********************
 import Targus, ut, _validate, mdr;
 phone_file := Targus.File_consumer_base;
 
@@ -48,6 +48,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.zip5						:= input.zip;
 	self.ace_fips_county			:= input.county;
 	self.did_score 						:= (string)input.did_score;
+	self.source				:= mdr.sourceTools.src_Targus_White_Pages;	//DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784	
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

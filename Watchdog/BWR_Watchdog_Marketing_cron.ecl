@@ -21,7 +21,7 @@ getnew := topn( sort ( getwulist,-wuid),1,-wuid );
 
 validate_statecount := count(getnew ( state = 'completed' ));
 
-statusemail := FileServices.sendemail('michael.gould@lexisnexisrisk.com,sudhir.kasavajjala@lexisnexis.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog Marketing build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
+statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com','Watchdog Job Update' +(STRING8)Std.Date.Today(), 'Watchdog Marketing build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
 
 
 LaunchJobs := Sequential(_control.fSubmitNewWorkunit(ECL1, _Control.Config.GroupName('36')));

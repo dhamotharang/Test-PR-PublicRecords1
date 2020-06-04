@@ -4,13 +4,23 @@ DF-18485
 /*2016-10-30T21:15:38Z (Wendy Ma)
 DF-17551 adding FCRA best 
 */
-import header,codes,mdr,drivers,_control,infutor, AID, ut, FCRA_list;
+import header,codes,mdr,drivers,_control,infutor, AID, ut, FCRA_list,dx_header;
+
+// adjust layout for CCPA and 
+ccpa (in_hdr) := FUNCTIONMACRO
+    
+    #UNIQUENAME(with_global_sid);
+    %with_global_sid%:=PROJECT(in_hdr,                                          TRANSFORM({dx_header.layout_header},SELF:=LEFT));
+    RETURN             PROJECT(header.fn_suppress_ccpa(%with_global_sid%,TRUE), TRANSFORM({header.layout_header}   ,SELF:=LEFT));
+
+ENDMACRO;
+
 
 string20 var1 := '' : stored('watchtype');
-fcrahdr_list := FCRA_list.file_base;
-fcrahdr    := watchdog.Prep_FCRA_header;
-hdr        := Files_ReCleaned .Header_(mdr.sourcetools.sourceisonprobation(src)=false);
-hdr_nonglb := Files_ReCleaned .Header_NonGLB(mdr.sourcetools.sourceisonprobation(src)=false);
+fcrahdr_list := ccpa(FCRA_list.file_base);
+fcrahdr      := ccpa(watchdog.Prep_FCRA_header);
+hdr          := ccpa(Files_ReCleaned .Header_(mdr.sourcetools.sourceisonprobation(src)=false));
+hdr_nonglb   := ccpa(Files_ReCleaned .Header_NonGLB(mdr.sourcetools.sourceisonprobation(src)=false));
 
 //could have changed the function to not return everything else
 //but instead decided to filter what's going in just in case future processes have need for it as well

@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add;
+import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -38,6 +38,9 @@ transform
 	self := l;
 end;
 
+projectBase  := project(BDID_Append, tLayout_6000_Inquiries_Base(left));
 
-export BDID_6000_Inquiries := project(BDID_Append, tLayout_6000_Inquiries_Base(left))
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export BDID_6000_Inquiries := addGlobalSID
 	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

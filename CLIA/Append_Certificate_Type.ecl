@@ -1,4 +1,4 @@
-EXPORT Append_Certificate_Type(DATASET(Layouts.Base) pDataset) := FUNCTION
+﻿EXPORT Append_Certificate_Type(DATASET(Layouts.Base) pDataset) := FUNCTION
 
 /*
 	Layouts.Base add_certificate(DATASET(Layouts.Base) input_ds, STRING in_certificate_type) := FUNCTION
@@ -91,8 +91,8 @@ EXPORT Append_Certificate_Type(DATASET(Layouts.Base) pDataset) := FUNCTION
 
     RETURN JOIN(base_with_certificates, lab_code_lookup,
 		            LEFT.lab_type_code = RIGHT.lab_type_code,
-								add_lab_type(LEFT, RIGHT),
-								LEFT OUTER);
+								add_lab_type(LEFT, RIGHT), skew(1),
+								LEFT OUTER, LOOKUP);
 
 	END;
 	

@@ -1,4 +1,4 @@
-﻿import ut,data_services;
+﻿import ut,data_services, _control, std;
 
 /* Recreation of MBS on thor. New Files uploaded daily. 1 version of file saved in fathered super.  */
 export File_MBS := module
@@ -85,7 +85,26 @@ fido_stats := table(df_fido_mbs_dedup, {gc_id, company_id,product_id,sub_product
 	Current:=nothor(fileservices.superfilecontents('~thor100_21::out::inquiry_acclogs::file_mbs'))[1].name[46..54];
   isCurrent:=param_version<=current;
 	
-mbs_new := sequential(output(df_fido_mbs_dedup, ,'~thor100_21::out::inquiry_acclogs::file_fido::' + param_version, overwrite, __compressed__),
+	foreign_fido_prod := '~foreign::' + Inql_v2._Constants.FIDO_ESP + '::';
+	fidoFileName			:= '~' + nothor(fileservices.superfilecontents(foreign_fido_prod + 'thor::red::extract::inquiry_tracking_extract'))[1].name;
+	copyToFileName 		:= '~' + REGEXREPLACE(foreign_fido_prod, fidoFileName, '', NOCASE);
+	version           := regexfind('::[0-9]+::', copyToFileName,0)[3..10];
+
+	despray(string logicalname, string flag) := nothor(fileservices.Despray('~'+logicalName, 
+																				 _control.IPAddress.bctlpedata10, 
+																				 '/data/inquiry_data_01/fido/inquiry_tracking_extract_'+version+'.txt', 
+																				 , 
+																				 , 
+																				 , 
+																				 true)); 
+
+	desprayFidoFile		:= sequential(
+																	output(Inql_v2.Files().FIDO_extract_in, ,copyToFileName, overwrite, __compressed__);
+																	despray(copyToFileName,'');
+																	STD.File.DeleteLogicalFile(copyToFileName);
+																	);
+	
+	mbs_new := sequential(output(df_fido_mbs_dedup, ,'~thor100_21::out::inquiry_acclogs::file_fido::' + param_version, overwrite, __compressed__),
 											   fileservices.startsuperfiletransaction(),
 											 
 												 fileservices.clearsuperfile('~thor100_21::out::inquiry_acclogs::file_mbs_grandfather'),
@@ -98,6 +117,7 @@ mbs_new := sequential(output(df_fido_mbs_dedup, ,'~thor100_21::out::inquiry_accl
 												 fileservices.addsuperfile('~thor100_21::out::inquiry_acclogs::file_mbs', '~thor100_21::out::inquiry_acclogs::file_fido::' + param_version),
 												 
 											 fileservices.finishsuperfiletransaction();
+
 											 output('MBS File Check', named('Quality_Check')),
 											 output(table(df_fido_mbs_dedup, {vertical, cnt := count(group)}, vertical, few), all, named('Verticals')),
 											 output(table(df_fido_mbs_dedup, {industry, cnt := count(group)}, industry, few), all, named('Industries')),
@@ -106,12 +126,11 @@ mbs_new := sequential(output(df_fido_mbs_dedup, ,'~thor100_21::out::inquiry_accl
 											 output(df_fido_mbs_dedup(sub_acct_id = ''), named('subaccountID_blank')),
 											 output(fido_stats(id_cnt > 1), named('multiple_allowflags')),
                        pValidate_FIDO,
-											 pValidate_subaccountID);
+											 pValidate_subaccountID,
+											 
+											 desprayFidoFile);
 																
 return if(~isCurrent, mbs_new);
 
 end;
 end;
-
-
-

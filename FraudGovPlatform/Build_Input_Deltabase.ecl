@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate,IDLExternalLinking,InsuranceHeader_xlink,SALT37;
 EXPORT Build_Input_Deltabase(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -6,6 +6,8 @@ EXPORT Build_Input_Deltabase(
 	,dataset(Layouts.Input.Deltabase) ByPassed_Deltabase_Sprayed = files().Input.ByPassed_Deltabase.sprayed	
 ) :=
 module
+
+  shared firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 
 	deltabaseUpdate :=	if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0,
 		Files(pversion).Sprayed.Deltabase, 
@@ -20,12 +22,15 @@ module
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate := (unsigned)l.fn[sub..sub+7];
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1));
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));		
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
-		self.file_type := 3 ;
+		self.rawlinkid	:= l.rawlinkid;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+		self.RIN_Source := map(	l.file_type = 3  => 4, //identity
+								l.file_type = 1 and l.deceitful_confidence != '3'  => 5, //knownrisk
+								l.file_type = 1 and l.deceitful_confidence = '3'  => 7,  //safelist
+								l.file_type = 5  => 6,  //status update
+								l.RIN_Source); 
+
 		self:=l;
 		self:=[];
 	end;
@@ -37,7 +42,27 @@ module
 
 	MAC_Sequence_Records( f1, source_rec_id, f1_source_rec_id, max_uid);
 	
-	shared d_source_rec_id := distribute(f1_source_rec_id);
+	f1_did := f1_source_rec_id(rawlinkid>0 and rawlinkid <firstrinid);
+	f1_rinid := f1_source_rec_id(rawlinkid>=firstrinid);
+	f1_rawlinkid_zero:= f1_source_rec_id(rawlinkid=0);
+	
+//validate did with PR
+	validate_did := IDLExternalLinking.did_getAllRecs_batch(f1_did,rawlinkid,source_rec_id);
+	j_did := Join(f1_did,validate_did,left.source_rec_id=right.source_rec_id and right.did>0
+							,Transform(recordof(left)
+							,self.rawlinkid :=if(right.did>0,left.rawlinkid,0)
+							,self:=left),left outer,keep(1));
+							
+//validate rinid's with RIN system						
+	j_rinid :=Join(f1_rinid,Fraudshared.key_did('FraudGov'),
+								left.rawlinkid =right.did
+								,Transform(recordof(left)
+								,self.rawlinkid :=if(left.rawlinkid=right.did,left.rawlinkid,0)
+								,self:=left),left outer,keep(1));
+								
+	final_rawlinkid := 	f1_rawlinkid_zero+j_did+j_rinid;						
+		
+	shared d_source_rec_id := distribute(final_rawlinkid);
 	
 	shared append_source := join(
 		d_source_rec_id,
@@ -50,7 +75,13 @@ module
 			or (_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8]) = false  
 			or (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8] > (unsigned)(STRING8)Std.Date.Today())
 			or reported_by = ''
-			or source = '');
+			or source = ''
+			or (rawlinkid=0 and household_id='' and ssn='' and dob='' and raw_full_name='' and raw_first_name ='' and raw_last_name=''
+			  and full_address ='' and street_1='' and city='' and state='' and zip='' and mailing_street_1=''
+				and mailing_city='' and mailing_state='' and mailing_zip='' and phone_number='' and tin=''
+				and email_address='' and appended_provider_id=0 and lnpid=0 and npi='' and ip_address='' and device_id='' 
+				and professional_id='' and bank_routing_number_1='' and bank_account_number_1='' and drivers_license='')
+			);
 
 	EXPORT fn_dedup(inputs):=FUNCTIONMACRO
 
@@ -82,14 +113,13 @@ module
 	shared Valid_Recs :=	join (	
 		append_source,
 		f1_bypass_dedup,
-		left.source_rec_id = right.source_rec_id,
+		left.inqlog_id = right.inqlog_id,
 		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),
 		LEFT ONLY,
 		LOOKUP);
 
-	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);	
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);	
+	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);		
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
 	
 	input_file_1 := fn_dedup(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
 

@@ -8,7 +8,7 @@ fcra_all				:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit);
 //Remove FCRA related information from non-updating sources
 hygenics_crim.Layout_Base_Offenses_with_OffenseCategory removeInfo(fcra_filtered l):= transform
 	  self.fcra_offense_key 							:= '';
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
@@ -338,6 +338,8 @@ rollupoffenseOut := ROLLUP(result_sort2,
 
 /*************************************End******************************************/
 
-	PromoteSupers.MAC_SF_BuildProcess(rollupoffenseOut,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
+  deduped_rollupoffenseOutPID := dedup(sort(distribute(rollupoffenseOut,HASH(offense_persistent_id)),offense_persistent_id,local),offense_persistent_id,local);
+
+	PromoteSupers.MAC_SF_BuildProcess(deduped_rollupoffenseOutPID,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
 				 
 export Out_DOC_Offenses := aout;

@@ -1,7 +1,8 @@
 ﻿import tools;
 EXPORT _fn_normscores(
   
-  pMtch
+   pMtch
+  ,pDebug = 'false'
 ) :=
 functionmacro
   layouttools := tools.macf_LayoutTools(recordof(pMtch),false,'^(?!.*?(left|right|skipped).*).*$',true);
@@ -16,10 +17,11 @@ functionmacro
   ///////////
   //--norm all fields, trying to group them better into child datasets per field so easier to see
   ///////////
+  dedup_input := topn(pMtch  ,1,-conf);
   layouttools2 := tools.macf_LayoutTools(recordof(pMtch),false,'',true);
-  mtch_score2  := project(pMtch,layouttools2.layout_record);
+  mtch_score2  := project(dedup_input,layouttools2.layout_record);
   // layspecs := {unsigned rid,string fieldname,string fieldvalue};
-  dnorm_specs2 := normalize(pMtch,count(layouttools2.setAllFields),transform({unsigned rollupid,layspecs}
+  dnorm_specs2 := normalize(dedup_input,count(layouttools2.setAllFields),transform({unsigned rollupid,layspecs}
     ,self.fieldname 	:= layouttools2.fGetFieldName(counter);
     ,self.fieldvalue	:= (string)layouttools2.fGetFieldValue(counter,left)
     ,self.rid					:= counter
@@ -39,6 +41,28 @@ functionmacro
                                                                                               ,self := left
                                                          )),rid),{recordof(left) - rid - rollupid});
   dnorm_specs_filt2 := dproj3(count(child(regexfind('^conf$',fieldname,nocase))) >0 or (unsigned)score != 0);
+
+  debug_outputs := parallel(
+    output(pMtch ,named('pMtch'))
+   ,output(mtch_score ,named('mtch_score'))
+   ,output(dnorm_specs ,named('dnorm_specs'))
+   ,output(dnorm_specs_filt ,named('dnorm_specs_filt'))
+   ,output(mtch_score2 ,named('mtch_score2'))
+   ,output(dnorm_specs2 ,named('dnorm_specs2'))
+   ,output(diterate ,named('diterate'))
+   ,output(dproj ,named('dproj'))
+   ,output(drollup ,named('drollup'))
+   ,output(dsortchild ,named('dsortchild'))
+   ,output(dsupports ,named('dsupports'))
+   ,output(dproj2 ,named('dproj2'))
+   ,output(dproj3 ,named('dproj3'))
+   ,output(dnorm_specs_filt2 ,named('dnorm_specs_filt2'))  
+  );
+
+  #IF(pDebug = false)
   return dnorm_specs_filt2;
+  #ELSE
+  return when(dnorm_specs_filt2 ,debug_outputs);
+  #END
   
 endmacro;

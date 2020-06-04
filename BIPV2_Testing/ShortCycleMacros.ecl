@@ -1,4 +1,4 @@
-EXPORT ShortCycleMacros := 
+﻿EXPORT ShortCycleMacros := 
 MODULE
 
 export mtype_priority(string mtype) := 
@@ -152,6 +152,7 @@ ENDMACRO;
 
 export mac_measure(ds, act, o, answers, jfield1_answers) :=
 MACRO
+  import ut;
 	#uniquename(perecall_hits)
 	#uniquename(recall_hits)
 	#uniquename(recall_errors)
@@ -190,7 +191,7 @@ MACRO
 	%underscore_pos% := stringlib.stringfind(#text(ds), '_', 1);
 	 o := 
 	project(
-		dataset([{1}], {unsigned a}),
+		ut.ds_oneRecord,
 		transform(
 			{string20 dsname, string20 dstime, integer4 total_answers_given, integer4 total_measured, integer4 pct_measured := 255, integer4 good_hits, integer4 bad_hits, integer4 unknown_hits, integer4 misses, 
 				integer4 precision := 255, integer4 recall := 255, integer4 potential_recall := 255, integer4 pct_amgibigous_match := 255},

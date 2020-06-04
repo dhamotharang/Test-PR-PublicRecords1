@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT Base_GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_AVM';
   EXPORT spc_NAMESCOPE := 'Base';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'AVM';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,history_date,ln_fares_id_ta,ln_fares_id_pi,unformatted_apn,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,p_city_name,st,zip,zip4,lat,long,geo_blk,fips_code,land_use,recording_date,assessed_value_year,sales_price,assessed_total_value,market_total_value,tax_assessment_valuation,price_index_valuation,hedonic_valuation,automated_valuation,confidence_score,comp1,comp2,comp3,comp4,comp5,nearby1,nearby2,nearby3,nearby4,nearby5,history_history_date,history_land_use,history_recording_date,history_assessed_value_year,history_sales_price,history_assessed_total_value,history_market_total_value,history_tax_assessment_valuation,history_price_index_valuation,history_hedonic_valuation,history_automated_valuation,history_confidence_score';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -21,11 +43,12 @@ EXPORT Base_GenerationMod := MODULE
     + 'FILENAME:AVM\n'
     + 'NAMESCOPE:Base\n'
     + '\n'
-    + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
+    + '//FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
+    + 'FIELDTYPE:Invalid_Date:ALLOW(0123456789):LENGTHS(..8)\n'
     + 'FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)\n'
     + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789)\n'
-    + 'FIELDTYPE:Invalid_Comps:ALLOW(0123456789OAD)\n'
+    + 'FIELDTYPE:Invalid_Comps:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + '\n'
     + 'FIELD:history_date:LIKE(Invalid_Date):TYPE(STRING8):0,0\n'
     + 'FIELD:ln_fares_id_ta:LIKE(Invalid_Comps):TYPE(STRING12):0,0\n'
@@ -86,3 +109,4 @@ EXPORT Base_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

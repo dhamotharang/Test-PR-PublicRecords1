@@ -57,8 +57,34 @@ TRANSFORM
 	
 	SELF.source_state  			:= 	'CT';
 	SELF.decedent_race			:=	Lookup_CT.lkp_race(pInput.race);
+
+
+	// Fill Origin according to UNITED STATES CENSUS 2000 POPULATION WITH BRIDGED RACE CATEGORIES
+	// Combine all the origins
+	dHispanic_Origins		:=	DATASET([
+								{IF(pInput.HISPMEX	=	'Y','MEXICAN, MEXICAN AMERICAN,CHICANO','')},
+								{IF(pInput.HISPPR	=	'Y','PUERTO RICAN','')},
+								{IF(pInput.HISPCUB	=	'Y','CUBAN','')},
+								{IF(pInput.HISPOTH	=	'Y',pInput.HISPOTHL,'')}
+								],{STRING	origin});
+								
+	dHispanic_Origins	tCombineOrigins(dHispanic_Origins	l, dHispanic_Origins	r)	:=	TRANSFORM
+		SELF.origin	:=	IF(l.origin<>'',l.origin+'; '+r.origin,r.origin);
+	END;
+	// Remove blanks and duplicates and then concatinate
+	combined_origins	:=	ITERATE(DEDUP(SORT(dHispanic_Origins(origin NOT IN ['','-','NA','N/A']),origin),ALL),tCombineOrigins(LEFT,RIGHT));
+	
+	SELF.decedent_origin		:=	IF( combined_origins[COUNT(combined_origins)].origin	=	''	AND
+																	pInput.NONHISP	=	'N',
+																	'NOT SPANISH/HISPANIC/LATINO',
+																	combined_origins[COUNT(combined_origins)].origin);
+
+
+
 	SELF.decedent_sex				:= 	Lookup_CT.lkp_gender(pInput.sex);
-	SELF.decedent_age 			:= 	Lookup_CT.lkp_age(TRIM(pInput.AgeUnit_NumberOfUnits[1],ALL),TRIM(pInput.AgeUnit_NumberOfUnits[2..],ALL));
+	SELF.decedent_age 			:= 	Lookup_CT.lkp_age(TRIM(pInput.AgeUnit[1],ALL),TRIM(pInput.AgeUnit_NumberOfUnits,ALL));
+  SELF.education		 			:= 	Lookup_CT.lkp_gender(pInput.educ);	
+	SELF.occupation         :=  ut.CleanSpacesAndUpper(pInput.OCCUPA);
 	SELF.dob 								:= 	clean_dob;
 	SELF.dod 								:= 	clean_dod;
 	SELF.birthplace					:=	ut.CleanSpacesAndUpper(	
@@ -95,12 +121,16 @@ TRANSFORM
 	SELF.orig_address1			:=	TRIM(orig_address1);
 	SELF.orig_address2			:=	TRIM(orig_address2);
 	SELF.autopsy						:= 	Lookup_CT.lkp_autopsy(pInput.autopsy);
+	SELF.autopsy_findings		:=	Lookup_CT.lkp_autopsy_avail(pInput.autop_avail);
 	SELF.med_exam						:= 	Lookup_CT.lkp_med_exam(pInput.MedicalExaminerContacted);
 	SELF.disposition				:=	Lookup_CT.lkp_disposition(TRIM(pInput.MethodOfDisposition,ALL));
 	SELF.work_injury				:= 	Lookup_CT.lkp_work_injury(pInput.InjuryAtWork);
+  SELF.injury_date        :=  Std.date.ConvertDateFormatMultiple(pInput.DATE_INJURY,fmtsin,fmtout);
+  SELF.injury_location    :=  ut.CleanSpacesAndUpper(pInput.PLACE_INJRY);	
 	SELF.hospital_status		:=	Lookup_CT.lkp_hospital_status(pInput.HospitalStatus);
 	SELF.pregnancy					:=	Lookup_CT.lkp_Pregnancy(pInput.Pregnancy);
 	SELF.death_type					:=	Lookup_CT.lkp_death_type(pInput.MannerOfDeath);
+	SELF.cause							:=  self.death_type;
 	SELF.time_death					:=	IF( (UNSIGNED)pInput.dod_time > 0,
 																									Std.date.ConvertTimeFormat(
 																										IF(pInput.dod_time_ap='P',(STRING)(1200+(UNSIGNED)pInput.dod_time),pInput.dod_time),
@@ -108,7 +138,7 @@ TRANSFORM
 																									),
 																									'UNKWN'
 																								);
-	SELF.birth_cert	:=	IF(pInput.birthcertificatenumber>0,(STRING)pInput.birthcertificatenumber,'');
+	// SELF.birth_cert	:=	IF(pInput.birthcertificatenumber>0,(STRING)pInput.birthcertificatenumber,'');
 	
 	SELF.place_of_death			:=	ut.CleanSpacesAndUpper(
 																IF(pInput.POD_State_FIPS='CT',
@@ -121,8 +151,9 @@ TRANSFORM
 																	''
 																)																
 															);
+	SELF.primary_cause_of_death			:=	ut.CleanSpacesAndUpper(pInput.underlying_cause_of_death);
 	SELF.facility_death			:=	Lookup_CT.lkp_hospital_name(pInput.Hospital);
-	
+	SELF.disposition_date		:=	SELF.filed_date;
 	SELF.underlying_cause_of_death	:=	ut.CleanSpacesAndUpper(
 																				TRIM(pInput.COD1)+
 																				IF(TRIM(pInput.COD2)<>'',';'+TRIM(pInput.COD2),'')+
@@ -149,7 +180,7 @@ TRANSFORM
 	SELF.fname							:= 	TRIM(pInput.fname);
 	SELF.mname							:= 	TRIM(pInput.mname);
 	SELF.lname							:= 	TRIM(pInput.lname);
-	SELF.statefn					:=		(STRING)pInput.StateFN;
+	SELF.statefn					  :=	(STRING)pInput.StateFN;
 	SELF										:=	[];
 	
 END;

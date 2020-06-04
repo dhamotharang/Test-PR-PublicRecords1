@@ -1,4 +1,4 @@
-import AID,codes,header,ut,vehicleV2;
+﻿import AID,codes,header,ut,vehicleV2;
 
 dNCBase	:=	VehicleV2.Files.Base.NC(REG_1_CUSTOMER_NAME	<>	''	or	REG_2_CUSTOMER_NAME	<>	'');
 
@@ -116,7 +116,7 @@ dNCPartyIterationKey	:=	join(	dNCBaseSort,
 //---------------------------------------------------------------------------
 //-------NORMALIZE TWO REGISTERED OWNERS
 //---------------------------------------------------------------------------
-VehicleV2.Layout_Base.Party_BIP	tParty(dNCPartyIterationKey	pInput,integer	cnt)	:=
+VehicleV2.Layout_Base.Party_CCPA	tParty(dNCPartyIterationKey	pInput,integer	cnt)	:=
 transform
 	self.State_Bitmap_Flag						:=	0;
 	self.Date_First_Seen 							:=	(UNSIGNED) pInput.Dt_First_Seen;
@@ -205,6 +205,11 @@ transform
 	self.Ttl_Odometer_Status_Desc			:=	'';
 	self.Ttl_Odometer_Date						:=	'';
 	self.ttl_rollup_count							:=	0;
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 	self 															:=	pInput;
 	self															:=	[];
 end;
@@ -226,7 +231,7 @@ AID.MacAppendFromRaw_2Line(	dNCAddrLastPopulated,
 														lAIDAppendFlags
 													);
 
-VehicleV2.Layout_Base.Party_BIP	tAceAddress(dNCPartyAppendAID	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tAceAddress(dNCPartyAppendAID	pInput)	:=
 transform
 	self.Ace_prim_range			:=	pInput.AIDWork_AceCache.prim_range;
 	self.Ace_predir					:=	pInput.AIDWork_AceCache.predir;
@@ -251,6 +256,11 @@ transform
 	self.Ace_err_stat				:=	pInput.AIDWork_AceCache.err_stat;
 	
 	self.Append_Ace1_RawAID	:=	pInput.AIDWork_RawAID;
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 	
 	self										:=	pInput;
 end;

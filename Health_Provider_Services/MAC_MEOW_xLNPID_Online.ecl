@@ -1,5 +1,6 @@
-EXPORT MAC_MEOW_xLNPID_Online(infile,Ref='',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_CNSMR_SSN = '',Input_DOB = '',Input_CNSMR_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_TAX_ID = '',Input_BILLING_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_BILLING_NPI_NUMBER = '',Input_UPIN = '',Input_DID = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_RID = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0) := MACRO
-  IMPORT SALT29,Health_Provider_Services;
+﻿ 
+EXPORT MAC_MEOW_xLNPID_Online(infile,Ref='',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_CNSMR_SSN = '',Input_DOB = '',Input_CNSMR_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_TAX_ID = '',Input_BILLING_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_BILLING_NPI_NUMBER = '',Input_UPIN = '',Input_DID = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_RID = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Soapcall_RoxieIP = '',Soapcall_Timeout = 3600,Soapcall_Time_Limit = 0,Soapcall_Retry = 0,Soapcall_Parallel = 2,OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0) := MACRO
+  IMPORT SALT311,Health_Provider_Services;
   ServiceModule := 'Health_Provider_Services.';
 #uniquename(into)
 Health_Provider_Services.Process_xLNPID_Layouts.InputLayout %into%(infile le) := TRANSFORM
@@ -22,7 +23,7 @@ Health_Provider_Services.Process_xLNPID_Layouts.InputLayout %into%(infile le) :=
     SELF.LNAME := (TYPEOF(SELF.LNAME))'';
   #END
   #IF ( #TEXT(Input_SNAME) <> '' )
-    SELF.SNAME := (TYPEOF(SELF.SNAME))Health_Provider_Services.fn_clean_suffix(le.Input_SNAME);
+    SELF.SNAME := (TYPEOF(SELF.SNAME))le.Input_SNAME;
   #ELSE
     SELF.SNAME := (TYPEOF(SELF.SNAME))'';
   #END
@@ -182,10 +183,16 @@ Health_Provider_Services.Process_xLNPID_Layouts.InputLayout %into%(infile le) :=
     SELF.ADDRESS := (TYPEOF(SELF.ADDRESS))'';
   #END
 END;
+#uniquename(Soapcall_RoxieIP_temp)
+  #IF ( #TEXT(Soapcall_RoxieIP) <> '' )
+	  %Soapcall_RoxieIP_temp% := Soapcall_RoxieIP;
+  #ELSE
+      %Soapcall_RoxieIP_temp% := Health_Provider_Services.MEOW_roxieip;
+  #END
 #uniquename(pr)
   %pr% := PROJECT(infile,%into%(LEFT)); // Into roxie input format
 #uniquename(res_out)
-SALT29.MAC_Soapcall(%pr%,Health_Provider_Services.Process_xLNPID_Layouts.OutputLayout, Health_Provider_Services.MEOW_roxieIP, ServiceModule+'MEOW_xLNPID_Service', %res_out%);
+SALT311.MAC_Soapcall(%pr%,Health_Provider_Services.Process_xLNPID_Layouts.OutputLayout, %Soapcall_RoxieIP_temp%, ServiceModule+'MEOW_xLNPID_Service', %res_out%,,,Soapcall_Timeout,Soapcall_Time_Limit,Soapcall_Retry,Soapcall_Parallel);
 OutFile := %res_out%;
   #IF (#TEXT(Stats)<>'')
     Stats := Health_Provider_Services.Process_xLNPID_Layouts.ScoreSummary(OutFile);

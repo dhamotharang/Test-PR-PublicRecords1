@@ -6,11 +6,17 @@
 +'wuname := \'NAC Contributory Pilot\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 ;
+  
+
+STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+STRING alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Devs&NOC','');
+
+
 
 lECL1 :=
 envVars
 +'email(string msg):=fileservices.sendemail(\n'
-+'																					\'jose.bello@lexisnexis.com\'\n'
++'   \'' + ProcessRecipient +     '\'\n'
 +'																					,\'NAC Build\'\n'
 +'																					,msg\n'
 +'																					+\'Build wuid \'+workunit\n'
@@ -37,7 +43,7 @@ ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_30_s
 #WORKUNIT('name', 'Sat NAC Contributory Build');
  Sat_at_10_AM:='0 15 * * 6';
  _Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(Sat_at_10_AM))
-																								 ,FAILURE(fileservices.sendemail(NAC.Mailing_List('').Dev1
+																								 ,FAILURE(fileservices.sendemail(alertList
 																																								 ,'Sat NAC Contributory Build schedule failure'
 																																								 ,'schedule failure\n'
 																																								 +'schedule failure\n'

@@ -1,4 +1,4 @@
-/*2011-05-03T12:42:30Z (Cecelie_p Guyton)
+﻿/*2011-05-03T12:42:30Z (Cecelie_p Guyton)
 
 */
 //****************Maps infutor CID to a common layout********************
@@ -6,7 +6,8 @@ import Gong, ut, _validate, InfutorCID, Mdr, Inquiry_Acclogs;
 
 /* Source 'IQ' is not being used in MDR.sourceTools and would make a good canidate if necessary */
 
-dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.History(
+// dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.History(
+dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.historyAll(
 									~inquiry_acclogs.fntranslations.is_Opt_Out(allow_flags.allowflags) and
 									 trim(person_q.lname,all) <> '' and
 									 trim(person_q.Personal_Phone + person_q.work_phone, all) <> '' and
@@ -108,7 +109,8 @@ transform(Layout_In_Phonesplus.Layout_In_Common,
 																	(data)self.fname);
 																	
 	self.company 								:= '';
-
+  self.source			:= mdr.sourceTools.src_InquiryAcclogs; //DF-25784
+	self.cellphone 	:= self.npa + self.phone7; //DF-25784		
 	self := left), local);
 	
 distPhoneFile := distribute(phone_file(trim(origname + lname, all) <> '' and (unsigned)orig_phone > 0 and did > 0), hash(origname, fname, lname, orig_phone, company));

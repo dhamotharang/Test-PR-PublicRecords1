@@ -1,15 +1,21 @@
-﻿import versioncontrol,tools, data_services;
+﻿import versioncontrol,tools, data_services, dx_InquiryHistory, ut;
 
 export Filenames(boolean isUpdate = true, boolean isFCRA = true, string pVersion = '') := module
 
-  shared period 						:= if(isUpdate,'::','::history::' );   
+	shared period 					  := if(isUpdate,'::daily','::weekly' );   
 	shared fcra               := if(isFCRA  ,'::fcra' ,'::non_fcra');	
-	
-	shared lBase 							:= data_services.Data_location.Prefix('INQL')+'thor_data' + '::base::' + INQL_FFD._Constants.DatasetName + fcra;
-	shared lBaseTemplate			:= lBase + period + '@version@';
-	export Base								:= tools.mod_FilenamesBuild(lBaseTemplate, pVersion);
+	export root               := '~' + Inql_ffd._Constants.THOR_ROOT + '::' + dx_InquiryHistory.Constants.dataset_name + fcra;	
+		
+	shared lBase 						 	:= root + '::base';
+	shared lBaseTemplate			:= lBase + period + '::@version@';
+	export Base							 	:= tools.mod_FilenamesBuild(lBaseTemplate, pVersion, pnGenerations:=2);
 
-	export lInputTemplate			:= data_services.Data_location.Prefix('INQL')+'thor_data' + '::in::' + INQL_FFD._Constants.DatasetName + fcra;
-	export lInputHistTemplate := data_services.Data_location.Prefix('INQL')+'thor_data' + '::in::' + INQL_FFD._Constants.DatasetName + fcra + '::history';	    
+	export Input							:= root + '::in';   
+	export InputFile					:= Input + '::' + pVersion;
+	export InputBuilding	    := Input + '::building';	
+	export InputBuilt		      := Input + '::built';		
+	export InputHistory	      := Input + '::history';
+	
+	
   	
 end;

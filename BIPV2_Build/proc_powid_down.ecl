@@ -141,7 +141,7 @@ EXPORT proc_powid_down(
         ,pSetNameCalculations := SetNameCalculations
         ,pBuildName           := 'PowIters'
         ,pNotifyEmails        := pEmailList
-        ,pOutputFilename      := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_powid_down.iterations'
+        ,pOutputFilename      := '~BIPV2_build::@version@::workunit_history::proc_powid_down.iterations'
         ,pOutputSuperfile     := '~BIPV2_build::qa::workunit_history' 
         ,pCompileOnly         := pCompileTest
         );

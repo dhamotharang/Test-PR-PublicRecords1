@@ -9,6 +9,7 @@ sfShuffle := sequential(
 	//fileservices.addsuperfile('~thor_data400::base::qsent_grandfather','~thor_data400::base::qsent_father',0,true),
 	//fileservices.clearsuperfile('~thor_data400::base::qsent_father'),
 	//fileservices.addsuperfile('~thor_data400::base::qsent_father','~thor_data400::base::qsent',0,true),
+	//DF-27305 - add following lines back to ensure latest base file is added to the super file
 	fileservices.clearsuperfile('~thor_data400::base::qsent', true),
 	fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
 	fileservices.finishsuperfiletransaction()
@@ -48,7 +49,7 @@ Phonesplus.MAC_Build_qsent(dist_DSqsent, filedate, fname,mname,lname,
 DS_qsent_rec := record
 	unsigned6 fdid;
 	// CCPA-5 Add CCPA fields
-	Phonesplus.layoutCommonKeys_CCPA;
+	Phonesplus.layoutCommonKeys;
 end;
 
 DS_qsent_rec slim_it(dist_DSqsent  l) := transform
@@ -76,7 +77,7 @@ ut.MAC_SK_Move_v2('~thor_data400::key::qsent_fdids', 'Q', mv_fdids_key);
 ut.mac_sk_move_v2('~thor_data400::key::qsent_companyname','Q',mv2qa_qcname);
 
 /* **ROXIE KEY NOTIFICATION EMAIL********************************************************************************************************** */	
-email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; tgibson@seisint.com ; fhumayun@seisint.com',
+email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; jason.allerdings@lexisnexisrisk.com',
 								 
 								'qsent: BUILD SUCCESS '+ filedate ,
 								'keys: 1) thor_data400::key::qsent_address_qa(thor_data400::key::qsent::'+ filedate +'::address),\n' +

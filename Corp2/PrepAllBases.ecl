@@ -1,4 +1,4 @@
-IMPORT Address, NID, Corp2_Mapping, Corp2, AID;
+﻿IMPORT Address, NID, Corp2_Mapping, Corp2, AID;
 
 EXPORT PrepAllBases := module
 
@@ -32,7 +32,16 @@ EXPORT PrepAllBases := module
 		dCont := 	project(inContBase, tPreProcessCont(left,counter));
 
 		//-------------------------------
-
+		Corp2_Mapping.LayoutsCommon.main tGetAllTitles(Corp2_Mapping.LayoutsCommon.main l, unsigned4 c) :=	transform,
+							skip(c = 2 and corp2.t2u(l.cont_title2_desc) = '' or
+									 c = 3 and corp2.t2u(l.cont_title3_desc) = '' or
+									 c = 4 and corp2.t2u(l.cont_title4_desc) = '' or
+									 c = 5 and corp2.t2u(l.cont_title5_desc) = '')
+			self.cont_title1_desc					:=	choose(c,l.cont_title1_desc,l.cont_title2_desc,l.cont_title3_desc,l.cont_title4_desc,l.cont_title5_desc);
+			self													:=	l;
+		end;		
+		
+		dMainAllTitles	:=	normalize(inMainUpdate,5,tGetAllTitles(left, counter));
 
 		Corp2_Mapping.LayoutsCommon.Temporary tPreProcessMain(Corp2_Mapping.LayoutsCommon.main l, unsigned4 cnt) :=	transform
 			self.unique_id								:=	cnt;
@@ -44,7 +53,7 @@ EXPORT PrepAllBases := module
 			self													:=	[];
 		end;
 	
-		dMain := 	project(inMainUpdate, tPreProcessMain(left,counter));
+		dMain := 	project(dMainAllTitles, tPreProcessMain(left,counter));
 
 		combined	:=	distribute(dCorp + dCont + dMain,hash(corp_key));
 

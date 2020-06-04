@@ -12,14 +12,20 @@ module
   export prod_name          := 'Prod_Thor'                        ; //should match what _Control.ThisEnvironment.Name is in your dev and prod environments
   export dev_name           := 'Dataland'                         ;
 
-  export prod_dali          := 'prod_dali.br.seisint.com'         ;
+  export prod_dali          := 'uspr-prod-thor-dali.risk.regn.net'         ;
   export dev_dali           := 'dataland_dali.br.seisint.com'     ; //10.173.14.201
 
   export prod_hthor         := 'hthor_eclcc'                            ;
   export dev_hthor          := 'hthor_dev_eclcc'                        ;
 
-  export ProdEsps           := ['prod_esp.br.seisint.com'     ,'10.173.84.202'  ,'10.173.85.202'  ,'10.241.20.202','10.241.30.202','10.173.84.205' ];
+  export alpha_prod_hthor   := 'hthor_prod_eclcc'                       ;
+  export alpha_dev_hthor    := 'hthor_dev_eclcc'                        ;
+
+  export ProdEsps           := ['prod_esp.br.seisint.com', '10.173.84.202'  ,'10.173.85.202'  ,'10.241.20.202','10.241.30.202','10.173.84.205' ];
   export DevEsps            := ['10.173.14.204','dataland_esp.br.seisint.com'  ,'10.173.14.207'                                 ];  
+
+  export AlphaProdEsps     	:= ['alpha_prod_thor_esp.risk.regn.net'];
+  export AlphaDevEsps      	:= [_Control.IPAddress.adataland_esp  ,'10.194.73.202','10.194.72.202'];
   
   export emailSender        := 'eclsystem@seisint.com'            ;
   export MailServer         := 'mailout.br.seisint.com'           ;
@@ -77,7 +83,12 @@ module
   export LocalEsp               := if(IsDev  ,DevEsp  ,ProdEsp   );
   export LocalEsps              := if(IsDev  ,DevEsps ,ProdEsps  );
   
-  export Esp2Hthor(string pEsp) := if(pEsp in DevEsps ,dev_hthor  ,prod_hthor   );
+  export Esp2Hthor(string pEsp) := trim(map( pEsp in DevEsps       => dev_hthor  
+                                  ,     pEsp in ProdEsps      => prod_hthor   
+                                  ,     pEsp in AlphaProdEsps => alpha_prod_hthor   
+                                  ,     pEsp in AlphaDevEsps  => alpha_dev_hthor   
+                                  ,                              ''
+                                  ));
   export Esp2Name (string pEsp) := if(pEsp in DevEsps ,dev_name   ,prod_name    );
   
   export LocalHthor             := Esp2Hthor(LocalEsp);

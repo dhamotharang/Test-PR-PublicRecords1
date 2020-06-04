@@ -167,6 +167,13 @@ EXPORT Layout_common := module
 		string15		caller_id									:= '';
 	end;
 	
+	//Phones Metadata Base Layout: DF-26977
+	export temp_PortedMetadata_Main := record
+		portedMetadata_Main;
+		string    name;
+		string 	  src;
+	end;
+	
 	//Phones Transaction Base Layout
 	//dx_PhonesInfo.Layouts.Phones_Transaction_Main;
 	

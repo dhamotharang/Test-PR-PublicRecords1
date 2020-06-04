@@ -41,7 +41,7 @@ export Files := module;
 	export Base_prev := DATASET(Superfile_List.Base_prev,Layouts.base, THOR);
 	export Collisions  := DATASET(Superfile_List.Collisions,Layouts.Collisions, THOR,opt);
 	export Collisions2  := DATASET(Superfile_List.sfCollisions, Layout_Collisions2.Layout_Collisions, THOR,opt);
-	export NewCollisions  := DATASET(Superfile_List.sfNewCollisions, Layout_Collisions2.Layout_Collisions, THOR,opt);
+	export fNewCollisions  := DATASET(Superfile_List.sfNewCollisions, Layout_Collisions2.Layout_Collisions, THOR,opt);
 	
 	//export temp      := DATASET(Superfile_List.temp,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);
 	export rejected  := DATASET(Superfile_List.rejectedFiles,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);

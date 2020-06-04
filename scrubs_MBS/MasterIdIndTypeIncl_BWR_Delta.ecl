@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_MBS.MasterIdIndTypeIncl_BWR_Delta - Finding the Delta of Two Files - SALT V3.9.0');
-IMPORT Scrubs_MBS,SALT39;
+#workunit('name','Scrubs_MBS.MasterIdIndTypeIncl_BWR_Delta - Finding the Delta of Two Files - SALT V3.11.8');
+IMPORT Scrubs_MBS,SALT311;
 FilePrev := DATASET([], MasterIdIndTypeIncl_Layout_MasterIdIndTypeIncl);
 FileNew := DATASET([], MasterIdIndTypeIncl_Layout_MasterIdIndTypeIncl);
 d := Scrubs_MBS.MasterIdIndTypeIncl_Delta(FilePrev, FileNew); // Instantiate delta module

@@ -1,4 +1,4 @@
-envVars :=
+﻿envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -9,10 +9,14 @@ envVars :=
 +'#OPTION(\'AllowedClusters\',\'thor400_30 ,thor400_20 ,thor400_92\');\n'
 ;
 
+ 
+STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
+
 lECL1 :=
 envVars
 +'email(string msg):=fileservices.sendemail(\n'
-+'																					\'jose.bello@lexisnexis.com\'\n'
++'   \'' + ProcessRecipient +     '\'\n'
 +'																					,\'NAC Build\'\n'
 +'																					,msg\n'
 +'																					+\'Build wuid \'+workunit\n'

@@ -1,4 +1,4 @@
-import  UCCV2,RoxieKeyBuild,promoteSupers,autokey;
+﻿import  UCCV2,RoxieKeyBuild,promoteSupers,autokey;
 
 export Proc_Build_UCC_Keys(string filedate) := function
 
@@ -19,9 +19,10 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_RMSID,SuperKeyName+'RMSID',BaseKe
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(uccv2.Key_Did_w_Type(),SuperKeyName+'did_w_type',BaseKeyName+'::did_w_type',key11);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(uccv2.Key_Bdid_w_Type,SuperKeyName+'bdid_w_type',BaseKeyName+'::bdid_w_type',key12);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(UCCV2.Key_LinkIds.key,SuperKeyName+'linkids',BaseKeyName+'::linkids',key13);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_rmsid_party_linkids(),SuperKeyName+'party_rmsid_linkids',BaseKeyName+'::party_rmsid_linkids',key14);
+//Deprecated Key - Jira DF-26976
+//RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_rmsid_party_linkids(),SuperKeyName+'party_rmsid_linkids',BaseKeyName+'::party_rmsid_linkids',key14);
 
-Keys_NON_FCRA := parallel(key1,key2,key3,key4,key5,key6,key7,key8,key9,key10,key11,key12,key13,key14);
+Keys_NON_FCRA := parallel(key1,key2,key3,key4,key5,key6,key7,key8,key9,key10,key11,key12,key13);
 
 //Move NON_FCRA Logical Key File Names to the associated Key Superfile Names
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'did',BaseKeyName+'::did',mv1,2);
@@ -37,9 +38,9 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'RMSID',BaseKeyName+'::RMSID'
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'did_w_type',BaseKeyName+'::did_w_type',mv11,2);
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'bdid_w_type',BaseKeyName+'::bdid_w_type',mv12,2);
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'linkids',BaseKeyName+'::linkids',mv13,2);
-RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'party_rmsid_linkids',BaseKeyName+'::party_rmsid_linkids',mv14,2);
+//RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'party_rmsid_linkids',BaseKeyName+'::party_rmsid_linkids',mv14,2);
 
-Move_NON_FCRA_keys := parallel(mv1, mv2, mv3, mv4, mv5, mv6, mv7, mv8, mv9,mv10,mv11,mv12,mv13,mv14);	
+Move_NON_FCRA_keys := parallel(mv1, mv2, mv3, mv4, mv5, mv6, mv7, mv8, mv9,mv10,mv11,mv12,mv13);	
 
 //Move NON_FCRA Keys from Built to QA
 promoteSupers.MAC_SK_Move_V2(SuperKeyName+'did','Q',toq1,2);
@@ -55,9 +56,9 @@ promoteSupers.MAC_SK_Move_V2(SuperKeyName+'RMSID','Q',toq10,2);
 promoteSupers.MAC_SK_Move_V2(SuperKeyName+'did_w_type','Q',toq11,2);
 promoteSupers.MAC_SK_Move_V2(SuperKeyName+'bdid_w_type','Q',toq12,2);
 promoteSupers.MAC_SK_Move_V2(SuperKeyName+'linkids','Q',toq13,2);
-promoteSupers.MAC_SK_Move_V2(SuperKeyName+'party_rmsid_linkids','Q',toq14,2);
+//promoteSupers.MAC_SK_Move_V2(SuperKeyName+'party_rmsid_linkids','Q',toq14,2);
 						
-To_NON_FCRA_qa    :=parallel(toq1, toq2, toq3, toq4, toq5, toq6, toq7, toq8, toq9,toq10,toq11,toq12,toq13,toq14);
+To_NON_FCRA_qa    :=parallel(toq1, toq2, toq3, toq4, toq5, toq6, toq7, toq8, toq9,toq10,toq11,toq12,toq13);
 
 
 // Process FCRA KEYS		

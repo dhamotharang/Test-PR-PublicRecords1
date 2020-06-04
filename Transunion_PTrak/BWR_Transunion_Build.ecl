@@ -44,7 +44,8 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 			,Orbit3.proc_Orbit3_CreateBuild_AddItem ('TUCS PTrak',update_filedate,'N',runaddcomponentsonly := true)
 		 ,_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_TUCS\');\r\n'+
 																	'Scrubs_TUCS.proc_generate_report();',thorlib.group())
-	);
+	):success(Transunion_PTrak.Send_Email(update_filedate).build_success),
+	  failure(Transunion_PTrak.Send_Email(update_filedate).build_failure);
  endmacro
  ;
 

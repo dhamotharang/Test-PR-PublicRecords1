@@ -10,7 +10,7 @@ EXPORT Send_Emails(
 	,STRING								pEmailList							= Equifax_Business_Data.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
 	,STRING								pRoxieEmailList					= Equifax_Business_Data.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= Equifax_Business_Data._Constants().Name
-	,STRING								pPackageName						= 'Equifax_Business_DataKeys'
+	,STRING								pPackageName						= 'EquifaxBusDataKeys'
 	,STRING								pBuildMessage						= 'Base Files Finished'
 ) := tools.mod_SendEmails(pversion
 		                     ,pBuildFilenames					
@@ -19,4 +19,7 @@ EXPORT Send_Emails(
 		                     ,pBuildName							
 		                     ,pPackageName			
 		                     ,pBuildMessage
-		                     ,pShouldUpdateRoxiePage);
+		                     ,pShouldUpdateRoxiePage
+												 ,
+												 ,'N'
+												 );

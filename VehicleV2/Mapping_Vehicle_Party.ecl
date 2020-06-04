@@ -1,11 +1,11 @@
-import VehLic,Vehiclev2,address,doxie_files,Codes,watchdog,ut,VehicleCodes,header;
+﻿import VehLic,Vehiclev2,address,doxie_files,Codes,watchdog,ut,VehicleCodes,header;
 
 temp_veh_in	:=	VehicleV2.mapping_TEMP_party;
 
 //temp_veh_in	:=	dataset('~thor_data400::persist::vehicleV2::vehicleV1_temp_party',VehicleV2.Layout_Base.Party,thor);
 
 //mapping owner
-VehicleV2.Layout_Base.Party_BIP	townerparty(temp_veh_in	L,integer	cnt)	:=
+VehicleV2.Layout_Base.Party_CCPA	townerparty(temp_veh_in	L,integer	cnt)	:=
 transform
 	self.sequence_key                 :=	(string15)L.sequence_key;
 	self.State_Bitmap_Flag						:=	0;
@@ -128,6 +128,11 @@ transform
 	self.Ttl_Odometer_Date						:=	L.ODOMETER_DATE;
 	self.PREVIOUS_TITLE_STATE					:=	'';
 	self.history											:=	if(L.history = 'E','H',L.history);
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 
 	self															:=	L;
 	self															:=	[];
@@ -141,7 +146,7 @@ file_owner_add_field1  	:=	Vehicle_owner_norm(orig_name <> '' or lname <> '');
 
 file_codesV3_desc_ttl  	:=	Codes.File_Codes_V3_In(file_name	=	'VEHICLE_REGISTRATION'	and	field_name	=	'TITLE_STATUS_CODE');
 						
-VehicleV2.Layout_Base.Party_BIP	tjoin2_ttl(file_owner_add_field1	L,file_codesV3_desc_ttl	R)	:=
+VehicleV2.Layout_Base.Party_CCPA	tjoin2_ttl(file_owner_add_field1	L,file_codesV3_desc_ttl	R)	:=
 transform
 	self.ttl_Status_Desc	:=	R.long_desc;
 	self									:=	L;
@@ -162,7 +167,7 @@ owner_concat_ttl       	:=	owner_codesV3_join_ttl;
 //Add Odometer_Status_Description
 file_codesV3_desc_odm	:= Codes.File_Codes_V3_In(file_name	=	'VEHICLE_REGISTRATION'	and	field_name	=	'ODOMETER_STATUS');
 							
-VehicleV2.Layout_Base.Party_BIP tjoin2_odm(owner_concat_ttl	L,file_codesV3_desc_odm	R )	:=
+VehicleV2.Layout_Base.Party_CCPA tjoin2_odm(owner_concat_ttl	L,file_codesV3_desc_odm	R )	:=
 transform
 	self.Ttl_Odometer_Status_Desc	:=	R.long_desc;
 	self													:=	L;
@@ -183,7 +188,7 @@ vehicle_owner			:= owner_codesV3_join_odm;
 //*************************************************************************************************************
 //mapping registration 
 
-VehicleV2.Layout_Base.Party_BIP tregparty(temp_veh_in L,integer cnt)	:=
+VehicleV2.Layout_Base.Party_CCPA tregparty(temp_veh_in L,integer cnt)	:=
 transform
 	self.sequence_key                 :=	(string15)L.sequence_key;
 	self.State_Bitmap_Flag						:=	0;
@@ -306,7 +311,7 @@ file_reg_add_field	:=	Vehicle_REG_norm(orig_name <> '' or lname <> '');
 file_codesV3_desc	:=	Codes.File_Codes_V3_In(file_name	=	'VEHICLE_REGISTRATION'	and	field_name	=	'REGISTRATION_STATUS_CODE');
 reg_codeV3_nojoin	:=	file_reg_add_field(REG_STATUS_CODE = '');
 
-VehicleV2.Layout_Base.Party_BIP	tjoin2(file_reg_add_field	L,file_codesV3_desc	R )	:=
+VehicleV2.Layout_Base.Party_CCPA	tjoin2(file_reg_add_field	L,file_codesV3_desc	R )	:=
 transform
 	self.Reg_Status_Desc	:=	R.long_desc;
 	self									:=	L;
@@ -349,7 +354,7 @@ vehicle_reg	:= reg_concat2;
 
 
 // modify pname and cname issues when orig_party_type = 'B' and 'I'
-VehicleV2.Layout_Base.Party_BIP tfixname(VehicleV2.Layout_Base.Party_BIP L)	:=
+VehicleV2.Layout_Base.Party_CCPA tfixname(VehicleV2.Layout_Base.Party_CCPA L)	:=
 transform
 	boolean iscname					:=	if(L.lname in ['LT','INFINITI LT'],true,false);																						 
 												 

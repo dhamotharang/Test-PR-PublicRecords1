@@ -11,30 +11,30 @@ EXPORT Promote(string     pVersion      =  ''
 							,unsigned1  pnGenerations = 3
 				):= MODULE
 		
-		export INQL := module				
+		export INQL := module		
+	
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pVersion, fcra).INQL_Base.dAll_filenames
-															,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
+															,INQL_v2.Filenames(pVersion, fcra, pDaily).INQL_Base.dAll_filenames
+															,INQL_v2.keynames(pDaily, fcra, pVersion).dAll_filenames
 															);
-			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+															
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
 		end;
 		
 		export SBA := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pVersion, fcra).SBA_Base.dAll_filenames
-															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			dataset(lay_builds)  pBuildFilenames := INQL_v2.Filenames(pVersion, fcra, pDaily).SBA_Base.dAll_filenames;
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
 		end;
 		
 		export Batch_PIIs := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pVersion, fcra).Batch_PIIs_Base.dAll_filenames
-															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			dataset(lay_builds)  pBuildFilenames := INQL_v2.Filenames(pVersion, fcra, pdaily).Batch_PIIs_Base.dAll_filenames;
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
 		end;	
-		
+
+		export BillGroups_DID := module				
+			dataset(lay_builds)  pBuildFilenames := INQL_v2.Filenames(pVersion, fcra, pDaily).BillGroups_DID_Base.dAll_filenames;
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
+		end;		
 		
 		export MBS_Deconfliction := module				
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
@@ -51,13 +51,5 @@ EXPORT Promote(string     pVersion      =  ''
 															);
 			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
 		end;
-		
-		// export INQL := module				
-			// dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															// ,INQL_v2.Filenames(pVersion, fcra).INQL_Base.dAll_filenames
-															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
-															// );
-			// export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		// end;
 		
 END;

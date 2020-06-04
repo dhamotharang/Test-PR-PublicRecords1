@@ -51,18 +51,20 @@
 		useOtherEnvironmentDali(BOOLEAN useProdData) := NOT((isProd AND useProdData) OR (~isProd AND ~useProdData));
 		EXPORT fileLocation(BOOLEAN useProdData)	:= IF(useProdData, data_services.foreign_prod, data_services.foreign_dataland);
 		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
-		// EXPORT fileScope						:= 'fraudgov::base::20190502::kel::';
+		// EXPORT fileScope						:= 'gov::otto::';
+		// EXPORT fileScope						:= 'fraudgov::base::20191025::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
-		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrZWUyMDE5IQ==';
+		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMjAhISE=';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
+		EXPORT DspCert							:= 'dsp-cert';
 		EXPORT DspQa								:= 'dsp-qa';
-		// EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
-		EXPORT HpccConnectionProd		:= 'ramps';
+		EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
-		EXPORT EclCompileStrategy		:= 'REMOTE';											
+		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
+		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT ForceRun							:= 'FALSE';
 		EXPORT CustomerDashboard 		:= MODULE
@@ -71,6 +73,23 @@
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
 				EXPORT InputLogicalGraph				:= fileLocation(useProdData) + fileScope + 'customerdashtopclustersandelements';
 				EXPORT InputLogicalEntityStats	:= fileLocation(useProdData) + fileScope + 'customerdashtopentitystats';
+			END;
+		END;
+		EXPORT CustomerDashboard1_1		:= MODULE
+			EXPORT VizServiceVersion								:= '2';
+			EXPORT CompositionUuid									:= '4dbbbb5c-e1d6-40ef-a8f9-51a33b35260a'; 	//Customer Dashboard 1.1 Composition ID
+			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
+				EXPORT InputLogicalCluster								:= fileLocation(useProdData) + fileScope + 'customerdashtopclusters';
+				EXPORT InputLogicalIdentitiesAndElements	:= fileLocation(useProdData) + fileScope + 'customerdashtopclustersandelements';
+				EXPORT InputLogicalEntityStats						:= fileLocation(useProdData) + fileScope + 'entitystats';
+			END;
+		END;
+		EXPORT HighRiskIdentityDashboard := MODULE
+			EXPORT VizServiceVersion															:= '1';
+			EXPORT CompositionUuid																:= 'd5d67f72-b428-4157-8f90-0b124f885c77'; 	//High Risk Identity Dashboard Composition ID		
+			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
+				EXPORT InputLogicalPersonStats								:= fileLocation(useProdData) + fileScope + 'personstats';
+				EXPORT InputLogicalEntityStats								:= fileLocation(useProdData) + fileScope + 'entitystats';
 			END;
 		END;
 		EXPORT ClusterDetailsDashboard := MODULE

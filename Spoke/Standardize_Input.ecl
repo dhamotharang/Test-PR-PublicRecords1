@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header;
+﻿import _control, MDR, Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header, Std;
 
 // -- add unique id
 // -- standardize name
@@ -203,8 +203,9 @@ module
 																,left outer
 															);
 		
+		addGlobalSID := MDR.macGetGlobalSid(dCleanDatesAppended, 'Spoke', '', 'global_sid'); //DF-25334: Append Global_SIDs
 	
-		return dCleanDatesAppended;
+		return addGlobalSID;
 	
 	end;
 	

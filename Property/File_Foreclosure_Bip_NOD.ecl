@@ -1,6 +1,6 @@
 ﻿import BIPV2;
 
-file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='N');
+file_in := Property.File_Foreclosure_Normalized(trim(deed_category)IN ['N','R','L']);
 
 BIP_layout:=record
 	string70		foreclosure_id;

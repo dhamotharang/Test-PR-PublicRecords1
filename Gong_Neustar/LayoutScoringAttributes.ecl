@@ -1,4 +1,4 @@
-EXPORT LayoutScoringAttributes := MODULE
+﻿EXPORT LayoutScoringAttributes := MODULE
 EXPORT Gong_partial := record
   string1 dual_name_flag:='';
   unsigned integer8 sequence_number:=0;
@@ -111,6 +111,9 @@ END;
 EXPORT KeyLayout := record
 Gong_partial;
 ScoringAttributes;
+//CCPA-22 add did/global_sid/record_sid
+UNSIGNED4	        global_sid := 0;
+UNSIGNED8         record_sid := 0;
 END;
 
 END;

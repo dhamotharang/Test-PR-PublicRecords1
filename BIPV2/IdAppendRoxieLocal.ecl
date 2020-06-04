@@ -1,22 +1,24 @@
-﻿import Address;
+﻿import dx_Header;
 import BIPV2;
 import BIPV2_Company_Names;
 import BIPV2_Suppression;
 import BizLinkFull;
 import SALT311;
 import Std.Str;
+import BIPV2_xlink_segmentation;
 
 // Should we disable fallback? Can we disable fallback?
 
 export IdAppendRoxieLocal(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 0
+		,unsigned weightThreshold = 44
 		,boolean disableSaltForce = false
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,boolean reAppend = true
+		,boolean segmentation = true
 	) := function
 
 inputRecPlus := {
@@ -35,7 +37,7 @@ inputDsZip :=
 		newState0 := Str.ToUpperCase(if(count(airportReplacement) = 0, left.state, airportReplacement[2]));
 		newState := if(newState0 != '', newState0,
 		               if(newCity = '', '',
-		                  Address.Key_CityStChance(city_name = newCity and percent_chance >= 99)[1].st));
+		                  dx_Header.Key_CityStChance()(KEYED(city_name = newCity) and percent_chance >= 99)[1].st));
 		inputZipRadius := left.zip_radius_miles;
 		zipsExpanded := BIPV2.fn_get_zips_2(newCity, newState, left.zip5, left.zip_radius_miles);
 		zipCases := project(zipsExpanded, transform(BizLinkFull.Process_Biz_Layouts.layout_zip_cases,
@@ -101,78 +103,198 @@ SALTInput := project(inputDsCnp, transform({BizLinkFull.Process_Biz_Layouts.Inpu
 ));
 
 // get meow_biz.raw_results
-rawResults := BizLinkFull.MEOW_Biz(SALTInput).raw_results; 
+meowBizRawResults := BizLinkFull.MEOW_Biz(SALTInput).raw_results; 
 
-// apply score threshold
-// convert layout 
-topScores := 
-	project(rawResults, transform(BIPV2.IdAppendLayouts.IdsOnly,
-		topProx0 := topn(left.results(proxid != 0), 1, -score, proxid)(score >= scoreThreshold, weight >= weightThreshold);
-		// If doing address matching and prim name/range post-force, check for no mismatch
-		// topProx := if('A' not in matchSet or not primForcePost, topProx0,
-		topProx := if(not primForcePost, topProx0,
-		              topProx0((left.prim_range != '' and prim_range_match_code = SALT311.MatchCode.ExactMatch)
-		                         or (not (left.prim_range != '' and prim_rangeWeight <= 0)
-		                               and not (left.prim_name != '' and prim_nameWeight <= 0)
-		                       )));
-		topSele := topn(left.results_seleid(seleid != 0), 1, -score)(score >= scoreThreshold, weight >= weightThreshold);
-		topOrg  := topn(left.results_orgid(orgid != 0),  1, -score)(score >= scoreThreshold, weight >= weightThreshold);
-		topUlt  := topn(left.results_ultid(ultid != 0),  1, -score)(score >= scoreThreshold, weight >= weightThreshold);
-		topPow  := topn(left.results_powid(powid != 0),  1, -score)(score >= scoreThreshold, weight >= weightThreshold);
-		self.proxid     := if(exists(topProx), topProx[1].proxid, 0);
-		self.proxWeight := if(exists(topProx), topProx[1].weight, 0);
-		self.proxScore  := if(exists(topProx), topProx[1].score,  0);
-		self.seleid     := if(exists(topSele), topSele[1].seleid, 0);
-		self.seleWeight := if(exists(topSele), topSele[1].weight, 0);
-		self.seleScore  := if(exists(topSele), topSele[1].score,  0);
-		self.orgid      := if(exists(topOrg),  topOrg[1].orgid,   0);
-		self.orgWeight  := if(exists(topOrg),  topOrg[1].weight,  0);
-		self.orgScore   := if(exists(topOrg),  topOrg[1].score,   0);
-		self.ultid      := if(exists(topUlt),  topUlt[1].ultid,   0);
-		self.ultWeight  := if(exists(topUlt),  topUlt[1].weight,  0);
-		self.ultScore   := if(exists(topUlt),  topUlt[1].score,   0);
-		self.powid      := if(exists(topPow),  topPow[1].powid,   0);
-		self.powWeight  := if(exists(topPow),  topPow[1].weight,  0);
-		self.powScore   := if(exists(topPow),  topPow[1].score,   0);
-		self.request_id := left.uniqueid;
-		self := left;
-		self := []));
+OutSegResult := BIPV2_xlink_segmentation.mac_Segmentation(meowBizRawResults, ,UniqueId);
 
-	// If there is an unambiguous proxid, then the higher level ids should go with this proxid.
-	preIdStream := project(topScores(proxid != 0 or seleid != 0),
-		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
-			self.uniqueid := left.request_id,
-			self.seleid := if(left.proxid != 0, 0, left.seleid);
-			self.orgid := 0;
-			self.ultid := 0;
-			self.powid := if(left.proxid != 0, 0, left.powid);
-			self := left,
-			self := []));
-	addHigherIds := BizLinkFull.Process_Biz_Layouts.id_stream_complete(preIdStream);
-	fixScores :=
-		join(topScores, addHigherIds,
-			left.request_id = right.uniqueid,
-			transform(recordof(left),
-				newSele := right.seleid != 0 and left.seleid != right.seleid;
-				newOrg := right.orgid != 0 and left.orgid != right.orgid;
-				newUlt := right.ultid != 0 and left.ultid != right.ultid;
-				newPow := right.powid != 0 and left.powid != right.powid;
-				self.seleid := if(newSele, right.seleid, left.seleid);
-				self.seleWeight := if(newSele, left.proxWeight, left.seleWeight);
-				self.seleScore := if(newSele, left.proxScore, left.seleScore);
-				self.orgid := if(newOrg, right.orgid, left.orgid);
-				self.orgWeight := if(newOrg, left.proxWeight, left.orgWeight);
-				self.orgScore := if(newOrg, left.proxScore, left.orgScore);
-				self.ultid := if(newUlt, right.ultid, left.ultid);
-				self.ultWeight := if(newUlt, left.proxWeight, left.ultWeight);
-				self.ultScore := if(newUlt, left.proxScore, left.ultScore);
-				self.powid := if(newPow, right.powid, left.powid);
-				self.powWeight := if(newPow, left.proxWeight, left.powWeight);
-				self.powScore := if(newPow, left.proxScore, left.powScore);
-				self := left),
-			left outer);
+rawResults := IF(segmentation, OutSegResult, meowBizRawResults);
 
-	preSuppression := fixScores;
+topIds := 
+	normalize(rawResults((results[1].score >= (integer)scoreThreshold
+			or results_seleid[1].score >= (integer)scoreThreshold 
+			or results_ultid[1].score >= (integer)scoreThreshold)
+		,(results[1].weight >= (integer)weightThreshold 
+			or results_seleid[1].weight >= weightThreshold)
+		,(results[1].proxid > 0
+			or results_seleid[1].seleid > 0 
+			or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work,
+	1, // trying to keep code mostly in sync with thor side. Changing to PROJECT
+		// would mean replacing "counter" in this transform to [1]
+	transform(BIPV2.IdAppendLayouts.IdsOnly,
+		isProxResolved := left.results[counter].score >= (integer)scoreThreshold 
+			and left.results[counter].weight >= (integer)weightThreshold;
+		isSeleResolved := left.results_seleid[counter].score >= (integer)scoreThreshold 
+			and left.results_seleid[counter].weight >= (integer)weightThreshold; 
+		isOrgResolved := left.results_orgid[counter].score >= (integer)scoreThreshold 
+			and left.results_orgid[counter].weight >= (integer)weightThreshold; 
+		isUltResolved := left.results_ultid[counter].score >= (integer)scoreThreshold 
+			and left.results_ultid[counter].weight >= (integer)weightThreshold; 
+		isPowResolved := left.results_powid[counter].score >= (integer)scoreThreshold 
+			and left.results_powid[counter].weight >= (integer)weightThreshold; 
+
+		isProxObvious := left.results[counter].score > 50;
+		isSeleObvious := left.results_seleid[counter].score > 50;
+		isOrgObvious := left.results_orgid[counter].score > 50;
+
+		isSeleWrong := isProxObvious
+			and left.results[counter].seleid != left.results_seleid[counter].seleid;
+		isOrgProxWrong := isProxObvious 
+			and left.results[counter].orgid != left.results_orgid[counter].orgid;
+		isOrgSeleWrong := not isProxObvious 
+			and isSeleObvious 
+			and left.results_seleid[counter].orgid != left.results_orgid[counter].orgid;
+		isOrgWrong := isOrgProxWrong or isOrgSeleWrong;
+		isUltProxWrong := isProxObvious 
+			and left.results[counter].ultid != left.results_ultid[counter].ultid;
+		isUltSeleWrong := not isProxObvious 
+			and isSeleObvious 
+			and left.results_seleid[counter].ultid != left.results_ultid[counter].ultid;
+		isUltOrgWrong := not isProxObvious and not isSeleObvious and isOrgObvious 
+			and left.results_orgid[counter].ultid != left.results_ultid[counter].ultid;
+		isUltWrong := isUltProxWrong or isUltSeleWrong or isUltOrgWrong;
+		isPowWrong := isProxObvious 
+			and left.results[counter].powid != left.results_powid[counter].powid;
+
+
+		proxid := if(isProxResolved, left.results[counter].proxid, 0);
+		proxScore := if(isProxResolved, left.results[counter].score, 0);
+		proxWeight := if(isProxResolved, left.results[counter].weight, 0);
+
+		// If the proxid is a good match, use the seleid associated with it, otherwise use the best matching seleid.
+		// If the proxid has a score of > 50, then only return seleid associated with it to avoid returning different
+		// seleids when different thresholds are used.
+		seleid := map(
+			isProxResolved => left.results[counter].seleid,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].seleid,
+			0);
+		// If proxid resolves, it doesn't make sense for sele score to be less than prox score so pick max(proxscore, selescore).
+		// If seleid results don't match with proxid, then use score from proxid.
+		// If proxid is non-ambiguous, then sele must match with it to avoid returning different results when
+		// different thresholds are used.
+		seleScore := map(
+			isProxResolved and not isSeleWrong => max(proxScore, left.results_seleid[counter].score),
+			isProxResolved and isSeleWrong => proxScore,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].score, 
+			0);
+
+		// If seleid results don't match with proxid, then use score from proxid.
+		// If proxid is non-ambiguous, then sele must match with it to avoid returning different results when
+		// different thresholds are used.
+		seleWeight := map(
+			isProxResolved and not isSeleWrong => left.results_seleid[counter].weight,
+			isProxResolved and isSeleWrong => proxWeight,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].weight, 
+			0);
+
+		// Use similar logic for orgid and ultid that was used for seleid.
+		orgid := map(isProxResolved => left.results[counter].orgid,
+		             isSeleResolved and not isSeleWrong => left.results_seleid[counter].orgid,
+		             isOrgResolved and not isOrgWrong => left.results_orgid[counter].orgid,
+		             0);
+		orgScore := map(
+			(isProxResolved or isSeleResolved) and not isOrgWrong 
+				=> max(seleScore, left.results_orgid[counter].score),
+			(isProxResolved or isSeleResolved) and isOrgWrong => seleScore,
+			isOrgResolved and not isOrgWrong => left.results_orgid[counter].score, 
+			0);
+		orgWeight := map(
+			(isProxResolved or isSeleResolved) and not isOrgWrong 
+				=> left.results_orgid[counter].weight,
+			(isProxResolved or isSeleResolved) and isOrgWrong => seleWeight,
+			isOrgResolved and not isOrgWrong => left.results_orgid[counter].weight, 
+			0);
+
+		ultid := map(isProxResolved => left.results[counter].ultid,
+		             isSeleResolved and not isSeleWrong => left.results_seleid[counter].ultid,
+		             isOrgResolved and not isOrgWrong => left.results_orgid[counter].ultid,
+		             isUltResolved and not isUltWrong => left.results_ultid[counter].ultid,
+		             0);
+		ultScore := map(
+			(isProxResolved or isSeleResolved or isOrgResolved) and not isUltWrong
+				=> max(orgScore, left.results_ultid[counter].score),
+			(isProxResolved or isSeleResolved or isOrgResolved) and isUltWrong
+				=> orgScore,
+			isUltResolved and not isUltWrong => left.results_ultid[counter].score, 
+			0);
+		ultWeight := map(
+			(isProxResolved or isSeleResolved or isOrgResolved) and not isUltWrong 
+				=> left.results_ultid[counter].weight,
+			(isProxResolved or isSeleResolved or isOrgResolved) and isUltWrong => orgWeight,
+			isUltResolved and not isUltWrong => left.results_ultid[counter].weight, 
+			0);
+
+		// Powid is above proxid in the id hierarchy so it is treated similar to seleid logic.
+		powid := map(isProxResolved => left.results[counter].powid,
+					 isPowResolved and not isPowWrong => left.results_powid[counter].powid,
+					 0);
+		
+		powScore := map(
+			isProxResolved and not isPowWrong 
+				=> max(proxScore, left.results_powid[counter].score),
+			isProxResolved and isPowWrong => proxScore,
+			isPowResolved and not isPowWrong => left.results_powid[counter].score, 
+			0);
+
+		powWeight := map(isProxResolved and not isPowWrong => left.results_powid[counter].weight,
+		                 isProxResolved and isPowWrong => proxWeight,
+		                 isPowResolved and not isPowWrong => left.results_powid[counter].weight, 
+		                 0);
+
+
+		self.request_id := left.UniqueId;
+
+		self.proxid := proxid;		  
+		self.proxWeight := proxWeight;
+		self.proxScore := proxScore;
+		  
+		self.seleid := seleid;
+		self.seleweight := seleWeight;
+		self.selescore  := seleScore;
+
+		self.orgid := orgid;		  
+		self.orgweight := orgWeight;
+		self.orgscore := orgScore;
+
+		self.ultid := ultid;		  
+		self.ultweight := ultWeight;
+		self.ultscore := ultScore;
+
+		self.powid := powid;		  
+		self.powweight := powWeight;
+		self.powscore := powScore;
+
+		// If there is a proxid that meets the threshold, grab the parent info from it.
+		// Otherwise grab the parent info from the matching seleid.
+		// sele_proxid, org_proxid, and ultimate_proxid are the same at any level of BIP ids.
+		// parent_proxid only applies to the given proxid.
+		self.parent_proxid := if(isProxResolved, left.results[counter].parent_proxid, 0);
+		self.sele_proxid := map(
+			isProxResolved => left.results[counter].sele_proxid,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].sele_proxid,
+			0);
+		self.org_proxid := map(
+			isProxResolved => left.results[counter].org_proxid,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].org_proxid,
+			0);
+		self.ultimate_proxid := map(
+			isProxResolved => left.results[counter].ultimate_proxid,
+			isSeleResolved and not isSeleWrong => left.results_seleid[counter].ultimate_proxid,
+			0);
+		)
+	)((proxscore >= (integer)scoreThreshold 
+			or selescore >= (integer)scoreThreshold 
+			or ultscore >= (integer)scoreThreshold)
+		,(proxid > 0 or seleid > 0 or ultid > 0));
+
+
+	preSuppression := 
+		join(inputDsZip, topIds,
+		left.request_id = right.request_id,
+		transform(BIPV2.IdAppendLayouts.IdsOnly,
+			self.request_id := left.request_id,
+			self := right),
+		left outer);
+			
 
 	passThru0 := project(inputDs(proxid != 0 or seleid != 0),
 		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,

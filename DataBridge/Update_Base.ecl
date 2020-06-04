@@ -16,8 +16,9 @@ function
 		
 	ingestMod					 :=  Ingest(,,dBase,dStandardizeInput);  
 	update_combined    :=  ingestMod.AllRecords_Notag;  
+	addGlobalSID 			 :=  mdr.macGetGlobalSID(update_combined, 'DataBridge', 'source', 'global_sid'); //DF-26602: Populate Global_SID Field
 
-	dStandardize_Addr	 :=  Standardize_NameAddr.fAll (update_combined, pversion);
+	dStandardize_Addr	 :=  Standardize_NameAddr.fAll (addGlobalSID, pversion);
 	dAppendIds				 :=  Append_Ids.fAll (dStandardize_Addr, pversion); 								 
 	dRollup						 :=  Rollup_Base (dAppendIds);
 	

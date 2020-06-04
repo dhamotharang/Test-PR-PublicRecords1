@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_history_date = '',Input_ln_fares_id_ta = '',Input_ln_fares_id_pi = '',Input_unformatted_apn = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_lat = '',Input_long = '',Input_geo_blk = '',Input_fips_code = '',Input_land_use = '',Input_recording_date = '',Input_assessed_value_year = '',Input_sales_price = '',Input_assessed_total_value = '',Input_market_total_value = '',Input_tax_assessment_valuation = '',Input_price_index_valuation = '',Input_hedonic_valuation = '',Input_automated_valuation = '',Input_confidence_score = '',Input_comp1 = '',Input_comp2 = '',Input_comp3 = '',Input_comp4 = '',Input_comp5 = '',Input_nearby1 = '',Input_nearby2 = '',Input_nearby3 = '',Input_nearby4 = '',Input_nearby5 = '',Input_history_history_date = '',Input_history_land_use = '',Input_history_recording_date = '',Input_history_assessed_value_year = '',Input_history_sales_price = '',Input_history_assessed_total_value = '',Input_history_market_total_value = '',Input_history_tax_assessment_valuation = '',Input_history_price_index_valuation = '',Input_history_hedonic_valuation = '',Input_history_automated_valuation = '',Input_history_confidence_score = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_AVM;
+  IMPORT SALT311,Scrubs_AVM;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

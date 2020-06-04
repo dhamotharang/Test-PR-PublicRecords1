@@ -1,4 +1,4 @@
-import ut;
+import Mdr, ut;
 export Update_Base(
    string 								jobid,
 	 string									pversion,
@@ -42,8 +42,10 @@ base := join(request,
 							self.jobid := (unsigned)left.jobid,
 							self.response_file_name := right.filename,
 							self.response_InputFileNamestring := '',
-						  self := left));
+						  self := left))(source<>'IB');
 
-	return base;
+addGlobalSID := mdr.macGetGlobalSID(base, 'PSS', 'source', 'global_sid'); //DF-26599: Populate Global_SID
+
+	return addGlobalSID;
 
 end;

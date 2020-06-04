@@ -1,4 +1,4 @@
-import standard, ut, doxie,FBNV2; 
+﻿import standard, ut, doxie,FBNV2; 
 
 export file_SearchAutokey(dataset(FBNV2.Layout_common.business) business_files = dataset([],fbnv2.Layout_common.business),
 						  dataset(FBNV2.Layout_common.contact) contact_files = dataset([],Layout_common.contact)
@@ -18,6 +18,9 @@ rec := record
 	standard.Addr person_addr  			;
 	standard.name person_name			;
 	unsigned1 zero 					:= 0;
+	// The below 2 fields are added for CCPA (California Consumer Protection Act) project enhancements - JIRA# CCPA-100
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
 end;
 
 Layout_Common.Business tNormalizeName(Layout_Common.Business pInput, unsigned1 pCounter)
@@ -48,18 +51,22 @@ end;
 
 Rec tranBC(Layout_Common.Contact pLeft, Layout_Common.Business pRight) 
  := transform
-	self.DID 						:= pLeft.DID;
-	self.BDID 						:= pRight.BDID;
+	self.DID 								:= pLeft.DID;
+	self.BDID 							:= pRight.BDID;
 	self.Bus_name 					:= pRight.Bus_name;
 	self.Bus_addr 					:= pRight;
 	self.Bus_addr 					:= [];
 	self.person_addr 				:= pLeft;
 	self.person_addr 				:= [];
 	self.person_name 				:= pLeft;
-	self.Person_name                := [];
-	self.ssn 						:= pLeft.ssn;
-	self 							:= pLeft;
-	self 							:= pRight;
+	self.Person_name        := [];
+	self.ssn 								:= pLeft.ssn;
+	self.global_sid 				:= pLeft.global_sid;
+	self.record_sid 				:= pLeft.record_sid;
+	self.tmsid 							:= if(trim(pRight.tmsid) <> '', pRight.tmsid, pLeft.tmsid);
+	self.rmsid 							:= if(trim(pRight.rmsid) <> '', pRight.rmsid, pLeft.rmsid);
+	self 										:= pLeft;
+	self 										:= pRight;
 end;
 
 

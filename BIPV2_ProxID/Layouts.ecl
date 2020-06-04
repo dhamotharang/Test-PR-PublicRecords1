@@ -155,14 +155,17 @@ end;
 ,orig_DOT_Base.ultid
 ,orig_DOT_Base.source
 ,orig_DOT_Base.source_record_id
-,orig_DOT_Base.active_domestic_corp_key
+// ,orig_DOT_Base.active_domestic_corp_key
+,typeof(orig_DOT_Base.active_domestic_corp_key) active_corp_key
 ,orig_DOT_Base.active_duns_number
 ,orig_DOT_Base.active_enterprise_number
+,typeof(orig_DOT_Base.vl_id) sbfe_id
 ,orig_DOT_Base.cnp_btype
 ,orig_DOT_Base.cnp_classid
 ,orig_DOT_Base.cnp_hasnumber
 ,orig_DOT_Base.cnp_lowv
 ,orig_DOT_Base.cnp_name
+,string250 cnp_name_phonetic
 ,orig_DOT_Base.cnp_number
 ,orig_DOT_Base.cnp_translated
 ,orig_DOT_Base.company_bdid
@@ -177,8 +180,9 @@ end;
 ,orig_DOT_Base.dt_first_seen
 ,orig_DOT_Base.dt_last_seen
 ,orig_DOT_Base.ebr_file_number
-,orig_DOT_Base.foreign_corp_key
-,orig_DOT_Base.hist_domestic_corp_key
+,typeof(orig_DOT_Base.hist_domestic_corp_key) hist_corp_key
+// ,orig_DOT_Base.foreign_corp_key
+// ,orig_DOT_Base.hist_domestic_corp_key
 ,orig_DOT_Base.hist_duns_number
 ,orig_DOT_Base.hist_enterprise_number
 ,orig_DOT_Base.prim_range
@@ -189,10 +193,10 @@ end;
 ,orig_DOT_Base.v_city_name
 ,orig_DOT_Base.st
 ,orig_DOT_Base.zip
-,orig_DOT_Base.unk_corp_key
+// ,orig_DOT_Base.unk_corp_key
 ,orig_DOT_Base.vl_id  
 ,orig_DOT_Base.deleted_key
-  };
+};
 //	export attfile_duns_entum := {dot_base.proxid,dot_base.duns_number,dot_base.enterprise_number};
 	export attfile_contact 		:= {dot_base.proxid,string73 contact};
 
