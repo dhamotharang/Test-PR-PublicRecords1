@@ -1892,6 +1892,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/584 Central African Republic List','1879'},
 {'EC (CFSP) 2020/607 Nicaragua List','1880'},
 {'EC 2020/582 Central African Republic List','1881'},
-{'EC 2020/606 Nicaragua List','1882'}
+{'EC 2020/606 Nicaragua List','1882'},
+{'EC (CFSP) 2020/719 Syria List','1883'},
+{'EC (CFSP) 2020/720 Central African Republic List','1884'},
+{'EC 2020/706 ISIL (Da\'esh) and Al-Qaida List','1885'},
+{'EC 2020/716 Syria List','1886'},
+{'EC 2020/717 Central African Republic List','1887'},
+{'UN Security Council Resolution 1518 (2003) Iraq List','1888'}
 ],r);
 
