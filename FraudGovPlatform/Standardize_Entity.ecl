@@ -26,9 +26,10 @@ ENDMACRO;
 EXPORT Clean_Phone( pInputFile ) := 
 FUNCTIONMACRO
 	import tools;
-	tools.mac_AppENDCleanPhone(pInputFile ,phone_number	,dphone_number	,clean_phones.phone_number	,,true);
-	tools.mac_AppENDCleanPhone(dphone_number	,cell_phone		,dcell_phone		,clean_phones.cell_phone		,,true);
-  RETURN dphone_number;
+	tools.mac_AppENDCleanPhone(pInputFile ,phone_number,dphone_number,clean_phones.phone_number,,true);
+	tools.mac_AppENDCleanPhone(dphone_number,cell_phone,dcell_phone,clean_phones.cell_phone,,true);
+	tools.mac_AppENDCleanPhone(dcell_phone,work_phone,dwork_phone,clean_phones.work_phone,,true);
+  RETURN dwork_phone;
 	
 ENDMACRO;
 

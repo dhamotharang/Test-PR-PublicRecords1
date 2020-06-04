@@ -360,6 +360,34 @@ EXPORT Layouts := MODULE
 			STRING uidescription;
 		END;
 		
+		EXPORT ConfigAttributes	:= RECORD
+			STRING entitytype;
+			STRING field;
+			STRING value;
+			STRING low;
+			STRING high;
+			STRING risklevel;
+			STRING indicatortype;
+			STRING indicatordescription;
+			STRING weight;
+			STRING uidescription;
+			STRING customerid;
+			STRING industrytype;
+		END;
+
+		EXPORT ConfigRules	:= RECORD
+			unsigned8 customerid;
+			unsigned8 industrytype;
+			integer1 entitytype;
+			string rulename;
+			string description;
+			string200 field;
+			string value;
+			decimal low;
+			decimal high;
+			integer8 risklevel;
+		END;
+		
 	END;
 
 
@@ -784,9 +812,9 @@ Export CIID := RECORD
  END;
  
  EXPORT BestInfo := RECORD
-		unsigned8 Record_ID;
-		unsigned6 did;
-		unsigned6 fdn_file_info_id;
+		unsigned8 	Record_ID;
+		unsigned6 	did;
+		unsigned6 	fdn_file_info_id;
 		string10 	best_phone;
 		string9  	best_ssn;
 		string9  	max_ssn;
@@ -795,7 +823,7 @@ Export CIID := RECORD
 		string20	best_mname;
 		string20	best_lname;
 		string5		best_name_suffix;
-		string120 best_addr1;
+		string120 	best_addr1;
 		string30	best_city;
 		string2		best_state;
 		string5		best_zip;
@@ -815,9 +843,9 @@ Export CIID := RECORD
 		STRING3 	score_any_phn;
 		STRING3		score_any_fzzy;
 		STRING		errorcode;
-    STRING2		best_drivers_license_state := '';
-    STRING25	best_drivers_license := '';    
-    STRING8   best_drivers_license_exp := '';
+		STRING2		best_drivers_license_state := '';
+		STRING25	best_drivers_license := '';    
+		unsigned8   best_drivers_license_exp := 0;
  END;
 
  EXPORT CoverageDates := RECORD
@@ -2482,6 +2510,71 @@ RECORD
   unsigned1 cl_high_risk_pattern13_flag_;
   unsigned1 cl_high_risk_pattern14_flag_;
   unsigned1 cl_high_risk_pattern15_flag_;
+ END;
+ 
+ EXPORT ConfigAttributes := Record
+  integer8 entitytype;
+  string200 field; 
+  string value; 
+  decimal low;
+  decimal high; 
+  integer risklevel; 
+  string indicatortype;
+  string indicatordescription;
+  integer weight; 
+  string uidescription;
+  unsigned customerid;
+  unsigned industrytype;
+ END;
+ 
+ shared nvprec := RECORD
+   string name;
+   string value;
+  END;
+
+ EXPORT EntityProfile	:=RECORD
+  integer8 customerid;
+  integer8 industrytype;
+  string entitycontextuid;
+  integer1 entitytype;
+  integer8 recordid;
+  unsigned4 eventdate;
+  string caseid;
+  string label;
+  integer1 riskindx;
+  integer1 aotkractflagev;
+  integer1 aotsafeactflagev;
+  integer1 aotcurrprofflag;
+  integer8 t_personuidecho;
+  string t_inpclnfirstnmecho;
+  string t_inpclnlastnmecho;
+  string t_inpclnssnecho;
+  integer8 t_inpclndobecho;
+  string t_inpclnaddrprimrangeecho;
+  string t_inpclnaddrpredirecho;
+  string t_inpclnaddrprimnmecho;
+  string t_inpclnaddrsuffixecho;
+  string t_inpclnaddrpostdirecho;
+  string t_inpclnaddrunitdesigecho;
+  string t_inpclnaddrsecrangeecho;
+  string t_inpclnaddrcityecho;
+  string t_inpclnaddrstecho;
+  string t_inpclnaddrzip5echo;
+  string t_inpclnipaddrecho;
+  string t18_ipaddrispnm;
+  string t18_ipaddrcountry;
+  string t_inpclnphnecho;
+  string t_inpclnemailecho;
+  string t19_bnkacctbnknm;
+  string t_inpclnbnkacctecho;
+  string t_inpclnbnkacctrtgecho;
+  string t_inpclndlstecho;
+  string t_inpclndlecho;
+  unsigned8 event30count;
+  unsigned8 eventcount;
+  integer8 personeventcount;
+  string100 deviceid;
+  DATASET(nvprec) nvp;
  END;
  
   //Begin BocaShell Layout

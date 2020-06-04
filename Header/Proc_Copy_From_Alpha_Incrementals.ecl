@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
-export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
-export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}\\S?', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
 
 
 // generic function to get the FIRST subfie in the super
@@ -37,7 +37,6 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
     output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('checked_file'),extend);
     
     return filedt;
-        // return '20181005';
 
 END;
 
@@ -336,16 +335,16 @@ qa     := aPrefLoc + 'qa::locid';
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
+    update_inc_superfiles(,filedt),        
+    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
+    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
     STD.File.AddSuperFile(father,qa, addcontents := true),
     STD.File.ClearSuperFile(qa),
     STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
-    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
-    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
-    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
-    update_inc_superfiles(,filedt),
     );
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  

@@ -1,0 +1,37 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_BK_Events
+FILENAME:BK_Events
+
+FIELDTYPE:Invalid_No:ALLOW(0123456789)
+FIELDTYPE:Invalid_Int:ALLOW(0123456789- )
+FIELDTYPE:Invalid_Float:ALLOW(0123456789., )
+FIELDTYPE:Invalid_CaseNo:ALLOW(0123456789-: ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:Invalid_URL:ALLOW(0123456789:;-_=&./? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:Invalid_Alpha:CUSTOM(Scrubs.Fn_Allow_ws > 0, 'Alpha')
+FIELDTYPE:Invalid_AlphaNum:CUSTOM(Scrubs.Fn_Allow_ws > 0, 'AlphaNum', true)
+FIELDTYPE:Invalid_AlphaNumChar:CUSTOM(Scrubs.Fn_Allow_ws > 0, 'AlphaNumChar', true)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_BK_Events.Functions.Fn_Valid_Date > 0)
+
+FIELD:dractivitytypecode:TYPE(QSTRING1):LIKE(Invalid_Alpha):0,0
+FIELD:docketentryid:TYPE(STRING100):LIKE(Invalid_No):0,0
+FIELD:courtid:TYPE(STRING10):LIKE(Invalid_No):0,0
+FIELD:casekey:TYPE(STRING7):LIKE(Invalid_No):0,0
+FIELD:casetype:TYPE(STRING2):LIKE(Invalid_Alpha):0,0
+FIELD:bkcasenumber:TYPE(STRING24):LIKE(Invalid_CaseNo):0,0
+FIELD:bkcasenumberurl:TYPE(STRING200):LIKE(Invalid_URL):0,0
+FIELD:proceedingscasenumber:TYPE(STRING24):LIKE(Invalid_CaseNo):0,0
+FIELD:proceedingscasenumberurl:TYPE(STRING200):LIKE(Invalid_URL):0,0
+FIELD:caseid:TYPE(STRING10):LIKE(Invalid_No):0,0
+FIELD:pacercaseid:TYPE(STRING10):LIKE(Invalid_Int):0,0
+FIELD:attachmenturl:TYPE(STRING200):LIKE(Invalid_URL):0,0
+FIELD:entrynumber:TYPE(STRING10):LIKE(Invalid_Int):0,0
+FIELD:entereddate:TYPE(STRING24):LIKE(Invalid_Date):0,0
+FIELD:pacer_entereddate:TYPE(STRING24):LIKE(Invalid_Date):0,0
+FIELD:fileddate:TYPE(STRING24):LIKE(Invalid_Date):0,0
+FIELD:score:TYPE(STRING5):LIKE(Invalid_Float):0,0
+FIELD:drcategoryeventid:TYPE(STRING5):LIKE(Invalid_No):0,0
+FIELD:court_code:TYPE(STRING5):LIKE(Invalid_AlphaNum):0,0
+FIELD:district:TYPE(STRING40):LIKE(Invalid_Alpha):0,0
+FIELD:boca_court:TYPE(STRING5):LIKE(Invalid_Alpha):0,0
+FIELD:catevent_description:TYPE(STRING200):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:catevent_category:TYPE(STRING200):LIKE(Invalid_AlphaNumChar):0,0

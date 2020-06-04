@@ -34,7 +34,7 @@ export IdAppendThor(
 		,phone10 // phone_field
 		,fein // fein_field
 		,BDID_field
-		,BIPV2.IdAppendLayouts.IdsOnly // outrec
+		,BIPV2.IdAppendLayouts.IdsOnlyDebug // outrec
 		,true // bool_outrec_has_score
 		,BDID_Score_field
 		,keepCount //keep_count := '1'

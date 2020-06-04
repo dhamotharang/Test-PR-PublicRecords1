@@ -141,6 +141,7 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_NDF1' ,'ND','Department of Human Services',																										'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NEF1' ,'NE','Department of Health and Human Services',																				'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NEF2'	,'NE','Department of Health and Human Services',																				'Health Regulation Administration',									'State',		'Cumulative'},
+									{'SNC_NEF3' ,'NE','Department of Health and Human Services',																				'Health Regulation Administration',									'State',		'Full refresh'},
 									{'SNC_NHF2' ,'NH','Board of Pharmacy',																															'Pharmacy Board',																		'State',				'Full refresh'},
 									{'SNC_NHF3' ,'NH','Department of Health and Human Services',																				'Medicaid Board',																		'Medicaid', 'Full refresh'},
 									{'SNC_NJF1' ,'NJ','Division of Revenue and Enterprise Services',																		'Medicaid Board',																		'Medicaid',	'Full refresh including reinstatements'},

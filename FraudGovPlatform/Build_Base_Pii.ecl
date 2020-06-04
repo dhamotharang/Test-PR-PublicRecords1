@@ -49,24 +49,7 @@ Export Bocashell :=Sequential(
 															Build_BocaShell_Base
 															,Promote(pversion).buildfiles.New2Built
 															);
-															
-//move bocashell file to thor400														
-Shell_in := distribute(FraudGovPlatform.files().base.BocaShell.built,hash(record_id));	
-
-tools.mac_WriteFile(Filenames(pversion+'_patch').Base.BocaShell.New,Shell_in,Build_BocaShell_Patch);
-
-Export BocaShell_patch :=
-								Sequential( 
-										 Build_BocaShell_Patch
-										,STD.File.StartSuperFileTransaction()
-										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.qa)
-										,FileServices.clearsuperfile(FraudGovplatform.Filenames().Base.BocaShell.Built, true)
-										,FileServices.AddSuperfile(FraudGovplatform.Filenames().Base.BocaShell.Built,FraudGovplatform.Filenames(pversion+'_Patch').Base.BocaShell.New)
-										,FileServices.AddSuperfile(FraudGovplatform.Filenames().Base.BocaShell.QA,FraudGovplatform.Filenames(pversion+'_Patch').Base.BocaShell.New)
-										,STD.File.FinishSuperFileTransaction()
-													);
-										
-																
+																																							
 Export All := 	Sequential
 											(
 											 Build_pii_Base
