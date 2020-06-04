@@ -334,6 +334,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING historydatetimestamp,
 		DATE reported_dob,
 		
+    BOOLEAN diddeceased,
+    DATE diddeceaseddate,
+    STRING fraudpoint_v3,
+		
 		// Best 
 		
     BOOLEAN BestHit,
@@ -497,8 +501,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		// bocashell
     nap_summary,nas_summary,cvi,fp3_stolenidentityindex,syntheticidentityindex_v3,manipulatedidentityindex_v3,socsdobflag,pwsocsdobflag,dobmatchlevel,
 		sourcerisklevel,reason1,reason2,reason3,reason4,reason5,reason6,socsvalflag,drlcvalflag,hphonevalflag,historydatetimestamp,reported_dob,
-    bocashell_addr1_dt_first_seen,bocashell_addr1_date_last_seen,
-
+    bocashell_addr1_dt_first_seen,bocashell_addr1_date_last_seen,diddeceased,diddeceaseddate,fraudpoint_v3,
+		
 		// best
     BestHit,best_phone,best_drivers_license_state,best_drivers_license,best_drivers_license_exp,
 		// phones meta
@@ -1035,6 +1039,10 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     
     add_curr_pop	= address_verification.address_history_1.addrpop,
     add_input_isbestmatch	= address_verification.input_address_information.isbestmatch,
+
+    diddeceased = diddeceased,
+		diddeceaseddate = diddeceaseddate,
+		fraudpoint_v3 = fd_scores.fraudpoint_v3,		
 
     AccountNumber = bank_account_number_1,
     RoutingNumber = bank_routing_number_1,
