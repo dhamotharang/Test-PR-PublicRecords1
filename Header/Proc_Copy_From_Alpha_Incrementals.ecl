@@ -335,16 +335,16 @@ qa     := aPrefLoc + 'qa::locid';
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
+    update_inc_superfiles(,filedt),        
+    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
+    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
     STD.File.AddSuperFile(father,qa, addcontents := true),
     STD.File.ClearSuperFile(qa),
     STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
-    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
-    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
-    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
-    update_inc_superfiles(,filedt),
     );
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
