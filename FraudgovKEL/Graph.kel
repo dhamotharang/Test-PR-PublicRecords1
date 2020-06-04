@@ -334,6 +334,10 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING historydatetimestamp,
 		DATE reported_dob,
 		
+    BOOLEAN diddeceased,
+    DATE diddeceaseddate,
+    STRING fraudpoint_v3,
+		
 		// Best 
 		
     BOOLEAN BestHit,
@@ -497,8 +501,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		// bocashell
     nap_summary,nas_summary,cvi,fp3_stolenidentityindex,syntheticidentityindex_v3,manipulatedidentityindex_v3,socsdobflag,pwsocsdobflag,dobmatchlevel,
 		sourcerisklevel,reason1,reason2,reason3,reason4,reason5,reason6,socsvalflag,drlcvalflag,hphonevalflag,historydatetimestamp,reported_dob,
-    bocashell_addr1_dt_first_seen,bocashell_addr1_date_last_seen,
-
+    bocashell_addr1_dt_first_seen,bocashell_addr1_date_last_seen,diddeceased,diddeceaseddate,fraudpoint_v3,
+		
 		// best
     BestHit,best_phone,best_drivers_license_state,best_drivers_license,best_drivers_license_exp,
 		// phones meta
@@ -1035,6 +1039,10 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     
     add_curr_pop	= address_verification.address_history_1.addrpop,
     add_input_isbestmatch	= address_verification.input_address_information.isbestmatch,
+
+    diddeceased = diddeceased,
+		diddeceaseddate = diddeceaseddate,
+		fraudpoint_v3 = fd_scores.fraudpoint_v3,		
 
     AccountNumber = bank_account_number_1,
     RoutingNumber = bank_routing_number_1,
@@ -1982,7 +1990,7 @@ Event: => P1_AotIdCurrProfFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 =>
 Event: => P9_AotAddrCurrProfFlag := MAP(T9_AddrPopFlag=0 => -99999,
 																			ALL(AddressEvent,Transaction.T_SrcClassType<2) => -99998,
 																			T_SrcClassType < 2 => -99997,
-																			IdIsLastEventId);
+																			AddrIsLastEventId);
 Event: => P15_AotSsnCurrProfFlag := MAP(T15_SsnPopFlag=0 => -99999,
 																			ALL(SsnEvent.Transaction,T_SrcClassType<2) => -99998,
 																			T_SrcClassType < 2 => -99997,
@@ -3013,7 +3021,7 @@ Event: => IpIsLastEventId := MAP(rInternetProtocol.LastRecordId = RecordId => 1,
 Event: => BnkIsLastEventId := MAP(rBankAccount.LastRecordId = RecordId => 1, 0);
 Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0);
 
-Event: => PersonLabel := TRIM(LastName) + ',' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
+Event: => PersonLabel := TRIM(LastName) + ', ' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
 Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
 Event: => IpLabel := IpAddress;
