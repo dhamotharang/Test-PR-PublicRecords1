@@ -94,20 +94,22 @@ export dsRelDefs := DATASET(root+'reldefs', Layouts.rCategories, CSV(separator('
 					
 export dsMasters_base := 			// master entries
 				dsEntities(ParentId=0) + dsWhiteListEntities(ParentId=0);
-
-export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,
-										Transform(Layouts.rWCOCategories,
+//export dsMainCats := Join(distribute(dsEntities, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,				
+Export dsMainCats := PROJECT(dsEntities, Transform(Layouts.rWCOCategories,
+											self.EntityID := Left.Ent_ID;
 											self.SegmentType := if (left.Entrycategory = 'Sanction List','Sanction', if (left.Entrycategory = 'Registrations' or left.Entrycategory = 'Associated Entity','AdditionalSegments',left.Entrycategory));
 											self.SubCategoryLabel := if(left.Entrycategory='PEP','Primary PEP',
 																									if(left.Entrycategory = 'Sanction List',left.Entrycategory,left.EntrySubcategory));
 											self.SubCategoryDesc := if (left.Entrycategory='PEP',left.EntrySubcategory,
 																									if (left.Entrycategory = 'Sanction List' and left.EntrySubcategory <> 'N/A',left.EntrySubcategory,''));
 											self.isActivePEP := if(left.Entrycategory = 'PEP','Y','');
-											self := right;
-										),Left Outer, local);
+											self.lastupdated := left.DateUpdated;));
+								//			self := right;
+								//		),Left Outer, local);
 				
-export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, Left.EntityID=Right.Ent_ID,	
+export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsEntities, Left.EntityID=Right.Ent_ID,	
 									TRANSFORM(Layouts.rEntity,								
+										self.Ent_ID := Left.EntityID;
 										self.Entrycategory := if(left.SegmentType='AdditionalSegments' or left.SegmentType='Sanction',
 											if(left.SubCategoryLabel = 'Associated Entity' or left.SubCategoryLabel ='Ownership Or Control' or left.SubCategoryLabel = 'SWIFT BIC Entity',
 												'Associated Entity', 
@@ -148,7 +150,9 @@ export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCa
 										), Inner, local);
 
 export dsMasters := dsMasters_base + dsMult;
-export dsWCOCategories := dsMainCats + FMdsWCOCategories;
+//export dsMasters := dsMasters_base + ;
+//export dsWCOCategories := dsMainCats + FMdsWCOCategories;
+export dsWCOCategories := dsMainCats & FMdsWCOCategories;
 export srcAdverseMedia := dedup(dsMasters(EntryCategory in Filters.fAdverseMedia),Ent_ID,ALL);
 export srcGlobalEnforcement := dedup(dsMasters(EntryCategory in Filters.fEnforcement),Ent_ID,ALL);
 
