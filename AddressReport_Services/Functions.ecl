@@ -8,7 +8,7 @@ IMPORT eMerges, iesp,DriversV2_Services,ut,
 EXPORT Functions := MODULE
 /////////////////////////////////////////////////
 
-  shared ms(string70 a, string70 b, string70 c) := 
+  shared ms(string70 a, string70 b, string70 c) :=
     map(
       a = '' => b,
       b = '' => a,
@@ -49,11 +49,11 @@ EXPORT Functions := MODULE
     rem := len_wholes % 3;
     start := IF (rem = 0, 3, rem);
     whole_value := MAP (
-      len_wholes > 9  => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' 
+      len_wholes > 9 => in_value[1..start] + ',' + in_value[start+1..start+3] + ','
         + in_value[start+4..start+6] + ',' + in_value[start+7..start+9],
-      len_wholes > 6  => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' + in_value[start+4..start+6],
-      len_wholes > 3  => in_value[1..start] + ',' + in_value[start+1..start+3],
-      len_wholes > 0  => in_value[1..start],
+      len_wholes > 6 => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' + in_value[start+4..start+6],
+      len_wholes > 3 => in_value[1..start] + ',' + in_value[start+1..start+3],
+      len_wholes > 0 => in_value[1..start],
       '');
 
     fraction_value := IF (len = 1, '0' + in_value, in_value[len-1..]);
@@ -72,7 +72,7 @@ EXPORT Functions := MODULE
       if (trim (L.name_suffix) != '', ' ' + trim (L.name_suffix), '');
   end;
   //****************************************************//
-  // Census Data Transform Function                        //
+  // Census Data Transform Function                     //
   //****************************************************//
   EXPORT iesp.bpsreport.t_BpsReportCensusData ProjectCensus (layouts.census_layout cens) := FUNCTION
     iesp.bpsreport.t_BpsReportCensusData SetCensus (layouts.census_layout cens) := TRANSFORM
@@ -85,7 +85,7 @@ EXPORT Functions := MODULE
   END;
 
   //****************************************************//
-  // Phone Information Transform Function                  //
+  // Phone Information Transform Function               //
   //****************************************************//
   EXPORT iesp.share.t_PhoneInfo ProjectPhones (dataset(layouts.phone_out_layout) phones) := FUNCTION
     iesp.share.t_PhoneInfo SetPhones (layouts.phone_out_layout l) := TRANSFORM
@@ -99,7 +99,7 @@ EXPORT Functions := MODULE
     RETURN PROJECT (phones, SetPhones (Left));
   END;
   //****************************************************//
-  // Drivers License Transform Function                  //
+  // Drivers License Transform Function                 //
   //****************************************************//
 
 
@@ -148,7 +148,7 @@ EXPORT Functions := MODULE
 
 
   //****************************************************//
-  // Residents Data Transform Function                    //
+  // Residents Data Transform Function                  //
   //****************************************************//
   EXPORT iesp.addressreport.t_AddrReportPresentResident ProjectPresentResidents (dataset(AddressReport_Services.Layouts.residents_final_out) res,
                                                                                  boolean isLocationReport) := FUNCTION
@@ -171,7 +171,7 @@ EXPORT Functions := MODULE
       self.Height := if(isLocationReport, L.height, '');
       self.Weight := if(isLocationReport, L.weight, '');
       self.HairColor := if(isLocationReport, L.hair_color, '');
-      self.EyeColor  := if(isLocationReport, L.eye_color, '');
+      self.EyeColor := if(isLocationReport, L.eye_color, '');
     END;
 
     RETURN PROJECT (res, SetCurrent (Left));
@@ -180,7 +180,7 @@ EXPORT Functions := MODULE
   EXPORT iesp.addressreport.t_AddrReportPriorResident ProjectPriorResidents (dataset(layouts.residents_final_out) res) := FUNCTION
     iesp.addressreport.t_AddrReportPriorResident SetPrior (res l) := TRANSFORM
       self.identity := l.identity;
-      Self.currentaddress := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir, 
+      Self.currentaddress := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
         L.suffix, L.unit_desig, L.sec_range, L.city_name, L.st, L.zip, L.zip4, '');
       self.AKAs := choosen(l.akas,iesp.constants.AR.MaxAkas);
       self.CurrentPhone := project(l.CurrentPhone, iesp.share.t_PhoneInfo)[1]; //Prior Residents only has one CurrentPhone record
@@ -188,7 +188,7 @@ EXPORT Functions := MODULE
     RETURN PROJECT (res, SetPrior (Left));
   END;
   //****************************************************//
-  // Business Data Transform Function                      //
+  // Business Data Transform Function                   //
   //****************************************************//
 
   EXPORT iesp.addressreport.t_AddrReportBusiness ProjectBusiness (dataset(layouts.layout_Business_out) bus) := FUNCTION
@@ -219,7 +219,7 @@ EXPORT Functions := MODULE
   END;
 
   //****************************************************//
-  // Property Transform Function                         //
+  // Property Transform Function //
   //****************************************************//
 EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Services.layouts.combined.widest) prop_in) := FUNCTION
 
@@ -229,8 +229,8 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     deed := L.deeds[1];
     Assess:= L.assessments[1];
     prop := L.parties (party_type = 'P')[1];
-    buyer := L.parties (party_type = 'O')[1];  // "Buyer"
-    seller :=  L.parties (party_type = 'S')[1];
+    buyer := L.parties (party_type = 'O')[1]; // "Buyer"
+    seller := L.parties (party_type = 'S')[1];
 
     SELF.SellerAddress := iesp.ECL2ESP.SetAddress (
       seller.prim_name, seller.prim_range, seller.predir, seller.postdir, seller.suffix,
@@ -262,9 +262,9 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     SELF.BuildingSquareFeet := deed.fares_building_square_feet;//l.building_square_feet;
     SELF.YearBuilt := (integer) assess.year_built;//(integer) l.Year_Built;
     SELF.TaxYear := (integer) assess.tax_year;//(integer) L.tax_year;
-    SELF.SaleDate := iesp.ECL2ESP.toDate (if(l.fid_type='D', (unsigned4) deed.contract_date, 
+    SELF.SaleDate := iesp.ECL2ESP.toDate (if(l.fid_type='D', (unsigned4) deed.contract_date,
       (unsigned4) assess.sale_date));
-    SELF.RecordingDate := if(l.fid_type='D',iesp.ECL2ESP.toDate ((unsigned4) deed.recording_date), 
+    SELF.RecordingDate := if(l.fid_type='D',iesp.ECL2ESP.toDate ((unsigned4) deed.recording_date),
       iesp.ECL2ESP.toDate ((unsigned4) assess.recording_date));
     SELF.LoanDueDate := []; //iesp.ECL2ESP.toDate ((unsigned4) l.Loan_Due_Date);
     SELF.SalePrice := if(l.fid_type='D', iesp.ECL2ESP.FormatDollarAmount (deed.sales_price),
@@ -289,10 +289,10 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     // SELF.MarketLandValue := L.mkt_land_val;
     // SELF.MarketImprovementValue := L.mkt_improvement_val;
     // SELF.TotalMarketValue := L.mkt_total_val;
-    // SELF.LivingSize := stringlib.stringfilter (L.building_square_feet, _Validate.Strings.digit);
+    // SELF.LivingSize := std.str.filter (L.building_square_feet, _Validate.Strings.digit);
     SELF.Foundation := assess.foundation_desc;
     Self.NumberStories := (string) assess.no_of_stories;
-    Self.NumberBedrooms  := (string) assess.no_of_bedrooms;
+    Self.NumberBedrooms := (string) assess.no_of_bedrooms;
     Self.NumberFullBaths := (string) assess.no_of_baths;
     Self.NumberHalfBaths := (string) assess.no_of_partial_baths;
 
@@ -301,7 +301,7 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     int_book:=if(l.fid_type='D',int_book_d,int_book_a);
     int_page_d := (integer) deed.recorder_page_number;
     int_page_a := (integer) assess.recorder_page_number;
-    int_page  := if(l.fid_type='D',int_page_d,int_page_a);
+    int_page := if(l.fid_type='D',int_page_d,int_page_a);
     Self.Book := if (int_book = 0, '', (string) int_book);
     Self.Page := if (int_page = 0, '', (string) int_page);
     SELF.InterestRate := deed.first_td_interest_rate;
@@ -320,7 +320,7 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
 
     Self.Sellers := choosen (project (seller.orig_names, transform (iesp.share.t_StringArrayItem, Self.value := Left.orig_name)),
       iesp.Constants.PROP.MaxSellers);
-    Self.Owners  := choosen (project (buyer.orig_names, transform (iesp.share.t_StringArrayItem, Self.value := Left.orig_name)),
+    Self.Owners := choosen (project (buyer.orig_names, transform (iesp.share.t_StringArrayItem, Self.value := Left.orig_name)),
       iesp.Constants.PROP.MaxOwners);
     // SELF.OtherBuyers := choosen (project (L.other_buyers, transform (iesp.share.t_StringArrayItem, Self.value := Left.buyer)),
                              // iesp.Constants.PROP.MaxBuyers);
@@ -374,7 +374,7 @@ export projectVehicles(dataset(VehicleV2_Services.Layout_Report) in_ds,
       zip5 = in_addr.zip);
     // Set boolean if the Vehicle registrant address is the same as the reported on address
     boolean regaddr_sameas_rptaddr := exists(reg);
-    reg_to_use  := if(regaddr_sameas_rptaddr, reg[1], L.registrants[1]);
+    reg_to_use := if(regaddr_sameas_rptaddr, reg[1], L.registrants[1]);
     self.YearMake := (integer4) L.model_year;
     self.Make := L.make_desc;
     self.Model := L.model_desc;
@@ -416,7 +416,7 @@ export projectHuntFish(dataset(iesp.huntingfishing.t_HuntFishRecord) in_ds,
     self.HomeState := L.HomeState;
     self.LicenseState := L.LicenseState;
     self.IssueDate := L.LicenseDate;
-    self.ResidentUniqueId  := ''; // null for now, will be filled in by the calling function
+    self.ResidentUniqueId := ''; // null for now, will be filled in by the calling function
     self.AssociatedToReportAddress := hfaddr_sameas_rptaddr;
     self.licensee_did := (unsigned6) L.UniqueId;
   end;
@@ -424,7 +424,7 @@ export projectHuntFish(dataset(iesp.huntingfishing.t_HuntFishRecord) in_ds,
 end;
 
   //****************************************************//
-  // Criminals Transform Function                        //
+  // Criminals Transform Function                       //
   //****************************************************//
 export projectCrim(dataset(iesp.criminal.t_CrimReportRecord) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleCriminal set_criminal_records(in_ds L) := transform
@@ -440,7 +440,7 @@ export projectCrim(dataset(iesp.criminal.t_CrimReportRecord) in_ds) := function
 end;
 
   //****************************************************//
-  // Sex Offenders Transform Function                    //
+  // Sex Offenders Transform Function                   //
   //****************************************************//
 export projectSexOffenders(dataset(SexOffender_Services.Layouts.t_OffenderRecord_plus) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleSexOffense set_sex_off(in_ds L) := transform
@@ -503,7 +503,7 @@ shared fCriminalRecords(dataset(CriminalRecords_Services.layouts.l_search) in_re
 end;
 
 export fCrimes(doxie.IDataAccess mod_access):= function
-  crim_module := module(project (inputParams,CriminalRecords_Services.IParam.ak_params,  opt))
+  crim_module := module(project (inputParams,CriminalRecords_Services.IParam.ak_params, opt))
     export boolean workHard := true;
     export boolean noFail := false;
     export boolean isdeepDive := false;
@@ -543,8 +543,8 @@ export fSexOffendors(doxie.IDataAccess mod_access):=FUNCTION
 END;
 
 export fSexOffenderRecords(dataset(doxie.layout_references) in_dids, doxie.IDataAccess mod_access) := function
-  so_dids  := project(in_dids, SexOffender_Services.layouts.search_did);
-  so_id_recs  := SexOffender_Services.Raw.byDIDs(so_dids);
+  so_dids := project(in_dids, SexOffender_Services.layouts.search_did);
+  so_id_recs := SexOffender_Services.Raw.byDIDs(so_dids);
 
   //a workaround for HPCC-23091 (or similar);
   ma := doxie.compliance.GetGlobalDataAccessModuleTranslated(inputParams);
@@ -552,8 +552,8 @@ export fSexOffenderRecords(dataset(doxie.layout_references) in_dids, doxie.IData
 
   //if input mod_access is used instead, this code fails when compiling the query:
   // SexOffender_Services.Layouts.t_OffenderRecord_plus form() := TRANSFORM
-  //   SELF.name_orig := so_mod.application_type + (string)so_mod.isValidGlb();
-  //   SELF := [];
+  // SELF.name_orig := so_mod.application_type + (string)so_mod.isValidGlb();
+  // SELF := [];
   // END;
   // results := DATASET([form()]);
 
@@ -582,18 +582,18 @@ export fHuntingAndFishing(doxie.IDataAccess mod_access):=function
         self:=left,
         self:=right),
       limit(0), keep(1));
-    in_mod := module(project(inputParams,hunting_fishing_Services.Search_Records.params,  opt))
+    in_mod := module(project(inputParams,hunting_fishing_Services.Search_Records.params, opt))
       doxie.compliance.MAC_CopyModAccessValues(mod_access);
     end;
-    hfSearch  := hunting_fishing_Services.Search_Records;
+    hfSearch := hunting_fishing_Services.Search_Records;
     result := hfSearch.formatandFilterRawRecords(hunting_Raw_recs,in_mod);
     return result;
 end;
 
 shared fConcealedWeaponsPermits(dataset(ccw_services.Layouts.search_rid) in_recs) := function
-  cw_mod := module(project(inputParams,CCW_services.SearchService_Records.params,  opt))end;
+  cw_mod := module(project(inputParams,CCW_services.SearchService_Records.params, opt))end;
   cw_rid_recs := CCW_services.Raw.byRids(in_recs);
-  result  := ccw_services.SearchService_Records.getFormatedRecords(cw_rid_recs,cw_mod);
+  result := ccw_services.SearchService_Records.getFormatedRecords(cw_rid_recs,cw_mod);
   return result;
 end;
 
@@ -601,7 +601,7 @@ export fWeaponsPermits():=Function
   Weapons_ID_params := module(project(inputParams,CCW_services.AutoKey_IDs.params,opt));
   end;
   Weapons_IDs := CCW_services.AutoKey_IDs.val(Weapons_ID_params);
-  result  := fConcealedWeaponsPermits(Weapons_IDs);
+  result := fConcealedWeaponsPermits(Weapons_IDs);
   return result;
 end;
 
@@ -619,7 +619,7 @@ export fAddDriverInfo(dataset(AddressReport_Services.Layouts.residents_final_out
     self.weight := R.weight;
     self.eye_color := R.eye_color;
     self.hair_color := R.hair_color;
-    self  := L;
+    self := L;
   end;
   result := join(m_Resident, ds_driver,
     left.did = right.did,
@@ -691,11 +691,11 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
       self.addr_dt_last_seen := (integer)left.dt_last_seen,
       self := []));
 
-  ppl_rec  := project(doxie.best_records(did_rec, false, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access),
+  ppl_rec := project(doxie.best_records(did_rec, false, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access),
     transform(AddressReport_Services.Layouts.possible_owner_layout,
       self := left,
       self := []));
-  results := if(exists(did_rec), ppl_rec) +  if(exists(bdid_rec), bus_rec);
+  results := if(exists(did_rec), ppl_rec) + if(exists(bdid_rec), bus_rec);
 
   return results;
 end;
@@ -706,14 +706,14 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
 
   layout_in_ext := record
     in_res;
-    string20 acctno;    
+    string20 acctno;
     unsigned4 global_sid := dx_gateway.Constants.QSENT.GLOBAL_SID; // we'll treat input as QSENT records for the sake of applying suppressions prior to calling the gateway
-  end;                
+  end;
   layout_in_ext addCounter(in_res L, integer C) := transform
-    self.acctno := (STRING) C; 
-    self.addr := Address.Addr1FromComponents(L.prim_range, L.predir, L.prim_name, L.suffix, L.postdir, L.unit_desig, L.sec_range);                                                 
+    self.acctno := (STRING) C;
+    self.addr := Address.Addr1FromComponents(L.prim_range, L.predir, L.prim_name, L.suffix, L.postdir, L.unit_desig, L.sec_range);
     self := L;
-  end; 
+  end;
   rtp_in_pre := project(in_res, addCounter(left, counter));
   
   in_gateways := Gateway.Configuration.Get();
@@ -724,13 +724,13 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
     export string5 serviceType := '';
   end;
 
-  gw_out_rec := record   //temporary structure to hold all resulting rows for each request (acct).
+  gw_out_rec := record //temporary structure to hold all resulting rows for each request (acct).
     string20 acctno;
-    dataset(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};  
+    dataset(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};
   end;
-  qsent_out_rec := Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext; 
+  qsent_out_rec := Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext;
 
-  gw_out_rec  getGateway(layout_in_ext L) := TRANSFORM
+  gw_out_rec getGateway(layout_in_ext L) := TRANSFORM
     in_mod := MODULE(project(rtp_mod,BatchServices.RealTimePhones_Params.params,opt))
       export string15 phone := '';
       export string30 firstname := L.fname;
@@ -741,14 +741,14 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
       export string6 zip := L.zip;
       export string20 acctno := L.acctno;
     end;
-    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_mod, in_gateways, 30, 0, call_gateway), 
+    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_mod, in_gateways, 30, 0, call_gateway),
       batchServices.constants.RealTime.REALTIME_PHONE_LIMIT);
-    self.gw_results := gw_results_res;                           
-    self.acctno := l.acctno; 
+    self.gw_results := gw_results_res;
+    self.acctno := l.acctno;
   end;
   // calling the gateway only if subject has not opted out.
-  rtp_in := Suppress.MAC_SuppressSource(rtp_in_pre, mod_access); 
-  gw_recs := project(rtp_in, getGateway(Left));  
+  rtp_in := Suppress.MAC_SuppressSource(rtp_in_pre, mod_access);
+  gw_recs := project(rtp_in, getGateway(Left));
 
   qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext R) := transform
    self.acctno := L.acctno;
@@ -756,16 +756,16 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
    _dt_last_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);
    self.dt_first_seen := _dt_first_seen;
    self.dt_last_seen := IF(_dt_last_seen <> '', _dt_last_seen, _dt_first_seen);
-   self := R; 
+   self := R;
   end;
   rtp_out_flat := NORMALIZE(gw_recs,LEFT.gw_results, flat_recs(LEFT, RIGHT));
   // suppress gateway results if we can lexid response and subject has opted out
-  rtp_out := dx_gateway.parser_qsent_raw.CleanRawResponse(rtp_out_flat, mod_access); 
+  rtp_out := dx_gateway.parser_qsent_raw.CleanRawResponse(rtp_out_flat, mod_access);
 
-  rtp_filt  := sort(dedup(sort(
-      rtp_out(ut.DaysApart(dt_last_seen, (STRING)Std.Date.Today()) < AddressReport_Services.Constants.DAYS_IN_YEAR), 
-        acctno, phone, -dt_last_seen), 
-      acctno, phone), 
+  rtp_filt := sort(dedup(sort(
+      rtp_out(ut.DaysApart(dt_last_seen, (STRING)Std.Date.Today()) < AddressReport_Services.Constants.DAYS_IN_YEAR),
+        acctno, phone, -dt_last_seen),
+      acctno, phone),
     acctno, -dt_last_seen);
   maxHriPer_value := iesp.Constants.MaxCountHRI;
   doxie.mac_AddHRIPhone(rtp_filt,rtp_out_hri);
@@ -794,7 +794,7 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
     self:=L;
   end;
     
-  rtp_results := denormalize(rtp_in_pre, rtp_out_hri_w_tzone, 
+  rtp_results := denormalize(rtp_in_pre, rtp_out_hri_w_tzone,
     left.acctno = right.acctno,
     group,
     add_phones(left, rows(right)));

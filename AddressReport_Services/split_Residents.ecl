@@ -1,34 +1,34 @@
 ﻿IMPORT doxie, ut, iesp, Suppress, header, DeathV2_Services, dx_death_master, dx_header;
 
-export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp, 
+export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
   DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
   Doxie.IDataAccess mod_access,
   boolean location_report) := MODULE
 
-  SHARED MatchOnAddressCriteria(DATASET(AddressReport_Services.layouts.residents_final_out) ds_first_cut, 
-    DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo, 
+  SHARED MatchOnAddressCriteria(DATASET(AddressReport_Services.layouts.residents_final_out) ds_first_cut,
+    DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
     BOOLEAN valid_addr_city_state, BOOLEAN valid_addr_zip) :=
   FUNCTION
           
-    ds_large_area_matches := 
-      MAP( valid_addr_zip  => ds_first_cut( zip = m_AddrInfo[1].zip ),
+    ds_large_area_matches :=
+      MAP( valid_addr_zip => ds_first_cut( zip = m_AddrInfo[1].zip ),
         valid_addr_city_state => ds_first_cut(ut.NNEQ(city_name, m_AddrInfo[1].p_city_name) AND
         ut.NNEQ(st, m_AddrInfo[1].st))
       );
     
-    ds_address_matches := ds_large_area_matches( 
+    ds_address_matches := ds_large_area_matches(
       ut.NNEQ(prim_name, m_AddrInfo[1].prim_name) AND
       ut.NNEQ(prim_range, m_AddrInfo[1].prim_range) AND
       ut.NNEQ(predir, m_AddrInfo[1].predir) AND
       ut.NNEQ(suffix, m_AddrInfo[1].suffix) AND
       ut.NNEQ(postdir, m_AddrInfo[1].postdir) AND
-      ut.NNEQ(sec_range, m_AddrInfo[1].sec_range) 
+      ut.NNEQ(sec_range, m_AddrInfo[1].sec_range)
     );
     RETURN ds_address_matches;
     
   END;
     
-  //********************************************************************************************************    
+  //********************************************************************************************************
   export AddressReport_Services.layouts.residents_final_out add_akas (DATASET(doxie.layout_best) resi_input):=function
     
     main_record := record (AddressReport_Services.layouts.resident_best_layout)
@@ -45,7 +45,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       limit(ut.limits.DEFAULT));
     glb_ok := mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();
-    Header.MAC_GlbClean_Header(hrecs_raw,hrecs0, , , mod_access);               
+    Header.MAC_GlbClean_Header(hrecs_raw,hrecs0, , , mod_access);
     
     main_record get_header_recs(RECORDOF(hrecs0) R) := transform
       self.is_best := false;
@@ -54,16 +54,16 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       self.dod:=(string) R.dod;
       self.age := if (R.dob = 0, 0, ut.Age(R.dob));
       self.addr_dt_first_seen := R.dt_first_seen;
-      self.addr_dt_last_seen  := R.dt_last_seen;
+      self.addr_dt_last_seen := R.dt_last_seen;
       self := R;
     end;
     
     hrecs := project(hrecs0, get_header_recs(left));
     
     // this defines which AKAs we consider to be the same.
-    all_names := hrecs + project (resi_input, main_record); 
+    all_names := hrecs + project (resi_input, main_record);
     resi_srt := sort (all_names, did, lname, fname, mname, name_suffix, -ssn, -dob, ~is_best);
-    resi := dedup (resi_srt,  did, lname, fname, mname, name_suffix, 
+    resi := dedup (resi_srt, did, lname, fname, mname, name_suffix,
       Left.ssn = Right.ssn or (Right.ssn = ''), Left.dob = Right.dob or (Right.dob = 0));
 
     // check if SSN was seen before randomization:
@@ -73,7 +73,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       transform (main_record, Self.legacy_ssn := Right.ssn != '', Self := Left),
       LEFT OUTER, KEEP (1), limit (0)); //at most 1 : 1 relation
 
-    // get SSN data, create into esdl-alike layout        
+    // get SSN data, create into esdl-alike layout
     AddressReport_Services.layouts.resident_layout AddIssuance (main_record L, doxie.Key_SSN_Map R) := transform
       Self.did := L.did;
       Self.Identity.UniqueID := intformat (L.did, 12, 1);
@@ -89,11 +89,11 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       m_validation := ut.GetSSNValidation (l.ssn);
       boolean is_valid := m_validation.is_valid;
       boolean is_legacy := m_validation.is_valid AND R.ssn5 = '' AND l.legacy_ssn;
-      valid_pre := (is_valid and not is_legacy and ((integer)L.ssn not in doxie.bad_ssn_list)); 
+      valid_pre := (is_valid and not is_legacy and ((integer)L.ssn not in doxie.bad_ssn_list));
       valid := Suppress.dateCorrect.valid (L.ssn, valid_pre);
       ssn_issue_place := Suppress.dateCorrect.state (L.ssn, R.state);
       Self.Identity.SSNInfo := [];
-      Self.Identity.SSNInfoEx := iesp.ECL2ESP.SetSSNInfoEx (L.ssn, if (valid, 'YES', 'NO'), ssn_issue_place, 
+      Self.Identity.SSNInfoEx := iesp.ECL2ESP.SetSSNInfoEx (L.ssn, if (valid, 'YES', 'NO'), ssn_issue_place,
         IssuedStart, IssuedEnd);
 
       Self.Identity.DOB := iesp.ECL2ESP.toDate (L.dob);
@@ -113,7 +113,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     res_w_d_appended := dx_death_master.Append.byDid(res_w_issuance, did, death_params);
     
     AddressReport_Services.layouts.resident_layout GetDead (res_w_d_appended L):=transform
-      // we prefer DOB from header, if valid for the purpose 
+      // we prefer DOB from header, if valid for the purpose
       DOB := L.Identity.DOB;
       left_dob := (string4) DOB.year + intformat (DOB.month, 2, 1) + intformat (DOB.day, 2, 1);
       d_birth := (unsigned) if (DOB.year != 0 and DOB.month != 0, left_dob, L.death.dob8);
@@ -151,30 +151,30 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
 
   shared ds_all_records:=add_akas(ds_all_records_tmp);
       
-  // Derived flags:    
+  // Derived flags:
   BOOLEAN valid_addr_city_state := m_AddrInfo[1].prim_name != '' AND m_AddrInfo[1].p_city_name != '' AND m_AddrInfo[1].st != '';
   BOOLEAN valid_addr_zip := m_AddrInfo[1].prim_name != '' AND m_AddrInfo[1].zip != '';
   
   // Prune off non-current records:
   ds_first_cut := ds_all_records(addr_dt_last_seen > AddressReport_Services.constants.THRESHOLD_DATE_FOR_CURRENT_RESIDENCY);
 
-  // Next, prune those records that do not match the input address:    
+  // Next, prune those records that do not match the input address:
   Current_res_tmp := IF(valid_addr_city_state OR valid_addr_zip,
     MatchOnAddressCriteria(ds_first_cut, m_AddrInfo, valid_addr_city_state, valid_addr_zip),
-    ds_first_cut);    
-  shared Current_res_dedup := dedup(sort(Current_res_tmp,did),did);    
+    ds_first_cut);
+  shared Current_res_dedup := dedup(sort(Current_res_tmp,did),did);
   maxHriPer_value := AddressReport_Services.Constants.MaxCountHRI;
   doxie.mac_AddHRIAddress(Current_res_dedup,CurrentResidents_hri);
   CurrentResidents_w_phone := AddressReport_Services.Functions.getRTPhones(CurrentResidents_hri, mod_access, location_report);
-  EXPORT CurrentResidents  := if(location_report, CurrentResidents_w_phone, project(Current_res_dedup, transform(AddressReport_Services.Layouts.residents_final_out_w_royalties, self.residents := left)));
+  EXPORT CurrentResidents := if(location_report, CurrentResidents_w_phone, project(Current_res_dedup, transform(AddressReport_Services.Layouts.residents_final_out_w_royalties, self.residents := left)));
   
-  ds_all_records format_prior_res(ds_all_records l, Current_res_dedup r):=transform  
+  ds_all_records format_prior_res(ds_all_records l, Current_res_dedup r):=transform
     boolean NOT_address_matches := if( (l.prim_name = m_AddrInfo[1].prim_name AND
       l.prim_range = m_AddrInfo[1].prim_range AND
       l.predir = m_AddrInfo[1].predir AND
       l.suffix = m_AddrInfo[1].suffix AND
       l.postdir = m_AddrInfo[1].postdir AND
-      l.sec_range =  m_AddrInfo[1].sec_range AND
+      l.sec_range = m_AddrInfo[1].sec_range AND
       l.city_name= m_AddrInfo[1].p_city_name AND
       l.st= m_AddrInfo[1].st),false,true);
     self.prim_name:=if(NOT_address_matches,l.prim_name,'');
@@ -188,11 +188,11 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     self.zip:=if(NOT_address_matches,l.zip,'');
     self.zip4:=if(NOT_address_matches,l.zip4,'');
     self:=l;
-  end;                                                   
+  end;
   Prior_res_tmp:=join(ds_all_records,Current_res_dedup,LEFT.did=RIGHT.did,format_prior_res(LEFT,RIGHT),LEFT ONLY);
   Prior_res_dedup:=dedup(sort(Prior_res_tmp,did),did);
   
-  doxie.layout_AppendGongByAddr_input fixComp(Prior_res_dedup L) := transform 
+  doxie.layout_AppendGongByAddr_input fixComp(Prior_res_dedup L) := transform
     self.listing_name := '';
     self.timezone := '';
     self.phone := '';
