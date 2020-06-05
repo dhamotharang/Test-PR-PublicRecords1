@@ -399,10 +399,8 @@ export Layouts_Voters := MODULE
 		string1    addr_type;
 	  unsigned8	 raw_aid := 0;
 	  unsigned8	 ace_aid := 0;	
-	  string100	 prep_res_addr_line1 := '';
-	  string50	 prep_res_addr_line_last := '';	
-	  string100	 prep_mail_addr_line1 := '';
-	  string50	 prep_mail_addr_line_last := '';
+	  string100	 prep_addr_line1 := '';
+	  string50	 prep_addr_line_last := '';	
 	end;
 	
 	Export Layout_Voters_Autokeys := record

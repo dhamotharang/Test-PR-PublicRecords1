@@ -138,4 +138,7 @@ Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD
 								EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
 								file_acquired_date, local): persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Rollup', SINGLE);					  
 
-export Transulate_Voters_Codes := Rollup_Voters : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE);
+export Transulate_Voters_Codes := Rollup_Voters 
+//uncomment for testing purposes
+// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
+;

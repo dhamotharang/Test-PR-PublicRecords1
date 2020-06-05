@@ -4,22 +4,7 @@
 
 in_file := VotersV2.Cleaned_Addr_Cache_Base;
 
-VotersV2.Layouts_Voters.Layout_Voters_base_new transformBase(in_file l) := transform	
-//populated name fields for flip name utility below 
-  self.title := l.prefix_title;
-	self.fname := l.first_name;
-	self.mname := l.middle_name;
-	self.lname := l.last_name;
-	self.name_suffix := l.name_suffix_in;
-	self.did := 0;
-	self.did_score := 0;
-	self              := l;
-  self              := [];
-end;
-
-transformedBaseFile := project(in_file, transformBase(left));
-
-ut.mac_flipnames(transformedBaseFile,fname,mname,lname, base_FlipNames)
+ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
 
 dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name_suffix, fname, mname, 
 																dob, prim_range, prim_name, predir, addr_suffix, postdir,
@@ -67,14 +52,9 @@ DID_Add.MAC_Match_Flex            // regular did macro
 //remove src
 Ds_Voters_WithDID := project(Ds_Voters_WithDID_src, transform(VotersV2.Layouts_Voters.Layout_Voters_base_new, self := left)) ;
 
-VotersV2.Layouts_Voters.Layout_Voters_base_new tDefault_ssn(Ds_Voters_WithDID l) := transform
-	self.ssn := '';
-	self := l;	
-  self := [];
-end;
+did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
-In_Voters_WithDidSsn := project(Ds_Voters_WithDID, tDefault_ssn(left));
-
-did_add.MAC_Add_SSN_By_DID(In_Voters_WithDidSsn, did, ssn, Out_Voters_WithDidSsn)
-
-export Cleaned_Voters_DID := Out_Voters_WithDidSsn : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE);
+export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
+//uncomment for testing purposes
+// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+;

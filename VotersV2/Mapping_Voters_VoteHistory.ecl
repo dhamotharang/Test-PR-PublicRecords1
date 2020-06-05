@@ -106,4 +106,7 @@ vote_hist := project(rollup_vote_hist, trfVoteHist(left));
 //DF-26929 added for maintaining MA_Census History Base 
 allVoteHistory := vote_hist + voteHistoryBase_File + MA_CensusHistoryBase_File;
 
-export Mapping_Voters_VoteHistory := allVoteHistory : persist(VotersV2.Cluster + 'persist::Voters_VoteHistory_Base');
+export Mapping_Voters_VoteHistory := allVoteHistory 
+//uncomment for testing purposes
+// : persist(VotersV2.Cluster + 'persist::Voters_VoteHistory_Base')
+;

@@ -4,34 +4,10 @@
 
 in_file := VotersV2.Cleaned_Voters_DID;
 
-layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
+layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;								
 
-Invalid_Maiden_Names := ['','JR','SR','MRS','NONE','N/A',
-                         'NOT AVAILABLE','UNAVAILABLE',
-                         'UNK','UNKN','UNKNOWN'];
-
-// Transform the Maiden Prior name value
-layout_base trfMaidenPrior(in_file l, unsigned c) := transform
-    string2 temp_st := if(trim(l.source_state,right,left) <> '',l.source_state,
-	                      if(trim(l.st,left,right) <> '',l.st,l.mail_st));
-														 
-	self.lname      := choose(c, l.lname, trim(l.clean_maiden_pri,left,right));
-	self.name_type  := choose(c, '','2');
-	self.rid        := if (l.rid = 0, hash64(temp_st, l.vendor_id, self.lname, l.name_suffix, l.fname, l.mname, 
-			 				  self.name_type, l.dob, l.addr_type, l.prim_range, l.prim_name, l.predir,
-							  l.addr_suffix, l.postdir, l.unit_desig, l.sec_range, l.p_city_name,
-							  l.st, l.zip, l.file_acquired_date), l.rid);
-	self := l;
-end;
-
-// Normalize the Maiden Prior name value
-Clean_Name_Norn_file  := NORMALIZE(in_file
-									,if(trim(left.clean_maiden_pri,left,right) in Invalid_Maiden_Names or
-									    trim(left.lname,left,right) = trim(left.clean_maiden_pri,left,right),1,2)
-									,trfMaidenPrior(left,counter));									
-
-	  sendRecs		:= Clean_Name_Norn_file(trim(fname + mname + lname) <> '');
-		notSendRecs := Clean_Name_Norn_file(trim(fname + mname + lname) = '');
+	  sendRecs		:= in_file(trim(fname + mname + lname) <> '');
+		notSendRecs := in_file(trim(fname + mname + lname) = '');
 
 		NID.Mac_CleanParsedNames(PROJECT(sendRecs, VotersV2.Layouts_Voters.Layout_Voters_base_new) 
 																		,NID_output
@@ -60,4 +36,7 @@ deduped_clean_file  := dedup(sort(dis_clean_norm_file, lname, name_suffix, fname
 							 lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
 							 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, local);
 															
-export Norm_Voters_Cleaned_Base := deduped_clean_file : persist(VotersV2.Cluster+'persist::Norm_Voters_Cleaned_Base', SINGLE);
+export Norm_Voters_Cleaned_Base := deduped_clean_file 
+//uncomment for testing purposes
+// : persist(VotersV2.Cluster+'persist::Norm_Voters_Cleaned_Base', SINGLE)
+;
