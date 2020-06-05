@@ -6,7 +6,7 @@ EXPORT  Proc_History(
                            
     dCRK        :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK;
     dCRKFather  :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK_Father;
-    dHistoryOld :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).History_Father;
+    dHistoryOld :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).History;
     pTimestamp  :=  (STRING)STD.Date.CurrentDate()+(STRING)STD.Date.CurrentTime(); 
     
     HealthcareNoMatchHeader_InternalLinking.Layout_History  tHistory(dCRK pNew, dCRKFather pOld)  :=  TRANSFORM
