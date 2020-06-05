@@ -1,18 +1,18 @@
 /*--SOAP--
 <message name="ReportService" wuTimeout="300000">
-  <part name="Addr"                type="xsd:string"/>
-  <part name="City"                type="xsd:string"/>
-  <part name="State"               type="xsd:string"/>
-  <part name="Zip"                 type="xsd:string"/>
+  <part name="Addr" type="xsd:string"/>
+  <part name="City" type="xsd:string"/>
+  <part name="State" type="xsd:string"/>
+  <part name="Zip" type="xsd:string"/>
   <separator />
   <part name="DID" type="xsd:string" required="1" />
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/> 
-  <part name="SSNMask" type="xsd:string"/>  <!-- [NONE, ALL, LAST4, FIRST5] -->
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
+  <part name="SSNMask" type="xsd:string"/> <!-- [NONE, ALL, LAST4, FIRST5] -->
   <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
   <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="ApplicationType"       type="xsd:string"/>
-  <separator />  
+  <part name="ApplicationType" type="xsd:string"/>
+  <separator />
   <part name="MaxResidents" type="xsd:unsignedInt"/>
   <part name="IncludeCensusData" type="xsd:boolean"/>
   <part name="IncludeProperties" type="xsd:boolean"/>
@@ -63,7 +63,7 @@ EXPORT ReportService := MACRO
   #constant ('IncludeNonDMVSources', true);
   #constant ('IncludeNonRegulatedVehicleSources', true);
   
-  include_def := module 
+  include_def := module
     export boolean include_businesses := true;
     export boolean include_CensusData := true;
     export boolean Include_ResidentialPhones := true;
@@ -120,56 +120,56 @@ EXPORT ReportService := MACRO
   //ESP had to split the request and the response for this service in order to be able to keep generating the layout
   //instead of manually making the changes
   //This should not become the norm
-  rec_in   := iesp.addressreportreq.t_AddressReportRequest;
-  ds_in   := DATASET ([], rec_in) : STORED ('AddressReportRequest', FEW);
+  rec_in := iesp.addressreportreq.t_AddressReportRequest;
+  ds_in := DATASET ([], rec_in) : STORED ('AddressReportRequest', FEW);
   
   first_raw := ds_in[1] : INDEPENDENT;
   iesp.ECL2ESP.SetInputBaseRequest (first_raw);
-  ReportBy   := global (first_raw.ReportBy);
+  ReportBy := global (first_raw.ReportBy);
   
   //***************************************************//
   // iesp.ECL2ESP.SetInputAddress (ReportBy.Address);
   // Unfortunately I cannot use the standard ECL2ESP setIputAddress
-  // because the input can be a single line or components and 
+  // because the input can be a single line or components and
   // I am using the clean address passing the single line address.
   //****************************************************//
   AddressReport_Services.input.SetInputAddress (ReportBy.Address);
   SetInputSearchOptions (first_raw.Options);
-  boolean location_report           := first_raw.Options.LocationReportOnly : STORED('LocationReportOnly');
-  boolean use_new_business_header   := first_raw.Options.useNewBusinessHeader : STORED('useNewBusinessHeader');
-  string1 bus_report_fetch_level    := 'S' : stored('BusinessReportFetchLevel'); 
+  boolean location_report := first_raw.Options.LocationReportOnly : STORED('LocationReportOnly');
+  boolean use_new_business_header := first_raw.Options.useNewBusinessHeader : STORED('useNewBusinessHeader');
+  string1 bus_report_fetch_level := 'S' : stored('BusinessReportFetchLevel');
 
-  include_stored   := PersonReports.GlobalIncludes ();
+  include_stored := PersonReports.GlobalIncludes ();
   
-  tmp        :=AutoStandardI.GlobalModule();
+  tmp := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(tmp);
 
-  tempmod   := module (project (tmp,AddressReport_Services.input._addressreport,  opt))
+  tempmod := module (project (tmp, AddressReport_Services.input._addressreport, opt))
       doxie.compliance.MAC_CopyModAccessValues(mod_access);
-      export boolean include_driverslicenses        := include_stored.include_driverslicenses;
-      export boolean include_businesses             := include_stored.include_businesses;
-      export boolean include_CensusData             := include_stored.include_CensusData;
-      export boolean Include_ResidentialPhones      := include_stored.Include_ResidentialPhones;
-      export boolean Include_BusinessPhones         := include_stored.Include_BusinessPhones;
-      export boolean include_bankruptcy             := include_stored.include_bankruptcy;
-      export boolean include_Properties             := include_stored.include_Properties;
-      export boolean include_Neighbors              := include_stored.include_Neighbors;
-      export boolean include_LiensJudgments         := include_stored.include_LiensJudgments;
-      export boolean include_MotorVehicles          := include_stored.include_MotorVehicles;
-      export boolean include_CriminalRecords        := include_stored.include_crimrecords;
-      export boolean include_SexualOffenses         := include_stored.include_sexualoffences;
+      export boolean include_driverslicenses := include_stored.include_driverslicenses;
+      export boolean include_businesses := include_stored.include_businesses;
+      export boolean include_CensusData := include_stored.include_CensusData;
+      export boolean Include_ResidentialPhones := include_stored.Include_ResidentialPhones;
+      export boolean Include_BusinessPhones := include_stored.Include_BusinessPhones;
+      export boolean include_bankruptcy := include_stored.include_bankruptcy;
+      export boolean include_Properties := include_stored.include_Properties;
+      export boolean include_Neighbors := include_stored.include_Neighbors;
+      export boolean include_LiensJudgments := include_stored.include_LiensJudgments;
+      export boolean include_MotorVehicles := include_stored.include_MotorVehicles;
+      export boolean include_CriminalRecords := include_stored.include_crimrecords;
+      export boolean include_SexualOffenses := include_stored.include_sexualoffences;
       export boolean include_HuntingFishingLicenses := include_stored.include_huntingfishing;
-      export boolean include_WeaponPermits          := include_stored.include_weaponpermits;
-      export boolean locationReport                 := location_report;
-      export boolean useNewBusinessHeader           := use_new_business_header;
-      export string1 BusinessReportFetchLevel       := STD.Str.ToUpperCase(bus_report_fetch_level);
+      export boolean include_WeaponPermits := include_stored.include_weaponpermits;
+      export boolean locationReport := location_report;
+      export boolean useNewBusinessHeader := use_new_business_header;
+      export string1 BusinessReportFetchLevel := STD.Str.ToUpperCase(bus_report_fetch_level);
   end;
 
   Relationship.IParams.storeParams(first_raw.Options.RelationshipOption);
   addr_mod := Relationship.IParams.getParams(tempmod,AddressReport_Services.input._addressreport);
 
-  recs              := AddressReport_Services.ReportService_Records (addr_mod, FALSE);
-  results_recs      := project(recs, transform(iesp.addressreport.t_AddressReportResponse, self := left.ReportResponse));
+  recs := AddressReport_Services.ReportService_Records (addr_mod, FALSE);
+  results_recs := project(recs, transform(iesp.addressreport.t_AddressReportResponse, self := left.ReportResponse));
   output(results_recs, named ('Results'));
   
   //Royalties for Location Report
