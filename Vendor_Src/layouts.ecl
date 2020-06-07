@@ -14,6 +14,17 @@ EXPORT layouts := MODULE
 		STRING Phone;
 	END;
 	
+	EXPORT College_Locator := RECORD
+     MasterList;
+		 STRING NSCHEnrollVerify;
+		 STRING NSCHDegreeVerify;
+		 STRING PhoneVerify;
+		 STRING OnlineDirectoryAvailable;
+		 STRING OnlineDirectoryWebsite;
+		 STRING ContacName;
+		 STRING ContactPhone;
+	END;
+	
 	
 	EXPORT Bank_Court	:= RECORD
 	  STRING    lncourtcode;

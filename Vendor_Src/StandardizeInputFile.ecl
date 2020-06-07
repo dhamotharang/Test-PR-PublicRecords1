@@ -246,7 +246,7 @@ end;
 	
 		CollegeLocator	:= Files(filedate,pUseProd).CollegeLocator_input  ;  
 		
-		layouts.Base MapCollegeLocatorInput(layouts.MasterList L) := TRANSFORM
+		layouts.Base MapCollegeLocatorInput(layouts.College_Locator L) := TRANSFORM
 		
     SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
@@ -258,7 +258,7 @@ end;
 		SELF.date_added						:= filedate[..8];
 		SELF.input_file_id				:= l.LNfileCategory;
 		SELF.clean_phone 					:= ut.fn_RemoveSpecialChars(IF(ut.CleanPhone(L.phone) [1] NOT IN ['0','1'],ut.CleanPhone(L.phone), ''));
-		SELF.prepped_addr1				:= ut.fn_RemoveSpecialChars(STD.STR.CleanSpaces(STD.Str.ToUpperCase(L.address1)+' '+STD.Str.ToUpperCase(L.address2)));
+		SELF.prepped_addr1				:= ut.fn_RemoveSpecialChars(STD.STR.CleanSpaces(STD.Str.ToUpperCase(L.address1) +' '+ IF(L.address2<>'NULL',STD.Str.ToUpperCase(L.address2),'')));
 		SELF.prepped_addr2        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(StringLib.StringCleanSpaces(L.city) + IF(L.city <> '',',','')
 																		+ ' '+ L.state	+ ' '+ L.ZipCode), LEFT, RIGHT));
 		SELF											:= [];
