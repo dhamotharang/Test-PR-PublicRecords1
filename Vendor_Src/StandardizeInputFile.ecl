@@ -59,7 +59,7 @@ end;
 	layouts.Base MapBankInput(layouts.Bank_Court L) := TRANSFORM
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
-		SELF.county_text        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
+		SELF.county_text          := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
 		SELF.display_name					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
 		SELF.description					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
@@ -88,7 +88,7 @@ end;
 	layouts.Base MapLienInput(layouts.Lien_Court L) := TRANSFORM	
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
-		SELF.county_text        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
+		SELF.county_text          := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
 		SELF.display_name					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
 		SELF.description					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
@@ -248,20 +248,27 @@ end;
 		
 		layouts.Base MapCollegeLocatorInput(layouts.College_Locator L) := TRANSFORM
 		
-    SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
-		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
-		SELF.display_name					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.vendorName), LEFT, RIGHT));
-		SELF.description					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.vendorName), LEFT, RIGHT));
-		SELF.status								:= '';
-		SELF.coverage_1						:= '';
-		SELF.coverage_2						:= '';
-		SELF.date_added						:= filedate[..8];
-		SELF.input_file_id				:= l.LNfileCategory;
-		SELF.clean_phone 					:= ut.fn_RemoveSpecialChars(IF(ut.CleanPhone(L.phone) [1] NOT IN ['0','1'],ut.CleanPhone(L.phone), ''));
-		SELF.prepped_addr1				:= ut.fn_RemoveSpecialChars(STD.STR.CleanSpaces(STD.Str.ToUpperCase(L.address1) +' '+ IF(L.address2<>'NULL',STD.Str.ToUpperCase(L.address2),'')));
-		SELF.prepped_addr2        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(StringLib.StringCleanSpaces(L.city) + IF(L.city <> '',',','')
+    SELF.item_source					    := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
+		SELF.source_code					    := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.LNsourcetCode), LEFT, RIGHT));
+		SELF.display_name					    := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.vendorName), LEFT, RIGHT));
+		SELF.description				    	:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.vendorName), LEFT, RIGHT));
+		SELF.status								    := '';
+		SELF.coverage_1					    	:= '';
+		SELF.coverage_2						    := '';
+		SELF.date_added						    := filedate[..8];
+		SELF.input_file_id				    := l.LNfileCategory;
+		SELF.clean_phone 					    := ut.fn_RemoveSpecialChars(IF(ut.CleanPhone(L.phone) [1] NOT IN ['0','1'],ut.CleanPhone(L.phone), ''));
+		SELF.prepped_addr1			    	:= ut.fn_RemoveSpecialChars(STD.STR.CleanSpaces(STD.Str.ToUpperCase(L.address1) +' '+ IF(L.address2<>'NULL',STD.Str.ToUpperCase(L.address2),'')));
+		SELF.prepped_addr2            := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(StringLib.StringCleanSpaces(L.city) + IF(L.city <> '',',','')
 																		+ ' '+ L.state	+ ' '+ L.ZipCode), LEFT, RIGHT));
-		SELF											:= [];
+		SELF.NSCHEnrollVerify         := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.NSCHEnrollVerify),LEFT, RIGHT));
+		SELF.NSCHDegreeVerify         := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.NSCHDegreeVerify),LEFT, RIGHT));
+		SELF. PhoneVerify             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.PhoneVerify),LEFT, RIGHT)); 
+		// SELF.OnlineDirectoryAvailable := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryAvailable),LEFT, RIGHT));
+		// SELF.OnlineDirectoryWebsite   := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryWebsite),LEFT, RIGHT));
+		SELF.ContacName               := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContacName),LEFT, RIGHT));
+		SELF.ContactPhone             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContactPhone),LEFT, RIGHT));  
+		SELF										     	:= [];
 	END;
 	
 		StdCollegeLocator := PROJECT(CollegeLocator(LNfileCategory<>'',LNsourcetCode<>'',vendorName<>'',address1<>'',city<>'',state<>'',zipcode<>''), MapCollegeLocatorInput(LEFT)); 

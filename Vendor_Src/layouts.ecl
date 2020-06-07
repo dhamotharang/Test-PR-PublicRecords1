@@ -130,7 +130,7 @@ EXPORT layouts := MODULE
 		STRING10  clean_phone;							//	phone				(col H)					//	source_phone					
 		STRING10	clean_fax;								//		<no match>								//
 		STRING65  Prepped_addr1;						//	address cleaner fields 			//	(based on source address fields)
-		STRING35  Prepped_addr2;
+		STRING35  Prepped_addr2;		
 		STRING28  v_prim_name;
 		STRING5   v_zip;
 		STRING4   v_zip4;
@@ -146,6 +146,13 @@ EXPORT layouts := MODULE
 		STRING		st;
 		STRING		zip;
 		STRING		zip4;
+		STRING NSCHEnrollVerify;
+		STRING NSCHDegreeVerify;
+		STRING PhoneVerify;
+		// STRING OnlineDirectoryAvailable;
+		// STRING OnlineDirectoryWebsite;
+		STRING ContacName;
+		STRING ContactPhone;
 		STRING		cart;
 		STRING		cr_sort_sz;
 		STRING		lot;
@@ -164,7 +171,7 @@ EXPORT layouts := MODULE
 	END;
 	
 	EXPORT Base	:= RECORD
-MergedSrc_Base ;
+MergedSrc_Base;
 end;
    
 	 
