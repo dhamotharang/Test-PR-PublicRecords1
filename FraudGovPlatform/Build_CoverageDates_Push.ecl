@@ -9,7 +9,7 @@ shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql_cert')[1].passw
 
 
 shared  MySQLServer                 :=  'dbqgov-bct.risk.regn.net';
-shared  MySQLPort                   :=  '3306';
+shared  MySQLPort                   :=  '3308';
 shared  MySQLDatabase               :=  'ring_web';
 shared  MySQLUser                   :=  mysql_username;
 shared  MySQLPassword               :=  mysql_password;
