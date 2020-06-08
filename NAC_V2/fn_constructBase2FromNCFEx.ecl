@@ -104,16 +104,16 @@ The records are now deduped when the file is processed. Dedupe occurs only withi
 
 **/
 
-EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
+EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 version) := FUNCTION
 
-	ca1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
+	ca1 := DISTRIBUTE(PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
 										)), hash32(CaseId));
 
 	cases := $.fn_rollupCases(ca1(errors=0));
 
-	cl1 := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+	cl1 := PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
@@ -121,7 +121,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 
 	clients := $.fn_rollupClients(cl1(errors=0));
 
-	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
+	ad1 := DISTRIBUTE(PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));

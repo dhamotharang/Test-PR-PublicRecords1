@@ -18,9 +18,11 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 		unsigned4	seqnum;
 		Nac_V2.Layouts2.rNac2;
 	END;	
-	shared ds := dataset(ilfn, NAC_V2.Layouts2.rRawFile, CSV)(LENGTH(TRIM(text,left,right)) > 4);
+	shared ds := SORT(
+						dataset(ilfn, NAC_V2.Layouts2.rRawFile, CSV)(LENGTH(TRIM(text,left,right)) > 4),
+						GetFileName(filename));
 
-	shared nacin := PROJECT(ds, TRANSFORM(rNac,			//Nac_V2.Layouts2.rNac2,
+	 ds1 := PROJECT(GROUP(ds,GetFileName(filename)), TRANSFORM(rNac,			//Nac_V2.Layouts2.rNac2,
 				string4 rc := left.text[1..4];
 				len := MIN(LENGTH(left.text), 484);
 				string484 text := left.text[5..len] + IF(len < 484, Std.Str.Repeat(' ', 484-len), '');
@@ -34,6 +36,8 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 				self.filename := GetFileName(left.filename);
 				self.seqnum := COUNTER;
 				));
+				
+		export nacin := UNGROUP(ds1);
 
 	export cases := 
 							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,

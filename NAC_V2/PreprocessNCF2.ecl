@@ -46,12 +46,18 @@ GetAddresses(string ilfn) := PROJECT(
 						self := left;
 			));
 
-GetContacts(string ilfn) := PROJECT($.ExtractRecords(ilfn).contacts,
+GetContacts(string ilfn) := DEDUP(SORT(DISTRIBUTE(
+				PROJECT($.ExtractRecords(ilfn).contacts,
 						TRANSFORM($.Layouts2.rStateContactEx;
 							self.ProgramState := uc(left.ProgramState);
 							self.ContactName := uc(left.ContactName);
 							self := left;
-						));
+						)),
+				hash32(contactname)),
+				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
+				filename, seqnum, local),
+				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
+				right, local);
 
 GetExceptions(string ilfn) := $.ExtractRecords(ilfn).exceptions;
 																	
