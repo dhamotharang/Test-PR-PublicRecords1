@@ -8,10 +8,10 @@ EXPORT Functions := MODULE
  SHARED _rin_Layout := RiskIntelligenceNetwork_Services.Layouts;
  SHARED _sharedLayout := FraudShared_Services.Layouts;
 
- EXPORT getRealtimePRAppends(DATASET(DidVille.Layout_Did_OutBatch) ds_best_in, 
+ EXPORT getRealtimePRAppends(DATASET(DidVille.Layout_Did_OutBatch) ds_best_in,
                              RiskIntelligenceNetwork_Services.IParam.Params params) := FUNCTION
 
-  ds_appends_in := PROJECT(ds_best_in, 
+  ds_appends_in := PROJECT(ds_best_in,
                     TRANSFORM(_sharedLayout.BatchIn_rec,
                       SELF.acctno := (string) LEFT.seq,
                       SELF.seq := LEFT.seq,
@@ -68,21 +68,21 @@ EXPORT Functions := MODULE
 
   ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload, skip_autokey_ds_matching, FRAUD_PLATFORM);
 
-  _rin_Layout.fragment_w_value_recs ds_fragment_recs_w_trans(_sharedLayout.layout_velocity_in L, 
+  _rin_Layout.fragment_w_value_recs ds_fragment_recs_w_trans(_sharedLayout.layout_velocity_in L,
                                                              _sharedLayout.Raw_Payload_rec R)  := TRANSFORM
-  
+
     BOOLEAN isBankAccountNumber1 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_1));
     BOOLEAN isBankAccountNumber2 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_2));
-    
-    bankRountingNumber1 := IF(isBankAccountNumber1 AND R.bank_routing_number_1 <> '', TRIM(R.bank_routing_number_1, LEFT, RIGHT), ' '); 
+
+    bankRountingNumber1 := IF(isBankAccountNumber1 AND R.bank_routing_number_1 <> '', TRIM(R.bank_routing_number_1, LEFT, RIGHT), ' ');
     bankRountingNumber2 := IF(isBankAccountNumber2 AND R.bank_routing_number_2 <> '', TRIM(R.bank_routing_number_2, LEFT, RIGHT), ' ');
-    
+
     bank_info_to_use := MAP(isBankAccountNumber1 => bankRountingNumber1 + _Constants.FRAGMENT_SEPARATOR + R.bank_account_number_1,
                             isBankAccountNumber2 => bankRountingNumber2 + _Constants.FRAGMENT_SEPARATOR + R.bank_account_number_2,
                             '');
-    
+
     //GEOLOCATION_FRAGMENT and MAILING_ADDRESS_FRAGMENT are not element yet, but will be in future. left in there for future use.
-    SELF.fragment_value := CASE(L.fragment, 
+    SELF.fragment_value := CASE(L.fragment,
                                 Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_info_to_use,
                                 Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
                                 Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => TRIM(R.drivers_license) + _Constants.FRAGMENT_SEPARATOR + TRIM(R.Drivers_License_State),
@@ -99,7 +99,7 @@ EXPORT Functions := MODULE
     SELF := L;
   END;
 
-  ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload, 
+  ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload,
                                 LEFT.record_id = RIGHT.record_id,
                                 ds_fragment_recs_w_trans(LEFT, RIGHT),
                               LIMIT(_Constants.MAX_JOIN_LIMIT, SKIP));
@@ -113,9 +113,9 @@ EXPORT Functions := MODULE
 
   ds_entityNameValue := PROJECT(ds_entity_rolled,TRANSFORM(_rin_Layout.entity_uid_recs, SELF := LEFT));
 
-  // All the commneted Fragment Types in the below project are not supported as of now (in MVP), However, 
-  // ... they will be supported for the final product. 
-  analytics_uids := PROJECT(ds_entityNameValue, 
+  // All the commneted Fragment Types in the below project are not supported as of now (in MVP), However,
+  // ... they will be supported for the final product.
+  analytics_uids := PROJECT(ds_entityNameValue,
                       TRANSFORM(_rin_Layout.entity_uid_recs,
                         uid := CASE(LEFT.fragment,
                                     Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => Entity_Type_Identifier.DLNUMBER + HASH64(STD.Str.FindReplace(LEFT.fragment_value,_Constants.FRAGMENT_SEPARATOR,'|')),
@@ -133,7 +133,7 @@ EXPORT Functions := MODULE
   RETURN analytics_uids;
  END;
 
- EXPORT getGovernmentBest(DATASET(didville.Layout_Did_OutBatch) ds_best_in, 
+ EXPORT getGovernmentBest(DATASET(didville.Layout_Did_OutBatch) ds_best_in,
                           RiskIntelligenceNetwork_Services.IParam.Params params) := FUNCTION
 
   ds_best := DidVille.did_service_common_function(ds_best_in,
@@ -146,12 +146,12 @@ EXPORT Functions := MODULE
                                                   IndustryClass_val:= params.industry_class,
                                                   DRM_val          := params.DataRestrictionMask,
                                                   GetSSNBest       := TRUE);
-  RETURN ds_best; 
+  RETURN ds_best;
  END;
 
  EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
   return REGEXREPLACE(RiskIntelligenceNetwork_Services.Constants.FRAGMENT_SEPARATOR ,address,', ');
- END;	
+ END;
 
  EXPORT GetCleanFragmentValue(string FragmentValue, integer pos) := FUNCTION
   return REGEXFIND('(.*)' + RiskIntelligenceNetwork_Services.Constants.FRAGMENT_SEPARATOR + '(.*)$',FragmentValue, pos);
