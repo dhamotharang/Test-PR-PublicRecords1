@@ -146,13 +146,6 @@ EXPORT layouts := MODULE
 		STRING		st;
 		STRING		zip;
 		STRING		zip4;
-		STRING NSCHEnrollVerify;
-		STRING NSCHDegreeVerify;
-		STRING PhoneVerify;
-		// STRING OnlineDirectoryAvailable;
-		// STRING OnlineDirectoryWebsite;
-		STRING ContacName;
-		STRING ContactPhone;
 		STRING		cart;
 		STRING		cr_sort_sz;
 		STRING		lot;
@@ -167,6 +160,13 @@ EXPORT layouts := MODULE
 		STRING		geo_blk;
 		STRING		geo_match;
 		STRING		err_stat;
+		STRING NSCHEnrollVerify;
+		STRING NSCHDegreeVerify;
+		STRING PhoneVerify;
+		// STRING OnlineDirectoryAvailable;
+		// STRING OnlineDirectoryWebsite;
+		STRING ContacName;
+		STRING ContactPhone;
 
 	END;
 	
