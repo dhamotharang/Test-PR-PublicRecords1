@@ -151,7 +151,10 @@ module
 		export kel_CustomerDashTopClusters				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters'),pversion);
 		export kel_EntityProfile								:= tools.mod_FilenamesBuild(Template('kel::EntityProfile'),pversion);
 		export kel_ConfigAttributes							:= tools.mod_FilenamesBuild(Template('kel::ConfigAttributes'),pversion);
-				
+		export kel_EntityRules									:= tools.mod_FilenamesBuild(Template('kel::EntityRules'),pversion);
+		export kel_EntityAttributes							:= tools.mod_FilenamesBuild(Template('kel::EntityAttributes'),pversion);
+		export kel_GraphEdges										:= tools.mod_FilenamesBuild(Template('kel::GraphEdges'),pversion);
+		export kel_GraphVertices								:= tools.mod_FilenamesBuild(Template('kel::GraphVertices'),pversion);
 		//Kel files demo
 		export kel_customeraddress_Demo	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Demo'),pversion);
 		export kel_personstats_Demo			:= tools.mod_FilenamesBuild(Template('kel::personstats_Demo'),pversion);
@@ -227,6 +230,10 @@ module
 			kel_CustomerDashTopClusters.dAll_filenames + 
 			kel_EntityProfile.dAll_filenames + 
 			kel_ConfigAttributes.dAll_filenames + 
+			kel_EntityRules.dAll_filenames + 
+			kel_EntityAttributes.dAll_filenames + 
+			kel_GraphEdges.dAll_filenames + 
+			kel_GraphVertices.dAll_filenames + 
 			//kel demo files
 			kel_customeraddress_Demo.dAll_filenames +
 			kel_personstats_Demo.dAll_filenames +
