@@ -23,7 +23,10 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
 													 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
 													 mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir, mail_unit_desig, 
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
-													 local):persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE);
+													 local)
+													 //uncomment for testing
+													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
+													 ;
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
 //add src 
@@ -50,7 +53,16 @@ DID_Add.MAC_Match_Flex            // regular did macro
 				)
 
 //remove src
-Ds_Voters_WithDID := project(Ds_Voters_WithDID_src, transform(VotersV2.Layouts_Voters.Layout_Voters_base_new, self := left)) ;
+Ds_Voters_WithDID := project(Ds_Voters_WithDID_src, 
+                             transform(VotersV2.Layouts_Voters.Layout_Voters_base_new, 	
+																			 string2 temp_st := if(trim(left.source_state,right,left) <> '',left.source_state,
+																														 if(trim(left.st,left,right) <> '',left.st,left.mail_st));
+																			 //persistent hash value										 
+	                                     self.rid := if (left.rid = 0, hash64(temp_st, left.vendor_id, left.lname, left.name_suffix, left.fname, left.mname, 
+																											                      left.name_type, left.dob, left.addr_type, left.prim_range, left.prim_name, left.predir,
+																																						left.addr_suffix, left.postdir, left.unit_desig, left.sec_range, left.p_city_name,
+																																						left.st, left.zip, left.file_acquired_date), left.rid);
+                                       self := left)) ;
 
 did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
