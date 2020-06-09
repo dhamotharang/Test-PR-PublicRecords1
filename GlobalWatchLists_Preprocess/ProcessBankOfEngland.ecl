@@ -19,13 +19,16 @@ MapToOld(DATASET(GlobalWatchlists_Preprocess.Layouts.rInputBOE) ds_in) := FUNCTI
 		self.ent_key 						:= 'BES' + TRIM(L.Group_ID, left, right);
 		self.source 						:= 'Bank of England Sanctions';
 		self.lst_vend_upd 			:= GlobalWatchLists_Preprocess.Versions.BankOfEngland_Version;
-		self.lstd_entity 				:= STD.Str.ToUpperCase(TRIM(if(TRIM(L.Title, left, right) = '', '', TRIM(L.Title, left, right) + ' ')
+		TempEntity 							:= STD.Str.ToUpperCase(TRIM(if(TRIM(L.Title, left, right) = '', '', TRIM(L.Title, left, right) + ' ')
 																	 + if(TRIM(L.Name_1, left, right) = '', '', TRIM(L.Name_1, left, right) + ' ')
 																	 + if(TRIM(L.Name_2, left, right) = '', '', TRIM(L.Name_2, left, right) + ' ')
 																	 + if(TRIM(L.Name_3, left, right) = '', '', TRIM(L.Name_3, left, right) + ' ')
 																	 + if(TRIM(L.Name_4, left, right) = '', '', TRIM(L.Name_4, left, right) + ' ')
 																	 + if(TRIM(L.Name_5, left, right) = '', '', TRIM(L.Name_5, left, right) + ' ')
 																	 + if(TRIM(L.Name_6, left, right) = '', '', TRIM(L.Name_6, left, right) + ' '), left, right))[1..80];
+		self.lstd_entity				:= IF(STD.Str.Find(TempEntity, '(1)',1) > 0,
+																	STD.Str.CleanSpaces(TRIM(TempEntity)[STD.Str.Find(TRIM(TempEntity) , '(2)' ,1)+3..]),
+																	TempEntity);
 			 
 		self.first_name 				:=  STD.Str.ToUpperCase(TRIM(if(TRIM(L.Name_1, left, right) = '', '', TRIM(L.Name_1, left, right) + ' ')
 																									+ if(TRIM(L.Name_2, left, right) = '', '', TRIM(L.Name_2, left, right) + ' ')
@@ -319,7 +322,12 @@ ReformatToCommonlayout(DATASET(GlobalWatchlists_Preprocess.IntermediaryLayoutBan
 		self.orig_entity_id 		:= L.Group_ID;
 		self.orig_first_name 		:= L.first_name;
 		self.orig_last_name 		:= L.last_name;
-		self.orig_title_1 			:= L.title;
+		self.orig_title_1 			:= IF(STD.Str.Find(L.title, '(2)', 1) > 0
+																	,STD.Str.FindReplace(TRIM(L.title[1..STD.Str.Find(L.title, '(2)', 1)-1], left, right), '(1)', ''),
+																	L.title);
+		self.orig_title_2 			:= IF(STD.Str.Find(L.title, '(2)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(2)', 1)+3..], left, right),
+																	'');
 		self.orig_aka_id 				:= '';
 		self.orig_aka_type 			:= L.alias_type;
 		self.orig_aka_category 	:= '';
