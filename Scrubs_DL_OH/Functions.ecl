@@ -1,25 +1,19 @@
-IMPORT ut, Scrubs, Codes;
+﻿IMPORT ut,Codes;
 
 EXPORT Functions := MODULE
 
-
   //****************************************************************************
-  //fn_check_dl_number: 	returns true or false based upon the incoming
-  //									    code.
-  // Ohio drivers license numbers consist of 2 letters followed by 6 numbers.
+  //fn_check_dl_number: 	returns true or false based upon the incoming code.
+  // Ohio drivers license numbers consist of 2 letters followed by 6 numbers OR It can be all(9) numbers
   //****************************************************************************
   EXPORT fn_check_dl_number(STRING dlnum) := FUNCTION
-    dlnum_clean := ut.CleanSpacesAndUpper(dlnum);
-    
-		isValidPattern := IF(regexfind('[A-Z]{2}[0-9]{6}', dlnum_clean), TRUE, FALSE);
-
+    dlnum_clean 	 := ut.CleanSpacesAndUpper(dlnum);    
+		isValidPattern := IF(regexfind('[A-Z]{2}[0-9]{6}|[0-9]', dlnum_clean), TRUE, FALSE);
     RETURN IF(isValidPattern, 1, 0);
-  END;  
-  
-  
+  END; 
+	
   //****************************************************************************
-  //fn_class: 	returns true or false based upon the incoming
-  //						code.
+  //fn_class: 	returns true or false based upon the incoming code.
   // Classes ():
   // A:  Any combination of vehicles with a combined Gross Vehicle Weight Rating (GVWR) of 26,001 lbs. or more, if the GVWR of the vehicle or vehicles being towed is in excess of 10,000 lbs.
   // B:  Any single vehicle with a GVWR of 26,001 lbs. or more or any such vehicle towing a vehicle having a GVWR that is not in excess of 10,000 lbs.
@@ -30,9 +24,11 @@ EXPORT Functions := MODULE
   // M1: Motorcycle Only
   // M2: Motorized Bicycle Only
   // M3: 3-Wheel Motorcycle Only
+	// M4: Motor Scooter Only
+	// '': Unknown
   //****************************************************************************
   EXPORT fn_class(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(code);
+	  uc_code 		:= ut.CleanSpacesAndUpper(code);
 		isValidCode := CASE(uc_code,
                         'A'  => TRUE,
                         'B'  => TRUE,
@@ -43,67 +39,14 @@ EXPORT Functions := MODULE
                         'M1' => TRUE,
                         'M2' => TRUE,
                         'M3' => TRUE,
+												'M4' => TRUE,												
                         ''   => TRUE,
                         FALSE);
     RETURN IF(isValidCode,1,0);
   END;
     
-
-  //****************************************************************************
-  //fn_check_license_type: 	returns true or false based upon the incoming
-  //											  code.
-  // License Types:
-  // E
-  // F
-  // G
-  // G1
-  // O
-  // R
-  //****************************************************************************
-  EXPORT fn_check_license_type(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(ut.fn_KeepPrintableChars(code));
-		isValidCode := CASE(uc_code,
-                        'E'  => TRUE,
-                        'F'  => TRUE,
-                        'G'  => TRUE,
-                        'G1' => TRUE,
-                        'O'  => TRUE,
-                        'R'  => TRUE,
-                        ''   => TRUE,
-                        FALSE);
-    RETURN IF(isValidCode,1,0);
-  END;  
-
-
-  //****************************************************************************
-  //fn_check_donor: 	returns true or false based upon the incoming
-  //									code.
-  // Donor Types:
-  // F
-  // M
-  // N
-  // S
-  // U
-  // Y
-  //****************************************************************************
-  EXPORT fn_check_donor(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(ut.fn_KeepPrintableChars(code));
-		isValidCode := CASE(uc_code,
-                        'F'  => TRUE,
-                        'M'  => TRUE,
-                        'N' => TRUE,
-                        'S'  => TRUE,
-                        'U'  => TRUE,
-                        'Y'  => TRUE,
-                        ''   => TRUE,
-                        FALSE);
-    RETURN IF(isValidCode,1,0);
-  END;  
-
-
-  //****************************************************************************
-  //fn_check_hair_color: 	returns true or false based upon the incoming
-  //											code.
+  //**************************************************************************** 
+  //fn_check_hair_color: 	returns true or false based upon the incoming code.
   // Hair colors:
   // BRO: Brown
   // BLN: Blonde
@@ -112,29 +55,29 @@ EXPORT Functions := MODULE
   // RED: Red
   // WHI: White
   // BAL: Bald
+	// BLD: Blond
   // SDY: Sandy
   // UNK: Unknown
   //****************************************************************************
   EXPORT fn_check_hair_color(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(code);
-		isValidCode := CASE(uc_code,
-                        'BRO' => TRUE,
-                        'BLN' => TRUE,
+	  uc_code 		:= ut.CleanSpacesAndUpper(code);
+		isValidCode := CASE(uc_code,		
+                        'BAL' => TRUE,
+												'BLD' => TRUE,
+                        'BRO' => TRUE,												
                         'BLK' => TRUE,
+                        'BLN' => TRUE,
                         'GRY' => TRUE,
                         'RED' => TRUE,
                         'WHI' => TRUE,
-                        'BAL' => TRUE,
                         'SDY' => TRUE,
                         'UNK' => TRUE,
                         FALSE);
     RETURN IF(isValidCode,1,0);
   END;
 
-
   //****************************************************************************
-  //fn_check_eye_color: 	returns true or false based upon the incoming
-  //											code.
+  //fn_check_eye_color: 	returns true or false based upon the incoming code.
   // Eye colors:
   // BRO: Brown
   // BLU: Blue
@@ -147,130 +90,94 @@ EXPORT Functions := MODULE
   // MAR: Maroon
   // PNK: Pink
   //****************************************************************************
-  EXPORT fn_check_eye_color(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(code);
+  EXPORT fn_check_eye_color(STRING code) := FUNCTION 
+	  uc_code 		:= ut.CleanSpacesAndUpper(code);
 		isValidCode := CASE(uc_code,
                         'BRO' => TRUE,
                         'BLU' => TRUE,
-                        'HAZ' => TRUE,
-                        'GRN' => TRUE,
-                        'BLK' => TRUE,
-                        'UNK' => TRUE,
+												'BLK' => TRUE,
+												'DIC' => TRUE,
+                        'GRN' => TRUE,												
                         'GRY' => TRUE,
-                        'DIC' => TRUE,
+                        'HAZ' => TRUE,
                         'MAR' => TRUE,
-                        'PNK' => TRUE,
+                        'PNK' => TRUE,												
+                        'UNK' => TRUE,
                         FALSE);
     RETURN IF(isValidCode,1,0);
   END;
-
 
   //*******************************************************************************
   //fn_verify_weight: 	returns true or false based upon validity of driver height											
   //*******************************************************************************
   EXPORT fn_verify_weight(STRING weight) := FUNCTION
-    weight_clean := (INTEGER2)ut.CleanSpacesAndUpper(weight);
-    
-		isValidWeight   := IF(weight_clean >= 40 AND weight_clean <= 600, TRUE, FALSE);
-    
+    weight_clean 		:= (INTEGER2)ut.CleanSpacesAndUpper(weight);    
+		isValidWeight   := IF(weight_clean >= 30 AND weight_clean <= 1000, TRUE, FALSE);    
     RETURN IF(weight = '' OR weight_clean = 0 OR isValidWeight, 1, 0);
   END;
   
-  
+	//*******************************************************************************
+  //fn_verify_height: returns true or false based upon validity of driver height
   //*******************************************************************************
-  //fn_verify_height: 	returns true or false based upon validity of driver height											
-  //*******************************************************************************
-  EXPORT fn_verify_height(STRING feet, STRING inches) := FUNCTION
-    clean_feet   := ut.CleanSpacesAndUpper(feet);
-    clean_inches := ut.CleanSpacesAndUpper(inches);
-    
-		isValidFeet   := IF(regexfind('[2345678]', clean_feet), TRUE, FALSE);
-		isValidInches := IF(regexfind('00|01|02|03|04|05|06|07|08|09|10|11', clean_inches), TRUE, FALSE);
-
-		isValidInchesOnly := IF(((clean_feet = '' OR clean_feet = '0') AND (clean_inches = '' OR clean_inches = '0' OR clean_inches = '00')) OR 
-                            ((clean_feet = '' OR clean_feet = '0') AND (INTEGER1)clean_inches > 23 AND (INTEGER1)clean_inches < 108), TRUE, FALSE);
-    
-    RETURN IF((isValidFeet AND isValidInches) OR isValidInchesOnly, 1, 0);
+  EXPORT fn_verify_height(STRING height, STRING inches) := FUNCTION
+    height_clean          := trim(height,all);   
+		inches_clean          := trim(inches,all); 
+		isValidFeet_Inches    := IF(regexfind('[3456789]', height_clean) and regexfind('0|1|2|3|4|5|6|7|8|9|10|11', inches_clean), TRUE, FALSE);
+		RETURN IF(height_clean = '' OR (isValidFeet_Inches), 1, 0);
   END;
-
-
-  //****************************************************************************
-  //fn_check_trans_type: 	returns true or false based upon the incoming
-  //											code.
-  // Application Trans Type:
-  // AED:
-  // DNG:
-  // DUP: Duplicate
-  // ORG: Original
-  // OSC: 
-  // REN: Renew
-  // RPL: Replacement
-  // SDP:
-  // TMP: Temporary
-  // UPG: Upgrade
-  //****************************************************************************
-  EXPORT fn_check_trans_type(STRING code) := FUNCTION
-	  uc_code := ut.CleanSpacesAndUpper(code);
-		isValidCode := CASE(uc_code,
-                        'AED' => TRUE,
-                        'DNG' => TRUE,
-                        'DUP' => TRUE,
-                        'ORG' => TRUE,
-                        'OSC' => TRUE,
-                        'REN' => TRUE,
-                        'RPL' => TRUE,
-                        'SDP' => TRUE,
-                        'TMP' => TRUE,
-                        'UPG' => TRUE,
-                        ''    => TRUE,
-                        FALSE);
-    RETURN IF(isValidCode,1,0);
-  END;
-
-
-  //****************************************************************************
-  //fn_check_sycpgm: 	returns true or false based upon the incoming
-  //									code.
-  //****************************************************************************
-  EXPORT fn_check_sycpgm(STRING sycpgm) := FUNCTION
-    sycpgm_clean := ut.CleanSpacesAndUpper(sycpgm);
-    
-		isValidPattern := IF(regexfind('[DLMUZ][0-9]{3}', sycpgm), TRUE, FALSE);
-
-    RETURN IF(isValidPattern, 1, 0);
-  END;  
-  
-  
+	
 	//****************************************************************************
-	//fn_yyyymmddHHMMsss0:  converts yyyymmddHHMMsss0 to yyyymmdd date and time
+	// fn_verify_zip: returns true or false based upon whether or not there is
+	// a 5-digit , 9-digit  or 11-digit(OH-data has '11' digit zip codes)
 	//****************************************************************************
-	EXPORT fn_yyyymmddHHMMsss0(string pDateTime_in) := function
-    pDateTime   := TRIM(pDateTime_in,ALL);
-    isValidDate	:= IF(Scrubs.fn_valid_pastDate(pDateTime[1..8]) > 0, TRUE, FALSE);                   
-    isValidTime	:= IF(((INTEGER1)pDateTime[9..10] >= 0  AND (INTEGER1)pDateTime[9..10]  <= 23) AND //hours
-                   ((INTEGER1)pDateTime[11..12] >= 0 AND (INTEGER1)pDateTime[11..12] <= 59)        //minutes
-                   , TRUE, FALSE);               
-		RETURN IF(isValidDate AND isValidTime, 1, 0);
-  END;
- 
- 
-  //****************************************************************************
-	//fn_verify_state:  returns true or false based upon whether or not there is
-  //                  a valid state abbreviation.
+	EXPORT fn_verify_zip(STRING zip) := function 
+		RETURN IF(LENGTH(trim(zip, all))in [5,9,11] AND Stringlib.StringFilterOut(trim(zip, all), '0123456789') = '', 1, 0);
+	END;
+	
 	//****************************************************************************
-	EXPORT fn_verify_state(STRING code) := function    
-		RETURN IF(LENGTH(Codes.St2Name(code)) > 0, 1, 0);
-  END;
+	//fn_verify_state: Returns true or false based upon whether or not there is
+	// a valid state abbreviation.(OH-data has foreign state data)
+	//****************************************************************************
+	EXPORT fn_verify_state(STRING code) := function
+	  list:=['NB','DI','AB','BC','DS','VE','MB','NS','QU','IR','DU','SK','OA','PE','NL','CH','NT','TA',
+					 'GR','NA','NU','YT','SL','RO','AG','YU','ON','SO','JA','PU','UM','AP','TL','PZ','ZA','SI',
+					 'QC','AE','AA']; 
+		RETURN IF(LENGTH(Codes.St2Name(code)) > 0 or trim(code,all)in list, 1, 0);		
+	END;
 
-
-  //****************************************************************************
-	//fn_valid_name:  returns true or false based upon whether or not there is
-  //                a valid name.
 	//****************************************************************************
-	EXPORT fn_valid_name(string lname, string fname, string mname) := function
-    isValidName	:= IF( ut.CleanSpacesAndUpper(fname) <> '' OR ut.CleanSpacesAndUpper(mname) <> '' OR ut.CleanSpacesAndUpper(lname) <> '', 1, 0);
-		RETURN isValidName;
-  END;
-  
-  
-END; //End Functions Module
+	//fn_verify_RrestrictionCode:  returns true or false based upon whether or not there is
+  //   a valid vendor restriction code.
+	//****************************************************************************
+	EXPORT fn_verify_RestrictionCode(STRING pRestCode) := function
+		List :=	['A','B','C1','C2','C3','C4','C5','C6','C7','C8','C9','C0','D1','D2',
+						 'D3','D4','D5','D6','D7','D8','D9','E','E1','E2','E3','F1','F2','F3',
+						 'G','G1','G2','J1','G3','G4','I','J','K','K1','K2','K3','L','P1','P2',
+						 'P3','P4','W','C','D','F','H','O','P','V','X','Z','PG','J2','J3','J4',
+						 'J5','J6','M','N',''];
+		Rrestriction 	 := map(trim(pRestCode[1..2],right)   in list =>1,
+													trim(pRestCode[3..4],right)   in list =>1, 
+													trim(pRestCode[5..6],right)   in list =>1, 
+													trim(pRestCode[7..8],right)   in list =>1, 
+													trim(pRestCode[9..10],right)  in list =>1, 
+													trim(pRestCode[11..12],right) in list =>1, 
+													trim(pRestCode[13..14],right) in list =>1, 
+													trim(pRestCode[15..16],right) in list =>1, 
+													trim(pRestCode[17..18],right) in list =>1, 
+													trim(pRestCode[19..20],right) in list =>1, 
+													trim(pRestCode[21..22],right) in list =>1, 
+													trim(pRestCode[23..24],right) in list =>1, 
+													trim(pRestCode[25..26],right) in list =>1,
+													trim(pRestCode[27..28],right) in list =>1,
+													trim(pRestCode[29..30],right) in list =>1,
+													trim(pRestCode[31..32],right) in list =>1, 
+													trim(pRestCode[33..34],right) in list =>1,
+													trim(pRestCode[35..36],right) in list =>1,
+													trim(pRestCode[37..38],right) in list =>1,
+													trim(pRestCode[39..40],right) in list =>1,
+													trim(pRestCode[41..42],right) in list =>1,
+													trim(pRestCode,all) ='' =>1,0);
+		RETURN Rrestriction	;
+	END;
+	
+END; 
