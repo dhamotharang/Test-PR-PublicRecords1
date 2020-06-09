@@ -2,7 +2,8 @@
 
 EXPORT Copy_Xlink_to_Alpha_Prod(
 
-   pversion             = 'BIPV2.keysuffix'
+   pversionSuppress    
+  ,pversion             = 'BIPV2.keysuffix'
   ,pistesting           = 'false'
   ,pSkipSuperStuff      = 'true'
   ,pOverwrite           = 'false'
@@ -25,12 +26,17 @@ functionmacro
 
   myfiles :=  BIPV2_Build.keynames(pversion).BIPV2FullKeys 
             + BIPV2_Build.keynames(pversion).BIPV2WeeklyKeys 
-            + BIPV2_Suppression.FileNames.key_sele_prox_names(pversion).dall_filenames
             ;
   
+  myfiles2 := BIPV2_Suppression.FileNames.key_sele_prox_names(pversionSuppress).dall_filenames;
+  
   return sequential(
-     BIPV2_Build.Copy_BIPV2FullKeys(pversion  ,psuperversions,true ,[] ,[],pkeyfilter2AlphaProd,pSkipSuperStuff,pOverwrite,,myfiles,pDestinationThor ,,,pistesting,pSrcDali)
-    ,BIPV2_Build.Promote(pversion,pkeyfilter2AlphaProd,,pIsTesting,myfiles).new2Built
+     BIPV2_Build.Copy_BIPV2FullKeys(pversion          ,psuperversions,true ,[] ,[],pkeyfilter2AlphaProd ,pSkipSuperStuff,pOverwrite,,myfiles  ,pDestinationThor ,,,pistesting,pSrcDali)
+
+    ,BIPV2_Build.Copy_BIPV2FullKeys(pversionSuppress  ,psuperversions,true ,[] ,[],''                   ,pSkipSuperStuff,pOverwrite,,myfiles2 ,pDestinationThor ,,,pistesting,pSrcDali)
+
+    ,BIPV2_Build.Promote(pversion         ,pkeyfilter2AlphaProd,,pIsTesting,myfiles ).new2Built
+    ,BIPV2_Build.Promote(pversionSuppress ,pkeyfilter2AlphaProd,,pIsTesting,myfiles2).new2Built
   );
 
 endmacro;
