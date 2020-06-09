@@ -77,10 +77,11 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
                                                                                FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get cortera Linkids key records
-  EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(project(ds_in_linkids,
-                                                                      transform(BIPV2.IDlayouts.l_xlink_ids2,
-                                   SELF := LEFT, SELF := [])),
-                                  FETCH_LEVEL,,FETCH_LIMIT);
+  EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(PROJECT(ds_in_linkids,
+                                                                   TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
+                                                                             SELF := LEFT, SELF := [])),
+                                                                             FETCH_LEVEL,,FETCH_LIMIT,,mod_access,/*append_contact*/ TRUE);
+  
   // *** Key fetch to get Corp/Incorporation linkids key records
   EXPORT ds_corp_linkidskey_recs := Corp2.Key_Linkids.Corp.kFetch(ds_in_linkids,FETCH_LEVEL);
 

@@ -1,4 +1,4 @@
-import iesp;
+﻿import Cortera, iesp;
 export ContactSection_Layouts := module
 
 	export rec_OptionsLayout := record
@@ -54,5 +54,11 @@ export ContactSection_Layouts := module
 		string25 acctno;		
 		iesp.TopBusinessReport.t_TopBusinessContactSection;
 	end;
-
+  
+  export cortera_contacts_temp := record
+    Cortera.Layout_ExecLinkID.link_id;
+    Cortera.Layout_ExecLinkID.persistent_record_id;
+    dataset(iesp.topbusinessOtherSources.t_OtherContact) CorteraContacts;
+  end;  
+  
 end;

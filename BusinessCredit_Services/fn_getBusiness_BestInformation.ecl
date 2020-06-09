@@ -102,7 +102,10 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
     corteraLinkIdInfo := Cortera.Key_LinkIds.kfetch2(project(inmod.BusinessIds, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
                                                                                           SELF := LEFT; SELF := [])), 
                                                      inmod.fetchLevel,,
-                                                     BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT );
+                                                     BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,,
+                                                     mod_access,
+                                                     /* append_contacts */ TRUE
+                                                    );
     corteraLinkIdsInfoSortedCurrent := sort(corteraLinkidInfo(current), -dt_last_seen);	
     corteraLinkIdsInfoSortedNoncurrent := sort(corteraLinkidInfo, -dt_last_seen);
     corteraLinkidsInfoSorted := if (exists(corteraLinkIdsInfoSortedCurrent), corteraLinkIdsInfoSortedCurrent, corteraLinkIdsInfoSortedNoncurrent );
