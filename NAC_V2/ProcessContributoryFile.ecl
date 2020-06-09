@@ -82,7 +82,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 				//*,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
 				//*,IF(NOT ExcessiveInvalidRecordsFound,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE))
 				//*,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
-				,IF(NOT ExcessiveInvalidRecordsFound,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2'))))
+				//,IF(NOT ExcessiveInvalidRecordsFound,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2'))))
 				,despray_NCF_reports('ncx2')
 				,despray_NCF_reports('ncd2')
 				,despray_NCF_reports('ncr2')
