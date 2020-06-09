@@ -208,7 +208,7 @@ export source_EU_33     := allsources(accuityDataSource='EU 33');    //European 
 export source_EUE_1170  := allsources(accuityDataSource='EUE 1170'); //European Union Enhancements List
 export source_FBI_35    := allsources(accuityDataSource='FBI 35');   //FBI Most Wanted
 export source_FDJ_1152  := allsources(accuityDataSource='FDJ 1152'); //FATF Deficient Jurisdictions List
-export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
+//export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
 export source_FR_1010   := allsources(accuityDataSource='FR 1010');  //France
 export source_GO_36     := allsources(accuityDataSource='GO 36');    //World Government Officials List
 export source_HK_37     := allsources(accuityDataSource='HK 37');    //Hong Kong Monetary Authority List

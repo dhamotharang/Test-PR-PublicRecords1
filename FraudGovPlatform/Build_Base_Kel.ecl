@@ -1,4 +1,4 @@
-﻿IMPORT KELOtto, ut,tools; 
+﻿IMPORT KELOtto, ut,tools,FraudgovKEL; 
 EXPORT Build_Base_Kel (
    string pversion
 ) := 
@@ -31,7 +31,20 @@ module
 	shared Base_customerdashtopclusters							:=	files().base.kel_customerdashtopclusters_delta.built
 																										+ files().base.kel_customerdashtopclusters_demo.built;	
 																										
-	shared Personevents_prep												:= Distribute(KELOtto.KelFiles.PersonEvents,hash(uid));																									
+	shared Personevents_prep												:= Distribute(KELOtto.KelFiles.PersonEvents,hash(uid));	
+	
+	shared Base_ConfigAttributes									:= PROJECT(Files().Input.ConfigAttributes.Sprayed
+																											,Transform(Layouts.ConfigAttributes
+																												,self.entitytype	:= (integer8)left.entitytype
+																												,self.field	:= (string200)left.field
+																												,self.low:=(decimal)left.low
+																												,self.high:=(decimal)left.high
+																												,self.risklevel	:=(integer)left.risklevel
+																												,self.weight	:=(integer)left.weight
+																												,self.customerid	:=(unsigned)left.customerid
+																												,self.industrytype	:=(unsigned)left.industrytype
+																												,Self:=left));
+
 																					
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress.New, Base_customeraddress, Build_kel_customeraddress , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats.New, Base_personstats, Build_kel_personstats , pOverwrite := true);
@@ -46,6 +59,8 @@ module
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopEntityStats.New, Base_customerdashtopentitystats, Build_kel_CustomerDashTopEntityStats , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClustersAndElements.New, Base_customerdashtopclustersandelements, Build_kel_CustomerDashTopClustersAndElements , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClusters.New, Base_CustomerDashTopClusters, Build_kel_CustomerDashTopClusters , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_EntityProfile.New, FraudgovKEL.KEL_PivotIndexPrep.ds_KEL_PivotIndexPrep, Build_kel_EntityProfile , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_ConfigAttributes.New, Base_ConfigAttributes, Build_kel_ConfigAttributes , pOverwrite := true);
 	//KEL Demo
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Demo.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Demo.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Demo , pOverwrite := true);
@@ -90,7 +105,9 @@ module
 			 Build_kel_entity_scorebreakdown,
 			 Build_kel_CustomerDashTopEntityStats,
 			 Build_kel_CustomerDashTopClustersAndElements,
-			 Build_kel_CustomerDashTopClusters
+			 Build_kel_CustomerDashTopClusters,
+			 Build_kel_EntityProfile,
+			 Build_kel_ConfigAttributes
 			 
 		);
 	

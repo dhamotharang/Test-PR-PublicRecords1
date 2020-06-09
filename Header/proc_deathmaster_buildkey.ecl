@@ -17,8 +17,8 @@ export proc_deathmaster_buildkey(string filedate) := function
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(death_master.Key_dod, '~thor_data400::key::dod_death_masterV2',
 											'~thor_data400::key::death_masterV2::'+%version_date%+'::dod',a3);
 
-	// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_Death_MasterV2_Did, '~thor_data400::key::did_death_masterV2',
-											// '~thor_data400::key::death_masterV2::'+%version_date%+'::did',a4);
+	 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_Death_MasterV2_Did, '~thor_data400::key::did_death_masterV2',
+											 '~thor_data400::key::death_masterV2::'+%version_date%+'::did',a4);
 
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(death_master.Key_Death_id_base,'~thor_data400::key::death_id_death_masterV2',
 											'~thor_data400::key::death_masterV2::'+%version_date%+'::death_id', a5);
@@ -50,8 +50,8 @@ export proc_deathmaster_buildkey(string filedate) := function
 	Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::dod_death_masterV2',
 										'~thor_data400::key::death_masterV2::'+%version_date%+'::dod', b3);
 
-	// Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::did_death_masterV2',
-										// '~thor_data400::key::death_masterV2::'+%version_date%+'::did', b4);
+	 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::did_death_masterV2',
+										 '~thor_data400::key::death_masterV2::'+%version_date%+'::did', b4);
 
 	Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::death_id_death_masterV2',
 										'~thor_data400::key::death_masterV2::'+%version_date%+'::death_id', b5);
@@ -72,8 +72,8 @@ export proc_deathmaster_buildkey(string filedate) := function
 	full1 := if(	fileservices.getsuperfilesubname('~thor_data400::base::did_death_master',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_death_master_built',1) and
 								fileservices.getsuperfilesubname('~thor_data400::base::did_death_masterV2',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_death_masterV2_built',1), 
 								output('main file BASE = BUILT, Nothing done.'), 
-								sequential(	parallel(a1,a2,a3,a5,a6,a8),
-														parallel(b1,b2,b3,b5,b6,b8)
+								sequential(	parallel(a1,a2,a3,a4,a5,a6,a8),
+														parallel(b1,b2,b3,b4,b5,b6,b8)
 													)
 							);
 
@@ -81,7 +81,7 @@ export proc_deathmaster_buildkey(string filedate) := function
 	promotesupers.Mac_SK_Move_v2('~thor_data400::key::did_death_master', 'Q', move1, 2);
 	promotesupers.Mac_SK_Move_v2('~thor_data400::key::death_id_death_supplemental', 'Q', move2, 2);
 	promotesupers.Mac_SK_Move_v2('~thor_data400::key::dod_death_masterV2', 'Q', move3, 2);
-	//promotesupers.Mac_SK_Move_v2('~thor_data400::key::did_death_masterV2', 'Q', move4, 2);
+	promotesupers.Mac_SK_Move_v2('~thor_data400::key::did_death_masterV2', 'Q', move4, 2);
 	promotesupers.Mac_SK_Move_v2('~thor_data400::key::death_id_death_masterV2', 'Q', move5, 2);
 	promotesupers.Mac_SK_Move_v2('~thor_data400::key::dob_death_masterV2', 'Q', move6, 2);
 	//promotesupers.Mac_SK_Move_v2('~thor_data400::key::fcra::death_master::ssn', 'Q', move7, 2);
@@ -89,7 +89,7 @@ export proc_deathmaster_buildkey(string filedate) := function
 	///////////////////////// Move FCRA KEYS /////////////////////////
 	//RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::fcra::did_death_masterV2', 'Q', move9, 2);
 
-	move_qa	:=	parallel(move1,move2,move3,move5,move6,move8);
+	move_qa	:=	parallel(move1,move2,move3,move4,move5,move6,move8);
 
 	// Move building to built
 	post1 := promotesupers.SF_MaintBuilt('~thor_data400::base::did_death_master');  

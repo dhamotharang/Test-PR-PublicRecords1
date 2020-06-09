@@ -328,8 +328,8 @@ RETURN 		sequential(			build_key_criminal_offendersfcra_did,
 			move_qa_key_corrections_offenses_public, 
 			move_qa_key_corrections_punishment_public, retval ,
 			corrections_keys_outaction,autokeymove,
-			proc_fcra_field_depreciation_stats
-			//PerformUpdateOrNot 
+			proc_fcra_field_depreciation_stats,
+			PerformUpdateOrNot 
 			);
 
 END;

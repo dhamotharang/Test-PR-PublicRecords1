@@ -19,7 +19,8 @@ percent_nbm_change_threshold:=100;
 ecl(string build_version) := '\n'
 + '#WORKUNIT(\'protect\',true);\n'
 + '#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest STAT\');\n\n'
-+ 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');';
++ 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');\n'
++ 'Header.REPORT_shifts_over_time_test();';
 
 sf_name(boolean incremental) := Header_Ops._Constant.ingest_build_sf(incremental);
 update_status(unsigned2 new_status, string8 build_version, boolean incremental) := Header.LogBuildStatus(sf_name(incremental),build_version,new_status).Write;
