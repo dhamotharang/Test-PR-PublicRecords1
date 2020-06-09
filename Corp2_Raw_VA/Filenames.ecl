@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 	
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -7,7 +7,7 @@ EXPORT Filenames(STRING  pversion = '',
 		SHARED Template(STRING tag) := Corp2_Raw_VA._Dataset(pUseOtherEnvironment).InputTemplate + tag;
 			
 		EXPORT Corps	   		:= tools.mod_FilenamesInput(Template('corps::va'), pversion);			
-		EXPORT Tables	    	:= tools.mod_FilenamesInput(Template('tables::va'), pversion);
+		//EXPORT Tables	    	:= tools.mod_FilenamesInput(Template('tables::va'), pversion);
 		EXPORT LLC	   			:= tools.mod_FilenamesInput(Template('llc::va'), pversion);			
 		EXPORT LP	    			:= tools.mod_FilenamesInput(Template('lp::va'), pversion);
 		EXPORT Officer	  	:= tools.mod_FilenamesInput(Template('officer::va'), pversion);			
@@ -22,7 +22,7 @@ EXPORT Filenames(STRING  pversion = '',
 		SHARED Template(STRING tag) := Corp2_Raw_VA._Dataset(pUseOtherEnvironment).FileTemplate + tag;
 		
 		EXPORT Corps   					:= tools.mod_FilenamesBuild(Template('corps::va'), pversion);
-		EXPORT Tables	    			:= tools.mod_FilenamesBuild(Template('tables::va'), pversion);
+		//EXPORT Tables	    			:= tools.mod_FilenamesBuild(Template('tables::va'), pversion);
 		EXPORT LLC	    				:= tools.mod_FilenamesBuild(Template('llc::va'), pversion);
 		EXPORT LP	    					:= tools.mod_FilenamesBuild(Template('lp::va'), pversion);
 		EXPORT Officer	    		:= tools.mod_FilenamesBuild(Template('officer::va'), pversion);
@@ -33,7 +33,7 @@ EXPORT Filenames(STRING  pversion = '',
 
 
 		EXPORT dAll_Corps 			:= Corps.dAll_filenames;
-		EXPORT dAll_Tables 			:= Tables.dAll_filenames;
+		//EXPORT dAll_Tables 			:= Tables.dAll_filenames;
 		EXPORT dAll_LLC 				:= LLC.dAll_filenames;
 		EXPORT dAll_LP 					:= LP.dAll_filenames;
 		EXPORT dAll_Officer 		:= Officer.dAll_filenames;
@@ -44,7 +44,7 @@ EXPORT Filenames(STRING  pversion = '',
 	END;
 	
 	EXPORT dAll_filenames 				:= Base.dAll_Corps  	  +
-																	 Base.dAll_Tables     +
+																	 //Base.dAll_Tables     +
 																	 Base.dAll_LLC  		  +
 																	 Base.dAll_LP				  +
 																	 Base.dAll_Officer	  +
