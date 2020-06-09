@@ -10,7 +10,8 @@ EXPORT Proc_Build_Override_Orphans(STRING filedate) := FUNCTION
 	#uniquename(dOrphanFilterCandidates)
 	%dOrphanFilterCandidates% := Overrides.File_Override_Orphans.datagroup_lookup_filter_file;
 
-	TrueOrphans :=  TrueOrphans_All(STD.Str.ToUpperCase(datagroup) IN SET(%dOrphanFilterCandidates%(skipFlag = false), datagroup));
+// code review point 1
+	//TrueOrphans :=  TrueOrphans_All(STD.Str.ToUpperCase(datagroup) IN SET(%dOrphanFilterCandidates%(skipFlag = false), datagroup));
 
 	Orphans := PROJECT(TrueOrphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
 								SELF.datagroup := STD.Str.ToUpperCase(LEFT.datagroup), SELF.did := (STRING) LEFT.did, SELF := LEFT));

@@ -1,99 +1,15 @@
-﻿IMPORT _Control, iesp;
-
-	MAC_read_override_base('Gong', GongRecIDs, flag_file_id, l_did, persistent_record_id);
-	ds_input := GongRecIDs;
-
-	service_name	:= 'ConsumerDisclosure.FCRADataService';
-	serviceURL		:= _Control.RoxieEnv.staging_fcra_roxieIP ;
-
-	nodes			:= 50;
-	threads		:= 2;
-	layout_in   	:= iesp.fcradataservice.t_FcraDataServiceRequest;
-	layout_out  := iesp.fcradataservice.t_FcraDataServiceReportResponse;
-
-	layoutSoap := RECORD
-		DATASET(layout_in) fcradataservicerequest;
-	end;
-
-	layout_in make_child_ds(ds_input L) := TRANSFORM
-		SELF.Options.ReturnSuppressedRECORDs := true;
-		SELF.Options.ReturnOverwrittenRECORDs := true;
-		SELF.Options.DATASETSelection.Includeall:= true;
-		SELF.ReportBy.lexid := L.did;
-		SELF := L;
-		SELF := [];
-	END;
-
-	layoutSoap trans(ds_input L) := TRANSFORM
-		request := PROJECT(L, make_child_ds(LEFT));
-		SELF.fcradataservicerequest := request;
-		SELF := L;
-	END;
-
-	soap_input := DISTRIBUTE(PROJECT(DEDUP(SORT(ds_input, did), did), trans(LEFT)), RANDOM() % nodes);
-
-	xlayout := RECORD
-		layout_out;
-		STRING errorcode;
-	END;
-
-	xlayout myFail(soap_input le) := TRANSFORM
-		SELF.errorcode := FAILCODE + '  ' + FAILMESSAGE;
-		SELF := [];
-	END;
-
-	soapResponse := SOAPCALL( soap_input,
-							serviceURL,
-							service_name,
-							{soap_input},
-							DATASET(xlayout),
-							PARALLEL(threads),
-							onFail(myFail(LEFT))
-							):INDEPENDENT;
-
-	Mac_Norm(DsIn,DsOut, rec):= MACRO
-		DsOut	:=	NORMALIZE(soapResponse, LEFT.results.DsIn
-								,TRANSFORM(iesp.fcradataservice.rec					
-								,SELF:=RIGHT
-								,SELF:=[]
-							));
-	ENDMACRO;
-
-	Mac_Norm(Gong, OutGong, t_FcraDataServiceGongData);
-
-	dNorm 	:= OutGong;
-	dNorm1	:= dNorm(Metadata.ComplianceFlags.IsSuppressed  OR Metadata.ComplianceFlags.IsOverride  OR Metadata.ComplianceFlags.IsOverwritten);
-	dNorm1;
-
-	dsOut := TABLE(dNorm1, {Datagroup := Metadata.Datagroup
-												,Did := Metadata.lexid
-												,RecID :=TRIM(Metadata.RecID.RecID1)
-																+	TRIM(Metadata.RecID.RecID2)
-																+	TRIM(Metadata.RecID.RecID3)
-																+	TRIM(Metadata.RecID.RecID4)
-												,IsSuppressed:= MAX(GROUP, Metadata.ComplianceFlags.IsSuppressed)
-												,IsOverride := MAX(GROUP, Metadata.ComplianceFlags.IsOverride)
-												,IsOverwritten := MAX(GROUP, Metadata.ComplianceFlags.IsOverwritten)
-												,fname := Rawdata.name_first
-												,lname := Rawdata.name_last
-												,prim_range := Rawdata.prim_range
-												,prim_name := Rawdata.prim_name
-												,zip := Rawdata.z5
-												}
-										,Metadata.Datagroup
-										,Metadata.lexid
-										,TRIM(Metadata.RecID.RecID1)+TRIM(Metadata.RecID.RecID2)+TRIM(Metadata.RecID.RecID3)+TRIM(Metadata.RecID.RecID4)
-										,MERGE):INDEPENDENT;
-
-	dsOut_candidates:= DEDUP(dsOut(IsOverride and ~IsOverwritten), all);
-
-	orphans_ds := dsOut_candidates;
-	OUTPUT(SORT(orphans_ds, did), NAMED('orphans_ds'));
+﻿IMPORT iesp, std, fcra;
+EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphansIn) :=  FUNCTION
 	
+	
+   OUTPUT(SORT(orphansIn, did), NAMED('orphans_ds'));
+
+	orphans_ds := orphansIn;
+
 	// evaluate
-	overrides.mac_orphans_evaluate(gong,'gong',orphans_ds,dsout_gong,,did,persistent_record_id,,,,name_first,name_last,prim_range, prim_name, z5);
+	//overrides.mac_orphans_evaluate(gong,'gong',orphans_ds,dsout_gong,,did,persistent_record_id,,,,name_first,name_last,prim_range, prim_name, z5);
 	
-	OUTPUT(SORT(dsout_gong(recid != '0'),did), NAMED('evaluate'));	
+	//OUTPUT(SORT(dsout_gong(recid != '0'),did), NAMED('evaluate'));	
 
 	// get the did and recid from orphan_ds
 	orphan_did_set := SET(orphans_ds(recid != '0'), (UNSIGNED)did);
@@ -122,16 +38,7 @@
 
 	cmb_keys_ds_dist_with := DISTRIBUTE(cmb_keys_ds, HASH(did, persistent_record_id, src, name_first, name_last, prim_range, prim_name, z5));
 	rolled_with := ROLLUP(cmb_keys_ds_dist_with, xform(LEFT), did, persistent_record_id, src, name_first, name_last, prim_range, prim_name, z5, local);
-	/*
-		OUTPUT(count(rolled_with), NAMED('cnt_rolled_with'));
-		OUTPUT(count(rolled_with(version='both')), NAMED('cnt_matching_with'));
-		OUTPUT(count(rolled_with(version='keys')), NAMED('cnt_overrides_only_with'));
-		OUTPUT(count(rolled_with(version='payload_keys')), NAMED('cnt_payload_only_with'));	
-												
-		OUTPUT(SORT(rolled_with(version='keys'),did) , NAMED('overrides_only_with'));
-		OUTPUT(SORT(rolled_with(version='payload_keys'),did), NAMED('payload_only_with'));	
-		OUTPUT(SORT(rolled_with(version='both'),did), NAMED('both_only_with'));	
-	*/
+	
 	overrides_rolled := rolled_with(version='keys');
 	payloads_rolled := rolled_with(version='payload_keys');
 
@@ -282,18 +189,19 @@
 
 	total_orphans_checked := PROJECT(total_orphans, PayloadCheck(LEFT));
    
-	true_orphans := total_orphans_checked(found_in_payload = FALSE);
+	OUTPUT(total_orphans_checked, NAMED('total_gong_orphans_checked'));	
+	 
+	 
+	GongTrueOrphans := total_orphans_checked(found_in_payload = FALSE);
 	
-	OUTPUT(true_orphans, NAMED('true_orphans'));														 
+	OUTPUT(GongTrueOrphans, NAMED('true_orphans'));														 
 	// test one true orphan check by name
-	/*	
-		OUTPUT(overrides.payload_keys.gong(listed_name = 'CHRISTOPHIDES LOUIS'), NAMED('payload_test'));
-		OUTPUT(overrides.payload_keys.gong(did IN [446083144, 929421213039]), NAMED('Payload_Keys_Gong_DID_446083144'));
-		OUTPUT(overrides.payload_keys.gong(persistent_record_id IN [929421213039, 446083144]), NAMED('Payload_Keys_Gong_RECID_446083144'));
-	*/
+
 
 	//OUTPUT(overrides.payload_keys.gong(did IN [754179542, 929495453487]), NAMED('Payload_Keys_Gong_DID_754179542'));
 	//OUTPUT(overrides.payload_keys.gong(persistent_record_id IN [754179542, 929495453487]), NAMED('Payload_Keys_Gong_RECID_754179542'));
-	
-	EXPORT Gong_Override_Findings := true_orphans;	
+
+	RETURN GongTrueOrphans;
+
+END;	
 
