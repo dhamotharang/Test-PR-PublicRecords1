@@ -74,4 +74,8 @@ EXPORT Layout_IP_Metadata := MODULE
 		boolean generated_rec;
 		boolean is_current;
 	END;
+    export keyed_fields := RECORD
+        string4 beg_hextet1;
+    END;
+    export Key_layout_ipv6 := Base_ipv6-[dt_first_seen, ip_rng_beg_full, ip_rng_end_full, end_hextet1, dt_last_seen, is_current];
 END;

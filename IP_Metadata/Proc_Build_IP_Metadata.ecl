@@ -1,4 +1,4 @@
-﻿import _Control, BuildLogger, PromoteSupers, RoxieKeybuild, Scrubs_IP_Metadata, Std, Orbit3, VersionControl;
+﻿import _Control, BuildLogger, PromoteSupers, RoxieKeybuild, Scrubs_IP_Metadata, Std, Orbit3, VersionControl, dx_ip_metadata, doxie;
 
 EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, string srcdir = '/data/data_999/phones/ip_metadata/build/', string suffixF = 'ip_metadata_header.csv', string suffixF6 = 'ip_metadata_header6.csv', boolean DoDopsOrbit = ~VersionControl._Flags.IsDataland):= function
 
@@ -59,11 +59,14 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(IP_Metadata.Key_IP_Metadata_IPv4
 																								,'~thor_data400::key::ip_metadata_ipv4'
 																								,'~thor_data400::key::'+version+'::ip_metadata_ipv4'
-																								,bldIPMetadata4);	
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(IP_Metadata.Key_IP_Metadata_IPv6
+																								,bldIPMetadata4);
+        
+        df := project(IP_Metadata.File_IP_Metadata.Base_ipv6(is_current=TRUE), dx_IP_Metadata.Layout_IP_Metadata.Key_layout_ipv6);
+        RoxieKeyBuild.MAC_build_logical(dx_ip_metadata.key_ipv6, df, IP_Metadata.File_IP_Metadata.key_ipv6(), IP_Metadata.File_IP_Metadata.key_ipv6(version), bldIPMetadata6)
+/* 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_ip_metadata.key_ipv6
 																								,$.File_IP_Metadata.key_ipv6()
 																								,$.File_IP_Metadata.key_ipv6(version)
-																								,bldIPMetadata6);
+																								,bldIPMetadata6); */
 		bldIPMetadata := parallel(bldIPMetadata4, bldIPMetadata6);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Move IP_Metadata Keys to Superfiles////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
