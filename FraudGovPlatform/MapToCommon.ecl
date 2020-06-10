@@ -1,7 +1,7 @@
 ﻿import FraudShared, STD, data_services; 
 EXPORT MapToCommon  (
 	 string pversion
-  ,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
+    ,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = FraudShared.Files().Base.Main.QA 
 	,dataset(Layouts.Input.IdentityData) inIdentityData = Files().Input.IdentityData.Sprayed
 	,dataset(Layouts.Input.KnownFraud) inKnownFraud = Files().Input.KnownFraud.Sprayed
 	,dataset(Layouts.Input.Deltabase) inDeltabase = Files().Input.Deltabase.Sprayed
