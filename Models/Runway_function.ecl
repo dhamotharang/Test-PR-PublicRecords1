@@ -1652,6 +1652,9 @@ self.fp1908_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_fp1908_1_0, named('with_fp1908_1_0'));
 
+
+
+
 //=== Fifth Third Custom Model ===
 fp1909_1_0_score := Models.fp1909_1_0(clam, 6, attributes);
 // output(fp1909_1_0_score, named('fp1909_1_0_score'));
@@ -1687,9 +1690,9 @@ self.fp1909_2_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self.fp1909_2_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_fp1909_2_0, named('with_fp1909_2_0'));
-
 //=== Avenger Model ===
 FP31604_0_0_score := Models.FP31604_0_0( ungroup(clam), 6 );
+
 
 with_FP31604_0_0	:= join(with_fp1909_2_0, FP31604_0_0_score,left.seq=right.seq,
 transform(Models.layout_Runway,

@@ -371,6 +371,16 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
     self.CheckAmountTotalSinceNegPaid := if(CheckingIndicatorsRequest, ri.CheckAmountTotalSinceNegPaid	, '');
     self.CheckAmountTotal03Month := if(CheckingIndicatorsRequest, ri.CheckAmountTotal03Month	, '');		
 		
+		// FIS attributes section
+		self.rv3ConfirmationSubjectFound	:= if(valid_attributes_requested, ri.rv3ConfirmationSubjectFound	, '');
+		self.rv3AddrChangeCount60Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount60Month	, '');
+		self.rv3AddrChangeCount12Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount12Month	, '');
+		self.rv3AddrInputTimeOldest	:= if(valid_attributes_requested, ri.rv3AddrInputTimeOldest	, '');
+		self.rv3SourceNonDerogCount	:= if(valid_attributes_requested, ri.rv3SourceNonDerogCount	, '');
+		self.rv3AssetPropCurrentCount	:= if(valid_attributes_requested, ri.rv3AssetPropCurrentCount	, '');
+		self.rv3SSNDeceased	:= if(valid_attributes_requested, ri.rv3SSNDeceased	, '');
+		self.rv3AssetIndex	:= if(valid_attributes_requested, ri.rv3AssetIndex	, '');
+		
 		//lien-judment section
 		self.LnJEvictionTotalCount           := if(lnjattributes_requested, ri.LnJEvictionTotalCount	, '');         
 		self.LnJEvictionTotalCount12Month    := if(lnjattributes_requested, ri.LnJEvictionTotalCount12Month	, '');           
