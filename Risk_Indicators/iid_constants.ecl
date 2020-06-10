@@ -323,6 +323,7 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
+
 export LnJDefault := '11111111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
@@ -522,6 +523,7 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
     enableEquifaxPhoneMart = 1     << 36,
     TurnOffTumblings = 1           << 37, // option to speed up bocashell 5.3 and higher if it's not needed
     UseIngestDate = 1              << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
+
     ReleasedCaseFltr = 1           << 39,
     TurnOffRelativeProperty=1      << 40,
     AttributesOnly = 1             << 41,
@@ -553,6 +555,7 @@ export FlagLiensOptions(string FilterLienTypes) := function
 		if(OtherLiens, BSOptions.OtherLien, 0) +
 		if(Judgments, BSOptions.Judgment, 0) +
 		if(Evictions, BSOptions.Eviction, 0) +
+
 		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0) +
 		if(AttributesOnly, BSOptions.AttributesOnly, 0) +
         if(ExcludeStatusRefresh, BSOptions.ExcludeStatusRefresh, 0));

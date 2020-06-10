@@ -455,6 +455,7 @@ EXPORT FP_models := MODULE
                         'fp1803_1' => model_fp1803_1,
                         'fp1806_1' => model_fp1806_1,
                         'fp1902_1' => model_fp1902_1,
+
                         'fp1908_1' => model_fp1908_1,
                         'fp1909_1' => model_fp1909_1,
                         'fp1909_2' => model_fp1909_2,
