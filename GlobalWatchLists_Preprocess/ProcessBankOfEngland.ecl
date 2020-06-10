@@ -26,9 +26,12 @@ MapToOld(DATASET(GlobalWatchlists_Preprocess.Layouts.rInputBOE) ds_in) := FUNCTI
 																	 + if(TRIM(L.Name_4, left, right) = '', '', TRIM(L.Name_4, left, right) + ' ')
 																	 + if(TRIM(L.Name_5, left, right) = '', '', TRIM(L.Name_5, left, right) + ' ')
 																	 + if(TRIM(L.Name_6, left, right) = '', '', TRIM(L.Name_6, left, right) + ' '), left, right))[1..80];
-		self.lstd_entity				:= IF(STD.Str.Find(TempEntity, '(1)',1) > 0,
+		ClnEntity								:= IF(STD.Str.Find(TempEntity, '(3)',1) > 0,
+																	STD.Str.CleanSpaces(TRIM(TempEntity)[STD.Str.Find(TRIM(TempEntity) , '(3)' ,1)+3..]),
+																IF(STD.Str.Find(TempEntity, '(2)',1) > 0,
 																	STD.Str.CleanSpaces(TRIM(TempEntity)[STD.Str.Find(TRIM(TempEntity) , '(2)' ,1)+3..]),
-																	TempEntity);
+																	TempEntity));
+		self.lstd_entity				:= STD.Str.CleanSpaces(REGEXREPLACE('\\([0-9]\\)',ClnEntity,''));
 			 
 		self.first_name 				:=  STD.Str.ToUpperCase(TRIM(if(TRIM(L.Name_1, left, right) = '', '', TRIM(L.Name_1, left, right) + ' ')
 																									+ if(TRIM(L.Name_2, left, right) = '', '', TRIM(L.Name_2, left, right) + ' ')
@@ -327,6 +330,30 @@ ReformatToCommonlayout(DATASET(GlobalWatchlists_Preprocess.IntermediaryLayoutBan
 																	L.title);
 		self.orig_title_2 			:= IF(STD.Str.Find(L.title, '(2)', 1) > 0
 																	,TRIM(L.title[STD.Str.Find(L.title, '(2)', 1)+3..], left, right),
+																	'');
+		self.orig_title_3 			:= IF(STD.Str.Find(L.title, '(3)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(3)', 1)+3..], left, right),
+																	'');
+		self.orig_title_4 			:= IF(STD.Str.Find(L.title, '(4)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(4)', 1)+3..], left, right),
+																	'');
+		self.orig_title_5 			:= IF(STD.Str.Find(L.title, '(5)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(5)', 1)+3..], left, right),
+																	'');
+		self.orig_title_6 			:= IF(STD.Str.Find(L.title, '(6)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(6)', 1)+3..], left, right),
+																	'');
+		self.orig_title_7 			:= IF(STD.Str.Find(L.title, '(7)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(7)', 1)+3..], left, right),
+																	'');
+		self.orig_title_8 			:= IF(STD.Str.Find(L.title, '(8)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(8)', 1)+3..], left, right),
+																	'');
+		self.orig_title_9 			:= IF(STD.Str.Find(L.title, '(9)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(9)', 1)+3..], left, right),
+																	'');
+		self.orig_title_10 			:= IF(STD.Str.Find(L.title, '(10)', 1) > 0
+																	,TRIM(L.title[STD.Str.Find(L.title, '(10)', 1)+3..], left, right),
 																	'');
 		self.orig_aka_id 				:= '';
 		self.orig_aka_type 			:= L.alias_type;
