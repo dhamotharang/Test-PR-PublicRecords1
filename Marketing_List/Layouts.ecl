@@ -96,6 +96,14 @@ module
     
   end;
 
+  export business_contact_prep := 
+  record
+    unsigned4 Age           ;
+    unsigned  executive_ind ;
+    business_contact        ;
+  end;
+
+
   export business_information_prep := 
   record
     unsigned6             seleid              ;

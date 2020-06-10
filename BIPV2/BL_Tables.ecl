@@ -2360,6 +2360,121 @@ export BL_Tables := module
 		{'VICE PRESIDENT, TREASURER'																,0},
 		{'VICE PRESIDENT'																						,5}
 	], {string position_title, integer order});
+
+  // -- Rank_ExecutiveTitles
+  // -- derived from ExecutiveTitles above, but as a function, and replace the zeros with 99s
+  // -- for better sorting
+	export Rank_ExecutiveTitles(
+    string pTitle
+  ) := map(
+		 trim(pTitle) = 'ASSISTANT SECRETARY'																			=> 99
+		,trim(pTitle) = 'ASSISTANT TREASURER'																			=> 99
+		,trim(pTitle) = 'ASSISTANT VICE PRESIDENT'																	=> 99
+		,trim(pTitle) = 'BOARD MEMBER'																						 => 14
+		,trim(pTitle) = 'CHAIRMAN'																									=> 1
+		,trim(pTitle) = 'CHIEF ACCOUNTANT'																					=> 99
+		,trim(pTitle) = 'CHIEF CUSTOMER OFFICER'																		=> 99
+		,trim(pTitle) = 'CHIEF EXECUTIVE OFFICER, PRESIDENT'												=> 99
+		,trim(pTitle) = 'CHIEF EXECUTIVE OFFICER, SECRETARY'												=> 99
+		,trim(pTitle) = 'CHIEF EXECUTIVE OFFICER'																	=> 1
+		,trim(pTitle) = 'CHIEF FINANCIAL OFFICER, EXECUTIVE VICE PRESIDENT'				=> 99
+		,trim(pTitle) = 'CHIEF FINANCIAL OFFICER, SENIOR VICE PRESIDENT, TREASURER'=> 99
+		,trim(pTitle) = 'CHIEF FINANCIAL OFFICER, SR VICE PRESIDENT'								=> 99
+		,trim(pTitle) = 'CHIEF FINANCIAL OFFICER'																	=> 3
+		,trim(pTitle) = 'CHIEF INFORMATION OFFICER'																=> 5
+		,trim(pTitle) = 'CHIEF MARKETING OFFICER'																	=> 3
+		,trim(pTitle) = 'CHIEF OFFICER - HUMAN RESOURCES'													=> 9
+		,trim(pTitle) = 'CHIEF OFFICER - MARKETING'																=> 6
+		,trim(pTitle) = 'CHIEF OFFICER - SALES'																		=> 7
+		,trim(pTitle) = 'CHIEF OPERATING OFFICER, EXECUTIVE VICE PRESIDENT'				=> 99
+		,trim(pTitle) = 'CHIEF OPERATING OFFICER'																	=> 2
+		,trim(pTitle) = 'CHIEF PURCHASING OFFICER'																	=> 5
+		,trim(pTitle) = 'CHIEF TECHNOLOGY OFFICER'																	=> 4
+		,trim(pTitle) = 'DIRECTOR, EXECUTIVE VICE PRESIDENT'												=> 99
+		,trim(pTitle) = 'DIRECTOR'																									=> 6
+		,trim(pTitle) = 'EXECUTIVE - FINANCE'																		 => 20
+		,trim(pTitle) = 'EXECUTIVE - HUMAN RESOURCE'															 => 23
+		,trim(pTitle) = 'EXECUTIVE - HUMAN RESOURCES'														 => 23
+		,trim(pTitle) = 'EXECUTIVE - MARKETING'																	 => 22
+		,trim(pTitle) = 'EXECUTIVE DIRECTOR'																				=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT - SALES'												 => 21
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, CHIEF FINANCIAL OFFICER'			  => 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, DIRECTOR'												=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, SECRETARY, DIRECTOR'						=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR' => 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, SECRETARY, TREASURER'						=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, SECRETARY'											=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, TREASURER, DIRECTOR'						=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT, TREASURER'											=> 99
+		,trim(pTitle) = 'EXECUTIVE VICE PRESIDENT'																 => 19
+		,trim(pTitle) = 'EXECUTIVE'																							 => 24
+		,trim(pTitle) = 'FOUNDER'																								 => 25
+		,trim(pTitle) = 'GENERAL PARTNER'																					=> 1
+		,trim(pTitle) = 'GOVERNOR'																								 => 27
+		,trim(pTitle) = 'IT EXECUTIVE'																							=> 99
+		,trim(pTitle) = 'LIMITED PARTNER'																					=> 99
+		,trim(pTitle) = 'MANAGING DIRECTOR'																				=> 99
+		,trim(pTitle) = 'MANAGING MEMBER'																					=> 99
+		,trim(pTitle) = 'MANAGING PARTNER'																					=> 99
+		,trim(pTitle) = 'MAYOR'																									 => 28
+		,trim(pTitle) = 'MEMBER'																									 => 13
+		,trim(pTitle) = 'OFFICER, DIRECTOR'																				=> 99
+		,trim(pTitle) = 'OFFICER'																									=> 9
+		,trim(pTitle) = 'OWNER'																										=> 3
+		,trim(pTitle) = 'PARTNER'																								 => 11
+		,trim(pTitle) = 'PRESDIENT, CHIEF EXECUTIVE OFFICER'												=> 99
+		,trim(pTitle) = 'PRESIDENT, CHIEF OPERATING OFFICER'												=> 99
+		,trim(pTitle) = 'PRESIDENT, DIRECTOR'																			=> 99
+		,trim(pTitle) = 'PRESIDENT, EXECUTIVE VICE PRESIDENT'											=> 99
+		,trim(pTitle) = 'PRESIDENT, SECRETARY, DIRECTOR'														=> 99
+		,trim(pTitle) = 'PRESIDENT, SECRETARY, TREASURER, DIRECTOR'								=> 99
+		,trim(pTitle) = 'PRESIDENT, SECRETARY, TREASURER'													=> 99
+		,trim(pTitle) = 'PRESIDENT, SECRETARY'																			=> 99
+		,trim(pTitle) = 'PRESIDENT, TREASURER, DIRECTOR'														=> 99
+		,trim(pTitle) = 'PRESIDENT, TREASURER'																			=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, DIRECTOR'											=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, SECRETARY, DIRECTOR'						=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR'=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, SECRETARY, TREASURER'					=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, SECRETARY'											=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, TREASURER, DIRECTOR'						=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT, TREASURER'											=> 99
+		,trim(pTitle) = 'PRESIDENT, VICE PRESIDENT'																=> 99
+		,trim(pTitle) = 'PRESIDENT'																								=> 4
+		,trim(pTitle) = 'PRINCIPAL'																							 => 12
+		,trim(pTitle) = 'REGIONAL VICE PRESIDENT'																	=> 99
+		,trim(pTitle) = 'SECRETARY, DIRECTOR'																			=> 99
+		,trim(pTitle) = 'SECRETARY, EXECUTIVE VICE PRESIDENT'											=> 99
+		,trim(pTitle) = 'SECRETARY, TREASURER, DIRECTOR'														=> 99
+		,trim(pTitle) = 'SECRETARY, TREASURER'																			=> 99
+		,trim(pTitle) = 'SECRETARY'																							 => 17
+		,trim(pTitle) = 'SELF EMPLOYED'																						=> 99
+		,trim(pTitle) = 'SHAREHOLDER'																						 => 26
+		,trim(pTitle) = 'SR VICE PRESIDENT - HUMAN RESOURCES'										 => 17
+		,trim(pTitle) = 'SR VICE PRESIDENT, CHIEF FINANCIAL OFFICER, TREASURER'		=> 99
+		,trim(pTitle) = 'SR VICE PRESIDENT, CHIEF FINANCIAL OFFICER'								=> 99
+		,trim(pTitle) = 'SR VICE PRESIDENT, CHIEF TECHNOLOGY OFFICER'							=> 99
+		,trim(pTitle) = 'SR VICE PRESIDENT, GENERAL COUNSEL'												=> 99
+		,trim(pTitle) = 'SR VICE PRESIDENT'																			 => 16
+		,trim(pTitle) = 'TREASURER, DIRECTOR'																			=> 99
+		,trim(pTitle) = 'TREASURER'																								=> 8
+		,trim(pTitle) = 'TRUSTEE'																								 => 29
+		,trim(pTitle) = 'VICE CHAIR'																							 => 18
+		,trim(pTitle) = 'VICE CHAIRMAN, CO-FOUNDER'																=> 99
+		,trim(pTitle) = 'VICE CHAIRMAN'																						=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, COMPTROLLER'															=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, DIRECTOR'																	=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, GENERAL COUNSEL'													=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, SECRETARY, DIRECTOR'											=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR'						=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, SECRETARY, TREASURER'											=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, SECRETARY'																=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, TREASURER, DIRECTOR'											=> 99
+		,trim(pTitle) = 'VICE PRESIDENT, TREASURER'																=> 99
+		,trim(pTitle) = 'VICE PRESIDENT'																						=> 5
+    ,999
+    );
+
 /*
 	export ContactTitle(string pCode) := function
 	

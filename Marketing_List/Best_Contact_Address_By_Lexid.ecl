@@ -10,21 +10,22 @@ EXPORT Best_Contact_Address_By_Lexid(
 ) :=
 functionmacro
   
-  // -- 1. join to watchdog key to get marketing bipmaps to use in marketing suppression
+  // -- 1. join contact lexids to watchdog key to get marketing bipmaps for each lexid to use in marketing suppression
   ds_join2watchdog := join(p_Contact_Lexids ,pWatchdog_Best_Key ,left.did = right.did ,transform(right)   ,keyed);  
   
-  // -- filter for only marketing permissable sources
+  // -- 2. filter for only marketing permissable sources
   ds_filtered_header_recs := ds_join2watchdog(permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0);  //817,659,349 
   
-  // -- slim down to just did again to prep for macro, dedup
+  // -- 3. slim down to just DID again to prep for address hierarchy macro & dedup on DID
   ds_filtered_header_recs_dedup := project(table(ds_filtered_header_recs  ,{did} ,did ,merge) ,doxie.layout_references);
   
-  // -- 3. use consumer best macro to rank addresses per lexid to pick best
+  // -- 4. use consumer best macro to rank addresses per lexid to pick best
   // Header.Mac_Append_Addr_Ind   // not in Boca Public Records yet, just on roxie.  once merged, should be able to use it.
   ds_append_address_hierarchy := Header.Append_addr_ind(ds_filtered_header_recs_dedup  ,bypassQH := true);
   
-  // -- join #2 to #3 on did and address to get only the ones that are marketing permissable.  idl has city_name instead of city
-  ds_filtered_header_recs_dedup_addr  := table(ds_filtered_header_recs  ,{did,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4} ,did,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4 ,merge);
+  // -- 5. join #2 to #4 on did and address to get only the ones that are marketing permissable.  idl has city_name instead of city.  also grab unit_desig while we're at it since that is missing from watchdog best.
+  ds_filtered_header_recs_dedup_addr  := table(ds_filtered_header_recs  ,{did,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4} 
+                                                                        , did,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4 ,merge);
   ds_marketing_permissable_addresses  := join(ds_append_address_hierarchy  ,ds_filtered_header_recs_dedup_addr 
     ,   left.did = right.did
     and left.prim_range = right.prim_range
@@ -33,14 +34,14 @@ functionmacro
     and left.city       = right.city_name
     and left.st         = right.st
     and left.zip        = right.zip
-    ,transform({string unit_desig,recordof(left)},self.unit_desig := right.unit_desig,self := left) ,keep(1),hash);
+    ,transform({string unit_desig ,recordof(left)} ,self.unit_desig := right.unit_desig ,self := left ) ,keep(1),hash);
   
-  // -- sort results by did, lowest addr_ind, lowest_best_addr_ind(maybe = 'B'?), and dedup by did. 
+  // -- 6. sort results by did, lowest addr_ind, lowest_best_addr_ind(maybe = 'B'?), and dedup by did. 
   ds_best_contact_address_by_lexid_dist  := distribute  (ds_marketing_permissable_addresses    ,did                                                                               );
   ds_best_contact_address_by_lexid_sort  := sort        (ds_best_contact_address_by_lexid_dist ,did,(integer)addr_ind,if(best_addr_ind = 'B',1,2)  ,(integer)best_addr_rank ,local);
   ds_best_contact_address_by_lexid_dedup := dedup       (ds_best_contact_address_by_lexid_sort ,did                                                                         ,local);
   
-  // -- reformat for output
+  // -- 7. reformat for output, compose address line 1.
   ds_result := project(ds_best_contact_address_by_lexid_dedup ,transform(
      Marketing_List.Layouts.best_lexid_contact_address
     ,self.lexid           := left.did
