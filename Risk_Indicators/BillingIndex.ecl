@@ -29,19 +29,19 @@ export BillingIndex := MODULE
 		export RVG_rvg904_1         := '118'; // Custom RV Money for ThinkCash
 
 		// flagship v3
-		export RVAuto_v3            := '119'; // RVA1003.0.0 - Auto 
-		export RVBankcard_v3        := '120'; // RVB1003.0.0 - Bankcard 
+		export RVAuto_v3            := '119'; // RVA1003.0.0 - Auto
+		export RVBankcard_v3        := '120'; // RVB1003.0.0 - Bankcard
 		export RVTelecom_v3         := '121'; // RVT1003.0.0 - Telecom/Wireless
-		export RVRetail_v3          := '122'; // RVR1003.0.0 - Retail 
+		export RVRetail_v3          := '122'; // RVR1003.0.0 - Retail
 		export RVMoney_v3           := '123'; // RVG1003.0.0 - Money Service Business
-		export RVPreScreen_v3       := '124'; // RVP1003.0.0 - Prescreen     
+		export RVPreScreen_v3       := '124'; // RVP1003.0.0 - Prescreen
 		export RVA_rva1007_1		:= '125'; // RVA1007.1.0 - Santander
 		export RVA_rva1007_2		:= '126'; // RVA1007.2.0 - Santander
 		export RVD_rvd1010_0        := '127';
 		export RVD_rvd1010_1        := '128';
 		export RVD_rvd1010_2        := '129';
 		export RVR1008_1            := '132'; // RVR1008.1.0 - Valued Services Custom RiskView Model
-		
+
 		// flagship RV4
 		export RVAuto_v4            := '133';
 		export RVBankcard_v4        := '134';
@@ -49,7 +49,7 @@ export BillingIndex := MODULE
 		export RVRetail_v4          := '136';
 		export RVMoney_v4           := '137';
 		export RVPreScreen_v4       := '138';
-		
+
 		export RV_Custom_IE9121     := '139';
 		export RVG1106_1            := '140';
 		export RVA1008_1            := '141';
@@ -64,7 +64,7 @@ export BillingIndex := MODULE
 		export RVR1104_3            := '151'; // GE Custom RV4 Retail
 		export RVC1110_1			:= '152'; // Ascension Point Custom RV4 Payment Score
 		export RVC1110_2			:= '153'; // Ascension Point Custom RV4 Probate Score
-		export RVT1204_1			:= '154'; // Verizon Wireless - Riskview custom telcom 
+		export RVT1204_1			:= '154'; // Verizon Wireless - Riskview custom telcom
 		export RVP1208_1			:= '155'; // DM Services - Riskview custom prescreen score
 		export RVC1208_1			:= '156'; // CCS - Riskview custom Payment score
 		export RVT1210_1			:= '157'; // T-Mobile - Riskview custom telcom
@@ -81,7 +81,7 @@ export BillingIndex := MODULE
 		export RVA1306_1			:= '169'; // CIG Financial - Riskview custom auto
 		export RVA1305_1			:= '170'; // CarMax riskview customer auto
 		export RVA1309_1			:= '171'; // SFG Financial - Riskview custom auto
-		export RVC1307_1			:= '172'; // Rossman & Co 
+		export RVC1307_1			:= '172'; // Rossman & Co
 		export RVA1310_1			:= '173'; // Auto Acceptance custom - Direct Loan
 		export RVA1310_2			:= '174'; // Auto Acceptance custom - Indirect Loan
 		export RVA1310_3			:= '175'; // Auto Acceptance custom - Consumer Loan
@@ -114,14 +114,14 @@ export BillingIndex := MODULE
 
 		export RVC1412_2			:= '201'; //Immediate Credit Recovery
 		export RVT1605_1			:= '202'; // Verizon - Telecom
-		export RVT1605_2			:= '203'; // Verizon - Wireless 
+		export RVT1605_2			:= '203'; // Verizon - Wireless
 		export RVC1703_1			:= '204'; // Rossman & Co //batch only
 		export RVC1801_1			:= '205'; // TSI //batch only
-		export RVT1705_1      := '206'; // Huntington	
-		
-    export RVC1805_1			:= '207'; // Phillips & Cohen //batch only (207 % 100 + 30 = 137)             
+		export RVT1705_1      := '206'; // Huntington
+
+    export RVC1805_1			:= '207'; // Phillips & Cohen //batch only (207 % 100 + 30 = 137)
     export RVC1805_2			:= '208'; // Phillips & Cohen //batch only (208 % 100 + 30 = 138)
-	
+
 		// Chargeback Defender Version 1
 		export CBD_v1 						:= '10';	// CDN712_0
 		export CBD1109_1					:= '11';	// Best Buy Custom Chargeback Defender
@@ -129,18 +129,18 @@ export BillingIndex := MODULE
 		export CBD1404_1          := '13';    // Best Buy Custom Chargeback Defender
 		export CBD1410_1          := '14';
 		export CBD1506_1          := '15';
-		
+
 		export OSN1504_0					:= '16'; // Order Score Flagship for ChargeBack Defender - NOT used by OrderScore service
 
 		export CBD_IdentityAttr_v1				:= '20';	// Chargeback Defender Basic Attributes
 		export CBD_RelationshipAttr_v1 		:= '21';	// Chargeback Defender All Attributes
-		
+
 		export CBD_IdentityAttr_v4      	:= '145';
 		export CBD_RelationshipAttr_v4  	:= '146';
 		export CBD_VelocityAttr_v4      	:= '147';
-		export CBD_1404_1                   := '148';   
-		
-		// fraudadvisor / fraudpoint		
+		export CBD_1404_1                   := '148';
+
+		// fraudadvisor / fraudpoint
 		export FP3710_0       := '109'; // FraudPoint
 		export FP3904_1       := '115'; // FraudPoint for Avon
 		export FP3905_1       := '116'; // Another FraudPoint for Avon
@@ -170,11 +170,11 @@ export BillingIndex := MODULE
 		export FP1509_2   		:= '151'; // FP1509.2.0 - Fraudpoint custom for GreenDot
     export FP1509_1   		:= '152'; // FP1509.1.0 - Fraudpoint custom for Republic Bank
 		export FP31505_9      := '153'; // FP31505.9.0 - Fraudpoint 3.0 non-FDN Flagship model (with criminal)
-		export FP3FDN1505_9   := '154'; // FP3FDN1505.9.0 - Fraudpoint 3.0 FDN Flagship model (with criminal)		
+		export FP3FDN1505_9   := '154'; // FP3FDN1505.9.0 - Fraudpoint 3.0 FDN Flagship model (with criminal)
 		export FP1510_2   		:= '155'; // FP1510.2.0 - Fraudpoint 3.0 Custom Model for Target
 		export FP1512_1   		:= '156'; // FP1512.1.0 - Fraudpoint 3.0 Custom Model for Westlake
 		//export FP1603_1   		:= '157'; // FP1603.1.0 - Fraudpoint 3.0 Custom Model for BarClays
-		export FP1511_1			:= '158'; //FP1511.1 - Fraudpoint 3.0 Custom Model for Moneylions 
+		export FP1511_1			:= '158'; //FP1511.1 - Fraudpoint 3.0 Custom Model for Moneylions
 		export FP31604_0    := '159'; //fp31604.0 - Fraudpoint 3.0 Avenger model
 		export FP1610_1			:= '160'; //FP1610_1 - Fraudpoint 3.0 Custom Model for Axcess Financial
 		export FP1609_1			:= '161'; //FP1609_1 - Fraudpoint 3.0 Custom Model for Total Management
@@ -183,22 +183,24 @@ export BillingIndex := MODULE
 		export FP1610_2			:= '164'; //FP1610_2 - Fraudpoint 3.0 Custom Model for Axcess Financial (164 % 100 + 30 = 94)
     export FP1702_1			:= '165'; //FP1702_1 - Fraudpoint 3.0 Custom Model for Kohls online (165 % 100 + 30 = 95)
 		export FP1706_1		  := '166'; //FP1706_1 - Fraudpoint 3.0 Custom Model for MetaBank (166 % 100 + 30 = 96)
-		export FP1702_2			:= '167'; //FP1702_2 - Fraudpoint 3.0 Custom Model for Kohls POS (167 % 100 + 30 = 97)	
-		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
-		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)	
-		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)	
-		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100) (171 % 100 + 30 = 101)             
-	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 (172 % 100 + 30 = 102)             
-    export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  (173 % 100 + 30 = 103)             
-    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital (174 % 100 + 30 = 104)             
+		export FP1702_2			:= '167'; //FP1702_2 - Fraudpoint 3.0 Custom Model for Kohls POS (167 % 100 + 30 = 97)
+		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)
+		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)
+		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)
+		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100) (171 % 100 + 30 = 101)
+	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 (172 % 100 + 30 = 102)
+    export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  (173 % 100 + 30 = 103)
+    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital (174 % 100 + 30 = 104)
     export FP1710_1     := '175'; //FP1710_1 - Fraudpoint 3.0 Custom Model for Borrow Works (175 % 100 + 30 = 105)
-    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover (176 % 100 + 30 = 106)             
-    export FP1803_1     := '177'; //FP1803_1 - Fraudpoint 3.0 Custom Model for Upgrade inc (177 % 100 + 30 = 107)             
-    export MSN1803_1    := '178';//MSN1803_1 - Custom Model for Paro (178 % 100 + 30 = 108)             
-    export RSN804_1     := '179'; //RSN804_1 - Custom Model for Paro (179 % 100 + 30 = 109)             
-    export MSNRSN_1     := '180'; //MSNRSN_1 - Custom Model Combo for Paro (180 % 100 + 30 = 110)             
-    export FP1704_1     := '181'; //FP1704_1 - Fraudpoint 3.0 Custom Model for Ford (181 % 100 + 30 = 111)          
-    export FP1902_1     := '182'; //FP1902_1 - Fraudpoint 3.0 Custom Model for elevate(182 % 100 + 30 = 112)    
-    export DI31906_0    := '183'; //DI31906_0 - ThreatMetrix Flagship Model(183 - 70 = 113)    
-  
+    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover (176 % 100 + 30 = 106)
+    export FP1803_1     := '177'; //FP1803_1 - Fraudpoint 3.0 Custom Model for Upgrade inc (177 % 100 + 30 = 107)
+    export MSN1803_1    := '178';//MSN1803_1 - Custom Model for Paro (178 % 100 + 30 = 108)
+    export RSN804_1     := '179'; //RSN804_1 - Custom Model for Paro (179 % 100 + 30 = 109)
+    export MSNRSN_1     := '180'; //MSNRSN_1 - Custom Model Combo for Paro (180 % 100 + 30 = 110)
+    export FP1704_1     := '181'; //FP1704_1 - Fraudpoint 3.0 Custom Model for Ford (181 % 100 + 30 = 111)
+    export FP1902_1     := '182'; //FP1902_1 - Fraudpoint 3.0 Custom Model for elevate(182 % 100 + 30 = 112)
+    export DI31906_0    := '183'; //DI31906_0 - ThreatMetrix Flagship Model(183 - 70 = 113)
+    export FP1909_1    	:= '184'; //FP1909_1 - Fraudpoint 3.0 Custom Model for Fifth Third (184 - 70 = 114)
+    export FP1909_2    	:= '185'; //FP1909_2 - Fraudpoint 3.0 Custom Model for Fifth Third (185 - 70 = 115)
+    export FP1908_1     := '188'; //FP1908_1_0 -  Fraudpoint 3.0 Custom Model for SCUSA (188 - 70 = 118)
 END;

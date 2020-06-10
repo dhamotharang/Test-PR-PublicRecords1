@@ -19,7 +19,8 @@ END;
 outfile := JOIN(inbdids, %bhbf%,
 				KEYED(LEFT.bdid = RIGHT.bdid) and
 				(NOT MDR.sourceTools.SourceIsEBR(RIGHT.source) OR NOT doxie.DataRestriction.EBR) and
-				(right.dppa_state = '' or (dppa_ok AND drivers.state_dppa_ok(right.dppa_state,dppa_purpose,,RIGHT.source))),
+				(right.dppa_state = '' or (dppa_ok AND drivers.state_dppa_ok(right.dppa_state,dppa_purpose,,RIGHT.source))) AND
+        (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
 				%tra%(LEFT, RIGHT),
 				#if(outerjoin)				
 				left outer,
