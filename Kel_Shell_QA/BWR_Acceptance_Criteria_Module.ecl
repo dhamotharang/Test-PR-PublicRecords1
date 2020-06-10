@@ -1,4 +1,4 @@
-﻿﻿Import STD;
+﻿Import STD;
 
 // step 1
 // update AC_Lay here...
@@ -46,8 +46,10 @@ parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, fi
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Input - Business Header Velocity'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Firmographics'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Sources'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Characteristics'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Associate'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Source Verification')
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Source Verification'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Education')
 				 );
 
 

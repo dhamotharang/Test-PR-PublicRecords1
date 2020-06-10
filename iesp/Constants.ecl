@@ -914,6 +914,14 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxOtherParties := 20;
 	end;
 
+  // Homestead Exemption
+	export hmstdExmptn := MODULE
+		export unsigned2 MAX_EXMPTN  := 4;
+		export unsigned2 MAX_OWNERS  := 4;
+		export unsigned2 MAX_PERSONS := 5;
+		export unsigned2 MAX_PROPERTIES := 15;
+	end;
+
   // Hunting & Fishing Licenses
 	export unsigned2 HF_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 

@@ -30,6 +30,8 @@ EXPORT IParam := MODULE
     export string8    CaseFilingStartDate        := '';
     export string8    CaseFilingEndDate          := '';
     export unsigned   OffenseCategories := 0; // bitmap
+    export string     OffenseType := '';
+    export boolean    ConvictionsOnly := FALSE;
   end;
     
   export report := interface(

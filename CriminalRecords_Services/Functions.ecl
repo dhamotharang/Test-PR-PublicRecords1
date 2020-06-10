@@ -20,37 +20,61 @@ export Functions := module
     offenseRec:=RECORD
       corrections.layout_Offender.offender_key;
       CriminalRecords_Services.layouts.offense_rec;
+      BOOLEAN isFelony;
+      BOOLEAN wasConvicted;
+    END;
+
+    workRec:=RECORD
+      CriminalRecords_Services.layouts.raw_with_offenses;
+      boolean hasFelony;
+      boolean hasConviction;
+      boolean hasFelonyConviction;
     END;
 
     offenses:=JOIN(in_recs,doxie_files.Key_Offenses(isFCRA),
       KEYED(LEFT.offender_key=RIGHT.ok),TRANSFORM(offenseRec,
       SELF.offender_key:=LEFT.offender_key,
       SELF.bitmap:=RIGHT.offense_category,
-      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category)),
+      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category),
+      SELF.isFelony:=RIGHT.off_typ=CriminalRecords_Services.Constants.FELONY[1],
+      SELF.wasConvicted:=RIGHT.fcra_conviction_flag='D'), // D = DOC assumed conviction
       LIMIT(iesp.constants.CRIM.MaxOffenses,SKIP));
 
     court_offenses:=JOIN(in_recs,doxie_files.Key_Court_Offenses(isFCRA),
       KEYED(LEFT.offender_key=RIGHT.ofk),TRANSFORM(offenseRec,
       SELF.offender_key:=LEFT.offender_key,
       SELF.bitmap:=RIGHT.offense_category,
-      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category)),
+      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category),
+      SELF.isFelony:=Std.Str.Contains(RIGHT.court_off_lev_mapped,CriminalRecords_Services.Constants.FELONY,TRUE),
+      SELF.wasConvicted:=RIGHT.fcra_conviction_flag='Y'),
       LIMIT(iesp.constants.CRIM.MaxCourtOffenses,SKIP));
 
     uniq_offenses:=DEDUP(SORT(offenses+court_offenses,offender_key,bitmap),offender_key,bitmap);
     slct_offenses:=IF(in_mod.OffenseCategories > 0,uniq_offenses(in_mod.OffenseCategories & bitmap > 0),uniq_offenses);
 
-    CriminalRecords_Services.layouts.raw_with_offenses appendOffenses1(CriminalRecords_Services.layouts.l_raw L,DATASET(offenseRec) R) := TRANSFORM
+    workRec appendOffenses1(CriminalRecords_Services.layouts.l_raw L,DATASET(offenseRec) R) := TRANSFORM
       SELF.offenses:=PROJECT(R,CriminalRecords_Services.layouts.offense_rec);
+      SELF.hasFelony:=EXISTS(R(isFelony));
+      SELF.hasConviction:=EXISTS(R(wasConvicted));
+      SELF.hasFelonyConviction:=EXISTS(R(isFelony AND wasConvicted));
       SELF:=L;
     END;
 
-    // add selected offense categories to input records
-    tempRecs:=DENORMALIZE(in_recs,slct_offenses,LEFT.offender_key=RIGHT.offender_key,GROUP,appendOffenses1(LEFT,ROWS(RIGHT)));
+    // add selected offense categories and set booleans in records
+    denormRecs:=DENORMALIZE(in_recs,slct_offenses,LEFT.offender_key=RIGHT.offender_key,GROUP,appendOffenses1(LEFT,ROWS(RIGHT)));
+
+    // filter records by felony and conviction flags
+    filterByFelony:=Std.Str.ToUpperCase(in_mod.OffenseType)[1..5]=CriminalRecords_Services.Constants.FELONY[1..5];
+    tempRecs:=MAP(
+      filterByFelony AND in_mod.ConvictionsOnly => denormRecs(hasFelonyConviction),
+      filterByFelony => denormRecs(hasFelony),
+      in_mod.ConvictionsOnly => denormRecs(hasConviction),
+      denormRecs);
 
     // filter input records by selected offense categories
     fltrdRecs:=IF(in_mod.OffenseCategories > 0,tempRecs(EXISTS(offenses)),tempRecs);
 
-    CriminalRecords_Services.layouts.raw_with_offenses appendOffenses2(CriminalRecords_Services.layouts.raw_with_offenses L,DATASET(offenseRec) R) := TRANSFORM
+    CriminalRecords_Services.layouts.raw_with_offenses appendOffenses2(workRec L,DATASET(offenseRec) R) := TRANSFORM
       SELF.offenses:=PROJECT(R,CriminalRecords_Services.layouts.offense_rec);
       SELF:=L;
     END;
@@ -58,7 +82,8 @@ export Functions := module
     // return all offense categories for selected records
     crimRecs:=DENORMALIZE(fltrdRecs,uniq_offenses,LEFT.offender_key=RIGHT.offender_key,GROUP,appendOffenses2(LEFT,ROWS(RIGHT)));
 
-    // OUTPUT(slct_offenses,NAMED('slct_offenses'));
+    // OUTPUT(slct_offenses,NAMED('offenses'));
+    // OUTPUT(tempRecs,NAMED('tempRecs'));
     // OUTPUT(fltrdRecs,NAMED('fltrdRecs'));
     // OUTPUT(crimRecs,NAMED('crimRecs'));
 

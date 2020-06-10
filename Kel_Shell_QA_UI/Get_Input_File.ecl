@@ -13,9 +13,9 @@ RETURN File;
 
 ENDMACRO;
 
-// logical_file_name:='~jastad01::100k_current_business_ks-1008_w20191021-092827_masterlayout.csv';
-// Environment:=Kel_Shell_QA_UI.Constants.Public_Records_EW;
-// Records_to_Run:=10;
+logical_file_name:='~jastad01::100k_current_business_ks-1008_w20191021-092827_masterlayout.csv';
+Environment:=Kel_Shell_QA_UI.Constants.Public_Records_EW;
+Records_to_Run:=10;
 
-// Get_Input_File(logical_file_name, Environment, Records_to_Run);												
+Get_Input_File(logical_file_name, Environment, Records_to_Run);												
 																	

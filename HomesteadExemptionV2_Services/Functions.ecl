@@ -1,6 +1,6 @@
 ﻿IMPORT AddrBest, Address, Autokey_batch, AutokeyB2, BatchServices, 
 	   BatchShare, DeathV2_Services, DidVille, LN_PropertyV2, 
-	   LN_PropertyV2_Services, Std, Suppress, ut;
+	   LN_PropertyV2_Services, Std, Suppress, ut, iesp;
 
 EXPORT Functions := MODULE
 
@@ -416,6 +416,59 @@ EXPORT Functions := MODULE
 			SELF.year:=(STRING4)((UNSIGNED)L.year-(C-1));
 		END;
 		RETURN NORMALIZE(DATASET([{year}],rec),cnt,norm(LEFT,COUNTER));
+	END;
+
+	//************************************************/
+	EXPORT getExceptions(DATASET(iesp.Homestead_Exemption_Search.t_HomesteadExemptionRecord) srch_recs) := FUNCTION
+
+		ndxCode:=RECORD
+			INTEGER ndx;
+			STRING2 code;
+		END;
+
+		{DATASET(ndxCode) ds} getCodes(iesp.Homestead_Exemption_Search.t_HomesteadExemptionRecord L, INTEGER ndx) := TRANSFORM
+			codes:=DATASET(Std.Str.SplitWords(L.ExceptionCode,';'),iesp.share.t_StringArrayItem);
+			SELF.ds:=PROJECT(codes,TRANSFORM(ndxCode,SELF.ndx:=ndx,SELF.code:=LEFT.value));
+		END;
+
+		ds_parent:=PROJECT(srch_recs,getCodes(LEFT,COUNTER));
+		ds_children:=NORMALIZE(ds_parent,LEFT.ds,TRANSFORM(ndxCode,SELF:=RIGHT));
+
+		CNST:=HomesteadExemptionV2_Services.Constants;
+		iesp.share.t_WsException exceptions(ndxCode L) := TRANSFORM
+			SELF.source:='Roxie';
+			SELF.code:=CASE(L.Code,
+				CNST.NO_LEXID_FOUND => CNST.NO_LEXID_FOUND_CODE,
+				CNST.LOW_LEXID_SCORE => CNST.LOW_LEXID_SCORE_CODE,
+				CNST.TOO_MANY_SUBJECTS => CNST.TOO_MANY_SUBJECTS_CODE,
+				CNST.INSUFFICIENT_INPUT => CNST.INSUFFICIENT_INPUT_CODE,
+				0);
+			SELF.location:=(STRING)L.ndx;
+			SELF.message:=CASE(L.Code,
+				CNST.NO_LEXID_FOUND => CNST.NO_LEXID_FOUND_MSG,
+				CNST.LOW_LEXID_SCORE => CNST.LOW_LEXID_SCORE_MSG,
+				CNST.TOO_MANY_SUBJECTS => CNST.TOO_MANY_SUBJECTS_MSG,
+				CNST.INSUFFICIENT_INPUT => CNST.INSUFFICIENT_INPUT_MSG,
+				'');
+			END;
+		ds_exceptions:=PROJECT(ds_children,exceptions(LEFT));
+
+		// Return standard FAIL message ESP is expecting if ALL of the names submitted cause exceptions
+		BOOLEAN allFailed:=COUNT(srch_recs)=COUNT(srch_recs(ExceptionCode!=''));
+
+		BOOLEAN notFound:=EXISTS(ds_exceptions(Code=CNST.NO_LEXID_FOUND_CODE));
+		IF(allFailed AND notFound,FAIL(CNST.NO_LEXID_FOUND_CODE,CNST.NO_LEXID_FOUND_MSG));
+
+		BOOLEAN lowScore:=EXISTS(ds_exceptions(Code=CNST.LOW_LEXID_SCORE_CODE));
+		IF(allFailed AND lowScore,FAIL(CNST.LOW_LEXID_SCORE_CODE,CNST.LOW_LEXID_SCORE_MSG));
+
+		BOOLEAN tooMany:=EXISTS(ds_exceptions(Code=CNST.TOO_MANY_SUBJECTS_CODE));
+		IF(allFailed AND tooMany,FAIL(CNST.TOO_MANY_SUBJECTS_CODE,CNST.TOO_MANY_SUBJECTS_MSG));
+
+		BOOLEAN insufficient:=EXISTS(ds_exceptions(Code=CNST.INSUFFICIENT_INPUT_CODE));
+		IF(allFailed AND insufficient,FAIL(CNST.INSUFFICIENT_INPUT_CODE,CNST.INSUFFICIENT_INPUT_MSG));
+
+		RETURN ds_exceptions(code>0);
 	END;
 
 END;

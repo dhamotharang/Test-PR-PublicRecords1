@@ -1,4 +1,4 @@
-﻿﻿EXPORT Email_Report(file_name, report_tag, file_tag) := FUNCTIONMACRO
+﻿﻿EXPORT Email_Report(logical_file_name, file_name, report_tag, file_tag, Tag) := FUNCTIONMACRO
 
 		string out_file_layout := '';
 
@@ -15,7 +15,7 @@
 		myrec ref1(outfile l, integer c) := TRANSFORM 
 		self.code0 := c; 
 		self.code1 := c + 1 ;
-		self.line := if( c = 1,file_tag+ '\n' + l.line 	, l.line);
+		self.line := if( c = 1,logical_file_name  + '\n' + l.line 	, l.line);
 		END;
 
 		outputs := project(outfile, ref1(left, counter));
@@ -34,10 +34,10 @@
 		// send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
 		send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
 							 ' '+ report_tag  +  'Test Results Direct From Thor ',
-																			 	 trim(file_tag,left,right) + ' '+ '\n Please view attachment.' ,
+																			 	 trim(Tag,left,right) + ' '+ '\n Please view attachment.' ,
 																			 XtabOut[no_of_records].line ,
 																			 'text/plain; charset=ISO-8859-3', 
-																				' ' +	 trim(file_tag,left,right) + ' '  + '.csv',
+																				' ' +	file_tag + ' '+ trim(Tag,left,right) + ' '  + '.csv',
 																			 ,
 																			 ,
 																			 'karthik.reddy@lexisnexis.com');	

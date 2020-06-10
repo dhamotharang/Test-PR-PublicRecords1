@@ -1,4 +1,4 @@
-﻿EXPORT Traditional_Stats_Report(unique_field, inut_file_records, Tag) := FUNCTIONMACRO
+﻿EXPORT Traditional_Stats_Report(logical_file_name, unique_field, inut_file_records, Tag) := FUNCTIONMACRO
 
 test:=record
 	unsigned seq_num;
@@ -24,7 +24,7 @@ result:=project(op,transform( {integer file_cnt;
 
 		final_report:=output(result,,'~kel_shell::out::Traditional_Stats_Report_'+ Tag ,CSV(heading(single), quote('"')), overwrite);
 		
-		final_report_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Traditional_Stats_Report_'+ Tag, ' Traditional Stats Report ',  Tag);
+		final_report_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::Traditional_Stats_Report_'+ Tag, ' Traditional Stats Report ',' Traditional Stats Report ',  Tag);
 		
 		seq:=sequential(final_report, final_report_excel);
 		
