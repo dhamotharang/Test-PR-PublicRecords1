@@ -1,7 +1,7 @@
 // calculates and adds best_phone number using Gong daily data (updated by did and hhid);
 // output records' number is as least as in the input;
 
-import didville, Doxie, gong, Suppress;
+import didville, Doxie, dx_Gong, Suppress;
 
 export Gong_Append(GROUPED DATASET(didville.Layout_Did_OutBatch) infile,
   Doxie.IDataAccess mod_access,
@@ -17,7 +17,8 @@ lx := RECORD
 END;
 
 // JOIN against DID
-lx take_did(didville.Layout_Did_OutBatch le, gong.key_did ri) := TRANSFORM
+key_did := dx_Gong.key_did();
+lx take_did(didville.Layout_Did_OutBatch le, key_did ri) := TRANSFORM
 	SELF.best_phone := IF((unsigned)ri.phone10=0,'',ri.phone10);
 	SELF.dl := (unsigned3)(ri.filedate[1..6]);
   SELF.global_sid := ri.global_sid;
@@ -26,7 +27,7 @@ lx take_did(didville.Layout_Did_OutBatch le, gong.key_did ri) := TRANSFORM
 	SELF := le;
 END;
 
-_j_did := JOIN (infile, gong.key_did,
+_j_did := JOIN (infile, key_did,
                LEFT.did<>0 AND keyed(LEFT.did=RIGHT.l_did) AND
                (~ismarketing OR RIGHT.cr_sort_sz<>'Y'),
                take_did (Left, Right), LEFT OUTER, ATMOST(20));
@@ -46,13 +47,14 @@ j_did := PROJECT(j_did_suppressed, TRANSFORM(lx,
 done_by_did := DEDUP(SORT(j_did, did, -dl, -LENGTH(TRIM(best_phone)), best_phone), did);
 
 // JOIN against HHID
-lx take_hhid(lx le, gong.Key_HHID ri) :=
+key_HHID := dx_Gong.key_hhid();
+lx take_hhid(lx le, key_HHID ri) :=
 TRANSFORM
 	SELF.best_phone := IF((unsigned)ri.phone10=0,le.best_phone,ri.phone10);
 	SELF.dl := IF((unsigned)ri.phone10=0,le.dl,(unsigned3)(ri.filedate[1..6]));
 	SELF := le;
 END;
-j_hhid := JOIN (done_by_did, gong.Key_HHID,
+j_hhid := JOIN (done_by_did, key_HHID,
 								LEFT.best_phone='' AND
 								LEFT.hhid<>0 AND keyed(LEFT.hhid=RIGHT.s_hhid) AND
                (~ismarketing OR RIGHT.cr_sort_sz<>'Y'),

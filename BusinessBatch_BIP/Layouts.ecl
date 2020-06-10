@@ -1389,6 +1389,7 @@ EXPORT Layouts := MODULE
     RECORD
       string20 acctno;
       unsigned2 request_id;
+      string1 record_type;    // identify type of record (L = linking/results, B = business, C = contact)
       Consumer_Best;
       Business_Best;
       boolean input_is_linked;
@@ -1398,6 +1399,64 @@ EXPORT Layouts := MODULE
       unsigned4 contact_no_lexid_count;
       string40 status;
       Batchshare.Layouts.ShareErrors;
+    END;
+
+    EXPORT Output_Combined := 
+    RECORD
+      // linking record
+      Output_Summary;
+
+      // business record
+      string120 b_best_co_name;
+      string10 b_best_co_prim_range;
+      string2 b_best_co_predir;
+      string28 b_best_co_prim_name;
+      string4 b_best_co_addr_suffix;
+      string10 b_best_co_unit_desig;
+      string8 b_best_co_sec_range;
+      string25 b_best_co_city;
+      string2 b_best_co_state;
+      string5 b_best_co_zip;
+      string4 b_best_co_zip4;
+      string16 b_best_co_phone;
+      unsigned6 b_ultid;
+      unsigned6 b_orgid;
+      unsigned6 b_seleid;
+      unsigned6 b_proxid;
+      unsigned6 b_powid;
+      string50 b_job_title1;
+      string8 b_dt_first_seen1;
+      string8 b_dt_last_seen1;
+      string50 b_job_title2;
+      string8 b_dt_first_seen2;
+      string8 b_dt_last_seen2;
+      string50 b_job_title3;
+      string8 b_dt_first_seen3;
+      string8 b_dt_last_seen3;
+
+      // contact record
+      string20 c_best_name_first;
+      string20 c_best_name_middle;
+      string20 c_best_name_last;
+      string5 c_best_name_suffix;
+      string10 c_best_prim_range;
+      string2 c_best_predir;
+      string28 c_best_prim_name;
+      string4 c_best_addr_suffix;
+      string10 c_best_unit_desig;
+      string8 c_best_sec_range;
+      string25 c_best_city;
+      string2 c_best_state;
+      string5 c_best_zip;
+      string4 c_best_zip4;
+      string10 c_best_home_phone;
+      unsigned6 c_lex_id;
+      unsigned6 c_empid;
+      string50 c_job_title1;
+      string50 c_job_title2;
+      string50 c_job_title3;
+      string8 c_dt_first_seen;
+      string8 c_dt_last_seen;
     END;
 
   END;

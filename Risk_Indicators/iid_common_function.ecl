@@ -18,7 +18,8 @@ export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_d
 							unsigned1 LexIdSourceOptout = 1,
 							string TransactionID = '',
 							string BatchUID = '',
-							unsigned6 GlobalCompanyId = 0
+							unsigned6 GlobalCompanyId = 0,
+              string5 IndustryClass = ''
 							) :=
 FUNCTION
 
@@ -117,6 +118,7 @@ in_email_mod := Module(EmailV2_Services.IParams.EmailParams);
     EXPORT UNSIGNED2  PenaltThreshold      := EmailV2_Services.Constants.Defaults.PenaltThreshold;
     EXPORT UNSIGNED  MaxResultsPerAcct    := EmailV2_Services.Constants.Defaults.MaxResultsPerAcct;
     EXPORT BOOLEAN   IncludeHistoricData  := TRUE;
+    EXPORT STRING5   Industry_Class       := IndustryClass;
     EXPORT BOOLEAN   RequireLexidMatch    := FALSE;
     EXPORT UNSIGNED1  EmailQualityRulesMask := 0;
     EXPORT BOOLEAN   RunDeepDive          := FALSE;

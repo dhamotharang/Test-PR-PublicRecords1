@@ -1,4 +1,4 @@
-﻿import bipv2, didville, doxie, gong, iesp, MIDEX_Services, relationshipIdentifier_services, STD, Suppress;
+﻿import bipv2, didville, doxie, dx_Gong, iesp, MIDEX_Services, relationshipIdentifier_services, STD, Suppress;
 EXPORT Functions := MODULE
 
   // this function calls the person search to find possible DID's.
@@ -878,14 +878,15 @@ EXPORT Functions := MODULE
 
     key_with_inrec_layout := RECORD
       slim_inrecs_layout;
-      RECORDOF(gong.Key_History_phone);
+      dx_Gong.layouts.i_history_phone;
     END;
 
     Slim_recs := PROJECT(inRecs, TRANSFORM(slim_inrecs_layout,
       SELF.phone := LEFT.PhoneInfo.Phone10;
       SELF := LEFT));
 
-    pre_base_recs := JOIN(inRecs, gong.Key_History_phone,
+    key_history_phone := dx_Gong.key_history_phone();
+    pre_base_recs := JOIN(inRecs, key_history_phone,
       KEYED(LEFT.PhoneInfo.phone10[4..10] = RIGHT.p7) AND
       KEYED(LEFT.PhoneInfo.phone10[1..3]  = RIGHT.p3),
       TRANSFORM(key_with_inrec_layout,

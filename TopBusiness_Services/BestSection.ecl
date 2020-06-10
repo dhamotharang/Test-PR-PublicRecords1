@@ -1,5 +1,5 @@
 ﻿import iesp, Doxie, Suppress, AutoStandardI, MDR, BIPV2, BIPV2_Best,
-  TopBusiness_Services, ut, Gong;
+  TopBusiness_Services, ut, dx_Gong;
 
 export BestSection := MODULE
 
@@ -313,18 +313,18 @@ export BestSection := MODULE
 																																  self.company_incorporation_date :=
 																																	  (string8) left.company_incorporation_date;
 																																		))[1].company_incorporation_date;
- 
-                                                                              
-														
+
+
+
                                                                                     year_startedIncorp :=  (integer) tmp_year_started_string[1..4]; // using from best file.
                                                                                     year_startedFirstSeen := (integer) (((string8) (left.company_name[1].dt_first_seen))[1..4]);
                                                                                     year_started := if (year_startedIncorp <>  0,  year_startedincorp, year_startedFirstSeen);
-                                                                      
+
 															tmpSource := project(left.company_incorporation_date,
 																				transform(BIPV2_Best.Layouts.company_incorporation_date_layout,
 																				      self.sources := left.sources;
 																						self := []));
-                                                                                                                            
+
                               self.YearStartedSourceDocID := project(tmpSource.Sources, transform({string50 sourceDocID},
 															                          self.sourceDocID := left.vl_id))[1].SourceDocID;
 
@@ -345,7 +345,7 @@ export BestSection := MODULE
 
                                self.isActive := left.isActive;
 															 self.isDefunct := left.isDefunct;
-                                                                                
+
 															self := left;
 															));
 
@@ -496,10 +496,10 @@ export BestSection := MODULE
 							                                if ( tmpDateVendorFirstReported  <> 0,
 																			         tmpDateVendorFirstReported,  0),
                                             left.year_started);
-                 Year_Started := if (left.year_started = 0, UseDerivedYearStarted, left.year_started);								
-							self.Year_started := Year_started;							
+                 Year_Started := if (left.year_started = 0, UseDerivedYearStarted, left.year_started);
+							self.Year_started := Year_started;
                                       self.years_inBusiness :=  left.years_inbusiness;
-								                                                                                   
+
               self.YearStartedDerived := UseDerivedYearStarted <> 0; // set accordingly
 								                                      // based on information in bug # : 119312
               self.yearStartedSource := if (Year_started <> 0, right.source, left.yearStartedSource);
@@ -507,7 +507,7 @@ export BestSection := MODULE
               self := left;
 						),
 			left outer);
-      
+
    // create a slimmed layout out of the phone information from best key
 	 // which will be used to set phone metadata based on lookup in gong history key
 
@@ -525,7 +525,7 @@ export BestSection := MODULE
 																	 self.dotid := left.dotid;
 																	 )); // sets  linkids;
 
-  ds_phone_info_raw := join(ds_trim_phone, gong.Key_History_phone,
+  ds_phone_info_raw := join(ds_trim_phone, dx_Gong.key_history_phone(),
     keyed(left.company_phone[4..10] = right.p7) and
     keyed(left.company_phone[1..3]  = right.p3),
     limit(10000,skip));
@@ -609,7 +609,7 @@ export BestSection := MODULE
 			self.Ticker := ''; //right.Ticker  field removed
 			self.Exchange := ''; //right.Exchange field removed
 			  tmpUrl := right.company_url[1].company_url;
-			  SlashPosition := stringlib.stringfind(tmpurl,'/',1);				
+			  SlashPosition := stringlib.stringfind(tmpurl,'/',1);
 			self.URL := if (tmpurl <> '' and SlashPosition > 1,  tmpUrl[1..slashPosition-1],
 			                                    tmpUrl);
 			self.Address.StreetNumber := right.company_address[1].company_prim_range,
@@ -660,9 +660,9 @@ export BestSection := MODULE
 															 // boolean option to add these 2 DS (finalccompanynamevariations and
 															                         // finalTinVariations  is taken care above.
 			self.OthercompanyNames := choosen(FinalCompanyNameVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);
-			self.OthercompanyTins := choosen(FinalTinVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);              
+			self.OthercompanyTins := choosen(FinalTinVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);
                self.AddressFromDate := iesp.ECL2ESP.toDate(RIGHT.company_name[1].dt_first_seen);
-               self.AddressToDate :=  iesp.ECL2ESP.toDate(RIGHT.company_name[1].dt_last_seen);            
+               self.AddressToDate :=  iesp.ECL2ESP.toDate(RIGHT.company_name[1].dt_last_seen);
                self.BestSicCode   :=  right.sic_code[1].company_sic_code1;
                Self.BestNaicsCode := right.naics_code[1].company_naics_code1;
 			self := []),
@@ -754,4 +754,3 @@ export BestSection := MODULE
 		return ds_final_records;
 	end;
 end;
-

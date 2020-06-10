@@ -72,6 +72,7 @@ EXPORT fn_getIndBSAndRI(DATASET(DueDiligence.Layouts.CleanedData) cleanData,
     //call Boca Shell
     bocaShell := Risk_Indicators.Boca_Shell_Function(iid, defaultGateway, options.DPPA_Purpose, options.GLBA_Purpose, BSversion := defaultBSVersion, BSOptions := defaultBSOptions,
                                                       DataRestriction := options.DataRestrictionMask, DataPermission := options.DataPermissionMask,
+																											includeVehInfo := false,
                                                       LexIdSourceOptout := LexIdSourceOptout, 
                                                       TransactionID := TransactionID, 
                                                       BatchUID := BatchUID, 

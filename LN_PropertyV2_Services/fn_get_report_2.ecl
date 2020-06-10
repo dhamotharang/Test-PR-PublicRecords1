@@ -27,8 +27,9 @@ export dataset(l_out) fn_get_report_2(
 	ds_flags := if (IsFCRA and ~OnThor, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
 
 	// Apply FaresID-based restrictions
-	fids1 := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
-	
+	fids1_orig := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
+	fids1 := dedup(sort(fids1_orig, ln_fares_id, search_did, isdeepdive), ln_fares_id, search_did, isdeepdive);  // added this dedup to handle cases where search_did exists more than once in the same batch of relatives
+  
 	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids1,nonSS,isFCRA,ds_flags);	
 	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw_2(fids1,isFCRA,ds_flags,in_mod);
 	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw_2(fids1,isFCRA,ds_flags,in_mod);
@@ -142,7 +143,9 @@ needed to put this code back in for the roxie query to work within bocashell for
 								addParties(left,right),	left outer,	atmost(max_raw), PARALLEL
 							);
 
-// output(in_fids, named('in_fids'));
+// output(count(fids1_orig), named('fids1_orig_count'));
+// output(count(fids1), named('fids1_count'));
+// output(choosen(fids1, 100), named('fids1'));
 // output(deeds_raw, named('deeds_raw'));
 // output(assess_raw, named('assess_raw'));
 // output(parties, named('parties'));

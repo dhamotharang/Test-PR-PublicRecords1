@@ -1,8 +1,9 @@
-import gong, doxie, Suppress, ut, NID;
+import dx_gong, doxie, Suppress, ut, NID;
+
 export SurnameSearch(doxie.IDataAccess mod_access) := function
   doxie.MAC_Header_Field_Declare();
 
-  clean_names := Gong.Key_History_CleanName (
+  clean_names := dx_gong.key_history_clean_name () (
     KEYED (ut.phoneticLnameMatch (dph_name_last, lname_value)),
     KEYED (name_last = lname_value),
     KEYED (state_value = '' or st = state_value),

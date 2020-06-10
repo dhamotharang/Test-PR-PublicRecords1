@@ -1,7 +1,7 @@
 ﻿﻿/*
 This function pulls inhouse phones data from gong, phonesplus, and bip.
 */
-IMPORT Doxie, BIPV2, Gong, MDR, Phones, phonesplus_batch, Suppress, ut;
+IMPORT Doxie, BIPV2, dx_Gong, MDR, Phones, phonesplus_batch, Suppress, ut;
 EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
   doxie.IDataAccess mod_access) := FUNCTION
 
@@ -18,7 +18,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
     unsigned8 record_sid;
   END;
 
-  pre_dsGong := JOIN(dsUniquePhones,Gong.key_history_phone,
+  pre_dsGong := JOIN(dsUniquePhones,dx_Gong.key_history_phone(),
     KEYED(LEFT.phone[4..10] = RIGHT.p7) AND
     KEYED(LEFT.phone[1..3] = RIGHT.p3) AND
     RIGHT.current_flag,

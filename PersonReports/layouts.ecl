@@ -3,7 +3,7 @@
 // all those fieldnames and their types to reflect those of the data -- the
 // existing structure should be preserved, however.
 
-import iesp, doxie_LN, risk_indicators, doxie_crs, Gong, doxie, FFD; //TODO: remove doxie_ln
+import iesp, risk_indicators, doxie_crs, dx_Gong, doxie, FFD;
 
 export layouts := module
 
@@ -32,14 +32,14 @@ export layouts := module
 	export max_faaCert				:= 50;
 	export max_faaCrft				:= 50;
 	export max_hri						:= 20;
-	
-	
+
+
 	// -----------------------------------------
 	// Common
 	// -----------------------------------------
 	export t_yesNo := string3;
 	export t_yesNo yesNo(boolean b) := if(b,'YES','NO');
-	
+
 	export name := module
 		export fml := record
 			string20 first;
@@ -58,7 +58,7 @@ export layouts := module
 			unsigned1 day;
 		end;
 	end;
-	
+
 	export addr := module
 		export summary := record
 			string10	street_number						{ xpath('street-number') };
@@ -75,7 +75,7 @@ export layouts := module
 		end;
 	end;
 
-	
+
 	export dl := record
 		string9		ssn;
 		string20	name_first								{ xpath('name-first') };
@@ -96,7 +96,7 @@ export layouts := module
 		string20	state_name								{ xpath('state-name') };
 		string2		src												{ xpath('src') };
 	end;
-	
+
 	export identity:= record
 		name.fml		name;
 		string9			ssn;
@@ -105,7 +105,7 @@ export layouts := module
 		date.ymd		ssn_issued_start_date		{ xpath('ssn-issued-start-date')	};
 		date.ymd		ssn_issued_end_date			{ xpath('ssn-issued-end-date')	};
 		DATASET(risk_indicators.layout_desc) hri_ssn {maxcount(max_hri)};
-		date.ymd		dob;	
+		date.ymd		dob;
 		date.ymd		dod;
 		boolean IsLimitedAccessDMF { xpath('IsLimitedAccessDMF')	};
 		unsigned1		age_at_death						{ xpath('age-at-death')	};
@@ -133,13 +133,11 @@ export layouts := module
 	  iesp.share.t_ResponseHeader _Header {xpath('Header')};
   	t_CentralRecordsIndividual Individual {xpath('Individual')};
   end;
-		
+
   export t_CentralRecordsRequest := iesp.bpsreport.t_BpsReportRequest;//record (iesp.share.t_BaseRequest)
 	  // iesp.bpsreport.t_BpsReportOption Options {xpath('Options')};
   	// iesp.bpsreport.t_BpsReportBy ReportBy {xpath('ReportBy')};
   // end;
-
-  export royalties := doxie_LN.layout_royalties;
 
   export comp_names := record
     integer3 address_seq_no;
@@ -151,9 +149,9 @@ export layouts := module
   end;
 
 export phones_rec := record (doxie_crs.layout_phone_records)
-  typeof (Gong.Key_address_current.st) st;   // only for mac_AddHRIPhone call
-  typeof (Gong.Key_address_current.lname) lname;  // only for mac_AddHRIPhone call
-  typeof (Gong.Key_address_current.omit_phone) omit_phone; // in addition to 'unpub'
+  typeof (dx_Gong.layouts.i_address_current.st) st;   // only for mac_AddHRIPhone call
+  typeof (dx_Gong.layouts.i_address_current.lname) lname;  // only for mac_AddHRIPhone call
+  typeof (dx_Gong.layouts.i_address_current.omit_phone) omit_phone; // in addition to 'unpub'
 end;
 
 export rec_wide := record
@@ -165,7 +163,7 @@ export rec_wide := record
   boolean is_subject_verified;
 end;
 
-export slim_addr_rec := record 
+export slim_addr_rec := record
   iesp.bpsreport.t_BpsReportAddressSlim and not [Residents];
   // these are for linking...
   rec_wide.did;
@@ -178,7 +176,7 @@ end;
 
   // slim version of compreport identity
   export identity_slim := record, MAXLENGTH (4096)
-    unsigned6 did; 
+    unsigned6 did;
     integer3 address_seq_no;
     iesp.bpsreport.t_BpsReportIdentitySlim;
 		FFD.Layouts.CommonRawRecordElements;
@@ -189,24 +187,24 @@ end;
     integer3 address_seq_no;
     dataset (iesp.bpsreport.t_BpsReportIdentitySlim) akas {maxcount(iesp.Constants.BR.MaxAKA)};
   END;
-	
+
 
   // most comprehensive identity as defined in compreport
   export identity_bps := record, MAXLENGTH (4096)
-    unsigned6 did; 
+    unsigned6 did;
     integer3 address_seq_no;
     iesp.bps_share.t_BpsReportIdentity;
   END;
-	
+
   export identity_bps_rolled := record
     unsigned6 did;
     integer3 address_seq_no;
     dataset (iesp.bps_share.t_BpsReportIdentity) akas {maxcount(iesp.Constants.BR.MaxAKA)};
   END;
-	
-	
+
+
   export address_slim := record
-    unsigned6 did; 
+    unsigned6 did;
     integer3 address_seq_no;
     // and need these to get census, if required
     rec_wide.county; //county "number"
@@ -215,7 +213,7 @@ end;
   end;
 
   export address_bps := record
-    unsigned6 did; 
+    unsigned6 did;
     integer3 address_seq_no;
     // and need these to get census, if required
     rec_wide.county; //county "number"
@@ -224,20 +222,20 @@ end;
   end;
 
   export address_bps_rolled := record
-    unsigned6 did; 
+    unsigned6 did;
     // integer3 address_seq_no;
     dataset (iesp.bpsreport.t_BpsReportAddress) addresses {maxcount(iesp.Constants.BR.MaxAddress)};
   end;
 
   export address_slim_rolled := record
-    unsigned6 did; 
+    unsigned6 did;
     // integer3 address_seq_no;
     dataset (iesp.bpsreport.t_BpsReportAddressSlim) addresses {maxcount(iesp.Constants.BR.MaxAddress)};
   end;
 
 	export ssn_hri_rec := RECORD
 		STRING9   ssn;
-		UNSIGNED6 did;	
+		UNSIGNED6 did;
 		STRING1   valid_ssn;
 		UNSIGNED  cnt;
 		UNSIGNED4 ssn_issue_early;
@@ -249,7 +247,7 @@ end;
 	export CommonAssetReportIdentity := record(iesp.share_fcra.t_FcraIdentity)
 		iesp.assetreport.t_AssetReportIdentity.IsCurrentName;
 		iesp.assetreport.t_AssetReportIdentity.IsCorrectDOB;
-		iesp.assetreport.t_AssetReportIdentity.SubjectSSNIndicator; 
+		iesp.assetreport.t_AssetReportIdentity.SubjectSSNIndicator;
 		dataset(iesp.bps_share.t_BpsReportDriverLicense) DriverLicenses;
 	end;
 
@@ -284,8 +282,8 @@ end;
 		iesp.bps_share.t_BpsReportIdentity.IsCorrectDOB;
 		iesp.bps_share.t_BpsReportIdentity.SubjectSSNIndicator;
    end;
-   
-   
+
+
    export CommonPreLitigationReportIndividual := record, MAXLENGTH (300000001)
    	string12 UniqueId {xpath('UniqueId')};
    	string3 Probability {xpath('Probability')};
@@ -308,7 +306,7 @@ end;
    	dataset(iesp.bankruptcy.t_BankruptcyReportRecord) Bankruptcies {xpath('Bankruptcies/Bankruptcy'), MAXCOUNT(iesp.constants.BR.MaxBankruptcies)};
    	dataset(iesp.proflicense.t_ProfessionalLicenseRecord) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.constants.BR.MaxProfLicenses)};
    	dataset(iesp.bpsreport.t_BpsReportLienJudgment) LiensJudgments {xpath('LiensJudgments/LienJudgment'), MAXCOUNT(iesp.constants.BR.MaxLiensJudgments)};
-   	
+
    	dataset(iesp.watercraft_fcra.t_FcraWaterCraftReportRecord) WaterCrafts {xpath('WaterCrafts/WaterCraft'), MAXCOUNT(iesp.constants.BR.MaxWatercrafts)};
    	dataset(iesp.propassess_fcra.t_FcraAssessReportRecord) AssessRecords {xpath('AssessRecords/AssessRecord'), MAXCOUNT(iesp.constants.BR.MaxAssessments)};
    	dataset(iesp.propdeed_fcra.t_FcraDeedReportRecord) DeedRecords {xpath('DeedRecords/DeedRecord'), MAXCOUNT(iesp.constants.BR.MaxDeeds)};
@@ -318,12 +316,12 @@ end;
 		dataset(iesp.bankruptcy_fcra.t_FcraBankruptcy3BpsRecord) Bankruptcies3 {xpath('Bankruptcies3/Bankruptcy'), MAXCOUNT(iesp.constants.BR.MaxBankruptcies)};
    	//dataset(share_fcra.t_FcraIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.constants.BR.MaxAKA)};
    	dataset(CommonPreLitigationReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.constants.BR.MaxAKA)};
-   	
+
    end;
-	 
+
 	EXPORT header_recPlusSource  := record
-					recordof(doxie.Key_Header);					
+					recordof(doxie.Key_Header);
 				      integer2 count := 0;
-				      string32 _type := '';					
+				      string32 _type := '';
 	end;
 end;

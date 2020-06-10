@@ -355,7 +355,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                          le.relationEverIncarcerated = FALSE AND
                          le.relationHeaderLess1YearWithSSNRiskCount = 0 AND
                          le.relationHeaderGreater1YearWithSSNRiskCount = 0 AND
-                         COUNT((le.parents + le.spouses + le.associates)((amlRelationshipDegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION))) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+                         COUNT(le.parents + le.spouses + le.associates) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
                          
     
     perAssoc_Flag_Final := DueDiligence.Common.calcFinalFlagField(perAssoc_Flag9,

@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT B_U_C_C_6,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
+IMPORT B_U_C_C_6,B_U_C_C_7,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT B_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_6(__in,__cfg).__ENH_U_C_C_6) __ENH_U_C_C_6 := B_U_C_C_6(__in,__cfg).__ENH_U_C_C_6;
-  SHARED __EE157582 := __ENH_U_C_C_6;
-  EXPORT __ST110630_Layout := RECORD
+  SHARED __EE262879 := __ENH_U_C_C_6;
+  EXPORT __ST143878_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -23,45 +23,75 @@ EXPORT B_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.nstr Statements_Filed_;
     KEL.typ.nstr Foreign_Flag_;
     KEL.typ.nkdate Process_Date_;
-    KEL.typ.bool Initial_Filing_ := FALSE;
-    KEL.typ.nkdate Recent_Filing_Date_;
+    KEL.typ.nint Filing_Date_Non_Null_;
+    KEL.typ.nstr Filing_Number_Non_Null_;
+    KEL.typ.nstr Filing_Time_Non_Null_;
+    KEL.typ.nkdate Max_Filing_Date_Sub_;
+    KEL.typ.nint Vendor_Entry_Date_Non_Null_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST110626_Layout := RECORD
+  EXPORT __ST262517_Layout := RECORD
+    KEL.typ.nstr R_M_S_I_D_;
+    KEL.typ.nstr Filing_Jurisdiction_;
+    KEL.typ.nstr Filing_Number_;
+    KEL.typ.nstr Filing_Type_;
+    KEL.typ.nkdate Filing_Date_;
+    KEL.typ.nkdate Original_Filing_Date_;
+    KEL.typ.nstr Filing_Status_;
+    KEL.typ.nstr Filing_Time_;
+    KEL.typ.nstr Status_Type_;
+    KEL.typ.nstr Filing_Agency_;
+    KEL.typ.nkdate Expiration_Date_;
+    KEL.typ.nstr Contract_Type_;
+    KEL.typ.nkdate Vendor_Entry_Date_;
+    KEL.typ.nkdate Vendor_Update_Date_;
+    KEL.typ.nstr Statements_Filed_;
+    KEL.typ.nstr Foreign_Flag_;
+    KEL.typ.nkdate Process_Date_;
+    KEL.typ.nkdate Max_Filing_Date_Sub_;
+    KEL.typ.nstr Filing_Number_Non_Null_;
+    KEL.typ.nstr Filing_Time_Non_Null_;
+    KEL.typ.nint Vendor_Entry_Date_Non_Null_;
+    KEL.typ.nint Filing_Date_Non_Null_;
+    KEL.typ.str Filing_Type_Filtered_ := '';
+    KEL.typ.nkdate Max_Filing_Date_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT __ST143874_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST110630_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST143878_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nkdate Current_Date_;
-    KEL.typ.nkdate Most_Recent_Filing_Date_;
-    KEL.typ.nstr Most_Recent_Filing_Type_;
-    KEL.typ.nstr Most_Recent_Non_Blank_Filing_Type_;
-    B_U_C_C_6(__in,__cfg).__NS138302_Layout Most_Recent_Non_Blank_Sub_Filing_;
-    B_U_C_C_6(__in,__cfg).__NS138339_Layout Most_Recent_Sub_Filing_;
+    KEL.typ.ndataset(__ST262517_Layout) Best_Child_Record_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST110626_Layout __ND157510__Project(B_U_C_C_6(__in,__cfg).__ST111703_Layout __PP156629) := TRANSFORM
-    __EE157585 := __PP156629.Sub_Filing_;
-    __ST110630_Layout __ND157414__Project(B_U_C_C_6(__in,__cfg).__ST111707_Layout __PP156980) := TRANSFORM
-      SELF.Initial_Filing_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP156980.Filing_Type_)),=,__CN('INITIAL FILING'))),TRUE,FALSE);
-      SELF := __PP156980;
+  SHARED __ST143874_Layout __ND263140__Project(B_U_C_C_6(__in,__cfg).__ST145901_Layout __PP262548) := TRANSFORM
+    __EE262581 := __PP262548.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE262581),__ST143878_Layout),__NL(__EE262581));
+    __EE262729 := __PP262548.Best_Child_Record_;
+    __ST262517_Layout __ND262996__Project(B_U_C_C_7(__in,__cfg).__ST147342_Layout __PP262992) := TRANSFORM
+      SELF.Filing_Type_Filtered_ := FN_Compile(__cfg).FN__map_Filing_Type(__ECAST(KEL.typ.nstr,__PP262992.Filing_Type_));
+      SELF.Max_Filing_Date_ := KEL.Routines.MaxN(__PP262992.Filing_Date_,__PP262992.Original_Filing_Date_);
+      SELF := __PP262992;
     END;
-    SELF.Sub_Filing_ := __PROJECT(__EE157585,__ND157414__Project(LEFT));
-    SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('ucc_build_version'))),__CN(__cfg.CurrentDate));
-    __EE157505 := __PP156629.Sub_Filing_;
-    SELF.Most_Recent_Filing_Date_ := KEL.Aggregates.MaxNN(__EE157505,__T(__EE157505).Recent_Filing_Date_);
-    SELF.Most_Recent_Filing_Type_ := __FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP156629.Most_Recent_Sub_Filing_.Filing_Type_));
-    SELF.Most_Recent_Non_Blank_Filing_Type_ := __FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP156629.Most_Recent_Non_Blank_Sub_Filing_.Filing_Type_));
-    SELF := __PP156629;
+    SELF.Best_Child_Record_ := __PROJECT(__EE262729,__ND262996__Project(LEFT));
+    SELF := __PP262548;
   END;
-  EXPORT __ENH_U_C_C_5 := PROJECT(__EE157582,__ND157510__Project(LEFT));
+  EXPORT __ENH_U_C_C_5 := PROJECT(__EE262879,__ND263140__Project(LEFT));
 END;

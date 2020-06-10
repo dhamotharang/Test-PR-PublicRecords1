@@ -220,7 +220,10 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 											bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '');
 										
-Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);									
+Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
+
+CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
+NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;								
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
 bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
@@ -228,7 +231,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
                 Custom2_model_name in ['RVP1702_1'] or 
                 Custom3_model_name in ['RVP1702_1'] or
                 Custom4_model_name in ['RVP1702_1'] or 
-                Custom5_model_name in ['RVP1702_1'],52,50);  // hard code this for now
+                Custom5_model_name in ['RVP1702_1'] or
+                CheckingIndicatorsRequest,52,50);  // hard code this for now
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -369,37 +373,6 @@ attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/, // uses clam_noScore
 
 emptyGateways := dataset([],Gateway.Layouts.Config); 
 
- CI_Layout := RECORD
- unsigned4 seq;
- string10 CheckProfileIndex;
- string10 CheckTimeOldest;
- string10 CheckTimeNewest;
- string10 CheckNegTimeOldest;
- string10 CheckNegRiskDecTimeNewest;
- string10 CheckNegPaidTimeNewest;
- string10 CheckCountTotal;
- string10 CheckAmountTotal;
- string10 CheckAmountTotalSinceNegPaid;
- string10 CheckAmountTotal03Month;
- boolean  FDGatewayCalled;
- END;
-
-FirstData_results :=  if(AttributesVersionRequest = 'RVCheckingAttrV5', RiskView.getFirstData(bsprep,gateways),
-PROJECT(bsprep, TRANSFORM(CI_Layout,
-SELF.SEQ := LEFT.Seq;
-SELF.CheckProfileIndex := '-1';
-SELF.CheckTimeOldest := '-1';
-SELF.CheckTimeNewest := '-1'; 
-SELF.CheckNegTimeOldest := '-1';
-SELF.CheckNegRiskDecTimeNewest := '-1';
-SELF.CheckNegPaidTimeNewest := '-1';
-SELF.CheckCountTotal := '-1';
-SELF.CheckAmountTotal := '-1';
-SELF.CheckAmountTotalSinceNegPaid := '-1';
-SELF.CheckAmountTotal03Month := '-1';
-SELF.FDGatewayCalled := FALSE;
-SELF := left;)));
-
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
@@ -407,15 +380,9 @@ transform(riskview.layouts.layout_riskview5_search_results,
 		iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	self := right,
 	self := left,
-	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
+	self := []), LEFT OUTER, KEEP(1), ATMOST(100));  
 
-riskview5_attr_search_results_attrv5_FirstData := join(riskview5_attr_search_results_attrv5, FirstData_results, left.seq=right.seq,
-transform(riskview.layouts.layout_riskview5_search_results, 
-	self := right,
-	self := left), LEFT OUTER, KEEP(1), ATMOST(100));
-   
-
-riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5_FirstData, attrLnJ, left.seq=right.seq,
+riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did); //don't show a lexid if the truedid is not TRUE
 	self.ConsumerStatements := left.ConsumerStatements;
@@ -1214,36 +1181,16 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
   
   //Checking Indicators
-  self.CheckProfileIndex := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckProfileIndex);
-  self.CheckTimeOldest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckTimeOldest);
-  self.CheckTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckTimeNewest);
-  self.CheckNegTimeOldest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckNegTimeOldest);
-  self.CheckNegRiskDecTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckNegRiskDecTimeNewest);
-  self.CheckNegPaidTimeNewest := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckNegPaidTimeNewest);
-  self.CheckCountTotal := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckCountTotal);
-  self.CheckAmountTotal := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckAmountTotal);
-  self.CheckAmountTotalSinceNegPaid := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckAmountTotalSinceNegPaid);
-  self.CheckAmountTotal03Month := map( AttributesVersionRequest <> 'RVCheckingAttrV5' => '',
-                                suppress_condition and AttributesVersionRequest = 'RVCheckingAttrV5' => '', 
-                                le.CheckAmountTotal03Month);
+  self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegRiskDecTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegPaidTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckCountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotalSinceNegPaid := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotal03Month := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
 
 //don't display data if suppressed or no report option selected	
 		self.report := if((~IncludeLnJ AND ~RiskviewReportRequest) or suppress_condition 
@@ -1333,13 +1280,47 @@ MLA_results := RiskView.getMLAAlert(riskview5_pre_MLA, if(MLA_request_pos <> 0, 
 //add records back in that didn't get passed to the gateway function
 riskview5_wMLA_results := riskview5_search_results(Alert1 in ['100D','100E','100F','222A'] or (Alert1 = '100A' and ~isCollectionsPurpose)) + MLA_results;
 															 
-riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
+riskview5_pre_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
+
+layout_preCI := record
+	Risk_Indicators.Layout_Input input;
+	riskview.layouts.layout_riskview5_search_results results;
+  string9 bestssn;
+end;
+
+Valid_FD_Input := riskview5_pre_final_results(AlertRegulatoryCondition <> '3' and Alert1 <> '222A' and CheckingIndicatorsRequest);
+
+Invalid_FD_Input := riskview5_pre_final_results(AlertRegulatoryCondition = '3' or Alert1 = '222A' or NoCheckingIndicatorsRequest);
+
+Slimmed_Invalid_FD_Input := project(Invalid_FD_Input, transform(Riskview.Layouts.Checking_Indicators_Layout,
+                                self.FDGatewayCalled := false;
+                                self := left;
+                                ));
+
+riskview5_pre_FirstData := join(Valid_FD_Input, clam, 
+													left.seq=right.seq, 
+													transform(layout_preCI,
+														self.input		:= right.shell_input;
+														self.results	:= left;
+                            self.bestssn := right.best_flags.ssn),
+													inner);
+
+FirstData_results :=  RiskView.getFirstData(riskview5_pre_FirstData,gateways);
+
+riskview5_wFD_results := FirstData_results + Slimmed_Invalid_FD_Input;
+
+riskview5_attr_search_results_FirstData := join(riskview5_pre_final_results, riskview5_wFD_results, left.seq=right.seq,
+transform(riskview.layouts.layout_riskview5_search_results, 
+	self := right,
+	self := left), LEFT OUTER, KEEP(1), ATMOST(100));
+  
+riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
 
 
  /* ****************************************************************
   *  Deferred Task ESP (DTE) Logging Functionality  *
   ******************************************************************/
-		IF(IncludeStatusRefreshChecks, 
+		IF(IncludeStatusRefreshChecks AND Status_Refresh_GW_Call[1].Response.Result.TaskID <> '', 
 			OUTPUT(Risk_Reporting.To_LOG_DTE.GetDTEOutput(
 						Status_Refresh_GW_Call[1].Response.Result.TaskID, 
 						'Status Refresh Task', 
@@ -1378,7 +1359,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // OUTPUT(Crossindustry_model_result, NAMED('Crossindustry_model_result'));
 // OUTPUT(custom_model_result, NAMED('custom_model_result'));
 // output(FirstData_results, named('FirstData_results'));
-// output(riskview5_attr_search_results_attrv5_FirstData, named('riskview5_attr_search_results_attrv5_FirstData'));
+// output(riskview5_attr_search_results_FirstData, named('riskview5_attr_search_results_FirstData'));
 // output(riskview5_attr_search_results, named('riskview5_attr_search_results'));
 // OUTPUT(riskview5_score_auto_results, NAMED('riskview5_score_auto_results'));
 // OUTPUT(riskview5_score_bankcard_results, NAMED('riskview5_score_bankcard_results'));

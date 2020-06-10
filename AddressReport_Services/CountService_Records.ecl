@@ -1,7 +1,7 @@
 IMPORT $, AutoStandardI, dx_header, Address, doxie_raw, iesp,
-       LN_PropertyV2, gong,Location_Services, VehicleV2_Services, DriversV2_Services, doxie, Suppress;
+       LN_PropertyV2, dx_Gong, Location_Services, VehicleV2_Services, DriversV2_Services, doxie, Suppress;
 
-types := Gong.Constants.PTYPE;
+types := dx_Gong.Constants.PTYPE;
 EXPORT CountService_Records ($.input.params param,
                              boolean IsFCRA = false):=module
 
@@ -55,7 +55,7 @@ EXPORT CountService_Records ($.input.params param,
       keyed(left.postdir = right.postdir) and
       keyed(left.suffix = right.suffix) and
       keyed(left.sec_range = right.sec_range) and
-      keyed(right.source_code_2='P') and 
+      keyed(right.source_code_2='P') and
       right.source_code_1='O',
      get_prop(LEFT,RIGHT),LIMIT(0),keep(10000));
 
@@ -100,7 +100,7 @@ EXPORT CountService_Records ($.input.params param,
 // Phone
 //*************************************//
 
-    ph_key:=Gong.key_address_current;
+    ph_key:=dx_Gong.key_address_current();
     typeof(ph_key) get_Ph(srchrec l, ph_key R) :=TRANSFORM
       SELF := R;
     END;
@@ -137,4 +137,3 @@ EXPORT CountService_Records ($.input.params param,
     export record_cnts:=dataset([format_cnts()]);
 
 end;
-

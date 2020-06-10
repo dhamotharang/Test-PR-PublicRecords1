@@ -1,11 +1,9 @@
-IMPORT doxie, LN_PropertyV2, Census_Data, Suppress, ut, AutoStandardI;
-
-// k_fips			:= Census_Data.Key_Fips2County;
+﻿IMPORT LN_PropertyV2_Services, _Control, LN_PropertyV2;
 
 l_raw				:= LN_PropertyV2_Services.layouts.parties.raw_source;
 l_fid				:= LN_PropertyV2_Services.layouts.fid;
 l_tmp1			:= {
-	layouts.parties.tmp1;
+	layouts.parties.tmp1 - orig_names - statementIDs - isDisputed;
 	unsigned2 county_pen_1;
 	unsigned2 county_pen_2;
 	unsigned2 penalt_1;
@@ -15,7 +13,7 @@ l_tmp1			:= {
 	unsigned8 persistent_record_id;  //added so that two sellers that are both restricted do not get deduped to one
 	};
 l_tmp2			:= {
-	layouts.parties.tmp2;
+	layouts.parties.tmp2 - orig_names;
 	unsigned2 county_pen_1;
 	unsigned2 county_pen_2;
 	unsigned2 penalt_1;
@@ -75,7 +73,6 @@ export dataset(l_out) fn_get_parties_2(
 		self.county_pen_1	:= 0;
 		self.county_pen_2	:= 0;
 		self.entity				:= dataset([],l_entity);
-		self.orig_names 	:= dataset([], layouts.parties.orig);
 		self.orig_addr		:= '';
 		self.orig_unit		:= '';
 		self.orig_csz			:= '';
@@ -164,11 +161,17 @@ export dataset(l_out) fn_get_parties_2(
 		self := L;
 	end;
 	
+#IF(_Control.Environment.OnThor)
 	ds_value4_distributed := distribute(ds_value4, hash64(ln_fares_id));
 	eroll1 := sort(ds_value4_distributed, ln_fares_id, search_did, party_type, if(input_mod.TwoPartySearch,penalt_1 + penalt_2,penalt_1), if(input_mod.TwoPartySearch,cPenalt_1 + cPenalt_2,cPenalt_1), -dt_last_seen, -prim_name, record, local); // added prim_name to ensure not getting a blank addr based on NonSubject Suppression.
+	eroll2 := dedup(group(eroll1, ln_fares_id, search_did, party_type),ln_fares_id,search_did,party_type,keep(consts.max_entities), local);
+#ELSE
+	ds_value4_distributed := ds_value4;
+	eroll1 := sort(ds_value4_distributed, ln_fares_id, search_did, party_type, if(input_mod.TwoPartySearch,penalt_1 + penalt_2,penalt_1), if(input_mod.TwoPartySearch,cPenalt_1 + cPenalt_2,cPenalt_1), -dt_last_seen, -prim_name, record); // added prim_name to ensure not getting a blank addr based on NonSubject Suppression.
 	eroll2 := dedup(group(eroll1, ln_fares_id, search_did, party_type),ln_fares_id,search_did,party_type,keep(consts.max_entities));
-	eroll3 := rollup(eroll2, group, xf_roll_entities(left,rows(left)));
-	
+#END
+
+  eroll3 := rollup(eroll2, group, xf_roll_entities(left,rows(left)));
 	
 	
 	// rollup parties by ln_fares_id
@@ -180,7 +183,8 @@ export dataset(l_out) fn_get_parties_2(
 	l_rolled xf_roll_parties(l_tmp2 L, dataset(l_tmp2) R) := transform
 	
 		par_s		:= choosen(R,max_parties);  // remove the sorts here for query performance improvement in the bocashell
-		self.parties	:= project(par_s, l_pparty);
+    self.parties	:= project(par_s, transform(l_pparty, self := left, self := [];));
+
   	self	:= L;
 		self := [];
 	end;

@@ -67,25 +67,26 @@ EXPORT IParam := MODULE
 	END;
 	
 	EXPORT BatchParams :=
-			INTERFACE(BatchShare.IParam.BatchParams);
-			EXPORT STRING1 BIPFetchLevel;
-			EXPORT UNSIGNED8 MaxSearchResultsPerAcct;
-			EXPORT BOOLEAN IncludeBusHeader;
+    INTERFACE(BatchShare.IParam.BatchParams);
+    EXPORT STRING1 BIPFetchLevel;
+    EXPORT UNSIGNED8 MaxSearchResultsPerAcct;
+    EXPORT BOOLEAN IncludeBusHeader;
+    EXPORT UNSIGNED1 Score_Threshold;
   END;
 
   // Function to initalize the batch params
-	EXPORT getBatchParams() :=	FUNCTION
-			BaseBatchParams := BatchShare.IParam.getBatchParams();
+  EXPORT getBatchParams() :=	FUNCTION
+      BaseBatchParams := BatchShare.IParam.getBatchParams();
 			
-			inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))
-				EXPORT UNSIGNED8 MaxSearchResultsPerAcct := BusinessCredit_Services.Constants.MaxSearchResultsPerAcct : STORED('Max_Search_Results_Per_Acct');
-				EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessCredit_Services.Constants.MaxResultsPerAcct : STORED('Max_Results_Per_Acct');	
-				BipFetchLevelTmp := BIPV2.IDconstants.Fetch_Level_SELEID : STORED('BIPFetchLevel');
-				EXPORT STRING1 BIPFetchLevel := STD.Str.touppercase(BipFetchLevelTmp);
-				EXPORT BOOLEAN IncludeBusHeader := FALSE : STORED('Include_BusHeader');
-			END;
-			
-			RETURN inMod;
-	END;
+      inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))
+        EXPORT UNSIGNED8 MaxSearchResultsPerAcct := BusinessCredit_Services.Constants.MaxSearchResultsPerAcct : STORED('Max_Search_Results_Per_Acct');
+        EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessCredit_Services.Constants.MaxResultsPerAcct : STORED('Max_Results_Per_Acct');	
+        BipFetchLevelTmp := BIPV2.IDconstants.Fetch_Level_SELEID : STORED('BIPFetchLevel');
+        EXPORT STRING1 BIPFetchLevel := STD.Str.touppercase(BipFetchLevelTmp);
+        EXPORT BOOLEAN IncludeBusHeader := FALSE : STORED('Include_BusHeader');
+        EXPORT UNSIGNED1 Score_Threshold := 75 : STORED('Score_Threshold');
+      END;
+      RETURN inMod;
+  END;
 		
 END;

@@ -166,9 +166,9 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				5 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA5, isFCRA),
 				6 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA6, isFCRA),
 				7 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA7, isFCRA),
-						 0) |
+						 0) |			 
 			MAP(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] = '1' => KELPermissions.Permit_WatchdogExperianRestricted, // Allow Watchdog Best experian restricted records (Note: this is the inverse of the check for Permit_Experian)
-			    DataRestrictionMask[Risk_Indicators.iid_constants.posRestrictPreGLB] != '1' OR Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA) => KELPermissions.Permit_WatchdogPreGLBA, // Allow Watchdog Best PreGLBA restricted records if the Data Restriction Mask isn't restricting, or if GLBA data is allowed
+					DataRestrictionMask[Risk_Indicators.iid_constants.posRestrictPreGLB] != '1' OR Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA) => KELPermissions.Permit_WatchdogPreGLBA, // Allow Watchdog Best PreGLBA restricted records if the Data Restriction Mask isn't restricting, or if GLBA data is allowed
 			    Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA) => KELPermissions.Permit_GLBA, // Allow Watchdog Best GLBA restricted records
 			    KELPermissions.Permit_WatchdogNonRestricted) | // Default to the version of Watchdog Best which isn't restricted
 

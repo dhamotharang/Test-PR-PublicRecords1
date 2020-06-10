@@ -1,4 +1,4 @@
-﻿import _Control, riskwise, ut, gong, FCRA, risk_indicators;
+﻿import _Control, riskwise, ut, dx_Gong, FCRA, risk_indicators, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
@@ -10,10 +10,10 @@ Layout_Gong := RECORD
 	string50 gongAddr;	// internal
 	string20 gongFirst;	// internal
 	string20 gongLast;	// internal
-	
+
 	string10 invalid_phone_from_did := '';	// internal
-	unsigned2 invalid_phones_per_adl := 0; 
-	unsigned2 invalid_phones_per_adl_created_6months := 0; 
+	unsigned2 invalid_phones_per_adl := 0;
+	unsigned2 invalid_phones_per_adl_created_6months := 0;
 	string8 invalid_gong_dt_first_seen;	// internal
 	string8 invalid_gong_dt_last_seen;		// internal
 	unsigned6 did;	// internal
@@ -36,20 +36,20 @@ Layout_Gong gong_corr(ids_wide le, FCRA.Key_Override_Gong_FFID ri) := TRANSFORM
 	self.gongAddr := trim(ri.prim_range)+trim(ri.prim_name);	// for counting addrs per did
 	self.gongFirst := trim(ri.name_first);	// for counting first per did
 	self.gongLast := trim(ri.name_last);	// for counting last per did
-	
+
 	self.did := le.did;
-	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');	
-	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
+	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');
+	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and
 		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
 														ri.dt_first_seen,
-														risk_indicators.iid_constants.oneyear, 
-														le.historydate), ri.phone10 + ',', '');	
+														risk_indicators.iid_constants.oneyear,
+														le.historydate), ri.phone10 + ',', '');
 
 		// set these 3 later	in their own join after we've rolled up unique phones
 	self.invalid_phone_from_did := '';
 	self.invalid_gong_dt_first_seen := ri.dt_first_seen;
-	self.invalid_gong_dt_last_seen := ri.dt_last_seen;	
-	
+	self.invalid_gong_dt_last_seen := ri.dt_last_seen;
+
 	self := le;
 end;
 gong_correct_roxie := join(ids_wide, FCRA.Key_Override_Gong_FFID,
@@ -66,7 +66,8 @@ gong_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Gong_FFID),
 	gong_correct := gong_correct_roxie;
 #END
 
-Layout_Gong addPhone(ids_wide le, gong.Key_FCRA_History_did ri) := transform	
+key_history_did := dx_Gong.key_history_did(data_services.data_env.iFCRA);
+Layout_Gong addPhone(ids_wide le, key_history_did ri) := transform
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historyDate);
 	self.gong_did.gong_ADL_dt_first_seen_full := ri.dt_first_seen;
 	self.gong_did.gong_ADL_dt_last_seen_full := if(ri.dt_last_seen>myGetDate, myGetDate, ri.dt_last_seen);	//set date last seen to history date if in future
@@ -78,34 +79,34 @@ Layout_Gong addPhone(ids_wide le, gong.Key_FCRA_History_did ri) := transform
 	self.gongAddr := trim(ri.prim_range)+trim(ri.prim_name);	// for counting addrs per did
 	self.gongFirst := trim(ri.name_first);	// for counting first per did
 	self.gongLast := trim(ri.name_last);	// for counting last per did
-	
+
 
 	self.did := le.did;
-	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');		
-	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
+	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');
+	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and
 		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
 														ri.dt_first_seen,
-														risk_indicators.iid_constants.oneyear, 
-														le.historydate), ri.phone10 + ',', '');			
-														
+														risk_indicators.iid_constants.oneyear,
+														le.historydate), ri.phone10 + ',', '');
+
 		// set these 3 later	in their own join after we've rolled up unique phones
 	self.invalid_phone_from_did := '';
 	self.invalid_gong_dt_first_seen := ri.dt_first_seen;
 	self.invalid_gong_dt_last_seen := ri.dt_last_seen;
-	
+
 	self := le;
 END;
-gong_by_did_roxie := join(ids_wide, gong.Key_FCRA_History_did, 
-													left.did != 0 and keyed(left.did=right.l_did) and		
+gong_by_did_roxie := join(ids_wide, key_history_did,
+													left.did != 0 and keyed(left.did=right.l_did) and
 													// check date
 													((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historyDate)) and
 													trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in	left.gong_correct_record_id // old way - prior to 11/13/2012
 													and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 													addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
-									
-gong_by_did_thor := join(distribute(ids_wide, hash64(did)), 
-												 distribute(pull(gong.Key_FCRA_History_did), hash64(l_did)), 
-													left.did != 0 and left.did=right.l_did and		
+
+gong_by_did_thor := join(distribute(ids_wide, hash64(did)),
+												 distribute(pull(key_history_did), hash64(l_did)),
+													left.did != 0 and left.did=right.l_did and
 													// check date
 													((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historyDate)) and
 													trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in	left.gong_correct_record_id // old way - prior to 11/13/2012
@@ -124,35 +125,35 @@ combined1 := gong_correct + gong_by_did;
 layout_gong getCombined(combined1 le, risk_indicators.Key_Telcordia_tds ri) := TRANSFORM
 	goodphone := ri.npa<>'';
 	// if the phone is valid according to telcordia, set the invalid_* fields blank
-	self.invalid_phone_from_did := if(goodPhone, '', le.gongphone);  
+	self.invalid_phone_from_did := if(goodPhone, '', le.gongphone);
 	self.invalid_gong_dt_first_seen := if(goodPhone, '', le.invalid_gong_dt_first_seen);
 	self.invalid_gong_dt_last_seen := if(goodPhone, '', le.invalid_gong_dt_last_seen);
 	self := le;
 END;
 
-combined_roxie := join(combined1, risk_indicators.Key_Telcordia_tds, 
-	left.gongPhone<>'' and 
-	keyed(left.gongPhone[1..3]=right.npa) and 
-	keyed(left.gongPhone[4..6]=right.nxx), 
-	getCombined(LEFT, RIGHT),	
-	left outer, keep(1))	;	
-	
-combined_thor := 	join(distribute(combined1, hash64(gongPhone[1..6])), 
-	distribute(pull(risk_indicators.Key_Telcordia_tds), hash64(npa+nxx)), 
-	left.gongPhone<>'' and 
-	(left.gongPhone[1..3]=right.npa) and 
-	(left.gongPhone[4..6]=right.nxx), 
-	getCombined(LEFT, RIGHT),	
-	left outer, keep(1), LOCAL)	;	
-	
+combined_roxie := join(combined1, risk_indicators.Key_Telcordia_tds,
+	left.gongPhone<>'' and
+	keyed(left.gongPhone[1..3]=right.npa) and
+	keyed(left.gongPhone[4..6]=right.nxx),
+	getCombined(LEFT, RIGHT),
+	left outer, keep(1))	;
+
+combined_thor := 	join(distribute(combined1, hash64(gongPhone[1..6])),
+	distribute(pull(risk_indicators.Key_Telcordia_tds), hash64(npa+nxx)),
+	left.gongPhone<>'' and
+	(left.gongPhone[1..3]=right.npa) and
+	(left.gongPhone[4..6]=right.nxx),
+	getCombined(LEFT, RIGHT),
+	left outer, keep(1), LOCAL)	;
+
 #IF(onThor)
 	combined := combined_thor;
 #ELSE
 	combined := combined_roxie;
 #END
 
-combo_roxie := group( sort ( combined, seq), seq);									
-combo_thor := group( sort ( distribute(combined, hash64(seq)), seq, LOCAL), seq, LOCAL);									
+combo_roxie := group( sort ( combined, seq), seq);
+combo_thor := group( sort ( distribute(combined, hash64(seq)), seq, LOCAL), seq, LOCAL);
 
 #IF(onThor)
 	combo := combo_thor;
@@ -166,10 +167,10 @@ Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_ADL_dt_last_seen_full := (string)MAX ((unsigned)le.gong_did.gong_ADL_dt_last_seen_full, (unsigned)ri.gong_did.gong_ADL_dt_last_seen_full);
 	self.gong_did.gong_did_phone_ct := le.gong_did.gong_did_phone_ct + if(le.gongPhone=ri.gongPhone, 0, ri.gong_did.gong_did_phone_ct);
 	self.phones_on_file := if(le.gongPhone=ri.gongPhone, le.phones_on_file, trim(le.phones_on_file) + ri.phones_on_file + ',');
-	self.phones_on_file_created12months := if(le.gongPhone=ri.gongPhone, 
-																						le.phones_on_file_created12months, 
+	self.phones_on_file_created12months := if(le.gongPhone=ri.gongPhone,
+																						le.phones_on_file_created12months,
 																				trim(le.phones_on_file_created12months) + if(trim(ri.phones_on_file)='', '', ri.phones_on_file + ',') );
-	
+
 	self := ri;
 end;
 
@@ -194,7 +195,7 @@ end;
 getGongLast := rollup(sort(combo, seq,-gongLast,-gong_did.gong_did_last_ct), true, getLasts(left,right));
 
 Layout_Gong joinDateAddr(Layout_Gong le, Layout_Gong ri) := transform
-	self.gong_did.gong_ADL_dt_first_seen_full := le.gong_did.gong_ADL_dt_first_seen_full; 
+	self.gong_did.gong_ADL_dt_first_seen_full := le.gong_did.gong_ADL_dt_first_seen_full;
 	self.gong_did.gong_ADL_dt_last_seen_full := le.gong_did.gong_ADL_dt_last_seen_full;
 	self.gong_did.gong_did_phone_ct := le.gong_did.gong_did_phone_ct;
 	self.gong_did.gong_did_addr_ct := ri.gong_did.gong_did_addr_ct;
@@ -259,7 +260,7 @@ invalid_phone_counts := table(d_phone, invalid_phone_stats, seq, did);
 Layout_Gong addInvalidGong (datephoneaddrfirstlast le, invalid_phone_counts ri) := TRANSFORM
 	self.invalid_phones_per_adl := ri.invalid_phone_ct;
 	self.invalid_phones_per_adl_created_6months := ri.invalid_phone_ct_c6;
-	
+
 	SELF := le;
 END;
 invalidGong_roxie := JOIN (datephoneaddrfirstlast, invalid_phone_counts,

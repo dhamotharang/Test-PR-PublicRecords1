@@ -20,6 +20,7 @@ export Search_Service := MACRO
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 	#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
+	#stored('RVCheckingSubscriberId', 0);
 
 #WEBSERVICE(FIELDS(
 		'RiskView2Request',
@@ -30,7 +31,8 @@ export Search_Service := MACRO
 		'SSNMask',
 		'DLMask',
 		'DOBMask',
-		'RetainInputDID'
+		'RetainInputDID',
+    'RVCheckingSubscriberId'
 	));
 
 /* ***************************************
@@ -178,7 +180,8 @@ export Search_Service := MACRO
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
 
   //Used only by Checking Indicators
-  STRING8 SubscriberId :=  (string8)option.RVCheckingSubscriberId;
+  Integer outOfBandSubscriberId := 0 : stored('RVCheckingSubscriberId');
+  INTEGER8 SubscriberId := IF(option.RVCheckingSubscriberId <> 0, option.RVCheckingSubscriberId, outOfBandSubscriberId);
 
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -186,7 +189,7 @@ export Search_Service := MACRO
 		SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
     self.properties := if(le.servicename IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
                         self.name := 'SubscriberId';
-                        self.val := SubscriberId;)]),
+                        self.val := (string8)SubscriberId;)]),
     Dataset([], Gateway.Layouts.ConfigProperties));
 		SELF := le;
 	END;
@@ -445,11 +448,16 @@ search_results_temp := ungroup(
 															 '',
 															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
 
-				SELF._Header.Exceptions := if((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or
-																			 custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or
-																			 custom5_model_name = 'mla1608_0') and left.Exception_code <> '',
-																			ds_excep,
-																			ds_excep_blank);
+       ds_excep_Checking_Indicators:= DATASET([{'Roxie',
+															 left.Exception_code,
+															 '',
+															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+
+				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or
+																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or
+																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
+                                        SubscriberId = 0 and STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
+																			  ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
 
 				SELF._Header := [];

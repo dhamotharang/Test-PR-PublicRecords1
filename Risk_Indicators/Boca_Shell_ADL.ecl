@@ -77,7 +77,7 @@ END;
 ADLinfo_nonfcra_roxie_unsuppressed := join(iid, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1));
 								
-ADLinfo_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+ADLinfo_nonfcra_roxie_flagged := Suppress.CheckSuppression(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 ADLinfo_nonfcra_roxie := PROJECT(ADLinfo_nonfcra_roxie_flagged, TRANSFORM(risk_indicators.layout_output, 
 	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);
@@ -120,7 +120,7 @@ ADLinfo_nonfcra_thor_unsuppressed := group(join(distribute(iid, hash64(did)),
 														 left.did != 0 and (left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL), seq, did);
 								
-ADLinfo_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+ADLinfo_nonfcra_thor_flagged := Suppress.CheckSuppression(ADLinfo_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
 ADLinfo_nonfcra_thor := PROJECT(ADLinfo_nonfcra_thor_flagged, TRANSFORM(risk_indicators.layout_output, 
 	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);

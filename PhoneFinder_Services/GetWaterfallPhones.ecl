@@ -155,9 +155,7 @@
   dPrimaryPhones := dWFQSentPrimaryPhone + dWaterfallPrimaryPhone;
 
   dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS,
-                                    PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones,
-                                                                                        inMod, phone, acctno,
-                                                                                        TRUE, qSentGateway));
+    PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones, inMod, qSentGateway));
   // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
   // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
   // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
