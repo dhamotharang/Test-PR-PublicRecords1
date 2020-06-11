@@ -77,6 +77,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnAddrLng :=	cleaned_Addr.geo_long;
 		SELF.P_InpClnAddrType := cleaned_Addr.rec_type;
 		SELF.P_InpClnAddrStatus :=	cleaned_Addr.err_stat;
+		SELF.P_InpClnAddrStateCode    := cleaned_Addr.county[1..2];
 		SELF.P_InpClnAddrCnty := cleaned_Addr.county[3..5];
 		SELF.P_InpClnAddrGeo := cleaned_Addr.geo_blk;
 		SELF.P_InpClnEmail :=cleaned_email;

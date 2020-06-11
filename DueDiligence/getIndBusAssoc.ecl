@@ -208,7 +208,6 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                                         SELF.relations := DATASET([TRANSFORM(DueDiligence.Layouts.SlimRelation, 
                                                                                               SELF.relationToInquired := LEFT.indvType;
                                                                                               SELF.relationship := Header.relative_titles.num_associate;
-                                                                                              SELF.amlRelationshipDegree := 52;
                                                                                               SELF.rawRelationshipType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE;
                                                                                               SELF := LEFT.individual; 
                                                                                               SELF := [];)]);

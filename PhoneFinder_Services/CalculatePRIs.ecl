@@ -48,16 +48,18 @@ Indicator ID  Risk Alert
 45  Phone Number is Associated to more than [Threshold] Identities
 46  Surname of Phone's Listing Name Does Not Match Identity Found
 47  Phone returned more than X times in past Y days.
+48  Phone linked to identity by self-reported sources only
+49  Phone Service Type is Other/Unknown
 */
 
-IMPORT $, iesp, MDR, STD, ut;
+IMPORT $, iesp, MDR, STD;
 
 EXPORT CalculatePRIs( DATASET($.Layouts.PhoneFinder.Final) dIn,
                       $.iParam.SearchParams                inMod) :=
 FUNCTION
-  
+
   dRIs := IF(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT,
-                     PROJECT(inMod.RiskIndicators(Category != $.Constants.enumCategory[1] OR RiskId IN $.Constants.PhoneRiskAssessmentExceptions), 
+                     PROJECT(inMod.RiskIndicators(Category != $.Constants.enumCategory[1] OR RiskId IN $.Constants.PhoneRiskAssessmentExceptions),
                             iesp.phonefinder.t_PhoneFinderRiskIndicator),
             inMod.RiskIndicators);
 
@@ -66,14 +68,18 @@ FUNCTION
     BOOLEAN OTPRIFailed;
   END;
 
+  currentDate     := STD.Date.Today();
 
   $.Layouts.PhoneFinder.Final tRiskInd(dIn pInput) :=
   TRANSFORM
-    rRiskInd_Layout tCheckRIs(iesp.phonefinder.t_PhoneFinderRiskIndicator le) :=
-    TRANSFORM
+
       dt_last_seen    := (UNSIGNED)pInput.dt_last_seen;
       dt_first_seen   := (UNSIGNED)pInput.dt_first_seen;
-      currentDate     := STD.Date.Today();
+      isSelfReportedSourcesOnly:= ~(EXISTS($.Functions.getSourceTypeByCode(pInput.phn_src_all)(_Type = $.Constants.PFSourceType.Account)));
+
+    rRiskInd_Layout tCheckRIs(iesp.phonefinder.t_PhoneFinderRiskIndicator le) :=
+    TRANSFORM
+
       monthstominutes := (le.Threshold*30*24*60); // Convert Months into Minutes.
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
@@ -129,6 +135,8 @@ FUNCTION
                                 45 => pInput.identity_count > le.Threshold,
                                 46 => inMod.isPrimarySearchPII AND ~pInput.isLNameMatch,
                                 47 => pInput.phone_inresponse_count > le.ThresholdA,
+                                48 => isSelfReportedSourcesOnly,
+                                49 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Other,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);
@@ -137,7 +145,7 @@ FUNCTION
     END;
 
     dIterateRIs := PROJECT(dRIs(Active AND LevelCount > 0), tCheckRIs(LEFT));
-    
+
     // For each Level we would only have ONE LevelCount. The structure of RIs is misleading.
     // For any RI with respective Level, we can look at the LevelCount to get the threshold of PASS/WARN/FAIL
     rLevelCnt_Layout :=
@@ -166,7 +174,7 @@ FUNCTION
     SELF.OTPRIFailed        := EXISTS(dIterateRIs(OTPRIFailed));
 
     hasMetadata             := pInput.carrier_name <> ''OR pInput.phone_region_city <> '' OR pInput.phone_region_st <> '' OR
-                               pInput.coc_description <> '' OR pInput.servicetype <> 0;  
+                               pInput.coc_description <> '' OR pInput.servicetype <> 0;
     SELF.phone              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])) AND ~hasMetadata, '', pInput.phone),
     // Blanking out fname, lname fields since we didn't find any results for the search criteria
     SELF.fname              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.fname),

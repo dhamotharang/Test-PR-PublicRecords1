@@ -25,16 +25,17 @@ EXPORT MAC_SuppressSource (ds_in, mod_access, did_field = 'did', gsid_field = 'g
 
   LOCAL key_optout := suppress.key_OptOutSrc(data_env);
   #IF(use_distributed)
-  LOCAL suppressed_recs := JOIN(DISTRIBUTE(ds_in, HASH(did_field)), DISTRIBUTE(PULL(key_optout), HASH(lexid)), 
+  LOCAL suppressed_recs := JOIN(DISTRIBUTE(ds_in((unsigned)did_field<>0), HASH(did_field)), DISTRIBUTE(PULL(key_optout), HASH(lexid)), 
     ((UNSIGNED6) LEFT.did_field = RIGHT.lexid) AND
     #IF(#TEXT(gsid_field) != 'NULL') 
     LEFT.gsid_field IN RIGHT.global_sids AND
     #END
     (~suppress.optout_exemption.is_test(RIGHT.exemptions) OR mod_access.lexid_source_optout = 2) AND
     (RIGHT.exemptions & (suppress.optout_exemption.bit_glb(mod_access.glb) | suppress.optout_exemption.bit_dppa(mod_access.dppa)) = 0),
-    TRANSFORM(LEFT), LEFT ONLY, LOCAL);
+    TRANSFORM(LEFT), LEFT ONLY, LOCAL) + ds_in((unsigned)did_field=0); // add back the records that have did=0
   #ELSE
   LOCAL suppressed_recs := JOIN(ds_in, key_optout, 
+		(unsigned)left.did_field<>0 and 
     KEYED((UNSIGNED6) LEFT.did_field = RIGHT.lexid) AND
     #IF(#TEXT(gsid_field) != 'NULL') 
     LEFT.gsid_field IN RIGHT.global_sids AND

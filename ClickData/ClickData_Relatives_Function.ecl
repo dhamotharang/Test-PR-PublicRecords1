@@ -1,4 +1,4 @@
-import didville, doxie, dx_header, address, gong, ut, Relationship, clickdata;
+import didville, doxie, dx_header, address, dx_Gong, ut, Relationship, clickdata;
 
 export ClickData_Relatives_Function(dataset(clickdata.Layout_Clickdata_In_RR) inf,
   Doxie.IDataAccess mod_access, boolean append_bests = false) := function
@@ -267,24 +267,26 @@ outf3 := denormalize(outf2, sort(myrels_use, seq, -number_cohabits, -recent_coha
             left.seq = right.seq,
             denorm_out(LEFT,RIGHT,COUNTER));
 
-temprec get_gong_dates(temprec L, gong.Key_History_did R) := transform
+Key_History_did := dx_gong.key_history_did();
+temprec get_gong_dates(temprec L, Key_History_did R) := transform
   self.EDA_Disconnect := if ((integer)L.eda_disconnect > (integer)R.deletion_date, L.eda_disconnect, R.deletion_date);
   self.EDA_Connect := if (((integer)L.eda_connect != 0 and (integer)L.eda_connect < (integer)R.dt_first_seen) or (integer)R.dt_first_seen = 0, L.eda_connect, R.dt_first_seen);
   self := L;
 end;
 
-temprec get_gong_dates2(temprec L, gong.Key_History_HHID R) := transform
+Key_History_HHID := dx_gong.key_history_hhid();
+temprec get_gong_dates2(temprec L, Key_History_HHID R) := transform
   self.EDA_Disconnect := if ((integer)L.eda_disconnect > (integer)R.deletion_date, L.eda_disconnect, R.deletion_date);
   self.EDA_Connect := if (((integer)L.eda_connect != 0 and (integer)L.eda_connect < (integer)R.dt_first_seen) or (integer)R.dt_first_seen = 0, L.eda_connect, R.dt_first_seen);
   self := L;
 end;
 
 // Since key data is taken conditionally, we must instead suppress the keys themselves.
-D_filtered := join(outf3((integer)adl != 0), gong.Key_History_did,
+D_filtered := join(outf3((integer)adl != 0), Key_History_did,
   keyed((integer)left.adl = right.l_did), transform(right));
 D_optout := Suppress.MAC_SuppressSource(D_filtered, mod_access);
 
-H_filtered := join(outf3((integer)hhid != 0), gong.Key_History_HHID,
+H_filtered := join(outf3((integer)hhid != 0), Key_History_HHID,
   keyed((integer)left.hhid = right.s_hhid), transform(right));
 H_optout := Suppress.MAC_SuppressSource(H_filtered, mod_access);
 

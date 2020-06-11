@@ -5,7 +5,7 @@
 
    2. Research/resolve open issues, search on "???"
 */
-IMPORT Address, AutoStandardI, BIPV2, Census_Data, Doxie, gong, iesp, MDR, Codes, Suppress, ut;
+IMPORT Address, AutoStandardI, BIPV2, Census_Data, Doxie, dx_Gong, iesp, MDR, Codes, Suppress, ut;
 
 EXPORT OperationsSitesSection := MODULE;
 
@@ -380,7 +380,7 @@ EXPORT OperationsSitesSection := MODULE;
 														company_phone);
 
   // Look up unique phone#s on gong history key to get most of the phone meta-data fields
-  pre_ds_unique_phones_wgongdata_1 := join(ds_unique_phones, gong.Key_History_phone,
+  pre_ds_unique_phones_wgongdata_1 := join(ds_unique_phones, dx_Gong.key_history_phone(),
     keyed(left.company_phone[4..10] = right.p7) and
     keyed(left.company_phone[1..3]  = right.p3),
     transform({recordof(left) or recordof(right) - [dt_first_seen, dt_last_seen];

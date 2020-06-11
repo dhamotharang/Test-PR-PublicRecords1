@@ -1,15 +1,15 @@
-import doxie, gong, ut;
+import doxie, dx_Gong, ut;
 import lib_datalib, NID, address; // to be able to call a macro in a JOIN condition
 
 export fn_AppendGongByAddr(
-	dataset(doxie.layout_AppendGongByAddr_input) a, 
+	dataset(doxie.layout_AppendGongByAddr_input) a,
 	boolean secRangeStrict = false) :=
 FUNCTION
 
-key := Gong.Key_address_current;
- 
+key := dx_Gong.key_address_current();
+
 outf := record
-	doxie.layout_AppendGongByAddr_input; 
+	doxie.layout_AppendGongByAddr_input;
 	boolean	business_flag; //I'm scared to change it to more correct and general "listing_type" at the moment
 	typeof (key.fname) name_first; // this is clearly redundant, but removing it is a nightmare!
 	typeof (key.lname) name_last;
@@ -21,7 +21,7 @@ end;
 
 //***** HISTORY KEYS METHOD
 
-str_unlisted := Gong.Constants.STR_UNLISTED;
+str_unlisted := dx_Gong.Constants.STR_UNLISTED;
 
 doxie.gong_append_utils.MAC_lookupAptCount(a, withApt, secRangeStrict);
 
@@ -34,7 +34,7 @@ outf GetPhones (key R) := transform
 	self.name_first := R.fname;
 	self.name_last := R.lname;
   self.timezone := '';
-  self.business_flag := R.listing_type & Gong.Constants.PTYPE.BUSINESS = Gong.Constants.PTYPE.BUSINESS;
+  self.business_flag := R.listing_type & dx_Gong.Constants.PTYPE.BUSINESS = dx_Gong.Constants.PTYPE.BUSINESS;
 	// populating Fields for Accurint Comp Report Redesign
   self.dt_first_seen := R.date_first_seen;
   self.listing_type := R.listing_type;
@@ -42,10 +42,10 @@ outf GetPhones (key R) := transform
 end;
 
 boolean IsRightType (unsigned1 ltype) := function
-  return (knowx_ftr_Set=[]) or (ltype = Gong.Constants.PTYPE.UNKNOWN) OR
-         (((ltype & Gong.Constants.PTYPE.BUSINESS    != Gong.Constants.PTYPE.BUSINESS)    or ('B' in knowx_ftr_Set)) AND
-          ((ltype & Gong.Constants.PTYPE.GOVERNMENT  != Gong.Constants.PTYPE.GOVERNMENT)  or ('G' in knowx_ftr_Set)) AND
-          ((ltype & Gong.Constants.PTYPE.RESIDENTIAL != Gong.Constants.PTYPE.RESIDENTIAL) or ('R' in knowx_ftr_Set))
+  return (knowx_ftr_Set=[]) or (ltype = dx_Gong.Constants.PTYPE.UNKNOWN) OR
+         (((ltype & dx_Gong.Constants.PTYPE.BUSINESS    != dx_Gong.Constants.PTYPE.BUSINESS)    or ('B' in knowx_ftr_Set)) AND
+          ((ltype & dx_Gong.Constants.PTYPE.GOVERNMENT  != dx_Gong.Constants.PTYPE.GOVERNMENT)  or ('G' in knowx_ftr_Set)) AND
+          ((ltype & dx_Gong.Constants.PTYPE.RESIDENTIAL != dx_Gong.Constants.PTYPE.RESIDENTIAL) or ('R' in knowx_ftr_Set))
          );
 end;
 
@@ -57,16 +57,16 @@ jr	    :=  join(withApt, key,
 								 // the first parm to macro needs to be a constant expression
 								 IF(secRangeStrict,
 								 	 doxie.gong_append_utils.MAC_sec_range(true),
-								 	 doxie.gong_append_utils.MAC_sec_range(false)) and 
+								 	 doxie.gong_append_utils.MAC_sec_range(false)) and
 								 ut.NNEQ(left.predir,right.predir) and
 								 ut.NNEQ(left.suffix,right.suffix) and
                  IsRightType (right.listing_type),
 								 GetPhones (Right),
 								 limit(ut.limits.PHONE_PER_ADDRESS * 5, skip));
 
-dd := dedup(sort(jr,whole record), whole record);	
+dd := dedup(sort(jr,whole record), whole record);
 
-ut.getTimeZone(dd,phone,timezone, dd_w_tzone)	
+ut.getTimeZone(dd,phone,timezone, dd_w_tzone)
 
 return dd_w_tzone;
 

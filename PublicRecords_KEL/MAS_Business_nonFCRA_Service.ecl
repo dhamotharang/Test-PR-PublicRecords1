@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT Std, PublicRecords_KEL, PublicRecords_KEL.ECL_Functions;
+IMPORT Std, PublicRecords_KEL, PublicRecords_KEL.ECL_Functions, Business_Risk_BIP, Gateway;
 
 EXPORT MAS_Business_nonFCRA_Service() := MACRO
 

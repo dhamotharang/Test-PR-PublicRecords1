@@ -13,9 +13,9 @@ export EDASurnameSearchService := MACRO
 
 doxie.MAC_Header_Field_Declare();
 mod_access := Doxie.compliance.GetGlobalDataAccessModule();
-surname_layout := Gong.Layout_HistorySurname;
+surname_layout := RECORDOF(dx_Gong.Layouts.i_history_surname) AND NOT [k_name_last, k_name_first, k_st, cnt];
 
-key_surname := Gong.Key_History_Surname;
+key_surname := dx_Gong.key_history_surname();
 listings := Gong_Services.SurnameSearch(mod_access);
 listings_slim := PROJECT(listings,surname_layout);
 

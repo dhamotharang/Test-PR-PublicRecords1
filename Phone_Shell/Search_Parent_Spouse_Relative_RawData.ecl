@@ -9,7 +9,7 @@
  * - Phone_Shell.Search_Spouse																						*
  ************************************************************************ */
 
-IMPORT Doxie, Doxie_Raw, DIDVille, Header, Gong, Phone_Shell, Progressive_Phone, UT, NID, STD, Suppress;
+IMPORT Doxie, Doxie_Raw, DIDVille, Header, dx_Gong, Phone_Shell, Progressive_Phone, UT, NID, STD, Suppress;
 
 EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_Spouse_Relative_RawData
        (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
@@ -62,7 +62,8 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
    /* ***************************************************************
     * 							Get Gong Data by Address and DID								*
     *************************************************************** */
-  {Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byAddressLastName(sixMonths le, Gong.Key_History_Address ri) := TRANSFORM
+  key_history_address := dx_Gong.key_history_address();
+  {Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byAddressLastName(sixMonths le, key_history_address ri) := TRANSFORM
     SELF.global_sid := ri.global_sid;
     SELF.AcctNo := IF(ri.phone10 = '', SKIP, (STRING20)le.seq);
     SELF.subj_first := le.fname;
@@ -91,7 +92,7 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
     SELF := [];
   END;
 
-  byAddrLName_unsuppressed := JOIN(sixMonths, Gong.Key_History_Address,
+  byAddrLName_unsuppressed := JOIN(sixMonths, key_history_address,
                                         KEYED(LEFT.prim_name = RIGHT.prim_name AND LEFT.Zip = RIGHT.z5 AND
                                         LEFT.Prim_Range = RIGHT.Prim_Range AND LEFT.st = RIGHT.st) AND
                                         RIGHT.current_flag = TRUE AND RIGHT.phone10 <> '' AND
@@ -105,7 +106,8 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 
   byAddrLName := Suppress.Suppress_ReturnOldLayout(byAddrLName_unsuppressed, mod_access, Phone_Shell.Layouts.layoutWithCohabitDid);
 
-  {Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byDID(DIDVille.Layout_Did_OutBatch le, Gong.key_did ri) := TRANSFORM
+  key_did := dx_Gong.key_did();
+  {Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byDID(DIDVille.Layout_Did_OutBatch le, key_did ri) := TRANSFORM
     SELF.global_sid := ri.global_sid;
     SELF.AcctNo := (STRING20)le.seq;
     SELF.Subj_First := ri.name_first;
@@ -133,7 +135,7 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
     SELF := [];
   END;
 
-  outputByDID_unsuppressed := JOIN(withRelativeDID, Gong.key_did, LEFT.DID <> 0 AND KEYED(LEFT.did = RIGHT.l_did) AND RIGHT.phone10 <> '', byDID(LEFT, RIGHT), LIMIT(UT.Limits.PHONE_PER_PERSON, SKIP));
+  outputByDID_unsuppressed := JOIN(withRelativeDID, key_did, LEFT.DID <> 0 AND KEYED(LEFT.did = RIGHT.l_did) AND RIGHT.phone10 <> '', byDID(LEFT, RIGHT), LIMIT(UT.Limits.PHONE_PER_PERSON, SKIP));
 
   outputByDID := Suppress.Suppress_ReturnOldLayout(outputByDID_unsuppressed, mod_access, Phone_Shell.Layouts.layoutWithCohabitDid);
 

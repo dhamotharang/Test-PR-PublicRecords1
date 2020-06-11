@@ -49,10 +49,12 @@
 	STRING P_InpClnAddrFull;
 	STRING10 P_InpClnAddrLat;
 	STRING11 P_InpClnAddrLng;
+	STRING6 P_InpClnAddrStateCode;
 	STRING6 P_InpClnAddrCnty;
 	STRING7 P_InpClnAddrGeo;
 	STRING6 P_InpClnAddrType;
 	STRING6 P_InpClnAddrStatus;
+	// INTEGER7 P_InpClnAddrLocID;
 	STRING10 P_InpClnPhoneHome;
 	STRING10 P_InpClnPhoneWork;
 	STRING54 P_InpClnEmail;
@@ -73,6 +75,9 @@
 	STRING6 P_InpClnAddrStateFlag;
 	STRING6 P_InpClnAddrZip5Flag;
 	STRING6 P_InpClnAddrZip4Flag;
+	STRING6 P_InpValAddrZipBadLenFlag,
+	STRING6 P_InpValAddrZipAllZeroFlag,
+	STRING6 P_InpValAddrStateBadAbbrFlag,
 	STRING6 P_InpClnAddrStFlag;
 	STRING6 P_InpClnAddrFullFlag;
 	STRING6 P_InpClnAddrLatFlag;
@@ -82,17 +87,41 @@
 	STRING6 P_InpClnAddrTypeFlag;
 	STRING6 P_InpClnAddrStatusFlag;
 	STRING6 P_InpClnSSNFlag;
+	STRING6 P_InpValSSNBadCharFlag,
+	STRING6 P_InpValSSNBadLenFlag,
+	STRING6 P_InpValSSNBogusFlag,
+	STRING6 P_InpValSSNNonSSAFlag,
+	STRING6 P_InpValSSNIsITINFlag,
 	STRING6 P_InpClnDOBFlag;
 	STRING6 P_InpClnDLFlag;
 	STRING6 P_InpClnDLStateFlag;
 	STRING6 P_InpClnPhoneHomeFlag;
 	STRING6 P_InpClnPhoneWorkFlag;
 	STRING6 P_InpClnEmailFlag;
+	STRING6 P_InpValEmailUserAllZeroFlag,
+	STRING6 P_InpValEmailUserBadCharFlag,
+	STRING6 P_InpValEmailDomAllZeroFlag,
+	STRING6 P_InpValEmailDomBadCharFlag,	
+	STRING6 P_InpValEmailBogusFlag,		
 	STRING6 P_InpClnArchDtFlag;
+	STRING6 P_InpValNameBogusFlag;
+	STRING6 P_InpValPhoneHomeBadCharFlag;
+	STRING6 P_InpValPhoneHomeBadLenFlag;
+	STRING6 P_InpValPhoneHomeBogusFlag;
+	STRING6 P_InpValPhoneWorkBadCharFlag;
+	STRING6 P_InpValPhoneWorkBadLenFlag;
+	STRING6 P_InpValPhoneWorkBogusFlag;	
+	// INTEGER4 PI_InpAddrAVMVal;
+	// INTEGER4 PI_InpAddrAVMValA1Y;
+	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
+	// INTEGER4 PI_InpAddrAVMValA5Y;
+	// DECIMAL7_2 PI_InpAddrAVMRatio5Y;
+	// INTEGER4 PI_InpAddrAVMConfScore;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAutoDt;
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
+	STRING10 G_BuildAstPropDt;
 	STRING6	P_LexIDSeenFlag;
 	INTEGER3 PL_AstVehAutoCntEv;
 	STRING	PL_AstVehAutoEmrgDtListEv;
@@ -234,4 +263,9 @@
 	STRING150 PL_ProfLicActvNewTitleType;
 	STRING6 PL_ProfLicActvNewIndx;
 	STRING6 PL_ProfLicActvNewSrcType;
+		// Best PII
+	STRING200 PL_CurrAddrFull;
+	// STRING200 PL_CurrAddrLocID;
+	STRING200 PL_PrevAddrFull;
+	// STRING200 PL_PrevAddrLocID;
 END;		

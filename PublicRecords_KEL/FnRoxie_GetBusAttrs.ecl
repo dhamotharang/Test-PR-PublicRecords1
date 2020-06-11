@@ -26,10 +26,17 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 
 	CheckTDSPhone := PublicRecords_KEL.ECL_Functions.FnRoxie_Get_TDS_Phones(CheckTPMPhone);
 
+	// 'mini' fdc fetching is to gather address hist data from rank key on person then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
+	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
+
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini);		
+
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini); 
+
 	// At this time, only need to collect data for rep1 and not other reps. 
 	// If/when this changes all records from withRepLexIDs will need to be passed to Fn_MAS_FDC.
 	// Just passing in Rep1 Inputs for now to avoid fetching too much data.
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options, CheckTDSPhone );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, CheckTDSPhone );
 
 	// Get Business attributes
 	// When we get the cleaned attributes, then B_InpArchDt will change to B_InpClnArchDt
@@ -44,13 +51,22 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 
+	BusinessProxIDAttributes := PublicRecords_KEL.FnRoxie_GetBusinessProxIDAttributes(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
+
+	withBusinessProxIDAttributes := JOIN(withBusinessSeleIDAttributes, BusinessProxIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF := RIGHT,
+			SELF := LEFT,
+			SELF := []),
+		LEFT OUTER, KEEP(1), ATMOST(100));	
+
 	// Get consumer attributes
 	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Library.LIB_ConsumerInputAttributes_Function(Rep1Input, Options), TRUE, TRUE, TRUE);
 
-	Rep1PersonAttributes := PublicRecords_KEL.Library.LIB_ConsumerAttributes_Function(Rep1Input, FDCDataset, Options);
+	Rep1PersonAttributes := PublicRecords_KEL.Library.LIB_ConsumerAttributes_Function(MiniAttributes, FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
-	withRep1InputPII := JOIN(withBusinessSeleIDAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
+	withRep1InputPII := JOIN(withBusinessProxIDAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF.G_ProcUID := RIGHT.G_ProcUID, // Set G_ProcUID to Rep1 value so we can use this value for other rep 1 attributes.
 			SELF := RIGHT,
@@ -66,7 +82,10 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 	
 	// If consumer shell attributes are turned off, we can bypass these calculations as a performance enhancement.	
-	FinalResult := IF(Options.ExcludeConsumerAttributes, withBusinessSeleIDAttributes, withRep1PersonAttributes);
+	FinalResult := IF(Options.ExcludeConsumerAttributes, PROJECT(withBusinessProxIDAttributes, TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+											SELF := LEFT,
+											SELF := [])),
+										withRep1PersonAttributes);	
 	
 	MasterResults := SORT(FinalResult, G_ProcBusUID);
 	

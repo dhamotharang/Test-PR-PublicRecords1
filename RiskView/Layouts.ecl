@@ -1152,4 +1152,20 @@ export layout_RV5capOneBatch_searchResults := record
   STRING12 inquiry_lexid := '';
 end;
 
+export  Checking_Indicators_Layout := RECORD
+ unsigned4 seq;
+ string10 CheckProfileIndex;
+ string10 CheckTimeOldest;
+ string10 CheckTimeNewest;
+ string10 CheckNegTimeOldest;
+ string10 CheckNegRiskDecTimeNewest;
+ string10 CheckNegPaidTimeNewest;
+ string10 CheckCountTotal;
+ string10 CheckAmountTotal;
+ string10 CheckAmountTotalSinceNegPaid;
+ string10 CheckAmountTotal03Month;
+ boolean  FDGatewayCalled;
+ string5  Exception_code := ''; 
+ END;
+
 end;

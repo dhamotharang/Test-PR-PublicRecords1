@@ -7,16 +7,14 @@ EXPORT getIndPerAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUN
     //get all associations
     allRelations := DueDiligence.CommonIndividual.GetAllRelationships(inData);
     
-    noParentRelationships := allRelations(amlRelationshipDegree NOT IN DueDiligence.Constants.AML_PARENT_DEFINITION);
     
-    
-    countFirstSeenSSNRisks := TABLE(noParentRelationships, {seq, inquiredDID, 
-                                                             lessThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
-                                                                                           DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) <= ut.DaysInNYears(1) AND 
-                                                                                           ssnrisk),
-                                                             greaterThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
-                                                                                              DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) > ut.DaysInNYears(1) AND 
-                                                                                              ssnrisk)}, seq, inquiredDID);
+    countFirstSeenSSNRisks := TABLE(allRelations, {seq, inquiredDID, 
+                                                       lessThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
+                                                                                     DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) <= ut.DaysInNYears(1) AND 
+                                                                                     ssnrisk),
+                                                       greaterThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
+                                                                                        DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) > ut.DaysInNYears(1) AND 
+                                                                                        ssnrisk)}, seq, inquiredDID);
                                                                                     
                                                                                     
     

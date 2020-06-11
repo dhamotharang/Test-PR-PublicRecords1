@@ -2,61 +2,61 @@ import AutoStandardI,iesp,doxie,suppress,deathv2_Services,STD,ut,dx_BestRecords;
 
 EXPORT Functions := MODULE
 	shared gm := AutoStandardI.GlobalModule();
-	
+
 	//Cleaning Functions
 	Export cleanOnlyNumbers (string inStr) := function
 		return STD.Str.Filter(inStr,'0123456789');
 	end;
-	
+
 	Export cleanAlpha (string inStr) := function
 		return STD.Str.Filter(STD.Str.ToUpperCase(inStr),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	end;
-	
+
 	Export cleanOnlyCharacters (string inStr) := function
 		return STD.Str.Filter(inStr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	end;
-	
-	
+
+
 	Export cleanOnlyNames (string inStr) := function
 		return STD.Str.Filter(inStr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	end;
-	
-	
+
+
 	Export cleanLicenses (string inStr) := function
 		return STD.Str.Filter(inStr,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-');
 	end;
-	
+
 	Export cleanAlphaNumeric (string inStr) := function
 		return STD.Str.Filter(STD.Str.ToUpperCase(inStr),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	end;
-	
+
 	Export cleanWord (string inStr) := function
 		return STD.Str.Filter(STD.Str.ToUpperCase(inStr),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	end;
-	
-	
+
+
 	EXPORT cleanValue(STRING inputValue) := FUNCTION
 		RETURN STD.Str.Filter(STD.Str.ToUpperCase(inputValue),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 	END;
-	
-	
+
+
 	EXPORT cleanValueNumbers(STRING inputValue) := FUNCTION
 		RETURN STD.Str.Filter(STD.Str.ToUpperCase(inputValue),'0123456789');
 	END;
-	
-	
+
+
 	EXPORT removeLeadingZeros(String inputStr) := FUNCTION
 		removeZero := STD.Str.Filter(STD.Str.ToUpperCase(inputStr),'123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 		findStart := STD.Str.Find(STD.Str.ToUpperCase(inputStr),removeZero[1],1);
 		result := inputStr[findStart..];
 		RETURN result;
 	END;
-	
-	Export IsRoyaltySource(string filesource, string filecode) := function 
+
+	Export IsRoyaltySource(string filesource, string filecode) := function
 		return	map(filesource = Healthcare_Shared.Constants.Src_DefinitiveHealthcare => true,
 								false);
 	end;
-	Export loadFileSource(string filesource, string filecode) := function 
+	Export loadFileSource(string filesource, string filecode) := function
 		return	row({filesource,filecode},Healthcare_Shared.Layouts.layout_FileSource);
 	end;
 	Export upinPractitionerType (string inStr) := function // We don't return this, but...
@@ -65,7 +65,7 @@ EXPORT Functions := MODULE
 								inStr between 'T' and 'V' => 'Other Doctor',
 								inStr between 'W' and 'Z' => 'Group UPIN','');
 	end;
-	
+
   Export convertSpecialty2Int(STRING s, string sub = '') := FUNCTION
 		//2 character entries are Enclarity customers take what they give us, everyone else map as best possible.
 		returnVal := map(length(trim(s,right))<=2 => s,
@@ -74,7 +74,7 @@ EXPORT Functions := MODULE
 											trim(s,right) = 'COLON AND RECTAL SURGERY' => '28',
 											trim(s,right) = 'DERMATOLOGY' => '07',
 											trim(s,right) = 'EMERGENCY MEDICINE' => '93',
-											trim(s,right) = 'FAMILY MEDICINE' => '01',//could also be 08  
+											trim(s,right) = 'FAMILY MEDICINE' => '01',//could also be 08
 											trim(s,right) = 'INTERNAL MEDICINE' => '11',
 											trim(s,right) = 'MEDICAL GENETICS' => '',
 											trim(s,right) = 'MEDICAL GENETICS AND GENOMICS' => '',
@@ -99,8 +99,8 @@ EXPORT Functions := MODULE
 											'');
 		return returnVal;
 	end;
-	
-	EXPORT isValidTINPrefix(STRING TIN_IN) := FUNCTION 
+
+	EXPORT isValidTINPrefix(STRING TIN_IN) := FUNCTION
 					return TIN_IN <> '999999999';
 	END;
   Export BusName_SplitAndSequenceWords(STRING s) := FUNCTION
@@ -110,16 +110,16 @@ EXPORT Functions := MODULE
 																	SELF.word := LEFT.word));
 		RETURN r20;
 	END;
-	
-	
+
+
   Export BusName_ResequenceWords(DATASET(Healthcare_Shared.Layouts.BusName_SeqWordRec) ds) := FUNCTION
     resultDS := PROJECT(SORT(ds, seq),TRANSFORM(Healthcare_Shared.Layouts.BusName_SeqWordRec,
 																									SELF.seq := COUNTER,
 																									SELF.word := LEFT.word));
     RETURN resultDS;
   END;
-	
-	
+
+
   Export BusName_getNoiseWords() := FUNCTION
 		NoiseRec := RECORD
 			STRING      word;
@@ -159,8 +159,8 @@ EXPORT Functions := MODULE
 																															SELF := LEFT));
     RETURN noiselessWordsDS;
   END;
-	
-	
+
+
 	// Translates certain whole words in the argument
 	Export BusName_TranslateSequencedWords(DATASET(Healthcare_Shared.Layouts.BusName_SeqWordRec) seqNameWords) := FUNCTION
 		TranslationRec := RECORD
@@ -266,8 +266,8 @@ EXPORT Functions := MODULE
 														SELF := LEFT),LOOKUP, LEFT OUTER);
 		RETURN r10;
 	END;
-	
-	
+
+
 	// Returns a string composed of the first character of each word in the argument
 	Export BusName_MakeInitialism(DATASET(Healthcare_Shared.Layouts.BusName_SeqWordRec) ds) := FUNCTION
 			tempDS := PROJECT(ds,TRANSFORM(Healthcare_Shared.Layouts.BusName_SeqWordRec,
@@ -279,16 +279,16 @@ EXPORT Functions := MODULE
 			finalWord := resultDS[1].word;
 		RETURN finalWord;
 	END;
-	
-	
+
+
 	Export BusName_ScorePrefixMatch(STRING name1, STRING name2) := FUNCTION
 			maxNameLength := MAX(LENGTH(name1), LENGTH(name2));
 			matchCount := Healthcare_Shared.Functions_C.BusName_PrefixMatchCount(name1, name2);
 			score := matchCount / maxNameLength * 100;
 			RETURN score;
 	END;
-	
-	
+
+
 	Export BusName_CleanAndSplitCompanyName(STRING name) := FUNCTION
 		// Influenced by BIP name cleaning code
 			withoutQuotes := REGEXREPLACE('[\'"]', name, '');
@@ -306,8 +306,8 @@ EXPORT Functions := MODULE
 			resequencedWords := BusName_ResequenceWords(noiselessWords);
 			RETURN resequencedWords;
 	END;
-	
-	
+
+
 	EXPORT CompareBusinessNameConfidence(STRING inputName, STRING candidateName) := FUNCTION
 			inputNameWords := dedup(sort(BusName_CleanAndSplitCompanyName(inputName),word,seq),word);
 			candidateNameWords := dedup(sort(BusName_CleanAndSplitCompanyName(candidateName),word,seq),word);
@@ -349,8 +349,8 @@ EXPORT Functions := MODULE
 			// output(finalScore);
 			RETURN finalScore;
 	END;
-	
-	
+
+
 	Export cleanBusinessWord (string inStr) := function
 		getActualName := cleanOnlyCharacters(inStr);
 		getStartPosition := STD.Str.Find(inStr,getActualName[1..3],1);
@@ -359,8 +359,8 @@ EXPORT Functions := MODULE
 		returnVal := cleanFirstPart+cleanSecondPart;
 		return returnVal;
 	end;
-	
-	
+
+
 	EXPORT getCleanHealthCareName(string inStr) := FUNCTION
 		wordpart := RECORD
 			string wordVal;
@@ -369,7 +369,7 @@ EXPORT Functions := MODULE
 			string wordVal;
 			boolean isInitial;
 		END;
-			
+
 		HealthCareFilterWords := dataset([{'MEDICAL'},{'CORPORATION'},{'COUNTY'},{'HEALTHCARE'},{'HEALTH'},{'CLINIC'},{'HOSPITAL'},{'UNIVERSITY'},{'OF'},
 																			{'AND'},{'THE'},{'SCHOOL'},{'COMMUNITY'},{'CENTER'},{'CENTERS'},{'GROUP'},{'GRP'},{'INC'},{'ASSOCIATES'},{'ASSOC'},
 																			{'CORP'},{'LLC'},{'LTD'},{'LLP'},{'INCORPORATION'},{'INCORPORATED'},{'MED'},{'LABORATORY'},{'AUTHORITY'}],wordpart);
@@ -388,11 +388,11 @@ EXPORT Functions := MODULE
 		returnVal := trim(mergeWords[maxRow].wordVal,left,right);
 		return returnVal;
 	END;
-	
-	
-	// EXPORT CompareCliaToState (STRING CliaNumber, STRING2 State) := FUNCTION 
-			// CliaStateCode := CliaNumber[1..2]; 
-			
+
+
+	// EXPORT CompareCliaToState (STRING CliaNumber, STRING2 State) := FUNCTION
+			// CliaStateCode := CliaNumber[1..2];
+
 			// CliaState := MAP(CliaStateCode = '01' => 'AL',
 									  // CliaStateCode = '02' => 'AK',
 									  // CliaStateCode = '03' => 'AZ',
@@ -450,11 +450,11 @@ EXPORT Functions := MODULE
 										// CliaStateCode = '65' => 'GU',
 										// CliaStateCode = '66' => 'MP',
 										// '');
-										
+
 			// return CliaState = State;
 	// END;
 	//Did Frequency Logic
-	Export processDids(dataset(Healthcare_Shared.Layouts.layout_did) ds) := Function  
+	Export processDids(dataset(Healthcare_Shared.Layouts.layout_did) ds) := Function
 		grp:=sort(ds,did);
 		tmprec := record
 			did:=grp.did;
@@ -464,10 +464,10 @@ EXPORT Functions := MODULE
 		f:=sort(project(t,Healthcare_Shared.Layouts.layout_did),-freq);
 		return f;
 	end;
-	
-	
+
+
 	// BDid Frequency Logic
-	Export processBDids(dataset(Healthcare_Shared.Layouts.layout_bdid) ds) := Function  
+	Export processBDids(dataset(Healthcare_Shared.Layouts.layout_bdid) ds) := Function
 		grp:=sort(ds,bdid);
 		tmprec := record
 			bdid:=grp.bdid;
@@ -477,10 +477,10 @@ EXPORT Functions := MODULE
 		f:=sort(project(t,Healthcare_Shared.Layouts.layout_bdid),-freq);
 		return f;
 	end;
-	
-	
+
+
 	// BIP Frequency Logic
-	Export processBIPKeys(dataset(Healthcare_Shared.Layouts.layout_bipkeys) ds) := Function  
+	Export processBIPKeys(dataset(Healthcare_Shared.Layouts.layout_bipkeys) ds) := Function
 		grp:=group(sort(ds,UltID,UltScore,UltWeight,OrgID,OrgScore,OrgWeight,SELEID,SELEScore,SELEWeight,ProxID,ProxScore,ProxWeight),UltID,OrgID,SELEID,ProxID);
 		tmprec := record
 			UltID:=grp.UltID;
@@ -501,8 +501,8 @@ EXPORT Functions := MODULE
 		f:=sort(project(t,Healthcare_Shared.Layouts.layout_bipkeys),-freq);
 		return f;
 	end;
-	
-	
+
+
 	export buildFullName (string pre_name, string first_name, string middle_name, string last_name, string maturity_suffix, string other_suffix) := function
 		n1 := pre_name;
 		n2 := trim(n1,right) + ' ' +first_name;
@@ -522,11 +522,11 @@ EXPORT Functions := MODULE
 		addr6 := trim(addr5,right) + ' ' +unit_desig;
 		return trim(trim(addr6,right)+ ' ' +sec_range,right);
 	end;
-	
-	
+
+
 	//Penalty Functions
 	export getHospitalAffiliationPenalty (string inStreet, string inCity, string inState, string inZip, string rawStreet, string rawCity, string rawState, string rawZip):=function
-			tempaddrmod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Addr.full, opt))					
+			tempaddrmod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Addr.full, opt))
 					EXPORT predir         := '';
 					EXPORT prim_name      := '';
 					EXPORT prim_range     := '';
@@ -535,36 +535,36 @@ EXPORT Functions := MODULE
 					EXPORT sec_range      := '';
 					EXPORT p_city_name    := inCity;
 					EXPORT st             := inState;
-					EXPORT z5             := inZip;											
-					//	The address in the matching record:						
-					EXPORT allow_wildcard  := FALSE;															
+					EXPORT z5             := inZip;
+					//	The address in the matching record:
+					EXPORT allow_wildcard  := FALSE;
 					EXPORT city_field      := rawCity;
-					EXPORT city2_field     := '';										
-					EXPORT pname_field     := '';									
-					EXPORT prange_field    := '';										
-					EXPORT postdir_field   := '';																				
-					EXPORT predir_field    := '';									
-					EXPORT state_field     := rawState;										
-					EXPORT suffix_field    := '';										
-					EXPORT zip_field       := rawZip;											
+					EXPORT city2_field     := '';
+					EXPORT pname_field     := '';
+					EXPORT prange_field    := '';
+					EXPORT postdir_field   := '';
+					EXPORT predir_field    := '';
+					EXPORT state_field     := rawState;
+					EXPORT suffix_field    := '';
+					EXPORT zip_field       := rawZip;
 					EXPORT sec_range_field := '';
 					EXPORT useGlobalScope  := FALSE;
 			end;
-			
+
 			addrPenalty:=AutoStandardI.LIBCALL_PenaltyI_Addr.val(tempaddrmod);
 			foundStreet := STD.Str.Contains(rawStreet,inStreet,true);
 			return If(foundStreet,addrPenalty,addrPenalty+5);
 	end;
-	
-	
+
+
 	Shared matchData := record
 		string		matchFieldRaw := '';
 		string		matchFieldClnString := '';
 		unsigned	matchFieldClnNumber := 0;
 		string		matchFieldOptional := '';
 	End;
-	
-	
+
+
 	Shared calcStLicPenalty(String rawLicenseState, String rawLicense, dataset(Healthcare_Shared.Layouts.layout_licenseinfo) recs) := Function
 		validdata := rawLicense<>'';
 		missingState := rawLicenseState='';
@@ -587,8 +587,8 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	
-	
+
+
 	Shared calcTaxIdPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_taxid) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		tmpRec := project(recs,transform(matchData,
@@ -603,8 +603,8 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	
-	
+
+
 	Shared calcFeinPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_fein) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		tmpRec := project(recs,transform(matchData,
@@ -619,8 +619,8 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	
-	
+
+
 	Shared calcUpinPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_upin) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		tmpRec := project(recs,transform(matchData,
@@ -635,8 +635,8 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	
-	
+
+
 	Shared calcNpiPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_npi) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		tmpRec := project(recs,transform(matchData,
@@ -651,8 +651,8 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	
-	
+
+
 	Shared calcDeaPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_dea) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		tmpRec := project(recs,transform(matchData,
@@ -666,18 +666,18 @@ EXPORT Functions := MODULE
 											validdata and not exists(recs) => 1,
 											0);
 		return penaltyVal;
-	end;	
-	
-	
+	end;
+
+
 	Shared calcCLIAPenalty(String rawInput, dataset(Healthcare_Shared.Layouts.layout_clianumber) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		checkString := recs((integer)cleanOnlyNumbers(clianumber)=(integer)cleanOnlyNumbers(rawInput));
 		penaltyVal := map(validdata and exists(recs) => if(exists(checkString),0,4),
 											0);
 		return penaltyVal;
-	end;	
-	
-	
+	end;
+
+
 	Shared calcNCPDPPenalty(String rawInput, dataset(iesp.ncpdp.t_PharmacyReportConsolidatedSearch) recs) := Function
 		validdata := length(trim(rawInput,all))>0;
 		RecsRaw := project(recs,Transform(iesp.ncpdp.t_PharmacyInformation,self:=left.EntityInformation;self:=[]));
@@ -685,11 +685,11 @@ EXPORT Functions := MODULE
 		penaltyVal := map(validdata and exists(recs) => if(exists(checkString),0,4),
 											0);
 		return penaltyVal;
-	end;	
-	
-	
+	end;
+
+
 	export getAddrPenalty (string inStreetNbr, string inStreet, string inCity, string inState, string inZip, string rawStreetNbr ,string rawStreet, string rawCity, string rawState, string rawZip, integer zip_Radius):=function
-			tempaddrmod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Addr.full, opt))					
+			tempaddrmod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Addr.full, opt))
 					EXPORT predir         := '';
 					EXPORT prim_name      := inStreet;
 					EXPORT prim_range     := '';
@@ -698,30 +698,30 @@ EXPORT Functions := MODULE
 					EXPORT sec_range      := '';
 					EXPORT p_city_name    := inCity;
 					EXPORT st             := inState;
-					EXPORT z5             := inZip;											
-					EXPORT zipradius      := zip_Radius;											
-					//	The address in the matching record:						
-					EXPORT allow_wildcard  := FALSE;															
+					EXPORT z5             := inZip;
+					EXPORT zipradius      := zip_Radius;
+					//	The address in the matching record:
+					EXPORT allow_wildcard  := FALSE;
 					EXPORT city_field      := rawCity;
-					EXPORT city2_field     := '';										
-					EXPORT pname_field     := rawStreet;									
-					EXPORT prange_field    := '';										
-					EXPORT postdir_field   := '';																				
-					EXPORT predir_field    := '';									
-					EXPORT state_field     := rawState;										
-					EXPORT suffix_field    := '';										
-					EXPORT zip_field       := rawZip;											
+					EXPORT city2_field     := '';
+					EXPORT pname_field     := rawStreet;
+					EXPORT prange_field    := '';
+					EXPORT postdir_field   := '';
+					EXPORT predir_field    := '';
+					EXPORT state_field     := rawState;
+					EXPORT suffix_field    := '';
+					EXPORT zip_field       := rawZip;
 					EXPORT sec_range_field := '';
-					EXPORT zipradius_value := zip_Radius;											
+					EXPORT zipradius_value := zip_Radius;
 					EXPORT useGlobalScope  := FALSE;
 			end;
-			
+
 			addrPenalty:=AutoStandardI.LIBCALL_PenaltyI_Addr.val(tempaddrmod);
 			foundHouse := STD.Str.Contains(rawStreetNbr,inStreetNbr,true);
 			return If(foundHouse,addrPenalty,addrPenalty+2);
 	end;
-	
-	
+
+
 	Export getBestAddrPenalty (dataset(Healthcare_Shared.Layouts.layout_addressinfo) inAddrs, Healthcare_Shared.Layouts.userInputCleanMatch input, integer zipradius) := function
 			bestValues := project(inAddrs,transform(Healthcare_Shared.Layouts.layout_addressinfo,
 															getPenalty := getAddrPenalty(STD.Str.ToUpperCase(input.prim_range),STD.Str.ToUpperCase(input.prim_name),STD.Str.ToUpperCase(input.p_city_name),STD.Str.ToUpperCase(input.st),input.z5,
@@ -729,23 +729,23 @@ EXPORT Functions := MODULE
 															self.addrPenalty:=getPenalty;self:=left));
 			return min(bestValues,addrpenalty);
 	end;
-	
-	
+
+
 	export getNamePenalty (string inFirst, string inMiddle, string inLast, string inCompany, string rawFirst ,string rawMiddle, string rawLast, string rawCompany):=function
-			tempNameMod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Indv_Name.full, opt))					
+			tempNameMod := MODULE(PROJECT(gm, AutoStandardI.LIBIN.PenaltyI_Indv_Name.full, opt))
 				EXPORT lastname       := rawLast;       // the 'input' last name
 				EXPORT middlename     := rawMiddle;     // the 'input' middle name
 				EXPORT firstname      := rawFirst;      // the 'input' first name
 				EXPORT allow_wildcard := FALSE;
-				EXPORT useGlobalScope := FALSE;									
-				EXPORT lname_field    := inLast;			// matching record name information			                          
-				EXPORT mname_field    := inMiddle; 
-				EXPORT fname_field    := inFirst;	
-			END;	
+				EXPORT useGlobalScope := FALSE;
+				EXPORT lname_field    := inLast;			// matching record name information
+				EXPORT mname_field    := inMiddle;
+				EXPORT fname_field    := inFirst;
+			END;
 			foundName := inLast <> '' and rawLast <> '';
 			namePenalty := map(foundName=>AutoStandardI.LIBCALL_PenaltyI_Indv_Name.val(tempNameMod),
 												 inLast <> '' => 10,
-												 0);	
+												 0);
 			foundCompany := inCompany<> '' and rawCompany <> ''; // we found a business
 			Confidence := CompareBusinessNameConfidence(rawCompany,inCompany);
 			busPenalty := map(foundCompany => if(Confidence>=Healthcare_Shared.Constants.BUS_NAME_BIPMATCH_THRESHOLD,(100-Confidence)/10,100-Confidence),
@@ -753,8 +753,8 @@ EXPORT Functions := MODULE
 												0);
 			return namePenalty+busPenalty;
 	end;
-	
-	
+
+
 	Export getBestNamePenalty (dataset(Healthcare_Shared.Layouts.layout_nameinfo) inNames, Healthcare_Shared.Layouts.userInputCleanMatch input) := function
 			bestValues := project(inNames(LastName<>'' or CompanyName <>''),transform(Healthcare_Shared.Layouts.layout_nameinfo,
 															getPenalty := getNamePenalty(STD.Str.ToUpperCase(input.name_first),STD.Str.ToUpperCase(input.name_middle),STD.Str.ToUpperCase(input.name_last),STD.Str.ToUpperCase(input.comp_name),
@@ -762,8 +762,8 @@ EXPORT Functions := MODULE
 															self.namePenalty:=getPenalty;self:=left));
 			return min(bestValues,namePenalty);
 	end;
-	
-	
+
+
 	Export doPenalty (dataset(Healthcare_Shared.Layouts.CombinedHeaderResults) inRecs, dataset(Healthcare_Shared.Layouts.userInputCleanMatch) input, Healthcare_Shared.Layouts.common_runtime_config cfg, integer zipradius = Healthcare_Shared.Constants.ZIP_RADIUS) := function
 		//Custom penalty logic
 		maxPenalty := cfg.penalty_threshold;
@@ -791,19 +791,19 @@ EXPORT Functions := MODULE
 						isUPINMatch := exists(l.upins(upin=r.UPIN)) and r.UPIN<>'';
 						isExactCLIA := exists(l.clianumbers((integer)cleanOnlyNumbers(clianumber)=(integer)cleanOnlyNumbers(r.CLIANumber))) and r.CLIANumber<>'';
 						isExactNCPDP := exists(l.NCPDPRaw(trim(EntityInformation.PharmacyProviderId,all)=Trim(r.NCPDPNumber,all))) and r.NCPDPNumber<>'';
-						isStateLicenseMatch0 := exists(l.StateLicenses(LicenseNumber=r.license_number and r.license_number<>'' and (LicenseState=r.license_state or LicenseState=r.st or (r.license_state='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
+						isStateLicenseMatch0 := exists(l.StateLicenses(LicenseNumber=r.license_number and r.license_number<>'' and (LicenseState=r.license_state or LicenseState=r.st or (r.license_state='' and r.st='')) and stlicPen = 0 and namePen <= 3));
 						isStateLicenseMatch1 := exists(l.StateLicenses(LicenseNumber=r.StateLicense1Verification and r.StateLicense1Verification<>'' and (LicenseState=r.StateLicense1StateVerification or LicenseState=r.st or (r.StateLicense1StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
-						isStateLicenseMatch2 := exists(l.StateLicenses(LicenseNumber=r.StateLicense2Verification and r.StateLicense2Verification<>'' and (LicenseState=r.StateLicense2StateVerification or LicenseState=r.st or (r.StateLicense2StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
-						isStateLicenseMatch3 := exists(l.StateLicenses(LicenseNumber=r.StateLicense3Verification and r.StateLicense3Verification<>'' and (LicenseState=r.StateLicense3StateVerification or LicenseState=r.st or (r.StateLicense3StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
+						isStateLicenseMatch2 := exists(l.StateLicenses(LicenseNumber=r.StateLicense2Verification and r.StateLicense2Verification<>'' and (LicenseState=r.StateLicense2StateVerification or LicenseState=r.st or (r.StateLicense2StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
+						isStateLicenseMatch3 := exists(l.StateLicenses(LicenseNumber=r.StateLicense3Verification and r.StateLicense3Verification<>'' and (LicenseState=r.StateLicense3StateVerification or LicenseState=r.st or (r.StateLicense3StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
 						isStateLicenseMatch4 := exists(l.StateLicenses(LicenseNumber=r.StateLicense4Verification and r.StateLicense4Verification<>'' and (LicenseState=r.StateLicense4StateVerification or LicenseState=r.st or (r.StateLicense4StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
-						isStateLicenseMatch5 := exists(l.StateLicenses(LicenseNumber=r.StateLicense5Verification and r.StateLicense5Verification<>'' and (LicenseState=r.StateLicense5StateVerification or LicenseState=r.st or (r.StateLicense5StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
-						isStateLicenseMatch6 := exists(l.StateLicenses(LicenseNumber=r.StateLicense6Verification and r.StateLicense6Verification<>'' and (LicenseState=r.StateLicense6StateVerification or LicenseState=r.st or (r.StateLicense6StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
-						isStateLicenseMatch7 := exists(l.StateLicenses(LicenseNumber=r.StateLicense7Verification and r.StateLicense7Verification<>'' and (LicenseState=r.StateLicense7StateVerification or LicenseState=r.st or (r.StateLicense7StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
-						isStateLicenseMatch8 := exists(l.StateLicenses(LicenseNumber=r.StateLicense8Verification and r.StateLicense8Verification<>'' and (LicenseState=r.StateLicense8StateVerification or LicenseState=r.st or (r.StateLicense8StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
-						isStateLicenseMatch9 := exists(l.StateLicenses(LicenseNumber=r.StateLicense9Verification and r.StateLicense9Verification<>'' and (LicenseState=r.StateLicense9StateVerification or LicenseState=r.st or (r.StateLicense9StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3)); 
+						isStateLicenseMatch5 := exists(l.StateLicenses(LicenseNumber=r.StateLicense5Verification and r.StateLicense5Verification<>'' and (LicenseState=r.StateLicense5StateVerification or LicenseState=r.st or (r.StateLicense5StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
+						isStateLicenseMatch6 := exists(l.StateLicenses(LicenseNumber=r.StateLicense6Verification and r.StateLicense6Verification<>'' and (LicenseState=r.StateLicense6StateVerification or LicenseState=r.st or (r.StateLicense6StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
+						isStateLicenseMatch7 := exists(l.StateLicenses(LicenseNumber=r.StateLicense7Verification and r.StateLicense7Verification<>'' and (LicenseState=r.StateLicense7StateVerification or LicenseState=r.st or (r.StateLicense7StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
+						isStateLicenseMatch8 := exists(l.StateLicenses(LicenseNumber=r.StateLicense8Verification and r.StateLicense8Verification<>'' and (LicenseState=r.StateLicense8StateVerification or LicenseState=r.st or (r.StateLicense8StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
+						isStateLicenseMatch9 := exists(l.StateLicenses(LicenseNumber=r.StateLicense9Verification and r.StateLicense9Verification<>'' and (LicenseState=r.StateLicense9StateVerification or LicenseState=r.st or (r.StateLicense9StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
 						isStateLicenseMatch10 := exists(l.StateLicenses(LicenseNumber=r.StateLicense10Verification and r.StateLicense10Verification<>'' and (LicenseState=r.StateLicense10StateVerification or LicenseState=r.st or (r.StateLicense10StateVerification='' and r.st='')) and stlicPen = 0 and namePen <= 3));
 						isStateLicenseMatch := isStateLicenseMatch0 or isStateLicenseMatch1 or isStateLicenseMatch2 or isStateLicenseMatch3 or
-																		isStateLicenseMatch4 or isStateLicenseMatch5 or isStateLicenseMatch6 or isStateLicenseMatch7 or 
+																		isStateLicenseMatch4 or isStateLicenseMatch5 or isStateLicenseMatch6 or isStateLicenseMatch7 or
 																		isStateLicenseMatch8 or isStateLicenseMatch9 or isStateLicenseMatch10;
 						isLNPIDMatch := r.LNPID > 0 and r.derivedInputRecord = false and (l.lnpid > 0 and l.lnpid = r.LNPID);
 						isLNFIDMatch := r.LNFID > 0 and r.derivedInputRecord = false and (l.lnfid > 0 and l.lnfid = r.LNFID);
@@ -836,8 +836,8 @@ EXPORT Functions := MODULE
 						self:=[];
 		end;
 		recsWithPenalty := join(inRecs(penalty_applied=false),input,left.acctno=right.acctno,xform(left,right),keep(Healthcare_Shared.Constants.MAX_RECS_ON_JOIN), limit(0));
-		// removeOverPenalty := recsWithPenalty(record_penalty<=if(src=Healthcare_Shared.Constants.SRC_BOCA_PERSON_HEADER,maxPenalty*Healthcare_Shared.Constants.DEEPDIVE_PENALTY_MULTIPLIER,maxPenalty) or isExactLNID or isExactDEA or isExactNPI or isExactUPIN or isExactCLIA or isExactNCPDP or isExactStateLicense  or isExactLNPID or isExactLNFID or isExactSSN or isautokeysresult or isDeepDiveSSNMatch or isDeepDiveFEINMatch);		
-		removeOverPenalty := project(recsWithPenalty, transform(outRec, 
+		// removeOverPenalty := recsWithPenalty(record_penalty<=if(src=Healthcare_Shared.Constants.SRC_BOCA_PERSON_HEADER,maxPenalty*Healthcare_Shared.Constants.DEEPDIVE_PENALTY_MULTIPLIER,maxPenalty) or isExactLNID or isExactDEA or isExactNPI or isExactUPIN or isExactCLIA or isExactNCPDP or isExactStateLicense  or isExactLNPID or isExactLNFID or isExactSSN or isautokeysresult or isDeepDiveSSNMatch or isDeepDiveFEINMatch);
+		removeOverPenalty := project(recsWithPenalty, transform(outRec,
 																					keepRec :=(left.record_penalty<=if(left.src=Healthcare_Shared.Constants.SRC_BOCA_PERSON_HEADER,maxPenalty*Healthcare_Shared.Constants.DEEPDIVE_PENALTY_MULTIPLIER,maxPenalty) or left.isExactLNID or left.isExactDEA or left.isExactNPI or left.isExactUPIN or left.isExactCLIA or left.isExactNCPDP or left.isExactStateLicense  or left.isExactLNPID or left.isExactLNFID or left.isExactSSN or left.isautokeysresult or left.isDeepDiveSSNMatch or left.isDeepDiveFEINMatch) and
 																										((left.srcBusinessHeader and left.record_penalty_enhanced >= EnhancedBusPenalty) or
 																										(left.srcIndividualHeader and left.record_penalty_enhanced >= EnhancedPenalty));
@@ -859,8 +859,8 @@ EXPORT Functions := MODULE
 		// output(Healthcare_Shared.Constants.ZIP_RADIUS, named('zipradius'),overwrite);
 		return dedupRecs;
 	end;
-	
-	
+
+
 	//Enclarity specific Functions
 		Export buildLegacySanctionRecord(Healthcare_Shared.Layouts.CombinedHeaderResults parent, dataset(Healthcare_Shared.Layouts.layout_sanctions) sanc) := Function
 			outlayout := Healthcare_Shared.Layouts.layout_LegacySanctions;
@@ -951,10 +951,10 @@ EXPORT Functions := MODULE
 											));
 			return results;
 		end;
-		
-		
+
+
 	//Append Data lookups
-	// Export getSlimHdrRecords (dataset(Healthcare_Shared.Layouts.CombinedHeaderResults) resultRecs, 
+	// Export getSlimHdrRecords (dataset(Healthcare_Shared.Layouts.CombinedHeaderResults) resultRecs,
 													// dataset(Healthcare_Shared.Layouts.userInputCleanMatch) inputRecs) := function
 		// basedata := join(resultRecs,inputRecs,left.acctno=right.acctno,
 											// transform(Healthcare_Shared.Layouts.layout_slim,
@@ -977,10 +977,10 @@ EXPORT Functions := MODULE
 												// keep(Healthcare_Shared.Constants.MAX_RECS_ON_JOIN), limit(0));
 		// return basedata;
 	// end;
-	
-	
+
+
 	Export getSSN(dataset(Healthcare_Shared.Layouts.CombinedHeaderResults) input) := Function
-		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
+		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
 		byDids := dedup(normalize(input,left.dids,transform(Healthcare_Shared.Layouts.layout_sanc_DID,self.acctno := left.acctno;self.InternalID:=left.InternalID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
 		Healthcare_Shared.Layouts.layout_ssns_freq get_provider_ssns(Healthcare_Shared.Layouts.layout_sanc_DID l, dx_BestRecords.layout_best r) := transform
 			self.ssn := if (r.did <> 0 and (r.valid_ssn = 'G' or r.valid_ssn = ' ' or r.valid_ssn = ''), r.ssn, '');
@@ -1000,7 +1000,7 @@ EXPORT Functions := MODULE
 		f_ssns_OthersWithFreq := dedup(sort(f_ssns_GetOthers,acctno,InternalID,-freq),acctno,InternalID);
 		f_ssns_OthersWithHighestFreq := project(f_ssns_OthersWithFreq,Healthcare_Shared.Layouts.layout_ssns);
 		f_ssns_final := sort(f_ssns_BestOnly+f_ssns_OthersWithHighestFreq,acctno,InternalID);
-		//Masking for SSN 
+		//Masking for SSN
 		doxie.MAC_PruneOldSSNs(f_ssns_final, out_ssn_pruned, ssn, InternalID);
 		suppress.MAC_Mask(out_ssn_pruned, f_ssns_masked, ssn, blank, true, false,,,,ssn_mask_val);
 		Healthcare_Shared.Layouts.layout_child_ssns doRollup(Healthcare_Shared.Layouts.layout_ssns l, dataset(Healthcare_Shared.Layouts.layout_ssns) r) := TRANSFORM
@@ -1026,63 +1026,14 @@ EXPORT Functions := MODULE
 																							self := left),left outer,keep(Healthcare_Shared.Constants.IDS_PER_DID), limit(0));
 		return results;
 	end;
-		
-/*	Export doCheckDeath(dataset(Healthcare_Shared.Layouts.layout_slim) input) := Function
-			deathparams := project(gm,deathv2_Services.functions.death_restrictions);
-			glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params));  
-			byDids := normalize(input,left.dids,transform(Healthcare_Shared.Layouts.layout_death_DID,self.acctno := left.acctno;self.InternalID:=left.InternalID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
-			byDids_BestFreq := dedup(sort(byDids,acctno,InternalID,-freq),acctno,InternalID);
-			deathRecs := join(byDids(SSN<>''),doxie.Key_Death_MasterV2_ssa_Did,
-									keyed(left.did = right.l_did)
-									and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, deathparams.datarestrictionmask,glb_ok, deathparams.datapermissionmask),
-									transform(Healthcare_Shared.Layouts.layout_death_BestHit,
-										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.dob8[1..6];
-										matchbySSN := left.UserSSNFound and left.SSN = right.ssn;
-										keepRecord := map(matchbyDOB or matchbySSN => true,
-																		 left.DOB <> '' and not matchbyDOB => false,
-																		 left.SSN <> '' and not matchbySSN => false,
-																		 true);
-										self.acctno:=if(keepRecord,left.acctno,skip); self.InternalID :=left.InternalID;self.death_ind:=true;self.dod:=right.dod8;self.besthit:=if(left.UserSSNFound and left.SSN=right.SSN,true,false)),
-									keep(1), limit(0));
-			death_BestHit := project(deathRecs(besthit=true),Healthcare_Shared.Layouts.layout_death);
-			//if you don't have the best record based on a match to user input, use the best freq.
-			death_NotBestHit := join(byDids_BestFreq,death_BestHit,left.acctno=right.acctno and left.InternalID= right.InternalID,left only);
-			death_BestFreq := join(death_NotBestHit,doxie.Key_Death_MasterV2_ssa_Did,
-									keyed(left.did = right.l_did)
-									and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, deathparams.datarestrictionmask,glb_ok, deathparams.datapermissionmask),
-									transform(Healthcare_Shared.Layouts.layout_death, 
-										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.dob8[1..6];
-										matchbySSN := left.UserSSNFound and left.SSN = right.ssn;
-										keepRecord := map(matchbyDOB or matchbySSN => true,
-																		 left.DOB <> '' and not matchbyDOB => false,
-																		 left.SSN <> '' and not matchbySSN => false,
-																		 true);
-										self.acctno:=if(keepRecord,left.acctno,skip); self.InternalID :=left.InternalID;self.death_ind:=true;self.dod:=right.dod8),
-									keep(1), limit(0));
-			death_final := sort(death_BestHit+death_BestFreq,acctno,InternalID);
-		return death_final;
-	end;
-	Export appendDeath (dataset(Healthcare_Shared.Layouts.layout_slim) inputSlim, 
-											dataset(Healthcare_Shared.Layouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
-		updateSSN := join(inputRecs,inputSlim,left.acctno=right.acctno and left.InternalID=(integer)right.InternalID,
-													transform(Healthcare_Shared.Layouts.layout_slim,self.UserSSNFound:=exists(left.ssns(ssn=right.userSSN));self:=right));
-		fmtRec_Death := sort(doCheckDeath(updateSSN),acctno,InternalID,-dod);
-		results := join(inputRecs,fmtRec_Death, left.acctno=right.acctno and left.InternalID=(integer)right.InternalID,
-																		transform(Healthcare_Shared.Layouts.CombinedHeaderResultsDoxieLayout,
-																							self.DeathLookup := right.death_ind;
-																							self.DateofDeath := right.dod;
-																							self := left),left outer,keep(Healthcare_Shared.Constants.IDS_PER_DID), limit(0));
-		return results;
-	end;
-	
-	*/
-	
+
+
 	//Validate NPI Checksum
 	EXPORT fn_NPICheckSum(string checkNPI):= FUNCTION
 		NPILength := length(checkNPI);  // NPI is either 10 chars (most of the time) or 15 chars.
 		x1 := if(NPILength = 10, (integer)checkNPI[1] * 2,(integer)checkNPI[6] * 2);
 		x2 := if(NPILength = 10, (integer)checkNPI[3] * 2,(integer)checkNPI[8] * 2);
-		x3 := if(NPILength = 10, (integer)checkNPI[5] * 2,(integer)checkNPI[10] * 2); 
+		x3 := if(NPILength = 10, (integer)checkNPI[5] * 2,(integer)checkNPI[10] * 2);
 		x4 := if(NPILength = 10, (integer)checkNPI[7] * 2,(integer)checkNPI[12] * 2);
 		x5 := if(NPILength = 10, (integer)checkNPI[9] * 2,(integer)checkNPI[14] * 2);
 		s1:=if( x1 >9,1+(integer)x1[2],x1);
@@ -1098,9 +1049,9 @@ EXPORT Functions := MODULE
 		CheckSumFinal := ((CheckSumModInt * 10) - CheckSumAllDigits);
 		isGoodCheckDigit := if(NPILength=10 and CheckSumFinal = (integer)checkNPI[10], true,
 													if(NPILength=15 and CheckSumFinal = (integer)checkNPI[15], true,false));
-		return isGoodCheckDigit;											
+		return isGoodCheckDigit;
 	end;
-		
+
 	//Enclarity Functions
 	EXPORT Healthcare_Shared.Constants.MatchType CompareSoundex(STRING str1, STRING str2) :=  FUNCTION
 		sndx1 := Healthcare_Shared.Functions_C.getSoundex(TRIM(str1,LEFT,RIGHT));
@@ -1111,19 +1062,19 @@ EXPORT Functions := MODULE
 		// maybe we have a partial match (matches the shorter)?
 		minLength := MIN(LENGTH(sndx1),LENGTH(sndx2));
 		fuzzyMatch := sndx1[ ..minLength] = sndx2[ ..minLength];
-		
+
 		result := if (na, Healthcare_Shared.Constants.MatchType.MT_NA, if (exactMatch, Healthcare_Shared.Constants.MatchType.MT_EXACT, if (fuzzyMatch, Healthcare_Shared.Constants.MatchType.MT_FUZZY, Healthcare_Shared.Constants.MatchType.MT_NO_MATCH)));
 
 		return result;
 	end;
-	
-	
+
+
 	EXPORT Healthcare_Shared.Constants.MatchType CompareMetaphone(STRING str1, STRING str2) := FUNCTION
 		dm1str := Healthcare_Shared.Functions_C.getDoubleMetaphone(TRIM(str1,LEFT,RIGHT));
 		dm1 := STD.Str.SplitWords(dm1str,'|');
 		dm2str := Healthcare_Shared.Functions_C.getDoubleMetaphone(TRIM(str2,LEFT,RIGHT));
 		dm2 := STD.Str.SplitWords(dm2str,'|');
-		
+
 		na := dm1[1] = '' OR dm2[1] = '';
 		exactMatch := dm1[1] = dm2[1] OR dm1[2] = dm2[2] OR dm1[1] = dm2[2] OR dm1[2] = dm2[1];
 		// maybe we have a partial match (matches the shorter)?
@@ -1136,7 +1087,7 @@ EXPORT Functions := MODULE
 		minLength4 := MIN(LENGTH(dm1[2]),LENGTH(dm2[1]));
 		fuzzyMatch4 := dm1[2][ ..minLength4] = dm2[1][ ..minLength4];
 		fuzzyMatch := fuzzyMatch1 OR fuzzyMatch2 OR fuzzyMatch3 OR fuzzyMatch4;
-		
+
 		result := if (na, Healthcare_Shared.Constants.MatchType.MT_NA, if (exactMatch, Healthcare_Shared.Constants.MatchType.MT_EXACT, if (fuzzyMatch, Healthcare_Shared.Constants.MatchType.MT_FUZZY, Healthcare_Shared.Constants.MatchType.MT_NO_MATCH)));
 		return result;
 	END;
@@ -1145,7 +1096,7 @@ EXPORT Functions := MODULE
 	EXPORT Healthcare_Shared.Constants.MatchType findFatFinger(STRING1 ch, STRING1 target) := FUNCTION
 		na := false;
 		exactMatch := ch = target;
-		
+
 		fuzzyMatch := ((ch='0' AND (target IN ['9','(','-','_'])) OR
 									 (ch='1' AND (target IN ['`','~','2','@'])) OR
 									 (ch='a' AND (target IN ['s','S'])) OR
@@ -1160,37 +1111,37 @@ EXPORT Functions := MODULE
 									 (ch='O' AND (target IN ['i','I'])) OR
 									 (ch='R' AND (target IN ['f','F'])) OR
 									 (ch='F' AND (target IN ['r','R'])));
-		
+
 		result := if (na, Healthcare_Shared.Constants.MatchType.MT_NA, if (exactMatch, Healthcare_Shared.Constants.MatchType.MT_EXACT, if (fuzzyMatch, Healthcare_Shared.Constants.MatchType.MT_FUZZY, Healthcare_Shared.Constants.MatchType.MT_NA)));
 		RETURN result;
 	END;
-	
+
 	EXPORT unsigned1 getNumberScore(STRING astr1, STRING astr2) := FUNCTION
 		STRING str1 := TRIM(astr1,LEFT,RIGHT);
 		STRING str2 := TRIM(astr2,LEFT,RIGHT);
 		minLength := MIN(LENGTH(str1),LENGTH(str2));
 		maxLength := MAX(LENGTH(str1),LENGTH(str2));
-		
+
 		distance := Healthcare_Shared.Functions_C.getLevenshteinDistance(str1, str2);
-		
+
 		result := if(minLength=0 or distance>=minLength, 0, ((minLength - distance) * 100 ) / minLength);
 		return result;
 	END;
-	
+
 	EXPORT Healthcare_Shared.Layouts.MatchResult getMatchResult(STRING astr1, STRING astr2) := FUNCTION
 		STRING str1 := TRIM(astr1,LEFT,RIGHT);
 		STRING str2 := TRIM(astr2,LEFT,RIGHT);
 		minLength := MIN(LENGTH(str1),LENGTH(str2));
 		maxLength := MAX(LENGTH(str1),LENGTH(str2));
-		
+
 		ucStr1 := STD.Str.ToUpperCase(str1);
 		ucStr2 := STD.Str.ToUpperCase(str2);
-		
+
 		bInitialMatch := (ucStr1[1] = ucStr2[1]) AND (((LENGTH(ucStr1) = 1) OR ((LENGTH(ucStr1) = 2) AND (ucStr1[2] = '.'))) OR ((LENGTH(ucStr2) = 1) OR ((LENGTH(ucStr2) = 2) AND (ucStr2[2] = '.'))));
-		
+
 		boolean na := str1 = '' OR str2 = '';
 		boolean exactMatch := ucStr1 = ucStr2;
-		
+
 		soundexMatchResult := CompareSoundex(ucStr1, ucStr2);
 		metaphoneMatchResult := CompareMetaphone(ucStr1, ucStr2);
 		REAL8 oliverConfidence := Healthcare_Shared.Functions_C.getOliverConfidence(ucStr1, ucStr2);
@@ -1198,41 +1149,41 @@ EXPORT Functions := MODULE
 
 		boolean bSoundexExact 	:= (soundexMatchResult = Healthcare_Shared.Constants.MatchType.MT_EXACT);
 		boolean bMetaphoneExact := (metaphoneMatchResult = Healthcare_Shared.Constants.MatchType.MT_EXACT);
-		
+
 		soundexScore := map(	bSoundexExact AND bMetaphoneExact	=> 90,
 													bSoundexExact => 80,
 													soundexMatchResult = Healthcare_Shared.Constants.MatchType.MT_FUZZY => 50,
 													0); // default
-													
+
 		metaphoneScore := map(bMetaphoneExact AND bSoundexExact	=> 90,
 													bMetaphoneExact => 80,
 													metaphoneMatchResult = Healthcare_Shared.Constants.MatchType.MT_FUZZY => 50,
 													0); // default
-													
+
 		distanceScore := if ((REAL8)((maxLength - distance) / (REAL8)maxLength) > 0, (REAL8)(maxLength - distance) / (REAL8)maxLength, 0);
-		
-		finalScore := map(	
-									exactMatch => 100, 
+
+		finalScore := map(
+									exactMatch => 100,
 									((soundexScore + metaphoneScore) = 0 AND distanceScore > 0.8 AND oliverConfidence > 0.9) =>	(INTEGER4)(distanceScore * 100.0 + oliverConfidence * 100.0) / 3,
 									(soundexScore + metaphoneScore + (INTEGER4)(distanceScore * 100.0) + (INTEGER4)(oliverConfidence * 100.0)) / 4 // default
 									);
-				
-		
+
+
 		boolean bStrStr := ((NOT bInitialMatch) AND (minLength > 3) AND ((STD.Str.Find(ucStr1, ucStr2) > 0) OR (STD.Str.Find(ucStr2, ucStr1) > 0)));
-																					 
+
 		mt := map (	na														=> Healthcare_Shared.Constants.MatchType.MT_NA,
 								exactMatch 										=> Healthcare_Shared.Constants.MatchType.MT_EXACT,
 								(finalScore > 50 or bStrStr)	=> Healthcare_Shared.Constants.MatchType.MT_FUZZY,
 								Healthcare_Shared.Constants.MatchType.MT_NO_MATCH); // default
-								
+
 		fi := map (	finalScore = 100	=> Healthcare_Shared.Constants.FuzzyInfo.FI_NULL,
 								finalScore > 80 	=> Healthcare_Shared.Constants.FuzzyInfo.FI_STRONG_POS_MATCH,
-								finalScore > 50   => Healthcare_Shared.Constants.FuzzyInfo.FI_PARTIAL, 
-								bStrStr						=> Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 
+								finalScore > 50   => Healthcare_Shared.Constants.FuzzyInfo.FI_PARTIAL,
+								bStrStr						=> Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR,
 								//TBD							=> Healthcare_Shared.Constants.FuzzyInfo.FI_SIMPLE_TRANSPOSITION,
 								//TBD							=> Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_CORRECTED,
 								Healthcare_Shared.Constants.FuzzyInfo.FI_NULL); // default
-																					 
+
 	//	cs1 := fatFingerCorrectedString(ucStr1, ucStr2);
 	//	numPossibleFatFingers := getLevenshteinDistance(ucStr1, cs1);
 	//	possibleFatFinger := (numPossibleFatFingers > (LENGTH(ucStr1) / 2));
@@ -1245,7 +1196,7 @@ EXPORT Functions := MODULE
 	//	corDistanceScore := if ((REAL8)(minLength - corDistance) / (REAL8)minLength > 0, (REAL8)(minLength - corDistance) / (REAL8)minLength, 0);
 	//	corFinalScore := ((corSoundexScore + corMetaphoneScore + corDistanceScore * 100.0 + corOliverConfidence * 100.0) / 4);
 	//	realFinalScore := MAX(finalScore,corFinalScore);
-	
+
 		Healthcare_Shared.Layouts.MatchResult createRow := TRANSFORM
 			SELF.s1											:= astr1;
 			SELF.s2											:= astr2;
@@ -1258,11 +1209,11 @@ EXPORT Functions := MODULE
 		end;
 		return row(createRow);
 	END;
-	
-	
+
+
 	EXPORT Healthcare_shared.Layouts.MatchStat getMatchStat(STRING astr1, STRING astr2) := FUNCTION
 		match_result := getMatchResult(astr1, astr2);
-		
+
 		Healthcare_shared.Layouts.MatchStat createRow := TRANSFORM
 			SELF.score									:= match_result.score;
 			SELF.matchType							:= match_result.match_type;
@@ -1270,10 +1221,10 @@ EXPORT Functions := MODULE
 			SELF.numPossibleFatFingers	:= 0;
 			SELF.extendedInfo 					:= 0;
 		end;
-		
+
 		return row(createRow);
 	END;
-	
+
 	EXPORT Healthcare_Shared.Layouts.NameScoreResult NameScoreMatch
 												(STRING n1_pre_name='',STRING n1_first_name='',STRING n1_middle_name='',STRING n1_last_name='',
 												 STRING n1_maturity_suffix='',STRING n1_preferred_name='',INTEGER1 n1_gender=-1,
@@ -1285,31 +1236,31 @@ EXPORT Functions := MODULE
 		otherFirstNameTokens  := STD.Str.SplitWords(n2_first_name,' ');
 		otherMiddleNameTokens := STD.Str.SplitWords(n2_middle_name,' ');
 		otherLastNameTokens   := STD.Str.SplitWords(n2_last_name,' ');
-		
+
 		bMultipleTokensInThisFirstName   := COUNT(thisFirstNameTokens) > 1;
 		bMultipleTokensInThisMiddleName  := COUNT(thisMiddleNameTokens) > 1;
 		bMultipleTokensInThisLastName    := COUNT(thisLastNameTokens) > 1;
 		bMultipleTokensInOtherFirstName  := COUNT(otherFirstNameTokens) > 1;
 		bMultipleTokensInOtherMiddleName := COUNT(otherMiddleNameTokens) > 1;
 		bMultipleTokensInOtherLastName   := COUNT(otherLastNameTokens) > 1;
-		
+
 		bMultipleTokensSomewhere := bMultipleTokensInThisFirstName OR bMultipleTokensInThisMiddleName OR bMultipleTokensInThisLastName OR bMultipleTokensInOtherFirstName OR bMultipleTokensInOtherMiddleName OR bMultipleTokensInOtherLastName;
 		//OUTPUT(bMultipleTokensSomewhere);
 		thisFullName  := n1_first_name  + ' ' + n1_middle_name  + ' ' + n1_last_name;
 		otherFullName := n2_first_name + ' ' + n2_middle_name + ' ' + n2_last_name;
-		
+
 		thisFullNameTokens   := STD.Str.SplitWords(thisFullName,' ');
 		otherFullNameTokens  := STD.Str.SplitWords(otherFullName,' ');
-		
+
 		tokenDifference := ABS(COUNT(otherFullNameTokens) - COUNT(thisFullNameTokens));
 		minTokens := MIN(COUNT(otherFullNameTokens),COUNT(thisFullNameTokens));
 		maxTokens := MAX(COUNT(otherFullNameTokens),COUNT(thisFullNameTokens));
-		
+
 		bNameRearrangementMatch1 := Healthcare_Shared.Functions_C.CompareTokens100(thisFullName,otherFullName) AND Healthcare_Shared.Functions_C.CompareTokens100(otherFullName,thisFullName);
 		bNameRearrangementMatch := bNameRearrangementMatch1 AND (tokenDifference=0);
 		bNameRearrangementFuzzyMatch1 := Healthcare_Shared.Functions_C.CompareTokens100(thisFullName,otherFullName) OR Healthcare_Shared.Functions_C.CompareTokens100(otherFullName,thisFullName);
 		bNameRearrangementFuzzyMatch := bNameRearrangementFuzzyMatch1 AND (maxTokens>=3) AND (minTokens>=2) AND (tokenDifference=1);
-		
+
 		names := DATASET([{n1_first_name,n2_first_name},
 											{n1_first_name,n2_middle_name},
 											{n1_first_name,n2_last_name},
@@ -1324,7 +1275,7 @@ EXPORT Functions := MODULE
 
 		ds := PROJECT(names, TRANSFORM(Healthcare_Shared.Layouts.MatchResult,
 														self := getMatchResult(LEFT.name1, LEFT.name2)));
-																											
+
 		// 1 - first to first
 		// 2 - first to middle
 		// 3 - first to last
@@ -1334,7 +1285,7 @@ EXPORT Functions := MODULE
 		// 7 - last to first
 		// 8 - last to middle
 		// 9 - last to last
-		
+
 		// first name
 		firstMatch := if (ds[1].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT,
 										if (ds[1].b_initial_match, 2, 1),  // 1, 2
@@ -1359,7 +1310,7 @@ EXPORT Functions := MODULE
 																			 ds[3].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
 																			 ds[3].b_initial_match), 8,  // 8
 																		if (ds[2].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 9,  // 9
-																			if (ds[3].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 10, 0))), // 10													  
+																			if (ds[3].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 10, 0))), // 10
 																	if (ds[2].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
 																			ds[2].b_initial_match OR
 																			ds[3].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
@@ -1453,7 +1404,7 @@ EXPORT Functions := MODULE
 																	11 => Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT,
 																	12 => Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT,
 																				0);
-		
+
 		// last name
 		lastMatch := if (ds[9].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT,
 										if (ds[9].b_initial_match, 2, 1),  // 1, 2
@@ -1474,7 +1425,7 @@ EXPORT Functions := MODULE
 																	ds[7].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
 																	ds[7].b_initial_match, 6,  // 6
 																if (ds[8].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 7,  // 7
-																	if (ds[7].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 8, 0))), // 8													  
+																	if (ds[7].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 8, 0))), // 8
 															if (ds[8].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
 																	ds[8].b_initial_match OR
 																	ds[7].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT OR
@@ -1503,12 +1454,12 @@ EXPORT Functions := MODULE
 																	9  => Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT,
 																	10 => Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT,
 																				0);
-																				
-																					
-		bFirstTaken1 := firstMatch IN [1,2,5,6,7] OR middleMatch IN [3,5,6] OR lastMatch IN [4];																	
+
+
+		bFirstTaken1 := firstMatch IN [1,2,5,6,7] OR middleMatch IN [3,5,6] OR lastMatch IN [4];
 		bMiddleTaken1 := firstMatch IN [3] OR middleMatch IN [1,2] OR lastMatch IN [3];
 		bLastTaken1 := firstMatch IN [4] OR middleMatch IN [4] OR lastMatch IN [1,2,5];
-		
+
 		// suspect transposition
 		suspectTransposition := if (bMultipleTokensSomewhere, 1, 0) +
 														if (firstMatch=3, 1, 0) +
@@ -1524,7 +1475,7 @@ EXPORT Functions := MODULE
 														if (lastMatch=4, 1, 0) +
 														if (lastMatch=6, 1, 0) +
 														if (lastMatch=9, 1, 0);
-														
+
 		// suspect aggregation
 		suspectAggregation := if (firstMatch=9, 1, 0) +
 													if (firstMatch=10, 1, 0) +
@@ -1538,7 +1489,7 @@ EXPORT Functions := MODULE
 
 		// extended match info
 		bExtendedMatchInfo1 := bFirstExtendedMatchInfo|bMiddleExtendedMatchInfo|bLastExtendedMatchInfo;
-		
+
 		// process transpositions
 		suspectTranspositionFirstName := if ((suspectTransposition > 1) AND ((bExtendedMatchInfo1&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT) > 0),
 																			 if (NOT bMiddleTaken1 AND ds[2].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT, 1,
@@ -1592,7 +1543,7 @@ EXPORT Functions := MODULE
 																						if (NOT bMiddleTaken2 AND ds[8].match_type=Healthcare_Shared.Constants.MatchType.MT_FUZZY, 4,
 																							if (NOT bFirstTaken1 AND ds[7].b_initial_match, 5,
 																								if (NOT bMiddleTaken2 AND ds[8].b_initial_match, 6, 0)))))),0);
-																								
+
 		bFirstTaken2 := if (suspectTranspositionLastName IN [1,3,5], true, false);
 		bMiddleTaken3 := if (suspectTranspositionLastName IN [2,4,6], true, false);
 		bExtendedMatchInfo3 := case (suspectTranspositionLastName,
@@ -1629,7 +1580,7 @@ EXPORT Functions := MODULE
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_MIDDLE_TRANSPOSED^
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT,
 																			 bExtendedMatchInfo2);
-																							
+
 		suspectTranspositionMiddleName := if ((suspectTransposition > 1) AND ((bExtendedMatchInfo1&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT) > 0),
 																				if (NOT bFirstTaken2 AND ds[4].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT, 1,
 																					if (NOT bLastTaken2 AND ds[6].match_type=Healthcare_Shared.Constants.MatchType.MT_EXACT, 2,
@@ -1680,7 +1631,7 @@ EXPORT Functions := MODULE
 																		 if ((bExtendedMatchInfo1&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT) > 0,
 																			 if (ds[2].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 1,
 																				 if (ds[3].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 2, 0)),0),0);
-																		
+
 		suspectAggregationMiddleName := if (suspectAggregation > 1,
 																			if ((bExtendedMatchInfo1&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT) > 0,
 																				if (ds[4].fuzzy_info=Healthcare_Shared.Constants.FuzzyInfo.FI_EXACT_STR_STR, 1,
@@ -1716,7 +1667,7 @@ EXPORT Functions := MODULE
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_LAST_TRANSPOSED^
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT,
 																			 bExtendedMatchInfo5);
-																			 
+
 		bExtendedMatchInfo7 := case (suspectAggregationLastName,
 																	1 => bExtendedMatchInfo6|
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_FUZZY|
@@ -1730,16 +1681,16 @@ EXPORT Functions := MODULE
 																			 Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT,
 																			 bExtendedMatchInfo6);
 
-		bExtendedMatchInfo8 := if (suspectTransposition=0 AND n1_gender!=0 AND n2_gender!=0 AND ((n1_gender<3 AND n2_gender>3) OR (n1_gender>3 AND n2_gender<3)), 
+		bExtendedMatchInfo8 := if (suspectTransposition=0 AND n1_gender!=0 AND n2_gender!=0 AND ((n1_gender<3 AND n2_gender>3) OR (n1_gender>3 AND n2_gender<3)),
 																bExtendedMatchInfo7|Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.GENDER_CONFLICT,bExtendedMatchInfo7);
-																
+
 		bProbablyFemale := (n1_gender>3 OR n2_gender>3);
-		
+
 		bExtendedMatchInfo9 := if (bExtendedMatchInfo8&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT>0 AND bProbablyFemale AND bExtendedMatchInfo8&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT=0,
 															 bExtendedMatchInfo8|Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FEMALE_WITH_LAST_NAME_CONFLICT,
 															 bExtendedMatchInfo8);
 
-		bExtendedMatchInfo10 := if (n1_maturity_suffix!='' AND n2_maturity_suffix!='', 
+		bExtendedMatchInfo10 := if (n1_maturity_suffix!='' AND n2_maturity_suffix!='',
 																if (n1_maturity_suffix!=n2_maturity_suffix,
 																		bExtendedMatchInfo9|Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MATURITY_SUFFIX_CONFLICT,
 																		bExtendedMatchInfo9),
@@ -1777,16 +1728,16 @@ EXPORT Functions := MODULE
 		lastNameScore2 := if (bExtendedMatchInfo10&(Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_FIRST_TRANSPOSED|Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_MIDDLE_TRANSPOSED)>0,
 												if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_INITIAL_MATCH>0, 0, lastNameScore *0.7),
 												lastNameScore);
-												
+
 		firstNameScore3 := if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT>0, firstNameScore2 - firstNameMax, firstNameScore2);
 		middleNameScore3 := if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT>0, middleNameScore2 - middleNameMax, middleNameScore2);
 		lastNameScore3 := if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT>0, lastNameScore2 - lastNameMax, lastNameScore2);
-		
+
 		nConflicts := if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT>0, 1, 0) + if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT>0, 1, 0) + if (bExtendedMatchInfo10&Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT>0, 1, 0);
 		nElementsMissing := if (firstNameScore2=0.0, 1, 0) + if (middleNameScore2=0.0, 1, 0) + if (lastNameScore2=0.0, 1, 0);
 		nExactMatches :=  if (firstNameScore2=firstNameMax, 1, 0) + if (middleNameScore2=middleNameMax, 1, 0) + if (lastNameScore2=lastNameMax, 1, 0);
 		nAnyMatches :=  if (firstNameScore2>0, 1, 0) + if (middleNameScore2>0, 1, 0) + if (lastNameScore2>0, 1, 0);
-		
+
 		// Compute a final modifier for the score.
 		finalModifier := if (nConflicts=0,
 											 if (nElementsMissing=1,
@@ -1797,21 +1748,21 @@ EXPORT Functions := MODULE
 													 ds[3].b_initial_match, 0, 33.3));
 
 		nameScore := MAX(0, firstNameScore3 + middleNameScore3 + lastNameScore3 + finalModifier);
-		
+
 		matchStat := if (nameScore=0, Healthcare_Shared.Constants.MatchType.MT_NO_MATCH,
 									 if (nameScore=100, Healthcare_Shared.Constants.MatchType.MT_EXACT, Healthcare_Shared.Constants.MatchType.MT_FUZZY));
-									 
+
 		// set rearrangement bits
 		bExtendedMatchInfo11 := bExtendedMatchInfo10 |
 														if (bNameRearrangementMatch, Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.NAME_REARRANGEMENT_MATCH,0) |
 														if (bNameRearrangementFuzzyMatch, Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.NAME_REARRANGEMENT_FUZZY_MATCH,0);
-		
-		return row({nameScore,matchStat,bExtendedMatchInfo11},Healthcare_Shared.Layouts.NameScoreResult);
-		
-	END;
-	
 
-	
+		return row({nameScore,matchStat,bExtendedMatchInfo11},Healthcare_Shared.Layouts.NameScoreResult);
+
+	END;
+
+
+
 	EXPORT INTEGER1 GetNameStrength(INTEGER4 extendedNameInfo) := FUNCTION
 		missingFirst := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT)=0 AND
 												(extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_MATCH)=0 AND
@@ -1826,12 +1777,12 @@ EXPORT Functions := MODULE
 											 (extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_FUZZY)=0 AND
 											 (extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_INITIAL_MATCH)=0, 1, 0);
 		nMissing := missingFirst + missingMiddle + missingLast;
-		
+
 		conflictFirst := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_CONFLICT)>0, 1, 0);
 		conflictMiddle := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_CONFLICT)>0, 1, 0);
 		conflictLast := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_CONFLICT)>0, 1, 0);
 		nConflicts := conflictFirst + conflictMiddle + conflictLast;
-		
+
 		exactFirst := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_MATCH)>0 AND
 											(extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.FIRST_NAME_INITIAL_MATCH)=0, 1, 0);
 		exactMiddle := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.MIDDLE_NAME_MATCH)>0 AND
@@ -1839,7 +1790,7 @@ EXPORT Functions := MODULE
 		exactLast := if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_MATCH)>0 AND
 										 (extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.LAST_NAME_INITIAL_MATCH)=0, 1, 0);
 		nExact := exactFirst + exactMiddle + exactLast;
-		
+
 		nFuzzy := 3 - (nConflicts + nExact + nMissing);
 
 		// Assess where there were no conflicts and some exact matching.
@@ -1850,7 +1801,7 @@ EXPORT Functions := MODULE
 											if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.STUFF_WAS_TRANSPOSED)>0, Healthcare_Shared.Constants.NameScoreStrength.Weak, Healthcare_Shared.Constants.NameScoreStrength.Strong),
 											if (nExact=1,
 												if ((extendedNameInfo & Healthcare_Shared.Constants.NameScoreExtendedMatchInfo.STUFF_WAS_TRANSPOSED)>0, Healthcare_Shared.Constants.NameScoreStrength.VeryWeak, Healthcare_Shared.Constants.NameScoreStrength.Weak), Healthcare_Shared.Constants.NameScoreStrength.NotAssessed))), Healthcare_Shared.Constants.NameScoreStrength.NotAssessed);
-		
+
 		// Assess where there were no conflicts, but no exact matching.
 		strength2 := if (strength!=Healthcare_Shared.Constants.NameScoreStrength.NotAssessed, strength,
 									 if (nConflicts=0 AND nExact=0,
@@ -1862,7 +1813,7 @@ EXPORT Functions := MODULE
 									 if (nConflicts>0 AND nExact>0,
 										 if (nExact=2, Healthcare_Shared.Constants.NameScoreStrength.Weak,
 											 if (nExact=1, Healthcare_Shared.Constants.NameScoreStrength.VeryWeak, Healthcare_Shared.Constants.NameScoreStrength.NotAssessed)), Healthcare_Shared.Constants.NameScoreStrength.NotAssessed));
-		
+
 		// Assess where there were conflicts and fuzzy matches.
 		strength4 := if (strength3!=Healthcare_Shared.Constants.NameScoreStrength.NotAssessed, strength3,
 									 if (nConflicts>0 AND nFuzzy>0,
@@ -1874,14 +1825,14 @@ EXPORT Functions := MODULE
 
 		RETURN strength5;
 	END;
-	
-	
+
+
 	EXPORT Healthcare_Shared.Layouts.NameExtendedMatchInfo GetNameExtendedMatchInfo(INTEGER4 extendedNameInfo) := FUNCTION
 		// alias this for readability
 		xmi := Healthcare_Shared.Constants.NameScoreExtendedMatchInfo;
 		val := extendedNameInfo;
-		
-		Healthcare_Shared.Layouts.NameExtendedMatchInfo create_row := transform 
+
+		Healthcare_Shared.Layouts.NameExtendedMatchInfo create_row := transform
 			self.stuff_was_transposed 						:= (val & xmi.STUFF_WAS_TRANSPOSED);
 			self.first_middle_transposed 					:= (val & xmi.FIRST_MIDDLE_TRANSPOSED);
 			self.first_last_transposed 						:= (val & xmi.FIRST_LAST_TRANSPOSED);
@@ -1915,22 +1866,22 @@ EXPORT Functions := MODULE
 		end;
 		return row(create_row);
 	END;
-	
+
 	// Check to see if date is expired, given a grace period in months
 	EXPORT boolean isExpiredWithGraceMonths(string8 date, integer4 graceMonths) := function
 		myDate := STD.Date.FromStringToDate(date, '%Y%m%d');
 
-		unsigned1 myMonth := STD.Date.Month(myDate) + graceMonths - 1;	
-		
+		unsigned1 myMonth := STD.Date.Month(myDate) + graceMonths - 1;
+
 		integer2 year := if (myMonth >= 12, STD.Date.Year(myDate) + myMonth DIV 12, STD.Date.Year(myDate));
 		unsigned1 month := myMonth % 12 + 1;
 		unsigned1 day := STD.Date.Day(myDate);
-		
+
 		isLeap :=	if ((((year % 4)=0 and (year % 100)!= 0) or (year % 400)=0), true, false);
 		monthDayCount := if (isLeap, [31,29,31,30,31,30,31,31,30,31,30,31], [31,28,31,30,31,30,31,31,30,31,30,31]);
 		// if we have a date that is not real, back up to last day of month
 		fixedDay := if (day > monthDayCount[month], monthDayCount[month], day);
-		
+
 		return if (STD.Date.DateFromParts(year, month, fixedDay) < STD.Date.Today(), true, false);
 	end;
 
@@ -1969,7 +1920,7 @@ EXPORT Functions := MODULE
 					isValidState := IF(state_in in set(states_ds,state),TRUE,FALSE);
 				return isValidState;
 	END;
-	
+
 	EXPORT getCountryCode (string inStr) := function //inStr will be a state that gets translated to a country code
 		clnStr := STD.Str.ToUpperCase(inStr);
 		return map(clnStr = 'AS' => 'ASM',
@@ -1982,8 +1933,8 @@ EXPORT Functions := MODULE
 							 clnStr = 'UM' => 'UMI',
 							 clnStr = 'VI' => 'VIR',
 							 'USA');
-	end;	
-	
+	end;
+
 	Export convertInt2Specialty(STRING sp) := FUNCTION
 			s := sp[1..2];
 			returnVal := map(s = '01' => 'General Practice',
@@ -2053,8 +2004,8 @@ EXPORT Functions := MODULE
 											'');
 		return returnVal;
 	end;
-	
-	EXPORT CleanTaxids(string15 taxid) := FUNCTION 
+
+	EXPORT CleanTaxids(string15 taxid) := FUNCTION
 		CleanedTin := cleanOnlyNumbers(Trim(taxid, left,right));
 		IsInvalid := TaxID = '999999999' or CleanedTin = '999999999';
 		IsCorrectLength := length(CleanedTin) = 9;
@@ -2070,7 +2021,7 @@ EXPORT Functions := MODULE
 									length(CleanedTin) = 8 => '0' + CleanedTin,
 									'');
 		return map(IsInvalid => '',
-							 Typo <> '' => Typo, 
+							 Typo <> '' => Typo,
 							 NOT IsCorrectLength and length(CleanedTin) = 9 => CleanedTin,
 							 NOT IsCorrectLength => EditedVal,
 							 IsCorrectLength => CleanedTin,
@@ -2103,7 +2054,7 @@ EXPORT Functions := MODULE
 			st_YearInvalid						:= map(IsYearInvalid		=> Healthcare_Shared.Constants.stat_Date_InvalidYear,0); 		//16384
 			st_MonthMissing						:= map(IsMonthMissing		=> Healthcare_Shared.Constants.stat_Date_MissingMonth,0); 	//32768
 			st_DayMissing							:= map(IsDayMissing			=> Healthcare_Shared.Constants.stat_Date_MissingDay,0); 		//65536
-			date_st 									:= (st_TooLong + st_InvalidDate + st_NonNumeric + st_MonthInvalid + st_YearBefore1900 + 
+			date_st 									:= (st_TooLong + st_InvalidDate + st_NonNumeric + st_MonthInvalid + st_YearBefore1900 +
 																		st_DateinFuture + st_YearInvalid + st_MonthMissing + st_DayMissing);
 			// output(st_Missing, Named('datestat_st_Missing'),overwrite);
 			// output(st_TooLong, Named('datestat_st_TooLong'),overwrite);

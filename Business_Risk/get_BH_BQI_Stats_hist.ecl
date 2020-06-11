@@ -1,4 +1,4 @@
-﻿﻿IMPORT Gong, dx_header, DNB, IRS5500, Business_Header, riskwise, doxie;
+﻿IMPORT dx_Gong, dx_header, DNB, IRS5500, Business_Header, riskwise, doxie;
 
 export get_BH_BQI_Stats_hist(dataset(Business_Risk.Layout_Output) biid,
                              doxie.IDataAccess mod_access) := FUNCTION
@@ -28,7 +28,7 @@ end;
 
 // append the zip, prim_name and prim_range from the bh_best file
 bdid_best_data := join(biid, business_header.key_bh_best,
-						left.bdid!=0 and 
+						left.bdid!=0 and
 						  keyed(left.bdid=right.bdid),
 						  append_best(left, right),
 						  ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1), left outer);
@@ -38,17 +38,17 @@ bh_temp := record
 	unsigned3 historydate;
 end;
 
-bh := join(bdid_best_data, business_risk.Key_Business_Header_Address,				
+bh := join(bdid_best_data, business_risk.Key_Business_Header_Address,
 					left.prim_name!='' and
 					keyed(right.zip=left.zip) and
-					keyed(right.prim_name=left.prim_name) and 
+					keyed(right.prim_name=left.prim_name) and
 					keyed(right.prim_range=left.prim_range) and
 					keyed(right.sec_range in ['', left.sec_range]) and
 					(unsigned)((STRING)right.dt_first_seen)[1..6] <= left.historydate,
 					transform(bh_temp,
 									self := right,
 									self.historydate := left.historydate),
-					ATMOST(						
+					ATMOST(
 						(keyed(right.prim_name=left.prim_name) and keyed(right.zip=left.zip) and
 						 keyed(right.prim_range=left.prim_range) and keyed(right.sec_range in ['', left.sec_range])),5001 ),
 					keep(5000));
@@ -78,16 +78,16 @@ bh_addr := TABLE(bh_addr_all, layout_full_stat, state, zip, prim_name, prim_rang
 aparts := join(bh_addr, dx_header.Key_AptBuildings(),
 			left.prim_name!='' and
 					keyed((string)left.zip = right.zip)  and
-					keyed(right.prim_name=left.prim_name) and 
+					keyed(right.prim_name=left.prim_name) and
 					keyed(right.prim_range=left.prim_range),
 					transform(layout_full_stat, SELF.apts := right.apt_cnt,
 												SELF.ppl := right.did_cnt,
 												self := left),
-					ATMOST(						
+					ATMOST(
 						(keyed(right.prim_name=left.prim_name) and keyed((string)left.zip = RIGHT.zip) and
 						 keyed(right.prim_range=left.prim_range)),RiskWise.max_atmost ),
 					keep(500), left outer);
-					
+
 // output(aparts);
 
 
@@ -100,7 +100,7 @@ END;
 
 addr_with_people_roll := ROLLUP(
 	group(SORT(aparts, zip, prim_name, prim_range, sec_range), zip, prim_name, prim_range, sec_range),
-	LEFT.zip = RIGHT.zip AND 
+	LEFT.zip = RIGHT.zip AND
 	LEFT.prim_name = RIGHT.prim_name AND
 	LEFT.prim_range = RIGHT.prim_range and
 	LEFT.sec_range = RIGHT.sec_range,
@@ -108,28 +108,28 @@ addr_with_people_roll := ROLLUP(
 
 
 // pull the full list of gong matches using the history date filters
-gng_full := join(bh_addr, gong.Key_History_Address,
+gng_full := join(bh_addr, dx_Gong.key_history_address(),
 					left.prim_name!='' and left.zip!=0 and
 					(keyed(right.prim_name=left.prim_name) and keyed(right.st=left.state) and keyed(right.z5=(string)left.zip) and
 					keyed(right.prim_range=left.prim_range)) and
 					(right.sec_range = left.sec_range) and
 					((unsigned)right.dt_first_seen[1..6] < left.historydate and
-						 (RIGHT.current_flag OR 
+						 (RIGHT.current_flag OR
 						 (unsigned)RIGHT.deletion_date[1..6] >= left.historydate )
 						 ),
-						 
-					transform(recordof(gong.Key_History_Address), self := right),
+
+					transform(dx_Gong.layouts.i_history_address, self := right),
 					ATMOST(
 						(keyed(right.prim_name=left.prim_name) and keyed(right.st=left.state) and keyed(right.z5=(string)left.zip) and
 						 keyed(right.prim_range=left.prim_range)),
 						5001
 					),
 					keep(5000));
-					
+
 
 // Get residential phones per addr.
 gng_res := gng_full(publish_code = 'P', listing_type_res <> '', z5 != '', prim_name != '');
-					
+
 gong_res_dist := DEDUP(
 	SORT(gng_res,
 	z5, prim_name, prim_range, sec_range, phone10),
@@ -165,7 +165,7 @@ gong_b_phone_per_addr := TABLE(gong_bus_dist, layout_bus_phones_per_addr, z5, pr
 
 
 stat2 := JOIN(addr_with_people_roll, gong_r_phone_per_addr,
-	LEFT.zip = (UNSIGNED3) RIGHT.z5 AND 
+	LEFT.zip = (UNSIGNED3) RIGHT.z5 AND
 	LEFT.prim_name = (QSTRING28) RIGHT.prim_name AND
 	LEFT.prim_range = (QSTRING10) RIGHT.prim_range AND
 	LEFT.sec_range = (QSTRING8) RIGHT.sec_range,
@@ -175,16 +175,16 @@ stat2 := JOIN(addr_with_people_roll, gong_r_phone_per_addr,
 // output(stat2, named('stat2'));
 
 addr_all_rollup := JOIN(stat2, gong_b_phone_per_addr,
-	LEFT.zip = (UNSIGNED3) RIGHT.z5 AND 
+	LEFT.zip = (UNSIGNED3) RIGHT.z5 AND
 	LEFT.prim_name = (QSTRING28) RIGHT.prim_name AND
 	LEFT.prim_range = (QSTRING10) RIGHT.prim_range AND
 	LEFT.sec_range = (QSTRING8) RIGHT.sec_range,
 	transform(layout_full_stat, self.b_phone_per_addr := right.b_phone_per_addr, self := left), LEFT OUTER, lookup);
 
 
-// ################################################################## 
+// ##################################################################
 
-// ################################################################## 
+// ##################################################################
 // Get information from DNB and IRS5500 per bdid.
 
 // layout_bs_join := RECORD
@@ -203,7 +203,7 @@ addr_all_rollup := JOIN(stat2, gong_b_phone_per_addr,
 	// BOOLEAN   current_corp := FALSE;
 	// UNSIGNED6 best_phone := 0;
 	// UNSIGNED1 company_name_score := 0;
-	
+
 	// UNSIGNED4 bdid_per_addr;
 	// UNSIGNED4 apts;
 	// UNSIGNED4 ppl;
@@ -213,16 +213,16 @@ addr_all_rollup := JOIN(stat2, gong_b_phone_per_addr,
 
 with_address_counts := join(bdid_best_data, addr_all_rollup,
 					right.zip=left.zip and
-					right.prim_name=left.prim_name and 
+					right.prim_name=left.prim_name and
 					right.prim_range=left.prim_range,
-					transform(business_header.Layout_BQI_Stats, 
+					transform(business_header.Layout_BQI_Stats,
 									self.bdid := left.bdid,
 									self.zip := left.zip,
 									self.prim_name := left.prim_name,
 									self.prim_range := left.prim_range,
 									self := right,
 									self := []), left outer, lookup);
-			
+
 
 
 l_temp := record
@@ -232,16 +232,16 @@ l_temp := record
 	string irs_date;
 	unsigned3 historydate;
 end;
-	
+
 l_temp append_dunsnumber(with_address_counts le, dnb.Key_DNB_BDID rt) := transform
 	self.dn := rt.duns_number;
 	self := le;
 	self := [];
 end;
 
-duns_number := join(with_address_counts, dnb.key_dnb_bdid, 
+duns_number := join(with_address_counts, dnb.key_dnb_bdid,
 						  keyed(left.bdid=right.bd) and mod_access.use_DNB(),
-						  append_dunsnumber(left, right), 
+						  append_dunsnumber(left, right),
 						  ATMOST(keyed(left.bdid=right.bd), RiskWise.max_atmost), keep(1),
 						  left outer);
  //output(duns_number);
@@ -254,16 +254,16 @@ duns_number := join(with_address_counts, dnb.key_dnb_bdid,
 bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 					keyed(left.dn=right.duns) and mod_access.use_DNB() and
 					 right.active_duns_number = 'Y' and right.record_type = 'C' and
-					 (unsigned)right.date_first_seen[1..6] < left.historydate, 
-					transform(l_temp, 
-							self.dnb_emps := IF( (INTEGER4) right.employees_total > 0, 
+					 (unsigned)right.date_first_seen[1..6] < left.historydate,
+					transform(l_temp,
+							self.dnb_emps := IF( (INTEGER4) right.employees_total > 0,
 													(UNSIGNED4) right.employees_total,
 													IF((INTEGER4) right.employees_here > 0,
 														(UNSIGNED4) right.employees_here,
 														if(right.duns!='', 1, 0))
 												),
 							self.dnb_date_last_seen := right.date_last_seen,
-							self := left), left outer, 
+							self := left), left outer,
 							ATMOST(keyed(left.dn=right.duns),RiskWise.max_atmost),
 					keep(100));
 
@@ -271,28 +271,28 @@ bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 
 bs_dnb_dedup := DEDUP(SORT(bs_dnb, bdid, -dnb_date_last_seen), bdid);
 // output(bs_dnb_dedup, named('bs_dnb_dedup'));
-		
+
 
 
 bs_irs := join(bs_dnb_dedup, irs5500.key_irs5500_bdid, left.bdid!=0 and
 					keyed(left.bdid=right.bdid) and
-					 (unsigned)right.form_plan_year_begin_date[1..6] < left.historydate, 
-					transform(l_temp, 
-							self.irs5500_emps := IF( (INTEGER4) right.tot_partcp_boy_cnt > 0, 
+					 (unsigned)right.form_plan_year_begin_date[1..6] < left.historydate,
+					transform(l_temp,
+							self.irs5500_emps := IF( (INTEGER4) right.tot_partcp_boy_cnt > 0,
 													(UNSIGNED4) right.tot_partcp_boy_cnt,
 													IF((INTEGER4) right.tot_active_partcp_cnt > 0,
 														(UNSIGNED4) right.tot_active_partcp_cnt,
 														if(right.bdid!=0,1,0))
 												),
 							self.irs_date := right.form_plan_year_begin_date,
-							self := left), left outer, 
+							self := left), left outer,
 							ATMOST(keyed(left.bdid=right.bdid),RiskWise.max_atmost),
 					keep(100));
 
 // output(bs_irs, named('bs_irs'));
 
 bs_irs_dedup := DEDUP(SORT(bs_irs, bdid, -irs_date), bdid);
-// output(bs_irs_dedup, named('bs_irs_dedup'));				
+// output(bs_irs_dedup, named('bs_irs_dedup'));
 
 // do this on the file, compare input company to best company somewhere
 // SELF.company_name_score := ut.CompanySimilar(le.company_name, rt.company_name);
@@ -305,7 +305,7 @@ bs_irs_dedup := DEDUP(SORT(bs_irs, bdid, -irs_date), bdid);
 //current_corp_cnt we can get from biid
 
 
-/*	
+/*
 // Add best address
 business_header.Layout_BQI_Stats Merge_results(with_address_counts l, bs_irs_dedup r) := transform
 	self.zip := l.zip;
@@ -318,12 +318,12 @@ business_header.Layout_BQI_Stats Merge_results(with_address_counts l, bs_irs_ded
 	self.ppl := l.ppl;
 	self.r_phone_per_addr := l.r_phone_per_addr;
 	self.b_phone_per_addr := l.b_phone_per_addr;
-	
+
 	self := r;
 	self := [];
 
 	// SELF.combined_score := 0 +
-		// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2, 
+		// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2,
 			// IF(l.b_phone_per_addr > 0, 1, 0)) +
 		// IF(l.dnb_emps + l.irs5500_emps > l.ppl, 5, 0) +
 		// IF(l.domainss > 1, 2 ,0) +
@@ -338,12 +338,12 @@ end;
 
 
 
-bqi_stats := join(with_address_counts, bs_irs_dedup, 
+bqi_stats := join(with_address_counts, bs_irs_dedup,
 					left.zip = right.zip  and
-					left.prim_name=right.prim_name and 
+					left.prim_name=right.prim_name and
 					left.prim_range=right.prim_range,
 				  merge_results(left,right), keep(1));
-				  
+
 // output(bqi_stats);
 */
 

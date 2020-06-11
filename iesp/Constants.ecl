@@ -1809,6 +1809,10 @@ EXPORT Constants := MODULE
 		// NOTE: this is currently not used in top business report - at present it is only used for combined bip service
 		export unsigned MAX_COUNT_BIZRPT_CTL_SEGMENTS := 50;
 		export unsigned MAX_COUNT_BIZRPT_CTL_ACCTS := 100;
+          
+           // BUSINESS INSIGHT SECTION CONSTANTS
+           export unsigned MAX_COUNT_BUSINESS_RISK_RISKCODE := 20;
+           export unsigned MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE := 20;
 
 		// Real Property section limits
 		// ensure that this is 1/2 of MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS

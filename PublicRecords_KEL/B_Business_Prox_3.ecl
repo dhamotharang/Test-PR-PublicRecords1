@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT B_Business_Prox_4,CFG_Compile,E_Address,E_Business_Org,E_Business_Prox,E_Business_Sele,E_Business_Ult,E_Prox_Address,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
+IMPORT B_Business_Prox_4,CFG_Compile,E_Address,E_Business_Org,E_Business_Prox,E_Business_Sele,E_Business_Ult,E_Geo_Link,E_Prox_Address,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Business_Prox_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Business_Prox_4(__in,__cfg).__ENH_Business_Prox_4) __ENH_Business_Prox_4 := B_Business_Prox_4(__in,__cfg).__ENH_Business_Prox_4;
-  SHARED __EE285515 := __ENH_Business_Prox_4;
-  EXPORT __NS289161_Layout := RECORD
+  SHARED __EE411326 := __ENH_Business_Prox_4;
+  EXPORT __NS414972_Layout := RECORD
     KEL.typ.nstr Best_Primary_Range_;
     KEL.typ.nstr Best_Predirectional_;
     KEL.typ.nstr Best_Primary_Name_;
@@ -20,7 +20,7 @@ EXPORT B_Business_Prox_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.nint Best_Zip4_;
     KEL.typ.nint Best_Address_Rank_;
   END;
-  EXPORT __ST96283_Layout := RECORD
+  EXPORT __ST127599_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -56,17 +56,18 @@ EXPORT B_Business_Prox_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Contacts_Layout) Contacts_;
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Prox_Address(__in,__cfg).Best_Addresses_Layout) Best_Business_Prox_Address_;
-    __NS289161_Layout Only_Best_Business_Prox_Address_;
+    __NS414972_Layout Only_Best_Business_Prox_Address_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST96283_Layout __ND288970__Project(B_Business_Prox_4(__in,__cfg).__ST174960_Layout __PP284747) := TRANSFORM
-    __EE285314 := __PP284747.Best_Business_Prox_Address_;
-    SELF.Only_Best_Business_Prox_Address_ := (__T(__EE285314))[1];
-    SELF := __PP284747;
+  SHARED __ST127599_Layout __ND414781__Project(B_Business_Prox_4(__in,__cfg).__ST265849_Layout __PP410558) := TRANSFORM
+    __EE411125 := __PP410558.Best_Business_Prox_Address_;
+    SELF.Only_Best_Business_Prox_Address_ := (__T(__EE411125))[1];
+    SELF := __PP410558;
   END;
-  EXPORT __ENH_Business_Prox_3 := PROJECT(__EE285515,__ND288970__Project(LEFT));
+  EXPORT __ENH_Business_Prox_3 := PROJECT(__EE411326,__ND414781__Project(LEFT));
 END;

@@ -92,8 +92,9 @@ layout_temp := record
 end;
 
 layout_temp_ccpa := RECORD
-    unsigned4 global_sid; // CCPA changes
-    layout_temp;
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
+  layout_temp;
 END;
 
 //can have multiple gateways so account for them
@@ -114,7 +115,7 @@ clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
 layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
-    self.global_sid := rt.ccpa.global_sid;
+   self.global_sid := rt.ccpa.global_sid;
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105 
@@ -139,6 +140,7 @@ layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did
 								 product_code in Inquiry_AccLogs.shell_constants.valid_product_codes;
 
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number); //if no transaction_id, use sequence number
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.first_log_date := if(inquiry_hit, logdate, '');
@@ -654,13 +656,12 @@ deltaBase_all_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Delt
 																														self.Sec_Range := left.shell_input.Sec_range;
 																														self.Zip5 := left.shell_input.z5;
 																														self.Phone10 := left.shell_input.Phone10;
-																														self.Email := left.shell_input.Email_Address));		
-deltaBase_all_results 		:= Inquiry_Deltabase.Search_All(deltaBase_all_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
-// did_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
-																														// self.seq := left.shell_input.seq;
-																														// self.did := left.shell_input.did));
+																														self.Email := left.shell_input.Email_Address));	
+
+// RQ-19982 - to speed up deltabase, we remove the function descriptions from the where clause and increased the limit on the SQL per join to 50 instead of 10																		
+deltaBase_all_results 		:= Inquiry_Deltabase.Search_All(deltaBase_all_ds, '50', DeltabaseGateway);
+
 deltaBase_did_results := deltaBase_all_results(S_DID <> 0 AND Search_Type='2');
-//deltaBase_did_results_old := Inquiry_Deltabase.Search_DID(did_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 MAC_raw_did_transform (add_inquiry_raw, Inquiry_AccLogs.Key_Inquiry_DID);
 MAC_raw_did_transform (add_inquiry_raw_update, Inquiry_AccLogs.Key_Inquiry_DID_Update);
 MAC_raw_did_transform (add_inquiry_raw_deltabase, deltaBase_did_results);
@@ -672,7 +673,7 @@ j_raw_nonfcra_full_unsuppressed := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_
 						add_inquiry_raw(left, right),
 						left outer, atmost(5000));	
 
-j_raw_nonfcra_full_flagged := Suppress.MAC_FlagSuppressedSource(j_raw_nonfcra_full_unsuppressed, mod_access);
+j_raw_nonfcra_full_flagged := Suppress.CheckSuppression(j_raw_nonfcra_full_unsuppressed, mod_access);
 
 j_raw_nonfcra_full := PROJECT(j_raw_nonfcra_full_flagged, TRANSFORM(layout_temp, 
 	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
@@ -1845,6 +1846,7 @@ layout_temp_CCPA trans_name(layout_temp le, ssn_key rt) := transform
 	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perssn_count_day := if(good_inquiry and within1day, 1, 0);
@@ -1938,11 +1940,7 @@ layout_temp_CCPA trans_name(layout_temp le, ssn_key rt) := transform
 end;
 ENDMACRO;
 
-// ssn_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_SSN,
-																														// self.seq := left.shell_input.seq;
-																														// self.SSN := left.shell_input.SSN));																										
 
-//deltaBase_ssn_results_old := Inquiry_Deltabase.Search_SSN(ssn_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltaBase_ssn_results := deltaBase_all_results(SSN <> '' AND Search_Type='7');
 MAC_raw_ssn_transform(add_ssn_raw, Inquiry_AccLogs.Key_Inquiry_SSN);
 MAC_raw_ssn_transform(add_ssn_raw_update, Inquiry_AccLogs.Key_Inquiry_SSN_update);
@@ -1955,7 +1953,7 @@ ssn_raw_base_unsuppressed := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
-ssn_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(ssn_raw_base_unsuppressed, mod_access);
+ssn_raw_base_flagged := Suppress.CheckSuppression(ssn_raw_base_unsuppressed, mod_access);
 
 ssn_raw_base := PROJECT(ssn_raw_base_flagged, TRANSFORM(layout_temp, 
 	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
@@ -2281,6 +2279,7 @@ layout_temp_CCPA trans_name(layout_temp le, addr_key rt) := transform
 	self.virtual_fraud.AltLexID_addr_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_peraddr_count_day := if(good_inquiry and within1day, 1, 0);
@@ -2334,14 +2333,7 @@ layout_temp_CCPA trans_name(layout_temp le, addr_key rt) := transform
 end;
 ENDMACRO;
 
-// address_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Address,
-																														// self.seq := left.shell_input.seq;
-																														// self.Prim_Range := left.shell_input.prim_range;
-																														// self.Prim_Name := left.shell_input.prim_name;
-																														// self.Sec_Range := left.shell_input.Sec_range;
-																														// self.Zip5 := left.shell_input.z5));
 
-// deltabase_address_results := Inquiry_Deltabase.Search_Address(address_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltabase_address_results := deltaBase_all_results(Zip5 <> '' AND Prim_Name <> '' AND Search_Type='1');
 
 MAC_raw_addr_transform(add_Addr_raw, Inquiry_AccLogs.Key_Inquiry_Address);
@@ -2360,7 +2352,7 @@ Addr_raw_base_unsuppressed := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
-Addr_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Addr_raw_base_unsuppressed, mod_access);
+Addr_raw_base_flagged := Suppress.CheckSuppression(Addr_raw_base_unsuppressed, mod_access);
 
 Addr_raw_base := PROJECT(Addr_raw_base_flagged, TRANSFORM(layout_temp, 
 	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
@@ -2649,6 +2641,7 @@ layout_temp_CCPA trans_name(layout_temp le, phone_key rt) := transform
 	self.virtual_fraud.AltLexID_Phone_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);	
+
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perphone_count_day := if(good_inquiry and within1day, 1, 0);
@@ -2702,12 +2695,7 @@ layout_temp_CCPA trans_name(layout_temp le, phone_key rt) := transform
 end;
 ENDMACRO;
 
-// phone_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Phone,
-																														// self.seq := left.shell_input.seq;
-																														// self.Phone10 := left.shell_input.Phone10));
 
-
-// deltaBase_phone_results := Inquiry_Deltabase.Search_Phone(phone_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 deltaBase_phone_results := deltaBase_all_results(Phone10 <> '' AND Search_Type='6');
 
 MAC_raw_phone_transform(add_Phone_raw, Inquiry_AccLogs.Key_Inquiry_Phone);
@@ -2720,7 +2708,7 @@ Phone_raw_base_unsuppressed := join(with_all_per_addr, Inquiry_AccLogs.Key_Inqui
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw(left, right), left outer, atmost(riskwise.max_atmost));
 						
-Phone_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Phone_raw_base_unsuppressed, mod_access);
+Phone_raw_base_flagged := Suppress.CheckSuppression(Phone_raw_base_unsuppressed, mod_access);
 
 Phone_raw_base := PROJECT(Phone_raw_base_flagged, TRANSFORM(layout_temp, 								
 	self.inquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerPhone);												
@@ -2821,6 +2809,10 @@ with_phone_velocities := rollup( grouped_Phone_raw, roll_Phone(left,right), true
 // -----------------------------------------------------
 MAC_raw_email_transform (trans_name, email_key) := MACRO
 layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
+
+	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number); //if no transaction_id, use sequence number
+	self.Sequence_Number := rt.search_info.Sequence_Number;
+	
     self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
@@ -2833,7 +2825,9 @@ layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
 															'', 
 															isFCRA, bsVersion,
 															rt.search_info.method, 
-															le.historyDateTimeStamp);  //for MS-160														
+															le.historyDateTimeStamp);  //for MS-160
+
+
 	self.inquiryPerEmail := if(good_inquiry, 1, 0);   // any search at all by email that meets the good_inquiry criteria														
 	self.inquiryADLsPerEmail := if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromEmail := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
@@ -2856,11 +2850,7 @@ layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
 	self := le;
 end;
 ENDMACRO;
-// email_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_Email,
-																														// self.seq := left.shell_input.seq;
-																														// self.Email := left.shell_input.Email_Address));
-																														
-// deltaBase_email_results := Inquiry_Deltabase.Search_Email(email_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
+
 deltaBase_email_results := deltaBase_all_results(Email <> '' AND Search_Type='3');
 
 MAC_raw_email_transform(add_email_raw, Inquiry_AccLogs.Key_Inquiry_Email);
@@ -2873,7 +2863,7 @@ Email_raw_base_unsuppressed := join(with_phone_velocities, Inquiry_AccLogs.Key_I
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Email_raw(left, right), left outer, atmost(riskwise.max_atmost));
 								
-Email_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Email_raw_base_unsuppressed, mod_access);
+Email_raw_base_flagged := Suppress.CheckSuppression(Email_raw_base_unsuppressed, mod_access);
 
 Email_raw_base := PROJECT(Email_raw_base_flagged, TRANSFORM(layout_temp, 													
 	self.inquiryPerEmail := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerEmail);											
@@ -2958,6 +2948,17 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 // output(deltaBase_ssn_results_old, named('deltaBase_ssn_results_old'));
 // output(deltaBase_ssn_results, named('deltaBase_ssn_results'));
 
+// output(deltaBase_all_results,named('deltaBase_all_results'));
+// output(deltaBase_email_results, named('deltaBase_email_results'));
+
+// output(Email_raw_base,named('Email_raw_base'));
+// output(Email_raw_updates,named('Email_raw_updates'));
+// output(Email_raw_deltabase, named('Email_raw_deltabase'));
+
+// output(Email_raw, named('Email_raw'));
+// output(grouped_Email_raw, named('grouped_Email_raw'));
+// output(with_email_velocities, named('with_email_velocities'));
+
 // output(j_raw_nonfcra_full, all, named('j_raw_nonfcra_full'));
 // output(j_raw_nonfcra_update, all, named('j_raw_nonfcra_update'));
 // output(j_raw_nonfcra_deltabase, all, named('j_raw_nonfcra_deltabase'));
@@ -3033,7 +3034,7 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 
 // output(did_ds,named('old'));
 // output(deltaBase_all_ds,named('new'));
-//  output(deltaBase_all_results,named('deltaBase_all_results'));
+ // output(deltaBase_all_results,named('deltaBase_all_results'));
 
 	return inquiry_summary;
 END;
