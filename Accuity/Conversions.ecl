@@ -122,7 +122,7 @@ case(TRIM(code,ALL),
 	'EUE1170'  =>       'EU Enhancements',
 'FBI35'  =>         'FBI Most Wanted',
 	'FDJ1152'  =>       'FATF Deficient Jurisdictions - Entities',
-'FMU1126'  =>       'Ukraine Financial Monitoring',
+//'FMU1126'  =>       'Ukraine Financial Monitoring',
 	'FR1010'  =>	'France Ministry of Economy',
 'GO36'  =>          'World Government Officials List',
 'HK37'  =>          'Hong Kong Monetary Authority List',
@@ -208,7 +208,7 @@ case(TRIM(code,ALL),
 	'EUE1170'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on EU regulations, but not included in the EU List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'FBI35'  =>         'FBI Most Wanted',
 	'FDJ1152'  =>	u'Entities associated with jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
-	'FMU1126'  =>	'Entities related to terrorist activity or persons subject to international sanctions derived from UN',
+//	'FMU1126'  =>	'Entities related to terrorist activity or persons subject to international sanctions derived from UN',
 	'FR1010'  =>	'Entities subject to French national and EU financial sanctions as posted in the French EU Official Journal',
   'GO36'  =>          'World Government Officials List',
   'HK37'  =>          'Hong Kong Monetary Authority List',
@@ -318,7 +318,7 @@ code= 'SECO42'  => '75DFF111-309D-4613-BE9C-9ED39FD725C1', //Swiss State Secreta
 code= 'TW1016'  => 'B639C576-74D1-4B5A-AE5D-E73A0A75FC25', //Taiwan List
 code= 'UGO1120' => 'E142C34B-6F6D-46D3-A02B-9E1CF4EF3B87', //U.S. Government Officials
 code= 'UK1046'  => 'E7B08E71-FC3B-4180-AEC8-89BADF913545', //UK HOME OFFICE
-code= 'FMU1126' => '5B409771-F615-49D0-80E2-418AC07A1F5E', //UKRAINE FINANCIAL MONITORING
+//code= 'FMU1126' => '5B409771-F615-49D0-80E2-418AC07A1F5E', //UKRAINE FINANCIAL MONITORING
 code= 'CAC1146' => '5DD0626C-8099-4A21-99B6-47FFB535409D', //UN CHILDREN AND ARMED CONFLICT LIST
 //code= 'UNT1064' => '10833C06-58F1-43BE-A4D8-A1EFC070F174', //UN TRAVEL RESTRICTIONS
 //code= 'UN1064'  => 'C0FB78C0-A3B6-41C3-B6DA-89876B5D4289', //UNITED NATIONS

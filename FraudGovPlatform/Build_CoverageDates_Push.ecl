@@ -1,15 +1,15 @@
-Import FraudGovPlatform, MySQL, ut;
+﻿Import FraudGovPlatform, MySQL, ut;
 EXPORT Build_CoverageDates_Push := MODULE
 
 shared coverage_dates := FraudGovPlatform.Files().Base.CoverageDates.Built;
 
 //mysql_prod for Prod, mysql_qa for QA, mysql_dev for Dev
-shared mysql_username := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].username;
-shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql_prod')[1].password;
+shared mysql_username := ut.Credentials().fGetAppUserInfo('mysql_cert')[1].username;
+shared mysql_password := ut.Credentials().fGetAppUserInfo('mysql_cert')[1].password;
 
 
-shared  MySQLServer                 :=  'dbpgov-bct.risk.regn.net';
-shared  MySQLPort                   :=  '3306';
+shared  MySQLServer                 :=  'dbqgov-bct.risk.regn.net';
+shared  MySQLPort                   :=  '3308';
 shared  MySQLDatabase               :=  'ring_web';
 shared  MySQLUser                   :=  mysql_username;
 shared  MySQLPassword               :=  mysql_password;

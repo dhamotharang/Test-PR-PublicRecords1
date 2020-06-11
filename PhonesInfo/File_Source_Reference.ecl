@@ -5,6 +5,10 @@
 EXPORT File_Source_Reference := MODULE
 	
 	//Carrier Reference Base File
-	EXPORT Main 	:= dataset('~thor_data400::base::phones::source_reference_main', dx_PhonesInfo.Layouts.sourceRefBase, flat);
+	EXPORT Main 					:= dataset('~thor_data400::base::phones::source_reference_main', 						dx_PhonesInfo.Layouts.sourceRefBase, flat);
+	EXPORT Main_Previous	:= dataset('~thor_data400::base::phones::source_reference_main_father',			dx_PhonesInfo.Layouts.sourceRefBase, flat);
 	
+	//Exception List
+	EXPORT MainException	:= dataset('~thor_data400::base::phones::source_reference_main_exception', 	dx_PhonesInfo.Layouts.sourceRefBase, flat);
+
 END; 
