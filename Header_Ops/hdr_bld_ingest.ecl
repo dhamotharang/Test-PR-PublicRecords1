@@ -30,7 +30,9 @@ EXPORT hdr_bld_ingest(string8 build_version, boolean incremental, unsigned2 stat
     if(status<1,sequential(setup_ingest, update_status(1, build_version, incremental))),
     if(status<2,sequential(Header.proc_Header(build_version,operatorEmailList,extraNotifyEmailList).run_ingest(incremental),update_status(2, build_version, incremental))),
     if(status<3,sequential(wk_ut.CreateWuid(ECL(build_version),'hthor_eclcc',wk_ut._constants.ProdEsp),update_status(3, build_version, incremental))),
-//In order to keep consistency across all builds and 
-//reserving status to add future steps, the end status is set as 9
+
+    //In order to keep consistency across all builds and 
+    //reserving status to add future steps, the end status is set as 9
     if(status<9,update_status(9, build_version, incremental))
     );
+
