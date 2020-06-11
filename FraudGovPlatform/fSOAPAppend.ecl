@@ -53,6 +53,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared IpAppend_Base		:= Files().base.IpMetaData.qa;
 
 	shared Advo_Base				:= Files().base.Advo.qa;
+
+	shared DLHistory_Base		:= if(STD.File.GetSuperFileSubCount(FraudGovPlatform.Filenames().base.DLHistory.qa) = 0, dataset([], FraudGovPlatform.Layouts.DLHistory ),Files().base.DLHistory.qa);
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
@@ -590,34 +592,21 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
-	EXPORT Best_DLN	(dataset(Layouts.BestInfo) BestInfo_base_map)	:= MODULE
+	EXPORT DL_History	:= MODULE
 
 		service_name	:= 'driversv2_services.batch_service';
 
 		soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
-		ResultNarrow := DriversV2_Services.layouts.result_narrow;
-		AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
-		Seq := DriversV2_Services.layouts.seq;
-		AcctRec := RECORD(Seq)
-			AutoKeyBatchInput.acctno;
-			UNSIGNED6	did := 0;
-			STRING24	dl_number := '';
-			STRING2		dlstate := '';
-		END;		
-
-		layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
-		layout_out := RECORD(ResultNarrow)
-			AcctRec.acctno;
-			STRING10	height_desc;
-		END;
-
 		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
 		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
+		layout_in := layouts.Drivers_Batch.layout_in;
+		layout_out := layouts.Drivers_Batch.layout_out;
 
 		layout_in make_batch_in(pii_base le, integer c) := TRANSFORM
 				self.seq := c;
 				self.acctno := (string)le.record_id;
+				SELF.did := le.did;
 				SELF.Name_First := le.fname;
 				SELF.Name_Middle := le.mname;
 				SELF.Name_Last := le.lname;
@@ -637,18 +626,17 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 				SELF.homephone := le.home_phone;
 				SELF.workphone := le.work_phone_;
 				SELF.dl := le.drivers_license;
-				SELF.dlstate := le.drivers_license_state;
-				SELF.max_results := '1';
+				SELF.dlstate := le.drivers_license_state;				
 				SELF := [];
 		END;
 					
 		layout_soap := RECORD
 			datapermissionmask :=DataPermission;
 			string datarestrictionmask:= DataRestriction;
+			BOOLEAN IncludeNonDMVSources := true;
 			INTEGER DPPAPurpose:=1;
 			INTEGER GLBPurpose:= 5;
-			BOOLEAN return_current_only := true;
-			string max_results_per_acct := '1';
+			BOOLEAN return_current_only := false;
 			DATASET(layout_in) batch_in;
 		END;
 
@@ -673,8 +661,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			SELF := [];
 		END;			
 
-
-
 		soap_results := soapcall( soap_input, 
 			soap_host, 
 			service_name,  
@@ -686,23 +672,41 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			(errorcode='')
 		;			
 
-		shared bdl	:= dedup(project(soap_results	,Transform(Layouts.BestInfo
-																				,self.record_id	:=(unsigned8)left.acctno
-																				,self.did := (unsigned6)left.did
-																				,self.best_drivers_license := left.dl_number
-																				,self.best_drivers_license_state := left.orig_state
-																				,self.best_drivers_license_exp := left.expiration_date																				
-																				,self:=left,self:=[])),record,all);
-		//Assign Driver's License
-		shared BestInfo_with_BDL	:= Join(BestInfo_base_map , bdl, left.record_id=right.record_id,
-										Transform(Layouts.BestInfo
-												,self.best_drivers_license 			:= right.best_drivers_license
-												,self.best_drivers_license_state 	:= right.best_drivers_license_state
-												,self.best_drivers_license_exp 		:= right.best_drivers_license_exp
-												,self:=left), LEFT OUTER):independent;
-		Export all			:= BestInfo_with_BDL;
+		shared p :=	dedup(project(soap_results,
+			Transform(Layouts.DLHistory
+				,self.record_id	:= (unsigned8)left.AcctNo
+				,self.did	:= (unsigned6)left.did
+				,self:=left
+				,self:=[])),record,all);
+
+		//Assign record_ids to the DL History
+
+		shared Drivers_Batch_recid_map	:= Join( Pii_Base_norm, P, 
+												left.record_id = right.record_id, 
+												Transform(Layouts.DLHistory
+													,self.record_id := left.record_id_new
+													,self.reported_date := (unsigned8)left.reported_date[1..6]
+													,self:=right));
+
+		shared DLHistory_base_map	:= Join( pii_input , sort(Drivers_Batch_recid_map, -dt_last_seen), 
+											left.record_id = right.record_id and 
+											right.reported_date >= right.dt_first_seen, 
+											Transform(Layouts.DLHistory
+												,self.did := left.did
+												,self.fdn_file_info_id := left.fdn_file_info_id
+												,self.dl_number := right.dl_number
+												,self.orig_state := right.orig_state
+												,self.expiration_date := right.expiration_date												
+												,self:=right),
+											Keep(1)):independent;
+
+
+		DLHistory_Update	:= if( UpdatePii, dedup( ( DLHistory_base_map + DLHistory_Base ), all ), DLHistory_base_map );
+
+
+		Export all			:= DLHistory_Update;
 	END;
-	EXPORT Best_Info		:= MODULE
+	EXPORT Best_Info ( dataset(FraudGovPlatform.Layouts.DLHistory) DLHistory )		:= MODULE
 
 			service_name	:= 'didville.did_batch_service_raw';
 			soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
@@ -790,9 +794,19 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 													,self.fdn_file_info_id := left.fdn_file_info_id
 													,self:=right)):independent;
 
-			Append_DLN := Best_DLN(BestInfo_base_map).All;
+			shared BestInfo_base_map2	:= Join(BestInfo_base_map , DLHistory, 
+											left.record_id=right.record_id,
+											Transform(Layouts.BestInfo
+													,self.best_drivers_license_state := right.orig_state
+													,self.best_drivers_license := right.dl_number
+													,self.best_drivers_license_exp := right.expiration_date
+													,self.best_drivers_dt_first_seen := right.dt_first_seen
+													,self.best_drivers_dt_last_seen := right.dt_last_seen
+													,self.reported_date := (string8) right.reported_date
+													,self:=left
+													,self:=[]), left outer):independent;			
 
-			BestInfo_Update	:= if(UpdatePii,dedup((Append_DLN + BestInfo_base),all),Append_DLN);
+			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map2 + BestInfo_base),all),BestInfo_base_map2);
 
 			
 
