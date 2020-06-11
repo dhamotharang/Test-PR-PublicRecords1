@@ -873,10 +873,7 @@ EXPORT Drivers_Batch := MODULE
  END;   
 
  EXPORT DLHistory := RECORD
-		unsigned8 	Record_ID;
-    unsigned8   reported_date;
 		unsigned6 	did;
-		unsigned6 	fdn_file_info_id;  
     Drivers_Batch.layout_out;
  END;
 

@@ -603,30 +603,9 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		layout_in := layouts.Drivers_Batch.layout_in;
 		layout_out := layouts.Drivers_Batch.layout_out;
 
-		layout_in make_batch_in(pii_base le, integer c) := TRANSFORM
+		layout_in make_batch_in(layout_in le, integer c) := TRANSFORM
 				self.seq := c;
-				self.acctno := (string)le.record_id;
-				SELF.did := le.did;
-				SELF.Name_First := le.fname;
-				SELF.Name_Middle := le.mname;
-				SELF.Name_Last := le.lname;
-				SELF.Name_suffix := le.name_suffix;
-				SELF.prim_range := le.prim_range;
-				SELF.predir := le.predir;
-				SELF.prim_name := le.prim_name;
-				SELF.addr_suffix := le.addr_suffix;
-				SELF.postdir := le.postdir;
-				SELF.unit_desig := le.unit_desig;
-				SELF.sec_range := le.sec_range;
-				SELF.p_city_name := le.p_city_name;
-				SELF.St := le.st;
-				SELF.z5 := le.ZIP;
-				SELF.SSN := le.SSN;
-				SELF.DOB := (string)le.dob;
-				SELF.homephone := le.home_phone;
-				SELF.workphone := le.work_phone_;
-				SELF.dl := le.drivers_license;
-				SELF.dlstate := le.drivers_license_state;				
+				self := le;			
 				SELF := [];
 		END;
 					
@@ -640,14 +619,41 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			DATASET(layout_in) batch_in;
 		END;
 
-		layout_Soap trans(pii_base L, integer c) := TRANSFORM
+		layout_Soap trans(layout_in L, integer c) := TRANSFORM
 				batch := PROJECT(L, make_batch_in(LEFT, c));
 				SELF.batch_in := batch;
 				self := L;
 		END;
 
+		tr_inputs := project(pii_base, transform( layout_in , 
+				SELF.did := LEFT.did;
+				SELF.name_first := LEFT.fname;
+				SELF.name_middle := LEFT.mname;
+				SELF.name_last := LEFT.lname;
+				SELF.name_suffix := LEFT.name_suffix;
+				SELF.prim_range := LEFT.prim_range;
+				SELF.predir := LEFT.predir;
+				SELF.prim_name := LEFT.prim_name;
+				SELF.addr_suffix := LEFT.addr_suffix;
+				SELF.postdir := LEFT.postdir;
+				SELF.unit_desig := LEFT.unit_desig;
+				SELF.sec_range := LEFT.sec_range;
+				SELF.p_city_name := LEFT.p_city_name;
+				SELF.St := LEFT.st;
+				SELF.z5 := LEFT.ZIP;
+				SELF.SSN := LEFT.SSN;
+				SELF.DOB := (string)LEFT.dob;
+				SELF.homephone := LEFT.home_phone;
+				SELF.workphone := LEFT.work_phone_;
+				SELF.dl := LEFT.drivers_license;
+				SELF.dlstate := LEFT.drivers_license_state;
+				SELF := LEFT;
+				SELF := [];		
+		));
 
-		soap_input := DISTRIBUTE(project(pii_base, trans(LEFT, counter)),RANDOM() % nodes);
+		ddp_inputs := DEDUP(tr_inputs, ALL);
+		
+		soap_input := DISTRIBUTE(project(ddp_inputs, trans(LEFT, counter)),RANDOM() % nodes);
 					
 					
 		xlayout := RECORD
@@ -674,34 +680,20 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 		shared p :=	dedup(project(soap_results,
 			Transform(Layouts.DLHistory
-				,self.record_id	:= (unsigned8)left.AcctNo
 				,self.did	:= (unsigned6)left.did
 				,self:=left
 				,self:=[])),record,all);
 
 		//Assign record_ids to the DL History
 
-		shared Drivers_Batch_recid_map	:= Join( Pii_Base_norm, P, 
-												left.record_id = right.record_id, 
-												Transform(Layouts.DLHistory
-													,self.record_id := left.record_id_new
-													,self.reported_date := (unsigned8)left.reported_date[1..6]
-													,self:=right));
-
-		shared DLHistory_base_map	:= Join( pii_input , sort(Drivers_Batch_recid_map, -dt_last_seen), 
-											left.record_id = right.record_id and 
-											right.reported_date >= right.dt_first_seen, 
+		shared DLHistory_base_map	:=  Join( pii_input , P, 
+											left.did = right.did, 
 											Transform(Layouts.DLHistory
-												,self.did := left.did
-												,self.fdn_file_info_id := left.fdn_file_info_id
-												,self.dl_number := right.dl_number
-												,self.orig_state := right.orig_state
-												,self.expiration_date := right.expiration_date												
-												,self:=right),
-											Keep(1)):independent;
+												,self.did := left.did												
+												,self:=right)):independent;
 
 
-		DLHistory_Update	:= if( UpdatePii, dedup( ( DLHistory_base_map + DLHistory_Base ), all ), DLHistory_base_map );
+		DLHistory_Update	:= if( UpdatePii,  dedup( DLHistory_base_map + DLHistory_Base, ALL ), dedup( DLHistory_base_map, ALL)  );
 
 
 		Export all			:= DLHistory_Update;
@@ -791,20 +783,25 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			shared BestInfo_base_map	:= Join(pii_input , BestInfo_recid_map, left.record_id=right.record_id,Transform(Layouts.BestInfo
 													,self.did := left.did
-													,self.fdn_file_info_id := left.fdn_file_info_id
+													,self.reported_date := left.reported_date
 													,self:=right)):independent;
 
-			shared BestInfo_base_map2	:= Join(BestInfo_base_map , DLHistory, 
-											left.record_id=right.record_id,
+			shared BestInfo_base_map2	:= Join(BestInfo_base_map , sort(DLHistory, -dt_last_seen), 
+											left.did=right.did and
+											(( 	(Unsigned8) left.reported_date[1..6] between right.dt_first_seen and right.dt_last_seen ) OR 
+											(
+												(Unsigned8) left.reported_date[1..6] >= right.dt_first_seen and 
+												(Unsigned8) left.reported_date[1..6] >= right.dt_last_seen
+											)),
 											Transform(Layouts.BestInfo
 													,self.best_drivers_license_state := right.orig_state
 													,self.best_drivers_license := right.dl_number
 													,self.best_drivers_license_exp := right.expiration_date
 													,self.best_drivers_dt_first_seen := right.dt_first_seen
 													,self.best_drivers_dt_last_seen := right.dt_last_seen
-													,self.reported_date := (string8) right.reported_date
-													,self:=left
-													,self:=[]), left outer):independent;			
+													,self:=left), 
+													left outer,
+													keep(1)):independent;			
 
 			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map2 + BestInfo_base),all),BestInfo_base_map2);
 
