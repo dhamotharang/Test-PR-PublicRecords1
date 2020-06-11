@@ -122,6 +122,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     BankAccount rBankAccount=UID(AssociatedCustomerFileInfo, OttoBankAccountId),
     DriversLicense rDriversLicense=UID(AssociatedCustomerFileInfo, OttoDriversLicenseId),
 		
+		ind_type_description,
     INTEGER rin_source,
 		STRING rin_sourcelabel,
 		
@@ -452,6 +453,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     Title,FirstName,MiddleName,LastName,NameSuffix,		
 		rin_source,
 	  rin_sourcelabel,		
+		ind_type_description,
 		
     LexId,
 	  BocashellHit,
@@ -916,6 +918,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,
 		BocashellLexId = bocashelldid,
+		ind_type_description = classification_permissible_use_access.ind_type_description,
 		CaseId = household_id,
 		ClientId = Customer_Person_ID,
     EventDate = event_date,
@@ -1679,7 +1682,7 @@ Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydesc
 
 Event: => AgencyUid := CustomerId;
 Event: => AgencyProgType := IndustryType;
-// Event: => AgencyProgDesc := ind_type_description;
+Event: => AgencyProgDesc := ind_type_description;
 Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 
 Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; 
@@ -3526,6 +3529,9 @@ Event: => DriversLicenseEventAfterKrCount := rDriversLicense.KrEventAfterLastKno
 Event: => AddrIdentityCount := COUNT(Location.PersonAddress(EventDates.EventDate < Event.EventDate){Subject});
 // this is the example for counting number of identitities at the associated address EVER (including the future)
 Event: => AddrIdentityFullCount := COUNT(Location.PersonAddress{Subject});
+
+// this is the example for counting number of identitities at the associated address BEFORE the date of this transaction
+Event: => SubjectPostDeathTransactionCount := COUNT(Subject.PersonEvent(EventDate < Event.EventDate AND EventDate > Event.diddeceaseddate));
 
 
 /*

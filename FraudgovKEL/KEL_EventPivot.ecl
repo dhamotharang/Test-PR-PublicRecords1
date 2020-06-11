@@ -7,18 +7,10 @@ EXPORT KEL_EventPivot := MODULE
 //output(d1_1(person_entity_context_uid_ = '_0110165360'), all, named('d1_1_'));
 //output(d1_1);
 
-// JP debug this is to force a link chart that has 2 degrees even if we use the sample dataset needs to come out for PROD
-Set_entity_context_uid_:=['_011288247490','_011565616510','_01191436849360','_01900002842380','_011599706980','_0131464757620','_01238528759680','_012601547200','_011774479870','_01237628984950','_01187859961720','_01900001576080','_01169473326670','_01900002892420','_01900002892510','_011985235570','_01900001596510','_011039698450','_0195869363320','_013181789260','_014389096870','_0158670530380','_01193865000580','_011214890110','_01190949021280','_01141059383650','_01182614587030','_01900002980440','_01900002988270','_01165072987270','_011548552240','_011613908620','_01900002995650','_01164190937410','_012462366430','_01236826239310','_01900002120760','_01900003014460','_01237694830480','_012331850230','_01146058766560','_01900002818530','_01900002097990','_012136562290','_01900003050910','_0165744435430','_01160028460','_01148798099170','_01720186030','_01900003056670'];
-SHARED UIStats1 := PROJECT(FraudgovKEL.KEL_EventShell.UIStats, TRANSFORM(RECORDOF(LEFT), 
-  self.addressentitycontextuid := MAP(LEFT.personentitycontextuid in Set_entity_context_uid_ => '_092247340211570905463', LEFT.addressentitycontextuid), 
-	SELF := LEFT));
-
-
-
-setFields := ['t_evttype1statuscodeecho','t_evttype2statuscodeecho','t_evttype3statuscodeecho','t_idstatuscodeecho','t_namestatuscodeecho','t_addrstatuscodeecho','t_bnkacctstatuscodeecho','t_dlstatuscodeecho','t_emailstatuscodeecho','t_ipaddrstatuscodeecho','t_phnstatuscodeecho','t_ssnstatuscodeecho'];
+SHARED UIStats1 := FraudgovKEL.KEL_EventShell.UIStats;
 
 // jp temp
-dConfig := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
+dConfig := DATASET('~temp::fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
 
 dictEvtType1 := DICTIONARY(dConfig(field = 't_evttype1statuscodeecho'),{value => uidescription});
 dictEvtType2 := DICTIONARY(dConfig(field = 't_evttype2statuscodeecho'),{value => uidescription});
@@ -106,7 +98,7 @@ MyRules := DATASET([
 */
 
 
-EXPORT MyRules := DATASET('~fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
+EXPORT MyRules := DATASET('~temp::fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
 
 // This is just to make sure there aren't duplicates. Should be moved into the build code for the index to check everything and validate.
 SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
@@ -133,7 +125,7 @@ RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customeri
                            OR
                            (
                              RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0)
-                           )                           
+                           )
                            OR
                            (
                              (RIGHT.Low > 0 OR RIGHT.High > 0) AND 
@@ -147,16 +139,16 @@ RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customeri
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
                             /*
                             SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => 
-														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
-																					 LEFT.Label);
+                            MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
+                            LEFT.Label);
                             */
                             SELF.field := LEFT.field,
-														SELF.RuleName := RIGHT.RuleName,
-														SELF.EntityType := RIGHT.EntityType,
-														SELF.Description := RIGHT.Description,
-														SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
+                            SELF.RuleName := RIGHT.RuleName,
+                            SELF.EntityType := RIGHT.EntityType,
+                            SELF.Description := RIGHT.Description,
+                            SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
                             SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~temp::deleteme41');
-														
+
 //output(RulesResult(entitycontextuid = '_1194033204'), all, named('RulesResult'));
 
 RulesResultAggPrep := TABLE(RulesResult, {customerid, industrytype, entitycontextuid, entitytype, rulename, Default, Description, risklevel, reccount := COUNT(GROUP)}, 
@@ -165,13 +157,13 @@ RulesResultAggPrep := TABLE(RulesResult, {customerid, industrytype, entitycontex
 RulesResultAgg := DEDUP(SORT(DISTRIBUTE(RulesResultAggPrep, HASH64(customerid, industrytype, entitycontextuid)), 
                        customerid, industrytype, entitycontextuid, entitytype, rulename, default, local), 
                        customerid, industrytype, entitycontextuid, entitytype, rulename, local); 
-										 
+                       
 //output(RulesResultAgg(entitycontextuid = '_1194033204'), named('RulesResultAgg'));
 
 // Add how many flags for each rule matched
 EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt, 
                         ((LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.RuleName = RIGHT.RuleName) OR
-												  (RIGHT.customerid = 0 AND RIGHT.industrytype = 0 AND LEFT.RuleName = RIGHT.RuleName)) AND LEFT.reccount = RIGHT.reccount, 
+                        (RIGHT.customerid = 0 AND RIGHT.industrytype = 0 AND LEFT.RuleName = RIGHT.RuleName)) AND LEFT.reccount = RIGHT.reccount, 
                         TRANSFORM({UNSIGNED customerid,UNSIGNED industrytype,STRING100 entitycontextuid,UNSIGNED entitytype, STRING100 rulename,STRING250 description,INTEGER1 risklevel}, SELF := LEFT),
                         LOOKUP, HASH);
 
@@ -181,38 +173,36 @@ EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt,
 //need to turn this into 
 EntityEventAssessment := TABLE(RulesFlagsMatched, 
                     {industrytype,customerid,entitycontextuid,
-										entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
-										industrytype,customerid,entitycontextuid, entitytype, MERGE);
+                    entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
+                    industrytype,customerid,entitycontextuid, entitytype, MERGE);
 
 //output(EntityEventAssessment(entitycontextuid = '_1194033204'), all, named('EventAssessment'));
 
 rAssessment := RECORD
-	UNSIGNED8 industrytype;
-	UNSIGNED8 customerid;
-	STRING entitycontextuid;
-	INTEGER1 P1_IDRiskIndx;// 1
-	INTEGER1 P15_SSNRiskIndx;// 15
-	INTEGER1 P16_PhnRiskIndx;// 16
-	INTEGER1 P17_EmailRiskIndx;// 17
-	INTEGER1 P19_BnkAcctRiskIndx;// 19
-	INTEGER1 P20_DLRiskIndx;// 20
-	INTEGER1 P18_IPAddrRiskIndx;// 18
-	INTEGER1 P9_AddrRiskIndx;// 9
+    UNSIGNED8 industrytype;
+    UNSIGNED8 customerid;
+    STRING entitycontextuid;
+    INTEGER1 P1_IDRiskIndx;// 1
+    INTEGER1 P15_SSNRiskIndx;// 15
+    INTEGER1 P16_PhnRiskIndx;// 16
+    INTEGER1 P17_EmailRiskIndx;// 17
+    INTEGER1 P19_BnkAcctRiskIndx;// 19
+    INTEGER1 P20_DLRiskIndx;// 20
+    INTEGER1 P18_IPAddrRiskIndx;// 18
+    INTEGER1 P9_AddrRiskIndx;// 9
 END;
 
 EntityAssessmentPrep := SORT(PROJECT(EntityEventAssessment, 
-                            TRANSFORM(rAssessment, 
-														  SELF.P1_IDRiskIndx := MAP(LEFT.EntityType = 1 => LEFT.RiskLevel, 0),
-															SELF.P15_SSNRiskIndx := MAP(LEFT.EntityType = 15 => LEFT.RiskLevel, 0),
-															SELF.P16_PhnRiskIndx := MAP(LEFT.EntityType = 16 => LEFT.RiskLevel, 0),
-															SELF.P17_EmailRiskIndx  := MAP(LEFT.EntityType = 17 => LEFT.RiskLevel, 0),
-															SELF.P19_BnkAcctRiskIndx := MAP(LEFT.EntityType = 19 => LEFT.RiskLevel, 0),
-															SELF.P20_DLRiskIndx := MAP(LEFT.EntityType = 20 => LEFT.RiskLevel, 0),
-															SELF.P18_IPAddrRiskIndx := MAP(LEFT.EntityType = 18 => LEFT.RiskLevel, 0),
-															SELF.P9_AddrRiskIndx := MAP(LEFT.EntityType = 9 => LEFT.RiskLevel, 0),
-  														SELF := LEFT, SELF := [])),industrytype,customerid,entitycontextuid, LOCAL);
-//output(EntityAssessmentPrep(entitycontextuid = '_1194033204'), all, named('EntityAssessmentPrep'));
-
+                        TRANSFORM(rAssessment, 
+                          SELF.P1_IDRiskIndx := MAP(LEFT.EntityType = 1 => LEFT.RiskLevel, 0),
+                          SELF.P15_SSNRiskIndx := MAP(LEFT.EntityType = 15 => LEFT.RiskLevel, 0),
+                          SELF.P16_PhnRiskIndx := MAP(LEFT.EntityType = 16 => LEFT.RiskLevel, 0),
+                          SELF.P17_EmailRiskIndx  := MAP(LEFT.EntityType = 17 => LEFT.RiskLevel, 0),
+                          SELF.P19_BnkAcctRiskIndx := MAP(LEFT.EntityType = 19 => LEFT.RiskLevel, 0),
+                          SELF.P20_DLRiskIndx := MAP(LEFT.EntityType = 20 => LEFT.RiskLevel, 0),
+                          SELF.P18_IPAddrRiskIndx := MAP(LEFT.EntityType = 18 => LEFT.RiskLevel, 0),
+                          SELF.P9_AddrRiskIndx := MAP(LEFT.EntityType = 9 => LEFT.RiskLevel, 0),
+                          SELF := LEFT, SELF := [])),industrytype,customerid,entitycontextuid, LOCAL);
 
 EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 											 industrytype, customerid, entitycontextuid, 
@@ -242,189 +232,227 @@ EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 END RULES ASSESSMENT
 */
 
-d1 := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
+SHARED InputWithRules := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
 //output(d1(entitycontextuid = '_1194033204'), all, named('d1_1_1'));
 
-OutRec := RECORD
-	INTEGER1 entitytype;
-	STRING Label;
-	INTEGER1 RiskIndx;		
-	INTEGER1 AotCurrProfFlag;
-	INTEGER1 aotkractflagev;
-	INTEGER1 aotsafeactflagev;
-	UNSIGNED aotkractnewdtev;
-  UNSIGNED aotkractcntev;
-	UNSIGNED aotnonstactcntev;
-	UNSIGNED aotnewkraftidactcntev;
-	UNSIGNED aotidactcnt30d;
-  UNSIGNED aotnonstactcnt30d;
-	UNSIGNED aotnewkraftnonstactcntev;
-	UNSIGNED aothiidcurrprofusngcntev;
-	UNSIGNED aotidusngcntev;
-	UNSIGNED aotidactcntev;
-
-  RECORDOF(d1);
-END;
-				
-OutRec NormIt(d1 L, INTEGER C) := TRANSFORM
-	SELF.entitytype := CHOOSE(C, 1, 9, 15, 16, 17, 18, 19, 20);
-	SELF.Label := CHOOSE(C, L.personlabel, L.addresslabel, L.ssnlabel, L.phonelabel, L.emaillabel,  L.iplabel, L.bankaccountlabel, L.driverslicenselabel);
-// jp add all these entity context uids to event output
-	SELF.EntityContextUID := CHOOSE(C, 
-																			L.personentitycontextuid,
-																			L.addressentitycontextuid,
-																			L.ssnentitycontextuid,
-																			L.phoneentitycontextuid,
-																			L.emailentitycontextuid,
-																			L.ipentitycontextuid,
-																			L.bankaccountentitycontextuid,
-																			L.driverslicenseentitycontextuid);
-
-	SELF.RiskIndx := CHOOSE(C, 
-																			L.P1_IDRiskIndx,
-																			L.P9_AddrRiskIndx,
-																			L.P15_SSNRiskIndx,
-																			L.P16_PhnRiskIndx,
-																			L.P17_EmailRiskIndx,
-																			L.P18_IPAddrRiskIndx,
-																			L.P19_BnkAcctRiskIndx,
-																			L.P20_DLRiskIndx);
-																																																																																																	
-  SELF.AotCurrProfFlag := CHOOSE(C, 
-																			L.P1_AotIdCurrProfFlag,
-																			L.P9_AotAddrCurrProfFlag,
-																			L.P15_AotSsnCurrProfFlag,
-																			L.P16_AotPhnCurrProfFlag,
-																			L.P17_AotEmailCurrProfFlag,
-																			L.P18_AotIpAddrCurrProfFlag,
-																			L.P19_AotBnkAcctCurrProfFlag,
-																			L.P20_AotDlCurrProfFlag);
-																													
-	SELF.aotkractflagev := CHOOSE(C, 
-																			L.p1_aotidkractflagev,
-																			L.p9_aotaddrkractflagev,
-																			L.p15_aotssnkractflagev,
-																			L.p16_aotphnkractflagev,
-																			L.p17_aotemailkractflagev,
-																			L.p18_aotipaddrkractflagev,
-																			L.p19_aotbnkacctkractflagev,
-																			L.p20_aotdlkractflagev);	
-
-	SELF.aotsafeactflagev := CHOOSE(C, 
-																			0/*L.p1_aotidkractflagev*/,
-																			L.p9_aotaddrsafeactflagev,
-																			0/*L.p15_aotssnkractflagev*/,
-																			L.p16_aotphnsafeactflagev,
-																			0/*L.p17_aotemailkractflagev*/,
-																			L.p18_aotipaddrsafeactflagev,
-																			0/*L.p19_aotbnkacctkractflagev*/,
-																			0/*L.p20_aotdlkractflagev*/);	
-																			
-SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
-																			L.p9_aotaddrkractnewdtev,
-																			L.p15_aotssnkractnewdtev,
-																			L.p16_aotphnkractnewdtev,
-																			L.p17_aotemailkractnewdtev,
-																			L.p18_aotipaddrkractnewdtev,
-																			L.p19_aotbnkacctkractnewdtev,
-																			L.p20_aotdlkractnewdtev);
-																			
-SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
-																			l.p9_aotaddrkractcntev,
-																			l.p15_aotssnkractcntev,
-																			l.p16_aotphnkractcntev,
-																			l.p17_aotemailkractcntev,
-																			l.p18_aotipaddrkractcntev,
-																			l.p19_aotbnkacctkractcntev,
-																			l.p20_aotdlkractcntev);
-																			
-SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
-																			l.p9_AotNonStActCntEv,
-																			l.p15_AotNonStActCntEv,
-																			l.p16_AotNonStActCntEv,
-																			l.p17_AotNonStActCntEv,
-																			l.p18_AotNonStActCntEv,
-																			l.p19_AotNonStActCntEv,
-																			l.p20_AotNonStActCntEv);
+//Clean out from Modeling for UI
+codesToIgnore := '-99999\', \'-99998\', \'-99997';
+SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(InputWithRules, RECORDOF(InputWithRules), codesToIgnore);
 		
+SHARED OutRec := RECORD
+  INTEGER1 entitytype;
+  STRING Label;
+  INTEGER1 RiskIndx;        
+  INTEGER1 AotCurrProfFlag;
+  INTEGER1 aotkractflagev;
+  INTEGER1 aotsafeactflagev;
+  UNSIGNED aotkractnewdtev;
+  UNSIGNED aotkractcntev;
+  UNSIGNED aotnonstactcntev;
+  UNSIGNED aotnewkraftidactcntev;
+  UNSIGNED aotidactcnt30d;
+  UNSIGNED aotnonstactcnt30d;
+  UNSIGNED aotnewkraftnonstactcntev;
+  UNSIGNED aothiidcurrprofusngcntev;
+  UNSIGNED aotidusngcntev;
+  UNSIGNED aotidactcntev;
+  UNSIGNED1 not_aotkractflagev;
+  UNSIGNED1 not_aotsafeactflagev;
+  STRING CustomerProgramDescription;
+  
+  RECORDOF(InputWithRules);
+END;
+        
+OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
+    SELF.entitytype := CHOOSE(C, 1, 9, 15, 16, 17, 18, 19, 20);
+    SELF.Label := CHOOSE(C, L.personlabel, L.addresslabel, L.ssnlabel, L.phonelabel, L.emaillabel,  L.iplabel, L.bankaccountlabel, L.driverslicenselabel);
+    SELF.customerProgramDescription := L.agencyprogjurst + '-' + L.AgencyProgDesc;
+// jp add all these entity context uids to event output
+    SELF.EntityContextUID := CHOOSE(C, 
+                              L.personentitycontextuid,
+                              L.addressentitycontextuid,
+                              L.ssnentitycontextuid,
+                              L.phoneentitycontextuid,
+                              L.emailentitycontextuid,
+                              L.ipentitycontextuid,
+                              L.bankaccountentitycontextuid,
+                              L.driverslicenseentitycontextuid);
+
+    SELF.RiskIndx := CHOOSE(C, 
+                              L.P1_IDRiskIndx,
+                              L.P9_AddrRiskIndx,
+                              L.P15_SSNRiskIndx,
+                              L.P16_PhnRiskIndx,
+                              L.P17_EmailRiskIndx,
+                              L.P18_IPAddrRiskIndx,
+                              L.P19_BnkAcctRiskIndx,
+                              L.P20_DLRiskIndx);
+                                                                                                                                                              
+  SELF.AotCurrProfFlag := CHOOSE(C, 
+                              L.P1_AotIdCurrProfFlag,
+                              L.P9_AotAddrCurrProfFlag,
+                              L.P15_AotSsnCurrProfFlag,
+                              L.P16_AotPhnCurrProfFlag,
+                              L.P17_AotEmailCurrProfFlag,
+                              L.P18_AotIpAddrCurrProfFlag,
+                              L.P19_AotBnkAcctCurrProfFlag,
+                              L.P20_AotDlCurrProfFlag);
+                                                                      
+    aotkractflagev := CHOOSE(C, 
+                              L.p1_aotidkractflagev,
+                              L.p9_aotaddrkractflagev,
+                              L.p15_aotssnkractflagev,
+                              L.p16_aotphnkractflagev,
+                              L.p17_aotemailkractflagev,
+                              L.p18_aotipaddrkractflagev,
+                              L.p19_aotbnkacctkractflagev,
+                              L.p20_aotdlkractflagev);    
+    SELF.aotkractflagev := aotkractflagev;
+    aotsafeactflagev := CHOOSE(C, 
+                              0/*L.p1_aotidkractflagev*/,
+                              L.p9_aotaddrsafeactflagev,
+                              0/*L.p15_aotssnkractflagev*/,
+                              L.p16_aotphnsafeactflagev,
+                              0/*L.p17_aotemailkractflagev*/,
+                              L.p18_aotipaddrsafeactflagev,
+                              0/*L.p19_aotbnkacctkractflagev*/,
+                              0/*L.p20_aotdlkractflagev*/);    
+    SELF.aotsafeactflagev := aotsafeactflagev;                          
+    SELF.not_aotkractflagev := (INTEGER)(aotkractflagev = 0);
+    SELF.not_aotsafeactflagev := (INTEGER)(aotsafeactflagev = 0);
+  
+SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
+                              L.p9_aotaddrkractnewdtev,
+                              L.p15_aotssnkractnewdtev,
+                              L.p16_aotphnkractnewdtev,
+                              L.p17_aotemailkractnewdtev,
+                              L.p18_aotipaddrkractnewdtev,
+                              L.p19_aotbnkacctkractnewdtev,
+                              L.p20_aotdlkractnewdtev);
+                              
+SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
+                              l.p9_aotaddrkractcntev,
+                              l.p15_aotssnkractcntev,
+                              l.p16_aotphnkractcntev,
+                              l.p17_aotemailkractcntev,
+                              l.p18_aotipaddrkractcntev,
+                              l.p19_aotbnkacctkractcntev,
+                              l.p20_aotdlkractcntev);
+                              
+SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
+                              l.p9_AotNonStActCntEv,
+                              l.p15_AotNonStActCntEv,
+                              l.p16_AotNonStActCntEv,
+                              l.p17_AotNonStActCntEv,
+                              l.p18_AotNonStActCntEv,
+                              l.p19_AotNonStActCntEv,
+                              l.p20_AotNonStActCntEv);
+        
 SELF.aotnewkraftidactcntev := CHOOSE(C, L.P1_aotidnewkraftidactcntev,
-																			l.p9_aotaddrnewkraftidactcntev,
-																			l.p15_aotssnnewkraftidactcntev,
-																			l.p16_aotphnnewkraftidactcntev,
-																			l.p17_aotemlnewkraftidactcntev,
-																			l.p18_aotipnewkraftidactcntev,
-																			l.p19_aotbkacnewkraftidactcntev,
-																			l.p20_aotdlnewkraftidactcntev);
-																			
-																			
+                              l.p9_aotaddrnewkraftidactcntev,
+                              l.p15_aotssnnewkraftidactcntev,
+                              l.p16_aotphnnewkraftidactcntev,
+                              l.p17_aotemlnewkraftidactcntev,
+                              l.p18_aotipnewkraftidactcntev,
+                              l.p19_aotbkacnewkraftidactcntev,
+                              l.p20_aotdlnewkraftidactcntev);
+                              
+                              
 SELF.aotidactcnt30d := CHOOSE(C, L.P1_aotidactcnt30d,
-																			l.p9_aotidactcnt30d,
-																			l.p15_aotidactcnt30d,
-																			l.p16_aotidactcnt30d,
-																			l.p17_aotidactcnt30d,
-																			l.p18_aotidactcnt30d,
-																			l.p19_aotidactcnt30d,
-																			l.p20_aotidactcnt30d);																	
+                              l.p9_aotidactcnt30d,
+                              l.p15_aotidactcnt30d,
+                              l.p16_aotidactcnt30d,
+                              l.p17_aotidactcnt30d,
+                              l.p18_aotidactcnt30d,
+                              l.p19_aotidactcnt30d,
+                              l.p20_aotidactcnt30d);                                                                    
 
 SELF.aotnonstactcnt30d := CHOOSE(C, L.P1_aotnonstactcnt30d,
-																			l.p9_aotnonstactcnt30d,
-																			l.p15_aotnonstactcnt30d,
-																			l.p16_aotnonstactcnt30d,
-																			l.p17_aotnonstactcnt30d,
-																			l.p18_aotnonstactcnt30d,
-																			l.p19_aotnonstactcnt30d,
-																			l.p20_aotnonstactcnt30d);		
-SELF.aotnewkraftnonstactcntev	:= CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
-																			l.p9_aotaddrnewkraftnonstactcntev,
-																			l.p15_aotssnnewkraftnonstactcntev,
-																			l.p16_aotphnnewkraftnonstactcntev,
-																			l.p17_aotemlnewkraftnonstactcntev,
-																			l.p18_aotipnewkraftnonstactcntev,
-																			l.p19_aotbkacnewkraftnonstactcntev,
-																			l.p20_aotdlnewkraftnonstactcntev);	
+                              l.p9_aotnonstactcnt30d,
+                              l.p15_aotnonstactcnt30d,
+                              l.p16_aotnonstactcnt30d,
+                              l.p17_aotnonstactcnt30d,
+                              l.p18_aotnonstactcnt30d,
+                              l.p19_aotnonstactcnt30d,
+                              l.p20_aotnonstactcnt30d);        
+SELF.aotnewkraftnonstactcntev    := CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
+                              l.p9_aotaddrnewkraftnonstactcntev,
+                              l.p15_aotssnnewkraftnonstactcntev,
+                              l.p16_aotphnnewkraftnonstactcntev,
+                              l.p17_aotemlnewkraftnonstactcntev,
+                              l.p18_aotipnewkraftnonstactcntev,
+                              l.p19_aotbkacnewkraftnonstactcntev,
+                              l.p20_aotdlnewkraftnonstactcntev);    
 
 SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count     
                              
 SELF.aotidusngcntev := CHOOSE(C, 1,
                                       l.p9_aotidusngaddrcntev,
-																			l.p15_aotidusngssncntev,
-																			l.p16_aotidusngphncntev,
-																			l.p17_aotidusngemailcntev,
-																			l.p18_aotidusngipaddrcntev,
-																			l.p19_aotidusngbnkacctcntev,
-																			l.p20_aotidusngdlcntev);	
+                              l.p15_aotidusngssncntev,
+                              l.p16_aotidusngphncntev,
+                              l.p17_aotidusngemailcntev,
+                              l.p18_aotidusngipaddrcntev,
+                              l.p19_aotidusingbnkacctcntev,
+                              l.p20_aotidusngdlcntev);    
 
 SELF.aotidactcntev := CHOOSE(C, L.p1_aotidactcntev,
-																			l.p9_aotidactcntev,
-																			l.p15_aotidactcntev,
-																			l.p16_aotidactcntev,
-																			l.p17_aotidactcntev,
-																			l.p18_aotidactcntev,
-																			l.p19_aotidactcntev,
-																			l.p20_aotidactcntev);
-	SELF := L;
+                              l.p9_aotidactcntev,
+                              l.p15_aotidactcntev,
+                              l.p16_aotidactcntev,
+                              l.p17_aotidactcntev,
+                              l.p18_aotidactcntev,
+                              l.p19_aotidactcntev,
+                              l.p20_aotidactcntev);
+    SELF := L;
 END;
 
 NonEntities := ['12638153115695167395', '14695981039346656037','12638153115695167395','','0000000000','4233676119','4073047705','']; 
 
 SHARED PivotToEntities :=
-            NORMALIZE(d1,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
-						
+            NORMALIZE(PivotClean,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~temp::fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
+
 
 //Clean out from Modeling for UI
-codesToIgnore := '-99999\', \'-99998\', \'-99997';
-SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(PivotToEntities, RECORDOF(PivotToEntities), codesToIgnore);
+//codesToIgnore := '-99999\', \'-99998\', \'-99997';
+//SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(PivotToEntities, RECORDOF(PivotToEntities), codesToIgnore);
+
+// Add Flags for Dashboard to know current vs historical.
+dDistribute := DISTRIBUTE(PivotToEntities, HASH32(customerid,industrytype,personentitycontextuid));//,entitycontextuid,idislasteventid,t_actdtecho));
+dSort := SORT(dDistribute, customerid,industrytype,personentitycontextuid,entitycontextuid,-idislasteventid,-t_actdtecho, LOCAL);
+dDedup := DEDUP(dSort, customerid,industrytype,personentitycontextuid,entitycontextuid,LOCAL):          PERSIST('temps::deleteme::identitydup');
+
+rNew := RECORD
+  UNSIGNED isCurrent; 
+  UNSIGNED isHistorical; 
+END;
+rOut := RECORD
+  RECORDOF(PivotToEntities);
+  rNew;
+END;
+
+SHARED PivotWithHistoricalCurrentFlags := JOIN(PivotToEntities, dDedup,
+  LEFT.customerid = RIGHT.customerid
+  AND LEFT.industrytype = RIGHT.industrytype
+  AND LEFT.entitycontextuid = RIGHT.entitycontextuid
+  AND LEFT.personentitycontextuid = RIGHT.personentitycontextuid
+  AND LEFT.idislasteventid = RIGHT.idislasteventid
+  AND LEFT.t_actdtecho = RIGHT.t_actdtecho
+  AND LEFT.t_actuid = RIGHT.t_actuid,
+  TRANSFORM(rOut,
+  SELF.isCurrent := IF(RIGHT.entitycontextuid <> '', RIGHT.idislasteventid, 0),
+  SELF.isHistorical := IF(RIGHT.entitycontextuid <> '', IF((BOOLEAN)RIGHT.idislasteventid, 0, 1), 0);
+  SELF := LEFT), LEFT OUTER, HASH);
 
 // Transform the rules so that we have identity/element entity context uid with the rules at the last transaction that triggered 
 // So one per entity.
 
-SHARED LastRulesForEntities := JOIN(PivotToEntities(AotCurrProfFlag=1), RulesFlagsMatched,
+SHARED LastRulesForEntities := JOIN(PivotWithHistoricalCurrentFlags(AotCurrProfFlag=1), RulesFlagsMatched,
                           LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND ('_11' + LEFT.recordid) = RIGHT.entitycontextuid AND LEFT.entitytype=RIGHT.entitytype, 
                           TRANSFORM(RECORDOF(RIGHT) AND NOT [entitytype], SELF.entitycontextuid := LEFT.entitycontextuid, SELF := RIGHT), HASH);
-													
-//output(PivotClean,,'~gov::otto::eventpivot', overwrite, compressed);	
-EXPORT EventPivotShell := PivotClean;
-								 
+                                                    
+//output(PivotClean,,'~gov::otto::eventpivot', overwrite, compressed);    
+EXPORT EventPivotShell := PivotWithHistoricalCurrentFlags;
+                                 
 //output(LastRulesForEntities,,'~gov::otto::entityrules', overwrite, compressed);
 EXPORT EntityProfileRules := LastRulesForEntities;
 
