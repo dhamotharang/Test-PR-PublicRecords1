@@ -158,7 +158,7 @@ functionmacro
 
   // -- Use lots of different parameters to make the event unique
   #UNIQUENAME(WORKMAN_MAC_WORKMAN_EVENT_NAME   )
-  #SET(WORKMAN_MAC_WORKMAN_EVENT_NAME  ,'__#__' + trim(pBuildName,all) + '_' + trim(pversion) + '_' + trim((string)pStartIteration) + '_' + trim((string)%'MAX_ITERATIONS'%) + '_' + trim((string)%'MIN_ITERATIONS'%) + '_' + length(trim(pECL)) + '_' + length(trim(regexreplace('[^;]',pECL,''),all)) + '_' + length(trim(regexreplace('[^[:alnum:]]',pECL,''),all)) + '__$__')
+  #SET(WORKMAN_MAC_WORKMAN_EVENT_NAME  ,'__#__' + trim(pBuildName,all) + '_' + trim(pversion) + '_' + trim((string)pStartIteration) + '_' + trim((string)%'MAX_ITERATIONS'%) + '_' + trim((string)%'MIN_ITERATIONS'%) + '_' /*+ length(trim(pECL)) + '_' + length(trim(regexreplace('[^;]',pECL,''),all)) + '_' + length(trim(regexreplace('[^[:alnum:]]',pECL,''),all))*/ /*using pECL doesn't work here if the ecl is dynamic, so comment out for now*/ + '__$__')
   #UNIQUENAME(WORKMAN_MAC_WORKMAN_EVENT   ,%'WORKMAN_MAC_WORKMAN_EVENT_NAME'%)
   
   // -- Fix backslashes and quotes in the ecl

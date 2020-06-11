@@ -1318,6 +1318,7 @@
 				trim(kword, left, right) = 'CNSAFE' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAFE,
 				trim(kword, left, right) = 'OFAC-CAATSA-IRAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_IRAN,
 				trim(kword, left, right) = 'IRAN-IEI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRAN_IEI,
+				trim(kword, left, right) = 'UNDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNDP,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

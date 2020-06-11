@@ -8,7 +8,7 @@ EXPORT Files( STRING	pSrc      = '',
 
 	EXPORT	AllRecords        :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Base.AllRecords.QA,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
 	EXPORT	AllRecords_Father :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Base.AllRecords.Father,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
-	EXPORT	History           :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Base.History.QA,HealthcareNoMatchHeader_InternalLinking.Layout_History,THOR);
+	EXPORT	History           :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Base.History.QA,HealthcareNoMatchHeader_InternalLinking.Layout_History,THOR,OPT);
 	EXPORT	History_Father    :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Base.History.Father,HealthcareNoMatchHeader_InternalLinking.Layout_History,THOR,OPT);
 	EXPORT	Linking(STRING it='1') :=  MODULE
     EXPORT  Iteration         :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Linking(it).Iteration.QA,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
