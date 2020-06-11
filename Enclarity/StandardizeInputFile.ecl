@@ -93,7 +93,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		
 	EXPORT Individual	(dataset(Layouts.individual_input) baseFile):=function
 
-		enclarity.layouts.individual_base tMapping(layouts.individual_input L) := TRANSFORM, SKIP((L.group_key = 'group_key')
+		enclarity.layouts.individual_base_temp tMapping(layouts.individual_input L) := TRANSFORM, SKIP((L.group_key = 'group_key')
 																																															OR (L.orig_fullname = '' AND
 																																																	L.first_name    = '' AND
 																																																	L.last_name     = ''))
@@ -121,7 +121,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.gender									:= TRIM(Stringlib.StringToUpperCase(L.gender), LEFT, RIGHT);
 			SELF.upin										:= TRIM(L.upin, LEFT, RIGHT);
 			SELF.clean_dob							:= IF(L.birth_year <> '',_validate.date.fCorrectedDateString((string)SELF.birth_year + '0000',false), '');
-			SELF.dotid									:= IF(L.cpa_optout = 'Y', 1, 0); // pushing opt out flag to dotid to avoid layout change for keys
+			SELF.cpa_optout							:= TRIM(L.cpa_optout, LEFT, RIGHT); // temporarily save opt out flag field - will push to dotid to avoid layout change for keys
 			SELF  :=  L;
 			SELF  :=  [];
 		END;
