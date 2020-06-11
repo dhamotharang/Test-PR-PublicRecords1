@@ -3,7 +3,7 @@ import $.REPORT_shifts_over_time as r;
 
 EXPORT REPORT_shifts_over_time_test() := FUNCTION
 
-    parallel(
+    seq := sequential(
         output(r.count_per_dt_first_seen, ALL, named('count_per_dt_first_seen')),
 
         output(r.count_per_dt_seen_last, ALL, named('count_per_dt_seen_last')),
@@ -20,7 +20,7 @@ EXPORT REPORT_shifts_over_time_test() := FUNCTION
 
         output(r.all_vendor_reported_counts, ALL, named('all_vendor_reported_counts'))
     )
-        : success(STD.System.Email.SendEmail(
+     : success(STD.System.Email.SendEmail(
             'veronica.aldous@lexisnexisrisk.com,gabriel.marcan@lexisnexisrisk.com',
             'REPORT_shifts_over_time success',
             'this build was a success')),
@@ -29,5 +29,6 @@ EXPORT REPORT_shifts_over_time_test() := FUNCTION
             'REPORT_shifts_over_time failure',
             'this build fails'));
 
-    return true;
+    return seq;
+
 END; 
