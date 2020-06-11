@@ -41,8 +41,7 @@ STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudG
 
 //Base Files
 STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudGovPlatform.Filenames().Base.AddressCache.Built	,'thor400_dev01',	FraudGovPlatform.Filenames().Base.AddressCache.Built	, allowoverwrite := true, asSuperfile := true, compress := true);
-STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudGovPlatform.Filenames().Base.Main_Orig.Built	,'thor400_dev01',	FraudGovPlatform.Filenames().Base.Main_Orig.Built	, allowoverwrite := true, asSuperfile := true, compress := true);
-STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudGovPlatform.Filenames().Base.Main_Anon.Built	,'thor400_dev01',	FraudGovPlatform.Filenames().Base.Main_Anon.Built	, allowoverwrite := true, asSuperfile := true, compress := true);
+STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudShared.Filenames().Base.Main.Built	,'thor400_dev01',	FraudShared.Filenames().Base.Main.Built	, allowoverwrite := true, asSuperfile := true, compress := true);
 
 //SOAP Append files
 STD.File.RemotePull( 'http://dataland_esp.br.seisint.com:8010/FileSpray',	FraudGovPlatform.Filenames().Base.pii.Built	,'thor400_dev01',	FraudGovPlatform.Filenames().Base.pii.Built	, allowoverwrite := true, asSuperfile := true, compress := true);

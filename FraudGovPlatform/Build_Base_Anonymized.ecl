@@ -11,7 +11,7 @@ module
 
 	empty := dataset([], FraudShared.Layouts.Base.Main);
 
-	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudGovPlatform.Filenames().Base.Main_Anon.QA )) > 0, FraudGovPlatform.Files().Base.Main_Anon.QA,empty);
+	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudShared.Filenames().Base.Main.QA )) > 0, FraudShared.Files().Base.Main.QA,empty);
 	Demo_Data	:= if(nothor(STD.File.GetSuperFileSubCount( Filenames().Input.DemoData.Sprayed )) > 0, Files().Input.DemoData.Sprayed,empty);
 
 	QABaseAndDemo := if(_Flags.UseDemoData, QA_Data + Demo_Data, QA_Data);
@@ -107,7 +107,7 @@ module
 	
 	Shared final_rec := join(pBaseFile, new_base, left.record_id = right.record_id, transform(FraudShared.Layouts.Base.Main, self := right));
 
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,final_rec,Build_Base_File_Anonymized);
+	tools.mac_WriteFile(FraudShared.Filenames(pversion).Base.Main.New,final_rec,Build_Base_File_Anonymized);
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
