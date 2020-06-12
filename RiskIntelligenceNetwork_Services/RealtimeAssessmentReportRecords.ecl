@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudGovPlatform, FraudShared_Services, iesp, RiskIntelligenceNetwork_Services;
+﻿IMPORT DidVille, FraudGovPlatform, FraudShared_Services, iesp, RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services;
 
 EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                                        RiskIntelligenceNetwork_Services.IParam.Params report_params) := FUNCTION
@@ -7,51 +7,51 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  _Constants := RiskIntelligenceNetwork_Services.Constants;
  blank_dataset := dataset([], _Layouts.fragment_w_value_recs);
 
- ds_best_in := PROJECT(ds_in, 
-                TRANSFORM(didville.Layout_Did_OutBatch, 
+ ds_best_in := PROJECT(ds_in,
+                TRANSFORM(didville.Layout_Did_OutBatch,
                   SELF.seq := (unsigned)LEFT.acctno,
                   SELF := LEFT,
                   SELF := []));
 
  ds_pr_best := RiskIntelligenceNetwork_Services.Functions.getGovernmentBest(ds_best_in, report_params);
  ds_pr_best_ungroup := UNGROUP(ds_pr_best);
- 
+
  ds_ssn_element := IF(ds_pr_best[1].best_ssn <> '',
-                    PROJECT(ds_pr_best_ungroup, 
+                    PROJECT(ds_pr_best_ungroup,
                       TRANSFORM(_Layouts.fragment_w_value_recs,
                         SELF.acctno := (string) LEFT.seq,
                         SELF.fragment := _Constants.Fragment_Types.SSN_FRAGMENT,
                         SELF.fragment_value := LEFT.best_ssn)),
                    blank_dataset);
- 
- ds_Address_element := IF(ds_pr_best[1].best_addr1 <> '', 
-                        PROJECT(ds_pr_best_ungroup, 
+
+ ds_Address_element := IF(ds_pr_best[1].best_addr1 <> '',
+                        PROJECT(ds_pr_best_ungroup,
                           TRANSFORM(_Layouts.fragment_w_value_recs,
-                           addr := stringlib.StringToUpperCase(trim(LEFT.best_addr1) + _Constants.FRAGMENT_SEPARATOR + 
+                           addr := stringlib.StringToUpperCase(trim(LEFT.best_addr1) + _Constants.FRAGMENT_SEPARATOR +
                                (trim(LEFT.best_city) + if( LEFT.best_city !='' and(LEFT.best_state != '' or LEFT.best_zip !=''), ', ', '') + trim(LEFT.best_state) +' '+ trim(LEFT.best_zip)));
                            SELF.acctno := (string) LEFT.seq,
                            SELF.fragment := _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT,
                            SELF.fragment_value := addr)),
-                       blank_dataset);            
+                       blank_dataset);
 
  ds_Phone_element := IF(ds_pr_best[1].best_phone <> '',
-                      PROJECT(ds_pr_best_ungroup, 
+                      PROJECT(ds_pr_best_ungroup,
                         TRANSFORM(_Layouts.fragment_w_value_recs,
                           SELF.acctno := (string) LEFT.seq,
                           SELF.fragment := _Constants.Fragment_Types.PHONE_FRAGMENT,
                           SELF.fragment_value := LEFT.best_phone)),
                      blank_dataset);
-            
+
  _Layouts.fragment_w_value_recs do_Rollup(_Layouts.fragment_w_value_recs L, dataset(_Layouts.fragment_w_value_recs) R) := TRANSFORM
     SELF := L;
- END;	
- 
+ END;
+
  ds_element_sorted := SORT(ds_ssn_element + ds_Address_element + ds_Phone_element, fragment_value, fragment);
  ds_element_recs_grouped := GROUP(ds_element_sorted, fragment_value, fragment);
  ds_element_recs_rolled := ROLLUP(ds_element_recs_grouped, GROUP, do_Rollup(LEFT, ROWS(LEFT)))(fragment_value <> '');
- 
+
  ds_entityNameUID := RiskIntelligenceNetwork_Services.Functions.GetAnalyticsUID(ds_element_recs_rolled);
- 
+
  ds_entity_w_risk := JOIN(ds_entityNameUID , FraudGovPlatform.Key_entityprofile,
                         KEYED(RIGHT.customerid = report_params.GlobalCompanyId AND
                               RIGHT.industrytype = report_params.IndustryType AND
@@ -61,65 +61,81 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
                           SELF.hasKnownRisk := RIGHT.aotkractflagev,
                           SELF.RiskLevel := (string) RIGHT.riskindx,
                           SELF := LEFT));
-            
+
  ds_realtime_profile := PROJECT(ds_pr_best,
-													TRANSFORM(iesp.identityreport.t_RINIdentityProfile,
-														dob_ := iesp.ECL2ESP.toDate((integer) LEFT.best_dob);
+                          TRANSFORM(iesp.identityreport.t_RINIdentityProfile,
+                            dob_ := iesp.ECL2ESP.toDate((integer) LEFT.best_dob);
                             dod_ := iesp.ECL2ESP.toDate((integer) LEFT.best_dod);
-														
-														SELF.UniqueId := (string) LEFT.did,
-														SELF.Name  := iesp.ECL2ESP.SetName(LEFT.best_fname,
+
+                            SELF.UniqueId := (string) LEFT.did,
+                            SELF.Name  := iesp.ECL2ESP.SetName(LEFT.best_fname,
                                                                LEFT.best_mname,
                                                                LEFT.best_lname,
                                                                LEFT.best_name_suffix,
                                                                LEFT.best_title),
-														SELF.SSN := (string) LEFT.best_ssn,
-                            SELF.SSNKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.SSN_FRAGMENT)[1], 
+                            SELF.SSN := (string) LEFT.best_ssn,
+                            SELF.SSNKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.SSN_FRAGMENT)[1],
                                                    TRANSFORM(iesp.identityreport.t_RINProfileElementKnownRisk,
                                                       SELF.AnalyticsRecordId := LEFT.entity_context_uid,
                                                       SELF.ElementType := LEFT.fragment,
                                                       SELF := LEFT)),
-														SELF.DOB := iesp.ECL2ESP.ApplyDateMask(dob_, report_params.dob_mask),
+                            SELF.DOB := iesp.ECL2ESP.ApplyDateMask(dob_, report_params.dob_mask),
                             SELF.DOD := iesp.ECL2ESP.ApplyDateMask(dod_, report_params.dob_mask),
-                            SELF.IsDeceased := LEFT.best_dod <> ''; 
-														SELF.Address := iesp.ECL2ESP.SetAddress('',
+                            SELF.IsDeceased := LEFT.best_dod <> '';
+                            SELF.Address := iesp.ECL2ESP.SetAddress('',
                                                                     '',
-                                                                    '', 
                                                                     '',
-                                                                    '', 
-                                                                    '', 
+                                                                    '',
+                                                                    '',
+                                                                    '',
                                                                     '',
                                                                     LEFT.best_city,
                                                                     LEFT.best_state,
                                                                     LEFT.best_zip,
-                                                                    LEFT.best_zip4, 
+                                                                    LEFT.best_zip4,
                                                                     '',
                                                                     '',
                                                                     LEFT.best_addr1),
-                            SELF.AddressKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT)[1], 
+                            SELF.AddressKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT)[1],
                                                        TRANSFORM(iesp.identityreport.t_RINProfileElementKnownRisk,
                                                         SELF.AnalyticsRecordId := LEFT.entity_context_uid,
                                                         SELF.ElementType := LEFT.fragment,
                                                         SELF := LEFT)),
                             SELF.Phone := LEFT.best_phone,
-                            SELF.PhoneKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.PHONE_FRAGMENT)[1], 
+                            SELF.PhoneKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.PHONE_FRAGMENT)[1],
                                                      TRANSFORM(iesp.identityreport.t_RINProfileElementKnownRisk,
                                                       SELF.AnalyticsRecordId := LEFT.entity_context_uid,
                                                       SELF.ElementType := LEFT.fragment,
-                                                      SELF := LEFT)),             
+                                                      SELF := LEFT)),
                             SELF := []));
-              
- // Public records appends for realtimetime identities. inorder to get risk scores from KEL analytics. 
- // This feature is still WIP. the key function from analytics is not yet availabe. Whenever the analytics function will be 
- // availabe "ds_pr_appends" will be used. 
+
+ // Public records appends for realtimetime identities. inorder to get attributes and risk scores from KEL analytics.
 
  ds_pr_appends := RiskIntelligenceNetwork_Services.Functions.getRealtimePRAppends(ds_pr_best_ungroup, report_params);
-
- // ****Ends here ****
-
+ ds_RiskAssessment := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends);  
+ 
+ ds_RiskAttribute := PROJECT(ds_RiskAssessment[1].EntityStats, 
+                       TRANSFORM(iesp.identityreport.t_RINRiskAttribute, 
+                         SELF.ElementType := CASE(LEFT.entitytype,
+                                                  _Constants.EntityType.LEXID => _Constants.Fragment_Types.PERSON_FRAGMENT,
+                                                  _Constants.EntityType.PHYSICAL_ADDRESS => _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT,
+                                                  _Constants.EntityType.SSN => _Constants.Fragment_Types.SSN_FRAGMENT,
+                                                  _Constants.EntityType.PHONENO => _Constants.Fragment_Types.PHONE_FRAGMENT,
+                                                  _Constants.EntityType.EMAIL => _Constants.Fragment_Types.EMAIL_FRAGMENT,
+                                                  _Constants.EntityType.IPADDRESS => _Constants.Fragment_Types.IP_ADDRESS_FRAGMENT,
+                                                  _Constants.EntityType.BANKACCOUNT => _Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
+                                                  _Constants.EntityType.DLNUMBER => _Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
+                                                  ''),                                                  
+                         SELF.KnownRiskCode := LEFT.value,
+                         SELF.KnownRiskDescription := LEFT.label,
+                         SELF.RiskLevel := (string) LEFT.risklevel,
+                         SELF.NVPs := []));
+ 
  iesp.identityreport.t_RINIdentityReportRecord trans_reportrecords() := TRANSFORM
   SELF.IdentityProfile := ROW(ds_realtime_profile[1], iesp.identityreport.t_RINIdentityProfile);
-  SELF := []  
+  SELF.RiskLevel := (string) ds_RiskAssessment[1].P1_IDRiskIndx;
+  SELF.RiskAttributes := ds_RiskAttribute;
+  SELF := []
  END;
 
  ds_reportrecords := DATASET([trans_reportrecords()]);
@@ -132,8 +148,10 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  // OUTPUT(ds_entity_w_risk, named('ds_entity_w_risk'));
  // OUTPUT(ds_realtime_profile, named('ds_realtime_profile'));
  // OUTPUT(ds_pr_appends, named('ds_pr_appends'));
+ // OUTPUT(ds_RiskAssessment, named('ds_RiskAssessment'));
+ // OUTPUT(ds_RiskAttribute, named('ds_RiskAttribute'));
  // OUTPUT(ds_reportrecords, named('ds_reportrecords'));
- 
+
  return ds_reportrecords;
 
 END;
