@@ -33,6 +33,6 @@ OttoSharingUsingInclusionIdWithState := JOIN(OttoSharingUsingInclusionId2, Custo
                                 LEFT.SourceCustomerHash=RIGHT.SourceCustomerHash, LEFT OUTER, LOOKUP);
 
 tempSharing := DATASET('~foreign::10.173.14.201::temp::sharingrules', RECORDOF(OttoSharingUsingInclusionIdWithState), THOR);
-EXPORT SharingRules := tempSharing;//OttoSharingUsingInclusionIdWithState;//CustomerIdState;//DEDUP(SORT(OttoSharingUsingInclusionId2, fdn_file_info_id, SourceCustomerHash, TargetCustomerHash), fdn_file_info_id, SourceCustomerHash, TargetCustomerHash); tempSharing; //
+EXPORT SharingRules := OttoSharingUsingInclusionIdWithState;//CustomerIdState;//DEDUP(SORT(OttoSharingUsingInclusionId2, fdn_file_info_id, SourceCustomerHash, TargetCustomerHash), fdn_file_info_id, SourceCustomerHash, TargetCustomerHash); tempSharing; //
 
 
