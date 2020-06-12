@@ -131,8 +131,8 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 																													BuildLogger.KeyEnd(false),
 																													BuildLogger.PostStart(False),
 																													dopsUpdate, orbit_update, 
-																													//if(doDopsOrbit, buildStrata, output('no strata')), 
-																													//if(doDopsOrbit, scrubsRuns, output('no scrubs')), 
+																													if(doDopsOrbit, buildStrata, output('Strata update disabled')), 
+																													if(doDopsOrbit, scrubsRuns, output('Scrubs update disabled')), 
 																													BuildLogger.PostEnd(False), 
 																													BuildLogger.BuildEnd(false)):
 																													Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
