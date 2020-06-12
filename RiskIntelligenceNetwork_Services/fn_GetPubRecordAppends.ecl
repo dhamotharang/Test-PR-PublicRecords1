@@ -1,12 +1,12 @@
-﻿IMPORT Address, Advo_Services, Autokey_batch, CriminalRecords_BatchService, DriversV2, DriversV2_Services, dx_PhonesInfo, 
+﻿IMPORT Address, Advo_Services, Autokey_batch, CriminalRecords_BatchService, DriversV2, DriversV2_Services, dx_PhonesInfo,
   FraudShared_Services, Gateway, risk_indicators, RiskIntelligenceNetwork_Services, ut;
 
-EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in, 
+EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
                               RiskIntelligenceNetwork_Services.IParam.Params params) := MODULE
 
  EXPORT GetCriminal() := FUNCTION
-  // As per GRP-247 only following offense Categories needs to be returned. 
-  crim_batch_params := MODULE(CriminalRecords_BatchService.IParam.batch_params) 
+  // As per GRP-247 only following offense Categories needs to be returned.
+  crim_batch_params := MODULE(CriminalRecords_BatchService.IParam.batch_params)
     EXPORT BOOLEAN IncludeBadChecks := TRUE;
     EXPORT BOOLEAN IncludeBribery := TRUE;
     EXPORT BOOLEAN IncludeBurglaryComm := TRUE;
@@ -16,7 +16,7 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
     EXPORT BOOLEAN IncludeCounterfeit := TRUE;
     EXPORT BOOLEAN IncludeFraud := TRUE;
     EXPORT BOOLEAN IncludeIdTheft := TRUE;
-    EXPORT BOOLEAN IncludeMVTheft := TRUE;  
+    EXPORT BOOLEAN IncludeMVTheft := TRUE;
     EXPORT BOOLEAN IncludeRobberyComm := TRUE;
     EXPORT BOOLEAN IncludeRobberyRes := TRUE;
     EXPORT BOOLEAN IncludeShoplift := TRUE;
@@ -30,9 +30,9 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
 
   RETURN ds_criminal.Records;
  END;
- 
+
  EXPORT GetAdvo := FUNCTION
-  ds_advo_in := PROJECT(ds_in, 
+  ds_advo_in := PROJECT(ds_in,
                   TRANSFORM(Advo_Services.Advo_Batch_Service_Layouts.Batch_In,
                    SELF.acctno := LEFT.acctno,
                    SELF.addr   := LEFT.addr,
@@ -43,16 +43,16 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
   ds_advo := Advo_Services.Advo_Batch_Service_Records(ds_advo_in, true, true);
   return ds_advo;
  END;
- 
+
  EXPORT GetPrepaidPhone := FUNCTION
-  ds_prepaidphone := JOIN(ds_in, dx_PhonesInfo.Key_Phones_Type, 
+  ds_prepaidphone := JOIN(ds_in, dx_PhonesInfo.Key_Phones_Type,
                       KEYED(LEFT.phoneno = RIGHT.phone) AND
                       RIGHT.prepaid = RiskIntelligenceNetwork_Services.Constants.PREPAID_VALUE,
                       TRANSFORM(RIGHT),
-                     LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT)); 
+                     LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT));
   return ds_prepaidphone;
  END;
- 
+
  EXPORT GetDL := FUNCTION
   dl_params := MODULE(DriversV2_Services.GetDLParams.batch_params)
     EXPORT useAllLookups := TRUE;
@@ -60,7 +60,7 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
     EXPORT RunDeepDive := FALSE;
     EXPORT boolean return_current_only := TRUE;
   END;
-  
+
   ds_dl_in := PROJECT(ds_in,
                TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster,
                 SELF.homephone := LEFT.phoneno,
@@ -70,9 +70,9 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
   ds_dl := PROJECT(ds_dl_pre, RiskIntelligenceNetwork_Services.Layouts.dl_layout);
   return ds_dl;
  END;
- 
+
  EXPORT GetBocaShell := FUNCTION
- 
+
   risk_indicators.Layout_Input tFormat2IIDIn(FraudShared_Services.Layouts.BatchIn_rec L)	:= TRANSFORM
    self.score := if(L.did != 0,100,0);
    self.in_StreetAddress :=	L.addr;
@@ -92,7 +92,7 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
 
   // InstantID & Boca shell constants
   dGateways :=	Gateway.Constants.void_gateway;
-  boolean isUtility :=	false;  
+  boolean isUtility :=	false;
   boolean isLn :=	false;
   boolean ofac_only :=	true;
   boolean suppressNearDups :=	false;
@@ -121,13 +121,13 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
                                              params.dppa,
                                              params.glb,
                                              isUtility,
-                                             isLn, 
+                                             isLn,
                                              ofac_only,
                                              suppressNearDups,
                                              require2Ele,
                                              from_biid,
                                              isFCRA,
-                                             excludewatchlists, 
+                                             excludewatchlists,
                                              from_IT1O,
                                              OFACVersion,
                                              IncludeOfac,
@@ -139,13 +139,13 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
                                              in_DataRestriction := params.DataRestrictionMask,
                                              in_DataPermission := params.DataPermissionMask);
 
-  // BocaShell function 
+  // BocaShell function
   dBocaShell :=	Risk_Indicators.Boca_Shell_Function(dIID,
                                                     dGateways,
                                                     params.dppa,
                                                     params.glb,
                                                     isUtility,
-                                                    isLn, 
+                                                    isLn,
                                                     doRelatives,
                                                     doDL,
                                                     doVehicle,
@@ -157,5 +157,5 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
                                                     DataPermission := params.DataPermissionMask);
   return ungroup(dBocaShell);
  END;
- 
+
 END;
