@@ -88,7 +88,7 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 	:= if(doDopsOrbit, RoxieKeybuild.updateversion('IP_MetadataKeys', version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', , 'N'), output('Dops update disabled'));
+		dopsUpdate 	:= if(doDopsOrbit, RoxieKeybuild.updateversion('IP_MetadataKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N'), output('Dops update disabled'));
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Orbit Update ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +110,8 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 	//Build Scrubs Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 																						
-		scrubsRuns		:= sequential(Scrubs_IP_Metadata.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com'), 
-																Scrubs_IP_Metadata.BaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com')
+		scrubsRuns		:= sequential(Scrubs_IP_Metadata.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com'), 
+																Scrubs_IP_Metadata.BaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com')
 																);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,8 +135,8 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 																													if(doDopsOrbit, scrubsRuns, output('Scrubs update disabled')), 
 																													BuildLogger.PostEnd(False), 
 																													BuildLogger.BuildEnd(false)):
-																													Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
-																													Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';alan.jaramillo@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE));					
+																													Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
+																													Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE));					
 																												
 	return sendEmail;
 
