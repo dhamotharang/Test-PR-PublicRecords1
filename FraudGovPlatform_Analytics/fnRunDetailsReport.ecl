@@ -12,7 +12,7 @@
 	cmpUuid 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DetailsReport.CompositionUuid;
 	vizVersion 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DetailsReport.VizServiceVersion;
 	reqSource 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.reqSource;																
-	encodedCreds 				:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCreds;			
+	encodedCreds 				:= FraudGovPlatform_Analytics.configFunctions.getCredentials(runProd, updateROSE);			
 	dspToUse						:= FraudGovPlatform_Analytics.configFunctions.getDspToUse(runProd, updateROSE, useDspQa);
 	hpccConnection 			:= FraudGovPlatform_Analytics.configFunctions.getHpccConnection(runProd, newVersion, updateROSE);
 	eclCompileStrategy	:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EclCompileStrategy;											

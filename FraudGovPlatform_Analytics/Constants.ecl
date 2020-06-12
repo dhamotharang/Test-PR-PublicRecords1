@@ -55,7 +55,8 @@
 		// EXPORT fileScope						:= 'fraudgov::base::20191025::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
 		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMjAhISE=';
-		EXPORT DataBuildRampsCreds	:= 'ZGF0YWJ1aWxkcmFtcHNAbWJzOnc1R0o0aDRyVmk=';
+		EXPORT DataBuildRampsCertCreds	:= 'ZGF0YWJ1aWxkcmFtcHNAbWJzOnc1R0o0aDRyVmk=';
+		EXPORT DataBuildRampsCreds	:= 'ZGF0YWJ1aWxkcmFtcHNAbWJzOlAxOGI5QTE1ZQ==';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspCert							:= 'dsp-cert';
@@ -72,8 +73,8 @@
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= 'cf45de78-de9f-4c1f-81e4-934609562c58'; 	//Find Leads Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				// EXPORT InputEventPivot          := '~foreign::10.173.10.157::fraudgov::base::built::kel::profile';
-				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.157::gov::otto::pivotentitystatsfilter';
+				// EXPORT InputEventPivot          := '~foreign::10.173.10.159::gov::otto::eventpivot';
+				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.159::gov::otto::pivotentitystatsfilter';
 				// EXPORT InputLogicalConfigFile	  := '~foreign::10.173.10.157::fraudgov::base::built::configattributes';
 				EXPORT InputEventPivot				  := fileLocation(useProdData) + fileScope + 'entityprofile';
 				EXPORT InputLogicalEntityStats  := fileLocation(useProdData) + fileScope + 'entityattributes';
@@ -84,8 +85,8 @@
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= '3adb4bd6-9d48-41c0-bf6c-acab5d827646'; 	//Dashboard Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				// EXPORT InputEventPivot          := '~foreign::10.173.10.157::fraudgov::base::built::kel::profile';
-				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.157::gov::otto::pivotentitystatsfilter';
+				// EXPORT InputEventPivot          := '~foreign::10.173.10.159::gov::otto::eventpivot';
+				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.159::gov::otto::pivotentitystatsfilter';
 				EXPORT InputEventPivot				  := fileLocation(useProdData) + fileScope + 'entityprofile';
 				EXPORT InputLogicalEntityStats  := fileLocation(useProdData) + fileScope + 'entityattributes';
 			END;
@@ -94,9 +95,9 @@
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= 'f44a200b-80f7-48eb-9328-b1767073d51b'; 	//Details Report Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				// EXPORT InputEventPivot          := '~foreign::10.173.10.157::fraudgov::base::built::kel::profile';
-				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.157::gov::otto::pivotentitystatsfilter';
-        // EXPORT InputLogicalEntityRules	:= '~foreign::10.173.10.157::gov::otto::entityrules';
+				// EXPORT InputEventPivot          := '~foreign::10.173.10.159::gov::otto::eventpivot';
+				// EXPORT InputLogicalEntityStats	:= '~foreign::10.173.10.159::gov::otto::pivotentitystatsfilter';
+        // EXPORT InputLogicalEntityRules	:= '~foreign::10.173.10.159::gov::otto::entityrules';
         EXPORT InputEventPivot				  := fileLocation(useProdData) + fileScope + 'entityprofile';
 				EXPORT InputLogicalEntityStats  := fileLocation(useProdData) + fileScope + 'entityattributes';
 				EXPORT InputLogicalEntityRules  := fileLocation(useProdData) + fileScope + 'entityrules';
@@ -106,8 +107,8 @@
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= '33e5b3de-4d45-4fe1-90d6-04b0c05ebd5d'; 	//Links Chart Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				// EXPORT InputLogicalGraphVertices:= '~foreign::10.173.10.157::fraudgov::rin2::graphpvertices';
-				// EXPORT InputLogicalGraphEdges 	:= '~foreign::10.173.10.157::fraudgov::rin2::graphedges';
+				// EXPORT InputLogicalGraphVertices:= '~foreign::10.173.10.159::temp::fraudgov::rin2::graphpvertices';
+				// EXPORT InputLogicalGraphEdges 	:= '~foreign::10.173.10.159::temp::fraudgov::rin2::graphedges';
         EXPORT InputLogicalGraphVertices:= fileLocation(useProdData) + fileScope + 'graphvertices';
         EXPORT InputLogicalGraphEdges   := fileLocation(useProdData) + fileScope + 'graphedges';
 			END;

@@ -22,4 +22,9 @@
 			FraudGovPlatform_Analytics.Constants.RampsWebServices.DspCert); //DSP Cert for RIN Cert
 	RETURN dspToUse;
 	END;
+  
+  EXPORT getCredentials(BOOLEAN runProd, BOOLEAN updateROSE = FALSE) := FUNCTION
+    creds := IF(runProd, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCreds, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCertCreds);
+  RETURN creds;
+  END;
 END;
