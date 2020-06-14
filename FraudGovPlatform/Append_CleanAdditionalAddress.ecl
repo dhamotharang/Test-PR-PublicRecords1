@@ -1,11 +1,16 @@
 ﻿IMPORT FraudShared,address,tools;
 EXPORT Append_CleanAdditionalAddress (
-	 dataset(FraudShared.Layouts.Base.Main) FileBase
+	  dataset(FraudShared.Layouts.Base.Main) FileBase
+     ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
 ) := FUNCTION
 
+    new_inputs := JOIN(FileBase, 
+         Previous_Build,
+         left.record_id = right.record_id, LEFT ONLY);
+         
     AddressCache := Files().Base.AddressCache.QA;
 
-	slim_in := Project( FileBase , TRANSFORM( FraudGovPlatform.Layouts.Temp.CleanAddressSlim , 
+	slim_in := Project( new_inputs , TRANSFORM( FraudGovPlatform.Layouts.Temp.CleanAddressSlim , 
         SELF.record_id                      := LEFT.record_id;
         SELF.street_1                       := LEFT.additional_address.street_1;
         SELF.street_2                       := LEFT.additional_address.street_2;
@@ -47,17 +52,11 @@ EXPORT Append_CleanAdditionalAddress (
 	
     CleneadAddresses :=  FraudGovPlatform.mac_Append_CleanAddresses( slim_in, AddressCache );
 
-    appendedAddresses := JOIN( FileBase , CleneadAddresses , 
+    appendedAddresses := JOIN( new_inputs , CleneadAddresses , 
         LEFT.RECORD_ID = RIGHT.RECORD_ID,
         TRANSFORM( FraudShared.Layouts.Base.Main , 
-        SELF.additional_address.street_1                        := RIGHT.street_1;
-        SELF.additional_address.street_2                        := RIGHT.street_2;
-        SELF.additional_address.city                            := RIGHT.city;
-        SELF.additional_address.state                           := RIGHT.state;
-        SELF.additional_address.zip                             := RIGHT.zip;        
         SELF.additional_address.address_1                       := RIGHT.address_1;
         SELF.additional_address.address_2                       := RIGHT.address_2;
-        SELF.additional_address.Address_Type                    := RIGHT.Address_Type;
         SELF.additional_address.clean_address.prim_range		:= RIGHT.clean_address.prim_range;
         SELF.additional_address.clean_address.predir			:= RIGHT.clean_address.predir;
         SELF.additional_address.clean_address.prim_name		    := RIGHT.clean_address.prim_name;

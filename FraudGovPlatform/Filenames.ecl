@@ -185,9 +185,6 @@ module
 		export kel_CustomerDashTopEntityStats_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats_Delta'),pversion);
 		export kel_CustomerDashTopClustersAndElements_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements_Delta'),pversion);
 		export kel_CustomerDashTopClusters_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters_Delta'),pversion);
-		
-		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
-		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
 
 		//	soap appends original
 		
@@ -264,8 +261,6 @@ module
 			kel_CustomerDashTopEntityStats_Delta.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements_Delta.dAll_filenames + 
 			kel_CustomerDashTopClusters_Delta.dAll_filenames + 
- 			Main_Orig.dAll_filenames + 
-			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 
 			CIID_Demo.dAll_filenames + 
 			Crim_Demo.dAll_filenames + 

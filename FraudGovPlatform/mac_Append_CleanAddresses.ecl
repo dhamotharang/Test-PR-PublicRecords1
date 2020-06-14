@@ -54,10 +54,10 @@ EXPORT mac_Append_CleanAddresses(
 	END;
 
 	//*********************************************  Valid Input Addresses **************************************************//
-    validAddresses := in_file(city <> '' and zip <> '' and street_1 <> '');	
+    validAddresses := in_file( street_1 <> '' and  ( ( city <> '' and (State <> '' or Zip <> '' ) ) OR ( State <> '' and Zip  <> '' )));
 
 	//*********************************************  Invalid or Empty Input Addresses **************************************************//
-    invalidOrEmptyAddresses := in_file(city = '' or zip = '' or street_1 = '');
+    invalidOrEmptyAddresses := join(in_file, validAddresses, left.record_id = right.record_id, left only);
 
     //*********************************************  Find in Cache **************************************************//
 
