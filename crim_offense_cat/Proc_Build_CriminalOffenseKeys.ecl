@@ -1,7 +1,7 @@
 import std, crim_offense_cat, orbit3, dops, VersionControl;
 //pUseProd must be set to true only when running on prod
-export BWR(string new_input_folder = '20200510', boolean pUseProd = true) := function
-        inSP := nothor(STD.File.SuperFileContents(crim_offense_cat.Filenames(pUseProd).processedIn));
+export Proc_Build_CriminalOffenseKeys(string new_input_folder = '20200510', boolean pUseProd = true) := function
+        inSP := nothor(STD.File.SuperFileContents(crim_offense_cat.Filenames(pUseProd).basein));
         basein := crim_offense_cat.filenames(pUseProd).BaseIn;
         newName := basein + '::'+ new_input_folder;
         isSameAsLast := count(inSP(name = newName[2..]))>0;
@@ -14,7 +14,6 @@ export BWR(string new_input_folder = '20200510', boolean pUseProd = true) := fun
                                 output('debug no orbit')
                                 );
         return sequential(
-                        crim_offense_cat.checksuperfiles(basein),
                         if( isSameAsLast,
                                 output(newName + ' already in superfile, skipping input version control'),
                                 sequential(
@@ -27,7 +26,7 @@ export BWR(string new_input_folder = '20200510', boolean pUseProd = true) := fun
                                         )
                                 ),
                         crim_offense_cat.Mac_build_all(new_input_folder, pUseProd), //runs key process once input is sprayed and version controlled,
-                        std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).processedIn, newName),
+                        //std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).processedIn, newName),
                         UpdateDops,
                         UpdateOrbit
                         );
