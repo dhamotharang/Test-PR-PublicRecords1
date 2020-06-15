@@ -197,10 +197,10 @@ EXPORT layouts := MODULE
 			Header.Layout_Header.did;
 		END;
 		SHARED didupdate_documentid_record := RECORD
-			AccountMonitoring.product_files.header_files.r_doxie_key_rid_did.did;
+			AccountMonitoring.product_files.header_files.doxie_key_rid_did.did;
 		END;		
 		SHARED bdidupdate_documentid_record := RECORD
-			AccountMonitoring.product_files.header_files.r_business_header_key_rcid.bdid;
+			AccountMonitoring.product_files.header_files.business_header_key_rcid.bdid;
 		END;
 		SHARED phoneownership_documentid_record := RECORD
 			PhonesInfo.Layout_Common.portedMetadata_Main.deact_start_dt;

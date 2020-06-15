@@ -100,9 +100,8 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 		// TYPE TB -- SE / TYPE TF -- SX
 		///////////////////////////////
 
-    dist_header := DISTRIBUTED(AccountMonitoring.product_files.header_files.r_doxie_key_header_slim, HASH64(did));
-
-
+    dist_header := DISTRIBUTED(AccountMonitoring.product_files.header_files.doxie_key_header_slim, HASH64(did));
+		
 		// temp_join_B1_inter is distributed on HASH64(did) (time to run--56:23)
 		temp_join_B1_inter := JOIN(dist_header,
 		                           in_portfolio_did_dist, 
@@ -125,8 +124,8 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
                                  LOCAL);
 
 		
-    dist_quick_header := DISTRIBUTED(AccountMonitoring.product_files.header_files.r_quick_header_key_DID_slim, HASH64(did)); 
-
+    dist_quick_header := DISTRIBUTED(AccountMonitoring.product_files.header_files.quick_header_key_DID_slim, HASH64(did)); 
+		
 		// temp_join_B2_inter is distributed on HASH64(did)
 		temp_join_B2_inter := JOIN(dist_quick_header,
                                  in_portfolio_did_dist, 
@@ -149,7 +148,7 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
                                  LOCAL);
 
 
-		dist_util_daily := DISTRIBUTED(AccountMonitoring.product_files.header_files.r_daily_utility_key_DID_slim, HASH64((UNSIGNED6)did));
+		dist_util_daily := DISTRIBUTED(AccountMonitoring.product_files.header_files.daily_utility_key_DID_slim, HASH64((UNSIGNED6)did));
 
 		// temp_join_B3_inter is distributed on HASH64(did)
 		temp_join_B3_inter := JOIN(dist_util_daily, 
@@ -491,7 +490,7 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 
 		// output(choosen(temp_project_portfolio_phone_only,5000),named('temp_project_portfolio_phone_only'));
 		// output(choosen(temp_redist_again,5000),named('temp_redist_again'));
-
+	
 		RETURN temp_rolled_hashes;
 
 	END;
