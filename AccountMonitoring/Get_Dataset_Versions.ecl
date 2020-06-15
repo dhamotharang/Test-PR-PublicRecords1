@@ -1,4 +1,4 @@
-﻿// This output for this function is the product, subfile name and the version number 
+// This output for this function is the product, subfile name and the version number 
 // It also always returns the three (header, quick header & Daily utility) key versions 
 // The output can be limited to a particular product or products by passing a product mask in.
 // Only when valid despray information passed into the funtion, will files be written, otherwise the
