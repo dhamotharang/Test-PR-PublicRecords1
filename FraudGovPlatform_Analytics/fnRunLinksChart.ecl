@@ -16,6 +16,7 @@
 	eclCompileStrategy	:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EclCompileStrategy;											
 	keepEcl 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.KeepEcl;					
 	forceRun						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ForceRun;
+  deleteOldIndexes    := FraudGovPlatform_Analytics.Constants.RampsWebServices.DeleteOldIndexes;
   useDspNext          := TRUE;
 	
 	//Files used to create the dashboard
@@ -28,6 +29,6 @@
 	dRunComposition := RAMPS_WebServices.macRunComposition(cmpUuid, encodedCreds, 
 		dspToUse, hpccConnection, reqSource,
 		eclCompileStrategy, keepEcl, 
-		vizVersion, filenames, forceRun, ,useDspNext);
+		vizVersion, filenames, forceRun, deleteOldIndexes, ,useDspNext);
 	RETURN dRunComposition;
 END;

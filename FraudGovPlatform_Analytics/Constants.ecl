@@ -69,6 +69,7 @@
 		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT ForceRun							:= 'FALSE';
+    EXPORT DeleteOldIndexes     := 'TRUE';
 		EXPORT FindLeads         		:= MODULE
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= 'cf45de78-de9f-4c1f-81e4-934609562c58'; 	//Find Leads Composition ID
