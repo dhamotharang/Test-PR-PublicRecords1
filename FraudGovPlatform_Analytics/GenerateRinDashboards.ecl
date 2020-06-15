@@ -1,9 +1,7 @@
 ﻿EXPORT GenerateRinDashboards(
 	BOOLEAN runProd = FALSE,			//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
 	BOOLEAN useProdData = FALSE,	//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
-	BOOLEAN updateROSE = FALSE,		//set to TRUE it will run from the specified DSP  on ramps dev cluster for ROSE environment
-  STRING  MaxDeltaBaseDate = '20200601', //Max Deltabase Date
-  STRING  MaxDeltaBaseTime = '235520'    //Max Deltabase Time
+	BOOLEAN updateROSE = FALSE		//set to TRUE it will run from the specified DSP  on ramps dev cluster for ROSE environment
 	) := FUNCTION
 	#OPTION('soapTraceLevel',10);
 	
@@ -24,17 +22,14 @@
 	linksChartLogicalfilename	    := LinksChartSuperFileName +'::'+(STRING8)STD.Date.Today();
 	detailsreportLogicalfilename	:= DetailsReportSuperFileName +'::'+(STRING8)STD.Date.Today();
   
-  //Get latest Deltabase date from main fraudgov file
-  DeltabaseSources        := [4,5,6,7];
-  FileIn                  := 'fraudgov::base::built::Main';
-  fraudgov_dataset_Input  := dataset(data_services.foreign_prod+FileIn, /*FraudShared.Layouts.Base.*/Main, thor); 
-  dDeltabase              := fraudgov_dataset_Input(Rin_Source IN DeltabaseSources);
-  STRING MaxDeltaBaseDate := (STRING)(MAX(dDeltabase,(integer)dDeltabase.reported_date));
-  STRING MaxDeltaBaseTime := (STRING)(MAX(dDeltabase,(integer)dDeltabase.reported_time));
+  //Get latest Deltabase date
+	base_in := Fraudgovplatform.files().base.agencyactivitydate.built;
+  MaxDeltaBaseDate := base_in[1].reported_date;
+  MaxDeltaBaseTime := base_in[1].reported_time;
 
 	dRunFindLeads   							:= DATASET(FraudGovPlatform_Analytics.fnRunFindLeads(runProd, useProdData, updateROSE));
 	dRunDashboard       					:= DATASET(FraudGovPlatform_Analytics.fnRunDashboard(runProd, useProdData, updateROSE));
-	dRunLinksChart       					:= DATASET(RinDev.FraudGovPlatform_Analytics.fnRunLinksChart(runProd, useProdData, updateROSE));
+	dRunLinksChart       					:= DATASET(FraudGovPlatform_Analytics.fnRunLinksChart(runProd, useProdData, updateROSE));
 	dRunDetailsReport             := DATASET(FraudGovPlatform_Analytics.fnRunDetailsReport(runProd, useProdData, updateROSE, (STRING)MaxDeltaBaseDate, (STRING)MaxDeltaBaseTime));
 	
 	//Dashboards for Non Prod environment
