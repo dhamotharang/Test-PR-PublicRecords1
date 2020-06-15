@@ -860,6 +860,10 @@ Export CIID := RECORD
     unsigned4	record_count := 1;				
   END;
 	
+	EXPORT AgencyActivityDate := RECORD
+		string8		reported_date;
+		string10	reported_time;
+	END;
  EXPORT PrepaidPhone	:= RECORD
 	string10	phone;
 	string8	reported_date;
