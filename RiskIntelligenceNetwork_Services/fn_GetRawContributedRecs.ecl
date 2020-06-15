@@ -3,20 +3,20 @@
 EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_search_in,
                                 RiskIntelligenceNetwork_Services.IParam.Params search_params) := FUNCTION
 
- //Since its batch of 1 record, there will always be only one row of input. 
+ //Since its batch of 1 record, there will always be only one row of input.
  in_rec := ds_search_in[1];
  fraud_platform := RiskIntelligenceNetwork_Services.Constants.FRAUD_PLATFORM;
 
  //Following project is necessary to transform "BatchInExtended_rec" back to "BatchIn_rec" , which is actually used by Batch & Report & FDN services.
  ds_search_in_orig := PROJECT(ds_search_in, FraudShared_Services.Layouts.BatchIn_rec);
 
- /* First "Normalize" the sequenced input, 5 times to split out the 5 pieces of data 
-  // (to be checked for in the FraudGov Auto keys for getting all the fuzzy data) onto 
-  // separate records since that is what the new  requirement is expecing 
-  // Check the counter: when 1 assign did, 
-  // 									 when 2 assign address fields, 
-  //                    when 3 assign ssn, 
-  // 									 when 4 assign phone, 
+ /* First "Normalize" the sequenced input, 5 times to split out the 5 pieces of data
+  // (to be checked for in the FraudGov Auto keys for getting all the fuzzy data) onto
+  // separate records since that is what the new  requirement is expecing
+  // Check the counter: when 1 assign did,
+  // 									 when 2 assign address fields,
+  //                    when 3 assign ssn,
+  // 									 when 4 assign phone,
                        when 5 assign names.
  */
  FraudShared_Services.Layouts.BatchIn_rec tf_NormAndSlim(FraudShared_Services.Layouts.BatchIn_rec L, INTEGER C) := TRANSFORM
@@ -42,15 +42,15 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
   self             := [];  // Added for FDN Expanded layout
  end;
 
- ds_search_in_norm5slim := NORMALIZE(ds_search_in_orig,5,tf_NormAndSlim(LEFT,COUNTER));	
+ ds_search_in_norm5slim := NORMALIZE(ds_search_in_orig,5,tf_NormAndSlim(LEFT,COUNTER));
 
  //Hitting the auto keys.
- ds_auto_name   := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim(name_first != '' or name_last != ''), fraud_platform);	
- ds_auto_address:= RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim((prim_name <> '' or addr <> '') AND (p_city_name <> '' AND st <> '') OR z5 <> ''), fraud_platform);
+ ds_auto_name   := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim(name_last != ''), fraud_platform);
+ ds_auto_address:= RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim((prim_name <> '' or addr <> '') AND ((p_city_name <> '' AND st <> '') OR z5 <> '')), fraud_platform);
  ds_auto_ssn    := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim(ssn !=''), fraud_platform);
- ds_auto_phone  := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim(phoneno !=''), fraud_platform);	
+ ds_auto_phone  := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_search_in_norm5slim(phoneno !=''), fraud_platform);
 
- //Hitting the Fraud shared keys.. which are based on BatchIn_rec record structure. 
+ //Hitting the Fraud shared keys.. which are based on BatchIn_rec record structure.
  ds_valid_in  := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_search_in_orig,fraud_platform);
  EntitiesIds_ := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, FALSE ,RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT);
 
@@ -96,18 +96,18 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
  //Find which IP_Address key to hit.
  BOOLEAN isIPRangeKey := STD.Str.Contains(in_rec.ip_address, 'XXX', true);
 
- octets := STD.STr.SplitWords(in_rec.ip_address,'.');										
+ octets := STD.STr.SplitWords(in_rec.ip_address,'.');
  octet1 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[1], 'xxx'), '', octets[1]);
  octet2 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[2], 'xxx'), '', octets[2]);
  octet3 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[3], 'xxx'), '', octets[3]);
- octet4 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[4], 'xxx'), '', octets[4]);	
+ octet4 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[4], 'xxx'), '', octets[4]);
 
  //Flags for IP Range Filtering.
  isIPRange123 := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 <> 0 AND octet4 = 0;
  isIPRange12  := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 = 0 AND octet4 = 0;
- isIPRange1   := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 = 0 AND octet3 = 0 AND octet4 = 0;		
+ isIPRange1   := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 = 0 AND octet3 = 0 AND octet4 = 0;
 
- ds_ip := MAP(isIPRangeKey => Search_EntitiesIDs_.GetIPRangeIds(octet1, octet2, octet3, isIPRange123, isIPRange12, isIPRange1), 
+ ds_ip := MAP(isIPRangeKey => Search_EntitiesIDs_.GetIPRangeIds(octet1, octet2, octet3, isIPRange123, isIPRange12, isIPRange1),
               NOT isIPRangeKey => EntitiesIds_.GetIp(),
               dataset([], FraudShared_Services.Layouts.Recid_rec));
 
@@ -117,7 +117,7 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
   dataset(FraudShared_Services.Layouts.Recid_rec) ds_rec_ids;
  END;
 
- ds_recs := if(search_params.IsOnline, 
+ ds_recs := if(search_params.IsOnline,
               dataset([ {count(ds_auto_name), 'autoname', ds_auto_name},
                         {count(ds_auto_address), 'autoaddress', ds_auto_address},
                         {count(ds_auto_ssn), 'autossn', ds_auto_ssn},
@@ -153,20 +153,19 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
  ds_payload_recs := RiskIntelligenceNetwork_Services.fn_GetPayloadRecords(ds_final_rec_ids, search_params, fraud_platform := fraud_platform);
 
  //Applying the all AND filters based on all the Search Fields.
- ds_recs_filtered := ds_payload_recs(if(in_rec.p_city_name <> '' AND in_rec.st <> '', 
-                                        clean_address.p_city_name = in_rec.p_city_name AND clean_address.st = in_rec.st,
-                                        true) AND
+ ds_recs_filtered := ds_payload_recs(if(in_rec.p_city_name <> '', clean_address.p_city_name = in_rec.p_city_name, true) AND
+                                     if(in_rec.st <> '', clean_address.st = in_rec.st, true) AND
                                      if(in_rec.z5 <> '', clean_address.zip = in_rec.z5, true) AND
                                      if(in_rec.HouseholdId <> '', household_id = in_rec.HouseholdId, true) AND
                                      if(in_rec.CustomerPersonId <> '', customer_person_id = in_rec.CustomerPersonId, true) AND
-                                     if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '', 
+                                     if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '',
                                         reported_date BETWEEN in_rec.transactionstartdate AND in_rec.transactionenddate , true) AND
                                      if(in_rec.amountmin <> '', amount_paid >= in_rec.amountmin, true) AND
                                      if(in_rec.amountmax <> '', amount_paid <= in_rec.amountmax, true) AND
-                                     if(in_rec.bank_routing_number <> '', bank_routing_number_1 = in_rec.bank_routing_number OR 
+                                     if(in_rec.bank_routing_number <> '', bank_routing_number_1 = in_rec.bank_routing_number OR
                                                                           bank_routing_number_2 = in_rec.bank_routing_number, true) AND
-                                     if(in_rec.bank_account_number <> '', bank_account_number_1 = in_rec.bank_account_number OR 
-                                                                          bank_account_number_2 = in_rec.bank_account_number, true) AND 
+                                     if(in_rec.bank_account_number <> '', bank_account_number_1 = in_rec.bank_account_number OR
+                                                                          bank_account_number_2 = in_rec.bank_account_number, true) AND
                                      if(in_rec.ispname <> '', isp = in_rec.ispname, true) AND
                                      if(in_rec.ip_address <> '' AND NOT isIPRangeKey , ip_address = in_rec.ip_address, true) AND
                                      if(isIPRange123 ,(unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 AND
@@ -188,50 +187,54 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                                      if(in_rec.dl_state <> '', drivers_license_state = in_rec.dl_state, true) AND
                                      if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true)
                                    );
-                                   
- //AND filter with BankName , explicit join because we do not have BankName field in the payload. 
+
+ //AND filter with BankName , explicit join because we do not have BankName field in the payload.
  ds_recs_filtered_bankname := IF(in_rec.BankName <> '',
                                 JOIN(ds_recs_filtered, ds_BankNameIds,
                                   LEFT.record_id = RIGHT.record_id,
                                   TRANSFORM(LEFT)),
                                 ds_recs_filtered);
-                              
- //AND filter with County , explicit join because we wanted to use recordid filtering... 
+
+ //AND filter with County , explicit join because we wanted to use recordid filtering...
  ds_recs_filtered_county := IF(in_rec.county_name <> '',
                               JOIN(ds_recs_filtered_bankname, ds_CountyIds,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
                               ds_recs_filtered_bankname);
-                              
+
  //AND Filter with Name Autokey,
- ds_recs_filtered_name := IF(in_rec.name_last <> '' AND in_rec.name_first <> '',
+ ds_recs_filtered_name := IF(in_rec.name_last <> '',
                               JOIN(ds_recs_filtered_county, ds_auto_name,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
-                              ds_recs_filtered_county);	
+                              ds_recs_filtered_county);
 
  //AND Filter with Address Autokey,
  ds_recs_filtered_address := IF(in_rec.prim_name <> '' AND ((in_rec.p_city_name <> '' AND in_rec.st <> '') OR in_rec.z5 <> ''),
                               JOIN(ds_recs_filtered_name, ds_auto_address,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
-                              ds_recs_filtered_name);	
+                              ds_recs_filtered_name);
 
  //AND Filter with Phone Autokey,
  ds_recs_filtered_phone := IF(in_rec.phoneno <> '',
                               JOIN(ds_recs_filtered_address, ds_auto_phone,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
-                              ds_recs_filtered_address);	
+                              ds_recs_filtered_address);
 
  //AND Filter with ssn Autokey,
  ds_recs_filtered_final := IF(in_rec.ssn <> '',
                               JOIN(ds_recs_filtered_phone, ds_auto_ssn,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
-                              ds_recs_filtered_phone);	
+                              ds_recs_filtered_phone);
 
  ds_allPayloadRecs := LIMIT(ds_recs_filtered_final,RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT , FAIL(203, doxie.ErrorCodes(203)));
-  
+ 
+ // output(ds_search_in, named('ds_search_in'));
+ // output(ds_payload_recs, named('ds_payload_recs'));
+ // output(ds_recs_filtered, named('ds_recs_filtered'));
+ // output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
  RETURN ds_allPayloadRecs;
-END; 
+END;
