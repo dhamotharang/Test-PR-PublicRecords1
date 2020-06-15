@@ -1,7 +1,7 @@
 ﻿
   IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
-	EXPORT WeightingChart := DATASET('~temp::fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
+	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
 
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
 	EXPORT WeightingChartPrepped := PROJECT(WeightingChart(customerid=0 and industrytype = 0), TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF.Indicatortype := Std.Str.ToUpperCase(LEFT.Indicatortype), SELF := LEFT));

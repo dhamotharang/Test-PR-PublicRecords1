@@ -10,7 +10,7 @@ EXPORT KEL_EventPivot := MODULE
 SHARED UIStats1 := FraudgovKEL.KEL_EventShell.UIStats;
 
 // jp temp
-dConfig := DATASET('~temp::fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
+dConfig := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));	
 
 dictEvtType1 := DICTIONARY(dConfig(field = 't_evttype1statuscodeecho'),{value => uidescription});
 dictEvtType2 := DICTIONARY(dConfig(field = 't_evttype2statuscodeecho'),{value => uidescription});
@@ -98,7 +98,7 @@ MyRules := DATASET([
 */
 
 
-EXPORT MyRules := DATASET('~temp::fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
+EXPORT MyRules := DATASET('~fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
 
 // This is just to make sure there aren't duplicates. Should be moved into the build code for the index to check everything and validate.
 SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
