@@ -1217,6 +1217,9 @@
 		export string KEYWORD_OFAC_CAATSA_IRAN			:= '903';
 		export string KEYWORD_IRAN_IEI							:= '904';
 		export string KEYWORD_UNDP									:= '905';
+		export string KEYWORD_JPJETRO								:= '906';
+		export string KEYWORD_AUEPA_VIC							:= '907';
+		export string KEYWORD_MLARB									:= '908';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
