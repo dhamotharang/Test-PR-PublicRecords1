@@ -1,6 +1,6 @@
 import std, crim_offense_cat, orbit3, dops, VersionControl;
 //pUseProd must be set to true only when running on prod
-export Proc_Build_CriminalOffenseKeys(string new_input_folder = '20200510', boolean pUseProd = true) := function
+export Proc_Build_CriminalOffenseKeys(string new_input_folder, boolean pUseProd = true) := function
         inSP := nothor(STD.File.SuperFileContents(crim_offense_cat.Filenames(pUseProd).basein));
         basein := crim_offense_cat.filenames(pUseProd).BaseIn;
         newName := basein + '::'+ new_input_folder;
