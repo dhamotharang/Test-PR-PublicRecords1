@@ -1319,6 +1319,9 @@
 				trim(kword, left, right) = 'OFAC-CAATSA-IRAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_IRAN,
 				trim(kword, left, right) = 'IRAN-IEI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRAN_IEI,
 				trim(kword, left, right) = 'UNDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNDP,
+				trim(kword, left, right) = 'JPJETRO' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJETRO,
+				trim(kword, left, right) = 'AUEPA-VIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUEPA_VIC,
+				trim(kword, left, right) = 'MLARB' =>SubGroup_Constants.numKeywordsID.KEYWORD_MLARB,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
