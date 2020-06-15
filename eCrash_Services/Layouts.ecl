@@ -13,6 +13,17 @@ EXPORT Layouts := MODULE
 				 boolean PrimaryAgency;
 				 boolean AgencyMatch;
 			END;
+
+			EXPORT HPD_Response_Results := RECORD
+				 iesp.hpdreportsearch.t_HPDReportSearchResult;
+				 iesp.hpdreportsearch.t_HPDReportSearchResponse._Header.Message ;				 
+				 iesp.ecrash.t_ECrashSearchAgency.Agencyid ;
+				 string2 State;
+				 string2 source_id;
+				 string50 AgencyName;
+				 string20 AgencyORI;
+				 boolean IsReadyForPublic; 
+			END;
 			
 			EXPORT ECrashSearchAgency_alias_extended := RECORD
 				string JurisdictionState;

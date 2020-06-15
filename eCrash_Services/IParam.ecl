@@ -33,11 +33,16 @@ export IParam := module
 		export string200 SqlSearchEspURL := '';
 		export string SqlSearchEspNAME := '';
 		export string KY_SearchEspNAME := '';
-		export string200 KY_SearchEspURL := '';
+		export string200 GatewayEspURL := '';
+		export string HPD_SearchEspNAME := '';
 		export string officerBadgeNumber := '';
 		export string driversLicenseNumber := '';
 		export string VehicleVin := '';
 		export string LicensePlate := '';
+		export string CustomerType := '';
+		export string DateOfCrash := '';
+		export string BlockNumber := '';
+		export string DateOfBirth := '';
 	end;
 	
 	export searchrecords := interface(
