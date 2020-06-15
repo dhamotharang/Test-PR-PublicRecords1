@@ -484,7 +484,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
     n := NORMALIZE(PROJECT(pr,idAddr(LEFT, COUNTER)),LEFT.phoneRecs,newChildren(LEFT,RIGHT));
 
     // TODO: limit
-    doxie.mac_AddHRIPhone(n,nout)
+    doxie.mac_AddHRIPhone(n,nout,mod_access)
 
     doxie.Layout_Rollup.PhoneRec fixPhones(layout_HFSListed le) := TRANSFORM
       SELF.phone := le.phone;

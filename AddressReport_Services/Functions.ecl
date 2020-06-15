@@ -1,4 +1,4 @@
-IMPORT eMerges, iesp,DriversV2_Services,ut,
+﻿IMPORT eMerges, iesp,DriversV2_Services,ut,
   LiensV2_Services,LN_PropertyV2_Services, AutoStandardI,
   CriminalRecords_Services, SexOffender_Services,hunting_fishing_services,
   CCW_Services, doxie,VehicleV2_Services,doxie_cbrs, LN_PropertyV2,
@@ -768,7 +768,7 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
       acctno, phone),
     acctno, -dt_last_seen);
   maxHriPer_value := iesp.Constants.MaxCountHRI;
-  doxie.mac_AddHRIPhone(rtp_filt,rtp_out_hri);
+  doxie.mac_AddHRIPhone(rtp_filt,rtp_out_hri,mod_access);
   ut.getTimeZone(rtp_out_hri,phone,timezone,rtp_out_hri_w_tzone);
 
   //Calculate Royalties and carry in separate dataset

@@ -184,7 +184,7 @@ end;
 // TODO: append HRIs conditionally
 phones_wide_hri := project (phones_wide, transform (phones_rec, Self := Left; Self.hri_phone := []));
 maxHriPer_value := 10; //TODO: include into input (unsigned1 maxHriPer_value := 10 : stored('MaxHriPer'));
-doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre);
+doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre, mod_access);
 phor := project (phor_pre, transform (phones_rec, Self.lname := Left.name_last, Self := Left));
 
 // FinderReport style: verifies phones by last residents' names, among other things
