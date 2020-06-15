@@ -11,6 +11,7 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 																			//If you want to override a given dashboard service use the same viz service version; otherwise, use a new one.
 	filenames = '\'\'',									//Files used to create the dashboard. These need to be URL encoded.
 	forceRun = 'FALSE',									//Force to always regenerate the service
+  deleteOldIndexes = 'TRUE',          //Clean old indexes
   globalVariables = '\'\'',           //Global variables if needed
   useDspNext = FALSE                  //Use DSP Next
 	) := FUNCTIONMACRO
@@ -22,6 +23,7 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 		+IF(~useDspNext, '&KeepECL='+TRIM(keepEcl), '')
 		+'&VIZSERVICEVERSION='+TRIM(vizServiceVersion)
 		+'&forcerun='+TRIM(forceRun)
+    +'&deleteOldIndexes='+TRIM(deleteOldIndexes)
 		+TRIM(filenames)
     +TRIM(globalVariables);
 
