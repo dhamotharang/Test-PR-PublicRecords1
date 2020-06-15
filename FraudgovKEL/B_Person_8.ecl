@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Person FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_8 := MODULE
   SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE89335 := __E_Person;
-  EXPORT __ST81729_Layout := RECORD
+  SHARED __EE118103 := __E_Person;
+  EXPORT __ST98828_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -38,13 +38,13 @@ EXPORT B_Person_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST81729_Layout __ND90027__Project(E_Person.Layout __PP88945) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP88945.Deceased_Date_))=>1,0);
-    __BS89176 := __T(__PP88945.Reported_Date_Of_Birth_);
-    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS89176(__T(__OP2(__PP88945.Deceased_Date_Of_Birth_,=,__T(__PP88945.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
-    __BS89218 := __T(__PP88945.Full_Name_);
-    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS89218(__T(__AND(__OP2(__T(__PP88945.Full_Name_).First_Name_,=,__PP88945.Deceased_First_),__OP2(__T(__PP88945.Full_Name_).Last_Name_,=,__PP88945.Deceased_Last_)))))=>1,0);
-    SELF := __PP88945;
+  SHARED __ST98828_Layout __ND118795__Project(E_Person.Layout __PP117713) := TRANSFORM
+    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP117713.Deceased_Date_))=>1,0);
+    __BS117944 := __T(__PP117713.Reported_Date_Of_Birth_);
+    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS117944(__T(__OP2(__PP117713.Deceased_Date_Of_Birth_,=,__T(__PP117713.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
+    __BS117986 := __T(__PP117713.Full_Name_);
+    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS117986(__T(__AND(__OP2(__T(__PP117713.Full_Name_).First_Name_,=,__PP117713.Deceased_First_),__OP2(__T(__PP117713.Full_Name_).Last_Name_,=,__PP117713.Deceased_Last_)))))=>1,0);
+    SELF := __PP117713;
   END;
-  EXPORT __ENH_Person_8 := PROJECT(__EE89335,__ND90027__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Person_8 := PROJECT(__EE118103,__ND118795__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_8',EXPIRE(7));
 END;
