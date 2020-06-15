@@ -750,7 +750,7 @@ EXPORT Transforms := MODULE
 																		self.did := if(goodDidLink and left.did_score>Constants.DID_SCORE_THRESHOLD and left.did>0,left.did,0);
 																		self.bdid := if(left.bdid_score>Constants.DID_SCORE_THRESHOLD and left.bdid>0,left.bdid,0);
 																		self := left;
-																		self:=[];)));
+																		self:=[];));
 		self:=[]; 
 	end;
 
@@ -1120,6 +1120,7 @@ EXPORT Transforms := MODULE
 		self.hasStateRestrict := exists(allRows(hasStateRestrict=true));
 		self.hasOIG := exists(allRows(hasOIG=true));
 		self.hasOPM := exists(allRows(hasOPM=true));
+		self.hasOptOut:=exists(allrows(hasoptout=true));
 		//Handle Status
 		statusDeceased := exists(allRows(status='D'));
 		statusReportedHighDeceased := exists(allRows(status='U'));
@@ -1144,7 +1145,7 @@ EXPORT Transforms := MODULE
 		self.ssns          := DEDUP( NORMALIZE( allRows, LEFT.ssns, TRANSFORM( Layouts.layout_ssn, SELF := RIGHT	)	), ssn, ALL );
 		self.dids          := Functions.processDids( NORMALIZE( allRows, LEFT.dids, TRANSFORM( Layouts.layout_did, SELF := RIGHT	)	) );
 		self.bdids         := Functions.processBDids( NORMALIZE( allRows, LEFT.bdids, TRANSFORM( Layouts.layout_bdid, SELF := RIGHT	)	) );
-		self.bipkeys       := Functions.processBIPKeys( NORMALIZE( allRows, LEFT.bipkeys, TRANSFORM( Layouts.layout_bipkeys, SELF := RIGHT	)	) );
+		self.bipkeys       := NORMALIZE( allRows, LEFT.bipkeys, TRANSFORM( Layouts.layout_bipkeys, SELF := RIGHT	)	);
 		self.optouts       := dedup( NORMALIZE( allRows, LEFT.optouts, TRANSFORM( Layouts.layout_optout, SELF := RIGHT	)	), record, all );
 		self.upins	       := dedup( NORMALIZE( allRows, LEFT.upins, TRANSFORM( Layouts.layout_upin, SELF := RIGHT	)	), record, all );
 		self.npis	      	 := dedup( NORMALIZE( allRows, LEFT.npis, TRANSFORM( Layouts.layout_npi, SELF := RIGHT	)	), record, all );
