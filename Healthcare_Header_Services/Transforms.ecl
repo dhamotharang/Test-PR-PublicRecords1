@@ -750,9 +750,10 @@ EXPORT Transforms := MODULE
 																		self.did := if(goodDidLink and left.did_score>Constants.DID_SCORE_THRESHOLD and left.did>0,left.did,0);
 																		self.bdid := if(left.bdid_score>Constants.DID_SCORE_THRESHOLD and left.bdid>0,left.bdid,0);
 																		self := left;
-																		self:=[];));
+																		self:=[];)));
 		self:=[]; 
 	end;
+
 
 	//Enclarity Business Base transforms
 	Export Healthcare_Header_Services.Layouts.CombinedHeaderResults  build_selectfile_Facility_base(Healthcare_Header_Services.Layouts.selectfile_facilities_base_with_input l) := transform
