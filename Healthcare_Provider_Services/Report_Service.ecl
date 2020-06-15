@@ -157,7 +157,6 @@
    &lt;/HealthCareConsolidatedReportRequest&gt;
 </pre>
 */
-
 import AutoStandardI,ingenix_natlprof,Prof_licensev2_services,doxie_files,doxie,iesp, address,Healthcare_Header_Services,ut;
 
 export Report_Service := macro
@@ -304,6 +303,7 @@ export Report_Service := macro
 		// self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfg:=dataset([buildConfig()]);
+
 	prov := sort(Healthcare_Header_Services.Records.getReportServiceDidValues(searchByCriteria,cfg)(record_penalty<=user_penalty_threshold),-record_penalty,map(Src=myConst.SRC_ING=>1,Src=myConst.SRC_AMS=>2,Src=myConst.SRC_HEADER=>1,3));
 
 	dsDids := project(prov.dids,doxie.layout_references);
@@ -311,6 +311,10 @@ export Report_Service := macro
 
 	#STORED('DID',dsDids[1].did);
 	#STORED('BDID',dsBDids[1].bdid);
+	isIndiv := request.ReportBy2.Name.Last <> '';
+	isBus := request.ReportBy2.CompanyName <> '';
+	FName := if(isIndiv,request.ReportBy2.Name.First,request.ReportBy2.CompanyName);
+	#Stored('First',FName);
 
 	doxie.MAC_Header_Field_Declare();
 
@@ -379,9 +383,10 @@ export Report_Service := macro
 		Export boolean		derivedLexID := request.ReportBy.UniqueId = ''and request.ReportBy2.UniqueId = '';
 		EXPORT String50 	BoardCertifiedSpecialty :=	request.ReportBy2.BoardCertifiedSpecialty;
 	end;
-
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
-	recs := Healthcare_Provider_Services.ReportService_Records (params, mod_access, ReportBy2,true,cfg);
+	recs := map(isIndiv => Healthcare_Provider_Services.ReportService_Records.getIndiv(params, mod_access, ReportBy2,cfg),
+							isBus => Healthcare_Provider_Services.ReportService_Records.getBus(params, mod_access, ReportBy2,cfg),
+							Healthcare_Provider_Services.ReportService_Records.getIndiv(params, mod_access, ReportBy2,cfg));//Default to Indiv if we do not know.
 	output(recs, named('Results'));
 endmacro;
 // Report_Service();
