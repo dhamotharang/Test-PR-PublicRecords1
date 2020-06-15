@@ -877,10 +877,7 @@ EXPORT Drivers_Batch := MODULE
  END;   
 
  EXPORT DLHistory := RECORD
-		unsigned8 	Record_ID;
-    unsigned8   reported_date;
 		unsigned6 	did;
-		unsigned6 	fdn_file_info_id;  
     Drivers_Batch.layout_out;
  END;
 
@@ -896,6 +893,10 @@ EXPORT Drivers_Batch := MODULE
     unsigned4	record_count := 1;				
   END;
 	
+	EXPORT AgencyActivityDate := RECORD
+		string8		reported_date;
+		string10	reported_time;
+	END;
  EXPORT PrepaidPhone	:= RECORD
 	string10	phone;
 	string8	reported_date;
