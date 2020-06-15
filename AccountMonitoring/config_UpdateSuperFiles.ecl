@@ -20,76 +20,41 @@ end;
     
      Superfiles := DATASET([
                     {
-      							 AccountMonitoring.product_files.header_files.r_doxie_key_header_superfile,
-										 AccountMonitoring.product_files.header_files.r_doxieKeyHeader_for_monitor,
-										 AccountMonitoring.types.productMask.phone
-										    + AccountMonitoring.types.productMask.address
-												+ AccountMonitoring.types.productMask.reverseaddress
-                        + AccountMonitoring.types.productMask.personheader 
-                    }
-									 ,{
-                     AccountMonitoring.product_files.header_files.r_quick_header_superfile,
-                     AccountMonitoring.product_files.header_files.r_quick_header_for_monitor,
-                     AccountMonitoring.types.productMask.phone
-										    + AccountMonitoring.types.productMask.address
-                    }
-									 ,{
-                     AccountMonitoring.product_files.header_files.r_daily_utility_superfile,
-                     AccountMonitoring.product_files.header_files.r_daily_utility_for_monitor,
-                     AccountMonitoring.types.productMask.phone
-										    + AccountMonitoring.types.productMask.address
-                    }
-									,{
-                     AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_superfile,
-                     AccountMonitoring.product_files.header_files.r_doxieKeyRid_did_for_monitor,
-                     AccountMonitoring.types.productMask.didupdate
-                    }
-									 ,{
-                     AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_split_superfile,
-                     AccountMonitoring.product_files.header_files.r_doxieKeyRid_did_split_for_monitor,
-                     AccountMonitoring.types.productMask.didupdate
-                    }
-									 ,{
-                     AccountMonitoring.product_files.header_files.r_business_header_rcid_superfile,
-                     AccountMonitoring.product_files.header_files.r_business_header_rcid_for_monitor,
-                     AccountMonitoring.types.productMask.bdidupdate
-                    }
-									 ,{
-                     AccountMonitoring.product_files.header_files.r_bipbest_header_superfile,
-                     AccountMonitoring.product_files.header_files.r_bipbest_header_for_monitor,
-                     AccountMonitoring.types.productMask.bipbestupdate
-                    }
-                   ,{
-                     'thor_data400::key::sbfe::qa::linkids',
-                     'monitor::sbfe::linkids',
+                     'thor_data400::key::header_qa',
+                     'monitor::personheader', 
+                     AccountMonitoring.types.productMask.personheader 
+                    },
+                    {
+                      'thor_data400::key::sbfe::qa::linkids',
+                      'monitor::sbfe::linkids',
                       AccountMonitoring.types.productMask.sbfe 
-                    }
-                   ,{
+                    },
+                    {
                      'thor_data400::key::sbfe::qa::tradeline',
-                     'monitor::sbfe::tradeline', 
+                      'monitor::sbfe::tradeline', 
                       AccountMonitoring.types.productMask.sbfe 
-                    }
-                   ,{
+                    },
+                    {
                      'thor_data400::key::sbfescoring::qa::scoringindex',
                      'monitor::sbfescoring::scoringindex', 
-                      AccountMonitoring.types.productMask.sbfe 
+                     AccountMonitoring.types.productMask.sbfe 
                     }
-                   ,{
-                      AccountMonitoring.product_files.Email.emailLexid_superfile,
-                      AccountMonitoring.product_files.Email.emailLexid_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.email 
+                    ,{
+                       AccountMonitoring.product_files.Email.emailLexid_superfile,
+                       AccountMonitoring.product_files.Email.emailLexid_for_superkey_monitor,
+                       AccountMonitoring.types.productMask.email 
                     }
-                   ,{
-                      AccountMonitoring.product_files.Email.emailaddr_superfile,
-                      AccountMonitoring.product_files.Email.emailaddr_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.email 
+                    ,{
+                       AccountMonitoring.product_files.Email.emailaddr_superfile,
+                       AccountMonitoring.product_files.Email.emailaddr_for_superkey_monitor,
+                       AccountMonitoring.types.productMask.email 
                     }
-                   ,{
-                      AccountMonitoring.product_files.Email.emailmain_superfile,
-                      AccountMonitoring.product_files.Email.emailmain_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.email 
+                    ,{
+                       AccountMonitoring.product_files.Email.emailmain_superfile,
+                       AccountMonitoring.product_files.Email.emailmain_for_superkey_monitor,
+                       AccountMonitoring.types.productMask.email 
                     }
-				            ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
+                   ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          
                               
    SuperfilesReturn := if(GetAll,Superfiles,Superfiles(AccountMonitoring.types.testPMBits(product_mask_supported, product_mask)));
