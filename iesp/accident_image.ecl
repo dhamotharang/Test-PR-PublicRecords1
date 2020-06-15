@@ -34,6 +34,9 @@ export t_AccidentImageSearchOption := record (iesp.share.t_BaseSearchOption)
 	boolean ColoredImage {xpath('ColoredImage')};
 	boolean Redact {xpath('Redact')};
 	string250 RequestType {xpath('RequestType')};
+	string CustomerType {xpath('CustomerType')};
+	iesp.share.t_Date OrderDate {xpath('OrderDate')};
+	string Fee {xpath('Fee')};
 end;
 		
 export t_AccidentImageResponse := record
