@@ -73,6 +73,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CoverageDates,Layouts.CoverageDates,CoverageDates);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AgencyActivityDate,Layouts.AgencyActivityDate,AgencyActivityDate);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii_Demo,Layouts.Pii,Pii_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Demo,Layouts.CIID,CIID_Demo);
