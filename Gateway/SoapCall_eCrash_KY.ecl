@@ -1,6 +1,6 @@
 ﻿import iesp,ecrash_services;
 
-EXPORT SoapCall_KY(dataset(iesp.ecrash.t_ECrashSearchAgency)  Ky_Agency_ds
+EXPORT SoapCall_eCrash_KY(dataset(iesp.ecrash.t_ECrashSearchAgency)  Ky_Agency_ds
 								, ecrash_services.IParam.searchrecords kymod) := FUNCTION
 
 		
@@ -43,7 +43,7 @@ EXPORT SoapCall_KY(dataset(iesp.ecrash.t_ECrashSearchAgency)  Ky_Agency_ds
 				self := [];
 		end;
 			 
-		outResponse:=SOAPCALL(ds_interim , kymod.KY_SearchEspURL
+		outResponse:=SOAPCALL(ds_interim , kymod.GatewayEspURL
 														, kymod.KY_SearchEspNAME
 														, iesp.ky_search.t_KYCrashSearchRequest
 														, trans_soap(left)
