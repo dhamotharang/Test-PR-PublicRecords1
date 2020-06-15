@@ -60,12 +60,12 @@ EXPORT Layout_IP_Metadata := MODULE
 	END;
 
 	EXPORT Raw := RECORD
-		Common;
+		Common - [sic_code];
 		string255 filename{virtual (logicalfilename)};
 	END;
 	
 	EXPORT History := RECORD
-		Common;
+		Common - [sic_code];
 		string255 filename;
 	END;
 
@@ -158,14 +158,14 @@ EXPORT Layout_IP_Metadata := MODULE
 	EXPORT Raw_ipv6 := RECORD
 		string39 ip_rng_beg;  // note: revised from ipv4 layout of string20
 		string39 ip_rng_end;  // note: revised from ipv4 layout of string20
-		Common;
+		Common - [sic_code];
 		string255 filename{virtual (logicalfilename)};
 	END;
 	
 	EXPORT History_ipv6 := RECORD
 		string39 ip_rng_beg;  // note: revised from ipv4 layout of string20
 		string39 ip_rng_end;  // note: revised from ipv4 layout of string20
-		Common;
+		Common - [sic_code];
 		string255 filename;
 	END;
 END;
