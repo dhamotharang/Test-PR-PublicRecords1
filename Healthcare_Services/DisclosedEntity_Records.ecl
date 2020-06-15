@@ -1,4 +1,4 @@
-﻿import BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,Business_Header_SS,ut,BizLinkFull,Relationship;
+﻿import iesp,BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,doxie,Business_Header_SS,ut,BizLinkFull,Relationship,Suppress;
 export DisclosedEntity_Records := module
 	shared defaults := BatchServices.RollupBusiness_BatchService_Constants.Defaults;
 
@@ -86,7 +86,7 @@ export DisclosedEntity_Records := module
 													keyed((left.f1+left.f2+left.f3+left.f4+left.f5+left.f6+left.f7+left.f8+left.f9)=right.company_fein),
 													transform(recordof(right), self:=right),
 													keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
-			bipFullRecords := join(bipFeins,BizLinkFull.Process_Biz_Layouts.Key,keyed(left.ultid=right.ultid) and keyed(left.orgid=right.orgid) and keyed(left.seleid=right.seleid) and keyed(left.proxid = right.proxid), transform(recordof(right), self.company_fein:= if(right.company_fein = '', left.company_fein,right.company_fein);self:=right));
+			bipFullRecords := join(bipFeins,BizLinkFull.Process_Biz_Layouts.Key,keyed(left.ultid=right.ultid) and keyed(left.orgid=right.orgid) and keyed(left.seleid=right.seleid) and keyed(left.proxid = right.proxid), transform(recordof(right), self.company_fein:= if(right.company_fein = '', left.company_fein,right.company_fein);self:=right),keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
 			bipDedup := dedup(sort(bipFullRecords,company_name,company_fein),company_name);
 			parentFlagsBIP_FEINExists := rollup(group(join(inputData,bipDedup,
 																(left.f1+left.f2+left.f3+left.f4+left.f5+left.f6+left.f7+left.f8+left.f9)=right.company_fein,
@@ -207,17 +207,24 @@ export DisclosedEntity_Records := module
 	end;
 	Export checkBusinessRelationship(dataset(DisclosedEntity_Layouts.entityIds) inputData) := function
 		//Get the associated BDID's for a given groupID
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 		getBDids := join(inputData, Business_Header.Key_BH_SuperGroup_GroupID, keyed(left.grpID=right.group_id),
 											DisclosedEntity_Transforms.xFormBusinessRelationships(left,right),
 											keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
 		//Check the key to see if these children are associated with the given groupid.
-		checkBusiness := join(getBDids, Business_Header.Key_Business_Contacts_BDID, 
+		checkBusinessRaw := join(getBDids, Business_Header.Key_Business_Contacts_BDID, 
+													left.grpbdid=right.bdid and left.did=right.did and right.did >0,
+													transform(right),
+													keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
+    supmacBusinessRaw:=Suppress.MAC_SuppressSource(checkBusinessRaw, mod_access); 
+		checkBusiness := join(getBDids, supmacBusinessRaw, 
 													left.grpbdid=right.bdid and left.did=right.did and right.did >0,
 													transform(DisclosedEntity_Layouts.entityIds,self.related:=true;self:=left),
 													keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
 		slimHits := dedup(sort(checkBusiness,acctno,seq,did),acctno,seq,did);
 		results := join(inputData,slimHits,left.acctno=right.acctno and left.seq=right.seq and left.did=right.did,
 											transform(DisclosedEntity_Layouts.entityIds, 
+														self.did:=if(right.acctno<>'',left.did,0),
 														self.related:=if(right.acctno<>'',right.related,left.related),
 														self:=left),
 											left outer,keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0));
