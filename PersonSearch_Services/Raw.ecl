@@ -1,4 +1,4 @@
-import AutoStandardI, AutoHeaderI, doxie, iesp, ut, suppress;
+﻿import AutoStandardI, AutoHeaderI, doxie, iesp, ut, suppress;
 		
 export Raw := module
 		
@@ -59,11 +59,12 @@ export Raw := module
 			
 			doxie.mac_AddHRIAddress(ssn_risk_use, with_addr_risk)
 			addr_risk_use := IF(in_mod.includeAddrHri, with_addr_risk, ssn_risk_use);
+      
+			mod_access := PROJECT(in_mod, doxie.IDataAccess);			
 			
-			doxie.mac_AddHRIPhone(addr_risk_use, with_phone_risk)
+			doxie.mac_AddHRIPhone(addr_risk_use, with_phone_risk, mod_access)
 			phone_risk_use := IF(in_mod.includePhoneHri, with_phone_risk, addr_risk_use);
 
-			mod_access := PROJECT(in_mod, doxie.IDataAccess);
 			hbr1 := doxie.header_base_rollup(phone_risk_use, mod_access);
 			
 			Layouts.HFS_wide Norm_phones(hbr1 L,integer cnt) := TRANSFORM
@@ -138,6 +139,7 @@ export Raw := module
 			ssn_mask_value := in_mod.ssn_mask;
 			phone_value := AutoStandardI.InterfaceTranslator.phone_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.phone_value.params));
 			unsigned1 maxHriPer_value := 10;
+			mod_access := PROJECT(in_mod, doxie.IDataAccess);
 		
 			dids_d := dedup(sort(in_dids,did),did);
 			
@@ -167,7 +169,7 @@ export Raw := module
 			doxie.mac_AddHRIAddress(ssn_risk_use, with_addr_risk)
 			addr_risk_use := IF(in_mod.includeAddrHri, with_addr_risk, ssn_risk_use);
 			
-			doxie.mac_AddHRIPhone(addr_risk_use, with_phone_risk)
+			doxie.mac_AddHRIPhone(addr_risk_use, with_phone_risk, mod_access);
 			phone_risk_use := IF(in_mod.includePhoneHri, with_phone_risk, addr_risk_use);
 
 			recs_ssn := Functions.add_ssn_issue(project(phone_risk_use,Layouts.HFS_wide));
@@ -193,7 +195,6 @@ export Raw := module
 			END;
 			inRids := dedup(sort(project(recs_ssn,getRids(left)),record),record); // needs dedup
 
-			mod_access := PROJECT(in_mod, doxie.IDataAccess);
 			srcRids := doxie.lookup_rid_src(inRids, mod_access, true);
 			recs_ssn addRids(recs_ssn le, srcRids ri) := transform
 				self.rids := ri.r + le.rids;

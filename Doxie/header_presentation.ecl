@@ -1,4 +1,4 @@
-import doxie, doxie_crs, suppress;
+﻿import doxie, doxie_crs, suppress;
 
 export header_presentation(DATASET(doxie.layout_presentation) presRecs, doxie.IDataAccess mod_access) := FUNCTION
 
@@ -17,7 +17,7 @@ rolled := doxie.header_base_rollup(without_risk, mod_access);
 
 doxie.mac_AddHRISSN(rolled, with_ssn_risk, ~include_hri)
 doxie.mac_AddHRIAddress(with_ssn_risk, with_addr_risk)
-doxie.mac_AddHRIPhone(with_addr_risk, with_phone_risk)
+doxie.mac_AddHRIPhone(with_addr_risk, with_phone_risk, mod_access)
 
 // Here HRIs are calculated for EDA phone (HeaderFileSearch doesn't use P+ to begin with),
 // thus, there's no need to verify HRIs for P+ as in rollup service
