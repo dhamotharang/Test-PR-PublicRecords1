@@ -1,4 +1,4 @@
-﻿IMPORT AccountMonitoring, lib_thorlib, Data_Services, STD;
+IMPORT AccountMonitoring, lib_thorlib, Data_Services, STD;
 
 EXPORT constants := MODULE
 	// The file cluster name
