@@ -29,7 +29,20 @@ GenerateDashboards :=
 +'	,FraudGovPlatform_Analytics.GenerateDashboards(False,True)\n'
 +		'):failure(IF(_control.ThisEnvironment.Name <> \'Prod_Thor\',email(\'Dev dashboards failed\'),email(\'Cert dashboards failed\')));\n'
 ;
-
+BuildCoverageDates := 
+ 'import ut,FraudGovPlatform;\n'
++'wuname := \'FraudGov Build Coverage Dates\';\n'
++'#WORKUNIT(\'name\', wuname);\n'
++'#WORKUNIT(\'protect\', true);\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
++'email(string msg):=fileservices.sendemail(\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
++' 	 ,\'FraudGov Build Coverage Dates\'\n'
++' 	 ,msg\n'
++' 	 +\'Build wuid \'+workunit\n'
++' 	 );\n\n'
++'FraudGovPlatform.Build_CoverageDates_Push.push_to_cert:failure(email(\'Build Coverage Dates failed\'));\n'
+;
 BuildStatusReport := 
  'import ut,FraudGovPlatform,FraudGovPlatform_Validation;\n'
 +'wuname := \'FraudGov Build Status Report\';\n'
@@ -59,6 +72,7 @@ BuildStatusReport :=
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
+										,_Control.fSubmitNewWorkunit(BuildCoverageDates,ThorName)
 										,FraudGovPlatform.Send_Emails(pversion).Roxie										
 									);
 		
