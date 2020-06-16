@@ -2431,8 +2431,13 @@ export i_linkids  := record
   integer1 fp;
 
  END;
-
-
+ 
+EXPORT rConsolidate:=record
+  UNSIGNED4 filedate;
+  UNSIGNED4 orig_transaction_id;
+  STRING raw;
+  STRING filename;
+END;
 
 END;
 
