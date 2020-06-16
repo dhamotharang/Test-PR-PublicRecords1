@@ -97,6 +97,10 @@ module
 	export HighRiskIdentity := FraudGov_Prefix('config') + 'kel::HighRiskIdentity';
 	export ClusterDetails := FraudGov_Prefix('config') + 'kel::clusterdetails';
 	export ProdDashboardVersion := FraudGov_Prefix('config') + 'kel::ProdDashboardVersion';
+	export FindLeads 				:= FraudGov_Prefix('config') + 'kel::FindLeads';
+	export Dashboard 				:= FraudGov_Prefix('config') + 'kel::Dashboard';
+	export LinksChart 			:= FraudGov_Prefix('config') + 'kel::LinksChart';
+	export DetailsReport 		:= FraudGov_Prefix('config') + 'kel::DetailsReport';
 
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
@@ -135,6 +139,7 @@ module
 		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
 		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
 		export BocaShell		:= tools.mod_FilenamesBuild(Template('BocaShell'),pversion);
+		export AgencyActivityDate		:= tools.mod_FilenamesBuild(Template('AgencyActivityDate'),pversion);
 		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -152,7 +157,10 @@ module
 		export kel_CustomerDashTopClusters				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters'),pversion);
 		export kel_EntityProfile								:= tools.mod_FilenamesBuild(Template('kel::EntityProfile'),pversion);
 		export kel_ConfigAttributes							:= tools.mod_FilenamesBuild(Template('kel::ConfigAttributes'),pversion);
-				
+		export kel_EntityRules									:= tools.mod_FilenamesBuild(Template('kel::EntityRules'),pversion);
+		export kel_EntityAttributes							:= tools.mod_FilenamesBuild(Template('kel::EntityAttributes'),pversion);
+		export kel_GraphEdges										:= tools.mod_FilenamesBuild(Template('kel::GraphEdges'),pversion);
+		export kel_GraphVertices								:= tools.mod_FilenamesBuild(Template('kel::GraphVertices'),pversion);
 		//Kel files demo
 		export kel_customeraddress_Demo	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Demo'),pversion);
 		export kel_personstats_Demo			:= tools.mod_FilenamesBuild(Template('kel::personstats_Demo'),pversion);
@@ -212,6 +220,7 @@ module
 			CoverageDates.dAll_filenames +
 			PrepaidPhone.dAll_filenames +
 			BocaShell.dAll_filenames +
+			AgencyActivityDate.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
@@ -228,6 +237,10 @@ module
 			kel_CustomerDashTopClusters.dAll_filenames + 
 			kel_EntityProfile.dAll_filenames + 
 			kel_ConfigAttributes.dAll_filenames + 
+			kel_EntityRules.dAll_filenames + 
+			kel_EntityAttributes.dAll_filenames + 
+			kel_GraphEdges.dAll_filenames + 
+			kel_GraphVertices.dAll_filenames + 
 			//kel demo files
 			kel_customeraddress_Demo.dAll_filenames +
 			kel_personstats_Demo.dAll_filenames +

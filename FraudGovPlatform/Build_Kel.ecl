@@ -25,8 +25,8 @@ GenerateDashboards :=
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
 +'IF(_control.ThisEnvironment.Name <> \'Prod_Thor\'\n'
-+'	,FraudGovPlatform_Analytics.GenerateDashboards(False,False,,True)\n'
-+'	,FraudGovPlatform_Analytics.GenerateDashboards(False,True)\n'
++'	,Sequential(FraudGovPlatform_Analytics.GenerateDashboards(False,False,,True),FraudGovPlatform_Analytics.GenerateRinDashboards(False,False,True))\n'
++'	,Sequential(FraudGovPlatform_Analytics.GenerateDashboards(False,True),FraudGovPlatform_Analytics.GenerateRinDashboards(False,True))\n'
 +		'):failure(IF(_control.ThisEnvironment.Name <> \'Prod_Thor\',email(\'Dev dashboards failed\'),email(\'Cert dashboards failed\')));\n'
 ;
 
