@@ -1,4 +1,4 @@
-IMPORT Std;
+IMPORT Std, dx_ip_metadata;
 
 EXPORT _Functions := MODULE
 
@@ -23,6 +23,15 @@ EXPORT _Functions := MODULE
 	EXPORT clAlphNum(string c) := FUNCTION
 		fRec 		:= stringlib.stringfilter(stringlib.stringtouppercase(c), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-.\'_#, ');	
 		return fRec;
+	END;
+
+	//Format Hex string with all caps and leading zeroes
+	EXPORT FormatHexAddress(string address) := FUNCTION
+		hextets := Std.Str.SplitWords(address, ':');
+		full_address := dx_ip_metadata.functions.hex4format(hextets[1]) + ':' + dx_ip_metadata.functions.hex4format(hextets[2]) + ':' +  dx_ip_metadata.functions.hex4format(hextets[3]) 
+						+ ':' + dx_ip_metadata.functions.hex4format(hextets[4]) + ':' +  dx_ip_metadata.functions.hex4format(hextets[5]) + ':' +  dx_ip_metadata.functions.hex4format(hextets[6]) + ':'
+						+ dx_ip_metadata.functions.hex4format(hextets[7]) + ':' +  dx_ip_metadata.functions.hex4format(hextets[8]);
+		return full_address;
 	END;
 	
 	//expand ranges
@@ -167,5 +176,83 @@ EXPORT _Functions := MODULE
 
 		RETURN outRecs;
 	END;
+	EXPORT expandRangesHex(DATASET(IP_Metadata.Layout_IP_Metadata.base_ipv6) ipRecs, UNSIGNED octet) := FUNCTION
+		workRec:=RECORD
+			UNSIGNED  rowCnt;
+			UNSIGNED2 beg_hextet_1;
+			UNSIGNED2 end_hextet_1;
+			IP_Metadata.Layout_IP_Metadata.base_ipv6;
+		END;
+
+		workRecs:=PROJECT(ipRecs,TRANSFORM(workRec,
+			SELF.rowCnt       := 0;
+			//beg_hextets       := Std.Str.SplitWords(LEFT.ip_rng_beg,':');
+			SELF.beg_hextet_1 := dx_ip_metadata.functions.hex4char2int(LEFT.beg_hextet1);
+			//end_hextets       := Std.Str.SplitWords(LEFT.ip_rng_end,':');
+			SELF.end_hextet_1 := dx_ip_metadata.functions.hex4char2int(LEFT.end_hextet1);
+			SELF              := LEFT;
+		));
+
+		// HEXTET 1 EXPANSION
+		workRec expandHextet1(workRec L,workRec R,UNSIGNED C) := TRANSFORM
+			end_hextet_1 := IF(C=1,R.beg_hextet_1,L.end_hextet_1+1);
+			beg_hextet_1 := IF(C=1,R.beg_hextet_1,L.beg_hextet_1+1);
+
+			SELF.end_hextet_1 := end_hextet_1;
+			SELF.beg_hextet_1 := beg_hextet_1;
+			self.beg_hextet1 := dx_ip_metadata.functions.int2hex4char(beg_hextet_1);
+			self.end_hextet1 := dx_ip_metadata.functions.int2hex4char(end_hextet_1);
+			beg_hextets       := Std.Str.SplitWords(R.ip_rng_beg,':');
+			end_hextets       := Std.Str.SplitWords(R.ip_rng_end,':');
+
+			SELF.ip_rng_beg_full := IF(C>1,
+								self.beg_hextet1+':0000:0000:0000:0000:0000:0000:0000' ,
+								formathexaddress(self.beg_hextet1+':'+beg_hextets[2]+':'+beg_hextets[3]+':'+beg_hextets[4]+':'+
+								beg_hextets[5]+':'+beg_hextets[6]+':'+beg_hextets[7]+':'+beg_hextets[8]));
+			SELF.ip_rng_end_full := IF(C!=R.rowCnt,
+									self.end_hextet1+':FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF',
+									formathexaddress(self.end_hextet1+':'+end_hextets[2]+':'+end_hextets[3]+':'+end_hextets[4]+':'+
+									end_hextets[5]+':'+end_hextets[6]+':'+end_hextets[7]+':'+end_hextets[8]));
+			self.ip_rng_beg_full6_39					:= SELF.ip_rng_beg_full[6..39];
+			self.ip_rng_end_full6_39					:= SELF.ip_rng_end_full[6..39];
+			SELF            := R;
+		END;
+
+		parentChild:=RECORD
+			workRec;
+			DATASET(workRec) expand;
+		END;
+
+		parentChild deNormhextet1(workRec L,DATASET(workRec) R) := TRANSFORM
+			loopCnt     :=(L.end_hextet_1-L.beg_hextet_1);
+			loopTemp    :=LOOP(R,loopCnt,ROWS(LEFT)+R);
+			loopRows    :=PROJECT(loopTemp,TRANSFORM(workRec,SELF.rowCnt:=COUNT(loopTemp),SELF:=LEFT));
+			iterateRows :=ITERATE(loopRows,expandhextet1(LEFT,RIGHT,COUNTER));
+			SELF.expand :=PROJECT(iterateRows,TRANSFORM(workRec,SELF:=LEFT));
+			SELF        :=L;
+		END;
+
+		targetRecs  :=workRecs(beg_hextet_1!=end_hextet_1);
+
+		deNormRecs  :=DENORMALIZE(targetRecs,targetRecs,
+								LEFT.beg_hextet_1=RIGHT.beg_hextet_1,
+								GROUP,
+								deNormhextet1(LEFT,ROWS(RIGHT)));
+
+		normRecs    :=NORMALIZE(deNormRecs,
+								LEFT.expand,
+								TRANSFORM(workRec, 
+								self.generated_rec := true;
+								SELF:=RIGHT));
+		expandedRecs:=PROJECT(normRecs, $.Layout_IP_Metadata.base_ipv6);
+
+	//	OUTPUT(ipRecs);
+	//	OUTPUT(targetRecs);
+	//	OUTPUT(deNormRecs);
+	//	OUTPUT(normRecs);
+	//	OUTPUT(expandedRecs);
+		return expandedRecs; 
+	END;
+	
 
 END;
