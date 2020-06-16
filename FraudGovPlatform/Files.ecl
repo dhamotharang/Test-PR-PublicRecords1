@@ -48,6 +48,8 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
@@ -70,6 +72,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CoverageDates,Layouts.CoverageDates,CoverageDates);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AgencyActivityDate,Layouts.AgencyActivityDate,AgencyActivityDate);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
@@ -113,6 +116,13 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopEntityStats_delta,Layouts.CustomerDashTopEntityStats, kel_CustomerDashTopEntityStats_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_delta,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_delta);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClusters_delta,Layouts.CustomerDashTopClusters, kel_CustomerDashTopClusters_delta);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityProfile,Layouts.EntityProfile, kel_EntityProfile);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_ConfigAttributes,Layouts.ConfigAttributes, kel_ConfigAttributes);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityRules,Layouts.EntityRules, kel_EntityRules);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityAttributes,Layouts.EntityAttributes, kel_EntityAttributes);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphEdges,Layouts.GraphEdges, kel_GraphEdges);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphVertices,Layouts.GraphVertices, kel_GraphVertices);
 		
 	end;
 

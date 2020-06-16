@@ -49,16 +49,12 @@ despray_fcra_deed_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_met
 																					pTarget + '/tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv'
 																					,,,,true);
 
-SEQUENTIAL(
-					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_fcra_deed_tbl);
-
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_fcra_deed_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Property_By_DocType Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Property_By_DocType Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Property_By_DocType Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Property_By_DocType Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

@@ -4,9 +4,8 @@ EXPORT Proc_Copy_From_Alpha(string pBldVer = '') := module
 
 SHARED filedate:=if(pBldVer <> '', pBldVer, header.version_build);
 
-SHARED linking_keys := dataset ( [  //13 keys
+SHARED linking_keys := dataset ( [  //12 keys
 
-                            {'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind','thor_data400::key::insuranceheader_segmentation::did_ind_qa'},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::address',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dln',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dob',''},
@@ -71,16 +70,8 @@ END;
 SHARED update_supers(string spr0, string newLogical) := function
 
     spr:='~'+ case( spr0, 'thor_data400::key::header::qa::relatives_v3'=>
-                         'thor_data400::key::relatives_v3_qa',
-                         'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
-                         'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
-                         'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
-                         'thor400_44::key::insuranceheader_segmentation::did_ind_built',
-                         'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
-                  ,spr0);
+                         'thor_data400::key::relatives_v3_qa'
+                   ,spr0);
     
     return if(~inspr(spr,newLogical)
           ,sequential(
@@ -135,8 +126,7 @@ Get_DFUInfo(string filename, string pesp = wk_ut._constants.LocalEsp,string dfu_
 end;
 generateDFUinfo(string filedate):=
 sequential(
-output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filedate+'::did_ind'),named('file_copy_log'),extend)
-,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'),named('file_copy_log'),extend)
+ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dln'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dob'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::lfz'),named('file_copy_log'),extend)

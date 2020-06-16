@@ -92,8 +92,11 @@ module
  	// Append Values from Previous Build
 	EXPORT NewBasePreviousValues := Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
 
+	// Append Clean Phones
+	NewBaseCleanPhones := Standardize_Entity.Clean_Phone (NewBasePreviousValues);
+
 	// Append Clean Address
-	EXPORT NewBaseCleanAddress := Append_CleanAddress(NewBasePreviousValues):independent;
+	EXPORT NewBaseCleanAddress := Append_CleanAddress(NewBaseCleanPhones):independent;
 
 	// Append Clean Additional Address
 	EXPORT Append_CleanAdditionalAddress := Append_CleanAdditionalAddress(NewBaseCleanAddress):independent;

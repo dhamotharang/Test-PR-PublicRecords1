@@ -65,7 +65,7 @@ export IdAppendRoxieRemote(
 		return soapDs;
 	end;
 
-	shared BIPV2.IDAppendLayouts.AppendOutput setError(IdAppendLayouts.SoapRequest l) := transform
+	shared BIPV2.IDAppendLayouts.AppendOutputDebug setError(IdAppendLayouts.SoapRequest l) := transform
 		self.error_code := FAILCODE;
 		self.error_msg := FAILMESSAGE;
 		self := L;
@@ -82,7 +82,7 @@ export IdAppendRoxieRemote(
 		soapResult := soapcall(
 			soapInputDs
 			,urlBipAppend, servicename, {soapInputDs}
-			,dataset(BIPV2.IDAppendLayouts.AppendOutput)
+			,dataset(BIPV2.IDAppendLayouts.AppendOutputDebug)
 			,xpath(servicename + 'Response/Results/Result/Dataset[1]/Row')
 			,onfail(setError(left)), parallel(1)
 			,merge(1), timeout(soapTimeout), timelimit(soapTimeLimit), retry(soapRetries)

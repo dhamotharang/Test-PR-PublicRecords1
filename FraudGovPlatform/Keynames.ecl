@@ -15,6 +15,9 @@ module
 		export ElementPivot									:= tools.mod_FilenamesBuild(lTemplate('ElementPivot'),pversion);
 		export ScoreBreakdown								:= tools.mod_FilenamesBuild(lTemplate('ScoreBreakdown'),pversion);
 		export WeightingChart								:= tools.mod_FilenamesBuild(lTemplate('WeightingChart'),pversion);
+		export EntityProfile								:= tools.mod_FilenamesBuild(lTemplate('EntityProfile'),pversion);
+		export ConfigAttributes							:= tools.mod_FilenamesBuild(lTemplate('ConfigAttributes'),pversion);
+		export ConfigRules									:= tools.mod_FilenamesBuild(lTemplate('ConfigRules'),pversion);
 		
 		export ClusterDetails_Demo					:= tools.mod_FilenamesBuild(lTemplate('ClusterDetails_Demo'),pversion);
 		export ElementPivot_Demo						:= tools.mod_FilenamesBuild(lTemplate('ElementPivot_Demo'),pversion);
@@ -29,6 +32,9 @@ module
 			 	ElementPivot.dAll_filenames +
 				ScoreBreakdown.dAll_filenames +
 				WeightingChart.dAll_filenames +
+				EntityProfile.dAll_filenames +
+				ConfigAttributes.dAll_filenames +
+				ConfigRules.dAll_filenames +
 				ClusterDetails_Demo.dAll_filenames +
 			 	ElementPivot_Demo.dAll_filenames +
 				ScoreBreakdown_Demo.dAll_filenames +

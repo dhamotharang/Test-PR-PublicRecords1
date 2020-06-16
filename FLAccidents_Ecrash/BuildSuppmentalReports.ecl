@@ -377,6 +377,7 @@ cmbnd_drollup_report_versionkey := drollup_report_versionkey_c + drollup_report_
 		self.agency_ori               := if(STD.Str.ToUpperCase(trim(L.ori_number,left,right))='NULL','',STD.Str.ToUpperCase(L.ori_number));
 		self.super_report_id_orig     := l.super_report_id;
 		self:=l;
+		self:=[];
 	end;
 
 	hash_key :=  normalize(hashTable, 
