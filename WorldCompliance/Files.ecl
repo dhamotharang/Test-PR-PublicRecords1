@@ -128,7 +128,7 @@ export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsEntities, Left.
 													left.SubCategoryLabel)));
 	
 											self := right;
-									),Full Outer,local, unordered);
+									),Full outer, unordered, local);
 
 export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCategories,Left.EntityID=Right.EntityID,
 										Transform(Layouts.rWCOCategories,
