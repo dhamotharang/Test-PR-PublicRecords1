@@ -72,6 +72,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CoverageDates,Layouts.CoverageDates,CoverageDates);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AgencyActivityDate,Layouts.AgencyActivityDate,AgencyActivityDate);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
@@ -118,6 +119,10 @@ module
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityProfile,Layouts.EntityProfile, kel_EntityProfile);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_ConfigAttributes,Layouts.ConfigAttributes, kel_ConfigAttributes);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityRules,Layouts.EntityRules, kel_EntityRules);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityAttributes,Layouts.EntityAttributes, kel_EntityAttributes);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphEdges,Layouts.GraphEdges, kel_GraphEdges);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphVertices,Layouts.GraphVertices, kel_GraphVertices);
 		
 	end;
 

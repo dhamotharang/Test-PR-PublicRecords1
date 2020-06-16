@@ -1,0 +1,102 @@
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
+IMPORT KEL011 AS KEL;
+IMPORT B_Event_6,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_Email,E_Event,E_Internet_Protocol,E_Person,E_Phone,E_Social_Security_Number,E_Ssn_Event FROM FraudgovKEL;
+IMPORT * FROM KEL011.Null;
+EXPORT B_Social_Security_Number_5 := MODULE
+  SHARED VIRTUAL TYPEOF(B_Event_6.__ENH_Event_6) __ENH_Event_6 := B_Event_6.__ENH_Event_6;
+  SHARED VIRTUAL TYPEOF(E_Social_Security_Number.__Result) __E_Social_Security_Number := E_Social_Security_Number.__Result;
+  SHARED VIRTUAL TYPEOF(E_Ssn_Event.__Result) __E_Ssn_Event := E_Ssn_Event.__Result;
+  SHARED __EE187617 := __E_Social_Security_Number;
+  SHARED __EE187730 := __E_Ssn_Event;
+  SHARED __EE188558 := __EE187730(__NN(__EE187730.Social_) AND __NN(__EE187730.Transaction_));
+  SHARED __EE187732 := __ENH_Event_6;
+  SHARED __EE187890 := __EE187732(__EE187732.T___In_Agency_Flag_ = 1 AND __EE187732.T15___Ssn_Is_Kr_Flag_ = 1);
+  __JC188576(E_Ssn_Event.Layout __EE188558, B_Event_6.__ST95508_Layout __EE187890) := __EEQP(__EE188558.Transaction_,__EE187890.UID);
+  SHARED __EE188577 := JOIN(__EE188558,__EE187890,__JC188576(LEFT,RIGHT),TRANSFORM(E_Ssn_Event.Layout,SELF:=LEFT),SMART,KEEP(1));
+  SHARED __ST187803_Layout := RECORD
+    KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
+    KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
+    KEL.typ.ntyp(E_Social_Security_Number.Typ) Social_;
+    KEL.typ.nkdate Event_Date_;
+    KEL.typ.ntyp(E_Event.Typ) Transaction_;
+    KEL.typ.ntyp(E_Event.Typ) U_I_D__1_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+  END;
+  SHARED __ST187803_Layout __ND188587__Project(E_Ssn_Event.Layout __PP188578) := TRANSFORM
+    SELF.UID := __PP188578.Social_;
+    SELF.U_I_D__1_ := __PP188578.Transaction_;
+    SELF := __PP188578;
+  END;
+  SHARED __EE188612 := PROJECT(__EE188577,__ND188587__Project(LEFT));
+  SHARED __ST187829_Layout := RECORD
+    KEL.typ.int C_O_U_N_T___Exp1_ := 0;
+    KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+  END;
+  SHARED __EE188625 := PROJECT(__CLEANANDDO(__EE188612,TABLE(__EE188612,{KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP),UID},UID,MERGE)),__ST187829_Layout);
+  SHARED __ST188106_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
+    KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
+    KEL.typ.nunk Ssn_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
+    KEL.typ.nstr Ssn_Formatted_;
+    KEL.typ.nunk _v2__divssnidentitycountnew_;
+    KEL.typ.nkdate Deceased_Date_;
+    KEL.typ.nkdate Deceased_Date_Of_Birth_;
+    KEL.typ.nstr Deceased_First_;
+    KEL.typ.nstr Deceased_Middle_;
+    KEL.typ.nstr Deceased_Last_;
+    KEL.typ.nstr Deceased_Match_Code_;
+    KEL.typ.nbool _isdeepdive_;
+    KEL.typ.nstr _county__death_;
+    KEL.typ.nstr Deceased_Ssn_;
+    KEL.typ.nstr _state__death__flag_;
+    KEL.typ.nstr _death__rec__src_;
+    KEL.typ.nstr _state__death__id_;
+    KEL.typ.int C_O_U_N_T___Exp1_ := 0;
+    KEL.typ.ntyp(E_Social_Security_Number.Typ) U_I_D__1_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  __JC188631(E_Social_Security_Number.Layout __EE187617, __ST187829_Layout __EE188625) := __EEQP(__EE187617.UID,__EE188625.UID);
+  __ST188106_Layout __JT188631(E_Social_Security_Number.Layout __l, __ST187829_Layout __r) := TRANSFORM
+    SELF.U_I_D__1_ := __r.UID;
+    SELF := __l;
+    SELF := __r;
+  END;
+  SHARED __EE188632 := JOIN(__EE187617,__EE188625,__JC188631(LEFT,RIGHT),__JT188631(LEFT,RIGHT),LEFT OUTER,SMART);
+  EXPORT __ST93958_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
+    KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
+    KEL.typ.nunk Ssn_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
+    KEL.typ.nstr Ssn_Formatted_;
+    KEL.typ.nunk _v2__divssnidentitycountnew_;
+    KEL.typ.nkdate Deceased_Date_;
+    KEL.typ.nkdate Deceased_Date_Of_Birth_;
+    KEL.typ.nstr Deceased_First_;
+    KEL.typ.nstr Deceased_Middle_;
+    KEL.typ.nstr Deceased_Last_;
+    KEL.typ.nstr Deceased_Match_Code_;
+    KEL.typ.nbool _isdeepdive_;
+    KEL.typ.nstr _county__death_;
+    KEL.typ.nstr Deceased_Ssn_;
+    KEL.typ.nstr _state__death__flag_;
+    KEL.typ.nstr _death__rec__src_;
+    KEL.typ.nstr _state__death__id_;
+    KEL.typ.int Aot_Ssn_Kr_Act_Cnt_Ev_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  SHARED __ST93958_Layout __ND188663__Project(__ST188106_Layout __PP188633) := TRANSFORM
+    SELF.Aot_Ssn_Kr_Act_Cnt_Ev_ := MIN(__PP188633.C_O_U_N_T___Exp1_,9999);
+    SELF := __PP188633;
+  END;
+  EXPORT __ENH_Social_Security_Number_5 := PROJECT(__EE188632,__ND188663__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_5',EXPIRE(7));
+END;
