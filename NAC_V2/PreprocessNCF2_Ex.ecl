@@ -1,5 +1,8 @@
 ﻿import	std;
-
+/**
+THIS VERSION IS FOR TESTING ONLY
+It allows excluding certain files from a superfile
+***
 /*
 
 	Perform preliminary processing on a new file or superfile
@@ -11,32 +14,35 @@
 
 uc(string s) := Std.Str.ToUpperCase(s);
 
+																	
+EXPORT PreprocessNCF2_Ex(string ilfn, string exclude = '') := function	
+
 GetCases(string ilfn) := PROJECT(
-		SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
-					CaseId, filename, seqnum, LOCAL),
+		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases(filename<>exclude), hash32(CaseId)),
+					CaseId, filename, -seqnum, LOCAL), CaseId, filename, LOCAL),
 				TRANSFORM($.Layouts2.rCaseEx,
 					self.ProgramState := uc(left.ProgramState);
 					self.CountyName := uc(left.CountyName);
 					self := left;
 			));
-
+					
 GetClients(string ilfn) := PROJECT(
-		SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId,CaseId)),
-					ClientId, CaseId, Eligibility, filename, seqnum, LOCAL),
-				//	ClientId, CaseId, Eligibility, filename, LOCAL),
+		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients(filename<>exclude), hash32(ClientId)),
+					ClientId, CaseId, Eligibility, filename, -seqnum, LOCAL),
+					ClientId, CaseId, Eligibility, filename, LOCAL),
 				TRANSFORM($.Layouts2.rClientEx,
 					self.ProgramState := uc(left.ProgramState);
 					self.LastName := uc(left.LastName);
 					self.FirstName := uc(left.FirstName);
 					self.MiddleName := uc(left.MiddleName);
 					self.NameSuffix := uc(left.NameSuffix);
-					self.Email := TRIM(left.email,left,right);
 					self := left;
 			));
-				
+					
 GetAddresses(string ilfn) := PROJECT(
-		SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses, hash32(CaseId, ClientId)),
-					CaseId, ClientId, AddressType, filename, seqnum, LOCAL),
+		DEDUP(SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses(filename<>exclude), hash32(CaseId, ClientId)),
+					CaseId, ClientId, AddressType, filename, -seqnum, LOCAL),
+					CaseId, ClientId, AddressType, filename, LOCAL),
 					TRANSFORM($.Layouts2.rAddressEx,
 						self.ProgramState := uc(left.ProgramState);
 						self.Street1 := uc(left.Street1);
@@ -46,22 +52,16 @@ GetAddresses(string ilfn) := PROJECT(
 						self := left;
 			));
 
-GetContacts(string ilfn) := DEDUP(SORT(DISTRIBUTE(
-				PROJECT($.ExtractRecords(ilfn).contacts,
+GetContacts(string ilfn) := PROJECT($.ExtractRecords(ilfn).contacts(filename<>exclude),
 						TRANSFORM($.Layouts2.rStateContactEx;
 							self.ProgramState := uc(left.ProgramState);
 							self.ContactName := uc(left.ContactName);
 							self := left;
-						)),
-				hash32(contactname)),
-				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
-				filename, seqnum, local),
-				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
-				right, local);
+						));
 
-GetExceptions(string ilfn) := $.ExtractRecords(ilfn).exceptions;
-																	
-EXPORT PreprocessNCF2(string ilfn) := function	
+GetExceptions(string ilfn) := $.ExtractRecords(ilfn).exceptions(filename<>exclude);
+
+
 
 	cases := 	Nac_V2.mod_Validation.CaseFile(GetCases(ilfn));
 
