@@ -47,7 +47,7 @@ FraudGovWithPhonesMeta := JOIN(FraudGovWithBest, FraudgovKEL.PersonPhonesMeta, L
 FraudGovWithIPMetadata := JOIN(FraudGovWithPhonesMeta, FraudgovKEL.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
 // Crim
-FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, FraudgovKEL.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, FraudgovKEL.PersonCrim, LEFT.record_id = RIGHT.record_id, TRANSFORM({RECORDOF(LEFT),RECORDOF(RIGHT), boolean CrimHit}, self.CrimHit := MAP(RIGHT.record_id>0 => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1), HASH);
 
 // Advo
 FraudGovWithAdvo := JOIN(FraudGovWithCrim, FraudgovKEL.PersonAdvo, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
