@@ -134,6 +134,7 @@ module
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
+		export DLHistory			:= tools.mod_FilenamesBuild(Template('DLHistory'),pversion);
 		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
 		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
 		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
@@ -215,6 +216,7 @@ module
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
 			FraudPoint.dAll_filenames +
+			DLHistory.dAll_filenames +
 			BestInfo.dAll_filenames +
 			CoverageDates.dAll_filenames +
 			PrepaidPhone.dAll_filenames +
