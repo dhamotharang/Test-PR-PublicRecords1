@@ -18,8 +18,6 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 //,DI_Metrics.FCRA_Emails(pHostname, pTarget, pContact) //FCRA_Emails is a completely different type of process at this point and does NOT need to be included (yet)
 
-,DI_Metrics.FCRA_Criminal(pHostname, pTarget, pContact)
-
 ,DI_Metrics.FCRA_Liens_Judgments_Evictions(pHostname, pTarget, pContact)
 
 ,DI_Metrics.FCRA_PAW(pHostname, pTarget, pContact)

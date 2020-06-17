@@ -24,12 +24,12 @@ EXPORT  Proc_History(
     dHistoryNew :=  JOIN(
                       DISTRIBUTE(dCRK,HASH(rid)),
                       DISTRIBUTE(dCRKFather,HASH(rid)),
-                      LEFT.rid  = RIGHT.rid AND
-                      (
-                        LEFT.nomatch_id <>  RIGHT.nomatch_id OR
-                        LEFT.lexid      <>  RIGHT.lexid OR
-                        LEFT.crk        <>  RIGHT.crk
-                      ),
+                        LEFT.rid  = RIGHT.rid AND
+                        (
+                          LEFT.nomatch_id <>  RIGHT.nomatch_id OR
+                          LEFT.lexid      <>  RIGHT.lexid OR
+                          LEFT.crk        <>  RIGHT.crk
+                        ),
                       tHistory(LEFT,RIGHT),
                       LOCAL
                     );
