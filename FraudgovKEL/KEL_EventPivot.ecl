@@ -107,13 +107,7 @@ SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entityt
 SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStats, 'industrytype,customerid,entitycontextuid,recordid', 
 'eventdate,' +
 // Need the list of the rules attributes here to limit the pivot to only attributes used in rules.
-'deceased,currentlyincarceratedflag,addressisvacant,addressiscmra,addressispobox,invalidaddress,addressoutofstate,' +
-'t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,p1_aotidkrgenfrdactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev'
-/*
-FraudgovKEL.KEL_EventShell.OriginalAttr + ',' +
-FraudgovKEL.KEL_EventShell.StructuralAttr + ',' +
-FraudgovKEL.KEL_EventShell.NicoleAttr
-*/
+'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,t18_ipaddrvpnflag,t18_ipaddrhostedflag,t1l_ssnnotverflag,t1_addrnotverflag,t1l_iddeceasedflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t17_emaildomaindispflag'
 );
 
 RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customerid), 
