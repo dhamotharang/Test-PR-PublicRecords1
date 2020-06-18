@@ -3713,8 +3713,12 @@ Person: => EntityType := 1;
 Person: => AgeAtLastEvent := MAX(PersonEvent, Transaction.IdAge);
 Person: => DtFirstSeen := MIN(PersonEvent.Transaction, EventDate);
 Person: => DtLastSeen := MAX(PersonEvent.Transaction, EventDate);
+Person: => IdActivityDtFirstSeen := MIN(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
+Person: => IdActivityDtLastSeen := MAX(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
 Person: => LastRecordId := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PersonEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Person.DtLastSeen), RecordId),
-															 MAX(PersonEvent.Transaction(T_SrcClassType = 4 AND EventDate=Person.DtLastSeen), RecordId));
+                  MAX(PersonEvent.Transaction(T_SrcClassType = 4 AND EventDate=Person.IdActivityDtLastSeen), RecordId));
+
+
 
 Person: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
 Person: => DateOfBirth := MAX(ReportedDateOfBirth, DateOfBirth);
@@ -3905,10 +3909,10 @@ SocialSecurityNumber: => Label := SsnFormatted;
 SocialSecurityNumber: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 SocialSecurityNumber: => DtFirstSeen := MIN(SsnEvent.Transaction, EventDate);
 SocialSecurityNumber: => DtLastSeen := MAX(SsnEvent.Transaction, EventDate);
+SocialSecurityNumber: => IdActivityDtFirstSeen := MIN(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
+SocialSecurityNumber: => IdActivityDtLastSeen := MAX(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
 SocialSecurityNumber: => LastRecordId := MAP(ALL(SsnEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(SsnEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=SocialSecurityNumber.DtLastSeen), RecordId),
-																				 MAX(SsnEvent.Transaction(T_SrcClassType = 4 AND EventDate=SocialSecurityNumber.DtLastSeen), RecordId));
-
-
+                  MAX(SsnEvent.Transaction(T_SrcClassType = 4 AND EventDate=SocialSecurityNumber.IdActivityDtLastSeen), RecordId));
 
 SocialSecurityNumber: => IdentityCount := COUNT(PersonSSN{Subject});
 SocialSecurityNumber: => IdentityCountGt2 := MAP(IdentityCount > 2 => 1, 0);
@@ -3965,9 +3969,10 @@ Phone: => Label := PhoneFormatted;
 Phone: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 Phone: => DtFirstSeen := MIN(PhoneEvent.Transaction, EventDate);
 Phone: => DtLastSeen := MAX(PhoneEvent.Transaction, EventDate);
+Phone: => IdActivityDtFirstSeen := MIN(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
+Phone: => IdActivityDtLastSeen := MAX(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
 Phone: => LastRecordId := MAP(ALL(PhoneEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PhoneEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Phone.DtLastSeen), RecordId),
-															 MAX(PhoneEvent.Transaction(T_SrcClassType = 4 AND EventDate=Phone.DtLastSeen), RecordId));
-
+                  MAX(PhoneEvent.Transaction(T_SrcClassType = 4 AND EventDate=Phone.IdActivityDtLastSeen), RecordId));
 
 Phone: => IdentityCount := COUNT(PersonPhone{Subject});
 Phone: => IdentityCountGt2 := MAP(IdentityCount > 2 => 1, 0);
@@ -4092,8 +4097,11 @@ BankAccount: => AbbreviatedBankname := rBank.AbbreviatedBankname;
 BankAccount: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 BankAccount: => DtFirstSeen := MIN(BankAccountEvent.Transaction, EventDate);
 BankAccount: => DtLastSeen := MAX(BankAccountEvent.Transaction, EventDate);
+
+BankAccount: => IdActivityDtFirstSeen := MIN(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
+BankAccount: => IdActivityDtLastSeen := MAX(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
 BankAccount: => LastRecordId := MAP(ALL(BankAccountEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(BankAccountEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=BankAccount.DtLastSeen), RecordId),
-															  MAX(BankAccountEvent.Transaction(T_SrcClassType = 4 AND EventDate=BankAccount.DtLastSeen), RecordId));
+                  MAX(BankAccountEvent.Transaction(T_SrcClassType = 4 AND EventDate=BankAccount.IdActivityDtLastSeen), RecordId));
 
 BankAccount: => IdentityCount := COUNT(PersonBankAccount{Subject});
 BankAccount: => IdentityCountGt2 := MAP(IdentityCount > 2 => 1, 0);
@@ -4153,8 +4161,10 @@ DriversLicense: => Label := LicenseNumber;
 DriversLicense: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 DriversLicense: => DtFirstSeen := MIN(DriversLicenseEvent.Transaction, EventDate);
 DriversLicense: => DtLastSeen := MAX(DriversLicenseEvent.Transaction, EventDate);
+DriversLicense: => IdActivityDtFirstSeen := MIN(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
+DriversLicense: => IdActivityDtLastSeen := MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
 DriversLicense: => LastRecordId := MAP(ALL(DriversLicenseEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(DriversLicenseEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=DriversLicense.DtLastSeen), RecordId),
-															 MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4 AND EventDate=DriversLicense.DtLastSeen), RecordId));
+                  MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4 AND EventDate=DriversLicense.IdActivityDtLastSeen), RecordId));
 
 
 DriversLicense: => IdentityCount := COUNT(PersonDriversLicense{Subject});
@@ -4215,8 +4225,10 @@ InternetProtocol: => EntityType := 18;
 InternetProtocol: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 InternetProtocol: => DtFirstSeen := MIN(InternetProtocolEvent.Transaction, EventDate);
 InternetProtocol: => DtLastSeen := MAX(InternetProtocolEvent.Transaction, EventDate);
+InternetProtocol: => IdActivityDtFirstSeen := MIN(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
+InternetProtocol: => IdActivityDtLastSeen := MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
 InternetProtocol: => LastRecordId := MAP(ALL(InternetProtocolEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(InternetProtocolEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=InternetProtocol.DtLastSeen), RecordId),
-															 MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4 AND EventDate=InternetProtocol.DtLastSeen), RecordId));
+                  MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4 AND EventDate=InternetProtocol.IdActivityDtLastSeen), RecordId));
 
 
 InternetProtocol: => IdentityCount := COUNT(PersonIpAddress{Subject});
@@ -4289,8 +4301,11 @@ Address: => EntityContextUid := '_09' + OttoAddressId;
 Address: => EntityType := 9;
 Address: => DtFirstSeen := MIN(AddressEvent.Transaction, EventDate);
 Address: => DtLastSeen := MAX(AddressEvent.Transaction, EventDate);
+
+Address: => IdActivityDtFirstSeen := MIN(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
+Address: => IdActivityDtLastSeen := MAX(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
 Address: => LastRecordId := MAP(ALL(AddressEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(AddressEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Address.DtLastSeen), RecordId),
-															 MAX(AddressEvent.Transaction(T_SrcClassType = 4 AND EventDate=Address.DtLastSeen), RecordId));
+                  MAX(AddressEvent.Transaction(T_SrcClassType = 4 AND EventDate=Address.IdActivityDtLastSeen), RecordId));
 
 Address: => NotInJurisdictionState := MAP(State != rCustomer.JurisdictionState => 1, 0);
 Address: => InvalidAddress := MAP(ACECleanerErrorCode IN ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E422','E423','E425','E427','E428','E429','E430','E431','E439','E500','E501','E502','E503','E504','E505','E600'] => 1, 0);
