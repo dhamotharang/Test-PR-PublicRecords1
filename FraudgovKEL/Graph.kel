@@ -1718,7 +1718,7 @@ Event: => T_PersonUidEcho	:= MAP(LexId = '' OR LexId:Null OR LexId = 0 => -99999
 																	
 														
 Event: => T_InpClnTitleEcho := MAP(Title = '' OR Title:Null => -99999, Title);
-Event: => T_InpClnFullNmEcho := MAP(T_InpClnFirstNmEcho=-99999 OR T_InpClnMiddleNmEcho=-99999 OR T_InpClnLastNmEcho=-99999 => -99999, TRIM(FirstName) + ' ' + TRIM(MiddleName) + ' ' + TRIM(LastName));
+Event: => T_InpClnFullNmEcho := MAP(T_InpClnFirstNmEcho=-99999 OR T_InpClnMiddleNmEcho=-99999 OR T_InpClnLastNmEcho=-99999 => -99999, TRIM(LastName) + ', ' + TRIM(FirstName) + ' ' + TRIM(MiddleName));
 Event: => T_InpClnFirstNmEcho := MAP(FirstName ='' OR FirstName:Null => -99999, FirstName);
 Event: => T_InpClnMiddleNmEcho := MAP(MiddleName = '' OR MiddleName:Null => -99999, MiddleName);
 Event: => T_InpClnLastNmEcho := MAP(LastName = '' OR LastName:Null => -99999, LastName);
@@ -2581,30 +2581,36 @@ Event: => T1_AddrNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR 
 Event: => T1L_SsnNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
                                    T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																	 T1L_NasSummary < 1 => -99997,
-																	 T1L_NasSummary IN [2,3,5,8] => 1, 0);
+																	 T1L_NasSummary IN [2,3,5,8] => 1, 
+																	 T1L_NasSummary IN [1,4,6,7,9,10,11,12] => 0);
 Event: => T1L_SsnWAltNAVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
                                       T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																			T1L_NasSummary < 1 => -99997,
-																			T1L_NasSummary = 1 => 1, 0);
+																			T1L_NasSummary = 1 => 1, 
+																			T1L_NasSummary IN [2,3,4,5,6,7,8,9,10,11,12] => 0);
 Event: => T1L_SsnWAddrNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 OR T9_AddrPopFlag=0 => -99999,
                                         T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																				T1L_NasSummary < 1 => -99997,
-																				T1L_NasSummary IN [4,7,9] => 1, 0);
+																				T1L_NasSummary IN [4,7,9] => 1, 
+																				T1L_NasSummary IN [1,2,3,5,6,8,10,11,12] => 0);
 Event: => T1_PhnNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T16_PhnPopFlag=0 => -99999,
                                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																	 T1_NapSummary < 1 => -99997,
-																	 T1_NapSummary IN [2,3,5,8] => 1, 0);
+																	 T1_NapSummary IN [2,3,5,8] => 1, 
+																	 T1_NapSummary IN [1,4,6,7,9,10,11,12] => 0);
 Event: => T1L_DobNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T_DobPopFlag=0 => -99999,
                                    T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																	 ALL(PersonEvent.Transaction,T1L_DobVerIndx=-99997) => -99997,
 																	 T1L_DobVerIndx < 7 => 1, 0);
-Event: => T1L_HiRiskCviFlag :=  MAP(T1_LexIdPopFlag=0 => -99999, 
+Event: => T1_HiRiskCviFlag :=  MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999, 
                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
 																		T1_Cvi <= 20 => 1, 0);
-Event: => T1L_MedRiskCviFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+Event: => T1_MedRiskCviFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
 																		T1_Cvi IN [30,40] => 1, 0);
-Event: => T1_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+Event: => T1L_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																			 ALL(PersonEvent.Transaction,T1L_Fp_SourceRiskLevel=-99997) => -99997,
 																			 T1L_Fp_SourceRiskLevel >=7 => 1, 0);
@@ -2631,7 +2637,7 @@ Event: => T1L_IdDtOfDeathAftIdActFlagEv := MAP(T1_LexIdPopFlag=0 => -99999,
 
 //best pii attributes
 Event: => T_BcShllArchDtEcho := MAP(T_IsBcShllHitFlag < 1 => -99998,
-																		historydatetimestamp); //need to get from code update
+																		historydatetimestamp); 
 Event: => T1L_BestFirstNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																		 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		 best_fname = '' OR best_fname:Null => -99997,
@@ -2649,7 +2655,7 @@ Event: => T1L_BestLastNmPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 Event: => T1L_BestFullNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																		T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		T1L_BestFirstNmPopFlag=0 OR T1L_BestLastNmPopFlag=0 => -99997,
-																		TRIM(T1L_BestFirstNmEcho) + ' ' + (T1L_BestLastNmEcho));
+																	 (T1L_BestLastNmEcho) + ', ' + TRIM(T1L_BestFirstNmEcho));
 Event: => T1L_CurrAddrPrimRangeEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																					 add_curr_prim_range = '' OR add_curr_prim_range:Null => -99997,
@@ -2707,11 +2713,11 @@ Event: => T1L_CurrAddrFullEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																			IF(T1L_CurrAddrZip5Echo IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrZip5Echo)));
 Event: => T1L_CurrAddrOldDt := MAP(T1_LexIdPopFlag=0 => -99999,
 																   T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 NOT ISVALIDDATE(bocashell_addr1_dt_first_seen) => -99997,
+																	 bocashell_addr1_dt_first_seen:Null OR NOT ISVALIDDATE(bocashell_addr1_dt_first_seen) => -99997,
 																	 INTEGER(bocashell_addr1_dt_first_seen));
 Event: => T1L_CurrAddrNewDt := MAP(T1_LexIdPopFlag=0 => -99999,
 																   T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 NOT ISVALIDDATE(bocashell_addr1_date_last_seen) => -99997,
+																	 bocashell_addr1_date_last_seen:Null OR NOT ISVALIDDATE(bocashell_addr1_date_last_seen) => -99997,
 																	 INTEGER(bocashell_addr1_date_last_seen));
 Event: => T1L_BestSsnEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -2722,7 +2728,7 @@ Event: => T1L_BestSsnPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 														 T1L_BestSsnEcho = -99997 => 0, 1);
 Event: => T1L_BestDobEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 /*reported_dob = '' OR reported_dob:Null OR */ INTEGER(reported_dob)=0 OR (NOT ISVALIDDATE(reported_dob)) => -99997,
+														 /*reported_dob = '' OR reported_dob:Null OR */ reported_dob:Null OR (NOT ISVALIDDATE(reported_dob)) => -99997,
 														 INTEGER(reported_dob));
 Event: => T1L_BestDobPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -2781,7 +2787,7 @@ Event: => T1L_BestDlNotInAgcyJurStFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 																							T1L_BestDlStEcho != AgencyProgJurSt => 1, 0);
 
 //web echo attributes
-Event: => T_ActTmEcho := 0; //where to find this?
+Event: => T_ActTmEcho := MAP(reported_time:Null OR reported_time=0 => -99997, reported_time); 
 Event: => T_InpAddrTypeEcho := MAP(Location.TypeCode	= '' OR Location.TypeCode:Null => -99999, Location.TypeCode);
 Event: => T_InpClnAddrStreetEcho := MAP(StreetAddress ='' OR StreetAddress :Null => -99999, StreetAddress );
 Event: => T_InpClnMailingAddrStreetEcho := MAP(MailingStreetAddress='' OR MailingStreetAddress:Null => -99999, MailingStreetAddress);
@@ -2832,15 +2838,15 @@ Event: => T1L_IdDeceasedFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 																		diddeceased=TRUE => 1, 0);
 Event: => T1L_IdDtOfDeath := MAP(T1_LexIdPopFlag=0 => -99999,
                              T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 NOT ISVALIDDATE(diddeceaseddate) => -99997,
+														 diddeceaseddate:Null OR NOT ISVALIDDATE(diddeceaseddate) => -99997,
 														 INTEGER(diddeceaseddate));
 Event: => T1L_IdCrimFlSdMatchFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                      T1L_IdCrimHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		 T_FirstNmPopFlag=0 OR T_LastNmPopFlag=0 OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99997,
 																		 name_ssn_dob_match);
-Event: => T1L_IdCrimHitFlag := 0; //T1_LexIdPopFlag=0 => -99999,
-                                  // T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	// need some sort of crimhitflag?);
+Event: => T1L_IdCrimHitFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                  T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	CrimHit=TRUE => 1, 0);
 Event: => T1L_IdCurrIncarcFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                   T1L_IdCrimHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																	T1L_IdCrimFlSdMatchFlag=-99997 OR curr_incar_flag='' OR curr_incar_flag:Null => -99997,
@@ -3161,7 +3167,7 @@ Event: => P18_AotIdUsngIpAddrCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                           T_SrcClassType < 2 => -99998,
 																					ALL(InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																					rInternetProtocol.AotIdUsngIpAddrCntEv);
-Event: => P19_AotIdUsingBnkAcctCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+Event: => P19_AotIdUsngBnkAcctCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                             T_SrcClassType < 2 => -99998,
 																						ALL(BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																						rBankAccount.AotIdUsingBnkAcctCntEv);
@@ -3218,6 +3224,122 @@ Event: => P17_EmailRiskUnscrbleFlag := 1;
 Event: => P18_IpAddrRiskUnscrbleFlag := 1;
 Event: => P19_BnkAcctRiskUnscrbleFlag := 1;
 Event: => P20_DlRiskUnscrbleFlag := 1;
+
+//Element Risk Attributes
+Event: => T1_MinorIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                T_SrcClassType < 4 => -99998,
+																ALL(PersonEvent.Transaction,T1_IdAge=-99997) => -99997,
+																T1_IdAge < 18 => 1, 0);
+Event: => T9_IdCurrProfUsngAddrCntEv := MAP(T9_AddrPopFlag=0 => -99999,
+                                            T_SrcClassType < 4 => -99998,
+																						COUNT(Location.AddressEvent(EventDate<=Event.EventDate AND Event.T_SrcClassType IN [2,3,4]).Transaction{T_PersonUidEcho}));
+Event: => T15_IdCurrProfUsngSsnCntEv := MAP(T15_SsnPopFlag=0 => -99999,
+                                            T_SrcClassType < 4 => -99998,
+																					  COUNT(rSsn.SsnEvent(EventDate<=Event.EventDate AND Event.T_SrcClassType IN [2,3,4]).Transaction{T_PersonUidEcho}));
+Event: => T20_IdCurrProfUsngDLCntEv := MAP(T20_DlPopFlag=0 => -99999,
+                                           T_SrcClassType < 4 => -99998,
+																					 COUNT(rDriversLicense.DriversLicenseEvent(EventDate<=Event.EventDate AND Event.T_SrcClassType IN [2,3,4]).Transaction{T_PersonUidEcho}));
+Event: => T19_IdCurrProfUsngBnkAcctCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+                                                T_SrcClassType < 4 => -99998,
+																								COUNT(rBankAccount.BankAccountEvent(EventDate<=Event.EventDate AND Event.T_SrcClassType IN [2,3,4]).Transaction{T_PersonUidEcho}));
+Event: => T9_AddrValType := MAP(T9_AddrPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																addrvalflag:Null OR addrvalflag='' => -99997,
+																addrvalflag);
+Event: => T9_AddrMailDropType := MAP(T9_AddrPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+                                     drop_indicator:Null OR drop_indicator='' => -99997,
+																		 drop_indicator);
+Event: => T15_SsnValType := MAP(T15_SsnPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																socsvalflag:Null => -99997,
+																socsvalflag);
+Event: => T20_DlValType := MAP(T20_DlPopFlag=0 => -99999,
+                               T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+															 drlcvalflag:Null => -99997,
+															 drlcvalflag);
+Event: => T16_PhnValType := MAP(T16_PhnPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																hphonevalflag:Null => -99997,
+																hphonevalflag);
+Event: => T16_IsPhnMetaHitFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                      PhonesMetaHit=TRUE => 1, 0);
+Event: => T16_PhnMetaNewVendDt := MAP(T16_PhnPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T16_IsPhnMetaHitFlag < 1 => -99998,
+																			phone_vendor_first_reported_dt:Null OR NOT ISVALIDDATE(phone_vendor_first_reported_dt) => -99997,
+																			INTEGER(phone_vendor_first_reported_dt));
+Event: => T16_PhnMetaOldVendDt := MAP(T16_PhnPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T16_IsPhnMetaHitFlag < 1 => -99998,
+																			phone_vendor_last_reported_dt:Null OR NOT ISVALIDDATE(phone_vendor_last_reported_dt) => -99997,
+																			phone_vendor_last_reported_dt > T_ActDtEcho => INTEGER(T_ActDtEcho),
+																			INTEGER(phone_vendor_last_reported_dt));
+Event: => T9_AddrPoBoxMultCurrIdFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
+                                              T_SrcClassType < 4 => -99998,
+																							T9_AddrType != 'P' => -99997,
+																							T9_AddrType='P' AND T9_IdCurrProfUsngAddrCntEv >= 2 => 1,0);
+Event: => T9_AddrIsVacantFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																		 address_vacancy_indicator:Null OR address_vacancy_indicator='' => -99997,
+																		 address_vacancy_indicator='Y' => 1, 0);	
+Event: => T9_AddrIsInvalidFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																			ALL(AddressEvent.Transaction,T9_AddrValType=-99997) => -99997,
+																			T9_AddrValType = 'N' => 1, 0);
+Event: => T9_AddrIsCmraFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                   T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																	 ALL(AddressEvent.Transaction,T9_AddrMailDropType=-99997) => -99997,
+																	 T9_AddrMailDropType = 'C' => 1, 0);
+Event: => T15_SsnMultCurrIDFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
+                                         T_SrcClassType < 4 => -99998,
+																				 T15_IdCurrProfUsngSsnCntEv >= 2 => 1, 0);
+Event: => T15_SsnIsInvalidFlag := MAP(T15_SsnPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																			ALL(SsnEvent.Transaction,T15_SsnValType=-99997) => -99997,
+																			T15_SsnValType = 1 => 1, 0);
+Event: => T20_DlMultCurrIdFlagEv := MAP(T20_DlPopFlag=0 => -99999,
+                                        T_SrcClassType < 4 => -99998,
+																				T20_IdCurrProfUsngDLCntEv >=2 => 1, 0);
+Event: => T20_DlIsInvalidFlag := MAP(T20_DlPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																		 ALL(DriversLicenseEvent.Transaction,T20_DlValType=-99997) => -99997,
+																		 T20_DlValType IN [1,3] => 1, 0);
+Event: => T16_PhnPrePdFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                  T_SrcClassType < 4 OR T16_IsPhnMetaHitFlag < 1 => -99998,
+																	phone_prepaid='' OR phone_prepaid:Null => -99997,
+																	phone_prepaid); //need to check what this is echoing to see how to map it to 0/1
+Event: => T16_PhnIsInvalidFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                  T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																	ALL(PhoneEvent.Transaction,T16_PhnValType=-99997) => -99997,
+																	T16_PhnValType = 0 => 1, 0);
+Event: => T19_BnkAcctMultCurrIDFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+                                             T_SrcClassType < 4 => -99998,
+																						 T19_IdCurrProfUsngBnkAcctCntEv >=2 => 1, 0);
+
+//first act date attributes
+Event: => P1_IdActOldDt := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                               T_SrcClassType < 2 OR P1_AotIdActCntEv=0 => -99998,
+															 MIN(PersonEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P9_IdActOldDt := MAP(T9_AddrPopFlag=0 => -99999,
+                               T_SrcClassType < 2 OR P9_AotIdActCntEv=0 => -99998,
+															 MIN(AddressEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P15_IDActOldDt := MAP(T15_SsnPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P15_AotIdActCntEv=0 => -99998,
+															  MIN(SsnEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P16_IDActOldDt := MAP(T16_PhnPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P16_AotIdActCntEv=0 => -99998,
+															  MIN(PhoneEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P17_IDActOldDt := MAP(T17_EmailPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P17_AotIdActCntEv=0 => -99998,
+															  MIN(EmailEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P18_IDActOldDt := MAP(T18_IpAddrPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P18_AotIdActCntEv=0 => -99998,
+															  MIN(InternetProtocolEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P19_IDActOldDt := MAP(T19_BnkAcctPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P19_AotIdActCntEv=0 => -99998,
+															  MIN(BankAccountEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
+Event: => P20_IDActOldDt := MAP(T20_DlPopFlag=0 => -99999,
+                                T_SrcClassType < 2 OR P20_AotIdActCntEv=0 => -99998,
+															  MIN(DriversLicenseEvent.Transaction(T_SrcClassType=4),INTEGER(T_ActDtEcho)));
 
 
 //DL Attributes
@@ -3449,7 +3571,7 @@ Person: => AotIdNewKrAftAddActCntEv := MIN(COUNT(PersonEvent.Transaction(T_SrcCl
 Person: => AotIdNewKrAftNonStActCntEv := MIN(COUNT(PersonEvent.Transaction((T_SrcClassType=1 OR T_SrcClassType=4) AND T_ActDtEcho > DATE(P1_AotIdKrActNewDtEv))),999);
 
 
-Person: => AotIdNacCollActCntEv := MIN(COUNT(PersonEvent.Transaction(T_SrcClassType=1 AND ActAge>0)),999);
+Person: => AotIdNacCollActCntEv := MIN(COUNT(PersonEvent.Transaction(T_SrcType=11 AND ActAge>0)),999);
 Person: => SrcType11 := ONLY(TOPN(PersonEvent.Transaction(T_SrcType=11){T_ActDtEcho,T_InpReasonDescEcho},1,-T_ActDtEcho));
 
 Person: => DtOfDeath := PersonEvent.Transaction(T_SrcClassType=4){T_SrcAgencyUid,T_ActUid,T_ActDtEcho,T1L_IdDtOfDeath};
@@ -3895,8 +4017,11 @@ Email: => Label := EmailAddress;
 Email: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 Email: => DtFirstSeen := MIN(EmailEvent.Transaction, EventDate);
 Email: => DtLastSeen := MAX(EmailEvent.Transaction, EventDate);
+Email: => IdActivityDtFirstSeen := MIN(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
+Email: => IdActivityDtLastSeen := MAX(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
 Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtLastSeen), RecordId),
-															 MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.DtLastSeen), RecordId));
+                  MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.IdActivityDtLastSeen), RecordId));
+
 
 
 Email: => IdentityCount := COUNT(PersonEmail{Subject});
