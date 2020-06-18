@@ -204,6 +204,9 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 		STRING GeoMatch=NULL(),
 		STRING ACECleanerErrorCode=NULL(),
 		BOOLEAN isAdditional,
+    STRING fips_state,
+    STRING fips_county,    
+    
 
 	  STRING MailingPrimaryRange=NULL(),
 		STRING MailingPredirectional=NULL(),
@@ -529,7 +532,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 
     addresspobox, addresscmra, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, 
 		Zip, Zip4, CarrierRouteNumber, CarrierRouteSortationAtZIP, LineOfTravel, LineOfTravelOrder, DeliveryPointBarcode, DeliveryPointBarcodeCheckDigit, 
-		TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,
+		TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,fips_state,fips_county,
+
 
 		MailingPrimaryRange,MailingPredirectional,MailingPrimaryName,MailingSuffix,MailingPostdirectional,MailingUnitDesignation,MailingSecondaryRange,
 		MailingPostalCity,MailingVanityCity,MailingState,MailingZip,MailingZip4,MailingTypeCode,MailingCounty,MailingLatitude,MailingLongitude,MailingGeoMatch,MailingACECleanerErrorCode,		
@@ -971,7 +975,9 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		GeoMatch = clean_address.geo_match,
 		ACECleanerErrorCode = clean_address.err_stat,
 		isAdditional=FALSE,
-		
+    fips_state = clean_address.fips_state,
+    fips_county = clean_address.fips_county,	
+    
 		MailingPrimaryRange = additional_address.clean_address.prim_range,
 		MailingPredirectional = additional_address.clean_address.predir,
 		MailingPrimaryName = additional_address.clean_address.prim_name,
