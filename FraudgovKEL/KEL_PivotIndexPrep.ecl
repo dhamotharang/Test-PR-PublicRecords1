@@ -67,7 +67,7 @@ EXPORT KEL_PivotIndexPrep := MODULE
 														TRANSFORM(profileRec,
 														SELF.event30count := LEFT.aotnonstactcnt30d,
 														SELF.eventcount := LEFT.aotnonstactcntev,
-														SELF.deviceid := LEFT.t_inpcaseidecho,
+														SELF.deviceid := LEFT.t_inpdvcidecho,
 														SELF.nvp := DATASET([
 														 {'personentitycontextuid', (STRING)LEFT.personentitycontextuid},
 															{'phoneentitycontextuid', (STRING)LEFT.phoneentitycontextuid},

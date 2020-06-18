@@ -846,6 +846,35 @@ Export CIID := RECORD
 		STRING2		best_drivers_license_state := '';
 		STRING25	best_drivers_license := '';    
 		unsigned8   best_drivers_license_exp := 0;
+	    unsigned8 best_drivers_dt_first_seen := '';
+	    unsigned8 best_drivers_dt_last_seen := '';
+	    string8   Reported_Date := '';
+ END;
+
+EXPORT Drivers_Batch := MODULE
+
+    import Autokey_batch,DriversV2_Services;
+    
+    SHARED ResultNarrow := DriversV2_Services.layouts.result_narrow;
+
+		SHARED AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
+		SHARED Seq := DriversV2_Services.layouts.seq;
+		SHARED AcctRec := RECORD(Seq)
+			AutoKeyBatchInput.acctno;
+			UNSIGNED6	did := 0;
+			STRING24	dl_number := '';
+			STRING2		dlstate := '';
+		END;		
+		EXPORT layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
+		EXPORT layout_out := RECORD(ResultNarrow)
+			AcctRec.acctno;
+			STRING10	height_desc;
+		END;
+ END;   
+
+ EXPORT DLHistory := RECORD
+		unsigned6 	did;
+    Drivers_Batch.layout_out;
  END;
 
  EXPORT CoverageDates := RECORD
@@ -860,6 +889,10 @@ Export CIID := RECORD
     unsigned4	record_count := 1;				
   END;
 	
+	EXPORT AgencyActivityDate := RECORD
+		string8		reported_date;
+		string10	reported_time;
+	END;
  EXPORT PrepaidPhone	:= RECORD
 	string10	phone;
 	string8	reported_date;
@@ -2511,7 +2544,7 @@ RECORD
   unsigned1 cl_high_risk_pattern14_flag_;
   unsigned1 cl_high_risk_pattern15_flag_;
  END;
- 
+
  EXPORT ConfigAttributes := Record
   integer8 entitytype;
   string200 field; 
@@ -2528,7 +2561,7 @@ RECORD
  END;
  
  EXPORT EntityProfile	:=RECORD
-  integer1 entitytype;
+   integer1 entitytype;
   string label;
   integer1 riskindx;
   integer1 aotcurrprofflag;
@@ -2544,6 +2577,9 @@ RECORD
   unsigned8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
+  unsigned1 not_aotkractflagev;
+  unsigned1 not_aotsafeactflagev;
+  string customerprogramdescription;
   integer8 industrytype;
   integer8 customerid;
   string entitycontextuid;
@@ -2658,6 +2694,7 @@ RECORD
   string zip;
   integer8 agencyuid;
   integer8 agencyprogtype;
+  string agencyprogdesc;
   string agencyprogjurst;
   integer8 t_srcagencyuid;
   integer8 t_srcagencyprogtype;
@@ -2667,6 +2704,10 @@ RECORD
   string t_srcdesc;
   integer8 t_srcclasstype;
   integer8 t_personuidecho;
+  string t_inpclnaddrstreetecho;
+  string t_inpclnmiddlenmecho;
+  string t_inpcaseidecho;
+  string t_inpdvcidecho;
   string t_inpclntitleecho;
   string t_inpclnfirstnmecho;
   string t_inpclnlastnmecho;
@@ -2885,13 +2926,20 @@ RECORD
   integer8 t1_idage;
   integer8 t1l_dobverindx;
   integer8 t1_napsummary;
+  integer8 t1l_iddeceasedflag;
   integer8 t1l_nassummary;
   integer8 t1_cvi;
+  string t1_fp3;
   integer8 t1_fp3_stolenidentityindex;
   integer8 t1_fp3_syntheticidentityindex;
   integer8 t1_fp3_manipidentityindex;
   integer8 t1l_fp_sourcerisklevel;
   integer8 t1_adultidnotseenflag;
+  integer8 t1_minorwlexidflag;
+  integer8 t1_ssnpriordobflag;
+  integer8 t1_firstnmnotverflag;
+  integer8 t1_lastnmnotverflag;
+  integer8 t1_addrnotverflag;
   integer8 t1l_ssnnotverflag;
   integer8 t1l_ssnwaltnaverflag;
   integer8 t1l_ssnwaddrnotverflag;
@@ -2903,6 +2951,8 @@ RECORD
   integer8 t1_stolidflag;
   integer8 t1_synthidflag;
   integer8 t1_manipidflag;
+  integer8 t1l_iddtofdeathaftidactcntev;
+  integer8 t1l_iddtofdeathaftidactflagev;
   string t_bcshllarchdtecho;
   string t1l_bestfirstnmecho;
   string t1l_bestlastnmecho;
@@ -2941,48 +2991,8 @@ RECORD
   integer8 t1l_bestdobmatchesinpflag;
   integer8 t1l_bestphnmatchesinpflag;
   integer8 t1l_bestdlmatchesinpflag;
+  integer8 t1l_curraddrnotinagcyjurstflag;
   integer8 t1l_bestdlnotinagcyjurstflag;
-  integer8 t_acttmecho;
-  string t_inpaddrtypeecho;
-  string t_inpclnaddrstreetecho;
-  string t_inpclnmailingaddrstreetecho;
-  string t_inpclnmailingaddrcityecho;
-  string t_inpclnmailingaddrstecho;
-  string t_inpclnmailingaddrzipecho;
-  string t_inpphncontacttypeecho;
-  string t_inpclncellphnecho;
-  string t_inpclnworkphnecho;
-  string t_inpclnbnkacct2echo;
-  string t_inpclnbnkacctrtg2echo;
-  string t_inpethnicityecho;
-  string t_inpraceecho;
-  string t_inpheadofhhecho;
-  string t_inprelationshipecho;
-  string t_inpdvcidecho;
-  string t_inpdvcuniquenumecho;
-  string t_inpdvcmacaddrecho;
-  string t_inpdvcserialnumecho;
-  string t_inpdvctypeecho;
-  string t_inpdvcidprovecho;
-  integer8 t_inpdvclatecho;
-  integer8 t_inpdvclongecho;
-  string t_inpinvestigatoridecho;
-  string t_inpreferralcaseidecho;
-  string t_inpreferraltypedescecho;
-  string t_inpreferralreasondescecho;
-  string t_inpreferraldispositionecho;
-  string t_inpclearedfraudecho;
-  string t_inpclearedreasonecho;
-  string t_inpcaseidecho;
-  string t_inpclientidecho;
-  string t_inpreasondescecho;
-  string t_agencyusernm;
-  integer8 t1_idinvupdflag;
-  integer8 t1l_iddeceasedflag;
-  integer8 t1l_iddtofdeath;
-  integer8 t1l_idcrimflsdmatchflag;
-  integer8 t1l_idcrimhitflag;
-  integer8 t1l_idcurrincarcflag;
   integer8 p1_aotidactcntev;
   integer8 p1_aotidactcnt30d;
   integer8 p9_aotidactcntev;
@@ -3074,19 +3084,59 @@ RECORD
   integer8 p16_aotidusngphncntev;
   integer8 p17_aotidusngemailcntev;
   integer8 p18_aotidusngipaddrcntev;
-  integer8 p19_aotidusngbnkacctcntev;
+  integer8 p19_aotidusingbnkacctcntev;
   integer8 p20_aotidusngdlcntev;
-  integer8 p9_aothiidcurrprofusngaddrcntev;
-  integer8 p15_aothiidcurrprofusngssncntev;
-  integer8 p16_aothiidcurrprofusngphncntev;
-  integer8 p17_aothiidcurrprofusngemlcntev;
-  integer8 p18_aothiidcurrprofusngipcntev;
-  integer8 p19_aothiidcurrprofusngbkaccntev;
-  integer8 p20_aothiidcurrprofusngdlcntev;
-  integer8 p1_aotidnaclvl1flag;
-  integer8 p2_aotidnaclvl2flag;
+  integer8 p1_aotidnaccollactcntev;
+  integer8 p1_aotidnaccollflagev;
+  integer8 p1_aotidnaccollnewdt;
+  integer8 p1_aotidnaccollnewtype;
+  integer8 p1_idriskunscrbleflag;
+  integer8 p9_addrriskunscrbleflag;
+  integer8 p15_ssnriskunscrbleflag;
+  integer8 p16_phnriskunscrbleflag;
+  integer8 p17_emailriskunscrbleflag;
+  integer8 p18_ipaddrriskunscrbleflag;
+  integer8 p19_bnkacctriskunscrbleflag;
+  integer8 p20_dlriskunscrbleflag;
+  integer8 t1l_idcurrincarcflag;
+  string t_inpclnfullnmecho;
+  integer8 t_acttmecho;
+  string t_inpaddrtypeecho;
+  string t_inpclnmailingaddrstreetecho;
+  string t_inpclnmailingaddrcityecho;
+  string t_inpclnmailingaddrstecho;
+  string t_inpclnmailingaddrzipecho;
+  string t_inpphncontacttypeecho;
+  string t_inpclncellphnecho;
+  string t_inpclnworkphnecho;
+  string t_inpclnbnkacct2echo;
+  string t_inpclnbnkacctrtg2echo;
+  string t_inpethnicityecho;
+  string t_inpraceecho;
+  string t_inpheadofhhecho;
+  string t_inprelationshipecho;
+  string t_inpdvcuniquenumecho;
+  string t_inpdvcmacaddrecho;
+  string t_inpdvcserialnumecho;
+  string t_inpdvctypeecho;
+  string t_inpdvcidprovecho;
+  integer8 t_inpdvclatecho;
+  integer8 t_inpdvclongecho;
+  string t_inpinvestigatoridecho;
+  string t_inpreferralcaseidecho;
+  string t_inpreferraltypedescecho;
+  string t_inpreferralreasondescecho;
+  string t_inpreferraldispositionecho;
+  string t_inpclearedfraudecho;
+  string t_inpreasondescecho;
+  string t_inpclientidecho;
+  string t_agencyusernm;
   string t_statusactiondesc;
-  string t_inpclnmiddlenmecho;
+  string t_inpclearedreasonecho;
+  integer8 t1_idinvupdflag;
+  integer8 t1l_iddtofdeath;
+  integer8 t1l_idcrimflsdmatchflag;
+  integer8 t1l_idcrimhitflag;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
@@ -3109,6 +3159,8 @@ RECORD
   integer1 p20_dlriskindx;
   integer1 p18_ipaddrriskindx;
   integer1 p9_addrriskindx;
+  unsigned8 iscurrent;
+  unsigned8 ishistorical;
  END;
  
  EXPORT EntityRules	:=	RECORD
@@ -3121,7 +3173,7 @@ RECORD
  END;
  
  EXPORT EntityAttributes := RECORD
-  string field;
+   string field;
   string value;
   string indicatortype;
   string indicatordescription;
@@ -3138,15 +3190,12 @@ RECORD
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
   unsigned4 t_actdtecho;
-  integer8 t9_addriskrflag;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
   integer8 t18_ipaddrhostedflag;
   integer8 t18_ipaddrvpnflag;
   integer8 t18_ipaddrtornodeflag;
-  integer8 t18_ipaddriskrflag;
   integer8 t19_bnkaccthrprepdrtgflag;
-  integer8 t19_bnkacctiskrflag;
   integer8 t17_emaildomaindispflag;
   integer8 p1_aotidkrstolidactflagev;
   integer8 p1_aotidkrgenfrdactflagev;
@@ -3159,9 +3208,31 @@ RECORD
   integer8 p18_aotipaddrkractflagev;
   integer8 p19_aotbnkacctkractflagev;
   integer8 p20_aotdlkractflagev;
-  unsigned4 eventdate;
+  unsigned1 not_aotkractflagev;
+  unsigned1 not_aotsafeactflagev;
+  integer8 t1l_dobnotverflag;
+  integer8 t1_stolidflag;
+  integer8 t1_synthidflag;
+  integer8 t1_manipidflag;
+  integer8 t1_adultidnotseenflag;
+  integer8 t1_addrnotverflag;
+  integer8 t1l_ssnwaltnaverflag;
+  integer8 t1_firstnmnotverflag;
+  integer8 t1l_hiriskcviflag;
+  integer8 t1l_medriskcviflag;
+  integer8 t1_minorwlexidflag;
+  integer8 t1_lastnmnotverflag;
+  integer8 t1_phnnotverflag;
+  integer8 t1l_ssnwaddrnotverflag;
+  integer8 t1_ssnpriordobflag;
+  integer8 t1l_ssnnotverflag;
+  integer8 t1l_curraddrnotinagcyjurstflag;
+  integer8 t1l_bestdlnotinagcyjurstflag;
+  integer8 t1_hdrsrccatcntlwflag;
+  integer8 t1l_iddeceasedflag;
+  integer8 t1l_idcurrincarcflag;
+  integer8 t1l_iddtofdeathaftidactflagev;
   integer8 incustomerpopulation;
-  integer8 kreventafterknownrisk;
   integer1 riskindx;
  END;
 
@@ -3185,6 +3256,9 @@ RECORD
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
   integer8 personeventcount;
+  integer8 t_inpclndobecho;
+  integer8 t1l_iddeceasedflag;
+  unsigned8 aotidactcntev;
   unsigned4 deceaseddate;
  END;
 

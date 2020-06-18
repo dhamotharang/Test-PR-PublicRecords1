@@ -97,6 +97,10 @@ module
 	export HighRiskIdentity := FraudGov_Prefix('config') + 'kel::HighRiskIdentity';
 	export ClusterDetails := FraudGov_Prefix('config') + 'kel::clusterdetails';
 	export ProdDashboardVersion := FraudGov_Prefix('config') + 'kel::ProdDashboardVersion';
+	export FindLeads 				:= FraudGov_Prefix('config') + 'kel::FindLeads';
+	export Dashboard 				:= FraudGov_Prefix('config') + 'kel::Dashboard';
+	export LinksChart 			:= FraudGov_Prefix('config') + 'kel::LinksChart';
+	export DetailsReport 		:= FraudGov_Prefix('config') + 'kel::DetailsReport';
 
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
@@ -130,10 +134,12 @@ module
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
+		export DLHistory			:= tools.mod_FilenamesBuild(Template('DLHistory'),pversion);
 		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
 		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
 		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
 		export BocaShell		:= tools.mod_FilenamesBuild(Template('BocaShell'),pversion);
+		export AgencyActivityDate		:= tools.mod_FilenamesBuild(Template('AgencyActivityDate'),pversion);
 		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -210,10 +216,12 @@ module
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
 			FraudPoint.dAll_filenames +
+			DLHistory.dAll_filenames +
 			BestInfo.dAll_filenames +
 			CoverageDates.dAll_filenames +
 			PrepaidPhone.dAll_filenames +
 			BocaShell.dAll_filenames +
+			AgencyActivityDate.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +

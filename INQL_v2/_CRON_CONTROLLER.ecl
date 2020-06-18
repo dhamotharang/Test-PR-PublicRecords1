@@ -51,7 +51,8 @@ NonFCRAProcesses      := Sequential(_process('FILES SPRAY', false,true)
 																	 ,_process('BASE PREP', false,true)   // Daily Base Pre-process
 																	 ,_process('BASE POST', false,true)   // Daily Base post-process
 																	 ,_process('BASE BUILD', false,false) // Weekly Base
-																	 ,_process('BATCHR3 BUILD', false,true)																	 
+																	 ,_process('BATCHR3 BUILD', false,true)				
+																	 ,_process('FILES CONSOLIDATE', false,true)	
 															 );
 
 FCRAProcesses      		:= Sequential(_process('FILES SPRAY', true,true)
