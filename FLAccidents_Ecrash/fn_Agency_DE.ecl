@@ -1,11 +1,11 @@
-﻿import ut;
+﻿import data_services, ut;
 EXPORT fn_Agency_DE := function
 
- agency_new    := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency'
+ agency_new    := dataset(data_services.foreign_prod+'thor_data400::in::ecrash::agency'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
 													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')))(Agency_ID != 'Agency_ID') ;
 													 
-	agency_old   := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency.'+ut.getDateOffset(-1,ut.GetDate)+'.csv'
+	agency_old   := dataset(data_services.foreign_prod+'thor_data400::in::ecrash::agency.'+ut.getDateOffset(-1,mod_Utilities.StrSysDate)+'.csv'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
 													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')),opt)(Agency_ID != 'Agency_ID') ;
 													 
@@ -27,9 +27,9 @@ EXPORT fn_Agency_DE := function
 													local
 												);
 												
-		mail_to := if ( count(agency_old) > 0 , if ( count(agency_diff ( deflagup = 'Y')) > 0, FileServices.SendEmail( 'Sai.Nagula@lexisnexis.com; hari.velappan@lexisnexis.com; Sudhir.Kasavajjala@lexisnexis.com' ,'DE Flag modified on Agency file dated '+ut.Getdate,'DE Flag turned on for Agency id '+agency_diff ( deflagup = 'Y')[1].agency_id + ' Agency Name ' +agency_diff ( deflagup = 'Y')[1].agency_name  ),
+		mail_to := if ( count(agency_old) > 0 , if ( count(agency_diff ( deflagup = 'Y')) > 0, FileServices.SendEmail( 'Sai.Nagula@lexisnexis.com; hari.velappan@lexisnexis.com; Sudhir.Kasavajjala@lexisnexis.com' ,'DE Flag modified on Agency file dated '+ mod_Utilities.StrSysDate,'DE Flag turned on for Agency id '+agency_diff ( deflagup = 'Y')[1].agency_id + ' Agency Name ' +agency_diff ( deflagup = 'Y')[1].agency_name  ),
 		                                                             Output('Agency file not modified')),
-																			Output('Agency file '+ut.getDateOffset(-2,ut.GetDate)+' is missing') 
+																			Output('Agency file '+ut.getDateOffset(-2, mod_Utilities.StrSysDate)+' is missing') 
 											);
 											
 		return mail_to;

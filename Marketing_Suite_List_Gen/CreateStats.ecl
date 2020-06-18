@@ -28,6 +28,12 @@ BusinessStatRec	:=	record
     CityAverageNonZero          	:= ave(group,if(ut.CleanSpacesAndUpper(BusinessUnique.City)<>'',100,0));	
     ZipcodeCountNonZero          	:= sum(group,if(ut.CleanSpacesAndUpper(BusinessUnique.Zip_code)<>'',1,0));
     ZipcodeAverageNonZero        	:= ave(group,if(ut.CleanSpacesAndUpper(BusinessUnique.Zip_code)<>'',100,0));	
+		BusinessEmailsCountNonZero		:= sum(group,if(ut.CleanSpacesAndUpper(BusinessUnique.email)<>'',1,0));
+    BusinessEmailsAverageNonZero	:= ave(group,if(ut.CleanSpacesAndUpper(BusinessUnique.email)<>'',100,0));	
+    SICCodeCountNonZero   		   	:= sum(group,if(ut.CleanSpacesAndUpper(BusinessUnique.sic_primary)<>'',1,0));
+    SICCodeAverageNonZero					:= ave(group,if(ut.CleanSpacesAndUpper(BusinessUnique.sic_primary)<>'',100,0));			
+		NAICSCountNonZero							:= sum(group,if(ut.CleanSpacesAndUpper(BusinessUnique.naics_primary)<>'',1,0));
+    NAICSAverageNonZero						:= ave(group,if(ut.CleanSpacesAndUpper(BusinessUnique.naics_primary)<>'',100,0));	
 end;
 
 pBusinessStat := table(BusinessUnique, BusinessStatRec, few);
@@ -51,6 +57,12 @@ BusinessStatFile	:=	project(pBusinessStat,
 															self.Per_Cities_Returned				:=	left.CityAverageNonZero;		
 															self.Cnt_Zip_Codes_Returned			:=	left.ZipCodeCountNonZero;
 															self.Per_Zip_Codes_Returned			:=	left.ZipCodeAverageNonZero;
+															self.Cnt_Bus_Emails_Returned		:=	left.BusinessEmailsCountNonZero;
+															self.Per_Bus_Emails_returned		:=	left.BusinessEmailsAverageNonZero;
+															self.Cnt_Total_SIC							:=	left.SICCodeCountNonZero;
+															self.Per_Total_SIC							:=	left.SICCodeAverageNonZero;
+															self.Cnt_Total_NAICS						:=	left.NAICSCountNonZero;
+															self.Per_Total_NAICS						:=	left.NAICSAverageNonZero;
 															self.Cnt_Unique_Business_Recs		:=	left.CountGroup;	
 															self														:=	[];
 															)
@@ -204,7 +216,43 @@ EmployeeStatFile	:=	project(pEmployeeStat,
 															self.Per_1500_and_Above_Employees	:= 	left.Employees1500_and_Above_Average;
 															self																	:=	[];
 															)
-															);												
+															);	
+															
+/*---------------------------------------------------------------------------------------------------------------------
+| Generate Years in Business stats. These stats are grouped into buckets.
+|----------------------------------------------------------------------------------------------------------------------*/															
+YearsStatRec	:=	record
+		unsigned8 CountGroup					:= count(group);
+    YearsLessThan2            		:= sum(group,if((integer)BusinessUnique.age<2,1,0));
+    YearsLessThan2_Average 				:= ave(group,if((integer)BusinessUnique.age<2,100,0)); 
+    Years2_5					          	:= sum(group,if((integer)BusinessUnique.age>=2 and 
+																									(integer)BusinessUnique.age<=5,1,0));
+    Years2_5_Average				  		:= ave(group,if((integer)BusinessUnique.age>=2 and 
+																									(integer)BusinessUnique.age<=5,100,0)); 
+    Years6_10				          		:= sum(group,if((integer)BusinessUnique.age>=6 and 
+																									(integer)BusinessUnique.age<=10,1,0));
+    Years6_10_Average  						:= ave(group,if((integer)BusinessUnique.age>=6 and 
+																									(integer)BusinessUnique.age<=10,100,0)); 
+    YearsGreaterThan10         		:= sum(group,if((integer)BusinessUnique.age>10,1,0));
+    YearsGreaterThan10_Average  	:= ave(group,if((integer)BusinessUnique.age>10,100,0)); 
+end;
+
+pYearstat := table(BusinessUnique, YearsStatRec, few);
+
+YearstatFile	:=	project(pYearstat,
+													transform(Marketing_Suite_List_Gen.Layouts.Layout_stats_temp,
+													self.unique_id										:=	1;
+													self.Cnt_Less_Than_2_Years 				:=	left.YearsLessThan2;
+													self.Per_Less_Than_2_Years 				:= 	left.YearsLessThan2_Average;
+													self.Cnt_2_5_Years 								:= 	left.Years2_5;
+													self.Per_2_5_Years 								:= 	left.Years2_5_Average;
+													self.Cnt_6_10_Years 							:= 	left.Years6_10;
+													self.Per_6_10_Years 							:= 	left.Years6_10_Average;
+													self.Cnt_More_Than_10_Years 			:= 	left.YearsGreaterThan10;
+													self.Per_More_Than_10_Years 			:= 	left.YearsGreaterThan10_Average;
+													self															:=	[];
+													)
+													);															
 
 /*---------------------------------------------------------------------------------------------------------------------
 | Generate SIC code stats. The SIC stats are grouped into buckets however the buckets will be based on description
@@ -245,7 +293,7 @@ FindTopSICRec	:=	record
     SIC_70_89							:= 	sum(group,if(BusinessUnique.sic_primary[1..2] in SIC9_set,1,0)); 
 		SIC_70_89_Percentage	:=	ave(group,if(BusinessUnique.sic_primary[1..2] in SIC9_set,100,0));		
     SIC_90_99			        := 	sum(group,if(BusinessUnique.sic_primary[1..2] in SIC10_set,1,0));
-		SIC_90_99_Percentage	:=	ave(group,if(BusinessUnique.sic_primary[1..2] in SIC10_set,100,0));		
+		SIC_90_99_Percentage	:=	ave(group,if(BusinessUnique.sic_primary[1..2] in SIC10_set,100,0));	
 end;
 
 pTopSICStat := table(BusinessUnique, FindTopSICRec, few);
@@ -692,7 +740,7 @@ ContactStatFile	:=	project(pContactStat,
 /*---------------------------------------------------------------------------------------------------------------------
 | Combine all stats and then rollup based on the unique id. 
 |----------------------------------------------------------------------------------------------------------------------*/
-AllFiles		:=	BusinessStatFile + RevenueStatFile + EmployeeStatFile + SicStatFile + NaicsRollup + ContactStatFile;
+AllFiles		:=	BusinessStatFile + RevenueStatFile + EmployeeStatFile + YearstatFile + SicStatFile + NaicsRollup + ContactStatFile;
 
 SrtAllFile	:=	Sort(AllFiles,unique_id);
 
@@ -1069,7 +1117,49 @@ StatLayout RollupAll(StatLayout l, StatLayout r) := transform
 																																			r.Per_Contact_Lexid);		
 	self.Cnt_Unique_Contact_Recs																:= 	if (l.Cnt_Unique_Contact_Recs > r.Cnt_Unique_Contact_Recs, 
 																																			l.Cnt_Unique_Contact_Recs, 
-																																			r.Cnt_Unique_Contact_Recs);																																			
+																																			r.Cnt_Unique_Contact_Recs);
+	self.Cnt_Bus_Emails_Returned																:=	if (l.Cnt_Bus_Emails_Returned > r.Cnt_Bus_Emails_Returned, 
+																																			l.Cnt_Bus_Emails_Returned, 
+																																			r.Cnt_Bus_Emails_Returned);
+	self.Per_Bus_Emails_Returned																:=	if (l.Per_Bus_Emails_Returned > r.Per_Bus_Emails_Returned, 
+																																			l.Per_Bus_Emails_Returned, 
+																																			r.Per_Bus_Emails_Returned);
+	self.Cnt_Less_Than_2_Years																	:=	if (l.Cnt_Less_Than_2_Years > r.Cnt_Less_Than_2_Years, 
+																																			l.Cnt_Less_Than_2_Years, 
+																																			r.Cnt_Less_Than_2_Years);
+	self.Per_Less_Than_2_Years																	:=	if (l.Per_Less_Than_2_Years > r.Per_Less_Than_2_Years, 
+																																			l.Per_Less_Than_2_Years, 
+																																			r.Per_Less_Than_2_Years);
+	self.Cnt_2_5_Years																					:=	if (l.Cnt_2_5_Years > r.Cnt_2_5_Years, 
+																																			l.Cnt_2_5_Years, 
+																																			r.Cnt_2_5_Years);
+	self.Per_2_5_Years																					:=	if (l.Per_2_5_Years > r.Per_2_5_Years, 
+																																			l.Per_2_5_Years, 
+																																			r.Per_2_5_Years);	
+	self.Cnt_6_10_Years																					:=	if (l.Cnt_6_10_Years > r.Cnt_6_10_Years, 
+																																			l.Cnt_6_10_Years, 
+																																			r.Cnt_6_10_Years);
+	self.Per_6_10_Years																					:=	if (l.Per_6_10_Years > r.Per_6_10_Years, 
+																																			l.Per_6_10_Years, 
+																																			r.Per_6_10_Years);
+	self.Cnt_More_Than_10_Years																	:=	if (l.Cnt_More_Than_10_Years > r.Cnt_More_Than_10_Years, 
+																																			l.Cnt_More_Than_10_Years, 
+																																			r.Cnt_More_Than_10_Years);
+	self.Per_More_Than_10_Years																	:=	if (l.Per_More_Than_10_Years > r.Per_More_Than_10_Years, 
+																																			l.Per_More_Than_10_Years, 
+																																			r.Per_More_Than_10_Years);
+	self.Cnt_Total_SIC																					:=	if (l.Cnt_Total_SIC > r.Cnt_Total_SIC, 
+																																			l.Cnt_Total_SIC, 
+																																			r.Cnt_Total_SIC);
+	self.Per_Total_SIC																					:=	if (l.Per_Total_SIC > r.Per_Total_SIC, 
+																																			l.Per_Total_SIC, 
+																																			r.Per_Total_SIC);																																			
+	self.Cnt_Total_NAICS																				:=	if (l.Cnt_Total_NAICS > r.Cnt_Total_NAICS, 
+																																			l.Cnt_Total_NAICS, 
+																																			r.Cnt_Total_NAICS);
+	self.Per_Total_NAICS																				:=	if (l.Per_Total_NAICS > r.Per_Total_NAICS, 
+																																			l.Per_Total_NAICS, 
+																																			r.Per_Total_NAICS);																																			
 	self := l;
 end;
 
@@ -1080,7 +1170,8 @@ AllFileStats	:=	project(AllFileRollup,TRANSFORM(Marketing_Suite_List_Gen.Layouts
 StatHeading		:=	'Cnt_Unique_Business_Recs|Cnt_Companies_Returned|Per_Companies_Returned|Cnt_Phones_Returned|' +
 									'Per_Phones_Returned|Cnt_States_Returned|Per_States_Returned|Cnt_Counties_Returned|' +
 									'Per_Counties_Returned|Cnt_Cities_Returned|Per_Cities_Returned|Cnt_Zip_Codes_Returned|' +
-									'Per_Zip_Codes_Returned|Cnt_Revenue_Less_150000|Per_Revenue_Less_150000|Cnt_Revenue_150000_249999|' +
+									'Per_Zip_Codes_Returned|Cnt_Bus_Emails_Returned|Per_Bus_Emails_Returned|' +
+									'Cnt_Revenue_Less_150000|Per_Revenue_Less_150000|Cnt_Revenue_150000_249999|' +
 									'Per_Revenue_150000_249999|Cnt_Revenue_250000_499999|Per_Revenue_250000_499999|' +
 									'Cnt_Revenue_500000_999999|Per_Revenue_500000_999999|Cnt_Revenue_1000000_2499999|' +
 									'Per_Revenue_1000000_2499999|Cnt_Revenue_2500000_4999999|Per_Revenue_2500000_4999999|' +
@@ -1091,7 +1182,9 @@ StatHeading		:=	'Cnt_Unique_Business_Recs|Cnt_Companies_Returned|Per_Companies_R
 									'Cnt_100_249_Employees|Per_100_249_Employees|Cnt_250_499_Employees|Per_250_499_Employees|' +
 									'Cnt_500_749_Employees|Per_500_749_Employees|Cnt_750_999_Employees|Per_750_999_Employees|' +
 									'Cnt_1000_1249_Employees|Per_1000_1249_Employees|Cnt_1250_1499_Employees|Per_1250_1499_Employees|' +
-									'Cnt_1500_and_Above_Employees|Per_1500_and_Above_Employees|Cnt_SIC_Agriculture_Forestry_And_Fishing|' +
+									'Cnt_1500_and_Above_Employees|Per_1500_and_Above_Employees|Cnt_Less_Than_2_Years|Per_Less_Than_2_Years|' +		
+									'Cnt_2_5_Years|Per_2_5_Years|Cnt_6_10_Years|Per_6_10_Years|Cnt_More_Than_10_Years|Per_More_Than_10_Years|' +
+									'Cnt_Total_SIC|Per_Total_SIC|Cnt_Total_NAICS|Per_Total_NAICS|Cnt_SIC_Agriculture_Forestry_And_Fishing|' +
 									'Per_SIC_Agriculture_Forestry_And_Fishing|Cnt_SIC_Mining|Per_SIC_Mining|Cnt_SIC_Construction|' +
 									'Per_SIC_Construction|Cnt_SIC_Manufacturing|Per_SIC_Manufacturing|' + 
 									'Cnt_SIC_Transportation_and_Public_Utilities|Per_SIC_Transportation_and_Public_Utilities|' +

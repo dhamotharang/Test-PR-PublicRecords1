@@ -1,4 +1,4 @@
-﻿import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents;
+﻿import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents,STD;
 
 export map_basefile_inquiry(string filedate) := function
 
@@ -153,9 +153,9 @@ self.geo_match 						:= L.clean[178];
 self.err_stat 						:= L.clean[179..182];
 
 //Clean the names of all involved parties -- (party file is already normalized) -- get middle names from order file
-CleanName1									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1+' '+L.LAST_NAME_1));
-CleanName2									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_2+' '+L.MIDDLE_NAME_2+' '+L.LAST_NAME_2));
-CleanName3									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_3+' '+L.MIDDLE_NAME_3+' '+L.LAST_NAME_3));
+CleanName1									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1+' '+L.LAST_NAME_1));
+CleanName2									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_2+' '+L.MIDDLE_NAME_2+' '+L.LAST_NAME_2));
+CleanName3									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_3+' '+L.MIDDLE_NAME_3+' '+L.LAST_NAME_3));
 
 self.orig_fname :=L.FIRST_NAME_1;
 self.orig_lname :=L.LAST_NAME_1;
@@ -338,9 +338,9 @@ self.geo_match 						:= L.clean[178];
 self.err_stat 						:= L.clean[179..182];
 
 //Clean the names of all involved parties -- (party file is already normalized) -- get middle names from order file
-CleanName1									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1+' '+L.LAST_NAME_1));
-CleanName2									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_2+' '+L.MIDDLE_NAME_2+' '+L.LAST_NAME_2));
-CleanName3									:= Address.CleanPersonFML73(stringlib.stringcleanspaces(L.FIRST_NAME_3+' '+L.MIDDLE_NAME_3+' '+L.LAST_NAME_3));
+CleanName1									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1+' '+L.LAST_NAME_1));
+CleanName2									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_2+' '+L.MIDDLE_NAME_2+' '+L.LAST_NAME_2));
+CleanName3									:= Address.CleanPersonFML73(STD.Str.CleanSpaces(L.FIRST_NAME_3+' '+L.MIDDLE_NAME_3+' '+L.LAST_NAME_3));
 
 self.orig_fname :=L.FIRST_NAME_1;
 self.orig_lname :=L.LAST_NAME_1;

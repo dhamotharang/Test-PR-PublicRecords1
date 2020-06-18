@@ -108,7 +108,7 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_npi',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_phone',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_specialty',true),
-								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_stliclookup',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::from_alpha::hms_stl::hms_stliclookup',true),
 
 			
 					// ),

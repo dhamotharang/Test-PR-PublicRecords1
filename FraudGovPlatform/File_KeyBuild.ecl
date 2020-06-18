@@ -16,6 +16,8 @@ import ut, Std;
 													self.zip	:= left.clean_zip;
 													self.ip_address	:= left.clean_ip_address;
 													self.dob	:= left.clean_dob;
+													self.Drivers_License_State := left.clean_Drivers_License.Drivers_License_State;
+													self.Drivers_License := left.clean_Drivers_License.Drivers_License;
 													self      := left ; )); 
 															
 	// Supress CCPA

@@ -79,14 +79,14 @@ EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneEr
 EXPORT MakeFT_Invalid_CourtOffLev(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_CourtOffLev(SALT311.StrType s,SALT311.StrType vendor) := WHICH(~Scrubs_Crim.fn_CourtOffensesV3Check(s,vendor)>0);
-EXPORT InValidMessageFT_Invalid_CourtOffLev(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Crim.fn_CourtOffensesV3Check'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_CourtOffLev(SALT311.StrType s) := WHICH(~Scrubs_Crim.fn_v3Code_check(s,'COURT_OFF_LEV','COURT_OFFENSES')>0);
+EXPORT InValidMessageFT_Invalid_CourtOffLev(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Crim.fn_v3Code_check'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_ArrOffLev(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_ArrOffLev(SALT311.StrType s,SALT311.StrType vendor) := WHICH(~Scrubs_Crim.fn_ArrestOffensesV3Check(s,vendor)>0);
-EXPORT InValidMessageFT_Invalid_ArrOffLev(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Crim.fn_ArrestOffensesV3Check'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_ArrOffLev(SALT311.StrType s) := WHICH(~Scrubs_Crim.fn_v3Code_check(s,'ARR_OFF_LEV','COURT_OFFENSES')>0);
+EXPORT InValidMessageFT_Invalid_ArrOffLev(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Crim.fn_v3Code_check'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'process_date','offender_key','vendor','state_origin','source_file','data_type','off_comp','off_delete_flag','off_date','arr_date','num_of_counts','le_agency_cd','le_agency_desc','le_agency_case_number','traffic_ticket_number','traffic_dl_no','traffic_dl_st','arr_off_code','arr_off_desc_1','arr_off_desc_2','arr_off_type_cd','arr_off_type_desc','arr_off_lev','arr_statute','arr_statute_desc','arr_disp_date','arr_disp_code','arr_disp_desc_1','arr_disp_desc_2','pros_refer_cd','pros_refer','pros_assgn_cd','pros_assgn','pros_chg_rej','pros_off_code','pros_off_desc_1','pros_off_desc_2','pros_off_type_cd','pros_off_type_desc','pros_off_lev','pros_act_filed','court_case_number','court_cd','court_desc','court_appeal_flag','court_final_plea','court_off_code','court_off_desc_1','court_off_desc_2','court_off_type_cd','court_off_type_desc','court_off_lev','court_statute','court_additional_statutes','court_statute_desc','court_disp_date','court_disp_code','court_disp_desc_1','court_disp_desc_2','sent_date','sent_jail','sent_susp_time','sent_court_cost','sent_court_fine','sent_susp_court_fine','sent_probation','sent_addl_prov_code','sent_addl_prov_desc_1','sent_addl_prov_desc_2','sent_consec','sent_agency_rec_cust_ori','sent_agency_rec_cust','appeal_date','appeal_off_disp','appeal_final_decision','convict_dt','offense_town','cty_conv','restitution','community_service','parole','addl_sent_dates','probation_desc2','court_dt','court_county','arr_off_lev_mapped','court_off_lev_mapped','fcra_offense_key','fcra_conviction_flag','fcra_traffic_flag','fcra_date','fcra_date_type','conviction_override_date','conviction_override_date_type','offense_score','offense_persistent_id','offense_category');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'process_date','offender_key','vendor','state_origin','source_file','data_type','off_comp','off_delete_flag','off_date','arr_date','num_of_counts','le_agency_cd','le_agency_desc','le_agency_case_number','traffic_ticket_number','traffic_dl_no','traffic_dl_st','arr_off_code','arr_off_desc_1','arr_off_desc_2','arr_off_type_cd','arr_off_type_desc','arr_off_lev','arr_statute','arr_statute_desc','arr_disp_date','arr_disp_code','arr_disp_desc_1','arr_disp_desc_2','pros_refer_cd','pros_refer','pros_assgn_cd','pros_assgn','pros_chg_rej','pros_off_code','pros_off_desc_1','pros_off_desc_2','pros_off_type_cd','pros_off_type_desc','pros_off_lev','pros_act_filed','court_case_number','court_cd','court_desc','court_appeal_flag','court_final_plea','court_off_code','court_off_desc_1','court_off_desc_2','court_off_type_cd','court_off_type_desc','court_off_lev','court_statute','court_additional_statutes','court_statute_desc','court_disp_date','court_disp_code','court_disp_desc_1','court_disp_desc_2','sent_date','sent_jail','sent_susp_time','sent_court_cost','sent_court_fine','sent_susp_court_fine','sent_probation','sent_addl_prov_code','sent_addl_prov_desc_1','sent_addl_prov_desc_2','sent_consec','sent_agency_rec_cust_ori','sent_agency_rec_cust','appeal_date','appeal_off_disp','appeal_final_decision','convict_dt','offense_town','cty_conv','restitution','community_service','parole','addl_sent_dates','probation_desc2','court_dt','court_county','arr_off_lev_mapped','court_off_lev_mapped','fcra_offense_key','fcra_conviction_flag','fcra_traffic_flag','fcra_date','fcra_date_type','conviction_override_date','conviction_override_date_type','offense_score','offense_persistent_id','offense_category');
@@ -185,7 +185,7 @@ EXPORT InValid_arr_off_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_arr_off_type_desc(UNSIGNED1 wh) := '';
  
 EXPORT Make_arr_off_lev(SALT311.StrType s0) := MakeFT_Invalid_ArrOffLev(s0);
-EXPORT InValid_arr_off_lev(SALT311.StrType s,SALT311.StrType vendor) := InValidFT_Invalid_ArrOffLev(s,vendor);
+EXPORT InValid_arr_off_lev(SALT311.StrType s) := InValidFT_Invalid_ArrOffLev(s);
 EXPORT InValidMessage_arr_off_lev(UNSIGNED1 wh) := InValidMessageFT_Invalid_ArrOffLev(wh);
  
 EXPORT Make_arr_statute(SALT311.StrType s0) := s0;
@@ -301,7 +301,7 @@ EXPORT InValid_court_off_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_court_off_type_desc(UNSIGNED1 wh) := '';
  
 EXPORT Make_court_off_lev(SALT311.StrType s0) := MakeFT_Invalid_CourtOffLev(s0);
-EXPORT InValid_court_off_lev(SALT311.StrType s,SALT311.StrType vendor) := InValidFT_Invalid_CourtOffLev(s,vendor);
+EXPORT InValid_court_off_lev(SALT311.StrType s) := InValidFT_Invalid_CourtOffLev(s);
 EXPORT InValidMessage_court_off_lev(UNSIGNED1 wh) := InValidMessageFT_Invalid_CourtOffLev(wh);
  
 EXPORT Make_court_statute(SALT311.StrType s0) := s0;

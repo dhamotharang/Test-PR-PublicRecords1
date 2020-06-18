@@ -68,13 +68,17 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isEQCHRestricted ()        := $.compliance.isEQCHRestricted        (DataRestrictionMask);
   EXPORT boolean isTCHRestricted ()         := $.compliance.isTCHRestricted         (DataRestrictionMask);
   EXPORT boolean isTTRestricted ()          := $.compliance.isTTRestricted          (DataRestrictionMask); //TeleTrack
+  EXPORT boolean isAdvoRestricted()         := $.compliance.isAdvoRestricted        (DataRestrictionMask);
   EXPORT boolean isInfutorMVRestricted ()   := $.compliance.isInfutorMVRestricted   (DataRestrictionMask); //Infutor Motorvehicles
   EXPORT boolean isPreGLBRestricted ()      := $.compliance.isPreGLBRestricted      (DataRestrictionMask);
   EXPORT boolean isFdnInquiry ()            := $.compliance.isFdnInquiry            (DataRestrictionMask);
   EXPORT boolean isJuliRestricted ()        := $.compliance.isJuliRestricted        (DataRestrictionMask);
+  EXPORT boolean isAccuDataRestricted    () := $.compliance.isAccuDataRestricted    (DataRestrictionMask);
   EXPORT BOOLEAN isBriteVerifyRestricted () := $.compliance.isBriteVerifyRestricted (DataRestrictionMask); // BriteVerify gateway for Email verification 
 
   EXPORT boolean isHeaderSourceRestricted (string2 src) := 
            $.compliance.isHeaderSourceRestricted (src, DataRestrictionMask);
 
+  EXPORT BOOLEAN use_DnB()                  := $.compliance.use_DnB(DataPermissionMask);
+   
 END;

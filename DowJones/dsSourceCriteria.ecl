@@ -1886,6 +1886,21 @@ EXPORT dsSourceCriteria := DATASET([
 {'United Arab Emirates National List of Terrorists','1873'},
 {'EC (CFSP) 2020/512 Iran List','1874'},
 {'EC 2020/510 Iran List','1875'},
-{'Kingdom of Bahrain Terrorists List','1876'}
+{'Kingdom of Bahrain Terrorists List','1876'},
+{'EC (CFSP) 2020/563 Myanmar/Burma List','1877'},
+{'EC 2020/562 Myanmar/Burma List','1878'},
+{'EC (CFSP) 2020/584 Central African Republic List','1879'},
+{'EC (CFSP) 2020/607 Nicaragua List','1880'},
+{'EC 2020/582 Central African Republic List','1881'},
+{'EC 2020/606 Nicaragua List','1882'},
+{'EC (CFSP) 2020/719 Syria List','1883'},
+{'EC (CFSP) 2020/720 Central African Republic List','1884'},
+{'EC 2020/706 ISIL (Da\'esh) and Al-Qaida List','1885'},
+{'EC 2020/716 Syria List','1886'},
+{'EC 2020/717 Central African Republic List','1887'},
+{'UN Security Council Resolution 1518 (2003) Iraq List','1888'},
+{'EC (CFSP) 2020/733 Democratic People\'s Republic of Korea List','1889'},
+{'EC 2020/730 Democratic People\'s Republic of Korea List','1890'},
+{'EC 2020/736 Banned Air Carriers List','1891'}
 ],r);
 

@@ -1,4 +1,4 @@
-import tools,aid,address,mdr,TopBusiness_External,Business_Header_SS,business_header,DID_Add,business_headerv2,bipv2;
+﻿import tools,aid,address,mdr,TopBusiness_External,Business_Header_SS,business_header,DID_Add,business_headerv2,bipv2;
 
 export Update_Contacts(
 
@@ -35,6 +35,10 @@ function
 															,'clean_Name.fname'				 
 															,'clean_Name.mname'				 
 															,'clean_Name.lname'   );
-	dAppendBdid_persist := project(dAppendBdid	,layouts.base.contacts) : persist(persistnames().UpdateContacts);
- 	return dAppendBdid_persist;	
+	dAppendBdid_proj := project(dAppendBdid	,layouts.base.contacts);
+	
+	// Jira# CCPA-1029 - Populate Global_SID's
+	addGlobalSID		:= MDR.macGetGlobalSid(dAppendBdid_proj, 'DCA', 'file_type', 'global_sid') : persist(persistnames().UpdateContacts); 
+	
+ 	return addGlobalSID;	
 end;

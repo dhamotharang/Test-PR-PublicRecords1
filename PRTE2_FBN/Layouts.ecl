@@ -116,7 +116,7 @@ EXPORT Combined_Contact_Base := RECORD
     Combined_Contact_Base_ext and not link_bus_name;
 
 	END;
-/*  	
+
 Export clean_Layout:=record
 FBNV2.Layout_Common.Contact_AID;
 unsigned8	nid;
@@ -133,5 +133,5 @@ string20	cln_lname2;
 string5		cln_suffix2;
 unsigned2	name_ind;
 end;
-*/
+
 End;

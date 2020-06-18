@@ -106,7 +106,7 @@ xpnd_layout xpndrecs(flc6 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr;
 self.ded_dob := l.ded_dob[5..8]+l.ded_dob[1..4] ;
 self.ped_race_desc := '';
@@ -117,7 +117,7 @@ end;
 pflc6:= project(flc6,xpndrecs(left));
 
 //ecrash 
-ecrashFile := eCrashBaseAgencyExclusion(StringLib.StringToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
+ecrashFile := eCrashBaseAgencyExclusion(STD.Str.ToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
 																																													 'PEDESTRIAN',
 																																								 					 'PEDETRIAN',
 																																													 'PEDISTRIAN']); 
@@ -126,7 +126,7 @@ xpnd_layout xpndecrash(ecrashFile L) := transform
   self.did							    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
   self.rec_type_6						:= '6';
   t_accident_nbr 			      := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
-  t_scrub                   := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+  t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
   self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
   self.orig_accnbr          := t_accident_nbr;
   self.addr_suffix 				  := L.addr_suffix;
@@ -153,7 +153,7 @@ end;
 pecrash := project(ecrashFile,xpndecrash(left));  
 /*
 // iyetek 
-pieyetk := FLAccidents_Ecrash.BaseFile_Iyetek(StringLib.StringToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
+pieyetk := FLAccidents_Ecrash.BaseFile_Iyetek(STD.Str.ToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
 'PEDESTRIAN',
 'PEDETRIAN',
 'PEDISTRIAN']); 
@@ -161,7 +161,7 @@ pieyetk := FLAccidents_Ecrash.BaseFile_Iyetek(StringLib.StringToUpperCase(trim(p
 xpnd_layout xpndiyetek(pieyetk L) := transform
 
 self.rec_type_6         := '6';
-t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 self.section_nbr := l.vehicle_unit_number; 

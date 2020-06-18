@@ -1,6 +1,8 @@
 import Infutor, Std;
 
-	main := reunion.files.dMain;
+EXPORT mapping_indicator_flags(unsigned1 mode, STRING sVersion) := MODULE
+
+	main := reunion.files(mode).dMain;
 
 	flags := Infutor.GetIndicatorFlags(main, adl, best_fname,best_mname,best_lname,best_name_suffix,best_city,best_st);
 
@@ -10,4 +12,6 @@ import Infutor, Std;
 	END;
 
 
-EXPORT mapping_indicator_flags := PROJECT(flags, t1(left));
+EXPORT all := PROJECT(flags, t1(left));
+
+END;

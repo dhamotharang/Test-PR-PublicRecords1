@@ -142,7 +142,13 @@
 '15383341', //CC-2884 Dempsey correction removal
 '8350301', //DF-27536 Dulplicate record removal 
 '15406531', //CC-2996 Dempsey correction removal
-'15405761' //CC-2995 Dempsey correction removal
+'15405761', //CC-2995 Dempsey correction removal
+'6981291', //CC-3079 Dempsey correction removal
+'6466521', //CC-3079 Dempsey correction removal
+'15432971', //CC-3142 Dempsey correction removal
+'15406481', //CC-3160 Dempsey correction removal
+'15406491', //CC-3160 Dempsey correction removal
+'15406501'  //CC-3160 Dempsey correction removal
 ];
 
 

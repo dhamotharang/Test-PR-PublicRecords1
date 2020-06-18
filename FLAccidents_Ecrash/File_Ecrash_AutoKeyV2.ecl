@@ -1,4 +1,4 @@
-/*2016-03-30T17:57:04Z (Srilatha Katukuri)
+﻿/*2016-03-30T17:57:04Z (Srilatha Katukuri)
 Bug# 200197 - Modified to not to include blank orig last names
 */
 /*2016-03-23T18:31:08Z (Srilatha Katukuri)
@@ -9,7 +9,7 @@ import standard,FLAccidents, std;
 base_file := FLAccidents_Ecrash.File_KeybuildV2.out;
 
 
-FLAccidents_Ecrash.Layout_keybuild_SSv2 copyNames(FLAccidents_Ecrash.Layout_keybuild_SSv2 le) := TRANSFORM
+Layout_eCrash.Consolidation copyNames(Layout_eCrash.Consolidation le) := TRANSFORM
 		SELF.fname := le.orig_fname;
 		SELF.lname := le.orig_lname;
 		self.mname := le.orig_mname;

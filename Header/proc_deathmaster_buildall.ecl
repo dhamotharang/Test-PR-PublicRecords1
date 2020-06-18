@@ -21,7 +21,7 @@ FUNCTION
 
 // Call to update dops Keys
     updateDops := PARALLEL(RoxieKeyBuild.updateversion('DeathMasterKeys',filedate,IF(emailTarget<>'',emailTarget,Death_Master.Spray_Notification_Email_Address),,'N|B'),
-                             RoxieKeyBuild.updateversion('FCRA_DeathMasterKeys',filedate,IF(emailTarget<>'',emailTarget,Death_Master.Spray_Notification_Email_Address),,'F'),
+                             //RoxieKeyBuild.updateversion('FCRA_DeathMasterKeys',filedate,IF(emailTarget<>'',emailTarget,Death_Master.Spray_Notification_Email_Address),,'F'),
                              RoxieKeyBuild.updateversion('DeathMasterSsaKeys',filedate,IF(emailTarget<>'',emailTarget,Death_Master.Spray_Notification_Email_Address),,'N|B'),
                              RoxieKeyBuild.updateversion('FCRA_DeathMasterSsaKeys',filedate,IF(emailTarget<>'',emailTarget,Death_Master.Spray_Notification_Email_Address),,'F'));
 
@@ -38,7 +38,7 @@ FUNCTION
 											,Header.proc_deathmaster_buildkey_ssa(filedate)
 											,Death_Master.proc_autokeybuild(filedate)
 											,Death_Master.proc_autokeybuild_ssa(filedate)
-											,Death_master.Proc_Build_Boolean_key(filedate)
+											//,Death_master.Proc_Build_Boolean_key(filedate)
 											,Death_master.Proc_Build_Boolean_key_ssa(filedate)
 											,Header.out_base_dev_stats_deaths(filedate)
 											,Header.out_base_dev_stats_deaths_ssa(filedate)
@@ -52,7 +52,7 @@ FUNCTION
 											,updateDops																					
 											,Orbit3.proc_Orbit3_CreateBuild ('Death Master',filedate, 'N|B')
 											,Orbit3.proc_Orbit3_CreateBuild ('Death Master SSA',filedate, 'N|B')
-											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master',filedate,'F')
+											//,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master',filedate,'F')
 											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master SSA',filedate,'F')
 												): SUCCESS(sendSuccMsg), FAILURE(sendFailMsg);
 	RETURN result;

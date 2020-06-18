@@ -16,7 +16,8 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 
 	// Filter records w/o ORG_NAME being not populated
 	ValidAprFile	:= Prof_License_Mari.file_KSS0902.apr(ORG_NAME != '' AND 
-																									        NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUppercase(TRIM(ORG_NAME,LEFT,RIGHT))));
+	                                                    ut.CleanSpacesAndUpper(LICENSE_TYPE) != 'S' AND 
+																									    NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, ut.CleanSpacesAndUpper(ORG_NAME)));
 
   oApr	:= OUTPUT(ValidAprFile);
 	

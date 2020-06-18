@@ -79,6 +79,7 @@ export layouts:= Module
 		string8					date_of_death; 
 		string1					gender;	
 		string6					upin;
+		string1					cpa_optout;
 	end;
 	// Provider Status 
 	//		D  = Provider confirmed deceased (only used when SSN is populated on input)
@@ -642,7 +643,7 @@ export layouts:= Module
 	end;
 
 	export individual_base	:= RECORD
-			individual_input;
+			individual_input - [cpa_optout];
 			src_and_date;
 			UNSIGNED6 did	:= 0;
 			UNSIGNED2 did_score		:= 0;
@@ -706,7 +707,77 @@ export layouts:= Module
 			Sanction_input.sanc1_lic_num;
 			Sanction_input.sanc1_rein_date;
 
-			BIPV2.IDlayouts.l_xlink_ids;
+			BIPV2.IDlayouts.l_xlink_ids;					// pushing opt out flag to dotid to avoid layout change 
+			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
+			unsigned8 								record_sid; 
+	END;
+	
+	export individual_base_temp	:= RECORD
+			individual_input; // carry cpa_optout field temporarily
+			src_and_date;
+			UNSIGNED6 did	:= 0;
+			UNSIGNED2 did_score		:= 0;
+			INTEGER2	xadl2_weight 				:= 0;
+			UNSIGNED2	xadl2_score	 				:= 0;
+			INTEGER1	xadl2_distance			:= 0;
+			UNSIGNED4	xadl2_keys_used			:= 0;
+			STRING		xadl2_keys_desc			:= '';
+			STRING60	xadl2_matches				:= '';
+			STRING		xadl2_matches_desc	:= '';			
+			UNSIGNED6 bdid :=0;
+			UNSIGNED1 bdid_score := 0;	
+			clean_name;
+			STRING100	clean_company_name;
+
+			Address_base.normed_addr_rec_type;
+			clean_address;
+
+			Address_input.addr_key;
+			Address_input.primary_location;
+			Address_input.prac_addr_ind;
+			Address_input.bill_addr_ind;
+			Address_input.addr_conf_score;
+			Address_input.addr_rectype;
+			Address_base.clean_last_verify_date;
+			Address_input.phone1;
+			Address_input.prac1_phone_ind;
+			Address_input.bill1_phone_ind;
+			Address_input.fax1;
+			Address_input.prac1_fax_ind;
+			Address_input.bill1_fax_ind;
+
+			string8		clean_dob;
+			UNSIGNED4	best_dob;
+			string9		clean_ssn;
+			string9		best_ssn;
+
+			License_input.lic_state	;
+			License_input.lic_num_in;
+			License_input.lic_num;
+			License_input.lic_type;
+			License_input.lic_status;
+			License_input.lic_begin_date;
+			License_input.lic_end_date;
+
+			NPI_input.npi_num;
+			NPI_input.taxonomy;
+			NPI_input.type1;
+			NPI_input.classification;
+			NPI_input.taxonomy_primary_ind;
+			NPI_input.npi_enum_date;
+			NPI_input.npi_deact_date;
+
+			DEA_input.dea_num;
+			DEA_input.dea_num_exp;
+			DEA_input.dea_bus_act_ind;
+
+			Sanction_input.sanc1_date;
+			Sanction_input.sanc1_code;
+			Sanction_input.sanc1_state;
+			Sanction_input.sanc1_lic_num;
+			Sanction_input.sanc1_rein_date;
+
+			BIPV2.IDlayouts.l_xlink_ids;					// pushing opt out flag to dotid to avoid layout change 
 			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
 			unsigned8 								record_sid; 
 	END;

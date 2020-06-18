@@ -11,7 +11,7 @@ import BizLinkFull, BIPV2_xlink_segmentation;
 #UNIQUENAME(OutputAllFields) 
 %OutputAllFields% := JOIN(inputFile, %resultCombine%, left.inReference_field = right.reference_biz, TRANSFORM(RECORDOF(LEFT),
 																																																		SELF.results_seleid := RIGHT.results_seleid;
-																																																		SELF := LEFT;),LEFT OUTER);//join with input file																																																				
+																																																		SELF := LEFT;),LEFT OUTER,HASH);//join with input file																																																				
 #UNIQUENAME(sortSeleResults)
 %sortSeleResults% := PROJECT(%OutputAllFields%, TRANSFORM(RECORDOF(left), 
                                                                   self.results_seleid := sort(left.results_seleid,-Weight,-(seleid=LEFT.Results[1].seleid),-seleid);//same as Process_Biz_Layouts.CombineAllScores

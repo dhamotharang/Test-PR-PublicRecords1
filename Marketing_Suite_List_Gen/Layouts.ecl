@@ -300,7 +300,10 @@ export Layouts := module
 		unsigned8		Cnt_Cities_Returned;
 		decimal8_2	Per_Cities_Returned;		
 		unsigned8		Cnt_Zip_Codes_Returned;
-		decimal8_2	Per_Zip_Codes_Returned;		
+		decimal8_2	Per_Zip_Codes_Returned;
+		
+		unsigned8		Cnt_Bus_Emails_Returned;
+		decimal8_2	Per_Bus_Emails_Returned;		
 
 		unsigned8		Cnt_Revenue_Less_150000;
 		decimal8_2	Per_Revenue_Less_150000;
@@ -345,6 +348,20 @@ export Layouts := module
 		decimal8_2	Per_1250_1499_Employees;
 		unsigned8		Cnt_1500_and_Above_Employees;
 		decimal8_2	Per_1500_and_Above_Employees;
+
+		unsigned8		Cnt_Less_Than_2_Years;
+		decimal8_2	Per_Less_Than_2_Years;		
+		unsigned8		Cnt_2_5_Years;
+		decimal8_2	Per_2_5_Years;	
+		unsigned8		Cnt_6_10_Years;
+		decimal8_2	Per_6_10_Years;
+		unsigned8		Cnt_More_Than_10_Years;
+		decimal8_2	Per_More_Than_10_Years;
+		
+		unsigned8		Cnt_Total_SIC;
+		decimal8_2	Per_Total_SIC;
+		unsigned8		Cnt_Total_NAICS;
+		decimal8_2	Per_Total_NAICS;
 		
 		unsigned8		Cnt_SIC_Agriculture_Forestry_And_Fishing;
 		decimal8_2	Per_SIC_Agriculture_Forestry_And_Fishing;	

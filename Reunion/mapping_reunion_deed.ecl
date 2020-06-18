@@ -1,6 +1,10 @@
 import address;
 
-reunion.layouts.l_deed t1(reunion.deeds le) := transform
+EXPORT mapping_reunion_deed(unsigned1 mode, STRING sVersion) := MODULE
+
+deed := reunion.deeds(mode);
+
+reunion.layouts.l_deed t1(deed le) := transform
  self.main_adl             := intformat(le.did,12,1);
  self.state                := le.state;
  self.county               := le.county_name;
@@ -43,4 +47,6 @@ reunion.layouts.l_deed t1(reunion.deeds le) := transform
  self.legal_description    := le.legal_brief_description;
 end;
 
-export mapping_reunion_deed := dedup(project(reunion.deeds,t1(left)),record,all);
+EXPORT all := dedup(project(deed, t1(left)),record,all);
+
+END;
