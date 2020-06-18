@@ -58,7 +58,7 @@
 		,state_field := state
 		,phone_field := phone10
 		,fein_field := fein
-		,outrec := BIPV2.IdAppendLayouts.IdsOnly
+		,outrec := BIPV2.IdAppendLayouts.IdsOnlyDebug
 		,bool_outrec_has_score := true
 		,keep_count := '1'
 		,score_threshold := score_threshold
