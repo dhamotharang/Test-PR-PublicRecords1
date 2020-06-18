@@ -77,10 +77,11 @@ EXPORT InValidFT_invalid_endorsements(SALT311.StrType s) := WHICH(LENGTH(TRIM(s)
 EXPORT InValidMessageFT_invalid_endorsements(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('23HMNOPQRSTX '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_restrictions(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPVWXZ '); // Only allow valid symbols
+  RETURN  s1;
 END;
-EXPORT InValidFT_invalid_restrictions(SALT311.StrType s) := WHICH(~Scrubs_DL_OH.Functions.fn_verify_RestrictionCode(s)>0);
-EXPORT InValidMessageFT_invalid_restrictions(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_DL_OH.Functions.fn_verify_RestrictionCode'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_restrictions(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPVWXZ '))));
+EXPORT InValidMessageFT_invalid_restrictions(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPVWXZ '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alpha_num_bnk(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
@@ -136,7 +137,7 @@ EXPORT InValidMessageFT_invalid_clean_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hy
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'process_date','key_number','license_number','license_class','donor_flag','hair_color','eye_color','weight_l','height_feet','height_inches','sex_gender','permanent_license_issue_date','license_expiration_date','restriction_codes','endorsement_codes','first_name','middle_name','last_name','street_address','city','state','zip_code','county_number','birth_date','clean_name_prefix','clean_fname','clean_mname','clean_lname');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'process_date','key_number','license_number','license_class','donor_flag','hair_color','eye_color','weight_l','height_feet','height_inches','sex_gender','permanent_license_issue_date','license_expiration_date','restriction_codes','endorsement_codes','first_name','middle_name','last_name','street_address','city','state','zip_code','county_number','birth_date','clean_name_prefix','clean_fname','clean_mname','clean_lname');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'process_date' => 0,'key_number' => 1,'license_number' => 2,'license_class' => 3,'donor_flag' => 4,'hair_color' => 5,'eye_color' => 6,'weight_l' => 7,'height_feet' => 8,'height_inches' => 9,'sex_gender' => 10,'permanent_license_issue_date' => 11,'license_expiration_date' => 12,'restriction_codes' => 13,'endorsement_codes' => 14,'first_name' => 15,'middle_name' => 16,'last_name' => 17,'street_address' => 18,'city' => 19,'state' => 20,'zip_code' => 21,'county_number' => 22,'birth_date' => 23,'clean_name_prefix' => 24,'clean_fname' => 25,'clean_mname' => 26,'clean_lname' => 27,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['ENUM'],['CUSTOM','LENGTHS'],['CUSTOM','LENGTHS'],['CUSTOM'],['ALLOW'],['CUSTOM'],[],[],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['CUSTOM','LENGTHS'],[],['CUSTOM'],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['ENUM'],['CUSTOM','LENGTHS'],['CUSTOM','LENGTHS'],['ALLOW'],['ALLOW'],['CUSTOM'],[],[],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['CUSTOM','LENGTHS'],[],['CUSTOM'],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

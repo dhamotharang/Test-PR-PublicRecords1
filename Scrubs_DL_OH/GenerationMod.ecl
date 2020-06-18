@@ -68,7 +68,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_height:CUSTOM(Scrubs_DL_OH.Functions.fn_verify_height>0,height_inches)\n'
     + 'FIELDTYPE:invalid_gender:ENUM(F|M|U|)\n'
     + 'FIELDTYPE:invalid_endorsements:ALLOW(23HMNOPQRSTX )\n'
-    + 'FIELDTYPE:invalid_restrictions:CUSTOM(Scrubs_DL_OH.Functions.fn_verify_RestrictionCode>0)\n'
+    + 'FIELDTYPE:invalid_restrictions:ALLOW(0123456789ABCDEFGHIJKLMNOPVWXZ )\n'
     + 'FIELDTYPE:invalid_alpha_num_bnk:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ )\n'
     + 'FIELDTYPE:invalid_8generaldate:LENGTHS(8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)\n'
     + 'FIELDTYPE:invalid_name:CUSTOM(scrubs.functions.fn_populated_strings>0,middle_name,last_name)\n'

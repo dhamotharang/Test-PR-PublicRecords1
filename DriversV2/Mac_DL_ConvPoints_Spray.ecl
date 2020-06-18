@@ -53,7 +53,7 @@ macro
 #workunit('name', state + ' DrvLic Conviction/Points Spray');
 
 %st%    						 := stringlib.StringToUpperCase(trim(state,left,right));
-%sourceCsvSeparater% := if(state ='OH','\\t','\\|');
+%sourceCsvSeparater% := if(%st% ='OH','\\t','\\|');
 %sourceCsvTeminater% := '\\n,\\r\\n';
 %sourceCsvQuote%     := '\"';
 
@@ -106,10 +106,11 @@ macro
 	#if (%stype% = 'MO_DPRDPS')
 	  %recSize% := 74;   //ebcdic
 	#end
-*/
+
 	#if (%stype% = 'OH')
 	  %recSize% := 602;  //OH Convictions data
 	#end
+*/
 	#if (%stype% = 'MN')
 	  %recSize% := 245;  //MN Convictions data
 	#end
@@ -176,7 +177,7 @@ macro
 		#end
 	*/
 		#if(%stype% = 'OH')
-			DriversV2.Layouts_DL_OH_In.Layout_OH_CP;  // Fixed length vendor raw data structure
+			DriversV2.Layouts_DL_OH_In.Layout_OH_CP;  // Varying length vendor raw data structure
 		#end
 		#if(%stype% = 'MN')
 			DriversV2.Layouts_DL_MN_In.Layout_MN_Convic;  // Fixed length vendor raw data structure

@@ -2,13 +2,6 @@
 
 export OH_as_DL (dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned) in_file):=function
 
-	// process each two-character restriction code
-	string f2CharCodeAndComma(string pRestrictionCode) := if(trim(pRestrictionCode,right)<>'', ',' + trim(pRestrictionCode,right) ,'' );
-
-	TrimUpper(STRING s):= FUNCTION
-	RETURN std.str.touppercase(std.str.cleanspaces(s));
-	END;
-
 	DriversV2.Layout_DL_Extended intof(DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned l) := transform 
 
 		self.orig_state 			    		    := 'OH';
@@ -18,10 +11,10 @@ export OH_as_DL (dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned) in_file):
 		self.dt_vendor_first_reported     := (unsigned8)l.process_date div 100;
 		self.dt_vendor_last_reported	    := (unsigned8)l.process_date div 100;
 		self.dateReceived		  				    := (integer)l.process_date;	
-		self.name											    := TrimUpper(TrimUpper(l.First_Name)+' '+ TrimUpper(l.Middle_Name)+' '+ 
-																							     TrimUpper(l.Last_Name)+' '+ TrimUpper(l.Suffix) );
-		self.RawFullName							    := TrimUpper(TrimUpper(l.First_Name)+' '+ TrimUpper(l.Middle_Name)+' '+ 
-																							     TrimUpper(l.Last_Name)+' '+ TrimUpper(l.Suffix) );																							 
+		self.name											    := DriversV2.functions.TrimUpper(DriversV2.functions.TrimUpper(l.First_Name)+' '+ DriversV2.functions.TrimUpper(l.Middle_Name)+' '+ 
+																																			 DriversV2.functions.TrimUpper(l.Last_Name)+' '+ DriversV2.functions.TrimUpper(l.Suffix) );
+		self.RawFullName							    := DriversV2.functions.TrimUpper(DriversV2.functions.TrimUpper(l.First_Name)+' '+ DriversV2.functions.TrimUpper(l.Middle_Name)+' '+ 
+																																			 DriversV2.functions.TrimUpper(l.Last_Name)+' '+ DriversV2.functions.TrimUpper(l.Suffix) );																							 
 		self.DLCP_Key         				    := l.Key_Number;
 		self.dl_key_number    				    := l.Key_Number;
 		self.dl_number        				    := l.License_Number;
@@ -48,20 +41,20 @@ export OH_as_DL (dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned) in_file):
 		self.restrictions     				    := l.Restriction_Codes;
 		self.restrictions_delimited 	    := if(trim(l.Restriction_Codes,all)<>'', 
 																						trim(l.Restriction_Codes[1..2],right) +
-																						f2CharCodeAndComma(l.Restriction_Codes[3..4]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[5..6]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[7..8]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[9..10]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[11..12]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[13..14]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[15..16]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[17..18]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[19..20]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[21..22]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[23..24]) + 
-																						f2CharCodeAndComma(l.Restriction_Codes[25..26]) +
-																						f2CharCodeAndComma(l.Restriction_Codes[27..28]) +
-																						f2CharCodeAndComma(l.Restriction_Codes[29..30]),
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[3..4]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[5..6]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[7..8]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[9..10]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[11..12]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[13..14]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[15..16]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[17..18]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[19..20]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[21..22]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[23..24]) + 
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[25..26]) +
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[27..28]) +
+																						DriversV2.functions.f2CharCodeAndComma(l.Restriction_Codes[29..30]),
 																						'');
 		self.expiration_date		          := (unsigned4)(l.License_Expiration_Date);
 		self.orig_expiration_date         := (unsigned4)(l.License_Expiration_Date);

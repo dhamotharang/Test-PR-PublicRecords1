@@ -122,7 +122,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     license_expiration_date_CUSTOM_ErrorCount := COUNT(GROUP,h.license_expiration_date_Invalid=1);
     license_expiration_date_LENGTHS_ErrorCount := COUNT(GROUP,h.license_expiration_date_Invalid=2);
     license_expiration_date_Total_ErrorCount := COUNT(GROUP,h.license_expiration_date_Invalid>0);
-    restriction_codes_CUSTOM_ErrorCount := COUNT(GROUP,h.restriction_codes_Invalid=1);
+    restriction_codes_ALLOW_ErrorCount := COUNT(GROUP,h.restriction_codes_Invalid=1);
     endorsement_codes_ALLOW_ErrorCount := COUNT(GROUP,h.endorsement_codes_Invalid=1);
     first_name_CUSTOM_ErrorCount := COUNT(GROUP,h.first_name_Invalid=1);
     street_address_ALLOW_ErrorCount := COUNT(GROUP,h.street_address_Invalid=1);
@@ -142,9 +142,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.process_date_Total_ErrorCount > 0, 1, 0) + IF(le.key_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.donor_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.hair_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eye_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.weight_l_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.height_feet_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sex_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_Total_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_Total_ErrorCount > 0, 1, 0) + IF(le.restriction_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.endorsement_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_Total_ErrorCount > 0, 1, 0) + IF(le.clean_fname_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.process_date_Total_ErrorCount > 0, 1, 0) + IF(le.key_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.donor_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.hair_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eye_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.weight_l_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.height_feet_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sex_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_Total_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_Total_ErrorCount > 0, 1, 0) + IF(le.restriction_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.endorsement_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_Total_ErrorCount > 0, 1, 0) + IF(le.clean_fname_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.key_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.donor_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.hair_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eye_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.weight_l_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.height_feet_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sex_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.restriction_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.endorsement_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birth_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_fname_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.key_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.donor_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.hair_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.eye_color_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.weight_l_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.height_feet_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sex_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.permanent_license_issue_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.license_expiration_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.restriction_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.endorsement_codes_ALLOW_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birth_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_fname_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -174,7 +174,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.sex_gender_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.permanent_license_issue_date_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.license_expiration_date_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.restriction_codes_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.restriction_codes_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.endorsement_codes_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.first_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.street_address_Invalid,'ALLOW','UNKNOWN')
@@ -211,7 +211,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'sex_gender:invalid_gender:ENUM'
           ,'permanent_license_issue_date:invalid_8pastdate:CUSTOM','permanent_license_issue_date:invalid_8pastdate:LENGTHS'
           ,'license_expiration_date:invalid_8generaldate:CUSTOM','license_expiration_date:invalid_8generaldate:LENGTHS'
-          ,'restriction_codes:invalid_restrictions:CUSTOM'
+          ,'restriction_codes:invalid_restrictions:ALLOW'
           ,'endorsement_codes:invalid_endorsements:ALLOW'
           ,'first_name:invalid_name:CUSTOM'
           ,'street_address:invalid_street:ALLOW'
@@ -271,7 +271,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.sex_gender_ENUM_ErrorCount
           ,le.permanent_license_issue_date_CUSTOM_ErrorCount,le.permanent_license_issue_date_LENGTHS_ErrorCount
           ,le.license_expiration_date_CUSTOM_ErrorCount,le.license_expiration_date_LENGTHS_ErrorCount
-          ,le.restriction_codes_CUSTOM_ErrorCount
+          ,le.restriction_codes_ALLOW_ErrorCount
           ,le.endorsement_codes_ALLOW_ErrorCount
           ,le.first_name_CUSTOM_ErrorCount
           ,le.street_address_ALLOW_ErrorCount
@@ -301,7 +301,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.sex_gender_ENUM_ErrorCount
           ,le.permanent_license_issue_date_CUSTOM_ErrorCount,le.permanent_license_issue_date_LENGTHS_ErrorCount
           ,le.license_expiration_date_CUSTOM_ErrorCount,le.license_expiration_date_LENGTHS_ErrorCount
-          ,le.restriction_codes_CUSTOM_ErrorCount
+          ,le.restriction_codes_ALLOW_ErrorCount
           ,le.endorsement_codes_ALLOW_ErrorCount
           ,le.first_name_CUSTOM_ErrorCount
           ,le.street_address_ALLOW_ErrorCount
