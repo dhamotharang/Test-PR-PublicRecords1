@@ -106,11 +106,10 @@ macro
 	#if (%stype% = 'MO_DPRDPS')
 	  %recSize% := 74;   //ebcdic
 	#end
-
-	#if (%stype% = 'OH')
-	  %recSize% := 602;  //OH Convictions data
-	#end
 */
+	#if (%stype% = 'OH')
+	  %recSize% := 602;  //JIRA :DF-27470!!Spraying OH data as varying length 
+	#end
 	#if (%stype% = 'MN')
 	  %recSize% := 245;  //MN Convictions data
 	#end
