@@ -846,6 +846,35 @@ Export CIID := RECORD
 		STRING2		best_drivers_license_state := '';
 		STRING25	best_drivers_license := '';    
 		unsigned8   best_drivers_license_exp := 0;
+	    unsigned8 best_drivers_dt_first_seen := '';
+	    unsigned8 best_drivers_dt_last_seen := '';
+	    string8   Reported_Date := '';
+ END;
+
+EXPORT Drivers_Batch := MODULE
+
+    import Autokey_batch,DriversV2_Services;
+    
+    SHARED ResultNarrow := DriversV2_Services.layouts.result_narrow;
+
+		SHARED AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
+		SHARED Seq := DriversV2_Services.layouts.seq;
+		SHARED AcctRec := RECORD(Seq)
+			AutoKeyBatchInput.acctno;
+			UNSIGNED6	did := 0;
+			STRING24	dl_number := '';
+			STRING2		dlstate := '';
+		END;		
+		EXPORT layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
+		EXPORT layout_out := RECORD(ResultNarrow)
+			AcctRec.acctno;
+			STRING10	height_desc;
+		END;
+ END;   
+
+ EXPORT DLHistory := RECORD
+		unsigned6 	did;
+    Drivers_Batch.layout_out;
  END;
 
  EXPORT CoverageDates := RECORD
