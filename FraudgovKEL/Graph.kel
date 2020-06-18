@@ -1743,7 +1743,7 @@ Event: => T_InpClnAddrZip5Echo := MAP(Zip = '' OR Zip:Null OR Zip=0 => -99999, Z
 Event: => T_InpClnAddrZip4Echo := MAP(Zip4 = '' OR Zip4:Null OR Zip=0 => -99999, Zip4);
 Event: => T_InpClnAddrLatEcho := MAP(Latitude:Null OR Latitude=0 => -99999, Latitude);
 Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null OR Longitude=0 => -99999, Longitude);
-Event: => T_InpClnAddrCountyEcho := MAP(County = '' OR County:Null OR County=0 => -99999, County);
+Event: => T_InpClnAddrCountyEcho := MAP(fips_county='' OR fips_county:Null OR fips_state='' OR fips_state:Null => -99999, fips_state+fips_county);
 Event: => T_InpClnAddrGeoBlkEcho := MAP(GeoBlock = '' OR GeoBlock:Null OR GeoBlock=0 => -99999, GeoBlock);
 
 Event: => T_InpClnSsnEcho := MAP(Ssn = '' OR Ssn:Null OR Ssn = '000000000' => -99999, TRIM(Ssn));
