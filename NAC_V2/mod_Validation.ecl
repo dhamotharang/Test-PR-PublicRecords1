@@ -52,7 +52,7 @@ EXPORT mod_Validation := MODULE
 	//shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(NOT IsValidName(name),
 	shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(name='',
 										DATASET([{errcodes.E110, 'E', 'F', FieldCode('E',errcodes.E110), name, state, RecordCode}], rErr)); 
-	shared suffix_set := ['I','II', 'III','IV','V', 'JR', 'SR'];
+	shared suffix_set := ['I','II', 'III','IV','V','VI', 'JR', 'SR'];
 	
 	shared ValidSsn(string9 ssn, string1 ssnType, string2 state, string4 RecordCode) := 
 				IF(ssnType = Mod_Sets.Actual_Type AND NOT REGEXFIND('^\\d{9}$', TRIM(ssn)), 
@@ -76,8 +76,10 @@ EXPORT mod_Validation := MODULE
 										
 	shared ValidStartDate(string date, string2 state, string4 RecordCode) := IF(NOT IsValidDate(date), 
 										DATASET([{errcodes.E117, 'E', 'F', FieldCode('E',errcodes.E117), date, state, RecordCode}], rErr));
-	shared ValidEndDate(string date, string2 state, string4 RecordCode) := IF(NOT IsValidDate(date), 
-										DATASET([{errcodes.E118, 'E', 'F', FieldCode('E',errcodes.E118), date, state, RecordCode}], rErr));
+	shared ValidEndDate(string startdate, string enddate, string2 state, string4 RecordCode) := 
+							IF(NOT IsValidDate(enddate),	// OR 
+								//(IsValidDate(startdate) AND IsValidDate(enddate) AND (unsigned)enddate < (unsigned)startdate),
+										DATASET([{errcodes.E118, 'E', 'F', FieldCode('E',errcodes.E118), enddate, state, RecordCode}], rErr));
 	// ** Address Validation
 	rgxValidStreet := '[A-Z0-9.,#/&_"\' -]+$';
 	shared validStreet(string street) := 
@@ -115,7 +117,7 @@ EXPORT mod_Validation := MODULE
 							+ ValidEligibilityStatus(left.Eligibility, left.ProgramState, left.RecordCode)
 							+ ValidEligibilityPeriod(left.PeriodType, left.ProgramState, left.RecordCode)
 							+ ValidStartDate(left.StartDate, left.ProgramState, left.RecordCode)
-							+ ValidEndDate(left.EndDate, left.ProgramState, left.RecordCode)
+							+ ValidEndDate(left.StartDate, left.EndDate, left.ProgramState, left.RecordCode)
 							// warnings
 							+ ValidEligibilityDate(left.EffectiveDate, left.Eligibility, left.ProgramState, left.RecordCode)
 							+	IF(HasInvalidChar(left.LastName), 

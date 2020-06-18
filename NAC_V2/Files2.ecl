@@ -6,7 +6,7 @@
 	export dsAddressRecords := DATASET(Superfile_List.sfAddressRecords, Layouts2.rAddressEx, THOR, opt);	
 	export dsCaseRecords := DATASET(Superfile_List.sfCaseRecords, Layouts2.rCaseEx, THOR, opt);	
 	
-	export dsNCF2 := DATASET(Superfile_List.sfNCF2, Layouts2.rNac2, THOR, opt);
+	export dsNCF2 := DATASET(Superfile_List.sfNCF2, $.Layouts2.rRawFile, CSV, opt);
 	export dsNCF2Base := DATASET(Superfile_List.sfNCF2Base, $.Layout_Base2, THOR, opt);
 	
 	export dsReady := DATASET($.Superfile_list.sfReady, $.Layout_Base2, thor, opt);	

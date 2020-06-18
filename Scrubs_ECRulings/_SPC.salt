@@ -1,0 +1,74 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_ECRulings
+FILENAME:ECRulings
+
+FIELDTYPE:Invalid_No:ALLOW(0123456789)
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ )
+FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ .,:;-'/\(\))
+FIELDTYPE:Invalid_AlphaNum:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ )
+FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ .,:;-'/\(\))
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date > 0 )
+FIELDTYPE:Invalid_Future:CUSTOM(Scrubs.fn_valid_date > 0 ,'future')
+FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)
+
+
+FIELD:dartid:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:dateadded:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:dateupdated:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:website:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:state:TYPE(STRING):LIKE(Invalid_State):0,0
+FIELD:euid:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:policyarea:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:casenumber:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:memberstate:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:lastdecisiondate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:title:TYPE(STRING):0,0
+FIELD:businessname:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+FIELD:region:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:primaryobjective:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:aidinstrument:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+FIELD:casetype:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:durationdatefrom:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:durationdateto:TYPE(STRING):LIKE(Invalid_Future):0,0
+FIELD:notificationregistrationdate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:dgresponsible:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:relatedcasenumber1:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:relatedcaseinformation1:TYPE(STRING):0,0
+FIELD:relatedcasenumber2:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:relatedcaseinformation2:TYPE(STRING):0,0
+FIELD:relatedcasenumber3:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:relatedcaseinformation3:TYPE(STRING):0,0
+FIELD:relatedcasenumber4:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:relatedcaseinformation4:TYPE(STRING):0,0
+FIELD:relatedcasenumber5:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:relatedcaseinformation5:TYPE(STRING):0,0
+FIELD:provisionaldeadlinedate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:provisionaldeadlinearticle:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:provisionaldeadlinestatus:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:regulation:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:relatedlink:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:decpubid:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:decisiondate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:decisionarticle:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:decisiondetails:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:pressrelease:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:pressreleasedate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:publicationjournaldate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:publicationjournal:TYPE(STRING):LIKE(Invalid_AlphaNum):0,0
+FIELD:publicationjournaledition:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:publicationjournalyear:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:publicationpriorjournal:TYPE(STRING):LIKE(Invalid_AlphaNum):0,0
+FIELD:publicationpriorjournaldate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:econactid:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:economicactivity:TYPE(STRING):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:compeventid:TYPE(STRING):LIKE(Invalid_No):0,0
+FIELD:eventdate:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:eventdoctype:TYPE(STRING):LIKE(Invalid_Alpha):0,0
+FIELD:eventdocument:TYPE(STRING):LIKE(Invalid_AlphaChar):0,0
+FIELD:did:TYPE(UNSIGNED6):LIKE(Invalid_No):0,0
+FIELD:bdid:TYPE(UNSIGNED6):LIKE(Invalid_No):0,0
+FIELD:dt_vendor_first_reported:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:dt_vendor_last_reported:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:dt_first_seen:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:dt_last_seen:TYPE(STRING):LIKE(Invalid_Date):0,0
+FIELD:eu_country_code:TYPE(STRING):LIKE(Invalid_State):0,0

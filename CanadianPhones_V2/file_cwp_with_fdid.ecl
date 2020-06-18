@@ -1,7 +1,7 @@
 ﻿import _Control, Autokey, MDR, Std, ut;
 
 //populate only updating source for keys
-canadianWP := file_CanadianWhitePagesBase(vendor='AX');
+canadianWP := file_CanadianWhitePagesBase(vendor IN ['I7','AX']);
 
 slim_canadianWP := RECORD
   string8 Date_first_reported;

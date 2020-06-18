@@ -18,6 +18,7 @@ export IdAppendThor(
 		,unsigned soapRetries = 0
 		,unsigned remoteBatchSize = 100
 		,boolean allowHighErrorRate = false
+		,unsigned keepCount = 1
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -33,10 +34,10 @@ export IdAppendThor(
 		,phone10 // phone_field
 		,fein // fein_field
 		,BDID_field
-		,BIPV2.IdAppendLayouts.IdsOnly // outrec
+		,BIPV2.IdAppendLayouts.IdsOnlyDebug // outrec
 		,true // bool_outrec_has_score
 		,BDID_Score_field
-		,//keep_count := '1'
+		,keepCount //keep_count := '1'
 		,scoreThreshold //score_threshold := '75'
 		,url // pURL = ''
 		,email // pEmail = ''
@@ -79,7 +80,7 @@ export IdAppendThor(
 			resLocal := project(localAppend, transform(BIPV2.IdAppendLayouts.IdsOnlyOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
 		return if(scoreThreshold > 50 or allowInvalidResults,
@@ -94,7 +95,7 @@ export IdAppendThor(
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
 		return if(scoreThreshold > 50 or allowInvalidResults,
@@ -109,7 +110,7 @@ export IdAppendThor(
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 			res := resLocal;
 		#ELSE
-			res := resRemote;
+			res := if(keepCount = 1, resRemote, error(recordof(resRemote), 'keepCount > 1 not implemented for remote BIP append'));
 		#END
 
 		return if(scoreThreshold > 50 or allowInvalidResults,

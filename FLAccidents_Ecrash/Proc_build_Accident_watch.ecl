@@ -1,4 +1,4 @@
-import _control , ut; 
+﻿import _control , ut, STD; 
 export Proc_build_Accident_watch (string filedate,string timestamp):= function
 
 // EA (2,3) and only records after july 2010 and vin status V should be allowed. 
@@ -16,7 +16,7 @@ new_recs := join(curr_dist,prev_dist , left.orig_accnbr = right.orig_accnbr and
                                        left.work_type_id = right.work_type_id 
 														, 
 	  													 transform({FLAccidents_Ecrash.layout_Accident_watch.temp},  self.agency_id:= left.jurisdiction_nbr, self.source_id := if(left.report_code in ['EA','FA','TM','TF'],left.report_code,
-															                           if(left.report_code[1] ='I' ,'NatInq','NatAcc')), self.process_date_time := ut.getdate+'_'+timestamp , self.hash_key := left.image_hash,self.CRU_Seq_number := left.cru_sequence_nbr, self := left,self:= []), left only ,local); 
+															                           if(left.report_code[1] ='I' ,'NatInq','NatAcc')), self.process_date_time := mod_Utilities.StrSysDate+'_'+timestamp , self.hash_key := left.image_hash,self.CRU_Seq_number := left.cru_sequence_nbr, self := left,self:= []), left only ,local); 
 
 valid_recs  := new_recs(fname <> '' or lname <>'' or vin<>''); 
 // Append carrier id carrier. 
@@ -62,19 +62,19 @@ total := (vin_blank+vin_non_blank_person +vin) (fname <> '' or lname <>'' or vin
 
 final := project(dedup(total,record,all), transform({FLAccidents_Ecrash.layout_Accident_watch.final},
                   
-	                self.record_type                    := StringLib.StringFindReplace(left.record_type,'|',' ');
-                  self.driver_license_nbr             := StringLib.StringFindReplace(left.driver_license_nbr,'|',' ');
-                  self.accident_location              := StringLib.StringFindReplace(left.accident_location,'|',' ');
-                  self.accident_street                := StringLib.StringFindReplace(left.accident_street,'|',' ');
-                  self.accident_cross_street          := StringLib.StringFindReplace(left.accident_cross_street,'|',' ');
-                  self.jurisdiction                   := StringLib.StringFindReplace(left.jurisdiction,'|',' ');
-                  self.jurisdiction_state             := StringLib.StringFindReplace(left.jurisdiction_state,'|',' ');
-                  self.vehicle_incident_city          := StringLib.StringFindReplace(left.vehicle_incident_city,'|',' ');
-                  tcarrier_name                       := StringLib.StringFindReplace(left.carrier_name,'|',' '); 
-                  tPolicy_num                         := StringLib.StringFindReplace(left.Policy_num,'|',' ');
-                  //self.Policy_Effective_Date        := StringLib.StringFindReplace(left.Policy_Effective_Date,'|',' '); 
-                  tInsurance_Company_Standardized     := StringLib.StringFindReplace(left.Insurance_Company_Standardized,'|',' ');
-                  tcarrier_id_carriername             := StringLib.StringFindReplace(left.carrier_id_carriername,'|',' ');
+	                self.record_type                    := STD.Str.FindReplace(left.record_type,'|',' ');
+                  self.driver_license_nbr             := STD.Str.FindReplace(left.driver_license_nbr,'|',' ');
+                  self.accident_location              := STD.Str.FindReplace(left.accident_location,'|',' ');
+                  self.accident_street                := STD.Str.FindReplace(left.accident_street,'|',' ');
+                  self.accident_cross_street          := STD.Str.FindReplace(left.accident_cross_street,'|',' ');
+                  self.jurisdiction                   := STD.Str.FindReplace(left.jurisdiction,'|',' ');
+                  self.jurisdiction_state             := STD.Str.FindReplace(left.jurisdiction_state,'|',' ');
+                  self.vehicle_incident_city          := STD.Str.FindReplace(left.vehicle_incident_city,'|',' ');
+                  tcarrier_name                       := STD.Str.FindReplace(left.carrier_name,'|',' '); 
+                  tPolicy_num                         := STD.Str.FindReplace(left.Policy_num,'|',' ');
+                  //self.Policy_Effective_Date        := STD.Str.FindReplace(left.Policy_Effective_Date,'|',' '); 
+                  tInsurance_Company_Standardized     := STD.Str.FindReplace(left.Insurance_Company_Standardized,'|',' ');
+                  tcarrier_id_carriername             := STD.Str.FindReplace(left.carrier_id_carriername,'|',' ');
                   self.carrier_id_carriername         := if(left.record_type in FLAccidents_Ecrash.personType_set , '', tcarrier_id_carriername); 
 									self.carrier_id_carrierSource       := if(left.record_type in FLAccidents_Ecrash.personType_set , '',left.carrier_id_carrierSource); 
 									self.Policy_Effective_Date          := if(left.record_type in FLAccidents_Ecrash.personType_set , '',left.Policy_Effective_Date); 

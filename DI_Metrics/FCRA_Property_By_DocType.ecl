@@ -3,7 +3,7 @@
 //PROPERTY BY DOCUMENT TYPE: For the following events, I would like the number of new events by type by month by state
 // all the way back to 2010. This data should be created using only data on the FCRA Roxies
 
-IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut, from_zz_CDKelly;
+IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut;
 
 export FCRA_Property_By_DocType(string pHostname, string pTarget, string pContact ='\' \'') := function
 
@@ -41,7 +41,7 @@ Key_Deeds_FCRA_2010 := File_Base_Deeds_Mnthly_plus_2010 + File_Base_Deeds_Fast_p
 Key_Deeds_FCRA_2010_props := DEDUP(sort(distribute(Key_Deeds_FCRA_2010(fares_unformatted_apn <> ''), hash(fares_unformatted_apn)), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, all,local);
 
 //proc_date is YYYYMM from the value for Recording Date, which is when the transaction was filed at the county
-tbl_Key_Deeds_FCRA_2010_props := TABLE(Key_Deeds_FCRA_2010_props, {proc_date, state, document_type_code, document_type := from_zz_CDKelly.zz_CDKelly_fnSourceBDocTypes(document_type_code), property_count := count(group)}, proc_date, state, document_type_code, few);
+tbl_Key_Deeds_FCRA_2010_props := TABLE(Key_Deeds_FCRA_2010_props, {proc_date, state, document_type_code, document_type := DI_Metrics.fnSourceBDocTypes(document_type_code), property_count := count(group)}, proc_date, state, document_type_code, few);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_fcra_deed_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv',
@@ -49,16 +49,12 @@ despray_fcra_deed_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_met
 																					pTarget + '/tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv'
 																					,,,,true);
 
-SEQUENTIAL(
-					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_fcra_deed_tbl);
-
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_fcra_deed_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Property_By_DocType Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Property_By_DocType Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Property_By_DocType Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Property_By_DocType Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

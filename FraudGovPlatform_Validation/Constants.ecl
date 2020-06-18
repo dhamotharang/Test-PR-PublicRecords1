@@ -1,4 +1,4 @@
-﻿import _control;
+﻿﻿import _control;
 export	Constants	:=
 module
 	export	string		LandingZoneServer_prod		:=	_control.IPAddress.bctlpedata10;
@@ -28,6 +28,9 @@ module
 
 	export string		hthor_Dev						:= 'hthor_dev_eclcc';
 	export string		hthor_Prod					:= 'hthor_eclcc';
+	
+	export string		Shell_ThorName_Dev		:= 'thor50_dev_eclcc';
+	export string		Shell_ThorName_Prod		:= 'pound_option_thor_eclcc';
 	
 	export string		ContributoryDirectory_dev	:= '/data/otto/in/';
 	export string		ContributoryDirectory_prod	:= '/data/otto/in/';

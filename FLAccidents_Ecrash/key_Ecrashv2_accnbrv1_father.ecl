@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents, STD;
 
 Ecrash := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
 
@@ -8,7 +8,7 @@ Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.out(report_code not in ['EA','T
 
 NormAddlRpt := project(Ecrash(trim(addl_report_number,left,right) not in ['','0','UNK', 'UNKNOWN'] and work_type_id not in ['2','3']), transform( {Ecrash}, 
 
-self.accident_nbr :=stringlib.StringFilter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr :=STD.Str.Filter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
  self := left)); 
 
 crash_accnbr_base_norm := (Ecrash + NormAddlRpt + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>'')) (trim(accident_nbr,left,right)<>'');

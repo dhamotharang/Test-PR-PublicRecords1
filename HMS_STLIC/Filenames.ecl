@@ -137,6 +137,7 @@ EXPORT Filenames(string pversion = '', boolean pUseProd = false) := module
 	EXPORT statelicense_lInputHistTemplate 				:= _Dataset(pUseProd).thor_cluster_files + 'in::'   + _Dataset().name + '::hms_statelicense::history';
 	EXPORT statelicense_Base		  								:= tools.mod_FilenamesBuild(statelicense_lBaseTemplate, pversion);
  
+ 	EXPORT stliclookup_alpha_lInputTemplate 			:= _Dataset(pUseProd).thor_cluster_files + 'from_alpha::' + HMS_STLIC._Dataset().name + '::hms_stliclookup_' + pversion;		
  	EXPORT stliclookup_new_lInputTemplate 				:= _Dataset(pUseProd).thor_cluster_files + 'temp_in::' + HMS_STLIC._Dataset().name + '::hms_stliclookup_' + pversion;		
 	EXPORT stliclookup_lInputTemplate 						:= _Dataset(pUseProd).thor_cluster_files + 'in::' + _Dataset().name + '::hms_stliclookup_' + pversion;
 	EXPORT stliclookup_lInputHistTemplate 				:= _Dataset(pUseProd).thor_cluster_files + 'in::' + _Dataset().name + '::hms_stliclookup::history';

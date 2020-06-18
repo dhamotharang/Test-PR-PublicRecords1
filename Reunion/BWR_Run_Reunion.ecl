@@ -28,7 +28,7 @@ ECL:=
 +'#option(\'maxCsvRowSizeMb\', 90);\n'
 +'\n\n'
 +'output(\'' + mode + buildVer + feedVer + '\');\n'
-// +'Reunion.actionBuildReunion(' + mode + ',\'' + buildVer + '\',\'' + feedVer + '\').all;\n'
++'Reunion.actionBuildReunion(' + mode + ',\'' + buildVer + '\',\'' + feedVer + '\').all;\n'
 ;
 
 wk_ut.CreateWuid(ECL,'thor400_36_eclcc',wk_ut._constants.ProdEsp);

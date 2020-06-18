@@ -1308,6 +1308,20 @@
 				trim(kword, left, right) = 'USCBP-WRO' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCBP_WRO,
 				trim(kword, left, right) = 'UKEMBARGO' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKEMBARGO,
 				trim(kword, left, right) = 'LVVID' =>SubGroup_Constants.numKeywordsID.KEYWORD_LVVID,
+				trim(kword, left, right) = 'ITOCF' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITOCF,
+				trim(kword, left, right) = 'MYKPDNHEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYKPDNHEP,
+				trim(kword, left, right) = 'BRTCU' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRTCU,
+				trim(kword, left, right) = 'BGRE-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_BGRE_WC,
+				trim(kword, left, right) = 'EU-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_NIC,
+				trim(kword, left, right) = 'IDBAPPEBTI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDBAPPEBTI,
+				trim(kword, left, right) = 'IMOJ-SO' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMOJ_SO,
+				trim(kword, left, right) = 'CNSAFE' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAFE,
+				trim(kword, left, right) = 'OFAC-CAATSA-IRAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_IRAN,
+				trim(kword, left, right) = 'IRAN-IEI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRAN_IEI,
+				trim(kword, left, right) = 'UNDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNDP,
+				trim(kword, left, right) = 'JPJETRO' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJETRO,
+				trim(kword, left, right) = 'AUEPA-VIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUEPA_VIC,
+				trim(kword, left, right) = 'MLARB' =>SubGroup_Constants.numKeywordsID.KEYWORD_MLARB,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

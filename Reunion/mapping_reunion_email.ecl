@@ -1,4 +1,8 @@
+EXPORT mapping_reunion_email(unsigned1 mode, STRING sVersion) := MODULE
+
 //-----------------------------------------------------------------------------
 // Builds the email file
 //-----------------------------------------------------------------------------
-EXPORT mapping_reunion_email := Reunion.fn_add_email(reunion.files.dMain);
+EXPORT all := Reunion.fn_add_email(reunion.files(mode).dMain);
+
+END;

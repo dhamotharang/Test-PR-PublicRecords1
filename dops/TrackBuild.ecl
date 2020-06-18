@@ -133,186 +133,6 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	end;
 	
 	////////////////////////////////////////////////////
-	// prep supers and remove the files if already in super
-	////////////////////////////////////////////////////
-	export fPrepSupers(string p_FileInfoPrefix) := function
-		dLogicalOwners := STD.File.LogicalFileSuperOwners(p_FileInfoPrefix + '::' + WORKUNIT) : independent;
-		
-		return sequential
-						(
-							if (~STD.File.SuperFileExists(SD_FileTrackBuild(p_FileInfoPrefix))
-										,STD.File.CreateSuperFile(SD_FileTrackBuild(p_FileInfoPrefix)))
-							,if (~STD.File.SuperFileExists(SB_FileTrackBuild(p_FileInfoPrefix))
-										,STD.File.CreateSuperFile(SB_FileTrackBuild(p_FileInfoPrefix)))
-							,if (~STD.File.SuperFileExists(SP_FileTrackBuild(p_FileInfoPrefix))
-										,STD.File.CreateSuperFile(SP_FileTrackBuild(p_FileInfoPrefix)))
-							,if (~STD.File.SuperFileExists(SU_FileTrackBuild(p_FileInfoPrefix))
-										,STD.File.CreateSuperFile(SU_FileTrackBuild(p_FileInfoPrefix)))
-							,if( STD.File.FileExists(p_FileInfoPrefix + '::' + WORKUNIT)
-									,if (count(dLogicalOwners) > 0
-										,nothor(
-											apply(
-												global(dLogicalOwners,few)
-													,STD.File.RemoveSuperFile('~'+name,p_FileInfoPrefix + '::' + WORKUNIT)
-													)
-												)
-											)
-										)
-							);
-									
-	end;
-	
-	////////////////////////////////////////////////////
-	// capture build information into a file
-	// this function will be called by builds
-	////////////////////////////////////////////////////
-	export fSetInfo(string p_dopsdatasetname
-									,string p_buildversion
-									,string p_componentname
-									// DUS-346: add email
-									,string p_email = ''
-									) := function
-		// get WU state							
-		
-		dBuildInfo := dataset([{p_dopsdatasetname,p_buildversion,p_componentname
-												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime()
-												,p_vertical,p_location
-												,'','','',p_email}],rTrackBuild);
-		
-		return 	sequential
-								(
-									fPrepSupers(FileInfoPrefix)
-									,output(dBuildInfo,,FileInfoPrefix + '::' + WORKUNIT,overwrite)
-									
-								);
-						
-		
-	end;
-	
-	////////////////////////////////////////////////////
-	// capture build information into WU details
-	// this function will be called by builds in BWR
-	////////////////////////////////////////////////////
-	export fSetInfoinWorktunit(string p_dopsdatasetname
-									,string p_buildversion
-									,string p_componentname
-									// DUS-346: add email
-									,string p_email = ''
-									) := function
-	
-		// isWorkunitExists := WORKUNIT in set(STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'),wuid);
-		
-		seq_number := max(fGetAppDataFromWUDetails(WORKUNIT,localesp),app_seq)+1;
-		app_value := p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location+'|'+p_email;
-		return sequential(
-										output('setting app value for '+app_value)
-										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',app_value)
-										);
-		
-	end;
-	
-	////////////////////////////////////////////////////
-	// Convert the information captured from WU into 
-	// rTrackBuild layout
-	////////////////////////////////////////////////////
-	export fConvertWUInfo() := function
-		dWUListWithAppInfo := if (p_wuid <> ''
-															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*')(wuid = p_wuid)
-															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'));
-		
-		rChildRecord := record
-			string wuid;
-			dataset(rAppInfo) appinfo;
-		end;
-		
-		rChildRecord xChildRecord(dWUListWithAppInfo l) := transform
-			self.wuid := l.wuid;
-			self.appinfo := fGetAppDataFromWUDetails(l.wuid);
-		end;
-		
-		dChildRecord := project(dWUListWithAppInfo,xChildRecord(left));
-		
-		rTrackBuild xNormChildRecord(dChildRecord l, rAppInfo r) := transform
-			self.datasetname := STD.Str.SplitWords(r.value,'|')[1];
-			self.buildversion := STD.Str.SplitWords(r.value,'|')[2];
-			self.componentname := STD.Str.SplitWords(r.value,'|')[3];
-			self.wuid := r.wuid;
-			self.datetime := STD.Str.SplitWords(r.value,'|')[4]; // time when the info was first captured
-			self.vertical := STD.Str.SplitWords(r.value,'|')[5]; 
-			self.location := STD.Str.SplitWords(r.value,'|')[6];
-			self.emailid := STD.Str.SplitWords(r.value,'|')[7];
-			self := l;
-		end;
-		
-		dNormChildRecord := normalize(dChildRecord,left.appinfo,xNormChildRecord(left,right));
-		
-		return dNormChildRecord(~(datasetname in vsIgnoreDataset and componentname in vsIgnoreComponent));
-		
-	end;
-	
-	////////////////////////////////////////////////////
-	// get the latest tracking info from prod super by default
-	// but when tracking use, using super 
-	////////////////////////////////////////////////////
-	export dGetInfo(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) 
-																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '' and datetime <> '');
-	
-	////////////////////////////////////////////////////
-	// move all track logical files into "using" super
-	////////////////////////////////////////////////////
-	export fAddTrackFilesToSuper() := function
-		dFileList := STD.File.LogicalFileList(regexreplace('~',FileInfoPrefix,'') + '*');
-		return nothor(apply
-						(
-							global(dFileList,few)
-							,if (count(STD.File.LogicalFileSuperOwners('~'+name)) = 0
-									,sequential
-											(
-												STD.File.StartSuperFileTransaction()
-												,STD.File.AddSuperFile(
-														SU_FileTrackBuild(FileInfoPrefix)
-														,'~'+name																		
-																)
-												,STD.File.FinishSuperFileTransaction()
-											)
-									)
-						));
-	end;
-	
-	////////////////////////////////////////////////////
-	// Function to capture status and timestamp for each WU
-	////////////////////////////////////////////////////
-	export fGetWUStatus(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)
-											,string p_esp = localesp
-											,string p_port = '8010'
-											) := function
-			dInfo := sort(dGetInfo(TrackBuildFile),wuid);
-			
-			rTrackBuild xGetWUStatus(dInfo l) := transform
-				wuidtofilter := if (p_wuid <> '', p_wuid, l.wuid);
-				dWUInfo := STD.system.Workunit.WorkunitList(lowwuid := wuidtofilter, highwuid := wuidtofilter);
-				dWUTimeStamps := sort(STD.system.Workunit.WorkunitTimeStamps(l.wuid),-time);
-				vdate := l.datetime[1..8];
-				vtime := l.datetime[9..];
-				jobstate := STD.str.ToUpperCase(trim(dWUInfo[1].state,left,right));
-				self.wuerrors := if (jobstate in  ['ABORTED','FAILED']
-														,dops.WorkUnitModule(p_esp,p_port).GetWUErrors(l.wuid,true)[1].Message
-														,'');
-				self.jobstatus := jobstate;
-				self.created := regexreplace('[-:TZ]',SORT(dWUTimeStamps(STD.Str.ToUpperCase(id) in ['CREATED','QUERYSTARTED']),time)[1].time,'',nocase);
-				self.modified := regexreplace('[-:TZ]',dWUTimeStamps[1].time,'',nocase);
-				self.datetime := vdate + intformat(STD.Date.Hour((integer)vtime),2,1)
-																+ intformat(STD.Date.Minute((integer)vtime),2,1)
-																+ intformat(STD.Date.Second((integer)vtime),2,1);
-				self := l;
-			end;
-			
-			dGetWUStatus := project(dInfo,xGetWUStatus(left));
-			
-			return dGetWUStatus(trim(created,left,right) <> '' and trim(modified,left,right) <> '' and length(trim(datetime,left,right)) = 14);
-	end;
-	
-	////////////////////////////////////////////////////
 	// function to pull/push records to/from dops database
 	////////////////////////////////////////////////////
 	export DB_BTInfo(dataset(rTrackBuild) dDetails
@@ -404,6 +224,196 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		return dNormRecs;
 	
 	end;
+	
+	////////////////////////////////////////////////////
+	// prep supers and remove the files if already in super
+	////////////////////////////////////////////////////
+	export fPrepSupers(string p_FileInfoPrefix) := function
+		dLogicalOwners := STD.File.LogicalFileSuperOwners(p_FileInfoPrefix + '::' + WORKUNIT) : independent;
+		
+		return sequential
+						(
+							if (~STD.File.SuperFileExists(SD_FileTrackBuild(p_FileInfoPrefix))
+										,STD.File.CreateSuperFile(SD_FileTrackBuild(p_FileInfoPrefix)))
+							,if (~STD.File.SuperFileExists(SB_FileTrackBuild(p_FileInfoPrefix))
+										,STD.File.CreateSuperFile(SB_FileTrackBuild(p_FileInfoPrefix)))
+							,if (~STD.File.SuperFileExists(SP_FileTrackBuild(p_FileInfoPrefix))
+										,STD.File.CreateSuperFile(SP_FileTrackBuild(p_FileInfoPrefix)))
+							,if (~STD.File.SuperFileExists(SU_FileTrackBuild(p_FileInfoPrefix))
+										,STD.File.CreateSuperFile(SU_FileTrackBuild(p_FileInfoPrefix)))
+							,if( STD.File.FileExists(p_FileInfoPrefix + '::' + WORKUNIT)
+									,if (count(dLogicalOwners) > 0
+										,nothor(
+											apply(
+												global(dLogicalOwners,few)
+													,STD.File.RemoveSuperFile('~'+name,p_FileInfoPrefix + '::' + WORKUNIT)
+													)
+												)
+											)
+										)
+							);
+									
+	end;
+	
+	////////////////////////////////////////////////////
+	// capture build information into a file
+	// this function will be called by builds
+	////////////////////////////////////////////////////
+	export fSetInfo(string p_dopsdatasetname
+									,string p_buildversion
+									,string p_componentname
+									// DUS-346: add email
+									,string p_email = ''
+									) := function
+		// get WU state							
+		
+		dBuildInfo := dataset([{p_dopsdatasetname,p_buildversion,p_componentname
+												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime()
+												,p_vertical,p_location
+												,'','','',p_email}],rTrackBuild);
+		
+		return 	sequential
+								(
+									fPrepSupers(FileInfoPrefix)
+									,output(dBuildInfo,,FileInfoPrefix + '::' + WORKUNIT,overwrite)
+									
+								);
+						
+		
+	end;
+	
+	////////////////////////////////////////////////////
+	// capture build information into WU details
+	// this function will be called by builds in BWR
+	////////////////////////////////////////////////////
+	export fSetInfoinWorktunit(string p_dopsdatasetname
+									,string p_buildversion
+									,string p_componentname
+									// DUS-346: add email
+									,string p_email = ''
+									) := function
+	
+		// isWorkunitExists := WORKUNIT in set(STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'),wuid);
+		
+		seq_number := max(fGetAppDataFromWUDetails(WORKUNIT,localesp),app_seq)+1;
+		app_value := p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location+'|'+p_email;
+		return sequential(
+										output('setting app value for '+app_value)
+										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',app_value)
+										);
+		
+	end;
+	
+	////////////////////////////////////////////////////
+	// Convert the information captured from WU into 
+	// rTrackBuild layout
+	////////////////////////////////////////////////////
+	export fConvertWUInfo() := function
+		dWUListWithAppInfo := sort(if (p_wuid <> ''
+															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*')(wuid = p_wuid)
+															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*')),wuid);
+		dGetRecordsFromDB := sort(DB_BTInfo(dataset([{'', '', '', '', '', '', '', '', '', '', '', '','',''}],rTrackBuild),true)(vertical = p_vertical and location = p_location),wuid) : independent;
+		
+		rChildRecord := record
+			string wuid;
+			dataset(rAppInfo) appinfo;
+		end;
+		
+		rChildRecord xChildRecord(dWUListWithAppInfo l,dGetRecordsFromDB r) := transform
+			self.wuid := l.wuid;
+			self.appinfo := fGetAppDataFromWUDetails(l.wuid);
+		end;
+		
+		//dChildRecord := project(dWUListWithAppInfo,xChildRecord(left));
+		dChildRecord := dedup(join(dWUListWithAppInfo
+													,dGetRecordsFromDB
+													,left.wuid = right.wuid
+														and STD.Str.ToUpperCase(left.state) = STD.Str.ToUpperCase(right.jobstatus)
+													,xChildRecord(left,right)
+													,left only),wuid);
+														
+		
+		rTrackBuild xNormChildRecord(dChildRecord l, rAppInfo r) := transform
+			self.datasetname := STD.Str.SplitWords(r.value,'|')[1];
+			self.buildversion := STD.Str.SplitWords(r.value,'|')[2];
+			self.componentname := STD.Str.SplitWords(r.value,'|')[3];
+			self.wuid := r.wuid;
+			self.datetime := STD.Str.SplitWords(r.value,'|')[4]; // time when the info was first captured
+			self.vertical := STD.Str.SplitWords(r.value,'|')[5]; 
+			self.location := STD.Str.SplitWords(r.value,'|')[6];
+			self.emailid := STD.Str.SplitWords(r.value,'|')[7];
+			self := l;
+		end;
+		
+		dNormChildRecord := normalize(dChildRecord,left.appinfo,xNormChildRecord(left,right));
+		
+		return dNormChildRecord(~(datasetname in vsIgnoreDataset and componentname in vsIgnoreComponent));
+		
+	end;
+	
+	////////////////////////////////////////////////////
+	// get the latest tracking info from prod super by default
+	// but when tracking use, using super 
+	////////////////////////////////////////////////////
+	export dGetInfo(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) 
+																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '' and datetime <> '');
+	
+	////////////////////////////////////////////////////
+	// move all track logical files into "using" super
+	////////////////////////////////////////////////////
+	export fAddTrackFilesToSuper() := function
+		dFileList := STD.File.LogicalFileList(regexreplace('~',FileInfoPrefix,'') + '*');
+		return nothor(apply
+						(
+							global(dFileList,few)
+							,if (count(STD.File.LogicalFileSuperOwners('~'+name)) = 0
+									,sequential
+											(
+												STD.File.StartSuperFileTransaction()
+												,STD.File.AddSuperFile(
+														SU_FileTrackBuild(FileInfoPrefix)
+														,'~'+name																		
+																)
+												,STD.File.FinishSuperFileTransaction()
+											)
+									)
+						));
+	end;
+	
+	////////////////////////////////////////////////////
+	// Function to capture status and timestamp for each WU
+	////////////////////////////////////////////////////
+	export fGetWUStatus(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)
+											,string p_esp = localesp
+											,string p_port = '8010'
+											) := function
+			dInfo := sort(dGetInfo(TrackBuildFile),wuid);
+			
+			rTrackBuild xGetWUStatus(dInfo l) := transform
+				wuidtofilter := if (p_wuid <> '', p_wuid, l.wuid);
+				dWUInfo := STD.system.Workunit.WorkunitList(lowwuid := wuidtofilter, highwuid := wuidtofilter);
+				dWUTimeStamps := sort(STD.system.Workunit.WorkunitTimeStamps(l.wuid),-time);
+				vdate := l.datetime[1..8];
+				vtime := l.datetime[9..];
+				jobstate := STD.str.ToUpperCase(trim(dWUInfo[1].state,left,right));
+				self.wuerrors := if (jobstate in  ['ABORTED','FAILED']
+														,dops.WorkUnitModule(p_esp,p_port).GetWUErrors(l.wuid,true)[1].Message
+														,'');
+				self.jobstatus := jobstate;
+				self.created := regexreplace('[-:TZ]',SORT(dWUTimeStamps(STD.Str.ToUpperCase(id) in ['CREATED','QUERYSTARTED']),time)[1].time,'',nocase);
+				self.modified := regexreplace('[-:TZ]',dWUTimeStamps[1].time,'',nocase);
+				self.datetime := vdate + intformat(STD.Date.Hour((integer)vtime),2,1)
+																+ intformat(STD.Date.Minute((integer)vtime),2,1)
+																+ intformat(STD.Date.Second((integer)vtime),2,1);
+				self := l;
+			end;
+			
+			dGetWUStatus := project(dInfo,xGetWUStatus(left));
+			
+			return dGetWUStatus(trim(created,left,right) <> '' and trim(modified,left,right) <> '' and length(trim(datetime,left,right)) = 14);
+	end;
+	
+	
 	
 	////////////////////////////////////////////////////
 	// move all track logical files
@@ -522,9 +532,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																												,true)
 																						,0);
 			timediff := endseconds - startseconds;
-			/*totaltime := if (l.datasetname = r.datasetname and l.componentname = r.componentname and l.buildversion = r.buildversion
-													,l.totaltimeinsecs + timediff
-													,0 + timediff);*/
+			
 			totaltime := timediff; // because now we r.created as time when first created and r.modified = time when last touched
 			td := totaltime - (integer)r.thresholdinsecs;
 			
