@@ -36,7 +36,7 @@ IMPORT ProfileBooster;
 
 #CONSTANT('ExtraPrefix','');      
 
-STRING8   version 	  := '20200315';
+STRING8   version 	  := '20200615';
 string    dali        := 'Prod';
 unsigned1 ProcToRun 	:= 1;
 
