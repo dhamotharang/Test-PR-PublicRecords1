@@ -414,6 +414,7 @@ Event := ENTITY(QUERY(UID(record_id),
     STRING state_death_id,
     
 		// Crim
+		BOOLEAN CrimHit,
     STRING curr_incar_flag,
     STRING off_cat_list,
     INTEGER name_ssn_dob_match,
@@ -553,7 +554,8 @@ Event := ENTITY(QUERY(UID(record_id),
     Ssn, SsnFormatted,
 
     RoutingNumber,FullBankname,AbbreviatedBankname,FractionalRoutingnumber,HeadofficeRoutingnumber,HeadofficeBranchcodes,AccountNumber,BankHit,
-
+		
+		CrimHit,
     curr_incar_flag,
     off_cat_list,
     name_ssn_dob_match,
@@ -578,8 +580,7 @@ PersonEvent := ASSOCIATION(QUERY(
 
 */	 
 	 
-	 
-Event: => EntityContextUid := '_11' + RecordId;     
+Event: => EntityContextUid := '_01' + RecordId;     
 Event: => InCustomerPopulation := 1;
 
 Event: => Deceased := MAP(ISVALIDDATE(DeceasedDate) => 1, 0);
@@ -916,44 +917,66 @@ Event: => T1_IdAge := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopF
 
 Event: => T1L_LexIdSeenFlag := MAP(T1_LexIdPopFlag = 0 => -99999,
 																	 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 ALL(PersonEvent.Transaction,T_BcShllLexIdEcho=-99997) => -99997,
+																	T_BcShllLexIdEcho=-99997 => -99997,
 																	 truedid=TRUE => 1, 0);
 																	 
 Event: => T1L_IdIsBcShllHitFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 																			 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																			 ALL(PersonEvent.Transaction,T1L_BcShllLexIdMatchesInpFlag=-99997) OR ALL(PersonEvent.Transaction,T1L_LexIdSeenFlag=-99997) => -99997,
+																			T1L_BcShllLexIdMatchesInpFlag=-99997 OR T1L_LexIdSeenFlag=-99997 => -99997,
 																			 T1L_BcShllLexIdMatchesInpFlag=1 AND T1L_LexIdSeenFlag=1 => 1, 0);
 
 Event: => T1L_BcShllLexIdMatchesInpFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 																							 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																							 ALL(PersonEvent.Transaction,T_BcShllLexIdEcho=-99997) => -99997,
+																							 T_BcShllLexIdEcho=-99997 => -99997,
 																							 T_BcShllLexIdEcho = T_PersonUidEcho => 1, 0);																			 
 Event: => T1_AdultIdNotSeenFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopFlag=0 => -99999,
                                         T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				ALL(PersonEvent.Transaction,T1_IdAge=-99997) => -99997,
+																				T1_IdAge=-99997 => -99997,
 																				T1_IdAge >= 18 AND ((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=1) OR (T1_LexIdPopFlag=1 AND T1L_IdIsBcShllHitFlag=0)) => 1, 0);
+Event: => T1_StolIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                               T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+															 T1_Fp3_StolenIdentityIndex=-99997 => -99997,
+															 T1_Fp3_StolenIdentityIndex >=7 => 1, 0);			
+Event: => T1_Fp3_StolenIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                            T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																						fp3_stolenidentityindex='' OR fp3_stolenidentityindex:Null OR fp3_stolenidentityindex=0 => -99997,
+																						fp3_stolenidentityindex);	
+																						
+Event: => T1_SynthIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T1_Fp3_SyntheticIdentityIndex=-99997 => -99997,
+																T1_Fp3_SyntheticIdentityIndex >=7 => 1, 0);
+																
+Event: => T1_Fp3_SyntheticIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                           T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																					 syntheticidentityindex_v3='' OR syntheticidentityindex_v3:Null OR syntheticidentityindex_v3=0 => -99997,
+																					 syntheticidentityindex_v3);
+																					 
+Event: => T1L_DobNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T_DobPopFlag=0 => -99999,
+                                   T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	 T1L_DobVerIndx=-99997 => -99997,
+																	 T1L_DobVerIndx < 7 => 1, 0);
 																	 
-/*																	 
-Event: => T1L_LexIdSeenFlag := MAP(T1_LexIdPopFlag = 0 => -99999,
-																	 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 ALL(PersonEvent.Transaction,T_BcShllLexIdEcho=-99997) => -99997,
-																	 truedid=TRUE => 1, 0);
-Event: => T1L_BcShllLexIdMatchesInpFlag := MAP(T1_LexIdPopFlag=0 => -99999,
-																							 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																							 ALL(PersonEvent.Transaction,T_BcShllLexIdEcho=-99997) => -99997,
-																							 T_BcShllLexIdEcho = T_PersonUidEcho => 1, 0);
-Event: => T1L_IdIsBcShllHitFlag := MAP(T1_LexIdPopFlag=0 => -99999,
-																			 T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																			 ALL(PersonEvent.Transaction,T1L_BcShllLexIdMatchesInpFlag=-99997) OR ALL(PersonEvent.Transaction,T1L_LexIdSeenFlag=-99997) => -99997,
-																			 T1L_BcShllLexIdMatchesInpFlag=1 AND T1L_LexIdSeenFlag=1 => 1, 0);
-Event: => T1_IdAge := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopFlag=0 => -99999,
-													T_SrcClassType < 4 => -99998,
-													INTEGER(T_InpClnDobEcho) > INTEGER(T_ActDtEcho) => -99997,
-													MIN(FLOOR(DAYSBETWEEN(DATE(T_InpClnDobEcho),T_ActDtEcho)/365.25),200));
 Event: => T1L_DobVerIndx := MAP(T1_LexIdPopFlag=0 OR T_DobPopFlag=0 => -99999,
                                 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																dobmatchlevel:Null OR dobmatchlevel=0 => -99997,
 																dobmatchlevel);
+																
+Event: => T1_ManipIDFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																T1_Fp3_ManipIdentityIndex=-99997 => -99997,
+																T1_Fp3_ManipIdentityIndex >=7 => 1, 0);
+																
+Event: => T1_Fp3_ManipIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                           T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																					 manipulatedidentityindex_v3='' OR manipulatedidentityindex_v3:Null OR manipulatedidentityindex_v3=0 => -99997,
+																					 manipulatedidentityindex_v3);
+																					 
+Event: => T1L_SsnWAltNAVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
+                                      T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																			T1L_NasSummary < 1 => -99997,
+																			T1L_NasSummary = 1 => 1, 0);
+																			
 Event: => T1_NapSummary := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                            T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 													 nap_summary);
@@ -963,38 +986,7 @@ Event: => T1L_NasSummary := MAP(T1_LexIdPopFlag=0 => -99999,
 Event: => T1_Cvi := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 										cvi);
-Event: => T1_Fp3 := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-										fraudpoint_v3='' OR fraudpoint_v3:Null OR fraudpoint_v3=0 => -99997,
-										fraudpoint_v3);
-Event: => T1_Fp3_StolenIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                            T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																						fp3_stolenidentityindex='' OR fp3_stolenidentityindex:Null OR fp3_stolenidentityindex=0 => -99997,
-																						fp3_stolenidentityindex);
-Event: => T1_Fp3_SyntheticIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                           T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 syntheticidentityindex_v3='' OR syntheticidentityindex_v3:Null OR syntheticidentityindex_v3=0 => -99997,
-																					 syntheticidentityindex_v3);
-Event: => T1_Fp3_ManipIdentityIndex := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                           T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 manipulatedidentityindex_v3='' OR manipulatedidentityindex_v3:Null OR manipulatedidentityindex_v3=0 => -99997,
-																					 manipulatedidentityindex_v3);
-Event: => T1L_Fp_SourceRiskLevel := MAP(T1_LexIdPopFlag=0 => -99999,
-                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				sourcerisklevel < 1 => -99997,
-																				sourcerisklevel);
-Event: => T1_AdultIdNotSeenFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopFlag=0 => -99999,
-                                        T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				ALL(PersonEvent.Transaction,T1_IdAge=-99997) => -99997,
-																				T1_IdAge >= 18 AND ((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=1) OR (T1_LexIdPopFlag=1 AND T1L_IdIsBcShllHitFlag=0)) => 1, 0);
-Event: => T1_MinorWLexIDFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopFlag=0 => -99999,
-                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		 ALL(PersonEvent.Transaction,T1_IdAge=-99997) => -99997,
-																		 T1_IdAge < 18 AND T1L_IdIsBcShllHitFlag=1 AND T1_LexIdPopFlag=1 => 1,0);
-Event: => T1_SsnPriorDOBFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99999,
-                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		 socsdobflag:Null OR socsdobflag > 1 => -99997,
-																		 socsdobflag);
+														
 Event: => T1_FirstNmNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_FirstNmPopFlag=0 => -99999,
                                        T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																			 T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
@@ -1003,265 +995,212 @@ Event: => T1_LastNmNotVerFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 OR 
                                      T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		 T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
 																		 T1_NapSummary IN [1,3,4,6,10] AND T1L_NasSummary IN [1,3,4,6,10] => 1, 0);
+																		 
 Event: => T1_AddrNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T9_AddrPopFlag=0 => -99999,
                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		T1_NapSummary  < 1 AND T1L_NasSummary < 1 => -99997,
 																		T1_NapSummary IN [1,2,4,7,9] AND T1L_NasSummary IN [1,2,4,7,9] => 1, 0);
-Event: => T1L_SsnNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
-                                   T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 T1L_NasSummary < 1 => -99997,
-																	 T1L_NasSummary IN [2,3,5,8] => 1, 0);
-Event: => T1L_SsnWAltNAVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
-                                      T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																			T1L_NasSummary < 1 => -99997,
-																			T1L_NasSummary = 1 => 1, 0);
-Event: => T1L_SsnWAddrNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 OR T9_AddrPopFlag=0 => -99999,
-                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				T1L_NasSummary < 1 => -99997,
-																				T1L_NasSummary IN [4,7,9] => 1, 0);
-Event: => T1_PhnNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T16_PhnPopFlag=0 => -99999,
-                                   T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 T1_NapSummary < 1 => -99997,
-																	 T1_NapSummary IN [2,3,5,8] => 1, 0);
-Event: => T1L_DobNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T_DobPopFlag=0 => -99999,
-                                   T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 ALL(PersonEvent.Transaction,T1L_DobVerIndx=-99997) => -99997,
-																	 T1L_DobVerIndx < 7 => 1, 0);
+																		 
 Event: => T1L_HiRiskCviFlag :=  MAP(T1_LexIdPopFlag=0 => -99999, 
                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		T1_Cvi <= 20 => 1, 0);
 Event: => T1L_MedRiskCviFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		T1_Cvi IN [30,40] => 1, 0);
-Event: => T1_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                       T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																			 ALL(PersonEvent.Transaction,T1L_Fp_SourceRiskLevel=-99997) => -99997,
-																			 T1L_Fp_SourceRiskLevel >=7 => 1, 0);
-Event: => T1_StolIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                               T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-															 ALL(PersonEvent.Transaction,T1_Fp3_StolenIdentityIndex=-99997) => -99997,
-															 T1_Fp3_StolenIdentityIndex >=7 => 1, 0);
-Event: => T1_SynthIdFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																ALL(PersonEvent.Transaction,T1_Fp3_SyntheticIdentityIndex=-99997) => -99997,
-																T1_Fp3_SyntheticIdentityIndex >=7 => 1, 0);
-Event: => T1_ManipIDFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																ALL(PersonEvent.Transaction,T1_Fp3_ManipIdentityIndex=-99997) => -99997,
-																T1_Fp3_ManipIdentityIndex >=7 => 1, 0);
-Event: => T1L_IdDtOfDeathAftIdActCntEv := MAP(T1_LexIdPopFlag=0 => -99999,
-                                              T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998, 
-																							T1L_IdDtOfDeath=-99997 => -99997,
-																							COUNT(Subject.PersonEvent(EventDate < Event.EventDate AND EventDate > Event.diddeceaseddate)));
-Event: => T1L_IdDtOfDeathAftIdActFlagEv := MAP(T1_LexIdPopFlag=0 => -99999,
-                                               T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998,
-																							 T1L_IdDtOfDeath=-99997 => -99997,
-																							 T1L_IdDtOfDeathAftIdActCntEv>0 => 1, 0);
+																		
+Event: => T1_MinorWLexIDFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_DobPopFlag=0 => -99999,
+                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		 T1_IdAge=-99997 => -99997,
+																		 T1_IdAge < 18 AND T1L_IdIsBcShllHitFlag=1 AND T1_LexIdPopFlag=1 => 1,0);
 
-//best pii attributes
-Event: => T_BcShllArchDtEcho := MAP(T_IsBcShllHitFlag < 1 => -99998,
-																		historydatetimestamp); //need to get from code update
-Event: => T1L_BestFirstNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																		 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		 best_fname = '' OR best_fname:Null => -99997,
-																		 best_fname);
-Event: => T1L_BestLastNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																		T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		best_lname = '' OR best_lname:Null => -99997,
-																		best_lname);
-Event: => T1L_BestFirstNmPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
-																				T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				T1L_BestFirstNmEcho = -99997 => 0, 1);
-Event: => T1L_BestLastNmPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
-																				T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																				T1L_BestLastNmEcho = -99997 => 0, 1);
-Event: => T1L_BestFullNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																		T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		T1L_BestFirstNmPopFlag=0 OR T1L_BestLastNmPopFlag=0 => -99997,
-																		TRIM(T1L_BestFirstNmEcho) + ' ' + (T1L_BestLastNmEcho));
-Event: => T1L_CurrAddrPrimRangeEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_prim_range = '' OR add_curr_prim_range:Null => -99997,
-																					 add_curr_prim_range);
-Event: => T1L_CurrAddrPreDirEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_predir = '' OR add_curr_predir:Null => -99997,
-																					 add_curr_predir);
-Event: => T1L_CurrAddrPrimNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_prim_name = '' OR add_curr_prim_name:Null => -99997,
-																					 add_curr_prim_name);
-Event: => T1L_CurrAddrSuffixEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_addr_suffix = '' OR add_curr_addr_suffix:Null => -99997,
-																					 add_curr_addr_suffix);
-Event: => T1L_CurrAddrPostDirEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_postdir = '' OR add_curr_postdir:Null => -99997,
-																					 add_curr_postdir);
-Event: => T1L_CurrAddrUnitDesigEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_unit_desig = '' OR add_curr_unit_desig:Null => -99997,
-																					 add_curr_unit_desig);
-Event: => T1L_CurrAddrSecRangeEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_sec_range = '' OR add_curr_sec_range:Null => -99997,
-																					 add_curr_sec_range);
-Event: => T1L_CurrAddrCityEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_city_name = '' OR add_curr_city_name:Null => -99997,
-																					 add_curr_city_name);
-Event: => T1L_CurrAddrStEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_st = '' OR add_curr_st:Null => -99997,
-																					 add_curr_st);
-Event: => T1L_CurrAddrZip5Echo := MAP(T1_LexIdPopFlag=0 => -99999,
-																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 add_curr_zip5 = '' OR add_curr_zip5:Null => -99997,
-																					 add_curr_zip5);
+Event: => T1_PhnNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T16_PhnPopFlag=0 => -99999,
+                                   T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	 T1_NapSummary < 1 => -99997,
+																	 T1_NapSummary IN [2,3,5,8] => 1, 0);
+																	 
+Event: => T1L_SsnWAddrNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 OR T9_AddrPopFlag=0 => -99999,
+                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																				T1L_NasSummary < 1 => -99997,
+																				T1L_NasSummary IN [4,7,9] => 1, 0);
+																				
+Event: => T1_SsnPriorDOBFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99999,
+                                     T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		 socsdobflag:Null OR socsdobflag > 1 => -99997,
+																		 socsdobflag);
+																		 
+Event: => T1L_SsnNotVerFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
+                                   T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	 T1L_NasSummary < 1 => -99997,
+																	 T1L_NasSummary IN [2,3,5,8] => 1, 0);
+																	 
+Event: => T1L_CurrAddrNotInAgcyJurStFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                                T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
+																								T1L_CurrAddrStEcho != AgencyProgJurSt => 1, 0);
+																								
 Event: => T1L_CurrAddrPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 																		T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		add_curr_pop=TRUE => 1, 0);
-Event: => T1L_CurrAddrFullEcho := MAP(T1_LexIdPopFlag=0 => -99999,
-																			T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																			T1L_CurrAddrPopFlag=0 => -99997,
-																			IF(T1L_CurrAddrPrimRangeEcho IN ['-99999','-99998','-99997'],'',TRIM(T1L_CurrAddrPrimRangeEcho)) +
-																			IF(T1L_CurrAddrPreDirEcho IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrPreDirEcho)) +
-																			IF(T1L_CurrAddrPrimNmEcho IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrPrimNmEcho)) +
-																			IF(T1L_CurrAddrSuffixEcho IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrSuffixEcho)) +
-																			IF(T1L_CurrAddrUnitDesigEcho IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrUnitDesigEcho)) +
-																			IF(T1L_CurrAddrSecRangeEcho IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrSecRangeEcho)) +
-																			IF(T1L_CurrAddrCityEcho IN ['-99999','-99998','-99997'],'',TRIM(', ' + T1L_CurrAddrCityEcho)) +
-																			IF(T1L_CurrAddrStEcho IN ['-99999','-99998','-99997'],'',TRIM(', ' + T1L_CurrAddrStEcho)) +
-																			IF(T1L_CurrAddrZip5Echo IN ['-99999','-99998','-99997'],'',TRIM(' ' + T1L_CurrAddrZip5Echo)));
-Event: => T1L_CurrAddrOldDt := MAP(T1_LexIdPopFlag=0 => -99999,
-																   T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 NOT ISVALIDDATE(bocashell_addr1_dt_first_seen) => -99997,
-																	 INTEGER(bocashell_addr1_dt_first_seen));
-Event: => T1L_CurrAddrNewDt := MAP(T1_LexIdPopFlag=0 => -99999,
-																   T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																	 NOT ISVALIDDATE(bocashell_addr1_date_last_seen) => -99997,
-																	 INTEGER(bocashell_addr1_date_last_seen));
-Event: => T1L_BestSsnEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-                             best_ssn = '' OR best_ssn:Null OR LENGTH(TRIM(best_ssn))<9 => -99997,
-														 TRIM(best_ssn));
-Event: => T1L_BestSsnPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 T1L_BestSsnEcho = -99997 => 0, 1);
-Event: => T1L_BestDobEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 INTEGER(reported_dob)=0 OR (NOT ISVALIDDATE(reported_dob)) => -99997,
-														 INTEGER(reported_dob));
-Event: => T1L_BestDobPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 T1L_BestDobEcho = -99997 => 0, 1);
-Event: => T1L_BestPhnEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 best_phone = '' OR best_phone:Null OR LENGTH(best_phone)<0 OR STARTSWITH(best_phone,'0') => -99997,
-														 best_phone);
-Event: => T1L_BestPhnPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 T1L_BestPhnEcho = -99997 => 0, 1);
+Event: => T1L_CurrAddrStEcho := MAP(T1_LexIdPopFlag=0 => -99999,
+																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																					 add_curr_st = '' OR add_curr_st:Null => -99997,
+																					 add_curr_st);	
+
+Event: => T1_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                       T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																			 T1L_Fp_SourceRiskLevel=-99997 => -99997,
+																			 T1L_Fp_SourceRiskLevel >=7 => 1, 0);
+																			 
+Event: => T1L_Fp_SourceRiskLevel := MAP(T1_LexIdPopFlag=0 => -99999,
+                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																				sourcerisklevel < 1 => -99997,
+																				sourcerisklevel);
+																				
+Event: => T1L_IdDeceasedFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                    T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+                                                                        diddeceased:Null => -99997,
+                                                                        diddeceased=TRUE => 1, 0);
+Event: => T1L_IdDtOfDeath := MAP(T1_LexIdPopFlag=0 => -99999,
+                             T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998,
+                                                         NOT ISVALIDDATE(diddeceaseddate) => -99997,
+                                                         INTEGER(diddeceaseddate));
+Event: => T1L_IdDtOfDeathAftIdActCntEv := MAP(T1_LexIdPopFlag=0 => -99999,
+                                              T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998, 
+																							T1L_IdDtOfDeath=-99997 => -99997,
+																							EventDate > Event.diddeceaseddate => 1, 0);
+Event: => T1L_IdDtOfDeathAftIdActFlagEv := MAP(T1_LexIdPopFlag=0 => -99999,
+                                               T1L_IdDeceasedFlag < 1 OR T_SrcClassType < 4 => -99998,
+																							 T1L_IdDtOfDeath=-99997 => -99997,
+																							 T1L_IdDtOfDeathAftIdActCntEv>0 => 1, 0);																						 
+																							 
+Event: => P1_AotIdKrStolIdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		      T_SrcClassType <2 => -99998,
+																					T1_IdIsKrStolIdFlag=-99997 => -99997,
+																					T1_IdIsKrStolIdFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P1_AotIdKrStolIdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		      T_SrcClassType <2 => -99998,
+																					P1_AotIdKrStolIdActCntEv=-99997 => -99997,
+																					P1_AotIdKrStolIdActCntEv>0 => 1, 0);
+																					
+Event: => P1_AotIdKrGenFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		    T_SrcClassType <2 => -99998,
+																		    T1_IdIsKrGenFrdFlag=-99997 => -99997,
+																				T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1 => 1, 0);																						
+Event: => P1_AotIdKrGenFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		       T_SrcClassType <2 => -99998,
+																				   P1_AotIdKrGenFrdActCntEv = -99997 => -99997,
+																					 P1_AotIdKrGenFrdActCntEv>0 => 1, 0);
+	
+Event: => P1_AotIdKrAppFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		  T_SrcClassType <2 => -99998,
+																			T1_IdIsKrAppFrdFlag=-99997 => -99997,
+																			T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1 => 1, 0);																	
+Event: => P1_AotIdKrAppFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		   T_SrcClassType <2 => -99998,
+																			 P1_AotIdKrAppFrdActCntEv=-99997 => -99997,
+																			 P1_AotIdKrAppFrdActCntEv>0 => 1, 0);	
+																			 
+Event: => P1_AotIdKrOthFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		      T_SrcClassType <2 => -99998,
+																					T1_IdIsKrOthFrdFlag=-99997 => -99997,
+																					T1_IdIsKrOthFrdFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P1_AotIdKrOthFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+																		      T_SrcClassType <2 => -99998,
+																					P1_AotIdKrOthFrdActCntEv = -99997 => -99997,
+																					P1_AotIdKrOthFrdActCntEv>0 => 1, 0);
+																					
+Event: => P9_AotAddrKrActCntEv := MAP(T9_AddrPopFlag=0 => -99999,
+																			T_SrcClassType < 2 => -99998,
+																			T9_AddrIsKrFlag=-99997 => -99997,
+																			T9_AddrIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P9_AotAddrKrActFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
+																			T_SrcClassType <2 => -99998,
+																			P9_AotAddrKrActCntEv=-99997 => -99997,
+																			P9_AotAddrKrActCntEv>0 => 1, 0);
+
+Event: => P15_AotSsnKrActCntEv := MAP(T15_SsnPopFlag=0 => -99999,
+																			T_SrcClassType <2 => -99998,
+																			T15_SsnIsKrFlag=-99997 => -99997,
+																			T15_SsnIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P15_AotSsnKrActFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
+																			T_SrcClassType <2 => -99998,
+																			P15_AotSsnKrActCntEv=-99997 => -99997,
+																			P15_AotSsnKrActCntEv>0 => 1, 0);
+																			
+Event: => P16_AotPhnKrActCntEv := MAP(T16_PhnPopFlag=0 => -99999,
+																			T_SrcClassType <2 => -99998,
+																			T16_PhnIsKrFlag=-99997 => -99997,
+																			T16_PhnIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P16_AotPhnKrActFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
+																			T_SrcClassType <2 => -99998,
+																			P16_AotPhnKrActCntEv=-99997 => -99997,
+																			P16_AotPhnKrActCntEv>0 => 1, 0);
+	
+Event: => P17_AotEmailKrActCntEv := MAP(T17_EmailPopFlag=0 => -99999,
+																				T_SrcClassType <2 => -99998,
+																				T17_EmailIsKrFlag=-99997 => -99997,
+																				T17_EmailIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P17_AotEmailKrActFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
+																				T_SrcClassType <2 => -99998,
+																				P17_AotEmailKrActCntEv=-99997 => -99997,
+																				P17_AotEmailKrActCntEv>0 => 1, 0);
+																				
+Event: => P18_AotIpAddrKrActCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
+																				 T_SrcClassType <2 => -99998,
+																				 T18_IpAddrIsKrFlag=-99997 => -99997,
+																				 T18_IpAddrIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P18_AotIpAddrKrActFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
+																				 T_SrcClassType <2 => -99998,
+																				 P18_AotIpAddrKrActCntEv=-99997 => -99997,
+																				 P18_AotIpAddrKrActCntEv>0 => 1, 0);	
+																				 
+Event: => P19_AotBnkAcctKrActCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+																					T_SrcClassType <2 => -99998,
+																					T19_BnkAcctIsKrFlag=-99997 => -99997,
+																					T19_BnkAcctIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P19_AotBnkAcctKrActFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+																					T_SrcClassType <2 => -99998,
+																					P19_AotBnkAcctKrActCntEv=-99997 => -99997,
+																					P19_AotBnkAcctKrActCntEv>0 => 1, 0);
+																					
+Event: => P20_AotDlKrActCntEv := MAP(T20_DlPopFlag=0 => -99999,
+																		 T_SrcClassType <2 => -99998,
+																		 T20_DlIsKrFlag=-99997 => -99997,
+																		 T20_DlIsKrFlag=1 AND T_InAgencyFlag=1 => 1, 0);
+Event: => P20_AotDlKrActFlagEv := MAP(T20_DlPopFlag=0 => -99999,
+																		 T_SrcClassType <2 => -99998,
+																		 P20_AotDlKrActCntEv = -99997 => -99997,
+																		 P20_AotDlKrActCntEv>0 => 1, 0);		
+																		 
+Event: => T1L_IdCrimFlSdMatchFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                     T1L_IdCrimHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		 T_FirstNmPopFlag=0 OR T_LastNmPopFlag=0 OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99997,
+																		 name_ssn_dob_match);
+Event: => T1L_IdCrimHitFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                  T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	CrimHit=TRUE => 1, 0);
+Event: => T1L_IdCurrIncarcFlag := MAP(T1_LexIdPopFlag=0 => -99999,
+                                  T1L_IdCrimHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																	T1L_IdCrimFlSdMatchFlag=-99997 OR curr_incar_flag='' OR curr_incar_flag:Null => -99997,
+																	T1L_IdCrimFlSdMatchFlag=1 AND curr_incar_flag='Y' => 1, 0);	
+																	
 Event: => T1L_BestDlEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 														 best_drivers_license = '' OR best_drivers_license:Null => -99997,
 														 best_drivers_license);
+														 
 Event: => T1L_BestDlStEcho := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 														 best_drivers_license_state = '' OR best_drivers_license_state:Null => -99997,
 														 best_drivers_license_state);
+																	
 Event: => T1L_BestDlPopFlag := MAP(T1_LexIdPopFlag=0 => -99999, 
                              T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 														 T1L_BestDlEcho = -99997 OR T1L_BestDlStEcho = -99997 => 0, 1);
-Event: => T1L_BestDlExpDt := MAP(T1_LexIdPopFlag=0 => -99999, 
-                             T1L_BestDlPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-														 best_drivers_license_exp = '' OR best_drivers_license_exp:Null OR best_drivers_license_exp=0 => -99997,
-														 best_drivers_license_exp);
-Event: => T1L_BestFirstNmMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T_FirstNmPopFlag=0 => -99999,
-                                           T1L_BestFirstNmPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 input_fname_isbestmatch);
-Event: => T1L_BestLastNmMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T_LastNmPopFlag=0 => -99999,
-                                           T1L_BestLastNmPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 input_lname_isbestmatch);
-Event: => T1L_BestFullNmMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T_FirstNmPopFlag=0 OR T_LastNmPopFlag=0 => -99999,
-                                              T1L_BestFirstNmPopFlag < 1 OR T1L_BestLastNmPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																							T1L_BestFirstNmMatchesInpFlag=1 AND T1L_BestLastNmMatchesInpFlag=1 => 1, 0);
-Event: => T1L_CurrAddrMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T9_AddrPopFlag=0 => -99999,
-                                            T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																						add_input_isbestmatch=TRUE => 1, 0); //might need to change this -- waiting for response from Jo
-Event: => T1L_BestSsnMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T15_SsnPopFlag=0 => -99999,
-                                           T1L_BestSsnPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 input_ssn_isbestmatch);
-Event: => T1L_BestDobMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T_DobPopFlag=0 => -99999,
-                                           T1L_BestDobPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 T1L_DobVerIndx >= 7 => 1, 0); // need to add this 
-Event: => T1L_BestPhnMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T16_PhnPopFlag=0 => -99999,
-                                           T1L_BestPhnPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					 (T_InpClnPhnEcho=T1L_BestPhnEcho) => 1, 0); //how do I do this?
-Event: => T1L_BestDlMatchesInpFlag := MAP(T1_LexIdPopFlag=0 OR T20_DlPopFlag=0 => -99999,
-                                          T1L_BestDlPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																					T_InpClnDlStEcho=T1L_BestDlStEcho AND T_InpClnDlEcho=T1L_BestDlEcho => 1, 0); //string comparison?
-Event: => T1L_CurrAddrNotInAgcyJurStFlag := MAP(T1_LexIdPopFlag=0 => -99999,
-                                                T1L_CurrAddrPopFlag < 1 OR T_SrcClassType < 4 => -99998,
-																								T1L_CurrAddrStEcho != AgencyProgJurSt => 1, 0);
+																	
 Event: => T1L_BestDlNotInAgcyJurStFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                               T1L_BestDlPopFlag < 1 OR T_SrcClassType < 4 => -99998,
 																							T1L_BestDlStEcho != AgencyProgJurSt => 1, 0);
-*/
-/*
-T1_AdultIDNotSeenFlag
-T1_MinorWLexIDFlag
-T1L_IDDeceasedFlag
-T1L_IDDtOfDeathAftIDActFlagEv
-T1L_IDCurrIncarcFlag
-T1_SSNPriorDOBFlag
-T1_FirstNmNotVerFlag
-T1_LastNmNotVerFlag
-T1_AddrNotVerFlag
-T1L_SSNNotVerFlag
-T1L_SSNWAltNAVerFlag
-T1L_SSNWAddrNotVerFlag
-T1_PhnNotVerFlag
-T1L_DOBNotVerFlag
-T1_HiRiskCVIFlag
-T1_MedRiskCVIFlag
-T1L_HdrSrcCatCntLwFlag
-T1_StolIDFlag
-T1_SynthIDFlag
-T1_ManipIDFlag
-T1L_CurrAddrNotInAgcyJurStFlag
-T1L_BestDLNotInAgcyJurStFlag
-T9_AddrIsVacantFlag
-T9_AddrIsInvalidFlag
-T9_AddrIsCMRAFlag
-T15_SSNIsInvalidFlag
-T20_DLIsInvalidFlag
-T16_PhnIsInvalidFlag
-T16_PhnPrePdFlag
-T18_IPAddrHostedFlag
-T18_IPAddrVPNFlag
-T18_IPAddrTORnodeFlag
-T18_IPAddrLocNonUSFlag
-T18_IPAddrLocMiamiFlag
-T17_EmailDomainDispFlag
-T19_BnkAcctHRPrePdRtgFlag
-T9_AddrPOBoxMultCurrIDFlagEv
-T15_SSNMultCurrIDFlagEv
-T20_DLMultCurrIDFlagEv
-T19_BnkAcctMultCurrIDFlagEv
-P1_AoTIDKRAppFrdActFlagEv
-P1_AoTIDKRGenFrdActFlagEv
-P1_AoTIDKROthFrdActFlagEv
-P1_AoTIDKRStolIDActFlagEv
-P9_AoTAddrKRActFlagEv
-P15_AoTSSNKRActFlagEv
-P16_AoTPhnKRActFlagEv
-P17_AoTEmailKRActFlagEv
-P18_AoTIPAddrKRActFlagEv
-P19_AoTBnkAcctKRActFlagEv
-P20_AoTDLKRActFlagEv
-*/
+																	
 
 Event: => P1_IdRiskUnscrbleFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=1) OR T_SrcClassType < 2 => 1, 0);
 Event: => P9_AddrRiskUnscrbleFlag := 1;
@@ -1275,7 +1214,9 @@ Event: => P20_DlRiskUnscrbleFlag := 1;
 
 QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2 InputPIIDataset) <= Event 
          {
-				  
+				 T1L_IdCurrIncarcFlag,
+				  T1L_IdCrimFlSdMatchFlag,
+					
 					EntityContextUid,     
 					InCustomerPopulation,
 
@@ -1369,9 +1310,40 @@ P16_PhnRiskUnscrbleFlag,
 P17_EmailRiskUnscrbleFlag,
 P18_IpAddrRiskUnscrbleFlag,
 P19_BnkAcctRiskUnscrbleFlag,
-P20_DlRiskUnscrbleFlag		
+P20_DlRiskUnscrbleFlag,
+T1_StolIdFlag,
+T1_SynthIdFlag,
+T1L_DobNotVerFlag,
+T1_ManipIDFlag,
+T1_AdultIdNotSeenFlag,
+T1L_SsnWAltNAVerFlag,
+T1_FirstNmNotVerFlag,
+T1_LastNmNotVerFlag,
+T1_AddrNotVerFlag,
+T1L_HiRiskCviFlag,
+T1L_MedRiskCviFlag,
+T1_MinorWLexIDFlag,
+T1_PhnNotVerFlag,
+T1L_SsnWAddrNotVerFlag,
+T1_SsnPriorDOBFlag,
+T1L_SsnNotVerFlag,
+T1L_CurrAddrNotInAgcyJurStFlag,
+T1L_BestDlNotInAgcyJurStFlag,
+T1_HdrSrcCatCntLwFlag,
+T1L_IdDeceasedFlag,
+T1L_IdDtOfDeathAftIdActFlagEv,
+P1_AotIdKrStolIdActFlagEv,
+P1_AotIdKrGenFrdActFlagEv,
+P1_AotIdKrAppFrdActFlagEv,
+P1_AotIdKrOthFrdActFlagEv,
+P9_AotAddrKrActFlagEv,
+P15_AotSsnKrActFlagEv,
+P16_AotPhnKrActFlagEv,
+P17_AotEmailKrActFlagEv,
+P18_AotIpAddrKrActFlagEv,
+P19_AotBnkAcctKrActFlagEv,
+P20_AotDlKrActFlagEv
 
-				 
 				 }
 			 USE InputPIIDataset(FLAT, 
 			   
@@ -1678,7 +1650,7 @@ P20_DlRiskUnscrbleFlag
 					event_type_3 = event_type_3,
 					
 					DateOfBirth = batchin_rec.dob,
-					BocashellHit = TRUE,
+					BocashellHit = BocaShellHit	,
 					BocashellLexId = boca_shell_appends.shell_input.did,
 					nap_summary = boca_shell_appends.iid.nap_summary,
 					nas_summary = boca_shell_appends.iid.nap_summary,
@@ -1733,7 +1705,7 @@ P20_DlRiskUnscrbleFlag
 							diddeceased = boca_shell_appends.iid.diddeceased,
 							diddeceaseddate = boca_shell_appends.iid.diddeceaseddate,
 							fraudpoint_v3 = boca_shell_appends.fd_scores.fraudpoint_v3,
-							BestHit = TRUE, //This is a guess
+							BestHit = TRUE, //by definition
 							best_phone = pr_best_appends.best_phone, //or boca_shell_appends.best_flags.best_phone_phoneval
 							best_drivers_license_state = pr_best_appends.dl_state,
 							best_drivers_license = pr_best_appends.dl_nbr,
@@ -1753,10 +1725,10 @@ P20_DlRiskUnscrbleFlag
 							death_rec_src = '',
 							state_death_id = '',
 
-
-							curr_incar_flag = crim_appends.curr_incar_flag,
+							CrimHit = crim_hit,
+							curr_incar_flag = curr_incar_flag,
 							off_cat_list = '', //Need to build list from the offense categories
-							name_ssn_dob_match = 1,//crim_appends.match_type, //??
+							name_ssn_dob_match = crim_match_type, //??
 
 							IpAddress=ip_address,
 							iprngbeg = iprngbeg,

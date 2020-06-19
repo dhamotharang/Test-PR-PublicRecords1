@@ -116,7 +116,10 @@ EXPORT LayoutInputPII_2 := RECORD
 					STRING gc_id,
 					STRING ind_type,
 					INTEGER record_id,
-					unsigned2 rin_source
+					UNSIGNED2 rin_source,
+					STRING curr_incar_flag,
+					INTEGER crim_match_type,
+					BOOLEAN crim_hit
 END;
 
 	source := RECORD
