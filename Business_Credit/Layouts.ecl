@@ -554,6 +554,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(PhoneNumberSegment)			phone{MAXCOUNT(100)};
 		DATASET(TaxID_SSNSegment)				taxID{MAXCOUNT(100)};
 		DATASET(MemberSpecificSegment)	memberSpecific{MAXCOUNT(100)};
+		DATASET(DigitalFootPrintSegment)		DigitalFootprint{MAXCOUNT(100)};
 	END;
 
 	EXPORT	IndividualOwnerLayout_Virtual	:=	RECORD
@@ -562,6 +563,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(PN_Virtual)							phone{MAXCOUNT(100)};
 		DATASET(TI_Virtual)							taxID{MAXCOUNT(100)};
 		DATASET(MS_Virtual)							memberSpecific{MAXCOUNT(100)};
+		DATASET(DF_Virtual)							DigitalFootprint{MAXCOUNT(100)};
 	END;
 
 	EXPORT	BusinessOwnerLayout	:=	RECORD
@@ -571,6 +573,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(BusinessIndustryIdentifierSegment)	businessIndustryClassification{MAXCOUNT(25)};
 		DATASET(TaxID_SSNSegment)										taxID{MAXCOUNT(100)};
 		DATASET(MemberSpecificSegment)							memberSpecific{MAXCOUNT(100)};
+		DATASET(DigitalFootPrintSegment)			DigitalFootprint{MAXCOUNT(100)};
 	END;
 
 	EXPORT	BusinessOwnerLayout_Virtual	:=	RECORD
@@ -580,6 +583,25 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(BI_Virtual)													businessIndustryClassification{MAXCOUNT(25)};
 		DATASET(TI_Virtual)													taxID{MAXCOUNT(100)};
 		DATASET(MS_Virtual)													memberSpecific{MAXCOUNT(100)};
+		DATASET(DF_Virtual)													DigitalFootprint{MAXCOUNT(100)};
+	END;
+
+	Export MemberProcessingDataLayout:=RECORD
+		MerchantProcessingDataSegment;
+		DATASET(MerchantCardTransaction)							MerchantCTSegment{MAXCOUNT(100)};						//	CT
+		DATASET(MerchantChargeback)							MerchantChargebackSegment{MAXCOUNT(100)};						//	MT
+		DATASET(MerchantRefund)							MerchantRefundSegment{MAXCOUNT(100)};								//	MR
+		DATASET(MerchantClassificationCode)							MemberMCSegment{MAXCOUNT(100)};							//	MC
+		DATASET(MerchantDestinationMedia)							MemberDMSegment{MAXCOUNT(100)};							//	DM
+	END;
+
+	Export MemberProcessingDataLayout_Virtual:=RECORD
+		MD_Virtual;
+		DATASET(CT_Virtual)							MerchantCTSegment{MAXCOUNT(100)};								//	CT
+		DATASET(MT_Virtual)							MerchantChargebackSegment{MAXCOUNT(100)};						//	MT
+		DATASET(MR_Virtual)							MerchantRefundSegment{MAXCOUNT(100)};							//	MR
+		DATASET(MC_Virtual)							MemberMCSegment{MAXCOUNT(100)};									//	MC
+		DATASET(DM_Virtual)							MemberDMSegment{MAXCOUNT(100)};									//	DM
 	END;
 
 	EXPORT	AccountDataLayout	:=	RECORD
@@ -595,13 +617,8 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(BusinessIndustryIdentifierSegment)	businessIndustryClassification{MAXCOUNT(25)};		//	BI
 		DATASET(CollateralSegment)									collateral{MAXCOUNT(1000)};											//	CL
 		DATASET(MemberSpecificSegment)							memberSpecific{MAXCOUNT(100)};									//	MS
-		DATASET(DigitalFootPrintSegment)							DigitalFootPrint{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantProcessingDataSegment)							MerchantProcessingData{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantCardTransaction)							MerchantCTSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantChargeback)							MerchantChargebackSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantRefund)							MerchantRefundSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantClassificationCode)							MemberMCSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MerchantDestinationMedia)							MemberDMSegment{MAXCOUNT(100)};									//	MS
+		DATASET(DigitalFootPrintSegment)							DigitalFootPrint{MAXCOUNT(100)};									//	DF
+		DATASET(MemberProcessingDataLayout)							MerchantProcessingData{MAXCOUNT(100)};									//	MD
 		HeaderSegment																portfolioHeader;																//	AA
 		FileHeaderSegment														fileHeader;																			//	FA
 		STRING50																		Original_Contract_Account_Number:='';
@@ -627,12 +644,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(CL_Virtual)													collateral{MAXCOUNT(1000)};											//	CL
 		DATASET(MS_Virtual)													memberSpecific{MAXCOUNT(100)};									//	MS
 		DATASET(DF_Virtual)							DigitalFootPrint{MAXCOUNT(100)};									//	MS
-		DATASET(MD_Virtual)							MerchantProcessingData{MAXCOUNT(100)};									//	MS
-		DATASET(CT_Virtual)							MerchantCTSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MT_Virtual)							MerchantChargebackSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MR_Virtual)							MerchantRefundSegment{MAXCOUNT(100)};									//	MS
-		DATASET(MC_Virtual)							MemberMCSegment{MAXCOUNT(100)};									//	MS
-		DATASET(DM_Virtual)							MemberDMSegment{MAXCOUNT(100)};									//	MS
+		DATASET(MemberProcessingDataLayout_Virtual)							MerchantProcessingData{MAXCOUNT(100)};									//	MS
 		AA_Virtual																	portfolioHeader;																//	AA
 		FA_Virtual																	fileHeader;																			//	FA
 		STRING50																		Original_Contract_Account_Number:='';
