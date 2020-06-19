@@ -65,6 +65,7 @@ EXPORT KEL_PivotIndexPrep := MODULE
 
 	BaseIndexPrepWithNVP := PROJECT(MainEventShell, 
 														TRANSFORM(profileRec,
+														SELF.personeventcount := LEFT.aotidusngcntev,
 														SELF.event30count := LEFT.aotnonstactcnt30d,
 														SELF.eventcount := LEFT.aotnonstactcntev,
 														SELF.deviceid := LEFT.t_inpdvcidecho,
