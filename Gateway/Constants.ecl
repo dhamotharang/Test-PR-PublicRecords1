@@ -74,6 +74,7 @@ export Constants := module
     export String40 NetWise := 'netwise'; //NetWise (Social Media Email Search) for use by the Virtual Identity Report V2 Accurint product
     export String40 SocialMediaLocator := 'socialmedialocator'; //Standalone Social Media Locator gateway.
     export String40 CaAvmReport := 'caavmreport'; //Standalone CaAvmReport property valuation gateway.
+    export String40 Avm := 'avminternal '; //Standalone avm gateway. "Automated Valuation Model". Interal calls avm.
     // DeferredTaskESP methods
     export String40 GetRequestInfo := 'dtegetrequestinfo'; // DTE Status Refresh method
   end;
