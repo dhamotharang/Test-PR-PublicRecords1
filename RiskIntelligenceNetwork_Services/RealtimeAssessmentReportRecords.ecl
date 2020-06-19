@@ -10,7 +10,7 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  ds_best_in := PROJECT(ds_in,
                 TRANSFORM(didville.Layout_Did_OutBatch,
                   SELF.seq := (unsigned)LEFT.acctno,
-                  SELF := LEFT,
+                  SELF.did := LEFT.did,
                   SELF := []));
 
  ds_pr_best := RiskIntelligenceNetwork_Services.Functions.getGovernmentBest(ds_best_in, report_params);
