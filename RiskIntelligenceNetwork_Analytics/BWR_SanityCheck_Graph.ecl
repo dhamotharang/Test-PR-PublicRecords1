@@ -379,6 +379,7 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Headoffice_Routingnumber__Sin
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Headoffice_Branchcodes__SingleValue_Invalid,NAMED('E_Event_Headoffice_Branchcodes__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Account_Number__SingleValue_Invalid,NAMED('E_Event_Account_Number__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Bank_Hit__SingleValue_Invalid,NAMED('E_Event_Bank_Hit__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Crim_Hit__SingleValue_Invalid,NAMED('E_Event_Crim_Hit__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._curr__incar__flag__SingleValue_Invalid,NAMED('E_Event__curr__incar__flag__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._off__cat__list__SingleValue_Invalid,NAMED('E_Event__off__cat__list__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._name__ssn__dob__match__SingleValue_Invalid,NAMED('E_Event__name__ssn__dob__match__SingleValue_Invalid')));
