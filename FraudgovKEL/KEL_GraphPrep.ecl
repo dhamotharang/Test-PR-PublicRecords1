@@ -345,7 +345,7 @@ EXPORT KEL_GraphPrep := MODULE
 	SHARED EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell;
 
 	// build only for profile records in pivot
-  EXPORT LinksPrep := JOIN(EntityEventPivot(AotCurrProfFlag = 1), EntityEventPivot, 
+  EXPORT LinksPrep := JOIN(EntityEventPivot(iscurrent = 1), EntityEventPivot, 
 	               LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.recordid=RIGHT.recordid AND LEFT.entitycontextuid != RIGHT.entitycontextuid AND 
 								 (LEFT.entitytype != 1 AND RIGHT.entitytype = 1 OR LEFT.entitytype = 1 AND RIGHT.entitytype != 1),
 	               TRANSFORM({LEFT.customerid, LEFT.industrytype, STRING treeuid, RIGHT.entitycontextuid, LEFT.t_actdtecho}, SELF.treeuid := LEFT.entitycontextuid, SELF.entitycontextuid := RIGHT.entitycontextuid, SELF := LEFT), HASH);

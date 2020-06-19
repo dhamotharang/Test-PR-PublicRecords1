@@ -32,6 +32,7 @@ BuildCoverageDates :=
 ;
 
 RunDashboards:=  SEQUENTIAL(	FraudGovPlatform_Analytics.GenerateDashboards(true,true),
+								FraudGovPlatform_Analytics.GenerateRinDashboards(true,true),
 								CreateSuper,
 								UpdateRefreshVersion,
 								fsuperadd,
