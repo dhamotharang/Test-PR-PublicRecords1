@@ -6,11 +6,11 @@ EXPORT B_Drivers_License_3 := MODULE
   SHARED VIRTUAL TYPEOF(B_Drivers_License_4.__ENH_Drivers_License_4) __ENH_Drivers_License_4 := B_Drivers_License_4.__ENH_Drivers_License_4;
   SHARED VIRTUAL TYPEOF(E_Drivers_License_Event.__Result) __E_Drivers_License_Event := E_Drivers_License_Event.__Result;
   SHARED VIRTUAL TYPEOF(B_Event_4.__ENH_Event_4) __ENH_Event_4 := B_Event_4.__ENH_Event_4;
-  SHARED __EE493919 := __ENH_Drivers_License_4;
-  SHARED __EE495614 := __ENH_Event_4;
-  SHARED __EE495612 := __E_Drivers_License_Event;
-  SHARED __EE506623 := __EE495612(__NN(__EE495612.Licence_) AND __NN(__EE495612.Transaction_));
-  SHARED __ST502263_Layout := RECORD
+  SHARED __EE503346 := __ENH_Drivers_License_4;
+  SHARED __EE505069 := __ENH_Event_4;
+  SHARED __EE505067 := __E_Drivers_License_Event;
+  SHARED __EE516260 := __EE505067(__NN(__EE505067.Licence_) AND __NN(__EE505067.Transaction_));
+  SHARED __ST511830_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -18,6 +18,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.ntyp(E_Address.Typ) Location_;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
+    KEL.typ.nstr _reported__time_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
     KEL.typ.ntyp(E_Phone.Typ) _r_Phone_;
     KEL.typ.ntyp(E_Email.Typ) _r_Email_;
@@ -81,6 +82,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nint _nap__summary_;
     KEL.typ.nint _nas__summary_;
     KEL.typ.nint _cvi_;
+    KEL.typ.nint _addrvalflag_;
     KEL.typ.nint _fp3__stolenidentityindex_;
     KEL.typ.nint _syntheticidentityindex__v3_;
     KEL.typ.nint _manipulatedidentityindex__v3_;
@@ -121,6 +123,8 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr _input__fname__isbestmatch_;
     KEL.typ.nstr _input__lname__isbestmatch_;
     KEL.typ.nstr _input__ssn__isbestmatch_;
+    KEL.typ.nunk _drop__indicator_;
+    KEL.typ.nunk _address__vacancy__indicator_;
     KEL.typ.nbool _add__curr__pop_;
     KEL.typ.nstr _add__curr__prim__range_;
     KEL.typ.nstr _add__curr__predir_;
@@ -171,6 +175,8 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
+    KEL.typ.nstr _fips__state_;
+    KEL.typ.nstr _fips__county_;
     KEL.typ.nstr Mailing_Primary_Range_;
     KEL.typ.nstr Mailing_Predirectional_;
     KEL.typ.nstr Mailing_Primary_Name_;
@@ -215,6 +221,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr Headoffice_Branchcodes2_;
     KEL.typ.nstr Account_Number2_;
     KEL.typ.nstr Bank_Hit2_;
+    KEL.typ.nbool Crim_Hit_;
     KEL.typ.nstr _curr__incar__flag_;
     KEL.typ.nstr _off__cat__list_;
     KEL.typ.nint _name__ssn__dob__match_;
@@ -407,15 +414,15 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC506641(B_Event_4.__ST90131_Layout __EE495614, E_Drivers_License_Event.Layout __EE506623) := __EEQP(__EE506623.Transaction_,__EE495614.UID);
-  __ST502263_Layout __JT506641(B_Event_4.__ST90131_Layout __l, E_Drivers_License_Event.Layout __r) := TRANSFORM
+  __JC516278(B_Event_4.__ST93433_Layout __EE505069, E_Drivers_License_Event.Layout __EE516260) := __EEQP(__EE516260.Transaction_,__EE505069.UID);
+  __ST511830_Layout __JT516278(B_Event_4.__ST93433_Layout __l, E_Drivers_License_Event.Layout __r) := TRANSFORM
     SELF._r_Customer__1_ := __r._r_Customer_;
     SELF.Event_Date__1_ := __r.Event_Date_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE506642 := JOIN(__EE506623,__EE495614,__JC506641(RIGHT,LEFT),__JT506641(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST500435_Layout := RECORD
+  SHARED __EE516279 := JOIN(__EE516260,__EE505069,__JC516278(RIGHT,LEFT),__JT516278(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST509974_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
@@ -428,6 +435,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.ntyp(E_Address.Typ) Location_;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date__1_;
+    KEL.typ.nstr _reported__time_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
     KEL.typ.ntyp(E_Phone.Typ) _r_Phone_;
     KEL.typ.ntyp(E_Email.Typ) _r_Email_;
@@ -491,6 +499,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nint _nap__summary_;
     KEL.typ.nint _nas__summary_;
     KEL.typ.nint _cvi_;
+    KEL.typ.nint _addrvalflag_;
     KEL.typ.nint _fp3__stolenidentityindex_;
     KEL.typ.nint _syntheticidentityindex__v3_;
     KEL.typ.nint _manipulatedidentityindex__v3_;
@@ -531,6 +540,8 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr _input__fname__isbestmatch_;
     KEL.typ.nstr _input__lname__isbestmatch_;
     KEL.typ.nstr _input__ssn__isbestmatch_;
+    KEL.typ.nunk _drop__indicator_;
+    KEL.typ.nunk _address__vacancy__indicator_;
     KEL.typ.nbool _add__curr__pop_;
     KEL.typ.nstr _add__curr__prim__range_;
     KEL.typ.nstr _add__curr__predir_;
@@ -581,6 +592,8 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
+    KEL.typ.nstr _fips__state_;
+    KEL.typ.nstr _fips__county_;
     KEL.typ.nstr Mailing_Primary_Range_;
     KEL.typ.nstr Mailing_Predirectional_;
     KEL.typ.nstr Mailing_Primary_Name_;
@@ -625,6 +638,7 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.nstr Headoffice_Branchcodes2_;
     KEL.typ.nstr Account_Number2_;
     KEL.typ.nstr Bank_Hit2_;
+    KEL.typ.nbool Crim_Hit_;
     KEL.typ.nstr _curr__incar__flag_;
     KEL.typ.nstr _off__cat__list_;
     KEL.typ.nint _name__ssn__dob__match_;
@@ -812,17 +826,17 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST500435_Layout __ND507046__Project(__ST502263_Layout __PP506643) := TRANSFORM
-    SELF.UID := __PP506643.Licence_;
-    SELF._r_Customer_ := __PP506643._r_Customer__1_;
-    SELF.Event_Date_ := __PP506643.Event_Date__1_;
-    SELF.U_I_D__1_ := __PP506643.UID;
-    SELF._r_Customer__1_ := __PP506643._r_Customer_;
-    SELF.Event_Date__1_ := __PP506643.Event_Date_;
-    SELF := __PP506643;
+  SHARED __ST509974_Layout __ND516690__Project(__ST511830_Layout __PP516280) := TRANSFORM
+    SELF.UID := __PP516280.Licence_;
+    SELF._r_Customer_ := __PP516280._r_Customer__1_;
+    SELF.Event_Date_ := __PP516280.Event_Date__1_;
+    SELF.U_I_D__1_ := __PP516280.UID;
+    SELF._r_Customer__1_ := __PP516280._r_Customer_;
+    SELF.Event_Date__1_ := __PP516280.Event_Date_;
+    SELF := __PP516280;
   END;
-  SHARED __EE508623 := PROJECT(__EE506642,__ND507046__Project(LEFT));
-  SHARED __ST501256_Layout := RECORD
+  SHARED __EE518295 := PROJECT(__EE516279,__ND516690__Project(LEFT));
+  SHARED __ST510809_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.nkdate Exp1_;
     KEL.typ.bool Exp2_ := FALSE;
@@ -830,13 +844,13 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST501256_Layout __ND508628__Project(__ST500435_Layout __PP508624) := TRANSFORM
-    SELF.Exp1_ := IF(__PP508624.T___In_Agency_Flag_ = 1 AND __PP508624.T20___Dl_Is_Kr_Flag_ = 1,__ECAST(KEL.typ.nkdate,__PP508624.T___Act_Dt_Echo_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    SELF.Exp2_ := __PP508624.T___In_Agency_Flag_ = 0 AND __PP508624.T20___Dl_Is_Kr_Flag_ = 1;
-    SELF := __PP508624;
+  SHARED __ST510809_Layout __ND518300__Project(__ST509974_Layout __PP518296) := TRANSFORM
+    SELF.Exp1_ := IF(__PP518296.T___In_Agency_Flag_ = 1 AND __PP518296.T20___Dl_Is_Kr_Flag_ = 1,__ECAST(KEL.typ.nkdate,__PP518296.T___Act_Dt_Echo_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    SELF.Exp2_ := __PP518296.T___In_Agency_Flag_ = 0 AND __PP518296.T20___Dl_Is_Kr_Flag_ = 1;
+    SELF := __PP518296;
   END;
-  SHARED __EE508658 := PROJECT(__EE508623,__ND508628__Project(LEFT));
-  SHARED __ST501281_Layout := RECORD
+  SHARED __EE518330 := PROJECT(__EE518295,__ND518300__Project(LEFT));
+  SHARED __ST510834_Layout := RECORD
     KEL.typ.nkdate M_A_X___T___Act_Dt_Echo_;
     KEL.typ.int C_O_U_N_T___Exp1_ := 0;
     KEL.typ.nkdate M_A_X___Event_Date__1_;
@@ -844,8 +858,8 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE508684 := PROJECT(__CLEANANDDO(__EE508658,TABLE(__EE508658,{KEL.Aggregates.MaxNG(__EE508658.Exp1_) M_A_X___T___Act_Dt_Echo_,KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE508658.Exp2_),KEL.Aggregates.MaxNG(__EE508658.Event_Date__1_) M_A_X___Event_Date__1_,UID},UID,MERGE)),__ST501281_Layout);
-  SHARED __ST504256_Layout := RECORD
+  SHARED __EE518356 := PROJECT(__CLEANANDDO(__EE518330,TABLE(__EE518330,{KEL.Aggregates.MaxNG(__EE518330.Exp1_) M_A_X___T___Act_Dt_Echo_,KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE518330.Exp2_),KEL.Aggregates.MaxNG(__EE518330.Event_Date__1_) M_A_X___Event_Date__1_,UID},UID,MERGE)),__ST510834_Layout);
+  SHARED __ST513858_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
@@ -862,14 +876,14 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC508690(B_Drivers_License_4.__ST87735_Layout __EE493919, __ST501281_Layout __EE508684) := __EEQP(__EE493919.UID,__EE508684.UID);
-  __ST504256_Layout __JT508690(B_Drivers_License_4.__ST87735_Layout __l, __ST501281_Layout __r) := TRANSFORM
+  __JC518362(B_Drivers_License_4.__ST91030_Layout __EE503346, __ST510834_Layout __EE518356) := __EEQP(__EE503346.UID,__EE518356.UID);
+  __ST513858_Layout __JT518362(B_Drivers_License_4.__ST91030_Layout __l, __ST510834_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE508691 := JOIN(__EE493919,__EE508684,__JC508690(LEFT,RIGHT),__JT508690(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST83535_Layout := RECORD
+  SHARED __EE518363 := JOIN(__EE503346,__EE518356,__JC518362(LEFT,RIGHT),__JT518362(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST86807_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
@@ -885,11 +899,11 @@ EXPORT B_Drivers_License_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST83535_Layout __ND508713__Project(__ST504256_Layout __PP508692) := TRANSFORM
-    SELF.Aot_Dl_Kr_Act_New_Dt_Ev_ := __PP508692.M_A_X___T___Act_Dt_Echo_;
-    SELF.Aot_Dl_Kr_Act_Shrd_Cnt_Ev_ := MIN(__PP508692.C_O_U_N_T___Exp1_,9999);
-    SELF.Dt_Last_Seen_ := __PP508692.M_A_X___Event_Date__1_;
-    SELF := __PP508692;
+  SHARED __ST86807_Layout __ND518385__Project(__ST513858_Layout __PP518364) := TRANSFORM
+    SELF.Aot_Dl_Kr_Act_New_Dt_Ev_ := __PP518364.M_A_X___T___Act_Dt_Echo_;
+    SELF.Aot_Dl_Kr_Act_Shrd_Cnt_Ev_ := MIN(__PP518364.C_O_U_N_T___Exp1_,9999);
+    SELF.Dt_Last_Seen_ := __PP518364.M_A_X___Event_Date__1_;
+    SELF := __PP518364;
   END;
-  EXPORT __ENH_Drivers_License_3 := PROJECT(__EE508691,__ND508713__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Drivers_License::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Drivers_License_3 := PROJECT(__EE518363,__ND518385__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Drivers_License::Annotated_3',EXPIRE(7));
 END;

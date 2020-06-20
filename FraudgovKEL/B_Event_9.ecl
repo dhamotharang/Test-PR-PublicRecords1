@@ -4,8 +4,8 @@ IMPORT B_Event_10,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_9 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_10.__ENH_Event_10) __ENH_Event_10 := B_Event_10.__ENH_Event_10;
-  SHARED __EE109366 := __ENH_Event_10;
-  EXPORT __ST99346_Layout := RECORD
+  SHARED __EE112969 := __ENH_Event_10;
+  EXPORT __ST102718_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -13,6 +13,7 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.ntyp(E_Address.Typ) Location_;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
+    KEL.typ.nstr _reported__time_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
     KEL.typ.ntyp(E_Phone.Typ) _r_Phone_;
     KEL.typ.ntyp(E_Email.Typ) _r_Email_;
@@ -76,6 +77,7 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.nint _nap__summary_;
     KEL.typ.nint _nas__summary_;
     KEL.typ.nint _cvi_;
+    KEL.typ.nint _addrvalflag_;
     KEL.typ.nint _fp3__stolenidentityindex_;
     KEL.typ.nint _syntheticidentityindex__v3_;
     KEL.typ.nint _manipulatedidentityindex__v3_;
@@ -116,6 +118,8 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.nstr _input__fname__isbestmatch_;
     KEL.typ.nstr _input__lname__isbestmatch_;
     KEL.typ.nstr _input__ssn__isbestmatch_;
+    KEL.typ.nunk _drop__indicator_;
+    KEL.typ.nunk _address__vacancy__indicator_;
     KEL.typ.nbool _add__curr__pop_;
     KEL.typ.nstr _add__curr__prim__range_;
     KEL.typ.nstr _add__curr__predir_;
@@ -166,6 +170,8 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
+    KEL.typ.nstr _fips__state_;
+    KEL.typ.nstr _fips__county_;
     KEL.typ.nstr Mailing_Primary_Range_;
     KEL.typ.nstr Mailing_Predirectional_;
     KEL.typ.nstr Mailing_Primary_Name_;
@@ -210,6 +216,7 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.nstr Headoffice_Branchcodes2_;
     KEL.typ.nstr Account_Number2_;
     KEL.typ.nstr Bank_Hit2_;
+    KEL.typ.nbool Crim_Hit_;
     KEL.typ.nstr _curr__incar__flag_;
     KEL.typ.nstr _off__cat__list_;
     KEL.typ.nint _name__ssn__dob__match_;
@@ -308,13 +315,13 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST99346_Layout __ND109975__Project(B_Event_10.__ST100004_Layout __PP107788) := TRANSFORM
-    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP107788.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP107788.No_Lex_Id_ = 1=>0,1);
-    SELF.T1___Rin_Id_Pop_Flag_ := MAP(__T(__OP2(__PP107788.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP107788.No_Lex_Id_ = 1=>1,0);
-    SELF.T___Evt_Type1_Status_Code_Echo_ := MAP(__PP107788.T___Src_Class_Type_ <> 2 AND __PP107788.T___Src_Class_Type_ <> 3 AND __PP107788.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP107788._event__type__1_),=,__CN('')),__NT(__PP107788._event__type__1_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP107788._event__type__1_));
-    SELF.T___Evt_Type2_Status_Code_Echo_ := MAP(__PP107788.T___Src_Class_Type_ <> 2 AND __PP107788.T___Src_Class_Type_ <> 3 AND __PP107788.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP107788._event__type__2_),=,__CN('')),__NT(__PP107788._event__type__2_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP107788._event__type__2_));
-    SELF.T___Evt_Type3_Status_Code_Echo_ := MAP(__PP107788.T___Src_Class_Type_ <> 2 AND __PP107788.T___Src_Class_Type_ <> 3 AND __PP107788.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP107788._event__type__3_),=,__CN('')),__NT(__PP107788._event__type__3_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP107788._event__type__3_));
-    SELF := __PP107788;
+  SHARED __ST102718_Layout __ND113592__Project(B_Event_10.__ST103390_Layout __PP111356) := TRANSFORM
+    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP111356.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP111356.No_Lex_Id_ = 1=>0,1);
+    SELF.T1___Rin_Id_Pop_Flag_ := MAP(__T(__OP2(__PP111356.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP111356.No_Lex_Id_ = 1=>1,0);
+    SELF.T___Evt_Type1_Status_Code_Echo_ := MAP(__PP111356.T___Src_Class_Type_ <> 2 AND __PP111356.T___Src_Class_Type_ <> 3 AND __PP111356.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111356._event__type__1_),=,__CN('')),__NT(__PP111356._event__type__1_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111356._event__type__1_));
+    SELF.T___Evt_Type2_Status_Code_Echo_ := MAP(__PP111356.T___Src_Class_Type_ <> 2 AND __PP111356.T___Src_Class_Type_ <> 3 AND __PP111356.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111356._event__type__2_),=,__CN('')),__NT(__PP111356._event__type__2_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111356._event__type__2_));
+    SELF.T___Evt_Type3_Status_Code_Echo_ := MAP(__PP111356.T___Src_Class_Type_ <> 2 AND __PP111356.T___Src_Class_Type_ <> 3 AND __PP111356.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111356._event__type__3_),=,__CN('')),__NT(__PP111356._event__type__3_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111356._event__type__3_));
+    SELF := __PP111356;
   END;
-  EXPORT __ENH_Event_9 := PROJECT(__EE109366,__ND109975__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
+  EXPORT __ENH_Event_9 := PROJECT(__EE112969,__ND113592__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
 END;
