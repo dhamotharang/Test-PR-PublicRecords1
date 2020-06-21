@@ -2561,7 +2561,7 @@ RECORD
  END;
  
  EXPORT EntityProfile	:=RECORD
-   integer1 entitytype;
+  integer1 entitytype;
   string label;
   integer1 riskindx;
   integer1 aotcurrprofflag;
@@ -2577,6 +2577,7 @@ RECORD
   unsigned8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
+  unsigned8 aotidcurrprofusngcntev;
   unsigned1 not_aotkractflagev;
   unsigned1 not_aotsafeactflagev;
   string customerprogramdescription;
@@ -2725,7 +2726,7 @@ RECORD
   string t_inpclnaddrzip4echo;
   real8 t_inpclnaddrlatecho;
   real8 t_inpclnaddrlongecho;
-  integer8 t_inpclnaddrcountyecho;
+  string t_inpclnaddrcountyecho;
   integer8 t_inpclnaddrgeoblkecho;
   string t_inpclnssnecho;
   integer8 t_inpclndobecho;
@@ -2945,9 +2946,9 @@ RECORD
   integer8 t1l_ssnwaddrnotverflag;
   integer8 t1_phnnotverflag;
   integer8 t1l_dobnotverflag;
-  integer8 t1l_hiriskcviflag;
-  integer8 t1l_medriskcviflag;
-  integer8 t1_hdrsrccatcntlwflag;
+  integer8 t1_hiriskcviflag;
+  integer8 t1_medriskcviflag;
+  integer8 t1l_hdrsrccatcntlwflag;
   integer8 t1_stolidflag;
   integer8 t1_synthidflag;
   integer8 t1_manipidflag;
@@ -3084,7 +3085,7 @@ RECORD
   integer8 p16_aotidusngphncntev;
   integer8 p17_aotidusngemailcntev;
   integer8 p18_aotidusngipaddrcntev;
-  integer8 p19_aotidusingbnkacctcntev;
+  integer8 p19_aotidusngbnkacctcntev;
   integer8 p20_aotidusngdlcntev;
   integer8 p1_aotidnaccollactcntev;
   integer8 p1_aotidnaccollflagev;
@@ -3100,7 +3101,7 @@ RECORD
   integer8 p20_dlriskunscrbleflag;
   integer8 t1l_idcurrincarcflag;
   string t_inpclnfullnmecho;
-  integer8 t_acttmecho;
+  string t_acttmecho;
   string t_inpaddrtypeecho;
   string t_inpclnmailingaddrstreetecho;
   string t_inpclnmailingaddrcityecho;
@@ -3137,6 +3138,38 @@ RECORD
   integer8 t1l_iddtofdeath;
   integer8 t1l_idcrimflsdmatchflag;
   integer8 t1l_idcrimhitflag;
+  integer8 t1_minoridflag;
+  integer8 t9_idcurrprofusngaddrcntev;
+  integer8 t15_idcurrprofusngssncntev;
+  integer8 t20_idcurrprofusngdlcntev;
+  integer8 t19_idcurrprofusngbnkacctcntev;
+  integer8 t9_addrvaltype;
+  string t9_addrmaildroptype;
+  integer8 t15_ssnvaltype;
+  integer8 t20_dlvaltype;
+  integer8 t16_phnvaltype;
+  integer8 t16_isphnmetahitflag;
+  integer8 t16_phnmetanewvenddt;
+  integer8 t16_phnmetaoldvenddt;
+  integer8 t9_addrpoboxmultcurridflagev;
+  integer8 t9_addrisvacantflag;
+  integer8 t9_addrisinvalidflag;
+  integer8 t9_addriscmraflag;
+  integer8 t15_ssnmultcurridflagev;
+  integer8 t15_ssnisinvalidflag;
+  integer8 t20_dlmultcurridflagev;
+  integer8 t20_dlisinvalidflag;
+  string t16_phnprepdflag;
+  integer8 t16_phnisinvalidflag;
+  integer8 t19_bnkacctmultcurridflagev;
+  integer8 p1_idactolddt;
+  integer8 p9_idactolddt;
+  integer8 p15_idactolddt;
+  integer8 p16_idactolddt;
+  integer8 p17_idactolddt;
+  integer8 p18_idactolddt;
+  integer8 p19_idactolddt;
+  integer8 p20_idactolddt;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
@@ -3173,7 +3206,7 @@ RECORD
  END;
  
  EXPORT EntityAttributes := RECORD
-   string field;
+  string field;
   string value;
   string indicatortype;
   string indicatordescription;
@@ -3218,8 +3251,8 @@ RECORD
   integer8 t1_addrnotverflag;
   integer8 t1l_ssnwaltnaverflag;
   integer8 t1_firstnmnotverflag;
-  integer8 t1l_hiriskcviflag;
-  integer8 t1l_medriskcviflag;
+  integer8 t1_hiriskcviflag;
+  integer8 t1_medriskcviflag;
   integer8 t1_minorwlexidflag;
   integer8 t1_lastnmnotverflag;
   integer8 t1_phnnotverflag;
@@ -3228,10 +3261,22 @@ RECORD
   integer8 t1l_ssnnotverflag;
   integer8 t1l_curraddrnotinagcyjurstflag;
   integer8 t1l_bestdlnotinagcyjurstflag;
-  integer8 t1_hdrsrccatcntlwflag;
+  integer8 t1l_hdrsrccatcntlwflag;
   integer8 t1l_iddeceasedflag;
   integer8 t1l_idcurrincarcflag;
   integer8 t1l_iddtofdeathaftidactflagev;
+  unsigned8 aotidcurrprofusngcntev;
+  integer8 t9_addrisvacantflag;
+  integer8 t9_addrisinvalidflag;
+  integer8 t9_addriscmraflag;
+  integer8 t9_addrpoboxmultcurridflagev;
+  integer8 t15_ssnisinvalidflag;
+  integer8 t15_ssnmultcurridflagev;
+  integer8 t16_phnisinvalidflag;
+  string t16_phnprepdflag;
+  integer8 t19_bnkacctmultcurridflagev;
+  integer8 t20_dlisinvalidflag;
+  integer8 t20_dlmultcurridflagev;
   integer8 incustomerpopulation;
   integer1 riskindx;
  END;

@@ -27,12 +27,12 @@ TOPN(t3, 100, -reccount);
 
 //output(FraudgovKEL.KEL_EventPivot.EventPivotShell);
 
-/*
+
 OUTPUT(COUNT(Std.Str.SplitWords(KEL_EventShell.NicoleAttr, ',')), named('AttributeCount'));
 ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 output(ModelingOutput,,'~temp::deleteme_nd', overwrite);	
 output(ModelingOutput,,'~temp::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);	
-*/
+
 
 
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~gov::otto::eventpivot', overwrite, compressed);	
@@ -44,5 +44,3 @@ output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~temp::fraudgov::rin2::graphpvertice
 */
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
-
-
