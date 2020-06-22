@@ -3226,6 +3226,7 @@ RECORD
   integer8 entitytype;
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
+  integer1 aotcurrprofflag;
   unsigned4 t_actdtecho;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
