@@ -1222,6 +1222,7 @@
 		export string KEYWORD_MLARB									:= '908';
 		export string KEYWORD_OFAC_SY_CAESAR				:= '909';
 		export string KEYWORD_OFAC_EO13894					:= '910';
+		export string KEYWORD_CNNBS									:= '911';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
