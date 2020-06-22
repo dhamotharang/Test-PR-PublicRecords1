@@ -16,10 +16,11 @@ NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t1
 't1_minoridflag,p1_idactolddt,t18_ipaddrcity,t18_ipaddrcountry,t18_ipaddrregion,t18_ipaddrdomain,t18_ipaddrispnm,t18_ipaddrloctype,t18_ipaddrproxytype,t18_ipaddrproxydesc,t18_ipaddrisispflag,' + 
 't18_ipaddrasncompnm,t18_ipaddrasn,t18_ipaddrcompnm,t18_ipaddrorgnm,t19_bnkacctbnknm,p1_aotidkrappfrdactshrdflagev,p1_aotidkrgenfrdactshrdflagev,p1_aotidkrothfrdactshrdflagev,p1_aotidkrstolidactshrdflagev,' + 
 'p9_aotaddrkractshrdflagev,p15_aotssnkractshrdflagev,p16_aotphnkractshrdflagev,p17_aotemailkractshrdflagev,p18_aotipaddrkractshrdflagev,p19_aotbnkacctkractshrdflagev,p20_aotdlkractshrdflagev,' +
+'p9_idactolddt,p15_idactolddt,p16_idactolddt,p17_idactolddt,p18_idactolddt,p19_idactolddt,p20_idactolddt,p9_aotaddrsafeactflagev,p16_aotphnsafeactflagev,p18_aotipaddrsafeactflagev,' +
 't9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t9_addrpoboxmultcurridflagev,t15_ssnisinvalidflag,t15_ssnmultcurridflagev,t16_phnisinvalidflag,t16_phnprepdflag,t19_bnkacctmultcurridflagev,t20_dlisinvalidflag,t20_dlmultcurridflagev';
 
   //EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
-  EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(iscurrent=1); // only create entity stats for the last event per element/identity.
+  EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
     
   EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(EntityEventPivot, 'customerid,industrytype,entitycontextuid,recordid', 
 'eventdate,' +
@@ -98,7 +99,7 @@ EntityStats := WeightedResult(RiskLevel in [0,1,2,3] AND Value != '0') : INDEPEN
 SuperSpecialEntityStatsForFilter := JOIN(EntityStats, EntityEventPivot, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND
 						  LEFT.entitycontextuid=RIGHT.entitycontextuid AND LEFT.recordid=RIGHT.recordid, 
 						  TRANSFORM({RECORDOF(LEFT), 
-							RIGHT.aotkractflagev, RIGHT.aotsafeactflagev,
+							RIGHT.aotkractflagev, RIGHT.aotsafeactflagev,RIGHT.aotcurrprofflag,
 							RIGHT.t_actdtecho,RIGHT.t18_ipaddrlocmiamiflag,RIGHT.t18_ipaddrlocnonusflag,RIGHT.t18_ipaddrhostedflag,RIGHT.t18_ipaddrvpnflag,RIGHT.t18_ipaddrtornodeflag,RIGHT.t19_bnkaccthrprepdrtgflag,RIGHT.t17_emaildomaindispflag,    
 							RIGHT.p1_aotidkrstolidactflagev, RIGHT.p1_aotidkrgenfrdactflagev,RIGHT.p1_aotidkrappfrdactflagev,RIGHT.p1_aotidkrothfrdactflagev,RIGHT.p9_aotaddrkractflagev,RIGHT.p15_aotssnkractflagev,RIGHT.p16_aotphnkractflagev,RIGHT.p17_aotemailkractflagev,RIGHT.p18_aotipaddrkractflagev,RIGHT.p19_aotbnkacctkractflagev,RIGHT.p20_aotdlkractflagev,
 							RIGHT.not_aotkractflagev,RIGHT.not_aotsafeactflagev,
