@@ -31,6 +31,7 @@ MyRules := DATASET([
 */
 
 IMPORT Std;
+IMPORT FraudgovKEL;
 
 RulesIn := DATASET([
 {'1', 'Rule99_1', 'Unscorable', 'p1_idriskunscrbleflag=1', 99},
@@ -41,6 +42,41 @@ RulesIn := DATASET([
 {'18', 'Rule99_18', 'Unscorable', 'p18_ipaddrriskunscrbleflag=1', 99},
 {'19', 'Rule99_19', 'Unscorable', 'p19_bnkacctriskunscrbleflag', 99},
 {'20', 'Rule99_20', 'Unscorable', 'p20_dlriskunscrbleflag', 99},
+{'1', 'Identity01', 'KR Identity Theft and Potential Compromised-Manipulated Identities', 'P1_AoTIDKRStolIDActFlagEv=1, T1_StolIDFlag=1, T1_ManipIDFlag=1', 3},
+{'1', 'Identity02', 'KR Identity Theft and Potential Compromised Identities','P1_AoTIDKRStolIDActFlagEv=1, T1_StolIDFlag=1', 3},
+{'1', 'Identity03', 'KR Identity Theft and Potential Manipulated Identities','P1_AoTIDKRStolIDActFlagEv=1, T1_ManipIDFlag=1', 3},
+{'1', 'Identity04', 'Active Deceased', 'T1L_IDDeceasedFlag=1,T1L_IDDtOfDeathAftIDActFlagEv=1', 3},
+{'1', 'Identity05', 'Adult records missing, Compromised, Synthetic', 'T1_AdultIDNotSeenFlag=1, T1_StolIDFlag=1, T1_SynthIDFlag=1', 3},
+{'1', 'Identity06', 'Adult records missing', 'T1_AdultIDNotSeenFlag=1', 3},
+{'1', 'Identity07', 'Out of agency state DL and Address', 'T1L_CurrAddrNotInAgcyJurStFlag=1, T1L_BestDLNotInAgcyJurStFlag=1', 2},
+{'1', 'Identity08', 'Minor with public records, Manipulated', 'T1_MinorWLexIDFlag=1, T1_ManipIDFlag=1', 2},
+{'1', 'Identity09', 'Minor with public records, Synthetic', 'T1_MinorWLexIDFlag=1,T1_SynthIDFlag=1', 2},
+{'1', 'Identity10', 'Minor with public records, Compromised', 'T1_MinorWLexIDFlag=1,T1_StolIDFlag=1', 2},
+{'1', 'Identity11', 'Minor with public records, Compromised-Synthetic-Manipulated', 'T1_MinorWLexIDFlag=1, T1_ManipIDFlag=1, T1_StolIDFlag=1, T1_SynthIDFlag=1', 3},
+{'1', 'Identity12', 'Potentially Deceased', 'T1L_IDDeceasedFlag=1', 3},
+{'1', 'Identity13', 'SSN issued before DOB, Compromised', 'T1_SSNPriorDOBFlag=1,T1_StolIDFlag=1', 3},
+{'1', 'Identity14', 'SSN issued before DOB, Manipulated', 'T1_SSNPriorDOBFlag=1,T1_ManipIDFlag=1', 3},
+{'1', 'Identity15', 'SSN issued before DOB, Synthetic', 'T1_SSNPriorDOBFlag=1,T1_SynthIDFlag=1', 3},
+{'1', 'Identity16', 'Potential Compromised-Manipulated-Synthetic Identities', 'T1_StolIDFlag=1,T1_SynthIDFlag=1,T1_ManipIDFlag=1', 3},
+{'1', 'Identity17', 'Minor with public records', 'T1_MinorWLexIDFlag=1', 1},
+{'1', 'Identity18', 'Address out of state, Compromised, Manipulated', 'T1L_CurrAddrNotInAgcyJurStFlag=1,T1_StolIDFlag=1,T1_ManipIDFlag=1', 3},
+{'1', 'Identity19', 'DL out of state, Compromised, Manipulated', 'T1L_BestDLNotInAgcyJurStFlag=1,T1_StolIDFlag=1,T1_ManipIDFlag=1', 3},
+{'1', 'Identity20', 'Minor with public records, Out of state DL and Address', 'T1_MinorWLexIDFlag=1,T1L_CurrAddrNotInAgcyJurStFlag=1,T1L_BestDLNotInAgcyJurStFlag=1', 2},
+{'1', 'Identity21', 'Known Risk Application', 'P1_AoTIDKRAppFrdActFlagEv=1', 3},
+{'1', 'Identity22', 'Known Risk General', 'P1_AoTIDKRGenFrdActFlagEv=1', 3},
+{'1', 'Identity23', 'Known Risk Other', 'P1_AoTIDKROthFrdActFlagEv=1', 3},
+{'1', 'Identity24', 'Known Risk Identity Theft', 'P1_AoTIDKRStolIDActFlagEv=1', 3},
+{'1', 'Identity25', 'Potentially Incarcerated', 'T1L_IDCurrIncarcFlag=1', 3},
+{'1', 'Identity26', 'Activity after death', 'T1L_IDDtOfDeathAftIDActFlagEv=1', 3},
+{'1', 'Identity27', 'SSN issued before DOB', 'T1_SSNPriorDOBFlag=1', 3},
+{'1', 'Identity28', 'Compromised', 'T1_StolIDFlag=1', 3},
+{'1', 'Identity29', 'Manipulated', 'T1_ManipIDFlag=1', 3},
+{'1', 'Identity30', 'Synthetic', 'T1_SynthIDFlag=1', 3},
+{'1', 'Identity31', 'Address out of agency state', 'T1L_CurrAddrNotInAgcyJurStFlag=1', 2},
+{'1', 'Identity32', 'DL out of agency state', 'T1L_BestDLNotInAgcyJurStFlag=1', 2},
+{'1', 'Identity33', 'Low source counts', 'T1L_HdrSrcCatCntLwFlag=1', 2}
+
+/*
 {'18', 'IPAddress1', 'IP Address City is Miami', 't18_ipaddrlocmiamiflag', 3}, 
 {'18', 'IPAddress2', 'IP Address not US and is a VPN', 't18_ipaddrlocnonusflag,t18_ipaddrvpnflag', 3},
 {'18', 'IPAddress3', 'IP Address is Hosted', 't18_ipaddrhostedflag', 2}, // risk level 2
@@ -53,6 +89,7 @@ RulesIn := DATASET([
 {'9', 'Address1', 'Invalid Address', 't9_addrisinvalidflag', 2},
 {'9', 'Address2', 'Vacant Address', 't9_addrisvacantflag', 2},
 {'17', 'Email1', 'Disposable email address', 't17_emaildomaindispflag', 2}
+*/
 ],
 {integer1 EntityType, string Rulename, string Description, string AttributeFlags, INTEGER RiskLevel});
  
@@ -60,7 +97,7 @@ output(RulesIn);
 
 rulesrec := {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel};
 
-RulesPrep := PROJECT(RulesIn, TRANSFORM(rulesrec, self.field := LEFT.AttributeFlags, SELF := LEFT, SELF := []));
+RulesPrep := PROJECT(RulesIn, TRANSFORM(rulesrec, self.field := Std.Str.ToLowerCase(Std.Str.FindReplace(LEFT.AttributeFlags, ' ', '')), SELF := LEFT, SELF := []));
 output(RulesPrep);
 
 
@@ -77,5 +114,16 @@ NormRules :=
             NORMALIZE(RulesPrep,Std.Str.CountWords(LEFT.Field, ','),tNormRules(LEFT,COUNTER));
 
 NormRules;            
-            
+
+RulesAttr := 't1_adultidnotseenflag,t1_minorwlexidflag,t1l_iddeceasedflag,t1l_iddtofdeathaftidactflagev,t1l_idcurrincarcflag,t1_ssnpriordobflag,t1_firstnmnotverflag,t1_lastnmnotverflag,t1_addrnotverflag,' +
+'t1l_ssnnotverflag,t1l_ssnwaltnaverflag,t1l_ssnwaddrnotverflag,t1_phnnotverflag,t1l_dobnotverflag,t1_hiriskcviflag,t1_medriskcviflag,t1l_hdrsrccatcntlwflag,t1_stolidflag,t1_synthidflag,' +
+'t1_manipidflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t15_ssnisinvalidflag,t20_dlisinvalidflag,t16_phnisinvalidflag,t16_phnprepdflag,' +
+'t18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t17_emaildomaindispflag,t19_bnkaccthrprepdrtgflag,t9_addrpoboxmultcurridflagev,t15_ssnmultcurridflagev,t20_dlmultcurridflagev,' +
+'t19_bnkacctmultcurridflagev,p1_aotidkrappfrdactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrothfrdactflagev,p1_aotidkrstolidactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev,p16_aotphnkractflagev,p17_aotemailkractflagev,p18_aotipaddrkractflagev,' +
+'p19_aotbnkacctkractflagev,p20_aotdlkractflagev,p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag';
+
+MissingRules := NormRules(Std.Str.FindCount(RulesAttr, TRIM(Field))<1);
+//'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,t18_ipaddrvpnflag,t18_ipaddrhostedflag,t1l_ssnnotverflag,t1_addrnotverflag,t1l_iddeceasedflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t17_emaildomaindispflag', Field)>0);
+output(MissingRules, named('MissingRules'));
+      
 output(NormRules,,'~fraudgov::in::sprayed::configrules', CSV, overwrite);
