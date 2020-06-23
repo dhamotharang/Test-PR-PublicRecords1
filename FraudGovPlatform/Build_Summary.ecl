@@ -1,4 +1,4 @@
-﻿IMPORT FraudGovPlatform,STD,FraudGovPlatform_Validation,FraudShared;
+﻿IMPORT FraudGovPlatform,STD,FraudGovPlatform_Validation;
 EXPORT Build_Summary(string pversion) := MODULE
 
 	EXPORT tableColumns_Layout := RECORD
@@ -35,8 +35,8 @@ EXPORT Build_Summary(string pversion) := MODULE
 	END;	
 
 
-	shared bm  := FraudShared.Files().Base.Main.Built;
-	shared fbm := FraudShared.Files().Base.Main.Father;
+	shared bm  := FraudGovPlatform.Files().Base.Main_Orig.Built;
+	shared fbm := FraudGovPlatform.Files().Base.Main_Orig.Father;
 	bid := FraudGovPlatform.Files().Input.IdentityData.Sprayed;
 	bkf := FraudGovPlatform.Files().Input.KnownFraud.Sprayed;
 	bdb := FraudGovPlatform.Files().Input.Deltabase.Sprayed;

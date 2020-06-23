@@ -493,10 +493,6 @@ export temp := module
 			BIPV2.IDlayouts.l_xlink_ids;
 	  end;
 
-    export CleanAddressSlim := RECORD
-        unsigned8 record_id;
-        FraudShared.Layouts.address_cleaner;
-    END;
  end; 
 
 Export PII	:=RECORD
