@@ -606,7 +606,10 @@ EXPORT	Layouts	:=	MODULE
 
 	EXPORT	AccountDataLayout	:=	RECORD
 		STRING																			process_date;
-		AccountBaseSegment;																																					//	AB
+		AccountBaseSegment;
+		STRING2																			PaymentFrequency;
+		STRING2																			DelinquencyStatus;
+		STRING3																			New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided;
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
 		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(1000)};													//	AH
@@ -633,6 +636,9 @@ EXPORT	Layouts	:=	MODULE
 	EXPORT	AccountDataLayout_Virtual	:=	RECORD
 		STRING																			process_date;
 		AB_Virtual;																																									//	AB
+		STRING2																			PaymentFrequency;
+		STRING2																			DelinquencyStatus;
+		STRING3																			New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided;
 		DATASET(MA_Virtual)													masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AD_Virtual)													address{MAXCOUNT(100)};													//	AD
 		DATASET(AH_Virtual)													history{MAXCOUNT(1000)};													//	AH

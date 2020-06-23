@@ -277,6 +277,12 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												TRANSFORM(RECORDOF(Business_Credit.Layouts.AccountDataLayout_Virtual),
 													SELF.Original_Contract_Account_Number	:=	LEFT.Contract_Account_Number;
 													SELF.Contract_Account_Number					:=	fn_removeLeadingZeros(LEFT.Contract_Account_Number);
+													SELF.PaymentFrequency					:=if(filedate > '20201001',Left.Payment_Interval,'');
+													SELF.Payment_Interval					:=if(filedate <= '20201001',Left.Payment_Interval,'');
+													SELF.DelinquencyStatus					:=if(filedate > '20201001',Left.Payment_Status_Category,'');
+													SELF.Payment_Status_Category					:=if(filedate <= '20201001',Left.Payment_Status_Category,'');
+													SELF.New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate > '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
+													SELF.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate <= '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
 													SELF:=LEFT,
 													SELF:=[]
 												)
