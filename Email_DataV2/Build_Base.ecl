@@ -32,7 +32,9 @@ EXPORT Databridge_src:= Map_Databridge_As_Email(version);
 												entiera_src +
 												Impulse_src +
 												DunnData_src +
-												WiredAssets_src;
+												WiredAssets_src + 
+												DataBaseUSA_src +
+												Databridge_src;
 
 //Set Filtering Rules
 EXPORT set_rules					:= Fn_Apply_Rules(email_sources);
