@@ -1,7 +1,7 @@
 ﻿Import FraudGovPlatform,FraudShared;
 EXPORT fn_validate_delta(
-	dataset(FraudShared.Layouts.Base.Main) FileBase,
-    dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA 
+	dataset(FraudShared.Layouts.Base.Main) FileBase
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
 ) := FUNCTION
 
 previous_delta := Previous_Build(regexfind('delta',source,nocase));

@@ -29,16 +29,32 @@ module
 	);	
 
 	Export clear_base_files := sequential(
+		// Clear Fathers
+		//STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Father, false),  // this file is not modified by the base_portion 
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.Father, false),
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.Father, false),
+		// Clear QAs
+		//STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.QA, false),  // this file is not modified by the base_portion 
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.QA, false),
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.QA, false),
 		// Clear Builts
-		STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built, false)
+		STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built, false),
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.Built, false),
+		STD.File.ClearSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.Built, false),
 	);
 
 	//Rollback Base Files to previous version known
 	Export rollback_base_files := sequential(
+		// Rollback QA Files
+		//STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.QA		,FraudShared.Filenames(PreviousVersion).Base.Main.New),	// this file is not modified by the base_portion 
+		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.QA		, FraudShared.Filenames(PreviousVersion).Base.Main.New),	
+		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.QA		, FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.New),	
 		// Rollback Built Files
 		if(FraudGovPlatform._Flags.UseDemoData, 
 				STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built,	FraudGovPlatform.Filenames(PreviousVersion).Input.DemoData.Sprayed)),		
-		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built		,FraudShared.Filenames(PreviousVersion).Base.Main.New),
+		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built		,FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.New),
+		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.Built		, FraudShared.Filenames(PreviousVersion).Base.Main.New),	
+		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.Built		, FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.New),	
 	);
 
 	Export rollback_input_files := sequential(

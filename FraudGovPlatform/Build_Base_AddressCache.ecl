@@ -1,9 +1,9 @@
 ﻿Import FraudShared,tools; 
 EXPORT Build_Base_AddressCache (
    string pversion
-	,dataset(FraudShared.Layouts.address_cleaner) BaseAddressCache = Files().Base.AddressCache.QA
-	,dataset(FraudShared.Layouts.Base.Main) FileBase = FraudShared.Files().Base.Main.Built 
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
+	,dataset(Layouts.Base.AddressCache)	BaseAddressCache		= Files().Base.AddressCache.QA
+	,dataset(FraudShared.Layouts.Base.Main) FileBase = IF(_Flags.FileExists.Base.MainOrig, FraudGovPlatform.Files().Base.Main_Orig.Built, DATASET([], FraudShared.Layouts.Base.Main))
+  ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
 ) := 
 module 
 
@@ -18,52 +18,76 @@ module
 		LOCAL
 	);
 
-	pSlimMainAddress := project ( New_Records, transform( FraudShared.Layouts.address_cleaner, self := left ) ); 
-	pSlimAdditionalAddress := project ( New_Records, transform( FraudShared.Layouts.address_cleaner, 
-		self.street_1 := left.additional_address.street_1;
-		self.street_2 := left.additional_address.street_2;
-		self.city := left.additional_address.city;
-		self.state := left.additional_address.state;
-		self.zip := left.additional_address.zip;
-		self.address_type := left.additional_address.address_type;
-		self.clean_address.prim_range := left.additional_address.clean_address.prim_range;
-		self.clean_address.predir := left.additional_address.clean_address.predir;	
-		self.clean_address.prim_name := left.additional_address.clean_address.prim_name;
-		self.clean_address.addr_suffix := left.additional_address.clean_address.addr_suffix;
-		self.clean_address.postdir := left.additional_address.clean_address.postdir;
-		self.clean_address.unit_desig := left.additional_address.clean_address.unit_desig;
-		self.clean_address.sec_range := left.additional_address.clean_address.sec_range;
-		self.clean_address.p_city_name := left.additional_address.clean_address.p_city_name;
-		self.clean_address.v_city_name := left.additional_address.clean_address.v_city_name;
-		self.clean_address.st := left.additional_address.clean_address.st;
-		self.clean_address.zip := left.additional_address.clean_address.zip;
-		self.clean_address.zip4 := left.additional_address.clean_address.zip4;
-		self.clean_address.cart := left.additional_address.clean_address.cart;
-		self.clean_address.cr_sort_sz := left.additional_address.clean_address.cr_sort_sz;
-		self.clean_address.lot := left.additional_address.clean_address.lot;
-		self.clean_address.lot_order := left.additional_address.clean_address.lot_order;
-		self.clean_address.dbpc := left.additional_address.clean_address.dbpc;
-		self.clean_address.chk_digit := left.additional_address.clean_address.chk_digit;
-		self.clean_address.rec_type := left.additional_address.clean_address.rec_type;
-		self.clean_address.fips_state := left.additional_address.clean_address.fips_state;
-		self.clean_address.fips_county := left.additional_address.clean_address.fips_county;
-		self.clean_address.geo_lat := left.additional_address.clean_address.geo_lat;
-		self.clean_address.geo_long := left.additional_address.clean_address.geo_long;
-		self.clean_address.msa := left.additional_address.clean_address.msa;
-		self.clean_address.geo_blk := left.additional_address.clean_address.geo_blk;
-		self.clean_address.geo_match := left.additional_address.clean_address.geo_match;
-		self.clean_address.err_stat := left.additional_address.clean_address.err_stat;
-		self := left 
-	
-	) ); 
+	pSlimMainAddress := table(New_Records, {
+		clean_address.prim_range,
+		clean_address.predir,	
+		clean_address.prim_name,
+		clean_address.addr_suffix,
+		clean_address.postdir,
+		clean_address.unit_desig,
+		clean_address.sec_range,
+		clean_address.p_city_name,
+		clean_address.v_city_name,
+		clean_address.st,
+		clean_address.zip,
+		clean_address.zip4,
+		clean_address.cart,
+		clean_address.cr_sort_sz,
+		clean_address.lot,
+		clean_address.lot_order,
+		clean_address.dbpc,
+		clean_address.chk_digit,
+		clean_address.rec_type,
+		clean_address.fips_state,
+		clean_address.fips_county,
+		clean_address.geo_lat,
+		clean_address.geo_long,
+		clean_address.msa,
+		clean_address.geo_blk,
+		clean_address.geo_match,
+		clean_address.err_stat
+	});
 
-FraudShared.Layouts.address_cleaner get_best(FraudShared.Layouts.address_cleaner L, FraudShared.Layouts.address_cleaner R) := transform 
-    SELF := if( L.clean_address.err_stat[1] = 'S',  L, R);
-end;
-srt := sort(pSlimMainAddress + pSlimAdditionalAddress + BaseAddressCache, State, City, Zip, Street_1, Street_2 );
-ddp := rollup (srt, get_best(LEFT,RIGHT),State, City, Zip, Street_1, Street_2 , LOCAL ) ;
-valid_addresses := ddp(clean_address.err_stat = 'S');
-tools.mac_WriteFile(Filenames(pversion).Base.AddressCache.New,valid_addresses,Build_Base_File,pCompress:=true,pHeading:=false,pOverwrite:=true);
+	pSlimAdditionalAddress := table(New_Records, {
+		additional_address.clean_address.prim_range,
+		additional_address.clean_address.predir,	
+		additional_address.clean_address.prim_name,
+		additional_address.clean_address.addr_suffix,
+		additional_address.clean_address.postdir,
+		additional_address.clean_address.unit_desig,
+		additional_address.clean_address.sec_range,
+		additional_address.clean_address.p_city_name,
+		additional_address.clean_address.v_city_name,
+		additional_address.clean_address.st,
+		additional_address.clean_address.zip,
+		additional_address.clean_address.zip4,
+		additional_address.clean_address.cart,
+		additional_address.clean_address.cr_sort_sz,
+		additional_address.clean_address.lot,
+		additional_address.clean_address.lot_order,
+		additional_address.clean_address.dbpc,
+		additional_address.clean_address.chk_digit,
+		additional_address.clean_address.rec_type,
+		additional_address.clean_address.fips_state,
+		additional_address.clean_address.fips_county,
+		additional_address.clean_address.geo_lat,
+		additional_address.clean_address.geo_long,
+		additional_address.clean_address.msa,
+		additional_address.clean_address.geo_blk,
+		additional_address.clean_address.geo_match,
+		additional_address.clean_address.err_stat
+	});	
+	
+	pNewAddresses := project(pSlimMainAddress + pSlimAdditionalAddress,transform(Layouts.Base.AddressCache,
+		self.address_cleaned := (unsigned4)pversion[1..8];
+		self := left;
+		self := [];
+	));
+	
+	SortedSlim := sort(pNewAddresses + BaseAddressCache,prim_range,prim_name,sec_range,zip,st,-address_cleaned);
+	dedupSlim := dedup(SortedSlim, prim_range,prim_name,sec_range,zip,st);
+
+	tools.mac_WriteFile(Filenames(pversion).Base.AddressCache.New,dedupSlim(prim_range != '' 	or prim_name != ''	or sec_range != ''	or zip != '' or st != ''),Build_Base_File,pCompress:=true,pHeading:=false,pOverwrite:=true);
 
 // Return
 	export full_build :=

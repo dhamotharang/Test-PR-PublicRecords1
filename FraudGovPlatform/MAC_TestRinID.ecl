@@ -1,8 +1,8 @@
 ﻿IMPORT FraudShared;
 EXPORT Mac_TestRinID(   
 	string pversion
-	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudShared.Files().Base.Main.Built
-	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = FraudShared.Files().Base.Main.QA
+	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudGovPlatform.Files().Base.Main_Anon.Built
+	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = FraudGovPlatform.Files().Base.Main_Anon.QA
 ) := 
 FUNCTION
 	// Find Duplicate RinIDs on 2 or more different People

@@ -25,6 +25,6 @@ import ut, Std;
 	Supress_CCPA := Suppress.MAC_SuppressSource(DpatchIdentityDatadid, mod_access, did, NULL,TRUE);													
 															
 	FinalValidRecs := Supress_CCPA ;
- return DpatchIdentityDatadid ;
+ return FinalValidRecs ;
 
 end; 

@@ -1,7 +1,7 @@
 ﻿IMPORT Header, FraudShared, ut;
 EXPORT Append_RID(
                 dataset(FraudShared.Layouts.Base.Main) Current_Build
-                ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
+                ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
 ) := FUNCTION
 
 

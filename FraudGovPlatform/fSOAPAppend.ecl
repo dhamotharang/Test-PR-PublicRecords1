@@ -8,7 +8,7 @@ EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	//PII Input Process Begin
 
-	Shared base := FraudShared.Files().Base.Main.built;
+	Shared base := Files().Base.Main_Orig.built;
 	shared pii_current :=Files().base.pii.built; //pii current build
 
 	shared pii_previous := Files().base.pii.qa;			//pii previous build
