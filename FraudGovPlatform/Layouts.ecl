@@ -3288,6 +3288,7 @@ RECORD
   string treeuid;
   string fromentitycontextuid;
   string toentitycontextuid;
+  unsigned4 t_actdtecho;
  END;
  
  EXPORT GraphVertices := RECORD
