@@ -5,7 +5,7 @@
 				//				Ent_ID, EntryCategory, EntrySubcategory,ALL);
 
 		dsConsolidatedRec := ent(EntryCategory='Sanction List' and NameSource='Sanctions' and MasterID=0);
-		dsOtherRec 				:= ent - dsConsolidatedRec;	
+		dsOtherRec 				:= $.Files.dsMasters - dsConsolidatedRec;	
 		dsLinkedToConsolidatedRec := dsOtherRec(MasterID in SET(dsConsolidatedRec, Ent_ID));
 		dsConsolidated := PROJECT(dsLinkedToConsolidatedRec, TRANSFORM($.rConsolidatedAsscoiations,
    																						self.MasterId := left.MasterId;

@@ -1,6 +1,6 @@
 ﻿EXPORT AllIds(boolean useLexId = false) := FUNCTION
 
-	ids := Dedup(GetIds(Files.dsMasters),ALL);
+	ids := GetIds(Files.dsMasters);
 	
 	LexIds := GetLexID(dsLexIds);
 

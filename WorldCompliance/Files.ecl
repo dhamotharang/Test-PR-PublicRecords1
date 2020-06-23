@@ -66,7 +66,8 @@ EXPORT Files := MODULE
 
 Entities 					:= ['Individual','Organization','Vessel','Bank','Aircraft'];
 
-export dsEntities := distribute(DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in Entities,Ent_Id<>0),Ent_ID);
+export dsEntities :=Distribute( 
+				DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in Entities,Ent_Id<>0),Ent_ID);
 export dsCountryEntities := 
 				DATASET(root+'entity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType = 'Country',Ent_Id<>0);
 export dsAddresses := DISTRIBUTE(
@@ -78,11 +79,12 @@ export dsSanctionsDOB := DISTRIBUTE(
 					DATASET(root+'SanctionsDOB', Layouts.rSanctionsDOB, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),
 					SanctionsDobId);
 
-export MdsWCOCategories := distribute(DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),EntityID);
+export MdsWCOCategories := Distribute(DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),EntityID);
 
 //export dsWCOCategories :=sort(DATASET(root+'WCOCategories', Layouts.rWCOCategories, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),Ent_ID);
 WhiteListEntities := ['Branch', 'Lead', 'Member', 'Single', 'Sponsoring Entity'];
-export dsWhiteListEntities := DATASET(root+'whitelistentity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in WhiteListEntities,Ent_Id<>0);	
+export dsWhiteListEntities := Distribute(
+															DATASET(root+'whitelistentity', Layouts.rEntity, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(EntryType in WhiteListEntities,Ent_Id<>0),Ent_ID);	
 // these files don't need to be versioned
 export dsCountries := DATASET(root+'countries', Layouts.rCountry, CSV(separator('|'),heading(1),quote('\t'),UNICODE));
 export dsSources := dsRegistrationsSrc + DATASET(root+'sources', Layouts.rSource, CSV(separator('|'),heading(1),quote('\t'),UNICODE));
@@ -94,8 +96,9 @@ export dsRelDefs := DATASET(root+'reldefs', Layouts.rCategories, CSV(separator('
 					
 export dsMasters_base := 			// master entries
 				dsEntities(ParentId=0) + dsWhiteListEntities(ParentId=0);
-//export dsMainCats := Join(distribute(dsEntities, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,				
-Export dsMainCats := PROJECT(dsEntities, Transform(Layouts.rWCOCategories,
+export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,
+//Export dsMainCats := PROJECT(dsEntities, 
+							Transform(Layouts.rWCOCategories,
 											self.EntityID := Left.Ent_ID;
 											self.SegmentType := if (left.Entrycategory = 'Sanction List','Sanction', if (left.Entrycategory = 'Registrations' or left.Entrycategory = 'Associated Entity','AdditionalSegments',left.Entrycategory));
 											self.SubCategoryLabel := if(left.Entrycategory='PEP','Primary PEP',
@@ -103,11 +106,11 @@ Export dsMainCats := PROJECT(dsEntities, Transform(Layouts.rWCOCategories,
 											self.SubCategoryDesc := if (left.Entrycategory='PEP',left.EntrySubcategory,
 																									if (left.Entrycategory = 'Sanction List' and left.EntrySubcategory <> 'N/A',left.EntrySubcategory,''));
 											self.isActivePEP := if(left.Entrycategory = 'PEP','Y','');
-											self.lastupdated := left.DateUpdated;));
-								//			self := right;
-								//		),Left Outer, local);
+											self.lastupdated := left.DateUpdated;//));
+											self := right;
+										),Left Outer, local);
 				
-export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsEntities, Left.EntityID=Right.Ent_ID,	
+export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, Left.EntityID=Right.Ent_ID,	
 									TRANSFORM(Layouts.rEntity,								
 										self.Ent_ID := Left.EntityID;
 										self.Entrycategory := if(left.SegmentType='AdditionalSegments' or left.SegmentType='Sanction',
@@ -128,7 +131,7 @@ export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsEntities, Left.
 													left.SubCategoryLabel)));
 	
 											self := right;
-									),Left outer, unordered, local);
+									),Inner, local);
 
 export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCategories,Left.EntityID=Right.EntityID,
 										Transform(Layouts.rWCOCategories,
@@ -150,9 +153,8 @@ export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCa
 										), Inner, local);
 
 export dsMasters := dsMasters_base + dsMult;
-//export dsMasters := dsMasters_base + ;
-//export dsWCOCategories := dsMainCats + FMdsWCOCategories;
-export dsWCOCategories := dsMainCats & FMdsWCOCategories;
+
+export dsWCOCategories := dsMainCats + FMdsWCOCategories;
 export srcAdverseMedia := dedup(dsMasters(EntryCategory in Filters.fAdverseMedia),Ent_ID,ALL);
 export srcGlobalEnforcement := dedup(dsMasters(EntryCategory in Filters.fEnforcement),Ent_ID,ALL);
 

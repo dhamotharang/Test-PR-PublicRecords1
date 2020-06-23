@@ -26,8 +26,8 @@ END;
    			self					:= L;
    	END;
 			
-   	return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
-		//return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+   	//return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+		return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
 	END;
 
 	GetPosition(dataset(Layouts.rEntity) src) := PROJECT(src, TRANSFORM(rComments, 
@@ -45,7 +45,7 @@ END;
 			
 	GetNotes(dataset(Layouts.rEntity) src) := PROJECT(src(Remarks<>''), TRANSFORM(rComments,
 			self.Ent_id := LEFT.Ent_id;
-			self.sorter := 9;
+			self.sorter := 7;
 			comment := CvtPilcrow(LEFT.Remarks);
 			comment1 := IF(LENGTH(comment) > maxlen - LENGTH('Profile Notes: '),
 													comment[1..maxlen-16] + '* || ', comment);
@@ -72,7 +72,7 @@ END;
 	
 	GetRelExcessive := PROJECT(ExcessiveRelations, TRANSFORM(rComments,
 			self.Ent_Id := LEFT.Ent_IdParent;
-			self.sorter := 10;
+			self.sorter := 8;
 			self.subcmts := '';
 			self.cmts := notice;));
   
@@ -136,7 +136,7 @@ END;
 	GetModifiedDates(dataset(Layouts.rEntity) src) := PROJECT(src, 
 			TRANSFORM(WorldCompliance.rComments,
 				self.Ent_Id := LEFT.Ent_Id;
-				self.sorter := 8;
+				self.sorter := 6;
 				self.subcmts := '';
 				self.cmts := 'Last updated: ' + ut.ConvertDate(TRIM(LEFT.touchdate),'%Y-%m-%d', '%Y-%m-%d');));
 

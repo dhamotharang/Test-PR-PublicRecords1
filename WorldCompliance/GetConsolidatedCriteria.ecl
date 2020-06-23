@@ -5,7 +5,7 @@
 //								Ent_ID, EntryCategory, EntrySubcategory,All);
 								
 		srcs := DISTRIBUTE(
-							JOIN($.Files.dsEntities, $.dsConsolidatedSanctions, left.ent_id=right.masterid,
+							JOIN(infile, $.dsConsolidatedSanctions, left.ent_id=right.masterid,
 												TRANSFORM($.rCriteriaRollup,
 														self.id := LEFT.Ent_id;
 														self.criteria := right.comments;
