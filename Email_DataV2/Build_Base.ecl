@@ -16,6 +16,8 @@ EXPORT entiera_src := Map_Entiera_as_Email(version);
 EXPORT Impulse_src := Map_Impulse_as_Email(version);
 EXPORT WiredAssets_src := Map_WiredAssets_as_Email(version);
 EXPORT DunnData_src:= Map_DunnData_AS_Email(version);
+EXPORT DataBaseUSA_src:= Map_DataBaseUSA_As_Email(version);
+EXPORT Databridge_src:= Map_Databridge_As_Email(version);
 
  email_sources := RealSource_src +
 												AcquireWeb_src +
