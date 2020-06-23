@@ -846,8 +846,8 @@ Export CIID := RECORD
 		STRING2		best_drivers_license_state := '';
 		STRING25	best_drivers_license := '';    
 		unsigned8   best_drivers_license_exp := 0;
-	    unsigned8 best_drivers_dt_first_seen := '';
-	    unsigned8 best_drivers_dt_last_seen := '';
+	    unsigned8   best_drivers_dt_first_seen := 0;
+	    unsigned8   best_drivers_dt_last_seen := 0;
 	    string8   Reported_Date := '';
  END;
 
