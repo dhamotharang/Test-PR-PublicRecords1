@@ -36,11 +36,10 @@ output(ModelingOutput,,'~temp::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
 
 
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~gov::otto::eventpivot', overwrite, compressed);	
-//output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~gov::otto::entityrules', overwrite, compressed);
-//output(FraudgovKEL.KEL_EntityStats,, '~gov::otto::pivotentitystatsfilter', overwrite, compressed);
-/*
+output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~gov::otto::entityrules', overwrite, compressed);
+output(FraudgovKEL.KEL_EntityStats,, '~gov::otto::pivotentitystatsfilter', overwrite, compressed);
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~temp::fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~temp::fraudgov::rin2::graphpvertices', overwrite);
-*/
+
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
