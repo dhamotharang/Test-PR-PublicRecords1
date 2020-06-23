@@ -2661,7 +2661,7 @@ Event: => T1L_BestLastNmPopFlag := MAP(T1_LexIdPopFlag=0 => -99999,
 Event: => T1L_BestFullNmEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																		T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																		T1L_BestFirstNmPopFlag=0 OR T1L_BestLastNmPopFlag=0 => -99997,
-																	 (T1L_BestLastNmEcho) + ', ' + TRIM(T1L_BestFirstNmEcho));
+																	 TRIM(T1L_BestLastNmEcho) + ', ' + TRIM(T1L_BestFirstNmEcho));
 Event: => T1L_CurrAddrPrimRangeEcho := MAP(T1_LexIdPopFlag=0 => -99999,
 																					 T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																					 add_curr_prim_range = '' OR add_curr_prim_range:Null => -99997,
@@ -3597,7 +3597,7 @@ Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0
 
 Event: => PersonLabel := TRIM(LastName) + ', ' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
-Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State)) + ', ' + TRIM(Zip)))))))));
+Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State)) + ' ' + TRIM(Zip)))))))));
 Event: => IpLabel := IpAddress;
 Event: => SsnLabel := SsnFormatted;
 Event: => PhoneLabel := PhoneFormatted;
