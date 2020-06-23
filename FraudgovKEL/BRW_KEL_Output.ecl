@@ -27,19 +27,19 @@ TOPN(t3, 100, -reccount);
 
 //output(FraudgovKEL.KEL_EventPivot.EventPivotShell);
 
-
+/*
 OUTPUT(COUNT(Std.Str.SplitWords(KEL_EventShell.NicoleAttr, ',')), named('AttributeCount'));
 ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 output(ModelingOutput,,'~temp::deleteme_nd', overwrite);	
 output(ModelingOutput,,'~temp::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);	
+*/
 
 
-
-output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~gov::otto::eventpivot', overwrite, compressed);	
-output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~gov::otto::entityrules', overwrite, compressed);
-output(FraudgovKEL.KEL_EntityStats,, '~gov::otto::pivotentitystatsfilter', overwrite, compressed);
-output(FraudgovKEL.KEL_GraphPrep.Edges,,'~temp::fraudgov::rin2::graphedges', overwrite);
-output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~temp::fraudgov::rin2::graphpvertices', overwrite);
+output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);	
+output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
+output(FraudgovKEL.KEL_EntityStats,, '~fraudgov::pivotentitystatsfilter', overwrite, compressed);
+output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
+output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
 
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
