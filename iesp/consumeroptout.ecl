@@ -15,7 +15,7 @@ export consumeroptout := module
     string Phone10 {xpath('Phone10')};
     string Email {xpath('Email')};
     string ActID {xpath('ActID')};
-    dataset(iesp.share.t_StringArrayItem) GlobalSIDs {xpath('GlobalSIDs/GlobalSID'), MAXCOUNT(iesp.Constants.ConsumerOptout.MaxGlobalSIDs)};
+    dataset(iesp.share.t_StringArrayItem) GlobalSIDs {xpath('GlobalSIDs/GlobalSID'), MAXCOUNT(iesp.Constants.ConsumerOptoutReport.MaxGlobalSIDs)};
   end;
 
   export t_ConsumerOptoutReportOptions := record(iesp.share.t_BaseOption)
@@ -28,7 +28,7 @@ export consumeroptout := module
     boolean OptOutFlag {xpath('OptOutFlag')};
     string Exemptions {xpath('Exemptions')};
     iesp.share.t_Date DateAdded {xpath('DateAdded')};
-    dataset(iesp.share.t_StringArrayItem) GlobalSIDs {xpath('GlobalSIDs/GlobalSID'), MAXCOUNT(iesp.Constants.ConsumerOptout.MaxGlobalSIDs)};
+    dataset(iesp.share.t_StringArrayItem) GlobalSIDs {xpath('GlobalSIDs/GlobalSID'), MAXCOUNT(iesp.Constants.ConsumerOptoutReport.MaxGlobalSIDs)};
   end;
 
   export t_ConsumerOptoutReportResponse := record

@@ -2202,7 +2202,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxCollectionRecords := 2000;
   end;
 
-  export ConsumerOptout := module
+  export ConsumerOptoutReport := module
     export unsigned2 MaxGlobalSIDs := 1000;
   end;
 
