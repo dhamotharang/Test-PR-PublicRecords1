@@ -1325,6 +1325,7 @@
 				trim(kword, left, right) = 'OFAC-SY-CAESAR' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_SY_CAESAR,
 				trim(kword, left, right) = 'OFAC-EO13894' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13894,
 				trim(kword, left, right) = 'CNNBS' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNNBS,
+				trim(kword, left, right) = 'UNOPS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNOPS,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
