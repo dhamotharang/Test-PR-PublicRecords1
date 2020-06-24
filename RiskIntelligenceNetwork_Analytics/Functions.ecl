@@ -28,10 +28,15 @@ EXPORT Functions := MODULE
 																																													// Clean name to avoid blank labels
 																																													SELF.batchin_rec.name_first := TRIM(ut.fn_RemoveSpecialChars(LEFT.batchin_rec.name_first)),
 																																													SELF.batchin_rec.name_last := TRIM(ut.fn_RemoveSpecialChars(LEFT.batchin_rec.name_last)),
-																																													SELF.boca_shell_appends := LEFT.boca_shell_appends[0],
-																																													SELF.BocaShellHit := (INTEGER1)(LEFT.Boca_shell_appends[0].seq > 0 and LEFT.Boca_shell_appends[0].did > 0),
+																																													SELF.boca_shell_appends := LEFT.boca_shell_appends[1],
+																																													SELF.crim_appends := LEFT.crim_appends[1],
+																																													SELF.BocaShellHit := (INTEGER1)(LEFT.Boca_shell_appends[1].seq > 0 and LEFT.Boca_shell_appends[1].did > 0),
 																																													SELF.rin_source := 1,
 																																													SELF.gc_id := '234',
+																																													SELF.record_id := 67564,
+																																													SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
+																																													SELF.crim_match_type := (INTEGER)LEFT.crim_appends[1].match_type,
+																																													SELF.crim_hit := IF(LEFT.crim_appends[1].did <> 0, TRUE, FALSE),
 																																													SELF := LEFT,
 																																													SELF := []));
 																																													
@@ -44,14 +49,15 @@ EXPORT Functions := MODULE
 					 COMPUTE ENTITY STATS (RISK INDICATORS)
 					*/
 
-					NicoleAttr := 'agencyuid,agencyprogtype,agencyprogjurst,t_srcagencyuid,t_srcagencyprogtype,t_actdtecho,t_srctype,t_srcclasstype,t_personuidecho,t_inpclntitleecho,'+
-					't_inpclnfullnmecho,t_inpclnfirstnmecho,t_inpclnmiddlenmecho,t_inpclnlastnmecho,t_inpclnnmsuffixecho,t_inpclnaddrprimrangeecho,t_inpclnaddrpredirecho,t_inpclnaddrprimnmecho,t_inpclnaddrsuffixecho,t_inpclnaddrpostdirecho,t_inpclnaddrunitdesigecho,'+
-					't_inpclnaddrsecrangeecho,t_inpclnaddrcityecho,t_inpclnaddrstecho,t_inpclnaddrzip5echo,t_inpclnaddrzip4echo,t_inpclnaddrlatecho,t_inpclnaddrlongecho,t_inpclnaddrcountyecho,t_inpclnaddrgeoblkecho,t_inpclnssnecho,t_inpclndobecho,'+
-					't_inpclndlstecho,t_inpclnemailecho,t_inpclnbnkacctecho,t_inpclnbnkacctrtgecho,t_inpclnipaddrecho,t_inpclnphnecho,t1_lexidpopflag,t1_rinidpopflag,t18_isipmetahitflag,t18_ipaddrcity,t18_ipaddrcountry ,'+
-					't18_ipaddrregion,t18_ipaddrdomain,t18_ipaddrispnm,t18_ipaddrloctype,t18_ipaddrproxytype,t18_ipaddrproxydesc,t18_ipaddrisispflag,t18_ipaddrasncompnm,t18_ipaddrasn,t18_ipaddrcompnm,t18_ipaddrorgnm,'+
-					't18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t19_bnkacctpopflag,t19_isbnkapphitflag,t19_bnkacctbnknm,t19_bnkaccthrprepdrtgflag,t17_emailpopflag,t17_emaildomain,'+
-					't17_emaildomaindispflag,t9_addrpopflag,t9_addrtype,t9_addrstatus,t16_phnpopflag,t15_ssnpopflag,t18_ipaddrpopflag,' +
-					'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag';
+					NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t19_bnkaccthrprepdrtgflag,t1l_dobnotverflag,' +
+																						't1_stolidflag,t1_synthidflag,t1_manipidflag,t1_adultidnotseenflag,t1_addrnotverflag,t1l_ssnwaltnaverflag,t1_firstnmnotverflag,t1l_hiriskcviflag,t1l_medriskcviflag,t1_minorwlexidflag,t1_lastnmnotverflag,' +
+																						't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
+																						't1l_iddtofdeathaftidactflagev,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev,p16_aotphnkractflagev,' +
+																						'p17_aotemailkractflagev,p18_aotipaddrkractflagev,p19_aotbnkacctkractflagev,p20_aotdlkractflagev,' +
+																						't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
+																						'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
+;
+;
 
 
 
@@ -112,7 +118,7 @@ EXPORT Functions := MODULE
 																			SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, LEFT.RiskLevel), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
 																			SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
 																			SELF.field := LEFT.field,
-																			SELF.EntityType := RIGHT.EntityType,
+																			SELF.EntityType := MAP(RIGHT.EntityType != 0 => RIGHT.EntityType, LEFT.EntityType),
 																			SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
 																			SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
 																			SELF := LEFT), KEYED, LEFT OUTER);
@@ -256,7 +262,7 @@ EXPORT Functions := MODULE
 					
 					rulesFlagsMatched_final := PROJECT(RulesFlagsMatched,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutRulesFlagsMatched,
 																																																							SELF := LEFT));
-					entityStats_final := PROJECT(WeightedResult,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
+					entityStats_final := PROJECT(WeightedResult(risklevel > -1),TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
 																																																							SELF := LEFT));
 
 					results := PROJECT(EntityAssessment,TRANSFORM(RiskIntelligenceNetwork_analytics.Layouts.LayoutRiskScore,
@@ -264,6 +270,17 @@ EXPORT Functions := MODULE
 																																																															SELF.RulesFlagsMatched := rulesFlagsMatched_final,
 																																																															SELF.EntityStats := entityStats_final,
 																																																															SELF := LEFT));
+																																																															
+						// output(ds_in,named('analytics_ds_in'));
+						// output(j2,named('analytics_j2'));
+						// output(AttrClean,named('analytics_AttrClean'));
+						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
+						// output(WeightedResult,named('analytics_WeightedResult'));
+						// output(RulesFlagsMatched,named('analytics_RulesFlagsMatched'));
+						// output(entityStats_final,named('analytics_entityStats_final'));
+						// output(rulesFlagsMatched_final,named('analytics_rulesFlagsMatched_final'));
+						// output(results,named('analytics_results'));
+						
 					RETURN results;
 		END;
 		
