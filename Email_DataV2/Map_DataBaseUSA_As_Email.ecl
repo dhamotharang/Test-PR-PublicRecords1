@@ -2,7 +2,7 @@
 
 EXPORT Map_DataBaseUSA_As_Email(version) := FUNCTION
 
-infile     := dataset(ut.foreign_prod + 'thor_data400::base::database_usa::qa::data',Database_USA.Layouts.Base,thor);
+infile     := Database_USA.Files().Base.Built;
 with_email := infile(TRIM(email) <> '');
 
 //apply macro to obtain email domain fields
@@ -11,7 +11,7 @@ emailservice.mac_append_domain_flags(with_email,domain_d,Email);
 //************Transform to a common email layout
 Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.email_src        					:= mdr.sourceTools.src_DataBase_USA;
-	// SELF.current_rec      					:= input.current_rec;
+	SELF.current_rec      					:= true;
 	SELF.activecode     						:= '';
 	SELF.did_type         					:= '';
 	SELF.orig_pmghousehold_id  			:= '';
@@ -68,11 +68,11 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.date_last_seen  						:= (string8)input.dt_last_seen;
 	SELF.Date_Vendor_First_Reported := (string8)input.dt_vendor_first_reported;
 	SELF.Date_Vendor_Last_Reported  := (string8)input.dt_vendor_last_reported;
-	SELF.append_email_username 			:= STD.Str.ToUpperCase(Email_Data.Fn_Clean_Email_Username(SELF.orig_email));
-	SELF.append_domain 							:= STD.Str.ToUpperCase(input.domain);
-	SELF.append_domain_type 				:= STD.Str.ToUpperCase(input.domain_type);
-	SELF.append_domain_root 				:= STD.Str.ToUpperCase(input.domain_root);
-	SELF.append_domain_ext 					:= STD.Str.ToUpperCase(input.domain_ext);
+	SELF.append_email_username 			:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Username(SELF.orig_email));
+	SELF.append_domain 							:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_domain(input.domain));
+	SELF.append_domain_type 				:= ut.CleanSpacesAndUpper(input.domain_type);
+	SELF.append_domain_root 				:= ut.CleanSpacesAndUpper(input.domain_root);
+	SELF.append_domain_ext 					:= ut.CleanSpacesAndUpper(input.domain_ext);
 	SELF.append_is_tld_state				:= input.is_tld_state;
 	SELF.append_is_tld_generic 			:= input.is_tld_generic;
 	SELF.append_is_tld_country 			:= input.is_tld_country;
@@ -88,7 +88,7 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 																						// (data)TRIM(SELF.orig_dob, LEFT, RIGHT) +
 																						// (data)TRIM(input.clean_cname, LEFT, RIGHT) +
 																						(data)TRIM(SELF.email_src, LEFT, RIGHT));
-	SELF.orig_CompanyName						:= STD.Str.ToUpperCase(input.Company_Name);
+	SELF.orig_CompanyName						:= ut.CleanSpacesAndUpper(input.Company_Name);
 	SELF.process_date               := (string8)input.process_date;
 	// SELF.cln_CompanyName						:= STD.Str.CleanSpaces(input.clean_cname);
 	SELF.rules											:= 0;
