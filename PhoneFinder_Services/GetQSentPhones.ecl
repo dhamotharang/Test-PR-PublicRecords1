@@ -85,7 +85,7 @@ MODULE
   END;
 
   // QSent gateway data - iQ411
-  EXPORT GetQSentiQ411Data( DATASET(lBatchIn) dIn, DATASET(lExcludePhones) dExcludePhones, 
+  EXPORT GetQSentiQ411Data( DATASET(lBatchIn) dIn, DATASET(lExcludePhones) dExcludePhones,
     PhoneFinder_Services.iParam.SearchParams inMod, Gateway.Layouts.Config pGateway) :=
   FUNCTION
 
@@ -93,7 +93,7 @@ MODULE
     mod_access := project(inMod, doxie.IDataAccess);
     timeoutSecs  := 5; // gateway timeout
     today := (string) STD.Date.Today();
-    
+
     // Temporary layout
     rQSent_Layout := RECORD
       string20 acctno;
@@ -107,7 +107,7 @@ MODULE
       SELF := pInput; // acctno, did, name_first, name_last, prim_range, predir, prim_name, postdir, sec_range, p_city_name, st, z5
       SELF := [];
     END;
-    dRtpIn := PROJECT(dIn, xtIQ411In(LEFT)); 
+    dRtpIn := PROJECT(dIn, xtIQ411In(LEFT));
 
     // apply ccpa optout before calling the gateway
     dRtpInClean := dx_gateway.parser_qsent_raw.CleanRawRequest(dRtpIn, mod_access);
@@ -144,14 +144,14 @@ MODULE
     dIQ411RawRecs := PROJECT(dRtpInClean, IQ411_Recs(LEFT));
     dNormIQ411Recs := NORMALIZE(dIQ411RawRecs, LEFT.qsent_recs(phone != ''),
       TRANSFORM(lPPResponse, SELF.acctno := left.acctno; SELF := RIGHT));
-      
+
     // apply ccpa opt-out to gw response
     dCleanIQ411Recs := dx_gateway.parser_qsent_raw.CleanRawResponse(dNormIQ411Recs, mod_access);
 
     lFinal tFinalIQ411(lPPResponse le, INTEGER cnt) := TRANSFORM
       SELF.acctno := le.acctno;
       SELF.dt_first_seen := iesp.ECL2ESP.t_DateToString8(le.RealTimePhone_Ext.ListingCreationDate);
-      SELF.dt_last_seen := today[1..6] + '00';
+      SELF.dt_last_seen := iesp.ECL2ESP.t_DateToString8(le.RealTimePhone_Ext.ListingTransactionDate);
       SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
       SELF.did := (UNSIGNED) le.did;
       SELF.telcordia_only:= le.telcordia_only = 'Y';
@@ -170,11 +170,11 @@ MODULE
 
     dIQ411PrimaryPhoneFlag_src := UNGROUP(ITERATE(GROUP(dIQ411RecsDedup, acctno), TRANSFORM(lFinal, SELF.isPrimaryPhone := COUNTER = 1, SELF := RIGHT)));
 
-    dIQ411PrimaryPhoneFlag := PROJECT(dIQ411PrimaryPhoneFlag_src, 
+    dIQ411PrimaryPhoneFlag := PROJECT(dIQ411PrimaryPhoneFlag_src,
       TRANSFORM(lFinal, SELF.phn_src_all := LEFT.phn_src_all +
         IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway,
         DATASET([$.Constants.PFSourceCodes.QsentIQ411], $.Layouts.PhoneFinder.src_rec)),
-        SELF := LEFT)); 
+        SELF := LEFT));
 
     // Debug
     #IF(PhoneFinder_Services.Constants.Debug.QSent)
@@ -190,8 +190,8 @@ MODULE
       OUTPUT(dIQ411PrimaryPhoneFlag,NAMED('dIQ411PrimaryPhoneFlag'));
     #END
 
-    RETURN dIQ411PrimaryPhoneFlag;    
-    
+    RETURN dIQ411PrimaryPhoneFlag;
+
   END;
 
 END;
