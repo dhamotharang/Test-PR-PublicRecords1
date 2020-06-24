@@ -43,7 +43,12 @@ Export get_hms_Indiv (dataset(healthcare_header_services.Layouts.searchKeyResult
                      transform(left),left only);
 			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);							 
       suppressmachms:=Suppress.MAC_FlagSuppressedSource(audits+NoAudits,mod_access); 
-			setOptOuthms := project(suppressmachms, transform(healthcare_header_services.Layouts.hms_Indivbase_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];));              			
+			setOptOuthms := project(suppressmachms, transform(healthcare_header_services.Layouts.hms_Indivbase_with_input,
+																																	self.hasOptOut:= left.is_suppressed;
+																																	self.acctno:=left.acctno;
+																																	self.lnpid:=left.lnpid;
+																																	self:=if(not left.is_suppressed,left);
+																																	self:=[];));    
 			baseRecs := project(setOptOuthms,Healthcare_Header_Services.Transforms.build_hms_Indivbase(left));
 			hms_providers_final_sorted := sort(baseRecs, acctno, LNPID, Src, statelicenses[1].LicenseNumber,statelicenses[1].LicenseState,-statelicenses[1].Termination_Date);
 			hms_providers_final_grouped := group(hms_providers_final_sorted, acctno, LNPID, Src,statelicenses[1].LicenseNumber,statelicenses[1].LicenseState);

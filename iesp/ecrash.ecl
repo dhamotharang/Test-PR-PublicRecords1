@@ -15,11 +15,13 @@ export t_ECrashSearchOption := record (iesp.share.t_BaseOption)
 	boolean StrictMatch {xpath('StrictMatch')};//hidden[internal]
 	integer MaxResults {xpath('MaxResults')};//hidden[internal]
 	boolean SubscriptionReports {xpath('SubscriptionReports')};
+	string CustomerType {xpath('CustomerType')};
 end;
 		
 export t_ECrashAccidentLocation := record
 	string Street {xpath('Street')};
 	string CrossStreet {xpath('CrossStreet')};
+	string BlockNumber {xpath('BlockNumber')};
 end;
 		
 export t_ECrashSearchVehicle := record
@@ -69,6 +71,7 @@ export t_ECrashSearchBy := record (t_ECrashSearchShared)
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
 	string Vin {xpath('Vin')};
 	string LicensePlate {xpath('LicensePlate')};
+	iesp.share.t_Date DOB {xpath('DOB')};
 end;
 		
 export t_ECrashDocument := record
@@ -126,8 +129,8 @@ export t_ECrashSearchRecord := record
 	string StateReportNumber {xpath('StateReportNumber')};
 	dataset(t_ECrashInvolvedParty) InvolvedParties {xpath('InvolvedParties/Party'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Involved_Parties)};
 	string SuperReportID {xpath('SuperReportID')};
-	string VendorReportId {xpath('VendorReportId')};
-	string ReportType {xpath('ReportType')};
+	string VendorReportId {xpath('VendorReportId')};//hidden[ecl_only]
+	string ReportType {xpath('ReportType')};//hidden[ecl_only]
 	string ContribSource {xpath('ContribSource')};
 	string DateReportCreated {xpath('DateReportCreated')};
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
