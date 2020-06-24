@@ -1,4 +1,4 @@
-﻿IMPORT Advo_Services, BatchShare, CriminalRecords_BatchService, DidVille, DriversV2_Services, 
+﻿IMPORT Advo_Services, BatchShare, CriminalRecords_BatchService, DidVille, DriversV2_Services,
  dx_PhonesInfo, FraudShared_Services, risk_indicators;
 
 EXPORT Layouts := MODULE
@@ -18,9 +18,9 @@ EXPORT Layouts := MODULE
   entity_uid_recs;
   boolean hasKnownRisk;
   string10 RiskLevel;
- END; 
+ END;
 
- EXPORT dids_recs := RECORD 
+ EXPORT dids_recs := RECORD
   DidVille.Layout_Did_OutBatch;
   string30 RecordSource;
  END;
