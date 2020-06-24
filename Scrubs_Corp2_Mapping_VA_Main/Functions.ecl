@@ -34,7 +34,7 @@ EXPORT Functions := MODULE
 		
 					 uc_desc 					:= corp2.t2u(desc);
 
-					 isValidStatusCD	:= map(uc_desc IN ['INACTIVE','ACTIVE','PENDINACT','']	=> TRUE,
+					 isValidStatusCD	:= map(uc_desc IN ['INACTIVE','ACTIVE','PENDING ACTIVE','']	=> TRUE,
 																	 FALSE
 																  );
 
@@ -76,4 +76,21 @@ EXPORT Functions := MODULE
 					
 		END;
 
+    //****************************************************************************
+		//ValidCorpAgentStatusDesc: 	returns true or false based upon the incoming code.
+		//****************************************************************************
+		EXPORT ValidCorpAgentStatusDesc(STRING s, STRING recordorigin) := FUNCTION
+					 
+					 uc_s 				:= corp2.t2u(s);
+					 
+					 isValidDesc	:= if(recordorigin = 'C',
+															map(uc_s IN ['ACTIVE','INACTIVE','RESIGNED','PENDING RESIGNATION',''] => TRUE,
+																	FALSE
+																 ),
+															TRUE
+														 );
+																		
+					RETURN if(isValidDesc,1,0);
+					
+		END;
 END;

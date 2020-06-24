@@ -29,7 +29,6 @@ EXPORT VA := MODULE;
 																		SELF.merg_type         := corp2.t2u(RIGHT.merg_type);
 																		SELF.merg_eff_date     := corp2.t2u(RIGHT.merg_eff_date);
 																		SELF.merg_surv_id      := corp2.t2u(RIGHT.merg_surv_id);
-																		SELF.merg_foreign_name := corp2.t2u(RIGHT.merg_foreign_name);
 																		SELF						 	     := LEFT;
 																		SELF						 		   := [];
 																	 ),
@@ -46,7 +45,6 @@ EXPORT VA := MODULE;
 																		SELF.merg_type         := corp2.t2u(RIGHT.merg_type);
 																		SELF.merg_eff_date     := corp2.t2u(RIGHT.merg_eff_date);
 																		SELF.merg_surv_id      := corp2.t2u(RIGHT.merg_surv_id);
-																		SELF.merg_foreign_name := corp2.t2u(RIGHT.merg_foreign_name);
 																		SELF						 	     := LEFT;
 																		SELF						 		   := [];
 																	 ),
@@ -63,7 +61,6 @@ EXPORT VA := MODULE;
 																		SELF.merg_type         := corp2.t2u(RIGHT.merg_type);
 																		SELF.merg_eff_date     := corp2.t2u(RIGHT.merg_eff_date);
 																		SELF.merg_surv_id      := corp2.t2u(RIGHT.merg_surv_id);
-																		SELF.merg_foreign_name := corp2.t2u(RIGHT.merg_foreign_name);
 																		SELF						 	     := LEFT;
 																		SELF						 		   := [];
 																	 ),
@@ -72,10 +69,10 @@ EXPORT VA := MODULE;
 												 
 													 
 		//********************************************************************
-		//NORMALIZE the AMENDMENT records for use in creating Event and
+		//PROJECT the AMENDMENT records for use in creating Event and
 		//Stock records.	
 		//******************************************************************** 
-		Corp2_Raw_VA.Layouts.TempNormAmendLayoutIn normAmendment(Corp2_Raw_VA.Layouts.AmendmentLayoutIn l) := TRANSFORM
+		Corp2_Raw_VA.Layouts.TempNormAmendLayoutIn transAmendment(Corp2_Raw_VA.Layouts.AmendmentLayoutIn l) := TRANSFORM
 			SELF.amend_type         := corp2.t2u(l.amend_type1) +
 			                           IF(corp2.t2u(l.amend_type2) <> '', '; ' + corp2.t2u(l.amend_type2), '') +
 																 IF(corp2.t2u(l.amend_type3) <> '', '; ' + corp2.t2u(l.amend_type3), '') +
@@ -91,7 +88,7 @@ EXPORT VA := MODULE;
 			SELF							      := [];
 		END;
 		 
-		AmendNormal 		:= PROJECT(AmendmtFile, normAmendment(LEFT));
+		AmendNormal 		:= PROJECT(AmendmtFile, transAmendment(LEFT));
 			 
 		AmendEvents 		:= AmendNormal(TRIM(amend_type,LEFT,RIGHT) <> '');
 			 
@@ -108,7 +105,6 @@ EXPORT VA := MODULE;
 																			SELF						 	    := LEFT;
 																			SELF						 		  := [];
 																		 ),
-														//LEFT OUTER
 														RIGHT OUTER
 													 ) : INDEPENDENT;	
 		
@@ -133,15 +129,16 @@ EXPORT VA := MODULE;
 			SELF.corp_ln_name_type_desc     		:= 'LEGAL'; 
 			//Per CI do not map FN or US when in the corp_state field
 			valid_state                         := IF(corp2.t2u(l.corps_state) NOT IN ['FN','US'],l.corps_state,'');
-			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,l.corps_state,l.corps_zip).ifAddressExists,'B','');
-			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,l.corps_state,l.corps_zip).ifAddressExists,'BUSINESS','');
-			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,l.corps_state,l.corps_zip).AddressLine1;
+			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).ifAddressExists,'B','');
+			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).ifAddressExists,'BUSINESS','');
+			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).AddressLine1;
 			SELF.corp_address1_line2						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).AddressLine2;
-			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,l.corps_state,l.corps_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.corps_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
+			SELF.corp_address1_line3						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).AddressLine3;
+			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.corps_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
 			SELF.corp_status_desc								:= Corp2_Raw_VA.Functions.CorpStatusDesc(l.corps_status);			
 			SELF.corp_status_date								:= Corp2_Mapping.fValidateDate(l.corps_status_date,'CCYY-MM-DD').PastDate;			
 			SELF.corp_inc_state									:= state_origin;		
-			SELF.corp_inc_date									:= IF(corp2.t2u(l.corps_incorp_state) = 'VA' ,Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
+			SELF.corp_inc_date									:= IF(corp2.t2u(l.corps_incorp_state) = state_origin,Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
 			SELF.corp_term_exist_exp						:= Corp2_Mapping.fValidateDate(l.corps_duration,'CCYY-MM-DD').GeneralDate;
 			SELF.corp_term_exist_cd							:= MAP(SELF.corp_term_exist_exp <> ''	            => 'D',
  																								 corp2.t2u(l.corps_duration) = '9999-12-31' => 'P',
@@ -152,7 +149,7 @@ EXPORT VA := MODULE;
 																						     corp2.t2u(l.corps_duration) = '9999-12-31' => 'PERPETUAL',
 																								 ''
 																								 );
-			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.corps_incorp_state) = 'VA' ,'D','F');
+			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.corps_incorp_state) IN [state_origin,''],'D','F');
 			SELF.corp_forgn_state_cd						:= IF(corp2.t2u(l.corps_incorp_state) NOT IN [state_origin,''],
 																								MAP(corp2.t2u(l.corps_incorp_state) IN ['US','FN']					          => '',
 																										Corp2_Raw_VA.Functions.Valid_US_State_Codes(l.corps_incorp_state)	=> corp2.t2u(l.corps_incorp_state),
@@ -167,7 +164,7 @@ EXPORT VA := MODULE;
 																									 ),
 																								''
 																							 );																					 
-			SELF.corp_forgn_date								:= IF(corp2.t2u(l.corps_incorp_state) <> 'VA',Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');
+			SELF.corp_forgn_date								:= IF(corp2.t2u(l.corps_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= MAP(corp2.t2u(l.corps_stock_ind) = 'S' => 'STOCK CORPORATION',
 																								 corp2.t2u(l.corps_stock_ind) = 'N' => 'NON-STOCK CORPORATION',																								 
 																								 ''
@@ -182,7 +179,8 @@ EXPORT VA := MODULE;
 			SELF.corp_ra_address_type_desc			:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).ifAddressExists,'REGISTERED OFFICE','');
 			SELF.corp_ra_address_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).AddressLine1;	
 			SELF.corp_ra_address_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).AddressLine2;
-			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,l.corps_state,l.corps_zip).PrepAddrLine1;																																		
+			SELF.corp_ra_address_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).AddressLine3;																					 
+			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).PrepAddrLine1;																																		
 			SELF.corp_prep_addr1_last_line 			:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_street1,l.corps_street2,l.corps_city,valid_state,l.corps_zip).PrepAddrLastLine;
 			SELF.ra_prep_addr_line1         		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).PrepAddrLine1;
 			SELF.ra_prep_addr_last_line     		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.corps_ra_street1,l.corps_ra_street2,l.corps_ra_city,l.corps_ra_state,l.corps_ra_zip).PrepAddrLastLine;
@@ -224,15 +222,16 @@ EXPORT VA := MODULE;
 			SELF.corp_ln_name_type_desc     		:= 'LEGAL'; 
 			//Per CI do not map FN or US when in the corp_state field
 			valid_state                         := IF(corp2.t2u(l.lp_state) NOT IN ['FN','US'],l.lp_state,'');
-			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,l.lp_state,l.lp_zip).ifAddressExists,'B','');
-			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,l.lp_state,l.lp_zip).ifAddressExists,'BUSINESS','');
-			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,l.lp_state,l.lp_zip).AddressLine1;
+			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).ifAddressExists,'B','');
+			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).ifAddressExists,'BUSINESS','');
+			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).AddressLine1;
 			SELF.corp_address1_line2						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).AddressLine2;
-			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,l.lp_state,l.lp_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.lp_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
+			SELF.corp_address1_line3						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).AddressLine3;
+			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.lp_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
 			SELF.corp_status_desc								:= Corp2_Raw_VA.Functions.CorpStatusDesc(l.lp_status);			
 			SELF.corp_status_date								:= Corp2_Mapping.fValidateDate(l.lp_status_date,'CCYY-MM-DD').PastDate;			
 			SELF.corp_inc_state									:= state_origin;		
-			SELF.corp_inc_date									:= IF(corp2.t2u(l.lp_incorp_state) = 'VA',Corp2_Mapping.fValidateDate(l.lp_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
+			SELF.corp_inc_date									:= IF(corp2.t2u(l.lp_incorp_state) = state_origin,Corp2_Mapping.fValidateDate(l.lp_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
 			SELF.corp_term_exist_exp						:= Corp2_Mapping.fValidateDate(l.lp_duration,'CCYY-MM-DD').GeneralDate;
 			SELF.corp_term_exist_cd							:= MAP(SELF.corp_term_exist_exp <> ''	         => 'D',
  																								 corp2.t2u(l.lp_duration) = '9999-12-31' => 'P',
@@ -243,7 +242,7 @@ EXPORT VA := MODULE;
 																						     corp2.t2u(l.lp_duration) = '9999-12-31' => 'PERPETUAL',
 																								 ''
 																								 );
-			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.lp_incorp_state) = 'VA' ,'D','F');
+			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.lp_incorp_state) IN [state_origin,''],'D','F');
 			SELF.corp_forgn_state_cd						:= IF(corp2.t2u(l.lp_incorp_state) NOT IN [state_origin,''],
 																								MAP(corp2.t2u(l.lp_incorp_state) IN ['US','FN']					            => '',
 																										Corp2_Raw_VA.Functions.Valid_US_State_Codes(l.lp_incorp_state)	=> corp2.t2u(l.lp_incorp_state),
@@ -258,7 +257,7 @@ EXPORT VA := MODULE;
 																									 ),
 																								''
 																							 );																					 
-			SELF.corp_forgn_date								:= IF(corp2.t2u(l.lp_incorp_state) <> 'VA',Corp2_Mapping.fValidateDate(l.lp_incorp_date,'CCYY-MM-DD').PastDate,'');
+			SELF.corp_forgn_date								:= IF(corp2.t2u(l.lp_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.lp_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'LIMITED PARTNERSHIP';
 			SELF.corp_orig_bus_type_cd					:= corp2.t2u(l.lp_industry_code);			
 			SELF.corp_orig_bus_type_desc   	   	:= Corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.lp_industry_code);	
@@ -270,7 +269,8 @@ EXPORT VA := MODULE;
 			SELF.corp_ra_address_type_desc			:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).ifAddressExists,'REGISTERED OFFICE','');
 			SELF.corp_ra_address_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).AddressLine1;	
 			SELF.corp_ra_address_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).AddressLine2;
-			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,l.lp_state,l.lp_zip).PrepAddrLine1;																																		
+			SELF.corp_ra_address_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).AddressLine3;																					 
+			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).PrepAddrLine1;																																		
 			SELF.corp_prep_addr1_last_line 			:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_street1,l.lp_street2,l.lp_city,valid_state,l.lp_zip).PrepAddrLastLine;
 			SELF.ra_prep_addr_line1         		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).PrepAddrLine1;
 			SELF.ra_prep_addr_last_line     		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.lp_ra_street1,l.lp_ra_street2,l.lp_ra_city,l.lp_ra_state,l.lp_ra_zip).PrepAddrLastLine;
@@ -311,15 +311,16 @@ EXPORT VA := MODULE;
 			SELF.corp_ln_name_type_desc     		:= 'LEGAL'; 
 			//Per CI do not map FN or US when in the corp_state field
 			valid_state                         := IF(corp2.t2u(l.llc_state) NOT IN ['FN','US'],l.llc_state,'');
-			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,l.llc_state,l.llc_zip).ifAddressExists,'B','');
-			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,l.llc_state,l.llc_zip).ifAddressExists,'BUSINESS','');
-			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,l.llc_state,l.llc_zip).AddressLine1;
+			SELF.corp_address1_type_cd					:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).ifAddressExists,'B','');
+			SELF.corp_address1_type_desc				:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).ifAddressExists,'BUSINESS','');
+			SELF.corp_address1_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).AddressLine1;
 			SELF.corp_address1_line2						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).AddressLine2;
-			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,l.llc_state,l.llc_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.llc_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
+			SELF.corp_address1_line3						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).AddressLine3;
+			SELF.corp_address1_effective_date		:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).ifAddressExists,Corp2_Mapping.fValidateDate(l.llc_po_eff_date,'CCYY-MM-DD').GeneralDate,'');
 			SELF.corp_status_desc								:= Corp2_Raw_VA.Functions.CorpStatusDesc(l.llc_status);			
 			SELF.corp_status_date								:= Corp2_Mapping.fValidateDate(l.llc_status_date,'CCYY-MM-DD').PastDate;			
 			SELF.corp_inc_state									:= state_origin;		
-			SELF.corp_inc_date									:= IF(corp2.t2u(l.llc_incorp_state) = 'VA',Corp2_Mapping.fValidateDate(l.llc_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
+			SELF.corp_inc_date									:= IF(corp2.t2u(l.llc_incorp_state) = state_origin,Corp2_Mapping.fValidateDate(l.llc_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
 			SELF.corp_term_exist_exp						:= Corp2_Mapping.fValidateDate(l.llc_duration,'CCYY-MM-DD').GeneralDate;
 			SELF.corp_term_exist_cd							:= MAP(SELF.corp_term_exist_exp <> ''	          => 'D',
  																								 corp2.t2u(l.llc_duration) = '9999-12-31' => 'P',
@@ -329,7 +330,7 @@ EXPORT VA := MODULE;
 																						     corp2.t2u(l.llc_duration) = '9999-12-31' => 'PERPETUAL',
 																								 ''
 																								 );
-			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.llc_incorp_state) = 'VA' ,'D','F');
+			SELF.corp_foreign_domestic_ind			:= IF(corp2.t2u(l.llc_incorp_state) IN [state_origin,''],'D','F');
 			SELF.corp_forgn_state_cd						:= IF(corp2.t2u(l.llc_incorp_state) NOT IN [state_origin,''],
 																								MAP(corp2.t2u(l.llc_incorp_state) IN ['US','FN']					          => '',
 																										Corp2_Raw_VA.Functions.Valid_US_State_Codes(l.llc_incorp_state)	=> corp2.t2u(l.llc_incorp_state),
@@ -338,13 +339,13 @@ EXPORT VA := MODULE;
 																								''
 																							 );
 			SELF.corp_forgn_state_desc          := IF(corp2.t2u(l.llc_incorp_state) NOT IN [state_origin,''],
-																								MAP(corp2.t2u(l.llc_incorp_state) IN ['US','FN']						    	  => '',
+																								MAP(corp2.t2u(l.llc_incorp_state) IN ['US','FN']						    	   => '',
 																								    Corp2_Raw_VA.Functions.Valid_US_State_Codes(l.llc_incorp_state)  => Corp2_Raw_VA.Functions.State_Code_Translation(l.llc_incorp_state),
 																										Corp2_Raw_VA.Functions.State_Code_Translation(l.llc_incorp_state)
 																									 ),
 																								''
 																							 );																					 
-			SELF.corp_forgn_date								:= IF(corp2.t2u(l.llc_incorp_state) <> 'VA',Corp2_Mapping.fValidateDate(l.llc_incorp_date,'CCYY-MM-DD').PastDate,'');
+			SELF.corp_forgn_date								:= IF(corp2.t2u(l.llc_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.llc_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'LIMITED LIABILITY COMPANY';
 			SELF.corp_orig_bus_type_cd					:= corp2.t2u(l.llc_industry_code);			
 			SELF.corp_orig_bus_type_desc   	   	:= Corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.llc_industry_code);	
@@ -356,7 +357,8 @@ EXPORT VA := MODULE;
 			SELF.corp_ra_address_type_desc			:= IF(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).ifAddressExists,'REGISTERED OFFICE','');
 			SELF.corp_ra_address_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).AddressLine1;	
 			SELF.corp_ra_address_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).AddressLine2;
-			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,l.llc_state,l.llc_zip).PrepAddrLine1;																																		
+			SELF.corp_ra_address_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).AddressLine3;																					 
+			SELF.corp_prep_addr1_line1      		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).PrepAddrLine1;																																		
 			SELF.corp_prep_addr1_last_line 			:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_street1,l.llc_street2,l.llc_city,valid_state,l.llc_zip).PrepAddrLastLine;
 			SELF.ra_prep_addr_line1         		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).PrepAddrLine1;
 			SELF.ra_prep_addr_last_line     		:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.llc_ra_street1,l.llc_ra_street2,l.llc_ra_city,l.llc_ra_state,l.llc_ra_zip).PrepAddrLastLine;
@@ -412,8 +414,8 @@ EXPORT VA := MODULE;
 																								);		
 			SELF.corp_inc_state									:= state_origin;		
 			SELF.corp_name_effective_date    		:= Corp2_Mapping.fValidateDate(l.nmhist_name_eff_date,'CCYY-MM-DD').GeneralDate;
-			SELF.corp_inc_date									:= IF(corp2.t2u(l.corps_incorp_state) = 'VA',Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
-			SELF.corp_forgn_date								:= IF(corp2.t2u(l.corps_incorp_state) <> 'VA',Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');
+			SELF.corp_inc_date									:= IF(corp2.t2u(l.corps_incorp_state) = state_origin,Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
+			SELF.corp_forgn_date								:= IF(corp2.t2u(l.corps_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.recordorigin										:= 'C';
 			SELF 																:= [];
 		END;		
@@ -455,8 +457,6 @@ EXPORT VA := MODULE;
 																											);		
 			SELF.corp_inc_state									       := state_origin;		
 			SELF.Corp_Name_Reservation_Expiration_Date := Corp2_Mapping.fValidateDate(l.res_exp_date,'CCYY-MM-DD').GeneralDate;
-			SELF.corp_inc_date									       := IF(corp2.t2u(l.corps_entity_id)[1] IN ['0','1','2','3','4','5','6','7','8','9'],Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');										   																							
-			SELF.corp_forgn_date								       := IF(corp2.t2u(l.corps_entity_id)[1]  = 'F',Corp2_Mapping.fValidateDate(l.corps_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_term_exist_exp						       := Corp2_Mapping.fValidateDate(l.res_exp_date,'CCYY-MM-DD').GeneralDate;
 			SELF.corp_term_exist_cd							       := IF(SELF.corp_term_exist_exp <> '','D','');
 			SELF.corp_term_exist_desc						       := IF(SELF.corp_term_exist_exp <> '','EXPIRATION DATE','');
@@ -483,7 +483,7 @@ EXPORT VA := MODULE;
 			SELF.corp_orig_sos_charter_nbr							:= corp2.t2u(l.offc_entity_id);
 			SELF.corp_legal_name												:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.corp_legal_name).BusinessName;
 			SELF.corp_inc_state													:= state_origin;
-			SELF.cont_full_name													:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.offc_first_name+' '+l.offc_middle_name+' '+l.offc_last_name).BusinessName;
+			SELF.cont_full_name													:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.offc_last_name +', '+l.offc_first_name+' '+l.offc_middle_name).BusinessName;
 			SELF.cont_title1_desc												:= corp2.t2u(l.offc_title);
 			SELF.cont_type_cd														:= IF(SELF.cont_full_name <> '','F','');				
 			SELF.cont_type_desc													:= IF(SELF.cont_full_name <> '','OFFICER','');
@@ -520,16 +520,17 @@ EXPORT VA := MODULE;
 																												 ''
 																												);																			 
 			
-			SELF.cont_address_type_cd										:= MAP(corp2.t2u(l.res_status) = '60' => '02',
-																												 corp2.t2u(l.res_status) = '61' => '01',                                                    
+			SELF.cont_address_type_cd										:= MAP(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).ifAddressExists and corp2.t2u(l.res_status) = '60' => '02',
+																												 Corp2_Mapping.fAddressExists(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).ifAddressExists and corp2.t2u(l.res_status) = '61' => '01',                                                    
 																												 ''
 																												);				
-			SELF.cont_address_type_desc									:= MAP(corp2.t2u(l.res_status) = '60' => 'REGISTRANT',
-																												 corp2.t2u(l.res_status) = '61' => 'RESERVER',                                                    
+			SELF.cont_address_type_desc									:= MAP(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).ifAddressExists and corp2.t2u(l.res_status) = '60' => 'REGISTRANT',
+																												 Corp2_Mapping.fAddressExists(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).ifAddressExists and corp2.t2u(l.res_status) = '61' => 'RESERVER',                                                    
 																												 ''
 																												);
 			SELF.cont_address_line1											:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).AddressLine1;										 
       SELF.cont_address_line2											:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).AddressLine2;
+			SELF.cont_address_line3											:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).AddressLine3;
 			SELF.cont_prep_addr_line1      							:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).PrepAddrLine1;																																		
 			SELF.cont_prep_addr_last_line 							:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.res_street1,l.res_street2,l.res_city,l.res_state,l.res_zip).PrepAddrLastLine;
 			SELF.recordorigin														:= 'T';																										
@@ -563,7 +564,7 @@ EXPORT VA := MODULE;
 																			);
 
 		//********************************************************************
-		//EVENT File Mapping from the AmendFile that has been normalized
+		//EVENT File Mapping from the AmendFile.
 		//
 		//Note: The Amend file contains all three (3) types of corporation
 		//			data: Corporation, Limited Parnership, and Limited Liability
@@ -618,7 +619,8 @@ EXPORT VA := MODULE;
     //********************************************************************
 		//STOCK File Mapping from the corpsFile
 		//********************************************************************
-		Corp2_Mapping.LayoutsCommon.Stock  Stock_CorpsStockTrans(Corp2_Raw_VA.Layouts.CorpsLayoutIn l) := TRANSFORM		
+		Corp2_Mapping.LayoutsCommon.Stock  Stock_CorpsStockTrans(Corp2_Raw_VA.Layouts.CorpsLayoutIn l) := TRANSFORM,
+		 SKIP(corp2.t2u(l.corps_total_shares)	IN ['','0'])
 			SELF.corp_key											:= state_fips + '-' + corp2.t2u(l.corps_entity_id);
 			SELF.corp_vendor									:= state_fips;
 			SELF.corp_state_origin						:= state_origin;
@@ -629,13 +631,13 @@ EXPORT VA := MODULE;
 			SELF 															:= [];
 		END;
 
-		mapped_Stock_Corps 				:= PROJECT(CorpsFile,Stock_CorpsStockTrans(LEFT));
-		mapped_Stock_CorpsFile		:= mapped_Stock_Corps(stock_shares_issued NOT IN ['','0']);
+		mapped_Stock_CorpsFile    := PROJECT(CorpsFile,Stock_CorpsStockTrans(LEFT));
 
     //********************************************************************
 		//STOCK File Mapping from the LPFile
 		//********************************************************************
-		Corp2_Mapping.LayoutsCommon.Stock  Stock_LPStockTrans(Corp2_Raw_VA.Layouts.LPLayoutIn l) := TRANSFORM		
+		Corp2_Mapping.LayoutsCommon.Stock  Stock_LPStockTrans(Corp2_Raw_VA.Layouts.LPLayoutIn l) := TRANSFORM,
+		 SKIP(corp2.t2u(l.lp_total_shares) IN ['','0'])
 			SELF.corp_key											:= state_fips + '-' + corp2.t2u(l.lp_entity_id);
 			SELF.corp_vendor									:= state_fips;
 			SELF.corp_state_origin						:= state_origin;
@@ -646,13 +648,13 @@ EXPORT VA := MODULE;
 			SELF 															:= [];
 		END;
 
-		mapped_Stock_LP 			:= PROJECT(LPFile,Stock_LPStockTrans(LEFT));
-		mapped_Stock_LPFile		:= mapped_Stock_LP(stock_shares_issued NOT IN ['','0']);
+		mapped_Stock_LPFile     := PROJECT(LPFile,Stock_LPStockTrans(LEFT));
 		
 		//********************************************************************
 		//STOCK File Mapping from the LLCFile
 		//********************************************************************
-		Corp2_Mapping.LayoutsCommon.Stock  Stock_LLCStockTrans(Corp2_Raw_VA.Layouts.LLCLayoutIn l) := TRANSFORM		
+		Corp2_Mapping.LayoutsCommon.Stock  Stock_LLCStockTrans(Corp2_Raw_VA.Layouts.LLCLayoutIn l) := TRANSFORM,
+		 SKIP(corp2.t2u(l.llc_total_shares)	IN ['','0'])
 			SELF.corp_key											:= state_fips + '-' + corp2.t2u(l.llc_entity_id);
 			SELF.corp_vendor									:= state_fips;
 			SELF.corp_state_origin						:= state_origin;
@@ -663,8 +665,7 @@ EXPORT VA := MODULE;
 			SELF 															:= [];
 		END;
 
-		mapped_Stock_LLC 			:= PROJECT(LLCFile,Stock_LLCStockTrans(LEFT));
-		mapped_Stock_LLCFile	:= mapped_Stock_LLC(stock_shares_issued NOT IN ['','0']);
+		mapped_Stock_LLCFile  := PROJECT(LLCFile,Stock_LLCStockTrans(LEFT));
 		
 		//********************************************************************
 		//STOCK File Mapping from the AmendFile that has been normalized
@@ -811,11 +812,13 @@ EXPORT VA := MODULE;
 																											 corp_orig_sos_charter_nbr_Invalid 							<> 0 OR
 																											 corp_legal_name_Invalid 												<> 0 OR	
 																											 corp_ln_name_type_cd_Invalid 									<> 0 OR
+																											 corp_ln_name_type_desc_Invalid 								<> 0 OR
 																											 corp_address1_type_cd_Invalid 									<> 0 OR
 																											 corp_address1_type_desc_Invalid 								<> 0 OR
 																											 corp_address1_effective_date_Invalid 					<> 0 OR
 																											 corp_status_date_Invalid 											<> 0 OR
-																											 corp_inc_state_Invalid 												<> 0 OR
+																											 corp_status_desc_Invalid                       <> 0 OR
+																											 corp_inc_state_Invalid 		 										<> 0 OR
 																											 corp_inc_date_Invalid 													<> 0 OR
 																											 corp_term_exist_cd_Invalid 										<> 0 OR
 																											 corp_term_exist_exp_Invalid 										<> 0 OR
@@ -826,6 +829,9 @@ EXPORT VA := MODULE;
 																											 corp_forgn_date_Invalid 												<> 0 OR
 																											 corp_orig_bus_type_cd_Invalid 									<> 0 OR
 																											 corp_ra_effective_date_Invalid 							 	<> 0 OR
+																											 corp_agent_status_desc_Invalid                 <> 0 OR
+																											 corp_agent_assign_date_Invalid                 <> 0 OR
+																											 corp_name_effective_date_Invalid               <> 0 OR
 																											 corp_name_reservation_expiration_date_Invalid 	<> 0
 																										);
 																										 																	
@@ -843,10 +849,12 @@ EXPORT VA := MODULE;
 																											 corp_orig_sos_charter_nbr_Invalid 							= 0 AND
 																											 corp_legal_name_Invalid 												= 0 AND	
 																											 corp_ln_name_type_cd_Invalid 									= 0 AND
+																											 corp_ln_name_type_desc_Invalid                 = 0 AND
 																											 corp_address1_type_cd_Invalid 									= 0 AND
 																											 corp_address1_type_desc_Invalid 								= 0 AND
 																											 corp_address1_effective_date_Invalid 					= 0 AND
 																											 corp_status_date_Invalid 											= 0 AND
+																											 corp_status_desc_Invalid                       = 0 AND
 																											 corp_inc_state_Invalid 												= 0 AND
 																											 corp_inc_date_Invalid 													= 0 AND
 																											 corp_term_exist_cd_Invalid 										= 0 AND
@@ -858,6 +866,9 @@ EXPORT VA := MODULE;
 																											 corp_forgn_date_Invalid 												= 0 AND
 																											 corp_orig_bus_type_cd_Invalid 									= 0 AND
 																											 corp_ra_effective_date_Invalid 							 	= 0 AND
+																											 corp_agent_status_desc_Invalid                 = 0 AND
+																											 corp_agent_assign_date_Invalid                 = 0 AND
+																											 corp_name_effective_date_Invalid               = 0 AND
 																											 corp_name_reservation_expiration_date_Invalid 	= 0																										 
 																								  );
 
