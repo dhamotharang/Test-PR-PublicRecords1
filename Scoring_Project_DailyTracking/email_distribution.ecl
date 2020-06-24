@@ -179,7 +179,7 @@ EXPORT BocaHeader_Alert_List :=
 					 'Jonathan.Deurlein@lexisnexis.com,narasimha.peruka@lexisnexis.com,ursula.rothe@lexisnexis.com,Adnan.Siddique@lexisnexis.com,Gabriel.Marcan@lexisnexis.com,Apaar.Sinha@lexisnexis.com';
 					
 EXPORT SOCIO_Daily_Monitoring_Success_List :=
-				   'Daniel.Harkins@lexisnexisrisk.com,Matthew.Ludewig@lexisnexisrisk.com,Isabel.Ma@lexisnexisrisk.com,Sheryl.Ramos@lexisnexisrisk.com,Crayton.Hudspeth@lexisnexisrisk.com';
+				   'Daniel.Harkins@lexisnexisrisk.com,Matthew.Ludewig@lexisnexisrisk.com,Isabel.Ma@lexisnexisrisk.com,Sheryl.Ramos@lexisnexisrisk.com,Crayton.Hudspeth@lexisnexisrisk.com,Noah.Lahr@lexisnexisrisk.com';
 
 
 END;

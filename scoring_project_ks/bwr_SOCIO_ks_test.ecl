@@ -9,7 +9,7 @@ req_date := (integer) ut.GetDate;
 
 curr_date := req_date + '_1';
 prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
-//prev_date := '20191029_1';
+
 
 
 results_rec :=RECORD
