@@ -1,5 +1,5 @@
-﻿IMPORT Address, Autokey_batch, BatchServices, Didville, FraudGovPlatform, FraudShared, FraudShared_Services, IDLExternalLinking,
- iesp, RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services, ut;
+﻿IMPORT Autokey_batch, BatchServices, Didville, FraudGovPlatform, FraudShared, FraudShared_Services, IDLExternalLinking,
+ iesp, RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_search_in,
                      RiskIntelligenceNetwork_Services.IParam.Params search_params) := FUNCTION
@@ -89,28 +89,15 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_entityNameUID := _RIN_Function.GetAnalyticsUID(ds_fragment_recs_rolled);
 
- PayloadCleandName_rec := RECORD
-  FraudShared.Layouts_Key.Main.Record_ID;
-  FraudShared.Layouts_Key.Main.cleaned_name cleaned_name;
- END;
- 
- ds_PayloadCleandName := PROJECT(ds_allPayloadRecs, TRANSFORM(PayloadCleandName_rec, SELF := LEFT));
-
  iesp.identitysearch.t_RINIdentitySearchProfileInformation createProfileInformation (RECORDOF(FraudGovPlatform.Key_entityprofile) pInfo) := TRANSFORM
   SELF.UniqueId := (string) pInfo.t_personuidecho,
-  cleaned_name := ds_PayloadCleandName(record_id = pInfo.recordid)[1].cleaned_name;
-  SELF.Name := iesp.ECL2ESP.SetName(cleaned_name.fname,
-                                    cleaned_name.mname,
-                                    cleaned_name.lname,
-                                    cleaned_name.name_suffix,
-                                    cleaned_name.title,
-                                    ut.fn_FormatFullName(cleaned_name.lname, cleaned_name.fname, cleaned_name.mname)),
+  SELF.Name := iesp.ECL2ESP.SetName(pInfo.t_inpclnfirstnmecho,
+                                    '',
+                                    pInfo.t_inpclnlastnmecho,
+                                    '',
+                                    ''),
   SELF.SSN := pInfo.t_inpclnssnecho,
   SELF.DOB := iesp.ECL2ESP.toDate(pInfo.t_inpclndobecho),
-  st_addr1 := Address.Addr1FromComponents(pInfo.t_inpclnaddrprimrangeecho,pInfo.t_inpclnaddrpredirecho,
-                                          pInfo.t_inpclnaddrprimnmecho,pInfo.t_inpclnaddrsuffixecho,pInfo.t_inpclnaddrpostdirecho,
-                                          pInfo.t_inpclnaddrunitdesigecho,pInfo.t_inpclnaddrsecrangeecho);
-  st_addr2 := Address.Addr2FromComponents(pInfo.t_inpclnaddrcityecho, pInfo.t_inpclnaddrstecho, pInfo.t_inpclnaddrzip5echo);  
   SELF.Address := iesp.ECL2ESP.SetAddress(pInfo.t_inpclnaddrprimnmecho,
                                           pInfo.t_inpclnaddrprimrangeecho,
                                           pInfo.t_inpclnaddrpredirecho,
@@ -124,8 +111,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
                                           '',
                                           '',
                                           '',
-                                          st_addr1,
-                                          st_addr2),
+                                          ''),
   SELF.IpAddress := pInfo.t_inpclnipaddrecho,
   SELF.ISPName := pInfo.t18_ipaddrispnm,
   SELF.Country := pInfo.t18_ipaddrcountry,
@@ -188,26 +174,23 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
                                                                 LEFT.best_mname,
                                                                 LEFT.best_lname,
                                                                 LEFT.best_name_suffix,
-                                                                LEFT.best_title,
-                                                                ut.fn_FormatFullName(LEFT.best_lname, LEFT.best_fname, LEFT.best_mname)),
+                                                                LEFT.best_title),
                           SELF.SSN     := (string) LEFT.best_ssn,
                           SELF.DOB     := iesp.ECL2ESP.ApplyDateMask(dob_, search_params.dob_mask),
-                          st_addr2     := Address.Addr2FromComponents(LEFT.best_city, LEFT.best_state, LEFT.best_zip);
-                          SELF.Address := iesp.ECL2ESP.SetAddress(primname := '',
-                                                                  primrange := '',
-                                                                  predir := '',
-                                                                  postdir := '',
-                                                                  suffix := '',
-                                                                  unitdesig := '',
-                                                                  secrange := '',
-                                                                  cityname := LEFT.best_city,
-                                                                  st := LEFT.best_state,
-                                                                  zip := LEFT.best_zip,
-                                                                  zip4 := LEFT.best_zip4,
-                                                                  countyname := '',
-                                                                  postalcode := '',
-                                                                  addr1 := LEFT.best_addr1,
-                                                                  addr2 := st_addr2),
+                          SELF.Address := iesp.ECL2ESP.SetAddress('',
+                                                                  '',
+                                                                  '',
+                                                                  '',
+                                                                  '',
+                                                                  '',
+                                                                  '',
+                                                                  LEFT.best_city,
+                                                                  LEFT.best_state,
+                                                                  LEFT.best_zip,
+                                                                  LEFT.best_zip4,
+                                                                  '',
+                                                                  '',
+                                                                  LEFT.best_addr1),
                           SELF.Phone10 := LEFT.best_phone,
                           SELF := []));
 
@@ -249,7 +232,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
  // OUTPUT(ds_pr_did, NAMED('ds_pr_did'));
  // OUTPUT(ds_pr_did_final, NAMED('ds_pr_did_final'));
  // OUTPUT(ds_allPayloadRecs, NAMED('ds_allPayloadRecs'));
- // OUTPUT(ds_PayloadCleandName, NAMED('ds_PayloadCleandName'));
  // OUTPUT(ds_contributory_dids, NAMED('ds_contributory_dids'));
  // OUTPUT(ds_dids_combined, NAMED('ds_dids_combined'));
  // OUTPUT(ds_dids_combined_dedup, NAMED('ds_dids_combined_dedup'));

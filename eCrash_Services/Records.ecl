@@ -15,8 +15,23 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
 		EXPORT AppendSourceID() := FUNCTION
 
+
+			// HPD_Dataset is a place holder until the appriss key has this row, This needs to be deleted and join revereted to keyed in lines 50,51
+			// once key is populated with this row.
+		  HPD_Record := record
+        string3 agency_state_abbr;
+        string100 agency_name;
+        string11 agency_ori;
+        string11 mbsi_agency_id;
+        string5 cru_agency_id;
+        unsigned3 cru_state_number;
+        string2 source_id;
+        string2 append_overwrite_flag;
+        unsigned8 __internal_fpos__;
+      end;
+     HPD_Dataset := dataset([{'TX ', 'HOUSTON POLICE DEPARTMENT', 'TX923608Z', '000000', '00000', 0, 'HP', 'AP', 0}], HPD_Record);
 			
-			appriss_agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
+			appriss_agency_key := FLAccidents_Ecrash.key_EcrashV2_agency + HPD_Dataset;
 
 		  dsAgency := in_mod.Agencies;
 
@@ -33,9 +48,11 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
       dsAgency1 := Project(dsAgency,xform_proj(LEFT));	
 
 		  dsAgencywSource := join(dsAgency1,appriss_agency_key,
-															keyed(left.state =right.Agency_State_Abbr) and
-															keyed(left.AgencyName = right.agency_name),
-														 transform(eCrash_Services.Layouts.KY_Response_incident,
+   								          //  keyed(left.state =right.Agency_State_Abbr) and 
+									          //  keyed(left.AgencyName = right.agency_name),
+														 (left.state =right.Agency_State_Abbr) and 
+									           (left.AgencyName = right.agency_name),
+									           transform(eCrash_Services.Layouts.KY_Response_incident,
 									                     self.source_id := right.source_id,
 											                 self.AgencyORI := right.Agency_ori,
 											                 self := left),
@@ -219,12 +236,8 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 					 self. Location := L.Location;
 					 self. DateofCrash := L.DateofCrash;
 					 self. InvolvedParties := PROJECT(L,TRANSFORM(iesp.ecrash.t_ECrashInvolvedParty,
-					 																			SpacecleanName := std.str.CleanSpaces(left.NameOfPerson);
-					                                     self.name.full := SpacecleanName,
-																							 // HPD web entry interface has only 2 fields, 1st and last name, trying to replicate the same here
-																							 self.name.first := std.str.GetNthWord(SpacecleanName,1),		
-																							 self.name.last := std.str.ExcludeFirstWord(SpacecleanName),
-																							 self.DriverLicenseNumber :=  left.DLNumber,
+					                                     self.name.full := left.NameOfPerson,
+						                                   self.DriverLicenseNumber :=  left.DLNumber,
 																							 self.dob := left.dob,
 																							 self := []));
         END;

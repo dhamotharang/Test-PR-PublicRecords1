@@ -566,32 +566,48 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
       ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
 
-      // Dedup any duplicate non-blank input ip_address values to eliminate looking up blank ip addresses or the same ip_address
-      // multiple times on the 2 key joins.
-      ds_batch_in_norm_ipa_dd := DEDUP(SORT(ds_batch_in_normalized(IP_Address != ''), IP_Address),IP_Address);
-
       // Split the normalized dataset into 2, 1 for IPv4 format addresses and 1 for Ipv6 format addresses
-      ds_normed_IPv4_addrs := ds_batch_in_norm_ipa_dd(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.period) !=0);
+      ds_normed_IPv4_addrs := ds_batch_in_normalized(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.period) !=0
+                                                     OR IP_address ='' // also include blank ip addresses here
+                                                    );
 
-      ds_normed_IPv6_addrs := ds_batch_in_norm_ipa_dd(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.colon) !=0);
+      ds_normed_IPv6_addrs := ds_batch_in_normalized(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.colon) !=0);
 
       // Join input ip_addresses against the appropriate key to get ip metadata
       ds_IPv4_child_recs_raw := BatchServices.IP_Metadata_Records(ds_normed_IPv4_addrs);
 
       ds_IPv6_child_recs_raw := fn_getIPv6MetaDataRecords(ds_normed_IPv6_addrs);
 
-      // Join the normalized input to the combined output of the 2 key joins, to restore any recs dropped due to 
-      // ip_address blank or duplicate.
-      ds_child_recs_raw := JOIN(ds_batch_in_normalized, ds_IPv4_child_recs_raw + ds_IPv6_child_recs_raw,
-                                  LEFT.IP_Address = RIGHT.IP_Address,
-                                TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
-                                  SELF :=LEFT,
-                                  SELF :=RIGHT),
-                                LEFT OUTER); //keep everything from left/normed input
+      //Combine ipv4 & ipv6 key join results and put into original order
+      ds_child_recs_raw := SORT(ds_IPv4_child_recs_raw + ds_IPv6_child_recs_raw,
+                                acctno, orig_acctno);
 
-      // Sort resulting child recs raw to put recs into the original order
-      ds_child_recs := SORT(ds_child_recs_raw,
-                            acctno, orig_acctno);
+      // A blank input ip_address causes some bogus info to be returned by 
+      // BatchServices.IP_Metadata_Records above; 
+      // So when that situation exists, null out the fields we are using for TRIS output.
+       ds_child_recs := PROJECT(ds_child_recs_raw,
+         TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
+         BlankIPAddress           := LEFT.ip_address = '';
+         SELF.edge_country        := IF(BlankIPAddress,'',LEFT.edge_country);
+         SELF.edge_region         := IF(BlankIPAddress,'',LEFT.edge_region);
+         SELF.edge_city           := IF(BlankIPAddress,'',LEFT.edge_city);
+         SELF.edge_conn_speed     := IF(BlankIPAddress,'',LEFT.edge_conn_speed);
+         SELF.edge_latitude       := IF(BlankIPAddress,'',LEFT.edge_latitude);
+         SELF.edge_longitude      := IF(BlankIPAddress,'',LEFT.edge_longitude);
+         SELF.edge_postal_code    := IF(BlankIPAddress,'',LEFT.edge_postal_code);
+         SELF.edge_continent_code := IF(BlankIPAddress,0, LEFT.edge_continent_code);
+         SELF.edge_country_conf   := IF(BlankIPAddress,0, LEFT.edge_country_conf);
+         SELF.edge_region_conf    := IF(BlankIPAddress,0, LEFT.edge_region_conf);
+         SELF.edge_city_conf      := IF(BlankIPAddress,0, LEFT.edge_city_conf);
+         SELF.edge_postal_conf    := IF(BlankIPAddress,0, LEFT.edge_postal_conf);
+         SELF.isp_name            := IF(BlankIPAddress,'',LEFT.isp_name);
+         SELF.edge_gmt_offset     := IF(BlankIPAddress,0, LEFT.edge_gmt_offset);
+         SELF.domain_name         := IF(BlankIPAddress,'',LEFT.domain_name);
+         SELF.proxy_type          := IF(BlankIPAddress,'',LEFT.proxy_type);
+         SELF.proxy_description   := IF(BlankIPAddress,'',LEFT.proxy_description);
+         SELF.asn                 := IF(BlankIPAddress,0, LEFT.asn);
+         SELF.asn_name            := IF(BlankIPAddress,'',LEFT.asn_name);
+         SELF                     := LEFT;));
 
       ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized, acctno, orig_acctno),
                                       acctno),
@@ -609,11 +625,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
       //output(in_clean_batch, named('in_clean_batch'));
       //output(ds_IP_Metadata_batch_in, named('ds_IP_Metadata_batch_in'));
       //output(ds_batch_in_normalized, named('ds_batch_in_normalized'));
-      //output(ds_batch_in_norm_ipa_dd, named('ds_batch_in_norm_ipa_dd'));
       //output(ds_normed_IPv4_addrs,   named('ds_normed_IPv4_addrs'));
-      //output(ds_normed_IPv6_addrs,   named('ds_normed_IPv6_addrs'));
       //output(ds_IPv4_child_recs_raw, named('ds_IPv4_child_recs_raw')); 
       //output(ds_IPv6_child_recs_raw, named('ds_IPv6_child_recs_raw'));
+      //output(ds_normed_IPv6_addrs,   named('ds_normed_IPv6_addrs'));
       //output(ds_child_recs_raw, named('ds_child_recs_raw'));
       //output(ds_child_recs, named('ds_child_recs'));
       //output(ds_parent_recs, named('ds_parent_recs'));

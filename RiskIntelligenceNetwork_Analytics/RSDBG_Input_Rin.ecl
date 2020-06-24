@@ -1,4 +1,4 @@
-﻿﻿//HPCC Systems KEL Compiler Version 1.1.0
+﻿//HPCC Systems KEL Compiler Version 1.1.0
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL11 AS KEL;
 IMPORT RiskIntelligenceNetwork_Analytics;
@@ -12,17 +12,10 @@ OUTPUT(__RoxieQuery.DBG_E_Address_PreEntity,NAMED('DBG_E_Address_PreEntity'));
 OUTPUT(__RoxieQuery.DBG_E_Address_Result,NAMED('DBG_E_Address_Result'));
 OUTPUT(__RoxieQuery.DBG_E_Customer_PreEntity,NAMED('DBG_E_Customer_PreEntity'));
 OUTPUT(__RoxieQuery.DBG_E_Customer_Result,NAMED('DBG_E_Customer_Result'));
-OUTPUT(__RoxieQuery.DBG_E_Drivers_License_PreEntity,NAMED('DBG_E_Drivers_License_PreEntity'));
-OUTPUT(__RoxieQuery.DBG_E_Drivers_License_Result,NAMED('DBG_E_Drivers_License_Result'));
 OUTPUT(__RoxieQuery.DBG_E_Email_PreEntity,NAMED('DBG_E_Email_PreEntity'));
 OUTPUT(__RoxieQuery.DBG_E_Email_Result,NAMED('DBG_E_Email_Result'));
 OUTPUT(__RoxieQuery.DBG_E_Event_PreEntity,NAMED('DBG_E_Event_PreEntity'));
 OUTPUT(__RoxieQuery.DBG_E_Event_Result,NAMED('DBG_E_Event_Result'));
-OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_8,NAMED('DBG_E_Event_Intermediate_8'));
-OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_7,NAMED('DBG_E_Event_Intermediate_7'));
-OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_6,NAMED('DBG_E_Event_Intermediate_6'));
-OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_5,NAMED('DBG_E_Event_Intermediate_5'));
-OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_4,NAMED('DBG_E_Event_Intermediate_4'));
 OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_3,NAMED('DBG_E_Event_Intermediate_3'));
 OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_2,NAMED('DBG_E_Event_Intermediate_2'));
 OUTPUT(__RoxieQuery.DBG_E_Event_Intermediate_1,NAMED('DBG_E_Event_Intermediate_1'));
