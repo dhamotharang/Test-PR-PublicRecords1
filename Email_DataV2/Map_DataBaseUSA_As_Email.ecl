@@ -89,8 +89,9 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 																						// (data)TRIM(input.clean_cname, LEFT, RIGHT) +
 																						(data)TRIM(SELF.email_src, LEFT, RIGHT));
 	SELF.orig_CompanyName						:= ut.CleanSpacesAndUpper(input.Company_Name);
+	SELF.cln_CompanyName						:= ut.CleanSpacesAndUpper(input.Company_Name);	
 	SELF.process_date               := (string8)input.process_date;
-	// SELF.cln_CompanyName						:= STD.Str.CleanSpaces(input.clean_cname);
+
 	SELF.rules											:= 0;
 	SELF := input;
 	SELF := [];
