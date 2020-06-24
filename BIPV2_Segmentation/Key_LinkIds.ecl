@@ -1,8 +1,11 @@
-﻿import BIPV2;
-import tools;
-import BIPV2_PostProcess;
+﻿import tools;
 
-export Key_LinkIds(string   pversion  = '' ,boolean	pUseOtherEnvironment	= tools._Constants.IsDataland) := module
+export Key_LinkIds(
+   string   pversion              = '' 
+  ,boolean	pUseOtherEnvironment	= tools._Constants.IsDataland
+) := 
+module
+  
   shared superfile_name   := keynames(, pUseOtherEnvironment).seg_linkids.qa;
 	
 	shared SegKeyLayout     := record
@@ -11,12 +14,12 @@ export Key_LinkIds(string   pversion  = '' ,boolean	pUseOtherEnvironment	= tools
 	     Layouts.SegmentationLayout.subcategory;
 	end;
 	
-	shared headerRecs     := BIPV2.CommonBase.DS_Clean;
-	shared header_clean   := distribute(headerRecs, hash32(seleid));
-	
-	shared seg          := project(BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, BIPV2.KeySuffix), SegKeyLayout);
+	shared seg          := dataset([], SegKeyLayout); // built in BIPV2_Build.Build_Misc_Keys
+
 	shared indexDef     := index(seg, { seleid }, { seg }, superfile_name); 
 	
-	
 	export Key          := indexDef;
+  
+  export keyversions := tools.macf_FilesIndex('Key',keynames(pversion, pUseOtherEnvironment).seg_linkids); //allow easy access to other versions(logical or super) of key
+
 end;

@@ -1,4 +1,4 @@
-﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation;
+﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation,BIPV2_Statuses;
 EXPORT proc_segmentation(
    string                            pversion
   ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_Clean
@@ -10,6 +10,8 @@ EXPORT proc_segmentation(
   ,boolean                           pPopulateStatus      = false //pass in the clean file if this is false for pInputDirty.  if this is true, then pass in ds_base(the whole file)
   ,boolean                           pUseClean2           = false //for testing so that persists will not have to be rebuilt each time(the regulatory suppression causes that to happen)
   ,string                            pLgid3KeyVersion     = 'built'  
+  ,boolean                           pPreserveGold        = false       
+  ,boolean                           pTurnOffSegOutFile   = false
 ) := 
 module
     shared ds_Input_clean := if(pUseClean2 = false
@@ -21,37 +23,41 @@ module
     lrec := {ds_Input_clean.ultid ,ds_Input_clean.orgid ,ds_Input_clean.seleid  ,ds_Input_clean.proxid ,ds_Input_clean.powid  ,ds_Input_clean.source  ,ds_Input_clean.company_status_derived  ,ds_Input_clean.dt_first_seen ,ds_Input_clean.dt_last_seen  ,ds_Input_clean.dt_vendor_first_reported  ,ds_Input_clean.dt_vendor_last_reported       };
     ds_set_status_prep  :=   table(ds_Input_clean  ,lrec  ,ultid   ,orgid   ,seleid    ,proxid   ,powid    ,source    ,company_status_derived    ,dt_first_seen   ,dt_last_seen    ,dt_vendor_first_reported    ,dt_vendor_last_reported   ,merge);
 
-    ds_set_status_proxid_private        := BIPV2_Tools.mac_Set_Statuses(ds_set_status_prep            ,proxid ,proxid_status_private  ,true );
-    ds_set_status_powid_private         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_proxid_private  ,powid  ,powid_status_private   ,true );
-    ds_set_status_seleid_private        := BIPV2_Tools.mac_Set_Statuses(ds_set_status_powid_private   ,seleid ,seleid_status_private  ,true );
-    ds_set_status_orgid_private         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_seleid_private  ,orgid  ,orgid_status_private   ,true );
-    ds_set_status_ultid_private         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_orgid_private   ,ultid  ,ultid_status_private   ,true );
-    ds_set_status_proxid_public         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_ultid_private   ,proxid ,proxid_status_public   ,false);
-    ds_set_status_powid_public          := BIPV2_Tools.mac_Set_Statuses(ds_set_status_proxid_public   ,powid  ,powid_status_public    ,false);
-    ds_set_status_seleid_public         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_powid_public    ,seleid ,seleid_status_public   ,false);
-    ds_set_status_orgid_public          := BIPV2_Tools.mac_Set_Statuses(ds_set_status_seleid_public   ,orgid  ,orgid_status_public    ,false);
-    ds_set_status_ultid_public1         := BIPV2_Tools.mac_Set_Statuses(ds_set_status_orgid_public    ,ultid  ,ultid_status_public    ,false);
+    ds_set_status_proxid_private        := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_prep            ,proxid ,proxid_status_private                               ,true   ,pOldWay := true  );
+    ds_set_status_powid_private         := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_proxid_private  ,powid  ,powid_status_private                                ,true   ,pOldWay := true  );
+    ds_set_status_seleid_private        := BIPV2_Tools.mac_Set_Statuses   (ds_set_status_powid_private   ,seleid ,seleid_status_private  ,seleid_status_private_score ,true                     );
+    ds_set_status_orgid_private         := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_seleid_private  ,orgid  ,orgid_status_private                                ,true   ,pOldWay := true  );
+    ds_set_status_ultid_private         := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_orgid_private   ,ultid  ,ultid_status_private                                ,true   ,pOldWay := true  );
+    ds_set_status_proxid_public         := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_ultid_private   ,proxid ,proxid_status_public                                ,false  ,pOldWay := true  );
+    ds_set_status_powid_public          := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_proxid_public   ,powid  ,powid_status_public                                 ,false  ,pOldWay := true  );
+    ds_set_status_seleid_public         := BIPV2_Tools.mac_Set_Statuses   (ds_set_status_powid_public    ,seleid ,seleid_status_public   ,seleid_status_public_score  ,false                    );
+    ds_set_status_orgid_public          := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_seleid_public   ,orgid  ,orgid_status_public                                 ,false  ,pOldWay := true  );
+    ds_set_status_ultid_public1         := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_orgid_public    ,ultid  ,ultid_status_public                                 ,false  ,pOldWay := true  );
     shared ds_set_status_ultid_public := join(ds_Input_clean  
     ,table(ds_set_status_ultid_public1,{proxid
 ,proxid_status_private    
 ,powid_status_private     
 ,seleid_status_private    
+,seleid_status_private_score    
 ,orgid_status_private     
 ,ultid_status_private     
 ,proxid_status_public     
 ,powid_status_public      
 ,seleid_status_public     
+,seleid_status_public_score     
 ,orgid_status_public      
 ,ultid_status_public      
     ,},proxid
 ,proxid_status_private    
 ,powid_status_private     
 ,seleid_status_private    
+,seleid_status_private_score    
 ,orgid_status_private     
 ,ultid_status_private     
 ,proxid_status_public     
 ,powid_status_public      
 ,seleid_status_public     
+,seleid_status_public_score     
 ,orgid_status_public      
 ,ultid_status_public      
     ,merge)  
@@ -60,11 +66,13 @@ module
         ,self.proxid_status_private  := right.proxid_status_private
         ,self.powid_status_private   := right.powid_status_private 
         ,self.seleid_status_private  := right.seleid_status_private
+        ,self.seleid_status_private_score  := right.seleid_status_private_score
         ,self.orgid_status_private   := right.orgid_status_private 
         ,self.ultid_status_private   := right.ultid_status_private 
         ,self.proxid_status_public   := right.proxid_status_public 
         ,self.powid_status_public    := right.powid_status_public  
         ,self.seleid_status_public   := right.seleid_status_public 
+        ,self.seleid_status_public_score   := right.seleid_status_public_score 
         ,self.orgid_status_public    := right.orgid_status_public  
         ,self.ultid_status_public    := right.ultid_status_public
         ,self   := left
@@ -78,24 +86,24 @@ module
 ////// -- patch status fields on full dirty file for output
     ds_proxid_slim_private  := table(ds_set_status_ultid_public  ,{proxid ,proxid_status_private}   ,proxid ,proxid_status_private,merge);//should be only 1 status per proxid
     ds_powid_slim_private   := table(ds_set_status_ultid_public  ,{powid  ,powid_status_private }   ,powid  ,powid_status_private ,merge);//should be only 1 status per proxid
-    ds_seleid_slim_private  := table(ds_set_status_ultid_public  ,{seleid ,seleid_status_private}   ,seleid ,seleid_status_private,merge);//should be only 1 status per proxid
+    ds_seleid_slim_private  := table(ds_set_status_ultid_public  ,{seleid ,seleid_status_private,seleid_status_private_score}   ,seleid ,seleid_status_private,seleid_status_private_score,merge);//should be only 1 status per proxid
     ds_orgid_slim_private   := table(ds_set_status_ultid_public  ,{orgid  ,orgid_status_private }   ,orgid  ,orgid_status_private ,merge);//should be only 1 status per proxid
     ds_ultid_slim_private   := table(ds_set_status_ultid_public  ,{ultid  ,ultid_status_private }   ,ultid  ,ultid_status_private ,merge);//should be only 1 status per proxid
     ds_proxid_slim_public   := table(ds_set_status_ultid_public  ,{proxid ,proxid_status_public }   ,proxid ,proxid_status_public ,merge);//should be only 1 status per proxid
     ds_powid_slim_public    := table(ds_set_status_ultid_public  ,{powid  ,powid_status_public  }   ,powid  ,powid_status_public  ,merge);//should be only 1 status per proxid
-    ds_seleid_slim_public   := table(ds_set_status_ultid_public  ,{seleid ,seleid_status_public }   ,seleid ,seleid_status_public ,merge);//should be only 1 status per proxid
+    ds_seleid_slim_public   := table(ds_set_status_ultid_public  ,{seleid ,seleid_status_public ,seleid_status_public_score }   ,seleid ,seleid_status_public ,seleid_status_public_score,merge);//should be only 1 status per proxid
     ds_orgid_slim_public    := table(ds_set_status_ultid_public  ,{orgid  ,orgid_status_public  }   ,orgid  ,orgid_status_public  ,merge);//should be only 1 status per proxid
     ds_ultid_slim_public    := table(ds_set_status_ultid_public  ,{ultid  ,ultid_status_public  }   ,ultid  ,ultid_status_public  ,merge);//should be only 1 status per proxid
     
     ds_join_proxid_private  := join(pInputDirty            ,ds_proxid_slim_private  ,left.proxid = right.proxid ,transform(recordof(left) ,self.proxid_status_private  := if(right.proxid != 0  ,right.proxid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
     ds_join_powid_private   := join(ds_join_proxid_private ,ds_powid_slim_private   ,left.powid  = right.powid  ,transform(recordof(left) ,self.powid_status_private   := if(right.powid  != 0  ,right.powid_status_private   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
-    ds_join_seleid_private  := join(ds_join_powid_private  ,ds_seleid_slim_private  ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_private  := if(right.seleid != 0  ,right.seleid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
+    ds_join_seleid_private  := join(ds_join_powid_private  ,ds_seleid_slim_private  ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_private  := if(right.seleid != 0  ,right.seleid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self.seleid_status_private_score  := if(right.seleid != 0  ,right.seleid_status_private_score  ,1),self := left) ,left outer,hash,keep(1));
     ds_join_orgid_private   := join(ds_join_seleid_private ,ds_orgid_slim_private   ,left.orgid  = right.orgid  ,transform(recordof(left) ,self.orgid_status_private   := if(right.orgid  != 0  ,right.orgid_status_private   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
     ds_join_ultid_private   := join(ds_join_orgid_private  ,ds_ultid_slim_private   ,left.ultid  = right.ultid  ,transform(recordof(left) ,self.ultid_status_private   := if(right.ultid  != 0  ,right.ultid_status_private   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
   
     ds_join_proxid_public       := join(ds_join_ultid_private  ,ds_proxid_slim_public   ,left.proxid = right.proxid ,transform(recordof(left) ,self.proxid_status_public   := if(right.proxid != 0  ,right.proxid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
     ds_join_powid_public        := join(ds_join_proxid_public  ,ds_powid_slim_public    ,left.powid  = right.powid  ,transform(recordof(left) ,self.powid_status_public    := if(right.powid  != 0  ,right.powid_status_public    ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
-    ds_join_seleid_public       := join(ds_join_powid_public   ,ds_seleid_slim_public   ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_public   := if(right.seleid != 0  ,right.seleid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
+    ds_join_seleid_public       := join(ds_join_powid_public   ,ds_seleid_slim_public   ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_public   := if(right.seleid != 0  ,right.seleid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self.seleid_status_public_score  := if(right.seleid != 0  ,right.seleid_status_public_score  ,1),self := left) ,left outer,hash,keep(1));
     ds_join_orgid_public        := join(ds_join_seleid_public  ,ds_orgid_slim_public    ,left.orgid  = right.orgid  ,transform(recordof(left) ,self.orgid_status_public    := if(right.orgid  != 0  ,right.orgid_status_public    ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
     export ds_join_ultid_public := join(ds_join_orgid_public   ,ds_ultid_slim_public    ,left.ultid  = right.ultid  ,transform(recordof(left) ,self.ultid_status_public    := if(right.ultid  != 0  ,right.ultid_status_public    ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1))
      : persist('~persist::BIPV2_PostProcess::proc_segmentation.ds_join_ultid_public' + pGoldOutputModifier);
@@ -108,11 +116,11 @@ module
     lrec_test := {ds_Input_clean.seleid  ,ds_Input_clean.proxid,ds_Input_clean.ultid,ds_Input_clean.orgid,ds_Input_clean.powid ,ds_Input_clean.source  ,ds_Input_clean.company_status_derived  ,ds_Input_clean.dt_first_seen ,ds_Input_clean.dt_last_seen  ,ds_Input_clean.dt_vendor_first_reported  ,ds_Input_clean.dt_vendor_last_reported       };
     ds_set_status_prep_test  :=   table(ds_Input_clean  ,lrec_test  ,seleid    ,proxid  ,source    ,company_status_derived    ,dt_first_seen   ,dt_last_seen    ,dt_vendor_first_reported    ,dt_vendor_last_reported   ,merge);
 
-    ds_set_status_proxid_private_test := BIPV2_Tools.mac_Set_Statuses(ds_set_status_prep_test             ,proxid ,proxid_status_private  ,true ,,,pToday);
-    ds_set_status_seleid_private_test := BIPV2_Tools.mac_Set_Statuses(ds_set_status_proxid_private_test   ,seleid ,seleid_status_private  ,true ,,,pToday);
-    ds_set_status_proxid_public_test  := BIPV2_Tools.mac_Set_Statuses(ds_set_status_seleid_private_test   ,proxid ,proxid_status_public   ,false,,,pToday);
-    ds_set_status_seleid_public_test1  := BIPV2_Tools.mac_Set_Statuses(ds_set_status_proxid_public_test   ,seleid ,seleid_status_public   ,false,,,pToday);
-    ds_table_seleid_status            := table(ds_set_status_seleid_public_test1,{proxid,proxid_status_private,seleid_status_private,proxid_status_public,seleid_status_public},proxid,proxid_status_private,seleid_status_private,proxid_status_public,seleid_status_public,merge);
+    ds_set_status_proxid_private_test := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_prep_test             ,proxid ,proxid_status_private  ,true ,,,pToday);
+    ds_set_status_seleid_private_test := BIPV2_Tools.mac_Set_Statuses   (ds_set_status_proxid_private_test   ,seleid ,seleid_status_private  ,seleid_status_private_score ,true ,,,pToday);
+    ds_set_status_proxid_public_test  := BIPV2_Statuses.mac_Set_Statuses(ds_set_status_seleid_private_test   ,proxid ,proxid_status_public   ,false,,,pToday);
+    ds_set_status_seleid_public_test1  := BIPV2_Tools.mac_Set_Statuses  (ds_set_status_proxid_public_test    ,seleid ,seleid_status_public   ,seleid_status_public_score  ,false,,,pToday);
+    ds_table_seleid_status            := table(ds_set_status_seleid_public_test1,{proxid,proxid_status_private,seleid_status_private,seleid_status_private_score,proxid_status_public,seleid_status_public,seleid_status_public_score},proxid,proxid_status_private,seleid_status_private,seleid_status_private_score,proxid_status_public,seleid_status_public,seleid_status_public_score,merge);
     
     shared ds_set_status_seleid_public_test := join(ds_Input_clean  
     ,ds_table_seleid_status
@@ -120,8 +128,10 @@ module
       ,transform(recordof(left)
         ,self.proxid_status_private  := right.proxid_status_private
         ,self.seleid_status_private  := right.seleid_status_private
+        ,self.seleid_status_private_score  := right.seleid_status_private_score
         ,self.proxid_status_public   := right.proxid_status_public 
         ,self.seleid_status_public   := right.seleid_status_public 
+        ,self.seleid_status_public_score   := right.seleid_status_public_score 
         ,self   := left
       
       ) 
@@ -129,25 +139,26 @@ module
      : persist('~persist::BIPV2_PostProcess::proc_segmentation.ds_set_status_seleid_public_test' + pGoldOutputModifier);
     
     ds_proxid_slim_private_test      := table(ds_set_status_seleid_public_test  ,{proxid ,proxid_status_private}   ,proxid ,proxid_status_private,merge);//should be only 1 status per proxid
-    ds_seleid_slim_private_test      := table(ds_set_status_seleid_public_test  ,{seleid ,seleid_status_private}   ,seleid ,seleid_status_private,merge);//should be only 1 status per proxid
+    ds_seleid_slim_private_test      := table(ds_set_status_seleid_public_test  ,{seleid ,seleid_status_private,seleid_status_private_score}   ,seleid ,seleid_status_private,seleid_status_private_score,merge);//should be only 1 status per proxid
     ds_proxid_slim_public_test       := table(ds_set_status_seleid_public_test  ,{proxid ,proxid_status_public }   ,proxid ,proxid_status_public ,merge);//should be only 1 status per proxid
-    ds_seleid_slim_public_test       := table(ds_set_status_seleid_public_test  ,{seleid ,seleid_status_public }   ,seleid ,seleid_status_public ,merge);//should be only 1 status per proxid
+    ds_seleid_slim_public_test       := table(ds_set_status_seleid_public_test  ,{seleid ,seleid_status_public ,seleid_status_public_score}   ,seleid ,seleid_status_public ,seleid_status_public_score,merge);//should be only 1 status per proxid
     
     ds_join_proxid_private_test      := join(pInputDirty                  ,ds_proxid_slim_private_test  ,left.proxid = right.proxid ,transform(recordof(left) ,self.proxid_status_private  := if(right.proxid != 0  ,right.proxid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
-    ds_join_seleid_private_test      := join(ds_join_proxid_private_test  ,ds_seleid_slim_private_test  ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_private  := if(right.seleid != 0  ,right.seleid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
+    ds_join_seleid_private_test      := join(ds_join_proxid_private_test  ,ds_seleid_slim_private_test  ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_private  := if(right.seleid != 0  ,right.seleid_status_private  ,BIPV2_PostProcess.constants.Inactive_NoActivity),self.seleid_status_private_score  := if(right.seleid != 0  ,right.seleid_status_private_score  ,1),self := left) ,left outer,hash,keep(1));
   
     ds_join_proxid_public_test       := join(ds_join_seleid_private_test  ,ds_proxid_slim_public_test   ,left.proxid = right.proxid ,transform(recordof(left) ,self.proxid_status_public   := if(right.proxid != 0  ,right.proxid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1));
-    export ds_join_seleid_public_test       := join(ds_join_proxid_public_test   ,ds_seleid_slim_public_test   ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_public   := if(right.seleid != 0  ,right.seleid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self := left) ,left outer,hash,keep(1))
+    export ds_join_seleid_public_test       := join(ds_join_proxid_public_test   ,ds_seleid_slim_public_test   ,left.seleid = right.seleid ,transform(recordof(left) ,self.seleid_status_public   := if(right.seleid != 0  ,right.seleid_status_public   ,BIPV2_PostProcess.constants.Inactive_NoActivity),self.seleid_status_public_score  := if(right.seleid != 0  ,right.seleid_status_public_score  ,1),self := left) ,left outer,hash,keep(1))
      : persist('~persist::BIPV2_PostProcess::proc_segmentation.ds_join_seleid_public_test' + pGoldOutputModifier);
 
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, ProxID, ProxFree_test, ProxProb_test)
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, SELEID, SeleFree_test, SeleProb_test)
     
-    //Generate Segmentation File
+    //Generate Segmentation File  
     export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile;
     // Gold Segmentation
-    export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion);
-    export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion);    
+
+    export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold);
+    export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold);    
     
     // Segmentation Stats
     export modProxV2_test           := BIPv2_PostProcess.segmentation(ProxFree_test, 'PROXID',pToday);
@@ -285,7 +296,6 @@ module
     
     shared SelestatsGold      := BIPV2_PostProcess.fieldstats_sele  (pversion,pInput,pSegStats := project(modgoldSELEV2._gold,    transform(BIPV2_PostProcess.layouts.laysegmentation, self := left, self.inactive := left.inactives[1].inactive, self := [])));
     shared SelestatsNotGold   := BIPV2_PostProcess.fieldstats_sele  (pversion,pInput,pSegStats := project(modgoldSELEV2._Notgold, transform(BIPV2_PostProcess.layouts.laysegmentation, self := left, self.inactive := left.inactives[1].inactive, self := [])));
-    
     
     // Output Field & Entity Stats to workunit
     shared TotalRecCount              := output(count(pInput)                       , named('TotalRecordCount'                    ));
@@ -589,7 +599,7 @@ module
          output(pToday                                      ,named('IngestDate'   ))
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
-        ,evaluate(build_seg_file(pversion))
+        ,if(pTurnOffSegOutFile = false  ,evaluate(build_seg_file(pversion)))
         ,output_segs_fixed_filtered
         ,email_executive_dashboard
         ,goldSELEV2
@@ -632,4 +642,5 @@ module
      SUCCESS(send_emails(pversion).buildsuccess) 
     ,FAILURE(send_emails(pversion).buildfailure)
     ;
+
 end;
