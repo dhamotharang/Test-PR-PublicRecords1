@@ -752,6 +752,7 @@ risk_indicators.layout_output naptrans(risk_indicators.layout_output le) := tran
 
 // bocashell version 50 doesn't count gong and targus white pages as a nonderog
 	self.num_nonderogs := le.num_nonderogs + if(bsversion>=50, 0, (integer)(le.phone_date_last_seen>0 or le.phoneaddr_date_last_seen>0));
+	self.FIS_num_nonderogs := le.num_nonderogs + (integer)(le.phone_date_last_seen>0 or le.phoneaddr_date_last_seen>0); //separate counting of nonderogs for FIS custom attribute rv3 SourceNonDerogCount
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
 	self.num_nonderogs30 := le.num_nonderogs30 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,30, le.historydate));
 	self.num_nonderogs90 := le.num_nonderogs90 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,90, le.historydate));

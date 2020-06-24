@@ -1,4 +1,4 @@
-// This module contains code involved in counting the number of times the source
+﻿// This module contains code involved in counting the number of times the source
 // report results reference various data types: Name, SSN, DOB, FEIN, Address, Phone
 
 import doxie_cbrs, ut, iesp, MDR, dx_header;
@@ -69,7 +69,7 @@ export Occurrence := module
 		export DOC					:= row({'DOC',						MDR.sourceTools.set_Accurint_DOC,						'Criminal'}, 																l_src);
 		export SO						:= row({'SEXOFFENDER',		MDR.sourceTools.set_Accurint_Sex_offender,	'Sexual Offenses'}, 												l_src);
 		export finder				:= row({'FINDER',					['FI'],																			'Historical Person Locator'}, 							l_src);
-		export ak						:= row({'AK',							MDR.sourceTools.set_AK_Perm_Fund,						'Alaskan Permanent Fund'}, 									l_src);
+		export ak						:= row({'AK',							MDR.sourceTools.set_AK_Perm_Fund,						'Alaska Permanent Fund'}, 									l_src);
 		export nod					:= row({'NOD',						MDR.sourceTools.set_Foreclosures_Delinquent,'Notice Of Defaults'},				 							l_src);
 		export for					:= row({'FOR',						MDR.sourceTools.set_Foreclosures,						'Foreclosure Records'}, 										l_src);
 		export util					:= row({'UTIL',						MDR.sourceTools.set_Utility_sources,				'Utility Data'},														l_src);

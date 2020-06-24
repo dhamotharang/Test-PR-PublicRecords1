@@ -1,4 +1,4 @@
-IMPORT	Gateway;
+﻿IMPORT	Gateway;
 
 export	IParam	:=
 module
@@ -6,7 +6,7 @@ module
 		export	unsigned1	Product										:=	Constants.Product.DEFAULT;
 		export	boolean		RunGateway_ERC						:=	false;
 		export	string1		ReportType								:=	'';
-		export	boolean		Reseller									:=	false;
+		export	string3		ResultOption							:=	Constants.Default_Option;
 		export	boolean		IncludeConfidenceFactors	:=	true;
 		export 	dataset(Gateway.Layouts.Config) GatewayConfig	:= 	dataset([], Gateway.Layouts.Config);
   end;

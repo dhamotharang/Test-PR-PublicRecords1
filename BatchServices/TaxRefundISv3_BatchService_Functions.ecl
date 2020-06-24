@@ -1,5 +1,5 @@
 ﻿IMPORT AddrBest, Address, Address_Attributes, Autokey_batch, AutoStandardI, 
-       batchservices, BatchShare, CriminalRecords_BatchService, Didville, Gateway, Models, 
+       batchservices, BatchShare, CriminalRecords_BatchService, Didville, dx_ip_metadata, Gateway, IP_Metadata, Models, 
        NID, progressive_phone, Risk_Indicators, Std, tris_lnssi_build;
 
 EXPORT TaxRefundISv3_BatchService_Functions := MODULE
@@ -401,8 +401,151 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
   END;
 
+
+  // *--- Function to expand a passed in IPv6 format ip_address that has double colon ('::') notation, where the '::'s   ---* //
+  //      represent 1 or more zero/'0000' hextets, however many are needed to make the ip address have 8 total hextets.
+  //      (2020-06-23, RR-19188)
+  EXPORT Fn_Expand_IPv6_Double_Colon (string ip_addr_in) := FUNCTION
+
+    string1 colon       := BatchServices.Constants.TRISv3.colon;
+    string4 four_zeroes := BatchServices.Constants.TRISv3.four_zeroes;
+
+    unsigned1 pos_double_colon := STD.Str.FIND(ip_addr_in, BatchServices.Constants.TRISv3.double_colon);
+    unsigned1 len_addr_in      := LENGTH(TRIM(ip_addr_in,RIGHT));
+    string first_part          := ip_addr_in[1..pos_double_colon - 1];
+    string last_part           := ip_addr_in[pos_double_colon + 2..len_addr_in];
+    unsigned2 fp_num_colons    := STD.Str.FindCount(first_part,':');
+    unsigned2 fp_num_hextets   := IF(first_part = '', 0, fp_num_colons+1);
+    unsigned1 lp_num_colons    := STD.Str.FindCount(last_part,colon);
+    unsigned1 lp_num_hextets   := IF(last_part = '', 0, lp_num_colons+1);
+    unsigned1 mp_num_hextets   := BatchServices.Constants.TRISv3.max_hextets - fp_num_hextets - lp_num_hextets;
+                                                            // ^--- the max number of hextets in a full IPv6 format ip address = 8
+
+    string middle_part := MAP(
+      mp_num_hextets = 1 => four_zeroes,
+      mp_num_hextets = 2 => four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 3 => four_zeroes+colon+four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 4 => four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 5 => four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 6 => four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 7 => four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes,
+      mp_num_hextets = 8 => four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes+colon+four_zeroes, // should not happen, but just in case
+      '');
+
+    string39 ip_addr_expanded := first_part              + IF(first_part = '','',colon) + 
+                                 TRIM(middle_part,RIGHT) + colon + 
+                                 last_part;
+        
+    //debug outputs
+    //OUTPUT(ip_addr_in,       NAMED('ip_addr_in'));
+    //OUTPUT(pos_double_colon, NAMED('pos_double_colon')); 
+    //OUTPUT(first_part,       NAMED('first_part')); 
+    //OUTPUT(len_addr_in,      NAMED('len_addr_in'));
+    //OUTPUT(last_part,        NAMED('last_part')); 
+    //OUTPUT(fp_num_colons,    NAMED('lp_num_colons')); 
+    //OUTPUT(fp_num_hextets,   NAMED('fp_num_hextets')); 
+    //OUTPUT(lp_num_colons,    NAMED('lp_num_colons')); 
+    //OUTPUT(lp_num_hextets,   NAMED('lp_num_hextets')); 
+    //OUTPUT(mp_num_hextets,   NAMED('mp_num_hextets')); 
+    //OUTPUT(middle_part,      NAMED('middle_part')); 
+    //OUTPUT(ip_addr_expanded, NAMED('ip_addr_expanded')); 
+    
+    RETURN ip_addr_expanded; 
+
+  END;
+
+
+  // *--- Function to pad hex4 string with the correct number of leading zeros to make 4 hex chars (2020-06-23, RR-19188) ---* //
+  EXPORT Fn_Pad_Hex4(string4 string_in) := FUNCTION
+
+    string1 one_zero     := BatchServices.Constants.TRISv3.one_zero;
+    string2 two_zeroes   := BatchServices.Constants.TRISv3.two_zeroes;
+    string3 three_zeroes := BatchServices.Constants.TRISv3.three_zeroes;
+    string4 four_zeroes  := BatchServices.Constants.TRISv3.four_zeroes;
+
+    // Trim any leading and trailing spaces; then add leading zeros to input values less than 4 chars
+    string_in_trimmed := TRIM(string_in, LEFT, RIGHT);
+    in_len := length(string_in_trimmed);
+    
+    string4 hex4_lz_out := MAP(in_len = 0 => four_zeroes,
+                               in_len = 1 => three_zeroes + string_in_trimmed,
+                               in_len = 2 => two_zeroes   + string_in_trimmed,
+                               in_len = 3 => one_zero     + string_in_trimmed,
+                               string_in_trimmed);
+
+    //OUTPUT(string_in,         NAMED('string_in'));
+    //OUTPUT(string_in_uc,      NAMED('string_in_uc'));
+    //OUTPUT(string_in_trimmed, NAMED('string_in_trimmed'));
+    //OUTPUT(in_len,            NAMED('in_len')); 
+    //OUTPUT(hex4_ls_out,       NAMED('hex4_ls_out'));
+
+    RETURN hex4_lz_out;
+
+  END;
+
+
+  // *--- Function to get in-house IP_Metadata info for IPv6 format input ip addresses (2020-06-23, RR-19188) ---* //
+  EXPORT fn_getIPv6MetaDataRecords(DATASET(BatchServices.IP_Metadata_Layouts.batch_in) ds_batch_in_IPv6) := FUNCTION
+  // NOTE: cloned from BatchServices.IP_Metadata_Records and revised as needed for use of the new IPv6 key
+
+    string1 colon := BatchServices.Constants.TRISv3.colon;
+
+    rec_srchRec := RECORD
+      STRING4  in_hextet1;
+      STRING34 in_ip_addr_full6_39;
+      BatchServices.IP_Metadata_Layouts.batch_in;
+    END;
+
+    ds_srchRecs := PROJECT(ds_batch_in_IPv6,
+                           TRANSFORM(rec_srchRec,
+                             // Look for double-colon ('::') notation in the input IPv6 format address
+                             // IF found, use a function to expand it the a full 8 hextets IPv6 ip address
+                             string39 ip_address_exp := IF(STD.Str.Find(LEFT.ip_address, 
+                                                                         batchServices.Constants.TRISv3.double_colon) != 0,
+                                                            Fn_Expand_IPv6_Double_Colon(LEFT.ip_address),
+                                                            LEFT.IP_Address);
+                             
+                             // identify the up to 8 hextets in the input ipv6 format ip address
+                             in_hextets := STD.Str.SplitWords(ip_address_exp, colon);
+                             // Pick off all 8 hextets, 1 at a time and 
+                             // pad all hextets with the appropriate# of leading zeros to make them 4 hex chars
+                             in_hextet1      := Fn_Pad_Hex4(in_hextets[1]);
+                             self.in_hextet1 := in_hextet1;
+                             in_hextet2      := Fn_Pad_Hex4(in_hextets[2]);
+                             in_hextet3      := Fn_Pad_Hex4(in_hextets[3]);
+                             in_hextet4      := Fn_Pad_Hex4(in_hextets[4]);
+                             in_hextet5      := Fn_Pad_Hex4(in_hextets[5]);
+                             in_hextet6      := Fn_Pad_Hex4(in_hextets[6]);
+                             in_hextet7      := Fn_Pad_Hex4(in_hextets[7]);
+                             in_hextet8      := Fn_Pad_Hex4(in_hextets[8]);
+                             // build ip addr positions 6-39(hextets2-8) for use in key join below
+                             self.in_ip_addr_full6_39 := in_hextet2 + colon + in_hextet3 + colon + in_hextet4 + colon +
+                                                         in_hextet5 + colon + in_hextet6 + colon + in_hextet7 + colon + in_hextet8;
+                             SELF:=LEFT)
+                          );
+
+    ds_batch_out_IPv6 := JOIN(ds_srchRecs, dx_ip_metadata.key_ipv6,
+                                KEYED(LEFT.in_hextet1 = RIGHT.beg_hextet1) AND
+                                // since first hextet already checked, next check input ip address from position 6 to 39(end)
+                                (LEFT.in_ip_addr_full6_39 BETWEEN RIGHT.ip_rng_beg_full6_39 AND RIGHT.ip_rng_end_full6_39),
+                              TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
+                                SELF :=LEFT,
+                                SELF :=RIGHT),
+                              LEFT OUTER, LIMIT(0), KEEP(1));
+
+    // Debug Outputs
+    //OUTPUT(ds_batch_in_IPv6,  NAMED('ds_batch_in_IPv6'));
+    //OUTPUT(ds_srchRecs,       NAMED('ds_srchRecs'));
+    //OUTPUT(ds_batch_out_IPv6, NAMED('ds_batch_out_IPv6'));
+
+    RETURN ds_batch_out_Ipv6;
+
+  END;
+
+
   // *--- Function to get in-house IP_Metadata info for all 3 input ip addresses ---* //
   // 08/11/2017 v3.2 enhancements requirement 3.1.3.12
+  // 06/23/2020 RR - Revised for new IPv6 format key access - RR-19188
   EXPORT getIPMetaDataRecords(DATASET(rec_in_wdid) in_clean_batch) := FUNCTION
     
       ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , 
@@ -414,56 +557,67 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
       BatchServices.IP_Metadata_Layouts.batch_in normBatchRecs(ds_IP_Metadata_batch_in L,INTEGER C) := TRANSFORM
         STRING IP_address  :=CHOOSE(C,L.IP_address1,L.IP_address2,L.IP_address3);
-        SELF.orig_acctno   := L.acctno;
+        SELF.orig_acctno   := (string) C; //for IPv6 changes use this existing unused field to hold a seq#
         // Need to maintain the order of input ip addresses as output 1, 2 & 3 even if 1 
-        // or more of the input values are blank.  So allow a blank ip_address to go thru.
-        SELF.IP_address    := Std.Str.ToUpperCase(IP_address); 
-        SELF:=L;
+        // or more of the input values are blank.  So allow a blank ip_address to go thru and use orig_acctno for a seq#.
+        SELF.IP_address    := Std.Str.ToUpperCase(IP_address);
+        SELF               := L;
       END;
 
       ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
 
-      ds_child_recs_raw := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
+      // Dedup any duplicate non-blank input ip_address values to eliminate looking up blank ip addresses or the same ip_address
+      // multiple times on the 2 key joins.
+      ds_batch_in_norm_ipa_dd := DEDUP(SORT(ds_batch_in_normalized(IP_Address != ''), IP_Address),IP_Address);
 
-      // A blank input ip_address causes some bogus info to be returned by 
-      // BatchServices.IP_Metadata_Records above; 
-      // So when that situation exists, null out the fields we are using for TRIS output.
-       ds_child_recs := PROJECT(ds_child_recs_raw,
-         TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
-         BlankIPAddress           := LEFT.ip_address = '';
-         SELF.edge_country        := IF(BlankIPAddress,'',LEFT.edge_country);
-         SELF.edge_region         := IF(BlankIPAddress,'',LEFT.edge_region);
-         SELF.edge_city           := IF(BlankIPAddress,'',LEFT.edge_city);
-         SELF.edge_conn_speed     := IF(BlankIPAddress,'',LEFT.edge_conn_speed);
-         SELF.edge_latitude       := IF(BlankIPAddress,'',LEFT.edge_latitude);
-         SELF.edge_longitude      := IF(BlankIPAddress,'',LEFT.edge_longitude);
-         SELF.edge_postal_code    := IF(BlankIPAddress,'',LEFT.edge_postal_code);
-         SELF.edge_continent_code := IF(BlankIPAddress,0, LEFT.edge_continent_code);
-         SELF.edge_country_conf   := IF(BlankIPAddress,0, LEFT.edge_country_conf);
-         SELF.edge_region_conf    := IF(BlankIPAddress,0, LEFT.edge_region_conf);
-         SELF.edge_city_conf      := IF(BlankIPAddress,0, LEFT.edge_city_conf);
-         SELF.edge_postal_conf    := IF(BlankIPAddress,0, LEFT.edge_postal_conf);
-         SELF.isp_name            := IF(BlankIPAddress,'',LEFT.isp_name);
-         SELF.edge_gmt_offset     := IF(BlankIPAddress,0, LEFT.edge_gmt_offset);
-         SELF.domain_name         := IF(BlankIPAddress,'',LEFT.domain_name);
-         SELF.proxy_type          := IF(BlankIPAddress,'',LEFT.proxy_type);
-         SELF.proxy_description   := IF(BlankIPAddress,'',LEFT.proxy_description);
-         SELF.asn                 := IF(BlankIPAddress,0, LEFT.asn);
-         SELF.asn_name            := IF(BlankIPAddress,'',LEFT.asn_name);
-         SELF                     := LEFT;));
+      // Split the normalized dataset into 2, 1 for IPv4 format addresses and 1 for Ipv6 format addresses
+      ds_normed_IPv4_addrs := ds_batch_in_norm_ipa_dd(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.period) !=0);
 
-      ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized,acctno),acctno),TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,SELF:=LEFT,SELF:=[]));
+      ds_normed_IPv6_addrs := ds_batch_in_norm_ipa_dd(STD.Str.Find(IP_address, BatchServices.Constants.TRISv3.colon) !=0);
 
-      ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,ds_child_recs,BatchServices.IP_Metadata_Layouts.batch_out_raw,'');
+      // Join input ip_addresses against the appropriate key to get ip metadata
+      ds_IPv4_child_recs_raw := BatchServices.IP_Metadata_Records(ds_normed_IPv4_addrs);
+
+      ds_IPv6_child_recs_raw := fn_getIPv6MetaDataRecords(ds_normed_IPv6_addrs);
+
+      // Join the normalized input to the combined output of the 2 key joins, to restore any recs dropped due to 
+      // ip_address blank or duplicate.
+      ds_child_recs_raw := JOIN(ds_batch_in_normalized, ds_IPv4_child_recs_raw + ds_IPv6_child_recs_raw,
+                                  LEFT.IP_Address = RIGHT.IP_Address,
+                                TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
+                                  SELF :=LEFT,
+                                  SELF :=RIGHT),
+                                LEFT OUTER); //keep everything from left/normed input
+
+      // Sort resulting child recs raw to put recs into the original order
+      ds_child_recs := SORT(ds_child_recs_raw,
+                            acctno, orig_acctno);
+
+      ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized, acctno, orig_acctno),
+                                      acctno),
+                                TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,
+                                  SELF :=LEFT,
+                                  SELF :=[])
+                               );
+
+      ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,
+                                                                      ds_child_recs,
+                                                                      BatchServices.IP_Metadata_Layouts.batch_out_raw,
+                                                                      '');
                                                              
       // *--- DEBUG ---* //
-      // output(in_clean_batch, named('in_clean_batch'));
-      // output(ds_IP_Metadata_batch_in, named('ds_IP_Metadata_batch_in'));
-      // output(ds_batch_in_normalized, named('ds_batch_in_normalized'));
-      // output(ds_child_recs_raw, named('ds_child_recs_raw'));
-      // output(ds_child_recs, named('ds_child_recs'));
-      // output(ds_parent_recs, named('ds_parent_recs'));
-      // output(ds_batch_out_denormalized, named('ds_batch_out_denormalized'));
+      //output(in_clean_batch, named('in_clean_batch'));
+      //output(ds_IP_Metadata_batch_in, named('ds_IP_Metadata_batch_in'));
+      //output(ds_batch_in_normalized, named('ds_batch_in_normalized'));
+      //output(ds_batch_in_norm_ipa_dd, named('ds_batch_in_norm_ipa_dd'));
+      //output(ds_normed_IPv4_addrs,   named('ds_normed_IPv4_addrs'));
+      //output(ds_normed_IPv6_addrs,   named('ds_normed_IPv6_addrs'));
+      //output(ds_IPv4_child_recs_raw, named('ds_IPv4_child_recs_raw')); 
+      //output(ds_IPv6_child_recs_raw, named('ds_IPv6_child_recs_raw'));
+      //output(ds_child_recs_raw, named('ds_child_recs_raw'));
+      //output(ds_child_recs, named('ds_child_recs'));
+      //output(ds_parent_recs, named('ds_parent_recs'));
+      //output(ds_batch_out_denormalized, named('ds_batch_out_denormalized'));
       
       RETURN ds_batch_out_denormalized;
   END;

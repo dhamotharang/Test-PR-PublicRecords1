@@ -1,4 +1,4 @@
-IMPORT iesp;
+﻿IMPORT iesp;
 
 export Constants := MODULE
   // is used as a sequence number in an address table to indicate that address was added
@@ -45,7 +45,7 @@ export Constants := MODULE
       {'Phone', 0, 'PHONE', 'Retrievable'},
       {'Accident', 0, 'FLCRASH', 'Retrievable'},
       {'SexualOffense', 0, 'SO', 'Retrievable'},
-      {'Alaskan Permenant Fund', 0, 'AK', 'Retrievable'},
+      {'Alaska Permenant Fund', 0, 'AK', 'Retrievable'},
       {'Mississippi Worker\'s Compensation', 0, 'MSWORK', 'Retrievable'},
       {'Foreclosure Records', 0, 'FOR', 'Retrievable'},
       {'Notice Of Defaults Records', 0, 'NOD', 'Retrievable'},

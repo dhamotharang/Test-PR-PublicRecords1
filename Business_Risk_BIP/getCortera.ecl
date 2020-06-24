@@ -1,10 +1,11 @@
-﻿IMPORT BIPV2, Cortera, MDR, Risk_Indicators, STD, UT;
+﻿IMPORT BIPV2, Cortera, doxie, MDR, Risk_Indicators, STD, UT;
 
 EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
-												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet,
-												 DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)) := FUNCTION
+                          doxie.IDataAccess mod_access,
+                          Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+                          BIPV2.mod_sources.iParams linkingOptions,
+                          SET OF STRING2 AllowedSourcesSet,
+                          DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)) := FUNCTION
 	
 	Allow_Cortera := Options.DataRestrictionMask[42] IN ['0', ''];
 	
@@ -74,11 +75,13 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	CorteraBuildDate := Risk_Indicators.get_Build_date('cortera_build_version');
 	
 	CorteraRaw := Cortera.Key_LinkIDs.kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-	                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-	                                         0, // ScoreThreshold --> 0 = Give me everything
-																					 Business_Risk_BIP.Constants.Limit_Default,
-																					 Options.KeepLargeBusinesses
-													);
+                                            Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                            0, // ScoreThreshold --> 0 = Give me everything
+                                            Business_Risk_BIP.Constants.Limit_Default,
+                                            Options.KeepLargeBusinesses,
+                                            mod_access,
+                                            /* append_contact */ TRUE
+                                           );
 	
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorteraRaw, Shell, CorteraSeq);

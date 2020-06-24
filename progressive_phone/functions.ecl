@@ -894,7 +894,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       ds_src_lastresort  := IF(le.phone_shell.Royalties.lastresortphones_royalty > 0, DATASET([MDR.sourceTools.src_wired_Assets_Royalty], {STRING3 src}) , empty);
       ds_src_other       := DATASET([rSource.source_code], {STRING3 src});
 
-      SELF.phn_src_all   := ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty);
+      SELF.phn_src_all   := DEDUP(SORT(ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty), src), src);
      //END
       SELF := [];
     END;

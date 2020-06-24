@@ -1,4 +1,4 @@
-import	iesp,InsuranceContext_iesp,ut;
+﻿import	iesp,InsuranceContext_iesp,ut;
 
 export	Get_Transaction_Logs(	iesp.property_info.t_PropertyInformationRequest														pRequest,
 															InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
@@ -67,7 +67,7 @@ function
 		self.result_format						:=	2;
 		self.return_node_id						:=	'';
 		self.request_node_id					:=	pInsContext.Common.CustomerNodeId;
-		self.product_line							:=	'';
+		self.product_line							:=	pInsContext.Products.PROPINFO.IndResultOption;
 		self.login_history_id					:=	(integer)pRequest.User.LoginHistoryId;
 		self.ip_address								:=	pRequest.User.IP;
 		self.esp_method								:=	PropertyCharacteristics_Services.Constants.ESPMethod;

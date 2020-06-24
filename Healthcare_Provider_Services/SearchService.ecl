@@ -93,12 +93,14 @@ export SearchService := MACRO
 		EXPORT boolean 		IsUnknownSearchBoth := first_row.options.IsUnknownSearchBoth;
 	END;
 	string _DRM := '':Stored('DataRestrictionMask'); 
+	string _DPM := '':Stored('DataPermissionMask'); 
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		self.CustomerID := CustID;	
 		self.OneStepRule := first_row.searchby.VerificationConfiguration;
 		self.penalty_threshold := UserThreshold;
 		self.MaxResults := first_row.options.MaxResults;
 		self.DRM := _DRM; // '':Stored('DataRestrictionMask'); 
+		self.DPM := _DPM; // '':Stored('DataPermissionMask'); 
 		self.hasFullNCPDP := hasFullNCPDP;
 		self.glb_ok := ut.glb_ok ((integer)first_row.user.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok((integer)first_row.user.DLPurpose);

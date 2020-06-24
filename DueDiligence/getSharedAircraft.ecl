@@ -21,7 +21,7 @@ EXPORT getSharedAircraft(DATASET(DueDiligence.LayoutsInternal.AircraftSlimLayout
   //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	aircraftDateClean := DueDiligence.Common.CleanDatasetDateFields(tempData, 'dateFirstSeen, dateLastSeen');
   
-  aircraftFiltered := DueDiligence.Common.FilterRecordsSingleDate(aircraftDateClean, dateFirstSeen);
+  aircraftFiltered := DueDiligence.CommonDate.FilterRecordsSingleDate(aircraftDateClean, dateFirstSeen);
   
   
   //remove duplicate rows

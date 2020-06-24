@@ -76,7 +76,8 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
 unsigned1 DPPA_Purpose := 0 					: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := 8 						: stored('GLBPurpose');
 STRING5 industry_class_val := '' 			: stored('IndustryClass');
-	isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
+isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
+industryClassValue := STD.Str.ToUpperCase(industry_class_val); 
 unsigned3 history_date := 999999 			: stored('HistoryDateYYYYMM');
 string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');  // new for shell 5.0
 boolean IsPOBoxCompliant := false 		: stored('PoBoxCompliance');
@@ -118,10 +119,10 @@ unsigned2 EverOccupant_PastMonths := 0      : stored('EverOccupant_PastMonths');
 unsigned4 EverOccupant_StartDate  := 99999999 : stored('EverOccupant_StartDate');
 unsigned3 LastSeenThresholdIn := Risk_Indicators.iid_constants.oneyear : stored('LastSeenThreshold');
 boolean   IncludeNAPData := false : stored('IncludeNAPData');
- unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
-	string TransactionID := '' : STORED('_TransactionId');
-	string BatchUID := '' : STORED('_BatchUID');
-	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 
 string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask; 
@@ -381,25 +382,27 @@ unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.
 												if(actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IsInstantIDv1, 0) +  // check other products to make sure it is on and off appropriately, ID2 for example, BIID for example ********************************
 												if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) + //check to allow use of Insurance DL information
 												if(disablenongovernmentdldata, risk_indicators.iid_constants.BSOptions.disablenongovernmentdldata, 0) + //check to disable use of Non Governmental DL information
-                  if(uniqueid<>0 and FromID2, Risk_Indicators.iid_constants.BSOptions.RetainInputDID,0) +
-                  if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0)+
-                  if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
-                  if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
+                        if(uniqueid<>0 and FromID2, Risk_Indicators.iid_constants.BSOptions.RetainInputDID,0) +
+                        if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0)+
+                        if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
+                        if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 
-ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, 
-																					ofac_only_from_ESP, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists_from_ESP,
-																					fromIT1O,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,
-																					global_watchlist_threshold,dob_radius_use,BSversion,runSSNCodes,runBestAddr,
-																					runChronoPhone,runAreaCodeSplit,allowCellPhones,
-																					ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, 
-																					DOBMatchOptions_in, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSOptions, 
-																					LastSeenThreshold,
-																					CompanyID, DataPermission, IncludeNAPData,LexIdSourceOptout := LexIdSourceOptout, 
-	TransactionID := TransactionID, 
-	BatchUID := BatchUID, 
-	GlobalCompanyID := GlobalCompanyID);
+ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded,
+                                          ofac_only_from_ESP, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists_from_ESP,
+                                          fromIT1O, ofac_version_from_ESP, Include_Ofac_from_ESP, Include_Additional_watchlists_from_ESP,
+                                          global_watchlist_threshold, dob_radius_use, BSversion, runSSNCodes,runBestAddr,
+                                          runChronoPhone,runAreaCodeSplit, allowCellPhones,
+                                          ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, 
+                                          DOBMatchOptions_in, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSOptions, 
+                                          LastSeenThreshold,
+                                          CompanyID, DataPermission, IncludeNAPData,LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID,
+                                          in_industryClass := industryClassValue); //new parameter added for industry class
 
-                                        
+
+                                       
 //For round 2 validation of Threatmetrix model
 VALIDATION_MODE := False;
  #if(VALIDATION_MODE)
@@ -881,13 +884,12 @@ formed := if(fromIIDModel and EXISTS(model_url), project(d, intoEmpty(LEFT)), re
 student_params := project(model_url(STD.STR.ToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
 student_boolean := student_params[1].value='1';
 
-ModelRequests1 := project(Risk_Indicators.iid_constants.ds_Record, 
-	transform(models.layouts.Layout_Model_Request_In, 
-		self.ModelName := 'customfa_service',
-		self.ModelOptions := project(model_url[1].parameters, transform(Models.Layouts.Layout_Model_Options,
-									self.optionname := left.Name;
-									self.optionvalue := left.Value;));
-			));
+ModelRequests1 := DATASET([TRANSFORM(models.layouts.Layout_Model_Request_In, 
+		                                 self.ModelName := 'customfa_service',
+		                                 self.ModelOptions := project(model_url[1].parameters, transform(Models.Layouts.Layout_Model_Options,
+                                                                  self.optionname := left.Name;
+                                                                  self.optionvalue := left.Value;)))]);
+
 //With the FraudPoint 3.0 changes, a second address/identity was added to the input into FraudAdvisor_Service so that custom models
 //could be built using this second set of elements. It is a requirement to also pass in these fields through InstantID and FlexID.
 //The decision was made to pass them in via the custom fields within the model request section, therefore there are no real changes
@@ -982,9 +984,9 @@ END;
 scores_out := IF(count(model_url(url<>''))>0,riskwise.ScoreController(model_url(url<>''),PROJECT(ungroup(d),scoredata(LEFT))));
 
 models.layouts.Layout_Score_IID_wFP limit_scores( models.layouts.Layout_Score_FP le ) := TRANSFORM
-  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1'], 6, 4);  // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
+  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1', 'FP1908_1'], 6, 4);  // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
 	self.reason_codes := choosen( le.reason_codes, num_reasons ); 
-  self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1'], 
+  self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2', 'FP1610_1', 'FP1610_2', 'FP1611_1', 'FP1705_1', 'FP1801_1', 'FP1908_1'], 
                           dataset([{'StolenIdentityIndex', le.StolenIdentityIndex},
                                    {'SyntheticIdentityIndex', le.SyntheticIdentityIndex},
                                    {'ManipulatedIdentityIndex', le.ManipulatedIdentityIndex},
@@ -1158,6 +1160,7 @@ final_output:=if(Excluded_Minor,temp_output,post_dob_masking);
 // output(reasoncode_settings, named('reasoncode_settings'));	//ZZZ
 // output(reasons_with_seq, named('reasons_with_seq'));	//ZZZ
 // output(reasons_with_seq_chase, named('reasons_with_seq_chase'));	//ZZZ
+// output(industry_class_val, named('industryClass_iidRecords') );
 
 export InstantID_records := final_output;
 #END

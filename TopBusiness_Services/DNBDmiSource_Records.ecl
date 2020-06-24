@@ -1,4 +1,4 @@
-// ================================================================================
+﻿// ================================================================================
 // ====== RETURNS D&B DMI Source Count Info, currently no raw source docs are returned.
 // ================================================================================
 // uses V1 layouts (both in ECL and ESP)
@@ -36,7 +36,7 @@ EXPORT DNBDmiSource_Records (
 	
   // fetch main records via Duns number key file.
 	SHARED dmi_sourceview := JOIN(dmi_keys,DNB_DMI.Keys().Duns.qa,
-													KEYED(LEFT.duns_number = RIGHT.duns),
+													KEYED(LEFT.duns_number = RIGHT.duns) and mod_access.use_DNB(),
 													TRANSFORM(Layout_DNB_Base_Linkids, SELF := RIGHT),
 													LIMIT(ut.limits.default,SKIP));
 

@@ -1,4 +1,4 @@
-import doxie_raw, gong_services, phonesPlus_Services, Suppress, targus, ut, Gateway, Census_data, std, doxie;
+﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, targus, ut, Gateway, Census_data, std, doxie;
 
 EXPORT phone_noreconn_records($.phone_noreconn_param.searchParams inMod,
             dataset(doxie.layout_references) dids,
@@ -234,7 +234,7 @@ withTelcordiaData:= project(TelcordiaMap, addChildren(left));
 
 //Get HRI address and phone for in_house records:
 doxie.mac_AddHRIAddress(withTelcordiaData, records_HRIAddress);
-doxie.mac_AddHRIPhone(records_HRIAddress,records_HRI);
+doxie.mac_AddHRIPhone(records_HRIAddress,records_HRI, mod_access);
 
 resultOut := sort(if(inMod.IncludeHRI, records_HRI, withTelcordiaData), telcordia_only, penalt, -confirmed_flag, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4),
                   -ConfidenceScore, listed_name, phone, fname, mname, lname, prim_name, prim_range, city_name, zip, zip4);

@@ -21,6 +21,7 @@ end;
 
 rtemp_CCPA := RECORD
 unsigned4 global_sid; // CCPA changes
+boolean skip_opt_out := false; // CCPA changes
 rtemp;
 END;
 
@@ -37,7 +38,7 @@ phonesearch_unsuppressed := join(ids_wide, Phonesplus_v2.Keys_Iverification().ph
 	self := [];
 		), left outer, atmost(riskwise.max_atmost), keep(100));
 
-phonesearch_flagged := Suppress.MAC_FlagSuppressedSource(phonesearch_unsuppressed, mod_access);
+phonesearch_flagged := Suppress.CheckSuppression(phonesearch_unsuppressed, mod_access);
 
 phonesearch := PROJECT(phonesearch_flagged, TRANSFORM(rtemp, 
 	self.insurance_phones_phone_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.insurance_phones_phone_hit);

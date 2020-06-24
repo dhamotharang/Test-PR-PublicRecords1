@@ -1,15 +1,15 @@
 export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, mod_access, sx_match_restriction_limit) := macro
 
-import gong, progressive_phone, NID, ut, STD, watchdog;
+import dx_Gong, progressive_phone, NID, ut, STD, watchdog;
 
 #uniquename(f_f_did_set)
 %f_f_did_set% := SET(f_f_did, did);
 
 #uniquename(gong_address_key)
-%gong_address_key% := gong.Key_history_Address;
+%gong_address_key% := dx_Gong.key_history_address();
 
 #uniquename(gong_history_city_st_key)
-%gong_history_city_st_key% := gong.key_history_city_st_name;
+%gong_history_city_st_key% := dx_Gong.key_history_city_st_name();
 
 #uniquename(best_city_st_name_key)
 %best_city_st_name_key%	:=	watchdog.Key_Best_Name_City_State;
@@ -269,7 +269,7 @@ end;
 #uniquename(f_f_all_optout)
 #uniquename(f_f_all)
 %pre_f_f_all% := IF(strict_apsx,
-  JOIN(%f_f_all_precheck%, gong.Key_History_phone,
+  JOIN(%f_f_all_precheck%, dx_Gong.key_history_phone(),
     keyed(LEFT.subj_phone10[4..10]=RIGHT.p7) AND
     keyed(LEFT.subj_phone10[1..3]=RIGHT.p3) AND
     RIGHT.current_flag AND (LEFT.did=RIGHT.did OR RIGHT.did=0),

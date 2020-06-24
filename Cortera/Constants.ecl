@@ -7,6 +7,7 @@ EXPORT Constants := MODULE
 	export sfCorteraHdr := prefix + 'thor::cortera::header';
 	export sfAttributes := prefix + 'thor::cortera::attributes';
 	export sfExecutives := prefix + 'thor::cortera::executives';
+	export sfExecLinkID := prefix + 'thor::cortera::executives_linkid';
 	export sfLinking := prefix + 'thor::cortera::linking';
 	export sfIndustry := prefix + 'thor::cortera::industry';
 	export sfHeaderIn := prefix + 'thor::cortera::hdr_in';

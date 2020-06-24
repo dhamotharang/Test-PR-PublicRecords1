@@ -13,6 +13,17 @@ EXPORT Layouts := MODULE
 				 boolean PrimaryAgency;
 				 boolean AgencyMatch;
 			END;
+
+			EXPORT HPD_Response_Results := RECORD
+				 iesp.hpdreportsearch.t_HPDReportSearchResult;
+				 iesp.hpdreportsearch.t_HPDReportSearchResponse._Header.Message ;				 
+				 iesp.ecrash.t_ECrashSearchAgency.Agencyid ;
+				 string2 State;
+				 string2 source_id;
+				 string50 AgencyName;
+				 string20 AgencyORI;
+				 boolean IsReadyForPublic; 
+			END;
 			
 			EXPORT ECrashSearchAgency_alias_extended := RECORD
 				string JurisdictionState;
@@ -54,7 +65,7 @@ EXPORT Layouts := MODULE
 		// ****** For resolving bug 138974 modified eCrashRecordStrure to add date_added , I have added date_added  to enable the query
 		// *** to pick up the latest report instance from delta base.
 		EXPORT eCrashRecordStructure := 		RECORD 
-			FLAccidents_Ecrash.key_EcrashV2_accnbrV1;
+			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrV1;
 			String20 date_added := '';
 			STRING2 person_addr_st := '';
 			STRING100 address := '';

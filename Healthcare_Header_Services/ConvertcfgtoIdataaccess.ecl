@@ -9,6 +9,7 @@ g_mod :=  AutoStandardI.GlobalModule();
   EXPORT unsigned1 dppa := cfg[1].dppa;
 
   EXPORT string DataRestrictionMask :=cfg[1].DRM;
+  EXPORT string DataPermissionMask :=cfg[1].DPM;
 
 end;
 return mod_access;

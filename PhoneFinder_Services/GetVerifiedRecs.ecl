@@ -21,7 +21,7 @@ FUNCTION
   matchName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
   (matchDid(L, R) OR
   (
-    R.name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first)) 
+    R.name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first))
     AND matchLastName(L, R)
   ));
 
@@ -30,17 +30,17 @@ FUNCTION
     (matchDid(L, R) OR
     ((matchName(L, R) AND
     (
-      (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.prim_range = '' AND L.prim_name = '')
-      OR
-      (
-        (R.prim_range != '' AND L.prim_range = R.prim_range AND R.prim_name != '' AND L.prim_name = STD.STR.ToUpperCase(R.prim_name)) AND
-        (
-          (R.p_city_name != '' AND L.city_name = STD.STR.ToUpperCase(R.p_city_name) AND R.st != '' AND L.st = STD.STR.ToUpperCase(R.st))
-          OR
-          (R.z5 != '' AND L.zip = R.z5)
-        )
-      )
-    ))));
+    (
+      (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.prim_range = '' AND L.prim_name = '' ) OR
+      (R.prim_range != '' AND L.prim_range = R.prim_range AND R.prim_name != '' AND L.prim_name = STD.STR.ToUpperCase(R.prim_name))
+    ) AND
+   (
+     (R.p_city_name != '' AND L.city_name = STD.STR.ToUpperCase(R.p_city_name) AND R.st != '' AND L.st = STD.STR.ToUpperCase(R.st))
+     OR
+     (R.z5 != '' AND L.zip = R.z5)
+  )
+  )
+  )));
 
   // Phone active
   matchPhoneActive($.Layouts.PhoneFinder.IdentitySlim L) :=
