@@ -1,4 +1,4 @@
-import doxie_cbrs,doxie_raw,dnb_services;
+﻿import doxie_cbrs,doxie_raw,dnb_services, Doxie;
 
 export SearchService_IDs := module
 	export params := interface(AutoKey_IDs.params)
@@ -8,6 +8,8 @@ export SearchService_IDs := module
 		export unsigned2 MAX_DEEP_BDIDS := 100;
 	end;
 	export val(params in_mod) := function
+  
+  mod_access := project(in_mod, Doxie.IDataAccess, opt);
 		// autokeys
 		by_auto	:= dnb_services.AutoKey_IDs.val(in_mod);
 		
@@ -17,15 +19,15 @@ export SearchService_IDs := module
 									 self.bdid := left.bdid,
 									 self := left)); 
 		// output(deep_bdids,named('SSI_deep_bdid'));	
-		by_deep_bdids := if(not in_mod.noDeepDive,dnb_services.Raw.byBDIDs(deep_bdids));
+		by_deep_bdids := if(not in_mod.noDeepDive,dnb_services.Raw.byBDIDs(deep_bdids, mod_access));
 		
 		duns_number := dataset([{in_mod.duns_number,0, false}],Layouts.dnbNumberPlus);
 		
-		by_duns_number := if(in_mod.duns_number != '',dnb_Services.Raw.bydunsnumber(duns_number));
+		by_duns_number := if(in_mod.duns_number != '',dnb_Services.Raw.bydunsnumber(duns_number, mod_access));
 		
 		// lookup by BDID
 		bdids := dataset([{(unsigned)in_mod.BDID}],doxie_cbrs.layout_references);
-		by_bdid := if((unsigned)in_mod.BDID > 0,dnb_services.Raw.byBDIDs(bdids));
+		by_bdid := if((unsigned)in_mod.BDID > 0,dnb_services.Raw.byBDIDs(bdids, mod_access));
 		
 
 		// combine...

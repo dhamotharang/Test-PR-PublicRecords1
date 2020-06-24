@@ -32,7 +32,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 			EmptyReportDeltabaseRow
 		);
 		
-		PayloadRowByDeltabaseRaw := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
+		PayloadRowByDeltabaseRaw := FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
 			KEYED(
 				l_accnbr = ReportDeltabaseRow[1].l_accnbr AND
 				//report_code IN ReportCodeDeltabase AND    //WE NEED to comment this out because if for example we found

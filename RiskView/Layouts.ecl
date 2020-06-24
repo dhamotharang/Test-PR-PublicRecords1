@@ -547,6 +547,7 @@ export Layout_Riskview_Batch_In := RECORD
 	string64 custom_input23 := '';
 	string64 custom_input24 := '';
 	string64 custom_input25 := '';
+	string32 DeferredTransactionID := '';
 END;
 
 export Layout_Custom_Inputs := RECORD
@@ -571,6 +572,17 @@ export layout_checkingindicators := record
   string7 CheckAmountTotalSinceNegPaid;
   string7 CheckAmountTotal03Month;
 end;
+
+export layout_FIS_custom_attributes := RECORD
+  STRING1 rv3ConfirmationSubjectFound;
+  STRING3 rv3AddrChangeCount60Month;
+  STRING3 rv3AddrChangeCount12Month;
+  STRING3 rv3AddrInputTimeOldest;
+  STRING3 rv3SourceNonDerogCount;
+  STRING3 rv3AssetPropCurrentCount;
+  STRING2 rv3SSNDeceased;
+  STRING2 rv3AssetIndex;
+END;
 
 export layout_riskview_attributes_5 := record
 	string3 Attribute_Index  := '0'; // for now, only 0 is valid attribute index, in the future we can default this.
@@ -763,8 +775,6 @@ export layout_riskview_attributes_5 := record
 	string3	PhoneInputSubjectCount	;
 	string2	PhoneInputMobile 	;
 	string1	AlertRegulatoryCondition	;
-  layout_checkingindicators;
-	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 end;
 
 
@@ -863,6 +873,9 @@ export layout_riskview5 := record
 	string3 Custom5_reason5;
 	
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	
 	string4 Alert1;
 	string4 Alert2;
@@ -923,6 +936,7 @@ end;
                 'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
                 'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
                 'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+				'STRING7 Liens' + %'cntLiens'% + '_AgencyID;' +
                 'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
                 'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
                 'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
@@ -959,6 +973,7 @@ end;
                 'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
                 'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
                 'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+				'STRING7 Jgmts' + %'cntJgmts'% + '_AgencyID;' +
                 'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
                 'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
                 'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
@@ -1031,6 +1046,9 @@ export attributes_internal_layout := record
 	unsigned seq;
 	unsigned did;
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+  Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_Attributes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets;
 end;
@@ -1132,9 +1150,25 @@ export layout_RV5capOneBatch_searchResults := record
 	string30  AcctNo;
 	string12  LexID;
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
-	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes - layout_checkingindicators; //CapOne is not running Juli so remove from output
+	layout_riskview_attributes_5; 
   layout_riskview5_alerts-ConsumerStatementText;
   STRING12 inquiry_lexid := '';
 end;
+
+export  Checking_Indicators_Layout := RECORD
+ unsigned4 seq;
+ string10 CheckProfileIndex;
+ string10 CheckTimeOldest;
+ string10 CheckTimeNewest;
+ string10 CheckNegTimeOldest;
+ string10 CheckNegRiskDecTimeNewest;
+ string10 CheckNegPaidTimeNewest;
+ string10 CheckCountTotal;
+ string10 CheckAmountTotal;
+ string10 CheckAmountTotalSinceNegPaid;
+ string10 CheckAmountTotal03Month;
+ boolean  FDGatewayCalled;
+ string5  Exception_code := ''; 
+ END;
 
 end;

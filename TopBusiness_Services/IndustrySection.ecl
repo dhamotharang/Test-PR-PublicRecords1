@@ -1,4 +1,4 @@
-/* TBD: 
+﻿/* TBD: 
      1. Research/resolve open issues (search for '???')
      2. Check/review individual source industry key mappers (i.e. Corp2.As_Industry, etc.),
         to check which fields (per source) are included in the BIPV2 industry linkids key.
@@ -9,6 +9,15 @@
 IMPORT AutoStandardI, BIPV2, Codes, iesp, MDR, TopBusiness_BIPV2;
 
 EXPORT IndustrySection := MODULE;
+
+EXPORT GetIndustryBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)  bipLinkids, 
+                                                  string1 FETCH_LEVEL, 
+                                                  unsigned4 FETCH_KEEP_LIMIT) := 
+                     TopBusiness_Services.Key_Fetches(
+	                    bipLInkids// input file to join key with
+				    ,FETCH_LEVEL // level of ids to join with				    						              
+                          ,FETCH_KEEP_LIMIT  
+					 ).ds_industry_linkidskey_recs;
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
@@ -27,15 +36,10 @@ EXPORT IndustrySection := MODULE;
 
   // *** Key fetch to get Industry related data from multiple sources by joining
 	//     to the new (as of 04/10/13) combined industry linkids key file.
-  // ds_industry_keyrecs := TopBusiness_BIPV2.Key_Industry_Linkids.KeyFetch(
-	                           // ds_in_ids_only, // input file to join key with
-														 // FETCH_LEVEL,,,TopBusiness_Services.Constants.defaultJoinLimit); // level of ids to join with
-							  						 // 3rd parm is ScoreThreshold, take default of 0
-  ds_industry_keyrecs := TopBusiness_Services.Key_Fetches(
-	                    ds_in_ids_only // input file to join key with
-										 ,FETCH_LEVEL // level of ids to join with
-										 ,TopBusiness_Services.Constants.defaultJoinLimit           // 3rd parm is ScoreThreshold, take default of 0
-										 ).ds_industry_linkidskey_recs;
+ 
+ ds_industry_keyrecs  := GetIndustryBipLinkids(ds_in_ids_only
+                                                                                     , FETCH_LEVEL
+                                                                                     , TopBusiness_Services.Constants.defaultJoinLimit );
   // Filter to only include recs with at least 1 of the 4 pieces of data being output
 	// and only use rec_type="C" recs for EBR (bug 143521). 
 	ds_industry_keyrecs_filtered := ds_industry_keyrecs((SicCode !='' or NAICS !='' or

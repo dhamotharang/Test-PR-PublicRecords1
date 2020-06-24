@@ -170,7 +170,10 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
   iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
   TRANSFORM
     SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
-    SELF.Records   := modRecords.dFormat2IESP;
+    SELF.Records   := PROJECT(modRecords.dFormat2IESP, TRANSFORM(iesp.phonefinder.t_PhoneFinderSearchRecord,
+                                                                SELF.PrimaryPhoneDetails := PROJECT(LEFT.PrimaryPhoneDetails, TRANSFORM(iesp.phonefinder.t_PhoneFinderDetailedInfo, SELF := LEFT));
+                                                                SELF.OtherPhones         := PROJECT(LEFT.OtherPhones, TRANSFORM(iesp.phonefinder.t_PhoneFinderInfo, SELF := LEFT));
+                                                                SELF := LEFT));
     SELF.InputEcho := pfSearchBy;
   END;
 
@@ -179,7 +182,7 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
  // return blank  dataset when identities child dataset is blank and carrier name is blank
 	IsIdentitiesExist := EXISTS(dPhoneFinder.records[1].identities);
 	IsCarrierInfoExist := dPhoneFinder.records[1].PrimaryPhoneDetails.OperatingCompany.name <> '';
-	 
+
   results := if(~reportMod.SuppressNonRelevantRecs or (reportMod.SuppressNonRelevantRecs and (IsIdentitiesExist or IsCarrierInfoExist)),
                         dPhoneFinder);
 

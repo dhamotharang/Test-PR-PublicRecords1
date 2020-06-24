@@ -1,4 +1,4 @@
-﻿import doxie, iesp, patriot, gateway, RIsk_Indicators;
+﻿import doxie, iesp, gateway, RIsk_Indicators;
 
 export LIB_InstantID_Function(DATASET(risk_indicators.layout_input) indata, 
 			dataset(Gateway.Layouts.Config) gateways, 
@@ -48,6 +48,7 @@ LexIdSourceOptout := args.iid_LexIdSourceOptout;
 TransactionID := args.iid_TransactionID; 
 BatchUID := args.iid_BatchUID; 
 GlobalCompanyID := args.iid_GlobalCompanyID;
+IndustryClass := args.IndustryClass; 
 
 mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := ^.glb;
@@ -69,7 +70,9 @@ commonstart := risk_indicators.iid_common_function(with_did, dppa, glb, isUtilit
 															LexIdSourceOptout := LexIdSourceOptout, 
 															TransactionID := TransactionID, 
 															BatchUID := BatchUID, 
-															GlobalCompanyID := GlobalCompanyID);
+															GlobalCompanyID := GlobalCompanyID,
+                              IndustryClass := IndustryClass
+                              );
 															
 common_transformed := risk_indicators.iid_transform_common(commonstart, BSOptions);
 

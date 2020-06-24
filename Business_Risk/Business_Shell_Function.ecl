@@ -1,16 +1,17 @@
-﻿import risk_indicators, Doxie;
+﻿import risk_indicators, Doxie, Business_Risk;
 
 export Business_Shell_Function(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
                                                         unsigned1 LexIdSourceOptout = 1,
                                                         string TransactionID = '',
                                                         string BatchUID = '',
-                                                        unsigned6 GlobalCompanyId = 0) := function
+                                                        unsigned6 GlobalCompanyId = 0, string DataPermission = '') := function
 
 mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := ^.glb;
 	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+  EXPORT String DataPermissionMask := DataPermission;
 END;
 
 	// check the first record in the batch to determine if this a realtime transaction or an archive test

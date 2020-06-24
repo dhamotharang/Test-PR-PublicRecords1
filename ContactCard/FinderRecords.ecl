@@ -1,4 +1,4 @@
-import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,address,PhonesFeedback_Services,
+﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,address,PhonesFeedback_Services,
       AutoStandardI,DeathV2_Services,suppress, ContactCard, STD, MDR,
       PhonesFeedback;  // PhonesFeedback is used in macro Mac_Append_Feedback()
 
@@ -240,7 +240,7 @@ fgong := dedup(project(head_roll_wnei, transform(doxie.layout_AppendGongByAddr_i
                                   self := left)),
                 all);
 
-wgong := dedup(doxie.fn_AppendGongByAddr(fgong)(phone <> ''), all);
+wgong := dedup(doxie.fn_AppendGongByAddr(fgong,mod_access)(phone <> ''), all);
 
 //***** FIND GONG BY DID
 didgong := doxie.mod_gong_records(project(allDIDs, doxie.layout_references), mod_access);

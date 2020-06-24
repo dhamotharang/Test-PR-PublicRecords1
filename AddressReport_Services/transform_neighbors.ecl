@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, ut, gong, CriminalRecords_Services, Suppress;
+IMPORT doxie, iesp, ut, dx_Gong, CriminalRecords_Services, Suppress;
 
 export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
   Doxie.IDataAccess mod_access,
@@ -83,17 +83,17 @@ export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
                     self.PostalCode := '' ,
                     self.StateCityZip:= '' ,
                     self.HighRiskIndicators := []));
-    phones0      := sort(r, seq_order, -ph_dt_last_seen);
-    phones_loc  := sort(r((integer)phone10<>0), -ph_dt_last_seen, seq_order); //for LocationReport we care more about the dt_last_seen of phones
-    phones      := if(location_report, phones_loc, phones0);
+    phones0 := sort(r, seq_order, -ph_dt_last_seen);
+    phones_loc := sort(r((integer)phone10<>0), -ph_dt_last_seen, seq_order); //for LocationReport we care more about the dt_last_seen of phones
+    phones := if(location_report, phones_loc, phones0);
     Self.Phones := dedup(sort(project(choosen(phones,max_nbr_phones),GetPhone(LEFT)),phone10),phone10);
     Self.LocationID := '';
     self.Verified := if(l.tnt='V',true,false);
     self.DateLastSeen:= iesp.ECL2ESP.toDateYM(max(r,dt_last_seen));//[];
     self.DateFirstSeen:=iesp.ECL2ESP.toDateYM(min(r,dt_first_seen));//[];
-    residents0      := sort(r,if(ut.isNamePart (ListingName, trim (lname),false), if(ut.isNamePart (ListingName, trim (fname),false),0,1),2),-dt_last_seen);
-    residents_loc    := dedup(sort(r, did, -dt_last_seen), did); //for LocationReport we need to dedup by did as there are name repeats due to returning multiple phones
-    residents        := if(location_report, residents_loc, residents0);
+    residents0 := sort(r,if(ut.isNamePart (ListingName, trim (lname),false), if(ut.isNamePart (ListingName, trim (fname),false),0,1),2),-dt_last_seen);
+    residents_loc := dedup(sort(r, did, -dt_last_seen), did); //for LocationReport we need to dedup by did as there are name repeats due to returning multiple phones
+    residents := if(location_report, residents_loc, residents0);
     Self.Residents := choosen(project (residents, UnfoldResidents (Left)),iesp.Constants.BR.Neigbors_Residents);
     self._Shared:=false;
     Self := l;
@@ -127,17 +127,17 @@ export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
 
   nbr:=project(p_neighbors,transform(nbr_phone_layout,self:=left,self:=[]));
 
-  gong_key:=Gong.Key_History_phone;
+  gong_key:=dx_Gong.key_history_phone();
 
   nbr_phone_layout_optout addgong (nbr l, gong_key r):=transform
-    self.Phone10         :=r.phone10;
-    self.PubNonpub      :=r.publish_code;
-    self.ListingPhone10  :='';
-    self.ListingName    :=r.listed_name;
-    self.TimeZone       :='';
+    self.Phone10 := r.phone10;
+    self.PubNonpub := r.publish_code;
+    self.ListingPhone10 :='';
+    self.ListingName := r.listed_name;
+    self.TimeZone :='';
     self.ListingTimeZone:='';
     self.ph_dt_last_seen:=(unsigned) r.dt_last_seen;
-    self.seq_order      :=if(l.lname=r.name_last,1,2);
+    self.seq_order := if(l.lname=r.name_last,1,2);
     self.key_did := r.did;
     self.record_sid := r.record_sid;
     self.global_sid := r.global_sid;

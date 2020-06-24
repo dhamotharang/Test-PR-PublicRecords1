@@ -97,8 +97,10 @@ EXPORT Transforms := MODULE
       SELF.cleaned.Name    := RI.Clean_Name,
       SELF.cleaned.Address := RI.clean_address,
       SELF.cleaned := RI;
-                              SELF := RI;
-                              SELF := [];
+      SELF.ln_date_last := (UNSIGNED) RI.date_last_seen;
+      SELF.ln_date_first := (UNSIGNED) RI.date_first_seen;
+      SELF := RI;
+      SELF := [];
   END;
 
   SHARED BatchShare.Layouts.ShareAddress xfAddrPenalties($.Layouts.email_internal_rec le) := TRANSFORM
@@ -321,6 +323,8 @@ EXPORT Transforms := MODULE
     SELF.ProcessDate := iesp.ECL2ESP.toDatestring8(le.process_date);
     SELF.DateFirstSeen := iesp.ECL2ESP.toDatestring8(le.date_first_seen);
     SELF.DateLastSeen := iesp.ECL2ESP.toDatestring8(le.date_last_seen);
+    SELF.LNDateFirst := iesp.ECL2ESP.toDate(le.ln_date_first);
+    SELF.LNDateLast := iesp.ECL2ESP.toDate(le.ln_date_last);
     SELF.DateVendorFirstReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_first_reported);
     SELF.DateVendorLastReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_last_reported);
     SELF.LatestOrigLoginDate := le.latest_orig_login_date;
@@ -419,6 +423,8 @@ EXPORT Transforms := MODULE
                                      le.additional_status_info<>'' => le.additional_status_info,
                                      _last_verified<>'' => _last_verified,
                                      '');
+      SELF.ln_date_first := IF(le.ln_date_first>0, (STRING) le.ln_date_first,'');
+      SELF.ln_date_last := IF(le.ln_date_last>0, (STRING) le.ln_date_last,'');
       SELF := le;
   END;
 

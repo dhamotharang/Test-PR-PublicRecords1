@@ -37,7 +37,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                       SELF.offenseTrafficRelated := IF(trafficRelated OR offenseTypeTraffic, DueDiligence.Constants.YES, LEFT.offenseTrafficRelated);
                                                                                                 
                                                                                                         
-                                                                      criminalActivityDate := DueDiligence.CommonDate.DaysApartAccountingForZero((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
+                                                                      criminalActivityDate := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING8)LEFT.offenseDDFirstReportedActivity, (STRING8)LEFT.historyDate);
                                                                       past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
                                                                       
                                                                       reportedLast3Yrs := LEFT.offenseDDFirstReportedActivity <> 0 AND criminalActivityDate <= past3Years;
@@ -82,13 +82,14 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                       
                                                                       SELF.trafficOffenseFound := isTrafficOffense;
                                                                       SELF.otherOffenseFound := isTrafficOffense = FALSE;
+                                                                      SELF.felonyPast3Years := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND reportedLast3Yrs;
                                                                        
                                                                                                        
                                                                       SELF := LEFT;));
 
 
     //roll up all offenses now by person
-    formatCrimData := PROJECT(updateWithStateLegal, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, BOOLEAN trafficOffenseFound, BOOLEAN otherOffenseFound, DueDiligence.LayoutsInternal.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
+    formatCrimData := PROJECT(updateWithStateLegal, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.LayoutsInternal.LegalFlags, DueDiligence.LayoutsInternal.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
                                                               SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
                                                               SELF := LEFT;
                                                               SELF := [];));
@@ -121,6 +122,12 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                       
                                       SELF.trafficOffenseFound := LEFT.trafficOffenseFound OR RIGHT.trafficOffenseFound;
                                       SELF.otherOffenseFound := LEFT.otherOffenseFound OR RIGHT.otherOffenseFound;
+                                      
+                                      SELF.currIncar := LEFT.currIncar OR RIGHT.currIncar;
+                                      SELF.currParole := LEFT.currParole OR RIGHT.currParole;
+                                      SELF.currProbation := LEFT.currProbation OR RIGHT.currProbation;
+                                      SELF.prevIncar := LEFT.prevIncar OR RIGHT.prevIncar;
+                                      SELF.felonyPast3Years := LEFT.felonyPast3Years OR RIGHT.felonyPast3Years;
                                       
                                       SELF.indCrimOffenses := LEFT.indCrimOffenses + RIGHT.indCrimOffenses;
                                       SELF := LEFT;));
@@ -174,8 +181,13 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 
                                   SELF.party.indOffenses := RIGHT.crimOffenses.indCrimOffenses;
                                   
-                                  SELF.party.trafficOffenseFound := RIGHT.crimOffenses.trafficOffenseFound;
-                                  SELF.party.otherCriminalOffenseFound := RIGHT.crimOffenses.otherOffenseFound;
+                                  SELF.trafficOffenseFound := RIGHT.crimOffenses.trafficOffenseFound;
+                                  SELF.otherOffenseFound := RIGHT.crimOffenses.otherOffenseFound;
+                                  SELF.currIncar := RIGHT.crimOffenses.currIncar;
+                                  SELF.currParole := RIGHT.crimOffenses.currParole;
+                                  SELF.currProbation := RIGHT.crimOffenses.currProbation;
+                                  SELF.prevIncar := RIGHT.crimOffenses.prevIncar;
+                                  SELF.felonyPast3Years := RIGHT.crimOffenses.felonyPast3Years;
                                   
                                   SELF := LEFT;),
                         LEFT OUTER,

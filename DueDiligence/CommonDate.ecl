@@ -3,9 +3,18 @@
 EXPORT CommonDate := MODULE
 
 
+    EXPORT DaysApartWithZeroEmptyDate(STRING date, STRING date2) := FUNCTION
+      
+      popDate2 := MAP(date2 = DueDiligence.Constants.EMPTY => (STRING8)STD.Date.Today(),
+                      (INTEGER)date2 = DueDiligence.Constants.date8Nines => (STRING8)STD.Date.Today(),
+                      date2);
+      
+      RETURN IF((UNSIGNED)date > 0, ut.DaysApart(date, popDate2), 0); //return 0 days apart if date doesn't exist 
+    END;
+
     EXPORT GetAreDatesWithinNumYears(UNSIGNED4 dateToCheck, UNSIGNED4 dateToCheckAgainst, UNSIGNED1 numberOfYears) := FUNCTION
     
-        daysBetween := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)dateToCheck, (STRING)dateToCheckAgainst);
+        daysBetween := DaysApartWithZeroEmptyDate((STRING)dateToCheck, (STRING)dateToCheckAgainst);
         daysWithinNumYrs := dateToCheck <> 0 AND dateToCheckAgainst <> 0 AND daysBetween <= ut.DaysInNYears(numberOfYears);
         
         RETURN daysWithinNumYrs;
@@ -37,22 +46,23 @@ EXPORT CommonDate := MODULE
       
     ENDMACRO;	
     
-    
-    EXPORT DaysApartAccountingForZero(STRING inDate, STRING inDate2) := FUNCTION
-    
-      tempDate := (UNSIGNED)inDate;
-      tempDate2 := (UNSIGNED)MAP(inDate2 = DueDiligence.Constants.EMPTY => (STRING8)STD.Date.Today(),
-                                  (UNSIGNED)inDate2 = DueDiligence.Constants.date8Nines => (STRING8)STD.Date.Today(),
-                                  inDate2);
+    EXPORT FilterRecords(dataSetToFilter, dateFirstSeenField, secondaryDateFirstSeenField) := FUNCTIONMACRO
+
+      //filter by dateFirstSeenField if populated, if not then use the secondaryDateFirstSeenField
+      filtered := dataSetToFilter(IF((INTEGER)dateFirstSeenField > 0, 
+                                    ((HistoryDate = DueDiligence.Constants.date8Nines AND DueDiligence.CommonDate.fn_filterOnCurrentMode((INTEGER)dateFirstSeenField))
+                                    OR DueDiligence.CommonDate.fn_filterOnArchiveDate((INTEGER)dateFirstSeenField, historyDate)),  //TRUE STATEMENT
+                                    ((HistoryDate = DueDiligence.Constants.date8Nines AND DueDiligence.CommonDate.fn_filterOnCurrentMode((INTEGER)secondaryDateFirstSeenField))
+                                    OR DueDiligence.CommonDate.fn_filterOnArchiveDate((INTEGER)secondaryDateFirstSeenField, historyDate))));//FALSE STATEMENT
       
+      RETURN filtered;
       
-      RETURN IF(tempDate = 0 OR tempDate2 = 0, 0, ut.DaysApart((STRING)tempDate, (STRING)tempDate2));  //return 0 days apart if date doesn't exist
-    END;
+    ENDMACRO;
     
     
     EXPORT NumberOfYearsMonthsDaysBetweenDates(STRING inDate, STRING inDate2) := FUNCTION
       
-      dayzApart := DaysApartAccountingForZero(inDate, inDate2);
+      dayzApart := DaysApartWithZeroEmptyDate(inDate, inDate2);
       
       years := dayzApart DIV 365;
       daysAfterYears := dayzApart % 365;

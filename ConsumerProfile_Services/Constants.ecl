@@ -41,10 +41,12 @@ EXPORT Constants := MODULE
 	end;
 	
 	export DOB_VERIFICATION := module
-		export set of string1 NO_MATCH := ['0', '1'];
+  export set of string1 NO_DOB := ['0'];
+		export set of string1 NO_MATCH := ['1'];
 		export set of string1 PARTIAL_MATCH := ['2', '3', '4', '5', '6', '7'];
 		export set of string1 MATCH := ['8'];
 		export string DESCRIPTION(string1 c) := map(
+      c in NO_DOB => 'No DOB input or No DOB found',
 						c in NO_MATCH 			=> 	'No DOB Match',
 						c in PARTIAL_MATCH	=>	'Partial DOB Match',
 						c in MATCH					=>	'Full DOB Match',

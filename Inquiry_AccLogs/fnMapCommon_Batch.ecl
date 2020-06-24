@@ -1,81 +1,80 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, lib_word;
-import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut, lib_stringlib, lib_word;
 
 export fnMapCommon_Batch := module
 
 export clean := function
 
 n := inquiry_acclogs.test_count; /* n - to test a sample set, 0 to run all */
-										
+
 NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
 inputfile := distribute(choosen(inquiry_acclogs.File_Batch_Logs.input
-																				(orig_method <> 'METHOD' and orig_global_company_id <> '')  
+																				(orig_method <> 'METHOD' and orig_global_company_id <> '')
 																				// (orig_last_name not in nullset or
 																				 // orig_company_name not in nullset))
 																		,IF(n > 0, n, choosen:ALL)), random()) // choosen for testing purposes
-																		; 		
-																		
+																		;
+
 blankRefCode := inputfile(length(orig_address1_z5 + orig_address1_z4) < 12);
 
 inquiry_acclogs.fncleanfunctions.cleanfields(blankRefCode, cleaned_fields);
-inquiry_acclogs.File_MBSApp(cleaned_fields, 'BATCH', '', mbs_outfile) 
+inquiry_acclogs.File_MBSApp(cleaned_fields, 'BATCH', '', mbs_outfile)
 
-/* !!!!!!!!!!!!!!!!! CLEAN NAMES, ADDRESSES, PHONES, SSN, etc !!!!!!!!!!!!!!!!!!!!! */					
+/* !!!!!!!!!!!!!!!!! CLEAN NAMES, ADDRESSES, PHONES, SSN, etc !!!!!!!!!!!!!!!!!!!!! */
 
 outfile := project(mbs_outfile,
 										transform(Inquiry_Acclogs.Layout_In_Common,
-															
+
 														self.ORIG_FULL_NAME1 := stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name);
 														self.ORIG_FULL_NAME2 :='';
-														
+
 														line1 := map(left.orig_address1_addressline1 <> '' => left.orig_address1_addressline1,
-																								stringlib.stringcleanspaces(left.orig_address1_prim_range + ' ' + 
+																								stringlib.stringcleanspaces(left.orig_address1_prim_range + ' ' +
 																											left.orig_address1_predir + ' ' +
 																											left.orig_address1_prim_name + ' ' +
 																											left.orig_address1_suffix + ' ' +
 																											left.orig_address1_postdir + ' ' +
 																											left.orig_address1_unit_desig + ' ' +
 																											left.orig_address1_sec_range));
-														line2 := map(left.orig_address1_addressline2 <> '' => left.orig_address1_addressline2, 
-																								stringlib.stringcleanspaces(left.orig_address1_city + ' ' + 
+														line2 := map(left.orig_address1_addressline2 <> '' => left.orig_address1_addressline2,
+																								stringlib.stringcleanspaces(left.orig_address1_city + ' ' +
 																											left.orig_address1_st + ' ' +
 																											left.orig_address1_z5 + ' ' +
 																											left.orig_address1_z4));
-																											
+
 														self.ORIG_ADDR1 := line1;
 														self.ORIG_LASTLINE1 := line2;
 														self.ORIG_CITY1 := left.orig_address1_city;
 														self.ORIG_STATE1 := left.orig_address1_st;
 														self.ORIG_ZIP1 := left.orig_address1_z5 + left.orig_address1_z4;
-								
+
 														self.SSN := Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 
 														self.WORK_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_work_phone);
 														self.PERSONAL_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_phone);
 														self.COMPANY_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_company_phone);
-																				
+
 														self.DOB := Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
 
 														fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(left.orig_datetime_stamp[1..8] + ' ' + left.orig_datetime_stamp[9..16]);
-														self.DateTime := fixTime;			
-																						 
-														self.DL := left.orig_dl_num; 
-														self.DL_State := left.orig_dl_state; 
+														self.DateTime := fixTime;
+
+														self.DL := left.orig_dl_num;
+														self.DL_State := left.orig_dl_state;
 														self.Email_Address := left.orig_email_address;
 														self.LinkID := left.orig_did;
 														self.domain_name := left.orig_domain_name;
 														self.ein := left.orig_fein,
 														self.charter_number := left.orig_charter_number,
 														self.ucc_number := left.orig_ucc_original_filing_number,
-								
+
 														self.orig_fname := left.orig_first_name;
 														self.orig_mname := left.orig_middle_name;
 														self.orig_lname := left.orig_last_name;
-														
+
 														self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 														self.COMPANY_ID := left.orig_company_id;
-														
+
 														self.orig_company_name1 := map(LIB_Word.Word(left.orig_company_name,2) <> '' => left.orig_company_name,
 																													 left.orig_company_name = left.orig_last_name => '',
 																													 left.orig_company_name);
@@ -89,19 +88,19 @@ outfile := project(mbs_outfile,
 														self.PERSON_ORIG_IP_ADDRESS1 := left.orig_ip_address_executed;
 														self.ORIG_IP_ADDRESS2 := left.orig_ip_address_initiated;
 														self.repflag	:= '';
-														
+
 														self.login_history_id := left.orig_login_history_id;
 														self.transaction_type := left.orig_transaction_type;
 														self.job_id := left.orig_job_id;
-														
+
 														self.GLB_purpose := '1'; ////// - default used for other products
 														self.DPPA_purpose := '3'; ////// - default used for other products
 														self.FCRA_purpose := '';
-										
+
 														self.source_file := 'BATCH';
 														self := left,
 														self := []));
-							
+
 return outfile;
 end;
 
@@ -111,14 +110,14 @@ end;
 
 export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCH') := function
 
-///////////////// PROJECT INTO PERSON QUERY LAYOUT 
-							
-person_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source), 
+///////////////// PROJECT INTO PERSON QUERY LAYOUT
+
+person_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
-		
+
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -128,11 +127,11 @@ person_project := project(AppendForward(repflag = '' and domain_name + clean_cna
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -195,14 +194,14 @@ person_project := project(AppendForward(repflag = '' and domain_name + clean_cna
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
-			
+
 			self := []));
 
 bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), transform(inquiry_acclogs.Layout.Common,
-		
+
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -212,11 +211,11 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -245,8 +244,8 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.Zip :=  left.orig_zip1;
 			self.bususer_q.Personal_Phone :=  left.personal_phone;
 			self.bususer_q.DOB := left.dob;
-			self.bususer_q.DL := left.dl; 
-			self.bususer_q.DL_St := left.dl_state; 
+			self.bususer_q.DL := left.dl;
+			self.bususer_q.DL_St := left.dl_state;
 			self.bususer_q.FName := left.fname;
 			self.bususer_q.MName := left.mname;
 			self.bususer_q.LName := left.lname;
@@ -275,11 +274,11 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.Appended_ADL := left.appendadl;
 			self := []));
 
-bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source), 
+bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source),
 		transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -289,11 +288,11 @@ bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -348,10 +347,10 @@ bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1
 									// transform(inquiry_acclogs.Layout.Common,
 														// self := left))(mbs.company_id + mbs.global_company_id <> '');
 
-return dedup(sort(distribute(bususer_project + person_project + bus_project, 
+return dedup(sort(distribute(bususer_project + person_project + bus_project,
 														hash(search_info.Sequence_Number))(mbs.company_id + mbs.global_company_id <> '')
 									, record, local), record, local);
 
-end;		
+end;
 
 end;

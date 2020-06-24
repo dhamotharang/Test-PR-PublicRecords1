@@ -25,7 +25,9 @@ export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData,
 	
 	isPreScreenPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'PRESCREENING';
 	isCollectionsPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'COLLECTIONS';
-	
+  
+  CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
+
 // Get TestSeed Results
 RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_Input le, SeedKey ri) := TRANSFORM
 		SELF.Seq := le.Seq;
@@ -358,16 +360,26 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.AlertRegulatoryCondition	:= if(valid_attributes_requested, ri.AlertRegulatoryCondition	, '');
     
     //checking indicators section
-    self.CheckProfileIndex := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckProfileIndex	, '');
-    self.CheckTimeOldest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckTimeOldest	, '');
-    self.CheckTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckTimeNewest	, '');
-    self.CheckNegTimeOldest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegTimeOldest	, '');
-    self.CheckNegRiskDecTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegRiskDecTimeNewest	, '');
-    self.CheckNegPaidTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegPaidTimeNewest	, '');
-    self.CheckCountTotal := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckCountTotal	, '');
-    self.CheckAmountTotal := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotal	, '');
-    self.CheckAmountTotalSinceNegPaid := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotalSinceNegPaid	, '');
-    self.CheckAmountTotal03Month := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotal03Month	, '');	
+    self.CheckProfileIndex := if(CheckingIndicatorsRequest, ri.CheckProfileIndex	, '');
+    self.CheckTimeOldest := if(CheckingIndicatorsRequest, ri.CheckTimeOldest	, '');
+    self.CheckTimeNewest := if(CheckingIndicatorsRequest, ri.CheckTimeNewest	, '');
+    self.CheckNegTimeOldest := if(CheckingIndicatorsRequest, ri.CheckNegTimeOldest	, '');
+    self.CheckNegRiskDecTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegRiskDecTimeNewest	, '');
+    self.CheckNegPaidTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegPaidTimeNewest	, '');
+    self.CheckCountTotal := if(CheckingIndicatorsRequest, ri.CheckCountTotal	, '');
+    self.CheckAmountTotal := if(CheckingIndicatorsRequest, ri.CheckAmountTotal	, '');
+    self.CheckAmountTotalSinceNegPaid := if(CheckingIndicatorsRequest, ri.CheckAmountTotalSinceNegPaid	, '');
+    self.CheckAmountTotal03Month := if(CheckingIndicatorsRequest, ri.CheckAmountTotal03Month	, '');		
+		
+		// FIS attributes section
+		self.rv3ConfirmationSubjectFound	:= if(valid_attributes_requested, ri.rv3ConfirmationSubjectFound	, '');
+		self.rv3AddrChangeCount60Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount60Month	, '');
+		self.rv3AddrChangeCount12Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount12Month	, '');
+		self.rv3AddrInputTimeOldest	:= if(valid_attributes_requested, ri.rv3AddrInputTimeOldest	, '');
+		self.rv3SourceNonDerogCount	:= if(valid_attributes_requested, ri.rv3SourceNonDerogCount	, '');
+		self.rv3AssetPropCurrentCount	:= if(valid_attributes_requested, ri.rv3AssetPropCurrentCount	, '');
+		self.rv3SSNDeceased	:= if(valid_attributes_requested, ri.rv3SSNDeceased	, '');
+		self.rv3AssetIndex	:= if(valid_attributes_requested, ri.rv3AssetIndex	, '');
 		
 		//lien-judment section
 		self.LnJEvictionTotalCount           := if(lnjattributes_requested, ri.LnJEvictionTotalCount	, '');         

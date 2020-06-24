@@ -20,7 +20,7 @@ EXPORT getBusRegistrationImpl := MODULE
         regBusCleanDates := DueDiligence.Common.CleanDatasetDateFields(regBusSeq, 'dt_first_seen, dt_vendor_first_reported, record_date, dt_last_seen');
 
         //filter out records after our history date.
-        regBusFilt := DueDiligence.Common.FilterRecords(regBusCleanDates, dt_first_seen, dt_vendor_first_reported);
+        regBusFilt := DueDiligence.CommonDate.FilterRecords(regBusCleanDates, dt_first_seen, dt_vendor_first_reported);
         
         RETURN regBusFilt;
     END;
