@@ -54,7 +54,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 	shared Advo_Base				:= Files().base.Advo.qa;
 
-	shared DLHistory_Base		:= if(STD.File.GetSuperFileSubCount(FraudGovPlatform.Filenames().base.DLHistory.qa) = 0, dataset([], FraudGovPlatform.Layouts.DLHistory ),Files().base.DLHistory.qa);
+	shared DLHistory_Base		:= Files().base.DLHistory.qa;
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
