@@ -481,6 +481,7 @@ EXPORT Constants := MODULE
 	   export unsigned2 Max_Involved_Parties := 50;
 		 export unsigned2 MaxAnalyticRecords := 200;
 		 export unsigned2 Max_Documents :=200;
+		 export unsigned1 Max_HPD_Results :=1;
 	END;
 
 	// EC (European Commission) Ruling

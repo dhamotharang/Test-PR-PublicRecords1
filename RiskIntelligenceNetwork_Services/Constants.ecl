@@ -38,11 +38,11 @@ EXPORT Constants := MODULE
   EXPORT INTEGER IPADDRESS := 18;
   EXPORT INTEGER BANKACCOUNT := 19;
   EXPORT INTEGER DLNUMBER := 20;
- END; 
- 
+ END;
+
  EXPORT INTEGER MAX_JOIN_LIMIT := 10000;
- 
- EXPORT FRAGMENT_SEPARATOR := '@@@'; 
+
+ EXPORT FRAGMENT_SEPARATOR := '@@@';
 
  EXPORT RECORD_SOURCE := MODULE
   EXPORT REALTIME := 'Realtime';
@@ -53,7 +53,7 @@ EXPORT Constants := MODULE
   EXPORT ELEMENT := 'Element';
   EXPORT IDENTITY := 'Identity';
  END;
- 
+
  // Mapping the FDN file type field above to our usage of the field for FraudGov
  // file_type 2 is reserved for Applicable Public Records, not used for FraudGov.
  // file_type 4 is reserved for Relationship Analytics, not used for FraudGov.
@@ -61,13 +61,13 @@ EXPORT Constants := MODULE
 
  EXPORT appends_value := 'BEST_ALL';
  EXPORT verify_value := 'BEST_ALL';
- 
+
  EXPORT INVALID_INPUT_CODE := AutoKeyI.errorcodes._codes.INVALID_INPUT; // 303
- EXPORT INVALID_INPUT_MSG  := AutoKeyI.errorcodes._msgs(INVALID_INPUT_CODE); 
+ EXPORT INVALID_INPUT_MSG  := AutoKeyI.errorcodes._msgs(INVALID_INPUT_CODE);
 
  EXPORT INSUFFICIENT_INPUT_CODE := AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT; // 301
- EXPORT INSUFFICIENT_INPUT_MSG  := AutoKeyI.errorcodes._msgs(INSUFFICIENT_INPUT_CODE); 
- 
+ EXPORT INSUFFICIENT_INPUT_MSG  := AutoKeyI.errorcodes._msgs(INSUFFICIENT_INPUT_CODE);
+
  EXPORT STRING PREPAID_VALUE := '1';
  EXPORT RIN_ID_START_VALUE := 900000000000;
  EXPORT CURR_PROFILE_FLAG := 1;

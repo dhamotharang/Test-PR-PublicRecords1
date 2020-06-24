@@ -157,7 +157,12 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 													keep(myConst.MAX_RECS_ON_JOIN),limit(0));
 		modaccess:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
     suppressmacAbmsbiognumber:=Suppress.MAC_FlagSuppressedSource(	baseRecs,	modaccess);	
-		optoutrecsabmsberbiognumber := project(suppressmacAbmsbiognumber, transform(ABMS_Layouts.LayoutOutput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];))   ; 
+		optoutrecsabmsberbiognumber := project(suppressmacAbmsbiognumber, transform(ABMS_Layouts.LayoutOutput,
+																						self.hasOptOut:= left.is_suppressed;
+																						self.AccountNumber:=left.AccountNumber;
+																						self._Penalty:=left._Penalty;
+																						self:=if(not left.is_suppressed,left);
+																						self:=[];));    
 
 		
 		//Rollup and dedup by biog_number
