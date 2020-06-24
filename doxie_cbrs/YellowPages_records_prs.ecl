@@ -1,7 +1,10 @@
-import infousa,Risk_Indicators,ut,doxie;
+﻿import AutoStandardI, infousa,Risk_Indicators,ut,doxie;
 doxie.MAC_Selection_Declare()
 
 export YellowPages_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 
 ypr0 := doxie_cbrs.YellowPages_records(bdids);
 	 
@@ -62,7 +65,7 @@ end;
 ypr1 := project(ypr0, tra(left));
 	 
 //**** HRI		
-doxie.mac_AddHRIPhone(ypr1, ypr)
+doxie.mac_AddHRIPhone(ypr1, ypr, mod_access)
 
 //**** get rid of the extra fields
 ut.MAC_Slim_Back(ypr, rec, ypr_slim)

@@ -1,4 +1,4 @@
-import doxie, ut;
+﻿import AutoStandardI, doxie, ut;
 
 rec := doxie.Layout_Comp_Addresses;
 
@@ -25,6 +25,9 @@ THIS LOOKS FOR THOSE SITUATIONS, AND SETS TNT AND LISTED PHONE SUCH THAT ESP WIL
 SEE ADDRESS.isVerified FOR ESP LOGIC
 */
 
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+
 var_string := dedup(ca,prim_range,prim_name,zip,sec_range,predir,all);
 
 outf := doxie.layout_AppendGongByAddr_input;
@@ -38,7 +41,7 @@ end;
 
 a := project(var_string,fixComp(left));
 
-p := doxie.fn_AppendGongByAddr(a);
+p := doxie.fn_AppendGongByAddr(a,mod_access);
 
 j := 
 	join(

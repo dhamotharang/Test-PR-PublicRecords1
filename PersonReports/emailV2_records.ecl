@@ -1,7 +1,8 @@
 IMPORT $, doxie, EmailV2_Services, Gateway, iesp;
 
 EXPORT emailV2_records (DATASET(doxie.layout_references) dids,
-                        $.IParam.emails in_params) := FUNCTION
+                        $.IParam.emails in_params,
+                        STRING DefaultSearchTier=EmailV2_Services.Constants.Basic) := FUNCTION
 
     email_params := MODULE(PROJECT(in_params, EmailV2_Services.IParams.EmailParams, OPT))
       _MaxResultsPerAcct := IF(in_params.MaxEmailResults<= iesp.Constants.SMART.MaxEmails,in_params.MaxEmailResults,iesp.Constants.SMART.MaxEmails);
@@ -11,7 +12,7 @@ EXPORT emailV2_records (DATASET(doxie.layout_references) dids,
       EXPORT BOOLEAN  IncludeAdditionalInfo := FALSE;
       EXPORT UNSIGNED1 EmailQualityRulesMask := EmailV2_Services.Constants.Defaults.EmailQualityRules;
       STRING _SearchTier := in_params.EmailSearchTier;
-      SHARED STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier, EmailV2_Services.Constants.Basic); // defaults to Basic
+      SHARED STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier, DefaultSearchTier); // defaults to Basic for all reports except Smart Linx - req. EMAIL-273
       _isBasicTier := EmailV2_Services.Constants.isBasic(SearchTier);
       EXPORT STRING   RestrictedUseCase := IF (_isBasicTier,
                                                EmailV2_Services.Constants.RestrictedUseCase.NoRoyaltySources,

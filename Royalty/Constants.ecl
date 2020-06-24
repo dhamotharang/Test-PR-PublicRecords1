@@ -70,6 +70,7 @@ export Constants := module
     export unsigned2 TU_FRAUD_ALERT := 431;
     export unsigned2 GG2 := 450;
     export unsigned2 GDC := 500;
+    export unsigned2 AVM := 530;
     export unsigned2 CA_VALUE_AVM := 570;
     export unsigned2 CA_VALUE_AVM_PLUS := 571;
     export unsigned2 CA_VALUE_AVM_INTERACTIVE := 572;
@@ -175,6 +176,7 @@ export Constants := module
     export MLAALERT := _TYPE(RoyaltyCode.MLAALERT);
     export GG2 := _TYPE(RoyaltyCode.GG2);
     export GDC := _TYPE(RoyaltyCode.GDC);
+    export AVM := _TYPE(RoyaltyCode.AVM);
     export CA_VALUE_AVM := _TYPE(RoyaltyCode.CA_VALUE_AVM);
     export CA_VALUE_AVM_PLUS := _TYPE(RoyaltyCode.CA_VALUE_AVM_PLUS);
     export CA_VALUE_AVM_INTERACTIVE := _TYPE(RoyaltyCode.CA_VALUE_AVM_INTERACTIVE);
@@ -218,7 +220,8 @@ export Constants := module
   export set of string2 LastResortRoyalty := [MDR.sourceTools.src_wired_Assets_Royalty];
 
   export WORKPLACE_ROYALTY_SET := [
-    MDR.sourceTools.src_One_Click_Data,
+    // MDR.sourceTools.src_One_Click_Data,
+    // As of 03/04/2020 (estd.), One Click Data is no longer a royalty
     MDR.sourceTools.src_Teletrack,
     MDR.sourceTools.src_SalesChannel,
     MDR.sourceTools.src_Thrive_LT,

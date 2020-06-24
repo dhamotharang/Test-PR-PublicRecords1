@@ -26,7 +26,7 @@ EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 	ebrDateClean := DueDiligence.Common.CleanDatasetDateFields(ebr5600RawSeq, 'date_last_seen, date_first_seen');
 	
 	// Filter out records after our history date.
-	ebrFilt := DueDiligence.Common.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
+	ebrFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
 	
   // Sort the records by record_type (to get current first) and then by date_last_seen desc (to get last reported) and then by sales_actual desc (to get largest)
 	ebrSorted := SORT(ebrFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), record_type, -date_last_seen, -sales_actual);

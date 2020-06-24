@@ -1,4 +1,4 @@
-import business_header_ss,ut,AutoStandardI;
+import business_header_ss,ut,AutoStandardI, MDR, Doxie;
 
 export fn_RSS_rollupBestRecords(grouped dataset(business_header.layout_biz_search.result_dateRange ) display_set, unsigned1 ROLLUP_LIMIT) := function
 	
@@ -198,7 +198,8 @@ export fn_RSS_rollupBestRecords(grouped dataset(business_header.layout_biz_searc
 		// Gather all the associated records
     glb_purpose:=AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
 		temp3rd := join(temp2nd,business_header_ss.Key_BH_BDID_pl,left.bdid = right.bdid and
-      ut.PermissionTools.glb.SrcOk(glb_purpose,right.source),
+      ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) and 
+      (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
 			transform(left),limit(10000,skip));
 		// Sort and table by Group ID to count how many records are associated
 		temp4th := sort(temp3rd,list_group_id);

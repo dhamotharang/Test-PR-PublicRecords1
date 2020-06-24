@@ -1,14 +1,14 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header,bipv2;
- 
+import ut, Business_Header_SS, Business_Header, bipv2;
+
 
 export FN_Append_Bip(dataset(SAM.layout_bip_linkid) pInFile) := function
 
-bdid_match_set := ['A', 'N']; 
+bdid_match_set := ['A', 'N'];
 
 filterappendlinkid := pInFile(cname <> '');
 filterappend_nolinkid := pInFile(cname = '');
 
-								
+
 Business_Header_SS.MAC_Add_BDID_FLEX(filterappendlinkid
 								,bdid_match_set
 								,cname
@@ -24,17 +24,17 @@ Business_Header_SS.MAC_Add_BDID_FLEX(filterappendlinkid
 								,false
 								,''
 						    ,dPostBip
-								, 
- 						    , 																
-			          , 															
-			          ,BIPV2.xlink_version_set	
+								,
+ 						    ,
+			          ,
+			          ,BIPV2.xlink_version_set
 							  ,													// url
-	            	,															// email 
+	            	,															// email
 		            ,p_city_name													// city
 		            ,fname																// fname
 	              ,mname																// mname
-	            	,lname																// lname		
-	              );   
+	            	,lname																// lname
+	              );
 
 outfile := dPostBip;
 return outfile;

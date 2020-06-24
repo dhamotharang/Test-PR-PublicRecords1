@@ -1,4 +1,4 @@
-﻿/*2016-01-08T01:08:11Z (Andi Koenen)
+﻿﻿/*2016-01-08T01:08:11Z (Andi Koenen)
 RR: 192631: CBD 5.0 new attributes
 */
 /*
@@ -11,11 +11,12 @@ btst_bt_addr_bip_match - whether or not searching the Business Header by the BT 
 btst_st_addr_bip_match - whether or not searching the Business Header by the ST inputs returns a matching business entity
 */
 
-import BIPV2, MDR, Header, riskwise, risk_indicators;
+import BIPV2, MDR, Header, riskwise, risk_indicators, doxie;
 
 export Boca_Shell_BtSt_Bus_Header(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input,
 	unsigned1 glb, unsigned1 dppa, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-	string50 DataPermission = risk_indicators.iid_constants.default_DataPermission) := FUNCTION
+	string50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
+	doxie.IDataAccess mod_access) := FUNCTION
 
 bus_input := ungroup(input);
 isFCRA := false;
@@ -62,7 +63,7 @@ end;
 	BIPSearchInput := BT_input + ST_input;
 	BIPSearchInput_fltrd := BIPSearchInput(prim_range != '');
 
-	LinkIDsRaw := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(BIPSearchInput_fltrd).Data2_;
+	LinkIDsRaw := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(BIPSearchInput_fltrd).SearchKeyData(mod_access);
 	Risk_Indicators.iid_constants.MAC_IsBusinessRestricted(LinkIDsRaw, LinkIDsRaw_out, source, vl_id, 
 		dt_first_seen, dppa, glb, DataRestriction, isFCRA);	
 	

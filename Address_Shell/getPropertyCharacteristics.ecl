@@ -230,7 +230,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyCharacteristics (D
 		interestrate := IF(keepLeft(le.confidencefactor2.interestratetypecode, ri.confidencefactor2.interestratetypecode), le.mortgages[1].interestrate, ri.mortgages[1].interestrate);
 		interestratetypecode := IF(keepLeft(le.confidencefactor2.interestratetypecode, ri.confidencefactor2.interestratetypecode), le.mortgages[1].interestratetypecode, ri.mortgages[1].interestratetypecode);
 		
-		SELF.mortgages := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.property_info.t_MortgageRecordReport,
+		SELF.mortgages := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.property_info.t_PropertyMortgageRecordReport,
 																													SELF.mortgagecompanyname := mortgagecompanyname;
 																													SELF.mortgagetype := mortgagetype;
 																													SELF.mortgagetypedesc := mortgagetypedesc;

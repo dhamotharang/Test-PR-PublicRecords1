@@ -4,53 +4,83 @@ Added Name criss cross validation for VIN/LicensePlate/TagNumber/OfficerBadge se
 /*2017-10-03T22:31:05Z (Dmitriy Lazarenko)
 [ECH-5359] removing partial report search capabilities. Cleaning up paths (adding "eCrash_Services." prefix where needed)
 */
-import FLAccidents_Ecrash, codes, ut, AutoStandardI, iesp, AutoKeyI, lib_stringlib, doxie, Std, BatchShare, Gateway, eCrash_Services;
+import FLAccidents_Ecrash, ut, AutoStandardI, iesp, AutoKeyI, lib_stringlib, doxie, Std, Gateway, eCrash_Services;
 
 //** Added the fix for bug 138974
 
 
 EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
-		shared Raw_in := Raw(in_mod);
-				
-		EXPORT getKYrecords() := FUNCTION	
-				
-				appriss_agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
-				
-				boolean KY_state  := in_mod.Agencies.JurisdictionState = 'KY';
-				KY_Agency_ds 			:= in_mod.Agencies(KY_state);
-				NONKY_Agency_ds   := in_mod.Agencies(NOT KY_State);
-			
-				eCrash_Services.Layouts.KY_Response_incident xform_proj(RECORDOF(KY_Agency_ds) l) := TRANSFORM
-					self.state := l.JurisdictionState;
-					self.AgencyName := l.Jurisdiction;
-					self.AgencyORI  := l.AgencyORI;
-					self := l;
-					self := [];
-				END; 
-				
-				DATASET(eCrash_Services.Layouts.KY_Response_incident) agency_validation_ds_1 := PROJECT(KY_Agency_ds,xform_proj(LEFT));	
-				DATASET(eCrash_Services.Layouts.KY_Response_incident) NONKY_Agency_ds_ref := PROJECT(NONKY_Agency_ds,xform_proj(LEFT));	
+		shared Raw_in := eCrash_Services.Raw(in_mod);
 
-				KY_Apriss_Agency_Ds := join(agency_validation_ds_1,appriss_agency_key
-   																, keyed(right.Agency_State_Abbr = left.state) 
-																		and keyed(right.agency_name = left.AgencyName ) 
-																	,	transform(eCrash_Services.Layouts.KY_Response_incident, self.source_id := right.source_id, self.AgencyORI := right.Agency_ori, self := left)
-																	,	limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))) , left outer);
+		EXPORT AppendSourceID() := FUNCTION
+
+
+			// HPD_Dataset is a place holder until the appriss key has this row, This needs to be deleted and join revereted to keyed in lines 50,51
+			// once key is populated with this row.
+		  HPD_Record := record
+        string3 agency_state_abbr;
+        string100 agency_name;
+        string11 agency_ori;
+        string11 mbsi_agency_id;
+        string5 cru_agency_id;
+        unsigned3 cru_state_number;
+        string2 source_id;
+        string2 append_overwrite_flag;
+        unsigned8 __internal_fpos__;
+      end;
+     HPD_Dataset := dataset([{'TX ', 'HOUSTON POLICE DEPARTMENT', 'TX923608Z', '000000', '00000', 0, 'HP', 'AP', 0}], HPD_Record);
+			
+			appriss_agency_key := FLAccidents_Ecrash.key_EcrashV2_agency + HPD_Dataset;
+
+		  dsAgency := in_mod.Agencies;
+
+			// to do : For now just rearranging the code. In future 1)Use a common layout rather than with KY 2) Remove xform_proj as it may not be needed
+
+		  eCrash_Services.Layouts.KY_Response_incident xform_proj(iesp.ecrash.t_ECrashSearchAgency l) := TRANSFORM
+		  	self.state := l.JurisdictionState;
+			  self.AgencyName := l.Jurisdiction;
+			  self.AgencyORI  := l.AgencyORI;
+		  	self := l;
+			  self := [];
+		  END; 
 				
-				boolean appriss_agency 	 := TRIM(KY_Apriss_Agency_Ds.source_id) = 'A';
+      dsAgency1 := Project(dsAgency,xform_proj(LEFT));	
+
+		  dsAgencywSource := join(dsAgency1,appriss_agency_key,
+   								          //  keyed(left.state =right.Agency_State_Abbr) and 
+									          //  keyed(left.AgencyName = right.agency_name),
+														 (left.state =right.Agency_State_Abbr) and 
+									           (left.AgencyName = right.agency_name),
+									           transform(eCrash_Services.Layouts.KY_Response_incident,
+									                     self.source_id := right.source_id,
+											                 self.AgencyORI := right.Agency_ori,
+											                 self := left),
+									        limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))) , left outer);
+            
+	  	return dsAgencywSource;
+  	END;
 				
-				KY_Apriss_Agencies	 		 := PROJECT(KY_Apriss_Agency_Ds(appriss_agency), 
+		EXPORT getKYRecords(DATASET(eCrash_Services.Layouts.KY_Response_incident) inrecs) := FUNCTION	
+
+
+			  	
+			  agency_validation_ds_1 := inrecs(state = eCrash_Services.Constants.KY_STATE_ABBR);
+				NONKY_Agency_ds_ref := inrecs(state <> eCrash_Services.Constants.KY_STATE_ABBR);
+				KY_Apriss_Agency_Ds :=  agency_validation_ds_1(TRIM(source_id) = eCrash_Services.Constants.KY_APPRISS_SOURCE_ID);
+				boolean appriss_agency 	 := TRIM(inrecs.source_id) = eCrash_Services.Constants.KY_APPRISS_SOURCE_ID;
+				
+				KY_Apriss_Agencies	 		 := PROJECT(inrecs(appriss_agency), 
 																						 TRANSFORM(iesp.ecrash.t_ECrashSearchAgency,
 																											self.JurisdictionState := left.state;
 																											self.Jurisdiction := left.AgencyName;
 																											self  := left;));
 																											 
-				KY_Non_Apriss_Agencies	 := KY_Apriss_Agency_Ds(NOT appriss_agency);
+				KY_Non_Apriss_Agencies	 := inrecs(NOT appriss_agency);
 				
-				IsSafeToPerformSoap  := in_mod.KY_SearchEspNAME <> '' AND in_mod.KY_SearchEspURL <> '' and COUNT(KY_Apriss_Agencies) > 0;
+				IsSafeToPerformSoap  := in_mod.KY_SearchEspNAME <> '' AND in_mod.GatewayEspURL <> '' and COUNT(KY_Apriss_Agencies) > 0;
 								
-				KY_Response := IF(IsSafeToPerformSoap,Gateway.SoapCall_KY( KY_Apriss_Agencies , in_mod));
+				KY_Response := IF(IsSafeToPerformSoap,Gateway.SoapCall_eCrash_KY( KY_Apriss_Agencies , in_mod));
 				
 				eCrash_Services.Layouts.KY_Response_incident Xform_norm( iesp.ky_search.t_KYCrashSearchIncident Incidents
 																													,	 RECORDOF(KY_Response) Response_agency ) := TRANSFORM 																																													
@@ -156,13 +186,145 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 																										self := right;), lookup);																												
 
 				RECORD_DS :=RECORD
-					dataset(RECORDOF(nonky_agencies_final)) alias_agencies ,
-					dataset(RECORDOF(Final_KY_Incidents)) ky_response_final
+					dataset(iesp.ecrash.t_ECrashSearchAgency) alias_agencies ,
+					dataset(iesp.ecrash.t_ECrashSearchRecord) response_final
 				END;
 				
 				return dataset([{nonky_agencies_final , final_KY_Incidents }],RECORD_DS);
 			
-		END;			
+		END;	
+
+
+		EXPORT getHPDRecords(dataset(eCrash_Services.Layouts.KY_Response_incident) dsHPDSourceID ) := Function
+
+		 
+		    dsHPDAgencies := dsHPDSourceID(source_id = eCrash_Services.Constants.HPD_SOURCE_ID);
+		    dsNonHPDAgencies := dsHPDSourceID(source_id <> eCrash_Services.Constants.HPD_SOURCE_ID);
+
+		  	dsNonHPD_agencies_final	:= JOIN(dsNonHPDAgencies,
+																				in_mod.Agencies,
+																				left.State = right.JurisdictionState
+																				and  left.AgencyName = right.Jurisdiction
+																				and  (right.AgencyORI = '' OR left.AgencyORI = right.AgencyORI)
+																				and  (right.Agencyid = '' OR left.Agencyid = right.Agencyid),
+																				transform(iesp.ecrash.t_ECrashSearchAgency,
+																										self := right;), lookup);		
+
+
+        IsSafeToPerformSoap  := in_mod.HPD_SearchEspNAME <> '' AND in_mod.GatewayEspURL <> '' AND EXISTS(dsHPDAgencies) ;
+
+		    dsHPDrecs := IF(IsSafeToPerformSoap,Gateway.SoapCall_eCrash_HPD(in_mod));
+  		  
+     		eCrash_Services.Layouts.HPD_Response_Results Xform_norm( iesp.hpdreportsearch.t_HPDReportSearchResult Results
+																													,	iesp.hpdreportsearch.t_HPDReportSearchResponseEx Response_agency ) := TRANSFORM
+					self.Message := Response_agency.Response._header.message;
+					self := Results;
+					self := [];
+				END;
+
+				dsHPD_Results	 := normalize(dsHPDrecs,LEFT.Response.results,Xform_norm(RIGHT,LEFT));
+
+				RecInvolvedParty := record
+				  dsHPD_Results.IncidentNumber;
+				  dsHPD_Results.Location;
+				  dsHPD_Results.DateofCrash;
+				  dataset(iesp.ecrash.t_ECrashInvolvedParty) InvolvedParties;
+        end;
+
+				RecInvolvedParty  xformInvolvedparty(eCrash_Services.Layouts.HPD_Response_Results L) := Transform
+				   self. IncidentNumber := L.IncidentNumber;
+					 self. Location := L.Location;
+					 self. DateofCrash := L.DateofCrash;
+					 self. InvolvedParties := PROJECT(L,TRANSFORM(iesp.ecrash.t_ECrashInvolvedParty,
+					                                     self.name.full := left.NameOfPerson,
+						                                   self.DriverLicenseNumber :=  left.DLNumber,
+																							 self.dob := left.dob,
+																							 self := []));
+        END;
+
+				Involvedparties := PROJECT(dsHPD_Results,xformInvolvedparty(LEFT));
+
+				RecInvolvedParty xtRollup(RecInvolvedParty L, RecInvolvedParty R) := transform
+				  self.InvolvedParties := L.InvolvedParties + R.InvolvedParties;
+					self.IncidentNumber := L.IncidentNumber;
+					self.Location := L.Location;
+					self.DateofCrash := L.DateofCrash;
+        end;
+
+				dsrolledup := rollup(Involvedparties, xtRollup(left,right), IncidentNumber,Location,DateofCrash);
+				
+				iesp.ecrash.t_ECrashSearchRecord xform_final_result(RecInvolvedParty L) := TRANSFORM
+					self.IsReleasable := true;
+					self.VendorCode := eCrash_Services.Constants.VENDOR_HPD ; 
+					self.JurisdictionState := dsHPDAgencies[1].State;
+					self.Jurisdiction := 	dsHPDAgencies[1].AgencyName;
+					self.AgencyORI := dsHPDAgencies[1].AgencyORI;
+					self.AgencyId  := dsHPDAgencies[1].AgencyId;
+					self.ReportCode  := eCrash_Services.Constants.REPORT_CODE_HPD;
+					self.ReportType  :=  eCrash_Services.Constants.REPORT_CODE_ACCIDENT;
+					self.ReportNumber  := L.IncidentNumber;
+					self.ResultType  :=  eCrash_Services.Constants.DIRECT_hit;
+					self.IsReadyForPublic := TRUE;
+					self.ContribSource := eCrash_Services.Constants.HPD_SOURCE_ID;
+					self.InvolvedParties := L.InvolvedParties;
+					self.DateOfLoss := L.DateofCrash;
+					self.Reports := project(dataset(L),transform(iesp.ecrash.t_ECrashSearchRecordData,
+																								self.ContribSource := eCrash_Services.Constants.HPD_SOURCE_ID,
+																							  self.ReportType  :=  eCrash_Services.Constants.REPORT_CODE_ACCIDENT,
+																							  self.VendorCode :=  eCrash_Services.Constants.VENDOR_HPD,
+																							  self.Jurisdiction := dsHPDAgencies[1].AgencyName,
+																							  self.JurisdictionState := dsHPDAgencies[1].State,
+																							  Self.AgencyId := dsHPDAgencies[1].AgencyId,
+																							  self.AgencyORI := dsHPDAgencies[1].AgencyORI,
+																							  self.DateOfLoss := left.DateofCrash,
+																							  self.AccidentLocation.CrossStreet := left.Location,
+																							  self.ResultType  := eCrash_Services.constants.DIRECT_hit,
+																							  self.ReportNumber  := left.IncidentNumber,
+																							  self.InvolvedParties := left.InvolvedParties,
+																								self.IsReadyForPublic := TRUE,
+																							  self.IsReleasable := TRUE,
+																							  self := left,
+																							  self := []));		
+					self := L;
+					self := [];
+				END;
+
+			dsHPD_Final_Results := project(dsrolledup,xform_final_result(left));
+
+				 
+
+			RECORD_DS :=RECORD
+			  dataset(iesp.ecrash.t_ECrashSearchAgency) alias_agencies ,
+			  dataset(iesp.ecrash.t_ECrashSearchRecord) response_final
+			END;
+				
+				
+			// output(HPD_Results,named('HPD_Results'));
+			// output(HPD_Final_Results,named('HPD_Final_Results'));
+			// output(NonHPD_agencies_final,named('NonHPD_agencies_final'));
+			
+			return dataset([{dsNonHPD_agencies_final , dsHPD_Final_Results }],RECORD_DS);
+
+		END;
+
+
+		EXPORT getGatewayRecords() := Function
+
+		// to do: Make alias_agencies independent of individual gateway functions and pass it directly from getGatewayrecords  
+
+		  boolean KY_state  := in_mod.Agencies.JurisdictionState = eCrash_Services.Constants.KY_STATE_ABBR;
+			dsSourceID := AppendSourceID();
+			dsHPDSourceID := dsSourceID(source_id = eCrash_Services.Constants.HPD_SOURCE_ID);
+
+			isHPDGatewaycall := exists(dsHPDSourceID);
+
+			Gatewayrecs := if(isHPDGatewaycall,getHPDRecords(dsSourceID),getKYRecords(dsSourceID));
+				
+      // output(Gatewayrecs,named('Gatewayrecs'));
+      // output(dsSourceID,named('dsSourceID'));
+		 
+		  return Gatewayrecs;
+		END;		
 				
 		EXPORT getSearchRecords(dataset(iesp.ecrash.t_ECrashSearchAgency) Agencies
 												 ,  dataset(iesp.ecrash.t_ECrashSearchRecord) KY_Response) := FUNCTION 
@@ -503,7 +665,7 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
   															(EXISTS(InvolvedParties((input_first_name_upper_cased = '' OR input_first_name_upper_cased = Name.First) and
 																												(input_last_name_upper_cased = ''  OR input_last_name_upper_cased = Name.Last))))), 
 					results_tag_filtered);
-	
+
 			grouped_result_recs := eCrash_Services.functions.AssociatedReportsTransform(results_filtered,in_mod);
 			
 			final_recs_ds := if(in_mod.GroupRecords, grouped_result_recs, results_filtered);

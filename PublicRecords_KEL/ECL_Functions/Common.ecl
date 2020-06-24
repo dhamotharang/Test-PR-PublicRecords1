@@ -175,6 +175,8 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludeSSNAddress);		
 
 	EXPORT DoFDCJoin_Header__Key_Addr_Hist := 
+		Options.IncludeMini OR
+		Options.IncludePerson OR
 		Options.IncludePersonAddress OR
 		Options.IncludeZipCodePerson;
 
@@ -239,6 +241,11 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludeEmailHousehold or
 		 Options.IncludePersonEmailPhoneAddress);
 
+	EXPORT DoFDCJoin_Email_Data__Key_Did_FCRA :=
+		Options.isFCRA AND
+		(Options.IncludeEmail or
+		 Options.IncludePersonEmail);	
+
 	EXPORT DoFDCJoin_Doxie__Key_Death_MasterV2_SSA_DID := 
 		(Options.IncludePerson OR
 		 Options.IncludePersonSSN);
@@ -272,7 +279,17 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 
 	EXPORT DoFDCJoin_AlloyMedia_student_list__key_DID := 
 			(Options.IncludeEducation OR
-			Options.IncludePersonEducation);	
+			Options.IncludePersonEducation);
+			
+/*-----------------------Surname-----------------------*/
+
+EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames := 
+ (Options.IncludeSurname OR
+  Options.IncludeBusinessSele OR
+  Options.IncludeBusinessProx OR
+  Options.IncludeSelePerson OR
+	 Options.IncludeProxPerson);
+	 
 /*-----------------------LienJudgement-----------------------*/
 		 
 	EXPORT DoFDCJoin_LiensV2_key_liens_main_ID_Records := 
@@ -418,11 +435,20 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	
 	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids :=
 		NOT Options.isFCRA AND
+	  (Options.IncludeMini OR
+		 Options.IncludeBusinessProx OR
+		 Options.IncludeProxPerson OR
+		 Options.IncludeSelePerson OR
+		 Options.IncludeSeleEmail OR
+		 Options.IncludeProxEmail);	
+		 
+	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids_slim :=
+		NOT Options.isFCRA AND
 	  (Options.IncludeBusinessProx OR
 		 Options.IncludeProxPerson OR
 		 Options.IncludeSelePerson OR
 		 Options.IncludeSeleEmail OR
-		 Options.IncludeProxEmail);	 
+		 Options.IncludeProxEmail);			 
 		 
  	EXPORT DoFDCJoin_BIPV2_Best__Key_LinkIds := 
 		NOT Options.isFCRA AND
@@ -531,19 +557,15 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 				Options.IncludePersonProperty OR
 				Options.IncludePersonPropertyEvent OR
 				Options.IncludeAddressProperty OR
-				Options.IncludeAddressPropertyEvent);  	
-		
-	EXPORT DoFDCJoin_PropertyV2__Key_Addl_Fares_Deed_Fid := 
-			NOT Options.isFCRA AND
-			 (Options.IncludeProperty OR
-			 Options.IncludePropertyEvent);
+				Options.IncludeAddressPropertyEvent);
 	
 	EXPORT DoFDCJoin_AVM_V2__Key_AVM_Address := 
 			Options.IncludeProperty;
 			
 	EXPORT DoFDCJoinfn_IndexedSearchForXLinkIDs	:= 
 			NOT Options.isFCRA AND
-			 (Options.IncludeBusinessSele OR
+			 (Options.IncludeMini OR
+			 Options.IncludeBusinessSele OR
 			 Options.IncludeBusinessProx OR
 			 Options.IncludeProxPerson OR 
 			 Options.IncludeSelePerson OR 
@@ -572,5 +594,15 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			(Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
+			 
+	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		
+			 NOT Options.isFCRA AND
+			(Options.IncludeHouseholdMember OR
+			Options.IncludePerson OR
+			Options.IncludeHousehold);	
+			 
+			 
+	EXPORT DoFDCJoin_dx_CFPB__key_BLKGRP :=
+			Options.IncludeGeolink;			 
 			 
 END;

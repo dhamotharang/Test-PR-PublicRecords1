@@ -12,7 +12,7 @@ EXPORT getSharedVehicle(DATASET(DueDiligence.LayoutsInternal.VehicleSlimLayout) 
 	vehicleSlimCleanDate := DueDiligence.Common.CleanDatasetDateFields(inVehicleData, 'dateFirstSeen');
 	
 	//Filter out records after our history date.
-	vehicleFilt := DueDiligence.Common.FilterRecordsSingleDate(vehicleSlimCleanDate, dateFirstSeen);      
+	vehicleFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(vehicleSlimCleanDate, dateFirstSeen);      
 
   //retrieve the vehichle data for all the vehicle data within our history range
   //this allows us to get as much info about a vehicle

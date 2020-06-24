@@ -1,4 +1,4 @@
-﻿IMPORT DCA,DMA,Doxie,ExecAtHomeV2,Gong,ProfileBooster,dx_BestRecords, Suppress;
+﻿IMPORT DCA, DMA, Doxie, ExecAtHomeV2, dx_Gong, ProfileBooster, dx_BestRecords, Suppress;
 
 EXPORT GetContactInfo(
   DATASET(ExecAtHomeV2.Layouts.expandedLayout) ds_Contacts,
@@ -32,7 +32,7 @@ FUNCTION
 
 
   // Suppress the key itself so we can leave the transform alone.
-  joined_gong := JOIN(ds_ProfileBoostAttrs,Gong.Key_History_Did,
+  joined_gong := JOIN(ds_ProfileBoostAttrs,dx_Gong.key_history_did(),
     KEYED(LEFT.DID = RIGHT.l_did AND
       RIGHT.current_flag AND
       ~RIGHT.business_flag),

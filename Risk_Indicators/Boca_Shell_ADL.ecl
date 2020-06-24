@@ -1,4 +1,4 @@
-﻿import _Control, riskwise, risk_indicators, Doxie, data_services, Suppress;
+﻿import _Control, riskwise, risk_indicators, Doxie, data_services, Suppress, STD;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_ADL (GROUPED DATASET(risk_indicators.layout_output) iid, boolean isFCRA, unsigned1 dppa,
@@ -34,6 +34,8 @@ dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa, isFCRA);
 	self.addrs_last12 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last1year);
 	self.addrs_last24 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last2years);
 	self.addrs_last36 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last3years);
+  self.FIS_addrs_last12 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last1year); 
+  self.FIS_addrs_last60 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last5years); 
 	
 	self.lnames_per_adl := risk_indicators.iid_constants.capVelocity(header_version.lname_ct);
 	self.lnames_per_adl30 := risk_indicators.iid_constants.capVelocity(header_version.lname_ct30);	
@@ -56,7 +58,7 @@ dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa, isFCRA);
 	inferred_age_on_file := if(dppa_ok or isFCRA, header_version.inferred_age, header_version.inferred_age_no_dppa);
 	self.inferred_age := if(reported_dob > 0, age_today_from_reported_dob, inferred_age_on_file );
 	
-	cat := trim(stringlib.stringtouppercase(ri.adl_category));		// only realtime data
+	cat := trim(STD.STR.ToUpperCase(ri.adl_category));		// only realtime data
 	self.adlCategory := risk_indicators.iid_constants.adlCategory(cat);
 													 
 	self.dl_addrs_per_adl := risk_indicators.iid_constants.capVelocity(header_version.dl_addrs_per_adl);												 
@@ -75,7 +77,7 @@ END;
 ADLinfo_nonfcra_roxie_unsuppressed := join(iid, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1));
 								
-ADLinfo_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+ADLinfo_nonfcra_roxie_flagged := Suppress.CheckSuppression(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
 
 ADLinfo_nonfcra_roxie := PROJECT(ADLinfo_nonfcra_roxie_flagged, TRANSFORM(risk_indicators.layout_output, 
 	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);
@@ -93,6 +95,8 @@ ADLinfo_nonfcra_roxie := PROJECT(ADLinfo_nonfcra_roxie_flagged, TRANSFORM(risk_i
 	self.addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last12);
 	self.addrs_last24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last24);
 	self.addrs_last36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last36);
+  self.FIS_addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FIS_addrs_last12);
+  self.FIS_addrs_last60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FIS_addrs_last60);
 	self.lnames_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl);
 	self.lnames_per_adl30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl30);
 	self.lnames_per_adl90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl90);
@@ -116,7 +120,7 @@ ADLinfo_nonfcra_thor_unsuppressed := group(join(distribute(iid, hash64(did)),
 														 left.did != 0 and (left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL), seq, did);
 								
-ADLinfo_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+ADLinfo_nonfcra_thor_flagged := Suppress.CheckSuppression(ADLinfo_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
 ADLinfo_nonfcra_thor := PROJECT(ADLinfo_nonfcra_thor_flagged, TRANSFORM(risk_indicators.layout_output, 
 	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);
@@ -134,6 +138,8 @@ ADLinfo_nonfcra_thor := PROJECT(ADLinfo_nonfcra_thor_flagged, TRANSFORM(risk_ind
 	self.addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last12);
 	self.addrs_last24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last24);
 	self.addrs_last36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last36);
+  self.FIS_addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FIS_addrs_last12);
+  self.FIS_addrs_last60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FIS_addrs_last60);
 	self.lnames_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl);
 	self.lnames_per_adl30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl30);
 	self.lnames_per_adl90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl90);
@@ -181,7 +187,9 @@ risk_indicators.layout_output addADL_FCRA(iid le, risk_indicators.key_FCRA_ADL_R
 	self.addrs_last12 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last1year);
 	self.addrs_last24 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last2years);
 	self.addrs_last36 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last3years);
-	
+	self.FIS_addrs_last12 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last1year);
+	self.FIS_addrs_last60 := risk_indicators.iid_constants.capVelocity(header_version.addr_ct_last5years);
+  
 	self.lnames_per_adl := risk_indicators.iid_constants.capVelocity(header_version.lname_ct);
 	self.lnames_per_adl30 := risk_indicators.iid_constants.capVelocity(header_version.lname_ct30);	
 	self.lnames_per_adl90 := risk_indicators.iid_constants.capVelocity(header_version.lname_ct90);
@@ -203,7 +211,7 @@ risk_indicators.layout_output addADL_FCRA(iid le, risk_indicators.key_FCRA_ADL_R
 	inferred_age_on_file := if(dppa_ok or isFCRA, header_version.inferred_age, header_version.inferred_age_no_dppa);
 	self.inferred_age := if(reported_dob > 0, age_today_from_reported_dob, inferred_age_on_file );
 	
-	cat := trim(stringlib.stringtouppercase(ri.adl_category));		// only realtime data
+	cat := trim(STD.STR.ToUpperCase(ri.adl_category));		// only realtime data
 	self.adlCategory := risk_indicators.iid_constants.adlCategory(cat);
 													 
 	self.dl_addrs_per_adl := risk_indicators.iid_constants.capVelocity(header_version.dl_addrs_per_adl);												 

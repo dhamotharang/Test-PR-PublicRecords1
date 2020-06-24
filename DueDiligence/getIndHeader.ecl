@@ -94,7 +94,7 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     headerCleanDates := DueDiligence.Common.CleanDatasetDateFields(realHeader, 'dateFirstSeen, dateLastSeen');
 
     //filter out records after our history date - this contains both the inquired and parents data
-    filterHeader := DueDiligence.Common.FilterRecordsSingleDate(headerCleanDates, dateFirstSeen);
+    filterHeader := DueDiligence.CommonDate.FilterRecordsSingleDate(headerCleanDates, dateFirstSeen);
 
     //only inquired records
     inquiredHeaderData := filterHeader(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL);
@@ -135,7 +135,6 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
 
     perAssocOptions := MODULE(DueDiligence.DataInterface.iAttributePerAssoc)
-                          EXPORT BOOLEAN includeLegalData := FALSE;
                           EXPORT BOOLEAN includeSSNData := FALSE;
                           EXPORT BOOLEAN includeHeaderData := TRUE;
                        END;

@@ -41,6 +41,14 @@ EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := 
                                         
                                         SELF.potentialSO := RIGHT.potentialSO;
                                         
+                                        SELF.trafficOffenseFound := RIGHT.trafficOffenseFound;
+                                        SELF.otherOffenseFound := RIGHT.otherOffenseFound;
+                                        SELF.currIncar := RIGHT.currIncar;
+                                        SELF.currParole := RIGHT.currParole;
+                                        SELF.currProbation := RIGHT.currProbation;
+                                        SELF.prevIncar := RIGHT.prevIncar;
+                                        SELF.felonyPast3Years := RIGHT.felonyPast3Years;
+                                        
                                         SELF := LEFT;),
                               LEFT OUTER,
                               ATMOST(1));
@@ -59,7 +67,6 @@ EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := 
 
  
     perAssocOptions := MODULE(DueDiligence.DataInterface.iAttributePerAssoc)
-                                EXPORT BOOLEAN includeLegalData := TRUE;
                                 EXPORT BOOLEAN includeSSNData := FALSE;
                                 EXPORT BOOLEAN includeHeaderData := FALSE;
                         END;

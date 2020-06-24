@@ -513,6 +513,7 @@ unsigned8 BSOptions :=
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(LEFT),
         Invalid_Blended_Request := 
+            LEFT.ModelName  <> BusinessCredit_Services.Constants.BBFM1906_1_0 AND 
             LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
             (
               TRIM(RIGHT.Rep_1_Full_Name) = '' AND 

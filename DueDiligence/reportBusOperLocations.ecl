@@ -23,7 +23,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
    // ------ Determine the Geographic Risk for the Inquired Business and operating locations   ------
    // ------  This list of addresses need to be cleaned                                        ------
    // ------                                                                                   ------
-   GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses, TRUE);  
+   GeographicRiskResults   := DueDiligence.CommonAddress.getAddressRisk(ListOfOperAddresses, TRUE);  
 
 	 // ------                                                                                   ------
 	 // ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------

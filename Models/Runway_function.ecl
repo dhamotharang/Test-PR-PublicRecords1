@@ -97,6 +97,10 @@ cclam := project(ungroup(clam), transform(Risk_Indicators.collection_shell_mod.c
 // dataset(Business_Risk.Layout_Business_Shell) bshell
 bshell := project(ungroup(clam), transform(Business_Risk.Layout_Business_Shell, self.biid := left, self := left, self := []));
 
+iid := project(ungroup(clam), transform(Risk_Indicators.Layout_Output, self := left.iid, self := left, self := []));
+
+attributes := Models.getFDAttributes(clam, group(iid, seq), '', dataset([], riskwise.Layout_IP2O));
+
 custom_clam := project(clam, transform(Risk_Indicators.Layout_Bocashell_with_Custom, self := left, self := []));
 
 recoverScoreBatchIn := project(ungroup(clam), transform(Models.Layout_RecoverScore_Batch_Input, self := left.shell_input, self := left, 
@@ -1630,14 +1634,67 @@ self.fp1902_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_fp1902_1_0, named('with_fp1902_1_0'));
 
+//=== SCUSA Custom Model ===
+fp1908_1_0_score := Models.fp1908_1_0(clam, 6, attributes);
+// output(fp1908_1_0_score, named('fp1908_1_0_score'));
+
+
+with_fp1908_1_0	:= join(with_fp1902_1_0, fp1908_1_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1908_1_0_score := right.score;
+self.fp1908_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1908_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1908_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1908_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1908_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1908_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1908_1_0, named('with_fp1908_1_0'));
 
 
 
+
+//=== Fifth Third Custom Model ===
+fp1909_1_0_score := Models.fp1909_1_0(clam, 6, attributes);
+// output(fp1909_1_0_score, named('fp1909_1_0_score'));
+
+
+with_fp1909_1_0	:= join(with_fp1908_1_0, fp1909_1_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1909_1_0_score := right.score;
+self.fp1909_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1909_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1909_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1909_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1909_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1909_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1909_1_0, named('with_fp1909_1_0'));
+
+//=== Fifth Third Custom Model ===
+fp1909_2_0_score := Models.FP1909_2_0(clam, 6, attributes);
+// output(fp1909_2_0_score, named('fp1909_2_0_score'));
+
+
+with_fp1909_2_0	:= join(with_fp1909_1_0, fp1909_2_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1909_2_0_score := right.score;
+self.fp1909_2_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1909_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1909_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1909_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1909_2_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1909_2_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1909_2_0, named('with_fp1909_2_0'));
 //=== Avenger Model ===
 FP31604_0_0_score := Models.FP31604_0_0( ungroup(clam), 6 );
 
-with_FP31604_0_0	:= join(with_fp1902_1_0, FP31604_0_0_score,
-left.seq=right.seq,
+
+with_FP31604_0_0	:= join(with_fp1909_2_0, FP31604_0_0_score,left.seq=right.seq,
 transform(Models.layout_Runway,
 self.FP31604_0_0_score := right.score;
 self.FP31604_0_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
@@ -3497,13 +3554,27 @@ self := left), keep(1), left outer);
 // output(with_RVA1904_1_0, named('with_RVA1904_1_0'));
 /* ================ */
 
-
+/* ================ */
+RVA1908_1_0_score := Models.RVA1908_1_0(clam);
+// output(RVA1908_1_0_score, named('RVA1908_1_0_score'));
+                             
+with_RVA1908_1_0 := join(with_RVA1904_1_0, RVA1908_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVA1908_1_0_score := right.score;
+self.RVA1908_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVA1908_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVA1908_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVA1908_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self := left), keep(1), left outer);
+// output(with_RVA1908_1_0, named('with_RVA1908_1_0'));
+/* ================ */
 
 /* ================ */
 RVG1705_1_0_score := Models.RVG1705_1_0(clam);
 // output(RVG1702_1_0_score, named('RVG1702_1_0_score'));
                              
-with_RVG1705_1_0 := join(with_RVA1904_1_0, RVG1705_1_0_score,
+with_RVG1705_1_0 := join(with_RVA1908_1_0, RVG1705_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVG1705_1_0_score := right.score;
@@ -4901,7 +4972,32 @@ self.fp1902_1_0_reason4	:= if(model_environment in [1,3], left.fp1902_1_0_reason
 self.fp1902_1_0_reason5	:= if(model_environment in [1,3], left.fp1902_1_0_reason5	, '');
 self.fp1902_1_0_reason6	:= if(model_environment in [1,3], left.fp1902_1_0_reason6	, '');
 
+//=== SCUSA Custom Model ===
+self.fp1908_1_0_score	:= if(model_environment in [1,3],   left.fp1908_1_0_score	, '');
+self.fp1908_1_0_reason1	:= if(model_environment in [1,3], left.fp1908_1_0_reason1	, '');
+self.fp1908_1_0_reason2	:= if(model_environment in [1,3], left.fp1908_1_0_reason2	, '');
+self.fp1908_1_0_reason3	:= if(model_environment in [1,3], left.fp1908_1_0_reason3	, '');
+self.fp1908_1_0_reason4	:= if(model_environment in [1,3], left.fp1908_1_0_reason4	, '');
+self.fp1908_1_0_reason5	:= if(model_environment in [1,3], left.fp1908_1_0_reason5	, '');
+self.fp1908_1_0_reason6	:= if(model_environment in [1,3], left.fp1908_1_0_reason6	, '');
 
+//=== Fifth Third Custom Model ===
+self.fp1909_1_0_score	:= if(model_environment in [1,3],   left.fp1909_1_0_score	, '');
+self.fp1909_1_0_reason1	:= if(model_environment in [1,3], left.fp1909_1_0_reason1	, '');
+self.fp1909_1_0_reason2	:= if(model_environment in [1,3], left.fp1909_1_0_reason2	, '');
+self.fp1909_1_0_reason3	:= if(model_environment in [1,3], left.fp1909_1_0_reason3	, '');
+self.fp1909_1_0_reason4	:= if(model_environment in [1,3], left.fp1909_1_0_reason4	, '');
+self.fp1909_1_0_reason5	:= if(model_environment in [1,3], left.fp1909_1_0_reason5	, '');
+self.fp1909_1_0_reason6	:= if(model_environment in [1,3], left.fp1909_1_0_reason6	, '');
+
+//=== Fifth Third Custom Model ===
+self.fp1909_2_0_score	:= if(model_environment in [1,3],   left.fp1909_2_0_score	, '');
+self.fp1909_2_0_reason1	:= if(model_environment in [1,3], left.fp1909_2_0_reason1	, '');
+self.fp1909_2_0_reason2	:= if(model_environment in [1,3], left.fp1909_2_0_reason2	, '');
+self.fp1909_2_0_reason3	:= if(model_environment in [1,3], left.fp1909_2_0_reason3	, '');
+self.fp1909_2_0_reason4	:= if(model_environment in [1,3], left.fp1909_2_0_reason4	, '');
+self.fp1909_2_0_reason5	:= if(model_environment in [1,3], left.fp1909_2_0_reason5	, '');
+self.fp1909_2_0_reason6	:= if(model_environment in [1,3], left.fp1909_2_0_reason6	, '');
 
 //=== Avenger model ===
 self.fp31604_0_0_score	:= if(model_environment in [1,3],   left.fp31604_0_0_score	, '');

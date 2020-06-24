@@ -548,12 +548,18 @@ unsigned8 BSOptions :=
             if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 
 
-ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only, suppressNearDups, 
-									require2ele, fromBiid, isFCRA, runExcludeWatchLists ,FALSE,ofc_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
-									bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, DataRestriction, CustomDataFilter, 
-									IncludeDLverification, watchlists_request, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold,
-									CompanyID, DataPermission,
-                                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), 
+                                          ln_branded_value, ofac_only, suppressNearDups, require2ele, fromBiid, isFCRA, runExcludeWatchLists, 
+                                          FALSE,ofc_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
+                                          bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, 
+                                          ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions, 
+                                          EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold,
+                                          CompanyID, DataPermission, 
+                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID,
+                                          in_industryClass := industry_class_value);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 							
@@ -975,9 +981,14 @@ Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(
 InsuranceRoyalties 	:= if(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetBatchRoyaltiesByAcctno(formed_pre, acctno, insurance_dl_used, TRUE));
 
 // this section is all to include the fraud scores if the boolean is set to true
-	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value,  
-					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission,
-                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), 
+                                             ln_branded_value, true, false, false, true, bsversion, 
+                                             DataRestriction := DataRestriction, 
+                                             DataPermission := DataPermission,
+                                             LexIdSourceOptout := LexIdSourceOptout, 
+                                             TransactionID := TransactionID, 
+                                             BatchUID := BatchUID, 
+                                             GlobalCompanyID := GlobalCompanyID);
 
 	ip_prep := join(fs, ret, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq, self.did := right.did) );
 	ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose, applyOptOut := TRUE);
@@ -1425,6 +1436,5 @@ dIPIn := PROJECT(fs,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEF
 dRoyaltiesByAcctno 	:= IF(trackNetacuityRoyalties, Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, formed, TRUE));
 dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno + InsuranceRoyalties, ReturnDetailedRoyalties);
 output(dRoyalties,NAMED('RoyaltySet'));
-
 
 endmacro;

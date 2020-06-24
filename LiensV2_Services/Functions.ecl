@@ -203,81 +203,85 @@ EXPORT Functions := MODULE
 	END;
 	
 	//Add matchcodes
-	EXPORT fn_addMatchcodes(dataset(liensv2_services.layout_lien_rollup) in_rec,
-													dataset(LiensV2_Services.Batch_Layouts.batch_in) batch_in,
-													LiensV2_Services.IParam.batch_params configData) := function
+  EXPORT fn_addMatchcodes(dataset(liensv2_services.layout_lien_rollup) in_rec,
+                          dataset(LiensV2_Services.Batch_Layouts.batch_in) batch_in,
+                          LiensV2_Services.IParam.batch_params configData) := function
 
-		LiensV2_Services.Batch_Layouts.int_layout_match_bool add_matchcodeValues(in_rec L,
-																																						 batch_in R)  := TRANSFORM
-			// fn_match* are called in order to match anything deeper in possible child datasets.
-			tmp_match_nameD  := if ('D' in configData.party_types, fn_match_name(L.debtors,  R), true);
-			tmp_match_nameC  := if ('C' in configData.party_types, fn_match_name(L.creditors,  R), true);
-			tmp_match_nameA  := if ('A' in configData.party_types, fn_match_name(L.attorneys,  R), true);
-			tmp_match_name := tmp_match_nameD OR tmp_match_nameC OR tmp_match_nameA;
-			SELF.match_name := tmp_match_name;
-			
-			tmp_match_street_addressD  := if ('D' in configData.party_types, fn_match_streetaddress(L.debtors,  R), true);
-			tmp_match_street_addressC  := if ('C' in configData.party_types, fn_match_streetaddress(L.creditors,  R), true);
-			tmp_match_street_addressA  := if ('A' in configData.party_types, fn_match_streetaddress(L.attorneys,  R), true);		                         
-			tmp_match_street_address := tmp_match_street_addressD OR tmp_match_street_addressC OR tmp_match_street_addressA;		
-			SELF.match_street_address := tmp_match_street_address;																						
-						
-			tmp_match_cityD  := if ('D' in configData.party_types, fn_match_city(L.debtors,  R), true);
-			tmp_match_cityC  := if ('C' in configData.party_types, fn_match_city(L.creditors,  R), true);
-			tmp_match_cityA  := if ('A' in configData.party_types, fn_match_city(L.attorneys,  R), true);		                         
-			tmp_match_city := tmp_match_cityD OR tmp_match_cityC OR tmp_match_cityA;																					
-			SELF.match_city  := tmp_match_city;
-			
-			tmp_match_stateD  := if ('D' in configData.party_types, fn_match_state(L.debtors,  R), true);
-			tmp_match_stateC  := if ('C' in configData.party_types, fn_match_state(L.creditors,  R), true);
-			tmp_match_stateA  := if ('A' in configData.party_types, fn_match_state(L.attorneys,  R), true);		                         
-			tmp_match_state := tmp_match_stateD OR tmp_match_stateC OR tmp_match_stateA;							  				
-			SELF.match_state := tmp_match_state;
-			
-			tmp_match_zipD  := if ('D' in configData.party_types, fn_match_zip(L.debtors,  R), true);
-			tmp_match_zipC  := if ('C' in configData.party_types, fn_match_zip(L.creditors,  R), true);
-			tmp_match_zipA  := if ('A' in configData.party_types, fn_match_zip(L.attorneys,  R), true);		                         
-			tmp_match_zip := tmp_match_zipD OR tmp_match_zipC OR tmp_match_zipA;									
-			SELF.match_zip   := tmp_match_zip;				
-			
-			tmp_match_ssnD  := if ('D' in configData.party_types, fn_match_ssn(L.debtors,  R), true);
-			tmp_match_ssnC  := if ('C' in configData.party_types, fn_match_ssn(L.creditors,  R), true);
-			tmp_match_ssnA  := if ('A' in configData.party_types, fn_match_ssn(L.attorneys,  R), true);		                         
-			tmp_match_ssn := tmp_match_ssnD OR tmp_match_ssnC OR tmp_match_ssnA;									
-			SELF.match_ssn   := tmp_match_ssn;	
-			
-			//adding DID match
-			// tmp_match_didD  := if ('D' in configData.party_types, fn_match_did(L.debtors,  R), true);
-			// tmp_match_didC  := if ('C' in configData.party_types, fn_match_did(L.creditors,  R), true);
-			// tmp_match_didA  := if ('A' in configData.party_types, fn_match_did(L.attorneys,  R), true);		                         
-			// tmp_match_did := tmp_match_didD OR tmp_match_didC OR tmp_match_didA;									
-			// SELF.match_did   := tmp_match_did;
-			
-			SELF.match_dob   := true; // set here cause no DOB data in J & L output.				
-																		 
-			SELF.acctno      := L.acctno; // sets acctno
-			nameV   := ((~(configData.MatchName)) OR (tmp_match_name));
-			streetV := ((~(configData.MatchStrAddr)) OR (tmp_match_street_address));
-			cityV  :=  ((~(configData.MatchCity)) OR (tmp_match_city));
-			stateV :=  ((~(configData.MatchState)) OR (tmp_match_state));
-			zipV   :=  ((~(configData.MatchZip)) OR (tmp_match_zip));
-			ssnV   :=  ((~(configData.MatchSSN)) OR (tmp_match_ssn));		    
-			
-			SELF.matches :=  nameV AND streetV AND cityV AND StateV AND zipV AND ssnV;							
-			SELF.matchcodes := BatchServices.Functions.match_code_result(tmp_match_name, tmp_match_street_address,
-																																	 tmp_match_city, tmp_match_state,tmp_match_zip,
-																																	 // tmp_match_ssn, FALSE,tmp_match_did);
-																																	 tmp_match_ssn, FALSE,false);
-			SELF  := L;						
-			
-			SELF := [];							
-		END;
+    match_debtor := 'D' in configData.party_types;
+    match_creditor := 'C' in configData.party_types;
+    match_attorney := 'A' in configData.party_types;
 
-		out_rec := join(in_rec, batch_in, 
-										LEFT.acctno = RIGHT.acctno,													
-										add_matchcodeValues(LEFT, RIGHT));
-		RETURN out_rec;
-	END;		
+    LiensV2_Services.Batch_Layouts.int_layout_match_bool add_matchcodeValues(in_rec L,
+                                                                             batch_in R)  := TRANSFORM
+      // fn_match* are called in order to match anything deeper in possible child datasets.
+      tmp_match_nameD  := if (match_debtor, fn_match_name(L.debtors,  R), false);
+      tmp_match_nameC  := if (match_creditor, fn_match_name(L.creditors,  R), false);
+      tmp_match_nameA  := if (match_attorney, fn_match_name(L.attorneys,  R), false);
+      tmp_match_name := tmp_match_nameD or tmp_match_nameC or tmp_match_nameA;
+      SELF.match_name := tmp_match_name;
+
+      tmp_match_street_addressD  := if (match_debtor, fn_match_streetaddress(L.debtors,  R), false);
+      tmp_match_street_addressC  := if (match_creditor, fn_match_streetaddress(L.creditors,  R), false);
+      tmp_match_street_addressA  := if (match_attorney, fn_match_streetaddress(L.attorneys,  R), false);
+      tmp_match_street_address := tmp_match_street_addressD or tmp_match_street_addressC or tmp_match_street_addressA;
+      SELF.match_street_address := tmp_match_street_address;
+
+      tmp_match_cityD  := if (match_debtor, fn_match_city(L.debtors,  R), false);
+      tmp_match_cityC  := if (match_creditor, fn_match_city(L.creditors,  R), false);
+      tmp_match_cityA  := if (match_attorney, fn_match_city(L.attorneys,  R), false);
+      tmp_match_city := tmp_match_cityD or tmp_match_cityC or tmp_match_cityA;
+      SELF.match_city  := tmp_match_city;
+
+      tmp_match_stateD  := if (match_debtor, fn_match_state(L.debtors,  R), false);
+      tmp_match_stateC  := if (match_creditor, fn_match_state(L.creditors,  R), false);
+      tmp_match_stateA  := if (match_attorney, fn_match_state(L.attorneys,  R), false);
+      tmp_match_state := tmp_match_stateD or tmp_match_stateC or tmp_match_stateA;
+      SELF.match_state := tmp_match_state;
+
+      tmp_match_zipD  := if (match_debtor, fn_match_zip(L.debtors,  R), false);
+      tmp_match_zipC  := if (match_creditor, fn_match_zip(L.creditors,  R), false);
+      tmp_match_zipA  := if (match_attorney, fn_match_zip(L.attorneys,  R), false);
+      tmp_match_zip := tmp_match_zipD or tmp_match_zipC or tmp_match_zipA;
+      SELF.match_zip   := tmp_match_zip;
+
+      tmp_match_ssnD  := if (match_debtor, fn_match_ssn(L.debtors,  R), false);
+      tmp_match_ssnC  := if (match_creditor, fn_match_ssn(L.creditors,  R), false);
+      tmp_match_ssnA  := if (match_attorney, fn_match_ssn(L.attorneys,  R), false);
+      tmp_match_ssn := tmp_match_ssnD or tmp_match_ssnC or tmp_match_ssnA;
+      SELF.match_ssn   := tmp_match_ssn;
+
+      //adding DID match
+      // tmp_match_didD  := if ('D' in configData.party_types, fn_match_did(L.debtors,  R), true);
+      // tmp_match_didC  := if ('C' in configData.party_types, fn_match_did(L.creditors,  R), true);
+      // tmp_match_didA  := if ('A' in configData.party_types, fn_match_did(L.attorneys,  R), true);
+      // tmp_match_did := tmp_match_didD OR tmp_match_didC OR tmp_match_didA;
+      // SELF.match_did   := tmp_match_did;
+
+      SELF.match_dob   := true; // set here cause no DOB data in J & L output.
+
+      SELF.acctno      := L.acctno; // sets acctno
+      nameV   := ((~(configData.MatchName)) OR (tmp_match_name));
+      streetV := ((~(configData.MatchStrAddr)) OR (tmp_match_street_address));
+      cityV  :=  ((~(configData.MatchCity)) OR (tmp_match_city));
+      stateV :=  ((~(configData.MatchState)) OR (tmp_match_state));
+      zipV   :=  ((~(configData.MatchZip)) OR (tmp_match_zip));
+      ssnV   :=  ((~(configData.MatchSSN)) OR (tmp_match_ssn));
+
+      SELF.matches :=  nameV AND streetV AND cityV AND StateV AND zipV AND ssnV;
+      SELF.matchcodes := BatchServices.Functions.match_code_result(tmp_match_name, tmp_match_street_address,
+                                                                   tmp_match_city, tmp_match_state,tmp_match_zip,
+                                                                   // tmp_match_ssn, FALSE,tmp_match_did);
+                                                                   tmp_match_ssn, FALSE,false);
+      SELF  := L;
+
+      SELF := [];
+    END;
+
+    out_rec := join(in_rec, batch_in,
+                    LEFT.acctno = RIGHT.acctno,
+                    add_matchcodeValues(LEFT, RIGHT));
+    RETURN out_rec;
+  END;	
 	
 	EXPORT fn_applyBatchFcraOverrides(dataset(LiensV2_Services.layout_lien_rollup) raw_rec,
 																		dataset(LiensV2_Services.Batch_Layouts.layout_batchids) batch_in,

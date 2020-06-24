@@ -1,13 +1,13 @@
-EXPORT RoyaltyMLA := module
+﻿EXPORT RoyaltyMLA := module
 
-	IMPORT Models;
-	
-			model_info := Models.LIB_RiskView_Models().ValidV50Models;
-			Custom_info := model_info(Model_Name = 'MLA1608_0')[1];
-		
+	IMPORT Models, Royalty;
+
 	EXPORT GetOnlineRoyalties(search_results_temp) := 
 		FUNCTIONMACRO	
 			
+      model_info := Models.LIB_RiskView_Models().ValidV50Models;
+      Custom_info := model_info(Model_Name = 'MLA1608_0')[1];
+      
 			dTGRoyalOut := 
 				DATASET([{
 									Royalty.Constants.RoyaltyCode.MLAALERT,

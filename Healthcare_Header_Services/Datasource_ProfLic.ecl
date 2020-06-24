@@ -52,7 +52,12 @@ EXPORT Datasource_ProfLic := Module
 			baseInput_rolled := rollup(baseInput_grouped, group, Healthcare_Header_Services.Transforms.doProfLicBaseRecordSrcIdRollup(left,rows(left)));	
 			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
 			supmacprof:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualbyVendorid+rawdataBusbyVendorid, mod_access); 
-			setOptOutproflic := project(supmacprof, transform(healthcare_header_services.Layouts.proflic_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];));    
+			setOptOutproflic := project(supmacprof, transform(healthcare_header_services.Layouts.proflic_base_with_input,
+																																	self.hasOptOut:= left.is_suppressed;
+																																	self.acctno:=left.acctno;
+																																	self.lnpid:=left.lnpid;
+																																	self:=if(not left.is_suppressed,left);
+																																	self:=[];));   
 			baseRecs := project(sort(setOptOutproflic,-rawData.expiration_date,rawData.prolic_seq_id),Healthcare_Header_Services.Transforms.build_ProfLic_base(left));
 			proflic_providers_final_sorted := sort(baseRecs, acctno, LNPID);
 			proflic_providers_final_grouped := group(proflic_providers_final_sorted, acctno, LNPID);
