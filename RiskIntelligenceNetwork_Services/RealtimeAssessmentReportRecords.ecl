@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudGovPlatform, FraudShared_Services, iesp, RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services;
+﻿IMPORT Address, DidVille, FraudGovPlatform, FraudShared_Services, iesp, RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services, ut;
 
 EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                                        RiskIntelligenceNetwork_Services.IParam.Params report_params) := FUNCTION
@@ -10,7 +10,7 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  ds_best_in := PROJECT(ds_in,
                 TRANSFORM(didville.Layout_Did_OutBatch,
                   SELF.seq := (unsigned)LEFT.acctno,
-                  SELF := LEFT,
+                  SELF.did := LEFT.did,
                   SELF := []));
 
  ds_pr_best := RiskIntelligenceNetwork_Services.Functions.getGovernmentBest(ds_best_in, report_params);
@@ -72,7 +72,8 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
                                                                LEFT.best_mname,
                                                                LEFT.best_lname,
                                                                LEFT.best_name_suffix,
-                                                               LEFT.best_title),
+                                                               LEFT.best_title,
+                                                               ut.fn_FormatFullName(LEFT.best_lname, LEFT.best_fname, LEFT.best_mname)),
                             SELF.SSN := (string) LEFT.best_ssn,
                             SELF.SSNKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.SSN_FRAGMENT)[1],
                                                    TRANSFORM(iesp.identityreport.t_RINProfileElementKnownRisk,
@@ -82,20 +83,22 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
                             SELF.DOB := iesp.ECL2ESP.ApplyDateMask(dob_, report_params.dob_mask),
                             SELF.DOD := iesp.ECL2ESP.ApplyDateMask(dod_, report_params.dob_mask),
                             SELF.IsDeceased := LEFT.best_dod <> '';
-                            SELF.Address := iesp.ECL2ESP.SetAddress('',
-                                                                    '',
-                                                                    '',
-                                                                    '',
-                                                                    '',
-                                                                    '',
-                                                                    '',
-                                                                    LEFT.best_city,
-                                                                    LEFT.best_state,
-                                                                    LEFT.best_zip,
-                                                                    LEFT.best_zip4,
-                                                                    '',
-                                                                    '',
-                                                                    LEFT.best_addr1),
+                            st_addr2 := Address.Addr2FromComponents(LEFT.best_city, LEFT.best_state, LEFT.best_zip);
+                            SELF.Address := iesp.ECL2ESP.SetAddress(primname := '',
+                                                                    primrange := '',
+                                                                    predir := '',
+                                                                    postdir := '',
+                                                                    suffix := '',
+                                                                    unitdesig := '',
+                                                                    secrange := '',
+                                                                    cityname := LEFT.best_city,
+                                                                    st := LEFT.best_state,
+                                                                    zip := LEFT.best_zip,
+                                                                    zip4 := LEFT.best_zip4,
+                                                                    countyname := '',
+                                                                    postalcode := '',
+                                                                    addr1 := LEFT.best_addr1,
+                                                                    addr2 := st_addr2),
                             SELF.AddressKnownRisk := PROJECT(ds_entity_w_risk(fragment = _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT)[1],
                                                        TRANSFORM(iesp.identityreport.t_RINProfileElementKnownRisk,
                                                         SELF.AnalyticsRecordId := LEFT.entity_context_uid,
@@ -126,7 +129,7 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
                                                   _Constants.EntityType.BANKACCOUNT => _Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
                                                   _Constants.EntityType.DLNUMBER => _Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
                                                   ''),                                                  
-                         SELF.KnownRiskCode := LEFT.value,
+                         SELF.KnownRiskCode := LEFT.indicatortype,
                          SELF.KnownRiskDescription := LEFT.label,
                          SELF.RiskLevel := (string) LEFT.risklevel,
                          SELF.NVPs := []));
