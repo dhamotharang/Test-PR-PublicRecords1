@@ -99,7 +99,7 @@ EntityStats := WeightedResult(RiskLevel in [0,1,2,3] AND Value != '0') : INDEPEN
 SuperSpecialEntityStatsForFilter := JOIN(EntityStats, EntityEventPivot, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND
 						  LEFT.entitycontextuid=RIGHT.entitycontextuid AND LEFT.recordid=RIGHT.recordid, 
 						  TRANSFORM({RECORDOF(LEFT), 
-							RIGHT.aotkractflagev, RIGHT.aotsafeactflagev,RIGHT.aotcurrprofflag,
+							RIGHT.aotkractflagev, RIGHT.aotsafeactflagev,RIGHT.aotcurrprofflag,RIGHT.iscurrent,
 							RIGHT.t_actdtecho,RIGHT.t18_ipaddrlocmiamiflag,RIGHT.t18_ipaddrlocnonusflag,RIGHT.t18_ipaddrhostedflag,RIGHT.t18_ipaddrvpnflag,RIGHT.t18_ipaddrtornodeflag,RIGHT.t19_bnkaccthrprepdrtgflag,RIGHT.t17_emaildomaindispflag,    
 							RIGHT.p1_aotidkrstolidactflagev, RIGHT.p1_aotidkrgenfrdactflagev,RIGHT.p1_aotidkrappfrdactflagev,RIGHT.p1_aotidkrothfrdactflagev,RIGHT.p9_aotaddrkractflagev,RIGHT.p15_aotssnkractflagev,RIGHT.p16_aotphnkractflagev,RIGHT.p17_aotemailkractflagev,RIGHT.p18_aotipaddrkractflagev,RIGHT.p19_aotbnkacctkractflagev,RIGHT.p20_aotdlkractflagev,
 							RIGHT.not_aotkractflagev,RIGHT.not_aotsafeactflagev,
