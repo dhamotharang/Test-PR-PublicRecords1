@@ -171,7 +171,7 @@ EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt,
 
 
 //need to turn this into 
-EntityEventAssessment := TABLE(RulesFlagsMatched, 
+EXPORT EntityEventAssessment := TABLE(RulesFlagsMatched, 
                     {industrytype,customerid,entitycontextuid,
                     entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
                     industrytype,customerid,entitycontextuid, entitytype, MERGE);
@@ -204,7 +204,7 @@ EntityAssessmentPrep := SORT(PROJECT(EntityEventAssessment,
                           SELF.P9_AddrRiskIndx := MAP(LEFT.EntityType = 9 => LEFT.RiskLevel, 0),
                           SELF := LEFT, SELF := [])),industrytype,customerid,entitycontextuid, LOCAL);
 
-EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
+EXPORT EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 											 industrytype, customerid, entitycontextuid, 
 											 INTEGER1 P1_IDRiskIndx := MAX(GROUP, P1_IDRiskIndx),
 											 INTEGER1 P15_SSNRiskIndx:= MAX(GROUP, P15_SSNRiskIndx),
@@ -232,7 +232,7 @@ EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 END RULES ASSESSMENT
 */
 
-SHARED InputWithRules := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
+EXPORT InputWithRules := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
 //output(d1(entitycontextuid = '_1194033204'), all, named('d1_1_1'));
 
 //Clean out from Modeling for UI
