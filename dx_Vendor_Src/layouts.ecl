@@ -1,8 +1,7 @@
 ﻿EXPORT Layouts := MODULE
 		
 	EXPORT Key_layout	:= RECORD
-  string75 source_code
-  =>
+  string75 source_code;
   string item_source;
   string display_name;
   string description;
