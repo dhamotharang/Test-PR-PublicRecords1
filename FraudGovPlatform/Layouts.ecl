@@ -3227,6 +3227,7 @@ RECORD
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
   integer1 aotcurrprofflag;
+  unsigned8 iscurrent;
   unsigned4 t_actdtecho;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
@@ -3311,6 +3312,7 @@ RECORD
   integer8 t1l_iddeceasedflag;
   unsigned8 aotidactcntev;
   unsigned4 deceaseddate;
+  integer8 t1_minoridflag;
  END;
 
 
