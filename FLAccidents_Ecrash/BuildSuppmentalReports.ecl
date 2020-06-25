@@ -240,7 +240,7 @@ export TMafterTF := dedup(join( IyetekMeta(is_available_for_public ='1' and STD.
 t_sort := sort(jdropMetadata,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id,-creation_date,-Sent_to_HPCC_DateTime,incident_id,last_name , first_name, middle_name, address,city,state,zip_code,
                Drivers_License_Number,License_Plate,vin,Make,Model_Yr,Model,hash_key,loss_street,loss_cross_street);
 
-t_sort t(t_sort L, t_sort R) := TRANSFORM
+t_sort t(t_sort L, t_sort R) := transform
 
   self.last_name                := l.last_name  + r.last_name  ; 
   self.first_name               := l.first_name + r.first_name ; 
@@ -256,43 +256,34 @@ t_sort t(t_sort L, t_sort R) := TRANSFORM
   self.Model_Yr                 := l.Model_Yr + r.Model_Yr; 
   self.Model                    := l.Model + r.Model; 
   self                          := l;
-END;
+end;
 
-shared troll  := ROLLUP(t_sort, LEFT.incident_id= RIGHT.incident_id,t(LEFT, RIGHT));
+shared troll := rollup(t_sort, LEFT.incident_id= RIGHT.incident_id,t(left, right));
 
+grp_coplogic := group(sort(troll(trim(vendor_code, left,right) = 'COPLOGIC'),
+                           case_identifier,agency_id,loss_state_abbr,crash_date,Supplemental_report
+													 ),
+                      case_identifier,agency_id,loss_state_abbr,crash_date
+											);
 
-	grp_coplogic    := group(sort(troll(trim(vendor_code, left,right) = 'COPLOGIC'),case_identifier,agency_id,loss_state_abbr,crash_date,Supplemental_report),case_identifier,agency_id,loss_state_abbr,crash_date);
-
-grp_coplogic coplogic(grp_coplogic l, grp_coplogic r) := transform	
-															
-			is_supplemental             := if((trim(l.agency_id,left,right)           =  trim(r.agency_id ,left,right)       and
-                                      trim(l.loss_state_abbr,left,right)       				=  trim(r.loss_state_abbr ,left,right) and
-                                      trim(l.case_identifier,left,right)       		=  trim(r.case_identifier ,left,right) and
-                                      trim(l.crash_date,left,right)                = trim(r.crash_date ,left,right)and
-																			trim(r.Supplemental_Report, left, right) = 	'1'  )  , 'Y', 'N');  
-										
-
-/* if(is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' ,'U')
-   if (is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' ,'D')
-   if (is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0' ,'')
-*/
-	self.U_D_flag								:= map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'' , 'D');
-  //self.U_D_flag                :=if(is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' ,'U' ,''); //if ( l.incident_id = '' , '', if(is_supplemental ='Y' ,'U' , 'N')); 
-  self.changed_hashkey         :=  map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'', 'D' );
-	self.changed_data_lev1       :=  map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
-																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'' , 'D' );
-  self                         := r;
+grp_coplogic coplogic(grp_coplogic l, grp_coplogic r) := transform
+																			
+	Suppmental_flag := map(l.incident_id = '' => '',
+                         trim(r.Supplemental_Report, left, right) = '1' => 'U',
+												 trim(r.Supplemental_Report, left, right) in ['0',''] => 'D', 
+											  'D');																			
+	self.U_D_flag := Suppmental_flag;															
+  self.changed_hashkey := Suppmental_flag;
+	self.changed_data_lev1 := Suppmental_flag;
+  self := r;
 end;
 shared ds_coplogic := iterate(grp_coplogic,coplogic(left,right));
 
-
-
-grp    := group(sort(troll(trim(vendor_code, left,right) <> 'COPLOGIC'),case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id),case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id);
+grp := group(sort(troll(trim(vendor_code, left,right) <> 'COPLOGIC'),
+                  case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id
+								 ),
+						case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id
+					  );
 
 // set a flag if Dupe or update 
 grp aflag(grp l, grp r) := transform	
@@ -318,8 +309,6 @@ grp aflag(grp l, grp r) := transform
 	self.changed_data_lev1       := tchanged_data_lev1;
   self                         := r;
 end;
-
-
 ds_other := iterate(grp,aflag(left,right));
 //compare_add := ds_coplogic + ds_other;
 	
