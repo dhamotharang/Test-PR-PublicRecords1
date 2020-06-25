@@ -215,6 +215,7 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																Rules_Generation('Business','Business Best - Best Sources')+
 																Rules_Generation('Business','Business Best - Best Characteristics')+
 																Rules_Generation('Business','Business Associate')+
-																Rules_Generation('Business','Business Source Verification')+
+																// there were some issues in Business Source Verification category conf page
+																// Rules_Generation('Business','Business Source Verification')+ 
 																Rules_Generation('Person','Education')+
 																Rules_Generation('Suit','Derogs - Lien and Judgment History');
