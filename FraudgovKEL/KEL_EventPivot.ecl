@@ -107,13 +107,13 @@ SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entityt
 SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStats, 'industrytype,customerid,entitycontextuid,recordid', 
 'eventdate,' +
 // Need the list of the rules attributes here to limit the pivot to only attributes used in rules.
-'deceased,currentlyincarceratedflag,addressisvacant,addressiscmra,addressispobox,invalidaddress,addressoutofstate,' +
-'t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,p1_aotidkrgenfrdactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev'
-/*
-FraudgovKEL.KEL_EventShell.OriginalAttr + ',' +
-FraudgovKEL.KEL_EventShell.StructuralAttr + ',' +
-FraudgovKEL.KEL_EventShell.NicoleAttr
-*/
+'t1_adultidnotseenflag,t1_minorwlexidflag,t1l_iddeceasedflag,t1l_iddtofdeathaftidactflagev,t1l_idcurrincarcflag,t1_ssnpriordobflag,t1_firstnmnotverflag,t1_lastnmnotverflag,t1_addrnotverflag,' +
+'t1l_ssnnotverflag,t1l_ssnwaltnaverflag,t1l_ssnwaddrnotverflag,t1_phnnotverflag,t1l_dobnotverflag,t1_hiriskcviflag,t1_medriskcviflag,t1l_hdrsrccatcntlwflag,t1_stolidflag,t1_synthidflag,' +
+'t1_manipidflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t15_ssnisinvalidflag,t20_dlisinvalidflag,t16_phnisinvalidflag,t16_phnprepdflag,' +
+'t18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t17_emaildomaindispflag,t19_bnkaccthrprepdrtgflag,t9_addrpoboxmultcurridflagev,t15_ssnmultcurridflagev,t20_dlmultcurridflagev,' +
+'t19_bnkacctmultcurridflagev,p1_aotidkrappfrdactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrothfrdactflagev,p1_aotidkrstolidactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev,p16_aotphnkractflagev,p17_aotemailkractflagev,p18_aotipaddrkractflagev,' +
+'p19_aotbnkacctkractflagev,p20_aotdlkractflagev,p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag'
+
 );
 
 RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customerid), 
@@ -256,6 +256,7 @@ SHARED OutRec := RECORD
   UNSIGNED aothiidcurrprofusngcntev;
   UNSIGNED aotidusngcntev;
   UNSIGNED aotidactcntev;
+  UNSIGNED aotidcurrprofusngcntev;
   UNSIGNED1 not_aotkractflagev;
   UNSIGNED1 not_aotsafeactflagev;
   STRING CustomerProgramDescription;
@@ -287,8 +288,8 @@ OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
                               L.P18_IPAddrRiskIndx,
                               L.P19_BnkAcctRiskIndx,
                               L.P20_DLRiskIndx);
-                                                                                                                                                              
-  SELF.AotCurrProfFlag := CHOOSE(C, 
+
+    SELF.AotCurrProfFlag := CHOOSE(C, 
                               L.P1_AotIdCurrProfFlag,
                               L.P9_AotAddrCurrProfFlag,
                               L.P15_AotSsnCurrProfFlag,
@@ -297,7 +298,17 @@ OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
                               L.P18_AotIpAddrCurrProfFlag,
                               L.P19_AotBnkAcctCurrProfFlag,
                               L.P20_AotDlCurrProfFlag);
-                                                                      
+							  
+    SELF.aotidcurrprofusngcntev := CHOOSE(C, 
+                              1,
+                              L.p9_aotidcurrprofusngaddrcntev,
+                              L.p15_aotidcurrprofusngssncntev,
+                              L.p16_aotidcurrprofusngphncntev,
+                              L.p17_aotidcurrprofusngemlcntev,
+                              L.p18_aotidcurrprofusngipcntev,
+                              L.p19_aotidcurrprofusngbkaccntev,
+                              L.p20_aotidcurrprofusngdlcntev);
+
     aotkractflagev := CHOOSE(C, 
                               L.p1_aotidkractflagev,
                               L.p9_aotaddrkractflagev,
@@ -306,7 +317,7 @@ OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
                               L.p17_aotemailkractflagev,
                               L.p18_aotipaddrkractflagev,
                               L.p19_aotbnkacctkractflagev,
-                              L.p20_aotdlkractflagev);    
+                              L.p20_aotdlkractflagev);
     SELF.aotkractflagev := aotkractflagev;
     aotsafeactflagev := CHOOSE(C, 
                               0/*L.p1_aotidkractflagev*/,
@@ -316,12 +327,12 @@ OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
                               0/*L.p17_aotemailkractflagev*/,
                               L.p18_aotipaddrsafeactflagev,
                               0/*L.p19_aotbnkacctkractflagev*/,
-                              0/*L.p20_aotdlkractflagev*/);    
+                              0/*L.p20_aotdlkractflagev*/);   							  
     SELF.aotsafeactflagev := aotsafeactflagev;                          
     SELF.not_aotkractflagev := (INTEGER)(aotkractflagev = 0);
     SELF.not_aotsafeactflagev := (INTEGER)(aotsafeactflagev = 0);
-  
-SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
+
+    SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
                               L.p9_aotaddrkractnewdtev,
                               L.p15_aotssnkractnewdtev,
                               L.p16_aotphnkractnewdtev,
@@ -329,8 +340,8 @@ SELF.aotkractnewdtev := CHOOSE(C, L.p1_aotidkractnewdtev,
                               L.p18_aotipaddrkractnewdtev,
                               L.p19_aotbnkacctkractnewdtev,
                               L.p20_aotdlkractnewdtev);
-                              
-SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
+
+    SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
                               l.p9_aotaddrkractcntev,
                               l.p15_aotssnkractcntev,
                               l.p16_aotphnkractcntev,
@@ -338,8 +349,8 @@ SELF.aotkractcntev := CHOOSE(C, L.P1_aotidkractcntev,
                               l.p18_aotipaddrkractcntev,
                               l.p19_aotbnkacctkractcntev,
                               l.p20_aotdlkractcntev);
-                              
-SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
+
+    SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
                               l.p9_AotNonStActCntEv,
                               l.p15_AotNonStActCntEv,
                               l.p16_AotNonStActCntEv,
@@ -348,7 +359,7 @@ SELF.aotnonstactcntev := CHOOSE(C, L.P1_AotNonStActCntEv,
                               l.p19_AotNonStActCntEv,
                               l.p20_AotNonStActCntEv);
         
-SELF.aotnewkraftidactcntev := CHOOSE(C, L.P1_aotidnewkraftidactcntev,
+    SELF.aotnewkraftidactcntev := CHOOSE(C, L.P1_aotidnewkraftidactcntev,
                               l.p9_aotaddrnewkraftidactcntev,
                               l.p15_aotssnnewkraftidactcntev,
                               l.p16_aotphnnewkraftidactcntev,
@@ -356,9 +367,8 @@ SELF.aotnewkraftidactcntev := CHOOSE(C, L.P1_aotidnewkraftidactcntev,
                               l.p18_aotipnewkraftidactcntev,
                               l.p19_aotbkacnewkraftidactcntev,
                               l.p20_aotdlnewkraftidactcntev);
-                              
-                              
-SELF.aotidactcnt30d := CHOOSE(C, L.P1_aotidactcnt30d,
+
+    SELF.aotidactcnt30d := CHOOSE(C, L.P1_aotidactcnt30d,
                               l.p9_aotidactcnt30d,
                               l.p15_aotidactcnt30d,
                               l.p16_aotidactcnt30d,
@@ -367,7 +377,7 @@ SELF.aotidactcnt30d := CHOOSE(C, L.P1_aotidactcnt30d,
                               l.p19_aotidactcnt30d,
                               l.p20_aotidactcnt30d);                                                                    
 
-SELF.aotnonstactcnt30d := CHOOSE(C, L.P1_aotnonstactcnt30d,
+    SELF.aotnonstactcnt30d := CHOOSE(C, L.P1_aotnonstactcnt30d,
                               l.p9_aotnonstactcnt30d,
                               l.p15_aotnonstactcnt30d,
                               l.p16_aotnonstactcnt30d,
@@ -375,7 +385,7 @@ SELF.aotnonstactcnt30d := CHOOSE(C, L.P1_aotnonstactcnt30d,
                               l.p18_aotnonstactcnt30d,
                               l.p19_aotnonstactcnt30d,
                               l.p20_aotnonstactcnt30d);        
-SELF.aotnewkraftnonstactcntev    := CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
+    SELF.aotnewkraftnonstactcntev    := CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
                               l.p9_aotaddrnewkraftnonstactcntev,
                               l.p15_aotssnnewkraftnonstactcntev,
                               l.p16_aotphnnewkraftnonstactcntev,
@@ -383,19 +393,19 @@ SELF.aotnewkraftnonstactcntev    := CHOOSE(C, L.p1_aotidnewkraftnonstactcntev,
                               l.p18_aotipnewkraftnonstactcntev,
                               l.p19_aotbkacnewkraftnonstactcntev,
                               l.p20_aotdlnewkraftnonstactcntev);    
+                              
+    SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count     
 
-SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count     
-                             
-SELF.aotidusngcntev := CHOOSE(C, 1,
-                                      l.p9_aotidusngaddrcntev,
+    SELF.aotidusngcntev := CHOOSE(C, 1,
+                              l.p9_aotidusngaddrcntev,
                               l.p15_aotidusngssncntev,
                               l.p16_aotidusngphncntev,
                               l.p17_aotidusngemailcntev,
                               l.p18_aotidusngipaddrcntev,
-                              l.p19_aotidusingbnkacctcntev,
+                              l.p19_aotidusngbnkacctcntev,
                               l.p20_aotidusngdlcntev);    
 
-SELF.aotidactcntev := CHOOSE(C, L.p1_aotidactcntev,
+    SELF.aotidactcntev := CHOOSE(C, L.p1_aotidactcntev,
                               l.p9_aotidactcntev,
                               l.p15_aotidactcntev,
                               l.p16_aotidactcntev,
