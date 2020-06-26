@@ -45,12 +45,17 @@ joinVoters_OptOut := join(distVoters, dedupOptOut,
 													 left.dob        = right.dob and
 													 left.last_name  = right.last_name and
 													 left.first_name = right.first_name and
-													 (left.res_state  = right.state or left.mail_state = right.state),
+													 (left.res_state = right.state or left.mail_state = right.state),
 														transform(joinLayout,
 																			 self.optout_flag := if( left.dob        = right.dob and
-																															 left.last_name  = right.last_name and
-																															 left.first_name = right.first_name and
-																															 (left.res_state  = right.state or left.mail_state = right.state), 'O', '');	
+																															 left.last_name  = right.last_name and 
+																															 left.first_name = right.first_name and 
+																															 (left.res_state = right.state or left.mail_state = right.state) and 
+																															 left.dob        <> '' and right.dob        <> ''  and 
+																															 left.last_name  <> '' and right.last_name  <> ''  and 
+																															 left.first_name <> '' and right.first_name <> ''  and 
+																															 (left.res_state <> '' or left.mail_state   <> '') and right.state <> ''
+																															 ,'O' ,'');	
 																			 self 				  := left;
 																			 self  				  := [];),
 															 left outer, lookup, local);
