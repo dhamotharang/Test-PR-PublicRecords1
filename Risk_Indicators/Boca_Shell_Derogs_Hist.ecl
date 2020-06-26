@@ -236,7 +236,7 @@ liens_full_unsuppressed := JOIN (liens_added, klr_nonFCRA,
 										LEFT OUTER, KEEP(100),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
 
-liens_full_flagged := Suppress.MAC_FlagSuppressedSource(liens_full_unsuppressed, mod_access);
+liens_full_flagged := Suppress.CheckSuppression(liens_full_unsuppressed, mod_access);
 
 liens_full := PROJECT(liens_full_flagged, TRANSFORM(layout_extended, 
 	SELF.BJL.last_liens_unreleased_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.last_liens_unreleased_date);
@@ -457,7 +457,7 @@ liens_main_unsuppressed := JOIN(liens_full, liensV2.key_liens_main_ID,
 		get_evictions(LEFT,RIGHT), left outer, 
 		ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
 	                   
-liens_main_flagged := Suppress.MAC_FlagSuppressedSource(liens_main_unsuppressed, mod_access);
+liens_main_flagged := Suppress.CheckSuppression(liens_main_unsuppressed, mod_access);
 
 liens_main := PROJECT(liens_main_flagged, TRANSFORM(layout_extended, 
     self.evictionRec  := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.evictionRec);

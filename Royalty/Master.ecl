@@ -1,4 +1,4 @@
-﻿import Codes;
+import Codes;
 
 /*
   *************************************************************************************
@@ -92,6 +92,9 @@ export Master := dataset(
       {'ROYALTY', 'EMAIL_II'				, '314', 'I', '!I'		, 'Email: Infutor'},       // non-royalty source
       {'ROYALTY', 'EMAIL_DX'				, '315', 'I', 'DX'		, 'Email: Infutor Dunn'}, // non-royalty source
       {'ROYALTY', 'EMAIL_RS'				, '316', 'I', 'RS'		, 'Email: RealSource'},  // non-royalty source
+      {'ROYALTY', 'EMAIL_W'	 			  , '317', 'I', 'W '		, 'Email: Domain Registrations (WHOIS)'},  // non-royalty source
+      {'ROYALTY', 'EMAIL_9I'	 			, '318', 'I', '9I'		, 'Email: DB USA, Execs at Home Business Email Data'},  // non-royalty source
+      {'ROYALTY', 'EMAIL_RQ'	 			, '319', 'I', 'RQ'		, 'Email: DB USA, Databridge Business Email Data'},  // non-royalty source
       {'ROYALTY', 'WORKPLACE'				, '320', 'I', ''			, 'Workplace'},
       {'ROYALTY', 'WORKPLACE_OC'		, '321', 'I', 'OC'		, 'Workplace: Oneclick'},
       {'ROYALTY', 'WORKPLACE_TT'		, '322', 'I', 'TT'		, 'Workplace: Teletrack'},
@@ -252,6 +255,6 @@ export Master := dataset(
       {'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},
       {'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'},
       {'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'},
-      {'ROYALTY', 'FIRST_DATA',                       '735', 'G', '' , 'First Data/Fiserv'},     
+      {'ROYALTY', 'FIRST_DATA',                       '735', 'G', '' , 'First Data/Fiserv'},
       {'ROYALTY', 'NETWISE_EMAIL',                    '750', 'G', '' , 'NetWise Data Social Media Email gateway'}    ]
     , MasterLayout);

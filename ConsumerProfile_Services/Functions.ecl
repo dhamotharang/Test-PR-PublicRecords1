@@ -138,7 +138,8 @@ EXPORT Functions := MODULE
 		string addr_verif_desc := ConsumerProfile_Services.Constants.ADDRESS_VERIFICATION.DESCRIPTION(clam.iid.nas_summary);		
 		
 		//DOB Verification
-		unsigned1 dob_verif_code := map(clam.dobmatchlevel in ConsumerProfile_Services.Constants.DOB_VERIFICATION.NO_MATCH 		  => 0,
+		unsigned1 dob_verif_code := map(clam.dobmatchlevel in ([ConsumerProfile_Services.Constants.DOB_VERIFICATION.NO_DOB,
+                                  ConsumerProfile_Services.Constants.DOB_VERIFICATION.NO_MATCH])            => 0,
 																	  clam.dobmatchlevel in ConsumerProfile_Services.Constants.DOB_VERIFICATION.PARTIAL_MATCH => 1,
 																	  2); //clam.dobmatchlevel in ConsumerProfile_Services.Constants.DOB_VERIFICATION.MATCH
 		string dob_verif_desc := ConsumerProfile_Services.Constants.DOB_VERIFICATION.DESCRIPTION(clam.dobmatchlevel);

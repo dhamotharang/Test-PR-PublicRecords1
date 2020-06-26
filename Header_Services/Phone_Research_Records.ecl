@@ -1,12 +1,12 @@
-import  doxie, suppress, gong, risk_indicators;
+import  doxie, suppress, dx_Gong, risk_indicators;
 
 export Phone_Research_Records(Doxie.IDataAccess mod_access) := FUNCTION
 
   string3 area_code_value := '' : stored('AreaCode');
   string3 exchange_value := '' : stored('Exchange');
 
-  hist_npa_nxx_key := gong.key_history_npa_nxx_line;
-  hist_phone_key := gong.Key_History_phone;
+  hist_npa_nxx_key := dx_Gong.key_history_npa_nxx_line();
+  hist_phone_key := dx_Gong.key_history_phone();
   npa_change_key := risk_indicators.Key_AreaCode_Change_plus;
 
   main_init := dataset([{area_code_value, exchange_value}],

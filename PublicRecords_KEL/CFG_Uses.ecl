@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
+IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT CFG_Uses := MODULE, VIRTUAL
   // **** Do not override these definitions - they are used to define the interface to KEL queries ****;
   EXPORT FDCLayout := RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);
@@ -70,6 +70,6 @@ EXPORT CFG_Uses := MODULE, VIRTUAL
   EXPORT UNSIGNED8 Permit_WatchdogExperianRestricted := 0x800000000000000;
   EXPORT UNSIGNED8 Permit_WatchdogNonRestricted := 0x1000000000000000;
   EXPORT UNSIGNED8 Permit_WatchdogPreGLBA := 0x2000000000000000;
-  EXPORT UNSIGNED8 Permit_Unassigned2 := 0x4000000000000000;
-  EXPORT UNSIGNED8 Permit_Unassigned1 := 0x8000000000000000;
+  EXPORT UNSIGNED8 Permit_MarketingRelatives := 0x4000000000000000;
+  EXPORT UNSIGNED8 Permit_NonMarketingRelatives := 0x8000000000000000;
 END;

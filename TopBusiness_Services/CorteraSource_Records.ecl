@@ -1,12 +1,13 @@
 ﻿// ================================================================================
 // ===== RETURNS Cortera Source Doc records in an ESP-COMPLIANT WAY ====
 // ================================================================================
-IMPORT BIPV2, iesp, TopBusiness_Services,Cortera, MDR;
+IMPORT BIPV2, Cortera, Doxie, iesp, MDR, TopBusiness_Services;
 
 EXPORT CorteraSource_Records (
-  dataset(Layouts.rec_input_ids_wSrc) in_docids,
+  DATASET(Layouts.rec_input_ids_wSrc) in_docids,
+  Doxie.IDataAccess mod_access,
   SourceService_Layouts.OptionsLayout inoptions, 
-	boolean IsFCRA = false) 
+	BOOLEAN IsFCRA = FALSE) 
  := MODULE
  	
 	// Use the linkid payload to build source doc
@@ -23,14 +24,15 @@ EXPORT CorteraSource_Records (
 																						 SELF := []
 																						 ));
   SHARED cortera_key_combined := in_docids(IdValue <> '') + ds_corterakeys;		
-	SHARED cortera_key_combinedSlim := Dedup(SORT(cortera_key_combined, idValue),idValue);
+  SHARED cortera_key_combinedSlim := DEDUP(SORT(cortera_key_combined, idValue),idValue);
 																																													 									 
-	 SHARED cortera_payload := JOIN(cortera_key_combinedSlim,Cortera.Key_Header_Link_Id,	                                     
-																						LEFT.IDValue = (STRING) RIGHT.link_id,
-																						TRANSFORM(RIGHT),
-																						KEEP(1));
-																		// For cases in which a idvalue has multiple linkids;
+  SHARED cortera_payload_all := JOIN(cortera_key_combinedSlim,Cortera.Key_Header_Link_Id,	                                     
+                                     KEYED((INTEGER4)LEFT.IDValue = RIGHT.link_id),
+                                     TRANSFORM(RIGHT),
+                                     KEEP(1));
+                                     // For cases in which a idvalue has multiple linkids;
 	
+  Cortera.MAC_Append_Contact(cortera_payload_all, SHARED cortera_payload, mod_access, /*append_contacts*/ TRUE);
 	       
    // name not cleaned into subpart so just using name last field for whole name														 
 	 iesp.topbusinessOtherSources.t_OtherContact xform_contacts(recordof(cortera_payload) L, INTEGER C) := TRANSFORM

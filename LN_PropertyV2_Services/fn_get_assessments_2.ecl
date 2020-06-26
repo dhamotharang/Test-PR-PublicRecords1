@@ -1,4 +1,4 @@
-import Codes, LN_PropertyV2;
+﻿import LN_PropertyV2_Services, LN_PropertyV2, _Control;
 
 k_codes			:= LN_PropertyV2_Services.keys_2.codes;
 
@@ -68,10 +68,8 @@ export dataset(l_rolled) fn_get_assessments_2(
 
 	ds_value := project(ds_raw, addOnlyALittleValue(left));
 	
+#IF(_Control.Environment.OnThor)  
 	ds_value_distributed := distribute(ds_value, hash64(ln_fares_id));
-	
-	// graph shows that this sort, dedup and rollup are very costly, need to simplify this a bit
-	// removing the dedup here since we rollup later anyway.  
 	// sort & dedup
 	ds_sort := 
 		DEDUP(
@@ -81,6 +79,17 @@ export dataset(l_rolled) fn_get_assessments_2(
 			),
 			ln_fares_id, search_did, sortby_date, fid_type, vendor_source_flag, assessed_total_value, local
 		);
+#ELSE	
+	// sort & dedup
+	ds_sort := 
+		DEDUP(
+			SORT(
+				ds_value, 
+				ln_fares_id, search_did, -sortby_date, fid_type, vendor_source_flag, -assessed_total_value
+			),
+			ln_fares_id, search_did, sortby_date, fid_type, vendor_source_flag, assessed_total_value
+		);
+#END
 	
 	// rollup
 	l_rolled xf_roll_assess(l_tmp L, dataset(l_tmp) R) := transform

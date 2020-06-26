@@ -170,7 +170,7 @@ EXPORT Records := Module
 	//Records with 'M' entity type
 	byOrgs (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt,cfg);
 		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
 																																							self.acctno := left.acctno; 
 																																							self:=right; self:=left;), left outer);
@@ -246,8 +246,8 @@ EXPORT Records := Module
 		missingHCP := inRecs(EntityType = Healthcare_Ganga.Constants.HCP AND (FirstName = '' or  LastName = '' or  SSN = '' or NPI = ''));
 		doHCO := inRecs(EntityType = Healthcare_Ganga.Constants.HCO AND LegalName <> '' AND StreetAddress1 <> '' AND City <> '' AND State <> '' AND Zip5 <> '' AND NPI <> '');
 		missingHCO := inRecs(EntityType = Healthcare_Ganga.Constants.HCO AND (LegalName = '' or StreetAddress1 = '' or City = '' or State = '' or Zip5 = '' or NPI = ''));
-		doOrgs := inRecs(EntityType = Healthcare_Ganga.Constants.Orgs AND LegalName <> '' AND StreetAddress1 <> '' AND City <> '' AND State <> '' AND Zip5 <> '');
-		missingOrgs := inRecs(EntityType = Healthcare_Ganga.Constants.Orgs AND (LegalName = '' or StreetAddress1 = '' or City = '' or State = '' or Zip5 = ''));
+		doOrgs := inRecs(EntityType = Healthcare_Ganga.Constants.Orgs AND LegalName <> '');
+		missingOrgs := inRecs(EntityType = Healthcare_Ganga.Constants.Orgs AND (LegalName = ''));
 		missingType := inRecs(EntityType Not in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.HCO,Healthcare_Ganga.Constants.Orgs]);
 		
 		//Process records based off type

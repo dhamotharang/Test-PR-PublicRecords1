@@ -1,6 +1,6 @@
 ﻿//Risk_Indicators.iid_common_function
 
-import emailv2_services,gateway,doxie,email_data,risk_indicators;
+import emailv2_services,gateway,doxie,email_data,risk_indicators, RiskWise;
 
 export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_did, unsigned1 dppa, unsigned1 glb, boolean isUtility=false, 
 							boolean ln_branded, boolean suppressNearDups=false, 
@@ -18,7 +18,8 @@ export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_d
 							unsigned1 LexIdSourceOptout = 1,
 							string TransactionID = '',
 							string BatchUID = '',
-							unsigned6 GlobalCompanyId = 0
+							unsigned6 GlobalCompanyId = 0,
+              string5 IndustryClass = ''
 							) :=
 FUNCTION
 
@@ -30,6 +31,8 @@ mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
 END;
 
+IsFIS  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsFISattributes) > 0;
+
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 production_realtime_mode := with_did[1].historydate=risk_indicators.iid_constants.default_history_date
 														or with_did[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate)[1..6];
@@ -37,7 +40,17 @@ production_realtime_mode := with_did[1].historydate=risk_indicators.iid_constant
 with_ADLVelocity := risk_indicators.Boca_Shell_ADL(with_DID, isFCRA, dppa, DataRestriction, mod_access);	// real time BocaShell 2 and 3 stuff
 
 // skip the realtime velocity stuff if history run and bocashell version 50 or higher
-adlRec := if(production_realtime_mode and BSversion between 2 and 49, with_ADLVelocity, with_did);	
+adlRec_temp := if(production_realtime_mode and BSversion between 2 and 49, with_ADLVelocity, with_did);	
+
+FIS_adlRec := join(with_did, with_ADLVelocity,
+                  left.seq = right.seq,
+                  Transform(risk_indicators.layout_output,
+                            self.FIS_addrs_last12 := right.FIS_addrs_last12,
+                            self.FIS_addrs_last60 := right.FIS_addrs_last60,
+                            self := left), 
+                            ATMOST(RiskWise.max_atmost), KEEP(1));
+                            
+adlRec := IF(IsFIS, group(FIS_adlRec, seq), adlRec_temp);
 
 // returns the full list of raw header records for that did																								
 with_header := risk_indicators.iid_getHeader(adlRec, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold, BSOptions,LexIdSourceOptout, 
@@ -52,6 +65,7 @@ with_hierarchy := if(bsversion >= 50, Risk_Indicators.iid_append_address_hierarc
 header_with_Military_addresses   := if(bsversion >= 50, risk_indicators.iid_GetMilitaryAddr(with_hierarchy), with_header);
 
 with_ssn_addr_velocity := risk_indicators.getVelocityHist(header_with_Military_addresses, isFCRA, dppa, DataRestriction, BSversion, mod_access);//  history BocaShell stuff
+
 with_ADL_counts := if(production_realtime_mode and BSversion between 2 and 49, 
 	header_with_Military_addresses, 
 	with_ssn_addr_velocity);  // for shell version 50 and higher, use the runtime calculation of ADL velocity counters
@@ -104,6 +118,7 @@ in_email_mod := Module(EmailV2_Services.IParams.EmailParams);
     EXPORT UNSIGNED2  PenaltThreshold      := EmailV2_Services.Constants.Defaults.PenaltThreshold;  
     EXPORT UNSIGNED  MaxResultsPerAcct    := EmailV2_Services.Constants.Defaults.MaxResultsPerAcct;  
     EXPORT BOOLEAN   IncludeHistoricData  := TRUE; 
+    EXPORT STRING5   Industry_Class       := IndustryClass;
     EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  
     EXPORT UNSIGNED1  EmailQualityRulesMask := 0;
     EXPORT BOOLEAN   RunDeepDive          := FALSE;  
@@ -153,6 +168,18 @@ output_common:= group(join_rolled_email,seq);
 // output(email_search_results,named('email_search_results'));
 // output(with_email_verification,named('with_email_verification'));
 // output(output_common,named('output_common'));
+// output(IndustryClass, named('industryClass_iidCommonFunction'));
+// output(with_ADLVelocity, named('with_ADLVelocity_iidCommonFunction'), Overwrite);
+// output(adlRec_temp, named('adlRec_temp_iidCommonFunction'), Overwrite);
+// output(adlRec, named('adlRec_iidCommonFunction'), Overwrite);
+// output(with_header, named('with_header_iidCommonFunction'), Overwrite);
+// output(with_hierarchy, named('with_hierarchy_iidCommonFunction'), Overwrite);
+// output(header_with_Military_addresses, named('header_with_Military_addresses_iidCommonFunction'), Overwrite);
+// output(with_ssn_addr_velocity, named('with_ssn_addr_velocity_iidCommonFunction'), Overwrite);
+// output(with_ADL_counts, named('with_ADL_counts_iidCommonFunction'), Overwrite);
+// output(with_addr_history, named('with_addr_history_iidCommonFunction'), Overwrite);
+// output(common, named('common_iidCommonFunction'), Overwrite);
+
 return output_common;
 
 END;

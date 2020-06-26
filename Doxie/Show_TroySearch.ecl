@@ -10,6 +10,8 @@ There are two outputs: a count of the individuals found
 */
 export Show_TroySearch(infile,zips,allow='500',suppressDMVInfo=false,bDemoMode=FALSE,pGender='M') := macro
 
+import doxie, suppress;
+
 dj := choosen(sort(dedup(sort(infile,did,-score,local),did,local),-score),(unsigned4)allow);
 
 hres_final := record
@@ -46,8 +48,11 @@ with_alldid_raw := JOIN(dj,doxie.Key_Header,left.did=right.s_did and
 	~Doxie.DataRestriction.isHeaderSourceRestricted(right.src),
 	take_right(left,right));
 
-with_alldid_filt := Header.FilterDMVInfo(with_alldid_raw);
-with_alldid0 := if(suppressDMVInfo, with_alldid_filt, with_alldid_raw);
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
+with_all_did_suppressed := Suppress.MAC_SuppressSource(with_alldid_raw, mod_access);  
+
+with_alldid_filt := Header.FilterDMVInfo(with_all_did_suppressed);
+with_alldid0 := if(suppressDMVInfo, with_alldid_filt, with_all_did_suppressed);
 
 unsigned3 get_header_first_seen(with_alldid0 L) := MAP ( l.dt_first_seen > 0 and ( l.dt_first_seen < l.dt_vendor_first_reported or l.dt_vendor_first_reported=0 )=> l.dt_first_seen,
            l.dt_vendor_first_reported > 0 => l.dt_vendor_first_reported,

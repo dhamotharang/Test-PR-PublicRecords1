@@ -1,4 +1,5 @@
-IMPORT Business_Header,doxie,iesp,doxie_raw,census_data,gong,AddrBest, Risk_Indicators, doxie_cbrs, Royalty, BIPV2;
+IMPORT Business_Header, doxie, iesp, census_data, dx_Gong, AddrBest, Risk_Indicators, Royalty, BIPV2;
+
 export Layouts := MODULE
 export in_address:=record
   string10 prim_range;
@@ -13,7 +14,7 @@ export in_address:=record
   string2 st;
   string5 zip;
   // string4 zip4:='';
-  // string60	county:='';
+  // string60 county:='';
 end;
 export slim_address:=record
   unsigned6 did;
@@ -38,7 +39,7 @@ end;
 
 EXPORT layout_Business_out :=record
   unsigned6 group_id;
-  unsigned6 bdid := 0; 
+  unsigned6 bdid := 0;
   BIPV2.IDlayouts.l_header_ids;
   unsigned4 dt_last_seen := 0;
   qstring120 company_name := '';
@@ -54,9 +55,9 @@ EXPORT layout_Business_out :=record
   string5 zip := '';
   string4 zip4 := '';
   unsigned6 phone := 0;
-  unsigned4 fein := 0;        // Federal Tax ID
+  unsigned4 fein := 0; // Federal Tax ID
   unsigned1 best_flags := 0;
-  string2 source := '';	   // source type (non-blank only if DPPA_State is non-blank)
+  string2 source := ''; // source type (non-blank only if DPPA_State is non-blank)
   string2 DPPA_State := ''; // If nonblank, indicates state code for a DPPA restricted record
 end;
 
@@ -66,7 +67,7 @@ export resident_best_layout := record
 end;
 
 export resident_layout :=record
-  boolean is_best; // to tell "best" records from header ones, when in the same dataset 
+  boolean is_best; // to tell "best" records from header ones, when in the same dataset
   unsigned6 did := 0;
   qstring10 phone := '';
   string4 timezone :='';
@@ -118,8 +119,8 @@ export residents_final_out_w_royalties := record
 end;
 
 export rel_asst_layout := record
-	doxie.layout_relative_dids;
-	doxie.layout_best;
+  doxie.layout_relative_dids;
+  doxie.layout_best;
 end;
 
 export census_layout :=record
@@ -132,10 +133,10 @@ export possible_owner_layout := record
   qstring120 company_name := '';
 end;
 
-k := gong.Key_History_Address;
- 
+k := dx_Gong.layouts.i_history_address;
+
 Export phone_out_layout := record
-  doxie.layout_AppendGongByAddr_input; 
+  doxie.layout_AppendGongByAddr_input;
   k.business_flag;
   k.name_first;
   k.name_last;
@@ -184,12 +185,12 @@ end;
 
 export iesp_addrpt_possveh_plusdid_layout := record
   iesp.addressreport.t_AddrReportPossibleVehicles;
-  unsigned6 registrant_did; 
+  unsigned6 registrant_did;
 end;
 
 export iesp_addrpt_posshf_plusdid_layout := record
   iesp.addressreport.t_AddrReportPossibleHuntingFishing;
-  unsigned6 licensee_did; 
+  unsigned6 licensee_did;
 end;
 
 END;

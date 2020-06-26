@@ -111,10 +111,11 @@ EXPORT Business_Report_Service_Raw := MACRO
 		Exclude_Sources	    := false : stored('ExcludeSources');
 		Include_Sources		  := not Exclude_Sources;
 
+  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
 
 		// =-=-=-=-=-=-=-=-=-=-=-= SourceInfo ByBDID =-=-=-=-=-=-=-=-=-=-=-=
-		base_records_source := doxie_cbrs.all_base_records_source(doxie_cbrs.ds_subject_BDIDs, ssn_mask_val) : INDEPENDENT;
+		base_records_source := doxie_cbrs.all_base_records_source(doxie_cbrs.ds_subject_BDIDs, ssn_mask_val, mod_access) : INDEPENDENT;
 		// =-=-=-=-=-=-=-=-=-=-=-= RoyaltySet =-=-=-=-=-=-=-=-=-=-=-=
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_property_records l):= transform
 			self := l;

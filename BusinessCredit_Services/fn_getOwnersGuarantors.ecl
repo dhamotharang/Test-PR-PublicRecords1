@@ -67,20 +67,54 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																														L.company_address[1].company_zip5, L.company_address[1].company_zip4, '', '', street_addr, '', csz);
 		SELF.OwnerGuarantorIndicator:=	BusinessCredit_Services.Functions.fn_OwnerGuarnIndicator(R.Guarantor_Owner_Indicator);
 		SELF.OwnershipPercent				:=	IF((integer)R.Percent_Of_Ownership_If_Owner_Principal >0, R.Percent_Of_Ownership_If_Owner_Principal, '');
-		SELF.BusinessCreditIndicator:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
-																																														L.OrgID,
-																																														L.SeleID,
-																																														mod_access,
-																																														buzCreditAccess);
+		
 		SELF := [];		
 	END;
 
 	busOwnrGuarRecs_PreFinal_temp:= JOIN(	best_rec , ds_busOwnerGuarRecs_raw ,
 																				BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																				trans_preFinalBus(LEFT, RIGHT));
+																				trans_preFinalBus(LEFT, RIGHT));                                             
+                                        
 																		
-	busOwnrGuarRecs_PreFinal := DEDUP(SORT(busOwnrGuarRecs_PreFinal_temp ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
+	busOwnrGuarRecs_PreFinalSlim := DEDUP(SORT(busOwnrGuarRecs_PreFinal_temp ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
 																	BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator);
+   
+     
+     // Sequence recs so that they can be joined 'back to' later below.
+     busOwnrGuarRecs_PreFinalWSeq :=  PROJECT(busOwnrGuarRecs_PreFinalSlim, 
+                                                                             TRANSFORM({iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor;
+                                                                                                      UNSIGNED4 SeqNum;},
+                                                                              SELF.SeqNum := COUNTER;
+                                                                              SELF := LEFT));
+       // setup DS to pass into kfetch2 function
+      BusOwnerGuarRecsBipLinkids := PROJECT(busOwnrGuarRecs_PreFinalSlim, 
+                                                                       TRANSFORM(bipv2.idlayouts.l_xlink_ids2,
+                                                                           SELF.UniqueID := COUNTER;
+                                                                           SELF.ultid := LEFT.BusinessIds.UltID;
+                                                                           SELF.orgid := LEFT.BusinessIds.OrgID;
+                                                                           SELF.seleid := LEFT.BusinessIds.SeleID;
+                                                                           SELF  := []));                                                                           
+                                                                         
+        tmpBusBipLinkids := Business_Credit.Key_LinkIds().Kfetch2(BusOwnerGuarRecsBipLinkids
+                                                                                                    ,mod_access
+                                                                                                    ,BIPV2.IDconstants.Fetch_Level_SeleID
+                                                                                                    ,
+                                                                                                    ,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase);                                                                                                                                                                             
+          tmpBusBiplinkidsSlim :=   DEDUP(SORT(tmpBusBipLinkids, uniqueID), uniqueID);
+          // Join back the results of ketch2 to bus credit header to set indicator.
+          busOwnrGuarRecs_PreFinalWSeqLarge := JOIN( busOwnrGuarRecs_PreFinalWSeq, tmpBusBiplinkidsSlim, 
+                                             LEFT.SeqNum = RIGHT.uniqueId,
+                                             TRANSFORM(iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor,                                               
+                                                SELF.BusinessCreditIndicator :=  MAP(EXISTS(busOwnerGuarRecs_Best_proj) and RIGHT.ULTID > 0  AND buzCreditAccess => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
+																			~EXISTS(busOwnerGuarRecs_Best_proj)  AND (RIGHT.ULTID > 0)  AND buzCreditAccess => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY,
+																			EXISTS(busOwnerGuarRecs_Best_proj) AND (~ (RIGHT.ULTID > 0 AND buzCreditAccess)) 	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
+																			0);                                                                                                                         
+                                                SELF := LEFT;                                              
+                                                ), LEFT OUTER);                                                                                                                                                            
+                                                  // ^^ need left outer here to keep everything specifically recs with BIP header recs only (1 ) value in businessCreditIndicator
+      busOwnrGuarRecs_PreFinal :=  DEDUP(SORT(
+                                                                   busOwnrGuarRecs_PreFinalWSeqLarge ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
+												   BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator);                             
 
 	//INDIVIDUAL:
 	OwnrGuarRecs_raw_IS_recs		:= OwnrGuarRecs_raw(Record_Type = Business_Credit.Constants().IndividualOwner AND DID > 0);
@@ -174,9 +208,27 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 										BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
 										LIMIT(BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, SKIP));
 													
-	y_trades_dedup := DEDUP(SORT(y_trades , 
-													#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), 
-										#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
+  y_trades_proj := PROJECT(y_trades, 
+    TRANSFORM({RECORDOF(y_trades), boolean disaster_impact, unsigned most_recent_status_dt, unsigned most_recent_suspend_dt}, 
+      SELF.disaster_impact := 
+        LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Impact_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Impact_Status, 
+      SELF.most_recent_status_dt := IF(
+        TRIM(LEFT.Account_Status_1) <> '' OR TRIM(LEFT.Account_Status_2) <> '', 
+        (UNSIGNED)LEFT.Cycle_End_Date, 0), 
+      SELF.most_recent_suspend_dt := IF(
+        LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Suspend_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Suspend_Status, 
+        (UNSIGNED)LEFT.Cycle_End_Date, 0), 
+      SELF := LEFT));
+
+	y_trades_dedup := ROLLUP(SORT(y_trades_proj, 
+    #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), 
+    TRANSFORM(RECORDOF(y_trades_proj), 
+      SELF.most_recent_status_dt := MAX(LEFT.most_recent_status_dt, RIGHT.most_recent_status_dt);
+      SELF.most_recent_suspend_dt := MAX(LEFT.most_recent_suspend_dt, RIGHT.most_recent_suspend_dt);
+      SELF := LEFT), 
+    #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 
 	y_trades_HistoryRecs := DEDUP(SORT(y_trades , 
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
@@ -203,35 +255,38 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		iesp.businesscreditreport.t_BusinessCreditAccountDetails AccountDetails;
 	END;
 
-	 y_AccDetail_temp trans_y_AccDetail (y_trades_dedup L) := TRANSFORM
-		PaymentStatusCategory 												:= 	BusinessCredit_Services.Functions.fn_PaymentStatusCategory(L.Payment_Status_Category);
-		
-		SELF.X_DID																		:=	L.DID;
-		SELF.AccountDetails.BusinessIds.UltID					:=  L.UltID;
-		SELF.AccountDetails.BusinessIds.OrgID					:=  L.OrgID;
-		SELF.AccountDetails.BusinessIds.SeleID				:=  L.SeleID;
-		SELF.AccountDetails.CompanyName								:=	L.Account_Holder_Business_Name;
-		SELF.AccountDetails.BusinessContributorNumber	:= 	L.Sbfe_Contributor_Number;
-		SELF.AccountDetails.BusinessAccountNumber			:= 	L.Contract_Account_Number;
-		SELF.AccountDetails.AccountTypeReportedCode		:= 	L.Account_Type_Reported;
-		SELF.AccountDetails.AccountTypeReportedDesc		:=	BusinessCredit_Services.Functions.fn_AccountTypeDescription(L.Account_Type_Reported);
-		SELF.AccountDetails.AccountStatus					 		:=	BusinessCredit_Services.Functions.fn_CurrentAccountStatus(L.Date_Account_Closed , L.Payment_Status_Category);
-		SELF.AccountDetails.AccountOpenDate						:= 	iesp.ECL2ESP.toDatestring8(L.Date_Account_Opened);
-		SELF.AccountDetails.OriginalAmount						:= 	L.Original_Credit_Limit;
-		SELF.AccountDetails.AmountOutstanding					:= 	L.Remaining_Balance;
-		SELF.AccountDetails.Overdue										:= 	IF(L.Payment_Status_Category = '000' , 'No' , PaymentStatusCategory);
-		SELF.AccountDetails.PastDueAmount							:=	L.Past_Due_Amount;
-		SELF.AccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
-																																																							L.OrgID,
-																																																							L.SeleID,
-																																																							mod_access,
-																																																							buzCreditAccess);
-		SELF.AccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(y_trades_HistoryRecsFiltered (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
-																																																		Contract_Account_Number = L.Contract_Account_Number AND
-																																																		Account_Type_Reported		= L.Account_Type_Reported) ,
-																																																		trans_y_paymenthistory(LEFT)), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY);
-		SELF := [];
-	END;
+  y_AccDetail_temp trans_y_AccDetail (y_trades_dedup L) := TRANSFORM
+    PaymentStatusCategory	:= 	BusinessCredit_Services.Functions.fn_PaymentStatusCategory(L.Payment_Status_Category);
+    IsDisasterSuspend := L.most_recent_suspend_dt > 0 AND 
+      L.most_recent_suspend_dt >= L.most_recent_status_dt AND 
+      STD.Date.DaysBetween(L.most_recent_suspend_dt, (UNSIGNED)L.Cycle_End_Date) < 180;
+
+    SELF.X_DID																		:=	L.DID;
+    SELF.AccountDetails.BusinessIds.UltID					:=  L.UltID;
+    SELF.AccountDetails.BusinessIds.OrgID					:=  L.OrgID;
+    SELF.AccountDetails.BusinessIds.SeleID				:=  L.SeleID;
+    SELF.AccountDetails.CompanyName								:=	L.Account_Holder_Business_Name;
+    SELF.AccountDetails.BusinessContributorNumber	:= 	L.Sbfe_Contributor_Number;
+    SELF.AccountDetails.BusinessAccountNumber			:= 	L.Contract_Account_Number;
+    SELF.AccountDetails.AccountTypeReportedCode		:= 	L.Account_Type_Reported;
+    SELF.AccountDetails.AccountTypeReportedDesc		:=	BusinessCredit_Services.Functions.fn_AccountTypeDescription(L.Account_Type_Reported);
+    SELF.AccountDetails.AccountStatus					 		:=	BusinessCredit_Services.Functions.fn_CurrentAccountStatus(L.Date_Account_Closed, L.Payment_Status_Category, L.disaster_impact, IsDisasterSuspend);
+    SELF.AccountDetails.AccountOpenDate						:= 	iesp.ECL2ESP.toDatestring8(L.Date_Account_Opened);
+    SELF.AccountDetails.OriginalAmount						:= 	L.Original_Credit_Limit;
+    SELF.AccountDetails.AmountOutstanding					:= 	L.Remaining_Balance;
+    SELF.AccountDetails.Overdue										:= 	IF(L.Payment_Status_Category = '000' , 'No' , PaymentStatusCategory);
+    SELF.AccountDetails.PastDueAmount							:=	L.Past_Due_Amount;
+    SELF.AccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
+                                                                                                              L.OrgID,
+                                                                                                              L.SeleID,
+                                                                                                              mod_access,
+                                                                                                              buzCreditAccess);
+    SELF.AccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(y_trades_HistoryRecsFiltered (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
+                                                                                                    Contract_Account_Number = L.Contract_Account_Number AND
+                                                                                                    Account_Type_Reported		= L.Account_Type_Reported) ,
+                                                                                                    trans_y_paymenthistory(LEFT)), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY);
+    SELF := [];
+  END;
 
 	y_AccDetail_Recs := PROJECT(y_trades_dedup , trans_y_AccDetail(LEFT));
 
@@ -296,10 +351,29 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 	z_trades := JOIN(	Z_linkids_accno_dedup , Business_Credit.key_tradeline(),
 										BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
 										LIMIT(BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, SKIP));
-													
-	z_trades_dedup := DEDUP(SORT(z_trades , 
-													#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), 
-										#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
+
+  z_trades_proj := PROJECT(z_trades, 
+    TRANSFORM({RECORDOF(z_trades), boolean disaster_impact, unsigned most_recent_status_dt, unsigned most_recent_suspend_dt}, 
+      SELF.disaster_impact := 
+        LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Impact_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Impact_Status, 
+      SELF.most_recent_status_dt := IF(
+        TRIM(LEFT.Account_Status_1) <> '' OR TRIM(LEFT.Account_Status_2) <> '', 
+        (UNSIGNED)LEFT.Cycle_End_Date, 0), 
+      SELF.most_recent_suspend_dt := IF(
+        LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Suspend_Status OR 
+        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Suspend_Status, 
+        (UNSIGNED)LEFT.Cycle_End_Date, 0), 
+      SELF := LEFT));
+
+	z_trades_dedup := ROLLUP(SORT(z_trades_proj, 
+    #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), 
+    TRANSFORM(RECORDOF(z_trades_proj), 
+      SELF.most_recent_status_dt := MAX(LEFT.most_recent_status_dt, RIGHT.most_recent_status_dt);
+      SELF.most_recent_suspend_dt := MAX(LEFT.most_recent_suspend_dt, RIGHT.most_recent_suspend_dt);
+      SELF := LEFT), 
+    #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
+
 
 	z_trades_HistoryRecs := DEDUP(SORT(z_trades , UltID, OrgID, SeleID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
 														cycle_end_date)(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ((STRING8)Std.Date.Today())[1..6]);
@@ -321,33 +395,37 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		SELF := [];
 	END;
 
-	Z_AccDetail_temp trans_z_AccDetail (z_trades_dedup L) := TRANSFORM
-		PaymentStatusCategory 																:= 	BusinessCredit_Services.Functions.fn_PaymentStatusCategory(L.Payment_Status_Category);
-		SELF.RelatedAccountDetails.BusinessIds.UltID					:=  L.UltID;
-		SELF.RelatedAccountDetails.BusinessIds.OrgID					:=  L.OrgID;
-		SELF.RelatedAccountDetails.BusinessIds.SeleID					:=  L.SeleID;
-		SELF.RelatedAccountDetails.CompanyName								:=	L.Account_Holder_Business_Name;
-		SELF.RelatedAccountDetails.BusinessContributorNumber	:= 	L.Sbfe_Contributor_Number;
-		SELF.RelatedAccountDetails.BusinessAccountNumber			:= 	L.Contract_Account_Number;
-		SELF.RelatedAccountDetails.AccountTypeReportedCode		:= 	L.Account_Type_Reported;
-		SELF.RelatedAccountDetails.AccountTypeReportedDesc		:=	BusinessCredit_Services.Functions.fn_AccountTypeDescription(L.Account_Type_Reported);
-		SELF.RelatedAccountDetails.AccountStatus					 		:=	BusinessCredit_Services.Functions.fn_CurrentAccountStatus(L.Date_Account_Closed , L.Payment_Status_Category);
-		SELF.RelatedAccountDetails.AccountOpenDate						:= 	iesp.ECL2ESP.toDatestring8(L.Date_Account_Opened);
-		SELF.RelatedAccountDetails.OriginalAmount							:= 	L.Original_Credit_Limit;
-		SELF.RelatedAccountDetails.AmountOutstanding					:= 	L.Remaining_Balance;
-		SELF.RelatedAccountDetails.Overdue										:= 	IF(L.Payment_Status_Category = '000' , 'No' , PaymentStatusCategory);
-		SELF.RelatedAccountDetails.PastDueAmount							:=	L.Past_Due_Amount;
-		SELF.RelatedAccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
-																																																											L.OrgID,
-																																																											L.SeleID,
-																																																											mod_access,
-																																																											buzCreditAccess); 
-		SELF.RelatedAccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(z_trades_HistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
-																																																		Contract_Account_Number = L.Contract_Account_Number AND
-																																																		Account_Type_Reported   = L.Account_Type_Reported) ,
-																																																		trans_z_paymenthistory(LEFT)), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY);
-		SELF := [];
-	END;
+  Z_AccDetail_temp trans_z_AccDetail (z_trades_dedup L) := TRANSFORM
+    PaymentStatusCategory := 	BusinessCredit_Services.Functions.fn_PaymentStatusCategory(L.Payment_Status_Category);
+    IsDisasterSuspend := L.most_recent_suspend_dt > 0 AND 
+      L.most_recent_suspend_dt >= L.most_recent_status_dt AND 
+      STD.Date.DaysBetween(L.most_recent_suspend_dt, (UNSIGNED)L.Cycle_End_Date) < 180;
+    
+    SELF.RelatedAccountDetails.BusinessIds.UltID					:=  L.UltID;
+    SELF.RelatedAccountDetails.BusinessIds.OrgID					:=  L.OrgID;
+    SELF.RelatedAccountDetails.BusinessIds.SeleID					:=  L.SeleID;
+    SELF.RelatedAccountDetails.CompanyName								:=	L.Account_Holder_Business_Name;
+    SELF.RelatedAccountDetails.BusinessContributorNumber	:= 	L.Sbfe_Contributor_Number;
+    SELF.RelatedAccountDetails.BusinessAccountNumber			:= 	L.Contract_Account_Number;
+    SELF.RelatedAccountDetails.AccountTypeReportedCode		:= 	L.Account_Type_Reported;
+    SELF.RelatedAccountDetails.AccountTypeReportedDesc		:=	BusinessCredit_Services.Functions.fn_AccountTypeDescription(L.Account_Type_Reported);
+    SELF.RelatedAccountDetails.AccountStatus					 		:=	BusinessCredit_Services.Functions.fn_CurrentAccountStatus(L.Date_Account_Closed, L.Payment_Status_Category, L.disaster_impact, IsDisasterSuspend);
+    SELF.RelatedAccountDetails.AccountOpenDate						:= 	iesp.ECL2ESP.toDatestring8(L.Date_Account_Opened);
+    SELF.RelatedAccountDetails.OriginalAmount							:= 	L.Original_Credit_Limit;
+    SELF.RelatedAccountDetails.AmountOutstanding					:= 	L.Remaining_Balance;
+    SELF.RelatedAccountDetails.Overdue										:= 	IF(L.Payment_Status_Category = '000' , 'No' , PaymentStatusCategory);
+    SELF.RelatedAccountDetails.PastDueAmount							:=	L.Past_Due_Amount;
+    SELF.RelatedAccountDetails.BusinessCreditIndicator		:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
+                                                                                                                      L.OrgID,
+                                                                                                                      L.SeleID,
+                                                                                                                      mod_access,
+                                                                                                                      buzCreditAccess); 
+    SELF.RelatedAccountDetails.AccountPaymentHistory			:= 	CHOOSEN(PROJECT(z_trades_HistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number AND 
+                                                                                                    Contract_Account_Number = L.Contract_Account_Number AND
+                                                                                                    Account_Type_Reported   = L.Account_Type_Reported) ,
+                                                                                                    trans_z_paymenthistory(LEFT)), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY);
+    SELF := [];
+  END;
 
 	z_RelatedAccDetail_Recs 	:= PROJECT(z_trades_dedup , trans_z_AccDetail(LEFT));
 

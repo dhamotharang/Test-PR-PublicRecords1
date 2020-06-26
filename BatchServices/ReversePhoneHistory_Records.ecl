@@ -1,4 +1,4 @@
-import doxie,gong,Census_Data,ut,suppress;
+import doxie,dx_Gong,Census_Data,ut,suppress;
 export ReversePhoneHistory_Records(
   dataset(BatchServices.Layouts.ReversePhoneHistory.batch_in_cleaned) batch_in,
   BatchServices.Interfaces.reversephonehistory_config in_mod,
@@ -6,9 +6,9 @@ export ReversePhoneHistory_Records(
 ) := FUNCTION
 	Batchin			:= BatchServices.Layouts.ReversePhoneHistory.batch_in_cleaned;
 	Batchout		:= BatchServices.Layouts.ReversePhoneHistory.batch_out;
-	GongRecs		:= gong.Key_History_phone;
-	GongDIDRecs	:= gong.Key_History_did;
-	GongBDIDRecs:= gong.Key_History_BDID;
+	GongRecs		:= dx_Gong.key_history_phone();
+	GongDIDRecs	:= dx_Gong.key_history_did();
+	GongBDIDRecs:= dx_Gong.key_history_bdid();
 	Census			:= Census_Data.Key_Fips2County;
 
   batchout_optout := RECORD

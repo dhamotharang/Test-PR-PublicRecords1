@@ -13,9 +13,9 @@ vIncludeAllPhonesPlusData := FALSE : STORED('IncludeAllPhonesPlusData');
 
 tmpMod :=
 MODULE(progressive_phone.waterfall_phones_options)
-	EXPORT BOOLEAN SkipPhoneScoring     := TRUE;
-	EXPORT BOOLEAN DedupOutputPhones    := IF(~SkipPhoneScoring,FALSE,NOT KeepAllPhones); // We need to keep all phones from all WF levels in order to run the model
-	EXPORT BOOLEAN ExcludeNonCellPPData := ~vIncludeAllPhonesplusData;
+  EXPORT BOOLEAN SkipPhoneScoring := TRUE;
+  EXPORT BOOLEAN DedupOutputPhones := IF(~SkipPhoneScoring,FALSE,NOT KeepAllPhones); // We need to keep all phones from all WF levels in order to run the model
+  EXPORT BOOLEAN ExcludeNonCellPPData := ~vIncludeAllPhonesplusData;
 END;
 
 ProgressivePhones := AddrBest.Progressive_phone_common(f_in_progressive_phone,tmpMod);

@@ -15,14 +15,14 @@
 							TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRecSlim,
 								// If a LexID was retrieved from Didville, use it.  
 								// If not, use the LexID from Property, even it's 0.
-								did := IF(LEFT.did <> 0, LEFT.did, RIGHT.did);
+								did := IF(RIGHT.did <> 0, RIGHT.did, LEFT.did);
 								// If a LexID was not retrieved from Didville but a LexID
 								// was retrieved from Property, force the score to be 100.
 								score := IF(RIGHT.did <> 0, RIGHT.score, LEFT.score);
 								SELF.did := did,
 								SELF.score := score;
-								SELF.error_code := IF(did = 0, LEFT.error_code, 0);
-								SELF.exception_code := IF(did = 0, LEFT.exception_code, '');
+								SELF.error_code := IF(LEFT.did <> 0 OR did = 0, LEFT.error_code, 0);
+								SELF.exception_code := IF(LEFT.did <> 0 OR did = 0, LEFT.exception_code, '');
 								SELF := LEFT), LEFT OUTER);
 
 	ds_with_best  := HomesteadExemptionV2_Services.Functions.append_Best(ds_with_all_dids(error_code = 0),in_mod);
