@@ -1327,6 +1327,7 @@
 				trim(kword, left, right) = 'CNNBS' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNNBS,
 				trim(kword, left, right) = 'UNOPS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNOPS,
 				trim(kword, left, right) = 'SECO-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_NIC,
+				trim(kword, left, right) = 'BEGC' =>SubGroup_Constants.numKeywordsID.KEYWORD_BEGC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
