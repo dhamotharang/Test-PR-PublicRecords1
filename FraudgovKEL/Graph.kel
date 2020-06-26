@@ -3279,12 +3279,12 @@ Event: => T9_AddrMailDropType := MAP(T9_AddrPopFlag=0 => -99999,
 																		 drop_indicator);
 Event: => T15_SsnValType := MAP(T15_SsnPopFlag=0 => -99999,
                                 T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																socsvalflag:Null => -99997,
-																socsvalflag);
+																STRING(socsvalflag)=''=> -99997,
+																STRING(socsvalflag));
 Event: => T20_DlValType := MAP(T20_DlPopFlag=0 => -99999,
                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-															 drlcvalflag:Null => -99997,
-															 drlcvalflag);
+															 STRING(drlcvalflag)='' => -99997,
+															 STRING(drlcvalflag));
 Event: => T16_PhnValType := MAP(T16_PhnPopFlag=0 => -99999,
                                 T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
 																STRING(hphonevalflag)='' => -99997,
@@ -3329,11 +3329,11 @@ Event: => T20_DlMultCurrIdFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 Event: => T20_DlIsInvalidFlag := MAP(T20_DlPopFlag=0 => -99999,
                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
 																		 ALL(DriversLicenseEvent.Transaction,T20_DlValType=-99997) => -99997,
-																		 T20_DlValType IN [1,3] => 1, 0);
+																		 T20_DlValType IN ['1','3'] => 1, 0);
 Event: => T16_PhnPrePdFlag := MAP(T16_PhnPopFlag=0 => -99999,
                                   T_SrcClassType < 4 OR T16_IsPhnMetaHitFlag < 1 => -99998,
 																	phone_prepaid='' OR phone_prepaid:Null => -99997,
-																	phone_prepaid); //need to check what this is echoing to see how to map it to 0/1
+																	phone_prepaid); 
 Event: => T16_PhnIsInvalidFlag := MAP(T16_PhnPopFlag=0 => -99999,
                                   T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
 																	ALL(PhoneEvent.Transaction,T16_PhnValType=-99997) => -99997,
