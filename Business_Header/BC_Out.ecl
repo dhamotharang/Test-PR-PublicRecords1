@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, lib_fileservices, header_services, NID;
+﻿IMPORT Business_Header, ut, lib_fileservices, header_services, NID;
 
 export bc_out(
 
@@ -9,94 +9,6 @@ function
 
 // Rollup Combined Contacts by BDID, Company across sources
 // This code moved from BC_Init to preserve contacts by source code in base
-
-//************************START CODE*************************************
-Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-Record
-string15 bdid := '0';       
-string15 did := '0';       
-string3 contact_score := '0';
-string34 vendor_id := ''; 
-string10 dt_first_seen;
-string10 dt_last_seen;
-string2   source;
-string1   record_type;
-string1   from_hdr := 'N';
-string1   glb := '0';
-string1	  dppa := '0';
-string35 company_title;
-string35 company_department := '';
-string5  title;
-string20 fname;
-string20 mname;
-string20 lname;
-string5  name_suffix;
-string1   name_score;
-string10 prim_range;
-string2   predir;
-string28 prim_name;
-string4  addr_suffix;
-string2   postdir;
-string5  unit_desig;
-string8  sec_range;
-string25 city;
-string2   state;
-string8 zip;
-string5 zip4;
-string3   county;
-string4   msa;
-string10 geo_lat;
-string11 geo_long;
-string15 phone;
-string60 email_address;
-string10 ssn := '0';
-  string34 company_source_group := '';
-  string120 company_name;
-  string10 company_prim_range;
-  string2   company_predir;
-  string28 company_prim_name := '';
-  string4  company_addr_suffix := '';
-  string2   company_postdir := '';
-  string5  company_unit_desig := '';
-  string8  company_sec_range := '';
-  string25 company_city := '';
-  string2   company_state := '';
-  string8 company_zip := '';
-  string5 company_zip4 := '';
-  string15 company_phone := '';
-  string10 company_fein := '0';
-  string2 eor := '\r\n';
-end;
-
-header_services.Supplemental_Data.mac_verify('file_business_contact_inj.txt', Drop_Header_Layout, attr);
-
-Base_File_Append_In := attr();
- 
-business_header.Layout_Business_Contact_Full reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
- transform
-	self.did := (unsigned6) L.did;
-	self.bdid := (unsigned6) L.bdid;
-	self.dt_first_seen := (unsigned4) L.dt_first_seen;
-	self.dt_last_seen := (unsigned4) L.dt_last_seen;
-	self.contact_score := (unsigned1) L.contact_score;
-	self.glb := (boolean) if(l.glb = '1', true, false);
-	self.dppa := (boolean) if(l.dppa = '1', true,  false);
-	self.zip := (unsigned3) L.zip;
-	self.zip4 := (unsigned2) L.zip4;
-	self.phone := (unsigned6) L.phone;
-	self.ssn := (unsigned4) L.ssn;
-	self.company_zip := (unsigned3) L.company_zip;
-	self.company_zip4 := (unsigned2) L.company_zip4;
-	self.company_phone := (unsigned6) L.company_phone;
-	self.company_fein := (unsigned4) L.company_fein;
-    self := L;
-
- end;
- 
- 
-Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-
-//************************END CODE*************************************
 
 bc := pBc_plus;
 
@@ -307,8 +219,6 @@ contact_full_out_suppress := join(dContactHeader_withMD5,
 //**********************************************
 
 
-in_append := PROJECT(Base_File_Append, FormatOutput(LEFT));
-
-return contact_full_out_suppress + in_append;
+return Business_Header.Prep_Build.applyBusinessContactInj(contact_full_out_suppress);
 
 end;

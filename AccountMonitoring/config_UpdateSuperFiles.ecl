@@ -1,4 +1,4 @@
-﻿IMPORT AccountMonitoring;
+IMPORT AccountMonitoring;
 
 EXPORT config_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                                  AccountMonitoring.types.productMask.allProducts,

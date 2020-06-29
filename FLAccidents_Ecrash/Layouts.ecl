@@ -142,7 +142,9 @@ export ReportVersion := record
 	string4     work_type_id,
 	string3     report_type_id; 
 	string9     agency_ori;
-	string11    agency_id; 
+	string11    agency_id;
+	//PR Recon COPPR-49
+	boolean is_terminated_agency;
 	string100   Vendor_Code;
   string20    vendor_report_id ;
 	string2     source_id; 
@@ -313,6 +315,8 @@ string1 is_deleted,
 string3 Report_type,
 string3 Page_Count,
 string3 extension;
+//PR Recon COPPR-49
+boolean is_terminated_agency;
 end;
 
 export Scrubs := FLAccidents_Ecrash.Layout_Basefile - ScrubsBits1;

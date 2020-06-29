@@ -126,7 +126,7 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	srt_lerg6Append 	:= sort(distribute(ds_lerg6Append, hash(account_owner)), account_owner, local);
 
 		//Carrier Reference File
-		cr							:= PhonesInfo.File_Source_Reference.Main;
+		cr							:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);
 
 		cr formTr(cr l):= transform
 			self.ocn 											:= PhonesInfo._Functions.fn_standardName(l.ocn); //Clean-up Field

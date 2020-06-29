@@ -27,7 +27,11 @@ The code is included here in case it moves back to additional info
 								infile.cred,
 								infile.action,
 								SKIP));
-		self.parsed := '';
+		self.parsed := Choose(n,
+										IF(infile.type_id = 'I' AND infile.DateOfBirth<>'0',Std.Date.ConvertDateFormat(infile.DateOfBirth,'%Y%m%d',	'%Y/%m/%d'),''),
+										'',
+										'',
+										''),
 		self.comments := CHOOSE(n,
 									'',
 									'',

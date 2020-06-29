@@ -1,4 +1,4 @@
-﻿
+
 IMPORT AccountMonitoring, Didville, Doxie, Doxie_cbrs, Doxie_Files, Header, PhonesFeedback, Property, PhonesInfo, BIPV2;
 
 EXPORT layouts := MODULE

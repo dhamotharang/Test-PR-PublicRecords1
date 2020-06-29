@@ -53,6 +53,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared IpAppend_Base		:= Files().base.IpMetaData.qa;
 
 	shared Advo_Base				:= Files().base.Advo.qa;
+
+	shared DLHistory_Base		:= Files().base.DLHistory.qa;
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
@@ -590,60 +592,68 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
-	EXPORT Best_DLN(dataset(FraudGovPlatform.Layouts.BestInfo) BestInfo)		:= MODULE
+	EXPORT DL_History	:= MODULE
 
 		service_name	:= 'driversv2_services.batch_service';
 
 		soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
-		ResultNarrow := DriversV2_Services.layouts.result_narrow;
-		AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
-		Seq := DriversV2_Services.layouts.seq;
-		AcctRec := RECORD(Seq)
-			AutoKeyBatchInput.acctno;
-			UNSIGNED6	did := 0;
-			STRING24	dl_number := '';
-			STRING2		dlstate := '';
-		END;		
-
-		layout_in   := Autokey_batch.Layouts.rec_inBatchMaster;
-		layout_out := RECORD(ResultNarrow)
-			AcctRec.acctno;
-			STRING10	height_desc;
-		END;
-
 		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
 		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
+		layout_in := layouts.Drivers_Batch.layout_in;
+		layout_out := layouts.Drivers_Batch.layout_out;
 
-		layout_in make_batch_in(BestInfo L) := TRANSFORM
-				SELF.acctno := (string)l.record_id;
-				SELF.Name_First := L.best_fname;
-				SELF.Name_Middle := L.best_mname;
-				SELF.Name_Last := L.best_lname;
-				SELF.Name_suffix := L.best_name_suffix;
-				SELF.SSN := L.best_ssn;
-				SELF.DOB := L.best_dob;
-				SELF.did := L.did;	
+		layout_in make_batch_in(layout_in le, integer c) := TRANSFORM
+				self.seq := c;
+				self := le;			
 				SELF := [];
 		END;
 					
 		layout_soap := RECORD
 			datapermissionmask :=DataPermission;
 			string datarestrictionmask:= DataRestriction;
+			BOOLEAN IncludeNonDMVSources := true;
 			INTEGER DPPAPurpose:=1;
 			INTEGER GLBPurpose:= 5;
-			BOOLEAN return_current_only := true;
+			BOOLEAN return_current_only := false;
 			DATASET(layout_in) batch_in;
 		END;
 
-		layout_Soap trans(BestInfo L) := TRANSFORM
-				batch := PROJECT(L, make_batch_in(LEFT));
+		layout_Soap trans(layout_in L, integer c) := TRANSFORM
+				batch := PROJECT(L, make_batch_in(LEFT, c));
 				SELF.batch_in := batch;
 				self := L;
 		END;
 
+		tr_inputs := project(pii_base, transform( layout_in , 
+				SELF.did := LEFT.did;
+				SELF.name_first := LEFT.fname;
+				SELF.name_middle := LEFT.mname;
+				SELF.name_last := LEFT.lname;
+				SELF.name_suffix := LEFT.name_suffix;
+				SELF.prim_range := LEFT.prim_range;
+				SELF.predir := LEFT.predir;
+				SELF.prim_name := LEFT.prim_name;
+				SELF.addr_suffix := LEFT.addr_suffix;
+				SELF.postdir := LEFT.postdir;
+				SELF.unit_desig := LEFT.unit_desig;
+				SELF.sec_range := LEFT.sec_range;
+				SELF.p_city_name := LEFT.p_city_name;
+				SELF.St := LEFT.st;
+				SELF.z5 := LEFT.ZIP;
+				SELF.SSN := LEFT.SSN;
+				SELF.DOB := (string)LEFT.dob;
+				SELF.homephone := LEFT.home_phone;
+				SELF.workphone := LEFT.work_phone_;
+				SELF.dl := LEFT.drivers_license;
+				SELF.dlstate := LEFT.drivers_license_state;
+				SELF := LEFT;
+				SELF := [];		
+		));
 
-		soap_input := DISTRIBUTE(project(BestInfo, trans(LEFT)),RANDOM() % nodes);
+		ddp_inputs := DEDUP(tr_inputs, ALL);
+		
+		soap_input := DISTRIBUTE(project(ddp_inputs, trans(LEFT, counter)),RANDOM() % nodes);
 					
 					
 		xlayout := RECORD
@@ -657,8 +667,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			SELF := [];
 		END;			
 
-
-
 		soap_results := soapcall( soap_input, 
 			soap_host, 
 			service_name,  
@@ -670,54 +678,27 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			(errorcode='')
 		;			
 
-		shared p	:=	dedup(project(soap_results,Transform(Layouts.BestInfo,
-			self.record_id	:= (unsigned8)left.AcctNo,
-			self.did	:= (unsigned6)left.did,
-			self.fdn_file_info_id := 0,
-			self.best_phone := '',
-			self.best_ssn := '',
-			self.max_ssn := '',
-			self.best_title := '',
-			self.best_fname := '',
-			self.best_mname := '',
-			self.best_lname := '',
-			self.best_name_suffix := '',
-			self.best_addr1 := '',
-			self.best_city := '',
-			self.best_state := '',
-			self.best_zip := '',
-			self.best_zip4 := '',
-			self.best_addr_date := '',
-			self.best_dob := '',
-			self.best_dod := '',
-			self.verify_best_phone := '',
-			self.verify_best_ssn := '',
-			self.verify_best_address := '',
-			self.verify_best_name := '',
-			self.verify_best_dob := '',
-			self.score_any_ssn := '',
-			self.score_any_addr := '',
-			self.any_addr_date := '',
-			self.score_any_dob := '',
-			self.score_any_phn := '',
-			self.score_any_fzzy := '',
-			self.errorcode := '',			
-			self.best_drivers_license := left.dl_number,
-			self.best_drivers_license_state := left.orig_state,
-			self.best_drivers_license_exp := (STRING8)left.expiration_date,
-			self:=left,self:=[])),record,all);
+		shared p :=	dedup(project(soap_results,
+			Transform(Layouts.DLHistory
+				,self.did	:= (unsigned6)left.did
+				,self:=left
+				,self:=[])),record,all);
 
-		//Assign Driver's License
+		//Assign record_ids to the DL History
 
-		shared BestInfo_base_map	:= Join(BestInfo , p, left.record_id=right.record_id,Transform(Layouts.BestInfo
-												,self.best_drivers_license := right.best_drivers_license
-												,self.best_drivers_license_state := right.best_drivers_license_state
-												,self.best_drivers_license_exp := right.best_drivers_license_exp
-												,self:=left), LEFT OUTER):independent;
+		shared DLHistory_base_map	:=  Join( pii_input , P, 
+											left.did = right.did, 
+											Transform(Layouts.DLHistory
+												,self.did := left.did												
+												,self:=right)):independent;
 
-		Export all			:= BestInfo_base_map;
+
+		DLHistory_Update	:= if( UpdatePii,  dedup( DLHistory_base_map + DLHistory_Base, ALL ), dedup( DLHistory_base_map, ALL)  );
+
+
+		Export all			:= DLHistory_Update;
 	END;
-	EXPORT Best_Info		:= MODULE
+	EXPORT Best_Info ( dataset(FraudGovPlatform.Layouts.DLHistory) DLHistory )		:= MODULE
 
 			service_name	:= 'didville.did_batch_service_raw';
 			soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
@@ -802,7 +783,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			shared BestInfo_base_map	:= Join(pii_input , BestInfo_recid_map, left.record_id=right.record_id,Transform(Layouts.BestInfo
 													,self.did := left.did
-													,self.fdn_file_info_id := left.fdn_file_info_id
+													,self.reported_date := left.reported_date
 													,self:=right)):independent;
 
 			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
@@ -812,6 +793,54 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			Export all := Append_DLN;
 								
 	END;
+	
+	EXPORT PrepaidPhone	:= MODULE
+		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
+	//get transactions between phone vendor dates
+		jPhone1 := join(distribute(Phone_key,hash(phone))
+					,distribute(pii_input(home_phone<>''),hash(home_phone))
+					,left.phone=right.home_phone
+					and 
+					((unsigned8)right.reported_date between left.vendor_first_reported_dt and left.vendor_last_reported_dt)				
+					,Transform(Layouts.PrepaidPhone
+							,self.phone:=right.home_phone
+							,self.reported_date:=right.reported_date
+							,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+							,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+							,self.prepaid := left.prepaid
+							,self.record_id :=right.record_id
+							,self.fdn_file_info_id	:=right.fdn_file_info_id
+							,self:=right)
+					,right outer,local);
+
+		dPhone1 := dedup(sort(jPhone1(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+	//get remaining prepaid matches
+		pii_input_2 := Join(pii_input(home_phone<>''),dPhone1,left.record_id=right.record_id,left only);
+
+		jPhone2 := join(distribute(Phone_key,hash(phone))
+								,distribute(pii_input_2,hash(home_phone))
+								,left.phone=right.home_phone
+								and 
+								((unsigned8)right.reported_date >= left.vendor_first_reported_dt)				
+								,Transform(Layouts.PrepaidPhone
+										,self.phone:=right.home_phone
+										,self.reported_date:=right.reported_date
+										,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
+										,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
+										,self.prepaid := left.prepaid
+										,self.record_id :=right.record_id
+										,self.fdn_file_info_id	:=right.fdn_file_info_id
+										,self:=right)
+								,right outer,local);
+								
+		dPhone2 := dedup(sort(jPhone2(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
+
+		Phone_final := dPhone1 + dPhone2;
+
+		Export All	:= If(UpdatePii, dedup((Phone_final + PrepaidPhone_Base),all) , Phone_final);
+		 
+	END;
+	
 
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
@@ -989,7 +1018,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
 											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
 	 
-	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , Base_Map);
+	 Export All := dedup(Base_Map,all);
    END;
 
 END;

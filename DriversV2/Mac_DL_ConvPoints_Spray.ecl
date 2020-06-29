@@ -52,11 +52,10 @@ macro
 
 #workunit('name', state + ' DrvLic Conviction/Points Spray');
 
-%sourceCsvSeparater% := '\\|';
+%st%    						 := stringlib.StringToUpperCase(trim(state,left,right));
+%sourceCsvSeparater% := if(%st% ='OH','\\t','\\|');
 %sourceCsvTeminater% := '\\n,\\r\\n';
-%sourceCsvQuote% := '\"';
-
-%st%    := stringlib.StringToUpperCase(trim(state,left,right));
+%sourceCsvQuote%     := '\"';
 
 // Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
 //#if (%st% in ['OH','MO','WY'])
@@ -109,7 +108,7 @@ macro
 	#end
 */
 	#if (%stype% = 'OH')
-	  %recSize% := 602;  //OH Convictions data
+	  %recSize% := 602;  //JIRA :DF-27470!!Spraying OH data as varying length 
 	#end
 	#if (%stype% = 'MN')
 	  %recSize% := 245;  //MN Convictions data
@@ -139,7 +138,7 @@ macro
 /* Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
 	%spray_main% := if (%stype% in ['MO_ACTION', 'MO_POINTS', 'MO_DPRDPS', 'OH','WY'],
 */
-	%spray_main% := if (%stype% in ['OH','MN','TN','TN_WDL'],
+	%spray_main% := if (%stype% in ['MN','TN','TN_WDL'],
 						FileServices.SprayFixed(Source_IP
 												,source_path + file_name
 												,%recSize%
@@ -177,7 +176,7 @@ macro
 		#end
 	*/
 		#if(%stype% = 'OH')
-			DriversV2.Layouts_DL_OH_In.Layout_OH_CP;  // Fixed length vendor raw data structure
+			DriversV2.Layouts_DL_OH_In.Layout_OH_CP;  // Varying length vendor raw data structure
 		#end
 		#if(%stype% = 'MN')
 			DriversV2.Layouts_DL_MN_In.Layout_MN_Convic;  // Fixed length vendor raw data structure
@@ -232,8 +231,13 @@ macro
 	   self              := l;
 	end;
 
-	%outfile% := project(dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::raw_'+ filedate,%Layout_In_File%,thor),%trfProject%(left));
-
+  %outfile% := if(state='OH',project(dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::raw_'+ filedate, %Layout_In_File%
+																						 ,CSV(SEPARATOR([['\t']]), quote('"'), TERMINATOR(['\n','\r\n','\n\r']),MAXLENGTH(5000),NOTRIM))
+																		 ,%trfProject%(left))
+														, project(dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::raw_'+ filedate,%Layout_In_File%,thor)
+														          ,%trfProject%(left))
+									);
+																				 
 	%ds% := output(%outfile%,,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+ filedate,overwrite);
 
 	%As_DL_CP_mapper% := case(%stype%,
@@ -241,7 +245,7 @@ macro
 														// 'MO_MEDCERT' => DriversV2.Mapping_DL_MO_New_As_ConvPoints(filedate).Build_DL_MO_Convpoints,
 														//***  MN conviction date is not being updated anymore.
 														// 'MN' => DriversV2.Mapping_DL_MN_New_As_ConvPoints(filedate, dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+filedate+'::cleaned',drivers.Layout_CT_Full,thor)).Build_DL_MN_New_Convpoints,
-														 'OH' 		=> DriversV2.Mapping_DL_OH_As_ConvPoints(filedate, dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+filedate,DriversV2.Layouts_DL_OH_In.Layout_OH_CP_Pdate,thor)).Build_DL_OH_Convpoints,
+														 'OH' 		=> DriversV2.Mapping_DL_OH_As_ConvPoints(filedate,%outfile%).Build_DL_OH_Convpoints,
 														 'TN' 		=> sequential(DriversV2.Cleaned_DL_TN_ConvPoints(filedate),
 																										DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Conviction
 																										),

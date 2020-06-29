@@ -276,7 +276,13 @@ END;
 															IF(REGEXFIND('(%)',StdNAME_OFFICE),StdNAME_OFFICE,
 																		Prof_License_Mari.mod_clean_name_addr.strippunctMisc(StdNAME_OFFICE))); 
 			
-			SELF.NAME_OFFICE	  :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
+		
+		  SELF.NAME_OFFICE      := MAP(TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
+		                               TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST, ALL) => '',
+																   TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST, ALL) => '',
+																   StringLib.StringCleanSpaces(CleanNAME_OFFICE));			
+			
+			// SELF.NAME_OFFICE	  :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
 			SELF.OFFICE_PARSE		:= IF(SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'GR',
 																		IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'MD',
 																								''));

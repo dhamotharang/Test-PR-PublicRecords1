@@ -9,7 +9,7 @@ EXPORT Functions := MODULE
 
 					 uc_code			:= corp2.t2u(code);
 					 
-					 isValidCode	:= map(uc_code IN ['00']																							=> TRUE,
+					 isValidCode	:= map(uc_code IN ['0','00']																				  => TRUE,
 															 uc_code IN ['11','12','13','14','15','16','18']								=> TRUE,
 															 uc_code IN ['20','22','23','25','26']													=> TRUE,
 															 uc_code IN ['30','31','35','36']																=> TRUE,
@@ -27,30 +27,21 @@ EXPORT Functions := MODULE
 
 		END;
 
+	 	//****************************************************************************
+		//ValidCorpStatusDesc: 	returns true or false based upon the incoming code.
 		//****************************************************************************
-		//ValidCorpStatusCD: 	returns true or false based upon the incoming code.
-		//****************************************************************************
-		EXPORT ValidCorpStatusCD(STRING code) := FUNCTION
+		EXPORT ValidCorpStatusDesc(STRING desc) := FUNCTION
 		
-					 uc_code 					:= corp2.t2u(code);
+					 uc_desc 					:= corp2.t2u(desc);
 
-					 isValidStatusCD	:= map(uc_code IN ['00','01','02','08','09']													=> TRUE,
-																	 uc_code IN ['10','11','12','13','14','15','16','17','18','19']	=> TRUE,
-																	 uc_code IN ['20','21','22','23','24','25','26']								=> TRUE,
-																	 uc_code IN ['30','31','32']																		=> TRUE,
-																	 uc_code IN ['40','42','43','44','45','46']											=> TRUE,
-																	 uc_code IN ['50','51']																					=> TRUE,
-																	 uc_code IN ['67']																							=> TRUE,
-																	 uc_code IN ['76']																							=> TRUE,
-																	 uc_code IN ['98','99']																					=> TRUE,
-																	 uc_code IN ['']																								=> TRUE,
+					 isValidStatusCD	:= map(uc_desc IN ['INACTIVE','ACTIVE','PENDING ACTIVE','']	=> TRUE,
 																	 FALSE
 																  );
 
 					RETURN if(isValidStatusCD,1,0);
 
 		END;
-
+		
 		//****************************************************************************
 		//ValidCorpLNNameTypeCD: 	returns true or false based upon the incoming code.
 		//****************************************************************************
@@ -85,4 +76,21 @@ EXPORT Functions := MODULE
 					
 		END;
 
+    //****************************************************************************
+		//ValidCorpAgentStatusDesc: 	returns true or false based upon the incoming code.
+		//****************************************************************************
+		EXPORT ValidCorpAgentStatusDesc(STRING s, STRING recordorigin) := FUNCTION
+					 
+					 uc_s 				:= corp2.t2u(s);
+					 
+					 isValidDesc	:= if(recordorigin = 'C',
+															map(uc_s IN ['ACTIVE','INACTIVE','RESIGNED','PENDING RESIGNATION',''] => TRUE,
+																	FALSE
+																 ),
+															TRUE
+														 );
+																		
+					RETURN if(isValidDesc,1,0);
+					
+		END;
 END;

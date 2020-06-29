@@ -159,8 +159,13 @@ EXPORT Layout_eCrash := MODULE
 		STRING2   motorcycle_cylinder_coding;
 		STRING60 next_street;
 		STRING40 addl_report_number;
+		STRING11 agency_id;
 		STRING9 agency_ori;		
 	  STRING11 orig_agency_ori;
+				
+		//PR Recon COPPR-49
+		BOOLEAN is_Terminated_Agency;
+		
 		STRING100 Insurance_Company_Standardized ;
 		STRING1 is_available_for_public;
 		STRING20 report_status ;
@@ -246,6 +251,10 @@ EXPORT Layout_eCrash := MODULE
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
 		STRING100 Citation_Detail1;
+		
+		//CR-1237
+		STRING64 Citation_Status; 
+		
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
 		STRING60 Violation_Code3;
@@ -280,6 +289,13 @@ EXPORT Layout_eCrash := MODULE
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
+		
+		//PRtcc CR-1237		
+		STRING Marijuana_Use_Suspected;
+				
+		//PRtcc CR-1262 
+    STRING Direction_Of_Impact;
+	  STRING Event_Sequence;
   END;
 
   EXPORT Consolidation := RECORD
@@ -561,10 +577,14 @@ EXPORT Layout_eCrash := MODULE
     Consolidation_AgencyOri.pedestrian_actions_at_time_of_crash;
     Consolidation_AgencyOri.pedalcyclist_actions_at_time_of_crash;
     Consolidation_AgencyOri.passenger_actions_at_time_of_crash;
-  END;
+		
+		//PRtcc CR-1262 
+    Consolidation_AgencyOri.Direction_Of_Impact;
+	  Consolidation_AgencyOri.Event_Sequence;
+	END;
 
   EXPORT Accidents_Alpha := RECORD
-    Consolidation_AgencyOri AND NOT [orig_agency_ori];
+    Consolidation_AgencyOri AND NOT [orig_agency_ori, Direction_Of_Impact, Event_Sequence];
   END;
 
 END;

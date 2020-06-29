@@ -90,7 +90,7 @@ EXPORT proc_quickHdr_build_all (
 			bld_prepped,
 			output(Header.Mod_CreditBureau_address.stats,named('nlr_counts')),
 			bld_key,
-			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_60')
+			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_44_eclcc')
 		),
 		output('No Monthly Files available')
 	);

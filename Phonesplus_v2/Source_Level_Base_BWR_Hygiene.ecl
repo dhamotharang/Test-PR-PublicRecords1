@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','PhonesPlus_V2.Source_Level_Base_BWR_Hygiene - Hygiene & Stats - SALT V3.11.9');
+#workunit('name','PhonesPlus_V2.Source_Level_Base_BWR_Hygiene - Hygiene & Stats - SALT V3.11.11');
 IMPORT PhonesPlus_V2,SALT311;
 // First create an instantiated hygiene module
   infile := PhonesPlus_V2.In_Source_Level_Base;
@@ -22,7 +22,9 @@ IMPORT PhonesPlus_V2,SALT311;
   // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
    Examples := 10;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cellphoneidkey,Examples),NAMED('cellphoneidkeyBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,src_bitmap,Examples),NAMED('src_bitmapBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,household_flag,Examples),NAMED('household_flagBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,rules,Examples),NAMED('rulesBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cellphone,Examples),NAMED('cellphoneBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,npa,Examples),NAMED('npaBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,phone7,Examples),NAMED('phone7Bysource'));
@@ -78,6 +80,7 @@ IMPORT PhonesPlus_V2,SALT311;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,lname,Examples),NAMED('lnameBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,name_suffix,Examples),NAMED('name_suffixBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,name_score,Examples),NAMED('name_scoreBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,dob,Examples),NAMED('dobBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,rawaid,Examples),NAMED('rawaidBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cleanaid,Examples),NAMED('cleanaidBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,current_rec,Examples),NAMED('current_recBysource'));
