@@ -488,11 +488,7 @@ HighRiskIdentities := JOIN(HighRiskIdentitiesPrep, HighRiskIdentityProfileRows,
                           TRANSFORM(RECORDOF(LEFT), SELF.personentitycontextuid := RIGHT.personentitycontextuid, SELF := LEFT),
                           HASH) : PERSIST('~graudgov::temp::deleteme42');
 
-HighRiskIdentities(entitycontextuid = '_0910012522626185952153');
-
 HighRiskIdentityCount := TABLE(HighRiskIdentities, {customerid,industrytype,entitycontextuid, aothiidcurrprofusngcntev := COUNT(GROUP)}, customerid,industrytype,entitycontextuid, MERGE);
-
-HighRiskIdentityCount;
 
 PivotToEntitiesWithHRICounts := JOIN(ProfileRowsPrep, HighRiskIdentityCount, 
                                   LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, 
