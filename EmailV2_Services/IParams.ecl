@@ -6,6 +6,7 @@ EXPORT IParams := MODULE
     EXPORT UNSIGNED2 PenaltThreshold      := $.Constants.Defaults.PenaltThreshold;  // specific to EAA search type
     EXPORT UNSIGNED  MaxResultsPerAcct    := $.Constants.Defaults.MaxResultsPerAcct;
     EXPORT BOOLEAN   IncludeHistoricData  := FALSE;
+    EXPORT STRING5   Industry_Class        := '';
     EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  // specific to EAA search type
     EXPORT UNSIGNED1 EmailQualityRulesMask := 0;
     EXPORT BOOLEAN   RunDeepDive          := FALSE;  // specific to EAA search type
