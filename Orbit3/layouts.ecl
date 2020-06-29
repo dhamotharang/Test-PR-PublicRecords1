@@ -25,5 +25,12 @@ EXPORT OrbitBuildInstancenewLayout	:=	record
 		string										Name														;
 		string										Status														;
 		string										Version														;
-	end;	
+	end;
+	EXPORT InputItem := record
+string ItemName ;
+ string SourceName ;
+ string ReceiveDateTape ;
+ string FilePathName;
+ end;
+ 	
 end;

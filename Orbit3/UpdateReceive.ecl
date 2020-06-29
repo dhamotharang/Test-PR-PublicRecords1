@@ -1,7 +1,6 @@
 ﻿import ut;
 
 EXPORT UpdateReceive(
-				string UpdateType,
 				string ItemName,
 				string ptoken,							
 				string SourceName,
@@ -17,7 +16,6 @@ EXPORT UpdateReceive(
 //Create Receive instance
 
 Inputrec := record
-string UpdateType { xpath('UpdateType')} := UpdateType ;
 string Description { xpath('Description')} := '' ;
 string ItemName { xpath('ItemName')} := ItemName;
 string MediaType { xpath('MediaType' )} := MediaType;
