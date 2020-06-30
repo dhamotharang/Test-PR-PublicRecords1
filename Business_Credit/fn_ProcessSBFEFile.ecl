@@ -177,7 +177,7 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												tDeNormISwithTI(LEFT,RIGHT),
 												LOCAL
 											);
-	parent_IS				:=	DENORMALIZE(
+	fill_IS_with_MS				:=	DENORMALIZE(
 												SORT(DISTRIBUTE(fill_IS_with_TI,HASH((UNSIGNED)file_sequence_number,__filename)),(UNSIGNED)file_sequence_number,__filename,LOCAL), 
 												SORT(DISTRIBUTE(Files(filename).MemberSpecificSegment_MS_Virtual,HASH((UNSIGNED)Parent_Sequence_Number,__filename)),(UNSIGNED)Parent_Sequence_Number,__filename,(UNSIGNED)file_sequence_number,LOCAL), 
 													(UNSIGNED)LEFT.file_sequence_number	=	(UNSIGNED)RIGHT.Parent_Sequence_Number	AND
@@ -185,9 +185,17 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												tDeNormISwithMS(LEFT,RIGHT),
 												LOCAL
 											);
+	parent_IS				:=	DENORMALIZE(
+												SORT(DISTRIBUTE(fill_IS_with_MS,HASH((UNSIGNED)file_sequence_number,__filename)),(UNSIGNED)file_sequence_number,__filename,LOCAL), 
+												SORT(DISTRIBUTE(Files(filename).DigitalFootPrintSegment_DF_Virtual,HASH((UNSIGNED)Parent_Sequence_Number,__filename)),(UNSIGNED)Parent_Sequence_Number,__filename,(UNSIGNED)file_sequence_number,LOCAL), 
+													(UNSIGNED)LEFT.file_sequence_number	=	(UNSIGNED)RIGHT.Parent_Sequence_Number	AND
+																		LEFT.__filename						=						RIGHT.__filename,
+												tDeNormISwithDF(LEFT,RIGHT),
+												LOCAL
+											);
 											
 
-	// FILL BS with AD, PN, BI, TI and MS segments
+	// FILL BS with AD, PN, BI, TI, MS, and DF segments
 	get_BS					:=	PROJECT(Files(filename).BS_Virtual,TRANSFORM(RECORDOF(Business_Credit.Layouts.BusinessOwnerLayout_Virtual),SELF:=LEFT,SELF:=[]));
 	fill_BS_with_AD	:=	DENORMALIZE(
 												SORT(DISTRIBUTE(get_BS,HASH((UNSIGNED)file_sequence_number,__filename)),(UNSIGNED)file_sequence_number,__filename,LOCAL), 
@@ -221,7 +229,8 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												tDeNormBSwithTI(LEFT,RIGHT),
 												LOCAL
 											);
-	parent_BS				:=	DENORMALIZE(
+	
+	fill_BS_with_MS				:=	DENORMALIZE(
 												SORT(DISTRIBUTE(fill_BS_with_TI,HASH((UNSIGNED)file_sequence_number,__filename)),(UNSIGNED)file_sequence_number,__filename,LOCAL), 
 												SORT(DISTRIBUTE(Files(filename).MemberSpecificSegment_MS_Virtual,HASH((UNSIGNED)Parent_Sequence_Number,__filename)),(UNSIGNED)Parent_Sequence_Number,__filename,(UNSIGNED)file_sequence_number,LOCAL), 
 													(UNSIGNED)LEFT.file_sequence_number	=	(UNSIGNED)RIGHT.Parent_Sequence_Number	AND
@@ -229,6 +238,14 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												tDeNormBSwithMS(LEFT,RIGHT),
 												LOCAL
 											);
+	parent_BS				:=	DENORMALIZE(
+												SORT(DISTRIBUTE(fill_BS_with_MS,HASH((UNSIGNED)file_sequence_number,__filename)),(UNSIGNED)file_sequence_number,__filename,LOCAL), 
+												SORT(DISTRIBUTE(Files(filename).DigitalFootPrintSegment_DF_Virtual,HASH((UNSIGNED)Parent_Sequence_Number,__filename)),(UNSIGNED)Parent_Sequence_Number,__filename,(UNSIGNED)file_sequence_number,LOCAL), 
+													(UNSIGNED)LEFT.file_sequence_number	=	(UNSIGNED)RIGHT.Parent_Sequence_Number	AND
+																		LEFT.__filename						=						RIGHT.__filename,
+												tDeNormBSwithDF(LEFT,RIGHT),
+												LOCAL
+											);	
 // Fill MD with CT, MT, MR, MC, and DM
 	get_MD					:=	PROJECT(Files(filename).MD_Virtual,TRANSFORM(RECORDOF(Business_Credit.Layouts.MemberProcessingDataLayout_Virtual),SELF:=LEFT,SELF:=[]));
 	fill_MD_with_CT	:=	DENORMALIZE(
@@ -401,7 +418,7 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												SMART,
 												LOCAL
 											);
-	dSlimSBFEFile	:=	Business_Credit.fn_SlimSBFEFile(Base_AB):PERSIST(PersistNames.fnProcessSBFEFile);
+	dSlimSBFEFile	:=	Business_Credit.fn_SlimSBFEFile(Base_AB);//:PERSIST(PersistNames.fnProcessSBFEFile);
 	dCleanRawData	:=	Business_Credit.fn_cleanRawData(dSlimSBFEFile);
 	dFillSBFEID		:=	Business_Credit.fn_GetSBFEID(dCleanRawData);
 	RETURN	dFillSBFEID;

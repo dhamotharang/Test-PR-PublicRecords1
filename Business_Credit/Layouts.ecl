@@ -488,9 +488,9 @@ EXPORT	Layouts	:=	MODULE
 		STRING12	File_Sequence_Number;
 		STRING12	Parent_Sequence_Number;
 		STRING12	Account_Base_Number;
-		STRING2		Refund_Code;
-		STRING9		Total_Refund_Count;
-		STRING12	Total_Refund_Amount;
+		STRING2		Destination_Media_Code;
+		STRING9		Total_Destination_Media_Code;
+		STRING12	Total_Destination_Media_Amount;
 
 	END;
 	EXPORT	DM	:=	RECORD
@@ -591,7 +591,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(MerchantCardTransaction)							MerchantCTSegment{MAXCOUNT(100)};						//	CT
 		DATASET(MerchantChargeback)							MerchantChargebackSegment{MAXCOUNT(100)};						//	MT
 		DATASET(MerchantRefund)							MerchantRefundSegment{MAXCOUNT(100)};								//	MR
-		DATASET(MerchantClassificationCode)							MemberMCSegment{MAXCOUNT(100)};							//	MC
+		DATASET(MerchantClassificationCode)							MemberMCSegment{MAXCOUNT(500)};							//	MC
 		DATASET(MerchantDestinationMedia)							MemberDMSegment{MAXCOUNT(100)};							//	DM
 	END;
 
@@ -600,7 +600,7 @@ EXPORT	Layouts	:=	MODULE
 		DATASET(CT_Virtual)							MerchantCTSegment{MAXCOUNT(100)};								//	CT
 		DATASET(MT_Virtual)							MerchantChargebackSegment{MAXCOUNT(100)};						//	MT
 		DATASET(MR_Virtual)							MerchantRefundSegment{MAXCOUNT(100)};							//	MR
-		DATASET(MC_Virtual)							MemberMCSegment{MAXCOUNT(100)};									//	MC
+		DATASET(MC_Virtual)							MemberMCSegment{MAXCOUNT(500)};									//	MC
 		DATASET(DM_Virtual)							MemberDMSegment{MAXCOUNT(100)};									//	DM
 	END;
 
@@ -908,6 +908,120 @@ EXPORT	Layouts	:=	MODULE
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
 	END;
+	
+	EXPORT	rDigitalFootprint	:=	RECORD
+		STRING30	Sbfe_Contributor_Number;
+		STRING50	Contract_Account_Number;
+		STRING50	Original_Contract_Account_Number;
+		STRING3		Account_Type_Reported;
+		STRING		process_date;
+		STRING		original_process_date;
+		STRING8		Extracted_Date;
+		STRING8		Cycle_End_Date;
+		DF;
+		STRING2		source:=Constants().source;
+		BOOLEAN		active;
+	END;
+
+	EXPORT	rPreMerchantProcessing	:=	RECORD
+		STRING30	Sbfe_Contributor_Number;
+		STRING50	Contract_Account_Number;
+		STRING50	Original_Contract_Account_Number;
+		STRING3		Account_Type_Reported;
+		STRING		process_date;
+		STRING		original_process_date;
+		STRING8		Extracted_Date;
+		STRING8		Cycle_End_Date;
+		string9		Total_Transaction_Count;
+		string12	Total_Transaction_Amount;
+		string2		Merchant_Account_Status;
+		string9		Total_Processing_Rejects_Count;
+		string12	Total_Processing_Rejects_Amount;
+		string9		Total_Chargeback_Adjustment_Count;
+		string12	Total_Chargeback_Adjustment_Amount;
+		string9		Total_Processing_Refund_Count_;
+		string12	Total__Processing_Refund_Amount_;
+		string12	Total_Amount_Unpaid;
+		string12	Total_Amount_Settled;
+		string4		Average_Days_to_Deliver;
+		string12	Merchant_Reserve_Amount;
+		STRING2		Card_Transaction_Type;
+		STRING9		Total_Card_Transaction_Type_Count;
+		STRING12	Total_Card_Transaction_Type_Amount;
+		STRING2		Chargeback_Code;
+		STRING9		Total_Chargeback_Count;
+		STRING12	Total_Chargeback_Amount;
+		STRING2		Refund_Code;
+		STRING9		Total_Refund_Count;
+		STRING12	Total_Refund_Amount;
+		string4		Merchant_Classification_Code;
+		string9		Total_Merchant_Classification_Code_Count;
+		string12	Total_Merchant_Classification_Code_Amount;
+		string4		Average_Days_to_Deliver_by_MCC;
+		string9		Total_Chargeback_Count_by_MCC;
+		string12	Total_Chargeback_Amount_by_MCC;
+		string9		Total_Refund_Count_by_MCC;
+		string12	Total_Refund_Amount_by_MCC;
+		string1		Privacy_Indicator;
+		STRING2		Destination_Media_Code;
+		STRING9		Total_Destination_Media_Code;
+		STRING12	Total_Destination_Media_Amount;
+		STRING2		source:=Constants().source;
+		BOOLEAN		active;
+		DATASET(MerchantCardTransaction)							MerchantCTSegment{MAXCOUNT(100)};						//	CT
+		DATASET(MerchantChargeback)							MerchantChargebackSegment{MAXCOUNT(100)};						//	MT
+		DATASET(MerchantRefund)							MerchantRefundSegment{MAXCOUNT(100)};								//	MR
+		DATASET(MerchantClassificationCode)							MemberMCSegment{MAXCOUNT(500)};							//	MC
+		DATASET(MerchantDestinationMedia)							MemberDMSegment{MAXCOUNT(100)};							//	DM
+	end;
+
+	EXPORT	rMerchantProcessing	:=	RECORD
+		STRING30	Sbfe_Contributor_Number;
+		STRING50	Contract_Account_Number;
+		STRING50	Original_Contract_Account_Number;
+		STRING3		Account_Type_Reported;
+		STRING		process_date;
+		STRING		original_process_date;
+		STRING8		Extracted_Date;
+		STRING8		Cycle_End_Date;
+		string9		Total_Transaction_Count;
+		string12	Total_Transaction_Amount;
+		string2		Merchant_Account_Status;
+		string9		Total_Processing_Rejects_Count;
+		string12	Total_Processing_Rejects_Amount;
+		string9		Total_Chargeback_Adjustment_Count;
+		string12	Total_Chargeback_Adjustment_Amount;
+		string9		Total_Processing_Refund_Count_;
+		string12	Total__Processing_Refund_Amount_;
+		string12	Total_Amount_Unpaid;
+		string12	Total_Amount_Settled;
+		string4		Average_Days_to_Deliver;
+		string12	Merchant_Reserve_Amount;
+		STRING2		Card_Transaction_Type;
+		STRING9		Total_Card_Transaction_Type_Count;
+		STRING12	Total_Card_Transaction_Type_Amount;
+		STRING2		Chargeback_Code;
+		STRING9		Total_Chargeback_Count;
+		STRING12	Total_Chargeback_Amount;
+		STRING2		Refund_Code;
+		STRING9		Total_Refund_Count;
+		STRING12	Total_Refund_Amount;
+		string4		Merchant_Classification_Code;
+		string9		Total_Merchant_Classification_Code_Count;
+		string12	Total_Merchant_Classification_Code_Amount;
+		string4		Average_Days_to_Deliver_by_MCC;
+		string9		Total_Chargeback_Count_by_MCC;
+		string12	Total_Chargeback_Amount_by_MCC;
+		string9		Total_Refund_Count_by_MCC;
+		string12	Total_Refund_Amount_by_MCC;
+		string1		Privacy_Indicator;
+		STRING2		Destination_Media_Code;
+		STRING9		Total_Destination_Media_Code;
+		STRING12	Total_Destination_Media_Amount;
+		STRING2		source:=Constants().source;
+		BOOLEAN		active;
+	END;
+
 	
 	EXPORT	rMemberSpecific	:=	RECORD
 		STRING2		Record_Type;
