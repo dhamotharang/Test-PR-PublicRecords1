@@ -1226,6 +1226,7 @@
 		export string KEYWORD_UNOPS									:= '912';
 		export string KEYWORD_SECO_NIC							:= '913';
 		export string KEYWORD_BEGC									:= '914';
+		export string KEYWORD_NLGA									:= '915';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
