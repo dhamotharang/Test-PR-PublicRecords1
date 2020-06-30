@@ -51,7 +51,7 @@ ENDMACRO;
 export Proc_Build_Deed_Boolean_Keys(string filedate, boolean isFast) := function
 
 	//DF-23330 determine if there is a deed base file
-	delta_rec_exist := exists(LN_PropertyV2_Fast.Files.base.deed_mortg);
+	delta_rec_exist := exists(LN_PropertyV2_Fast.Files.basedelta.deed_mortg);
 	useDummyFile := IF(isFast AND NOT delta_rec_exist, TRUE, FALSE);
 	
 	superKeyPrefix := if (isFast,'property_fast','ln_propertyV2');

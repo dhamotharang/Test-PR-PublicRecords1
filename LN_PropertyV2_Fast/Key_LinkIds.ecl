@@ -9,7 +9,7 @@ EXPORT Key_LinkIds := MODULE
 		superfile_name		:= '~thor_data400::key::'+keyPrefix+'::'+doxie.Version_SuperKey+'::search.linkIds';
 		
 		base0	:=	LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2.File_Search_DID,false);
-		base1	:=	LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2_Fast.Files.base.search_prp,true);
+		base1	:=	LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2_Fast.Files.basedelta.search_prp,true);
 			
 		Base	:= if(isFast,base1,base0);
 		//shared dkeybuild	:= project(Base, transform(frandx.layouts.keybuild, self := left));

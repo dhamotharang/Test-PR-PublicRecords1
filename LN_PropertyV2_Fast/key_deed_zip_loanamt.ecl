@@ -4,8 +4,8 @@ export key_deed_zip_loanamt(boolean isFast = false) := FUNCTION
 
 keyPrefix := if (isFast, 'property_fast','ln_propertyV2');
 
-deed_mortgage				:=  if (isFast, LN_PropertyV2_Fast.Files.base.deed_mortg,ln_propertyv2.File_deed);
-addl_fares_deed			:= 	if (isFast, LN_PropertyV2_Fast.Files.base.addl_frs_d ,ln_propertyv2.File_addl_fares_deed);
+deed_mortgage				:=  if (isFast, LN_PropertyV2_Fast.Files.basedelta.deed_mortg,ln_propertyv2.File_deed);
+addl_fares_deed			:= 	if (isFast, LN_PropertyV2_Fast.Files.basedelta.addl_frs_d ,ln_propertyv2.File_addl_fares_deed);
 
 deed_building 			:= 	LN_PropertyV2_Fast.CleanDeed(deed_mortgage, isFast);
 search_building 		:= 	LN_PropertyV2_Fast.CleanSearch(isFast);

@@ -1,9 +1,9 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
 
-IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD;
+IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD, codes;
 
 //combine, clean and enrich
-EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStartDate = '' ) := FUNCTION
+EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDeltaStartDate = '' ) := FUNCTION
 	
 	// Determine start process_date for delta
 	
@@ -164,6 +164,14 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 																										// **** REMOVE "OLD" ABOVE **** // *****************************//
 	// -- PROCEED WITH BUILD --- //
   // populate ln_derived fields
+
+	dcodesv3 := Codes.File_Codes_V3_In(file_name = 'PROPERTY_ASSESSMENT', field_name = 'FLOOR2SUB') :independent;
+	
+	fncodesv3desc(string code_field, string vendor) := function 
+		file_desc := dcodesv3(code = code_field, field_name2[1]=vendor); 
+		return  file_desc[1].long_desc;
+	END ;
+
   recordof(cmbindAssesEmtpyLnFields) tPopulateLnFields(cmbindAssesEmtpyLnFields L) := TRANSFORM
 		SELF.ln_block										:= if(l.legal_block='',LN_PropertyV2_Fast.Functions_LN_Fields.ExtractBlock(L.legal_brief_description),'');
 		SELF.ln_lot											:= if(l.legal_lot_number='',LN_PropertyV2_Fast.Functions_LN_Fields.ExtractLot(L.legal_brief_description),'');
@@ -173,9 +181,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 		SELF.ln_condo_indicator					:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractCondo(L);
 		SELF.ln_mobile_home_indicator		:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractMH(L);
 		SELF.ln_land_use_category 			:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractLuseCat(L);
-    SELF.ln_subfloor                := LN_PropertyV2.fn_codesv3_desc(
-																					'FLOOR2SUB', L.floor_cover_code,'PROPERTY_ASSESSMENT',
-																					if(L.vendor_source_flag in ['F','S'], 'F',''));
+    SELF.ln_subfloor                := fncodesv3desc(L.floor_cover_code, if(L.vendor_source_flag in ['F','S'], 'F',''));
 		
 		//
 		self.ln_ownership_rights 				:= LN_PropertyV2_Fast.Functions_LN_Owner_Fields.ExtractAssesOwnRghts(L);
@@ -188,7 +194,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	END;
 	
 	// Jira DF-11862 - added isfast to persist name file in order to run continuous delta
-	combined_assessment := PROJECT(cmbindAssesEmtpyLnFields,tPopulateLnFields(LEFT)) : persist('~persist::property::combined_assessment'+if(isFast,'_d','f'));
+	combined_assessment := PROJECT(cmbindAssesEmtpyLnFields,tPopulateLnFields(LEFT));// : persist('~persist::property::combined_assessment'+if(isFast,'_d','f'));
 			//dataset('~persist::property::combined_assessment'+if(isFast,'_d','f'),recordof(cmbindAssesEmtpyLnFields),thor)(process_date<=versionDate);
 	
 	recordof(cmbindDeedEmtpyLnFields) tPopulateDeedLnFields(cmbindDeedEmtpyLnFields L) := TRANSFORM
@@ -228,13 +234,13 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 
 	// address improvements (EPIC)
 	// Jira DF-11862 - added isfast to persist name file in order to run continuous delta
-	address_improvement_prep_file := ln_propertyv2_addressenhancements.PrepFile(dRemovePropagatedRecs,assessor_base,deeds_base,isFast) : persist('~thor400_data::persist::epic_prep_file'+if(isFast,'_d','f'));
+	address_improvement_prep_file := ln_propertyv2_addressenhancements.PrepFile(dRemovePropagatedRecs,assessor_base,deeds_base,isFast);// : persist('~thor400_data::persist::epic_prep_file'+if(isFast,'_d','f'));
 															//dataset('~thor400_data::persist::epic_prep_file'+if(isFast,'_d','f'),ln_propertyv2_addressenhancements.layouts.prep_rec,thor);
-	by_name_street_attempt   := ln_propertyv2_addressenhancements.fnJoinOnNameStreetCounty(address_improvement_prep_file,isFast)  : persist('~thor400_data::persist::epic_by_name_street'+if(isFast,'_d','f'));
+	by_name_street_attempt   := ln_propertyv2_addressenhancements.fnJoinOnNameStreetCounty(address_improvement_prep_file,isFast);//  : persist('~thor400_data::persist::epic_by_name_street'+if(isFast,'_d','f'));
 															//dataset('~thor40_241::persist::epic_by_name_street'+if(isFast,'_d','f'),ln_propertyv2_addressenhancements.layouts.prep_rec,thor);
-  by_street_attempt        := ln_propertyv2_addressenhancements.fnJoinOnStreetCounty(by_name_street_attempt,isFast)             : persist('~thor400_data::persist::epic_by_street'+if(isFast,'_d','f'));
+  by_street_attempt        := ln_propertyv2_addressenhancements.fnJoinOnStreetCounty(by_name_street_attempt,isFast);//             : persist('~thor400_data::persist::epic_by_street'+if(isFast,'_d','f'));
 															//dataset('~thor400_data::persist::epic_by_street'+if(isFast,'_d','f'),ln_propertyv2_addressenhancements.layouts.prep_rec,thor);
-	by_name_primname_attempt := ln_propertyv2_addressenhancements.fnJoinOnNamePrimNameCounty(by_street_attempt,isFast)            : persist('~thor400_data::persist::epic_by_name_primname'+if(isFast,'_d','f'));
+	by_name_primname_attempt := ln_propertyv2_addressenhancements.fnJoinOnNamePrimNameCounty(by_street_attempt,isFast);//            : persist('~thor400_data::persist::epic_by_name_primname'+if(isFast,'_d','f'));
 															//dataset('~thor400_data::persist::epic_by_name_primname'+if(isFast,'_d','f'),ln_propertyv2_addressenhancements.layouts.prep_rec,thor);
 	reclean                  := ln_propertyv2_addressenhancements.fnRecleanAndReapplyToSearch(by_name_primname_attempt,dRemovePropagatedRecs,Assessor_base,Deeds_base,isFast);
 
@@ -275,13 +281,14 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 																				 LN_PropertyV2.Layouts.layout_deed_mortgage_common_model_base_scrubs,flat,opt);
 
   // To avoid duplicate records on the delta in case forceDeltaStartDate is informed instead of max process_date calculated (Jira DF-18820)
-	combined_addl_legal_d				:= dedup(LN_PropertyV2_fast.files.base.addl_legal+combined_addl_legal,all);
-	addlFaresAssessorPatched_d	:= dedup(LN_PropertyV2_fast.files.base.addl_frs_a+addlFaresAssessorPatched,all);
-	addlFaresDeedsPathced_d			:= dedup(LN_PropertyV2_fast.files.base.addl_frs_d+addlFaresDeedsPathced,all);
-	addlNames_d									:= dedup(LN_PropertyV2_fast.files.base.addl_names+addlNames,all);
-	search_withdid_d						:= dedup(LN_PropertyV2_fast.files.base.search_prp+search_withdid,all);
-	assesswBitmap_d							:= dedup(fast_base_assessment+assesswBitmap,all);
-	deedswbitmap_d							:= dedup(fast_base_deed_mortg+deedswbitmap,all);
+	// DF-27847 to include only current delta and append logical file to superfle
+  combined_addl_legal_d				:= dedup(/*LN_PropertyV2_fast.files.base.addl_legal+*/combined_addl_legal,all);
+	addlFaresAssessorPatched_d	:= dedup(/*LN_PropertyV2_fast.files.base.addl_frs_a+*/addlFaresAssessorPatched,all);
+	addlFaresDeedsPathced_d			:= dedup(/*LN_PropertyV2_fast.files.base.addl_frs_d+*/addlFaresDeedsPathced,all);
+	addlNames_d									:= dedup(/*LN_PropertyV2_fast.files.base.addl_names+*/addlNames,all);
+	search_withdid_d						:= dedup(/*LN_PropertyV2_fast.files.base.search_prp+*/search_withdid,all);
+	assesswBitmap_d							:= dedup(/*fast_base_assessment+*/assesswBitmap,all);
+	deedswbitmap_d							:= dedup(/*fast_base_deed_mortg+*/deedswbitmap,all);
 
 	combined_addl_legal_c				:= if(isfast,combined_addl_legal_d,combined_addl_legal);
 	addlFaresAssessorPatched_c	:= if(isfast,addlFaresAssessorPatched_d,addlFaresAssessorPatched);
@@ -290,6 +297,33 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	search_withdid_c						:= if(isfast,search_withdid_d,search_withdid);
 	assesswBitmap_c							:= if(isfast,assesswBitmap_d,assesswBitmap);
 	deedswbitmap_c							:= if(isfast,deedswbitmap_d,deedswbitmap);
+
+// DF-27847 to include only current delta and append logical file to superfle
+	addToSuperFiles(string superFileName, string subFileName) := FUNCTION
+			RETURN SEQUENTIAL(
+									if (not fileservices.SuperFileExists(superFileName), fileservices.CreateSuperFile(superFileName)),
+									fileservices.StartSuperFileTransaction(),
+									fileservices.AddSuperFile(superFileName,subFileName),
+									fileservices.ClearSuperFile(superFileName+'::delta'),
+									fileservices.AddSuperFile(superFileName+'::delta',subFileName),
+									fileservices.FinishSuperFileTransaction()
+							);
+	END;	
+
+	bld_propertyv2_legal_f 				:= sequential(output(combined_addl_legal,,alg+'_'+versionDate,compressed,overwrite),
+	                               addToSuperFiles(alg,alg+'_'+versionDate));
+	bld_propertyv2_fares_tax_f 		:= sequential(output(addlFaresAssessorPatched,,afa+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(afa,afa+'_'+versionDate));
+	bld_propertyv2_fares_deed_f 	:= sequential(output(addlFaresDeedsPathced,,afd+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(afd,afd+'_'+versionDate));
+	bld_propertyv2_ln_addl_names_f:= sequential(output(addlNames,,aln+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(aln,aln+'_'+versionDate));
+	bld_propertyv2_search_f 			:= sequential(output(search_withdid,,asr+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(asr,asr+'_'+versionDate));
+	bld_propertyv2_Assesor_f 			:= sequential(output(assesswBitmap,,asm+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(asm,asm+'_'+versionDate));
+	bld_propertyv2_Deed_f 				:= sequential(output(deedswbitmap,,ade+'_'+versionDate,compressed,overwrite),
+		                        		 addToSuperFiles(ade,ade+'_'+versionDate));
 
 	PromoteSupers.MAC_SF_BuildProcess(combined_addl_legal_c,		 alg,bld_propertyv2_legal,2,,true,versionDate);
 	PromoteSupers.MAC_SF_BuildProcess(addlFaresAssessorPatched_c,afa,bld_propertyv2_fares_tax,2,,true,versionDate);
@@ -322,14 +356,14 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	return	sequential(	
 											LN_PropertyV2_Fast.BuildLogger.update(versionDate,'base_build_start_date',(STRING8)Std.Date.Today()),
 											LN_PropertyV2_Fast.BuildLogger.update(versionDate,'update_type',if(isFast,'DELTA','FULL')),
-											bld_propertyv2_legal,
-											bld_propertyv2_fares_tax,
-											bld_propertyv2_fares_deed,
-											bld_propertyv2_ln_addl_names,
+											if(isFast,bld_propertyv2_legal_f,bld_propertyv2_legal),
+											if(isFast,bld_propertyv2_fares_tax_f,bld_propertyv2_fares_tax),
+											if(isFast,bld_propertyv2_fares_deed_f,bld_propertyv2_fares_deed),
+											if(isFast,bld_propertyv2_ln_addl_names_f,bld_propertyv2_ln_addl_names),
 											if(not(isfast),set_addr_tx_id),
-											bld_propertyv2_search,
-											bld_propertyv2_Assesor,
-											bld_propertyv2_Deed,
+											if(isFast,bld_propertyv2_search_f,bld_propertyv2_search),
+											if(isFast,bld_propertyv2_Assesor_f,bld_propertyv2_Assesor),
+											if(isFast,bld_propertyv2_Deed_f,bld_propertyv2_Deed),
 											LN_PropertyV2_Fast.BuildLogger.update(versionDate,'base_build_end_date',(STRING8)Std.Date.Today()),
 											);	
 END;
