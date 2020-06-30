@@ -5,13 +5,13 @@ EXPORT Clean_Name(pInputFile) :=
 FUNCTIONMACRO
 	import address, ut;
 	pInputFile tr(pInputFile l) := TRANSFORM
-			clean_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-			cleanperson73								:= Address.cleanperson73(clean_full_name);
-			SELF.cleaned_name.fname				:= ut.CleanSpacesAndUpper(cleanperson73[6..25]);
-			SELF.cleaned_name.mname				:= ut.CleanSpacesAndUpper(cleanperson73[26..45]); 
-			SELF.cleaned_name.lname				:= ut.CleanSpacesAndUpper(cleanperson73[46..65]);
-			SELF.cleaned_name.name_score		:= ut.CleanSpacesAndUpper(cleanperson73[71..73]);		
-
+			full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+			cleanperson73 := Address.cleanperson73(full_name);
+			clean_full_name := ut.CleanSpacesAndUpper(cleanperson73[6..25]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[26..45]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[46..65]);
+			SELF.cleaned_name.fname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[6..25])	, l.raw_first_name);
+			SELF.cleaned_name.mname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[26..45]) 	, l.raw_middle_name);
+			SELF.cleaned_name.lname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[46..65])  , l.raw_last_name);
+			SELF.cleaned_name.name_score		:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[71..73]), '15' );			
 			SELF.cleaned_name.title 				:= ut.fGetTitle(ut.CleanSpacesAndUpper(regexreplace('\\n|\\t',l.raw_Title,'')));
 			SELF.cleaned_name.name_suffix 	:= ut.fGetSuffix(ut.CleanSpacesAndUpper(regexreplace('\\n|\\t',l.raw_Orig_Suffix,''))); 	
 			SELF:=l;
