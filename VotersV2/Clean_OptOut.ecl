@@ -2,8 +2,7 @@
 
 EXPORT Clean_OptOut(STRING  pVersion) := FUNCTION
 
-	OptOutInput:=  dataset(VotersV2.cluster + 'in::Voters::OptOut::sprayed::'+pVersion, VotersV2.Layout_Emerges_OptOut,	
-												csv(heading(1),separator(','),terminator(['\r\n','\r','\n']),quote('"')));
+	OptOutInput:=  VotersV2.File_OptOut_In(pVersion);
 
 	VotersV2.Layout_Emerges_OptOut getCleanOptOut(VotersV2.Layout_Emerges_OptOut l) := transform
 		self.first_name    					 := ut.CleanSpacesAndUpper(l.first_name);

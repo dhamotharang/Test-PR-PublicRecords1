@@ -4,7 +4,7 @@ EXPORT fSpray_OptOut(STRING pVersion) := FUNCTION
 	
  	pSprayed_name := FileServices.SprayVariable(
 										'bctlpedata12.risk.regn.net'
-									 ,'/data/temp/mireleaa/voter_opt_out/emerges_(ei)/' + pVersion + '/e*'
+									 ,'/data/Builds/builds/voters_opt_out/data/' + pVersion + '/e*'
 									 ,,,,		 
 									 ,STD.System.Thorlib.Group( )
 									 ,VotersV2.cluster + 'in::Voters::OptOut::sprayed::'+pVersion
@@ -15,5 +15,3 @@ EXPORT fSpray_OptOut(STRING pVersion) := FUNCTION
 	RETURN pSprayed_name;
 
 END;
-
-
