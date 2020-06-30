@@ -1,4 +1,4 @@
-// This output for this function is the product, subfile name and the version number 
+﻿// This output for this function is the product, subfile name and the version number 
 // It also always returns the three (header, quick header & Daily utility) key versions 
 // The output can be limited to a particular product or products by passing a product mask in.
 // Only when valid despray information passed into the funtion, will files be written, otherwise the
@@ -21,7 +21,7 @@ EXPORT Get_Dataset_Versions(
 		RECURSE := TRUE;
 
 		// Header Keys
-		header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_header_superkeyname),
+		header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'HEADER_KEY',
 				SELF.subfile := '',
@@ -29,7 +29,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::header::(.*)::data',
 					LEFT.name,1,NOCASE)));
 		
-		quick_header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_superkeyname),
+		quick_header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'QUICK_HEADER_KEY',
 				SELF.subfile := '',
@@ -37,7 +37,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::headerquick::(.*)::did',
 					LEFT.name,1,NOCASE)));
 		
-		daily_utility_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_superkeyname),
+		daily_utility_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DAILY_UTILITY_KEY',
 				SELF.subfile := '',
@@ -97,28 +97,28 @@ EXPORT Get_Dataset_Versions(
 					'base::business_header::(.*)::best$',
 					LEFT.name,1,NOCASE)));
 
-		Address_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.person_header_filename),
+		Address_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'PERSON HEADER',
 				SELF.version := REGEXFIND(
-					'base::header(.*)$',
+					'key::header(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Address_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_filename),
+		Address_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'QUICK HEADER',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.header_files.quick_header_filename_raw + '_(.*)$',
+					'key::headerquick(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Address_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_filename,RECURSE),
+		Address_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname,RECURSE),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'DAILY UTILITY',
 				SELF.version := REGEXFIND(
-					'in::utility::(.*)::daily_did$',
+					'key::utility::(.*)::daily_did$',
 					LEFT.name,1,NOCASE)));
 					
 		Address :=
@@ -145,28 +145,28 @@ EXPORT Get_Dataset_Versions(
 					AccountMonitoring.product_files.phone.plus_filename_subfile + '_(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.person_header_filename),
+		Phone_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'PERSON HEADER',
 				SELF.version := REGEXFIND(
-					'base::header(.*)$',
+					'key::header(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_filename),
+		Phone_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'QUICK HEADER',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.header_files.quick_header_filename_raw + '_(.*)$',
+					'key::headerquick(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_filename,RECURSE),
+		Phone_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname,RECURSE),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'DAILY UTILITY',
 				SELF.version := REGEXFIND(
-					'in::utility::(.*)::daily_did$',
+					'key::utility::(.*)::daily_did$',
 					LEFT.name,1,NOCASE)));
 
 		Phone_Person_Best := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.person_best_filename),
@@ -479,7 +479,7 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// DIDUpdate
-		rid_did_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_rid_did_superkeyname),
+		rid_did_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DIDUPDATE',
 				SELF.subfile := 'RID_DID',
@@ -487,7 +487,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::header::(.*)::rid_did',
 					LEFT.name,1,NOCASE)));
 		
-		rid_did_split_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_rid_did_split_superkeyname),
+		rid_did_split_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_split_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DIDUPDATE',
 				SELF.subfile := 'RID_DID_SPLIT',
@@ -500,7 +500,7 @@ EXPORT Get_Dataset_Versions(
 			rid_did_split_key;
 			
 		// BDIDUpdate
-		BDIDUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.business_header_key_rcid_superkeyname),
+		BDIDUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_business_header_rcid_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'BDIDUPDATE',
 				SELF.subfile := '',
@@ -518,7 +518,7 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// BipBest Update
-		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.bipbest_header_superkeyname),
+		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_bipbest_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'BIPBESTUPDATE',
 				SELF.subfile := '',
