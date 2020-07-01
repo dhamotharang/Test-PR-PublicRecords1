@@ -315,7 +315,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 	
 	EXPORT Individual_Base := FUNCTION
 		prep_hist	:= project(Enclarity.Files(filedate,pUseProd).individual_base.built, transform(Enclarity.Layouts.individual_base_temp,
-														self.cpa_optout := '', self := left));
+														self.cpa_optout := if(left.dotid = 1, 'Y',''), self := left));
 		// hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).individual_base.built, Enclarity.layouts.individual_base_temp);
 		hist_base	:= Mark_history(prep_hist, Enclarity.layouts.individual_base_temp);
 													

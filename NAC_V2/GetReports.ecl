@@ -1,8 +1,14 @@
 ﻿import STD;
-ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'nac2', rpt);
-ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
-EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
+ExtractFileName(string ilfn) := FUNCTION
+		s1 := Std.Str.SplitWords(ilfn, '::');
+		n := COUNT(s1);
+		return s1[n];
+END;
+
+EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
+
+		fn := ExtractFileName(ilfn);
 
 		//nac2 := DATASET(lfn, $.Layouts2.rNac2Ex, thor);
 
