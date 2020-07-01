@@ -89,15 +89,15 @@ export tcitation  := project(jcitation, transform(FLAccidents_Ecrash.Layout_Infi
 incidents := join(distribute(incident, hash(incident_id)), incidents_todelete,
    				trim(left.incident_id, all)= trim(right.incident_id,all),
    				left only, local);
-					
-//filter out Nassau TF
-export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id = '1603437')),transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
+
+export tincident  := project(incidents,transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
 													,SELF.incident_id := LEFT.incident_id[1..9]; 
 													 SELF.case_identifier := STD.Str.ToUpperCase(LEFT.case_identifier);
 													 SELF.state_report_number := STD.Str.ToUpperCase(LEFT.state_report_number);
 													 SELF.crash_time := IF(left.incident_id IN ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', LEFT.crash_time);
 													 SELF.contrib_source := IF(STD.Str.ToUpperCase(TRIM(LEFT.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', LEFT.contrib_source);
 													 SELF.releasable := IF(STD.Str.ToUpperCase(TRIM(LEFT.releasable,left,right)) IN ['\\N', 'NULL', ''],  '1', LEFT.releasable);
+													 SELF.Supplemental_Report := IF(STD.Str.ToUpperCase(TRIM(LEFT.Supplemental_Report,left,right)) IN ['\\N', 'NULL', ''],  '', LEFT.Supplemental_Report);
 													 SELF:= LEFT;));		
 
  jpersn := 	join(distribute(persn, hash(incident_id)), incidents_todelete, 

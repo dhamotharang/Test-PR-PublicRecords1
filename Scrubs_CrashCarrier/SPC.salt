@@ -1,0 +1,36 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_CrashCarrier
+FILENAME:In_CrashCarrier
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+
+FIELDTYPE:Invalid_id:CUSTOM(Scrubs.functions.fn_numeric>0,7)
+FIELDTYPE:Invalid_mandatory_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)
+FIELDTYPE:Invalid_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0) 
+FIELDTYPE:Invalid_zip:CUSTOM(Scrubs.functions.fn_valid_zip>0)
+FIELDTYPE:Invalid_Numeric_Optional:ALLOW(0123456789 )
+FIELDTYPE:Invalid_interstate:ENUM(N|Y|X| )
+FIELDTYPE:Invalid_no_id_flag:ENUM(0|1)
+
+FIELD:carrier_id:LIKE(Invalid_id):0,0						
+FIELD:crash_id:LIKE(Invalid_id):0,0					
+FIELD:carrier_source_code:0,0			
+FIELD:carrier_name:LIKE(Invalid_mandatory_alpha):0,0						
+FIELD:carrier_street:LIKE(Invalid_alpha):0,0							
+FIELD:carrier_city:LIKE(Invalid_alpha):0,0			
+FIELD:carrier_city_code:0,0
+FIELD:carrier_state:LIKE(Invalid_alpha):0,0
+FIELD:carrier_zip_code:LIKE(Invalid_alpha):0,0
+FIELD:crash_colonia:0,0
+// FIELD:prefix:0,0 -- not populated by the vendor and "prefix" is a reserved word, so commenting it out
+FIELD:docket_number:LIKE(Invalid_Numeric_Optional):0,0
+FIELD:interstate:LIKE(Invalid_interstate):0,0
+FIELD:no_id_flag:LIKE(Invalid_no_id_flag):0,0
+FIELD:state_number:LIKE(Invalid_alpha):0,0			
+FIELD:state_issuing_number:LIKE(Invalid_alpha):0,0

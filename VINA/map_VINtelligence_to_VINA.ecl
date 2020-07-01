@@ -5407,17 +5407,18 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																			 ut.CleanSpacesAndUpper(L.ENG_ASP_VVTL_CD)='YES'
 																			 => 'Y',
 																			 '');
-		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['N','NO'] 					//157 iso_liability-Y,N		
+		//DF-27656
+		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['N','NO'] 					//157 iso_liability-Y,N		
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL)) +
-																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['N','NO']	
+																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL_2018)) +
+																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['N','NO']	
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL)) +
-																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND)='Y','R','');
+																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL_2018)) +
+																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND_2018)='Y','R','');
 		SELF.series_name_condensed	:= temp_series_name;																										//158 series_name_condensed
 		SELF.aces_data							:= stringlib.stringtouppercase(L.ACES_VEHICLE_ID) +																	//159 aces_data-all blank
 																	 stringlib.stringtouppercase(L.ACES_BASE_VEHICLE)  +															//    ACES_VEHICLE_ID(235)

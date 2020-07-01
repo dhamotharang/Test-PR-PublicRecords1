@@ -1,4 +1,4 @@
-import doxie, tools,autokeyb2,dca;
+﻿import doxie, tools,autokeyb2,dca;
 export Keys(
 	 string													pversion									= ''
 	,boolean												pUseOtherEnvironment			= false
@@ -18,7 +18,12 @@ module
 	export EntNumNonFilter := pFileKeybuildNonFiltered;
 		
 	export FilterBdids	 := Basebdid	(bdid	!= 0);
-	export dFileContacts := pFileContacts;
+	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029
+	// applying the same record_type filter applied on contact base file that is used to create the DCAV2.File_Keybuild file for the creation of companies BDID key.
+	// So, only keeping the contact records that matched this record_type filter code for ContactBDID key.
+	// filter applied is - record_type in [DCAV2.Utilities.RecordType.Updated,DCAV2.Utilities.RecordType.New]
+	export FilterContBdids			:= pFileContacts(bdid	!= 0 and record_type in [DCAV2.Utilities.RecordType.Updated,DCAV2.Utilities.RecordType.New]);
+	export FilterContBdids_ded  := dedup(sort(distribute(FilterContBdids, hash(BDID, rawfields.enterprise_num)), record, local), record, except rid, lncagid, lncaghid, local);
 	
 	shared layout_dca_hierarchy :=
 	record
@@ -96,6 +101,7 @@ module
 	export HierEntNum 	:= tools.macf_FilesIndex('dHierRootSubNew		,{Enterprise_num																							}	,{dHierRootSubNew	}'	,knames.HierEntNum		);
 	export EntNum				:= tools.macf_FilesIndex('EntNumFilt   		  ,{Enterprise_num																							}	,{EntNumFilt  		}'	,knames.EntNum				);
 	export EntNumNonFilt:= tools.macf_FilesIndex('EntNumNonFilter		,{Enterprise_num																				    	}	,{EntNumNonFilter }'	,knames.EntNumNonFilt	);
+	export ContactBdid 	:= tools.macf_FilesIndex('FilterContBdids		,{bdid																												}	,{FilterContBdids	}'	,knames.ContactBdid		);
 
 end;
 

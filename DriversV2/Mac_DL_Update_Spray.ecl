@@ -53,9 +53,11 @@ macro
 
 //#workunit('name','DrvLic '+ state + ' Spray & CLean');
 
-%sourceCsvSeparater% := if (state='NC','$',if (state='MA','\\|\\|','\\|'));
+%sourceCsvSeparater% := map(state='NC'=>'$',
+                            state='MA'=>'\\|\\|',
+							              state='OH'=>'\\t', '\\|');
 %sourceCsvTeminater% := '\\n,\\r\\n';
-%sourceCsvQuote% := '\"';
+%sourceCsvQuote% 		 := '\"';
 
 %st% := stringlib.StringToUpperCase(trim(state,left,right));
 
@@ -91,7 +93,7 @@ macro
 					 %subname% = 'MO_ICISSU' => 392,  //ebcdic
 					 %subname% = 'NE'        => 130,
 					 %subname% = 'NV'        => 307,
-					 %subname% = 'OH'        => 402,
+					// %subname% = 'OH'        => 402,// Vendor sending us varying length data  
 					 //%subname% = 'TN'        => 219,
 					 %subname% = 'TN'        => 253,
 					 //%subname% = 'TX'        => 275,  //ebcdic
@@ -106,7 +108,7 @@ macro
 	//re-instated MO per Jill Luber 20090716
 	//%spray_raw% := if (%st% in ['CT', 'ME', 'MI', 'MN', 'MO', 'OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
 	//%spray_raw% := if (%st% in ['CT', 'LA','ME', 'MI', 'MN','MO','NE','NV','OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
-	%spray_raw% := if (%st% in ['LA','ME', 'MI', 'MN','NE','NV','OH', 'TN', 'WI', 'WV', 'WY'] OR
+	%spray_raw% := if (%st% in ['LA','ME', 'MI', 'MN','NE','NV', 'TN', 'WI', 'WV', 'WY'] OR
 	                   %subname% = 'MO_BASIC' OR %subname% = 'MO_ICISSU',
 						FileServices.SprayFixed(Source_IP
 												,source_path + file_name

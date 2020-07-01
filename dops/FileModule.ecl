@@ -1,9 +1,20 @@
 ﻿import lib_fileservices,lib_thorlib,ut,STD;
 EXPORT FileModule(string esp
 									,string port = '8010'
+									,string targettype = ''
+									,string target = ''
 									) := module
 									
 	shared l_esp := if (~regexfind('http://',esp),'http://'+esp, esp);
+	shared l_roxiepathprefix := '/var/lib/HPCCSystems/hpcc-data/roxie/';
+	shared rParts := record
+                string nodeip := '';
+                string dirpath := '';
+                string partname := '';
+                dataset(STD.File.FsFilenameRecord) dFParts;
+                //unsigned4 tfileparts;
+                
+	end;
 	
 	shared rExceptions := record
 		string errormsg{xpath('Exception/Message')}
@@ -139,5 +150,95 @@ EXPORT FileModule(string esp
 	
 	end;
 	
+	export dRoxieTopology := dops.modWsTopology(esp,port).fTpTargetClusterQuery(targettype,target) : independent;
+	export dRoxiePackage := dops.GetRoxiePackage(esp,port,target).Keys() : independent;
 	
+	export fGetPartsFromRoxie(string p_dirpath
+                           ,string p_lasttoken
+                           ,string filedali = ''
+													 ) := FUNCTION
+
+		
+		rParts xform(dRoxieTopology l, UNSIGNED2 cntr) := TRANSFORM
+			dParts := STD.File.RemoteDirectory(l.netaddress,p_dirpath,p_lasttoken+'._*');
+      SELF.nodeip := l.netaddress;
+      self.dirpath := p_dirpath;
+      self.dFParts := dParts;
+    END;
+    
+		dGetNodesAndParts := project(dRoxieTopology, xform(left,COUNTER));
+			rParts - dFParts xNormPath(dGetNodesAndParts l, STD.File.FsFilenameRecord r) := transform
+      self.partname := r.name;
+      self := l;
+    end;
+    
+		dNormParts := sort(normalize(dGetNodesAndParts,left.dFParts,xNormPath(left,right)),partname,nodeip);
+		
+		RETURN dNormParts(~regexfind('\\$',partname));
+END;
+
+	
+	// file copy status
+	export fGetRoxieFileCopyStatus(
+																string roxiedali
+															) := function
+	
+		rCopyStatus := record
+			string packagename := '';
+			string packageid := '';
+			set of string tokens := [];
+			string buildversion := '';
+      string superfile := '';
+      string subfile := '';
+      string directory := '';
+      string filemask := '';
+			unsigned4 copiedfileparts := 0;
+      unsigned4 expectedfileparts := 0;
+      unsigned4 pendingpartstocopy := 0;
+      unsigned4 percentcopied := 0;
+			string wuid := '';
+		end;
+
+		rCopyStatus xGetTotalFilePartFromDali(dRoxiePackage l) := transform
+                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (roxiedali <> '','~foreign::'+roxiedali+'::','~')+l.subfile,'numparts');
+                self := l;
+		end;
+
+		dGetTotalFilePartFromDali := project(dRoxiePackage,xGetTotalFilePartFromDali(left));
+		
+		rCopyStatusWithParts := record
+			rCopyStatus;
+      dataset(rParts - dFParts) dAllParts;
+		end;
+
+		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
+                wordcount := STD.Str.CountWords(l.subfile,'::');
+                getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
+                abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
+                dGetParts := fGetPartsFromRoxie(abspath,getlasttoken);
+                self.filemask := getlasttoken;
+                self.directory := abspath;
+                self.dAllParts := dGetParts;
+                self.copiedfileparts := count(dedup(dGetParts,partname));
+                self := l;
+		end;
+
+		dCopyStatus := project(dGetTotalFilePartFromDali,xCopyStatus(left));
+		rCopyStatus xNormRecs(dCopyStatus l, rParts - dFParts r) := transform
+			l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
+			self.tokens := l_tokens;
+                //self.partname := r.partname;
+                self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+                self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
+								self.buildversion := dataset(l_tokens,{string tokens})(regexfind('^[0-9]+$',tokens)
+																																				or regexfind('^[0-9]+[a-z]',tokens))[1].tokens;
+								self.wuid := WORKUNIT;
+								self := l;
+		end;
+
+		dFinalCopyStatus := dedup(sort(normalize(dCopyStatus,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
+
+		return dFinalCopyStatus;
+		
+	end;
 end;

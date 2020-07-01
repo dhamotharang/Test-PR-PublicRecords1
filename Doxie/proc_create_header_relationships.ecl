@@ -89,7 +89,7 @@ export proc_create_header_relationships(string filedate) := function
 			checkkey('~thor_data400::key::header::'+filedate+'::ssn5.did') +
 			checkkey('~thor_data400::key::header::'+filedate+'::address') +
 			//checkkey('~thor_data400::key::header::'+filedate+'::dob') +
-			checkkey('~thor_data400::key::header::'+filedate+'::parentlnames') +
+			//checkkey('~thor_data400::key::header::'+filedate+'::parentlnames') +
 			checkkey('~thor_data400::key::header::'+filedate+'::zipprlname') +
 			checkkey('~thor_data400::key::header::'+filedate+'::dobname')+
 			checkkey('~thor_data400::key::header::'+filedate+'::ssn4_v2.did');
@@ -244,12 +244,6 @@ export proc_create_header_relationships(string filedate) := function
 						's_did', 'did', 'link', '1:M', true
 						);					
 						
-	ParentLnames_to_header:= fileServices.AddFileRelationship
-						(
-						'~thor_data400::key::header::'+filedate+'::data',
-						'~thor_data400::key::header::'+filedate+'::parentlnames',
-						's_did', 'did', 'link', '1:M', true
-						);
 						
 	ZipPRLName_to_header:= fileServices.AddFileRelationship
 						(
@@ -294,7 +288,7 @@ export proc_create_header_relationships(string filedate) := function
 						DTS_StreetZipName_to_header,DTS_FnameSmall_to_header,
 						ssn4_to_header,ssn5_to_header,
 						header_address_to_header,
-						ParentLnames_to_header,ZipPRLName_to_header,
+						ZipPRLName_to_header,
 						dobname_to_header,ssn4_v2_to_header
 						),
 					FileServices.sendemail

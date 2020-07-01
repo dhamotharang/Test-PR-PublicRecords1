@@ -8,7 +8,9 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	//DF-23827: Update Transaction File
 	
-	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
+	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
+	PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main_Temp trT(inFile l):= transform
 		self.date_file_loaded 				:= version;
 		self.transaction_date					:= if(Std.Date.IsValidDate((unsigned)(PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8])),
 																				PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8],

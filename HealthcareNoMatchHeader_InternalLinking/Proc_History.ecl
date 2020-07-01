@@ -6,7 +6,7 @@ EXPORT  Proc_History(
                            
     dCRK        :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK;
     dCRKFather  :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK_Father;
-    dHistoryOld :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).History_Father;
+    dHistoryOld :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).History;
     pTimestamp  :=  (STRING)STD.Date.CurrentDate()+(STRING)STD.Date.CurrentTime(); 
     
     HealthcareNoMatchHeader_InternalLinking.Layout_History  tHistory(dCRK pNew, dCRKFather pOld)  :=  TRANSFORM
@@ -24,12 +24,12 @@ EXPORT  Proc_History(
     dHistoryNew :=  JOIN(
                       DISTRIBUTE(dCRK,HASH(rid)),
                       DISTRIBUTE(dCRKFather,HASH(rid)),
-                      LEFT.rid  = RIGHT.rid AND
-                      (
-                        LEFT.nomatch_id <>  RIGHT.nomatch_id OR
-                        LEFT.lexid      <>  RIGHT.lexid OR
-                        LEFT.crk        <>  RIGHT.crk
-                      ),
+                        LEFT.rid  = RIGHT.rid AND
+                        (
+                          LEFT.nomatch_id <>  RIGHT.nomatch_id OR
+                          LEFT.lexid      <>  RIGHT.lexid OR
+                          LEFT.crk        <>  RIGHT.crk
+                        ),
                       tHistory(LEFT,RIGHT),
                       LOCAL
                     );

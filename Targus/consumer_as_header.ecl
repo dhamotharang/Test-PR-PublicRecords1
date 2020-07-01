@@ -31,7 +31,7 @@ export	consumer_as_header(dataset(targus.layout_consumer_out) pTargusConsumer = 
 		self.mname 				    	:= pLeft.minit;
 		self.vendor_id 					:= trim(pLeft.record_id) + '_' +
 											pLeft.pubdate;
-		self.phone 						:= '';//pleft.phone_number;
+		self.phone 						:= if(regexfind('[a-zA-Z]', pleft.phone_number), '', pleft.phone_number);
 		self.ssn 						:= '';
 		self.dob 						:= 0;
 		self.cbsa 						:= if(pLeft.cbsa!='',pLeft.cbsa + '0','');

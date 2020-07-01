@@ -186,7 +186,7 @@ EXPORT Build_Datacard(
 		Unsigned8 postdir, Unsigned8 unit_desig,Unsigned8 sec_range,Unsigned8 p_city_name, Unsigned8 v_city_name,Unsigned8 st,Unsigned8 zip, 
 		Unsigned8 zip4,Unsigned8 cart,Unsigned8 cr_sort_sz, Unsigned8 lot, Unsigned8 lot_order,Unsigned8 dbpc,Unsigned8 chk_digit, Unsigned8 rec_type, 
 		Unsigned8 fips_state,Unsigned8 fips_county,Unsigned8 geo_lat, Unsigned8 geo_long, Unsigned8 msa, Unsigned8 geo_blk, Unsigned8 geo_match, 
-		Unsigned8 err_stat,Unsigned8 corp_legal_name,Unsigned8 dba_name, Unsigned8 active_duns_number, Unsigned8 hist_duns_number,
+		Unsigned8 err_stat, Unsigned8 locid, Unsigned8 corp_legal_name,Unsigned8 dba_name, Unsigned8 active_duns_number, Unsigned8 hist_duns_number,
 		Unsigned8 deleted_key, Unsigned8 deleted_fein, /*Newly added ????????? !!!!!!!!!!!!!!!  W20160503-114312 */
 		Unsigned8 active_enterprise_number, Unsigned8 hist_enterprise_number,Unsigned8 ebr_file_number, Unsigned8 active_domestic_corp_key,
 		Unsigned8 hist_domestic_corp_key, Unsigned8 foreign_corp_key, Unsigned8 unk_corp_key,Unsigned8 dt_first_seen, Unsigned8 dt_last_seen, 

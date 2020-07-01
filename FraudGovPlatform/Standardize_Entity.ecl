@@ -5,13 +5,13 @@ EXPORT Clean_Name(pInputFile) :=
 FUNCTIONMACRO
 	import address, ut;
 	pInputFile tr(pInputFile l) := TRANSFORM
-			clean_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-			cleanperson73								:= Address.cleanperson73(clean_full_name);
-			SELF.cleaned_name.fname				:= ut.CleanSpacesAndUpper(cleanperson73[6..25]);
-			SELF.cleaned_name.mname				:= ut.CleanSpacesAndUpper(cleanperson73[26..45]); 
-			SELF.cleaned_name.lname				:= ut.CleanSpacesAndUpper(cleanperson73[46..65]);
-			SELF.cleaned_name.name_score		:= ut.CleanSpacesAndUpper(cleanperson73[71..73]);		
-
+			full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+			cleanperson73 := Address.cleanperson73(full_name);
+			clean_full_name := ut.CleanSpacesAndUpper(cleanperson73[6..25]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[26..45]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[46..65]);
+			SELF.cleaned_name.fname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[6..25])	, l.raw_first_name);
+			SELF.cleaned_name.mname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[26..45]) 	, l.raw_middle_name);
+			SELF.cleaned_name.lname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[46..65])  , l.raw_last_name);
+			SELF.cleaned_name.name_score		:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[71..73]), '15' );			
 			SELF.cleaned_name.title 				:= ut.fGetTitle(ut.CleanSpacesAndUpper(regexreplace('\\n|\\t',l.raw_Title,'')));
 			SELF.cleaned_name.name_suffix 	:= ut.fGetSuffix(ut.CleanSpacesAndUpper(regexreplace('\\n|\\t',l.raw_Orig_Suffix,''))); 	
 			SELF:=l;
@@ -26,21 +26,31 @@ ENDMACRO;
 EXPORT Clean_Phone( pInputFile ) := 
 FUNCTIONMACRO
 	import tools;
-	tools.mac_AppENDCleanPhone(pInputFile ,phone_number	,dphone_number	,clean_phones.phone_number	,,true);
-	tools.mac_AppENDCleanPhone(dphone_number	,cell_phone		,dcell_phone		,clean_phones.cell_phone		,,true);
-  RETURN dphone_number;
+	tools.mac_AppENDCleanPhone(pInputFile ,phone_number,dphone_number,clean_phones.phone_number,,true);
+	tools.mac_AppENDCleanPhone(dphone_number,cell_phone,dcell_phone,clean_phones.cell_phone,,true);
+	tools.mac_AppENDCleanPhone(dcell_phone,work_phone,dwork_phone,clean_phones.work_phone,,true);
+  RETURN dwork_phone;
 	
 ENDMACRO;
 
 EXPORT Clean_InputFields(pInputFile) := 
 FUNCTIONMACRO
-	import std,_Validate;
+	import std,_Validate,ut;
 	pInputFile tr(pInputFile l) := TRANSFORM
+
 		SELF.clean_ssn				:= If(regexfind('^[0-9]*$',ut.CleanSpacesAndUpper(l.ssn)) = true,ut.CleanSpacesAndUpper(l.ssn),'');
 		SELF.clean_Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
 		SELF.clean_Zip				:= If(regexfind('^[0-9]*$',	STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) = true,
 						if(length(STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) in [5,9],l.zip,'')
-						,'');		
+						,'');
+
+		valid_dl := if (ut.CleanSpacesAndUpper(l.Drivers_License_State) <> ''
+						AND ut.CleanSpacesAndUpper(l.Drivers_License) <> ''	
+						AND ut.CleanSpacesAndUpper(l.Drivers_License_State) IN FraudGovPlatform.Constants().states,
+						true,false);
+
+		SELF.clean_Drivers_License.Drivers_License := if (valid_dl,l.Drivers_License,'');
+		SELF.clean_Drivers_License.Drivers_License_State := if (valid_dl,l.Drivers_License_State,'');
 		SELF.clean_dob				:= if (_Validate.Date.fIsValid(l.dob) and 
 														(unsigned)l.dob <= (unsigned)(STRING8)Std.Date.Today(),
 														_validate.date.fCorrectedDateString(l.dob),

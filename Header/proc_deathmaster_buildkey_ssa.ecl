@@ -2,7 +2,7 @@
 
 export proc_deathmaster_buildkey_ssa(string filedate) := function
 	//Add persistence and growth checks.  Placed at top of code to avoid variable scope issue with variables declared in macros.
-	GetDops:=dops.GetDeployedDatasets('P','B','F');
+/*	GetDops:=dops.GetDeployedDatasets('P','B','F');
 	OnlyDeathMaster:=GetDops(datasetname='FCRA_DeathMasterKeys');
 	father_filedate := OnlyDeathMaster[1].buildversion;
 	filename := '~thor_data400::key::fcra::death_masterv2::'+filedate+'::did';
@@ -15,7 +15,7 @@ export proc_deathmaster_buildkey_ssa(string filedate) := function
 	DOPSGrowthCheck.ChangesByField(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id','',filedate,father_filedate),
 	DopsGrowthCheck.PersistenceCheck(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',key_DeathMaster_InputSet,key_DeathMaster_InputSet,filedate,father_filedate),
 	);
-
+*/
 	
 	#uniquename(version_date)
 	%version_date% := filedate;
@@ -116,5 +116,5 @@ export proc_deathmaster_buildkey_ssa(string filedate) := function
 	post2 := promotesupers.SF_MaintBuilding('~thor_data400::base::did_death_masterV2_ssa');
 	
 
-	return sequential(pre1,pre2,full1,move_qa,post1,post2,DeltaCommands,cnt_death_masterv2_ssa_did_key_fcra,cnt_death_master_ssa_ssn_key_fcra);
+	return sequential(pre1,pre2,full1,move_qa,post1,post2,/*DeltaCommands,*/cnt_death_masterv2_ssa_did_key_fcra,cnt_death_master_ssa_ssn_key_fcra);
 end;
