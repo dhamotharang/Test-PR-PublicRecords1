@@ -23,27 +23,7 @@ export proc_build_base(string version_date) := function
 	dHuntCCW	:=	emerges.file_hvccw_in;
 
   // Added for DF-27895 - Emerges Opt Out - This will filter out Hunt/Fish/CCW records that are found in the Emerges Opt Out file.  
-  
-	// *** Once this layout goes into production with DF-27802, will just call the layout instead of having it in this attribute.
-	EXPORT Layout_Emerges_OptOut := record
-			 string  timestamp;
-			 string  first_name; 
-			 string  last_name;	
-			 string  email;	
-			 string  dob;	
-			 string  StreetAddress;	
-			 string  City;	
-			 string  State;	
-			 string  Zip;	
-			 string  Reason_for_Your_Request;
-			 string  Info_Relates_To;
-			 string  maiden_prior;
-			 string  Cell_Phone;
-			 string  filler;
-			 string  middle_name;
-			 string  name_suffix;
-	END;
-	optOut :=  dataset('~thor_data400::in::voters::optout::superfile', /*VotersV2.*/Layout_Emerges_OptOut,thor);	
+ 	optOut :=  VotersV2.File_OptOut_Cleaned;	
 
 	joinLayout := record
 		 emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout;	
