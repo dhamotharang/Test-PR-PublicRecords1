@@ -1,3 +1,4 @@
+import dx_ip_metadata;
 EXPORT Layout_IP_Metadata := MODULE
 
 	EXPORT Common := RECORD
@@ -59,12 +60,12 @@ EXPORT Layout_IP_Metadata := MODULE
 	END;
 
 	EXPORT Raw := RECORD
-		Common;
+		Common - [sic_code];
 		string255 filename{virtual (logicalfilename)};
 	END;
 	
 	EXPORT History := RECORD
-		Common;
+		Common - [sic_code];
 		string255 filename;
 	END;
 
@@ -138,4 +139,33 @@ EXPORT Layout_IP_Metadata := MODULE
 		boolean  is_current;
 	END;
 
+	export base_in_ipv6 := record
+		string39 ip_rng_beg_full;
+		string39 ip_rng_end_full;
+		string8 dt_first_seen;
+		string8 dt_last_seen;
+		string39 ip_rng_beg;  // note: revised from ipv4 layout of string20
+		string39 ip_rng_end;  // note: revised from ipv4 layout of string20
+		string4 beg_hextet1;
+		string4 end_hextet1;
+		Common;
+		boolean generated_rec;
+		boolean is_current;
+	END;
+
+	export base_ipv6 := dx_ip_metadata.Layout_IP_Metadata.base_ipv6;
+
+	EXPORT Raw_ipv6 := RECORD
+		string39 ip_rng_beg;  // note: revised from ipv4 layout of string20
+		string39 ip_rng_end;  // note: revised from ipv4 layout of string20
+		Common - [sic_code];
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT History_ipv6 := RECORD
+		string39 ip_rng_beg;  // note: revised from ipv4 layout of string20
+		string39 ip_rng_end;  // note: revised from ipv4 layout of string20
+		Common - [sic_code];
+		string255 filename;
+	END;
 END;

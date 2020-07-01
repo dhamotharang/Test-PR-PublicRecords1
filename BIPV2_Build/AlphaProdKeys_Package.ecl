@@ -4,7 +4,8 @@ import BizLinkFull,tools,BIPV2_Segmentation,BIPV2_Suppression,BIPV2_Best,BIPV2_B
 
 EXPORT AlphaProdKeys_Package(
 
-   string   pversion              = 'qa'
+   string   pversionSuppress      = 'qa'
+  ,string   pversion              = 'qa'
   ,boolean	pUseOtherEnvironment	= false
   ,unsigned pKey                  = 0
   ,string   pRegexFieldFilter     = ''
@@ -18,7 +19,7 @@ module
   shared bizknames        := BizLinkFull.keynames         (pversion,puseotherenvironment);
   shared segnames         := BIPV2_Segmentation.keynames  (pversion,puseotherenvironment);
 
-  shared seleprox_names   := BIPV2_Suppression.FileNames.key_sele_prox_names  (pversion);
+  shared seleprox_names   := BIPV2_Suppression.FileNames.key_sele_prox_names  (pversionSuppress);
   shared bestknames       := BIPV2_Best.Keynames                              (pversion,puseotherenvironment);
   shared knames           := BIPV2_Build.keynames                             (pversion,puseotherenvironment);
 

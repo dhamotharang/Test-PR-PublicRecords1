@@ -175,11 +175,13 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_VTF2' ,'VT','Department of Vermont Health Access Agency of Human Services',										'Medicaid Board',																		'Medicaid',	'Cumulative'},
 									{'SNC_VTF3' ,'VT','Vermont Secretary of State',																											'State Conduct Decisions',													'State',		'Cumulative'},
 									{'SNC_WAF1' ,'WA','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
-									{'SNC_WIF1' ,'WI','Department of Safety and Professional Services',																	'License Board',																		'State',				'Cumulative'},
+									{'SNC_WAF5' ,'WA','Washington State Department of Health Pharmacy Commission',											'License Board',																		'State',		'Cumulative'},
+									{'SNC_WIF1' ,'WI','Department of Safety and Professional Services',																	'License Board',																		'State',		'Cumulative'},
 									{'SNC_WVF1' ,'WV','Medicaid Management Information System',																					'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_WVF2' ,'WV','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_WVF3' ,'WV','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
-									{'SNC_WYF1' ,'WY','Department of Health',																														'Medicaid Board',																		'Medicaid',	'Cumulative'}
+									{'SNC_WYF1' ,'WY','Department of Health',																														'Medicaid Board',																		'Medicaid',	'Cumulative'},
+									{'SNC_WYF2' ,'WY','Board of Pharmacy',																															'License Board',																		'State',		'Full refresh'}
 								],BoardLookupTable);
 
 END;

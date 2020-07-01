@@ -1031,7 +1031,6 @@ module
 		export Officer        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export Amendmt        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendment::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export ResrvdName     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ResrvdName::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Tables         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tables::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 
 		export dAll_filenames :=
 			  corps.dAll_filenames 
@@ -1042,7 +1041,6 @@ module
       + Officer.dAll_filenames
 			+ Amendmt.dAll_filenames
 			+ ResrvdName.dAll_filenames
-			+ Tables.dAll_filenames
 			;
 
 	end;
