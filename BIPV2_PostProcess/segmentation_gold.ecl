@@ -9,7 +9,10 @@ EXPORT segmentation_gold(
   ,string                             outputNameModifier  = ''
   ,string                             pLgid3KeyVersion    = 'built'
   ,boolean                            pPreserveGold       = false       
-) := module
+  ,boolean                            pUseNewGoldCalc     = false 
+  
+) := 
+module
 	shared hrec := record
 		unsigned6 	id;
 			pInfile.source;
@@ -361,16 +364,16 @@ shared AddBackNew := project(AddBackNew_prep ,transform({recordof(left)  ,boolea
 // -- use new gold calc
 import BIPV2_Statuses;
 shared ds_calc_new_gold := BIPV2_Statuses.mac_Calculate_Gold (pInfile);   // not used yet
-shared ds_gold     := join(AddBackNew ,table(ds_calc_new_gold(sele_gold = 'G') ,{seleid} ,seleid ,merge)  ,left.ID = right.seleid ,transform(recordof(left),self.isgold := true ,self := left)            ,hash);  
-shared ds_not_gold := join(AddBackNew ,table(ds_calc_new_gold(sele_gold = 'G') ,{seleid} ,seleid ,merge)  ,left.ID = right.seleid ,transform(recordof(left),self.isgold := false,self := left) ,left only ,hash);  
+shared ds_gold          := join(AddBackNew ,table(ds_calc_new_gold(sele_gold = 'G') ,{seleid} ,seleid ,merge)  ,left.ID = right.seleid ,transform(recordof(left),self.isgold := true ,self := left)            ,hash);  
+shared ds_not_gold      := join(AddBackNew ,table(ds_calc_new_gold(sele_gold = 'G') ,{seleid} ,seleid ,merge)  ,left.ID = right.seleid ,transform(recordof(left),self.isgold := false,self := left) ,left only ,hash);  
 
 // -- new gold calc  
-// shared Gold := ds_gold;
-// shared NotGold := ds_not_gold;
+shared Gold_new     := ds_gold;
+shared NotGold_new  := ds_not_gold;
 
 // -- old gold calc
-shared Gold := AddBackNew(isGold);
-shared NotGold := AddBackNew(~isGold);
+shared Gold     := if(pUseNewGoldCalc = true  ,Gold_new     ,AddBackNew( isGold));
+shared NotGold  := if(pUseNewGoldCalc = true  ,NotGold_new  ,AddBackNew(~isGold));
 
 export ds_append_gold_field_prep :=  project(Gold     ,transform({unsigned6 seleid,boolean isgold,dataset({string calculation ,boolean result}) gold_calculation,recordof(AddBackNew) - isgold}
   ,self.isgold := true
@@ -380,10 +383,10 @@ export ds_append_gold_field_prep :=  project(Gold     ,transform({unsigned6 sele
                              ,{'AND isNotJustPOBox'               ,~(exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX')));  }
                              ,{'AND (inHrchy OR isLgid3Linkable)' ,exists(left.has_lgids(has_lgid)) or exists(left.has_lgid3_cands(has_lgid3_cand)) }
 
-                             ,{'AND inHrchy' ,exists(left.has_lgids(has_lgid)) }
-                             ,{'AND isLgid3Linkable' ,exists(left.has_lgid3_cands(has_lgid3_cand)) }
+                             ,{'AND inHrchy'                      ,exists(left.has_lgids(has_lgid)) }
+                             ,{'AND isLgid3Linkable'              ,exists(left.has_lgid3_cands(has_lgid3_cand)) }
 
-                             ,{'AND hasMultipleTrustedSources' ,left.cnt_trusted_sources_total >1 }
+                             ,{'AND hasMultipleTrustedSources'    ,left.cnt_trusted_sources_total >1 }
 
                              ,{'AND (\n'
                               +'hasSuperCoreSrc \n'
@@ -408,12 +411,14 @@ export ds_append_gold_field_prep :=  project(Gold     ,transform({unsigned6 sele
                             ]  ,{string calculation ,boolean result})
                               ,self := left));
 
-export ds_append_gold_field_prep2 := join(pInfile ,ds_append_gold_field_prep ,left.seleid = right.seleid  ,transform(recordof(right),self.isgold := if(left.sele_gold = 'G'  ,true,false)  ,self := right)  ,hash);
+ds_infile_gold := table(pInfile ,{seleid,sele_gold} ,seleid,sele_gold ,merge);
+
+export ds_append_gold_field_prep2 := join(ds_infile_gold ,ds_append_gold_field_prep ,left.seleid = right.seleid  ,transform(recordof(right),self.isgold := if(left.sele_gold = 'G'  ,true,false)  ,self := right)  ,hash);
 
 export ds_append_gold_field := if(pPreserveGold = true  ,ds_append_gold_field_prep2 ,ds_append_gold_field_prep);
 
 // shared abn := table(AddBackNew, {AddBackNew, isGold, isActive, isNotJustPOBox, hasSuperCoreSrc, hasOtherCoreSrc, has2TSrc, hasMultipleSources, hasBizAddr});
-shared abn := AddBackNew;
+shared abn := ds_gold + ds_not_gold;/*AddBackNew;*/
 shared attrec := record
 	abn.isGold;
 	abn.isActive;

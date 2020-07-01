@@ -1,5 +1,5 @@
 ﻿/* 
-  BIPV2_Tools.mac_Set_Statuses()
+  BIPV2_Statuses.mac_Set_Statuses()
     -- Set statuses for each BIP ID, allowing for public(no use of DNB) and private(limited use of DNB to corroborate other sources' status)
 
    2. Create new Active Score field (scores should be based on source ranking , latest dt_last_seen)

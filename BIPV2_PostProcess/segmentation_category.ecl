@@ -30,6 +30,7 @@ EXPORT segmentation_category := module
  export perSeleid(
    dataset(BIPV2.CommonBase.Layout) header_clean
   ,String                           pToday
+  ,boolean                          pNewWay       = false
  ) := 
  function
  
@@ -87,9 +88,9 @@ EXPORT segmentation_category := module
                               category.Unknown);
 																															
         self.subCategory := map(defunct                              => subCategory.None        ,
-                                 high_valid                          => subCategory.High_Valid  ,
-                                 medium_valid                        => subCategory.Medium_Valid,
-                                 low_valid                           => subCategory.Low_Valid   ,
+                                 pNewWay and high_valid              => subCategory.High_Valid  ,
+                                 pNewWay and medium_valid            => subCategory.Medium_Valid,
+                                 pNewWay and low_valid               => subCategory.Low_Valid   ,
                                  valid                               => subCategory.Valid       ,
                                  not valid and goodAddr and active   => subCategory.C_Merge     ,
                                  not valid and goodAddr and inactive => subCategory.H_Merge     ,

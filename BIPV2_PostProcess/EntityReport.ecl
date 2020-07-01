@@ -831,9 +831,9 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export rawSegStats   := generateSegStats(raw_slim_recs);
   export cleanSegStats := generateSegStats(clean_slim_recs);
 	
-  segDsCleanCatagories_newgold  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean_newgold, (string) reportDate); 
+  segDsCleanCatagories_newgold  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean_newgold, (string) reportDate  ,true); 
   noSegRecords_newgold          := join(header_rec_newgold, segDsCleanCatagories_newgold, left.seleid=right.seleid, transform(left), left only, local);
-  noSegOnlyCatagories_newgold   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords_newgold,hash32(seleid)), (string) reportDate);  
+  noSegOnlyCatagories_newgold   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords_newgold,hash32(seleid)), (string) reportDate ,true);  
   shared segCatagories_newgold  := segDsCleanCatagories_newgold + noSegOnlyCatagories_newgold;
 
 // -- use new active status score fields in categories
@@ -843,18 +843,18 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     allRecsWithSeg := join(slim, segCatagories_newgold, left.seleid=right.seleid, 
       transform(recordof(slim),
         self.state := map(
-            right.seleid    = 0                                                                                                               => 'NO SEG'
-           ,right.category  = SC.category.Gold                                                                                                => 'Gold'
-           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Valid    and left.seleid_status_private_score = 3  => 'Active High Valid'
-           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Valid    and left.seleid_status_private_score = 2  => 'Active Medium Valid'
-           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Valid    and left.seleid_status_private_score = 1  => 'Active Low Valid'
-           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.C_Merge                                            => 'Active C-Merge'
-           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Noise                                              => 'Active Noise'
-           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Valid                                              => 'Inactive Valid'
-           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.H_Merge                                            => 'Inactive H-Merge'
-           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Noise                                              => 'Inactive Noise'
-           ,right.category  = SC.category.Defunct                                                                                             => 'Defunct'
-           ,                                                                                                                                     'BLANK'
+            right.seleid    = 0                                                                         => 'NO SEG'
+           ,right.category  = SC.category.Gold                                                          => 'Gold'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.High_Valid   => 'Active High Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Medium_Valid => 'Active Medium Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Low_Valid    => 'Active Low Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.C_Merge      => 'Active C-Merge'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Noise        => 'Active Noise'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Valid        => 'Inactive Valid'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.H_Merge      => 'Inactive H-Merge'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Noise        => 'Inactive Noise'
+           ,right.category  = SC.category.Defunct                                                       => 'Defunct'
+           ,                                                                                               'BLANK'
         );
         self := left;),
       left outer, keep(1), local);
@@ -875,9 +875,6 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
               ,state='Active Noise'
               ,state='Active C-Merge'
               ,state='Active Valid'
-              ,state='Active Low Valid'
-              ,state='Active Medium Valid'
-              ,state='Active High Valid'
               ,state='Gold'
               ,state='ALL'
   );
@@ -917,11 +914,21 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
       return segSortOrder(format);
 		end ;
 
-		export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
+	export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
 						format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec, report.SBFE}, self:=left)); 
 						return segSortOrder(format);
   end ;
 	
+  export formatBySegmentSourceMakeup_new(dataset(report_rec) report) := function
+      format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec}, self:=left)); 
+      return segSortOrder_new(format);
+		end ;
+
+	export formatBySegmentSourceMakeupSBFE_new(dataset(report_rec) report) := function
+						format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec, report.SBFE}, self:=left)); 
+						return segSortOrder_new(format);
+  end ;
+
   export formatCntActiveOnly(dataset(report_rec) report) := function 
       return project(report, {report_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown -source_type_rec });
 		end ;

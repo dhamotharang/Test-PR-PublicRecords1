@@ -2,12 +2,12 @@
 
 EXPORT Build_Marketing_Stats (
 
-   pversion             = 'bipv2.KeySuffix'                                           // -- build date
-  ,pToday               = 'bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate'      // -- in case you want to run as of a date in the past.  default to date of newest data.
-  ,pCurrentSprint       = '\'\''                                                      // -- Sprint #. Default will use the pversion to figure it out, but you can override that here.
-  ,pKeyLinkidsMarketing = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,true,,\'built\')' // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
-  ,pKeyLinkidsFull      = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,false,,\'built\')' // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
-  ,pBIP_Base            = 'BIPV2.commonbase.ds_built'                                  // -- full base file(contacts new status score fields)
+   pversion             = 'bipv2.KeySuffix'                                             // -- build date
+  ,pToday               = 'bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate'        // -- in case you want to run as of a date in the past.  default to date of newest data.
+  ,pCurrentSprint       = '\'\''                                                        // -- Sprint #. Default will use the pversion to figure it out, but you can override that here.
+  ,pKeyLinkidsMarketing = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,true,,\'built\')'   // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
+  ,pKeyLinkidsFull      = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,false,,\'built\')'  // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
+  ,pBIP_Clean_Base      = 'BIPV2.commonbase.ds_clean'                                   // -- clean base file(contacts new status score fields).  to use to recalc gold the new way.
 
 ) := 
 functionmacro
@@ -26,7 +26,7 @@ functionmacro
   // sele_gold does not contain new value for gold though, so that needs to be calculated
   
   // -- calc new gold on base file with all records.
-  ds_bip_base       := BIPV2_Statuses.mac_Calculate_Gold(pBIP_Base);
+  ds_bip_base       := BIPV2_Statuses.mac_Calculate_Gold(pBIP_Clean_Base);
   ds_bip_base_slim  := table(ds_bip_base  ,{seleid,sele_gold} ,seleid,sele_gold ,merge);
 
   // -- patch new gold onto marketing and full linkids datasets.  don't need scores for marketing data fill rates yet

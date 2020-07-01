@@ -23,23 +23,23 @@ Module
   cleanSegStats_scores  := ER.cleanSegStats_scores  ;
 
   export run := parallel (
-                  output(pversion                                                                             ,named('pversion'                   )),
-                  output(TheSprint                                                                            ,named('TheSprint'                  )),
-                  output(ER.formatCntAll                    (allStats             .countsAllAndStateReport  ) ,named('all_count'                  ), all),
-                  output(ER.formatPercentAll                (allStats             .percentAllAndStateReport ) ,named('all_percent'                ), all),
-                  
-                  output(ER.formatCntActiveOnly             (goldStats            .countsAllAndStateReport  ) ,named('gold_count'                 ), all),
-                  output(ER.formatPercentActiveOnly         (goldStats            .percentAllAndStateReport ) ,named('gold_percent'               ), all),
-                  output(ER.formatCntActiveOnly             (goldStats_newgold    .countsAllAndStateReport  ) ,named('New_gold_count'             ), all),
-                  output(ER.formatPercentActiveOnly         (goldStats_newgold    .percentAllAndStateReport ) ,named('New_gold_percent'           ), all),
-                    
-                  output(ER.formatBySegment                 (cleanSegStats        .countsAllAndStateReport  ) ,named('seg_count'                  ), all),
-                  output(ER.formatBySegmentSourceMakeup     (cleanSegStats        .countsAllAndStateReport  ) ,named('seg_clean_src_makeup'       ), all),
-                  output(ER.formatBySegmentSourceMakeupSBFE (rawSegStats          .countsAllAndStateReport  ) ,named('seg_raw_src_makeup'         ), all),
+                  output(pversion                                                                                 ,named('pversion'                   )     ),
+                  output(TheSprint                                                                                ,named('TheSprint'                  )     ),
+                  output(ER.formatCntAll                        (allStats             .countsAllAndStateReport  ) ,named('all_count'                  ), all),
+                  output(ER.formatPercentAll                    (allStats             .percentAllAndStateReport ) ,named('all_percent'                ), all),
+                      
+                  output(ER.formatCntActiveOnly                 (goldStats            .countsAllAndStateReport  ) ,named('gold_count'                 ), all),
+                  output(ER.formatPercentActiveOnly             (goldStats            .percentAllAndStateReport ) ,named('gold_percent'               ), all),
+                  output(ER.formatCntActiveOnly                 (goldStats_newgold    .countsAllAndStateReport  ) ,named('New_gold_count'             ), all),
+                  output(ER.formatPercentActiveOnly             (goldStats_newgold    .percentAllAndStateReport ) ,named('New_gold_percent'           ), all),
+                        
+                  output(ER.formatBySegment                     (cleanSegStats        .countsAllAndStateReport  ) ,named('seg_count'                  ), all),
+                  output(ER.formatBySegmentSourceMakeup         (cleanSegStats        .countsAllAndStateReport  ) ,named('seg_clean_src_makeup'       ), all),
+                  output(ER.formatBySegmentSourceMakeupSBFE     (rawSegStats          .countsAllAndStateReport  ) ,named('seg_raw_src_makeup'         ), all),
     
-                  output(ER.formatBySegment                 (cleanSegStats_scores .countsAllAndStateReport  ) ,named('seg_count_scores'           ), all),
-                  output(ER.formatBySegmentSourceMakeup     (cleanSegStats_scores .countsAllAndStateReport  ) ,named('seg_clean_src_makeup_scores'), all),
-                  output(ER.formatBySegmentSourceMakeupSBFE (rawSegStats_scores   .countsAllAndStateReport  ) ,named('seg_raw_src_makeup_scores'  ), all),
+                  output(ER.formatBySegment_new                 (cleanSegStats_scores .countsAllAndStateReport  ) ,named('seg_count_scores'           ), all),
+                  output(ER.formatBySegmentSourceMakeup_new     (cleanSegStats_scores .countsAllAndStateReport  ) ,named('seg_clean_src_makeup_scores'), all),
+                  output(ER.formatBySegmentSourceMakeupSBFE_new (rawSegStats_scores   .countsAllAndStateReport  ) ,named('seg_raw_src_makeup_scores'  ), all)
               );
 end;
 

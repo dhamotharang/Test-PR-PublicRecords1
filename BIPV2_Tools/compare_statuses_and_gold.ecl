@@ -45,8 +45,8 @@ functionmacro
 
   import tools,BIPV2,Advo,BIPV2_Tools,BIPV2_Statuses;
   
-  old_version := pFather_Version;
-  new_version := pCurrent_Version;
+  old_version := pFather_Version [1..8];
+  new_version := pCurrent_Version[1..8];
 
   old_sprint := BIPV2.KeySuffix_mod2.SprintNumber(old_version);
   new_sprint := BIPV2.KeySuffix_mod2.SprintNumber(new_version);
@@ -65,7 +65,7 @@ functionmacro
 
 
   // -- Set the statuses for those files, showing underlying sources and dates used for each ID
-  ds_get_statuses_built := BIPV2_Statuses.mac_Set_Statuses(ds_built  ,pShow_Work := true,pToday := new_version,pOldWay := false,pActive_Fieldname  := pActive_Fieldname2) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
+  ds_get_statuses_built := BIPV2_Statuses.mac_Set_Statuses(ds_built  ,pShow_Work := true,pToday := new_version,pOldWay := true ,pActive_Fieldname  := pActive_Fieldname2) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
   // ds_get_statuses_base  := dataset('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base__p499438766' ,recordof(ds_get_statuses_built),flat);
   ds_get_statuses_base  := BIPV2_Statuses.mac_Set_Statuses(ds_base   ,pShow_Work := true,pToday := old_version,pOldWay := true ,pActive_Fieldname  := pActive_Fieldname2) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base' );  //keeps rebuilding this even though nothing has changed
 
@@ -232,13 +232,13 @@ functionmacro
   // ds_old_golds := old_segs.modgoldSELEV2.Gold;
 
   // test_gold_summarys  := new_segs.modgoldSELEV2.ds_src_status_dt_rollup;
-  ds_append_gold_field_new := new_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
-  ds_append_gold_field_old := old_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
+  ds_append_gold_field_new := new_segs.modgoldSELEV2_all.ds_append_gold_field       : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
+  ds_append_gold_field_old := old_segs.modgoldSELEV2_all_old.ds_append_gold_field   : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
 
 
-  ds_find_gold_diffs := join(ds_append_gold_field_new ,ds_append_gold_field_old ,left.id = right.id ,transform(
+  ds_find_gold_diffs := join(ds_append_gold_field_new ,ds_append_gold_field_old ,left.seleid = right.seleid ,transform(
      {unsigned6 seleid ,boolean isgold_new ,boolean isgold_old ,dataset(recordof(ds_append_gold_field_new.gold_calculation)) gold_calc_new,dataset(recordof(ds_append_gold_field_new.gold_calculation)) gold_calc_old,dataset(recordof(ds_append_gold_field_new.src_dt_status)) new_sources  ,dataset(recordof(ds_append_gold_field_new.src_dt_status)) old_sources}
-    ,self.seleid      := if(left.id != 0 ,left.id  ,right.id)
+    ,self.seleid      := if(left.seleid != 0 ,left.seleid  ,right.seleid)
     ,self.isgold_new  := left.isgold
     ,self.isgold_old  := right.isgold
     ,self.new_sources := sort(left.src_dt_status ,-dt_last_seen,company_status_derived,source)

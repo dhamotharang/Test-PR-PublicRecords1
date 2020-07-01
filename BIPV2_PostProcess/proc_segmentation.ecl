@@ -12,6 +12,7 @@ EXPORT proc_segmentation(
   ,string                            pLgid3KeyVersion     = 'built'  
   ,boolean                           pPreserveGold        = false       
   ,boolean                           pTurnOffSegOutFile   = false
+  ,dataset(BIPV2.CommonBase.layout ) pInfileFather        = bipv2.CommonBase.DS_LOCAL_STATIC_CLEAN
 ) := 
 module
     shared ds_Input_clean := if(pUseClean2 = false
@@ -154,7 +155,7 @@ module
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, SELEID, SeleFree_test, SeleProb_test)
     
     //Generate Segmentation File  
-    export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile;
+    export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile(pversion,,pInput);
     // Gold Segmentation
 
     export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold);
@@ -226,13 +227,18 @@ module
     BIPV2_PostProcess.macPartition(pInput, Empid,  EmpFree,  EmpProb)
     
     // Gold Segmentation
-    export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion);
-    export modgoldSELEV2P     := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion);    
 
-    export modgoldSELEV2_all  := BIPV2_PostProcess.segmentation_gold(pInput  ,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion);
+    export modgoldSELEV2_topatch      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion); // old gold on this to patch onto the base file
+    export modgoldSELEV2P_topatch     := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion); // old gold on this to patch onto the base file
+
+    export modgoldSELEV2              := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion,FALSE,TRUE);  //use new gold on these for seg stats
+    export modgoldSELEV2P             := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion,FALSE,TRUE);  //use new gold on these for seg stats
+
+    export modgoldSELEV2_all          := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,true ); // used in BIPV2_Tools.compare_statuses_and_gold
+    export modgoldSELEV2_all_old      := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,if(pToday[1..8] = '20200601'    ,false  ,true)); // used in BIPV2_Tools.compare_statuses_and_gold
     
-    export goldSELEV2         := modgoldSELEV2.out;
-    export goldSELEV2P        := modgoldSELEV2P.out;
+    export goldSELEV2                 := modgoldSELEV2.out;
+    export goldSELEV2P                := modgoldSELEV2P.out;
     
     // Segmentation Stats
     export modProxV2          := BIPv2_PostProcess.segmentation(ProxFree, 'PROXID',pToday);
@@ -320,18 +326,18 @@ module
     shared sicCount             := output(fieldstat.sicCounts           , named('V1_ProxFile_SICDistribution'  ), all);
     shared naicsCount           := output(fieldstat.naicsCounts         , named('V1_ProxFile_NAICSDistribution'), all);
     // ID Counts
-    shared IDChange             := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).change                ,named('IdChangeTable'));
-    shared IDCountBuckets       := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).buckets               ,named('IDCountBuckets'));
-    shared TotalProxIDsInLGID3  := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).TotalProxIDsInLGID3   ,named('TotalProxIDsInLGID3'));
-    shared XTabProxIDsInLGID3   := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).XTabProxIDsInLGID3    ,named('XTabProxIDsInLGID3'));
-    shared TotalProxIDsInHrchy  := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).TotalProxIDsInHrchy   ,named('TotalProxIDsInHrchy'));
-    shared XTabProxIDsInHrchy   := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput).XTabProxIDsInHrchy    ,named('XTabProxIDsInHrchy'));
+    shared IDChange             := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).change                ,named('IdChangeTable'));
+    shared IDCountBuckets       := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).buckets               ,named('IDCountBuckets'));
+    shared TotalProxIDsInLGID3  := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).TotalProxIDsInLGID3   ,named('TotalProxIDsInLGID3'));
+    shared XTabProxIDsInLGID3   := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).XTabProxIDsInLGID3    ,named('XTabProxIDsInLGID3'));
+    shared TotalProxIDsInHrchy  := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).TotalProxIDsInHrchy   ,named('TotalProxIDsInHrchy'));
+    shared XTabProxIDsInHrchy   := output(BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).XTabProxIDsInHrchy    ,named('XTabProxIDsInHrchy'));
     
     // Run build process    
     export patched := 
     BIPV2_PostProcess.append_segtype(
        ds_join_ultid_public
-      ,modgoldSELEV2._gold      + modgoldSELEV2P._gold
+      ,modgoldSELEV2_topatch._gold      + modgoldSELEV2P_topatch._gold
       ,modUltV2.result_w_desc   , modUltV2P.result_w_desc
       ,modOrgV2.result_w_desc   , modOrgV2P.result_w_desc
       ,modSeleV2.result_w_desc  , modSeleV2P.result_w_desc
@@ -425,8 +431,8 @@ module
   
   export do_strata(
      string                       pversion              = bipv2.KeySuffix
-    ,dataset(lay_id_change    )   pIDChange             = BIPV2_PostProcess.fieldStats_IDcounts(pInput).change  
-    ,dataset(lay_id_count     )   pIDCountBuckets       = BIPV2_PostProcess.fieldStats_IDcounts(pInput).buckets 
+    ,dataset(lay_id_change    )   pIDChange             = BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).change  
+    ,dataset(lay_id_count     )   pIDCountBuckets       = BIPV2_PostProcess.fieldStats_IDcounts(pInput,pInfileFather).buckets 
     // ,dataset(lay_entity_count )   pbipEntityCnt          = fieldstat.uniqueIDCounts      //this is included in the idcount buckets                       
     ,dataset(lay_seg_stats    )   pProxStatsV2          = modProxV2.stats                                       
     ,dataset(lay_seg_stats    )   pProxStatsV2_res      = modProxV2_res.stats                                       
@@ -599,7 +605,7 @@ module
          output(pToday                                      ,named('IngestDate'   ))
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
-        ,if(pTurnOffSegOutFile = false  ,evaluate(build_seg_file(pversion)))
+        ,if(pTurnOffSegOutFile = false  ,evaluate(build_seg_file))
         ,output_segs_fixed_filtered
         ,email_executive_dashboard
         ,goldSELEV2
@@ -632,7 +638,7 @@ module
         ,IDCountBuckets
         ,TotalProxIDsInLGID3,XTabProxIDsInLGID3
         ,TotalProxIDsInHrchy,XTabProxIDsInHrchy
-        ,BIPV2_PostProcess.Build_Marketing_Stats(pversion,pToday)
+        ,BIPV2_PostProcess.Build_Marketing_Stats(pversion,pToday,pBIP_Clean_Base := pInput)
         ,if(pTurnOffStrata  = false ,do_strata())
         // ,outputPatched
       )

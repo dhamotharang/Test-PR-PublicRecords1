@@ -15,12 +15,14 @@ export BuildSegmentationFile(
 ) := 
 functionmacro
 
-  import BIPV2_Files;
-  import BIPV2_Contacts;
-  import MDR;
-  import BIPV2_PostProcess;
-  import tools;
-  import BIPV2_Statuses;
+  import BIPV2_Files        ;
+  import BIPV2_Contacts     ;
+  import MDR                ;
+  import BIPV2_PostProcess  ;
+  import tools              ;
+  import BIPV2_Statuses     ;
+  import BIPV2_Best         ;
+  import InsuranceHeader_PostProcess;
 
   DS_Clean            := pDS_Clean           ;
   Key_Contact_Linkids := pKey_Contact_Linkids;
@@ -63,7 +65,7 @@ functionmacro
      header_slim  := project(header_clean, transform(BIPV2_Segmentation.Layouts.SlimLayout, self:=left; self:=[]));                    
      header_info  := ungroup(rollup(group(sort(header_slim, seleid, local), seleid), group, tallyTransform(left, rows(left))));
 
-     seg := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, pVersion);
+     seg := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, pVersion  ,true);
      
      withSeg := join(header_info, distribute(seg, hash32(seleid)), 
                      left.seleid = right.seleid, 

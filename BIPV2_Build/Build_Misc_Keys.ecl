@@ -18,7 +18,7 @@ module
 
 	shared headerRecs     := BIPV2_Statuses.mac_Calculate_Gold(pDs_Clean);
 	shared header_clean   := distribute(headerRecs, hash32(seleid));
-	shared seg            := project(BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, pversion_current), SegKeyLayout);
+	shared seg            := project(BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, pversion_current ,true), SegKeyLayout);
 
   export BuildLinkIds       := tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.key                 ,keynames(pversion).linkids.new'                        );
   export BuildLinkIds_hidden:= tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.Key_hidden          ,keynames(pversion).linkids_hidden.new'                 );
