@@ -1,4 +1,4 @@
-IMPORT $, Address_Rank, Codes, Data_Services, DidVille, doxie, dx_BestRecords, EmailService, Royalty, Suppress;
+IMPORT $, Address_Rank, Codes, Data_Services, DidVille, doxie, dx_BestRecords, EmailService, Royalty, Suppress, ut;
 
 EXPORT Functions := MODULE
 
@@ -94,7 +94,7 @@ EXPORT Functions := MODULE
     ds_results_grouped_by_name_address := GROUP(SORT(ds_no_lexid, acctno, seq,
                                              cleaned.Name.fname, cleaned.Name.mname,cleaned.Name.lname,cleaned.Name.name_suffix,
                                              cleaned.Address.PreDir,cleaned.Address.prim_range, cleaned.Address.prim_name,cleaned.Address.postdir,cleaned.Address.addr_suffix,cleaned.Address.zip,cleaned.Address.sec_range,
-                                             isRoyaltySource, -did_score, -date_last_seen, date_first_seen, -original.login_date, -process_date, email_quality_mask, record),
+                                             isRoyaltySource, -date_last_seen, date_first_seen, -original.login_date, -process_date, email_quality_mask, record),
                                        acctno, seq,
                                        cleaned.Name.fname, cleaned.Name.mname,cleaned.Name.lname,cleaned.Name.name_suffix,
                                        cleaned.Address.PreDir,cleaned.Address.prim_range, cleaned.Address.prim_name,cleaned.Address.postdir,cleaned.Address.addr_suffix,cleaned.Address.zip,cleaned.Address.sec_range
@@ -119,22 +119,81 @@ EXPORT Functions := MODULE
     RETURN UNGROUP(ds_results_rolled);
   END;
 
+  CalculateLNDates(DATASET($.Layouts.email_raw_rec) ds_batch_raw,
+                         STRING5 search_by
+  ) := FUNCTION
+
+    ds_with_lexid := ds_batch_raw(DID > 0);
+    ds_no_lexid := ds_batch_raw(DID = 0);
+
+    temp_raw_rec := RECORD($.Layouts.email_raw_rec)
+      INTEGER hash_val := 0;
+    END;
+
+    ds_results_hashed_by_lexid := PROJECT(ds_with_lexid, TRANSFORM(temp_raw_rec,
+                                          SELF.hash_val := HASH(LEFT.acctno, LEFT.seq, LEFT.did),
+                                          SELF := LEFT));
+
+    ds_results_hashed_by_name_address := PROJECT(ds_no_lexid, TRANSFORM(temp_raw_rec,
+                                       SELF.hash_val := HASH(LEFT.acctno,LEFT.seq,
+                                       LEFT.cleaned.Name.fname,LEFT.cleaned.Name.mname,
+                                       LEFT.cleaned.Name.lname,LEFT.cleaned.Name.name_suffix,
+                                       LEFT.cleaned.Address.PreDir,LEFT.cleaned.Address.prim_range,LEFT.cleaned.Address.prim_name,
+                                       LEFT.cleaned.Address.postdir,LEFT.cleaned.Address.addr_suffix,
+                                       LEFT.cleaned.Address.zip,LEFT.cleaned.Address.sec_range),
+                                       SELF:=LEFT)
+                                   );
+
+    ds_results_hashed_by_email := PROJECT(ds_batch_raw, TRANSFORM(temp_raw_rec,
+                                          SELF.hash_val := HASH(LEFT.acctno, LEFT.seq, LEFT.cleaned.clean_email),
+                                          SELF := LEFT));
+
+    ds_results_hashed := IF(search_by = $.Constants.SearchBy.ByEmail,
+                               ds_results_hashed_by_lexid + ds_results_hashed_by_name_address,   // list of identiies pulled by input email
+                               ds_results_hashed_by_email  // list of emails pulled by input PII
+                              );
+
+    temp_raw_rec doMinMax(temp_raw_rec ll, DATASET(temp_raw_rec) rr) := TRANSFORM
+      SELF.ln_date_last := MAX(rr,ln_date_last);
+      SELF.ln_date_first := MIN(rr(ln_date_first>0),ln_date_first);
+      SELF := ll;
+    END;
+
+    ds_rolled_with_dates := ROLLUP(GROUP(SORT(ds_results_hashed, hash_val),hash_val), GROUP, doMinMax(LEFT,ROWS(LEFT)));
+
+    ds_with_lndates := JOIN(ds_results_hashed, UNGROUP(ds_rolled_with_dates),
+                            LEFT.hash_val=RiGHT.hash_val,
+                            TRANSFORM($.Layouts.email_raw_rec,
+                              SELF.ln_date_last := RIGHT.ln_date_last,
+                              SELF.ln_date_first := RIGHT.ln_date_first,
+                              SELF := LEFT),
+                            LIMIT(0), KEEP(1));
+
+    RETURN ds_with_lndates;
+  END;
+
   EXPORT GetEmailData(DATASET($.Layouts.batch_in_rec) batch_in,
                       $.IParams.EmailParams in_mod,
                       STRING5 search_by,
-                      UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA
+                      UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA,
+                      BOOLEAN SkipDatesCalculation = FALSE
   ) := FUNCTION     // this function currently doesn't apply FCRA overrides, if FCRA functionality is requested the overrides logic need to be added
 
     email_raw_recs := $.Raw.getEmailRawData(batch_in,in_mod,search_by,data_environment);
-
-    email_fltrd_recs := FilterEmailData(email_raw_recs,in_mod,search_by);
-
+    // we calculate LN first/last seen dates based on all email data before filtering to restrict sources are applied
+    email_raw_with_dates_recs := IF(SkipDatesCalculation OR in_mod.KeepRawData, email_raw_recs,
+                                    CalculateLNDates(email_raw_recs,search_by));
+    // now we filter to apply restrictions
+    email_fltrd_recs := FilterEmailData(email_raw_with_dates_recs,in_mod,search_by);
     // in case of search by PII we need to apply penalties for fuzzy matching
     email_matching_recs := IF(search_by = $.Constants.SearchBy.ByPII,
                                  ApplyFuzzyMatching(email_fltrd_recs, batch_in, in_mod),
                                  email_fltrd_recs);
 
     email_rolled_recs := RollupEmailData(email_matching_recs,in_mod,search_by);
+
+    //OUTPUT(email_raw_with_dates_recs, NAMED('email_raw_with_dates_recs'), EXTEND);
+    //OUTPUT(email_fltrd_recs, NAMED('email_fltrd_recs'), EXTEND);
 
     RETURN IF(~in_mod.KeepRawData, email_rolled_recs, email_matching_recs);
   END;
@@ -149,37 +208,25 @@ EXPORT Functions := MODULE
                      $.IParams.EmailParams in_mod
   ) := FUNCTION
 
-    ds_srtd_identity := SORT(ds_batch_in, acctno, -did_score, isRoyaltySource,-date_last_seen, date_first_seen, -num_sources,
-                                          -latest_orig_login_date, -process_date, num_email_per_did, email_quality_mask, RECORD);
+    ds_srtd_identity := SORT(ds_batch_in, acctno, -did_score, isRoyaltySource,-ln_date_last, ln_date_first, -num_sources,
+                                          -latest_orig_login_date, -date_last_seen, date_first_seen, -process_date, num_email_per_did, email_quality_mask, RECORD);
+
+    ds_srtd_identity_relations := SORT(ds_batch_in, acctno, -$.Constants.Relationship.IsSubject(relationship), -did_score, isRoyaltySource,-ln_date_last, ln_date_first, -num_sources,
+                                          -latest_orig_login_date, -date_last_seen, date_first_seen, -process_date, num_email_per_did, email_quality_mask, RECORD);
 
     ds_srtd_email := SORT(ds_batch_in, acctno, -$.Constants.isTMXVerifiedEmail(TMX_insights.review_status), OrderByEmailStatus(email_status), // pushing TMX pass and BV verified emails to the top
-                                       -num_sources, -date_last_seen, date_first_seen, -latest_orig_login_date, -did_score, isRoyaltySource, -date_last_verified,
+                                       -num_sources, -ln_date_last, ln_date_first, -latest_orig_login_date, -date_last_seen, date_first_seen, -did_score, isRoyaltySource, -date_last_verified,
                                         num_did_per_email, penalt,-process_date, email_quality_mask, RECORD);
 
-    ds_srtd := IF($.Constants.SearchType.isEAA(in_mod.SearchType), ds_srtd_email, ds_srtd_identity);
+    ds_srtd := MAP($.Constants.SearchType.isEAA(in_mod.SearchType) => ds_srtd_email,
+                   $.Constants.SearchType.isEIC(in_mod.SearchType) => ds_srtd_identity_relations,
+                   ds_srtd_identity); // -EIA search type
 
     RETURN ds_srtd;
   END;
 
-  EXPORT AddBestInfo(DATASET($.Layouts.email_internal_rec) ds_batch_in,
-                             $.IParams.EmailParams in_mod
+  getBestAddress(DATASET(Address_Rank.Layouts.Batch_in) addr_rank_in
   ) := FUNCTION
-
-    perm_type := dx_BestRecords.Functions.get_perm_type_idata(PROJECT(in_mod,doxie.IDataAccess),
-                       useMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase));
-
-    email_with_watchdog_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
-                                    TRANSFORM($.Layouts.email_final_rec,
-                                              SELF.bestinfo := LEFT._best,
-                                              SELF:=LEFT,
-                                              SELF:=[]));
-
-    // for best address we will use address ranking - req. EMAIL-205
-    addr_rank_in := PROJECT(DEDUP(SORT(ds_batch_in(did!=0),did),did),
-                           TRANSFORM(Address_Rank.Layouts.Batch_in,
-                                     SELF.acctno := (STRING) COUNTER,
-                                     SELF.did    := LEFT.did,
-                                     SELF := []));
 
     //get all addresses from header based on LexIds
     dids_for_header   := PROJECT(addr_rank_in, doxie.layout_references_hh);
@@ -224,13 +271,36 @@ EXPORT Functions := MODULE
               xform_addrbest(LEFT, RIGHT),
               LIMIT(0), LEFT OUTER);
 
-
     //get address history from Address Rank Key and determine best address
     addr_ranked_recs	:= Address_Rank.fn_getAddressHistory(all_hdr_recs, MaxRecordsToReturn:=1);
 
+    RETURN addr_ranked_recs;
+  END;
+
+  EXPORT AddBestInfo(DATASET($.Layouts.email_internal_rec) ds_batch_in,
+                             $.IParams.EmailParams in_mod
+  ) := FUNCTION
+
+    perm_type := dx_BestRecords.Functions.get_perm_type_idata(PROJECT(in_mod,doxie.IDataAccess),
+                       useMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase));
+
+    email_with_watchdog_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type),
+                                    TRANSFORM($.Layouts.email_final_rec,
+                                              SELF.bestinfo := LEFT._best,
+                                              SELF:=LEFT,
+                                              SELF:=[]));
+
+    // for best address we will use address ranking - req. EMAIL-205
+    addr_rank_in := PROJECT(DEDUP(SORT(ds_batch_in(did!=0),did),did),
+                           TRANSFORM(Address_Rank.Layouts.Batch_in,
+                                     SELF.acctno := (STRING) COUNTER,
+                                     SELF.did    := LEFT.did,
+                                     SELF := []));
+
+    best_addr_ranked_recs := getBestAddress(addr_rank_in);
     // adding best address to the results
     email_with_best_recs :=
-      JOIN(email_with_watchdog_recs, addr_ranked_recs,
+      JOIN(email_with_watchdog_recs, best_addr_ranked_recs,
            LEFT.did = RIGHT.did,
            TRANSFORM($.Layouts.email_final_rec,
                     SELF.bestinfo.prim_range := RIGHT.prim_range,
@@ -268,7 +338,7 @@ EXPORT Functions := MODULE
                             SELF.seq := LEFT.seq,  // since same acctno will have multiple emails we need to use seq field to distinguish results
                             SELF := []));
 
-    ds_with_lexids_by_email_for_calc := GetEmailData(email_batch, in_mod, $.Constants.SearchBy.ByEmail );
+    ds_with_lexids_by_email_for_calc := GetEmailData(email_batch, in_mod, $.Constants.SearchBy.ByEmail, SkipDatesCalculation:=TRUE);
 
     $.Layouts.email_internal_rec addLexIdcount($.Layouts.email_internal_rec ll, DATASET($.Layouts.email_internal_rec) allRows) := TRANSFORM
       SELF.num_did_per_email := COUNT(allRows(did > 0));
@@ -305,7 +375,7 @@ EXPORT Functions := MODULE
                             SELF.seq    := LEFT.seq,  // since same acctno will have multiple identities we need to use seq field to distinguish results
                             SELF := []));
 
-    ds_with_emails_by_lexids_for_calc := GetEmailData(lexids_batch, in_mod, $.Constants.SearchBy.ByLexid);
+    ds_with_emails_by_lexids_for_calc := GetEmailData(lexids_batch, in_mod, $.Constants.SearchBy.ByLexid, SkipDatesCalculation:=TRUE);
 
     $.Layouts.email_internal_rec addEmailCount($.Layouts.email_internal_rec ll, DATASET($.Layouts.email_internal_rec) allRows) := TRANSFORM
       SELF.num_email_per_did := COUNT(allRows);  //the email uniqueness is taken care by RollupEmailData() -> GetEmailData
@@ -364,7 +434,10 @@ EXPORT Functions := MODULE
 
 
 
-    rels_by_lexid := IF(EXISTS(inrecs_for_lexid_rels), EmailService.Functions.GetRelationshipBySubjectLexId(rel_pairs_by_lexid, include_2ndDegree_relatives:=TRUE));
+    rels_by_lexid := IF(EXISTS(inrecs_for_lexid_rels),
+                        EmailService.Functions.GetRelationshipBySubjectLexId(rel_pairs_by_lexid,
+                                     PROJECT(in_mod, Doxie.IDataAccess),
+                                     include_2ndDegree_relatives:=TRUE));
 
     recs_with_rels_by_lexid := JOIN(inrecs_for_lexid_rels, rels_by_lexid,
                                  LEFT.did = RIGHT.identity_LexID AND

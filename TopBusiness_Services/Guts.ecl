@@ -15,26 +15,27 @@ export Guts := MODULE
 	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 // output rows from the various base files
  
-	section_aircraft      := in_options.IncludeAircrafts; 
+	section_aircraft      := in_options.IncludeAircrafts OR in_options.IncludeBusinessInsight;
 	section_associateBus  := in_options.IncludeAssociatedBusinesses;
 	section_bankruptcy    := in_options.IncludeBankruptcies; 
+  section_BusinessInsight := in_options.IncludeBusinessInsight;
   section_connectedBusinesses := in_options.IncludeConnectedBusinesses;
-	section_contact       := in_options.IncludeContacts; 
-	section_finance       := in_options.IncludeFinances; 
+	section_contact       := in_options.IncludeContacts  OR in_options.IncludeBusinessInsight;
+	section_finance       := in_options.IncludeFinances OR in_options.IncludeBusinessInsight;
 	section_incorporation := in_options.IncludeIncorporation; 
-	section_industry      := in_options.IncludeIndustries; 
+	section_industry      := in_options.IncludeIndustries  OR in_options.IncludeBusinessInsight;
 	section_licenses      := in_options.IncludeProfessionalLicenses;
 	section_lien          := in_options.IncludeLiensJudgments; 
-	section_motorvehicle  := in_options.IncludeMotorVehicles; 
+	section_motorvehicle  := in_options.IncludeMotorVehicles OR in_options.IncludeBusinessInsight;
 	section_opssites      := in_options.IncludeOpsSites;
 	section_parent        := in_options.IncludeParents; 
-	section_property      := in_options.IncludeProperties; 
+	section_property      := in_options.IncludeProperties OR in_options.IncludeBusinessInsight;
 	section_registeredAgents := in_options.IncludeRegisteredAgents;
-	section_sources       := in_options.IncludeSourceCounts; 
-	section_ucc           := in_options.IncludeUCCFilings;
-	section_uccSecureds   := (in_options.IncludeUCCFilings AND in_options.IncludeUCCFilingsSecureds);
+	section_sources       := in_options.IncludeSourceCounts OR in_options.IncludeBusinessInsight;
+	section_ucc           := in_options.IncludeUCCFilings OR in_options.IncludeBusinessInsight;
+	section_uccSecureds   := (in_options.IncludeUCCFilings AND in_options.IncludeUCCFilingsSecureds) OR in_options.IncludeBusinessInsight;;
 	section_url           := in_options.IncludeInternetDomains; 
-  section_watercraft    := in_options.IncludeWatercrafts; 
+  section_watercraft    := in_options.IncludeWatercrafts OR in_options.IncludeBusinessInsight;
 
   // For "Accurint" only additional sections	
 	section_businessRegistrations := in_options.IncludeBusinessRegistrations;
@@ -110,7 +111,7 @@ export Guts := MODULE
 				)
 		 );
 		
-     AssociateSEction := if (section_associateBus, TopBusiness_Services.AssociateSection.fn_fullView(
+     AssociateSection := if (section_associateBus, TopBusiness_Services.AssociateSection.fn_fullView(
 		    ds_input_data,
 				project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
 				mod_access)
@@ -147,7 +148,7 @@ export Guts := MODULE
 					)
 			);
 			
-      FinanceSection := if (section_finance,  TopBusiness_Services.FinanceSection.fn_fullView(
+                FinanceSection := if (section_finance,  TopBusiness_Services.FinanceSection.fn_fullView(
 			  ds_input_data,				
 				project(dataset(in_options), TopBusiness_Services.Layouts.rec_input_options)[1],
 				in_mod)
@@ -159,7 +160,7 @@ export Guts := MODULE
 					in_mod)
 			 );
 			 
-       LicenseSection := if (section_licenses, TopBusiness_Services.LicenseSection.fn_fullView(
+                  LicenseSection := if (section_licenses, TopBusiness_Services.LicenseSection.fn_fullView(
 					ds_input_data,				
 					project(dataset(in_options), TopBusiness_Services.Layouts.rec_input_options)[1],
 					in_mod)
@@ -252,48 +253,89 @@ export Guts := MODULE
 				
 				source_mod_access := module(mod_access)
 	    	  export boolean log_record_source := mod_access.log_record_source AND section_sources;
-        end;
+                    end;
 
 				SourceSection := if (section_sources, TopBusiness_Services.SourceSection.fn_FullView(
 						ds_input_data,
 						project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
 						source_mod_access,ds_busHeaderRecs)
-				);
-				
+				);              
+                  
+            TmpBusinessInsightPreLayoutPopulation := if (section_BusinessInsight,                           
+                           TopBusiness_Services.BusinessInsightSection.FromBipReportBusinessEvidence(
+                            project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
+                            ,project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]
+                            ,BestSection[1]
+                           ,ContactSection[1]                                         
+                           ,SourceSection[1].AllSourcesCount
+                           ,SourceSection[1].SourceDocs[1].source                          
+                           ,FinanceSection[1]
+                           )
+                           );
+              tmpBusinessInsightSection := if (section_BusinessInsight, TopBusiness_Services.BusinessInsightSection.fn_FullViewBusinessEvidence( 
+                                                                            TmpBusinessInsightPreLayoutPopulation[1] ));
+             BusinessInsightSection := if (section_businessInsight,
+                           TopBusiness_Services.BusinessInsightSection.fn_FullViewRisk(
+                            project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
+                            ,project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]                        
+                           ,TmpBusinessInsightSection[1]
+                           ,BestSection[1]
+                           ,ContactSection[1]         
+                            ,FinanceSection[1]                           
+                            ,Industrysection[1]
+                            ,MotorVehicleSection[1].MotorVehicleRecords.CurrentRecordCount
+                            ,WatercraftSection[1].WatercraftRecords.CurrentRecordCount
+                            ,AircraftSection[1].AircraftRecords.CurrentRecordCount
+                            ,PropertySection[1].propertyRecords.CurrentRecordsCount             
+                            ,PropertySection[1].propertyRecords.ForeclosureNODRecordCount
+                            )
+                            );
+                            
+                    SourceSectionFinal := if (in_options.IncludeSourceCounts, SourceSection);
+                    ContactSectionFinal := if (in_options.IncludeContacts, ContactSection);
+                    IndustrySectionFinal := if ( in_options.IncludeIndustries, IndustrySection);
+                    MotorVehicleSectionFinal :=   if ( in_options.IncludeMotorVehicles,  MotorVehicleSection);
+                    PropertySectionFinal := if (in_options.IncludeProperties, PropertySection);
+                    AircraftSectionFinal := if (in_options.IncludeAircrafts, AircraftSection);
+                    WatercraftSectionFinal := if (in_options.IncludeWatercrafts, WatercraftSection);
+			    FinanceSectionFinal := if (in_options.IncludeFinances, FinanceSection);
  				
 				
  TopBusiness_Services.BranchReport_Layouts.Final BIPREPORTXFORM() := TRANSFORM
       SELF.acctno := ds_tmpinput_data[1].acctno;
-		  SELF.BestSection := BestSEction[1];
+		     SELF.BestSection := BestSection[1];
 			SELF.ParentSection := parentSection[1];
-			SELF.AssociateSEction := AssociateSEction[1];
-			SELF.ContactSection := ContactSection[1];
+			SELF.AssociateSEction := AssociateSection[1];
+			SELF.ContactSection := ContactSectionFinal[1];
 			SELF.IncorporationSection := IncorporationSection[1];
-			SELF.PropertySection := PropertySection[1];
+			SELF.PropertySection := PropertySectionFinal[1];
 			SELF.OperationsSitesSection := OperationsSitesSection[1];
-			SELF.FinanceSection :=  FinanceSection[1];
-			SELF.IndustrySection := IndustrySection[1];
-			SELF.LicenseSection := LicenseSEction[1];
+			SELF.FinanceSection :=  FinanceSectionFinal[1];
+			SELF.IndustrySection := IndustrySectionFinal[1];
+			SELF.LicenseSection := LicenseSection[1];
 			SELF.UrlSection      := UrlSection[1];
 			SELF.BankruptcySection := BankruptcySection[1];
 			SELF.LienSection := LienSection[1];
 			SELF.UCCSection :=  UccSection[1];
-			SELF.AircraftSEction := AircraftSection[1];
-			SELF.MotorVehicleSection         := MotorVehicleSection[1];
-			SELF.WatercraftSection           := WatercraftSection[1];
+			SELF.AircraftSEction := AircraftSectionFinal[1];
+			SELF.MotorVehicleSection         := MotorVehicleSectionFinal[1];
+			SELF.WatercraftSection           := WatercraftSectionFinal[1];
 			SELF.ConnectedBusinessSection    := ConnectedBusinessSection[1];
 			SELF.RegisteredAgentSEction      := RegisteredAgentSection[1];
 			SELF.IRS5500Section              := IRS5500Section[1];
 			SELF.BusinessRegistrationSection := BusinessRegistrationSection[1];
 			SELF.SanctionSection             := SanctionsSection[1];
 			SElf.ExperianBusinessReportSection := ExperianBusinessReportSection[1];
-			SELF.DunBradStreetSection        := DunBradStreetSection[1];
-			SELF.SourceSection               := SourceSection[1];
+			SELF.DunBradStreetSection        := DunBradStreetSection[1];		
+                SELF.SourceSection               := SourceSectionFinal[1];
+      
+                //SELF.businessInsightSection := BusinessInsightSection[1];
+                SELF.BusinessInsightSection := TmpBusinessInsightSection[1];
 			//SELF.CompanyVerifcationSection := []		//purposely like this not a typo.	
 		  SELF := [];
 	END;
   SectionReport := DATASET([ BIPREPORTXFORM() ]);		 
-	
+
 	return(sectionReport);
 
 	end; // getReport

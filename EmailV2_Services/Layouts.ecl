@@ -97,6 +97,8 @@ EXPORT Layouts := MODULE
     UNSIGNED8 did_score := 0;
     STRING8   date_first_seen;
     STRING8   date_last_seen;
+    UNSIGNED4 ln_date_first := 0;    // LN calculated date based on vendor's date_first_seen
+    UNSIGNED4 ln_date_last := 0;    // LN calculated date based on vendor's date_last_seen
     STRING8   date_vendor_first_reported;
     STRING8   date_vendor_last_reported;
     STRING8   process_date;
@@ -300,6 +302,8 @@ EXPORT Layouts := MODULE
     STRING    src;
     STRING50  record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
+    STRING8   ln_date_first := '';    // LN calculated date based on vendor's date_first_seen
+    STRING8   ln_date_last := '';    // LN calculated date based on vendor's date_last_seen
   END;
 
   EXPORT batch_combined_rec := RECORD
@@ -315,7 +319,7 @@ EXPORT Layouts := MODULE
   EXPORT crs_email_raw_rec := RECORD                         // to be used with source_counts reporting
     crs_raw_cleaned Cleaned;
     iesp.emailsearchv2.t_EmailSearchV2OriginalData - [FirstName,LastName,StreetAddress,City,State,Zip,Zip4] Original;
-  	unsigned8 LexId {xpath('LexId')};
+    unsigned8 LexId {xpath('LexId')};
     STRING8 DateFirstSeen {xpath('DateFirstSeen')};
     STRING8 DateLastSeen {xpath('DateLastSeen')};
     STRING8 DateVendorFirstReported {xpath('DateVendorFirstReported')};

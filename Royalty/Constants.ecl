@@ -218,7 +218,8 @@ export Constants := module
   export set of string2 LastResortRoyalty := [MDR.sourceTools.src_wired_Assets_Royalty];
 
   export WORKPLACE_ROYALTY_SET := [
-    MDR.sourceTools.src_One_Click_Data,
+    // MDR.sourceTools.src_One_Click_Data,
+    // As of 03/04/2020 (estd.), One Click Data is no longer a royalty
     MDR.sourceTools.src_Teletrack,
     MDR.sourceTools.src_SalesChannel,
     MDR.sourceTools.src_Thrive_LT,

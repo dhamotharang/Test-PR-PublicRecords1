@@ -1,4 +1,4 @@
-﻿import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
+﻿import AutoStandardI,Census_data,codes,doxie,DriversV2,dx_Gong,iesp,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
        dx_header;
 
 export Functions := module
@@ -641,7 +641,7 @@ export Functions := module
     // *** Get the current gong history phone info for the input phone# (if there was one)
     // from the thor_data400::key::gong_history_phone_qa file.
     // It will be used for warning checking later and to output RPL info later.
-    input_phone_info_rec_raw := gong.Key_History_phone(
+    input_phone_info_rec_raw := dx_Gong.key_history_phone()(
       keyed(search_phone7 = p7 and search_phone3 = p3) and current_flag);
 
     input_phone_info_rec_optout := Suppress.MAC_SuppressSource(input_phone_info_rec_raw, mod_access);
@@ -1361,7 +1361,7 @@ export Functions := module
     // **************** SUBORDINATE FILE TRANSFORMS ****************
 
  		//******** Gong file (telephone data) transform
-		iesp.rateevasion.t_RateEvasionReversePhone gong_file_xform(gong.Key_History_phone l) := transform
+		iesp.rateevasion.t_RateEvasionReversePhone gong_file_xform(input_phone_info_rec_raw l) := transform
 
 		  // convert state abbrev & county fips code to county name to be used in the address below.
 		  gong_county_name := get_county_name(l.st, l.county_code[3..5]);

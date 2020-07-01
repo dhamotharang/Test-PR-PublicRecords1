@@ -326,13 +326,13 @@ EXPORT EBRSource_Records(
 		self := [];
   end;
 		
-  iesp.share.t_CodeMap xform_demo5600_sic(EBR.Layout_5600_demographic_data_In L, integer C) := transform
+  iesp.share.t_CodeMap xform_demo5600_sic(EBR_Services.Layouts.demographic_5600_output_Rec L, integer C) := transform
 		self.Code        := choose(C,L.SIC_1_CODE,L.SIC_2_CODE,L.SIC_3_CODE,L.SIC_4_CODE,'');
 	  self.Description := choose(C,L.SIC_1_DESC,L.SIC_2_DESC,L.SIC_3_DESC,L.SIC_4_DESC,'');
 		self := [];
   end;
 
-	iesp.bizcredit.t_BizCreditDemographic5600 xform_demo_5600(ebr.Layout_5600_demographic_data_In L) := transform
+	iesp.bizcredit.t_BizCreditDemographic5600 xform_demo_5600(EBR_Services.Layouts.demographic_5600_output_Rec L) := transform
 		// Create a dataset from the 1-4 sets of L.SIC_*_CODE/DESC fields.
 		numSics := MAP(L.SIC_4_CODE != '' => 4,
 									 L.SIC_3_CODE != '' => 3,

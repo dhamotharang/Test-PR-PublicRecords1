@@ -1,9 +1,9 @@
-/***
+﻿/***
  ** Function takes a doxie formatted Person dataset and filter/project/transform into desired format.
  **	Clear the bad SSNs and defenestrate addresses that have not been seen in a long time.
 ***/
  
-IMPORT doxie, iesp, ut, Address, AID_Build;
+IMPORT doxie, iesp, ut, Address, AID_Build, Header, IdentityManagement_Services;
 
 out_rec := iesp.identitymanagementreport.t_IdmPersonRecord;
 
@@ -23,15 +23,51 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 	// 157096:UNIMPLEMENTED Activity <parameter> Error workaround.
 	// Passed in only dids as input parameter and brought header_records_byDID here.
 	hh_dids := project(dids, doxie.layout_references_hh);
-	d_person := doxie.header_records_byDID(hh_dids, true,,,, true); //include dailies, include all records
- 
+	d_person_hdr := doxie.header_records_byDID(hh_dids, true,,,, true); //include dailies, include all records
 	
+  rec_header_plus_in := record(doxie.layout_presentation) 
+    string2   addr_ind := '';
+	end;
+  
+    rec_header_plus_out := record(doxie.layout_presentation)
+    iesp.identitymanagementreport.t_IdmAddressHierarchy AddressHierarchy;
+	end;
+    
+  
+  d_person_hdr_plus := PROJECT(d_person_hdr,rec_header_plus_in);
+      
+	d_person_hr := Header.MAC_Append_Addr_Ind(d_person_hdr_plus, addr_ind, /*src*/, did, prim_range , 
+                                             prim_name, sec_range, city_name, st, zip,
+                                             /*predir*/, /*postdir*/, /*addr_suffix */, 
+                                             /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/,
+                                             /*dt_vendor_last_reported*/ , /*isTrusted*/ ,
+                                             /*isFCRA*/, /*hitQH*/, /*debug*/);
+	d_person := project(d_person_hr,transform(rec_header_plus_out,
+    		Self.AddressHierarchy.BestAddress := (Left.Best_addr_rank = '1');
+   			Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDate(Left.dt_first_seen_addr);
+   			Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDate(Left.dt_last_seen_addr);
+   			Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDate(Left.dt_vendor_first_reported_addr);
+   			Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDate(Left.dt_vendor_last_reported_addr);
+   			Self.AddressHierarchy.SourceCounts.UnitNumberVariations := Left.apt_cnt;
+   			Self.AddressHierarchy.SourceCounts.UniqueSources := Left.src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Insurance := Left.insurance_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Bureau := Left.bureau_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Property := Left.property_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Utility := Left.utility_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Vehicle := Left.vehicle_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.DriverLicense := Left.dl_src_cnt;
+   			Self.AddressHierarchy.SourceCounts.Voter := Left.voter_src_cnt;
+   			Self.AddressHierarchy.AddressStatus := Left.addressstatus;
+   			Self.AddressHierarchy.AddressType := Left.addresstype;
+       Self := Left; 
+ 
+  ));
 	// #STEP-1: rollup addresses
 	d_person_sorted := sort(d_person,
 	                        prim_range, predir, prim_name, suffix, postdir, sec_range,
 													city_name, st, zip, -dt_last_seen, dt_first_seen);
-	
-	doxie.Layout_presentation rollupAddr(doxie.Layout_presentation L, doxie.Layout_presentation R) := transform
+                          
+	rec_header_plus_out rollupAddr(rec_header_plus_out L, rec_header_plus_out R) := transform
 			self.dt_last_seen := if(R.dt_last_seen > L.dt_last_seen, R.dt_last_seen, L.dt_last_seen);
 			self.dt_first_seen := if(R.dt_first_seen < L.dt_first_seen and R.dt_first_seen <> 0, R.dt_first_seen,	L.dt_first_seen);
 			self.sec_range := if(L.sec_range <> '', L.sec_range, R.sec_range);
@@ -57,12 +93,12 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 
 	// #STEP-2: add location (Latitude\Longitude) info to addresses.
 	headerloc := RECORD
-		doxie.Layout_presentation;
+		rec_header_plus_out;
 		string10 Latitude := '';
 		string11 Longitude := '';
 	END;
  
-	headerloc get_location(doxie.Layout_presentation L, AID_Build.Key_AID_Base R) := transform
+	headerloc get_location(rec_header_plus_out L, AID_Build.Key_AID_Base R) := transform
 			self.Latitude  := R.geo_lat;
 			self.Longitude := R.geo_long;
 			SELF := L;	
@@ -86,7 +122,8 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 															Address.Addr2FromComponents(l.city_name, l.st, l.zip));
 			self.Address := ROW(Addr,TRANSFORM(iesp.share.t_AddressWithGeoLocation,
 																					SELF.Latitude := L.Latitude,
-																					SELF.Longitude := L.Longitude, SELF := LEFT));			
+																					SELF.Longitude := L.Longitude, SELF := LEFT));
+     self := L;                                      
 	end;
 		
 	AddressWithGeo := SORT(PROJECT(addr_aids,formatAddr(LEFT)),-dateLastSeen,dateFirstSeen); 
@@ -124,10 +161,10 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 	END;
 	person_best := PROJECT(best_recs,toheader(LEFT));
 	// Calling common function to add SSN info to header records. Bug: 165034.					
-	ssnrecs := Functions.add_ssn_issue(person_best);		
+	ssnrecs := IdentityManagement_Services.Functions.add_ssn_issue(person_best);		
 		 	 
 	// Transforming to the output layout
-	out_rec toOut(layouts.headerRecordEx L) := transform
+	out_rec toOut(IdentityManagement_Services.layouts.headerRecordEx L) := transform
 			//self.did := L.did;
 			string full_name := StringLib.StringCleanSpaces (L.fname + ' ' + L.mname + ' ' + L.lname);
 			Self.Name := iesp.ECL2ESP.SetName (L.fname, L.mname, L.lname, L.name_suffix, L.title, full_name);

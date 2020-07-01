@@ -1,10 +1,10 @@
 
 export mac_get_type_h(f_h_did, f_h_acctno, f_h_out, modAccess) := macro
 
-import gong, doxie, address, progressive_phone, ut, STD;
+import dx_Gong, doxie, address, progressive_phone, ut, STD;
 
 #uniquename(gong_addr_key)
-%gong_addr_key% := gong.key_Address_current;
+%gong_addr_key% := dx_Gong.key_Address_current();
 
 #uniquename(subj_best_rec)
 %subj_best_rec% := record
@@ -26,7 +26,7 @@ doxie.mac_best_records(f_with_did(did<>0),
 											 did,
 											 %outfile%,
 											 dppa_ok,
-											 glb_ok, 
+											 glb_ok,
 											 ,
 											 modAccess.DataRestrictionMask);
 
@@ -41,8 +41,8 @@ doxie.layout_nbr_targets  %get_nbr_best_init%(%f_subj_best% l) := transform
 	self.dt_last_seen := l.addr_dt_last_seen;
 	self := l;
 	self := [];
-end;		
-		
+end;
+
 #uniquename(f_best_nbr_init)
 %f_best_nbr_init% := project(%f_subj_best%, %get_nbr_best_init%(left))(prim_name<>'');
 
@@ -53,8 +53,8 @@ doxie.layout_nbr_targets  %get_nbr_in_init%(f_h_acctno l) := transform
 	self.zip := l.z5;
 	self := l;
 	self := [];
-end;		
-		
+end;
+
 #uniquename(f_in_nbr_init)
 %f_in_nbr_init% := project(f_h_acctno, %get_nbr_in_init%(left))(prim_name<>'');
 
@@ -66,9 +66,9 @@ end;
 #uniquename(f_both_nbr_init)
 %f_both_nbr_init% := join(%f_in_nbr_init%, %f_best_nbr_init%,
                           left.seqTarget = right.seqTarget,
-						           		%get_in_only%(left), left only) 
+						           		%get_in_only%(left), left only)
 					           + %f_best_nbr_init%;
-										 
+
 #uniquename(f_nbrs_raw)
 %f_nbrs_raw% := doxie.nbr_records(%f_both_nbr_init%,
 						                    	'C',
@@ -76,10 +76,10 @@ end;
 							                    10,
 							                    Neighbors_Per_NA,
 							                    Neighbor_Recency,
-							                    false, false,,false, modAccess);  
+							                    false, false,,false, modAccess);
 																	// treat as subject because the header rows are only being used to look up phone rows and it will not be returned otherwise
-																	
-#uniquename(nbr_with_rank_rec)																	
+
+#uniquename(nbr_with_rank_rec)
 %nbr_with_rank_rec% := record
 	doxie.layout_nbr_records;
 	unsigned nbr_rank;
@@ -101,13 +101,13 @@ end;
 %f_nbrs% := TopN(%f_nbrs_ready%, 100, nbr_rank);
 
 #uniquename(by_addr_lname)
-progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs% l, 
+progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs% l,
                                                                %gong_addr_key% r) := transform
 	self.acctno := if(r.phone10='', skip, (string20)l.seqtarget);
      self.subj_first := l.fname;
      self.subj_middle := l.mname;
      self.subj_last := l.lname;
-     self.subj_suffix := l.name_suffix; 
+     self.subj_suffix := l.name_suffix;
 	self.subj_phone10 := r.phone10;
      self.subj_name_dual := r.listed_name;
      self.subj_phone_type := '8';
@@ -115,9 +115,9 @@ progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs%
      self.subj_date_last := (string8)l.dt_last_seen;
 		 self.subj_phone_date_last := '';
      // note that generally phone can have more than one type:
-     self.phpl_phones_plus_type := map(r.listing_type & Gong.Constants.PTYPE.RESIDENTIAL = Gong.Constants.PTYPE.RESIDENTIAL => 'R',
-                                       r.listing_type & Gong.Constants.PTYPE.BUSINESS    = Gong.Constants.PTYPE.BUSINESS => 'B',
-                                       r.listing_type & Gong.Constants.PTYPE.GOVERNMENT  = Gong.Constants.PTYPE.GOVERNMENT => 'G',
+     self.phpl_phones_plus_type := map(r.listing_type & dx_Gong.Constants.PTYPE.RESIDENTIAL = dx_Gong.Constants.PTYPE.RESIDENTIAL => 'R',
+                                       r.listing_type & dx_Gong.Constants.PTYPE.BUSINESS    = dx_Gong.Constants.PTYPE.BUSINESS => 'B',
+                                       r.listing_type & dx_Gong.Constants.PTYPE.GOVERNMENT  = dx_Gong.Constants.PTYPE.GOVERNMENT => 'G',
                                        '');
 	self.did := l.did;
 	self.sort_order_internal := l.nbr_rank;
@@ -135,7 +135,7 @@ progressive_phone.layout_progressive_batch_out_with_did %by_addr_lname%(%f_nbrs%
 	self.st := cln.st;
 	self.zip5 := cln.zip;
 	self.sub_rule_number := 81;
-	self := [];											   
+	self := [];
 end;
 
 #uniquename(f_h_nbr_out_ready)
@@ -145,25 +145,25 @@ end;
 	                          keyed(left.zip = right.z5) and
 		                        keyed(left.prim_range = right.prim_range) and
 		                        (left.lname = right.lname or
-				                    (length(trim(left.lname))>6 and length(trim(right.lname))>6 and 
+				                    (length(trim(left.lname))>6 and length(trim(right.lname))>6 and
 					                   STD.Str.EditDistance(left.lname, right.lname)<2) or
-					                  (length(trim(left.lname))>4 and 
-					                   left.lname=right.listed_name[1..length(trim(left.lname))]) or 
-					                  (STD.Str.Find(right.lname,'-'+trim(left.lname),1) > 0 or 
-					                   STD.Str.Find(right.lname,trim(left.lname)+'-',1) > 0) or  
-			                       left.fname = right.fname and 
+					                  (length(trim(left.lname))>4 and
+					                   left.lname=right.listed_name[1..length(trim(left.lname))]) or
+					                  (STD.Str.Find(right.lname,'-'+trim(left.lname),1) > 0 or
+					                   STD.Str.Find(right.lname,trim(left.lname)+'-',1) > 0) or
+			                       left.fname = right.fname and
 				                    (STD.Str.EditDistance(left.lname, right.lname)<2 or
-				                     length(trim(left.lname))>5 and 
+				                     length(trim(left.lname))>5 and
 				                     STD.Str.EditDistance(left.lname, right.lname)<3)) and
 				                    (left.sec_range = '' or left.sec_range = right.sec_range or
-				                     NID.mod_PFirstTools.PFLeqPFR(left.fname, right.fname) or 
-					                   length(trim(right.fname))=1 and left.fname[1]=right.fname),					          
-		                         %by_addr_lname%(left, right),limit(ut.limits.PHONE_PER_PERSON, skip));														 
+				                     NID.mod_PFirstTools.PFLeqPFR(left.fname, right.fname) or
+					                   length(trim(right.fname))=1 and left.fname[1]=right.fname),
+		                         %by_addr_lname%(left, right),limit(ut.limits.PHONE_PER_PERSON, skip));
 
 #uniquename(f_h_nbr_out_dep)
-%f_h_nbr_out_dep% := dedup(sort(%f_h_nbr_out_ready%, acctno, subj_phone10, -subj_date_last, -subj_date_first), 
+%f_h_nbr_out_dep% := dedup(sort(%f_h_nbr_out_ready%, acctno, subj_phone10, -subj_date_last, -subj_date_first),
                        acctno, subj_phone10);
 
 progressive_phone.mac_get_back_acctno(%f_h_nbr_out_dep%, f_h_acctno, f_h_out)
 
-endmacro; 
+endmacro;

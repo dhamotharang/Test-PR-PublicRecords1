@@ -67,20 +67,54 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																														L.company_address[1].company_zip5, L.company_address[1].company_zip4, '', '', street_addr, '', csz);
 		SELF.OwnerGuarantorIndicator:=	BusinessCredit_Services.Functions.fn_OwnerGuarnIndicator(R.Guarantor_Owner_Indicator);
 		SELF.OwnershipPercent				:=	IF((integer)R.Percent_Of_Ownership_If_Owner_Principal >0, R.Percent_Of_Ownership_If_Owner_Principal, '');
-		SELF.BusinessCreditIndicator:=	BusinessCredit_Services.Functions.fn_BuzCreditIndicator(L.UltId, 
-																																														L.OrgID,
-																																														L.SeleID,
-																																														mod_access,
-																																														buzCreditAccess);
+		
 		SELF := [];		
 	END;
 
 	busOwnrGuarRecs_PreFinal_temp:= JOIN(	best_rec , ds_busOwnerGuarRecs_raw ,
 																				BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																				trans_preFinalBus(LEFT, RIGHT));
+																				trans_preFinalBus(LEFT, RIGHT));                                             
+                                        
 																		
-	busOwnrGuarRecs_PreFinal := DEDUP(SORT(busOwnrGuarRecs_PreFinal_temp ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
+	busOwnrGuarRecs_PreFinalSlim := DEDUP(SORT(busOwnrGuarRecs_PreFinal_temp ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
 																	BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator);
+   
+     
+     // Sequence recs so that they can be joined 'back to' later below.
+     busOwnrGuarRecs_PreFinalWSeq :=  PROJECT(busOwnrGuarRecs_PreFinalSlim, 
+                                                                             TRANSFORM({iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor;
+                                                                                                      UNSIGNED4 SeqNum;},
+                                                                              SELF.SeqNum := COUNTER;
+                                                                              SELF := LEFT));
+       // setup DS to pass into kfetch2 function
+      BusOwnerGuarRecsBipLinkids := PROJECT(busOwnrGuarRecs_PreFinalSlim, 
+                                                                       TRANSFORM(bipv2.idlayouts.l_xlink_ids2,
+                                                                           SELF.UniqueID := COUNTER;
+                                                                           SELF.ultid := LEFT.BusinessIds.UltID;
+                                                                           SELF.orgid := LEFT.BusinessIds.OrgID;
+                                                                           SELF.seleid := LEFT.BusinessIds.SeleID;
+                                                                           SELF  := []));                                                                           
+                                                                         
+        tmpBusBipLinkids := Business_Credit.Key_LinkIds().Kfetch2(BusOwnerGuarRecsBipLinkids
+                                                                                                    ,mod_access
+                                                                                                    ,BIPV2.IDconstants.Fetch_Level_SeleID
+                                                                                                    ,
+                                                                                                    ,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase);                                                                                                                                                                             
+          tmpBusBiplinkidsSlim :=   DEDUP(SORT(tmpBusBipLinkids, uniqueID), uniqueID);
+          // Join back the results of ketch2 to bus credit header to set indicator.
+          busOwnrGuarRecs_PreFinalWSeqLarge := JOIN( busOwnrGuarRecs_PreFinalWSeq, tmpBusBiplinkidsSlim, 
+                                             LEFT.SeqNum = RIGHT.uniqueId,
+                                             TRANSFORM(iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor,                                               
+                                                SELF.BusinessCreditIndicator :=  MAP(EXISTS(busOwnerGuarRecs_Best_proj) and RIGHT.ULTID > 0  AND buzCreditAccess => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
+																			~EXISTS(busOwnerGuarRecs_Best_proj)  AND (RIGHT.ULTID > 0)  AND buzCreditAccess => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY,
+																			EXISTS(busOwnerGuarRecs_Best_proj) AND (~ (RIGHT.ULTID > 0 AND buzCreditAccess)) 	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
+																			0);                                                                                                                         
+                                                SELF := LEFT;                                              
+                                                ), LEFT OUTER);                                                                                                                                                            
+                                                  // ^^ need left outer here to keep everything specifically recs with BIP header recs only (1 ) value in businessCreditIndicator
+      busOwnrGuarRecs_PreFinal :=  DEDUP(SORT(
+                                                                   busOwnrGuarRecs_PreFinalWSeqLarge ,BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator, -OwnershipPercent),
+												   BusinessIds.UltID, BusinessIds.Orgid , BusinessIds.Seleid, OwnerGuarantorIndicator);                             
 
 	//INDIVIDUAL:
 	OwnrGuarRecs_raw_IS_recs		:= OwnrGuarRecs_raw(Record_Type = Business_Credit.Constants().IndividualOwner AND DID > 0);

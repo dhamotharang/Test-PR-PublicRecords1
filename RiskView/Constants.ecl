@@ -4,7 +4,7 @@ EXPORT Constants := module
 // new NoScore logic to apply across all models and riskview attributes for Riskview Dempsey core project
 export noScore(integer nas, integer nap, integer naprop, boolean truedid) := truedid=false;
 // export noScore(integer nas, integer nap, integer naprop, boolean truedid) := (nas <= 4 and nap <= 4 and naprop <= 3) or truedid=false;
-export noScoreAlert := '222A';  
+export noScoreAlert := '222A';
 
 
 export batch := 'batch';
@@ -54,6 +54,12 @@ export MLAScore 	 			:= '444';
 export gatewayErrorCode := '22';
 export InputErrorCode 	:= '23';
 export purposeErrorCode := '24';
+export FDSubscriberIDErrorCode := '25';
+
+export SubscriberID_error_desc(string5 error_code) := function
+	desc := if(trim(error_code) = FDSubscriberIDErrorCode, 'Request for RiskView Checking Indicators denied due to incomplete account setup', '');
+	return desc;
+end;
 
 export MLA_error_desc(string5 error_code) := function
 	desc := map(

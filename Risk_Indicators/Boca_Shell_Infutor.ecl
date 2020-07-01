@@ -10,8 +10,9 @@ END;
 
 Layout_Infutor_CCPA := RECORD
 	integer8 did; // CCPA changes
-    unsigned4 global_sid; // CCPA changes
-    Layout_Infutor;
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
+	Layout_Infutor;
 END;
 
 Layout_Infutor_CCPA getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := transform	
@@ -41,7 +42,7 @@ wInfutor_unsuppressed := join(ids_wide, InfutorCID.Key_Infutor_DID,
 									right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 									getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));
 									
-wInfutor_flagged := Suppress.MAC_FlagSuppressedSource(wInfutor_unsuppressed, mod_access);
+wInfutor_flagged := Suppress.CheckSuppression(wInfutor_unsuppressed, mod_access);
 
 wInfutor := PROJECT(wInfutor_flagged, TRANSFORM(Layout_Infutor,
 	self.infutor_date_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_date_first_seen);
