@@ -10,7 +10,7 @@ EXPORT Best_Contact_Address_By_Lexid(
 ) :=
 functionmacro
   
-  // -- 1. join contact lexids to watchdog key to get marketing bipmaps for each lexid to use in marketing suppression
+  // -- 1. join contact lexids to watchdog key to get marketing bitmaps for each lexid to use in marketing suppression
   ds_join2watchdog := join(p_Contact_Lexids ,pWatchdog_Best_Key ,left.did = right.did ,transform(right)   ,keyed);  
   
   // -- 2. filter for only marketing permissable sources

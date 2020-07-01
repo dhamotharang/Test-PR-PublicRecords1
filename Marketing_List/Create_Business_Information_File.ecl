@@ -42,7 +42,7 @@ functionmacro
   ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  );
   ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  );
   
-  ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information
+  ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information_prep2
 
     ,proxid_level_address := Address.Addr1FromComponents(left.prim_range  ,left.predir  ,left.prim_name   ,left.addr_suffix   ,left.postdir   ,left.unit_desig  ,left.sec_range )  ;
      seleid_level_address := Address.Addr1FromComponents(right.prim_range ,right.predir ,right.prim_name  ,right.addr_suffix  ,right.postdir  ,right.unit_desig ,right.sec_range)  ;
@@ -102,12 +102,14 @@ functionmacro
     ,self.seleid_level.SIC2               := right.SIC2              
     ,self.seleid_level.SIC3               := right.SIC3              
     ,self.seleid_level.SIC4               := right.SIC4              
-    ,self.seleid_level.SIC5               := right.SIC5              
+    ,self.seleid_level.SIC5               := right.SIC5  
+    ,self.seleid_level.src_sics           := right.src_sics
     ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary     
     ,self.seleid_level.NAICS2             := right.NAICS2            
     ,self.seleid_level.NAICS3             := right.NAICS3            
     ,self.seleid_level.NAICS4             := right.NAICS4            
     ,self.seleid_level.NAICS5             := right.NAICS5            
+    ,self.seleid_level.src_naics          := right.src_naics
     ,self                                 := left
   ) ,hash ,left outer);
 
@@ -127,9 +129,10 @@ functionmacro
 
   // -- if no data for emp num or revenue, set to -1.
   ds_return_result_biz := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
-    ,self.seleid_level.number_of_employees  := if(right.seleid != 0                               ,right.number_of_employees  ,-1)
-    ,self.seleid_level.annual_revenue       := if(right.seleid != 0                               ,right.annual_revenue       ,-1)
-    ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue >= 0 ,right.source               ,'')
+    ,self.seleid_level.number_of_employees  := if(right.seleid != 0                                     ,right.number_of_employees  ,-1)
+    ,self.seleid_level.annual_revenue       := if(right.seleid != 0                                     ,right.annual_revenue       ,-1)
+    ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0  ,right.src_revenue          ,'')
+    ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0  ,right.src_employees        ,'')
     ,self                                   := left
   ) ,hash ,left outer);
   

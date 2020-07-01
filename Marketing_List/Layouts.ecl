@@ -27,19 +27,32 @@ module
     integer                   annual_revenue      ;
     string2                   src_revenue         ;
     integer                   number_of_employees ;
+    string2                   src_employees       ;
     string4                   SIC_Primary         ;
     string4                   SIC2                ;
     string4                   SIC3                ;
     string4                   SIC4                ;
     string4                   SIC5                ;
+    string2                   src_sics            ;
     string6                   NAICS_Primary       ;
     string6                   NAICS2              ;
     string6                   NAICS3              ;
     string6                   NAICS4              ;
     string6                   NAICS5              ;
+    string2                   src_naics           ;
   end;
 
   export business_information := 
+  record
+    unsigned6                 seleid          ;
+    unsigned6                 proxid          ;
+    unsigned6                 ultid           ;
+    unsigned6                 orgid           ;
+    core_business_info_seleid - src_employees - src_sics - src_naics seleid_level    ;
+    core_business_info_proxid proxid_level    ;        
+  end;
+
+  export business_information_prep2 := 
   record
     unsigned6                 seleid          ;
     unsigned6                 proxid          ;
@@ -100,9 +113,9 @@ module
   record
     unsigned4 Age           ;
     unsigned  executive_ind ;
+    string2   src_name              ;
     business_contact        ;
   end;
-
 
   export business_information_prep := 
   record
@@ -136,16 +149,20 @@ module
     unsigned              annual_revenue      ;
     string2               src_revenue         ;
     unsigned              number_of_employees ;
+    string2               src_employees       ;
     string4               SIC_Primary         ;
     string4               SIC2                ;
     string4               SIC3                ;
     string4               SIC4                ;
     string4               SIC5                ;
+    string2               src_sics            ;
     string6               NAICS_Primary       ;
     string6               NAICS2              ;
     string6               NAICS3              ;
     string6               NAICS4              ;
     string6               NAICS5              ;
+    string2               src_naics           ;
+
   end;
 
   export source_rank := 

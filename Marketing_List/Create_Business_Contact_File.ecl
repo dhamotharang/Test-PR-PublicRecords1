@@ -99,6 +99,7 @@ functionmacro
     self.empid                := left.empid                             ;
     self.fname                := best_contact_name[1].fname             ;
     self.lname                := best_contact_name[1].lname             ;
+    self.src_name             := best_contact_name[1].source            ;
     self.title                := job_titles[1].job_title                ;
     self.title_dt_first_seen  := job_titles[1].dt_title_first_seen      ;
     self.title_dt_last_seen   := job_titles[1].dt_title_first_seen      ;
@@ -212,7 +213,7 @@ functionmacro
   // -- set hiearchy at end after all fields have been set properly because set hiearchy uses the address fields
   ds_set_hierarchy := Marketing_List.Set_Hierarchy(ds_blank_address_fields);
   
-  ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact);
+  ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact_prep);
 
   ds_stats := dataset([
     {'ds_crosswalk                    ' ,ut.fIntWithCommas(count(ds_crosswalk                     ))}
