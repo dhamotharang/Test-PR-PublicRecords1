@@ -30,8 +30,40 @@ transformedBaseFile := project(baseFile, transformBase(left)): persist('~thor_da
 
 inputAndBaseFile := In_Base_File + transformedBaseFile;
 
- ut.mac_flipnames(inputAndBaseFile,fname,mname,lname, base_FlipNames)
-// ut.mac_flipnames(In_Base_File,fname,mname,lname, base_FlipNames)
+// Added for DF-27802 - Emerges Opt Out - This will filter out Voters records that are found in the Emerges Opt Out file.  
+optOut :=  VotersV2.File_OptOut_Cleaned;	
+
+joinLayout := record
+	 Layout_outfile;	
+	 string optout_flag;
+end;
+	
+distVoters  :=	distribute(inputAndBaseFile,hash(dob)); 
+dedupOptOut :=	dedup(sort(distribute(optOut,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
+	
+joinVoters_OptOut := join(distVoters, dedupOptOut,
+													 left.dob        = right.dob and
+													 left.last_name  = right.last_name and
+													 left.first_name = right.first_name and
+													 (left.res_state = right.state or left.mail_state = right.state),
+														transform(joinLayout,
+																			 self.optout_flag := if( left.dob        = right.dob and
+																															 left.last_name  = right.last_name and 
+																															 left.first_name = right.first_name and 
+																															 (left.res_state = right.state or left.mail_state = right.state) and 
+																															 left.dob        <> '' and right.dob        <> ''  and 
+																															 left.last_name  <> '' and right.last_name  <> ''  and 
+																															 left.first_name <> '' and right.first_name <> ''  and 
+																															 (left.res_state <> '' or left.mail_state   <> '') and right.state <> ''
+																															 ,'O' ,'');	
+																			 self 				  := left;
+																			 self  				  := [];),
+															 left outer, lookup, local);
+																	 
+Base_filterOptOuts := project(joinVoters_OptOut(optOut_flag <> 'O'),transform(Layout_outfile,self := left));
+// End of Emerges Opt Out filter
+
+ut.mac_flipnames(Base_filterOptOuts,fname,mname,lname, base_FlipNames)
 
 dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name_suffix, fname, mname, 
 																dob, prim_range, prim_name, predir, addr_suffix, postdir,
