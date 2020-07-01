@@ -115,4 +115,4 @@ MissingRules := NormRules(Std.Str.FindCount(RulesAttr, TRIM(Field))<1);
 output(MissingRules, named('MissingRules'));
       
 //output(NormRules,,'~fraudgov::in::sprayed::configrules', CSV(QUOTE('"')), overwrite);
-output(NormRules,,'~fraudgov::in::20200625::configrules', CSV(QUOTE('"')), overwrite);
+output(NormRules,,'~fraudgov::in::20200701::configrules', CSV(QUOTE('"'),HEADING(SINGLE)), overwrite);
