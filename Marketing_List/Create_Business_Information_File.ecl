@@ -140,8 +140,15 @@ functionmacro
      Marketing_List.Validate_Address(proxid_level.business_address,proxid_level.city,proxid_level.state,proxid_level.zip5)
     ,Marketing_List.Validate_Address(seleid_level.business_address,seleid_level.city,seleid_level.state,seleid_level.zip5)
   );
+
+  #IF(Marketing_List._Config().Add_Extra_Source_Fields = true)
+    ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information_prep2);
+  #ELSE
+    ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information      );  
+  #END
   
-  ds_filtered_out_recs := join(ds_return_result_biz ,ds_return_result_validate_address ,left.proxid = right.proxid ,transform(left)  ,left only,hash);
+  
+  ds_filtered_out_recs := join(ds_return_result_biz ,ds_return_result ,left.proxid = right.proxid ,transform(left)  ,left only,hash);
 
   ds_stats := dataset([
     {'pDataset_Best                         ' ,ut.fIntWithCommas(count(pDataset_Best                        ))}
@@ -164,6 +171,7 @@ functionmacro
    ,{'ds_best_emps_sales                    ' ,ut.fIntWithCommas(count(ds_best_emps_sales                   ))}
    ,{'ds_return_result_biz                  ' ,ut.fIntWithCommas(count(ds_return_result_biz                 ))}
    ,{'ds_return_result_validate_address     ' ,ut.fIntWithCommas(count(ds_return_result_validate_address    ))}
+   ,{'ds_return_result                      ' ,ut.fIntWithCommas(count(ds_return_result                     ))}
    ,{'ds_filtered_out_recs                  ' ,ut.fIntWithCommas(count(ds_filtered_out_recs                 ))}
   
   ]  ,{string statname  ,string statvalue});
@@ -196,14 +204,15 @@ functionmacro
    ,output(choosen(ds_best_emps_sales                   (count(pSampleProxids) = 0 or seleid in set_debug_seleids ),300)  ,named('Create_Business_Information_File_ds_best_emps_sales'                   ),all)
    ,output(choosen(ds_return_result_biz                 (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_return_result_biz'                 ),all)
    ,output(choosen(ds_return_result_validate_address    (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_return_result_validate_address'    ),all)
+   ,output(choosen(ds_return_result                     (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_return_result'                     ),all)
    ,output(choosen(ds_filtered_out_recs                 (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_filtered_out_recs'                 ),all)
                                                                                                                                   
   );
 
   #IF(pDebug = true)
-    return when(ds_return_result_validate_address  ,output_debug);
+    return when(ds_return_result  ,output_debug);
   #ELSE
-    return ds_return_result_validate_address;
+    return ds_return_result;
   #END
   
 endmacro;

@@ -213,8 +213,12 @@ functionmacro
   // -- set hiearchy at end after all fields have been set properly because set hiearchy uses the address fields
   ds_set_hierarchy := Marketing_List.Set_Hierarchy(ds_blank_address_fields);
   
-  ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact_prep);
-
+  #IF(Marketing_List._Config().Add_Extra_Source_Fields = true)
+    ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact_prep );
+  #ELSE
+    ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact      );
+  #END
+  
   ds_stats := dataset([
     {'ds_crosswalk                    ' ,ut.fIntWithCommas(count(ds_crosswalk                     ))}
    ,{'ds_biz_info                     ' ,ut.fIntWithCommas(count(ds_biz_info                      ))}
