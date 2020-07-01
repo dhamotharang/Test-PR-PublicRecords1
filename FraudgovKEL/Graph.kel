@@ -289,7 +289,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     INTEGER nap_summary,
     INTEGER nas_summary,
     INTEGER cvi,
-    INTEGER addrvalflag,
+    STRING addrvalflag,
     INTEGER fp3_stolenidentityindex,
     INTEGER syntheticidentityindex_v3,
     INTEGER manipulatedidentityindex_v3,
@@ -3271,8 +3271,8 @@ Event: => T19_IdCurrProfUsngBnkAcctCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																								COUNT(rBankAccount.BankAccountEvent(EventDate<=Event.EventDate AND Event.T_SrcClassType IN [2,3,4]).Transaction{T_PersonUidEcho}));
 Event: => T9_AddrValType := MAP(T9_AddrPopFlag=0 => -99999,
                                 T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																STRING(addrvalflag)='' => -99997,
-																STRING(addrvalflag));
+																addrvalflag = '' => -99997,
+																addrvalflag);
 Event: => T9_AddrMailDropType := MAP(T9_AddrPopFlag=0 => -99999,
                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
                                      drop_indicator:Null OR drop_indicator='' => -99997,
@@ -3314,7 +3314,7 @@ Event: => T9_AddrIsInvalidFlag := MAP(T9_AddrPopFlag=0 => -99999,
 																			T9_AddrValType = 'N' => 1, 0);
 Event: => T9_AddrIsCmraFlag := MAP(T9_AddrPopFlag=0 => -99999,
                                    T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																	 ALL(AddressEvent.Transaction,T9_AddrMailDropType='-99997') => -99997,
+																	 T9_AddrMailDropType=-99997 => -99997,
 																	 T9_AddrMailDropType = 'C' => 1, 0);
 Event: => T15_SsnMultCurrIDFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
                                          T_SrcClassType < 4 => -99998,
@@ -3336,8 +3336,8 @@ Event: => T16_PhnPrePdFlag := MAP(T16_PhnPopFlag=0 => -99999,
 																	phone_prepaid); 
 Event: => T16_PhnIsInvalidFlag := MAP(T16_PhnPopFlag=0 => -99999,
                                   T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																	ALL(PhoneEvent.Transaction,T16_PhnValType=-99997) => -99997,
-																	T16_PhnValType = 0 => 1, 0);
+																	ALL(PhoneEvent.Transaction,T16_PhnValType='-99997') => -99997,
+																	T16_PhnValType = '0' => 1, 0);
 Event: => T19_BnkAcctMultCurrIDFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                              T_SrcClassType < 4 => -99998,
 																						 T19_IdCurrProfUsngBnkAcctCntEv >=2 => 1, 0);
