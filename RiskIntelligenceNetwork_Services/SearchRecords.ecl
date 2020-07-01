@@ -213,7 +213,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  // Public records appends for realtimetime identities. inorder to get risk scores from KEL analytics.
  ds_pr_appends := _RIN_Function.getRealtimePRAppends(ungroup(ds_pr_best), search_params);
- ds_realtime_attribute := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends);
+ ds_realtime_attribute := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends, search_params);
 
  // ****Ends here ****
 
