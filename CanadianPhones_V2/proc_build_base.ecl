@@ -85,11 +85,8 @@ EXPORT proc_build_base := FUNCTION
 	did_add.MAC_Match_Flex(canadianwp_rollup, matchset, '', '', fname, mname, lname, name_suffix, 
   prim_range, prim_name, sec_range, zip, state, '' , did, CanadianPhones_V2.layoutCanadianWhitepagesBase, TRUE, DID_Score,75, dCanadianPhonesWDID);
 
-  mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
-	Supress_CCPA := Suppress.MAC_SuppressSource(dCanadianPhonesWDID, mod_access, did, NULL,TRUE);	
-
 	//DF-16788
-	PromoteSupers.MAC_SF_BuildProcess(Supress_CCPA,
+	PromoteSupers.MAC_SF_BuildProcess(dCanadianPhonesWDID,
 													CanadianPhones.thor_cluster + 'base::canadianwp_v2',
 													bld_base,
 													2,,true
