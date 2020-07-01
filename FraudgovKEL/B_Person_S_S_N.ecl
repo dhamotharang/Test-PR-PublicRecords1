@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Person,E_Person_S_S_N,E_Social_Security_Number FRO
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_S_S_N := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_S_S_N.__Result) __E_Person_S_S_N := E_Person_S_S_N.__Result;
-  SHARED __EE3804227 := __E_Person_S_S_N;
-  EXPORT __ST66186_Layout := RECORD
+  SHARED __EE3960809 := __E_Person_S_S_N;
+  EXPORT __ST66832_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number.Typ) Social_;
@@ -16,16 +16,16 @@ EXPORT B_Person_S_S_N := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST66186_Layout __ND3804261__Project(E_Person_S_S_N.Layout __PP3804122) := TRANSFORM
-    __EE3804160 := __PP3804122.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE3804160,__T(__EE3804160).Event_Date_);
-    __EE3804189 := __PP3804122.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE3804189,__T(__EE3804189).Event_Date_);
-    SELF := __PP3804122;
+  SHARED __ST66832_Layout __ND3960843__Project(E_Person_S_S_N.Layout __PP3960704) := TRANSFORM
+    __EE3960742 := __PP3960704.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE3960742,__T(__EE3960742).Event_Date_);
+    __EE3960771 := __PP3960704.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE3960771,__T(__EE3960771).Event_Date_);
+    SELF := __PP3960704;
   END;
-  EXPORT __ENH_Person_S_S_N := PROJECT(__EE3804227,__ND3804261__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_S_S_N::Annotated',EXPIRE(7));
-  SHARED __EE4093838 := __ENH_Person_S_S_N;
-  SHARED __IDX_Person_S_S_N_Social__Filtered := __EE4093838(__NN(__EE4093838.Social_));
+  EXPORT __ENH_Person_S_S_N := PROJECT(__EE3960809,__ND3960843__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_S_S_N::Annotated',EXPIRE(7));
+  SHARED __EE4267457 := __ENH_Person_S_S_N;
+  SHARED __IDX_Person_S_S_N_Social__Filtered := __EE4267457(__NN(__EE4267457.Social_));
   SHARED IDX_Person_S_S_N_Social__Layout := RECORD
     E_Social_Security_Number.Typ Social_;
     __IDX_Person_S_S_N_Social__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_S_S_N := MODULE
   EXPORT IDX_Person_S_S_N_Social__Name := '~key::KEL::FraudgovKEL::Person_S_S_N::Social_';
   EXPORT IDX_Person_S_S_N_Social_ := INDEX(IDX_Person_S_S_N_Social__Projected,{Social_},{IDX_Person_S_S_N_Social__Projected},IDX_Person_S_S_N_Social__Name);
   EXPORT IDX_Person_S_S_N_Social__Build := BUILD(IDX_Person_S_S_N_Social_,OVERWRITE);
-  EXPORT __ST4093840_Layout := RECORDOF(IDX_Person_S_S_N_Social_);
-  EXPORT IDX_Person_S_S_N_Social__Wrapped := PROJECT(IDX_Person_S_S_N_Social_,TRANSFORM(__ST66186_Layout,SELF.Social_ := __CN(LEFT.Social_),SELF:=LEFT));
+  EXPORT __ST4267459_Layout := RECORDOF(IDX_Person_S_S_N_Social_);
+  EXPORT IDX_Person_S_S_N_Social__Wrapped := PROJECT(IDX_Person_S_S_N_Social_,TRANSFORM(__ST66832_Layout,SELF.Social_ := __CN(LEFT.Social_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_S_S_N_Social__Build);
 END;

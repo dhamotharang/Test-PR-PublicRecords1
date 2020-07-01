@@ -2937,7 +2937,7 @@ RECORD
   integer8 t1l_fp_sourcerisklevel;
   integer8 t1_adultidnotseenflag;
   integer8 t1_minorwlexidflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1_firstnmnotverflag;
   integer8 t1_lastnmnotverflag;
   integer8 t1_addrnotverflag;
@@ -3121,8 +3121,8 @@ RECORD
   string t_inpdvcserialnumecho;
   string t_inpdvctypeecho;
   string t_inpdvcidprovecho;
-  integer8 t_inpdvclatecho;
-  integer8 t_inpdvclongecho;
+  real8 t_inpdvclatecho;
+  real8 t_inpdvclongecho;
   string t_inpinvestigatoridecho;
   string t_inpreferralcaseidecho;
   string t_inpreferraltypedescecho;
@@ -3143,11 +3143,11 @@ RECORD
   integer8 t15_idcurrprofusngssncntev;
   integer8 t20_idcurrprofusngdlcntev;
   integer8 t19_idcurrprofusngbnkacctcntev;
-  integer8 t9_addrvaltype;
+  string t9_addrvaltype;
   string t9_addrmaildroptype;
-  integer8 t15_ssnvaltype;
-  integer8 t20_dlvaltype;
-  integer8 t16_phnvaltype;
+  string t15_ssnvaltype;
+  string t20_dlvaltype;
+  string t16_phnvaltype;
   integer8 t16_isphnmetahitflag;
   integer8 t16_phnmetanewvenddt;
   integer8 t16_phnmetaoldvenddt;
@@ -3223,6 +3223,7 @@ RECORD
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
   integer1 aotcurrprofflag;
+  unsigned8 iscurrent;
   unsigned4 t_actdtecho;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
@@ -3258,7 +3259,7 @@ RECORD
   integer8 t1_lastnmnotverflag;
   integer8 t1_phnnotverflag;
   integer8 t1l_ssnwaddrnotverflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1l_ssnnotverflag;
   integer8 t1l_curraddrnotinagcyjurstflag;
   integer8 t1l_bestdlnotinagcyjurstflag;
@@ -3307,6 +3308,7 @@ RECORD
   integer8 t1l_iddeceasedflag;
   unsigned8 aotidactcntev;
   unsigned4 deceaseddate;
+  integer8 t1_minoridflag;
  END;
 
   //Begin BocaShell Layout

@@ -1,4 +1,4 @@
-﻿import tools, _control;
+﻿import tools, _control, Scrubs, Scrubs_YellowPages;
 
 export Proc_Build_All(
 
@@ -35,6 +35,11 @@ module
 		,spray_files
 		,Promote().Inputfiles.Sprayed2Using
 		,Check_4_New_Fields()
+		,Scrubs.ScrubsPlus('YellowPages', 'Scrubs_YellowPages', 'Scrubs_YellowPages_Input', 'Input', pversion, YellowPages.Email_Notification_Lists(pIsTesting).BuildFailure)
+		,IF(Scrubs.mac_ScrubsFailureTest('Scrubs_YellowPages_Input',pversion)
+        ,OUTPUT('Scrubs passed.  Continuing to the Proc_Build_Base step.')				
+        ,FAIL('Scrubs failed.  Base not built.  Processing stopped.')
+        )
 		,Proc_Build_Base(pversion,pUpdateFile,pBaseFile)
 		,proc_build_autokeys(pversion)
 		,proc_build_keys(pversion)
@@ -44,6 +49,7 @@ module
 		,Promote().buildfiles.Built2QA
 		,Promote().Inputfiles.Using2used
 		,QA_samples(pversion,pIsTesting,pOverwrite)
+		,fDOPSGrowthCheck(pversion).GrowthCheck
 
 	) : success(Send_Emails(pversion).Roxie), failure(send_emails(pversion).buildfailure);
 	

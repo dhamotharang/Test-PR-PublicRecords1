@@ -24,7 +24,8 @@
 	END;
   
   EXPORT getCredentials(BOOLEAN runProd, BOOLEAN updateROSE = FALSE) := FUNCTION
-    creds := IF(runProd, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCreds, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCertCreds);
+    // creds := IF(runProd, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCreds, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCertCreds);
+    creds := IF(updateROSE, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCertCreds, FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCreds);
   RETURN creds;
   END;
 END;
