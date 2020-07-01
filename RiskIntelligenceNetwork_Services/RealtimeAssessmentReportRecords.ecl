@@ -115,7 +115,7 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  // Public records appends for realtimetime identities. inorder to get attributes and risk scores from KEL analytics.
 
  ds_pr_appends := RiskIntelligenceNetwork_Services.Functions.getRealtimePRAppends(ds_pr_best_ungroup, report_params);
- ds_RiskAssessment := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends);  
+ ds_RiskAssessment := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends,report_params);  
  
  ds_RiskAttribute := PROJECT(ds_RiskAssessment[1].EntityStats, 
                        TRANSFORM(iesp.identityreport.t_RINRiskAttribute, 
