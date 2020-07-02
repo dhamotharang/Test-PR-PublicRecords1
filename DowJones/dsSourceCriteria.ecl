@@ -1904,6 +1904,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/736 Banned Air Carriers List','1891'},
 {'EC (CFSP) 2020/849 Iran List','1892'},
 {'EC 2020/847 Iran List','1893'},
-{'OFAC - Caesar Syria Civilian Protection Act of 2019','1894'}
+{'OFAC - Caesar Syria Civilian Protection Act of 2019','1894'},
+{'EC (CFSP) 2020/898 Venezuela List','1895'},
+{'EC 2020/897 Venezuela List','1896'},
+{'PPATK (Indonesia) Proliferation of Weapons of Mass Destruction Funding List','1897'},
+{'SECO (Switzerland) Nicaragua List','1898'}
 ],r);
 
