@@ -376,9 +376,12 @@ self := left;
 real_header1 := join(g_inrec, real_header_nodate_filtering, 
 	left.seq=right.seq and 
  RIGHT.h.dt_first_seen < left.historydate and // check dt_first_seen 
-(right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
+(right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.h.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 transform(Layout_Header_Data,
-self := right,
+	self.h := right.h; 
+	self.valid_dob := right.valid_dob, 
+	self.hhid_summary.hhid := right.hhid_summary.hhid;
+	self.came_from_fastheader := right.came_from_fastheader;
 self := left),
 left outer );
 
@@ -391,7 +394,10 @@ real_header2 := join(g_inrec, real_header_with_ingestdate_appended,
 (right.first_ingest_date=0 and right.h.dt_first_seen < left.historydate and right.h.dt_vendor_first_reported < left.historydate) // use old logic if ingest_date=0
 ),
 transform(Layout_Header_Data,
-self := right,
+	self.h := right.h; 
+	self.valid_dob := right.valid_dob, 
+	self.hhid_summary.hhid := right.hhid_summary.hhid;
+	self.came_from_fastheader := right.came_from_fastheader;
 self := left),
 left outer );
 
