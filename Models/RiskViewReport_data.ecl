@@ -812,7 +812,6 @@ EXPORT RiskViewReport_data := MODULE
         integer namematch;
         string8 dt_last_seen;
         string10 phone;
-        //Gong_v2.Layout_GongHistory gong; // only needed for testing...
       END;
 
       bestValid_plusphone := join(bestValid, dx_Gong.key_history_address(iFcra),

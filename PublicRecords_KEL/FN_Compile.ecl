@@ -1,11 +1,17 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
+  EXPORT KEL.typ.nbool FN_R_E_A_L_E_Q_U_A_L(KEL.typ.nfloat __Pval1, KEL.typ.nfloat __Pval2) := FUNCTION
+    RETURN __OP2(__FN1(ABS,__OP2(__Pval1,-,__Pval2)),<,__CN(1.0E-8));
+  END;
   EXPORT KEL.typ.nint FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(KEL.typ.nkdate __Pfrom, KEL.typ.nkdate __Pto) := FUNCTION
     RETURN __FN1(ABS,__FN2(KEL.Routines.DaysBetween,__Pfrom,__Pto));
+  END;
+  EXPORT KEL.typ.nint FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(KEL.typ.nkdate __Pfrom, KEL.typ.nkdate __Pto) := FUNCTION
+    RETURN __FN1(ABS,__FN2(KEL.Routines.YearsBetween,__Pfrom,__Pto));
   END;
   EXPORT KEL.typ.nstr FN_Is_Blank(KEL.typ.nstr __PFieldToCheck, KEL.typ.nstr __PDefaultVal) := FUNCTION
     RETURN IF(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN('')))),__ECAST(KEL.typ.nstr,__PDefaultVal),__ECAST(KEL.typ.nstr,__PFieldToCheck));
@@ -121,9 +127,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC9260 := -99999;
+  SHARED __CC9352 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC9260,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC9352,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -157,7 +163,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nstr FN__fn_Naic_Code_Interpreter(KEL.typ.nstr __PNaicCodeInput) := FUNCTION
     NaicCodeInput := __T(__PNaicCodeInput);
     __IsNull := __NL(__PNaicCodeInput);
-    __Value := PublicRecords_KEL.ECL_Functions.fn_NaicCodeInterpreter((INTEGER)NaicCodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.fn_NaicCodeInterpreter(NaicCodeInput);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN__fn_Naic_Group_Code_Interpreter(KEL.typ.nstr __PNaicCodeGroup) := FUNCTION
@@ -166,7 +172,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nstr FN_Fn_S_I_C_Code_Interpreter(KEL.typ.nstr __PSic4CodeInput) := FUNCTION
     Sic4CodeInput := __T(__PSic4CodeInput);
     __IsNull := __NL(__PSic4CodeInput);
-    __Value := PublicRecords_KEL.ECL_Functions.Fn_SICCodeInterpreter((INTEGER)Sic4CodeInput);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_SICCodeInterpreter(Sic4CodeInput);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN_Fn_S_I_C_Group_Code_Interpreter(KEL.typ.nstr __PSicCodeGroup) := FUNCTION
@@ -182,6 +188,54 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     SecondaryRange := __T(__PSecondaryRange);
     __IsNull := __NL(__PPrimaryRange) OR __NL(__PPredirectional) OR __NL(__PPrimaryName) OR __NL(__PSuffix) OR __NL(__PPostdirectional) OR __NL(__PUnitDesignation) OR __NL(__PSecondaryRange);
     __Value := address.Addr1FromComponents(PrimaryRange,Predirectional,PrimaryName,Suffix,Postdirectional,UnitDesignation,SecondaryRange);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Found(KEL.typ.nstr __Psource, KEL.typ.nstr __Ptarget) := FUNCTION
+    source := __T(__Psource);
+    target := __T(__Ptarget);
+    __IsNull := __NL(__Psource) OR __NL(__Ptarget);
+    __Value := STD.Str.Find(source, target, 1) > 0;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nstr FN_Regex_Replace(KEL.typ.nstr __Pregex, KEL.typ.nstr __Ptext, KEL.typ.nstr __Preplacement, KEL.typ.nbool __Pnocase) := FUNCTION
+    regex := __T(__Pregex);
+    text := __T(__Ptext);
+    replacement := __T(__Preplacement);
+    nocase := __T(__Pnocase);
+    __IsNull := __NL(__Pregex) OR __NL(__Ptext) OR __NL(__Preplacement) OR __NL(__Pnocase);
+    __Value := REGEXREPLACE(regex, text, replacement, nocase);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Slim_Business_Name(KEL.typ.nstr __PBusinessName) := FUNCTION
+    RETURN FN_Regex_Replace(__ECAST(KEL.typ.nstr,__CN('\\s')),__ECAST(KEL.typ.nstr,FN_Regex_Replace(__ECAST(KEL.typ.nstr,__CN('(?:^| )(?:CENTER(?:$| )|COMPANY(?:$| )|CO(?:$| )|CORP(?:$| )|CORPORATION(?:$| )|CORPORATE(?:$| )|SERVICE(?:$| )|SERVICES(?:$| )|SER(?:$| )|INC(?:$| )|INCORPORATED(?:$| )|INTL(?:$| )|INTERNATIONAL(?:$| )|GLOBAL(?:$| )|INTERCONTINENTAL(?:$| )|WORLDWIDE(?:$| )|ASSOC(?:$| )|ASS(?:$| )|ASSO(?:$| )|ASSOCIATES(?:$| )|ASSOCIATION(?:$| )|BOUTIQUE(?:$| )|INDUSTRIES(?:$| )|INDUSTRIAL(?:$| )|IND(?:$| )|ENTERPRISES(?:$| )|ENTERPRISE(?:$| )|TRADING(?:$| )|GP(?:$| )|G P(?:$| )|QA(?:$| )|Q A(?:$| )|LP(?:$| )|L P(?:$| )|LLP(?:$| )|COOP(?:$| )|FACTORY(?:$| )|GRP(?:$| )|GROUP(?:$| )|LC(?:$| )|L C(?:$| )|LLC(?:$| )|FL LLC(?:$| )|BUILDING(?:$| )|CONDOMINIUM(?:$| )|COMMISSION(?:$| )|CLUB(?:$| )|DEPT(?:$| )|DEPARTMENT(?:$| )|DEPARTMENTS(?:$| )|NATIONWIDE(?:$| )|CONTRACTORS(?:$| )|CONTRACTING(?:$| )|WORLD(?:$| )|ADVANCED(?:$| )|STORE(?:$| )|STORES(?:$| )|THE(?:$| )|OF(?:$| )|MALL(?:$| )|LTD(?:$| )|LIMITED(?:$| )|LIABILITY(?:$| )|PARTNERSHIP(?:$| )|PARTNERS(?:$| )|PARTNER(?:$| )|FRANCHISE(?:$| )|INDUSTRY(?:$| )|INDUSTRIES(?:$| )|VENTURE(?:$| )|VENTURES(?:$| )|HOLDING(?:$| )|HOLDINGS(?:$| )|GENERAL(?:$| )|AND(?:$| )|MANAGEMENT(?:$| )|MGMT(?:$| )|MFG(?:$| )|MANUFACTURING(?:$| )|COOPERATIVE(?:$| )|DBA(?:$| )|ORG(?:$| )|ORGANIZATION(?:$| )|CONTRACTOR(?:$| ))+')),__ECAST(KEL.typ.nstr,FN_Regex_Replace(__ECAST(KEL.typ.nstr,__CN('[[:punct:]]')),__ECAST(KEL.typ.nstr,__PBusinessName),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nbool,__CN(TRUE)))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nbool,__CN(TRUE)))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nbool,__CN(TRUE)));
+  END;
+  EXPORT KEL.typ.nfloat FN_Levenshtein_Similarity(KEL.typ.nstr __Pfield1, KEL.typ.nstr __Pfield2) := FUNCTION
+    RETURN __OP2(FN_Edit_Distance(__ECAST(KEL.typ.nstr,__Pfield1),__ECAST(KEL.typ.nstr,__Pfield2)),/,KEL.Routines.MaxN(__FN1(LENGTH,__Pfield1),__FN1(LENGTH,__Pfield2)));
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Null_Or_Equal(KEL.typ.nunk __PField1, KEL.typ.nunk __PField2) := FUNCTION
+    RETURN __OR(__OP2(__PField1,=,__PField2),__AND(__NT(__PField1),__NT(__PField2)));
+  END;
+  EXPORT KEL.typ.nbool FN_Edit_Distance_Within_Radius(KEL.typ.nstr __Pfield1, KEL.typ.nstr __Pfield2, KEL.typ.nint __Pradius) := FUNCTION
+    field1 := __T(__Pfield1);
+    field2 := __T(__Pfield2);
+    radius := __T(__Pradius);
+    __IsNull := __NL(__Pfield1) OR __NL(__Pfield2) OR __NL(__Pradius);
+    __Value := STD.Str.EditDistanceWithinRadius(field1, field2, radius);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Phone7_Match(KEL.typ.nstr __PPhone1, KEL.typ.nstr __PPhone2) := FUNCTION
+    RETURN FN_Edit_Distance_Within_Radius(__ECAST(KEL.typ.nstr,__PPhone1),__ECAST(KEL.typ.nstr,__PPhone2),__ECAST(KEL.typ.nint,__CN(1)));
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Phone10_Match(KEL.typ.nstr __PPhone1, KEL.typ.nstr __PPhone2) := FUNCTION
+    RETURN __OR(__OP2(__FN3(KEL.Routines.SubStr2,__PPhone1,__CN(4),__CN(10)),=,__FN3(KEL.Routines.SubStr2,__PPhone2,__CN(4),__CN(10))),FN_Edit_Distance_Within_Radius(__ECAST(KEL.typ.nstr,__PPhone1),__ECAST(KEL.typ.nstr,__PPhone2),__ECAST(KEL.typ.nint,__CN(2))));
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Phone_Match(KEL.typ.nstr __PPhoneOnFile, KEL.typ.nstr __PInputPhone) := FUNCTION
+    RETURN MAP(__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(10)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(10))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone10_Match(__ECAST(KEL.typ.nstr,__PPhoneOnFile),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(7)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(7))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone7_Match(__ECAST(KEL.typ.nstr,__PPhoneOnFile),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(10)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(7))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone7_Match(__ECAST(KEL.typ.nstr,__FN3(KEL.Routines.SubStr2,__PPhoneOnFile,__CN(4),__CN(10))),__ECAST(KEL.typ.nstr,__PInputPhone))),__T(__AND(__OP2(__FN1(LENGTH,__PPhoneOnFile),=,__CN(7)),__OP2(__FN1(LENGTH,__PInputPhone),=,__CN(10))))=>__ECAST(KEL.typ.nbool,FN_Is_Phone10_Match(__ECAST(KEL.typ.nstr,__OP2(__FN3(KEL.Routines.SubStr2,__PInputPhone,__CN(1),__CN(3)),+,__PPhoneOnFile)),__ECAST(KEL.typ.nstr,__PInputPhone))),__ECAST(KEL.typ.nbool,__CN(FALSE)));
+  END;
+  EXPORT KEL.typ.nstr FN_Fn_I_P_Validate(KEL.typ.nstr __Pfield1) := FUNCTION
+    field1 := __T(__Pfield1);
+    __IsNull := __NL(__Pfield1);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_IPValidate(field1);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION

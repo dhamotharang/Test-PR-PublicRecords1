@@ -51,14 +51,17 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeEducation := TRUE;
 	EXPORT BOOLEAN IncludeEmail := TRUE;
 	EXPORT BOOLEAN IncludeEmployment := TRUE;
+	EXPORT BOOLEAN IncludeGeolink := TRUE;
 	EXPORT BOOLEAN IncludeHousehold := TRUE;
 	EXPORT BOOLEAN IncludeInquiry := TRUE;
+	EXPORT BOOLEAN IncludeLienJudgment := TRUE;
 	EXPORT BOOLEAN IncludePerson := TRUE;
 	EXPORT BOOLEAN IncludePhone := TRUE;
 	EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 	EXPORT BOOLEAN IncludeProperty := TRUE;
 	EXPORT BOOLEAN IncludePropertyEvent := TRUE;
 	EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+	EXPORT BOOLEAN IncludeSurname := TRUE;
 	EXPORT BOOLEAN IncludeTIN := TRUE;
 	EXPORT BOOLEAN IncludeTradeline := TRUE;
 	EXPORT BOOLEAN IncludeUtility := TRUE;
@@ -66,9 +69,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeWatercraft := TRUE;
 	EXPORT BOOLEAN IncludeZipCode := TRUE;
 	EXPORT BOOLEAN IncludeUCC := TRUE;
-	EXPORT BOOLEAN IncludeLienJudgment := TRUE;
 	EXPORT BOOLEAN IncludeMini := TRUE;
-	EXPORT BOOLEAN IncludeSurname := TRUE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.

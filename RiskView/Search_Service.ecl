@@ -16,12 +16,12 @@ IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, Ris
 
 export Search_Service := MACRO
 
-  // Can't have duplicate definitions of Stored with different default values,
+  // Can't have duplicate definitions of Stored with different default values, 
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 	#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
 	#stored('RVCheckingSubscriberId', 0);
-
+  
 #WEBSERVICE(FIELDS(
 		'RiskView2Request',
 		'HistoryDateTimeStamp',
@@ -44,7 +44,7 @@ export Search_Service := MACRO
 	option := GLOBAL(firstRow.Options);
 	users := GLOBAL(firstRow.User);
 	context := GLOBAL(firstRow.TransactionContext);
-
+	
 /* **********************************************
 	 *  Fields needed for improved Scout Logging  *
 	 **********************************************/
@@ -58,7 +58,7 @@ export Search_Service := MACRO
 	string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
 	STRING6 SSNMask                 := 'NONE'	: stored('SSNMask');
 	STRING6 DOBMask                 := 'NONE'	: stored('DOBMask');
-	BOOLEAN DLMask                  := false	: stored('DLMask');
+	BOOLEAN DLMask                  := false	: stored('DLMask');	
 	BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
 	BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
@@ -97,7 +97,7 @@ export Search_Service := MACRO
 	STRING15 DLNumber := search.DriverLicenseNumber;
 	STRING2 DLState := search.DriverLicenseState;
 	string12 LexID := search.UniqueId;
-
+	
 /* ***************************************
 	 *             Set Options:            *
    *************************************** */
@@ -106,9 +106,9 @@ export Search_Service := MACRO
 	STRING auto_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rva1503_0')[1].value);
 	STRING bankcard_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvb1503_0')[1].value);
 	STRING Short_term_lending_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvg1502_0')[1].value);
-	STRING Telecommunications_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvt1503_0')[1].value);
-	STRING Crossindustry_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvs1706_0')[1].value);
-
+	STRING Telecommunications_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvt1503_0')[1].value);	
+	STRING Crossindustry_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvs1706_0')[1].value);	
+	
 	ds_flagship_models := dataset([{auto_model_name}, {bankcard_model_name}, {short_term_lending_model_name}, {telecommunications_model_name}, {Crossindustry_model_name}], {string flagship_names}) : global;
 	STRING custom_model_name 	:= STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_models, flagship_names) )[1].value);
 	ds_flagship_plus_custom   := ds_flagship_models + dataset([{custom_model_name}], {string flagship_names}) : global;
@@ -119,7 +119,7 @@ export Search_Service := MACRO
 	STRING custom4_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom3, flagship_names) )[1].value);
 	ds_flagship_plus_custom4  := ds_flagship_plus_custom3 + dataset([{custom4_model_name}], {string flagship_names}) : global;
 	STRING custom5_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom4, flagship_names) )[1].value);
-
+	
 	string intended_purpose := trim(option.IntendedPurpose);
 	string	AttributesVersionRequest := trim(option.AttributesVersionRequest);
 	string prescreen_score_threshold := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(OptionName)='prescreen_score_threshold')[1].OptionValue;
@@ -127,14 +127,14 @@ export Search_Service := MACRO
 	boolean isCalifornia_in_person := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(OptionName)='inpersonapplicant')[1].OptionValue='1';  // defaults to false unless there is an option passed in to turn it on
 	boolean run_riskview_report := option.IncludeReport;
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
-
+	
 	boolean IncludeLnJ := option.IncludeLiensJudgmentsReport;
 	boolean IncludeStatusRefreshChecks := option.IncludeStatusRefreshChecks;
 	boolean IncludeRecordsWithSSN := option.LiensJudgmentsReportOptions.IncludeRecordsWithSSN;
 	boolean IncludeBureauRecs := option.LiensJudgmentsReportOptions.IncludeBureauRecs;
- integer ReportingPeriod := if(option.LiensJudgmentsReportOptions.ReportingPeriod = 0, 84,
+ integer ReportingPeriod := if(option.LiensJudgmentsReportOptions.ReportingPeriod = 0, 84, 
                                option.LiensJudgmentsReportOptions.ReportingPeriod);
-
+	
 	//Default the options to be ON which is '1'. If excluded, then change to 0
 	string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
@@ -151,9 +151,14 @@ export Search_Service := MACRO
 	unsigned6 MinimumAmount := MIN(option.LiensJudgmentsReportOptions.MinimumAmount, 999999999);
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates := option.LiensJudgmentsReportOptions.ExcludeStates;
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources := option.LiensJudgmentsReportOptions.ExcludeReportingSources;
+	boolean AttributesOnly := option.LiensJudgmentsReportOptions.AttributesOnly;
+    boolean ExcludeStatusRefresh := option.LiensJudgmentsReportOptions.ExcludeStatusRefresh;
+    string32 DeferredTransactionID := option.LiensJudgmentsReportOptions.DeferredTransactionID;
+    string5 StatusRefreshWaitPeriod := option.LiensJudgmentsReportOptions.StatusRefreshWaitPeriod;
+	
 	// if the boolean flag is true, use the boolean flags
-	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType
-
+	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType	
+	
 	tmpCityFltr := if(ExcludeCityTaxLiens, '0', tmpFilterLienTypes[1..1]);
 	tmpCountyFltr := if(ExcludeCountyTaxLiens, '0', tmpFilterLienTypes[2..2]);
 	tmpStateWarrantFltr := if(ExcludeStateTaxWarrants, '0', tmpFilterLienTypes[3..3]);
@@ -163,26 +168,31 @@ export Search_Service := MACRO
 	tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 	tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
 	tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
+	tmpAttributesOnlyFltr := if(AttributesOnly, '0', tmpFilterLienTypes[10..10]);
+    tmpExcludeStatusRefresh := if(ExcludeStatusRefresh, '0', tmpFilterLienTypes[11..11]);
+	
 		//We now have boolean options for each of these filters. We built the code to use a bit (string)
-		//saying which ones they want and which ones they want to filter. I take the boolean flags and
-		//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to
+		//saying which ones they want and which ones they want to filter. I take the boolean flags and 
+		//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
 		//the BS options in the search_function.
-	FilterLienTypes := tmpCityFltr +
+	FilterLienTypes := tmpCityFltr + 
 		tmpCountyFltr +
 		tmpStateWarrantFltr +
-		tmpStateFltr +
+		tmpStateFltr + 
 		tmpFedFltr +
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
 		tmpEvictionsFltr +
-		tmpReleasedCasesFltr;
-
+		tmpReleasedCasesFltr +
+		tmpAttributesOnlyFltr +
+        tmpExcludeStatusRefresh;
+		
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
-
+  
   //Used only by Checking Indicators
   Integer outOfBandSubscriberId := 0 : stored('RVCheckingSubscriberId');
   INTEGER8 SubscriberId := IF(option.RVCheckingSubscriberId <> 0, option.RVCheckingSubscriberId, outOfBandSubscriberId);
-
+	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 		SELF.servicename := le.servicename;
@@ -194,7 +204,7 @@ export Search_Service := MACRO
 		SELF := le;
 	END;
 	gateways := PROJECT(gateways_in, gw_switch(LEFT));
-
+	
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
 /* ***************************************
@@ -212,7 +222,7 @@ export Search_Service := MACRO
   STRING20 AccountNumber := users.AccountNumber;
   BOOLEAN TestDataEnabled := users.TestDataEnabled;
 	STRING32 TestDataTableName := STD.Str.ToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
-
+	
   //Used only by MLA
   STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
@@ -240,13 +250,13 @@ export Search_Service := MACRO
 		SELF.DL_Number := DLNumber;
 		SELF.DL_State := DLState;
 		SELF.AcctNo := AccountNumber;
-		self.LexID := LexID;
+		self.LexID := LexID; 		
 		self.HistoryDateTimeStamp := HistoryDateTimeStamp;
 		self.Custom_Inputs := option.IncludeModels.ModelOptions;
-		SELF := [];)]);
-
+		SELF := [];)]);	
+	
 	packagedTestseedInput := DATASET([TRANSFORM(Risk_Indicators.Layout_Input,
-		SELF.seq := (integer)search.seq;	// Sequence - This is to be used by the ECL Developers for testing purposes
+		SELF.seq := (integer)search.seq;	// Sequence - This is to be used by the ECL Developers for testing purposes	
 		SELF.fname := STD.Str.ToUpperCase(search.Name.First);
 		SELF.lname := STD.Str.ToUpperCase(search.Name.Last);
 		SELF.ssn := SSN;
@@ -262,8 +272,8 @@ export Search_Service := MACRO
 // c.	First Name, Last Name, SSN
 // d. LexID
 error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
-// MLA alert requested by itself (no scores, attributes, report)
-MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND bankcard_model_name = '' AND
+// MLA alert requested by itself (no scores, attributes, report) 
+MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND bankcard_model_name = '' AND 
 									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name ='' AND AttributesVersionRequest = '' AND
 									 custom2_model_name = '' AND custom3_model_name = '' AND custom4_model_name = '' AND custom5_model_name = '' AND
 									 ~run_riskview_report;
@@ -271,7 +281,9 @@ MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND ban
 
 rpt_period_error_message := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
 
-input_ok := map(((
+attr_only_error_message := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
+            
+check_valid_input := IF((( 
 							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
 							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
 								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
@@ -280,26 +292,15 @@ input_ok := map(((
 								) or
 							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
 							  ) or
-							(unsigned)packagedInput[1].LexID <> 0)
-           and
-        (ReportingPeriod > 0 and ReportingPeriod <= 84)
-         => true,
-       ((
-							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
-							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
-								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
-								(trim(packagedInput[1].z5)<>'' OR (trim(packagedInput[1].p_city_name)<>'' AND trim(packagedInput[1].St)<>'')))												// zip or city/state check
-							)
-								) or
-							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
-							  ) or
-							(unsigned)packagedInput[1].LexID <> 0)
-           and
-        (ReportingPeriod <= 0 or ReportingPeriod > 84) // same as above, everything is good EXCEPT reportingperiod
-         => ERROR(301,rpt_period_error_message),
+							(unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
+
+input_ok := map(AttributesOnly AND ExcludeReleasedCases => ERROR(301,attr_only_error_message),
+							check_valid_input and (ReportingPeriod > 0 and ReportingPeriod <= 84) => true,
+							check_valid_input and (ReportingPeriod <= 0 or ReportingPeriod > 84) => ERROR(301,rpt_period_error_message), // Reporting period must be within 0 - 84.
 							ERROR(301,error_message) // else if anything else is wrong, give the other error message first priority.
-						);
-		//output(input_ok);
+							);
+		
+		// output(input_ok);						
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
@@ -308,19 +309,19 @@ search_results_temp := ungroup(
       	riskview.Search_Function(packagedInput,
       		gateways,
       		DataRestriction,
-      		AttributesVersionRequest,
-      		auto_model_name,
-      		bankcard_model_name,
-      		Short_term_lending_model_name,
-      		Telecommunications_model_name,
-      		Crossindustry_model_name,
+      		AttributesVersionRequest, 
+      		auto_model_name, 
+      		bankcard_model_name, 
+      		Short_term_lending_model_name, 
+      		Telecommunications_model_name, 
+      		Crossindustry_model_name, 
       		Custom_model_name,
       		Custom2_model_name,
       		Custom3_model_name,
       		Custom4_model_name,
       		Custom5_model_name,
       		intended_purpose,
-      		prescreen_score_threshold,
+      		prescreen_score_threshold, 
       		isCalifornia_in_person,
       		riskview.constants.online,
       		run_riskview_report,//riskview.constants.no_riskview_report // don't run report in initial deployment
@@ -328,37 +329,40 @@ search_results_temp := ungroup(
       		SSNMask,
       		DOBMask,
       		DLMask,
-      		FilterLienTypes,
+      		FilterLienTypes, 
       		EndUserCompanyName,
       		CustomerNumber,
-      		SecurityCode,
+      		SecurityCode, 
       		IncludeRecordsWithSSN,
-      	 IncludeBureauRecs,
-      		ReportingPeriod,
+      	 IncludeBureauRecs, 
+      		ReportingPeriod, 
       		IncludeLnJ,
       		RetainInputDID,
       		exception_score_reason,
       		MinimumAmount := MinimumAmount,
       		ExcludeStates := ExcludeStates,
       		ExcludeReportingSources := ExcludeReportingSources,
-			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks
-      		)
+			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+            DeferredTransactionID := DeferredTransactionID,
+            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
+            ESPInterfaceVersion := InterfaceVersion
+      		) 
       	);
-
+  
 	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
 	#else // Else, this is a normal transaction and should be formatted for output appropriately
 	// search_results := ungroup(search_results_temp);
 	search_results := ungroup(
-		IF(TestDataEnabled,
-		RiskView.TestSeed_Function(packagedTestseedInput,
-				TestDataTableName,
-				AttributesVersionRequest,
-				auto_model_name,
-				bankcard_model_name,
-				Short_term_lending_model_name,
-				Telecommunications_model_name,
-				Crossindustry_model_name,
+		IF(TestDataEnabled, 
+		RiskView.TestSeed_Function(packagedTestseedInput, 
+				TestDataTableName, 
+				AttributesVersionRequest, 
+				auto_model_name, 
+				bankcard_model_name, 
+				Short_term_lending_model_name, 
+				Telecommunications_model_name, 
+				Crossindustry_model_name, 
 				Custom_model_name,
 				Custom2_model_name,
 				Custom3_model_name,
@@ -370,14 +374,14 @@ search_results_temp := ungroup(
 				includeLnj),	// TestSeed Values
 		  search_results_temp
 	 )
-   );
+   );						
 
-  // Convert Search Results to name/value pairs for ESDL:
-	Riskviewattrs_namevaluePairs :=  RiskView.functions.Format_riskview_attrs(search_results, AttributesVersionRequest);
+  // Convert Search Results to name/value pairs for ESDL:  
+	Riskviewattrs_namevaluePairs :=  RiskView.functions.Format_riskview_attrs(search_results, AttributesVersionRequest);  
 
   // Convert Model Results to ESDL:
 	modelResults := normalize(	search_results , 9, RiskView.Transforms.intoModel(LEFT, counter)	)(name<>'');
-
+	
   // Convert Search Results to alert code/description pairs for ESDL:
 	nameValuePairsAlerts :=  NORMALIZE(search_results, 10, RiskView.Transforms.norm_alerts(LEFT, COUNTER))(code<>'');
 
@@ -385,9 +389,10 @@ search_results_temp := ungroup(
 	LnJReport := NORMALIZE(search_results, 27, RiskView.Transforms.norm_LnJ(LEFT, COUNTER))(trim(value)<>'');
 
 
-	LnJ_liens := project(search_results[1].LnJliens,
+	LnJ_liens := project(search_results[1].LnJliens, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForLien,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -399,9 +404,10 @@ search_results_temp := ungroup(
 			self := left;
 			self := [];
 		));
-	LnJ_jdgmts := project(search_results[1].LnJJudgments,
+	LnJ_jdgmts := project(search_results[1].LnJJudgments, 
 		transform(iesp.riskview2.t_RiskView2LiensJudgmentsReportForJudgement,
 			self.seq := (string) left.seq;
+			self.RecordID := left.orig_RMSID;
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
@@ -413,7 +419,7 @@ search_results_temp := ungroup(
 			self := left;
 			self := [];
 		));
-
+	
 	valid_riskview_xml_response := project(search_results,
 		transform(iesp.riskview2.t_RiskView2Response,
 				self.Result.UniqueId := LEFT.LexID;
@@ -423,21 +429,20 @@ search_results_temp := ungroup(
 			  self.Result.AttributesGroup.attributes := Riskviewattrs_namevaluePairs;
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ, left.report.summary);
+				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly, left.report.summary);
 				self.Result.Report := IF(run_riskview_report, left.report);
-
+				
 				self.Result.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
-				self.Result.LiensJudgmentsReports.Liens := LnJ_liens;
-				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
+				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly, LnJ_liens);
+				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly, LnJ_jdgmts);
 				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport;
-
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore
         self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);
         searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
 		    SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
         self.Result.Consumer.Inquiry.Phone10 := search.HomePhone;
-        self.Result.Consumer.Inquiry := search;
+        self.Result.Consumer.Inquiry := search;      
 
 				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
 				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
@@ -469,7 +474,7 @@ invalid_input_xml_response := project(search_results,
 				SELF := [];
 	));
 
-riskview_xml := if(input_ok, valid_riskview_xml_response, invalid_input_xml_response);
+riskview_xml := if(input_ok, valid_riskview_xml_response, invalid_input_xml_response);		
 
 output( riskview_xml, named( 'Results' ) );
 // output(LnJ_liens, named('LnJ_liens'));
@@ -521,7 +526,7 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
                                                          self.i_name_full := search.Name.Full,
 																												 self.i_name_first := search.Name.First,
 																												 self.i_name_last := search.Name.Last,
-																												 self.i_lexid := (Integer)search.UniqueId,
+																												 self.i_lexid := (Integer)search.UniqueId, 
 																												 self.i_address := streetAddr,
 																												 self.i_city := search.Address.City,
 																												 self.i_state := search.Address.State,
@@ -560,7 +565,7 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
 
 #end
 
-/*--HELP--
+/*--HELP-- 
 <pre>
 &lt;RiskView2Request&gt;
   &lt;Row&gt;
@@ -598,7 +603,7 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
       &lt;WorkPhone&gt;&lt;/WorkPhone&gt;
       &lt;DriverLicenseNumber&gt;&lt;/DriverLicenseNumber&gt;
       &lt;DriverLicenseState&gt;&lt;/DriverLicenseState&gt;
-    &lt;/SearchBy&gt;
+    &lt;/SearchBy&gt;  
     &lt;Options&gt;
       &lt;AttributesVersionRequest&gt;RiskViewAttrV5&lt;/AttributesVersionRequest&gt;
       &lt;IntendedPurpose&gt;&lt;/IntendedPurpose&gt;
@@ -637,14 +642,14 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
       &lt;AccountNumber&gt;&lt;/AccountNumber&gt;
       &lt;GLBPurpose&gt;5&lt;/GLBPurpose&gt;
       &lt;DLPurpose&gt;0&lt;/DLPurpose&gt;
-      &lt;DataRestrictionMask&gt;&lt;/DataRestrictionMask&gt;
-      &lt;DataPermissionMask&gt;&lt;/DataPermissionMask&gt;
-      &lt;TestDataEnabled&gt;0&lt;/TestDataEnabled&gt;
-      &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt;
+      &lt;DataRestrictionMask&gt;&lt;/DataRestrictionMask&gt; 
+      &lt;DataPermissionMask&gt;&lt;/DataPermissionMask&gt; 
+      &lt;TestDataEnabled&gt;0&lt;/TestDataEnabled&gt; 
+      &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt; 
     &lt;/User&gt;
   &lt;/Row&gt;
 &lt;/RiskView2Request&gt;
 </pre>
 */
-
+ 
 ENDMACRO;

@@ -1,14 +1,13 @@
 ﻿
-IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2, Cortera, Cortera_Tradeline,
-	DMA, DCAV2, Doxie_Files, dx_BestRecords, dx_Email, dx_Header, EBR, FAA, FBNv2, Fraudpoint3, Gong, dx_Gong, GovData,
-	Header_Quick, InfutorCID, Inquiry_AccLogs, IRS5500, LN_PropertyV2, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
-	PublicRecords_KEL, OSHAIR, Targus, USPIS_HotList, UtilFile, SAM, VehicleV2, Watercraft, Watchdog, YellowPages,
-	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Relationship, data_services, Doxie,
-	American_student_list, AlloyMedia_student_list, RiskWise, Death_Master, LiensV2, dx_Relatives_v3, FLAccidents_Ecrash,
-  dx_ConsumerFinancialProtectionBureau;
-
-	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE
-
+IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BusReg,CalBus, CellPhone, Corp2, Cortera, Cortera_Tradeline, 
+	DMA, DCAV2, Doxie_Files, dx_BestRecords, dx_Email, dx_Gong, dx_Header,EBR, Email_Data, FAA,FBNv2, Fraudpoint3, Gong, GovData, 
+	Header_Quick, InfoUSA, InfutorCID, Inquiry_AccLogs, IRS5500, LN_PropertyV2, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
+	PublicRecords_KEL, OSHAIR, Targus, USPIS_HotList, UtilFile,SAM, VehicleV2, Watercraft, Watchdog, YellowPages, 
+	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Risk_Indicators, Relationship, dx_header, data_services, Doxie,
+	American_student_list, AlloyMedia_student_list, RiskWise, Death_Master,LiensV2, dx_Relatives_v3, FLAccidents_Ecrash, AID_Build,dx_ConsumerFinancialProtectionBureau;
+	
+	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
+	
 	EXPORT LayoutIDs := RECORD
 		INTEGER UIDAppend;
 		INTEGER G_ProcUID;
@@ -20,16 +19,17 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		INTEGER7 B_LexIDSite;     // ProxID
 		INTEGER7 B_LexIDLoc;          // PowID
 		STRING54 P_InpClnEmail;
-		STRING50 P_InpClnDL;
+		STRING50 P_InpClnDL;		
 		STRING9 P_InpClnSSN;
 		STRING78 P_InpClnNameLast;
+		STRING20 p_inpclnarchdt;
 
 	END;
 
 	EXPORT LayoutAddressGeneric := RECORD
 		LayoutIDs;
 		STRING10 PrimaryRange;
-		STRING6 Predirectional;
+		STRING6 Predirectional; 
 		STRING28 PrimaryName;
 		STRING6 AddrSuffix;
 		STRING6 Postdirectional;
@@ -46,31 +46,31 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		LayoutIDs;
 		STRING10 Phone;
 	END;
-
-  SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
-
+  
+SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 	EXPORT LayoutPhoneAutoKeys := RECORD
 		LayoutPhoneGeneric;
 		unsigned6 Fdid;
 		STRING Archive_Date;
 	END;
-
+	
   SHARED Doxie__Key_Header := dx_header.key_header(iType);
 	EXPORT Layout_Doxie__Key_Header := RECORD
 		LayoutAddressGeneric;
 		RECORDOF(Doxie__Key_Header);
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 	// For Consumer and Address data
-
+	
 	SHARED Header_Quick__Key_Did := IF(Options.IsFCRA, Header_Quick.Key_Did_FCRA, Header_Quick.Key_Did);
 	EXPORT Layout_Header_Quick__Key_Did := RECORD
 		LayoutIDs;
 		RECORDOF(Header_Quick__Key_Did);
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 	// For Consumer and Address data
 
   SHARED Doxie__key_wild_SSN := dx_Header.key_wild_SSN();
@@ -78,10 +78,10 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		LayoutIDs;
 		RECORDOF(Doxie__key_wild_SSN);
 		STRING Archive_Date;
-	END;
+	END;	
 
 	// --------------------[ Criminal ]--------------------
-
+	
 	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA);
@@ -89,7 +89,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		UNSIGNED8 DPMBitmap;
 		STRING Archive_Date;
 	END;
-
+	
 	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA) - Criminal_Count; // Changing layout to normalize child dataset Criminal_Count
@@ -98,31 +98,31 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	EXPORT Layout_Doxie_Files__Key_Offenders := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_Offenders);
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	EXPORT Layout_Doxie_files__Key_Court_Offenses := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_files.Key_Court_Offenses);
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	EXPORT Layout_Doxie_Files__Key_Offenses := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_Offenses);
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	EXPORT Layout_Doxie_Files__Key_Offenders_Risk := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_Offenders_Risk);
@@ -130,7 +130,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 
 	EXPORT Layout_Doxie_Files__Key_Punishment := RECORD
 		LayoutIDs;
@@ -139,7 +139,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	// --------------------[ Bankruptcy ]--------------------
 
 	SHARED BankruptcyV3__key_bankruptcyV3_did := BankruptcyV3.key_bankruptcyV3_did(Options.IsFCRA);
@@ -147,7 +147,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		LayoutIDs;
 		STRING Archive_Date;
 		RECORDOF(BankruptcyV3__key_bankruptcyV3_did);
-	END;
+	END;		
 
 	SHARED BankruptcyV3__key_bankruptcyv3_search_full_bip := BankruptcyV3.key_bankruptcyv3_search_full_bip(Options.IsFCRA);
 	EXPORT Layout_BankruptcyV3__key_bankruptcyv3_search := RECORD
@@ -156,7 +156,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED BankruptcyV3__key_bankruptcyV3_linkids_Key := BankruptcyV3.key_bankruptcyV3_linkids.kFetch2;
 	EXPORT Layout_BankruptcyV3__key_bankruptcyV3_linkids_Key := RECORD
@@ -174,9 +174,9 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 			STRING2 src;
 			UNSIGNED8 DPMBitmap;
 			BOOLEAN sele_gold_boolean;
-			BOOLEAN is_sele_level_boolean;
-			BOOLEAN is_org_level_boolean;
-			BOOLEAN is_ult_level_boolean;
+			BOOLEAN is_sele_level_boolean; 
+			BOOLEAN is_org_level_boolean; 
+			BOOLEAN is_ult_level_boolean; 
 			BOOLEAN iscorp_boolean;
 			STRING Archive_Date;
 			LayoutIDs;//this has to stay at the end of this layout or this key will display garbage for some reason
@@ -201,7 +201,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		RECORDOF(FAA__key_aircraft_did);
 	END;
-
+	
 	SHARED FAA__key_aircraft_linkids := FAA.key_aircraft_linkids.kFetch2;
 	EXPORT Layout_FAA__key_aircraft_linkids := RECORD
 		LayoutIDs;
@@ -210,7 +210,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED FAA__key_aircraft_id := FAA.key_aircraft_id();
 	EXPORT Layout_FAA__key_aircraft_id := RECORD
 		LayoutIDs;
@@ -228,7 +228,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		RECORDOF(VehicleV2__Key_Vehicle_DID);
 	END;
-
+	
 	SHARED VehicleV2__Key_Vehicle_LinkID_Key := VehicleV2.Key_Vehicle_linkids.kFetch;
 	EXPORT Layout_VehicleV2__Key_Vehicle_LinkID_Key := RECORD
 		LayoutIDs;
@@ -236,7 +236,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED VehicleV2__Key_Vehicle_Party_Key := VehicleV2.Key_Vehicle_Party_Key;
 	EXPORT Layout_VehicleV2__Key_Vehicle_Party_Key := RECORD
@@ -269,7 +269,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		RECORDOF(Watercraft__key_watercraft_did);
 	END;
-
+	
 	SHARED Watercraft__Key_LinkIds := Watercraft.Key_LinkIds.kFetch2;
 	EXPORT Layout_Watercraft__Key_LinkIds := RECORD
 		LayoutIDs;
@@ -289,15 +289,15 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 	END;
 
 	// --------------------[ ProfessionalLicense ]--------------------
-
+	
 	SHARED Prof_LicenseV2__Key_Proflic_Did := Prof_LicenseV2.Key_Proflic_Did();
 	EXPORT Layout_Prof_LicenseV2__Key_Proflic_Did := RECORD
 		LayoutIDs;
 		RECORDOF(Prof_LicenseV2__Key_Proflic_Did);
-		STRING20 Cleaned_License_Number;
-		STRING2 Src;
+		STRING20 Cleaned_License_Number; 
+		STRING2 Src; 
 		STRING Archive_Date;
-		STRING100 Occupation;
+		STRING100 Occupation; 
 		STRING1 Category;
 		UNSIGNED8 DPMBitmap;
 	END;
@@ -306,25 +306,25 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 	EXPORT Layout_Prof_License_Mari__key_did := RECORD
 		LayoutIDs;
 		RECORDOF(Prof_License_Mari__key_did);
-		STRING20 Cleaned_License_Number;
-		STRING2 Src;
+		STRING20 Cleaned_License_Number; 
+		STRING2 Src; 
 		STRING Archive_Date;
-		STRING100 Occupation;
+		STRING100 Occupation; 
 		STRING1 Category;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	// --------------------[ Email ]--------------------
-
+	
 	SHARED Email_Data__Key_DID :=  dx_Email.Key_Did();
 	SHARED Email_Data__Key_Email_Address := dx_Email.Key_Email_Address();
 	EXPORT Email_Data__Key_Email_Temp := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
 		RECORDOF(Email_Data__Key_DID);
-		RECORDOF(Email_Data__Key_Email_Address) - email_rec_key;
-	END;
-
+		RECORDOF(Email_Data__Key_Email_Address) - email_rec_key - __internal_fpos__;
+	END;	
+	
 	SHARED DX_Email__Key_Email_Payload :=  DX_Email.Key_Email_Payload();
 	EXPORT Layout_DX_Email__Key_Email_Payload := RECORD
 		LayoutIDs;
@@ -334,11 +334,21 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		UNSIGNED8 DPMBitmap;
 	END;
 
+	SHARED Email_Data__Key_Did_FCRA :=  Email_Data.Key_Did_FCRA;
+	EXPORT Layout_Email_Data__Key_Did_FCRA := RECORD
+		LayoutIDs;
+		RECORDOF(Email_Data__Key_Did_FCRA);
+		STRING Archive_Date;
+		STRING2 src;
+		UNSIGNED8 DPMBitmap;
+	END;	
+
+	
 	// --------------------[ Address ]--------------------
 
 	// NOTE: some keys for Address--Consumer and Business--are defined above already.
 	// See comments.
-
+	
 	// Consumer Address keys, NonFCRA and FCRA:
 	SHARED ADVO__Key_Addr1 := IF(Options.IsFCRA, ADVO.Key_Addr1_FCRA, ADVO.Key_Addr1);
 	EXPORT Layout_ADVO__Key_Addr1 := RECORD
@@ -373,6 +383,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(Fraudpoint3__Key_Address);
 		STRING2 src;
 		STRING Archive_Date;
+		BOOLEAN FDNIndicator;
 		UNSIGNED8 DPMBitmap;
 	END;
 
@@ -382,19 +393,19 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(Fraudpoint3__Key_SSN);
 		STRING2 src;
 		STRING Archive_Date;
+		BOOLEAN FDNIndicator;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED Header__Key_Addr_Hist := dx_Header.key_addr_hist(iType);
-
 	EXPORT Layout_Header__Key_Addr_Hist_temp := RECORD
 		LayoutIDs;
 		RECORDOF(Header__Key_Addr_Hist);
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	EXPORT Layout_Header__Key_Addr_Hist := RECORD
 		LayoutIDs;
 		RECORDOF(Header__Key_Addr_Hist);
@@ -402,11 +413,12 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 st;
 		string4 zip4;
 		string2 StateCode;
-		string3 county;
-		string10 geo_lat;
-		string11 geo_long;
-		string7 geo_blk;
-		string1 geo_match;
+		string3 county; 
+		string10 geo_lat; 
+		string11 geo_long; 
+		string7 geo_blk; 
+		string1 geo_match; 
+		String12 Geo_Link;
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
@@ -439,7 +451,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(Inquiry_AccLogs__Key_FCRA_SSN);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED Inquiry_AccLogs__Inquiry_Table_SSN := Inquiry_AccLogs.Key_Inquiry_SSN;
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_SSN := RECORD
@@ -448,8 +460,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_SSN);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 		SHARED Inquiry_AccLogs__Inquiry_Table_Update_SSN := Inquiry_AccLogs.Key_Inquiry_SSN_Update;
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_Update_SSN := RECORD
 		LayoutIDs;
@@ -457,7 +469,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_Update_SSN);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED UtilFile__Key_Address := UtilFile.Key_Address;
 	EXPORT Layout_UtilFile__Key_Address := RECORD
@@ -495,7 +507,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED RiskWise__key_CityStZip := RiskWise.Key_CityStZip;
 	EXPORT Layout_RiskWise__key_CityStZip := RECORD
 		LayoutIDs;
@@ -546,7 +558,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED Doxie__Key_Death_MasterV2_SSA_DID := IF(Options.IsFCRA, Doxie.key_death_masterV2_ssa_DID_fcra, Doxie.Key_Death_MasterV2_SSA_DID);
 
 	EXPORT Layout_Doxie__Key_Death_MasterV2_SSA_DID := RECORD
@@ -582,7 +594,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		UNSIGNED8 DPMBitmap;
 	END;
 
-
+	
 // --------------------[ Relatives ]--------------------
 	SHARED Relatives__Key_Relatives_V3 := Relationship.key_relatives_v3;
 	EXPORT Layout_Relatives__Key_Relatives_V3 := RECORD
@@ -594,7 +606,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	//Marketing
 	SHARED Relatives__Key_Marketing_Header_Relatives := dx_Relatives_v3.Key_Marketing_Header_Relatives();
 	EXPORT Layout_Relatives__Key_Marketing_Header_Relatives := RECORD
@@ -605,7 +617,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
 	SHARED BBB2__kfetch_BBB_LinkIds := BBB2.Key_BBB_LinkIds.Kfetch2;
 	EXPORT Layout_BBB2__kfetch_BBB_LinkIds := RECORD
@@ -614,8 +626,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	SHARED BBB2__kfetch_BBB_Non_Member_LinkIds :=  BBB2.Key_BBB_Non_Member_LinkIds.Kfetch2;
 	EXPORT Layout_BBB2__kfetch_BBB_Non_Member_LinkIds := RECORD
 		LayoutIDs;
@@ -633,7 +645,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 		SHARED CalBus__kfetch_Calbus_LinkIDS := CalBus.Key_Calbus_LinkIDS.Kfetch2;
 	EXPORT Layout_CalBus__kfetch_Calbus_LinkIDS := RECORD
 		LayoutIDs;
@@ -642,7 +654,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 		SHARED Cortera__kfetch_LinkID := Cortera.Key_LinkIDs.Kfetch2;
 	EXPORT Layout_Cortera__kfetch_LinkID := RECORD
 		LayoutIDs;
@@ -651,7 +663,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 		SHARED DCAV2__kfetch_LinkIds := DCAV2.Key_LinkIds.Kfetch2;
 	EXPORT Layout_DCAV2__kfetch_LinkIds := RECORD
 		LayoutIDs;
@@ -669,7 +681,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED FBNv2__kfetch_LinkIds := FBNv2.Key_LinkIds.Kfetch2;
 	EXPORT Layout_FBNv2__kfetch_LinkIds := RECORD
 		LayoutIDs;
@@ -725,7 +737,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED Infutor_NARB__kfetch_LinkIds := dx_Infutor_NARB.Key_Linkids.Kfetch;//no kfetch2
 	EXPORT Layout_Infutor_NARB__kfetch_LinkIds := RECORD
 		LayoutIDs;
@@ -734,7 +746,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED Equifax_Business_Data__kfetch_LinkIDs := dx_Equifax_Business_Data.Key_LinkIDs.Kfetch;//no kfetch2
 	EXPORT Layout_Equifax_Business__Data_kfetch_LinkIDs := RECORD
 		LayoutIDs;
@@ -743,18 +755,22 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
 	END;
-
+	
 	SHARED BIPV2_Build__kfetch_contact_linkids := BIPV2_Build.key_contact_linkids.Kfetch;//no kfetch2
 	EXPORT Layout_BIPV2_Build__kfetch_contact_linkids := RECORD
 		LayoutIDs;
 		RECORDOF(BIPV2_Build__kfetch_contact_linkids);
 		STRING2 src;
 		STRING Archive_Date;
-		String JobTitle;
+		String JobTitle; 
 		String Status;
 		UNSIGNED8 DPMBitmap;
 	END;
 
+	SHARED layout_clean182_fips := RECORD
+		string2 st; //needed for property marketing from BH
+	END;
+	
 	EXPORT Layout_BIPV2_Build__kfetch_contact_linkids_slim := RECORD
 		LayoutIDs;
 		unsigned6 ultid;
@@ -766,20 +782,21 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		unsigned6 dotid;
 		string2 source;
 		unsigned4 dt_first_seen_contact;
-		unsigned4 dt_last_seen_contact;
+		unsigned4 dt_last_seen_contact;	
 		unsigned4 dt_first_seen;
 		unsigned4 dt_last_seen;
 		unsigned4 dt_vendor_first_reported;
 		unsigned4 dt_vendor_last_reported;
 		unsigned6 contact_did;
+		layout_clean182_fips company_address; //needed for property marketing from BH
 		STRING2 src;
 		STRING Archive_Date;
-		// String JobTitle;
+		// String JobTitle; 
 		// String Status;
 		UNSIGNED8 DPMBitmap;
 	END;
-
-	// --------------------[ BIP Best ]--------------------
+	
+	// --------------------[ BIP Best ]--------------------	
 	EXPORT Layout_BIPV2_Best__Key_LinkIds := RECORD
 		LayoutIDs;
 		RECORDOF(BIPv2.IdAppendRoxie(DATASET([], BIPV2.IdAppendLayouts.AppendInput)).withBest());
@@ -797,8 +814,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING3 Listing_Type;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	SHARED Gong__Key_History_Address := dx_Gong.key_history_address(iType);
 	EXPORT Layout_Gong__Key_History_Address := RECORD
 		LayoutAddressGeneric;
@@ -806,8 +823,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING3 Listing_Type;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	SHARED Gong__Key_History_Phone := dx_Gong.key_history_phone(iType);
 	EXPORT Layout_Gong__Key_History_Phone := RECORD
 		LayoutAddressGeneric;
@@ -815,9 +832,9 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING3 Listing_Type;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
+	END;	
 
-	SHARED Gong__Key_History_LinkIds := Gong.Key_History_LinkIds.kFetch2;
+	SHARED Gong__Key_History_LinkIds := dx_Gong.Key_History_LinkIds.kFetch2;
 	EXPORT Layout_Gong__Key_History_LinkIds := RECORD
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_LinkIds);
@@ -834,9 +851,9 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
-
+	END;	
+	
+	 
 	SHARED InfutorCID__Key_Infutor_Phone := IF( Options.isFCRA, InfutorCID.Key_Infutor_Phone_FCRA, InfutorCID.Key_Infutor_Phone );
 	EXPORT Layout_InfutorCID__Key_Infutor_Phone := RECORD
 		LayoutAddressGeneric;
@@ -844,8 +861,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 		UNSIGNED8 DPMBitmap;
-	END;
-
+	END;	
+	
 	SHARED PhonesPlus_v2_Keys_Scoring_Phone := Phonesplus_v2.Keys_Scoring().phone.qa;
 	EXPORT Layout_Phone__PhonesPlus_v2_Keys_Scoring_Phone := RECORD
 		LayoutPhoneGeneric;
@@ -890,8 +907,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 Source;
 		STRING Archive_Date;
 	END;
-
-
+	
+	
 		//====================[Education]============================
 	SHARED American_student_list__key_DID := IF( Options.isFCRA, American_student_list.key_DID_FCRA, American_student_list.key_DID);
 	EXPORT Layout_American_student_list__key_DID := RECORD
@@ -899,9 +916,9 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		RECORDOF(American_student_list__key_DID); // contains "src"
 		UNSIGNED8 DPMBitmap;
 		STRING Archive_Date;
-	END;
-
-	SHARED AlloyMedia_student_list__Key_DID := IF( Options.isFCRA, AlloyMedia_student_list.Key_DID_FCRA, AlloyMedia_student_list.Key_DID);
+	END;	
+	
+	SHARED AlloyMedia_student_list__Key_DID := IF( Options.isFCRA, AlloyMedia_student_list.Key_DID_FCRA, AlloyMedia_student_list.Key_DID);	
 	EXPORT Layout_AlloyMedia_student_list__Key_DID := RECORD
 		LayoutIDs;
 		RECORDOF(AlloyMedia_student_list__key_DID); // contains "src"
@@ -914,77 +931,149 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 	EXPORT Layout_dx_CFPB_key_Census_Surnames := RECORD
 		LayoutIDs;
 		RECORDOF(dx_CFPB__key_Census_Surnames); // contains "src"
-		STRING Archive_Date;
+		STRING Archive_Date;		
+		UNSIGNED8 DPMBitmap;
+	END;	
+	
+	//====================[Household]============================
+	SHARED dx_Header__key_did_hhid:=dx_Header.key_did_hhid;
+	EXPORT Layout_dx_Header__key_did_hhid := RECORD
+		LayoutIDs;
+		RECORDOF(dx_Header__key_did_hhid);
+		STRING Archive_Date;		
 		UNSIGNED8 DPMBitmap;
 	END;
-// --------------------[ Property - Consumer and Business]--------------------
-
-	EXPORT Layout_PropertyV2_Data_Temp := RECORD
-		LayoutAddressGeneric;
-		STRING LN_FARES_ID;
-		STRING Archive_Date;
+	
+	//hhid_did
+	SHARED dx_Header__key_hhid_did:=dx_Header.key_hhid_did;
+	EXPORT Layout_dx_Header__key_hhid_did := RECORD
+		LayoutIDs;
+		RECORDOF(dx_Header__key_hhid_did);
+		STRING Archive_Date;		
+		UNSIGNED8 DPMBitmap;
 	END;
+	
+	
+// --------------------[ Property - Consumer and Business]--------------------	
 
+//to help with memory limit errors in roxie we are removing fields that are not used. 
 	SHARED PropertyV2_Key_Assessor_Fid_Records := LN_PropertyV2.key_assessor_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Assessor_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Assessor_Fid_Records) - owner_occupied - fireplace_indicator - ln_mobile_home_indicator - ln_condo_indicator - ln_property_tax_exemption - current_record;
+		PropertyV2_Key_Assessor_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Assessor_Fid_Records.proc_date;
+		PropertyV2_Key_Assessor_Fid_Records.vendor_source_flag;
+		PropertyV2_Key_Assessor_Fid_Records.mailing_city_state_zip;
+		PropertyV2_Key_Assessor_Fid_Records.property_full_street_address;
+		PropertyV2_Key_Assessor_Fid_Records.property_city_state_zip;
+		PropertyV2_Key_Assessor_Fid_Records.standardized_land_use_code;
+		PropertyV2_Key_Assessor_Fid_Records.recording_date;
+		PropertyV2_Key_Assessor_Fid_Records.sale_date;
+		PropertyV2_Key_Assessor_Fid_Records.sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_amount;
+		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_type_code;
+		PropertyV2_Key_Assessor_Fid_Records.prior_recording_date;
+		PropertyV2_Key_Assessor_Fid_Records.prior_sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.assessed_total_value;
+		PropertyV2_Key_Assessor_Fid_Records.assessed_value_year;
+		PropertyV2_Key_Assessor_Fid_Records.market_total_value;
+		PropertyV2_Key_Assessor_Fid_Records.market_value_year;
+		PropertyV2_Key_Assessor_Fid_Records.tax_year;
+		PropertyV2_Key_Assessor_Fid_Records.land_square_footage;
+		PropertyV2_Key_Assessor_Fid_Records.lot_size;
+		PropertyV2_Key_Assessor_Fid_Records.building_area;
+		PropertyV2_Key_Assessor_Fid_Records.year_built;
+		PropertyV2_Key_Assessor_Fid_Records.effective_year_built;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_buildings;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_stories;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_units;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_rooms;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_bedrooms;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_baths;
+		PropertyV2_Key_Assessor_Fid_Records.no_of_partial_baths;
+		PropertyV2_Key_Assessor_Fid_Records.garage_type_code;
+		PropertyV2_Key_Assessor_Fid_Records.parking_no_of_cars;
+		PropertyV2_Key_Assessor_Fid_Records.style_code;
+		PropertyV2_Key_Assessor_Fid_Records.tape_cut_date;
+		PropertyV2_Key_Assessor_Fid_Records.certification_date;
 		BOOLEAN owner_occupied;
 		BOOLEAN fireplace_indicator;
 		BOOLEAN ln_mobile_home_indicator;
 		BOOLEAN ln_condo_indicator;
 		BOOLEAN current_record;
-		BOOLEAN ln_property_tax_exemption;
+		BOOLEAN ln_property_tax_exemption;		
 		UNSIGNED date_first_seen;
 		UNSIGNED8 DPMBitmap;
 		STRING Archive_Date;
 		STRING2 src;
 	END;
-
+	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Deed_Fid_Records := LN_PropertyV2.key_deed_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Deed_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Deed_Fid_Records) - current_record - timeshare_flag - addl_name_flag;
+		PropertyV2_Key_Deed_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Deed_Fid_Records.process_date;
+		PropertyV2_Key_Deed_Fid_Records.buyer_or_borrower_ind;
+		PropertyV2_Key_Deed_Fid_Records.name1;
+		PropertyV2_Key_Deed_Fid_Records.name2;
+		PropertyV2_Key_Deed_Fid_Records.mailing_csz;
+		PropertyV2_Key_Deed_Fid_Records.property_full_street_address;
+		PropertyV2_Key_Deed_Fid_Records.property_address_citystatezip;
+		PropertyV2_Key_Deed_Fid_Records.contract_date;
+		PropertyV2_Key_Deed_Fid_Records.recording_date;
+		PropertyV2_Key_Deed_Fid_Records.sales_price;
+		PropertyV2_Key_Deed_Fid_Records.land_lot_size;
 		BOOLEAN current_record;
 		BOOLEAN timeshare_flag;
 		BOOLEAN addl_name_flag;
-		UNSIGNED Date_First_Seen;
+		UNSIGNED Date_First_Seen;	
 		UNSIGNED8 DPMBitmap;
 		STRING Archive_Date;
 		STRING2 src;
 	END;
-
+	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Property_Did_Records := LN_PropertyV2.key_Property_did(Options.isFCRA);
-	EXPORT Layout_PropertyV2_Key_Property_Did_Records := RECORD
-		LayoutIDs;
-		RECORDOF(PropertyV2_Key_Property_Did_Records);
-		UNSIGNED8 DPMBitmap;
-		STRING Archive_Date;
-		STRING2 src;
-	END;
-
-	SHARED PropertyV2_Key_Linkids_Records := LN_PropertyV2.Key_LinkIds.kfetch2;
-	EXPORT Layout_PropertyV2_Key_Linkids_Records := RECORD
-		LayoutIDs;
-		RECORDOF(PropertyV2_Key_Linkids_Records);
-		UNSIGNED8 DPMBitmap;
-		STRING Archive_Date;
-		STRING2 src;
-	END;
-
-	SHARED PropertyV2_Key_Addr_Fid_Records := LN_PropertyV2.key_addr_fid(Options.isFCRA);
-	EXPORT Layout_PropertyV2_Key_Addr_Fid_Records := RECORD
+	EXPORT Layout_PropertyV2_Data_Temp := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Addr_Fid_Records);
-		UNSIGNED8 DPMBitmap;
+		PropertyV2_Key_Property_Did_Records.s_did;
+		PropertyV2_Key_Property_Did_Records.source_code_2;
+		PropertyV2_Key_Property_Did_Records.ln_fares_id;
+		PropertyV2_Key_Property_Did_Records.prim_range;
+		PropertyV2_Key_Property_Did_Records.predir;
+		PropertyV2_Key_Property_Did_Records.prim_name;
+		PropertyV2_Key_Property_Did_Records.suffix;
+		PropertyV2_Key_Property_Did_Records.postdir;
+		PropertyV2_Key_Property_Did_Records.sec_range;
+		PropertyV2_Key_Property_Did_Records.st;
+		PropertyV2_Key_Property_Did_Records.zip;
 		STRING Archive_Date;
-		STRING2 src;
-	END;
-
+	END;		
+	
+//to help with memory limit errors in roxie we are removing fields that are not used. 	
 	SHARED PropertyV2_Key_Search_Fid_Records := LN_PropertyV2.key_search_fid(Options.isFCRA);
 	EXPORT Layout_PropertyV2_Key_Search_Fid_Records := RECORD
 		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Search_Fid_Records);
+		PropertyV2_Key_Search_Fid_Records.source_code_2;
+		PropertyV2_Key_Search_Fid_Records.ln_fares_id;
+		PropertyV2_Key_Search_Fid_Records.did;
+		PropertyV2_Key_Search_Fid_Records.prim_range;
+		PropertyV2_Key_Search_Fid_Records.predir;
+		PropertyV2_Key_Search_Fid_Records.prim_name;
+		PropertyV2_Key_Search_Fid_Records.suffix;
+		PropertyV2_Key_Search_Fid_Records.postdir;
+		PropertyV2_Key_Search_Fid_Records.unit_desig;
+		PropertyV2_Key_Search_Fid_Records.sec_range;
+		PropertyV2_Key_Search_Fid_Records.p_city_name;
+		PropertyV2_Key_Search_Fid_Records.v_city_name;
+		PropertyV2_Key_Search_Fid_Records.st;
+		PropertyV2_Key_Search_Fid_Records.zip;
+		PropertyV2_Key_Search_Fid_Records.ultid;
+		PropertyV2_Key_Search_Fid_Records.orgid;
+		PropertyV2_Key_Search_Fid_Records.seleid;
+		PropertyV2_Key_Search_Fid_Records.proxid;
+		PropertyV2_Key_Search_Fid_Records.powid;
 		BOOLEAN PartyIsBuyerOrOwner;
 		BOOLEAN PartyIsBorrower;
 		BOOLEAN PartyIsSeller;
@@ -997,21 +1086,9 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
-	SHARED PropertyV2_Key_Addl_Fares_Deed_Fid_Records := LN_PropertyV2.key_addl_fares_deed_fid;
-	EXPORT Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records := RECORD
-		LayoutAddressGeneric;
-		RECORDOF(PropertyV2_Key_Addl_Fares_Deed_Fid_Records)- fares_corporate_indicator - fares_residential_model_ind - fares_partial_interest_ind;
-		BOOLEAN fares_corporate_indicator;
-		BOOLEAN fares_residential_model_ind;
-		BOOLEAN fares_partial_interest_ind;
-		UNSIGNED8 DPMBitmap;
-		STRING2 src;
-		STRING Archive_Date;
-	END;
-
+	
 	SHARED AVM_V2_Key_AVM_Address_Records := IF( Options.isFCRA, AVM_V2.Key_AVM_Address_FCRA, AVM_V2.Key_AVM_Address );
-
+	
 	EXPORT Layout_AVM_V2_Key_AVM_Address_Records := RECORD
 		LayoutAddressGeneric;
 		RECORDOF(AVM_V2_Key_AVM_Address_Records);
@@ -1020,13 +1097,13 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
+	
 	EXPORT Layout_AVM_V2_Key_AVM_Address_Norm_Records := RECORD
 		Layout_AVM_V2_Key_AVM_Address_Records - history OR RECORDOF(AVM_V2_Key_AVM_Address_Records.history);
 	END;
 
 
-	// --------------------[ LienJudgement ]--------------------
+	// --------------------[ LienJudgement ]--------------------	
 
 	SHARED LienJudgement_DID := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.key_liens_DID);
 	EXPORT Layout_LienJudgement_DID := RECORD
@@ -1036,7 +1113,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
+	
 	SHARED LiensV2_key_liens_main_ID_Records := IF( Options.isFCRA, LiensV2.key_liens_main_ID_FCRA, LiensV2.key_liens_main_ID	 );
 	EXPORT Layout_LiensV2_key_liens_main_ID_Records := RECORD
 		LayoutIDs;
@@ -1054,40 +1131,40 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		UNSIGNED8 DPMBitmap;
 		STRING2 src;
 		STRING100 DebtorName;
-		STRING100 PlaintiffName;
+		STRING100 PlaintiffName; 
 		STRING100 SubjectsName;
 		STRING Archive_Date;
-
+    
 	END;
 
-	SHARED LiensV2__Key_party_Linkids_Records := LiensV2.Key_LinkIds.kFetch2;
+	SHARED LiensV2__Key_party_Linkids_Records := LiensV2.Key_LinkIds.kFetch2;	
 	EXPORT Layout_Key_party_Linkids_Records := RECORD
 		LayoutIDs;
 		RECORDOF(LiensV2__Key_party_Linkids_Records);
 		UNSIGNED8 DPMBitmap;
 		STRING2 src;
 		STRING Archive_Date;
-	END;
-
-	SHARED FLAccidents_Ecrash__key_EcrashV2_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbr;
+	END;	
+	
+	SHARED FLAccidents_Ecrash__key_EcrashV2_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbr;	
 	EXPORT Layout_FLAccidents_Ecrash__key_EcrashV2_accnbr := RECORD
 		LayoutIDs;
 		RECORDOF(FLAccidents_Ecrash__key_EcrashV2_accnbr);
 		UNSIGNED8 DPMBitmap;
 		STRING2 src;
 		STRING Archive_Date;
-	END;
-
-	SHARED FLAccidents_Ecrash__Key_ECrash4 := FLAccidents_Ecrash.Key_ECrash4;
+	END;	
+	
+	SHARED FLAccidents_Ecrash__Key_ECrash4 := FLAccidents_Ecrash.Key_ECrash4;	
 	EXPORT Layout_FLAccidents_Ecrash__Key_ECrash4 := RECORD
 		LayoutIDs;
 		RECORDOF(FLAccidents_Ecrash__Key_ECrash4);
 		UNSIGNED8 DPMBitmap;
 		STRING2 src;
 		STRING Archive_Date;
-	END;
-
-	SHARED FLAccidents_Ecrash__Key_EcrashV2_did	 := FLAccidents_Ecrash.Key_EcrashV2_did	;
+	END;	
+	
+	SHARED FLAccidents_Ecrash__Key_EcrashV2_did	 := FLAccidents_Ecrash.Key_EcrashV2_did	;	
 	EXPORT Layout_FLAccidents_Ecrash__Key_EcrashV2_did := RECORD
 		LayoutIDs;
 		RECORDOF(FLAccidents_Ecrash__Key_EcrashV2_did);
@@ -1095,10 +1172,10 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
-	// --------------------[ WatchDog - Best Person ]--------------------
-
-	SHARED Best_Person__Key_Watchdog	 := dx_BestRecords.layout_best;
+	
+	// --------------------[ WatchDog - Best Person ]--------------------	
+	
+	SHARED Best_Person__Key_Watchdog	 := dx_BestRecords.layout_best;	
 	EXPORT Layout_Best_Person__Key_Watchdog := RECORD
 		LayoutIDs;
 		RECORDOF(Best_Person__Key_Watchdog) rec;
@@ -1106,8 +1183,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
-	SHARED Best_Person__Key_Watchdog_FCRA_nonEN	 := Watchdog.Key_Watchdog_FCRA_nonEN;
+	
+	SHARED Best_Person__Key_Watchdog_FCRA_nonEN	 := Watchdog.Key_Watchdog_FCRA_nonEN;	
 	EXPORT Layout_Best_Person__Key_Watchdog_FCRA_nonEN := RECORD
 		LayoutIDs;
 		RECORDOF(Best_Person__Key_Watchdog_FCRA_nonEN);
@@ -1115,8 +1192,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
-	SHARED Best_Person__Key_Watchdog_FCRA_nonEQ	 := Watchdog.Key_Watchdog_FCRA_nonEQ;
+	
+	SHARED Best_Person__Key_Watchdog_FCRA_nonEQ	 := Watchdog.Key_Watchdog_FCRA_nonEQ;	
 	EXPORT Layout_Best_Person__Key_Watchdog_FCRA_nonEQ := RECORD
 		LayoutIDs;
 		RECORDOF(Best_Person__Key_Watchdog_FCRA_nonEQ);
@@ -1124,58 +1201,76 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		STRING2 src;
 		STRING Archive_Date;
 	END;
-
+	
+	SHARED dx_ConsumerFinancialProtectionBureau__Key_BLKGRP := IF( Options.isFCRA, dx_ConsumerFinancialProtectionBureau.Key_BLKGRP(TRUE), dx_ConsumerFinancialProtectionBureau.Key_BLKGRP(FALSE) );
+	EXPORT Layout_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP := RECORD
+		LayoutIDs;
+		RECORDOF(dx_ConsumerFinancialProtectionBureau__Key_BLKGRP);
+		UNSIGNED8 DPMBitmap;
+		STRING Archive_Date;
+	END;		
+	
+	SHARED dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18 := IF( Options.isFCRA, dx_ConsumerFinancialProtectionBureau.key_BLKGRP_attr_over18(TRUE), dx_ConsumerFinancialProtectionBureau.key_BLKGRP_attr_over18(FALSE) );
+	EXPORT Layout_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18 := RECORD
+		LayoutIDs;
+		RECORDOF(dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18);
+		UNSIGNED8 DPMBitmap;
+		STRING Archive_Date;
+	END;	
+	
+	
 	// ===================[ Composite Layout ]===================
-
+  
 	EXPORT Layout_FDC := RECORD
 		LayoutIDs;
 
-		DATASET(Layout_Doxie__Key_Header) Dataset_Doxie__Key_Header;
-		DATASET(Layout_Header_Quick__Key_Did) Dataset_Header_Quick__Key_Did;
-
+		DATASET(Layout_Doxie__Key_Header) Dataset_Doxie__Key_Header;		
+		DATASET(Layout_Header_Quick__Key_Did) Dataset_Header_Quick__Key_Did;		
+    
 		// --------------------[ Consumer Section ]--------------------
 		// Criminal
-		DATASET(Layout_Doxie_Files__Key_BocaShell_Crim_FCRA) Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA;
-		DATASET(Layout_Doxie_Files__Key_Offenders) Dataset_Doxie_Files__Key_Offenders;
-		DATASET(Layout_Doxie_files__Key_Court_Offenses) Dataset_Doxie_files__Key_Court_Offenses;
-		DATASET(Layout_Doxie_Files__Key_Offenses) Dataset_Doxie_Files__Key_Offenses;
-		DATASET(Layout_Doxie_Files__Key_Offenders_Risk) Dataset_Doxie_Files__Key_Offenders_Risk;
-		DATASET(Layout_Doxie_Files__Key_Punishment) Dataset_Doxie_Files__Key_Punishment;
+		DATASET(Layout_Doxie_Files__Key_BocaShell_Crim_FCRA) Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA;		
+		DATASET(Layout_Doxie_Files__Key_Offenders) Dataset_Doxie_Files__Key_Offenders;		
+		DATASET(Layout_Doxie_files__Key_Court_Offenses) Dataset_Doxie_files__Key_Court_Offenses;		
+		DATASET(Layout_Doxie_Files__Key_Offenses) Dataset_Doxie_Files__Key_Offenses;		
+		DATASET(Layout_Doxie_Files__Key_Offenders_Risk) Dataset_Doxie_Files__Key_Offenders_Risk;		
+		DATASET(Layout_Doxie_Files__Key_Punishment) Dataset_Doxie_Files__Key_Punishment;		
 		// Bankruptcy
-		DATASET(Layout_BankruptcyV3__key_bankruptcyv3_search) Dataset_Bankruptcy_Files__Key_Search;
+		DATASET(Layout_BankruptcyV3__key_bankruptcyv3_search) Dataset_Bankruptcy_Files__Key_Search;		
 		DATASET(Layout_BankruptcyV3__key_bankruptcyV3_linkids_Key) Dataset_Bankruptcy_Files__Linkids_Key_Search;
 
 		// Aircraft
-		DATASET(Layout_FAA__key_aircraft_id) Dataset_FAA__Key_Aircraft_IDs;
+		DATASET(Layout_FAA__key_aircraft_id) Dataset_FAA__Key_Aircraft_IDs;		
 		    // Watercraft
-		DATASET(Layout_Watercraft__Key_Watercraft_SID) Dataset_Watercraft__Key_Watercraft_SID;
+		DATASET(Layout_Watercraft__Key_Watercraft_SID) Dataset_Watercraft__Key_Watercraft_SID;		
 		// ProfessionalLicense
-		DATASET(Layout_Prof_LicenseV2__Key_Proflic_Did) Dataset_Prof_LicenseV2__Key_Proflic_Did;
-		DATASET(Layout_Prof_License_Mari__Key_Did) Dataset_Prof_License_Mari__Key_Did;
+		DATASET(Layout_Prof_LicenseV2__Key_Proflic_Did) Dataset_Prof_LicenseV2__Key_Proflic_Did;		
+		DATASET(Layout_Prof_License_Mari__Key_Did) Dataset_Prof_License_Mari__Key_Did;		
 		// Email
-		DATASET(Layout_DX_Email__Key_Email_Payload) Dataset_DX_Email__Key_Email_Payload;
+		DATASET(Layout_DX_Email__Key_Email_Payload) Dataset_DX_Email__Key_Email_Payload;		
+		DATASET(Layout_Email_Data__Key_Did_FCRA) Dataset_Email_Data__Key_Did_FCRA;		
 		// Address
-		DATASET(Layout_ADVO__Key_Addr1) Dataset_ADVO__Key_Addr1;
-		DATASET(Layout_ADVO__Key_Addr1_History) Dataset_ADVO__Key_Addr1_History;
-		DATASET(Layout_DMA__Key_DNM_Name_Address) Dataset_DMA__Key_DNM_Name_Address;
-		DATASET(Layout_Fraudpoint3__Key_Address) Dataset_Fraudpoint3__Key_Address;
-		DATASET(Layout_Header__Key_Addr_Hist) Dataset_Header__Key_Addr_Hist;
-		DATASET(Layout_Inquiry_AccLogs__Key_FCRA_DID) Dataset_Inquiry_AccLogs__Key_FCRA_DID;
-		DATASET(Layout_USPIS_HotList__key_addr_search_zip) Dataset_USPIS_HotList__key_addr_search_zip;
-		DATASET(Layout_UtilFile__Key_Address) Dataset_UtilFile__Key_Address;
+		DATASET(Layout_ADVO__Key_Addr1) Dataset_ADVO__Key_Addr1;		
+		DATASET(Layout_ADVO__Key_Addr1_History) Dataset_ADVO__Key_Addr1_History;		
+		DATASET(Layout_DMA__Key_DNM_Name_Address) Dataset_DMA__Key_DNM_Name_Address;		
+		DATASET(Layout_Fraudpoint3__Key_Address) Dataset_Fraudpoint3__Key_Address;		
+		DATASET(Layout_Header__Key_Addr_Hist) Dataset_Header__Key_Addr_Hist;		
+		DATASET(Layout_Inquiry_AccLogs__Key_FCRA_DID) Dataset_Inquiry_AccLogs__Key_FCRA_DID;		
+		DATASET(Layout_USPIS_HotList__key_addr_search_zip) Dataset_USPIS_HotList__key_addr_search_zip;		
+		DATASET(Layout_UtilFile__Key_Address) Dataset_UtilFile__Key_Address;		
 		DATASET(Layout_UtilFile__Key_DID) Dataset_UtilFile__Key_DID;
 		DATASET(Layout_RiskWise__key_CityStZip) Dataset_RiskWise__key_CityStZip;
-		// Person
-		DATASET(Layout_Doxie__Key_Header_Address) Dataset_Doxie__Key_Header_Address;
-		DATASET(Layout_Doxie__Key_Death_MasterV2_SSA_DID) Dataset_Doxie__Key_Death_MasterV2_SSA_DID;
-		DATASET(Layout_DriversV2__Key_DL_DID) Dataset_DriversV2__Key_DL_DID;
-		DATASET(Layout_DriversV2__Key_DL_Number) Dataset_DriversV2__Key_DL_Number;
+		// Person 
+		DATASET(Layout_Doxie__Key_Header_Address) Dataset_Doxie__Key_Header_Address; 
+		DATASET(Layout_Doxie__Key_Death_MasterV2_SSA_DID) Dataset_Doxie__Key_Death_MasterV2_SSA_DID; 
+		DATASET(Layout_DriversV2__Key_DL_DID) Dataset_DriversV2__Key_DL_DID; 
+		DATASET(Layout_DriversV2__Key_DL_Number) Dataset_DriversV2__Key_DL_Number; 
 		//ssn
-		DATASET(Layout_Death_MasterV2__key_ssn_ssa) Dataset_Death_MasterV2__key_ssn_ssa;
-		DATASET(Layout_Fraudpoint3__Key_SSN) Dataset_Fraudpoint3__Key_SSN;
-		DATASET(Layout_Inquiry_AccLogs__Key_FCRA_SSN) Dataset_Inquiry_AccLogs__Key_FCRA_SSN;
-		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_SSN) Dataset_Inquiry_AccLogs__Inquiry_Table_SSN;
-		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_Update_SSN) Dataset_Inquiry_AccLogs__Inquiry_Table_Update_SSN;
+		DATASET(Layout_Death_MasterV2__key_ssn_ssa) Dataset_Death_MasterV2__key_ssn_ssa; 
+		DATASET(Layout_Fraudpoint3__Key_SSN) Dataset_Fraudpoint3__Key_SSN;		
+		DATASET(Layout_Inquiry_AccLogs__Key_FCRA_SSN) Dataset_Inquiry_AccLogs__Key_FCRA_SSN;		
+		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_SSN) Dataset_Inquiry_AccLogs__Inquiry_Table_SSN;		
+		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_Update_SSN) Dataset_Inquiry_AccLogs__Inquiry_Table_Update_SSN;		
 		// Phone
 		DATASET(Layout_Gong__Key_History_DID) Dataset_Gong__Key_History_DID;
 		DATASET(Layout_Gong__Key_History_Address) Dataset_Gong__Key_History_Address;
@@ -1191,11 +1286,16 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		// Education
 		DATASET(Layout_American_student_list__key_DID) Dataset_American_student_list__key_DID;
 		DATASET(Layout_AlloyMedia_student_list__Key_DID) Dataset_AlloyMedia_student_list__Key_DID;
-		//Surname
+		//CFPB
 		DATASET(Layout_dx_CFPB_key_Census_Surnames) Dataset_dx_CFPB_key_Census_Surnames;
-		// LienJudgement
+
+		DATASET(Layout_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP) Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP;
+		DATASET(Layout_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18) Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18;
+		//Household
+		DATASET(Layout_dx_Header__key_did_hhid) Dataset_dx_Header__key_did_hhid;
+		DATASET(Layout_dx_Header__key_hhid_did) Dataset_dx_Header__key_hhid_did;		// LienJudgement
 		DATASET(Layout_LiensV2_key_liens_main_ID_Records) Dataset_LiensV2_key_liens_main_ID_Records;
-		DATASET(Layout_LiensV2_Key_Liens_Party_ID_Records) Dataset_LiensV2_Key_Liens_Party_ID_Records;
+		DATASET(Layout_LiensV2_Key_Liens_Party_ID_Records) Dataset_LiensV2_Key_Liens_Party_ID_Records; 
 
 		// --------------------[ Business Section ]--------------------
 		// Business Header
@@ -1211,8 +1311,8 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		DATASET(Layout_Watercraft__Key_LinkIds) Dataset_Watercraft__Watercraft__Key_LinkIds;
 		//aircraft
 		DATASET(Layout_FAA__key_aircraft_linkids) Dataset_FAA__key_aircraft_linkids;
-		//LienJudgement
-		DATASET(Layout_Key_party_Linkids_Records) Dataset_LiensV2__Key_party_Linkids_Records;
+		//LienJudgement		
+		DATASET(Layout_Key_party_Linkids_Records) Dataset_LiensV2__Key_party_Linkids_Records;	   		
 		//UCC
 		DATASET(Layout_UCC__Key_LinkIds_key) Dataset_UCC__Key_LinkIds_key;
 		DATASET(Layout_UCC__Key_RMSID_Main) Dataset_UCC__Key_RMSID_Main;
@@ -1234,28 +1334,27 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		DATASET(Layout_Infutor_NARB__kfetch_LinkIds) Dataset_Layout_Infutor_NARB__kfetch_LinkIds;
 		DATASET(Layout_Equifax_Business__Data_kfetch_LinkIDs) Dataset_Equifax_Business__Data_kfetch_LinkIDs;
 		DATASET(Layout_BIPV2_Build__kfetch_contact_linkids) Dataset_BIPV2_Build__kfetch_contact_linkids;
-		DATASET(Layout_BIPV2_Build__kfetch_contact_linkids_slim) Dataset_BIPV2_Build__kfetch_contact_linkids_slim;
+		DATASET(Layout_BIPV2_Build__kfetch_contact_linkids_slim) Dataset_BIPV2_Build__kfetch_contact_linkids_slim;		
 		// BIP Best
 		DATASET(Layout_BIPV2_Best__Key_LinkIds) Dataset_BIPV2_Best__Key_LinkIds;
-
+		
 				// --------------------[ Both ]--------------------
-
+		
 		// Vehicle
 		DATASET(Layout_VehicleV2__Key_Vehicle_Party_Key) Dataset_VehicleV2__Key_Vehicle_Party_Key;
 		DATASET(Layout_VehicleV2__Key_Vehicle_Main_Key) Dataset_VehicleV2__Key_Vehicle_Main_Key;
-
+	
 		// --------------------[ Relative - Person Relative ]--------------------
 
 		// Relative V3
 		DATASET(Layout_Relatives__Key_Relatives_V3) Dataset_Relatives__Key_Relatives_V3;
 		DATASET(Layout_Relatives__Key_Marketing_Header_Relatives) Dataset_Relatives__Key_Marketing_Header_Relatives3;
-
+		
 		// --------------------[ Property - Consumer and Business]--------------------
 
 		DATASET(Layout_PropertyV2_Key_Assessor_Fid_Records) Dataset_PropertyV2__Key_Assessor_Fid;
 		DATASET(Layout_PropertyV2_Key_Deed_Fid_Records) Dataset_PropertyV2__Key_Deed_Fid_Fid;
 		DATASET(Layout_PropertyV2_Key_Search_Fid_Records) Dataset_PropertyV2__Key_Search_Fid;
-		DATASET(Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records) Dataset_PropertyV2__Key_Addl_Fares_Deed_Fid;
 		DATASET(Layout_AVM_V2_Key_AVM_Address_Norm_Records) Dataset_AVM_V2__Key_AVM_Address;
 
 
@@ -1263,11 +1362,11 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BusReg, CalBus, CellPhone, Corp2
 		DATASET(Layout_FLAccidents_Ecrash__Key_ECrash4) Dataset_FLAccidents_Ecrash__Key_ECrash4;
 
 		// --------------------[ Best Person - Watchdog]--------------------
-
+		
 		DATASET(Layout_Best_Person__Key_Watchdog) Dataset_Best_Person__Key_Watchdog;
 		DATASET(Layout_Best_Person__Key_Watchdog_FCRA_nonEN) Dataset_Best_Person__Key_Watchdog_FCRA_nonEN;
 		DATASET(Layout_Best_Person__Key_Watchdog_FCRA_nonEQ) Dataset_Best_Person__Key_Watchdog_FCRA_nonEQ;
 
 	END;
-
+	
 END;

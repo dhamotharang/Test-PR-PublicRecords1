@@ -1,4 +1,4 @@
-import Address, dx_Gong;
+﻿import Address, dx_Gong;
 
 export CensusBureau_Phone_Service_Layouts := module
 
@@ -23,6 +23,9 @@ export CensusBureau_Phone_Service_Layouts := module
 		Batch_Post_In;
 		string10 phone10;
 		dx_Gong.layouts.i_address_current.publish_code;
+		unsigned6 did;    
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 	end;
 
 	// Layout as presented to user.

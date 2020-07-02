@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -149,11 +149,11 @@ EXPORT E_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT College_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,College_Name_);
-  EXPORT L_N_College_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,L_N_College_Name_);
-  EXPORT Sequence__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sequence_);
-  EXPORT Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Key_);
-  EXPORT Raw_A_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Raw_A_I_D_);
+  EXPORT College_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,College_Name_);
+  EXPORT L_N_College_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,L_N_College_Name_);
+  EXPORT Sequence__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sequence_);
+  EXPORT Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Key_);
+  EXPORT Raw_A_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Raw_A_I_D_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid),COUNT(College_Name__SingleValue_Invalid),COUNT(L_N_College_Name__SingleValue_Invalid),COUNT(Sequence__SingleValue_Invalid),COUNT(Key__SingleValue_Invalid),COUNT(Raw_A_I_D__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid,KEL.typ.int College_Name__SingleValue_Invalid,KEL.typ.int L_N_College_Name__SingleValue_Invalid,KEL.typ.int Sequence__SingleValue_Invalid,KEL.typ.int Key__SingleValue_Invalid,KEL.typ.int Raw_A_I_D__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid),COUNT(__d0)},

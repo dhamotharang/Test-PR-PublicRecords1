@@ -232,47 +232,6 @@ EXPORT Common := MODULE
 
       RETURN updatedDS;
     ENDMACRO;
-      
-      
-    EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
-      
-      isEarlierThanArchiveDate := fieldDate <= archiveDate AND fieldDate > 0;
-
-      RETURN isEarlierThanArchiveDate;
-    END;
-
-
-    EXPORT fn_filterOnCurrentMode(INTEGER fieldDate) := FUNCTION
-      
-      isCurrentMode := fieldDate > 0 AND (INTEGER)((STRING)fieldDate) <= (INTEGER)((STRING8)STD.Date.Today());
-      
-      RETURN isCurrentMode;
-    END;
-
-      //copied/modified from 	Business_Risk_BIP.Common.FilterRecords - used for only 1 date to filter on
-    EXPORT FilterRecordsSingleDate(dataSetToFilter, dateFirstSeenField) := FUNCTIONMACRO
-      
-      //filter by dateFirstSeenField if populated, if not then use the secondaryDateFirstSeenField
-      filtered := dataSetToFilter((HistoryDate = DueDiligence.Constants.date8Nines AND DueDiligence.Common.fn_filterOnCurrentMode((INTEGER)dateFirstSeenField))
-                                OR DueDiligence.Common.fn_filterOnArchiveDate((INTEGER)dateFirstSeenField, historyDate));
-      
-      RETURN filtered;
-      
-    ENDMACRO;	
-
-    //copied/modified from 	Business_Risk_BIP.Common.FilterRecords - used with 2 dates to filter
-    EXPORT FilterRecords(dataSetToFilter, dateFirstSeenField, secondaryDateFirstSeenField) := FUNCTIONMACRO
-
-      //filter by dateFirstSeenField if populated, if not then use the secondaryDateFirstSeenField
-      filtered := dataSetToFilter(IF((INTEGER)dateFirstSeenField > 0, 
-                                    ((HistoryDate = DueDiligence.Constants.date8Nines AND DueDiligence.Common.fn_filterOnCurrentMode((INTEGER)dateFirstSeenField))
-                                    OR DueDiligence.Common.fn_filterOnArchiveDate((INTEGER)dateFirstSeenField, historyDate)),  //TRUE STATEMENT
-                                    ((HistoryDate = DueDiligence.Constants.date8Nines AND DueDiligence.Common.fn_filterOnCurrentMode((INTEGER)secondaryDateFirstSeenField))
-                                    OR DueDiligence.Common.fn_filterOnArchiveDate((INTEGER)secondaryDateFirstSeenField, historyDate))));//FALSE STATEMENT
-      
-      RETURN filtered;
-      
-    ENDMACRO;	
 
 
 
@@ -299,7 +258,7 @@ EXPORT Common := MODULE
     END;
 
 
-    EXPORT IsValidDate(UNSIGNED date, BOOLEAN yearOnly = FALSE) := FUNCTION
+    SHARED IsValidDate(UNSIGNED date, BOOLEAN yearOnly = FALSE) := FUNCTION
       dateVal := fn_getDateVal(date);
       
       yearIn := dateVal div 10000;
@@ -364,53 +323,6 @@ EXPORT Common := MODULE
     END;
 		
     
-    //Moving to CommonDate
-		EXPORT IsValidDOB(UNSIGNED inputDOB) := FUNCTION
-		  validDOB := MAP(
-				//just year (no month, no day)
-				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[5..6]='00' AND ((STRING8)inputDOB)[7..8]='00' 	=> STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..4]+'0101')),
-				//year + day (no month)
-				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[5..6]='00' AND ((STRING8)inputDOB)[7..8]<>'00'  => STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..4]+'01'+((STRING8)inputDOB)[7..8])),
-				//just year + month (no day)
-				LENGTH((STRING8)inputDOB)=6 OR (LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[7..8]='00') 		=> STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..6]+'01')),
-				//full populated date
-				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[7..8]<>'00'	                                    => STD.Date.IsValidDate(inputDOB),
-																																																							 FALSE);
-      RETURN validDOB;
-    END;
-
-    
-    EXPORT getCleanAddress(DATASET(DueDiligence.LayoutsInternal.GeographicLayout) input) := FUNCTION
-
-      cleanedAddress := PROJECT(input, TRANSFORM(DueDiligence.LayoutsInternal.GeographicLayout,
-                                                  tempAddr := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Address, SELF := LEFT;));
-                                                  
-                                                  cleanAddress := DueDiligence.CommonAddress.GetCleanAddress(tempAddr);
-                                                  
-                                                  SELF := cleanAddress;
-                                                  SELF := LEFT;));
-      
-      RETURN cleanedAddress;
-    END; 
-
-
-
-    EXPORT DaysApartWithZeroEmptyDate(STRING date, STRING date2) := FUNCTION
-      
-      popDate2 := MAP(date2 = DueDiligence.Constants.EMPTY => (STRING8)STD.Date.Today(),
-                      (INTEGER)date2 = DueDiligence.Constants.date8Nines => (STRING8)STD.Date.Today(),
-                      date2);
-      
-      RETURN IF((UNSIGNED)date > 0, ut.DaysApart(date, popDate2), 0); //return 0 days apart if date doesn't exist 
-    END;
-
-    EXPORT getAddressScore(STRING prim_range1, STRING prim_name1, STRING sec_range1, STRING prim_range2, STRING prim_name2, STRING sec_range2) := FUNCTION
-      score := Risk_Indicators.AddrScore.AddressScore(prim_range1, prim_name1, sec_range1, prim_range2, prim_name2, sec_range2);
-
-      RETURN score;
-    END;
-
-
 
     EXPORT getLinkedBusinesses(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 
@@ -469,63 +381,8 @@ EXPORT Common := MODULE
 
                               
     EXPORT getGeographicRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) AddressList, BOOLEAN TheseAddressesNeedToBeCleaned = FALSE) := FUNCTION
-
-
-      PickUpGeoRiskForThisList := IF(TheseAddressesNeedToBeCleaned, getCleanAddress(AddressList), AddressList);  
-    
-
-      //Pick up the EasiTotCrime for this state and county and geo blk                         
-      //    from the Census Keys.  This FUNCTION is expecting the 3 digits county to build          
-      //    the geolink Build the 5 digit FIPS code using the state code + county                       
-      //    Use the 5 digit FIPS code to determine if the county area matches the lists       
-      //    created in the duediligence.constants                                                                                                                  
-      //Note:  The Easi - if we cannot find any Census data for this geographic location  
-      //       per our requirements the "not found" condition will produce the same result  
-      //       a low to average crime index 
-      withGeographicRisk := JOIN(PickUpGeoRiskForThisList, Easi.Key_Easi_Census,
-                                  KEYED(RIGHT.geolink = LEFT.state + LEFT.county + LEFT.geo_blk),
-                                  TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout, 
-                                            //Set all of the County/State area risk indicators
-                                            INTEGER tempCrimeValue := (INTEGER)RIGHT.totcrime;  
-                                            
-                                            SELF.CountyHasHighCrimeIndex := tempCrimeValue >= DueDiligence.Constants.HighCrimeValue;
-                                            SELF.EasiTotCrime := RIGHT.totcrime;
-                                            SELF.buildgeolink := LEFT.state + LEFT.county + LEFT.geo_blk;
-                                             
-                                            
-                                            STRING5 tempFIPS := codes.st2FipsCode(STD.Str.ToUpperCase(LEFT.state)) + LEFT.county;
-                                            
-                                            SELF.FipsCode := tempFIPS; 
-                                            SELF.validFIPSCode := LENGTH(TRIM(tempFIPS, ALL)) = 5;
-                                            SELF.HIFCA := tempFIPS IN DueDiligence.Constants.setHIFCA;
-                                            SELF.HIDTA := tempFIPS IN DueDiligence.Constants.setHIDTA;
-                                            SELF.CountyBordersForgeinJur := tempFIPS IN DueDiligence.Constants.CountyForeignJurisdic;   
-                                            SELF.CountyBorderOceanForgJur := tempFIPS IN DueDiligence.Constants.CountyBordersOceanForgJur;
-                                            
-                                            //Set all of the City/State area risk indicators
-                                            tempCityState := TRIM(LEFT.city, LEFT, RIGHT) + ','+ LEFT.state;
-                                            
-                                            SELF.CityState := tempCityState; 
-                                            SELF.CityBorderStation := tempCityState in DueDiligence.Constants.CityBorderStation;
-                                            SELF.CityFerryCrossing := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
-                                            SELF.CityRailStation := tempCityState in DueDiligence.Constants.CityRailStation; 
-                                            
-                                            SELF.censusRecordExists := RIGHT.geolink <> DueDiligence.Constants.EMPTY;
-
-                                            SELF := LEFT;),  
-                                  LEFT OUTER,  
-                                  ATMOST (KEYED(RIGHT.geolink = LEFT.state + LEFT.county + LEFT.geo_blk), DueDiligence.Constants.MAX_ATMOST), 
-                                  KEEP(DueDiligence.Constants.MAX_ATMOST_1));
-
-                                                                                                            
-      //Use the Census Macro to fill in the county_name - pass the result set as input,                              
-      //the field name that contains the state,                                                                       
-      //the field name that contains the 3 digit fips(county) and the field name of the county name.                 
-      //the name of the output result set                                                                                                                                                                                          
-      Census_Data.MAC_Fips2County_Keyed(withGeographicRisk, state, FipsCode, countyName, WithGeoRiskCounty);
-
-      RETURN WithGeoRiskCounty;
-    END;
+      RETURN DueDiligence.CommonAddress.getAddressRisk(AddressList, TheseAddressesNeedToBeCleaned);
+    END : DEPRECATED('Use DueDiligence.CommonAddress.getAddressRisk');
 
 
     EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION

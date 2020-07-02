@@ -11,6 +11,7 @@
 	STRING16 P_InpPhoneHome;
 	STRING16 P_InpPhoneWork;
 	STRING54 P_InpEmail;
+	STRING45 P_InpIPAddr;
 	STRING20 P_InpArchDt;
 	STRING1 P_InpAcctFlag;
 	STRING1 P_InpLexIDFlag;
@@ -28,6 +29,7 @@
 	STRING1 P_InpPhoneHomeFlag;
 	STRING1 P_InpPhoneWorkFlag;
 	STRING1 P_InpEmailFlag;
+	STRING1 P_InpIPAddrFlag;
 	STRING1 P_InpArchDtFlag;
 	INTEGER7 P_LexID;
 	INTEGER3 P_LexIDScore;
@@ -42,6 +44,7 @@
 	STRING10 P_InpClnAddrUnitDesig;
 	STRING8 P_InpClnAddrSecRng;
 	STRING25 P_InpClnAddrCity;
+	STRING25 P_InpClnAddrCityPost;
 	STRING6 P_InpClnAddrState;
 	STRING6 P_InpClnAddrZip5;
 	STRING6 P_InpClnAddrZip4;
@@ -72,6 +75,7 @@
 	STRING6 P_InpClnAddrUnitDesigFlag;
 	STRING6 P_InpClnAddrSecRngFlag;
 	STRING6 P_InpClnAddrCityFlag;
+	STRING6 P_InpClnAddrCityPostFlag;
 	STRING6 P_InpClnAddrStateFlag;
 	STRING6 P_InpClnAddrZip5Flag;
 	STRING6 P_InpClnAddrZip4Flag;
@@ -98,6 +102,7 @@
 	STRING6 P_InpClnPhoneHomeFlag;
 	STRING6 P_InpClnPhoneWorkFlag;
 	STRING6 P_InpClnEmailFlag;
+	STRING6 P_InpClnIPAddrFlag,
 	STRING6 P_InpValEmailUserAllZeroFlag,
 	STRING6 P_InpValEmailUserBadCharFlag,
 	STRING6 P_InpValEmailDomAllZeroFlag,
@@ -110,7 +115,11 @@
 	STRING6 P_InpValPhoneHomeBogusFlag;
 	STRING6 P_InpValPhoneWorkBadCharFlag;
 	STRING6 P_InpValPhoneWorkBadLenFlag;
-	STRING6 P_InpValPhoneWorkBogusFlag;	
+	STRING6 P_InpValPhoneWorkBogusFlag;
+	STRING30 P_InpClnEmailUser;		
+	STRING30 P_InpClnEmailDom;		
+	STRING6  P_InpClnEmailExt;
+	STRING45 P_InpClnIPAddr;
 	// INTEGER4 PI_InpAddrAVMVal;
 	// INTEGER4 PI_InpAddrAVMValA1Y;
 	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
@@ -121,6 +130,7 @@
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
 	STRING10 G_BuildAstPropDt;
+	STRING10 G_BuildEduDt;	
 	STRING6	P_LexIDSeenFlag;
 	INTEGER3 PL_AstVehAirCntEv;
 	STRING PL_AstVehAirEmrgDtListEv;
@@ -248,4 +258,20 @@
 	// STRING200 PL_CurrAddrLocID;
 	STRING200 PL_PrevAddrFull;
 	// STRING200 PL_PrevAddrLocID;
+		//consumer liens		
+	INTEGER3 PL_DrgJudgCnt7Y;		
+	INTEGER3 PL_DrgLTDCnt7Y;		
+	INTEGER3 PL_DrgLienCnt7Y;		
+	//Education		
+	STRING6 PL_EduRecFlagEv;		
+	STRING50 PL_EduSrcListEv;		
+	STRING6 PL_EduHSRecFlagEv;		
+	STRING6 PL_EduCollRecFlagEv;		
+	STRING PL_EduCollSrcEmrgDtListEv;		
+	STRING PL_EduCollSrcLastDtListEv;		
+	STRING8 PL_EduCollSrcNewRecOldDtEv;		
+	STRING8 PL_EduCollSrcNewRecNewDtEv;		
+	INTEGER3 PL_EduCollSrcNewRecOldMsncEv;		
+	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;		
+	INTEGER3 PL_EduCollRecSpanEv;	
 END;

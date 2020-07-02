@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT B_Professional_License_5,CFG_Compile,E_Professional_License,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
-  SHARED __EE406036 := __ENH_Professional_License_5;
-  EXPORT __ST140731_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Professional_License_5().__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
+  SHARED __EE710212 := __ENH_Professional_License_5;
+  EXPORT __ST155076_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -28,11 +28,11 @@ EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST140731_Layout __ND406315__Project(B_Professional_License_5(__in,__cfg).__ST143371_Layout __PP405824) := TRANSFORM
-    __CC9115 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Active_ := __OP2(__PP405824.Max_Expire_Date_,>,__CC9115);
-    SELF.Valid_Professional_License_ := __AND(__OP2(__PP405824.License_Number_,<>,__CN('')),__OR(__OP2(__PP405824.Max_Issue_Date_,<,__CC9115),__NT(__PP405824.Max_Issue_Date_)));
-    SELF := __PP405824;
+  SHARED __ST155076_Layout __ND710491__Project(B_Professional_License_5(__in,__cfg).__ST160258_Layout __PP710000) := TRANSFORM
+    __CC9191 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Active_ := __OP2(__PP710000.Max_Expire_Date_,>,__CC9191);
+    SELF.Valid_Professional_License_ := __AND(__OP2(__PP710000.License_Number_,<>,__CN('')),__OR(__OP2(__PP710000.Max_Issue_Date_,<,__CC9191),__NT(__PP710000.Max_Issue_Date_)));
+    SELF := __PP710000;
   END;
-  EXPORT __ENH_Professional_License_4 := PROJECT(__EE406036,__ND406315__Project(LEFT));
+  EXPORT __ENH_Professional_License_4 := PROJECT(__EE710212,__ND710491__Project(LEFT));
 END;

@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -125,8 +125,8 @@ EXPORT E_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Watercraft_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Watercraft_Key_);
-  EXPORT Sequence_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sequence_Key_);
+  EXPORT Watercraft_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Watercraft_Key_);
+  EXPORT Sequence_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sequence_Key_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Watercraft__Key_LinkIds_Invalid),COUNT(Watercraft_Key__SingleValue_Invalid),COUNT(Sequence_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Watercraft__Key_LinkIds_Invalid,KEL.typ.int Watercraft_Key__SingleValue_Invalid,KEL.typ.int Sequence_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid),COUNT(__d0)},

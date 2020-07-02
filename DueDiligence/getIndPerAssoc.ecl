@@ -10,10 +10,10 @@ EXPORT getIndPerAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUN
     
     countFirstSeenSSNRisks := TABLE(allRelations, {seq, inquiredDID, 
                                                        lessThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
-                                                                                     DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) <= ut.DaysInNYears(1) AND 
+                                                                                     DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)headerFirstSeenDate, (STRING)historyDate) <= ut.DaysInNYears(1) AND 
                                                                                      ssnrisk),
                                                        greaterThan1Year := COUNT(GROUP, headerFirstSeenDate <> 0 AND 
-                                                                                        DueDiligence.CommonDate.DaysApartAccountingForZero((STRING)headerFirstSeenDate, (STRING)historyDate) > ut.DaysInNYears(1) AND 
+                                                                                        DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)headerFirstSeenDate, (STRING)historyDate) > ut.DaysInNYears(1) AND 
                                                                                         ssnrisk)}, seq, inquiredDID);
                                                                                     
                                                                                     

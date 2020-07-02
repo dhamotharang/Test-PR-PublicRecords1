@@ -1,34 +1,84 @@
 ﻿IMPORT KEL11 AS KEL;
-IMPORT PublicRecords_KEL, Risk_Indicators;
+IMPORT PublicRecords_KEL, Risk_Indicators, STD;
 
 EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := FUNCTION
 
 	Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;
-
-	RecordsWithLexID := InputData(P_LexID  > 0);
-	RecordsWithoutLexID := InputData(P_LexID  <= 0);
-	
 	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
-	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1(0, 0, 0).res0);
-	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1(0, 0, 0).res0);
+	Get_Lexids_FDC := table(FDCDataset.Dataset_Header__Key_Addr_Hist, {p_lexid, G_ProcUID,
+															_count := count(group)}, p_lexid, G_ProcUID, merge);
+		
+	contact_inputs := project(Get_Lexids_FDC, transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, self.p_lexid := left.p_lexid, self.G_ProcUID := left.G_ProcUID; self := []));							
 	
-	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutNonFCRAPersonAttributes},
-		SELF.G_ProcUID := LEFT.G_ProcUID;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1(LEFT.P_LexID , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF := NonFCRAPersonResults[1]));	
+	Combine_InputData := 	dedup(sort((contact_inputs+InputData),G_ProcUID,  p_lexid,  -p_lexidscore ),  G_ProcUID, p_lexid ); //keep the row with the input
+	
+	RecordsWithLexID := Combine_InputData(P_LexID  > 0);
+	RecordsWithoutLexID := Combine_InputData(P_LexID  <= 0);	
 
-	FCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutNonFCRAPersonAttributes},
+	temp := RECORD
+		SET ids;
+		PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII;
+	end;
+	
+	getids := project(Get_Lexids_FDC, transform(temp, self.ids := SET(Get_Lexids_FDC, P_LexID); self := left;  self := [];));			
+
+	Outids := join(RecordsWithLexID, getids, LEFT.p_lexid = right.p_lexid,	
+							transform(temp, self.ids := right.ids, self := left;), left outer, atmost(1));
+								
+	CleanInputs := Outids((INTEGER)p_inparchdt <> 0);//keeping the record with inputs
+	
+	LayoutFCRAPersonAttributes := RECORD
+		INTEGER G_ProcUID;
+		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0)}) attributes;
+	END;
+	LayoutNonFCRAPersonAttributes := RECORD
+		INTEGER G_ProcUID;
+		Dataset({RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0)}) attributes;
+	END;
+	
+	NonFCRAPersonAttributesRaw := PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
 		SELF.G_ProcUID := LEFT.G_ProcUID;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1(LEFT.P_LexID , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF := FCRAPersonResults[1],
+		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
+		SELF.attributes := NonFCRAPersonResults;
 		SELF := []));	
-				
+
+	FCRAPersonAttributesRaw := PROJECT(CleanInputs, TRANSFORM(LayoutFCRAPersonAttributes,
+		SELF.G_ProcUID := LEFT.G_ProcUID;
+		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
+		SELF.attributes := FCRAPersonResults;
+		SELF := []));	
+			
+	FinalnonFCRA := RECORD
+		INTEGER G_ProcUID;
+		RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0);
+	END;	
+	FinalFCRA := RECORD
+		INTEGER G_ProcUID;
+		RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0);
+	END;
+	
+	FinalnonFCRA Normalize_FinalnonFCRA(RecordOF(LayoutNonFCRAPersonAttributes.attributes) ri, LayoutNonFCRAPersonAttributes le) := TRANSFORM
+		SELF.G_ProcUID := le.G_ProcUID;
+		SELF := ri;
+		SELF := le;
+	END;
+			
+	FinalFCRA Normalize_FinalFCRA(RecordOF(LayoutFCRAPersonAttributes.attributes) ri, LayoutFCRAPersonAttributes le) := TRANSFORM
+		SELF.G_ProcUID := le.G_ProcUID;	
+		SELF := ri;
+		SELF := le;
+	END;
+		
+	norm_nonFCRA := normalize(NonFCRAPersonAttributesRaw, left.attributes, Normalize_FinalnonFCRA(RIGHT,LEFT));
+	norm_FCRA := normalize(FCRAPersonAttributesRaw, left.attributes, Normalize_FinalFCRA(RIGHT,LEFT));
+	
+	
 	PersonAttributesClean := IF(OptionsMini.IsFCRA, 
-															KEL.Clean(FCRAPersonAttributesRaw, TRUE, TRUE, TRUE),
-															KEL.Clean(NonFCRAPersonAttributesRaw, TRUE, TRUE, TRUE));
+															KEL.Clean(norm_FCRA, TRUE, TRUE, TRUE),
+															KEL.Clean(norm_nonFCRA, TRUE, TRUE, TRUE));	
 	
 	PersonAttributesWithLexID := JOIN(RecordsWithLexID, PersonAttributesClean, LEFT.G_ProcUID = RIGHT.G_ProcUID AND LEFT.P_LexID  = RIGHT.LexID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII,
@@ -104,6 +154,6 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 			Self := [];)); 
 			
 	MiniAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, G_ProcUID ); 
-	
+
 	RETURN MiniAttributes;
 END;

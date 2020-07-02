@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -84,11 +84,11 @@ EXPORT E_Employment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Job_Title__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Job_Title_);
-  EXPORT Internal_Source_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Internal_Source_Score_);
-  EXPORT From_H_D_R__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,From_H_D_R_);
-  EXPORT Old_Internal_Source_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Old_Internal_Source_Score_);
-  EXPORT G_L_B__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,G_L_B_);
+  EXPORT Job_Title__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Job_Title_);
+  EXPORT Internal_Source_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Internal_Source_Score_);
+  EXPORT From_H_D_R__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,From_H_D_R_);
+  EXPORT Old_Internal_Source_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Old_Internal_Source_Score_);
+  EXPORT G_L_B__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,G_L_B_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(Job_Title__SingleValue_Invalid),COUNT(Internal_Source_Score__SingleValue_Invalid),COUNT(From_H_D_R__SingleValue_Invalid),COUNT(Old_Internal_Source_Score__SingleValue_Invalid),COUNT(G_L_B__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid,KEL.typ.int Job_Title__SingleValue_Invalid,KEL.typ.int Internal_Source_Score__SingleValue_Invalid,KEL.typ.int From_H_D_R__SingleValue_Invalid,KEL.typ.int Old_Internal_Source_Score__SingleValue_Invalid,KEL.typ.int G_L_B__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Employment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(__d0)},

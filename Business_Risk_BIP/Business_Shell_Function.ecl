@@ -501,7 +501,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	ProfLic := Business_Risk_BIP.getProfLicenses(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	Cortera := Business_Risk_BIP.getCortera(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, ds_CorteraRetrotestRecsRaw);
+	Cortera := Business_Risk_BIP.getCortera(LinkIDsFound, mod_access, Options, linkingOptions, AllowedSourcesSet, ds_CorteraRetrotestRecsRaw);
 
 	SBFE := Business_Risk_BIP.getSBFE(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 

@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -207,11 +207,11 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT License_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,License_Number_);
-  EXPORT License_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,License_State_);
-  EXPORT Lex_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Lex_I_D_);
-  EXPORT Date_Created__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Date_Created_);
-  EXPORT Legacy_Result_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Legacy_Result_Code_);
+  EXPORT License_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,License_Number_);
+  EXPORT License_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,License_State_);
+  EXPORT Lex_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Lex_I_D_);
+  EXPORT Date_Created__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Date_Created_);
+  EXPORT Legacy_Result_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Legacy_Result_Code_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Prof_LicenseV2__Key_Proflic_Did_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Prof_License_Mari__Key_Did_Invalid),COUNT(License_Number__SingleValue_Invalid),COUNT(License_State__SingleValue_Invalid),COUNT(Lex_I_D__SingleValue_Invalid),COUNT(Date_Created__SingleValue_Invalid),COUNT(Legacy_Result_Code__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Prof_LicenseV2__Key_Proflic_Did_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Prof_License_Mari__Key_Did_Invalid,KEL.typ.int License_Number__SingleValue_Invalid,KEL.typ.int License_State__SingleValue_Invalid,KEL.typ.int Lex_I_D__SingleValue_Invalid,KEL.typ.int Date_Created__SingleValue_Invalid,KEL.typ.int Legacy_Result_Code__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Prof_LicenseV2__Key_Proflic_Did_Invalid),COUNT(__d0)},

@@ -70,7 +70,8 @@ import AutoStandardI, ut, riskwise, risk_indicators, didville, dx_Gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,utilfile,liensv2,business_header,
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,
-			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2,dx_ConsumerFinancialProtectionBureau, std;
+			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2,dx_ConsumerFinancialProtectionBureau, std,
+			 Doxie, dx_death_master, DeathV2_Services;
 
 export ProdData := MACRO
 
@@ -212,6 +213,13 @@ unsigned BSOptions := if(Shell50orCIIDv1, risk_indicators.iid_constants.BSOption
 BOOLEAN DisplayDeployedEnvironment := FALSE : STORED('DisplayDeployedEnvironment');
 
 max_recs := 100;
+
+mod_access := MODULE(Doxie.IDataAccess) 
+	EXPORT glb := ^.GLB;
+    EXPORT dppa := ^.DPPA;
+	EXPORT DataRestrictionMask := DataRestriction;
+END;
+
 
 a := record
 	unsigned seq;
@@ -564,9 +572,9 @@ deltaBase_did_results := Inquiry_Deltabase.Search_DID(did_ds,
 	DeltabaseGateway);
 	if(searchdid!=0 and (IncludeInquiriesDeltabase=true), output(deltaBase_did_results, named('deltaBase_did_results')) );
 
-	death_did := choosen(doxie.key_death_masterV2_DID(KEYED(L_DID=searchdid)), max_recs);
+	death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+	death_did := CHOOSEN(dx_death_master.Get.byDid(DATASET([{searchdid}], {unsigned did}), did, death_params), max_recs);
 	if(searchdid!=0 and (include_all_files=true or include_death=true), output(death_did, named('death_did')) );
-
 
 //	start of new inquiry logic.  Need boolean added to control whether to return inquiry data or not
 	inquiries_phone := choosen(Inquiry_AccLogs.Key_Inquiry_Phone(keyed(phone10=in_phone)), max_recs);

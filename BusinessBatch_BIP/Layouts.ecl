@@ -1397,6 +1397,20 @@ EXPORT Layouts := MODULE
       unsigned4 linked_contact_count;
       unsigned4 contact_lexid_count;
       unsigned4 contact_no_lexid_count;
+      // matching flags
+      boolean match_first_last_name, 
+      boolean match_first_name, 
+      boolean match_last_name, 
+      boolean match_first_bus_name_addr1,
+      boolean match_last_bus_name_addr1,
+      boolean match_first_bus_name, 
+      boolean match_last_bus_name, 
+      boolean match_addr1, 
+      boolean match_bus_addr1, 
+      boolean match_ssn, 
+      boolean match_ssn_fein,
+      boolean match_phone,
+      boolean match_bus_phone,
       string40 status;
       Batchshare.Layouts.ShareErrors;
     END;

@@ -1,4 +1,4 @@
-import ut, watchdog, did_add, header, did_add, address, lib_fileservices, lib_stringlib, ut, header_slimsort, didville, watchdog, idl_header;;
+import ut, did_add, lib_fileservices, lib_stringlib, ut, watchdog;
 
 /****** SAMPLE CODE *********************************************************************************************/
 /*
@@ -20,11 +20,11 @@ export Randomize := record
  end;
 
 export Output_Internal := record
-	STRING5  title; 
+	STRING5  title;
 	STRING20 fname;
 	STRING20 mname;
 	STRING20 lname;
-	STRING5  name_suffix;	
+	STRING5  name_suffix;
 	string10 prim_range ;
 	string2  predir ;
 	string28 prim_name ;
@@ -44,15 +44,15 @@ export Output_Internal := record
 	string	Industry_2_Code;
 	string	Sub_market;
 	string	Vertical;
-	string	Use; 
-	string	Industry; 
+	string	Use;
+	string	Industry;
 	string	Function_Description;
 	unsigned6 Appended_ADL;
 	string Appended_SSN;
 	string hashid;
 	unsigned count_records := 0;
  end;
- 
+
 export Output_Customer := RECORD
   string watchdog_fname := '';
   string watchdog_mname := '';
@@ -87,38 +87,38 @@ filtParameters := filtOpts(if('' not in pvertical, stringlib.stringtouppercase(b
 													);
 
 //filter out records with no name or address
-filtNameAddrPopulation := filtParameters(person_q.fname <> '' and 
-																				 person_q.lname <> '' and 
-																				 person_q.prim_range + person_q.prim_name <> '' and 
-																				 person_q.zip5 <> '' and 
+filtNameAddrPopulation := filtParameters(person_q.fname <> '' and
+																				 person_q.lname <> '' and
+																				 person_q.prim_range + person_q.prim_name <> '' and
+																				 person_q.zip5 <> '' and
 																				 person_q.ssn <> '');
 
 
-Mac_Efficient_Table := project(filtNameAddrPopulation, 
+Mac_Efficient_Table := project(filtNameAddrPopulation,
 															 transform({Output_Customer, Output_Internal, Randomize},
 																					self.watchdog_hashID := (string)hash(left.person_q.appended_adl);
 																					self.hashID := self.watchdog_hashID;
-																				 
+
 																					self.Primary_Market_Code := left.bus_intel.Primary_Market_Code;
 																					self.Secondary_Market_Code := left.bus_intel.Secondary_Market_Code;
 																					self.Industry_1_Code := left.bus_intel.Industry_1_Code;
 																					self.Industry_2_Code := left.bus_intel.Industry_2_Code;
 																					self.Sub_market := left.bus_intel.Sub_market;
 																					self.Vertical := left.bus_intel.Vertical;
-																					self.Use := left.bus_intel.Use; 
-																					self.Industry := left.bus_intel.Industry; 
+																					self.Use := left.bus_intel.Use;
+																					self.Industry := left.bus_intel.Industry;
 																					self.Function_Description := left.search_info.Function_Description;
 																					self.Appended_ADL := left.person_q.appended_adl;
 																					self.Appended_SSN := left.person_q.appended_ssn;
 																					self.LinkID := left.person_q.linkid;
 																					self.SSN := left.person_q.ssn;
 																					self.count_records := 0;
-																					
+
 																					self.title := left.person_q.title;
 																					self.fname := left.person_q.fname;
 																					self.mname := left.person_q.mname;
 																					self.lname := left.person_q.lname;
-																					self.name_suffix := left.person_q.name_suffix;	
+																					self.name_suffix := left.person_q.name_suffix;
 																					self.prim_range := left.person_q.prim_range;
 																					self.predir := left.person_q.predir;
 																					self.prim_name := left.person_q.prim_name;
@@ -130,7 +130,7 @@ Mac_Efficient_Table := project(filtNameAddrPopulation,
 																					self.st := left.person_q.st;
 																					self.zip5 := left.person_q.zip5;
 																					self.zip4 := left.person_q.zip4;
-																					
+
 																					self.random_number := random();
 																					self := left));
 
@@ -139,7 +139,7 @@ fastMatchFilter := choosen(Mac_Efficient_Table, if(fast_Match, 14000000, choosen
 matchset := ['A','Q','Z'];
 
 did_add.MAC_Match_Flex(fastMatchFilter
-						,matchset					
+						,matchset
 						,ssn
 						,''
 						,fname
@@ -164,11 +164,11 @@ dstReDIDFile := distribute(reDIDFile, hash(appended_adl));
 
 trimDIDFile := table(dstReDIDFile, {appended_adl}, appended_adl, local);
 
-WatchDogRecords := choosen(join(watchdog.File_Best_nonglb(fname <> '' and lname <> '' and prim_range + prim_name <> '' and zip <> '' and ssn <> ''), 
-															  trimDIDFile, 
+WatchDogRecords := choosen(join(watchdog.File_Best_nonglb(fname <> '' and lname <> '' and prim_range + prim_name <> '' and zip <> '' and ssn <> ''),
+															  trimDIDFile,
 															  right.appended_adl = left.did, keep(1), local), number_out);
 
-JnWDtoIQTrack := join(dstReDIDFile, WatchDogRecords, 
+JnWDtoIQTrack := join(dstReDIDFile, WatchDogRecords,
 											right.did = left.appended_adl,
 											transform(recordof(dstReDIDFile),
 													 self.watchdog_fname := right.fname,
@@ -180,7 +180,7 @@ JnWDtoIQTrack := join(dstReDIDFile, WatchDogRecords,
 													 self.watchdog_address_last_line := stringlib.stringcleanspaces(right.city_name + ' ' + right.st + ' ' + right.zip + ' ' + right.zip4),
 													 self.watchdog_ssn := right.ssn;
 													 self := left));
- 
+
 ForCustomer := sort(dedup(project(JnWDtoIQTrack, Output_Customer), record, all), watchdog_hashID);
 Customer := dataset('~thor_200::out::inquiry_acclogs::inquiry_test::collections::customer_'+wu_,recordof(forcustomer), csv(separator('\t')));
 
@@ -212,10 +212,10 @@ headerCustomerNoSSN := dataset([{'fname','mname','lname','sname','address_line1'
 
 /* ----------- */
 
- 
+
 return parallel(output(WatchDogRecords);
 				output(choosen(sort(JnWDtoIQTrack, Appended_ADL), 1000), named('test'));
-				
+
 				output(choosen(ForCustomer, 100), named('Customer_Sample'));
 				output(headerCustomer & ForCustomer,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::customer_'+wu_, overwrite, csv(separator('\t')),expire(30));
 
