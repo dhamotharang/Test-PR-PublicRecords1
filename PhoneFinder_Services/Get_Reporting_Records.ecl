@@ -1,6 +1,6 @@
 IMPORT iesp, Std;
 
-EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord) pF_Records,
+EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_Records,
 								     PhoneFinder_Services.iParam.SearchParams    inMod,
 									 iesp.phonefinder.t_PhoneFinderSearchBy      pSearchBy,
 									 DATASET(PhoneFinder_Services.Layouts.PhoneFinder.final)   dFinalResults
@@ -26,7 +26,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
                          (STRING1)(INTEGER)inMod.NameAddressInfo + (STRING1)(INTEGER)inMod.AccountInfo +  (STRING1)(INTEGER)inMod.CallHandlingInfo +
                          (STRING1)(INTEGER)inMod.DeviceHistory + (STRING1)(INTEGER)inMod.DeviceInfo + (STRING1)(INTEGER)inMod.DeviceChangeInfo;
 
-  transaction_rec_with_alerts xfm_Transaction(iesp.phonefinder.t_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
+  transaction_rec_with_alerts xfm_Transaction($.Layouts.log_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
 	 SELF.transaction_id    	  := inMod.TransactionId;
 	 SELF.transaction_date      := (STRING)Date +' '+ (STRING)Time;
 	 SELF.User_Id            	  := IF(inMod.CompanyId <> '', inMod.BillingCode, inMod._Loginid);
@@ -60,6 +60,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 SELF.last_spoof_date		     := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.SpoofingData.LastEventSpoofedDate);
 	 SELF.phone_forwarded      	 := R.PrimaryPhoneDetails.CallForwardingIndicator;
 	 SELF.Alerts 				         := R.PrimaryPhoneDetails.AlertIndicators;
+	 SELF.Identity_Count         := R.PrimaryPhoneDetails.identity_count;
  END;
 
   Transaction_Rec := PROJECT (pF_Records,  xfm_Transaction(LEFT, COUNTER));
@@ -69,7 +70,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 		DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) alerts;
 	 END;
 
- 	OtherPhones_with_alerts xfm_OtherPhones(iesp.phonefinder.t_PhoneFinderInfo R, INTEGER C) := TRANSFORM
+ 	OtherPhones_with_alerts xfm_OtherPhones($.Layouts.log_other R, INTEGER C) := TRANSFORM
          SELF.transaction_id    	 := inMod.TransactionId;
       	 SELF.sequence_number      := C;
       	 SELF.phone_id             := C;
@@ -77,6 +78,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
    		   SELF.Risk_Indicator       := R.PhoneRiskIndicator;
       	 SELF.phone_type           := R._Type;
       	 SELF.phone_status         := R.PhoneStatus;
+         SELF.identity_Count       := R.identity_count;
       	 SELF.listing_name         := R.ListingName;
       	 SELF.porting_code         := R.PortingCode;
       	 SELF.phone_forwarded      := R.CallForwardingIndicator;

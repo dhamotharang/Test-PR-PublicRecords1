@@ -1,4 +1,4 @@
-IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
+﻿IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
 
 EXPORT Transforms := MODULE
 
@@ -323,6 +323,8 @@ EXPORT Transforms := MODULE
     SELF.ProcessDate := iesp.ECL2ESP.toDatestring8(le.process_date);
     SELF.DateFirstSeen := iesp.ECL2ESP.toDatestring8(le.date_first_seen);
     SELF.DateLastSeen := iesp.ECL2ESP.toDatestring8(le.date_last_seen);
+    SELF.LNDateFirst := iesp.ECL2ESP.toDate(le.ln_date_first);
+    SELF.LNDateLast := iesp.ECL2ESP.toDate(le.ln_date_last);
     SELF.DateVendorFirstReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_first_reported);
     SELF.DateVendorLastReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_last_reported);
     SELF.LatestOrigLoginDate := le.latest_orig_login_date;

@@ -267,8 +267,8 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     
     
     //PERSON IDENTITY RISK
-    idFirstReported := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.firstReportedDate, (STRING)le.historyDate);
-    idRiskLastSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.lastSeenBySource, (STRING)le.historyDate);
+    idFirstReported := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.firstReportedDate, (STRING)le.historyDate);
+    idRiskLastSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.lastSeenBySource, (STRING)le.historyDate);
     
     ssnRedFlags := le.redFlagSSNInvalid OR le.redFlagSSNIssuedPriorDOB OR le.redFlagSSNRandomIssuedInvalid OR
                    le.redFlagLexIDContainsMultiSSNs OR le.redFlagInputSSNAssocAtleast3LexIDs OR le.redFlagInputSSNIsITIN;
@@ -298,9 +298,9 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     
     
     //PERSON MOBILITY
-    daysHeaderAddrFirstSeen := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.earliestHeaderAddressReported, (STRING)le.Historydate);
-    daysAtCurrentAddr := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.Historydate);
-    daysBetweenCurrPrevAddr := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.previousAddressFirstSeen);
+    daysHeaderAddrFirstSeen := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.earliestHeaderAddressReported, (STRING)le.Historydate);
+    daysAtCurrentAddr := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.Historydate);
+    daysBetweenCurrPrevAddr := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.previousAddressFirstSeen);
 
     movedLessThan1YearAgo := le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr < ut.DaysInNYears(1);
     movedTwice := le.move1Distance <> DueDiligence.Constants.EMPTY AND le.move2Distance <> DueDiligence.Constants.EMPTY;

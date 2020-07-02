@@ -14,7 +14,7 @@ export in_address:=record
   string2 st;
   string5 zip;
   // string4 zip4:='';
-  // string60	county:='';
+  // string60 county:='';
 end;
 export slim_address:=record
   unsigned6 did;
@@ -55,9 +55,9 @@ EXPORT layout_Business_out :=record
   string5 zip := '';
   string4 zip4 := '';
   unsigned6 phone := 0;
-  unsigned4 fein := 0;        // Federal Tax ID
+  unsigned4 fein := 0; // Federal Tax ID
   unsigned1 best_flags := 0;
-  string2 source := '';	   // source type (non-blank only if DPPA_State is non-blank)
+  string2 source := ''; // source type (non-blank only if DPPA_State is non-blank)
   string2 DPPA_State := ''; // If nonblank, indicates state code for a DPPA restricted record
 end;
 
@@ -119,8 +119,8 @@ export residents_final_out_w_royalties := record
 end;
 
 export rel_asst_layout := record
-	doxie.layout_relative_dids;
-	doxie.layout_best;
+  doxie.layout_relative_dids;
+  doxie.layout_best;
 end;
 
 export census_layout :=record

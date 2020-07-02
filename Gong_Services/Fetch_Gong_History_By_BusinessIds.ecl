@@ -1,4 +1,4 @@
-import BIPV2, Doxie, gong, TopBusiness_Services;
+import BIPV2, Doxie, dx_Gong, TopBusiness_Services;
 
 export Fetch_Gong_History_By_BusinessIds(dataset(BIPV2.IDFunctions.rec_SearchInput) ds_inData,
   Doxie.IDataAccess mod_access) := function
@@ -13,7 +13,7 @@ export Fetch_Gong_History_By_BusinessIds(dataset(BIPV2.IDFunctions.rec_SearchInp
 	end;
 
   ds_businessIds := project(ds_businessIdsInfoOutSorted, xform_businessIdsOnly(left));
-  businessIdsWithHistory := Gong.key_History_LinkIDs.kfetch(ds_businessIds, mod_access,
+  businessIdsWithHistory := dx_Gong.key_history_LinkIDs.kfetch(ds_businessIds, mod_access,
     TopBusiness_Services.Constants.sourceLinkIdLevel);
 
 	businessIdsWithHistorySorted := sort(businessIdsWithHistory, -(current_record_flag ='Y'), -dt_last_seen);

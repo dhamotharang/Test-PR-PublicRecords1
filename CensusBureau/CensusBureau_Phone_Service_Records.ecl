@@ -1,8 +1,11 @@
-import address, dx_Gong;
+﻿import doxie, AutoStandardI, address, dx_Gong, Suppress;
 
 export CensusBureau_Phone_Service_Records(
 	 dataset(CensusBureau_Phone_Service_Layouts.Batch_In) in_data) := function
-
+  
+  global_mod := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+  
 	// Clean the input data, provide a seq number for uniqueness
 	cleaned_data := project(in_data,transform(CensusBureau_Phone_Service_Layouts.Batch_Post_In,
 		self.__seq := counter,
@@ -33,12 +36,15 @@ export CensusBureau_Phone_Service_Records(
 			self.phone10 := right.phone10,
 			// These next one is for filtering and sorting
 			self.publish_code := right.publish_code,
+			self.did := right.did,
+			self.global_sid := right.global_sid, 
+			self.record_sid := right.record_sid, 
 			// Take everything else as it was
 			self := left),
 		limit(10000,skip));
-
+  records_suppressed := suppress.MAC_SuppressSource(records_from_key,mod_access);
 	// Filter out non-published
-	returnable_records := records_from_key(publish_code != 'N');
+	returnable_records := records_suppressed(publish_code != 'N');
 
 	// Sort and dedup, to ensure order
 	deduped_records := dedup(sort(returnable_records,__seq,record),__seq);

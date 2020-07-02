@@ -1,4 +1,4 @@
-import doxie, business_header, ut, doxie_raw, contactcard, std;
+﻿import AutoStandardI, doxie, business_header, ut, doxie_raw, contactcard, std;
 
 export Fn_PhonesAtWork(
 	dataset(doxie.layout_references) in_dids,
@@ -8,6 +8,9 @@ export Fn_PhonesAtWork(
 	unsigned4 recencyInDays = 365,
 	unsigned2 minScore = 0) := 
 FUNCTION
+
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 
 outrec := contactcard.layouts.contact_phone_addr_rec;
 con := contactcard.constants;
@@ -72,7 +75,7 @@ fgong := dedup(project(wp, transform(doxie.layout_AppendGongByAddr_input,
 																						self := [])),
 							  all);
 											
-wgong := doxie.fn_AppendGongByAddr(fgong);
+wgong := doxie.fn_AppendGongByAddr(fgong,mod_access);
 
 
 //***** ATTACH FOUND GONG TO BIZ DATA

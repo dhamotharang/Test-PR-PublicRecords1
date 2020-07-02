@@ -1,4 +1,4 @@
-import dx_Gong, dx_header, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
+﻿import dx_Gong, dx_header, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
 import lib_datalib, NID; // to be able to call a macro in a JOIN condition
 
 todays_date := (string) STD.Date.Today();
@@ -340,6 +340,29 @@ END;
 
 out_roll := ROLLUP(SORT(withApt, rid, gong_score, -listed_phone, -listed_name), rid, keepBestTNT(LEFT, RIGHT));
 
+gong_addr_rec_slim := record
+  curr_addr_key.DID;
+  curr_addr_key.listed_name;
+  curr_addr_key.fname;
+  curr_addr_key.mname;
+  curr_addr_key.lname;
+  curr_addr_key.name_suffix;
+  curr_addr_key.prim_name;
+  curr_addr_key.sec_range;
+  curr_addr_key.phone10;
+  curr_addr_key.date_first_seen;
+  curr_addr_key.listing_type;
+  curr_addr_key.global_sid;
+  curr_addr_key.record_sid;
+  boolean is_suppressed := false;
+end;
+
+rec_out_roll_ext := record
+  out_roll;
+  gong_addr_rec_slim gong_addr_rec;
+  dataset(doxie.Layout_Phones) gong_addr_phones;
+end;
+
 // extra work to add some phone number when no listing got appended
 doxie.Layout_Phones add_addr_phones(curr_addr_key le, integer gong_score) :=
 TRANSFORM
@@ -355,30 +378,16 @@ TRANSFORM
   SELF.phone_last_seen := (integer)(todays_date[1..6]);
 //  Self.listing_type_cell; in the future can be read from listing_type as well
   SELF := le;
-  SELF := [];//todo need more fields in key
+  SELF := []; // timezone, listing_type_cell, new_type, carrier, carrier_city
 END;
 
-out_roll checkAddr(out_roll le, curr_addr_key ri) := TRANSFORM
-  SELF.listed_name := IF(le.listed_phone != '', le.listed_name, ri.listed_name);
-  SELF.listed_name_prefix:= IF(le.listed_phone != '', le.listed_name_prefix, '');
-  SELF.listed_name_first:= IF(le.listed_phone != '', le.listed_name_first, ri.fname);
-  SELF.listed_name_middle:= IF(le.listed_phone != '', le.listed_name_middle, ri.mname);
-  SELF.listed_name_last:= IF(le.listed_phone != '', le.listed_name_last, ri.lname);
-  SELF.listed_name_suffix:= IF(le.listed_phone != '', le.listed_name_suffix, ri.name_suffix);
-  SELF.listed_phone := IF(le.listed_phone != '', le.listed_phone, ri.phone10);
-  self.phone_first_seen := if(le.listed_phone = '' and ri.phone10<>'',(integer)ri.date_first_seen[1..6],le.phone_first_seen);
-  self.phone_last_seen := if(le.listed_phone = '' and ri.phone10<>'',(integer)(todays_date[1..6]),le.phone_last_seen);
-  self.publish_code := IF(le.listed_phone != '', le.publish_code, '');
-  SELF.gong_score := if(ri.listed_name = ''
-                        or (ri.lname ='' and ri.fname =''), 500,
-                        datalib.nameMatch(le.fname, le.mname, le.lname,
-                  ri.fname, ri.mname, ri.lname)) + address.Sec_Range_EQ(le.sec_range,ri.sec_range);
-  // if name/addr match, upgrade tnt to a 'V' since it is a 'virtual' hhid match (test lname match and optional
-  // input phone match)
-  SELF.tnt := IF(le.tnt = 'C' and le.lname = ri.lname and (ut.NNEQ(phoneToMatch,ri.phone10)),'V',le.tnt);
-  SELF.phones := choosen(le.phones&IF(ri.prim_name<>'',DATASET(PROJECT(ri,add_addr_phones(LEFT, self.gong_score)))),rollup_limits.phones);
-  SELF := le;
-END;
+
+rec_out_roll_ext checkAddr(out_roll le, curr_addr_key ri) := TRANSFORM
+  self.gong_addr_rec := ri;
+  self.gong_addr_phones := DATASET(PROJECT(ri,add_addr_phones(LEFT, 0)));//self.gong_score)));
+  self := le;
+  self := [];
+end;
 
 // Join current Gong records:
 //To avoid inappropriate matches among persons living in apartment buildings, among other things. . .
@@ -387,7 +396,7 @@ END;
 // . . .  both dwellings have similar enough sec_ranges. OR . . .
 // . . .  both dwellings have differing sec_ranges but whose occupants have similar enough names ).
 
-j_addr := JOIN(out_roll, curr_addr_key,
+j_addr_pre := JOIN(out_roll, curr_addr_key,
   (ut.DaysApart((STRING6)LEFT.dt_last_seen+'31',todays_date) < 365 or dcp_value >= 5) AND
   keyed(LEFT.prim_name = RIGHT.prim_name) AND
   keyed(LEFT.st = RIGHT.st) AND
@@ -395,6 +404,31 @@ j_addr := JOIN(out_roll, curr_addr_key,
   keyed(LEFT.prim_range = RIGHT.prim_range) AND
   ut.NNEQ (Left.suffix, Right.suffix) AND
   doxie.gong_append_utils.MAC_sec_range(true), checkAddr(LEFT,RIGHT), LEFT OUTER, ATMOST(100));
+
+j_addr_sup_flag := Suppress.MAC_FlagSuppressedSource (j_addr_pre, mod_access, gong_addr_rec.did, gong_addr_rec.global_sid);  
+
+j_addr := project(j_addr_sup_flag, transform(recordof(out_roll),
+  _gong_addr_rec := if(~left.is_suppressed, left.gong_addr_rec, row([], gong_addr_rec_slim));
+  SELF.listed_name := IF(left.listed_phone != '', left.listed_name, _gong_addr_rec.listed_name);
+  SELF.listed_name_prefix:= IF(left.listed_phone != '', left.listed_name_prefix, '');
+  SELF.listed_name_first:= IF(left.listed_phone != '', left.listed_name_first, _gong_addr_rec.fname);
+  SELF.listed_name_middle:= IF(left.listed_phone != '', left.listed_name_middle, _gong_addr_rec.mname);
+  SELF.listed_name_last:= IF(left.listed_phone != '', left.listed_name_last, _gong_addr_rec.lname);
+  SELF.listed_name_suffix:= IF(left.listed_phone != '', left.listed_name_suffix, _gong_addr_rec.name_suffix);
+  SELF.listed_phone := IF(left.listed_phone != '', left.listed_phone, _gong_addr_rec.phone10);
+  self.phone_first_seen := if(left.listed_phone = '' and _gong_addr_rec.phone10<>'',(integer)_gong_addr_rec.date_first_seen[1..6],left.phone_first_seen);
+  self.phone_last_seen := if(left.listed_phone = '' and _gong_addr_rec.phone10<>'',(integer)(todays_date[1..6]),left.phone_last_seen);
+  self.publish_code := IF(left.listed_phone != '', left.publish_code, '');
+  SELF.gong_score := 
+    if(_gong_addr_rec.listed_name = '' or (_gong_addr_rec.lname ='' and _gong_addr_rec.fname =''), 500,
+    datalib.nameMatch(left.fname, left.mname, left.lname, _gong_addr_rec.fname, _gong_addr_rec.mname, _gong_addr_rec.lname)) 
+    + address.Sec_Range_EQ(left.sec_range,_gong_addr_rec.sec_range);
+  // if name/addr match, upgrade tnt to a 'V' since it is a 'virtual' hhid match (test lname match and optional
+  // input phone match)
+  SELF.tnt := IF(left.tnt = 'C' and left.lname = _gong_addr_rec.lname and (ut.NNEQ(phoneToMatch,_gong_addr_rec.phone10)),'V',left.tnt);
+  SELF.phones := choosen(left.phones & IF(_gong_addr_rec.prim_name<>'', left.gong_addr_phones), rollup_limits.phones);
+  self := left;
+  ));
 
 
 out_roll2_ready := ROLLUP(SORT(j_addr, rid, gong_score, -listed_phone, -listed_name), rid, keepBestTNT(LEFT, RIGHT));

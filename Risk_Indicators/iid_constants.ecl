@@ -1,7 +1,7 @@
 ﻿
 IMPORT ut, risk_indicators, header, mdr, suppress, did_add, dx_header, fcra, riskwise, STD, data_services;
 
-// line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.
+// line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
 
 todays_date := (string) STD.Date.Today();
@@ -18,7 +18,7 @@ export integer monthsApart_YYYYMMDD_legacy(string8 d1, string8 d2, boolean round
 	months := (integer)late[5..6] - (integer)early[5..6];
   // round up partial month if requested
 	partial := if(roundUpPartial and (integer) late[7..8] > (integer) early[7..8], 1, 0);
-
+	
 	return yrs + months + partial;
 end;
 
@@ -46,26 +46,26 @@ export dwelltype(STRING1 addrtype) := MAP(addrtype='G' => 'S',
 										addrtype='H' => 'A',
 										addrtype='P' => 'E',
 										addrtype='R' => 'R',
-										addrtype='S' => ' ',
+										addrtype='S' => ' ', 
 										'');
-
+					  		
 export invalidSet := ['E101','E212','E213','E214','E216','E302','E412','E413','E420',
 											'E421','E423','E500','E501','E502','E503','E600'];	// added E600 6/6/2005 per Jim C.
-
+							 
 export ambiguousSet := ['E422','E425','E427','E428','E429','E430','E431','E504'];
-
-export addrvalflag(STRING4 stat) := MAP( stat IN invalidSet => 'N',
+	
+export addrvalflag(STRING4 stat) := MAP( stat IN invalidSet => 'N',  
 																				 stat IN ambiguousSet => 'M',
 																				 stat = '' => '',
-																				 'V');
-
+																				 'V');	
+																				 
 export full_history_date(unsigned3 history_date) := (STRING6)history_date+'01';
 export myGetDate(unsigned3 history_date) := IF(history_date=999999,todays_date,full_history_date(history_date));
 export defaultTimeStamp := '01 12010100';
 
 export myGetDateTimestamp(string historydateTimeStamp, unsigned3 history_date) := function
 	historydateTimeStamp_trim := trim(historydateTimeStamp);
-
+	
 	ts := map(historydateTimeStamp_trim='' and history_date=999999 => todays_date + ' ' + ut.getTimeStamp()[1..8],
 						historydateTimeStamp_trim='' and history_date<>999999 => (string)history_date + defaultTimeStamp  , // hard code 01 as the day, and hard code the time
 						historydateTimeStamp_trim[1..6] = '999999' => todays_date + ' ' + ut.getTimeStamp()[1..8],	//even though this should be an 8 digit date, account for if only 6 nines are passed in to indicate current
@@ -95,12 +95,12 @@ export randomSSN3Years := 201406;
 export myDaysApart(unsigned3 history_date, string8 d2, unsigned3 LastSeenThreshold = oneyear) := ut.DaysApart(myGetDate(history_date), d2) <= LastSeenThreshold OR (unsigned)d2 >= (unsigned)myGetDate(history_date);
 
 // when in history mode, also double check that history_date greater than date being compared to.
-export checkDays(string8 d1, string8 d2, unsigned2 days, unsigned3 history_date) := if(history_date=default_history_date,
-								ut.DaysApart(d1,d2) <= days,
+export checkDays(string8 d1, string8 d2, unsigned2 days, unsigned3 history_date) := if(history_date=default_history_date, 
+								ut.DaysApart(d1,d2) <= days,  
 								ut.DaysApart(d1,d2) <= days and d1>=d2);
 
 export checkingDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
-
+						
 export layout_outx := RECORD
 	risk_indicators.layout_output;
 	header.layout_header h;
@@ -123,20 +123,20 @@ end;
 
 export adl_based_layout_output := record
 	adl_based_modeling_flags;
-	risk_indicators.Layout_Output;
+	risk_indicators.Layout_Output;	
 end;
 
 // to be used in header filtering instead of having this logic in many different places
 // don't use experian vehicles or mixed sources
 // per bug 175600, bocashell version 50 and higher can now use experian vehicles and DL for header verification
 export filtered_source(string2 src,  string2 st, integer bsversion=0) := (src in mdr.sourcetools.set_Experian_dl and bsversion < 50) or
-																			 (src in mdr.sourcetools.set_Experian_vehicles and bsversion < 50) or
-																			 src in ['MI','MA'] or
+																			 (src in mdr.sourcetools.set_Experian_vehicles and bsversion < 50) or 
+																			 src in ['MI','MA'] or 
 																			 mdr.Source_is_on_Probation(src) or
-																			 (src = mdr.sourcetools.src_Voters_v2 and  st = 'AL') or
+																			 (src = mdr.sourcetools.src_Voters_v2 and  st = 'AL') or 
 																			 src = mdr.sourcetools.src_EMerge_CCW_NY;
 
-
+																			 
 export sTrue := '1';
 export sFalse := '0';
 export default_ExactMatchLevel := '00000000';  // default to using the scoring thresholds, nothing has to be exact unless specified otherwise
@@ -151,7 +151,7 @@ export posExactDLMatch := 8;
 export posExactAddrZip5andPrimRange := 9;
 
 // default to Experian and Transunion, bureau death records and Experian FCRA restricted, currently we're up to 14 restrictions now
-export default_DataRestriction := '0000010001001100000000000';
+export default_DataRestriction := '0000010001001100000000000'; 
 export posFaresRestriction := 1;
 export posExperianEBR := 3;
 export posFidelityRestriction := 5;
@@ -168,7 +168,7 @@ export posInfutorMVRestriction := 17;
 export posInfutorWCRestriction := 18;
 export posRestrictPreGLB := 23; //this is high level check use other code not just this if checking in future
 export posFDNvfRestriction := 25; //FDN Virtual Fraud data
-export posLiensJudgRestriction := 41; //Liens/Judgments
+export posLiensJudgRestriction := 41; //Liens/Judgments 
 export posCortera := 42;
 export IncludeDigitalIdentity:=26;
 export enableEquifaxPhoneMart:=24;
@@ -176,7 +176,7 @@ export enableEquifaxPhoneMart:=24;
 export FDNvf_ok(string DataRestriction) := DataRestriction[posFDNvfRestriction]=sFalse;
 
 // default to no permission granted - this created for SSA Death Master file restrictions as of 3/26/14
-export default_DataPermission := '0000000000000';
+export default_DataPermission := '0000000000000';  
 export posTargusPermission := 2;
 export posSSADeathMasterPermission := 10;
 export posFDNcftfPermission := 11;	//FDN Contributory Fraud and Test Fraud data
@@ -216,11 +216,11 @@ export setPhillipMorrisAllowedHeaderSources := ['!E','#E','$E','&E','.E','?E','@
 'SE','TD','TE','TS','TU','TV','UE','VD','VE','WD','WE','WV','XE','XV','XX','YD','YH','YV','ZE','ZX'];
 
 export ExperianFCRA_Batch := 'EB';
-export setExperianBatchAllowedHeaderSources := mdr.sourcetools.set_scoring_FCRA_non_gov +
+export setExperianBatchAllowedHeaderSources := mdr.sourcetools.set_scoring_FCRA_non_gov + 
 																							mdr.sourcetools.set_scoring_FCRA_gov +
 																							mdr.sourcetools.set_scoring_FCRA_retro_test;
 
-export comp_nap(boolean firstmatch, boolean lastmatch, boolean addrmatch, boolean phonematch) :=
+export comp_nap(boolean firstmatch, boolean lastmatch, boolean addrmatch, boolean phonematch) := 
 										map(~firstmatch and ~lastmatch and ~addrmatch and phonematch => 1,
 												firstmatch and lastmatch and ~addrmatch and ~phonematch => 2,
 												firstmatch and ~lastmatch and addrmatch and ~phonematch => 3,
@@ -234,7 +234,7 @@ export comp_nap(boolean firstmatch, boolean lastmatch, boolean addrmatch, boolea
 												~firstmatch and lastmatch and addrmatch and phonematch => 11,
 												firstmatch and lastmatch and addrmatch and phonematch => 12,
 												0);
-
+															
 export setCivilJudgment_standard := ['CIVIL JUDGMENT','CIVIL NEW FILING','CIVIL SPECIAL JUDGMENT','CIVIL SUIT','CIVIL SUMMONS','COURT ORDER','COURT ORDER NO CHANGE',
 														'FEDERAL COURT CHANGE OF VENUE','FEDERAL COURT JUDGMENT','FEDERAL COURT NEW FILING','JUDGMENT',
 														'JUDGMENT - CHAPTER 7','JUDGMENTS','JUDGMENTS DOCKET','SATISFACTION OF JUDGMENT','SUBSEQUENT JUDGMENT',
@@ -277,18 +277,18 @@ export set_Invalid_Liens_50 := ['CITY TAX LIEN FILED IN ERROR','CIVIL DISMISSAL'
 'FEDERAL COURT DISMISSAL','FILED IN ERROR-COUNTY TAX LIEN','FILED IN ERROR-FED TAX LIEN','FILED IN ERROR-ST TAX LIEN','FILED IN ERROR-ST TAX WARRANT','FORECLOSURE DISMISSED',
 'LIS PENDENS WITHDRAWAL','TERMINATION','VACATED FORECLOSURE','VACATED JUDGMENT'];
 
-//new for Juli: Liens and Judgments for Public Records
+//new for Juli: Liens and Judgments for Public Records 
 export setValidEviction := ['Y'];
 export setPRJudgment := setCivilJudgment_50 + setForeclosure_50 + setSmallClaims_50;// + setLisPendens;
 export setPREviction := setLandlordTenant_50 + setValidEviction;
 export setOtherLien := ['BUILDING LIEN', 'BUILDING RELEASE', 'BUILDING WITHDRAWAL',
- 'CHILD SUPPORT LIEN', 'SIDEWALK LIEN', 'SIDEWALK RELEASE', 'SIDEWALK WITHDRAWAL'];
+ 'CHILD SUPPORT LIEN', 'SIDEWALK LIEN', 'SIDEWALK RELEASE', 'SIDEWALK WITHDRAWAL']; 
 export setPRLien := setFederalTax + setOtherTax + setOtherLien + ['JUDGEMENT LIEN','JUDGMENT LIEN RELEASE', 'WELFARE LIEN', 'JUDGMENT LIEN'];
 export setPROther := setOtherLJ_50 + setValidEviction + setMechanicsLiens; //we say is NOT in this category
 
 export JudgmentText := 'Judgment';
 export EvictionText := 'Eviction';
-export LienText := 'Lien';
+export LienText := 'Lien';	
 export OtherText:= 'Other';
 
 export LienBucket := [LienText];
@@ -302,12 +302,12 @@ export FedLienFltrs := ['FEDERAL TAX LIEN','FEDERAL TAX LIEN RELEASE','CORRECTED
 export OtherLienFltrs := ['BUILDING LIEN','BUILDING RELEASE','CHILD SUPPORT LIEN',
 									'HOSPITAL LIEN','HOSPITAL RELEASE',
 									/*'MECHANICS LIEN','MECHANICS LIEN RELEASE',*/'SIDEWALK LIEN',
-									'SIDEWALK RELEASE',
+									'SIDEWALK RELEASE', 
 									'JUDGMENT LIEN', 'JUDGEMENT LIEN', 'JUDGMENT LIEN RELEASE',
 									//'LIS PENDENS','LIS PENDENS RELEASE'
 									'WELFARE LIEN'];
 export JudgmentFltrs := ['CIVIL JUDGMENT','CIVIL JUDGMENT RELEASE',
-									'CIVIL SPECIAL JUDGMENT', 'CIVIL SPECIAL JUDGMENT RELEASE',
+									'CIVIL SPECIAL JUDGMENT', 'CIVIL SPECIAL JUDGMENT RELEASE', 
 									'SMALL CLAIMS JUDGMENT', 'SMALL CLAIMS JUDGMENT RELEASE',
 									'FEDERAL COURT JUDGMENT','FEDERAL COURT NEW FILING',
 									'CIVIL NEW FILING','CIVIL SUIT',
@@ -323,7 +323,8 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
-export LnJDefault := '111111111';
+
+export LnJDefault := '11111111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
  return (if(trim(title) != '', trim(title) + ' ','') +
@@ -338,7 +339,7 @@ export override_addr_type(string street_addr, string addr_type, string carr_rte)
 	checked_rare_PO := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s ) // po boxes (spelled out)
-		OR carr_rte in ['C770','C771','C772','C773','C774','C775','C776','C777','C778','C779'] ,    // street style addresses flagged by the carrier route
+		OR carr_rte in ['C770','C771','C772','C773','C774','C775','C776','C777','C778','C779'] ,    // street style addresses flagged by the carrier route       
 		'P', addr_type);
 	return checked_rare_PO;
 end;
@@ -355,7 +356,7 @@ end;
 
 export ssn_name_match := [4,7,9,10,11,12];
 
-export mortgage_type(boolean fidelity, boolean fares, string mt) :=
+export mortgage_type(boolean fidelity, boolean fares, string mt) := 
 												map(fidelity and mt = 'B' => 'CNS',	// map fidelity B to CNS
 														fares and mt in ['CNV','C','CON','.NV'] => 'CNV',	// map all these fares codes into CNV
 														(fares and mt in ['FHA','F','HFA','=HA']) OR (fidelity and mt = 'F') => 'FHA',	// map all these fares plus fidelity F to FHA
@@ -364,13 +365,13 @@ export mortgage_type(boolean fidelity, boolean fares, string mt) :=
 														(fares and mt in ['VA','V','VHA','=A']) OR (fidelity and mt = 'V') => 'VA',	// map these fares and fidelity V to VA
 														fares and mt in ['WRP','W'] => 'WRP',	// map these fares to WRP
 														mt);
-
-export type_financing(boolean fidelity, boolean fares, string ft) :=
+														
+export type_financing(boolean fidelity, boolean fares, string ft) := 
 												map((fidelity and ft in ['VAR','ADJ','XXX']) OR (fares and ft in ['A','VAR','ADJ']) => 'ADJ',	// map these to adjustable
 														(fidelity and ft in ['FIX']) or (fares and ft in ['FIX','F']) => 'CNV',	// map these to conventional
 														ft <> '' => 'OTH',	// map all others to OTHER
 														'');	// if blank, leave blank
-
+														
 export adlCategory(string cat) := map(cat = 'DEAD' => '1 DEAD',
 																			cat = 'NOISE' => '2 NOISE',
 																			cat = 'H_MERGE' => '3 H_MERGE',
@@ -380,36 +381,36 @@ export adlCategory(string cat) := map(cat = 'DEAD' => '1 DEAD',
 																			cat = 'NO_SSN' => '7 NO_SSN',
 																			cat = 'CORE' => '8 CORE',
 																			cat <> '' => '0 OTHER',
-																			'0 NONE');	// this should never happen when populated
-
+																			'0 NONE');	// this should never happen when populated		
+																			
 export Mask_DOB(string dob, unsigned1 dob_mask_value = suppress.Constants.dateMask.NONE) := function
 	masked_date := Suppress.date_mask((unsigned4)DOB, dob_mask_value);
 
 	// if the dob doesn't need to be masked, simply return the input dob
 	sDOBmasked := if(dob_mask_value=0 or trim(dob)='', dob, (string)masked_date.year + (string)masked_date.month + (string)masked_date.day);
-
+	
 	return sDOBmasked;
 end;
 
 export invalid_dobs := ['19000101','19000000','19010101','18990101'];
 
-export dobmatch_score_fuzzy6(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) :=
+export dobmatch_score_fuzzy6(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) := 
 																	map(~indobpop or ~founddobpop => 255,
 																			'00' = indob[5..6]  or '00' = founddob[5..6] => 255,
 																			did_add.SSN_Match_Score(indob[1..6]+'00',founddob[1..6]+'00'));	// score with dobmatchoption set to FuzzyCCYYMM
-
-export dobmatch_score_radius(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob, unsigned1 radius) :=
+																
+export dobmatch_score_radius(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob, unsigned1 radius) := 
 																	map(~indobpop or ~founddobpop => 255,
 																			indob[1..4]=founddob[1..4] => 100,
 																			abs((integer)(indob[1..4])-(integer)(founddob[1..4])) <= Radius => 91,
 																			15);	// score with dobmatchoption set to RadiusCCYY
-
-export dobmatch_score_exact8(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) :=
+																
+export dobmatch_score_exact8(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) := 
 																	map(~indobpop or ~founddobpop => 255,
 																			indob[1..8]=founddob[1..8] => 100,
 																			13);	// score with dobmatchoption set to ExactCCYYMMDD
-
-export dobmatch_score_exact6(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) :=
+																
+export dobmatch_score_exact6(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) := 
 																	map(~indobpop or ~founddobpop => 255,
 																			indob[1..6]=founddob[1..6] => 100,
 																			14);	// score with dobmatchoption set to ExactCCYYMM
@@ -441,8 +442,8 @@ export SetDLValidationStates := ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','F
 											'KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC',
 											'ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WI','WV','WY',
 											'AB','BC','MB','NB','NL','NS','ON','PE','QC','SK','NT','YT','NU','PR','GU','MP','VI'];
-
-export SetValidStateSrcs := ['AD','AX'];
+																				
+export SetValidStateSrcs := ['AD','AX']; 
 
 export bureau_sources := ['EQ', 'EN', 'TN'];
 
@@ -450,21 +451,21 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		dt := if( indate='999999', todays_date, indate );
 		yyyy := (unsigned2)dt[1..4];
 		mm   := (unsigned2)dt[5..6];
-
+		
 		return map(
 			length(indate) not in [6,8] => 0,
 			mm - months >= 1 => yyyy*100 + mm - months, // 201012 minus three months -> 201009
 			100*(yyyy-1) + mm+12-months // 201102 gets rolled back to 201011
 		);
 	END;
-
+	
 	export AddressAppendMatchLevel := ENUM(
 		NoMatch = 0,
 		JustZip5 = 1,
 		StreetNumAndZip5 = 2,
 		AddressHierarchyResult = 3
 	);
-
+	
 	// these flags specify the bit location in Layout_Output.IID_Flags of the return value
 	export IIDFlag := enum(
 		CurrentOccupant = 0,
@@ -507,7 +508,7 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		CountyTaxLien = 1    << 21,
 		StateTaxWarrant = 1  << 22,
 		StateTaxLien  = 1    << 23,
-		FederalTaxLien = 1   << 24,
+		FederalTaxLien = 1   << 24,	
 		OtherLien = 1        << 25,
 		Judgment = 1         << 26,
 		Eviction = 1         << 27,
@@ -522,6 +523,7 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
     enableEquifaxPhoneMart = 1     << 36,
     TurnOffTumblings = 1           << 37, // option to speed up bocashell 5.3 and higher if it's not needed
     UseIngestDate = 1              << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
+
     ReleasedCaseFltr = 1           << 39,
     TurnOffRelativeProperty=1      << 40,
     AttributesOnly = 1             << 41,
@@ -533,7 +535,7 @@ export CheckifFlagged(string inString, integer Position) :=  if(inString[Positio
 
 export FlagLiensOptions(string FilterLienTypes) := function
 	LiensInput := trim(FilterLienTypes);
-
+	
 	CityTaxLiens := CheckifFlagged(LiensInput, 1);
 	CountyTaxLiens := CheckifFlagged(LiensInput, 2);
 	StateTaxWarrants := CheckifFlagged(LiensInput, 3);
@@ -543,6 +545,8 @@ export FlagLiensOptions(string FilterLienTypes) := function
 	Judgments := CheckifFlagged(LiensInput, 7);
 	Evictions := CheckifFlagged(LiensInput, 8);
 	ReleasedCases := CheckifFlagged(LiensInput, 9);
+	AttributesOnly := CheckifFlagged(LiensInput, 10);
+    ExcludeStatusRefresh := CheckifFlagged(LiensInput, 11);
 	return (if(CityTaxLiens, BSOptions.CityTaxLien, 0) +
 		if(CountyTaxLiens, BSOptions.CountyTaxLien, 0) +
 		if(StateTaxWarrants, BSOptions.StateTaxWarrant, 0) +
@@ -551,34 +555,37 @@ export FlagLiensOptions(string FilterLienTypes) := function
 		if(OtherLiens, BSOptions.OtherLien, 0) +
 		if(Judgments, BSOptions.Judgment, 0) +
 		if(Evictions, BSOptions.Eviction, 0) +
-		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0));
+
+		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0) +
+		if(AttributesOnly, BSOptions.AttributesOnly, 0) +
+        if(ExcludeStatusRefresh, BSOptions.ExcludeStatusRefresh, 0));
 end;
 
-export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
+export GoodSSNLength(string9 inSSN) :=  inSSN != '' and 
 		((length(trim(inSSN)) = 9 and inSSN != '000000000') or
 		(length(trim(inSSN)) = 4 and inSSN != '0000'));
-
+		
 	// Check to see if a particular BSOption is turned on
 	export boolean CheckBSOptionFlag (BSOptions Flag, UNSIGNED8 Options) := (Options & Flag) > 0;
-
+	
   key_header := dx_header.key_header(data_services.data_env.iFCRA);
-	export boolean IsEligibleHeaderRec (key_header KeyHeader, boolean dppa_ok) :=
+	export boolean IsEligibleHeaderRec (key_header KeyHeader, boolean dppa_ok) := 
 																		~mdr.Source_is_Utility (KeyHeader.src) AND // rm Utility from NAS
-																		~mdr.Source_is_on_Probation (KeyHeader.src) AND // we won't use probation data
+																		~mdr.Source_is_on_Probation (KeyHeader.src) AND // we won't use probation data 
 																		~(dppa_ok AND KeyHeader.src[2] IN ['E','X']) AND // we won't use experian dl's/vehicles (requires LN branding)
 																		~FCRA.Restricted_Header_Src (KeyHeader.src, KeyHeader.vendor_id[1]); //always FCRA
-
-	export GetVRUDataset (unsigned1 code, string64 message,
+																		
+	export GetVRUDataset (unsigned1 code, string64 message, 
                         DATASET (RiskWise.layouts_vru.layout_verified) verified = DATASET ([], RiskWise.layouts_vru.layout_verified),
                         DATASET (RiskWise.layouts_vru.layout_person) did_person = DATASET ([], RiskWise.layouts_vru.layout_person)) := FUNCTION
-								ds := DATASET ([{code, message, verified, did_person}], RiskWise.layouts_vru.layout_output);
+								ds := DATASET ([{code, message, verified, did_person}], RiskWise.layouts_vru.layout_output); 
 								RETURN ds;
 	END;
 
 	export GetVerified (string9 ssnval, string2 yobval, string5 hnumberval, string10 phoneval, string5 zipval) := FUNCTION
 								RETURN DATASET ([{ssnval, yobval, hnumberval, phoneval, zipval}], RiskWise.layouts_vru.layout_verified);
 	END;
-
+	
 	// add constants for the blankout header correction fields
 	export suppress := enum(
 													fname = 1, 	// 1
@@ -611,11 +618,11 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 													Mail_usage,		// 28
 													title, // 29
 													dod); // 30
-
+	
 	export unsigned1 capVelocity(unsigned vcounter) := min(255, vcounter);
-
+											
 	export setCRMA := ['2310','2300','2220','2280','2320'];	// set of sic codes to define CMRA
-
+	
 	// map the internal sic codes to the description for disclosure purposes
 export hri_sic_code_description(string4 internal_sic) := function
 	desc := map(
@@ -673,7 +680,7 @@ export DeviceProvider1Score (string20 DeviceProvider1_value) := map( //kountscor
 		(integer) DeviceProvider1_value >= 31 and (integer) DeviceProvider1_value <= 54 => 'MEDIUM-LOW RISK',
 		(integer) DeviceProvider1_value >= 55 and (integer) DeviceProvider1_value <= 69 => 'MEDIUM RISK',
 		(integer) DeviceProvider1_value >=70 and (integer) DeviceProvider1_value <= 98 => 'MEDIUM-HIGH RISK',
-		(integer) DeviceProvider1_value > 98 => 'HIGH RISK',
+		(integer) DeviceProvider1_value > 98 => 'HIGH RISK', 
 		'LOW RISK');
 export DeviceProvider2Score (string20 DeviceProvider2_value) := map( //threat metrix score
 		DeviceProvider2_value = '' => '',
@@ -686,42 +693,42 @@ export DeviceProvider2Score (string20 DeviceProvider2_value) := map( //threat me
 		'HIGH RISK');
 export DeviceProvider3Score (string20 DeviceProvider3_value) := map( //lovationscore
 			DeviceProvider3_value = '' => '',
-			'LOW RISK'); //NOTHING DEFINED FOR THIS SO FAR
+			'LOW RISK'); //NOTHING DEFINED FOR THIS SO FAR		
 export DeviceProvider4Score(string20 DeviceProvider4_value) := map( //para41score
 			DeviceProvider4_value = '' => '',
-			'LOW RISK'); //NOTHING DEFINED FOR THIS SO FAR
+			'LOW RISK'); //NOTHING DEFINED FOR THIS SO FAR	
 
 export EmailFakeIds := 15000000000000;
 
 export SetEmailSources := [mdr.sourceTools.src_Acquiredweb,
-		mdr.sourceTools.src_Entiera,
+		mdr.sourceTools.src_Entiera,  
 		mdr.sourceTools.src_Wired_Assets_Email,
-		mdr.sourceTools.src_MediaOne,
+		mdr.sourceTools.src_MediaOne, 
 		mdr.sourceTools.src_Ibehavior,
 		mdr.sourceTools.src_SalesChannel,
-		mdr.sourceTools.src_Datagence];
+		mdr.sourceTools.src_Datagence];  
 
 export MAC_IsBusinessRestricted(inDS,outDS,source_field,vl_id,dt_first_seen, dppa, glb, drm, isFCRA) := MACRO
 
   #uniquename(outrec)
-
+	
 	%outrec% :=  record
 		recordof(inDS);
   end;
-
+								
   tmpOutDS := project(inDS, transform(%outrec%,
-
+	                    	                           
 	rowIsRestrictedTmp := false;
 	// now deal with GLB access
 	glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);
 	dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
-   rowIsRestrictedGLB :=  MDR.SourceTools.SourceIsGLB(left.source_field) AND
+   rowIsRestrictedGLB :=  MDR.SourceTools.SourceIsGLB(left.source_field) AND 
 			                        (glb_ok OR
-																//AutoStandardI.PermissionI_Tools.GLB.HeaderIsPreGLB(0,left.dt_first_seen,left.source_field));
-																Header.IsPreGLB_LIB(0,
-																								left.dt_first_seen,
-																								left.source_field,
+																//AutoStandardI.PermissionI_Tools.GLB.HeaderIsPreGLB(0,left.dt_first_seen,left.source_field)); 
+																Header.IsPreGLB_LIB(0, 
+																								left.dt_first_seen, 
+																								left.source_field, 
 																								drm));
     // have to keep GLB and DPPA separate ....and separate the GLB logic outside map statement
 		// so that both restrictions can be made if necessary.
@@ -729,12 +736,12 @@ export MAC_IsBusinessRestricted(inDS,outDS,source_field,vl_id,dt_first_seen, dpp
 		// if either of these is true then we want to leave that row out
 		// of the result set.
     rowIsRestricted := rowIsRestrictedTmp  OR rowIsRestrictedGLB;
-
+		
 		self := if (~(rowIsRestricted), left);
 		)
-		);
+		);				
 	 outDS := tmpOutDS(source_field != '');
-
+ 
 ENDMACRO;
 
 export ActiveText := 'ACTIVE';
@@ -752,14 +759,14 @@ export ds_Record := dataset([{1}], {unsigned a}) : DEPRECATED('Replace with: ds 
 
 export stripLeadingZeros(string ZeroedNumber) := function
 	strip_leadingzeroes(string number) := REGEXREPLACE('^[ |0]*', trim(number, left, right), '');
-
-	ExceptLeadingZeros  := strip_leadingzeroes(ZeroedNumber);
+	
+	ExceptLeadingZeros  := strip_leadingzeroes(ZeroedNumber); 
 	//we have leading zero's and now remove the left over dash - only remove dash if preceeding 0s were found
-	RemoveDash := if(ExceptLeadingZeros != ZeroedNumber and ExceptLeadingZeros[1..1] = '-',
+	RemoveDash := if(ExceptLeadingZeros != ZeroedNumber and ExceptLeadingZeros[1..1] = '-', 
 		ExceptLeadingZeros[2..], ExceptLeadingZeros);
 
-	return RemoveDash;
-
+	return RemoveDash;	
+	
 end;
 
 export SetFICOScoreXDRejectCodes := ['A1','B0','C1','C6','C7','C8','C9','CC','CD','CE',
@@ -794,7 +801,7 @@ export countSubDOBDay(GROUPED DATASET(subsLayout) subsFile, string30 currString)
 	subsLayout projDOBDay(subsLayout le) := transform
 		self.seq							:= le.seq;
 		self.subsString				:= le.subsString;
-		dayIsDiff							:= currString[1..6] = le.subsString[1..6] and currString[7..8] <> le.subsString[7..8];
+		dayIsDiff							:= currString[1..6] = le.subsString[1..6] and currString[7..8] <> le.subsString[7..8];  
 		self.subsCount				:= if(dayIsDiff, 1, 0);
 	end;
 	projSubsDOBDay	:= project(subsFile, projDOBDay(left));
@@ -807,7 +814,7 @@ export countSubDOBMonth(GROUPED DATASET(subsLayout) subsFile, string30 currStrin
 	subsLayout projDOBMonth(subsLayout le) := transform
 		self.seq							:= le.seq;
 		self.subsString				:= le.subsString;
-		MonthIsDiff						:= currString[1..4] = le.subsString[1..4] and currString[7..8] = le.subsString[7..8] and currString[5..6] <> le.subsString[5..6];
+		MonthIsDiff						:= currString[1..4] = le.subsString[1..4] and currString[7..8] = le.subsString[7..8] and currString[5..6] <> le.subsString[5..6]; 
 		self.subsCount				:= if(MonthIsDiff, 1, 0);
 	end;
 	projSubsDOBMonth	:= project(subsFile, projDOBMonth(left));
@@ -820,7 +827,7 @@ export countSubDOBYear(GROUPED DATASET(subsLayout) subsFile, string30 currString
 	subsLayout projDOBYear(subsLayout le) := transform
 		self.seq							:= le.seq;
 		self.subsString				:= le.subsString;
-		YearIsDiff						:= currString[5..8] = le.subsString[5..8] and currString[1..4] <> le.subsString[1..4];
+		YearIsDiff						:= currString[5..8] = le.subsString[5..8] and currString[1..4] <> le.subsString[1..4]; 
 		self.subsCount				:= if(YearIsDiff, 1, 0);
 	end;
 	projSubsDOBYear	:= project(subsFile, projDOBYear(left));
@@ -836,7 +843,7 @@ export countDiff1Dig(GROUPED DATASET(subsLayout) subsFile, string30 currString) 
 	subsLayout proj1dig(subsLayout le) := transform
 		self.seq							:= le.seq;
 		self.subsString				:= le.subsString;
-		diffValue							:= abs((integer)currString - (integer)le.subsString);
+		diffValue							:= abs((integer)currString - (integer)le.subsString); 
 		diff1dig							:= diffValue in diffValues1Dig;  //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 		self.subsCount				:= if(diff1dig, 1, 0);
 	end;
@@ -844,7 +851,7 @@ export countDiff1Dig(GROUPED DATASET(subsLayout) subsFile, string30 currString) 
 	countDiffs1Dig	:= exists(projDiff1Dig(subsCount = 1));
 	// countDiffs1Dig	:= count(projDiff1Dig(subsCount = 1) > 0);
 	return (integer)countDiffs1Dig;
-
+	
 end;
 
 export Set_Restricted_States_For_Marketing := ['ID', 'IL', 'KS', 'NM', 'SC', 'WA', 'NY'];
@@ -1011,12 +1018,12 @@ export Set_Equifax_Active_Duty_Alert_Codes := ['W','Q','N'];
 export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 
 export OFAC4_NoGateway := 'watchlist server error';
-export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0'];
+export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0']; 
 export FAXML_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0', 'fp3904_1'];
 export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];
-export set_validOFACVersions := [1,2,3,4];
+export set_validOFACVersions := [1,2,3,4];   
 
-export fn_CreateFakeDID( STRING fname, STRING lname ) :=
+export fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
 
 // for dempsey riskview project, change the bankruptcy filter to only include these specific chapters
@@ -1046,7 +1053,7 @@ export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  in
 									 //NAS 7
 									 curr_NAS_NAP = 7 and chase_l = '' => 1,
 									 //NAS 8
-									 curr_NAS_NAP = 8 and chase_f = '' and chase_l = '' and chase_addr = '' => 0,
+									 curr_NAS_NAP = 8 and chase_f = '' and chase_l = '' and chase_addr = '' => 0, 
 									 curr_NAS_NAP = 8 and chase_f = '' and chase_l = '' => 0,
 									 curr_NAS_NAP = 8 and chase_f = '' and chase_addr = '' => 0,
 									 curr_NAS_NAP = 8 and chase_l = '' and chase_addr = '' => 0,
@@ -1170,23 +1177,23 @@ end;
 
 EXPORT FP3_FDN_Min_Input(string in_first, string in_last, string in_ssn, string in_streetaddress, string in_zip5) := Function
 
-input_ok_fp3 := (in_first<>''and in_last<>''and in_ssn<>'') or (in_streetaddress<>'' and in_zip5<>'');
-
-return input_ok_fp3;
+input_ok_fp3 := (in_first<>''and in_last<>''and in_ssn<>'') or (in_streetaddress<>'' and in_zip5<>''); 
+						
+return input_ok_fp3;						
 end;
 
 Export LexidDeceased_Lookup (boolean truedid, string ver_sources, boolean diddeceased):= function
 lexidDecFlag := Map(not truedid => '-1',
 								diddeceased => '1', //check ssa lexid key
 								STD.Str.Find(ver_sources,mdr.sourcetools.src_Death_Master, 1) > 0 => '1', //check header for DE source,  DS sources are converted to DE in iid_getheader
-								'0');
+								'0');	
 return lexidDecFlag;
 end;
 
 Export SSNDeceased_Lookup (boolean truedid, string In_SSN, string decsflag):= function
 
-SSNDecFlag := Map(not truedid or In_SSN='0' => '-1',
-									decsflag='1' => '1',
+SSNDecFlag := Map(not truedid or In_SSN='0' => '-1', 
+									decsflag='1' => '1', 
 									'0');
 
 return SSNDecFlag;
@@ -1194,11 +1201,11 @@ end;
 
 Export inputssnflag_Lookup (string in_ssn, integer in_ssnpop, integer adl_ssn):= function
 
-inputssnflag := map(
+inputssnflag := map(	
 		in_ssn in ['000000000','111111111','222222222','333333333','444444444','555555555','666666666','777777777','888888888','999999999'] => '0', // set repeating digits as not provided on input
 		in_ssnpop=0 and adl_ssn=1 => '1',
 		length(in_ssn)=4 => '2',
-		in_ssn<>'' and length(in_ssn)=9 => '3',
+		in_ssn<>'' and length(in_ssn)=9 => '3', 
 		'0');
 
 return inputssnflag;

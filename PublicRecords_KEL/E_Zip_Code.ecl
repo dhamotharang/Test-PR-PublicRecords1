@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -86,11 +86,11 @@ EXPORT E_Zip_Code(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Zip_Class__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Zip_Class_);
-  EXPORT City__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,City_);
-  EXPORT State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,State_);
-  EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,County_);
-  EXPORT City_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,City_Name_);
+  EXPORT Zip_Class__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Zip_Class_);
+  EXPORT City__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,City_);
+  EXPORT State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,State_);
+  EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,County_);
+  EXPORT City_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,City_Name_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid),COUNT(Zip_Class__SingleValue_Invalid),COUNT(City__SingleValue_Invalid),COUNT(State__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(City_Name__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid,KEL.typ.int Zip_Class__SingleValue_Invalid,KEL.typ.int City__SingleValue_Invalid,KEL.typ.int State__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int City_Name__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid),COUNT(__d0)},

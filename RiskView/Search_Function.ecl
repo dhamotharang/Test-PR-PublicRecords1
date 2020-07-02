@@ -40,9 +40,11 @@ EXPORT Search_Function(
 	unsigned6 MinimumAmount = 0,
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
-	boolean IncludeStatusRefreshChecks = FALSE
+	boolean IncludeStatusRefreshChecks = FALSE,
+	string32 DeferredTransactionID = '',
+    string5 StatusRefreshWaitPeriod = '',
+    string10 ESPInterfaceVersion = ''
   ) := function
-
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
 boolean   isCollectionsPurpose := STD.Str.ToUpperCase(intended_purpose) = 'COLLECTIONS';
@@ -223,16 +225,23 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
 
 CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
-NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;								
+NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;															
+
+
+//good chance these come through with varied case, so we will build out the set and capitalize them all
+//start change to upper case
+
+custom_models := DATASET([Custom_model_name,Custom2_model_name,Custom3_model_name,Custom4_model_name,Custom5_model_name],{string model});
+ucase_custom_models := PROJECT(custom_models, TRANSFORM(recordof(custom_models),SELF.model := STD.Str.ToUpperCase(LEFT.model)));
+Custom_model_name_array := SET(ucase_custom_models, model);
+
+
+ 
+// end change to upper case
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
-bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
-                Custom_model_name in  ['RVP1702_1'] or 
-                Custom2_model_name in ['RVP1702_1'] or 
-                Custom3_model_name in ['RVP1702_1'] or
-                Custom4_model_name in ['RVP1702_1'] or 
-                Custom5_model_name in ['RVP1702_1'] or
-                CheckingIndicatorsRequest,52,50);  // hard code this for now
+ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 'RVP1702_1' in Custom_model_name_array or  CheckingIndicatorsRequest,52,50); 
+
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -270,6 +279,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0) +
     IF(STD.Str.ToLowerCase(AttributesVersionRequest) = 'riskviewattrv5fis', Risk_Indicators.iid_constants.BSOptions.IsFISattributes, 0);
 
+	AttributesOnly := (BSOptions & risk_indicators.iid_constants.BSOptions.AttributesOnly) > 0;
+    ExcludeStatusRefresh := (BSOptions & risk_indicators.iid_constants.BSOptions.ExcludeStatusRefresh) > 0;
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
 	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;
 	
@@ -287,8 +298,6 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		in_ExcludeStates := ExcludeStates,
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
-	
-	Status_Refresh_GW_Call := if(IncludeStatusRefreshChecks, RiskView.InitiateStatusRefresh(clam[1].LnJ_datasets, gateways, 5, 0, true), DATASET([], iesp.okc_statusrefresh_request.t_OkcStatusRefreshResponseEx));
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
 
@@ -1316,21 +1325,10 @@ transform(riskview.layouts.layout_riskview5_search_results,
   
 riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
 
-
- /* ****************************************************************
-  *  Deferred Task ESP (DTE) Logging Functionality  *
-  ******************************************************************/
-		IF(IncludeStatusRefreshChecks AND Status_Refresh_GW_Call[1].Response.Result.TaskID <> '', 
-			OUTPUT(Risk_Reporting.To_LOG_DTE.GetDTEOutput(
-						Status_Refresh_GW_Call[1].Response.Result.TaskID, 
-						'Status Refresh Task', 
-						/* Debugging specifically for JuLi Release 2, will change in JuLi Release 3 */
-						'<LiensRMSID>' + clam[1].LnJ_datasets.lnjliens[1].rmsid + '</LiensRMSID>' +
-						'<JudgmentsRMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].rmsid + '</JudgmentsRMSID>' +
-						'<LiensTMSID>' + clam[1].LnJ_datasets.lnjliens[1].tmsid + '</LiensTMSID>' +
-						'<JudgmentsTMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].tmsid + '</JudgmentsTMSID>'), 
-			NAMED('LOG_Deferred_Task_ESP')));
-	
+riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion),
+                                                                   IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID <> '' => Riskview.Functions.JuLiProcessDTE(DeferredTransactionID, clam, gateways, riskview5_final_results),
+                                                                   riskview5_final_results);
+                                                                   
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
@@ -1392,7 +1390,7 @@ riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_r
 // output(riskview5_search_results, named('riskview5_search_results'));
 // output(riskview5_search_results_tmp, named('riskview5_search_results_tmp'));
 	
-return riskview5_final_results;
+return riskview5_with_status_refresh;
 #else // Else, output the model results directly
 
 return Models.LIB_RiskView_Models(clam, lib_in).ValidatingModel;

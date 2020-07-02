@@ -533,14 +533,6 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		// output(CHOOSEN(AccDetail_recsChargedOff,2), named('first2'));
 		// output(ChargeOffsRecsToPutOnEnd, named('ChargeOffsRecsToPutOnEnd'));
 	 // added coding for pushing chargeoff recs to top of heap..
-
-
-  // output(TradeRecs_Raw, named('fn_getBuzCreditTrades__TradeRecs_Raw'));
-  // output(TradeRecs_dedup, named('fn_getBuzCreditTrades__TradeRecs_dedup'));
-  // output(TradeRecs_Raw_with_Status_Sort, named('fn_getBuzCreditTrades__TradeRecs_Raw_with_Status_Sort'));
-  // output(TradeRecs_with_Status_Rolled, named('fn_getBuzCreditTrades__TradeRecs_with_Status_Rolled'));
-  // output(most_severe_status, named('fn_getBuzCreditTrades__most_severe_status'));
-
 	 //output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
    // output(tempAccDetail_Recs, named('tempAccDetail_Recs'));
    // output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
@@ -550,5 +542,12 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
    // output(tempAcctDetail_RecsYearlyCreditUtils, named('tempAcctDetail_RecsYearlyCreditUtils'));
    // output(TEMP2AccDetail_Recs, named('TEMP2AccDetail_Recs'));
    // output(AccDetail_Recs, named('AccDetail_Recs'));
-	EXPORT   AccDetail_Recs_Combined :=   CHOOSEN( FinalAccDetail_recs,  iesp.Constants.BusinessCredit.MaxTradelines);
+
+  // output(TradeRecs_Raw, named('fn_getBuzCreditTrades__TradeRecs_Raw'));
+  // output(TradeRecs_dedup, named('fn_getBuzCreditTrades__TradeRecs_dedup'));
+  // output(TradeRecs_Raw_with_Status_Sort, named('fn_getBuzCreditTrades__TradeRecs_Raw_with_Status_Sort'));
+  // output(TradeRecs_with_Status_Rolled, named('fn_getBuzCreditTrades__TradeRecs_with_Status_Rolled'));
+  // output(most_severe_status, named('fn_getBuzCreditTrades__most_severe_status'));
+
+	EXPORT   AccDetail_Recs_Combined :=   CHOOSEN( FinalAccDetail_recs,  iesp.Constants.BusinessCredit.MaxTradelines);							            
 END;

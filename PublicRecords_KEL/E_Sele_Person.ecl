@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Person,E_Surname FROM PublicRecords_KEL;
@@ -8,6 +8,9 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
+    KEL.typ.nint Ult_I_D_;
+    KEL.typ.nint Org_I_D_;
+    KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Job_Title_;
     KEL.typ.nstr Contact_Status_;
     KEL.typ.nstr Contact_First_Name_;
@@ -35,8 +38,8 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),contact(DEFAULT:Contact_:0),jobtitle(DEFAULT:Job_Title_:\'\'),contactstatus(DEFAULT:Contact_Status_:\'\'),contactfirstname(DEFAULT:Contact_First_Name_:\'\'),contactmiddlename(DEFAULT:Contact_Middle_Name_:\'\'),Last_Name_(DEFAULT:Last_Name_:0),contactlastname(DEFAULT:Contact_Last_Name_:\'\'),contactnamesuffix(DEFAULT:Contact_Name_Suffix_:\'\'),contactssn(DEFAULT:Contact_S_S_N_:0),contactphonenumber(DEFAULT:Contact_Phone_Number_:0),contactscore(DEFAULT:Contact_Score_:0),contacttype(DEFAULT:Contact_Type_:\'\'),contactemail(DEFAULT:Contact_Email_:\'\'),contactemailusername(DEFAULT:Contact_Email_Username_:\'\'),contactemaildomain(DEFAULT:Contact_Email_Domain_:\'\'),headerhitflag(DEFAULT:Header_Hit_Flag_),isexecutive(DEFAULT:Is_Executive_),executiveorder(DEFAULT:Executive_Order_:0),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
-  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),contact_did(OVERRIDE:Contact_:0),jobtitle(OVERRIDE:Job_Title_:\'\'),status(OVERRIDE:Contact_Status_:\'\'),contact_name.fname(OVERRIDE:Contact_First_Name_:\'\'),contact_name.mname(OVERRIDE:Contact_Middle_Name_:\'\'),Last_Name_(OVERRIDE:Last_Name_:0),contact_name.lname(OVERRIDE:Contact_Last_Name_:\'\'),contact_name.name_suffix(OVERRIDE:Contact_Name_Suffix_:\'\'),contact_ssn(OVERRIDE:Contact_S_S_N_:0),contact_phone(OVERRIDE:Contact_Phone_Number_:0),contact_score(OVERRIDE:Contact_Score_:0),contact_type_derived(OVERRIDE:Contact_Type_:\'\'),contact_email(OVERRIDE:Contact_Email_:\'\'),contact_email_username(OVERRIDE:Contact_Email_Username_:\'\'),contact_email_domain(OVERRIDE:Contact_Email_Domain_:\'\'),executive_ind(OVERRIDE:Is_Executive_),executive_ind_order(OVERRIDE:Executive_Order_:0),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),contact(DEFAULT:Contact_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),jobtitle(DEFAULT:Job_Title_:\'\'),contactstatus(DEFAULT:Contact_Status_:\'\'),contactfirstname(DEFAULT:Contact_First_Name_:\'\'),contactmiddlename(DEFAULT:Contact_Middle_Name_:\'\'),Last_Name_(DEFAULT:Last_Name_:0),contactlastname(DEFAULT:Contact_Last_Name_:\'\'),contactnamesuffix(DEFAULT:Contact_Name_Suffix_:\'\'),contactssn(DEFAULT:Contact_S_S_N_:0),contactphonenumber(DEFAULT:Contact_Phone_Number_:0),contactscore(DEFAULT:Contact_Score_:0),contacttype(DEFAULT:Contact_Type_:\'\'),contactemail(DEFAULT:Contact_Email_:\'\'),contactemailusername(DEFAULT:Contact_Email_Username_:\'\'),contactemaildomain(DEFAULT:Contact_Email_Domain_:\'\'),headerhitflag(DEFAULT:Header_Hit_Flag_),isexecutive(DEFAULT:Is_Executive_),executiveorder(DEFAULT:Executive_Order_:0),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
+  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),contact_did(OVERRIDE:Contact_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),jobtitle(OVERRIDE:Job_Title_:\'\'),status(OVERRIDE:Contact_Status_:\'\'),contact_name.fname(OVERRIDE:Contact_First_Name_:\'\'),contact_name.mname(OVERRIDE:Contact_Middle_Name_:\'\'),Last_Name_(OVERRIDE:Last_Name_:0),contact_name.lname(OVERRIDE:Contact_Last_Name_:\'\'),contact_name.name_suffix(OVERRIDE:Contact_Name_Suffix_:\'\'),contact_ssn(OVERRIDE:Contact_S_S_N_:0),contact_phone(OVERRIDE:Contact_Phone_Number_:0),contact_score(OVERRIDE:Contact_Score_:0),contact_type_derived(OVERRIDE:Contact_Type_:\'\'),contact_email(OVERRIDE:Contact_Email_:\'\'),contact_email_username(OVERRIDE:Contact_Email_Username_:\'\'),contact_email_domain(OVERRIDE:Contact_Email_Domain_:\'\'),executive_ind(OVERRIDE:Is_Executive_),executive_ind_order(OVERRIDE:Executive_Order_:0),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(TRUE);
     SELF := __r;
@@ -57,7 +60,7 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   SHARED __d0_Last_Name__Mapped := IF(__d0_Missing_Last_Name__UIDComponents = 'contact_name.lname',PROJECT(__d0_Legal__Mapped,TRANSFORM(__d0_Last_Name__Layout,SELF.Last_Name_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Legal__Mapped,__d0_Missing_Last_Name__UIDComponents),E_Surname(__in,__cfg).Lookup,TRIM((STRING)LEFT.contact_name.lname) = RIGHT.KeyVal,TRANSFORM(__d0_Last_Name__Layout,SELF.Last_Name_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Last_Name__Mapped;
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'Legal_(DEFAULT:Legal_:0),contact_did(OVERRIDE:Contact_:0),jobtitle(DEFAULT:Job_Title_:\'\'),contactstatus(DEFAULT:Contact_Status_:\'\'),contactfirstname(DEFAULT:Contact_First_Name_:\'\'),contactmiddlename(DEFAULT:Contact_Middle_Name_:\'\'),Last_Name_(DEFAULT:Last_Name_:0),contactlastname(DEFAULT:Contact_Last_Name_:\'\'),contactnamesuffix(DEFAULT:Contact_Name_Suffix_:\'\'),contactssn(DEFAULT:Contact_S_S_N_:0),contactphonenumber(DEFAULT:Contact_Phone_Number_:0),contactscore(DEFAULT:Contact_Score_:0),contacttype(DEFAULT:Contact_Type_:\'\'),contactemail(DEFAULT:Contact_Email_:\'\'),contactemailusername(DEFAULT:Contact_Email_Username_:\'\'),contactemaildomain(DEFAULT:Contact_Email_Domain_:\'\'),isexecutive(DEFAULT:Is_Executive_),executiveorder(DEFAULT:Executive_Order_:0),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping1 := 'Legal_(DEFAULT:Legal_:0),contact_did(OVERRIDE:Contact_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),jobtitle(DEFAULT:Job_Title_:\'\'),contactstatus(DEFAULT:Contact_Status_:\'\'),contactfirstname(DEFAULT:Contact_First_Name_:\'\'),contactmiddlename(DEFAULT:Contact_Middle_Name_:\'\'),Last_Name_(DEFAULT:Last_Name_:0),contactlastname(DEFAULT:Contact_Last_Name_:\'\'),contactnamesuffix(DEFAULT:Contact_Name_Suffix_:\'\'),contactssn(DEFAULT:Contact_S_S_N_:0),contactphonenumber(DEFAULT:Contact_Phone_Number_:0),contactscore(DEFAULT:Contact_Score_:0),contacttype(DEFAULT:Contact_Type_:\'\'),contactemail(DEFAULT:Contact_Email_:\'\'),contactemailusername(DEFAULT:Contact_Email_Username_:\'\'),contactemaildomain(DEFAULT:Contact_Email_Domain_:\'\'),isexecutive(DEFAULT:Is_Executive_),executiveorder(DEFAULT:Executive_Order_:0),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(TRUE);
     SELF := __r;
@@ -118,6 +121,9 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   EXPORT Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
+    KEL.typ.nint Ult_I_D_;
+    KEL.typ.nint Org_I_D_;
+    KEL.typ.nint Sele_I_D_;
     KEL.typ.ndataset(Contact_Info_Layout) Contact_Info_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -127,7 +133,7 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Legal_,Contact_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Legal_,Contact_,Ult_I_D_,Org_I_D_,Sele_I_D_,ALL));
   Sele_Person_Group := __PostFilter;
   Layout Sele_Person__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.Contact_Info_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Job_Title_,Contact_Status_,Contact_First_Name_,Contact_Middle_Name_,Contact_Last_Name_,Last_Name_,Contact_Name_Suffix_,Contact_S_S_N_,Contact_Phone_Number_,Contact_Score_,Contact_Type_,Is_Executive_,Executive_Order_,Contact_Email_,Contact_Email_Username_,Contact_Email_Domain_,Header_Hit_Flag_,Source_},Job_Title_,Contact_Status_,Contact_First_Name_,Contact_Middle_Name_,Contact_Last_Name_,Last_Name_,Contact_Name_Suffix_,Contact_S_S_N_,Contact_Phone_Number_,Contact_Score_,Contact_Type_,Is_Executive_,Executive_Order_,Contact_Email_,Contact_Email_Username_,Contact_Email_Domain_,Header_Hit_Flag_,Source_),Contact_Info_Layout)(__NN(Job_Title_) OR __NN(Contact_Status_) OR __NN(Contact_First_Name_) OR __NN(Contact_Middle_Name_) OR __NN(Contact_Last_Name_) OR __NN(Last_Name_) OR __NN(Contact_Name_Suffix_) OR __NN(Contact_S_S_N_) OR __NN(Contact_Phone_Number_) OR __NN(Contact_Score_) OR __NN(Contact_Type_) OR __NN(Is_Executive_) OR __NN(Executive_Order_) OR __NN(Contact_Email_) OR __NN(Contact_Email_Username_) OR __NN(Contact_Email_Domain_) OR __NN(Header_Hit_Flag_) OR __NN(Source_)));
@@ -161,6 +167,9 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   EXPORT NullCounts := DATASET([
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Legal',COUNT(__d0(__NL(Legal_))),COUNT(__d0(__NN(Legal_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_did',COUNT(__d0(__NL(Contact_))),COUNT(__d0(__NN(Contact_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JobTitle',COUNT(__d0(__NL(Job_Title_))),COUNT(__d0(__NN(Job_Title_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Status',COUNT(__d0(__NL(Contact_Status_))),COUNT(__d0(__NN(Contact_Status_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_name.fname',COUNT(__d0(__NL(Contact_First_Name_))),COUNT(__d0(__NN(Contact_First_Name_)))},
@@ -185,6 +194,9 @@ EXPORT E_Sele_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Legal',COUNT(__d1(__NL(Legal_))),COUNT(__d1(__NN(Legal_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_did',COUNT(__d1(__NL(Contact_))),COUNT(__d1(__NN(Contact_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d1(__NL(Ult_I_D_))),COUNT(__d1(__NN(Ult_I_D_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d1(__NL(Org_I_D_))),COUNT(__d1(__NN(Org_I_D_)))},
+    {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d1(__NL(Sele_I_D_))),COUNT(__d1(__NN(Sele_I_D_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JobTitle',COUNT(__d1(__NL(Job_Title_))),COUNT(__d1(__NN(Job_Title_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ContactStatus',COUNT(__d1(__NL(Contact_Status_))),COUNT(__d1(__NN(Contact_Status_)))},
     {'SelePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ContactFirstName',COUNT(__d1(__NL(Contact_First_Name_))),COUNT(__d1(__NN(Contact_First_Name_)))},

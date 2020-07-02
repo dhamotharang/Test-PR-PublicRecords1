@@ -1,6 +1,6 @@
-﻿﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts, 
+﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts,
        Business_Risk, Business_Risk_BIP, BusinessBatch_BIP, Codes, Corp2, DCAV2,
-       diversity_certification, Doxie, FAA, Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
+       diversity_certification, Doxie, FAA, dx_Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
        MDR, TopBusiness_Services, OSHAIR, Risk_Indicators, SAM, STD, Suppress,
        UCCV2, UCCV2_Services, ut, VehicleV2, Watercraft;
 
@@ -76,7 +76,7 @@ END;
 EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
                           BIPV2.mod_sources.iParams loc_mod = PROJECT(AutoStandardI.GlobalModule(), BIPV2.mod_sources.iParams, opt),
                           boolean isMarketing = FALSE) := FUNCTION
-  
+
   preBest :=
   PROJECT(withAppend,
     TRANSFORM(BIPV2.IdLayouts.l_xlink_ids2,
@@ -85,13 +85,13 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
 
   // note: the BIPV2_Best.Key_LinkIds.kfetch2 call returns not only the SeleID Best record for the
   //       input linkids, but also the best ProxId records for all associated ProxIds
-  withBestSele0 := IF(isMarketing, 
+  withBestSele0 := IF(isMarketing,
                       BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod),
                       BIPV2_Best.Key_LinkIds.kfetch2(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod));
   withBestSele := DEDUP(withBestSele0, ultid, orgid, seleid, proxid, uniqueid, all);
 
-  BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_getSeleBest(BIPV2.IdAppendLayouts.IdsOnly l, 
-                                                               BIPV2_Best.Key_LinkIds.kFetch2_layout r) := 
+  BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_getSeleBest(BIPV2.IdAppendLayouts.IdsOnly l,
+                                                               BIPV2_Best.Key_LinkIds.kFetch2_layout r) :=
     TRANSFORM
       SELF.proxid := l.proxid;
       SELF.proxscore := l.proxscore;
@@ -151,7 +151,7 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
       SELF := r;
     END;
 
-    BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_addProxBest(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp l, BIPV2_Best.Key_LinkIds.kFetch2_layout r, INTEGER c) := 
+    BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_addProxBest(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp l, BIPV2_Best.Key_LinkIds.kFetch2_layout r, INTEGER c) :=
     TRANSFORM
       SELF.proxId_comp_name := r.company_name[1].company_name;
       SELF.proxId_dt_first_seen := r.company_name[1].dt_first_seen;
@@ -180,7 +180,7 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
       SELF._btype_id := c;
       SELF := l;
     END;
-  
+
     postBestSele :=
     JOIN(withAppend, withBestSele,
         LEFT.request_id = RIGHT.uniqueid AND
@@ -189,7 +189,7 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
       xfm_getSeleBest(LEFT,RIGHT),
       KEEP (1),
       LEFT OUTER);
-      
+
   postBestWithProxAndId :=
     JOIN(postBestSele, withBestSele,
          LEFT.uniqueid = RIGHT.uniqueid AND
@@ -220,7 +220,7 @@ END;
   EXPORT GetPhones( DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dGongPhonesRaw := Gong.key_History_LinkIDs.kFetch(dLinkIds, mod_access,
+    dGongPhonesRaw := dx_Gong.key_history_LinkIDs.kFetch(dLinkIds, mod_access,
         BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
     RawRecordType := RECORDOF(dGongPhonesRaw);
 
