@@ -31,7 +31,7 @@ EXPORT E_Person_Address := MODULE
   SHARED __d0_Prefiltered := __d0_Location__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   SHARED __Mapping1 := 'associatedcustomerfileinfo(_r_Customer_:0),Subject_(Subject_:0),Location_(Location_:0),event_date(Event_Date_:DATE),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  EXPORT __d1_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0);
+  EXPORT __d1_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0);
   SHARED __d1_Subject__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Subject_;
