@@ -2560,7 +2560,7 @@ RECORD
   unsigned industrytype;
  END;
  
- EXPORT EntityProfile	:=RECORD
+ EXPORT EntityProfile	:= RECORD
   integer1 entitytype;
   string label;
   integer1 riskindx;
@@ -3170,6 +3170,30 @@ RECORD
   integer8 p18_idactolddt;
   integer8 p19_idactolddt;
   integer8 p20_idactolddt;
+  integer8 p1_aotactcntev;
+  integer8 p1_aotsrc1actcntev;
+  boolean p1_aotsrc1actonlyflag;
+  integer8 p9_aotactcntev;
+  integer8 p9_aotsrc1actcntev;
+  boolean p9_aotsrc1actonlyflag;
+  integer8 p15_aotactcntev;
+  integer8 p15_aotsrc1actcntev;
+  boolean p15_aotsrc1actonlyflag;
+  integer8 p20_aotactcntev;
+  integer8 p20_aotsrc1actcntev;
+  boolean p20_aotsrc1actonlyflag;
+  integer8 p16_aotactcntev;
+  integer8 p16_aotsrc1actcntev;
+  boolean p16_aotsrc1actonlyflag;
+  integer8 p17_aotactcntev;
+  integer8 p17_aotsrc1actcntev;
+  boolean p17_aotsrc1actonlyflag;
+  integer8 p18_aotactcntev;
+  integer8 p18_aotsrc1actcntev;
+  boolean p18_aotsrc1actonlyflag;
+  integer8 p19_aotactcntev;
+  integer8 p19_aotsrc1actcntev;
+  boolean p19_aotsrc1actonlyflag;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
